@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga</groupId>
     <artifactId>jsaga-installer</artifactId>
-    <version>0.9.0-alpha-3</version>
+    <version>0.9.0-alpha-4-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>JSAGA Installer</name>
     <description>JSAGA is a Java implementation of the Simple API for Grid Applications (SAGA)</description>
@@ -85,8 +85,4 @@
             <version>0.9</version>
         </dependency>
     </dependencies>
-
-  <scm>
-    <tag>jsaga-installer-0_9_0-alpha-3</tag>
-  </scm>
 </project>
