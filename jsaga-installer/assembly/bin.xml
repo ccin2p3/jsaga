@@ -6,7 +6,8 @@
         <format>zip</format>
         <format>tar.gz</format>
     </formats>
-    <includeBaseDirectory>false</includeBaseDirectory>
+    <baseDirectory>jsaga-${version}</baseDirectory>
+    <includeBaseDirectory>true</includeBaseDirectory>
     <dependencySets>
         <dependencySet>
             <outputFileNameMapping>/</outputFileNameMapping>
