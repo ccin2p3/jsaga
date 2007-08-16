@@ -1,0 +1,88 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <!-- declaration -->
+    <parent>
+        <groupId>fr.in2p3.parent</groupId>
+        <artifactId>in2p3-root-pom</artifactId>
+        <version>current</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>fr.in2p3.jsaga</groupId>
+    <artifactId>jsaga-installer</artifactId>
+    <version>0.9.0-alpha-2-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>JSAGA Installer</name>
+    <description>JSAGA is a Java implementation of the Simple API for Grid Applications (SAGA)</description>
+
+    <!-- web site -->
+    <developers>
+        <developer>
+            <name>Sylvain REYNAUD</name>
+            <email>sreynaud@in2p3.fr</email>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Youri TCHINDA DJOU</name>
+            <email>ytchinda@in2p3.fr</email>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
+    </developers>
+    <distributionManagement>
+        <site>
+            <url>${site.upload.root}</url>
+        </site>
+    </distributionManagement>
+
+    <!-- izPack -->
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>assembly/bin.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>prepare-izPack</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <!-- engine -->
+        <dependency>
+            <groupId>fr.in2p3.jsaga</groupId>
+            <artifactId>jsaga-engine</artifactId>
+            <version>0.9.0-alpha-2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.in2p3.jsaga</groupId>
+            <artifactId>jsaga-engine</artifactId>
+            <version>0.9.0-alpha-2-SNAPSHOT</version>
+            <classifier>config</classifier>
+            <type>zip</type>
+        </dependency>
+        <!-- adaptors -->
+        <dependency>
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-globus</artifactId>
+            <version>0.9-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-voms</artifactId>
+            <version>0.9-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+</project>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.in2p3.fr/jsaga/job-emulator"
+        xmlns:tns="http://www.in2p3.fr/jsaga/job-emulator"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        attributeFormDefault="qualified"
+        elementFormDefault="qualified">
+
+    <element name="job-emulator"><complexType>
+        <sequence>
+            <element name="server" minOccurs="0" maxOccurs="unbounded"><complexType>
+                <sequence>
+                    <element name="job" minOccurs="0" maxOccurs="unbounded"><complexType>
+                        <attribute name="id" type="anyURI" use="required"/>
+                        <attribute name="owner" type="string" use="optional"/>
+                        <attribute name="name" type="string" use="optional"/>
+                        <attribute name="status" use="optional"><simpleType><restriction base="string">
+                            <enumeration value="SUBMITTED"/>
+                            <enumeration value="RUNNING"/>
+                            <enumeration value="CANCELLED"/>
+                            <enumeration value="FAILED"/>
+                            <enumeration value="DONE"/>
+                        </restriction></simpleType></attribute>
+                        <attribute name="queueTime" type="dateTime" use="optional"/>
+                        <attribute name="startTime" type="dateTime" use="optional"/>
+                        <attribute name="endTime" type="dateTime" use="optional"/>
+                    </complexType></element>
+                </sequence>
+                <attribute name="host" type="string" use="optional"/>
+                <attribute name="port" type="int" use="optional"/>
+            </complexType></element>
+        </sequence>
+    </complexType></element>
+</schema>

@@ -1,0 +1,50 @@
+Download JSAGA
+
+* System Requirements
+
+*-------------+--+
+| <<JDK>>     | {{{http://java.sun.com/j2se/1.4.2/download.html}JDK 1.4.2}} (or above) |
+*-------------+--+
+| <<Operating | Some adaptors may require a specific release of linux. Such adaptors can be  |
+| System>>    | installed on a separate host and used remotely through the "Remote Adaptor". |
+*-------------+--+
+
+* Installation Instructions
+
+** Windows 2000/XP
+
+    [[1]] Unzip <<<jsaga-installer-${project.version}-bin.zip>>> to the directory you wish to install JSAGA.
+
+    [[2]] Set the JSAGA_HOME environment variable to this directory (optional).
+          Open up the system properties (WinKey + Pause), select the "Advanced" tab, and the
+          "Environment Variables" button, then click on "New" to set the JSAGA_HOME variable
+          with the location of this directory.
+
+    [[3]] Add the bin directory to your PATH environment variable (optional).
+          Open up the system properties (WinKey + Pause), select the "Advanced" tab, and the
+          "Environment Variables" button, then click on "Modify" to add "<<<;%JSAGA_HOME%\bin>>>"
+          at the end of the PATH variable.
+
+** Unix-based Operating Systems (Linux, Solaris and Mac OS X)
+
+    [[1]] Unzip <<<jsaga-installer-${project.version}-bin.zip>>> to the directory you wish to install JSAGA.
+
+    [[2]] Set the JSAGA_HOME environment variable to this directory (optional).
+          Add in your profile: <<<export JSAGA_HOME=>>>path_to_your_directory
+
+    [[3]] Add the bin directory to your PATH environment variable (optional).
+          Add in your profile: <<<export PATH=$PATH:JSAGA_HOME/bin>>>
+
+* Current Release
+
+    JSAGA is distributed in several formats for your convenience.
+
+    * {{{../maven2/fr/in2p3/jsaga/jsaga-installer/${project.version}/jsaga-installer-${project.version}-bin.zip}jsaga-installer-${project.version}-bin.zip}}
+
+    * {{{../maven2/fr/in2p3/jsaga/jsaga-installer/${project.version}/jsaga-installer-${project.version}-bin.tar.gz}jsaga-installer-${project.version}-bin.tar.gz}}
+
+    See {{{changes-report.html}release notes}}.
+
+* Previous Releases
+
+    Previous releases of JSAGA can be downloaded from the {{{http://grid.in2p3.fr/archives/jsaga/}archives}}.

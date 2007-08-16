@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.in2p3.fr/jsaga"
+        xmlns:tns="http://www.in2p3.fr/jsaga"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        attributeFormDefault="unqualified"
+        elementFormDefault="qualified">
+
+    <!-- base types -->
+    <simpleType name="SetOperationType"><restriction base="string">
+        <enumeration value="union"/>
+        <enumeration value="intersection"/>
+        <enumeration value="substraction"/>
+    </restriction></simpleType>
+    <simpleType name="SecurityLevelType"><restriction base="string">
+        <enumeration value="none"/>
+        <enumeration value="integrity"/>
+        <enumeration value="confidentiality"/>
+    </restriction></simpleType>
+    <complexType name="ObjectType">
+        <sequence>
+            <element name="attribute" minOccurs="0" maxOccurs="unbounded"><complexType>
+                <attribute name="name" type='string' use="required"/>
+                <attribute name="value" type="string" use="optional"/><!-- no value means 'unset attribute' -->
+            </complexType></element>
+        </sequence>
+    </complexType>
+    <complexType name="PluginType">
+        <choice>
+            <element name="delegated" minOccurs="0" maxOccurs="1"/>
+            <element name="custom" minOccurs="0" maxOccurs="unbounded" ><complexType><complexContent><extension base="tns:ObjectType">
+                <attribute name="impl" type='string' use="optional"/>
+                <attribute name="mode" type="tns:SetOperationType" use="optional"/>
+                <attribute name="weight" type="positiveInteger" use="optional"/>
+            </extension></complexContent></complexType></element>
+        </choice>
+    </complexType>
+    <element name="contextInstanceRef"><complexType>
+        <attribute name="type" type="string" use="required"/>
+        <attribute name="indice" type="int" use="required"/>
+        <attribute name="name" type="string" use="optional"/>
+    </complexType></element>
+
+    <!-- main types -->
+    <element name="language"><complexType>
+        <attribute name="name" type="string" use="optional"/><!-- from adaptor descriptor -->
+        <attribute name="parse" type="string" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="validate" type="string" use="optional"/><!-- from adaptor descriptor -->
+        <attribute name="transform" type="string" use="optional"/><!-- from adaptor descriptor -->
+    </complexType></element>
+
+    <element name="contextInstance"><complexType><complexContent><extension base="tns:ObjectType">
+        <sequence>
+            <element name="init" minOccurs="0" maxOccurs="1"><complexType>
+                <attribute name="usage" type="string" use="required"/><!-- from adaptor descriptor -->
+            </complexType></element>
+        </sequence>
+        <attribute name="type" type="string" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="impl" type="string" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="usage" type="string" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="indice" type="int" use="optional"/>
+        <attribute name="name" type="string" use="optional"/>
+    </extension></complexContent></complexType></element>
+
+    <element name="protocol"><complexType><complexContent><extension base="tns:ObjectType">
+        <sequence>
+            <element name="schemeAlias" minOccurs="0" maxOccurs="unbounded" type="string"/><!-- from adaptor descriptor -->
+            <element name="supportedContextType" minOccurs="0" maxOccurs="unbounded" type="string"/><!-- from adaptor descriptor -->
+            <element name="domain" minOccurs="0" maxOccurs="unbounded"><complexType>
+                <sequence>
+                    <element name="host" minOccurs="0" maxOccurs="unbounded"><complexType>
+                        <sequence>
+                            <element ref="tns:contextInstanceRef" minOccurs="0" maxOccurs="unbounded"/>
+                        </sequence>
+                        <attribute name="name" type="string" use="required"/>
+                    </complexType></element>
+                    <element ref="tns:contextInstanceRef" minOccurs="0" maxOccurs="unbounded"/>
+                </sequence>
+                <attribute name="name" type="string" use="required"/>
+            </complexType></element>
+            <element ref="tns:contextInstanceRef" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+        <attribute name="scheme" type='string' use="required"/><!-- from adaptor descriptor -->
+        <attribute name="impl" type="string" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="read" type="boolean" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="write" type="boolean" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="thirdparty" type="boolean" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="logical" type="boolean" use="required"/><!-- from adaptor descriptor -->
+    </extension></complexContent></complexType></element>
+
+    <element name="jobservice"><complexType><complexContent><extension base="tns:ObjectType">
+        <sequence>
+            <element name="pathAlias" minOccurs="0" maxOccurs="unbounded" type="string"/>
+            <element name="supportedContextType" minOccurs="0" maxOccurs="unbounded" type="string"/><!-- from adaptor descriptor -->
+            <element name="supportedProtocolScheme" minOccurs="0" maxOccurs="unbounded" type="string"><!-- from adaptor descriptor -->
+                <annotation><documentation>If exist, then file staging can be delegated to job service for this protocol</documentation></annotation>
+            </element>
+            <element name="sandbox" minOccurs="0" maxOccurs="1"><complexType><complexContent><extension base="tns:PluginType">
+                <attribute name="defaultIntermediary" type="anyURI" use="optional"/>
+            </extension></complexContent></complexType></element>
+            <element name="protocolRef" minOccurs="0" maxOccurs="unbounded"><complexType><complexContent><extension base="tns:ObjectType">
+                <sequence>
+                    <element name="workerIn" minOccurs="0" maxOccurs="unbounded" type="tns:FileManagementWorkerType"/>
+                    <element name="workerOut" minOccurs="0" maxOccurs="unbounded" type="tns:FileManagementWorkerType"/>
+                </sequence>
+                <attribute name="scheme" type='string' use="required"/>
+            </extension></complexContent></complexType></element>
+            <element ref="tns:contextInstanceRef" minOccurs="0" maxOccurs="1"/>
+        </sequence>
+        <attribute name="type" type="string" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="impl" type="string" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="bulk" type="boolean" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="path" type="string" use="optional"/>
+    </extension></complexContent></complexType></element>
+    <complexType name="FileManagementWorkerType"><simpleContent><extension base="string"><!-- should be CDATA -->
+        <attribute name="source" type="string" use="optional"/>
+        <attribute name="target" type="string" use="optional"/>
+        <attribute name="recursive" type="boolean" use="optional"/>
+        <attribute name="security" type="tns:SecurityLevelType" use="optional"/>
+    </extension></simpleContent></complexType>
+
+    <!-- root type -->
+    <element name="effective-config"><complexType>
+        <sequence>
+            <element ref="tns:language" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="tns:contextInstance" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="tns:protocol" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="tns:jobservice" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType></element>
+</schema>

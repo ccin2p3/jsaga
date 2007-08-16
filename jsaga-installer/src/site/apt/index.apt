@@ -1,0 +1,30 @@
+JSAGA
+
+    JSAGA est une implémentation dédiée à l’interopérabilité de grilles de calcul
+    de l'API standard SAGA de l'{{{http://forge.ogf.org/}Open Grid Forum}}.
+    L'objectif de cette implémentation est de permettre, à partir de la description d’un job
+    (exécutable, données en entrée/sortie, contraintes sur l’environnement d’exécution…),
+    de soumettre ce job sur de multiples grilles de façon transparente.
+
+    Cette implémentation :
+
+    * Permet de masquer l’hétérogénéité des technologies employées pour la sécurité, la gestion de données
+      et la gestion de l’exécution.
+
+    * Permet d'acheminer les données d’entrée/sortie des jobs vers/depuis les serveurs de calcul.
+      Il détermine le meilleur chemin pour l’acheminement de chaque fichier.
+      Ce chemin dépend de nombreux paramètres, tels que les caractéristiques de la grille et du site utilisés,
+      les caractéristiques du protocole et du contexte de sécurité par lesquels le fichier est accessible,
+      les caractéristiques du fichier lui-même.
+
+    * Est extensible. Il accueille des modules enfichables afin de permettre l'ajout du support
+      de nouvelles grilles.
+
+
+    [Note:] Sont aujourd’hui implémentées les interfaces communes, les interfaces de sécurité
+            et les interfaces de gestion des données du moteur SAGA.
+            Reste à implémenter les interfaces de gestion de l’exécution du moteur SAGA, ainsi que
+            les modules enfichables pour la sécurité, la gestion des données et la gestion de
+            l'exécution de toutes les grilles à supporter.
+            Les interfaces « Streams » et « Remote Procedure Call » de la spécification SAGA ne
+            seront pas implémentées.

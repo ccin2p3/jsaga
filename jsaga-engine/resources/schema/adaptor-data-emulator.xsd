@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.in2p3.fr/jsaga/data-emulator"
+        xmlns:tns="http://www.in2p3.fr/jsaga/data-emulator"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        attributeFormDefault="qualified"
+        elementFormDefault="qualified">
+
+    <complexType name="EntryType">
+        <attribute name="name" type="string" use="required"/>
+        <attribute name="owner" type="string" use="optional"/>
+    </complexType>
+    <complexType name="DirectoryType"><complexContent><extension base="tns:EntryType">
+        <sequence>
+            <element ref="tns:directory" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="tns:file" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </extension></complexContent></complexType>
+    <complexType name="FileType"><complexContent><extension base="tns:EntryType">
+        <sequence>
+            <element name="content" type="string" minOccurs="0" maxOccurs="1"/>
+        </sequence>
+        <attribute name="link" type="anyURI" use="optional"/>
+    </extension></complexContent></complexType>
+
+    <complexType name="ServerType"><complexContent><extension base="tns:DirectoryType">
+        <attribute name="protocol" type="string" use="required"/>
+        <attribute name="host" type="string" use="optional"/>
+        <attribute name="port" type="int" use="optional"/>
+    </extension></complexContent></complexType>
+    <complexType name="SecureServerType"><complexContent><extension base="tns:ServerType">
+        <sequence>
+            <element name="user" minOccurs="0" maxOccurs="unbounded"><complexType>
+                <attribute name="login" type="string" use="required"/>
+                <attribute name="password" type="string" use="required"/>
+            </complexType></element>
+        </sequence>
+    </extension></complexContent></complexType>
+
+    <element name="directory" type="tns:DirectoryType"/>
+    <element name="file" type="tns:FileType"/>
+
+    <element name="data-emulator"><complexType>
+        <sequence>
+            <element name="server" type="tns:ServerType" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="secureServer" type="tns:SecureServerType" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType></element>
+</schema>

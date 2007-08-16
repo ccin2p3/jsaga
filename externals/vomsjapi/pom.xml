@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>fr.in2p3.parent</groupId>
+        <artifactId>in2p3-external-pom</artifactId>
+        <version>current</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.glite</groupId>
+    <artifactId>vomsjapi</artifactId>
+    <version>1.7.22</version>
+    <name>VOMS library</name>
+    <url>http://edg-wp2.web.cern.ch/edg-wp2/security/voms/voms.html</url>
+    <dependencies>
+        <dependency>
+            <groupId>org.globus</groupId>
+            <artifactId>cog-jglobus</artifactId>
+            <version>1.2</version>
+        </dependency>
+    </dependencies>
+</project>

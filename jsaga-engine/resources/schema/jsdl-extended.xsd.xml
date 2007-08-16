@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:ext="http://www.in2p3.fr/jsdl-extension"
+        xmlns:jsdl-posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
+        xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+        targetNamespace="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+        elementFormDefault="qualified">
+
+    <include schemaLocation="jsdl.xsd-18.xsd"/>
+    <import schemaLocation="jsdl-posix.xsd-6.xsd" namespace="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"/>
+    <import schemaLocation="jsdl-extension.xsd" namespace="http://www.in2p3.fr/jsdl-extension"/>
+
+    <element name="JobDefinitionExtended"><complexType><complexContent><extension base="jsdl:JobDefinition_Type">
+        <sequence>
+            <element name="JobDescription" minOccurs="1" maxOccurs="unbounded"><complexType><complexContent><extension base="jsdl:JobDescription_Type">
+                <sequence>
+                    <element name="Application" minOccurs="0" maxOccurs="1"><complexType><complexContent><extension base="jsdl:Application_Type">
+                        <sequence>
+                            <element ref="ext:ScriptApplication" minOccurs="0" maxOccurs="1"/>
+                            <element ref="jsdl-posix:POSIXApplication" minOccurs="0" maxOccurs="1"/>
+                        </sequence>
+                    </extension></complexContent></complexType></element>
+                    <element name="Resources" minOccurs="0" maxOccurs="1"><complexType><complexContent><extension base="jsdl:Resources_Type">
+                        <sequence>
+                            <element ref="ext:CandidateTags" minOccurs="0" maxOccurs="unbounded"/>
+                        </sequence>
+                    </extension></complexContent></complexType></element>
+                    <element name="DataStaging" minOccurs="0" maxOccurs="unbounded"><complexType><complexContent><extension base="jsdl:DataStaging_Type">
+                        <sequence>
+                            <element name="Source" minOccurs="0" maxOccurs="1"><complexType><complexContent><extension base="jsdl:SourceTarget_Type">
+                                <sequence>
+                                    <element ref="ext:Tag" minOccurs="0" maxOccurs="unbounded"/>
+                                    <element ref="ext:Process" minOccurs="0" maxOccurs="1"/>
+                                </sequence>
+                            </extension></complexContent></complexType></element>
+                            <element name="Target" minOccurs="0" maxOccurs="1"><complexType><complexContent><extension base="jsdl:SourceTarget_Type">
+                                <sequence>
+                                    <element ref="ext:Process" minOccurs="0" maxOccurs="1"/>
+                                </sequence>
+                            </extension></complexContent></complexType></element>
+                            <element ref="ext:LocalCopy" minOccurs="0" maxOccurs="1"/>
+                            <element ref="ext:Dependency" minOccurs="0" maxOccurs="1"/>
+                        </sequence>
+                    </extension></complexContent></complexType></element>
+                    <element ref="ext:JobRetry" minOccurs="0" maxOccurs="1"/>
+                    <element ref="ext:SelectedResource" minOccurs="0" maxOccurs="unbounded"/>
+                </sequence>
+            </extension></complexContent></complexType></element>
+            <element ref="ext:JobCollection" minOccurs="0" maxOccurs="1"/>
+        </sequence>
+    </extension></complexContent></complexType></element>
+</schema>

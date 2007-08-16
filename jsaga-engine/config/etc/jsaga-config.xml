@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://www.in2p3.fr/jsaga">
+    <security>
+        <context type="VOMS">
+            <attribute name="Server" value="voms://voms.cern.ch:15004/DC=ch/DC=cern/OU=computers/CN=voms.cern.ch"/>
+            <attribute name="VomsDir" value="etc/vomsdir"/>
+            <instance/>
+        </context>
+        <context type="MyProxy">
+            <attribute name="Server" value="cclcgproxli01.in2p3.fr:7512"/>
+            <instance/>
+        </context>
+    </security>
+    <GRID/>
+</config>

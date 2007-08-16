@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>fr.in2p3.parent</groupId>
+        <artifactId>in2p3-external-pom</artifactId>
+        <version>current</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.claymoresystems</groupId>
+    <artifactId>puretls</artifactId>
+    <version>0.9-beta-4</version>
+    <name>Claymore Systems SSL/TLS protocols implementation</name>
+    <url>http://www.rtfm.com/puretls/</url>
+    <dependencies>
+        <dependency>
+            <groupId>org.cryptix</groupId>
+            <artifactId>cryptix32</artifactId>
+            <version>3.2.0</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.cryptix</groupId>
+            <artifactId>cryptix-asn1</artifactId>
+            <version>3.2.0</version>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+</project>

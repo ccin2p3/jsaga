@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>fr.in2p3.jsaga</groupId>
+        <artifactId>jsaga-adaptorpom</artifactId>
+        <version>current</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>${groupId}</groupId>
+    <artifactId>${artifactId}</artifactId>
+    <version>${version}</version>
+    <properties>
+        <saga-interfaces.version>0.9.0-alpha-1</saga-interfaces.version>
+        <jsaga-adaptoritf.version>0.9.0-alpha-1</jsaga-adaptoritf.version>
+        <jsaga-engine.version>0.9.0-alpha-1</jsaga-engine.version>
+    </properties>
+    <packaging>jar</packaging>
+    <name>${artifactId}</name>
+    <build>
+        <sourceDirectory>src</sourceDirectory>
+        <testSourceDirectory>test/src</testSourceDirectory>
+        <resources>
+            <resource>
+                <directory>resources</directory>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>test/resources</directory>
+            </testResource>
+        </testResources>
+    </build>
+</project>

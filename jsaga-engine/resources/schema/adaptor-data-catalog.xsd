@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.in2p3.fr/jsaga/data-catalog"
+        xmlns:tns="http://www.in2p3.fr/jsaga/data-catalog"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        attributeFormDefault="qualified"
+        elementFormDefault="qualified">
+
+    <complexType name="EntryType">
+        <sequence>
+            <element name="metadata" minOccurs="0" maxOccurs="unbounded"><complexType>
+                <attribute name="name" type="string" use="required"/>
+                <attribute name="value" type="string" use="required"/>
+            </complexType></element>
+        </sequence>
+        <attribute name="name" type="string" use="required"/>
+        <attribute name="link" type="anyURI" use="optional"/>
+    </complexType>
+    <complexType name="DirectoryType"><complexContent><extension base="tns:EntryType">
+        <sequence>
+            <element ref="tns:directory" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="tns:file" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </extension></complexContent></complexType>
+    <complexType name="FileType"><complexContent><extension base="tns:EntryType">
+        <sequence>
+            <element name="replica" type="anyURI" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </extension></complexContent></complexType>
+
+    <element name="directory" type="tns:DirectoryType"/>
+    <element name="file" type="tns:FileType"/>
+
+    <element name="data-catalog" type="tns:DirectoryType"/>
+</schema>

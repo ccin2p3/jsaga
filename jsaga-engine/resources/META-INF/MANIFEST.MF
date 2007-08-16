@@ -1,0 +1,4 @@
+Specification-Title: SAGA
+Specification-Vendor: Open Grid Forum, Copyright 2006
+Specification-Version: 1.0 RC.6
+Application-Name: JSAGA

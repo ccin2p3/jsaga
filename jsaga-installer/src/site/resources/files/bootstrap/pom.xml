@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>fr.in2p3</groupId>
+    <artifactId>jsaga-bootstrap</artifactId>
+    <version>1.0</version>
+    <packaging>pom</packaging>
+    <name>Bootstrap for JSAGA project</name>
+    <properties>
+        <application>jsaga</application>
+        <!--<scm.root>scm:cvs|local|c:\\cvsroot|${application}</scm.root>-->
+        <scm.root>scm:cvs|ext|anoncvs@anoncvs.in2p3.fr|/cvs/gridpub|${application}</scm.root>
+        <devscm.root>scm:cvs|ext|${maven.scm.user}@cvs.in2p3.fr|/cvs/gridpub|${application}</devscm.root>
+        <maven.scm.cvs.java.cvs_rsh>/bin/ssh</maven.scm.cvs.java.cvs_rsh>
+    </properties>
+    <profiles>
+        <profile>
+            <id>maven.scm.user_default</id>
+            <activation>
+                <property>
+                    <name>!maven.scm.user</name>
+                </property>
+            </activation>
+            <properties>
+                <maven.scm.user>${user.name}</maven.scm.user>
+            </properties>
+        </profile>
+    </profiles>
+    <scm>
+        <connection>${scm.root}</connection>
+        <developerConnection>${devscm.root}</developerConnection>
+    </scm>
+    <build>
+        <directory>build</directory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-plugin</artifactId>
+                <configuration>
+                    <goals>install</goals>
+                    <connectionType>connection</connectionType>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

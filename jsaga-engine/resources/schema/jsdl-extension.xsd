@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:tns="http://www.in2p3.fr/jsdl-extension"
+        targetNamespace="http://www.in2p3.fr/jsdl-extension"
+        elementFormDefault="qualified">
+    <annotation><documentation>
+        This XML schema SHOULD prevent user from setting unreasonable values.
+    </documentation></annotation>
+
+    <!-- /JobDefinition -->
+    <element name="JobCollection"><complexType>
+        <sequence>
+            <element name="JobCollectionName" minOccurs="1" maxOccurs="1" type="string"/>
+            <element name="Parametric" minOccurs="0" maxOccurs="1"><complexType>
+                <attribute name="count" type="positiveInteger" use="required"/>
+                <attribute name="start" type="int" use="required"/>
+                <attribute name="step" type="positiveInteger" use="required"/>
+            </complexType></element>
+            <element name="Termination" minOccurs="0" maxOccurs="1"><complexType>
+                <sequence>
+                    <element name="Abort" minOccurs="0" maxOccurs="unbounded" type="tns:TerminationType"/>
+                    <element name="Complete" minOccurs="0" maxOccurs="unbounded" type="tns:TerminationType"/>
+                </sequence>
+            </complexType></element>
+        </sequence>
+        <attribute name="grid" type="string" use="required"/>
+        <attribute name="language" type="string" use="optional"/>
+        <attribute name="context" type="string" use="optional"/>
+        <attribute name="security" use="optional"><simpleType><restriction base="string">
+            <enumeration value="none"/>
+            <enumeration value="integrity"/>
+            <enumeration value="confidentiality"/>
+        </restriction></simpleType></attribute>
+    </complexType></element>
+    <complexType name="TerminationType">
+        <attribute name="maxTime" type="duration" use="optional"/>
+        <attribute name="aborted" type="tns:PercentType" use="optional"/>
+        <attribute name="failed" type="tns:PercentType" use="optional"/>
+        <attribute name="completed" type="tns:PercentType" use="optional"/>
+    </complexType>
+    <simpleType name="PercentType"><restriction base="float">
+        <minInclusive value="0.0"/>
+        <maxInclusive value="1.0"/>
+    </restriction></simpleType>
+
+    <!-- /JobDefinition/JobDescription -->
+    <element name="SelectedResource"><complexType>
+        <sequence>
+            <element name="Intermediary" minOccurs="0" maxOccurs="1" type="anyURI"/>
+            <element name="StandaloneWorker" minOccurs="0" maxOccurs="1" type="boolean" default="false"/>
+            <element name="Tag" minOccurs="0" maxOccurs="unbounded" type="string"/>
+        </sequence>
+        <attribute name="id" type="string" use="required"/>
+        <attribute name="nbslots" type="nonNegativeInteger" use="optional"/>
+    </complexType></element>
+    <element name="JobRetry"><complexType>
+        <sequence>
+            <element name="Retry" minOccurs="1" maxOccurs="unbounded"><complexType><simpleContent><extension base="positiveInteger">
+                <attribute name="status" use="required"><simpleType><restriction base="string">
+                    <enumeration value="queued"/>
+                    <enumeration value="running"/>
+                    <enumeration value="aborted"/>
+                    <enumeration value="failed"/>
+                </restriction></simpleType></attribute>
+                <attribute name="maxTime" use="optional" type="duration"><annotation><documentation>
+                    Ignored for last retry iteration
+                </documentation></annotation></attribute>
+            </extension></simpleContent></complexType></element>
+        </sequence>
+    </complexType></element>
+
+    <!-- /JobDefinition/JobDescription/Application -->
+    <element name="ScriptApplication"><complexType><simpleContent><extension base="string">
+        <annotation><documentation>
+             Dump content to script file and create elements: POSIXApplication + DataStaging
+        </documentation></annotation>
+        <attribute name="shell" type="string" use="required"/>
+    </extension></simpleContent></complexType></element>
+
+    <!-- JobDefinition/JobDescription/Resources -->
+    <element name="CandidateTags"><complexType>
+        <sequence>
+            <element name="Tag" minOccurs="0" maxOccurs="unbounded" type="string"/>
+        </sequence>
+        <attribute name="optional" type="boolean" use="optional" default="false"/>
+    </complexType></element>
+
+    <!-- /JobDefinition/JobDescription/DataStaging/Source & Target -->
+    <element name="Tag"><complexType><simpleContent><extension base="string"><!-- Source only -->
+        <attribute name="path" type="string" use="optional"/>
+    </extension></simpleContent></complexType></element>
+    <element name="Process"><complexType><simpleContent><!-- complexType needed to generate it as an object -->
+        <extension base="string"/>
+    </simpleContent></complexType></element>
+
+    <!-- /JobDefinition/JobDescription/DataStaging -->
+    <element name="LocalCopy"><complexType><simpleContent>
+        <extension base="string"/>
+    </simpleContent></complexType></element>
+    <element name="Dependency"><complexType><simpleContent>
+        <extension base="string"/>
+    </simpleContent></complexType></element>
+</schema>

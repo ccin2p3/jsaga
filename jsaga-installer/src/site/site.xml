@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="JSAGA">
+    <bannerLeft>
+        <name/>
+    </bannerLeft>
+    <bannerRight>
+        <name>CC-IN2P3</name>
+        <src>images/header-cc.png</src>
+        <href>http://cc.in2p3.fr/</href>
+    </bannerRight>
+    <body>
+        <links>
+            <item name="ANR" href="http://www.agence-nationale-recherche.fr"/>
+            <item name="CNRS" href="http://www.cnrs.fr"/>
+            <item name="CC-IN2P3" href="http://cc.in2p3.fr"/>
+        </links>
+        <menu name="JSAGA">
+            <item name="What is it?" href="index.html"/>
+            <item name="Download" href="download.html"/>
+            <item name="Presentations" href="presentations.html"/>
+        </menu>
+        <menu name="User Documentation">
+            <item name="SAGA Specification" href="http://forge.ogf.org/sf/docman/do/downloadDocument/projects.saga-core-wg/docman.root.drafts/doc13771"/>
+            <item name="JSDL Specification" href="http://www.ogf.org/documents/GFD.56.pdf"/>
+            <item name="Java API of JSAGA" href="saga-interfaces/index.html"/>
+        </menu>
+        <menu name="Developer Documentation">
+            <item name="Java API for adaptors" href="jsaga-adaptoritf/index.html"/>
+            <item name="The JSAGA Engine" href="jsaga-engine/index.html"/>
+            <item name="Build Tools" href="../build-tools/index.html"/>
+            <item name="FAQ" href="faq.html"/>
+        </menu>
+        <menu name="Project Documentation" ref="reports"/>
+        <menu name="Adaptors">
+            <item name="Globus" href="adaptors/jsaga-adaptor-globus/index.html"/>
+            <item name="VOMS" href="adaptors/jsaga-adaptor-voms/index.html"/>
+        </menu>
+    </body>
+</project>

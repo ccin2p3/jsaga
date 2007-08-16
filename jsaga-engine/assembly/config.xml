@@ -1,0 +1,25 @@
+<assembly>
+    <id>config</id>
+    <baseDirectory>.</baseDirectory>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <fileSets>
+        <fileSet>
+            <!-- copy directories -->
+            <outputDirectory>.</outputDirectory>
+            <directory>config</directory>
+            <excludes>
+                <exclude>var/**</exclude>
+                <exclude>bin/template.sh</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <!-- generate launcher scripts -->
+            <outputDirectory>./bin</outputDirectory>
+            <directory>build/bin</directory>
+            <lineEnding>unix</lineEnding><!-- fixme: does not work when build is launched by parent project -->
+            <fileMode>0755</fileMode>
+        </fileSet>
+    </fileSets>
+</assembly>

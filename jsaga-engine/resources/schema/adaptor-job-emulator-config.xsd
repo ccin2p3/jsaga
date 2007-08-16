@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.in2p3.fr/jsaga/job-emulator-config"
+        xmlns:tns="http://www.in2p3.fr/jsaga/job-emulator-config"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        attributeFormDefault="qualified"
+        elementFormDefault="qualified">
+
+    <simpleType name="PercentType"><restriction base="float">
+        <minInclusive value="0.0"/>
+        <maxInclusive value="1.0"/>
+    </restriction></simpleType>
+    <complexType name="DelayType">
+        <attribute name="time" type="duration" use="required"/>
+        <attribute name="percent" type="tns:PercentType" use="required"/>
+    </complexType>
+
+    <element name="job-emulator-config"><complexType>
+        <sequence>
+            <element name="server" minOccurs="0" maxOccurs="unbounded"><complexType>
+                <sequence>
+                    <element name="queuing" minOccurs="0" maxOccurs="unbounded" type="tns:DelayType"/>
+                    <element name="running" minOccurs="0" maxOccurs="unbounded" type="tns:DelayType"/>
+                </sequence>
+                <attribute name="host" type="string" use="optional"/>
+                <attribute name="port" type="int" use="optional"/>
+                <attribute name="cancelledJobs" type="tns:PercentType" use="optional"/>
+                <attribute name="failedJobs" type="tns:PercentType" use="optional"/>
+                <attribute name="completedJobs" type="tns:PercentType" use="optional"/>
+                <attribute name="lostJobs" type="tns:PercentType" use="optional"/>
+            </complexType></element>
+        </sequence>
+    </complexType></element>
+</schema>

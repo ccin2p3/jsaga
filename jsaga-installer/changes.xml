@@ -1,0 +1,25 @@
+<document>
+    <properties>
+        <title>JSAGA changes</title>
+    </properties>
+    <body>
+        <release version="0.9.0-alpha-2" date="2007-08-14">
+            <action dev="sreynaud" type="add">
+                Added security context plugins: Globus, MyProxy, VOMS.
+            </action>
+        </release>
+        <release version="0.9.0-alpha-1" date="2007-07-30">
+            <action dev="sreynaud" type="update">
+                Renamed module sagaitf-jdk14 to saga-interfaces.
+            </action>
+            <action dev="sreynaud" type="fix">
+                Fixed a bug in the SAGA test-suite.
+            </action>
+        </release>
+        <release version="0.9.0-alpha-0" date="2007-07-23">
+            <action dev="sreynaud" type="add">
+                Initial release.
+            </action>
+        </release>
+    </body>
+</document>
