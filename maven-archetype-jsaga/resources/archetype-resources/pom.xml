@@ -10,13 +10,36 @@
     <groupId>${groupId}</groupId>
     <artifactId>${artifactId}</artifactId>
     <version>${version}</version>
-    <properties>
-        <saga-interfaces.version>0.9.0-alpha-1</saga-interfaces.version>
-        <jsaga-adaptoritf.version>0.9.0-alpha-1</jsaga-adaptoritf.version>
-        <jsaga-engine.version>0.9.0-alpha-1</jsaga-engine.version>
-    </properties>
-    <packaging>jar</packaging>
     <name>${artifactId}</name>
+    <dependencies>
+        <!-- common -->
+        <dependency>
+            <groupId>fr.in2p3.jsaga</groupId>
+            <artifactId>jsaga-adaptoritf</artifactId>
+            <version>CHANGEME</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ogf.saga</groupId>
+            <artifactId>saga-interfaces</artifactId>
+            <version>CHANGEME</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ogf.saga</groupId>
+            <artifactId>saga-interfaces</artifactId>
+            <version>CHANGEME</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>fr.in2p3.jsaga</groupId>
+            <artifactId>jsaga-engine</artifactId>
+            <version>CHANGEME</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- adaptor specific -->
+    </dependencies>
     <build>
         <sourceDirectory>src</sourceDirectory>
         <testSourceDirectory>test/src</testSourceDirectory>

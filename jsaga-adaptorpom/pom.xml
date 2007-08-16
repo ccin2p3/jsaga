@@ -62,19 +62,6 @@
     </build>
     <profiles>
         <profile>
-            <id>Workaround</id>
-            <activation>
-                <file>
-                    <exists>jsaga-adaptorpom/bypass.pom-profile</exists>
-                </file>
-            </activation>
-            <properties>
-                <saga-interfaces.version>0.9.0-alpha-2-SNAPSHOT</saga-interfaces.version>
-                <jsaga-adaptoritf.version>0.9.0-alpha-2-SNAPSHOT</jsaga-adaptoritf.version>
-                <jsaga-engine.version>0.9.0-alpha-2-SNAPSHOT</jsaga-engine.version>
-            </properties>
-        </profile>
-        <profile>
             <id>Integration Testing</id>
             <activation>
                 <property>
@@ -146,35 +133,6 @@
                     </plugin>
                 </plugins>
             </build>
-            <dependencies>
-                <dependency>
-                    <groupId>org.ogf.saga</groupId>
-                    <artifactId>saga-interfaces</artifactId>
-                    <version>${saga-interfaces.version}</version>
-                    <type>test-jar</type>
-                    <scope>provided</scope>
-                </dependency>
-                <dependency>
-                    <groupId>fr.in2p3.jsaga</groupId>
-                    <artifactId>jsaga-engine</artifactId>
-                    <version>${jsaga-engine.version}</version>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
         </profile>
     </profiles>
-    <dependencies>
-        <dependency>
-            <groupId>fr.in2p3.jsaga</groupId>
-            <artifactId>jsaga-adaptoritf</artifactId>
-            <version>${jsaga-adaptoritf.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.ogf.saga</groupId>
-            <artifactId>saga-interfaces</artifactId>
-            <version>${saga-interfaces.version}</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
 </project>
