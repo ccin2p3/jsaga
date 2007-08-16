@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga</groupId>
     <artifactId>jsaga-installer</artifactId>
-    <version>0.9.0-alpha-2-SNAPSHOT</version>
+    <version>0.9.0-alpha-2</version>
     <packaging>pom</packaging>
     <name>JSAGA Installer</name>
     <description>JSAGA is a Java implementation of the Simple API for Grid Applications (SAGA)</description>
@@ -64,12 +64,12 @@
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
-            <version>0.9.0-alpha-2-SNAPSHOT</version>
+            <version>0.9.0-alpha-2</version>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
-            <version>0.9.0-alpha-2-SNAPSHOT</version>
+            <version>0.9.0-alpha-2</version>
             <classifier>config</classifier>
             <type>zip</type>
         </dependency>
@@ -77,12 +77,16 @@
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-globus</artifactId>
-            <version>0.9-SNAPSHOT</version>
+            <version>0.9</version>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-voms</artifactId>
-            <version>0.9-SNAPSHOT</version>
+            <version>0.9</version>
         </dependency>
     </dependencies>
+
+  <scm>
+    <tag>jsaga-0_9_0-alpha-2</tag>
+  </scm>
 </project>

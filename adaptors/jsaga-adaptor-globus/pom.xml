@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>fr.in2p3.jsaga</groupId>
@@ -8,33 +7,33 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
     <artifactId>jsaga-adaptor-globus</artifactId>
-    <version>0.9-SNAPSHOT</version>
+    <version>0.9</version>
     <name>Adaptor for Globus Toolkit</name>
     <dependencies>
         <!-- common -->
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-adaptoritf</artifactId>
-            <version>0.9.0-alpha-2-SNAPSHOT</version>
+            <version>0.9.0-alpha-2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-interfaces</artifactId>
-            <version>0.9.0-alpha-2-SNAPSHOT</version>
+            <version>0.9.0-alpha-2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-interfaces</artifactId>
-            <version>0.9.0-alpha-2-SNAPSHOT</version>
+            <version>0.9.0-alpha-2</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
-            <version>0.9.0-alpha-2-SNAPSHOT</version>
+            <version>0.9.0-alpha-2</version>
             <scope>test</scope>
         </dependency>
         <!-- adaptor specific -->
@@ -44,4 +43,8 @@
             <version>1.2</version>
         </dependency>
     </dependencies>
+
+  <scm>
+    <tag>jsaga-0_9_0-alpha-2</tag>
+  </scm>
 </project>

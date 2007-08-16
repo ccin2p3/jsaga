@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga</groupId>
     <artifactId>jsaga-engine</artifactId>
-    <version>0.9.0-alpha-2-SNAPSHOT</version>
+    <version>0.9.0-alpha-2</version>
     <name>JSAGA Engine</name>
     <description>This is an implementation of the SAGA interface.</description>
     <distributionManagement>
@@ -41,12 +41,12 @@
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-interfaces</artifactId>
-            <version>0.9.0-alpha-2-SNAPSHOT</version>
+            <version>0.9.0-alpha-2</version>
         </dependency>
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-interfaces</artifactId>
-            <version>0.9.0-alpha-2-SNAPSHOT</version>
+            <version>0.9.0-alpha-2</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -54,7 +54,7 @@
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-adaptoritf</artifactId>
-            <version>0.9.0-alpha-2-SNAPSHOT</version>
+            <version>0.9.0-alpha-2</version>
         </dependency>
         <!-- external dependencies -->
         <dependency>
@@ -68,4 +68,8 @@
             <version>1.0.3</version>
         </dependency>
     </dependencies>
+
+  <scm>
+    <tag>jsaga-0_9_0-alpha-2</tag>
+  </scm>
 </project>
