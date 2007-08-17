@@ -101,7 +101,7 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
         m_catalog.commit();
     }
 
-    public void removeEntry(String absolutePath) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public void removeFile(String absolutePath) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         m_catalog.removeFile(absolutePath);
         m_catalog.commit();
     }
@@ -146,7 +146,7 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
         return ret;
     }
 
-    public void makeDir(String parentAbsolutePath, String directoryName) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public void makeDir(String parentAbsolutePath, String directoryName) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         DirectoryType parent;
         try {
             parent = m_catalog.getDirectory(parentAbsolutePath);

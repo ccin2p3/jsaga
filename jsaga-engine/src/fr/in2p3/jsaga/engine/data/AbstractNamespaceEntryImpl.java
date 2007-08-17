@@ -282,7 +282,7 @@ public abstract class AbstractNamespaceEntryImpl extends AbstractPermissionsImpl
         effectiveFlags.checkAllowed(Flags.DEREFERENCE);
         if (m_adaptor instanceof DataWriterAdaptor) {
             URI effectiveSource = _getEffectiveURI(effectiveFlags);
-            ((DataWriterAdaptor)m_adaptor).removeEntry(effectiveSource.getPath());
+            ((DataWriterAdaptor)m_adaptor).removeFile(effectiveSource.getPath());
         } else {
             throw new NotImplemented("Not supported for this protocol: "+m_uri.getScheme());
         }

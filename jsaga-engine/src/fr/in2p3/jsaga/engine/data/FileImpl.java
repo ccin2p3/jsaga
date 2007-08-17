@@ -52,7 +52,7 @@ public class FileImpl extends AbstractNamespaceEntryImpl implements File {
             if (m_adaptor instanceof FileWriter) {
                 boolean overwrite = effectiveFlags.contains(Flags.OVERWRITE);
                 boolean append = effectiveFlags.contains(PhysicalEntryFlags.APPEND);
-                m_outStream = ((FileWriter)m_adaptor).openFileWriterStream(m_uri.getPath(), overwrite, append);
+                m_outStream = ((FileWriter)m_adaptor).openFileWriterStream(super._getParentDirURI().getPath(), super.getName(), overwrite, append);
                 if (m_outStream == null) {
                     throw new NoSuccess("[ADAPTOR ERROR] Method openFileWriterStream() must return a FileWriterStream object", this);
                 }

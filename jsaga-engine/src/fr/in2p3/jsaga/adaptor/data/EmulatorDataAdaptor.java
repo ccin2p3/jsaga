@@ -87,24 +87,30 @@ public class EmulatorDataAdaptor implements FileReader, FileWriter, DirectoryRea
         return new EmulatorFileReaderStream(file.getContent());
     }
 
-    public FileWriterStream openFileWriterStream(String absolutePath, boolean overwrite, boolean append) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public FileWriterStream openFileWriterStream(String parentAbsolutePath, String fileName, boolean overwrite, boolean append) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        DirectoryType parent;
+        try {
+            parent = m_server.getDirectory(parentAbsolutePath);
+        } catch (IncorrectState e) {
+            throw new DoesNotExist("Parent directory does not exist: "+parentAbsolutePath);
+        }
         File file;
         try {
-            file = m_server.getFile(absolutePath);
+            file = m_server.getFile(parent, fileName);
             if (append) {
                 // do nothing
             } else if (overwrite) {
                 file.setContent(null);
             } else {
-                throw new AlreadyExists("File already exists: "+absolutePath);
+                throw new AlreadyExists("File already exists: "+fileName);
             }
         } catch(IncorrectState e) {
-            file = m_server.addFile(absolutePath);
+            file = m_server.addFile(parent, fileName);
         }
         return new EmulatorFileWriterStream(m_server, file);
     }
 
-    public void removeEntry(String absolutePath) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public void removeFile(String absolutePath) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         m_server.removeFile(absolutePath);
         m_server.commit();
     }
@@ -144,7 +150,7 @@ public class EmulatorDataAdaptor implements FileReader, FileWriter, DirectoryRea
         return ret;
     }
 
-    public void makeDir(String parentAbsolutePath, String directoryName) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public void makeDir(String parentAbsolutePath, String directoryName) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         DirectoryType parent;
         try {
             parent = m_server.getDirectory(parentAbsolutePath);
