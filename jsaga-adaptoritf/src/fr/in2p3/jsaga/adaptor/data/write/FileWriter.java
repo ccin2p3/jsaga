@@ -16,13 +16,15 @@ import org.ogf.saga.error.*;
  */
 public interface FileWriter extends DataWriterAdaptor {
     /**
-     * Get a stream writer for the file <code>absolutePath</code>.
-     * @param absolutePath the file to write to.
+     * Get a stream writer for the file <code>fileName</code>.
+     * @param parentAbsolutePath the parent directory.
+     * @param fileName the file to write to.
      * @param append if true, append stream at the end of file.
      * @return a stream writer.
-     * @throws AlreadyExists if <code>absolutePath</code> already exists and <code>overwrite</code> and <code>append</code> are both false.
-     * @throws DoesNotExist if <code>absolutePath</code> has no parent directory.
+     * @throws BadParameter if <code>parentAbsolutePath</code> is not a directory.
+     * @throws AlreadyExists if <code>fileName</code> already exists and <code>overwrite</code> and <code>append</code> are both false.
+     * @throws DoesNotExist if <code>parentAbsolutePath</code> does not exist.
      */
-    public FileWriterStream openFileWriterStream(String absolutePath, boolean overwrite, boolean append)
-        throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, AlreadyExists, DoesNotExist, Timeout, NoSuccess;
+    public FileWriterStream openFileWriterStream(String parentAbsolutePath, String fileName, boolean overwrite, boolean append)
+        throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess;
 }
