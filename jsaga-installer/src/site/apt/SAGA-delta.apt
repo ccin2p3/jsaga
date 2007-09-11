@@ -1,0 +1,30 @@
+Differences with SAGA specification
+
+* Security management
+
+    * Add attributes "Indice" and "Name" to refer to a specific security context factory
+
+* Data management
+
+    * Add fragment at the end of URI to refer to a specific security context factory
+
+    * Add method copyFrom(): available by casting your NamespaceEntry instance to AbstractNamespaceEntryImpl,
+      or by casting your NamespaceDirectory instance to AbstractNamespaceDirectoryImpl.
+
+    * Add extension flags:
+
+        * LATE_EXISTENCE_CHECK (4096): to disable existence check when creating the NamespaceEntry object
+          (then an IncorrectState exception embedding a DoesNotExist exception may be thrown
+           on subsequent methods invocations)
+
+        * LONG_FORMAT (8192): to use a long format when listing files
+
+    * Few differences in implementation of behavior with some flags (see comments in source code)
+
+* Job management
+
+    * Will also support JSDL for job description.
+
+* Streams, Remote Procedure Call and future...
+
+    * Will not be implemented.
