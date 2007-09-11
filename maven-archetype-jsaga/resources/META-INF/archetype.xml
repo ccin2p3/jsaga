@@ -12,6 +12,8 @@
     </resources>
     <testResources>
         <resource>test/resources/saga-test.properties</resource>
-        <resource>test/src/IntegrationTestSuite.java</resource>
+        <resource>test/src/MyProtocolIntegrationTestSuite.java</resource>
+        <resource>test/assembly.xml</resource>
+        <resource>test/config/jsaga-config.xml</resource>
     </testResources>
 </archetype>

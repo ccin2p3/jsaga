@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.adaptor.data;
 
+import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.data.impl.DataEmulatorConnectionSecure;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.UserPassSecurityAdaptor;
@@ -36,9 +37,13 @@ public class SecureEmulatorDataAdaptor extends EmulatorDataAdaptor {
         return new String[]{"semulated"};
     }
 
+    public int getDefaultPort() {
+        return 43;
+    }
+
     public void connect(String userInfo, String host, int port) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {
-        m_server = new DataEmulatorConnectionSecure("stest", host, port, m_securityAdaptor);
-        m_server.commit();
+        m_server = new DataEmulatorConnectionSecure(this.getScheme(), host, port, m_securityAdaptor);
+        if(Base.DEBUG) m_server.commit();
     }
 
     public void disconnect() throws NoSuccess {

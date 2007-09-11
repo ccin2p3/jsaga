@@ -1,7 +1,6 @@
 package fr.in2p3.jsaga.engine.data;
 
 import fr.in2p3.jsaga.ExtensionFlags;
-import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.*;
 import fr.in2p3.jsaga.adaptor.data.write.DirectoryWriter;
 import fr.in2p3.jsaga.engine.factories.NamespaceFactoryImpl;
@@ -29,11 +28,10 @@ import java.util.regex.Pattern;
  */
 public abstract class AbstractNamespaceDirectoryImpl extends AbstractNamespaceEntryDirImpl implements NamespaceDirectory {
     /** constructor */
-    public AbstractNamespaceDirectoryImpl(Session session, URI uri, Flags flags, DataAdaptor adaptor) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(session, uri, adaptor);
+    public AbstractNamespaceDirectoryImpl(Session session, URI uri, Flags flags, DataConnection connection) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        super(session, uri, flags, connection);
         FlagsContainer effectiveFlags = new FlagsContainer(flags, Flags.NONE);
         effectiveFlags.keepNamespaceEntryFlags();
-        effectiveFlags.checkAllowed(Flags.CREATE.or(Flags.EXCL).or(Flags.CREATEPARENTS));
         if (effectiveFlags.contains(Flags.CREATE)) {
             if (m_adaptor instanceof DirectoryWriter) {
                 if ("/".equals(m_uri.getPath())) {
@@ -43,20 +41,22 @@ public abstract class AbstractNamespaceDirectoryImpl extends AbstractNamespaceEn
                         return;
                     }
                 }
+                URI parent = super._getParentDirURI();
+                String directoryName = super.getName();
                 try {
                     // try to make current directory
-                    ((DirectoryWriter)m_adaptor).makeDir(super._getParentDirURI().getPath(), super.getName());
+                    ((DirectoryWriter)m_adaptor).makeDir(parent.getPath(), directoryName);
                 } catch(DoesNotExist e) {
                     // make parent directories, then retry
                     if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
                         this._makeParentDirs();
-                        ((DirectoryWriter)m_adaptor).makeDir(super._getParentDirURI().getPath(), super.getName());
+                        ((DirectoryWriter)m_adaptor).makeDir(parent.getPath(), directoryName);
                     } else {
-                        throw e;
+                        throw new DoesNotExist("Parent directory does not exist: "+parent, e.getCause());
                     }
                 } catch(AlreadyExists e) {
                     if (effectiveFlags.contains(Flags.EXCL)) {
-                        throw e;
+                        throw new AlreadyExists("Directory already exists: "+m_uri, e.getCause());
                     }
                 }
             } else {
@@ -80,22 +80,28 @@ public abstract class AbstractNamespaceDirectoryImpl extends AbstractNamespaceEn
         if (dir.getScheme()!=null || dir.getUserInfo()!=null || dir.getHost()!=null) {
             throw new IncorrectURL("Was expecting a absolute/relative path instead of: "+dir.toString());
         }
-        m_uri = this.resolveURI(dir);
+        m_uri = this._resolveRelativeURI(dir);
     }
 
     public List list(String pattern, Flags flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         FlagsContainer effectiveFlags = new FlagsContainer(flags, Flags.NONE);
+        if (effectiveFlags.contains(Flags.DEREFERENCE)) {
+            return this._dereferenceDir().list(pattern, effectiveFlags.remove(Flags.DEREFERENCE));
+        }
+        boolean longFormat = effectiveFlags.contains(ExtensionFlags.LONG_FORMAT);
         effectiveFlags.keepNamespaceEntryFlags();
         effectiveFlags.checkAllowed(Flags.DEREFERENCE);
-        URI effectiveSource = this._getEffectiveURI(effectiveFlags);
         if (m_adaptor instanceof DirectoryReader) {
             Pattern p = _toRegexp(pattern);
             List matchingNames = new ArrayList();
             // for each child
-            String[] names = ((DirectoryReader)m_adaptor).list(effectiveSource.getPath());
-            for (int i=0; i<names.length; i++) {
-                if (p==null || p.matcher(names[i]).matches()) {
-                    matchingNames.add(names[i]);
+            FileAttributes[] childs = this._listAttributes(m_uri.getPath());
+            for (int i=0; i<childs.length; i++) {
+                if (p==null || p.matcher(childs[i].getName()).matches()) {
+                    String line = (longFormat
+                            ? childs[i].toString()
+                            : childs[i].getName());
+                    matchingNames.add(line);
                 }
             }
             return matchingNames;
@@ -106,6 +112,9 @@ public abstract class AbstractNamespaceDirectoryImpl extends AbstractNamespaceEn
 
     public List find(String pattern, Flags flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         FlagsContainer effectiveFlags = new FlagsContainer(flags, Flags.RECURSIVE);
+        if (effectiveFlags.contains(Flags.DEREFERENCE)) {
+            return this._dereferenceDir().find(pattern, effectiveFlags.remove(Flags.DEREFERENCE));
+        }
         effectiveFlags.keepNamespaceEntryFlags();
         effectiveFlags.checkAllowed(Flags.RECURSIVE.or(Flags.DEREFERENCE));
         if (m_adaptor instanceof DirectoryReader) {
@@ -119,23 +128,22 @@ public abstract class AbstractNamespaceDirectoryImpl extends AbstractNamespaceEn
         }
     }
     private void _doFind(Pattern p, FlagsContainer effectiveFlags, List matchingPath, URI currentPath) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        URI effectiveSource = this._getEffectiveURI(effectiveFlags);
         // for each child
-        FileAttributes[] childs = ((DirectoryReader)m_adaptor).listAttributes(effectiveSource.getPath());
+        FileAttributes[] childs = this._listAttributes(m_uri.getPath());
         for (int i=0; i<childs.length; i++) {
             // set child path
             URI childPath;
-            if (childs[i].type == FileAttributes.DIRECTORY_TYPE) {
-                childPath = currentPath.resolve(childs[i].name+"/");
+            if (childs[i].getType() == FileAttributes.DIRECTORY_TYPE) {
+                childPath = currentPath.resolve(childs[i].getName()+"/");
             } else {
-                childPath = currentPath.resolve(childs[i].name);
+                childPath = currentPath.resolve(childs[i].getName());
             }
             // add child path to matching list
-            if (p==null || p.matcher(childs[i].name).matches()) {
+            if (p==null || p.matcher(childs[i].getName()).matches()) {
                 matchingPath.add(childPath);
             }
             // may recurse
-            if (effectiveFlags.contains(Flags.RECURSIVE) && childs[i].type==FileAttributes.DIRECTORY_TYPE) {
+            if (effectiveFlags.contains(Flags.RECURSIVE) && childs[i].getType()==FileAttributes.DIRECTORY_TYPE) {
                 AbstractNamespaceDirectoryImpl childDir = (AbstractNamespaceDirectoryImpl) this._openNSDir(childPath);
                 childDir._doFind(p, effectiveFlags, matchingPath, childPath);
             }
@@ -165,7 +173,7 @@ public abstract class AbstractNamespaceDirectoryImpl extends AbstractNamespaceEn
     private String[] m_entriesCache = null;
     public int getNumEntries() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
         if (m_adaptor instanceof DirectoryReader) {
-            m_entriesCache = ((DirectoryReader)m_adaptor).list(m_uri.getPath());
+            m_entriesCache = this._listNames(m_uri.getPath());
             return m_entriesCache.length;
         } else {
             throw new NotImplemented("Not supported for this protocol: "+m_uri.getScheme(), this);
@@ -174,7 +182,7 @@ public abstract class AbstractNamespaceDirectoryImpl extends AbstractNamespaceEn
     public URI getEntry(int entry) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
         if (m_adaptor instanceof DirectoryReader) {
             if (m_entriesCache == null) {
-                m_entriesCache = ((DirectoryReader)m_adaptor).list(m_uri.getPath());
+                m_entriesCache = this._listNames(m_uri.getPath());
             }
             if (entry < m_entriesCache.length) {
                 try {
@@ -250,7 +258,7 @@ public abstract class AbstractNamespaceDirectoryImpl extends AbstractNamespaceEn
         }
     }
 
-    protected URI resolveURI(URI relativePath) throws IncorrectURL {
+    protected URI _resolveRelativeURI(URI relativePath) throws IncorrectURL {
         if (relativePath==null) {
             throw new IncorrectURL("URI must not be null");
         } else if (relativePath.getScheme()!=null && !relativePath.getScheme().equals(m_uri.getScheme())) {
@@ -268,5 +276,14 @@ public abstract class AbstractNamespaceDirectoryImpl extends AbstractNamespaceEn
         } catch (URISyntaxException e) {
             throw new IncorrectURL(e);
         }
+    }
+
+    private String[] _listNames(String absolutePath) throws NotImplemented, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+        FileAttributes[] files = this._listAttributes(absolutePath);
+        String[] filenames = new String[files.length];
+        for (int i=0; i<files.length; i++) {
+            filenames[i] = files[i].getName();
+        }
+        return filenames;
     }
 }

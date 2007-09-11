@@ -1,14 +1,17 @@
 package fr.in2p3.jsaga.adaptor.data;
 
+import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
 import fr.in2p3.jsaga.adaptor.data.read.*;
 import fr.in2p3.jsaga.adaptor.data.read.FileReader;
-import fr.in2p3.jsaga.adaptor.data.write.*;
+import fr.in2p3.jsaga.adaptor.data.write.DirectoryWriter;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import org.ogf.saga.error.*;
-import org.ogf.saga.permissions.Permission;
 
 import java.io.*;
+import java.util.Map;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -22,7 +25,19 @@ import java.io.*;
 /**
  *
  */
-public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader, DirectoryWriter {
+public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader, DirectoryWriter, DataRename {
+    public Usage getUsage() {
+        return null;
+    }
+
+    public Default[] getDefaults(Map attributes) throws IncorrectState {
+        return null;
+    }
+
+    public void setAttributes(Map attributes) throws BadParameter {
+        // do nothing
+    }
+
     public String[] getSupportedContextTypes() {
         return null;    // no context type
     }
@@ -39,6 +54,10 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
         return new String[]{"local"};
     }
 
+    public int getDefaultPort() {
+        return 0;
+    }
+
     public void connect(String userInfo, String host, int port) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {
         // do nothing
     }
@@ -47,127 +66,111 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
         // do nothing
     }
 
-    public boolean exists(String absolutePath) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
+    public boolean exists(String absolutePath) throws PermissionDenied, Timeout, NoSuccess {
         return new File(absolutePath).exists();
     }
 
-    public boolean isDirectory(String absolutePath) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public boolean isDirectory(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         return newEntry(absolutePath).isDirectory();
     }
 
-    public boolean isEntry(String absolutePath) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public boolean isEntry(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         return newEntry(absolutePath).isFile();
     }
 
-    public int getSize(String absolutePath) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        return (int) newFile(absolutePath).length();
+    public long getSize(String absolutePath) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+        return newFile(absolutePath).length();
     }
 
-    public FileReaderStream openFileReaderStream(String absolutePath) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    public InputStream getInputStream(String absolutePath) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         try {
-            return new LocalFileReaderStream(newFile(absolutePath));
+            File file = newFile(absolutePath);
+            return new FileInputStream(file);
         } catch (FileNotFoundException e) {
-            throw new IncorrectState("File does not exist: "+absolutePath);
+            throw new DoesNotExist("File does not exist");
         }
     }
 
-    public FileWriterStream openFileWriterStream(String parentAbsolutePath, String fileName, boolean overwrite, boolean append) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        File parentDirectory;
-        try {
-            parentDirectory = newDirectory(parentAbsolutePath);
-        } catch (IncorrectState e) {
-            throw new DoesNotExist("Parent directory does not exist: "+parentAbsolutePath);
-        }
+    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append) throws PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        File parentDirectory = newDirectory(parentAbsolutePath);
         File file = new File(parentDirectory, fileName);
         try {
             if (!file.createNewFile()) {
-                if (append) {
-                    return new LocalFileWriterStream(file, true);
-                } else if (overwrite) {
-                    return new LocalFileWriterStream(file, false);
+                if (exclusive) {
+                    throw new AlreadyExists("File already exist");
+                } else if (append) {
+                    return new FileOutputStream(file, true);
                 } else {
-                    throw new AlreadyExists("File already exist: "+fileName);
+                    return new FileOutputStream(file, false);   //overwrite
                 }
             } else {
-                return new LocalFileWriterStream(file, false);
+                return new FileOutputStream(file, false);
             }
         } catch (IOException e) {
             throw new NoSuccess("Failed to create file: "+fileName, e);
         }
     }
 
-    public void removeFile(String absolutePath) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        File file = newFile(absolutePath);
-        if (!file.delete()) {
-            throw new NoSuccess("Failed to remove file: "+absolutePath);
+    public void removeFile(String parentAbsolutePath, String fileName) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+        File parentDirectory = newDirectory(parentAbsolutePath);
+        File file = new File(parentDirectory, fileName);
+        if (!file.exists()) {
+            throw new DoesNotExist("File does not exist");
+        } else if (!file.delete()) {
+            throw new NoSuccess("Failed to remove file: "+fileName);
         }
     }
 
-    public String[] list(String absolutePath) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
-        File entry = newEntry(absolutePath);
-        if (entry.isDirectory()) {
-            return entry.list();
-        } else {
-            return new String[]{entry.getName()};
+    public FileAttributes[] listAttributes(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        File[] list = newEntry(absolutePath).listFiles();
+        FileAttributes[] ret = new FileAttributes[list.length];
+        for (int i=0; i<list.length; i++) {
+            ret[i] = new LocalFileAttributes(list[i]);
         }
+        return ret;
     }
 
-    public FileAttributes[] listAttributes(String absolutePath) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
-        File entry = newEntry(absolutePath);
-        File[] fileArray = entry.listFiles();
-        FileAttributes[] attributeArray = new FileAttributes[fileArray.length];
-        for (int i=0; i<fileArray.length; i++) {
-            File file = fileArray[i];
-            FileAttributes attr = new FileAttributes();
-            // set attributes
-            attr.name = file.getName();
-            attr.size = (int) (file.isFile() ? file.length() : 0);
-            attr.type = file.isDirectory()
-                    ? FileAttributes.DIRECTORY_TYPE
-                    : file.isFile()
-                        ? FileAttributes.FILE_TYPE
-                        : FileAttributes.UNKNOWN_TYPE;
-            attr.permission = Permission.NONE;
-            if(file.canRead()) attr.permission.or(Permission.READ);
-            if(file.canWrite()) attr.permission.or(Permission.WRITE);
-            // add to list
-            attributeArray[i] = attr;
-        }
-        return attributeArray;
-    }
-
-    public void makeDir(String parentAbsolutePath, String directoryName) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        File parentDirectory;
-        try {
-            parentDirectory = newDirectory(parentAbsolutePath);
-        } catch (IncorrectState e) {
-            throw new DoesNotExist("Parent directory does not exist: "+parentAbsolutePath);
-        }
+    public void makeDir(String parentAbsolutePath, String directoryName) throws PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        File parentDirectory = newDirectory(parentAbsolutePath);
         File directory = new File(parentDirectory, directoryName);
         if (directory.exists()) {
-            throw new AlreadyExists("Directory already exist: "+directoryName);
+            throw new AlreadyExists("Directory already exist");
         } else if (!directory.mkdir()) {
             throw new NoSuccess("Failed to create directory: "+directoryName);
         }
     }
 
-    public void removeDir(String absolutePath) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        File directory = newDirectory(absolutePath);
-        if (!directory.delete()) {
-            throw new NoSuccess("Failed to remove directory: "+absolutePath);
+    public void removeDir(String parentAbsolutePath, String directoryName) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+        File parentDirectory = newDirectory(parentAbsolutePath);
+        File directory = new File(parentDirectory, directoryName);
+        if (!directory.exists()) {
+            throw new DoesNotExist("Directory does not exist");
+        } else if (!directory.delete()) {
+            throw new NoSuccess("Failed to remove directory: "+directoryName);
         }
     }
 
-    private static File newEntry(String absolutePath) throws IncorrectState {
+    public void rename(String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite) throws PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+        File source = newEntry(sourceAbsolutePath);
+        File target = new File(targetAbsolutePath);
+        if (!overwrite && target.exists()) {
+            throw new AlreadyExists("Entry already exists");
+        }
+        source.renameTo(target);
+    }
+
+    ////////////////////////////////////// private methods //////////////////////////////////////
+
+    private static File newEntry(String absolutePath) throws DoesNotExist {
         File entry = new File(absolutePath);
         if (entry.exists()) {
             return entry;
         } else {
-            throw new IncorrectState("Entry does not exist: "+absolutePath);
+            throw new DoesNotExist("Entry does not exist");
         }
     }
 
-    private static File newFile(String absolutePath) throws BadParameter, IncorrectState {
+    private static File newFile(String absolutePath) throws BadParameter, DoesNotExist {
         File entry = newEntry(absolutePath);
         if (entry.isFile()) {
             return entry;
@@ -176,7 +179,7 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
         }
     }
 
-    private static File newDirectory(String absolutePath) throws BadParameter, IncorrectState {
+    private static File newDirectory(String absolutePath) throws BadParameter, DoesNotExist {
         File entry = newEntry(absolutePath);
         if (entry.isDirectory()) {
             return entry;

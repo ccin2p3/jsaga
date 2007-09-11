@@ -1,14 +1,18 @@
 package fr.in2p3.jsaga.engine.config.adaptor;
 
+import fr.in2p3.jsaga.adaptor.base.SagaBaseAdaptor;
+import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptorBuilder;
 import fr.in2p3.jsaga.engine.config.ConfigurationException;
-import fr.in2p3.jsaga.engine.schema.config.EffectiveConfig;
+import fr.in2p3.jsaga.engine.schema.config.*;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.*;
+import org.ogf.saga.error.IncorrectState;
 
 import java.io.*;
+import java.util.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -67,5 +71,26 @@ public class AdaptorDescriptors {
 
         // build DOM
         return xmlStream.toByteArray();
+    }
+
+    protected static void setDefaults(ObjectType bean, SagaBaseAdaptor adaptor) {
+        Default[] defaults;
+        try {
+            defaults = adaptor.getDefaults(new HashMap());
+        } catch (IncorrectState e) {
+            defaults = null;
+        }
+        if (defaults != null) {
+            List list = new ArrayList();
+            for (int d=0; d<defaults.length; d++) {
+                if (defaults[d].getValue() != null) {
+                    Attribute attr = new Attribute();
+                    attr.setName(defaults[d].getName());
+                    attr.setValue(defaults[d].getValue());
+                    list.add(attr);
+                }
+            }
+            bean.setAttribute((Attribute[]) list.toArray(new Attribute[list.size()]));
+        }
     }
 }

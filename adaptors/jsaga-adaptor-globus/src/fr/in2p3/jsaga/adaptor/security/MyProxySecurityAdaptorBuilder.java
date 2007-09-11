@@ -1,8 +1,10 @@
 package fr.in2p3.jsaga.adaptor.security;
 
-import fr.in2p3.jsaga.adaptor.security.defaults.Default;
-import fr.in2p3.jsaga.adaptor.security.defaults.EnvironmentVariables;
-import fr.in2p3.jsaga.adaptor.security.usage.*;
+import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
+import fr.in2p3.jsaga.adaptor.base.usage.*;
+import fr.in2p3.jsaga.adaptor.security.usage.UProxyFile;
+import fr.in2p3.jsaga.adaptor.security.usage.UProxyObject;
 import org.globus.myproxy.MyProxy;
 import org.globus.myproxy.MyProxyException;
 import org.gridforum.jgss.ExtendedGSSCredential;
@@ -57,8 +59,8 @@ public class MyProxySecurityAdaptorBuilder implements InitializableSecurityAdapt
             },
 */
             new UDuration("LifeTime") {
-                protected void throwExceptionIfInvalid(Object value) throws Exception {
-                    if (value!=null) {super.throwExceptionIfInvalid(value);}
+                protected Object throwExceptionIfInvalid(Object value) throws Exception {
+                    return (value!=null ? super.throwExceptionIfInvalid(value) : null);
                 }
             },
     });
@@ -86,9 +88,9 @@ public class MyProxySecurityAdaptorBuilder implements InitializableSecurityAdapt
         return new Default[]{
                 new Default("UserProxy", new String[]{
                         env.getProperty("X509_USER_PROXY"),
-                        System.getProperty("os.name").equalsIgnoreCase("windows")
-                                ? System.getProperty("java.io.tmpdir")+"x509up_u_"+System.getProperty("user.name").toLowerCase()
-                                : System.getProperty("java.io.tmpdir")+"x509up_u_"+env.getProperty("UID")}),
+                        System.getProperty("os.name").toLowerCase().startsWith("windows")
+                                ? System.getProperty("java.io.tmpdir")+System.getProperty("file.separator")+"x509up_u_"+System.getProperty("user.name").toLowerCase()
+                                : System.getProperty("java.io.tmpdir")+System.getProperty("file.separator")+"x509up_u_"+env.getProperty("UID")}),
                 new Default("UserCert", new File[]{
                         new File(env.getProperty("X509_USER_CERT")+""),
                         new File(System.getProperty("user.home")+"/.globus/usercert.pem")}),
@@ -130,7 +132,7 @@ public class MyProxySecurityAdaptorBuilder implements InitializableSecurityAdapt
             String userName = (String) attributes.get("UserName");
             String myProxyPass = (String) attributes.get("MyProxyPass");
             int lifetime = attributes.containsKey("LifeTime")
-                    ? (int) UDuration.toLong((String) attributes.get("LifeTime"))
+                    ? UDuration.toInt(attributes.get("LifeTime"))
                     : DEFAULT_DELEGATED_PROXY_LIFETIME;  // default lifetime for delegated proxies
             createMyProxy(attributes).put(cred, userName, myProxyPass, lifetime);
             return new MyProxySecurityAdaptor(cred);
@@ -157,7 +159,7 @@ public class MyProxySecurityAdaptorBuilder implements InitializableSecurityAdapt
             String userName = (String) attributes.get("UserName");
             String myProxyPass = (String) attributes.get("MyProxyPass");
             int lifetime = attributes.containsKey("LifeTime")
-                    ? (int) UDuration.toLong((String) attributes.get("LifeTime"))
+                    ? UDuration.toInt(attributes.get("LifeTime"))
                     : DEFAULT_DELEGATED_PROXY_LIFETIME;  // default lifetime for delegated proxies
             createMyProxy(attributes).put(cred, userName, myProxyPass, lifetime);
             return new MyProxySecurityAdaptor(cred);
@@ -181,7 +183,7 @@ public class MyProxySecurityAdaptorBuilder implements InitializableSecurityAdapt
         String userName = (String) attributes.get("UserName");
         String myProxyPass = (String) attributes.get("MyProxyPass");
         int lifetime = attributes.containsKey("LifeTime")
-                ? (int) UDuration.toLong((String) attributes.get("LifeTime"))
+                ? UDuration.toInt(attributes.get("LifeTime"))
                 : DEFAULT_DELEGATED_PROXY_LIFETIME;  // effective lifetime for delegated proxy
         return createMyProxy(attributes).get(oldCred, userName, myProxyPass, lifetime);
     }

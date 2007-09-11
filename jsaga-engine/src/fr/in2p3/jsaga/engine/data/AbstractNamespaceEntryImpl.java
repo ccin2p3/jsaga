@@ -1,21 +1,15 @@
 package fr.in2p3.jsaga.engine.data;
 
-import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.link.LinkAdaptor;
 import fr.in2p3.jsaga.adaptor.data.link.NotLink;
-import fr.in2p3.jsaga.adaptor.data.read.*;
-import fr.in2p3.jsaga.adaptor.data.readwrite.*;
-import fr.in2p3.jsaga.adaptor.data.write.*;
-import fr.in2p3.jsaga.engine.base.BufferImpl;
-import fr.in2p3.jsaga.engine.base.BufferImplApplicationManaged;
-import fr.in2p3.jsaga.engine.config.Configuration;
-import fr.in2p3.jsaga.engine.schema.config.Protocol;
+import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
+import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
+import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
 import org.ogf.saga.URI;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 
-import java.lang.Exception;
 import java.net.URISyntaxException;
 
 /* ***************************************************
@@ -31,33 +25,22 @@ import java.net.URISyntaxException;
  *
  */
 public abstract class AbstractNamespaceEntryImpl extends AbstractPermissionsImpl implements NamespaceEntry {
-    /** constructor */
-    public AbstractNamespaceEntryImpl(Session session, URI uri, Flags flags, DataAdaptor adaptor) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(session, uri, adaptor);
-        FlagsContainer effectiveFlags = new FlagsContainer(flags, PhysicalEntryFlags.NONE);
-        effectiveFlags.keepNamespaceEntryFlags();
-        effectiveFlags.checkAllowed(Flags.CREATE.or(Flags.EXCL).or(Flags.CREATEPARENTS).or(Flags.OVERWRITE));
-        if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
-            this._makeParentDirs();
-        }
-        if (effectiveFlags.contains(Flags.CREATE)) {
-            if (!(m_adaptor instanceof FileWriter) && !(m_adaptor instanceof LogicalWriter)) {
-                throw new NotImplemented("Not supported for this protocol: "+m_uri.getScheme());
-            }
-            if (effectiveFlags.contains(Flags.EXCL) && this.exists()) {
-                throw new AlreadyExists("Entry already exists: "+m_uri);
-            }
-        }
-    }
+    protected final DataConnection m_connection;
 
-    /** constructor for AbstractNamespaceDirectoryImpl */
-    protected AbstractNamespaceEntryImpl(Session session, URI uri, DataAdaptor adaptor) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(session, uri, adaptor);
+    /** constructor */
+    public AbstractNamespaceEntryImpl(Session session, URI uri, Flags flags, DataConnection connection) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        super(session, uri, connection.getDataAdaptor());
+        FlagsContainer effectiveFlags = new FlagsContainer(flags, Flags.NONE);
+        effectiveFlags.keepNamespaceEntryFlags();
+        effectiveFlags.checkAllowed(Flags.CREATE.or(Flags.EXCL).or(Flags.CREATEPARENTS));
+        m_connection = connection;
+        m_connection.registerEntry(this);
     }
 
     /** constructor for deepCopy */
     protected AbstractNamespaceEntryImpl(AbstractNamespaceEntryImpl source) {
         super(source);
+        m_connection = source.m_connection;
     }
 
     public URI getURI() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
@@ -70,7 +53,7 @@ public abstract class AbstractNamespaceEntryImpl extends AbstractPermissionsImpl
             path = path.substring(0, path.length()-1);
         }
         int pos = path.lastIndexOf('/');
-        String parentPath = (pos>-1 ? path.substring(0,pos) : "/");
+        String parentPath = (pos>-1 ? path.substring(0,pos+1) : "/");
         try {
             return new URI(new java.net.URI(
                     m_uri.getScheme(), m_uri.getUserInfo(), m_uri.getHost(), m_uri.getPort(), parentPath, m_uri.getQuery(), m_uri.getFragment()));
@@ -103,11 +86,17 @@ public abstract class AbstractNamespaceEntryImpl extends AbstractPermissionsImpl
 
     public boolean isDirectory(Flags flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         FlagsContainer effectiveFlags = new FlagsContainer(flags, Flags.NONE);
+        if (effectiveFlags.contains(Flags.DEREFERENCE)) {
+            return this._dereferenceEntry().isDirectory(effectiveFlags.remove(Flags.DEREFERENCE));
+        }
         effectiveFlags.keepNamespaceEntryFlags();
         effectiveFlags.checkAllowed(Flags.DEREFERENCE);
         if (m_adaptor instanceof DataReaderAdaptor) {
-            URI effectiveSource = _getEffectiveURI(effectiveFlags);
-            return ((DataReaderAdaptor)m_adaptor).isDirectory(effectiveSource.getPath());
+            try {
+                return ((DataReaderAdaptor)m_adaptor).isDirectory(m_uri.getPath());
+            } catch (DoesNotExist doesNotExist) {
+                throw new IncorrectState("Entry does not exist: "+m_uri, doesNotExist);
+            }
         } else {
             throw new NotImplemented("Not supported for this protocol: "+m_uri.getScheme(), this);
         }
@@ -115,11 +104,17 @@ public abstract class AbstractNamespaceEntryImpl extends AbstractPermissionsImpl
 
     public boolean isEntry(Flags flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         FlagsContainer effectiveFlags = new FlagsContainer(flags, Flags.NONE);
+        if (effectiveFlags.contains(Flags.DEREFERENCE)) {
+            return this._dereferenceEntry().isEntry(effectiveFlags.remove(Flags.DEREFERENCE));
+        }
         effectiveFlags.keepNamespaceEntryFlags();
         effectiveFlags.checkAllowed(Flags.DEREFERENCE);
         if (m_adaptor instanceof DataReaderAdaptor) {
-            URI effectiveSource = _getEffectiveURI(effectiveFlags);
-            return ((DataReaderAdaptor)m_adaptor).isEntry(effectiveSource.getPath());
+            try {
+                return ((DataReaderAdaptor)m_adaptor).isEntry(m_uri.getPath());
+            } catch (DoesNotExist doesNotExist) {
+                throw new IncorrectState("Entry does not exist: "+m_uri, doesNotExist);
+            }
         } else {
             throw new NotImplemented("Not supported for this protocol: "+m_uri.getScheme(), this);
         }
@@ -127,11 +122,17 @@ public abstract class AbstractNamespaceEntryImpl extends AbstractPermissionsImpl
 
     public boolean isLink(Flags flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         FlagsContainer effectiveFlags = new FlagsContainer(flags, Flags.NONE);
+        if (effectiveFlags.contains(Flags.DEREFERENCE)) {
+            return this._dereferenceEntry().isLink(effectiveFlags.remove(Flags.DEREFERENCE));
+        }
         effectiveFlags.keepNamespaceEntryFlags();
         effectiveFlags.checkAllowed(Flags.DEREFERENCE);
         if (m_adaptor instanceof LinkAdaptor) {
-            URI effectiveSource = _getEffectiveURI(effectiveFlags);
-            return ((LinkAdaptor)m_adaptor).isLink(effectiveSource.getPath());
+            try {
+                return ((LinkAdaptor)m_adaptor).isLink(m_uri.getPath());
+            } catch (DoesNotExist doesNotExist) {
+                throw new IncorrectState("Link does not exist: "+m_uri, doesNotExist);
+            }
         } else {
             throw new NotImplemented("Not supported for this protocol: "+m_uri.getScheme(), this);
         }
@@ -141,86 +142,15 @@ public abstract class AbstractNamespaceEntryImpl extends AbstractPermissionsImpl
         if (m_adaptor instanceof LinkAdaptor) {
             String absolutePath;
             try {
-                absolutePath = ((LinkAdaptor)m_adaptor).readLink(m_uri.getPath());
+                try {
+                    absolutePath = ((LinkAdaptor)m_adaptor).readLink(m_uri.getPath());
+                } catch (DoesNotExist doesNotExist) {
+                    throw new IncorrectState("Link does not exist: "+m_uri, doesNotExist);
+                }
             } catch (NotLink notLink) {
                 throw new BadParameter("Not a link: "+m_uri, this);
             }
             return m_uri.resolve(absolutePath);
-        } else {
-            throw new NotImplemented("Not supported for this protocol: "+m_uri.getScheme(), this);
-        }
-    }
-
-    public void copy(URI target, Flags flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
-        FlagsContainer effectiveFlags = new FlagsContainer(flags, Flags.NONE);
-        effectiveFlags.keepNamespaceEntryFlags();
-        effectiveFlags.checkAllowed(Flags.CREATEPARENTS.or(Flags.OVERWRITE).or(Flags.DEREFERENCE));
-        boolean overwrite = effectiveFlags.contains(Flags.OVERWRITE);
-        URI effectiveTarget = this._getEffectiveTarget(target);
-        Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(target.getScheme());
-        boolean isLogical = descriptor.hasLogical() && descriptor.getLogical();
-        if (m_adaptor instanceof DataCopyDelegated && m_uri.getScheme().equals(effectiveTarget.getScheme())) {
-            ((DataCopyDelegated)m_adaptor).requestTransfer(
-                    m_uri,
-                    effectiveTarget,
-                    overwrite);
-        } else if (m_adaptor instanceof DataCopy && m_uri.getScheme().equals(effectiveTarget.getScheme())) {
-            ((DataCopy)m_adaptor).copy(
-                    m_uri.getPath(),
-                    effectiveTarget.getHost(), effectiveTarget.getPort(), effectiveTarget.getPath(),
-                    overwrite);
-        } else if (m_adaptor instanceof FileReader) {
-            FileReaderStream in = ((FileReader)m_adaptor).openFileReaderStream(m_uri.getPath());
-            if (!isLogical) {
-                Flags targetFlags = (overwrite
-                        ? flags.or(PhysicalEntryFlags.WRITE).or(Flags.CREATE)
-                        : flags.or(PhysicalEntryFlags.WRITE).or(Flags.CREATE).or(Flags.EXCL));
-                File out = (File) this._createEntry(effectiveTarget, targetFlags);
-                try {
-                    byte[] data = new byte[1024];
-                    BufferImpl buffer = new BufferImplApplicationManaged(data);
-                    int readlen,writelen;
-                    while ((readlen=in.read(data,data.length)) > 0) {
-                        for (int total=0; total<readlen; total+=writelen) {
-                            if (total > 0) {
-                                int readlenRemaining = readlen-total;
-                                byte[] dataBis = new byte[readlenRemaining];
-                                System.arraycopy(data, total, dataBis, 0, readlenRemaining);
-                                BufferImpl bufferBis = new BufferImplApplicationManaged(dataBis);
-                                writelen = out.write(bufferBis, readlenRemaining);
-                            } else {
-                                writelen = out.write(buffer, readlen);
-                            }
-                        }
-                    }
-                } finally {
-                    in.close();
-                }
-            } else {
-                throw new BadParameter("Maybe what you want to do is to add to the target logical file this location: "+m_uri.toString());
-            }
-        } else if (m_adaptor instanceof LogicalReader) {
-            String[] locations = ((LogicalReader)m_adaptor).listLocations(m_uri.getPath());
-            if (isLogical) {
-                Flags targetFlags = (overwrite
-                        ? flags.or(PhysicalEntryFlags.WRITE).or(Flags.CREATE)
-                        : flags.or(PhysicalEntryFlags.WRITE).or(Flags.CREATE).or(Flags.EXCL));
-                LogicalFileImpl targetLogical = (LogicalFileImpl) this._createEntry(effectiveTarget, targetFlags);
-                if (overwrite) {
-                    targetLogical._removeAllLocations();
-                }
-                targetLogical._addAllLocations(locations);
-            } else {
-                if (locations!=null && locations.length>0) {
-                    NamespaceEntry sourcePhysical;
-                    try {
-                        sourcePhysical = NamespaceFactory.createNamespaceEntry(m_session, new URI(locations[0]), flags);
-                    } catch (Exception e) {
-                        throw new NoSuccess(e);
-                    }
-                    sourcePhysical.copy(effectiveTarget, flags);
-                }
-            }
         } else {
             throw new NotImplemented("Not supported for this protocol: "+m_uri.getScheme(), this);
         }
@@ -233,23 +163,38 @@ public abstract class AbstractNamespaceEntryImpl extends AbstractPermissionsImpl
      */
     public void link(URI link, Flags flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
         FlagsContainer effectiveFlags = new FlagsContainer(flags, Flags.NONE);
+        if (effectiveFlags.contains(Flags.DEREFERENCE)) {
+            this._dereferenceEntry().link(link, effectiveFlags.remove(Flags.DEREFERENCE));
+            return; //==========> EXIT
+        }
         effectiveFlags.keepNamespaceEntryFlags();
-        effectiveFlags.checkAllowed(Flags.RECURSIVE.or(Flags.CREATEPARENTS).or(Flags.OVERWRITE).or(Flags.DEREFERENCE));
+        effectiveFlags.checkAllowed(Flags.RECURSIVE.or(Flags.DEREFERENCE).or(Flags.CREATEPARENTS).or(Flags.OVERWRITE));
         if (effectiveFlags.contains(Flags.RECURSIVE)) {
             throw new NotImplemented("Support of RECURSIVE flags with method link() is not implemented by the SAGA engine", this);
         }
-        URI effectiveLink = this._getEffectiveTarget(link);
+        URI effectiveLink = this._getEffectiveURI(link);
         if (m_adaptor instanceof LinkAdaptor) {
-            URI effectiveSource = _getEffectiveURI(effectiveFlags);
             boolean overwrite = effectiveFlags.contains(Flags.OVERWRITE);
             try {
-                ((LinkAdaptor)m_adaptor).link(effectiveSource.getPath(), effectiveLink.getPath(), overwrite);
+                try {
+                    ((LinkAdaptor)m_adaptor).link(m_uri.getPath(), effectiveLink.getPath(), overwrite);
+                } catch (DoesNotExist doesNotExist) {
+                    throw new IncorrectState("Entry does not exist: "+m_uri, doesNotExist);
+                } catch (AlreadyExists alreadyExists) {
+                    throw new AlreadyExists("Target entry already exists: "+effectiveLink, alreadyExists.getCause());
+                }
             } catch(IncorrectState e) {
                 if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
                     // make parent directories
                     this._makeParentDirs();
                     // create link
-                    ((LinkAdaptor)m_adaptor).link(effectiveSource.getPath(), effectiveLink.getPath(), overwrite);
+                    try {
+                        ((LinkAdaptor)m_adaptor).link(m_uri.getPath(), effectiveLink.getPath(), overwrite);
+                    } catch (DoesNotExist doesNotExist) {
+                        throw new IncorrectState("Entry does not exist: "+m_uri, doesNotExist);
+                    } catch (AlreadyExists alreadyExists) {
+                        throw new AlreadyExists("Target entry already exists: "+effectiveLink, alreadyExists.getCause());
+                    }
                 } else {
                     throw e;
                 }
@@ -259,17 +204,31 @@ public abstract class AbstractNamespaceEntryImpl extends AbstractPermissionsImpl
         }
     }
 
+    public abstract void copyFrom(URI source, Flags flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess;
+
     public void move(URI target, Flags flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
         FlagsContainer effectiveFlags = new FlagsContainer(flags, Flags.NONE);
+        if (effectiveFlags.contains(Flags.DEREFERENCE)) {
+            this._dereferenceEntry().move(target, effectiveFlags.remove(Flags.DEREFERENCE));
+            return; //==========> EXIT
+        }
         effectiveFlags.keepNamespaceEntryFlags();
-        effectiveFlags.checkAllowed(Flags.CREATEPARENTS.or(Flags.OVERWRITE).or(Flags.DEREFERENCE));
+        effectiveFlags.checkAllowed(Flags.DEREFERENCE.or(Flags.CREATEPARENTS).or(Flags.OVERWRITE));
         boolean overwrite = effectiveFlags.contains(Flags.OVERWRITE);
-        URI effectiveTarget = this._getEffectiveTarget(target);
-        if (m_adaptor instanceof DataMove && m_uri.getScheme().equals(effectiveTarget.getScheme())) {
-            ((DataMove)m_adaptor).move(
-                    m_uri.getPath(),
-                    effectiveTarget.getHost(), effectiveTarget.getPort(), effectiveTarget.getPath(),
-                    overwrite);
+        URI effectiveTarget = this._getEffectiveURI(target);
+        if (m_adaptor instanceof DataRename
+                && m_uri.getScheme().equals(effectiveTarget.getScheme())
+                && (m_uri.getUserInfo()==null || m_uri.getUserInfo().equals(effectiveTarget.getUserInfo()))
+                && (m_uri.getHost()==null || m_uri.getHost().equals(effectiveTarget.getHost()))
+                && (m_uri.getPort()==effectiveTarget.getPort()))
+        {
+            try {
+                ((DataRename)m_adaptor).rename(m_uri.getPath(), effectiveTarget.getPath(), overwrite);
+            } catch (DoesNotExist doesNotExist) {
+                throw new IncorrectState("File does not exist: "+m_uri, doesNotExist);
+            } catch (AlreadyExists alreadyExists) {
+                throw new AlreadyExists("Target entry already exists: "+effectiveTarget, alreadyExists.getCause());
+            }
         } else {
             this.copy(effectiveTarget, flags);
             this.remove(flags);
@@ -278,31 +237,106 @@ public abstract class AbstractNamespaceEntryImpl extends AbstractPermissionsImpl
 
     public void remove(Flags flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         FlagsContainer effectiveFlags = new FlagsContainer(flags, Flags.NONE);
+        if (effectiveFlags.contains(Flags.DEREFERENCE)) {
+            this._dereferenceEntry().remove(flags);
+            return; //==========> EXIT
+        }
         effectiveFlags.keepNamespaceEntryFlags();
         effectiveFlags.checkAllowed(Flags.DEREFERENCE);
         if (m_adaptor instanceof DataWriterAdaptor) {
-            URI effectiveSource = _getEffectiveURI(effectiveFlags);
-            ((DataWriterAdaptor)m_adaptor).removeFile(effectiveSource.getPath());
+            URI parent = this._getParentDirURI();
+            String fileName = this.getName();
+            try {
+                ((DataWriterAdaptor)m_adaptor).removeFile(parent.getPath(), fileName);
+            } catch (DoesNotExist doesNotExist) {
+                throw new IncorrectState("File does not exist: "+m_uri, doesNotExist);
+            }
         } else {
             throw new NotImplemented("Not supported for this protocol: "+m_uri.getScheme());
         }
     }
 
-    public void close(float timeoutInSeconds) throws NotImplemented, IncorrectState, NoSuccess {
-        m_adaptor.disconnect();
+    private boolean m_disconnected = false;
+    public synchronized void close(float timeoutInSeconds) throws NotImplemented, IncorrectState, NoSuccess {
+        synchronized(m_connection) {
+            m_connection.unregisterEntry(this);
+            if (! m_disconnected && ! m_connection.hasRegisteredEntries()) {
+                m_adaptor.disconnect();
+                m_disconnected = true;
+            }
+        }
+    }
+
+    public void finalize() throws Throwable {
+        super.finalize();
+        if (! m_disconnected) {
+            m_adaptor.disconnect();
+        }
     }
 
     ///////////////////////////////////////// protected methods /////////////////////////////////////////
 
-    protected URI _getEffectiveURI(FlagsContainer effectiveFlags) throws Timeout, PermissionDenied, IncorrectState, NoSuccess, BadParameter, AuthorizationFailed, NotImplemented, AuthenticationFailed {
-        if (effectiveFlags.contains(Flags.DEREFERENCE)) {
-            return this.readLink();
-        } else {
-            return m_uri;
+    public abstract NamespaceDirectory openDir(URI name, Flags flags) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess;
+    public abstract NamespaceEntry openEntry(URI name, Flags flags) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess;
+
+    protected AbstractNamespaceDirectoryImpl _dereferenceDir()  throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+        try {
+            return (AbstractNamespaceDirectoryImpl) this.openDir(this.readLink(), Flags.NONE);
+        } catch (IncorrectURL e) {
+            throw new NoSuccess("Unexpected exception", e);
+        } catch (IncorrectSession e) {
+            throw new NoSuccess("Unexpected exception", e);
+        } catch (AlreadyExists e) {
+            throw new IncorrectState(e);
+        } catch (DoesNotExist e) {
+            throw new IncorrectState(e);
         }
     }
 
-    protected URI _getEffectiveTarget(URI target) throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    protected AbstractNamespaceEntryImpl _dereferenceEntry()  throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+        try {
+            return (AbstractNamespaceEntryImpl) this.openEntry(this.readLink(), Flags.NONE);
+        } catch (IncorrectURL e) {
+            throw new NoSuccess("Unexpected exception", e);
+        } catch (IncorrectSession e) {
+            throw new NoSuccess("Unexpected exception", e);
+        } catch (AlreadyExists e) {
+            throw new IncorrectState(e);
+        } catch (DoesNotExist e) {
+            throw new IncorrectState(e);
+        }
+    }
+
+    protected NamespaceDirectory _getParent(FlagsContainer flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+        try {
+            return this.openDir(this._getParentDirURI(), flags.remove(Flags.NONE));
+        } catch (IncorrectURL e) {
+            throw new NoSuccess("Unexpected exception", e);
+        } catch (IncorrectSession e) {
+            throw new NoSuccess("Unexpected exception", e);
+        } catch (AlreadyExists e) {
+            throw new IncorrectState(e);
+        } catch (DoesNotExist e) {
+            throw new IncorrectState(e);
+        }
+    }
+
+    protected URI _resolveAbsoluteURI(URI absolutePath) throws IncorrectURL {
+        if (absolutePath==null) {
+            throw new IncorrectURL("URI must not be null");
+        } else if (absolutePath.getScheme()!=null && !absolutePath.getScheme().equals(m_uri.getScheme())) {
+            throw new IncorrectURL("You must not modify the scheme of the URI: "+m_uri.getScheme());
+        } else if (absolutePath.getUserInfo()!=null && !absolutePath.getUserInfo().equals(m_uri.getUserInfo())) {
+            throw new IncorrectURL("You must not modify the user part of the URI: "+m_uri.getUserInfo());
+        } else if (absolutePath.getHost()!=null && !absolutePath.getHost().equals(m_uri.getHost())) {
+            throw new IncorrectURL("You must not modify the host of the URI: "+m_uri.getHost());
+        } else if (! absolutePath.getPath().startsWith("/")) {
+            throw new IncorrectURL("URI must contain an absolute path: "+m_uri.getPath());
+        }
+        return m_uri.resolve(absolutePath);
+    }
+
+    protected URI _getEffectiveURI(URI target) throws NotImplemented, IncorrectState, Timeout, NoSuccess {
         if (target.getPath().endsWith("/")) {
             return target.resolve(this.getName());
         } else {
@@ -314,24 +348,11 @@ public abstract class AbstractNamespaceEntryImpl extends AbstractPermissionsImpl
         return (m_uri.getPath().endsWith("/") ? m_uri.resolve("..") : m_uri.resolve("."));
     }
 
-    protected abstract NamespaceDirectory _openParentDir(Flags flags) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess;
-
     protected void _makeParentDirs() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
         try {
+            URI parent = this._getParentDirURI();
             Flags flags = Flags.CREATE.or(Flags.CREATEPARENTS);
-            _openParentDir(flags);
-        } catch (IncorrectURL e) {
-            throw new NoSuccess(e);
-        } catch (IncorrectSession e) {
-            throw new NoSuccess(e);
-        } catch (DoesNotExist e) {
-            throw new NoSuccess(e);
-        }
-    }
-
-    protected NamespaceEntry _createEntry(URI name, Flags flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
-        try {
-            return NamespaceFactory.createNamespaceEntry(m_session, name, flags);
+            this.openDir(parent, flags);
         } catch (IncorrectURL e) {
             throw new NoSuccess(e);
         } catch (IncorrectSession e) {

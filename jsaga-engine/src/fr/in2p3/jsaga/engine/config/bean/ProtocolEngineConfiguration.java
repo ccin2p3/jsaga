@@ -1,7 +1,8 @@
 package fr.in2p3.jsaga.engine.config.bean;
 
-import fr.in2p3.jsaga.engine.config.Configuration;
-import fr.in2p3.jsaga.engine.config.UserAttributesMap;
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.engine.config.*;
+import fr.in2p3.jsaga.engine.config.adaptor.DataAdaptorDescriptor;
 import fr.in2p3.jsaga.engine.schema.config.*;
 import fr.in2p3.jsaga.helpers.StringArray;
 import org.ogf.saga.URI;
@@ -26,11 +27,24 @@ import java.util.List;
 public class ProtocolEngineConfiguration {
     private Protocol[] m_protocol;
 
-    public ProtocolEngineConfiguration(Protocol[] protocol, UserAttributesMap userAttributes) {
+    public ProtocolEngineConfiguration(Protocol[] protocol, DataAdaptorDescriptor desc, UserAttributesMap userAttributes) throws Exception {
         m_protocol = protocol;
-        // update configured attributes with user attributes
         for (int i=0; m_protocol!=null && i<m_protocol.length; i++) {
             Protocol prt = m_protocol[i];
+
+            // get attributes
+            ConfAttributesMap attrs = new ConfAttributesMap(prt.getAttribute());
+
+            // update configured attributes with usages
+            Usage usage = desc.getUsage(prt.getScheme());
+            if (usage != null) {
+                usage.updateAttributes(attrs.getMap());
+            }
+
+            // set new attributes
+            prt.setAttribute(attrs.toArray());
+
+            // update configured attributes with user attributes
             this.updateAttributes(userAttributes, prt, prt.getScheme());
             for (int a=0; a<prt.getSchemeAliasCount(); a++) {
                 this.updateAttributes(userAttributes, prt, prt.getSchemeAlias(a));

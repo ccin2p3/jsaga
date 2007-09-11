@@ -1,10 +1,10 @@
 package fr.in2p3.jsaga.engine.config.adaptor;
 
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.InitializableSecurityAdaptorBuilder;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptorBuilder;
-import fr.in2p3.jsaga.adaptor.security.defaults.Default;
-import fr.in2p3.jsaga.engine.schema.config.*;
-import org.ogf.saga.error.IncorrectState;
+import fr.in2p3.jsaga.engine.schema.config.ContextInstance;
+import fr.in2p3.jsaga.engine.schema.config.Init;
 import org.ogf.saga.error.NoSuccess;
 
 import java.util.HashMap;
@@ -24,14 +24,30 @@ import java.util.Map;
  */
 public class SecurityAdaptorDescriptor {
     private Map m_classes;
+    private Map m_usages;
+    private Map m_initUsages;
     protected ContextInstance[] m_xml;
 
     public SecurityAdaptorDescriptor(Class[] adaptorClasses) throws IllegalAccessException, InstantiationException {
         m_classes = new HashMap();
+        m_usages = new HashMap();
+        m_initUsages = new HashMap();
         m_xml = new ContextInstance[adaptorClasses.length];
         for (int i=0; i<adaptorClasses.length; i++) {
             SecurityAdaptorBuilder adaptor = (SecurityAdaptorBuilder) adaptorClasses[i].newInstance();
+
+            // type
             m_classes.put(adaptor.getType(), adaptorClasses[i]);
+            Usage usage = adaptor.getUsage();
+            if (usage != null) {
+                m_usages.put(adaptor.getType(), usage);
+            }
+            if (adaptor instanceof InitializableSecurityAdaptorBuilder) {
+                Usage initUsage = ((InitializableSecurityAdaptorBuilder)adaptor).getInitUsage();
+                if (initUsage != null) {
+                    m_initUsages.put(adaptor.getType(), initUsage);
+                }
+            }
             m_xml[i] = toXML(adaptor);
         }
     }
@@ -45,33 +61,29 @@ public class SecurityAdaptorDescriptor {
         }
     }
 
+    public Usage getUsage(String type) {
+        return (Usage) m_usages.get(type);
+    }
+
+    public Usage getInitUsage(String type) {
+        return (Usage) m_initUsages.get(type);
+    }
+
     private static ContextInstance toXML(SecurityAdaptorBuilder adaptor) {
         ContextInstance ctx = new ContextInstance();
         ctx.setType(adaptor.getType());
         ctx.setIndice(0);
         ctx.setImpl(adaptor.getClass().getName());
-        ctx.setUsage(adaptor.getUsage().toString());
         if (adaptor instanceof InitializableSecurityAdaptorBuilder) {
             String usage = ((InitializableSecurityAdaptorBuilder)adaptor).getInitUsage().toString();
             Init init = new Init();
             init.setUsage(usage);
             ctx.setInit(init);
         }
-        Default[] defaults;
-        try {
-            defaults = adaptor.getDefaults(new HashMap());
-        } catch (IncorrectState e) {
-            defaults = null;
+        if (adaptor.getUsage() != null) {
+            ctx.setUsage(adaptor.getUsage().toString());
         }
-        if (defaults != null) {
-            ctx.setAttribute(new Attribute[defaults.length]);
-            for (int d=0; d<defaults.length; d++) {
-                Attribute attr = new Attribute();
-                attr.setName(defaults[d].getName());
-                attr.setValue(defaults[d].getValue());
-                ctx.setAttribute(d, attr);
-            }
-        }
+        AdaptorDescriptors.setDefaults(ctx, adaptor);
         return ctx;
     }
 }

@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.engine.data;
 
-import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import org.ogf.saga.SagaBase;
 import org.ogf.saga.URI;
 import org.ogf.saga.error.*;
@@ -21,8 +20,8 @@ import org.ogf.saga.session.Session;
  */
 public class DirectoryImpl extends AbstractNamespaceDirectoryImpl implements Directory {
     /** constructor */
-    public DirectoryImpl(Session session, URI uri, PhysicalEntryFlags flags, DataAdaptor adaptor) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(session, uri, flags, adaptor);
+    public DirectoryImpl(Session session, URI uri, PhysicalEntryFlags flags, DataConnection connection) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        super(session, uri, flags, connection);
         FlagsContainer effectiveFlags = new FlagsContainer(flags, PhysicalEntryFlags.READ);
         effectiveFlags.keepPhysicalEntryFlags();
     }
@@ -35,15 +34,11 @@ public class DirectoryImpl extends AbstractNamespaceDirectoryImpl implements Dir
         return new DirectoryImpl(this);
     }
 
-    public NamespaceDirectory openDir(URI name, Flags flags) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return new DirectoryImpl(m_session, resolveURI(name), PhysicalEntryFlags.cast(flags), m_adaptor);
+    public NamespaceDirectory openDir(URI relativePath, Flags flags) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        return new DirectoryImpl(m_session, super._resolveRelativeURI(relativePath), PhysicalEntryFlags.cast(flags), m_connection);
     }
 
-    public NamespaceEntry openEntry(URI name, Flags flags) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return new FileImpl(m_session, resolveURI(name), PhysicalEntryFlags.cast(flags), m_adaptor);
-    }
-
-    protected NamespaceDirectory _openParentDir(Flags flags) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return new DirectoryImpl(m_session, super._getParentDirURI(), PhysicalEntryFlags.cast(flags), m_adaptor);
+    public NamespaceEntry openEntry(URI relativePath, Flags flags) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        return new FileImpl(m_session, super._resolveRelativeURI(relativePath), PhysicalEntryFlags.cast(flags), m_connection);
     }
 }

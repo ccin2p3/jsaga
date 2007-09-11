@@ -17,5 +17,12 @@
             <artifactId>cog-jglobus</artifactId>
             <version>1.2</version>
         </dependency>
+        <!-- for runtime -->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.8</version>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 </project>

@@ -1,9 +1,9 @@
 package fr.in2p3.jsaga.engine.security;
 
 import fr.in2p3.jsaga.Base;
+import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.*;
-import fr.in2p3.jsaga.adaptor.security.defaults.Default;
-import fr.in2p3.jsaga.adaptor.security.usage.Usage;
 import fr.in2p3.jsaga.engine.adaptor.SecurityAdaptorBuilderFactory;
 import fr.in2p3.jsaga.engine.base.AbstractAttributesImpl;
 import fr.in2p3.jsaga.engine.config.Configuration;

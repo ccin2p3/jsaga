@@ -49,7 +49,7 @@ public abstract class DataEmulatorConnectionAbstract {
 
     // add
     public Directory addDirectory(String absolutePath) throws DoesNotExist {
-        return addDirectory(_parent(absolutePath), getEntryName(absolutePath));
+        return addDirectory(getParentDirectory(absolutePath), getEntryName(absolutePath));
     }
     public Directory addDirectory(DirectoryType parent, String name) {
         Directory dir = new Directory();
@@ -58,7 +58,7 @@ public abstract class DataEmulatorConnectionAbstract {
         return dir;
     }
     public File addFile(String absolutePath) throws DoesNotExist {
-        return addFile(_parent(absolutePath), getEntryName(absolutePath));
+        return addFile(getParentDirectory(absolutePath), getEntryName(absolutePath));
     }
     public File addFile(DirectoryType parent, String name) {
         File file = new File();
@@ -66,34 +66,27 @@ public abstract class DataEmulatorConnectionAbstract {
         parent.addFile(file);
         return file;
     }
-    private DirectoryType _parent(String absolutePath) throws DoesNotExist {
-        try {
-            return getParentDirectory(absolutePath);
-        } catch(IncorrectState e) {
-            throw new DoesNotExist("Parent directory does not exist, can not add entry: "+absolutePath);
-        }
-    }
 
     // remove
-    public void removeDirectory(String absolutePath) throws IncorrectState, BadParameter {
+    public void removeDirectory(String absolutePath) throws DoesNotExist, BadParameter {
         removeDirectory(getParentDirectory(absolutePath), getEntryName(absolutePath));
     }
-    public void removeDirectory(DirectoryType parent, String name) throws IncorrectState, BadParameter {
+    public void removeDirectory(DirectoryType parent, String name) throws DoesNotExist, BadParameter {
         Directory dir = getDirectory(parent, name);
         if (dir.getDirectoryCount()>0 || dir.getFileCount()>0) {
             throw new BadParameter("Directory is not empty: "+name);
         }
         parent.removeDirectory(dir);
     }
-    public void removeFile(String absolutePath) throws IncorrectState {
+    public void removeFile(String absolutePath) throws DoesNotExist {
         removeFile(getParentDirectory(absolutePath), getEntryName(absolutePath));
     }
-    public void removeFile(DirectoryType parent, String name) throws IncorrectState {
+    public void removeFile(DirectoryType parent, String name) throws DoesNotExist {
         parent.removeFile(getFile(parent, name));
     }
 
     // get
-    public DirectoryType getDirectory(String absolutePath) throws IncorrectState {
+    public DirectoryType getDirectory(String absolutePath) throws DoesNotExist {
         DirectoryType parent = getParentDirectory(absolutePath);
         String name = getEntryName(absolutePath);
         if (name != null) {
@@ -102,47 +95,43 @@ public abstract class DataEmulatorConnectionAbstract {
             return parent;
         }
     }
-    public Directory getDirectory(DirectoryType parent, String entryName) throws IncorrectState {
+    public Directory getDirectory(DirectoryType parent, String entryName) throws DoesNotExist {
         for (int i=0; i<parent.getDirectoryCount(); i++) {
             if (parent.getDirectory(i).getName().equals(entryName)) {
                 return parent.getDirectory(i);
             }
         }
-        throw new IncorrectState("Directory does not exist: "+entryName);
+        throw new DoesNotExist("Directory does not exist");
     }
-    public File getFile(String absolutePath) throws IncorrectState {
+    public File getFile(String absolutePath) throws DoesNotExist {
         return getFile(getParentDirectory(absolutePath), getEntryName(absolutePath));
     }
-    public File getFile(DirectoryType parent, String entryName) throws IncorrectState {
+    public File getFile(DirectoryType parent, String entryName) throws DoesNotExist {
         for (int i=0; i<parent.getFileCount(); i++) {
             if (parent.getFile(i).getName().equals(entryName)) {
                 return parent.getFile(i);
             }
         }
-        throw new IncorrectState("File does not exist: "+entryName);
+        throw new DoesNotExist("File does not exist");
     }
-    public EntryType getEntry(String absolutePath) throws IncorrectState {
+    public EntryType getEntry(String absolutePath) throws DoesNotExist {
         DirectoryType parentDir = getParentDirectory(absolutePath);
         String entryName = getEntryName(absolutePath);
-        try {
-            return getEntry(parentDir, entryName);
-        } catch(IncorrectState e) {
-            throw new IncorrectState("Entry does not exist: "+absolutePath);
-        }
+        return getEntry(parentDir, entryName);
     }
-    public EntryType getEntry(DirectoryType parent, String entryName) throws IncorrectState {
+    public EntryType getEntry(DirectoryType parent, String entryName) throws DoesNotExist {
         if (entryName == null) {
             return parent;
         }
         try {
             return getFile(parent, entryName);
-        } catch(IncorrectState e) {
+        } catch(DoesNotExist e) {
             return getDirectory(parent, entryName);
         }
     }
 
     // list
-    public EntryType[] listEntries(String absolutePath) throws IncorrectState {
+    public EntryType[] listEntries(String absolutePath) throws DoesNotExist {
         EntryType entry = this.getEntry(absolutePath);
         if (entry instanceof DirectoryType) {
             return listEntries((DirectoryType)entry);
@@ -163,7 +152,7 @@ public abstract class DataEmulatorConnectionAbstract {
 
     ////////////////////////////////////////// friend methods /////////////////////////////////////////
 
-    public DirectoryType getParentDirectory(String absolutePath) throws IncorrectState {
+    public DirectoryType getParentDirectory(String absolutePath) throws DoesNotExist {
         String[] entryNames = toArray(absolutePath);
         DirectoryType parent = this.getServerRoot();
         for (int i=0; i<entryNames.length-1; i++) {

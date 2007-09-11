@@ -54,7 +54,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <testExcludes>
-                        <testExclude>IntegrationTestSuite.java</testExclude>
+                        <testExclude>*IntegrationTestSuite.java</testExclude>
                     </testExcludes>
                 </configuration>
             </plugin>
@@ -69,9 +69,6 @@
                     <value>false</value>
                 </property>
             </activation>
-            <properties>
-                <jsaga.home>build/jsaga_home</jsaga.home>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -85,25 +82,20 @@
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
+                        <artifactId>maven-assembly-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>unpack-config</id>
                                 <phase>pre-integration-test</phase>
                                 <goals>
-                                    <goal>unpack</goal>
+                                    <goal>directory-inline</goal>
                                 </goals>
                                 <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>fr.in2p3.jsaga</groupId>
-                                            <artifactId>jsaga-engine</artifactId>
-                                            <type>zip</type>
-                                            <classifier>config</classifier>
-                                            <outputDirectory>${jsaga.home}</outputDirectory>
-                                            <overWrite>true</overWrite>
-                                        </artifactItem>
-                                    </artifactItems>
+                                    <descriptors>
+                                        <descriptor>test/assembly.xml</descriptor>
+                                    </descriptors>
+                                    <finalName>jsaga_home</finalName>
+                                    <appendAssemblyId>false</appendAssemblyId>
+                                    <archiveBaseDirectory>test/config</archiveBaseDirectory>
                                 </configuration>
                             </execution>
                         </executions>
@@ -119,12 +111,12 @@
                                 </goals>
                                 <configuration>
                                     <includes>
-                                        <include>IntegrationTestSuite.java</include>
+                                        <include>*IntegrationTestSuite.java</include>
                                     </includes>
                                     <systemProperties>
                                         <property>
                                             <name>JSAGA_HOME</name>
-                                            <value>${jsaga.home}</value>
+                                            <value>build/jsaga_home.dir</value>
                                         </property>
                                     </systemProperties>
                                 </configuration>

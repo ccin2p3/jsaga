@@ -16,6 +16,7 @@ import org.ogf.saga.namespace.PhysicalEntryFlags;
  */
 public class ExtensionFlags extends PhysicalEntryFlags {
     public static final ExtensionFlags LATE_EXISTENCE_CHECK = new ExtensionFlags(4096);
+    public static final ExtensionFlags LONG_FORMAT = new ExtensionFlags(8192);
 
     ExtensionFlags(int value) {
         super(value);

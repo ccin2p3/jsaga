@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.engine.config.adaptor;
 
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.ListJobControl;
 import fr.in2p3.jsaga.engine.schema.config.Jobservice;
@@ -22,14 +23,22 @@ import java.util.Map;
  */
 public class JobAdaptorDescriptor {
     private Map m_classes;
+    private Map m_usages;
     protected Jobservice[] m_xml;
 
     public JobAdaptorDescriptor(Class[] adaptorClasses) throws IllegalAccessException, InstantiationException {
         m_classes = new HashMap();
+        m_usages = new HashMap();
         m_xml = new Jobservice[adaptorClasses.length];
         for (int i=0; i<adaptorClasses.length; i++) {
             JobAdaptor adaptor = (JobAdaptor) adaptorClasses[i].newInstance();
+
+            // type
             m_classes.put(adaptor.getType(), adaptorClasses[i]);
+            Usage usage = adaptor.getUsage();
+            if (usage != null) {
+                m_usages.put(adaptor.getType(), usage);
+            }
             m_xml[i] = toXML(adaptor);
         }
     }
@@ -43,6 +52,10 @@ public class JobAdaptorDescriptor {
         }
     }
 
+    public Usage getUsage(String type) {
+        return (Usage) m_usages.get(type);
+    }
+
     private static Jobservice toXML(JobAdaptor adaptor) {
         Jobservice jobservice = new Jobservice();
         jobservice.setType(adaptor.getType());
@@ -54,6 +67,10 @@ public class JobAdaptorDescriptor {
         if (adaptor.getSupportedSandboxProtocols() != null) {
             jobservice.setSupportedProtocolScheme(adaptor.getSupportedSandboxProtocols());
         }
+        if (adaptor.getUsage() != null) {
+            jobservice.setUsage(adaptor.getUsage().toString());
+        }
+        AdaptorDescriptors.setDefaults(jobservice, adaptor);
         return jobservice;
     }
 }

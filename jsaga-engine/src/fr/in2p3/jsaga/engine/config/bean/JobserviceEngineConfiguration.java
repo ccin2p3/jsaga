@@ -1,6 +1,9 @@
 package fr.in2p3.jsaga.engine.config.bean;
 
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.engine.config.ConfAttributesMap;
 import fr.in2p3.jsaga.engine.config.UserAttributesMap;
+import fr.in2p3.jsaga.engine.config.adaptor.JobAdaptorDescriptor;
 import fr.in2p3.jsaga.engine.schema.config.Attribute;
 import fr.in2p3.jsaga.engine.schema.config.Jobservice;
 import org.ogf.saga.error.NoSuccess;
@@ -20,11 +23,24 @@ import org.ogf.saga.error.NoSuccess;
 public class JobserviceEngineConfiguration {
     private Jobservice[] m_jobservice;
 
-    public JobserviceEngineConfiguration(Jobservice[] jobservice, UserAttributesMap userAttributes) {
+    public JobserviceEngineConfiguration(Jobservice[] jobservice, JobAdaptorDescriptor desc, UserAttributesMap userAttributes) throws Exception {
         m_jobservice = jobservice;
-        // update configured attributes with user attributes
         for (int i=0; m_jobservice!=null && i<m_jobservice.length; i++) {
             Jobservice job = m_jobservice[i];
+
+            // get attributes
+            ConfAttributesMap attrs = new ConfAttributesMap(job.getAttribute());
+
+            // update configured attributes with usages
+            Usage usage = desc.getUsage(job.getType());
+            if (usage != null) {
+                usage.updateAttributes(attrs.getMap());
+            }
+
+            // set new attributes
+            job.setAttribute(attrs.toArray());
+
+            // update configured attributes with user attributes
             this.updateAttributes(userAttributes, job, job.getPath());
             for (int a=0; a<job.getPathAliasCount(); a++) {
                 this.updateAttributes(userAttributes, job, job.getPathAlias(a));

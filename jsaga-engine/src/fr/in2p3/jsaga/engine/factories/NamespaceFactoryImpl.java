@@ -51,10 +51,11 @@ public class NamespaceFactoryImpl extends NamespaceFactory {
             throw new IncorrectURL("Invalid entry name");
         }
         DataAdaptor dataAdaptor = createDataAdaptor(session, name);
+        DataConnection connection = new DataConnection(dataAdaptor);
         if (dataAdaptor instanceof LogicalReader || dataAdaptor instanceof LogicalWriter) {
-            return new LogicalDirectoryImpl(session, name, PhysicalEntryFlags.cast(flags), dataAdaptor);
+            return new LogicalDirectoryImpl(session, name, PhysicalEntryFlags.cast(flags), connection);
         } else {
-            return new DirectoryImpl(session, name, PhysicalEntryFlags.cast(flags), dataAdaptor);
+            return new DirectoryImpl(session, name, PhysicalEntryFlags.cast(flags), connection);
         }
     }
 
@@ -69,10 +70,11 @@ public class NamespaceFactoryImpl extends NamespaceFactory {
             throw new IncorrectURL("Invalid entry name");
         }
         DataAdaptor dataAdaptor = createDataAdaptor(session, name);
+        DataConnection connection = new DataConnection(dataAdaptor);
         if (dataAdaptor instanceof LogicalReader || dataAdaptor instanceof LogicalWriter) {
-            return new LogicalFileImpl(session, name, PhysicalEntryFlags.cast(flags), dataAdaptor);
+            return new LogicalFileImpl(session, name, PhysicalEntryFlags.cast(flags), connection);
         } else {
-            return new FileImpl(session, name, PhysicalEntryFlags.cast(flags), dataAdaptor);
+            return new FileImpl(session, name, PhysicalEntryFlags.cast(flags), connection);
         }
     }
 

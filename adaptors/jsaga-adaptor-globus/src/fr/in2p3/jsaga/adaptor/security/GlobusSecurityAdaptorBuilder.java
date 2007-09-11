@@ -1,8 +1,11 @@
 package fr.in2p3.jsaga.adaptor.security;
 
-import fr.in2p3.jsaga.adaptor.security.defaults.Default;
-import fr.in2p3.jsaga.adaptor.security.defaults.EnvironmentVariables;
-import fr.in2p3.jsaga.adaptor.security.usage.*;
+import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
+import fr.in2p3.jsaga.adaptor.base.usage.*;
+import fr.in2p3.jsaga.adaptor.security.usage.UProxyFile;
+import fr.in2p3.jsaga.adaptor.security.usage.UProxyObject;
+import org.globus.common.CoGProperties;
 import org.gridforum.jgss.ExtendedGSSCredential;
 import org.gridforum.jgss.ExtendedGSSManager;
 import org.ietf.jgss.GSSCredential;
@@ -33,30 +36,30 @@ public class GlobusSecurityAdaptorBuilder implements InitializableSecurityAdapto
     private static final Usage CREATE_PROXY = new UAnd(new Usage[]{
             new U("UserProxy"), new UFile("UserCert"), new UFile("UserKey"), new UHidden("UserPass"),
             new UDuration("LifeTime") {
-                protected void throwExceptionIfInvalid(Object value) throws Exception {
-                    if (value!=null) {super.throwExceptionIfInvalid(value);}
+                protected Object throwExceptionIfInvalid(Object value) throws Exception {
+                    return (value!=null ? super.throwExceptionIfInvalid(value) : null);
                 }
             },
             new UOptional("Delegation") {
-                protected void throwExceptionIfInvalid(Object value) throws Exception {
-                    super.throwExceptionIfInvalid(value);
-                    if (value != null) {
+                protected Object throwExceptionIfInvalid(Object value) throws Exception {
+                    if (super.throwExceptionIfInvalid(value) != null) {
                         String v = (String) value;
                         if (!v.equalsIgnoreCase("limited") && !v.equalsIgnoreCase("full")) {
                             throw new BadParameter("Expected: limited | full");
                         }
                     }
+                    return value;
                 }
             },
             new UOptional("ProxyType") {
-                protected void throwExceptionIfInvalid(Object value) throws Exception {
-                    super.throwExceptionIfInvalid(value);
-                    if (value != null) {
+                protected Object throwExceptionIfInvalid(Object value) throws Exception {
+                    if (super.throwExceptionIfInvalid(value) != null) {
                         String v = (String) value;
                         if (!v.equalsIgnoreCase("old") && !v.equalsIgnoreCase("globus") && !v.equalsIgnoreCase("RFC820")) {
                             throw new BadParameter("Expected: old | globus | RFC820");
                         }
                     }
+                    return value;
                 }
             }
     });
@@ -77,9 +80,9 @@ public class GlobusSecurityAdaptorBuilder implements InitializableSecurityAdapto
         return new Default[]{
                 new Default("UserProxy", new String[]{
                         env.getProperty("X509_USER_PROXY"),
-                        System.getProperty("os.name").equalsIgnoreCase("windows")
-                                ? System.getProperty("java.io.tmpdir")+"x509up_u_"+System.getProperty("user.name").toLowerCase()
-                                : System.getProperty("java.io.tmpdir")+"x509up_u_"+env.getProperty("UID")}),
+                        System.getProperty("os.name").toLowerCase().startsWith("windows")
+                                ? System.getProperty("java.io.tmpdir")+System.getProperty("file.separator")+"x509up_u_"+System.getProperty("user.name").toLowerCase()
+                                : System.getProperty("java.io.tmpdir")+System.getProperty("file.separator")+"x509up_u_"+env.getProperty("UID")}),
                 new Default("UserCert", new File[]{
                         new File(env.getProperty("X509_USER_CERT")+""),
                         new File(System.getProperty("user.home")+"/.globus/usercert.pem")}),
@@ -99,6 +102,7 @@ public class GlobusSecurityAdaptorBuilder implements InitializableSecurityAdapto
         if (LOCAL_PROXY_OBJECT.getMissingValues(attributes) == null) {
             return new GlobusSecurityAdaptor((GSSCredential) attributes.get("UserProxyObject"));
         } else if (LOCAL_PROXY_FILE.getMissingValues(attributes) == null) {
+            CoGProperties.getDefault().setCaCertLocations((String) attributes.get("CertDir"));
             File proxyFile = new File((String) attributes.get("UserProxy"));
             return new GlobusSecurityAdaptor(load(proxyFile));
         } else if (CREATE_PROXY.getMissingValues(attributes) == null) {
@@ -127,6 +131,6 @@ public class GlobusSecurityAdaptorBuilder implements InitializableSecurityAdapto
                 ExtendedGSSCredential.IMPEXP_OPAQUE,
                 GSSCredential.DEFAULT_LIFETIME,
                 null, // use default mechanism: GSI
-                GSSCredential.ACCEPT_ONLY);
+                GSSCredential.INITIATE_AND_ACCEPT);
     }
 }

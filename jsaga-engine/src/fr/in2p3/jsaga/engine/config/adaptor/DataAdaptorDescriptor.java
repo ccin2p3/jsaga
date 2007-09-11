@@ -1,10 +1,11 @@
 package fr.in2p3.jsaga.engine.config.adaptor;
 
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
+import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
+import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyDelegated;
 import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
-import fr.in2p3.jsaga.adaptor.data.readwrite.DataCopy;
-import fr.in2p3.jsaga.adaptor.data.readwrite.DataCopyDelegated;
 import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
 import fr.in2p3.jsaga.engine.schema.config.Protocol;
@@ -27,21 +28,28 @@ import java.util.Map;
  */
 public class DataAdaptorDescriptor {
     private Map m_classes;
+    private Map m_usages;
     protected Protocol[] m_xml;
 
     public DataAdaptorDescriptor(Class[] adaptorClasses) throws IllegalAccessException, InstantiationException {
         m_classes = new HashMap();
+        m_usages = new HashMap();
         m_xml = new Protocol[adaptorClasses.length];
         for (int i=0; i<adaptorClasses.length; i++) {
             DataAdaptor adaptor = (DataAdaptor) adaptorClasses[i].newInstance();
+
             // scheme
-            Class adaptorClass = adaptorClasses[i];
-            m_classes.put(adaptor.getScheme(), adaptorClass);
+            m_classes.put(adaptor.getScheme(), adaptorClasses[i]);
+            Usage usage = adaptor.getUsage();
+            if (usage != null) {
+                m_usages.put(adaptor.getScheme(), usage);
+            }
             m_xml[i] = toXML(adaptor);
+
             // scheme aliases
             String[] alias = adaptor.getSchemeAliases();
             for (int a=0; alias!=null && a<alias.length; a++) {
-                m_classes.put(alias[a], adaptorClass);
+                m_classes.put(alias[a], adaptorClasses[i]);
             }
         }
     }
@@ -53,6 +61,10 @@ public class DataAdaptorDescriptor {
         } else {
             throw new NoSuccess("Found no data adaptor supporting scheme: "+ scheme);
         }
+    }
+
+    public Usage getUsage(String scheme) {
+        return (Usage) m_usages.get(scheme);
     }
 
     private static Protocol toXML(DataAdaptor adaptor) {
@@ -69,6 +81,10 @@ public class DataAdaptorDescriptor {
         if (adaptor.getSupportedContextTypes() != null) {
             protocol.setSupportedContextType(adaptor.getSupportedContextTypes());
         }
+        if (adaptor.getUsage() != null) {
+            protocol.setUsage(adaptor.getUsage().toString());
+        }
+        AdaptorDescriptors.setDefaults(protocol, adaptor);
         return protocol;
     }
 }

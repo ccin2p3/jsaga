@@ -17,9 +17,18 @@ import java.util.*;
  *
  */
 public class UserAttributesMap {
+    private static final String[] KNOWN_SYSTEM_PROPERTIES = {
+            "java", "awt", "user", "os", "line", "path", "file.separator", "file.encoding"};
     private Map m_map;
 
     public UserAttributesMap() {
+        // set known system properties
+        Set propNamesFilter = new HashSet();
+        for (int i=0; i< KNOWN_SYSTEM_PROPERTIES.length; i++) {
+            propNamesFilter.add(KNOWN_SYSTEM_PROPERTIES[i]);
+        }
+
+        // set map
         m_map = new HashMap();
         for (Iterator it=System.getProperties().entrySet().iterator(); it.hasNext(); ) {
             Map.Entry entry = (Map.Entry) it.next();
@@ -29,12 +38,14 @@ public class UserAttributesMap {
             if (array.length == 2) {
                 String id = array[0];
                 String attributeName = array[1];
-                Properties userAttributes = (Properties) m_map.get(id);
-                if (userAttributes == null) {
-                    userAttributes = new Properties();
-                    m_map.put(id, userAttributes);
+                if (!propNamesFilter.contains(id) && !propNamesFilter.contains(propName)) {
+                    Properties userAttributes = (Properties) m_map.get(id);
+                    if (userAttributes == null) {
+                        userAttributes = new Properties();
+                        m_map.put(id, userAttributes);
+                    }
+                    userAttributes.setProperty(attributeName, attributeValue);
                 }
-                userAttributes.setProperty(attributeName, attributeValue);
             }
         }
     }

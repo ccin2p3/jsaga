@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.adaptor.security;
 
-import fr.in2p3.jsaga.adaptor.security.defaults.Default;
-import fr.in2p3.jsaga.adaptor.security.defaults.EnvironmentVariables;
-import fr.in2p3.jsaga.adaptor.security.usage.*;
+import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
+import fr.in2p3.jsaga.adaptor.base.usage.*;
 import org.glite.security.voms.contact.*;
 import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
@@ -35,52 +35,53 @@ public class VOMSSecurityAdaptorBuilder implements InitializableSecurityAdaptorB
 
     private static final Usage LOCAL_PROXY_OBJECT = new UNoPrompt("UserProxyObject") {
         public String toString() {return "_"+m_name+":"+MIN_REMAINING_LIFETIME+"_";}
-        protected void throwExceptionIfInvalid(Object value) throws Exception {
-            super.throwExceptionIfInvalid(value);
-            GSSCredential cred = (GSSCredential) value;
+        protected Object throwExceptionIfInvalid(Object value) throws Exception {
+            GSSCredential cred = (GSSCredential) super.throwExceptionIfInvalid(value);
             if (cred.getRemainingLifetime() < MIN_REMAINING_LIFETIME) {
                 throw new IncorrectState("Proxy file remaining lifetime if not enougth: "+cred.getRemainingLifetime());
             }
+            return cred;
         }
     };
     private static final Usage LOCAL_PROXY_FILE = new UFile("UserProxy") {
         public String toString() {return "<"+m_name+":"+MIN_REMAINING_LIFETIME+">";}
-        protected void throwExceptionIfInvalid(Object value) throws Exception {
-            super.throwExceptionIfInvalid(value);
-            GSSCredential cred = load(new File((String)value));
+        protected Object throwExceptionIfInvalid(Object value) throws Exception {
+            File file = (File) super.throwExceptionIfInvalid(value); 
+            GSSCredential cred = load(file);
             if (cred.getRemainingLifetime() < MIN_REMAINING_LIFETIME) {
                 throw new IncorrectState("Proxy file remaining lifetime if not enougth: "+cred.getRemainingLifetime());
             }
+            return cred;
         }
     };
     private static final Usage CREATE_PROXY = new UAnd(new Usage[]{
             new U("UserProxy"), new UFile("UserCert"), new UFile("UserKey"), new UHidden("UserPass"),
             new U("Server"), new U("UserVO"), new UOptional("UserFQAN"),
             new UDuration("LifeTime") {
-                protected void throwExceptionIfInvalid(Object value) throws Exception {
-                    if (value!=null) {super.throwExceptionIfInvalid(value);}
+                protected Object throwExceptionIfInvalid(Object value) throws Exception {
+                    return (value!=null ? super.throwExceptionIfInvalid(value) : null);
                 }
             },
             new UOptional("Delegation") {
-                protected void throwExceptionIfInvalid(Object value) throws Exception {
-                    super.throwExceptionIfInvalid(value);
-                    if (value != null) {
+                protected Object throwExceptionIfInvalid(Object value) throws Exception {
+                    if (super.throwExceptionIfInvalid(value) != null) {
                         String v = (String) value;
                         if (!v.equalsIgnoreCase("none") && !v.equalsIgnoreCase("limited") && !v.equalsIgnoreCase("full")) {
                             throw new BadParameter("Expected: none | limited | full");
                         }
                     }
+                    return value;
                 }
             },
             new UOptional("ProxyType") {
-                protected void throwExceptionIfInvalid(Object value) throws Exception {
-                    super.throwExceptionIfInvalid(value);
-                    if (value != null) {
+                protected Object throwExceptionIfInvalid(Object value) throws Exception {
+                    if (super.throwExceptionIfInvalid(value) != null) {
                         String v = (String) value;
                         if (!v.equalsIgnoreCase("old") && !v.equalsIgnoreCase("globus") && !v.equalsIgnoreCase("RFC820")) {
                             throw new BadParameter("Expected: old | globus | RFC820");
                         }
                     }
+                    return value;
                 }
             }
     });
@@ -102,9 +103,9 @@ public class VOMSSecurityAdaptorBuilder implements InitializableSecurityAdaptorB
         return new Default[]{
                 new Default("UserProxy", new String[]{
                         env.getProperty("X509_USER_PROXY"),
-                        System.getProperty("os.name").equalsIgnoreCase("windows")
-                                ? System.getProperty("java.io.tmpdir")+"x509up_u_"+System.getProperty("user.name").toLowerCase()
-                                : System.getProperty("java.io.tmpdir")+"x509up_u_"+env.getProperty("UID")}),
+                        System.getProperty("os.name").toLowerCase().startsWith("windows")
+                                ? System.getProperty("java.io.tmpdir")+System.getProperty("file.separator")+"x509up_u_"+System.getProperty("user.name").toLowerCase()
+                                : System.getProperty("java.io.tmpdir")+System.getProperty("file.separator")+"x509up_u_"+env.getProperty("UID")}),
                 new Default("UserCert", new File[]{
                         new File(env.getProperty("X509_USER_CERT")+""),
                         new File(System.getProperty("user.home")+"/.globus/usercert.pem")}),
@@ -155,7 +156,7 @@ public class VOMSSecurityAdaptorBuilder implements InitializableSecurityAdaptorB
         // required attributes
         System.setProperty("X509_USER_CERT", (String) attributes.get("UserCert"));
         System.setProperty("X509_USER_KEY", (String) attributes.get("UserKey"));
-        System.setProperty("CADIR", (String) attributes.get("CertDir"));
+        System.setProperty("X509_CERT_DIR", (String) attributes.get("CertDir"));
         System.setProperty("VOMSDIR", (String) attributes.get("VomsDir"));
         URI uri = new URI((String) attributes.get("Server"));
         if (uri.getHost()==null) {
@@ -179,7 +180,7 @@ public class VOMSSecurityAdaptorBuilder implements InitializableSecurityAdaptorB
             o.addFQAN((String) attributes.get("UserFQAN"));
         }
         if (attributes.containsKey("LifeTime")) {
-            int lifetime = (int) UDuration.toLong((String) attributes.get("LifeTime"));
+            int lifetime = UDuration.toInt(attributes.get("LifeTime"));
             proxyInit.setProxyLifetime(lifetime);
         }
         if (attributes.containsKey("Delegation")) {

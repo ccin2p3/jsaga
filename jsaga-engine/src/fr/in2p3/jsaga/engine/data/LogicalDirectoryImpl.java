@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.engine.data;
 
-import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.MetaDataReader;
 import org.ogf.saga.SagaBase;
@@ -26,8 +25,8 @@ import java.util.regex.Pattern;
  */
 public class LogicalDirectoryImpl extends AbstractNamespaceDirectoryImpl implements LogicalDirectory {
     /** constructor */
-    public LogicalDirectoryImpl(Session session, URI uri, LogicalEntryFlags flags, DataAdaptor adaptor) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(session, uri, flags, adaptor);
+    public LogicalDirectoryImpl(Session session, URI uri, LogicalEntryFlags flags, DataConnection connection) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        super(session, uri, flags, connection);
         FlagsContainer effectiveFlags = new FlagsContainer(flags, PhysicalEntryFlags.READ);
         effectiveFlags.keepLogicalEntryFlags();
     }
@@ -47,6 +46,9 @@ public class LogicalDirectoryImpl extends AbstractNamespaceDirectoryImpl impleme
     /** search in meta-data */
     public List find(String namePattern, String[] keyPattern, String[] valPattern, LogicalEntryFlags flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         FlagsContainer effectiveFlags = new FlagsContainer(flags, LogicalEntryFlags.RECURSIVE);
+        if (effectiveFlags.contains(Flags.DEREFERENCE)) {
+            return ((LogicalDirectoryImpl)this._dereferenceDir()).find(namePattern, keyPattern, valPattern, PhysicalEntryFlags.cast(effectiveFlags.remove(Flags.DEREFERENCE)));
+        }
         effectiveFlags.keepLogicalEntryFlags();
         effectiveFlags.checkAllowed(Flags.RECURSIVE.or(Flags.DEREFERENCE));
 
@@ -74,16 +76,20 @@ public class LogicalDirectoryImpl extends AbstractNamespaceDirectoryImpl impleme
         }
     }
     private void _doFind(Pattern p, Map keyValuePatterns, FlagsContainer effectiveFlags, List matchingPath, URI currentPath) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        URI effectiveSource = this._getEffectiveURI(effectiveFlags);
         // for each child
-        FileAttributes[] childs = ((MetaDataReader)m_adaptor).listAttributes(effectiveSource.getPath(), keyValuePatterns);
+        FileAttributes[] childs;
+        try {
+            childs = ((MetaDataReader)m_adaptor).listAttributes(m_uri.getPath(), keyValuePatterns);
+        } catch (DoesNotExist doesNotExist) {
+            throw new IncorrectState("Logical directory does not exist: "+m_uri, doesNotExist);
+        }
         for (int i=0; i<childs.length; i++) {
-            if (p==null || p.matcher(childs[i].name).matches()) {
+            if (p==null || p.matcher(childs[i].getName()).matches()) {
                 // add relative path
-                URI childPath = currentPath.resolve(childs[i].name);
+                URI childPath = currentPath.resolve(childs[i].getName());
                 matchingPath.add(childPath);
                 // may recurse
-                if (effectiveFlags.contains(Flags.RECURSIVE) && childs[i].type==FileAttributes.DIRECTORY_TYPE) {
+                if (effectiveFlags.contains(Flags.RECURSIVE) && childs[i].getType()==FileAttributes.DIRECTORY_TYPE) {
                     LogicalDirectoryImpl childDir = (LogicalDirectoryImpl) this._openNSDir(childPath);
                     childDir._doFind(p, keyValuePatterns, effectiveFlags, matchingPath, childPath);
                 }
@@ -92,14 +98,10 @@ public class LogicalDirectoryImpl extends AbstractNamespaceDirectoryImpl impleme
     }
 
     public NamespaceDirectory openDir(URI name, Flags flags) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return new LogicalDirectoryImpl(m_session, resolveURI(name), PhysicalEntryFlags.cast(flags), m_adaptor);
+        return new LogicalDirectoryImpl(m_session, super._resolveRelativeURI(name), PhysicalEntryFlags.cast(flags), m_connection);
     }
 
     public NamespaceEntry openEntry(URI name, Flags flags) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return new LogicalFileImpl(m_session, resolveURI(name), PhysicalEntryFlags.cast(flags), m_adaptor);
-    }
-
-    protected NamespaceDirectory _openParentDir(Flags flags) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return new LogicalDirectoryImpl(m_session, super._getParentDirURI(), PhysicalEntryFlags.cast(flags), m_adaptor);
+        return new LogicalFileImpl(m_session, super._resolveRelativeURI(name), PhysicalEntryFlags.cast(flags), m_connection);
     }
 }

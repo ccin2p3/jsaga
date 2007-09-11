@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.adaptor.security;
 
-import fr.in2p3.jsaga.adaptor.security.defaults.Default;
-import fr.in2p3.jsaga.adaptor.security.usage.*;
+import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.*;
 import org.ogf.saga.error.IncorrectState;
 import org.ogf.saga.error.NotImplemented;
 

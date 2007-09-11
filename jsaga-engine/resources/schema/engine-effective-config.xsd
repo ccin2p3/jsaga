@@ -56,7 +56,7 @@
         </sequence>
         <attribute name="type" type="string" use="required"/><!-- from adaptor descriptor -->
         <attribute name="impl" type="string" use="required"/><!-- from adaptor descriptor -->
-        <attribute name="usage" type="string" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="usage" type="string" use="optional"/><!-- from adaptor descriptor -->
         <attribute name="indice" type="int" use="optional"/>
         <attribute name="name" type="string" use="optional"/>
     </extension></complexContent></complexType></element>
@@ -85,6 +85,7 @@
         <attribute name="write" type="boolean" use="required"/><!-- from adaptor descriptor -->
         <attribute name="thirdparty" type="boolean" use="required"/><!-- from adaptor descriptor -->
         <attribute name="logical" type="boolean" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="usage" type="string" use="optional"/><!-- from adaptor descriptor -->
     </extension></complexContent></complexType></element>
 
     <element name="jobservice"><complexType><complexContent><extension base="tns:ObjectType">
@@ -109,6 +110,7 @@
         <attribute name="type" type="string" use="required"/><!-- from adaptor descriptor -->
         <attribute name="impl" type="string" use="required"/><!-- from adaptor descriptor -->
         <attribute name="bulk" type="boolean" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="usage" type="string" use="optional"/><!-- from adaptor descriptor -->
         <attribute name="path" type="string" use="optional"/>
     </extension></complexContent></complexType></element>
     <complexType name="FileManagementWorkerType"><simpleContent><extension base="string"><!-- should be CDATA -->

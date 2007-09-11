@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.security;
 
-import fr.in2p3.jsaga.adaptor.security.usage.UDuration;
+import fr.in2p3.jsaga.adaptor.base.usage.UDuration;
+import org.globus.common.CoGProperties;
 import org.globus.common.Version;
 import org.globus.gsi.CertUtil;
 import org.globus.gsi.GSIConstants;
@@ -40,13 +41,14 @@ public class GlobusProxyFactory extends GlobusProxyFactoryAbstract {
     public GlobusProxyFactory(Map attributes) throws BadParameter, ParseException {
         // required attributes
         super((String) attributes.get("UserPass")); // UserPass is ignored if key is not encrypted
+        CoGProperties.getDefault().setCaCertLocations((String) attributes.get("CertDir"));
         m_proxyFile = (String) attributes.get("UserProxy");
         m_certFile = (String) attributes.get("UserCert");
         m_keyFile = (String) attributes.get("UserKey");
         
         // optional attributes
         if (attributes.containsKey("LifeTime")) {
-            lifetime = (int) UDuration.toLong((String) attributes.get("LifeTime"));
+            lifetime = UDuration.toInt(attributes.get("LifeTime"));
         }
         boolean limited = false;
         if (attributes.containsKey("Delegation")) {

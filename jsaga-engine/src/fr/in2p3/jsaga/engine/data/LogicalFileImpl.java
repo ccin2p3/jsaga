@@ -1,15 +1,19 @@
 package fr.in2p3.jsaga.engine.data;
 
 import fr.in2p3.jsaga.ExtensionFlags;
-import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
+import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
+import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyDelegated;
 import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
+import fr.in2p3.jsaga.engine.config.Configuration;
+import fr.in2p3.jsaga.engine.data.copy.SourceLogicalFile;
+import fr.in2p3.jsaga.engine.data.copy.TargetLogicalFile;
 import fr.in2p3.jsaga.engine.factories.NamespaceFactoryImpl;
+import fr.in2p3.jsaga.engine.schema.config.Protocol;
 import org.ogf.saga.SagaBase;
 import org.ogf.saga.URI;
 import org.ogf.saga.error.*;
-import org.ogf.saga.error.Exception;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 
@@ -29,12 +33,24 @@ import java.net.URISyntaxException;
  */
 public class LogicalFileImpl extends AbstractNamespaceEntryImpl implements LogicalFile {
     /** constructor */
-    public LogicalFileImpl(Session session, URI uri, LogicalEntryFlags flags, DataAdaptor adaptor) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(session, uri, flags, adaptor);
+    public LogicalFileImpl(Session session, URI uri, LogicalEntryFlags flags, DataConnection connection) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        super(session, uri, flags, connection);
         FlagsContainer effectiveFlags = new FlagsContainer(flags, PhysicalEntryFlags.READ);
         effectiveFlags.keepLogicalEntryFlags();
         if (effectiveFlags.contains(Flags.CREATE)) {
-            // do nothing
+            if (m_adaptor instanceof LogicalWriter) {
+                if (this.exists()) {
+                    if (effectiveFlags.contains(Flags.EXCL)) {
+                        throw new AlreadyExists("Entry already exists: "+m_uri);
+                    }
+                } else if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
+                    this._makeParentDirs();
+                }
+            } else {
+                throw new NotImplemented("Not supported for this protocol: "+m_uri.getScheme());
+            }
+        } else if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
+            this._makeParentDirs();
         } else if (! new FlagsContainer(flags).contains(ExtensionFlags.LATE_EXISTENCE_CHECK)) {
             if (m_adaptor instanceof DataReaderAdaptor && !((DataReaderAdaptor)m_adaptor).exists(m_uri.getPath())) {
                 throw new DoesNotExist("Logical file does not exist: "+m_uri);
@@ -84,7 +100,11 @@ public class LogicalFileImpl extends AbstractNamespaceEntryImpl implements Logic
 
     public String[] listLocations() throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         if (m_adaptor instanceof LogicalReader) {
-            return ((LogicalReader)m_adaptor).listLocations(m_uri.getPath());
+            try {
+                return ((LogicalReader)m_adaptor).listLocations(m_uri.getPath());
+            } catch (DoesNotExist doesNotExist) {
+                throw new IncorrectState("Logical file does not exist: "+m_uri, doesNotExist);
+            }
         } else {
             throw new NotImplemented("Not supported for this protocol: "+m_uri.getScheme(), this);
         }
@@ -160,27 +180,104 @@ public class LogicalFileImpl extends AbstractNamespaceEntryImpl implements Logic
         }
     }
 
-    ///////////////////////////////////////// protected methods /////////////////////////////////////////
-
-    protected void _removeAllLocations() {
-        try {
-            String[] locations = this.listLocations();
-            for (int i=0; locations!=null && i<locations.length; i++) {
-                this.removeLocation(locations[i]);
+    public void copy(URI target, Flags flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
+        FlagsContainer effectiveFlags = new FlagsContainer(flags, Flags.NONE);
+        if (effectiveFlags.contains(Flags.DEREFERENCE)) {
+            this._dereferenceEntry().copy(target, effectiveFlags.remove(Flags.DEREFERENCE));
+            return; //==========> EXIT
+        }
+        effectiveFlags.keepNamespaceEntryFlags();
+        effectiveFlags.checkAllowed(Flags.DEREFERENCE.or(Flags.CREATEPARENTS).or(Flags.OVERWRITE));
+        boolean overwrite = effectiveFlags.contains(Flags.OVERWRITE);
+        URI effectiveTarget = this._getEffectiveURI(target);
+        if (m_adaptor instanceof DataCopyDelegated && m_uri.getScheme().equals(effectiveTarget.getScheme())) {
+            try {
+                ((DataCopyDelegated)m_adaptor).requestTransfer(
+                        m_uri,
+                        effectiveTarget,
+                        overwrite);
+            } catch (DoesNotExist doesNotExist) {
+                throw new IncorrectState("Logical file does not exist: "+m_uri, doesNotExist);
+            } catch (AlreadyExists alreadyExists) {
+                throw new AlreadyExists("Target entry already exists: "+effectiveTarget, alreadyExists.getCause());
             }
-        } catch(Exception e) {
-            // do nothing
+        } else if (m_adaptor instanceof DataCopy && m_uri.getScheme().equals(effectiveTarget.getScheme())) {
+            try {
+                ((DataCopy)m_adaptor).copy(
+                        m_uri.getPath(),
+                        effectiveTarget.getHost(), effectiveTarget.getPort(), effectiveTarget.getPath(),
+                        overwrite);
+            } catch (DoesNotExist doesNotExist) {
+                throw new IncorrectState("Logical file does not exist: "+m_uri, doesNotExist);
+            } catch (AlreadyExists alreadyExists) {
+                throw new AlreadyExists("Target entry already exists: "+effectiveTarget, alreadyExists.getCause());
+            }
+        } else if (m_adaptor instanceof LogicalReader) {
+            SourceLogicalFile source = new SourceLogicalFile(this);
+            Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(target.getScheme());
+            if (descriptor.hasLogical() && descriptor.getLogical()) {
+                source.putToLogicalFile(m_session, effectiveTarget, effectiveFlags);
+            } else {
+                source.putToPhysicalFile(m_session, effectiveTarget, effectiveFlags);
+            }
+        } else {
+            throw new NotImplemented("Not supported for this protocol: "+m_uri.getScheme(), this);
         }
     }
 
-    protected void _addAllLocations(String[] locations) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
-        try {
-            for (int i=0; locations!=null && i<locations.length; i++) {
-                this.addLocation(locations[i]);
-            }
-        } catch (IncorrectURL e) {
-            throw new NoSuccess(e);
+    public void copyFrom(URI source, Flags flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+        FlagsContainer effectiveFlags = new FlagsContainer(flags, Flags.NONE);
+        if (effectiveFlags.contains(Flags.DEREFERENCE)) {
+            this._dereferenceEntry().copyFrom(source, effectiveFlags.remove(Flags.DEREFERENCE));
+            return; //==========> EXIT
         }
+        effectiveFlags.keepNamespaceEntryFlags();
+        effectiveFlags.checkAllowed(Flags.DEREFERENCE.or(Flags.OVERWRITE));
+        boolean overwrite = effectiveFlags.contains(Flags.OVERWRITE);
+        URI effectiveSource = this._getEffectiveURI(source);
+        if (m_adaptor instanceof DataCopyDelegated && m_uri.getScheme().equals(effectiveSource.getScheme())) {
+            try {
+                ((DataCopyDelegated)m_adaptor).requestTransfer(
+                        effectiveSource,
+                        m_uri,
+                        overwrite);
+            } catch (DoesNotExist doesNotExist) {
+                throw new DoesNotExist("Logical file does not exist: "+effectiveSource, doesNotExist.getCause());
+            } catch (AlreadyExists alreadyExists) {
+                throw new IncorrectState("Target entry already exists: "+m_uri, alreadyExists);
+            }
+        } else if (m_adaptor instanceof DataCopy && m_uri.getScheme().equals(effectiveSource.getScheme())) {
+            try {
+                ((DataCopy)m_adaptor).copyFrom(
+                        effectiveSource.getHost(), effectiveSource.getPort(), effectiveSource.getPath(),
+                        m_uri.getPath(),
+                        overwrite);
+            } catch (DoesNotExist doesNotExist) {
+                throw new DoesNotExist("Logical file does not exist: "+effectiveSource, doesNotExist.getCause());
+            } catch (AlreadyExists alreadyExists) {
+                throw new IncorrectState("Target entry already exists: "+m_uri, alreadyExists);
+            }
+        } else if (m_adaptor instanceof LogicalWriter) {
+            Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(source.getScheme());
+            if (descriptor.hasLogical() && descriptor.getLogical()) {
+                TargetLogicalFile target = new TargetLogicalFile(this);
+                target.getFromLogicalFile(m_session, effectiveSource, effectiveFlags);
+            } else {
+                throw new BadParameter("Maybe what you want to do is to register to logical file the following location: "+source);
+            }
+        } else {
+            throw new NotImplemented("Not supported for this protocol: "+m_uri.getScheme(), this);
+        }
+    }
+
+    ///////////////////////////////////////// protected methods /////////////////////////////////////////
+
+    public NamespaceDirectory openDir(URI absolutePath, Flags flags) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        return new LogicalDirectoryImpl(m_session, super._resolveAbsoluteURI(absolutePath), PhysicalEntryFlags.cast(flags), m_connection);
+    }
+
+    public NamespaceEntry openEntry(URI absolutePath, Flags flags) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        return new LogicalFileImpl(m_session, super._resolveAbsoluteURI(absolutePath), PhysicalEntryFlags.cast(flags), m_connection);
     }
 
     protected URI _getReplicaLocation(String name) throws IncorrectURL {
@@ -189,9 +286,5 @@ public class LogicalFileImpl extends AbstractNamespaceEntryImpl implements Logic
         } catch (URISyntaxException e) {
             throw new IncorrectURL(e);
         }
-    }
-
-    protected NamespaceDirectory _openParentDir(Flags flags) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return new LogicalDirectoryImpl(m_session, super._getParentDirURI(), PhysicalEntryFlags.cast(flags), m_adaptor);
     }
 }

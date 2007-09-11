@@ -56,6 +56,12 @@ public class Configuration {
         return _instance;
     }
     private Configuration() throws Exception {
+        if (!Base.JSAGA_HOME.exists()) {
+            throw new FileNotFoundException("JSAGA_HOME does not exist: "+Base.JSAGA_HOME.getAbsolutePath());
+        }
+        if (!Base.JSAGA_CONFIG.exists()) {
+            throw new FileNotFoundException("Configuration file does not exist: "+Base.JSAGA_CONFIG.getAbsolutePath());
+        }
         String xslBaseDir = "xsl/config";
         File baseDir = new File(Base.JSAGA_VAR, "jsaga-config");
         if(!baseDir.exists()) baseDir.mkdir();
@@ -107,7 +113,7 @@ public class Configuration {
         }
 
         // serialize config
-        m_configurations = new EngineConfiguration(mergedConfig);
+        m_configurations = new EngineConfiguration(mergedConfig, m_descriptors);
     }
 
     public AdaptorDescriptors getDescriptors() {

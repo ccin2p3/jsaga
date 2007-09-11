@@ -1,5 +1,8 @@
 package fr.in2p3.jsaga.adaptor.data;
 
+import fr.in2p3.jsaga.Base;
+import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.impl.DataCatalogHandler;
 import fr.in2p3.jsaga.adaptor.data.link.LinkAdaptor;
 import fr.in2p3.jsaga.adaptor.data.link.NotLink;
@@ -10,6 +13,8 @@ import fr.in2p3.jsaga.adaptor.schema.data.catalog.*;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import org.ogf.saga.URI;
 import org.ogf.saga.error.*;
+
+import java.util.Map;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -26,8 +31,20 @@ import org.ogf.saga.error.*;
 public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter, DirectoryReader, DirectoryWriter, LinkAdaptor {
     private DataCatalogHandler m_catalog;
 
+    public Usage getUsage() {
+        return null;
+    }
+
+    public Default[] getDefaults(Map attributes) throws IncorrectState {
+        return null;
+    }
+
+    public void setAttributes(Map attributes) throws BadParameter {
+        // do nothing
+    }
+
     public String[] getSupportedContextTypes() {
-        return new String[0];  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
@@ -42,40 +59,44 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
         return null;
     }
 
+    public int getDefaultPort() {
+        return 0;
+    }
+
     public void connect(String userInfo, String host, int port) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {
         m_catalog = DataCatalogHandler.getInstance();
-        m_catalog.commit();
+        if(Base.DEBUG) m_catalog.commit();
     }
 
     public void disconnect() throws NoSuccess {
         m_catalog.commit();
     }
 
-    public boolean exists(String absolutePath) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
+    public boolean exists(String absolutePath) throws PermissionDenied, Timeout, NoSuccess {
         try {
             m_catalog.getEntry(absolutePath);
             return true;
-        } catch (IncorrectState e) {
+        } catch (DoesNotExist e) {
             return false;
         }
     }
 
-    public boolean isDirectory(String absolutePath) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public boolean isDirectory(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         EntryType entry = m_catalog.getEntry(absolutePath);
         return entry instanceof DirectoryType;
     }
 
-    public boolean isEntry(String absolutePath) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public boolean isEntry(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         EntryType entry = m_catalog.getEntry(absolutePath);
         return entry instanceof FileType;
     }
 
-    public void addLocation(String logicalEntry, URI replicaEntry) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, AlreadyExists, Timeout, NoSuccess {
+    public void addLocation(String logicalEntry, URI replicaEntry) throws PermissionDenied, IncorrectState, AlreadyExists, Timeout, NoSuccess {
         // get or create logical entry
         File file;
         try {
             file = m_catalog.getFile(logicalEntry);
-        } catch(IncorrectState e) {
+        } catch(DoesNotExist e) {
             try {
                 file = m_catalog.addFile(logicalEntry);
             } catch (DoesNotExist e2) {
@@ -84,95 +105,66 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
         }
         // add replica location
         if (arrayContains(file.getReplica(), replicaEntry.toString())) {
-            throw new AlreadyExists("Replica location already registered: "+replicaEntry.toString());
+            throw new AlreadyExists("Replica location already registered");
         } else {
             file.addReplica(replicaEntry.toString());
         }
-        m_catalog.commit();
+        if(Base.DEBUG) m_catalog.commit();
     }
 
-    public void removeLocation(String logicalEntry, URI replicaEntry) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    public void removeLocation(String logicalEntry, URI replicaEntry) throws PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
         // get logical entry
         File file = m_catalog.getFile(logicalEntry);
         // remove replica location
         if (! file.removeReplica(replicaEntry.toString())) {
-            throw new DoesNotExist("Replica location no registered: "+replicaEntry.toString());
+            throw new DoesNotExist("Replica location no registered");
         }
-        m_catalog.commit();
+        if(Base.DEBUG) m_catalog.commit();
     }
 
-    public void removeFile(String absolutePath) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        m_catalog.removeFile(absolutePath);
-        m_catalog.commit();
+    public void removeFile(String parentAbsolutePath, String fileName) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+        DirectoryType parent = m_catalog.getDirectory(parentAbsolutePath);
+        m_catalog.removeFile(parent, fileName);
+        if(Base.DEBUG) m_catalog.commit();
     }
 
-    public String[] listLocations(String logicalEntry) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public String[] listLocations(String logicalEntry) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         File file = m_catalog.getFile(logicalEntry);
         return file.getReplica();
     }
 
-    public String[] list(String absolutePath) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
-        EntryType[] list = m_catalog.listEntries(absolutePath);
-        String[] ret = new String[list.length];
-        for (int i=0; i<list.length; i++) {
-            ret[i] = list[i].getName();
-        }
-        return ret;
-    }
-
-    public FileAttributes[] listAttributes(String absolutePath) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public FileAttributes[] listAttributes(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         EntryType[] list = m_catalog.listEntries(absolutePath);
         FileAttributes[] ret = new FileAttributes[list.length];
         for (int i=0; i<list.length; i++) {
-            ret[i] = new FileAttributes();
-            ret[i].name = list[i].getName();
-            if (list[i] instanceof DirectoryType) {
-                ret[i].type = FileAttributes.DIRECTORY_TYPE;
-                ret[i].size = 0;
-            } else if (list[i] instanceof FileType) {
-                FileType file = (FileType) list[i];
-                if (file.getLink() != null) {
-                    ret[i].type = FileAttributes.LINK_TYPE;
-                    ret[i].size = 0;
-                } else {
-                    ret[i].type = FileAttributes.FILE_TYPE;
-                    ret[i].size = file.getReplicaCount();
-                }
-            } else {
-                ret[i].type = FileAttributes.UNKNOWN_TYPE;
-                ret[i].size = -1;
-            }
+            ret[i] = new CatalogFileAttributes(list[i]);
         }
         return ret;
     }
 
-    public void makeDir(String parentAbsolutePath, String directoryName) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        DirectoryType parent;
-        try {
-            parent = m_catalog.getDirectory(parentAbsolutePath);
-        } catch (IncorrectState e) {
-            throw new DoesNotExist("Parent directory does not exist: "+parentAbsolutePath);
-        }
+    public void makeDir(String parentAbsolutePath, String directoryName) throws PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        DirectoryType parent = m_catalog.getDirectory(parentAbsolutePath);
         try {
             m_catalog.getEntry(parent, directoryName);
-            throw new AlreadyExists("Entry already exists: "+directoryName);
-        } catch(IncorrectState e) {
+            throw new AlreadyExists("Entry already exists");
+        } catch(DoesNotExist e) {
             m_catalog.addDirectory(parent, directoryName);
         }
-        m_catalog.commit();
+        if(Base.DEBUG) m_catalog.commit();
     }
 
-    public void removeDir(String absolutePath) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        m_catalog.removeDirectory(absolutePath);
-        m_catalog.commit();
+    public void removeDir(String parentAbsolutePath, String directoryName) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+        DirectoryType parent = m_catalog.getDirectory(parentAbsolutePath);
+        m_catalog.removeDirectory(parent, directoryName);
+        if(Base.DEBUG) m_catalog.commit();
     }
 
-    public boolean isLink(String absolutePath) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public boolean isLink(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         EntryType entry = m_catalog.getEntry(absolutePath);
         return entry instanceof FileType && entry.getLink()!=null;
     }
 
-    public String readLink(String absolutePath) throws NotLink, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public String readLink(String absolutePath) throws NotLink, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         EntryType entry = m_catalog.getEntry(absolutePath);
         if (entry instanceof FileType && entry.getLink()!=null) {
             return entry.getLink();
@@ -181,19 +173,15 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
         }
     }
 
-    public void link(String sourceAbsolutePath, String linkAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, AlreadyExists, Timeout, NoSuccess {
+    public void link(String sourceAbsolutePath, String linkAbsolutePath, boolean overwrite) throws PermissionDenied, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
         File link;
         try {
             link = m_catalog.getFile(linkAbsolutePath);
             if (! overwrite) {
-                throw new AlreadyExists("Link already exists: "+linkAbsolutePath);
+                throw new AlreadyExists("Link already exists");
             }
-        } catch(IncorrectState e) {
-            try {
-                link = m_catalog.addFile(linkAbsolutePath);
-            } catch (DoesNotExist e2) {
-                throw new IncorrectState("Parent directory does not exist for link: "+linkAbsolutePath, e2);
-            }
+        } catch(DoesNotExist e) {
+            link = m_catalog.addFile(linkAbsolutePath);
         }
         link.setLink(sourceAbsolutePath);
     }

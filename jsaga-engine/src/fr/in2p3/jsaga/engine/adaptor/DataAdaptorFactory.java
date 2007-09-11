@@ -5,11 +5,15 @@ import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.config.adaptor.DataAdaptorDescriptor;
+import fr.in2p3.jsaga.engine.config.bean.ProtocolEngineConfiguration;
+import fr.in2p3.jsaga.engine.schema.config.Protocol;
 import fr.in2p3.jsaga.helpers.StringArray;
 import org.ogf.saga.URI;
 import org.ogf.saga.error.*;
 
 import java.lang.Exception;
+import java.util.HashMap;
+import java.util.Map;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -27,6 +31,7 @@ public class DataAdaptorFactory {
     private static DataAdaptorFactory _instance = null;
 
     private DataAdaptorDescriptor m_descriptor;
+    private ProtocolEngineConfiguration m_configuration;
 
     public static synchronized DataAdaptorFactory getInstance() throws ConfigurationException {
         if (_instance == null) {
@@ -36,6 +41,7 @@ public class DataAdaptorFactory {
     }
     private DataAdaptorFactory() throws ConfigurationException {
         m_descriptor = Configuration.getInstance().getDescriptors().getDataDesc();
+        m_configuration = Configuration.getInstance().getConfigurations().getProtocolCfg();
     }
 
     /**
@@ -47,7 +53,7 @@ public class DataAdaptorFactory {
      * @param type the security context type
      * @return the data adaptor instance
      */
-    public DataAdaptor getDataAdaptor(URI service, SecurityAdaptor securityAdaptor, String type) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
+    public DataAdaptor getDataAdaptor(URI service, SecurityAdaptor securityAdaptor, String type) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
         // create instance
         Class clazz = m_descriptor.getClass(service.getScheme());
         DataAdaptor dataAdaptor;
@@ -66,8 +72,17 @@ public class DataAdaptorFactory {
             }
         }
 
+        // set attributes
+        Map attributes = new HashMap();
+        Protocol config = m_configuration.findProtocol(service.getScheme());
+        for (int i=0; i<config.getAttributeCount(); i++) {
+            attributes.put(config.getAttribute(i).getName(), config.getAttribute(i).getValue());
+        }
+        dataAdaptor.setAttributes(attributes);
+
         // connect
-        dataAdaptor.connect(service.getUserInfo(), service.getHost(), service.getPort());
+        int port = (service.getPort()>0 ? service.getPort() : dataAdaptor.getDefaultPort());
+        dataAdaptor.connect(service.getUserInfo(), service.getHost(), port);
         return dataAdaptor;
     }
 }

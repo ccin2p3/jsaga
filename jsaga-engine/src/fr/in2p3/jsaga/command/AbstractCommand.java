@@ -2,8 +2,8 @@ package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.*;
 
-import java.io.PrintWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,19 +23,26 @@ public abstract class AbstractCommand {
     private String m_appName;
     private Options m_options;
     private String[] m_nonOptionNames;
+    private String[] m_standaloneOptionNames;
     protected String[] m_nonOptionValues;
 
     protected abstract Options createOptions();
 
-    protected AbstractCommand(String appName, String[] nonOptionNames) {
+    /**
+     * @param appName the application name
+     * @param nonOptionNames the names of non-options (required if <code>standaloneOptionNames</code> not null)
+     * @param standaloneOptionNames the names of standalone options (i.e. options that do not require non-options)
+     */
+    protected AbstractCommand(String appName, String[] nonOptionNames, String[] standaloneOptionNames) {
         m_appName = appName;
         m_options = this.createOptions();
         m_nonOptionNames = nonOptionNames;
+        m_standaloneOptionNames = standaloneOptionNames;
         m_nonOptionValues = null;
     }
 
     protected AbstractCommand(String appName) {
-        this(appName, null);
+        this(appName, null, null);
     }
 
     protected CommandLine parse(String[] args) {
@@ -62,6 +69,8 @@ public abstract class AbstractCommand {
             m_nonOptionValues = line.getArgs();
             if (m_nonOptionNames!=null && m_nonOptionValues.length>m_nonOptionNames.length) {
                 throw new UnrecognizedOptionException("Unexpected option: "+ m_nonOptionValues[m_nonOptionNames.length]);
+            } else if (m_standaloneOptionNames!=null && m_nonOptionValues.length<m_nonOptionNames.length && !this.hasStandaloneOption(line)) {
+                throw new MissingOptionException("Missing option: "+m_nonOptionNames[m_nonOptionValues.length]);
             } else {
                 return line;
             }
@@ -69,6 +78,14 @@ public abstract class AbstractCommand {
             printHelpAndExit(e.getMessage());
             return null;
         }
+    }
+    private boolean hasStandaloneOption(CommandLine line) {
+        for (int i=0; m_standaloneOptionNames!=null && i<m_standaloneOptionNames.length; i++) {
+            if (line.hasOption(m_standaloneOptionNames[i])) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected void printHelpAndExit(String errorMessage) {
@@ -98,9 +115,7 @@ public abstract class AbstractCommand {
         // print usage and help
         writer = new PrintWriter(System.out);
         writer.write(usage.toString(), 0, usage.size()-2);
-        for (int i=0; m_nonOptionNames!=null && i<m_nonOptionNames.length; i++) {
-            writer.print(" [<"+m_nonOptionNames[i]+">]");
-        }
+        printNonOptionNames(writer, 0);
         writer.println();
         writer.println();
         writer.println("where:");
@@ -111,5 +126,16 @@ public abstract class AbstractCommand {
                 HelpFormatter.DEFAULT_LEFT_PAD,
                 HelpFormatter.DEFAULT_DESC_PAD);
         writer.flush();
+    }
+    private void printNonOptionNames(PrintWriter writer, int current) {
+        if (m_nonOptionNames!=null && current<m_nonOptionNames.length) {
+            if (m_standaloneOptionNames != null) {
+                writer.print(" <"+m_nonOptionNames[current]+">");
+            } else {
+                writer.print(" [<"+m_nonOptionNames[current]+">");
+                printNonOptionNames(writer, current+1);
+                writer.print("]");
+            }
+        }
     }
 }

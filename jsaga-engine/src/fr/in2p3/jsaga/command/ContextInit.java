@@ -24,7 +24,7 @@ public class ContextInit extends AbstractCommand {
     private static final String OPT_HELP = "h", LONGOPT_HELP = "help";
 
     public ContextInit() {
-        super("jsaga-context-init", new String[]{"contextId"});
+        super("jsaga-context-init", new String[]{"contextId"}, null);
     }
     
     public static void main(String[] args) throws Exception {

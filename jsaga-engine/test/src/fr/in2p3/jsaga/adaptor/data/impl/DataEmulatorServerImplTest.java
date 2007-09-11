@@ -4,6 +4,7 @@ import fr.in2p3.jsaga.adaptor.schema.data.emulator.DirectoryType;
 import fr.in2p3.jsaga.adaptor.schema.data.emulator.File;
 import junit.framework.TestCase;
 import org.ogf.saga.error.IncorrectState;
+import org.ogf.saga.error.DoesNotExist;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -38,7 +39,7 @@ public class DataEmulatorServerImplTest extends TestCase {
         m_server = null;
     }
 
-    public void test_getParentDirectory() throws IncorrectState {
+    public void test_getParentDirectory() throws DoesNotExist {
         assertEquals(
                 "to",
                 m_server.getParentDirectory("/path/to/file1.txt").getName());
@@ -50,7 +51,7 @@ public class DataEmulatorServerImplTest extends TestCase {
                 m_server.getParentDirectory("/path/to/unexisting file").getName());
     }
 
-    public void test_getEntry() throws IncorrectState {
+    public void test_getEntry() throws DoesNotExist {
         assertEquals(
                 "file1.txt",
                 m_server.getEntry("/path/to/file1.txt").getName());
@@ -59,12 +60,12 @@ public class DataEmulatorServerImplTest extends TestCase {
                 m_server.getEntry("/path/to/").getName());
         try {
             m_server.getEntry("/path/to/file2.txt");
-            fail("Expected IncorrectState exception");
-        } catch(IncorrectState e) {
+            fail("Expected DoesNotExist exception");
+        } catch(DoesNotExist e) {
         }
     }
 
-    public void test_listChildEntries() throws IncorrectState {
+    public void test_listChildEntries() throws DoesNotExist {
         assertEquals(
                 "file1.txt",
                 m_server.listEntries("/path/to/file1.txt")[0].getName());
@@ -73,8 +74,8 @@ public class DataEmulatorServerImplTest extends TestCase {
                 m_server.listEntries("/path/to/")[0].getName());
         try {
             m_server.listEntries("/path/to/file2.txt");
-            fail("Expected IncorrectState exception");
-        } catch(IncorrectState e) {
+            fail("Expected DoesNotExist exception");
+        } catch(DoesNotExist e) {
         }
     }
 }

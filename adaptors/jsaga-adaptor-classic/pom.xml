@@ -7,33 +7,33 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
     <artifactId>jsaga-adaptor-classic</artifactId>
-    <version>0.9.0-SNAPSHOT</version>
+    <version>0.9.1-SNAPSHOT</version>
     <name>Adaptor for classic protocols</name>
     <dependencies>
         <!-- common -->
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-adaptoritf</artifactId>
-            <version>0.9.0-alpha-4-SNAPSHOT</version>
+            <version>0.9.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-interfaces</artifactId>
-            <version>0.9.0-alpha-3-SNAPSHOT</version>
+            <version>0.9.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-interfaces</artifactId>
-            <version>0.9.0-alpha-3-SNAPSHOT</version>
+            <version>0.9.1-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
-            <version>0.9.0-alpha-4-SNAPSHOT</version>
+            <version>0.9.1-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <!-- adaptor specific -->

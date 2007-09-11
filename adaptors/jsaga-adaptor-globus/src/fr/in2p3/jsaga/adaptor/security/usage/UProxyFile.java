@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.adaptor.security.usage;
 
+import fr.in2p3.jsaga.adaptor.base.usage.UFile;
 import org.gridforum.jgss.ExtendedGSSCredential;
 import org.gridforum.jgss.ExtendedGSSManager;
 import org.ietf.jgss.GSSCredential;
@@ -32,12 +33,13 @@ public class UProxyFile extends UFile {
         return "<"+m_name+":"+m_minLifeTime+">";
     }
 
-    protected void throwExceptionIfInvalid(Object value) throws Exception {
-        super.throwExceptionIfInvalid(value);
-        GSSCredential cred = load(new File((String)value));
+    protected Object throwExceptionIfInvalid(Object value) throws Exception {
+        File file = (File) super.throwExceptionIfInvalid(value);
+        GSSCredential cred = load(file);
         if (cred.getRemainingLifetime() < m_minLifeTime) {
             throw new IncorrectState("Proxy file remaining lifetime is not enougth: "+cred.getRemainingLifetime());
         }
+        return cred;
     }
 
     private static GSSCredential load(File proxyFile) throws IOException, GSSException {
