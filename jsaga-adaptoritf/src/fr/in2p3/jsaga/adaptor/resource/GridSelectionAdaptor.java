@@ -1,7 +1,5 @@
 package fr.in2p3.jsaga.adaptor.resource;
 
-import fr.in2p3.jsaga.adaptor.resource.AmbiguousMatch;
-import fr.in2p3.jsaga.adaptor.resource.NoMatch;
 import fr.in2p3.jsaga.adaptor.language.JobDescriptionContainer;
 
 /* ***************************************************

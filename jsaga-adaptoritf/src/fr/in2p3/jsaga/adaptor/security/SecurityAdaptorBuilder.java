@@ -1,8 +1,6 @@
 package fr.in2p3.jsaga.adaptor.security;
 
-import fr.in2p3.jsaga.adaptor.security.defaults.Default;
-import fr.in2p3.jsaga.adaptor.security.usage.Usage;
-import org.ogf.saga.error.IncorrectState;
+import fr.in2p3.jsaga.adaptor.base.SagaBaseAdaptor;
 
 import java.util.Map;
 
@@ -18,26 +16,11 @@ import java.util.Map;
 /**
  *
  */
-public interface SecurityAdaptorBuilder {
+public interface SecurityAdaptorBuilder extends SagaBaseAdaptor {
     /**
      * @return the context type.
      */
     public String getType();
-
-    /**
-     * Get the expected usage for this context.
-     * @return the description of the expected usage.
-     */
-    public Usage getUsage();
-
-    /**
-     * Get the defaults values for this context.
-     * These values may be statically defined, or they may be generated according to the available information.
-     * @param attributes the available information.
-     * @return array of default values for some attributes.
-     * @throws IncorrectState if cannot create valid default values based on the available information.
-     */
-    public Default[] getDefaults(Map attributes) throws IncorrectState;
 
     /**
      * Create a security context instance and initialize it with the provided attributes.

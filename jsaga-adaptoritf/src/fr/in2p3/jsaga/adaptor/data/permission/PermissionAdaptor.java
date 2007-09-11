@@ -26,7 +26,7 @@ public interface PermissionAdaptor extends DataAdaptor {
      * @param permissions the permissions to enable.
      */
     public void enablePermissions(String absolutePath, String id, Permission permissions)
-            throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess;
+            throws PermissionDenied, Timeout, NoSuccess;
 
     /**
      * Disables the specified permissions for the specified id.
@@ -37,7 +37,7 @@ public interface PermissionAdaptor extends DataAdaptor {
      * @param permissions the permissions to disable.
      */
     public void disablePermissions(String absolutePath, String id, Permission permissions)
-            throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess;
+            throws PermissionDenied, Timeout, NoSuccess;
 
     /**
      * Determines if the specified permissions are enabled for the
@@ -51,7 +51,7 @@ public interface PermissionAdaptor extends DataAdaptor {
      *     for the specified id.
      */
     public boolean areEnabled(String absolutePath, String id, Permission permissions)
-            throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess;
+            throws PermissionDenied, Timeout, NoSuccess;
 
     /**
      * Gets the owner id of the entity.
@@ -59,7 +59,7 @@ public interface PermissionAdaptor extends DataAdaptor {
      * @return the id of the owner.
      */
     public String getOwner(String absolutePath)
-            throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess;
+            throws PermissionDenied, Timeout, NoSuccess;
 
     /**
      * Gets the group id of the entity.
@@ -67,5 +67,5 @@ public interface PermissionAdaptor extends DataAdaptor {
      * @return the id of the group.
      */
     public String getGroup(String absolutePath)
-            throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess;
+            throws PermissionDenied, Timeout, NoSuccess;
 }

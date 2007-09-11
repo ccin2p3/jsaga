@@ -18,10 +18,11 @@ import org.ogf.saga.error.*;
 public interface DataWriterAdaptor extends DataAdaptor {
     /**
      * Removes the file <code>absolutePath</code>.
-     * @param absolutePath the absolute path of the entry.
+     * @param parentAbsolutePath the parent directory.
+     * @param fileName the file to remove.
      * @throws BadParameter if <code>absolutePath</code> is a directory.
-     * @throws IncorrectState if <code>absolutePath</code> does not exist.
+     * @throws DoesNotExist if <code>absolutePath</code> does not exist.
      */
-    public void removeFile(String absolutePath)
-        throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess;
+    public void removeFile(String parentAbsolutePath, String fileName)
+        throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess;
 }

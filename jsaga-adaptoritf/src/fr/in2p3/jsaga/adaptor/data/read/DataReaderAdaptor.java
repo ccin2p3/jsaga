@@ -22,16 +22,16 @@ public interface DataReaderAdaptor extends DataAdaptor {
      * @return true if the entry exists.
      */
     public boolean exists(String absolutePath)
-        throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess;
+        throws PermissionDenied, Timeout, NoSuccess;
 
     /**
      * Tests this entry for being a directory.
      * @param absolutePath the absolute path of the entry.
      * @return true if the entry is a directory.
-     * @throws IncorrectState if <code>absolutePath</code> does not exist.
+     * @throws DoesNotExist if <code>absolutePath</code> does not exist.
      */
     public boolean isDirectory(String absolutePath)
-        throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess;
+        throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
 
     /**
      * Tests this entry for being a namespace entry. If this entry represents
@@ -39,8 +39,8 @@ public interface DataReaderAdaptor extends DataAdaptor {
      * strictly speaking, directories and links are namespace entries as well.
      * @param absolutePath the absolute path of the entry.
      * @return true if the entry is a namespace entry.
-     * @throws IncorrectState if <code>absolutePath</code> does not exist.
+     * @throws DoesNotExist if <code>absolutePath</code> does not exist.
      */
     public boolean isEntry(String absolutePath)
-        throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess;
+        throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
 }

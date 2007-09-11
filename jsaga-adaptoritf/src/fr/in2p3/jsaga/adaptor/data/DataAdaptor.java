@@ -1,7 +1,9 @@
 package fr.in2p3.jsaga.adaptor.data;
 
-import fr.in2p3.jsaga.adaptor.SagaBaseAdaptor;
+import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
 import org.ogf.saga.error.*;
+
+import java.util.Map;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -15,7 +17,13 @@ import org.ogf.saga.error.*;
 /**
  *
  */
-public interface DataAdaptor extends SagaBaseAdaptor {
+public interface DataAdaptor extends SagaSecureAdaptor {
+    /**
+     * Set the attributes.
+     * @param attributes the attributes to set.
+     */
+    public void setAttributes(Map attributes) throws BadParameter;
+
     /**
      * @return the protocol scheme supported by this adaptor.
      */
@@ -25,6 +33,11 @@ public interface DataAdaptor extends SagaBaseAdaptor {
      * @return the aliases of the protocol scheme supported by this adaptor.
      */
     public String[] getSchemeAliases();
+
+    /**
+     * @return the default server port.
+     */
+    public int getDefaultPort();
 
     /**
      * Connect to the server.

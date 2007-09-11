@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.job;
 
-import fr.in2p3.jsaga.adaptor.SagaBaseAdaptor;
+import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -14,7 +14,7 @@ import fr.in2p3.jsaga.adaptor.SagaBaseAdaptor;
 /**
  *
  */
-public interface JobAdaptor extends SagaBaseAdaptor {
+public interface JobAdaptor extends SagaSecureAdaptor {
     /**
      * @return the job service type.
      */

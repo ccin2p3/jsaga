@@ -24,7 +24,7 @@ public interface LogicalWriter extends DataWriterAdaptor {
      * @throws AlreadyExists if the replica is already in the set.
      */
     public void addLocation(String logicalEntry, URI replicaEntry)
-        throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, AlreadyExists, Timeout, NoSuccess;
+        throws PermissionDenied, IncorrectState, AlreadyExists, Timeout, NoSuccess;
 
     /**
      * Remove a replica location from the replica set.
@@ -34,5 +34,5 @@ public interface LogicalWriter extends DataWriterAdaptor {
      * @throws DoesNotExist if the location is not in the set of replicas.
      */
     public void removeLocation(String logicalEntry, URI replicaEntry)
-        throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess;
+        throws PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess;
 }
