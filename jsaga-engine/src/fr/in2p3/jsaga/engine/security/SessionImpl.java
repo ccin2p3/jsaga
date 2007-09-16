@@ -3,7 +3,7 @@ package fr.in2p3.jsaga.engine.security;
 import fr.in2p3.jsaga.engine.base.AbstractSagaBaseImpl;
 import org.ogf.saga.SagaBase;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.*;
+import org.ogf.saga.error.DoesNotExist;
 import org.ogf.saga.session.Session;
 
 import java.util.*;
@@ -59,16 +59,6 @@ public class SessionImpl extends AbstractSagaBaseImpl implements Session {
         for (Iterator it=m_contexts.iterator(); it.hasNext(); ) {
             ContextImpl currentContext = (ContextImpl) it.next();
             currentContext.close();
-        }
-    }
-
-    /**
-     * This method is specific to JSAGA implementation.
-     */
-    public void init() throws NotImplemented, BadParameter, IncorrectState, NoSuccess {
-        for (Iterator it=m_contexts.iterator(); it.hasNext(); ) {
-            ContextImpl currentContext = (ContextImpl) it.next();
-            currentContext.init();
         }
     }
 
