@@ -4,6 +4,11 @@ Differences with SAGA specification
 
     * Add attributes "Indice" and "Name" to refer to a specific security context factory
 
+    * Add method init(): available by casting your Context instance to ContextImpl.
+      This initialise the context factory (e.g. grid-proxy-init, voms-proxy-init, myproxy-init, ...)
+
+    * Override method toString(): this dump a description of the security context instance.
+
 * Data management
 
     * Add fragment at the end of URI to refer to a specific security context factory
