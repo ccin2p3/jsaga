@@ -1,5 +1,7 @@
 package fr.in2p3.jsaga.adaptor.security;
 
+import java.io.PrintStream;
+
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -17,4 +19,9 @@ public interface SecurityAdaptor {
      * Close the context (implementation may be empty).
      */
     public void close() throws Exception;
+
+    /**
+     * @return description of security context instance.
+     */
+    public void dump(PrintStream out) throws Exception;
 }
