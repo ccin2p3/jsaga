@@ -3,10 +3,13 @@ package fr.in2p3.jsaga.command;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.schema.config.ContextInstance;
 import fr.in2p3.jsaga.engine.security.ContextImpl;
-import fr.in2p3.jsaga.engine.security.SessionImpl;
 import org.apache.commons.cli.*;
+import org.ogf.saga.context.Context;
 import org.ogf.saga.context.ContextFactory;
+import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
+
+import java.util.Iterator;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -37,19 +40,24 @@ public class ContextInit extends AbstractCommand {
         }
         else if (command.m_nonOptionValues.length == 0)
         {
-            SessionImpl session = (SessionImpl) SessionFactory.createSession(true);
-            session.init();
+            Session session = SessionFactory.createSession(true);
+            for (Iterator it=session.listContexts().iterator(); it.hasNext(); ) {
+                Context context = (Context) it.next();
+                ((ContextImpl) context).init();
+            }
+            session.close(0.0f);
         }
         else if (command.m_nonOptionValues.length == 1)
         {
             String id = command.m_nonOptionValues[0];
             ContextInstance[] xmlContext = Configuration.getInstance().getConfigurations().getContextCfg().listContextInstanceArrayById(id);
             for (int i=0; i<xmlContext.length; i++) {
-                ContextImpl context = (ContextImpl) ContextFactory.createContext();
+                Context context = ContextFactory.createContext();
                 context.setAttribute("Type", xmlContext[i].getType());
                 context.setAttribute("Indice", ""+xmlContext[i].getIndice());
                 context.setDefaults();
-                context.init();
+                ((ContextImpl) context).init();
+                ((ContextImpl) context).close();
             }
         }
     }
