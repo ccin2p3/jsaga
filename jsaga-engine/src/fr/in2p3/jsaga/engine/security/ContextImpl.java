@@ -14,6 +14,8 @@ import org.ogf.saga.SagaBase;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.lang.Exception;
 import java.util.*;
 
@@ -163,6 +165,47 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
             throw new NoSuccess(e);
         }
         return m_adaptor;
+    }
+
+    /**
+     * This method is specific to JSAGA implementation.
+     */
+    public String toString() {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        PrintStream out = new PrintStream(stream);
+
+        // title
+        Map map;
+        try {
+            map = super._getAttributesMap();
+        } catch (Exception e) {
+            throw new RuntimeException("Unexpected exception");
+        }
+        String type = (String) map.get("Type");
+        String indice = (String) map.get("Indice");
+        String name = (String) map.get("Name");
+        out.println(
+                (type!=null ? type : "???") +
+                (indice!=null ? "["+indice+"]" : "") +
+                (name!=null ? ": "+name : ""));
+
+        // content
+        try {
+            this.checkUsage(m_adaptorBuilder.getUsage());
+            if (m_adaptor == null) {
+                m_adaptor = m_adaptorBuilder.createSecurityAdaptor(super._getAttributesMap());
+            }
+            try {
+                m_adaptor.dump(out);
+            } catch (Exception e) {
+                out.println("  *** Exception raised "+e.getClass().getName()+": "+e.getMessage()+" ***");
+            }
+        } catch (Exception e) {
+            out.println("  Not initialised");
+        }
+
+        out.close();
+        return stream.toString();
     }
 
     private boolean isInitialized(String key) throws IncorrectState {
