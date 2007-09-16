@@ -123,6 +123,9 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
 
     public FileAttributes[] listAttributes(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         File[] list = newEntry(absolutePath).listFiles();
+        if (list == null) {
+            throw new PermissionDenied("Permission denied");
+        }
         FileAttributes[] ret = new FileAttributes[list.length];
         for (int i=0; i<list.length; i++) {
             ret[i] = new LocalFileAttributes(list[i]);

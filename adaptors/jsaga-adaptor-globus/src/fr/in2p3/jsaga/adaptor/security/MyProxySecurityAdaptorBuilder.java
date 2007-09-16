@@ -88,9 +88,14 @@ public class MyProxySecurityAdaptorBuilder implements InitializableSecurityAdapt
         return new Default[]{
                 new Default("UserProxy", new String[]{
                         env.getProperty("X509_USER_PROXY"),
-                        System.getProperty("os.name").toLowerCase().startsWith("windows")
-                                ? System.getProperty("java.io.tmpdir")+System.getProperty("file.separator")+"x509up_u_"+System.getProperty("user.name").toLowerCase()
-                                : System.getProperty("java.io.tmpdir")+System.getProperty("file.separator")+"x509up_u_"+env.getProperty("UID")}),
+                        System.getProperty("java.io.tmpdir")+System.getProperty("file.separator")+"x509up_u"+
+                                (System.getProperty("os.name").toLowerCase().startsWith("windows")
+                                        ? "_"+System.getProperty("user.name").toLowerCase()
+                                        : (env.getProperty("UID")!=null
+                                                ? env.getProperty("UID")
+                                                : GlobusSecurityAdaptorBuilder.getUnixUID()
+                                          )
+                                )}),
                 new Default("UserCert", new File[]{
                         new File(env.getProperty("X509_USER_CERT")+""),
                         new File(System.getProperty("user.home")+"/.globus/usercert.pem")}),
@@ -107,35 +112,35 @@ public class MyProxySecurityAdaptorBuilder implements InitializableSecurityAdapt
     }
 
     public SecurityAdaptor createSecurityAdaptor(Map attributes) throws Exception {
+        String userName = (String) attributes.get("UserName");
+        String myProxyPass = (String) attributes.get("MyProxyPass");
         if (LOCAL_PROXY_OBJECT.getMissingValues(attributes) == null) {
-            return new MyProxySecurityAdaptor((GSSCredential) attributes.get("UserProxyObject"));
+            return new MyProxySecurityAdaptor((GSSCredential) attributes.get("UserProxyObject"), userName, myProxyPass);
         } else if (LOCAL_PROXY_FILE.getMissingValues(attributes) == null) {
-            return new MyProxySecurityAdaptor(load(new File((String) attributes.get("UserProxy"))));
+            return new MyProxySecurityAdaptor(load(new File((String) attributes.get("UserProxy"))), userName, myProxyPass);
         } else if (RENEW_PROXY_OBJECT_WITH_PASS.getMissingValues(attributes) == null) {
-            return new MyProxySecurityAdaptor(renewCredential(null, attributes));
+            return new MyProxySecurityAdaptor(renewCredential(null, attributes), userName, myProxyPass);
         } else if (RENEW_PROXY_FILE_WITH_PASS.getMissingValues(attributes) == null) {
             GSSCredential cred = renewCredential(null, attributes);
             save(new File((String) attributes.get("UserProxy")), cred);
-            return new MyProxySecurityAdaptor(cred);
+            return new MyProxySecurityAdaptor(cred, userName, myProxyPass);
 /*
         } else if (RENEW_PROXY_OBJECT_WITH_PROXY.getMissingValues(attributes) == null) {
             GSSCredential oldCred = (GSSCredential) attributes.get("UserProxyObject");
-            return new MyProxySecurityAdaptor(renewCredential(oldCred, attributes));
+            return new MyProxySecurityAdaptor(renewCredential(oldCred, attributes), userName, myProxyPass);
         } else if (RENEW_PROXY_FILE_WITH_PROXY.getMissingValues(attributes) == null) {
             GSSCredential oldCred = load(new File((String) attributes.get("UserProxy")));
             GSSCredential cred = renewCredential(oldCred, attributes);
             save(new File((String) attributes.get("UserProxy")), cred);
-            return new MyProxySecurityAdaptor(cred);
+            return new MyProxySecurityAdaptor(cred, userName, myProxyPass);
 */
         } else if (CREATE_PROXY.getMissingValues(attributes) == null) {
             GSSCredential cred = new GlobusProxyFactory(attributes).createProxy();
-            String userName = (String) attributes.get("UserName");
-            String myProxyPass = (String) attributes.get("MyProxyPass");
             int lifetime = attributes.containsKey("LifeTime")
                     ? UDuration.toInt(attributes.get("LifeTime"))
                     : DEFAULT_DELEGATED_PROXY_LIFETIME;  // default lifetime for delegated proxies
             createMyProxy(attributes).put(cred, userName, myProxyPass, lifetime);
-            return new MyProxySecurityAdaptor(cred);
+            return new MyProxySecurityAdaptor(cred, userName, myProxyPass);
         } else {
             throw new BadParameter("Missing attribute(s): "+this.getUsage().getMissingValues(attributes));
         }
@@ -154,25 +159,25 @@ public class MyProxySecurityAdaptorBuilder implements InitializableSecurityAdapt
     }
 
     public SecurityAdaptor initAndCreateSecurityAdaptor(Map attributes) throws Exception {
+        String userName = (String) attributes.get("UserName");
+        String myProxyPass = (String) attributes.get("MyProxyPass");
         if (CREATE_PROXY.getMissingValues(attributes) == null) {
             GSSCredential cred = new GlobusProxyFactory(attributes).createProxy();
-            String userName = (String) attributes.get("UserName");
-            String myProxyPass = (String) attributes.get("MyProxyPass");
             int lifetime = attributes.containsKey("LifeTime")
                     ? UDuration.toInt(attributes.get("LifeTime"))
                     : DEFAULT_DELEGATED_PROXY_LIFETIME;  // default lifetime for delegated proxies
             createMyProxy(attributes).put(cred, userName, myProxyPass, lifetime);
-            return new MyProxySecurityAdaptor(cred);
+            return new MyProxySecurityAdaptor(cred, userName, myProxyPass);
         } else if (RENEW_PROXY_FILE_WITH_PASS.getMissingValues(attributes) == null) {
             GSSCredential cred = renewCredential(null, attributes);
             save(new File((String) attributes.get("UserProxy")), cred);
-            return new MyProxySecurityAdaptor(cred);
+            return new MyProxySecurityAdaptor(cred, userName, myProxyPass);
 /*
         } else if (RENEW_PROXY_FILE_WITH_PROXY.getMissingValues(attributes) == null) {
             GSSCredential oldCred = load(new File((String) attributes.get("UserProxy")));
             GSSCredential cred = renewCredential(oldCred, attributes);
             save(new File((String) attributes.get("UserProxy")), cred);
-            return new MyProxySecurityAdaptor(cred);
+            return new MyProxySecurityAdaptor(cred, userName, myProxyPass);
 */
         } else {
             throw new BadParameter("Missing attribute(s): "+this.getUsage().getMissingValues(attributes));

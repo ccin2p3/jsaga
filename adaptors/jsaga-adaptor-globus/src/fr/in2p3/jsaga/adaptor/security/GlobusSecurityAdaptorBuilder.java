@@ -80,9 +80,14 @@ public class GlobusSecurityAdaptorBuilder implements InitializableSecurityAdapto
         return new Default[]{
                 new Default("UserProxy", new String[]{
                         env.getProperty("X509_USER_PROXY"),
-                        System.getProperty("os.name").toLowerCase().startsWith("windows")
-                                ? System.getProperty("java.io.tmpdir")+System.getProperty("file.separator")+"x509up_u_"+System.getProperty("user.name").toLowerCase()
-                                : System.getProperty("java.io.tmpdir")+System.getProperty("file.separator")+"x509up_u_"+env.getProperty("UID")}),
+                        System.getProperty("java.io.tmpdir")+System.getProperty("file.separator")+"x509up_u"+
+                                (System.getProperty("os.name").toLowerCase().startsWith("windows")
+                                        ? "_"+System.getProperty("user.name").toLowerCase()
+                                        : (env.getProperty("UID")!=null
+                                                ? env.getProperty("UID")
+                                                : getUnixUID()
+                                          )
+                                )}),
                 new Default("UserCert", new File[]{
                         new File(env.getProperty("X509_USER_CERT")+""),
                         new File(System.getProperty("user.home")+"/.globus/usercert.pem")}),
@@ -96,6 +101,17 @@ public class GlobusSecurityAdaptorBuilder implements InitializableSecurityAdapto
                 new Default("LifeTime", "PT12H"),
                 new Default("Delegation", "full")
         };
+    }
+    protected static String getUnixUID() throws IncorrectState {
+        try {
+            Process p = Runtime.getRuntime().exec("id -u");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String uid = reader.readLine();
+            reader.close();
+            return uid;
+        } catch (IOException e) {
+            throw new IncorrectState(e);
+        }
     }
 
     public SecurityAdaptor createSecurityAdaptor(Map attributes) throws Exception {

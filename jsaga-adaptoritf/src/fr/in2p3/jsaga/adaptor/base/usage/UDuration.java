@@ -49,7 +49,7 @@ public class UDuration extends U {
     }
 
     public static int toInt(Object value) throws ParseException {
-        return (int) toLong((String) value);
+        return (int) toLong((String) value) / 1000;
     }
 
     private static long toLong(String value) throws ParseException {
