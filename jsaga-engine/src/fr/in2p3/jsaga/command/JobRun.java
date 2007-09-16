@@ -22,14 +22,17 @@ import java.io.*;
 public class JobRun {
     public static void main(String[] args) throws Exception {
         // parse command line
-        if (args.length<1 || args.length>2) {
-            System.err.println("usage: JobRun <JSDL-file> [<step>]");
+        if (args.length!=2) {
+            System.err.println("usage: JobRun <job> <resources>");
             System.exit(1);
         }
         File jobDescFile = new File(args[0]);
-        String step = args.length>1 ? args[1] : JobPreprocessor.XSL_ALL;
         if (!jobDescFile.exists()) {
             throw new FileNotFoundException("File not found: "+jobDescFile.getAbsolutePath());
+        }
+        File resourcesFile = new File(args[1]);
+        if (!resourcesFile.exists()) {
+            throw new FileNotFoundException("File not found: "+resourcesFile.getAbsolutePath());
         }
 
         // run job
@@ -37,10 +40,7 @@ public class JobRun {
         parser.loadLanguageDefinitionResources();
         Document jobDesc = parser.jobDescriptionToDOM(new FileInputStream(jobDescFile));
         JobPreprocessor preprocessor = new JobPreprocessor();
-        try {
-            preprocessor.preprocess(jobDesc, step);
-        } finally {
-            preprocessor.dump();
-        }
+        preprocessor.preprocess(jobDesc);
+        preprocessor.dump();
     }
 }
