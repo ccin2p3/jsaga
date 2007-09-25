@@ -16,9 +16,9 @@ import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
  */
 public interface SagaSecureAdaptor extends SagaBaseAdaptor {
     /**
-     * @return list of supported security context types.
+     * @return list of supported SecurityAdaptor classes.
      */
-    public String[] getSupportedContextTypes();
+    public Class[] getSupportedSecurityAdaptorClasses();
 
     /**
      * Set the security adaptor.

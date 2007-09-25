@@ -1,9 +1,11 @@
 package fr.in2p3.jsaga.adaptor.security;
 
+import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
 import org.globus.gsi.CertUtil;
 import org.globus.gsi.GlobusCredential;
+import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.util.Util;
-import org.ogf.saga.error.NotImplemented;
+import org.ietf.jgss.GSSCredential;
 
 import java.io.PrintStream;
 
@@ -19,32 +21,30 @@ import java.io.PrintStream;
 /**
  *
  */
-public class VOMSSecurityAdaptor implements SecurityAdaptor {
-    private GlobusCredential m_globusProxy;
-
-    public VOMSSecurityAdaptor(GlobusCredential globusProxy) {
-        m_globusProxy = globusProxy;
+public class VOMSSecurityAdaptor extends GSSCredentialSecurityAdaptor implements SecurityAdaptor {
+    public VOMSSecurityAdaptor(GSSCredential proxy) {
+        super(proxy);
     }
 
-    public GlobusCredential getGlobusCredential() {
-        return m_globusProxy;
-    }
-
-    public void close() throws Exception {
-    }
-
+    /** override super.dump() */
     public void dump(PrintStream out) throws Exception {
         // same as globus
-        out.println("  subject  : "+m_globusProxy.getCertificateChain()[0].getSubjectDN());
-        out.println("  issuer   : "+m_globusProxy.getCertificateChain()[0].getIssuerDN());
-        out.println("  identity : "+m_globusProxy.getIdentity());
-        out.println("  type     : "+ CertUtil.getProxyTypeAsString(m_globusProxy.getProxyType()));
-        out.println("  strength : "+m_globusProxy.getStrength()+" bits");
-        out.println("  timeleft : "+ Util.formatTimeSec(m_globusProxy.getTimeLeft()));
+        GlobusCredential globusProxy;
+        if (m_proxy instanceof GlobusGSSCredentialImpl) {
+            globusProxy = ((GlobusGSSCredentialImpl)m_proxy).getGlobusCredential();
+        } else {
+            throw new Exception("Not a globus proxy");
+        }
+        out.println("  subject  : "+globusProxy.getCertificateChain()[0].getSubjectDN());
+        out.println("  issuer   : "+globusProxy.getCertificateChain()[0].getIssuerDN());
+        out.println("  identity : "+globusProxy.getIdentity());
+        out.println("  type     : "+CertUtil.getProxyTypeAsString(globusProxy.getProxyType()));
+        out.println("  strength : "+globusProxy.getStrength()+" bits");
+        out.println("  timeleft : "+Util.formatTimeSec(globusProxy.getTimeLeft()));
 
         // VOMS specific
         out.println("  === VO extension information ===");
-        throw new NotImplemented("not implemented yet...");
+        out.println("  Not implemented yet...");
 /*
         out.println("  VO        : dteam");
         out.println("  subject   : /O=GRID-FR/C=FR/O=CNRS/OU=CC-LYON/CN=Sylvain Reynaud");

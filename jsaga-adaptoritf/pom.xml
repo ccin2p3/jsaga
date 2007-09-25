@@ -19,7 +19,7 @@
     <dependencies>
         <dependency>
             <groupId>org.ogf.saga</groupId>
-            <artifactId>saga-interfaces</artifactId>
+            <artifactId>saga-api</artifactId>
             <version>0.9.1-SNAPSHOT</version>
         </dependency>
     </dependencies>

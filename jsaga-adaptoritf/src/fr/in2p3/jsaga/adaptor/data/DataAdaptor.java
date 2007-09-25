@@ -19,17 +19,6 @@ import java.util.Map;
  */
 public interface DataAdaptor extends SagaSecureAdaptor {
     /**
-     * Set the attributes.
-     * @param attributes the attributes to set.
-     */
-    public void setAttributes(Map attributes) throws BadParameter;
-
-    /**
-     * @return the protocol scheme supported by this adaptor.
-     */
-    public String getScheme();
-
-    /**
      * @return the aliases of the protocol scheme supported by this adaptor.
      */
     public String[] getSchemeAliases();
@@ -40,13 +29,14 @@ public interface DataAdaptor extends SagaSecureAdaptor {
     public int getDefaultPort();
 
     /**
-     * Connect to the server.
+     * Connect to the server and initialize the connection with the provided <code>attributes</code>.
      * @param userInfo the user login
      * @param host the server
      * @param port the port
+     * @param attributes the provided attributes
      */
-    public void connect(String userInfo, String host, int port)
-        throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess;
+    public void connect(String userInfo, String host, int port, Map attributes)
+        throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess;
 
 
     /**

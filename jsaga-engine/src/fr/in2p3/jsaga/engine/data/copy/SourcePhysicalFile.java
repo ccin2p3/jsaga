@@ -1,10 +1,12 @@
 package fr.in2p3.jsaga.engine.data.copy;
 
-import fr.in2p3.jsaga.engine.data.*;
+import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
+import fr.in2p3.jsaga.engine.data.flags.FlagsBytesPhysical;
+import fr.in2p3.jsaga.impl.file.FileImpl;
 import org.ogf.saga.URI;
 import org.ogf.saga.error.*;
+import org.ogf.saga.file.FileFactory;
 import org.ogf.saga.namespace.Flags;
-import org.ogf.saga.namespace.PhysicalEntryFlags;
 import org.ogf.saga.session.Session;
 
 import java.io.*;
@@ -29,13 +31,13 @@ public class SourcePhysicalFile {
         m_sourceFile = sourceFile;
     }
 
-    public void putToPhysicalFile(Session session, URI target, FlagsContainer targetFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
+    public void putToPhysicalFile(Session session, URI target, FlagsBytes targetFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
         IOException closingException = null;
 
         // open source file if it exists
         InputStream in;
         try {
-            in = FileImplStreamFactory.createInputStream(m_sourceFile);
+            in = m_sourceFile.newInputStream();
         } catch (DoesNotExist doesNotExist) {
             throw new IncorrectState("Source file does not exist: "+m_sourceFile.getURI(), doesNotExist);
         }
@@ -54,12 +56,12 @@ public class SourcePhysicalFile {
 
         // open target file and copy
         try {
-            Flags correctedFlags =
-                    (targetFlags.contains(Flags.OVERWRITE)
-                        ? targetFlags.remove(Flags.OVERWRITE)               // remove overwrite
-                        : targetFlags.remove(Flags.NONE).or(Flags.EXCL))    // add exclusive
-                    .or(PhysicalEntryFlags.WRITE).or(Flags.CREATE);         // add write + create
-            OutputStream out = FileImplStreamFactory.createOutputStream(session, target, correctedFlags);
+            FlagsBytes correctedBytes = targetFlags.or(FlagsBytesPhysical.WRITE).or(FlagsBytes.CREATE);
+            Flags[] correctedFlags =
+                    (correctedBytes.contains(Flags.OVERWRITE)
+                            ? correctedBytes.remove(Flags.OVERWRITE)
+                            : correctedBytes.add(Flags.EXCL));
+            OutputStream out = this.newOutputStream(session, target, correctedFlags);
             try {
                 while (readlen > 0) {
                     int writelen;
@@ -93,6 +95,19 @@ public class SourcePhysicalFile {
         }
         if (closingException != null) {
             throw new IncorrectState(closingException);
+        }
+    }
+
+    private OutputStream newOutputStream(Session session, URI target, Flags... flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
+        try {
+            FileImpl targetFile = (FileImpl) FileFactory.createFile(session, target, flags);
+            return targetFile.getOutputStream();
+        } catch (IncorrectURL e) {
+            throw new NoSuccess(e);
+        } catch (IncorrectSession e) {
+            throw new NoSuccess(e);
+        } catch (DoesNotExist e) {
+            throw new NoSuccess("Unexpected exception: DoesNotExist", e);
         }
     }
 }

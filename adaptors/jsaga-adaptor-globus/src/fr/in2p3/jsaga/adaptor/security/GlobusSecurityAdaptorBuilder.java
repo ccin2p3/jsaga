@@ -3,8 +3,6 @@ package fr.in2p3.jsaga.adaptor.security;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
-import fr.in2p3.jsaga.adaptor.security.usage.UProxyFile;
-import fr.in2p3.jsaga.adaptor.security.usage.UProxyObject;
 import org.globus.common.CoGProperties;
 import org.gridforum.jgss.ExtendedGSSCredential;
 import org.gridforum.jgss.ExtendedGSSManager;
@@ -28,49 +26,21 @@ import java.util.Map;
 /**
  *
  */
-public class GlobusSecurityAdaptorBuilder implements InitializableSecurityAdaptorBuilder {
-    private static final int MIN_REMAINING_LIFETIME = 30*60;    // 30 minutes
-
-    private static final Usage LOCAL_PROXY_OBJECT = new UProxyObject("UserProxyObject", MIN_REMAINING_LIFETIME);
-    private static final Usage LOCAL_PROXY_FILE = new UProxyFile("UserProxy", MIN_REMAINING_LIFETIME);
-    private static final Usage CREATE_PROXY = new UAnd(new Usage[]{
-            new U("UserProxy"), new UFile("UserCert"), new UFile("UserKey"), new UHidden("UserPass"),
-            new UDuration("LifeTime") {
-                protected Object throwExceptionIfInvalid(Object value) throws Exception {
-                    return (value!=null ? super.throwExceptionIfInvalid(value) : null);
-                }
-            },
-            new UOptional("Delegation") {
-                protected Object throwExceptionIfInvalid(Object value) throws Exception {
-                    if (super.throwExceptionIfInvalid(value) != null) {
-                        String v = (String) value;
-                        if (!v.equalsIgnoreCase("limited") && !v.equalsIgnoreCase("full")) {
-                            throw new BadParameter("Expected: limited | full");
-                        }
-                    }
-                    return value;
-                }
-            },
-            new UOptional("ProxyType") {
-                protected Object throwExceptionIfInvalid(Object value) throws Exception {
-                    if (super.throwExceptionIfInvalid(value) != null) {
-                        String v = (String) value;
-                        if (!v.equalsIgnoreCase("old") && !v.equalsIgnoreCase("globus") && !v.equalsIgnoreCase("RFC820")) {
-                            throw new BadParameter("Expected: old | globus | RFC820");
-                        }
-                    }
-                    return value;
-                }
-            }
-    });
+public class GlobusSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
+    private static final Usage LOCAL_PROXY_OBJECT = new UNoPrompt("UserProxyObject");
+    private static final Usage LOCAL_PROXY_FILE = new UFile("UserProxy");
 
     public String getType() {
         return "Globus";
     }
 
+    public Class getSecurityAdaptorClass() {
+        return GlobusSecurityAdaptor.class;
+    }
+
     public Usage getUsage() {
         return new UAnd(new Usage[]{
-                new UOr(new Usage[]{LOCAL_PROXY_OBJECT, LOCAL_PROXY_FILE, CREATE_PROXY}),
+                new UOr(new Usage[]{LOCAL_PROXY_OBJECT, LOCAL_PROXY_FILE}),
                 new UFile("CertDir")
         });
     }
@@ -121,19 +91,9 @@ public class GlobusSecurityAdaptorBuilder implements InitializableSecurityAdapto
             CoGProperties.getDefault().setCaCertLocations((String) attributes.get("CertDir"));
             File proxyFile = new File((String) attributes.get("UserProxy"));
             return new GlobusSecurityAdaptor(load(proxyFile));
-        } else if (CREATE_PROXY.getMissingValues(attributes) == null) {
-            return this.initAndCreateSecurityAdaptor(attributes);
         } else {
             throw new BadParameter("Missing attribute(s): "+this.getUsage().getMissingValues(attributes));
         }
-    }
-
-    public Usage getInitUsage() {
-        return new UAnd(new Usage[]{CREATE_PROXY, new UFile("CertDir")});
-    }
-
-    public SecurityAdaptor initAndCreateSecurityAdaptor(Map attributes) throws Exception {
-        return new GlobusSecurityAdaptor(new GlobusProxyFactory(attributes).createProxy());
     }
 
     private static GSSCredential load(File proxyFile) throws IOException, GSSException {

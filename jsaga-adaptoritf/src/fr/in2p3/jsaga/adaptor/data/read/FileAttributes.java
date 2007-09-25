@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.adaptor.data.read;
 
+import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import org.ogf.saga.permissions.Permission;
 
 import java.text.SimpleDateFormat;
@@ -27,7 +28,7 @@ public abstract class FileAttributes {
     protected String m_name = null;
     protected int m_type = UNKNOWN_TYPE;
     protected long m_size = -1;
-    protected Permission m_permission = Permission.UNKNOWN;
+    protected PermissionBytes m_permission = PermissionBytes.UNKNOWN;
     protected long m_lastModified = 0;
 
     public String getName() {
@@ -53,7 +54,7 @@ public abstract class FileAttributes {
         return buf.toString();
     }
 
-    private boolean contains(Permission permission, final Permission ref) {
+    private boolean contains(PermissionBytes permission, final Permission ref) {
         return (permission.getValue() & ref.getValue()) > 0;
     }
 

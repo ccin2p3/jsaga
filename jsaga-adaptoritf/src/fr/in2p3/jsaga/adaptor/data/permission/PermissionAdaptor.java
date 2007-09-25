@@ -2,7 +2,6 @@ package fr.in2p3.jsaga.adaptor.data.permission;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import org.ogf.saga.error.*;
-import org.ogf.saga.permissions.Permission;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -25,7 +24,7 @@ public interface PermissionAdaptor extends DataAdaptor {
      * @param id the id.
      * @param permissions the permissions to enable.
      */
-    public void enablePermissions(String absolutePath, String id, Permission permissions)
+    public void enablePermissions(String absolutePath, String id, PermissionBytes permissions)
             throws PermissionDenied, Timeout, NoSuccess;
 
     /**
@@ -36,7 +35,7 @@ public interface PermissionAdaptor extends DataAdaptor {
      * @param id the id.
      * @param permissions the permissions to disable.
      */
-    public void disablePermissions(String absolutePath, String id, Permission permissions)
+    public void disablePermissions(String absolutePath, String id, PermissionBytes permissions)
             throws PermissionDenied, Timeout, NoSuccess;
 
     /**
@@ -50,7 +49,7 @@ public interface PermissionAdaptor extends DataAdaptor {
      * @return <code>true</code> if the specified permissions are enabled
      *     for the specified id.
      */
-    public boolean areEnabled(String absolutePath, String id, Permission permissions)
+    public boolean areEnabled(String absolutePath, String id, PermissionBytes permissions)
             throws PermissionDenied, Timeout, NoSuccess;
 
     /**

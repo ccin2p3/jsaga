@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.adaptor.security;
 
+import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
 import org.globus.myproxy.CredentialInfo;
 import org.globus.myproxy.MyProxy;
 import org.globus.util.Util;
@@ -19,7 +20,7 @@ import java.io.PrintStream;
 /**
  *
  */
-public class MyProxySecurityAdaptor extends GlobusSecurityAdaptor implements SecurityAdaptor {
+public class MyProxySecurityAdaptor extends GSSCredentialSecurityAdaptor implements SecurityAdaptor {
     private String m_userName;
     private String m_myProxyPass;
 
@@ -29,6 +30,7 @@ public class MyProxySecurityAdaptor extends GlobusSecurityAdaptor implements Sec
         m_myProxyPass = myProxyPass;
     }
 
+    /** override super.dump() */
     public void dump(PrintStream out) throws Exception {
         CredentialInfo info = new MyProxy().info(m_proxy, m_userName, m_myProxyPass);
         if (info.getName() != null) {

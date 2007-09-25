@@ -27,17 +27,13 @@ import java.lang.Exception;
  *
  */
 public class OptimizedEmulatorDataAdaptor extends EmulatorDataAdaptor implements DataCopy, DataRename {
-    public String getScheme() {
-        return "otest";
-    }
-
     public String[] getSchemeAliases() {
-        return new String[]{"oemulated"};
+        return new String[]{"otest", "oemulated"};
     }
 
     public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
         File file = m_server.getFile(sourceAbsolutePath);
-        DataEmulatorConnection targetServer = new DataEmulatorConnection(this.getScheme(), targetHost, targetPort);
+        DataEmulatorConnection targetServer = new DataEmulatorConnection(this.getSchemeAliases()[0], targetHost, targetPort);
 
         // check if exists
         try {
@@ -62,7 +58,7 @@ public class OptimizedEmulatorDataAdaptor extends EmulatorDataAdaptor implements
     }
 
     public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
-        DataEmulatorConnection sourceServer = new DataEmulatorConnection(this.getScheme(), sourceHost, sourcePort);
+        DataEmulatorConnection sourceServer = new DataEmulatorConnection(this.getSchemeAliases()[0], sourceHost, sourcePort);
         File file = sourceServer.getFile(sourceAbsolutePath);
 
         // check if exists

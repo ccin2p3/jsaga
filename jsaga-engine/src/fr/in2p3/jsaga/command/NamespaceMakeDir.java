@@ -30,6 +30,7 @@ public class NamespaceMakeDir extends AbstractCommand {
         NamespaceMakeDir command = new NamespaceMakeDir();
         CommandLine line = command.parse(args);
 
+        System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
         if (line.hasOption(OPT_HELP))
         {
             command.printHelpAndExit(null);
@@ -38,8 +39,9 @@ public class NamespaceMakeDir extends AbstractCommand {
         {
             // get arguments
             URI uri = new URI(command.m_nonOptionValues[0]);
-            Flags flags = Flags.CREATE
-                    .or(line.hasOption(OPT_CREATEPARENTS) ? Flags.CREATEPARENTS : Flags.NONE);
+            Flags[] flags = (line.hasOption(OPT_CREATEPARENTS)
+                    ? new Flags[]{Flags.CREATE, Flags.CREATEPARENTS}
+                    : new Flags[]{Flags.CREATE});
 
             // execute command
             Session session = SessionFactory.createSession(true);

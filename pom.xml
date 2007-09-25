@@ -22,7 +22,7 @@
 
   <!-- aggregation -->
   <modules>
-    <module>saga-interfaces</module>
+    <module>saga-api</module>
     <module>jsaga-adaptoritf</module>
     <module>jsaga-engine</module>
     <module>adaptors</module>

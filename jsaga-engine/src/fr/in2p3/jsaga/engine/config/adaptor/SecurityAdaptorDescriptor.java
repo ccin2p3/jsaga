@@ -7,8 +7,7 @@ import fr.in2p3.jsaga.engine.schema.config.ContextInstance;
 import fr.in2p3.jsaga.engine.schema.config.Init;
 import org.ogf.saga.error.NoSuccess;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -23,12 +22,14 @@ import java.util.Map;
  *
  */
 public class SecurityAdaptorDescriptor {
+    private Map m_builderClasses;
     private Map m_classes;
     private Map m_usages;
     private Map m_initUsages;
     protected ContextInstance[] m_xml;
 
     public SecurityAdaptorDescriptor(Class[] adaptorClasses) throws IllegalAccessException, InstantiationException {
+        m_builderClasses = new HashMap();
         m_classes = new HashMap();
         m_usages = new HashMap();
         m_initUsages = new HashMap();
@@ -37,7 +38,8 @@ public class SecurityAdaptorDescriptor {
             SecurityAdaptorBuilder adaptor = (SecurityAdaptorBuilder) adaptorClasses[i].newInstance();
 
             // type
-            m_classes.put(adaptor.getType(), adaptorClasses[i]);
+            m_builderClasses.put(adaptor.getType(), adaptorClasses[i]);
+            m_classes.put(adaptor.getType(), adaptor.getSecurityAdaptorClass());
             Usage usage = adaptor.getUsage();
             if (usage != null) {
                 m_usages.put(adaptor.getType(), usage);
@@ -52,8 +54,8 @@ public class SecurityAdaptorDescriptor {
         }
     }
 
-    public Class getClass(String type) throws NoSuccess {
-        Class clazz = (Class) m_classes.get(type);
+    public Class getBuilderClass(String type) throws NoSuccess {
+        Class clazz = (Class) m_builderClasses.get(type);
         if (clazz != null) {
             return clazz;
         } else {
@@ -67,6 +69,42 @@ public class SecurityAdaptorDescriptor {
 
     public Usage getInitUsage(String type) {
         return (Usage) m_initUsages.get(type);
+    }
+
+    public String[] getSupportedContextTypes(Class[] supportedSecurityAdaptorClasses) {
+        Set contextTypeSet = new HashSet();
+        for (Iterator it=m_classes.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry entry = (Map.Entry) it.next();
+            String contextType = (String) entry.getKey();
+            Class securityAdaptorClazz = (Class) entry.getValue();
+            if (isSupported(securityAdaptorClazz, supportedSecurityAdaptorClasses)) {
+                contextTypeSet.add(contextType);
+            }
+        }
+        return (String[]) contextTypeSet.toArray(new String[contextTypeSet.size()]);
+    }
+
+    public static boolean isSupported(Class securityAdaptorClazz, Class[] supportedClazzArray) {
+        for (int i=0; supportedClazzArray!=null && i<supportedClazzArray.length; i++) {
+            if (superClassesContain(securityAdaptorClazz, supportedClazzArray[i])) {
+                return true;
+            }
+        }
+        return false;
+    }
+    private static boolean superClassesContain(Class securityAdaptorClazz, Class supportedClazz) {
+        if (securityAdaptorClazz.equals(supportedClazz)) {
+            // stop condition
+            return true;
+        } else {
+            // recurse
+            Class superClazz = securityAdaptorClazz.getSuperclass();
+            if (superClazz != null) {
+                return superClassesContain(superClazz, supportedClazz);
+            } else {
+                return false;
+            }
+        }
     }
 
     private static ContextInstance toXML(SecurityAdaptorBuilder adaptor) {

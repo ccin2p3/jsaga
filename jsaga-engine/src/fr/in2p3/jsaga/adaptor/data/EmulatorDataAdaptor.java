@@ -42,32 +42,24 @@ public class EmulatorDataAdaptor implements FileReader, FileWriter, DirectoryRea
         return null;
     }
 
-    public void setAttributes(Map attributes) throws BadParameter {
-        // do nothing
-    }
-
-    public String[] getSupportedContextTypes() {
-        return null;
+    public Class[] getSupportedSecurityAdaptorClasses() {
+        return null;    // no context class
     }
 
     public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
         // do nothing
     }
 
-    public String getScheme() {
-        return "test";
-    }
-
     public String[] getSchemeAliases() {
-        return new String[]{"emulated"};
+        return new String[]{"test", "emulated"};
     }
 
     public int getDefaultPort() {
         return 1234;
     }
 
-    public void connect(String userInfo, String host, int port) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {
-        m_server = new DataEmulatorConnection(this.getScheme(), host, port);
+    public void connect(String userInfo, String host, int port, Map attributes) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {
+        m_server = new DataEmulatorConnection(this.getSchemeAliases()[0], host, port);
         if(Base.DEBUG) m_server.commit();
     }
 

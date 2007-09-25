@@ -26,7 +26,7 @@ public class JobAdaptorDescriptor {
     private Map m_usages;
     protected Jobservice[] m_xml;
 
-    public JobAdaptorDescriptor(Class[] adaptorClasses) throws IllegalAccessException, InstantiationException {
+    public JobAdaptorDescriptor(Class[] adaptorClasses, SecurityAdaptorDescriptor securityDesc) throws IllegalAccessException, InstantiationException {
         m_classes = new HashMap();
         m_usages = new HashMap();
         m_xml = new Jobservice[adaptorClasses.length];
@@ -39,7 +39,7 @@ public class JobAdaptorDescriptor {
             if (usage != null) {
                 m_usages.put(adaptor.getType(), usage);
             }
-            m_xml[i] = toXML(adaptor);
+            m_xml[i] = toXML(adaptor, securityDesc);
         }
     }
 
@@ -56,13 +56,14 @@ public class JobAdaptorDescriptor {
         return (Usage) m_usages.get(type);
     }
 
-    private static Jobservice toXML(JobAdaptor adaptor) {
+    private static Jobservice toXML(JobAdaptor adaptor, SecurityAdaptorDescriptor securityDesc) {
         Jobservice jobservice = new Jobservice();
         jobservice.setType(adaptor.getType());
         jobservice.setImpl(adaptor.getClass().getName());
         jobservice.setBulk(adaptor instanceof ListJobControl);
-        if (adaptor.getSupportedContextTypes() != null) {
-            jobservice.setSupportedContextType(adaptor.getSupportedContextTypes());
+        if (adaptor.getSupportedSecurityAdaptorClasses() != null) {
+            String[] supportedContextTypes = securityDesc.getSupportedContextTypes(adaptor.getSupportedSecurityAdaptorClasses());
+            jobservice.setSupportedContextType(supportedContextTypes);
         }
         if (adaptor.getSupportedSandboxProtocols() != null) {
             jobservice.setSupportedProtocolScheme(adaptor.getSupportedSandboxProtocols());

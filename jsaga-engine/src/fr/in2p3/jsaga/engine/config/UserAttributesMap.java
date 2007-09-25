@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.engine.config;
 
+import fr.in2p3.jsaga.engine.config.attributes.UserAttributesParser;
 import fr.in2p3.jsaga.engine.schema.config.Attribute;
 
 import java.util.*;
@@ -17,41 +18,15 @@ import java.util.*;
  *
  */
 public class UserAttributesMap {
-    private static final String[] KNOWN_SYSTEM_PROPERTIES = {
-            "java", "awt", "user", "os", "line", "path", "file.separator", "file.encoding"};
-    private Map m_map;
+    private UserAttributesParser m_parser;
 
-    public UserAttributesMap() {
-        // set known system properties
-        Set propNamesFilter = new HashSet();
-        for (int i=0; i< KNOWN_SYSTEM_PROPERTIES.length; i++) {
-            propNamesFilter.add(KNOWN_SYSTEM_PROPERTIES[i]);
-        }
-
-        // set map
-        m_map = new HashMap();
-        for (Iterator it=System.getProperties().entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry entry = (Map.Entry) it.next();
-            String propName = (String) entry.getKey();
-            String attributeValue = (String) entry.getValue();
-            String[] array = propName.split("\\.");
-            if (array.length == 2) {
-                String id = array[0];
-                String attributeName = array[1];
-                if (!propNamesFilter.contains(id) && !propNamesFilter.contains(propName)) {
-                    Properties userAttributes = (Properties) m_map.get(id);
-                    if (userAttributes == null) {
-                        userAttributes = new Properties();
-                        m_map.put(id, userAttributes);
-                    }
-                    userAttributes.setProperty(attributeName, attributeValue);
-                }
-            }
-        }
+    public UserAttributesMap() throws ConfigurationException {
+        m_parser = new UserAttributesParser();
+        m_parser.parse();
     }
 
     public Attribute[] update(Attribute[] attributes, String id) {
-        Properties userAttributes = (Properties) m_map.get(id);
+        Properties userAttributes = m_parser.getUserAttributes(id);
         if (userAttributes != null) {
             List newAttributes = new ArrayList();
 

@@ -18,6 +18,44 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-filter-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-sh</id>
+                        <phase>process-resources</phase>
+                        <goals><goal>filter</goal></goals>
+                        <configuration>
+                            <file>config/bin/template.sh</file>
+                            <outputDirectory>${project.build.directory}/bin</outputDirectory>
+                            <outputExtension>sh</outputExtension>
+                            <propertyName>class.name</propertyName>
+                            <propertyValues>assembly/filter.properties</propertyValues>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-bat</id>
+                        <phase>process-resources</phase>
+                        <goals><goal>filter</goal></goals>
+                        <configuration>
+                            <file>config/bin/template.bat</file>
+                            <outputDirectory>${project.build.directory}/bin</outputDirectory>
+                            <outputExtension>bat</outputExtension>
+                            <propertyName>class.name</propertyName>
+                            <propertyValues>assembly/filter.properties</propertyValues>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptors>
@@ -40,12 +78,12 @@
         <!-- SAGA modules -->
         <dependency>
             <groupId>org.ogf.saga</groupId>
-            <artifactId>saga-interfaces</artifactId>
+            <artifactId>saga-api</artifactId>
             <version>0.9.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.ogf.saga</groupId>
-            <artifactId>saga-interfaces</artifactId>
+            <artifactId>saga-api</artifactId>
             <version>0.9.1-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>

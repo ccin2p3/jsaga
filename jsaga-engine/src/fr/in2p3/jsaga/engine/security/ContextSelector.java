@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.engine.security;
 
+import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 

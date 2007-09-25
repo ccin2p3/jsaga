@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.command;
 
 import fr.in2p3.jsaga.adaptor.language.LanguageAdaptor;
-import fr.in2p3.jsaga.engine.adaptor.LanguageAdaptorFactory;
+import fr.in2p3.jsaga.engine.factories.LanguageAdaptorFactory;
 import fr.in2p3.jsaga.engine.job.preprocess.JobPreprocessor;
 import org.w3c.dom.Document;
 
@@ -36,6 +36,7 @@ public class JobRun {
         }
 
         // run job
+        System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
         LanguageAdaptor parser = LanguageAdaptorFactory.getLanguageAdaptor("jsdl");
         parser.loadLanguageDefinitionResources();
         Document jobDesc = parser.jobDescriptionToDOM(new FileInputStream(jobDescFile));

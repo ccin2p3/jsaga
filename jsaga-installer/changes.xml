@@ -3,9 +3,9 @@
         <title>JSAGA changes</title>
     </properties>
     <body>
-        <release version="0.9.1-SNAPSHOT" date="2007-09-11">
+        <release version="0.9.1-SNAPSHOT" date="2007-09-20">
             <action dev="sreynaud" type="update">
-                Updated data adaptors interface.
+                Move to JDK 1.5 and to the offical Java-binding of the SAGA interfaces.
             </action>
         </release>
         <release version="0.9.0-alpha-4" date="2007-08-17">

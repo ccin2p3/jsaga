@@ -34,31 +34,23 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
         return null;
     }
 
-    public void setAttributes(Map attributes) throws BadParameter {
-        // do nothing
-    }
-
-    public String[] getSupportedContextTypes() {
-        return null;    // no context type
+    public Class[] getSupportedSecurityAdaptorClasses() {
+        return null;    // no context class
     }
 
     public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
         // do nothing
     }
 
-    public String getScheme() {
-        return "file";
-    }
-
     public String[] getSchemeAliases() {
-        return new String[]{"local"};
+        return new String[]{"file", "local"};
     }
 
     public int getDefaultPort() {
         return 0;
     }
 
-    public void connect(String userInfo, String host, int port) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, Map attributes) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {
         // do nothing
     }
 

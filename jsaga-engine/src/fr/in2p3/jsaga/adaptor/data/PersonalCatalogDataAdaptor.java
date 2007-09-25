@@ -39,31 +39,23 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
         return null;
     }
 
-    public void setAttributes(Map attributes) throws BadParameter {
-        // do nothing
-    }
-
-    public String[] getSupportedContextTypes() {
-        return null;
+    public Class[] getSupportedSecurityAdaptorClasses() {
+        return null;    // no context class
     }
 
     public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
         // do nothing
     }
 
-    public String getScheme() {
-        return "catalog";
-    }
-
     public String[] getSchemeAliases() {
-        return null;
+        return new String[]{"catalog"};
     }
 
     public int getDefaultPort() {
         return 0;
     }
 
-    public void connect(String userInfo, String host, int port) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, Map attributes) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {
         m_catalog = DataCatalogHandler.getInstance();
         if(Base.DEBUG) m_catalog.commit();
     }
@@ -91,7 +83,7 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
         return entry instanceof FileType;
     }
 
-    public void addLocation(String logicalEntry, URI replicaEntry) throws PermissionDenied, IncorrectState, AlreadyExists, Timeout, NoSuccess {
+    public void addLocation(String logicalEntry, URI replicaEntry) throws PermissionDenied, IncorrectState, Timeout, NoSuccess {
         // get or create logical entry
         File file;
         try {
@@ -103,10 +95,8 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
                 throw new IncorrectState(e2);
             }
         }
-        // add replica location
-        if (arrayContains(file.getReplica(), replicaEntry.toString())) {
-            throw new AlreadyExists("Replica location already registered");
-        } else {
+        // add replica location (if it does not already exist)
+        if (! arrayContains(file.getReplica(), replicaEntry.toString())) {
             file.addReplica(replicaEntry.toString());
         }
         if(Base.DEBUG) m_catalog.commit();

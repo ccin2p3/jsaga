@@ -41,7 +41,7 @@ public class ContextEngineConfiguration {
             }
             Usage initUsage = desc.getInitUsage(ctx.getType());
             if (initUsage != null) {
-                usage.updateAttributes(attrs.getMap());
+                initUsage.updateAttributes(attrs.getMap());
             }
 
             // set new attributes

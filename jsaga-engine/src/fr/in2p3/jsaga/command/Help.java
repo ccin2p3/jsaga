@@ -3,9 +3,9 @@ package fr.in2p3.jsaga.command;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.InitializableSecurityAdaptorBuilder;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptorBuilder;
-import fr.in2p3.jsaga.engine.adaptor.SecurityAdaptorBuilderFactory;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.config.bean.EngineConfiguration;
+import fr.in2p3.jsaga.engine.factories.SecurityAdaptorBuilderFactory;
 import fr.in2p3.jsaga.engine.schema.config.*;
 import fr.in2p3.jsaga.helpers.ASCIITableFormatter;
 import fr.in2p3.jsaga.helpers.StringArray;
@@ -43,6 +43,8 @@ public class Help extends AbstractCommand {
     public static void main(String[] args) throws Exception {
         Help command = new Help();
         CommandLine line = command.parse(args);
+
+        System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
         EngineConfiguration config = Configuration.getInstance().getConfigurations();
         if (line.hasOption(OPT_HELP))
         {

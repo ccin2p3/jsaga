@@ -1,13 +1,17 @@
 package fr.in2p3.jsaga.engine.data.copy;
 
-import fr.in2p3.jsaga.engine.data.*;
+import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
+import fr.in2p3.jsaga.impl.file.FileImpl;
 import org.ogf.saga.URI;
 import org.ogf.saga.error.*;
-import org.ogf.saga.namespace.*;
+import org.ogf.saga.file.FileFactory;
+import org.ogf.saga.logicalfile.LogicalFile;
+import org.ogf.saga.logicalfile.LogicalFileFactory;
+import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.session.Session;
 
 import java.io.*;
-import java.net.URISyntaxException;
+import java.util.List;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -29,11 +33,11 @@ public class TargetPhysicalFile {
         m_targetFile = targetFile;
     }
 
-    public void getFromPhysicalFile(Session session, URI source, FlagsContainer sourceFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    public void getFromPhysicalFile(Session session, URI source, FlagsBytes sourceFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
         IOException closingException = null;
 
         // open source file if it exists
-        InputStream in = FileImplStreamFactory.createInputStream(session, source, PhysicalEntryFlags.READ);
+        InputStream in = this.newInputStream(session, source, Flags.READ);
 
         // start to read if it exists
         byte[] data = new byte[DEFAULT_BUFFER_SIZE];
@@ -51,7 +55,7 @@ public class TargetPhysicalFile {
         try {
             // sourceFlags may contains OVERWRITE flag for target
             boolean overwrite = sourceFlags.contains(Flags.OVERWRITE);
-            OutputStream out = FileImplStreamFactory.createOutputStream(m_targetFile, overwrite);
+            OutputStream out = m_targetFile.newOutputStream(overwrite);
             try {
                 while (readlen > 0) {
                     int writelen;
@@ -90,12 +94,12 @@ public class TargetPhysicalFile {
         }
     }
 
-    public void getFromLogicalFile(Session session, URI source, FlagsContainer sourceFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    public void getFromLogicalFile(Session session, URI source, FlagsBytes sourceFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
         // get location of source physical file
-        String[] sourceLocations;
+        List<URI> sourceLocations;
         try {
-            Flags flags = sourceFlags.remove(Flags.OVERWRITE);
-            LogicalFileImpl sourceLogicalFile = (LogicalFileImpl) NamespaceFactory.createNamespaceEntry(session, source, flags);
+            Flags[] flags = sourceFlags.remove(Flags.OVERWRITE);
+            LogicalFile sourceLogicalFile = LogicalFileFactory.createLogicalFile(session, source, flags);
             sourceLocations = sourceLogicalFile.listLocations();
         } catch (IncorrectURL e) {
             throw new NoSuccess("Failed to get a location for logical file: "+source, e);
@@ -105,19 +109,26 @@ public class TargetPhysicalFile {
             throw new NoSuccess("Failed to get a location for logical file: "+source, e);
         }
 
-        if (sourceLocations!=null && sourceLocations.length>0) {
-            // open source physical file
-            URI sourcePhysicalUri;
-            try {
-                sourcePhysicalUri = new URI(sourceLocations[0]);
-            } catch (URISyntaxException e) {
-                throw new BadParameter("Incorrect URI: "+sourceLocations[0]);
-            }
-
+        if (sourceLocations!=null && sourceLocations.size()>0) {
+            // get source physical file
+            URI sourcePhysicalUri = sourceLocations.get(0);
             // copy
             m_targetFile.copyFrom(sourcePhysicalUri, sourceFlags.remove(Flags.NONE));
         } else {
             throw new NoSuccess("No location found for logical file: "+source);
+        }
+    }
+
+    private InputStream newInputStream(Session session, URI source, Flags... flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+        try {
+            FileImpl sourceFile = (FileImpl) FileFactory.createFile(session, source, flags);
+            return sourceFile.getInputStream();
+        } catch (IncorrectURL e) {
+            throw new NoSuccess(e);
+        } catch (IncorrectSession e) {
+            throw new NoSuccess(e);
+        } catch (AlreadyExists e) {
+            throw new NoSuccess("Unexpected exception: DoesNotExist", e);
         }
     }
 }

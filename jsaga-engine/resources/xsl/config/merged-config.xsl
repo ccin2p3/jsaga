@@ -30,7 +30,7 @@
         <xsl:variable name="desc" select="$descriptors/cfg:contextInstance[@type=$conf/@type]"/>
         <contextInstance>
             <xsl:copy-of select="$desc/@*[not(name()=name($conf/@*))] | $conf/@*"/>
-            <xsl:apply-templates select="$desc/cfg:attribute[not(@name=$conf/cfg:attribute/@name)] | $conf/cfg:attribute[@value]"/>
+            <xsl:apply-templates select="$desc/cfg:attribute[not(@name=$conf/cfg:attribute/@name)] | $conf/cfg:attribute"/>
             <xsl:apply-templates select="$desc/cfg:init"/>
         </contextInstance>
     </xsl:template>

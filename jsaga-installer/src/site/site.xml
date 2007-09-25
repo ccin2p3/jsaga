@@ -23,7 +23,8 @@
             <item name="SAGA Specification" href="http://forge.ogf.org/sf/docman/do/downloadDocument/projects.saga-core-wg/docman.root.drafts/doc13771"/>
             <item name="SAGA add-ons" href="SAGA-delta.html"/>
             <item name="JSDL Specification" href="http://www.ogf.org/documents/GFD.56.pdf"/>
-            <item name="Java API of JSAGA" href="saga-interfaces/index.html"/>
+            <item name="Java API of JSAGA" href="saga-api/index.html"/>
+            <item name="Tips" href="tips.html"/>
         </menu>
         <menu name="Developer Documentation">
             <item name="Java API for adaptors" href="jsaga-adaptoritf/index.html"/>

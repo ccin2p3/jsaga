@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.command;
 
+import fr.in2p3.jsaga.impl.namespace.AbstractNamespaceDirectoryImpl;
 import org.apache.commons.cli.*;
 import org.ogf.saga.URI;
 import org.ogf.saga.namespace.*;
@@ -25,7 +26,6 @@ public class NamespaceList extends AbstractCommand {
     private static final String OPT_HELP = "h", LONGOPT_HELP = "help";
     private static final String OPT_LONG = "l", LONGOPT_LONG = "long";
     private static final String OPT_PATTERN = "p", LONGOPT_PATTERN = "pattern";
-    private static final Flags LONG_FORMAT = new Flags(8192);
 
     public NamespaceList() {
         super("jsaga-ls", new String[]{"URI"}, new String[]{OPT_HELP, LONGOPT_HELP});
@@ -35,6 +35,7 @@ public class NamespaceList extends AbstractCommand {
         NamespaceList command = new NamespaceList();
         CommandLine line = command.parse(args);
 
+        System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
         if (line.hasOption(OPT_HELP))
         {
             command.printHelpAndExit(null);
@@ -44,14 +45,16 @@ public class NamespaceList extends AbstractCommand {
             // get arguments
             URI uri = new URI(command.m_nonOptionValues[0]);
             String pattern = line.getOptionValue(OPT_PATTERN);
-            Flags flags = (line.hasOption(OPT_LONG)
-                    ? LONG_FORMAT
-                    : Flags.NONE);
 
             // get list
             Session session = SessionFactory.createSession(true);
             NamespaceDirectory dir = NamespaceFactory.createNamespaceDirectory(session, uri, Flags.NONE);
-            List list = dir.list(pattern, flags);
+            List list;
+            if (line.hasOption(OPT_LONG)) {
+                list = dir.list(pattern, Flags.NONE);
+            } else {
+                list = ((AbstractNamespaceDirectoryImpl)dir).listWithLongFormat(pattern, Flags.NONE);
+            }
             dir.close(0.0f);
 
             // display list

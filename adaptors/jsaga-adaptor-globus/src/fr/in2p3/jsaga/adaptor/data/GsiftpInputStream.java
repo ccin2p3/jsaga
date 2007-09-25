@@ -90,7 +90,7 @@ public class GsiftpInputStream extends PipedInputStream implements Runnable {
             m_exception = e;
         } catch (Exception e) {
             try {
-                throw GsiftpDataAdaptor.rethrowException(e);
+                throw GsiftpDataAdaptorAbstract.rethrowException(e);
             } catch (Exception rethrown) {
                 m_exception = new IOException(rethrown.getClass()+": "+rethrown.getMessage());
             }

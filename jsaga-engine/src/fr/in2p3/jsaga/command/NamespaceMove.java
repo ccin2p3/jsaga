@@ -30,6 +30,7 @@ public class NamespaceMove extends AbstractCommand {
         NamespaceMove command = new NamespaceMove();
         CommandLine line = command.parse(args);
 
+        System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
         if (line.hasOption(OPT_HELP))
         {
             command.printHelpAndExit(null);

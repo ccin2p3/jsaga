@@ -23,6 +23,11 @@ public interface SecurityAdaptorBuilder extends SagaBaseAdaptor {
     public String getType();
 
     /**
+     * @return the security adaptor class instanciated by this builder.
+     */
+    public Class getSecurityAdaptorClass();
+
+    /**
      * Create a security context instance and initialize it with the provided attributes.
      * @param attributes the provided attributes.
      * @return the security context instance.

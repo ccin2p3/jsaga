@@ -6,6 +6,8 @@ import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.UserPassSecurityAdaptor;
 import org.ogf.saga.error.*;
 
+import java.util.Map;
+
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -21,28 +23,24 @@ import org.ogf.saga.error.*;
 public class SecureEmulatorDataAdaptor extends EmulatorDataAdaptor {
     UserPassSecurityAdaptor m_securityAdaptor;
 
-    public String[] getSupportedContextTypes() {
-        return new String[]{"UserPass"};
+    public Class[] getSupportedSecurityAdaptorClasses() {
+        return new Class[]{UserPassSecurityAdaptor.class};
     }
 
     public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
         m_securityAdaptor = (UserPassSecurityAdaptor) securityAdaptor;
     }
 
-    public String getScheme() {
-        return "stest";
-    }
-
     public String[] getSchemeAliases() {
-        return new String[]{"semulated"};
+        return new String[]{"stest", "semulated"};
     }
 
     public int getDefaultPort() {
         return 43;
     }
 
-    public void connect(String userInfo, String host, int port) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {
-        m_server = new DataEmulatorConnectionSecure(this.getScheme(), host, port, m_securityAdaptor);
+    public void connect(String userInfo, String host, int port, Map attributes) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {
+        m_server = new DataEmulatorConnectionSecure(this.getSchemeAliases()[0], host, port, m_securityAdaptor);
         if(Base.DEBUG) m_server.commit();
     }
 

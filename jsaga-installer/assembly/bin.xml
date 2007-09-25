@@ -23,7 +23,7 @@
             <includes>
                 <include>fr.in2p3.jsaga:jsaga-engine:jar</include>
                 <include>fr.in2p3.jsaga:jsaga-adaptoritf:jar</include>
-                <include>org.ogf.saga:saga-interfaces:jar</include>
+                <include>org.ogf.saga:saga-api:jar</include>
             </includes>
         </dependencySet>
         <dependencySet>
@@ -33,7 +33,7 @@
             <excludes>
                 <exclude>fr.in2p3.jsaga:jsaga-engine</exclude>
                 <exclude>fr.in2p3.jsaga:jsaga-adaptoritf:jar</exclude>
-                <exclude>org.ogf.saga:saga-interfaces:jar</exclude>
+                <exclude>org.ogf.saga:saga-api:jar</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>

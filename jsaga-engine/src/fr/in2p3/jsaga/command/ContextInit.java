@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.command;
 
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.schema.config.ContextInstance;
-import fr.in2p3.jsaga.engine.security.ContextImpl;
+import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.apache.commons.cli.*;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.context.ContextFactory;
@@ -34,6 +34,7 @@ public class ContextInit extends AbstractCommand {
         ContextInit command = new ContextInit();
         CommandLine line = command.parse(args);
 
+        System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
         if (line.hasOption(OPT_HELP))
         {
             command.printHelpAndExit(null);

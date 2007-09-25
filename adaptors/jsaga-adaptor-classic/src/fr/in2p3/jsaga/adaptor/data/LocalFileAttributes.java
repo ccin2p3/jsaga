@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.adaptor.data;
 
+import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import org.ogf.saga.permissions.Permission;
 
 import java.io.File;
 
@@ -29,9 +29,9 @@ public class LocalFileAttributes extends FileAttributes {
 
         m_size = (entry.isFile() ? entry.length() : 0);
 
-        m_permission = Permission.NONE;
-        if(entry.canRead()) m_permission.or(Permission.READ);
-        if(entry.canWrite()) m_permission.or(Permission.WRITE);
+        m_permission = PermissionBytes.NONE;
+        if(entry.canRead()) m_permission.or(PermissionBytes.READ);
+        if(entry.canWrite()) m_permission.or(PermissionBytes.WRITE);
 
         m_lastModified = entry.lastModified();
     }

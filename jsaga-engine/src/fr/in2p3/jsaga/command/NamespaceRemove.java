@@ -30,6 +30,7 @@ public class NamespaceRemove extends AbstractCommand {
         NamespaceRemove command = new NamespaceRemove();
         CommandLine line = command.parse(args);
 
+        System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
         if (line.hasOption(OPT_HELP))
         {
             command.printHelpAndExit(null);

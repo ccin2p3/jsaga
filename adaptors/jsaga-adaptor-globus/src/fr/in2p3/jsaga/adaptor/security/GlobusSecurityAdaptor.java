@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.adaptor.security;
 
+import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
 import org.globus.gsi.CertUtil;
 import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
@@ -20,21 +21,12 @@ import java.io.PrintStream;
 /**
  *
  */
-public class GlobusSecurityAdaptor implements SecurityAdaptor {
-    protected GSSCredential m_proxy;
-
+public class GlobusSecurityAdaptor extends GSSCredentialSecurityAdaptor implements SecurityAdaptor {
     public GlobusSecurityAdaptor(GSSCredential proxy) {
-        m_proxy = proxy;
+        super(proxy);
     }
 
-    public GSSCredential getGSSCredential() {
-        return m_proxy;
-    }
-
-    public void close() throws Exception {
-        //m_proxy.dispose();
-    }
-
+    /** override super.dump() */
     public void dump(PrintStream out) throws Exception {
         GlobusCredential globusProxy;
         if (m_proxy instanceof GlobusGSSCredentialImpl) {

@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.command;
 import org.apache.commons.cli.*;
 import org.ogf.saga.URI;
 import org.ogf.saga.error.*;
+import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
@@ -36,6 +37,7 @@ public class NamespaceLogical extends AbstractCommand {
         NamespaceLogical command = new NamespaceLogical();
         CommandLine line = command.parse(args);
 
+        System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
         if (line.hasOption(OPT_HELP))
         {
             command.printHelpAndExit(null);
@@ -43,21 +45,20 @@ public class NamespaceLogical extends AbstractCommand {
         else if (line.hasOption(OPT_REGISTER))
         {
             LogicalFile file = command.getLogicalFile();
-            file.addLocation(line.getOptionValue(OPT_REGISTER));
+            file.addLocation(new URI(line.getOptionValue(OPT_REGISTER)));
             file.close(0.0f);
         }
         else if (line.hasOption(OPT_UNREGISTER))
         {
             LogicalFile file = command.getLogicalFile();
-            file.removeLocation(line.getOptionValue(OPT_REGISTER));
+            file.removeLocation(new URI(line.getOptionValue(OPT_REGISTER)));
             file.close(0.0f);
         }
         else if (line.hasOption(OPT_LIST))
         {
             LogicalFile file = command.getLogicalFile();
-            String[] locations = file.listLocations();
-            for (int i=0; i<locations.length; i++) {
-                System.out.println(locations[i]);
+            for (URI location : file.listLocations()) {
+                System.out.println(location);
             }
             file.close(0.0f);
         }

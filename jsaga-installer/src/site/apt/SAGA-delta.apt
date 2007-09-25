@@ -13,16 +13,20 @@ Differences with SAGA specification
 
     * Add fragment at the end of URI to refer to a specific security context factory
 
-    * Add method copyFrom(): available by casting your NamespaceEntry instance to AbstractNamespaceEntryImpl,
-      or by casting your NamespaceDirectory instance to AbstractNamespaceDirectoryImpl.
+    * Add system properties "saga.existence.check.skip" to disable existence check when creating NamespaceEntry instances
+      (then an IncorrectState exception embedding a DoesNotExist exception may be thrown on subsequent methods invocations).
 
-    * Add extension flags:
+    * Add some methods. These methods are accessible when casting NamespaceEntry instances to AbstractNamespaceEntryImpl,
+      or by casting NamespaceDirectory instances to AbstractNamespaceDirectoryImpl.
 
-        * LATE_EXISTENCE_CHECK (4096): to disable existence check when creating the NamespaceEntry object
-          (then an IncorrectState exception embedding a DoesNotExist exception may be thrown
-           on subsequent methods invocations)
+        * exist(): Check if current entry exist (use this if property saga.existence.check.skip=true).
+          This reduces the number of queries sent to the server.
 
-        * LONG_FORMAT (8192): to use a long format when listing files
+        * copyFrom(): Copy remote source entry to current entry.
+          This reduces the number of connections to the target server.
+
+        * listWithLongFormat(): List files under current directory, and display them with a long listing format.
+          Similar to the -l option of the Unix command ls.
 
     * Few differences in implementation of behavior with some flags (see comments in source code)
 

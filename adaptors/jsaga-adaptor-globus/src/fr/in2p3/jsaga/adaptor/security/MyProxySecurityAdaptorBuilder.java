@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  *
  */
-public class MyProxySecurityAdaptorBuilder implements InitializableSecurityAdaptorBuilder {
+public class MyProxySecurityAdaptorBuilder implements SecurityAdaptorBuilder {
     private static final int MIN_LIFETIME_FOR_USING = 3*3600;   // 3 hours
 //    private static final int MIN_LIFETIME_FOR_RENEW = 30*60;    // 30 minutes
     private static final int DEFAULT_DELEGATED_PROXY_LIFETIME = 12*3600;
@@ -46,27 +46,13 @@ public class MyProxySecurityAdaptorBuilder implements InitializableSecurityAdapt
     private static final Usage RENEW_PROXY_OBJECT_WITH_PROXY = new UProxyObject("UserProxyObject", MIN_LIFETIME_FOR_RENEW);
     private static final Usage RENEW_PROXY_FILE_WITH_PROXY = new UProxyFile("UserProxy", MIN_LIFETIME_FOR_RENEW);
 */
-    private static final Usage CREATE_PROXY = new UAnd(new Usage[]{
-            new U("UserProxy"), new UFile("UserCert"), new UFile("UserKey"), new UHidden("UserPass"),
-            new U("Server"),
-            new U("UserName"),
-            new UHidden("MyProxyPass"),
-/*
-            new UOptional("UserName"),
-            new UHidden("MyProxyPass") {
-                public String toString() {return "[*"+m_name+"*]";}
-                protected void throwExceptionIfInvalid(Object value) throws Exception {}
-            },
-*/
-            new UDuration("LifeTime") {
-                protected Object throwExceptionIfInvalid(Object value) throws Exception {
-                    return (value!=null ? super.throwExceptionIfInvalid(value) : null);
-                }
-            },
-    });
 
     public String getType() {
         return "MyProxy";
+    }
+
+    public Class getSecurityAdaptorClass() {
+        return MyProxySecurityAdaptor.class;
     }
 
     public Usage getUsage() {
@@ -77,8 +63,7 @@ public class MyProxySecurityAdaptorBuilder implements InitializableSecurityAdapt
                         // get proxy from server
                         RENEW_PROXY_OBJECT_WITH_PASS, RENEW_PROXY_FILE_WITH_PASS,
 //                        RENEW_PROXY_OBJECT_WITH_PROXY, RENEW_PROXY_FILE_WITH_PROXY,
-                        // create proxy
-                        CREATE_PROXY}),
+                }),
                 new UFile("CertDir")
         });
     }
@@ -134,51 +119,6 @@ public class MyProxySecurityAdaptorBuilder implements InitializableSecurityAdapt
             save(new File((String) attributes.get("UserProxy")), cred);
             return new MyProxySecurityAdaptor(cred, userName, myProxyPass);
 */
-        } else if (CREATE_PROXY.getMissingValues(attributes) == null) {
-            GSSCredential cred = new GlobusProxyFactory(attributes).createProxy();
-            int lifetime = attributes.containsKey("LifeTime")
-                    ? UDuration.toInt(attributes.get("LifeTime"))
-                    : DEFAULT_DELEGATED_PROXY_LIFETIME;  // default lifetime for delegated proxies
-            createMyProxy(attributes).put(cred, userName, myProxyPass, lifetime);
-            return new MyProxySecurityAdaptor(cred, userName, myProxyPass);
-        } else {
-            throw new BadParameter("Missing attribute(s): "+this.getUsage().getMissingValues(attributes));
-        }
-    }
-
-    public Usage getInitUsage() {
-        return new UAnd(new Usage[]{
-                new UOr(new Usage[]{
-                        // local proxy
-                        CREATE_PROXY,
-                        // get proxy from server
-                        RENEW_PROXY_FILE_WITH_PASS
-//                        ,RENEW_PROXY_FILE_WITH_PROXY
-                }),
-                new UFile("CertDir")});
-    }
-
-    public SecurityAdaptor initAndCreateSecurityAdaptor(Map attributes) throws Exception {
-        String userName = (String) attributes.get("UserName");
-        String myProxyPass = (String) attributes.get("MyProxyPass");
-        if (CREATE_PROXY.getMissingValues(attributes) == null) {
-            GSSCredential cred = new GlobusProxyFactory(attributes).createProxy();
-            int lifetime = attributes.containsKey("LifeTime")
-                    ? UDuration.toInt(attributes.get("LifeTime"))
-                    : DEFAULT_DELEGATED_PROXY_LIFETIME;  // default lifetime for delegated proxies
-            createMyProxy(attributes).put(cred, userName, myProxyPass, lifetime);
-            return new MyProxySecurityAdaptor(cred, userName, myProxyPass);
-        } else if (RENEW_PROXY_FILE_WITH_PASS.getMissingValues(attributes) == null) {
-            GSSCredential cred = renewCredential(null, attributes);
-            save(new File((String) attributes.get("UserProxy")), cred);
-            return new MyProxySecurityAdaptor(cred, userName, myProxyPass);
-/*
-        } else if (RENEW_PROXY_FILE_WITH_PROXY.getMissingValues(attributes) == null) {
-            GSSCredential oldCred = load(new File((String) attributes.get("UserProxy")));
-            GSSCredential cred = renewCredential(oldCred, attributes);
-            save(new File((String) attributes.get("UserProxy")), cred);
-            return new MyProxySecurityAdaptor(cred, userName, myProxyPass);
-*/
         } else {
             throw new BadParameter("Missing attribute(s): "+this.getUsage().getMissingValues(attributes));
         }
@@ -187,13 +127,13 @@ public class MyProxySecurityAdaptorBuilder implements InitializableSecurityAdapt
     private static GSSCredential renewCredential(GSSCredential oldCred, Map attributes) throws ParseException, URISyntaxException, MyProxyException {
         String userName = (String) attributes.get("UserName");
         String myProxyPass = (String) attributes.get("MyProxyPass");
-        int lifetime = attributes.containsKey("LifeTime")
+        int delegatedLifetime = attributes.containsKey("LifeTime")
                 ? UDuration.toInt(attributes.get("LifeTime"))
                 : DEFAULT_DELEGATED_PROXY_LIFETIME;  // effective lifetime for delegated proxy
-        return createMyProxy(attributes).get(oldCred, userName, myProxyPass, lifetime);
+        return createMyProxy(attributes).get(oldCred, userName, myProxyPass, delegatedLifetime);
     }
 
-    private static MyProxy createMyProxy(Map attributes) throws URISyntaxException {
+    protected static MyProxy createMyProxy(Map attributes) throws URISyntaxException {
         String[] server = ((String) attributes.get("Server")).split(":");
         String host = server[0];
         int port = (server.length>1 ? Integer.parseInt(server[1]) : MyProxy.DEFAULT_PORT);

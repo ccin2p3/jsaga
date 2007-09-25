@@ -89,12 +89,18 @@
     </complexType></element>
 
     <!-- root-child types -->
-    <element name="security"><complexType>
-        <sequence>
-            <element ref="tns:context" minOccurs="0" maxOccurs="unbounded"/>
-        </sequence>
-        <anyAttribute namespace="##other" processContents="lax"/>
-    </complexType></element>
+    <element name="security">
+        <complexType>
+            <sequence>
+                <element ref="tns:context" minOccurs="0" maxOccurs="unbounded"/>
+            </sequence>
+            <anyAttribute namespace="##other" processContents="lax"/>
+        </complexType>
+        <unique name="uniqueContextType">
+            <selector xpath="./tns:context"/>
+            <field xpath="@type"/>
+        </unique>
+    </element>
     <element name="GRID"><complexType>
         <sequence>
             <element ref="tns:GRID" minOccurs="0" maxOccurs="unbounded"/>

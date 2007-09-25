@@ -36,8 +36,8 @@ public class AdaptorDescriptors {
         AdaptorLoader loader = new AdaptorLoader();
         try {
             m_securityDesc = new SecurityAdaptorDescriptor(loader.getClasses(SecurityAdaptorBuilder.class));
-            m_dataDesc = new DataAdaptorDescriptor(loader.getClasses(DataAdaptor.class));
-            m_jobDesc = new JobAdaptorDescriptor(loader.getClasses(JobAdaptor.class));
+            m_dataDesc = new DataAdaptorDescriptor(loader.getClasses(DataAdaptor.class), m_securityDesc);
+            m_jobDesc = new JobAdaptorDescriptor(loader.getClasses(JobAdaptor.class), m_securityDesc);
         } catch(Exception e) {
             throw new ConfigurationException(e);
         }
