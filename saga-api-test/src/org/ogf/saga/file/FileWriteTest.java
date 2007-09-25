@@ -1,0 +1,66 @@
+package org.ogf.saga.file;
+
+import org.ogf.saga.buffer.Buffer;
+import org.ogf.saga.buffer.BufferFactory;
+import org.ogf.saga.error.AlreadyExists;
+import org.ogf.saga.namespace.Flags;
+import org.ogf.saga.namespace.NamespaceFactory;
+import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
+
+/* ***************************************************
+* *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
+* ***             http://cc.in2p3.fr/             ***
+* ***************************************************
+* File:   FileWriteTest
+* Author: Sylvain Reynaud (sreynaud@in2p3.fr)
+* Date:   2 juil. 2007
+* ***************************************************
+* Description:                                      */
+/**
+ *
+ */
+public class FileWriteTest extends AbstractNSEntryTest {
+    // test data
+    private static final String DEFAULT_CONTENT2 = "Another text !";
+
+    public FileWriteTest(String protocol) throws Exception {
+        super(protocol);
+    }
+
+    public void test_write_nooverwrite() throws Exception {
+        if (m_file instanceof File) {
+            try {
+                NamespaceFactory.createNamespaceEntry(m_session, m_fileUri, Flags.WRITE, Flags.EXCL);
+                fail("Expected AlreadyExist exception");
+            } catch(AlreadyExists e) {
+                checkWrited(m_fileUri, DEFAULT_CONTENT);
+            }
+        } else {
+            fail("Not an instance of class: File");
+        }
+    }
+
+    public void test_write_overwrite() throws Exception {
+        if (m_file instanceof File) {
+            Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT2.getBytes());
+            File writer = (File) NamespaceFactory.createNamespaceEntry(m_session, m_fileUri, Flags.WRITE);
+            writer.write(buffer.getSize(), buffer);
+            writer.close(0);
+            checkWrited(m_fileUri, DEFAULT_CONTENT2);
+        } else {
+            fail("Not an instance of class: File");
+        }
+    }
+
+    public void test_write_append() throws Exception {
+        if (m_file instanceof File) {
+            Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT2.getBytes());
+            File writer = (File) NamespaceFactory.createNamespaceEntry(m_session, m_fileUri, Flags.WRITE, Flags.APPEND);
+            writer.write(buffer.getSize(), buffer);
+            writer.close(0);
+            checkWrited(m_fileUri, DEFAULT_CONTENT+DEFAULT_CONTENT2);
+        } else {
+            fail("Not an instance of class: File");
+        }
+    }
+}

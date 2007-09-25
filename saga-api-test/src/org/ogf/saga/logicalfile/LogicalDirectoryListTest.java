@@ -1,0 +1,75 @@
+package org.ogf.saga.logicalfile;
+
+import org.ogf.saga.URI;
+import org.ogf.saga.namespace.Flags;
+import org.ogf.saga.namespace.abstracts.AbstractNSDirectoryListTest;
+
+import java.util.List;
+
+/* ***************************************************
+* *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
+* ***             http://cc.in2p3.fr/             ***
+* ***************************************************
+* File:   LogicalDirectoryListTest
+* Author: Sylvain Reynaud (sreynaud@in2p3.fr)
+* Date:   2 juil. 2007
+* ***************************************************
+* Description:                                      */
+/**
+ *
+ */
+public class LogicalDirectoryListTest extends AbstractNSDirectoryListTest {
+    public LogicalDirectoryListTest(String protocol) throws Exception {
+        super(protocol);
+    }
+
+    public void test_find() throws Exception {
+        if (m_dir instanceof LogicalDirectory) {
+            List list = ((LogicalDirectory)m_dir).find(DEFAULT_FILEPATTERN, (String[])null, (String[])null, Flags.NONE);
+            assertEquals(
+                    1,
+                    list.size());
+            assertEquals(
+                    DEFAULT_FILENAME,
+                    list.get(0).toString());
+        } else {
+            fail("Not an instance of class: LogicalDirectory");
+        }
+    }
+
+    public void test_find_norecurse() throws Exception {
+        if (m_dir instanceof LogicalDirectory) {
+            LogicalDirectory root = (LogicalDirectory) m_dir.openDir(new URI(".."), Flags.NONE);
+            List list = root.find(DEFAULT_FILEPATTERN, (String[])null, (String[])null, Flags.NONE);
+            assertEquals(
+                    0,
+                    list.size());
+        } else {
+            fail("Not an instance of class: LogicalDirectory");
+        }
+    }
+
+    public void test_find_recurse() throws Exception {
+        if (m_dir instanceof LogicalDirectory) {
+            LogicalDirectory root = (LogicalDirectory) m_dir.openDir(new URI(".."), Flags.NONE);
+            List list = root.find(DEFAULT_FILEPATTERN, (String[])null, (String[])null, Flags.RECURSIVE);
+            assertEquals(
+                    1,
+                    list.size());
+            assertEquals(
+                    DEFAULT_DIRNAME+DEFAULT_FILENAME,
+                    list.get(0).toString());
+        } else {
+            fail("Not an instance of class: LogicalDirectory");
+        }
+    }
+
+    public void test_isFile() throws Exception {
+        if (m_dir instanceof LogicalDirectory) {
+            assertFalse(((LogicalDirectory)m_dir).isFile(new URI(".."), Flags.NONE));
+            assertTrue(((LogicalDirectory)m_dir).isFile(new URI(DEFAULT_FILENAME), Flags.NONE));
+        } else {
+            fail("Not an instance of class: LogicalDirectory");
+        }
+    }
+}
