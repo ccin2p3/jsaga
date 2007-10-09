@@ -9,7 +9,7 @@
     <groupId>fr.in2p3.jsaga</groupId>
     <artifactId>jsaga-installer</artifactId>
     <version>0.9.1-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
     <name>JSAGA Installer</name>
     <description>JSAGA is a Java implementation of the Simple API for Grid Applications (SAGA)</description>
 
@@ -41,6 +41,42 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependserializer-plugin</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <id>serialize-dependencies</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>serialize</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>xslt-maven-plugin</artifactId>
+                <version>1.0</version>
+                <configuration>
+                    <xslFile>assembly/izpack.xsl</xslFile>
+                    <srcDir>${project.build.directory}</srcDir>
+                    <srcIncludes>dependencies.xml</srcIncludes>
+                    <destDir>${project.build.directory}</destDir>
+                    <fileNameRegex>dependencies</fileNameRegex>
+                    <fileNameReplacement>izpack</fileNameReplacement>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>generate-izpack-descriptor</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptors>
@@ -57,8 +93,37 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-izpack-plugin</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <configuration>
+                    <descriptor>${project.build.directory}/izpack.xml</descriptor>
+                    <basedir>${project.build.directory}/${project.artifactId}-${project.version}-bin.dir/jsaga-${project.version}/</basedir>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>izpack</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>izpack</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-statistic-plugin</artifactId>
+                <configuration>
+                    <root>..</root>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
     <dependencies>
         <!-- engine -->
         <dependency>
@@ -87,6 +152,11 @@
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-voms</artifactId>
+            <version>0.9.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-srm</artifactId>
             <version>0.9.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
