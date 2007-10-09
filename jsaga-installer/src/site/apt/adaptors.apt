@@ -1,0 +1,55 @@
+Adaptors
+
+* Security Context Adaptors
+
+*------------------+--+
+| <<Context Type>> | <<Module>> |
+*------------------+--+
+| UserPass         | Core |
+*------------------+--+
+| Globus           | jsaga-adaptor-globus |
+| GlobusLegacy     |
+| GlobusRFC820     |
+| MyProxy          |
+*------------------+--+
+| VOMS             | jsaga-adaptor-voms |
+*------------------+--+
+
+* Data Management Adaptors
+
+*--------------+--+--+
+| <<Protocol>> | <<Supported Context Types>> | <<Module>> |
+*--------------+--+--+
+| catalog      |                             | Core |
+*--------------+--+--+
+| file         |                             | jsaga-adaptor-classic |
+*--------------+--+--+
+| gsiftp       | Globus, GlobusLegacy, GlobusRFC820 | jsaga-adaptor-globus |
+| gsiftp-new   | MyProxy                     |
+| gsiftp-old   | VOMS                        |
+*--------------+--+--+
+| gsiftp-win   | Globus, GlobusLegacy, GlobusRFC820 | jsaga-adaptor-globus |
+|              | MyProxy                     |
+*--------------+--+--+
+| srm          | Globus, GlobusLegacy, GlobusRFC820 | jsaga-adaptor-srm |
+| srm22        | MyProxy                     |
+| srm11        | VOMS                        |
+*--------------+--+--+
+
+* Execution Management Adaptors
+
+~~** Job Submission Adaptors
+
+~~*-----------------+--+
+~~| <<Job Service>> | <<Module>> |
+~~*-----------------+--+
+~~| Gatekeeper      | jsaga-adaptor-globus |
+~~*-----------------+--+
+
+~~** Langage Adaptors
+
+~~*--------------+--+
+~~| <<Language>> | <<Module>> |
+~~*--------------+--+
+~~| JSDL         | Core |
+~~*--------------+--+

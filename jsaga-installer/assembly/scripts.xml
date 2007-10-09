@@ -1,0 +1,19 @@
+<scripts>
+    <script>jsaga-help</script>
+
+    <script>jsaga-context-info</script>
+    <script>jsaga-context-init</script>
+    <script>jsaga-context-destroy</script>
+
+    <script>jsaga-job-run</script>
+
+    <script>jsaga-cat</script>
+    <script>jsaga-cp</script>
+    <script>jsaga-ls</script>
+    <script>jsaga-logical</script>
+    <script>jsaga-mkdir</script>
+    <script>jsaga-mv</script>
+    <script>jsaga-rm</script>
+    <script>jsaga-rmdir</script>
+    <script>jsaga-test</script>
+</scripts>
