@@ -178,6 +178,16 @@ public class FileImpl extends AbstractFileImpl implements File {
             } catch (AlreadyExists alreadyExists) {
                 throw new AlreadyExists("Target entry already exists: "+effectiveTarget, alreadyExists.getCause());
             }
+/*
+        } else if (m_adaptor instanceof DataGet) {
+            FileImpl targetFile = SourcePhysicalFile.createTargetFile(m_session, effectiveTarget, effectiveFlags);
+            try {
+                ((DataGet)m_adaptor).getToStream(m_uri.getPath(), targetFile.getOutputStream());
+            } catch (DoesNotExist doesNotExist) {
+                throw new IncorrectState("Source file does not exist: "+m_uri, doesNotExist);
+            }
+            targetFile.close();
+*/
         } else if (m_adaptor instanceof FileReader) {
             Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(target.getScheme());
             if (descriptor.hasLogical() && descriptor.getLogical()) {
@@ -226,6 +236,16 @@ public class FileImpl extends AbstractFileImpl implements File {
             } catch (AlreadyExists alreadyExists) {
                 throw new IncorrectState("Target entry already exists: "+m_uri, alreadyExists);
             }
+/*
+        } else if (m_adaptor instanceof DataPut) {
+            FileImpl sourceFile = TargetPhysicalFile.createSourceFile(m_session, effectiveSource);
+            try {
+                ((DataPut)m_adaptor).putFromStream(m_uri.getPath(), sourceFile.getInputStream(), false);
+            } catch (AlreadyExists alreadyExists) {
+                throw new IncorrectState("Target entry already exists: "+m_uri, alreadyExists);
+            }
+            sourceFile.close();
+*/
         } else if (m_adaptor instanceof FileWriter) {
             TargetPhysicalFile target = new TargetPhysicalFile(this);
             Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(source.getScheme());
