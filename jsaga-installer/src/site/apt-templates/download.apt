@@ -13,35 +13,39 @@ Download JSAGA
 
 ** Windows 2000/XP
 
-    [[1]] Unzip <<<jsaga-installer-${project.version}-bin.zip>>> to the directory you wish to install JSAGA.
+    [[1]] Execute installer or extract binaries package to the directory you
+          wish to install JSAGA.
 
-    [[2]] Set the JSAGA_HOME environment variable to this directory (optional).
-          Open up the system properties (WinKey + Pause), select the "Advanced" tab, and the
-          "Environment Variables" button, then click on "New" to set the JSAGA_HOME variable
-          with the location of this directory.
+    [[2]] Set the JSAGA_HOME environment variable (optional):
+          Open up the system properties (WinKey + Pause), select the tab
+          "Advanced", and the "Environment Variables" button, then click on
+          "New" to set the JSAGA_HOME variable with the installation path.
 
-    [[3]] Add the bin directory to your PATH environment variable (optional).
-          Open up the system properties (WinKey + Pause), select the "Advanced" tab, and the
-          "Environment Variables" button, then click on "Modify" to add "<<<;%JSAGA_HOME%\bin>>>"
-          at the end of the PATH variable.
+    [[3]] Update the PATH environment variable (optional):
+          Open up the system properties (WinKey + Pause), select the tab
+          "Advanced", and the "Environment Variables" button, then click on
+          "Modify" to add "<<<;%JSAGA_HOME%\bin>>>" at the end of variable PATH.
 
 ** Unix-based Operating Systems (Linux, Solaris and Mac OS X)
 
-    [[1]] Unzip <<<jsaga-installer-${project.version}-bin.zip>>> to the directory you wish to install JSAGA.
+    [[1]] Execute installer or extract binaries package to the directory you
+          wish to install JSAGA.
 
-    [[2]] Set the JSAGA_HOME environment variable to this directory (optional).
-          Add in your profile: <<<export JSAGA_HOME=>>>path_to_your_directory
+    [[2]] Set the JSAGA_HOME environment variable (optional):
+          <<<export JSAGA_HOME=>>>path_to_your_directory
 
-    [[3]] Add the bin directory to your PATH environment variable (optional).
-          Add in your profile: <<<export PATH=$PATH:JSAGA_HOME/bin>>>
+    [[3]] Update the PATH environment variable (optional):
+          <<<export PATH=$PATH:JSAGA_HOME/bin>>>
 
 * Current Release
 
     JSAGA is distributed in several formats for your convenience.
 
-    * {{{../maven2/fr/in2p3/jsaga/jsaga-installer/${project.version}/jsaga-installer-${project.version}-bin.zip}jsaga-installer-${project.version}-bin.zip}}
+    * Graphical Installer: {{{../maven2/fr/in2p3/jsaga/jsaga-installer/${project.version}/jsaga-installer-${project.version}.jar}jsaga-installer-${project.version}.jar}}
 
-    * {{{../maven2/fr/in2p3/jsaga/jsaga-installer/${project.version}/jsaga-installer-${project.version}-bin.tar.gz}jsaga-installer-${project.version}-bin.tar.gz}}
+    * ZIP binaries package: {{{../maven2/fr/in2p3/jsaga/jsaga-installer/${project.version}/jsaga-installer-${project.version}-bin.zip}jsaga-installer-${project.version}-bin.zip}}
+
+    * TAR-GZ binaries package: {{{../maven2/fr/in2p3/jsaga/jsaga-installer/${project.version}/jsaga-installer-${project.version}-bin.tar.gz}jsaga-installer-${project.version}-bin.tar.gz}}
 
     See {{{changes-report.html}release notes}}.
 
