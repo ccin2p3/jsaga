@@ -4,11 +4,9 @@ import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytesPhysical;
 import org.ogf.saga.URI;
 import org.ogf.saga.error.*;
-import org.ogf.saga.file.FileFactory;
 import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.logicalfile.LogicalFileFactory;
-import org.ogf.saga.namespace.Flags;
-import org.ogf.saga.namespace.NamespaceEntry;
+import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 
 import java.util.List;
@@ -33,24 +31,18 @@ public class SourceLogicalFile {
     }
 
     public void putToPhysicalFile(Session session, URI target, FlagsBytes targetFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
-        // get location of source physical file
+        // get location of source entry (may be logical or physical)
         List<URI> sourceLocations = m_sourceFile.listLocations();
         if (sourceLocations!=null && sourceLocations.size()>0) {
-            // open source physical file
+            // open source entry
             URI source = sourceLocations.get(0);
-            NamespaceEntry sourcePhysicalFile;
-            try {
-                sourcePhysicalFile = FileFactory.createFile(session, source, Flags.NONE);
-            } catch (IncorrectURL e) {
-                throw new NoSuccess(e);
-            } catch (IncorrectSession e) {
-                throw new NoSuccess(e);
-            } catch (DoesNotExist doesNotExist) {
-                throw new IncorrectState("Source physical file does not exist: "+source, doesNotExist);
-            }
+            NamespaceEntry sourceEntry = createSourceNSEntry(session, source);
 
             // copy
-            sourcePhysicalFile.copy(target, targetFlags.remove(Flags.NONE));
+            sourceEntry.copy(target, targetFlags.remove(Flags.NONE));
+
+            // close source entry (but not the source logical file)
+            sourceEntry.close();
         } else {
             throw new NoSuccess("No location found for logical file: "+m_sourceFile.getURI());
         }
@@ -60,15 +52,9 @@ public class SourceLogicalFile {
         // get location of source physical file
         List<URI> sourceLocations = m_sourceFile.listLocations();
         if (sourceLocations!=null && sourceLocations.size()>0) {
+            // open target logical file
+            LogicalFile targetLogicalFile = createTargetLogicalFile(session, target, targetFlags);
             try {
-                // open target logical file
-                FlagsBytes correctedBytes = targetFlags.or(FlagsBytesPhysical.WRITE).or(FlagsBytes.CREATE);
-                Flags[] correctedFlags =
-                        (correctedBytes.contains(Flags.OVERWRITE)
-                                ? correctedBytes.remove(Flags.OVERWRITE)
-                                : correctedBytes.add(Flags.EXCL));
-                LogicalFile targetLogicalFile = LogicalFileFactory.createLogicalFile(session, target, correctedFlags);
-
                 // copy
                 if (targetFlags.contains(Flags.OVERWRITE)) {
                     // remove all target locations
@@ -87,11 +73,45 @@ public class SourceLogicalFile {
                 }
             } catch (IncorrectURL e) {
                 throw new NoSuccess(e);
-            } catch (IncorrectSession e) {
-                throw new NoSuccess(e);
             } catch (DoesNotExist e) {
                 throw new NoSuccess("Unexpected exception: DoesNotExist", e);
+            } finally {
+                // close target
+                targetLogicalFile.close();
             }
+        }
+    }
+
+    public static NamespaceEntry createSourceNSEntry(Session session, URI source) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
+        try {
+            return NamespaceFactory.createNamespaceEntry(session, source, Flags.NONE);
+        } catch (IncorrectURL e) {
+            throw new NoSuccess(e);
+        } catch (IncorrectSession e) {
+            throw new NoSuccess(e);
+        } catch (AlreadyExists e) {
+            throw new NoSuccess("Unexpected exception: AlreadyExists");
+        } catch (DoesNotExist doesNotExist) {
+            throw new IncorrectState("Source physical file does not exist: "+source, doesNotExist);
+        }
+    }
+
+    public static LogicalFile createTargetLogicalFile(Session session, URI target, FlagsBytes flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
+        FlagsBytes correctedBytes = flags.or(FlagsBytesPhysical.WRITE).or(FlagsBytes.CREATE);
+        Flags[] correctedFlags =
+                (correctedBytes.contains(Flags.OVERWRITE)
+                        ? correctedBytes.remove(Flags.OVERWRITE)
+                        : correctedBytes.add(Flags.EXCL));
+        try {
+            return LogicalFileFactory.createLogicalFile(session, target, correctedFlags);
+        } catch (IncorrectURL e) {
+            throw new NoSuccess(e);
+        } catch (IncorrectSession e) {
+            throw new NoSuccess(e);
+        } catch (DoesNotExist e) {
+            throw new NoSuccess("Unexpected exception: DoesNotExist", e);
+        } catch (AlreadyExists alreadyExists) {
+            throw new AlreadyExists("Target entry already exists: "+target, alreadyExists.getCause());
         }
     }
 }

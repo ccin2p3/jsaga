@@ -10,6 +10,7 @@ import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.session.Session;
 
 import java.io.*;
+import java.lang.Exception;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -56,13 +57,9 @@ public class SourcePhysicalFile {
 
         // open target file and copy
         try {
-            FlagsBytes correctedBytes = targetFlags.or(FlagsBytesPhysical.WRITE).or(FlagsBytes.CREATE);
-            Flags[] correctedFlags =
-                    (correctedBytes.contains(Flags.OVERWRITE)
-                            ? correctedBytes.remove(Flags.OVERWRITE)
-                            : correctedBytes.add(Flags.EXCL));
-            OutputStream out = this.newOutputStream(session, target, correctedFlags);
+            FileImpl targetFile = createTargetFile(session, target, targetFlags);
             try {
+                OutputStream out = targetFile.getOutputStream();
                 while (readlen > 0) {
                     int writelen;
                     for (int total=0; total<readlen; total+=writelen) {
@@ -81,9 +78,9 @@ public class SourcePhysicalFile {
                 throw new Timeout(e);
             } finally {
                 try {
-                    out.close();
-                } catch (IOException e) {
-                    closingException = e;
+                    targetFile.close();
+                } catch (Exception e) {
+                    closingException = new IOException(e.getClass().getName()+": "+e.getMessage());
                 }
             }
         } finally {
@@ -98,16 +95,22 @@ public class SourcePhysicalFile {
         }
     }
 
-    private OutputStream newOutputStream(Session session, URI target, Flags... flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
+    public static FileImpl createTargetFile(Session session, URI target, FlagsBytes flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
+        FlagsBytes correctedBytes = flags.or(FlagsBytesPhysical.WRITE).or(FlagsBytes.CREATE);
+        Flags[] correctedFlags =
+                (correctedBytes.contains(Flags.OVERWRITE)
+                        ? correctedBytes.remove(Flags.OVERWRITE)
+                        : correctedBytes.add(Flags.EXCL));
         try {
-            FileImpl targetFile = (FileImpl) FileFactory.createFile(session, target, flags);
-            return targetFile.getOutputStream();
+            return (FileImpl) FileFactory.createFile(session, target, correctedFlags);
         } catch (IncorrectURL e) {
             throw new NoSuccess(e);
         } catch (IncorrectSession e) {
             throw new NoSuccess(e);
         } catch (DoesNotExist e) {
             throw new NoSuccess("Unexpected exception: DoesNotExist", e);
+        } catch (AlreadyExists alreadyExists) {
+            throw new AlreadyExists("Target entry already exists: "+target, alreadyExists.getCause());
         }
     }
 }
