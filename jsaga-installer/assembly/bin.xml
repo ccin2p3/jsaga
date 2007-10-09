@@ -40,7 +40,11 @@
     <files>
         <file>
             <outputDirectory>/</outputDirectory>
-            <source>assembly/README.txt</source>
+            <source>assembly/Licence.txt</source>
+        </file>
+        <file>
+            <outputDirectory>/</outputDirectory>
+            <source>assembly/Readme.txt</source>
         </file>
     </files>
 </assembly>
