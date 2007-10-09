@@ -15,7 +15,11 @@ goto beginArgs
 
 REM # set JSAGA_HOME
 if "%JSAGA_HOME%_"=="_" (
-  set JSAGA_HOME=.
+  if exist "$INSTALL_PATH" (
+    set JSAGA_HOME="$INSTALL_PATH"
+  ) else (
+    set JSAGA_HOME=.
+  )
 )
 
 REM # set system properties

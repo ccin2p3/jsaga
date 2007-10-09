@@ -15,7 +15,11 @@ fi
 
 # set JSAGA_HOME
 if test -z "$JSAGA_HOME" ; then
-  JSAGA_HOME=.
+  if test -d "%INSTALL_PATH" ; then
+    JSAGA_HOME="%INSTALL_PATH"
+  else
+    JSAGA_HOME=.
+  fi
 fi
 
 # set system properties
