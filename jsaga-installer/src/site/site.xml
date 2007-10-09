@@ -16,6 +16,7 @@
         </links>
         <menu name="JSAGA">
             <item name="What is it?" href="index.html"/>
+            <item name="Adaptors" href="adaptors.html"/>
             <item name="Download" href="download.html"/>
             <item name="Presentations" href="presentations.html"/>
         </menu>
@@ -37,6 +38,7 @@
             <item name="Classic" href="adaptors/jsaga-adaptor-classic/index.html"/>
             <item name="Globus" href="adaptors/jsaga-adaptor-globus/index.html"/>
             <item name="VOMS" href="adaptors/jsaga-adaptor-voms/index.html"/>
+            <item name="SRM" href="adaptors/jsaga-adaptor-srm/index.html"/>
         </menu>
     </body>
 </project>
