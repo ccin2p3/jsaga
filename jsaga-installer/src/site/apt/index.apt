@@ -1,30 +1,25 @@
 JSAGA
 
-    JSAGA est une implémentation dédiée à l’interopérabilité de grilles de calcul
-    de l'API standard SAGA de l'{{{http://forge.ogf.org/}Open Grid Forum}}.
-    L'objectif de cette implémentation est de permettre, à partir de la description d’un job
-    (exécutable, données en entrée/sortie, contraintes sur l’environnement d’exécution…),
-    de soumettre ce job sur de multiples grilles de façon transparente.
+ JSAGA is a Java implementation of the Simple API for Grid Application
+ ({{{http://forge.ogf.org/sf/go/doc13771?nav=1}SAGA}}) specification from
+ the Open Grid Forum ({{{http://forge.ogf.org/}OGF}}).
 
-    Cette implémentation :
+ This implementation enables to transparently use resources of several
+ grids supporting heterogeneous security, data management and execution
+ management technologies.
 
-    * Permet de masquer l’hétérogénéité des technologies employées pour la sécurité, la gestion de données
-      et la gestion de l’exécution.
+ The goal of JSAGA is to provide an extensible (plugins) and customizable
+ (configuration files) implementation, which does not only enable
+ submitting jobs on various grid middleware components, but which also
+ automatically and efficiently convey the input/output files of the jobs
+ to/from the worker nodes.
+ Selecting the best transfer path for each file requires considering many
+ parameters, such as the caracteristics of the selected grid and site,
+ the caracteristics of the transfer protocol and security context used to
+ access the file, the caracteristics of the file itself.
 
-    * Permet d'acheminer les données d’entrée/sortie des jobs vers/depuis les serveurs de calcul.
-      Il détermine le meilleur chemin pour l’acheminement de chaque fichier.
-      Ce chemin dépend de nombreux paramètres, tels que les caractéristiques de la grille et du site utilisés,
-      les caractéristiques du protocole et du contexte de sécurité par lesquels le fichier est accessible,
-      les caractéristiques du fichier lui-même.
+ JSAGA hides all this complexity and enables submitting jobs to several
+ grids, by using a single job description written in Job Submission
+ Description Language ({{{http://www.ogf.org/documents/GFD.56.pdf}JSDL}})
 
-    * Est extensible. Il accueille des modules enfichables afin de permettre l'ajout du support
-      de nouvelles grilles.
-
-
-    [Note:] Sont aujourd’hui implémentées les interfaces communes, les interfaces de sécurité
-            et les interfaces de gestion des données du moteur SAGA.
-            Reste à implémenter les interfaces de gestion de l’exécution du moteur SAGA, ainsi que
-            les modules enfichables pour la sécurité, la gestion des données et la gestion de
-            l'exécution de toutes les grilles à supporter.
-            Les interfaces « Streams » et « Remote Procedure Call » de la spécification SAGA ne
-            seront pas implémentées.
+            "DESCRIBE YOUR JOB ONCE, SUBMIT IT EVERY WHERE !"
