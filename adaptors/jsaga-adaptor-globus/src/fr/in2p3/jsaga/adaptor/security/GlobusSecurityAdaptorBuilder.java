@@ -26,13 +26,11 @@ import java.util.Map;
 /**
  *
  */
-public class GlobusSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
+public abstract class GlobusSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
     private static final Usage LOCAL_PROXY_OBJECT = new UNoPrompt("UserProxyObject");
     private static final Usage LOCAL_PROXY_FILE = new UFile("UserProxy");
 
-    public String getType() {
-        return "Globus";
-    }
+    public abstract String getType();
 
     public Class getSecurityAdaptorClass() {
         return GlobusSecurityAdaptor.class;

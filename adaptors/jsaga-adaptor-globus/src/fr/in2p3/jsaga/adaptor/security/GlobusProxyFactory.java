@@ -28,9 +28,9 @@ import java.util.Map;
  *
  */
 public class GlobusProxyFactory extends GlobusProxyFactoryAbstract {
-    private static final int OID_OLD = 2;
-    private static final int OID_GLOBUS = 3;    // default
-    private static final int OID_RFC820 = 4;
+    public static final int OID_OLD = 2;
+    public static final int OID_GLOBUS = 3;    // default
+    public static final int OID_RFC820 = 4;
     
     private String m_certFile = null;
     private String m_proxyFile = null;
@@ -38,7 +38,7 @@ public class GlobusProxyFactory extends GlobusProxyFactoryAbstract {
     private boolean m_verify = true;
     private boolean m_globusStyle = false;
 
-    public GlobusProxyFactory(Map attributes) throws BadParameter, ParseException {
+    public GlobusProxyFactory(Map attributes, int oid) throws BadParameter, ParseException {
         // required attributes
         super((String) attributes.get("UserPass")); // UserPass is ignored if key is not encrypted
         CoGProperties.getDefault().setCaCertLocations((String) attributes.get("CertDir"));
@@ -53,14 +53,6 @@ public class GlobusProxyFactory extends GlobusProxyFactoryAbstract {
         boolean limited = false;
         if (attributes.containsKey("Delegation")) {
             limited = ((String)attributes.get("Delegation")).equalsIgnoreCase("limited");
-        }
-        int oid = OID_GLOBUS;
-        if (attributes.containsKey("ProxyType")) {
-            if (((String)attributes.get("ProxyType")).equalsIgnoreCase("old")) {
-                oid = OID_OLD;
-            } else if (((String)attributes.get("ProxyType")).equalsIgnoreCase("RFC820")) {
-                oid = OID_RFC820;
-            }
         }
         switch(oid) {
             case OID_OLD:

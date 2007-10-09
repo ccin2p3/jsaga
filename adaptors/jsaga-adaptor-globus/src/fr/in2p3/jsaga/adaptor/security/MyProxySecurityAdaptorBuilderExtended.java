@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.security;
 
 import fr.in2p3.jsaga.adaptor.base.usage.*;
+import org.globus.util.Util;
 import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.BadParameter;
 
@@ -48,7 +49,7 @@ public class MyProxySecurityAdaptorBuilderExtended extends MyProxySecurityAdapto
         String userName = (String) attributes.get("UserName");
         String myProxyPass = (String) attributes.get("MyProxyPass");
         if (CREATE_PROXY.getMissingValues(attributes) == null) {
-            GSSCredential cred = new GlobusProxyFactory(attributes).createProxy();
+            GSSCredential cred = new GlobusProxyFactory(attributes, GlobusProxyFactory.OID_OLD).createProxy();
             int storedLifetime = attributes.containsKey("LifeTime")
                     ? UDuration.toInt(attributes.get("LifeTime"))
                     : DEFAULT_STORED_PROXY_LIFETIME;  // default lifetime for stored proxies
@@ -56,5 +57,10 @@ public class MyProxySecurityAdaptorBuilderExtended extends MyProxySecurityAdapto
         } else {
             throw new BadParameter("Missing attribute(s): "+this.getUsage().getMissingValues(attributes));
         }
+    }
+
+    public void destroyBuilder(Map attributes, String contextId) throws Exception {
+        String proxyFile = (String) attributes.get("UserProxy");
+        Util.destroy(proxyFile);
     }
 }
