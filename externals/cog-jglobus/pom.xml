@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.globus</groupId>
     <artifactId>cog-jglobus</artifactId>
-    <version>1.2</version>
+    <version>gt4</version>
     <name>Java CoG Kit</name>
     <url>http://www-unix.globus.org/cog/</url>
     <dependencies>
