@@ -1,0 +1,90 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>fr.in2p3.jsaga</groupId>
+        <artifactId>jsaga-adaptorpom</artifactId>
+        <version>current</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>fr.in2p3.jsaga.adaptor</groupId>
+    <artifactId>jsaga-adaptor-srm</artifactId>
+    <version>0.9.1-SNAPSHOT</version>
+    <name>Adaptor for SRM implementations</name>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>axistools-maven-plugin</artifactId>
+                <!--<version>1.0</version>--><!-- axis 1.2.1 -->
+                <version>1.1</version><!-- axis 1.4 -->
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>wsdl2java</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirectory>${basedir}/resources/wsdl</sourceDirectory>
+                            <fileNamespaceToPackage>${basedir}/resources/wsdl/NStoPkg.properties</fileNamespaceToPackage>
+                            <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
+                            <timestampDirectory>${project.build.directory}</timestampDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <!-- common -->
+        <dependency>
+            <groupId>fr.in2p3.jsaga</groupId>
+            <artifactId>jsaga-adaptoritf</artifactId>
+            <version>0.9.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ogf.saga</groupId>
+            <artifactId>saga-api</artifactId>
+            <version>0.9.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ogf.saga</groupId>
+            <artifactId>saga-api</artifactId>
+            <version>0.9.1-SNAPSHOT</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>fr.in2p3.jsaga</groupId>
+            <artifactId>jsaga-engine</artifactId>
+            <version>0.9.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- adaptor specific -->
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis</artifactId>
+            <version>1.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.globus</groupId>
+            <artifactId>cog-axis</artifactId>
+            <version>gt4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.globus</groupId>
+            <artifactId>cog-url</artifactId>
+            <version>gt4</version>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- for testing -->
+        <dependency>
+            <groupId>org.globus</groupId>
+            <artifactId>cog-jglobus</artifactId>
+            <version>gt4</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
