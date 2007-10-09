@@ -164,6 +164,24 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     /**
      * This method is specific to JSAGA implementation.
      */
+    public void destroy() throws IncorrectState, NoSuccess {
+        if (m_adaptorBuilder == null) {
+            throw new IncorrectState("Please set context type prior to invoking any other operation", this);
+        }
+        if (!(m_adaptorBuilder instanceof InitializableSecurityAdaptorBuilder)) {
+            return; //ignore
+        }
+        InitializableSecurityAdaptorBuilder initAdaptorBuilder = (InitializableSecurityAdaptorBuilder) m_adaptorBuilder;
+        try {
+            initAdaptorBuilder.destroyBuilder(super._getAttributesMap(), this.getContextId());
+        } catch (Exception e) {
+            throw new NoSuccess(e);
+        }
+    }
+
+    /**
+     * This method is specific to JSAGA implementation.
+     */
     public SecurityAdaptor createSecurityAdaptor() throws NotImplemented, BadParameter, IncorrectState, NoSuccess {
         this.checkUsage(m_adaptorBuilder.getUsage());
         try {
