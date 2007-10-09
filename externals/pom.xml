@@ -17,6 +17,8 @@
   <!-- aggregation -->
   <modules>
     <module>cog-jglobus</module>
+    <module>cog-axis</module>
+    <module>cog-url</module>
     <module>jce-jdk13</module>
     <module>puretls</module>
     <module>cryptix32</module>
