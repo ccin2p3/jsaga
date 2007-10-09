@@ -8,9 +8,9 @@
     <name>VOMS library</name>
     <url>http://edg-wp2.web.cern.ch/edg-wp2/security/voms/voms.html</url>
     <build>
-        <directory>java/build</directory>
-        <outputDirectory>java/build/classes</outputDirectory>
-        <sourceDirectory>java/src</sourceDirectory>
+        <directory>build</directory>
+        <outputDirectory>build/classes</outputDirectory>
+        <sourceDirectory>java</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -39,7 +39,7 @@
         <dependency>
             <groupId>org.globus</groupId>
             <artifactId>cog-jglobus</artifactId>
-            <version>1.2</version>
+            <version>gt4</version>
         </dependency>
         <!-- for build -->
         <dependency>
