@@ -111,6 +111,6 @@ public class VOMSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
                 ExtendedGSSCredential.IMPEXP_OPAQUE,
                 GSSCredential.DEFAULT_LIFETIME,
                 null, // use default mechanism: GSI
-                GSSCredential.ACCEPT_ONLY);
+                GSSCredential.INITIATE_AND_ACCEPT);
     }
 }

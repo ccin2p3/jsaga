@@ -51,9 +51,9 @@ public class NamespaceList extends AbstractCommand {
             NamespaceDirectory dir = NamespaceFactory.createNamespaceDirectory(session, uri, Flags.NONE);
             List list;
             if (line.hasOption(OPT_LONG)) {
-                list = dir.list(pattern, Flags.NONE);
-            } else {
                 list = ((AbstractNamespaceDirectoryImpl)dir).listWithLongFormat(pattern, Flags.NONE);
+            } else {
+                list = dir.list(pattern, Flags.NONE);
             }
             dir.close(0.0f);
 
