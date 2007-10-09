@@ -97,4 +97,11 @@ public class UserPassSecurityAdaptorBuilderExtended extends UserPassSecurityAdap
         prop.setProperty(contextId+".UserPassCrypted", cryptedPassword);
         prop.store(new FileOutputStream(FilePropertiesAttributesParser.FILE), "JSAGA user attributes");
     }
+
+    public void destroyBuilder(Map attributes, String contextId) throws Exception {
+        Properties prop = new Properties();
+        prop.load(new FileInputStream(FilePropertiesAttributesParser.FILE));
+        prop.remove(contextId+".UserPassCrypted");
+        prop.store(new FileOutputStream(FilePropertiesAttributesParser.FILE), "JSAGA user attributes");
+    }
 }

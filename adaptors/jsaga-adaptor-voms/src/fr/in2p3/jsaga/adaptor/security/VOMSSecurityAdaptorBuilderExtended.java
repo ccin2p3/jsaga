@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.adaptor.security;
 
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import org.glite.security.voms.contact.*;
+import org.globus.util.Util;
 import org.ogf.saga.error.BadParameter;
 
 import java.net.URI;
@@ -117,5 +118,10 @@ public class VOMSSecurityAdaptorBuilderExtended extends VOMSSecurityAdaptorBuild
         ArrayList options = new ArrayList();
         options.add(o);
         proxyInit.getVomsProxy(options);
+    }
+
+    public void destroyBuilder(Map attributes, String contextId) throws Exception {
+        String proxyFile = (String) attributes.get("UserProxy");
+        Util.destroy(proxyFile);
     }
 }
