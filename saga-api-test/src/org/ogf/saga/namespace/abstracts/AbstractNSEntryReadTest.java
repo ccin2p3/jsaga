@@ -1,6 +1,6 @@
 package org.ogf.saga.namespace.abstracts;
 
-import org.ogf.saga.namespace.Flags;/* ***************************************************
+/* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
@@ -18,10 +18,10 @@ public abstract class AbstractNSEntryReadTest extends AbstractNSEntryTest {
     }
 
     public void test_isDirectory() throws Exception {
-        assertFalse(m_file.isDirectory(Flags.NONE));
+        assertFalse(m_file.isDir());
     }
 
     public void test_isEntry() throws Exception {
-        assertTrue(m_file.isEntry(Flags.NONE));
+        assertTrue(m_file.isEntry());
     }
 }

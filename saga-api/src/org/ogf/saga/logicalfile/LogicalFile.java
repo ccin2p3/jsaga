@@ -2,8 +2,8 @@ package org.ogf.saga.logicalfile;
 
 import java.util.List;
 
-import org.ogf.saga.URI;
-import org.ogf.saga.attributes.Attributes;
+import org.ogf.saga.URL;
+import org.ogf.saga.attributes.AsyncAttributes;
 import org.ogf.saga.error.AlreadyExists;
 import org.ogf.saga.error.AuthenticationFailed;
 import org.ogf.saga.error.AuthorizationFailed;
@@ -15,24 +15,22 @@ import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.error.PermissionDenied;
 import org.ogf.saga.error.Timeout;
-import org.ogf.saga.namespace.Flags;
-import org.ogf.saga.namespace.NamespaceEntry;
+import org.ogf.saga.namespace.NSEntry;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
-import org.ogf.saga.task.RVTask;
 
 /**
  * A LogicalFile provides the means to handle the contents of logical
  * files.
  */
-public interface LogicalFile extends NamespaceEntry, Attributes {
+public interface LogicalFile extends NSEntry, AsyncAttributes {
 
     /**
      * Adds a replica location to the replica set.
      * Note: does never throw an <code>AlreadyExists</code> exception!
      * @param name the location to add.
      */
-    public void addLocation(URI name)
+    public void addLocation(URL name)
         throws NotImplemented, IncorrectURL, AuthenticationFailed,
             AuthorizationFailed, PermissionDenied, BadParameter,
             IncorrectState, Timeout, NoSuccess;
@@ -41,7 +39,7 @@ public interface LogicalFile extends NamespaceEntry, Attributes {
      * Removes a replica location from the replica set.
      * @param name the location to remove.
      */
-    public void removeLocation(URI name)
+    public void removeLocation(URL name)
         throws NotImplemented, IncorrectURL, AuthenticationFailed,
             AuthorizationFailed, PermissionDenied, BadParameter,
             IncorrectState, DoesNotExist, Timeout, NoSuccess;
@@ -51,7 +49,7 @@ public interface LogicalFile extends NamespaceEntry, Attributes {
      * @param nameOld the location to be updated.
      * @param nameNew the updated location.
      */
-    public void updateLocation(URI nameOld, URI nameNew)
+    public void updateLocation(URL nameOld, URL nameNew)
         throws NotImplemented, IncorrectURL, AuthenticationFailed,
             AuthorizationFailed, PermissionDenied, BadParameter,
             IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess;
@@ -60,7 +58,7 @@ public interface LogicalFile extends NamespaceEntry, Attributes {
      * Lists the locations in this location set.
      * @return the location list.
      */
-    public List<URI> listLocations()
+    public List<URL> listLocations()
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
             PermissionDenied, IncorrectState, Timeout, NoSuccess;
 
@@ -69,7 +67,7 @@ public interface LogicalFile extends NamespaceEntry, Attributes {
      * @param name location to replicate to.
      * @param flags flags defining the operation modus.
      */
-    public void replicate(URI name, Flags... flags)
+    public void replicate(URL name, int flags)
         throws NotImplemented, IncorrectURL, AuthenticationFailed,
             AuthorizationFailed, PermissionDenied, BadParameter,
             IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess;
@@ -86,7 +84,7 @@ public interface LogicalFile extends NamespaceEntry, Attributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public Task addLocation(TaskMode mode, URI name)
+    public Task addLocation(TaskMode mode, URL name)
         throws NotImplemented;
 
     /**
@@ -97,7 +95,7 @@ public interface LogicalFile extends NamespaceEntry, Attributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public Task removeLocation(TaskMode mode, URI name)
+    public Task removeLocation(TaskMode mode, URL name)
         throws NotImplemented;
 
     /**
@@ -109,7 +107,7 @@ public interface LogicalFile extends NamespaceEntry, Attributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public Task updateLocation(TaskMode mode, URI nameOld, URI nameNew)
+    public Task updateLocation(TaskMode mode, URL nameOld, URL nameNew)
         throws NotImplemented;
 
     /**
@@ -119,7 +117,7 @@ public interface LogicalFile extends NamespaceEntry, Attributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<List<URI>> listLocations(TaskMode mode)
+    public Task<List<URL>> listLocations(TaskMode mode)
         throws NotImplemented;
 
     /**
@@ -132,6 +130,6 @@ public interface LogicalFile extends NamespaceEntry, Attributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public Task replicate(TaskMode mode, URI name, Flags... flags)
+    public Task replicate(TaskMode mode, URL name, int flags)
         throws NotImplemented;
 }

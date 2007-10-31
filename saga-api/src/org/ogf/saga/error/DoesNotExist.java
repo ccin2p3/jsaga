@@ -1,6 +1,6 @@
 package org.ogf.saga.error;
 
-import org.ogf.saga.SagaBase;
+import org.ogf.saga.SagaObject;
 
 /**
  * This exception indicates that an operation cannot succeed because a
@@ -50,7 +50,7 @@ public class DoesNotExist extends Exception {
      * @param message the detail message.
      * @param object the associated SAGA object.
      */
-    public DoesNotExist(String message, SagaBase object) {
+    public DoesNotExist(String message, SagaObject object) {
         super(message, object);
     }
 }

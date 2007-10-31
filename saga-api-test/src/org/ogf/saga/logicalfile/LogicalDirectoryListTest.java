@@ -1,6 +1,6 @@
 package org.ogf.saga.logicalfile;
 
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.abstracts.AbstractNSDirectoryListTest;
 
@@ -25,7 +25,7 @@ public class LogicalDirectoryListTest extends AbstractNSDirectoryListTest {
 
     public void test_find() throws Exception {
         if (m_dir instanceof LogicalDirectory) {
-            List list = ((LogicalDirectory)m_dir).find(DEFAULT_FILEPATTERN, (String[])null, (String[])null, Flags.NONE);
+            List list = ((LogicalDirectory)m_dir).find(DEFAULT_FILEPATTERN, null, Flags.NONE.getValue());
             assertEquals(
                     1,
                     list.size());
@@ -39,8 +39,8 @@ public class LogicalDirectoryListTest extends AbstractNSDirectoryListTest {
 
     public void test_find_norecurse() throws Exception {
         if (m_dir instanceof LogicalDirectory) {
-            LogicalDirectory root = (LogicalDirectory) m_dir.openDir(new URI(".."), Flags.NONE);
-            List list = root.find(DEFAULT_FILEPATTERN, (String[])null, (String[])null, Flags.NONE);
+            LogicalDirectory root = (LogicalDirectory) m_dir.openDir(new URL(".."), Flags.NONE.getValue());
+            List list = root.find(DEFAULT_FILEPATTERN, null, Flags.NONE.getValue());
             assertEquals(
                     0,
                     list.size());
@@ -51,8 +51,8 @@ public class LogicalDirectoryListTest extends AbstractNSDirectoryListTest {
 
     public void test_find_recurse() throws Exception {
         if (m_dir instanceof LogicalDirectory) {
-            LogicalDirectory root = (LogicalDirectory) m_dir.openDir(new URI(".."), Flags.NONE);
-            List list = root.find(DEFAULT_FILEPATTERN, (String[])null, (String[])null, Flags.RECURSIVE);
+            LogicalDirectory root = (LogicalDirectory) m_dir.openDir(new URL(".."), Flags.NONE.getValue());
+            List list = root.find(DEFAULT_FILEPATTERN, null, Flags.RECURSIVE.getValue());
             assertEquals(
                     1,
                     list.size());
@@ -66,8 +66,8 @@ public class LogicalDirectoryListTest extends AbstractNSDirectoryListTest {
 
     public void test_isFile() throws Exception {
         if (m_dir instanceof LogicalDirectory) {
-            assertFalse(((LogicalDirectory)m_dir).isFile(new URI(".."), Flags.NONE));
-            assertTrue(((LogicalDirectory)m_dir).isFile(new URI(DEFAULT_FILENAME), Flags.NONE));
+            assertFalse(((LogicalDirectory)m_dir).isFile(new URL(".."), Flags.NONE.getValue()));
+            assertTrue(((LogicalDirectory)m_dir).isFile(new URL(DEFAULT_FILENAME), Flags.NONE.getValue()));
         } else {
             fail("Not an instance of class: LogicalDirectory");
         }

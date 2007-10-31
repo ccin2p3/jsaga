@@ -3,23 +3,18 @@ package org.ogf.saga.file;
 import java.io.IOException;
 import java.util.List;
 
-import org.ogf.saga.attributes.Attributes;
 import org.ogf.saga.buffer.Buffer;
-import org.ogf.saga.error.AlreadyExists;
 import org.ogf.saga.error.AuthenticationFailed;
 import org.ogf.saga.error.AuthorizationFailed;
 import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.DoesNotExist;
 import org.ogf.saga.error.IncorrectState;
-import org.ogf.saga.error.IncorrectURL;
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.error.PermissionDenied;
 import org.ogf.saga.error.Timeout;
-import org.ogf.saga.namespace.NamespaceEntry;
+import org.ogf.saga.namespace.NSEntry;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
-import org.ogf.saga.task.RVTask;
 
 /**
  * The File interface represents an open file descriptor for reads/writes on a
@@ -27,7 +22,7 @@ import org.ogf.saga.task.RVTask;
  * Deviation: the SAGA specification refers to error codes in POSIX, but it is
  * very strange to do that in Java. Errors should just result in an IOException.
  */
-public interface File extends NamespaceEntry, Attributes {
+public interface File extends NSEntry {
 
     // Inspection
 
@@ -36,16 +31,22 @@ public interface File extends NamespaceEntry, Attributes {
      * @return the size.
      */
     public long getSize()
-        throws NotImplemented, IncorrectURL, AuthenticationFailed,
-            AuthorizationFailed, PermissionDenied, BadParameter,
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, BadParameter,
             IncorrectState, Timeout, NoSuccess;
+    //sreynaud: BadParameter added for consistency with methods read/write
 
     // POSIX-like I/O
 
     /**
      * Reads up to <code>len</code> bytes from the file into the buffer.
-     * Returns the number of bytes read, or -1 at end-of-file. 0 could be
-     * returned for non-blocking reads when no data is available.
+     * Returns the number of bytes read, or 0 at end-of-file.
+     * Note: this call is blocking. The async version can be used
+     * to implement non-blocking reads.
+     * <strong>
+     * The SAGA specification refers to error codes in POSIX, but it
+     * is very strange to do that in Java. Errors just result in an IOException.
+     * </strong>
      * @param len the number of bytes to be read.
      * @param buffer the buffer to read data into.
      * @return the number of bytes read.
@@ -59,6 +60,10 @@ public interface File extends NamespaceEntry, Attributes {
      * Writes up to <code>len</code> bytes from the buffer to the file
      * at the current file position.
      * Returns the number of bytes written.
+     * <strong>
+     * The SAGA specification refers to error codes in POSIX, but it
+     * is very strange to do that in Java. Errors just result in an IOException.
+     * </strong>
      * @param len the number of bytes to be written.
      * @param buffer the buffer to write data from.
      * @return the number of bytes written.
@@ -70,6 +75,10 @@ public interface File extends NamespaceEntry, Attributes {
 
     /**
      * Repositions the current file position as requested.
+     * <strong>
+     * The SAGA specification refers to error codes in POSIX, but it
+     * is very strange to do that in Java. Errors just result in an IOException.
+     * </strong>
      * @param offset offset in bytes to move pointer.
      * @param whence determines from where the offset is relative.
      * @return the position after the seek.
@@ -83,6 +92,10 @@ public interface File extends NamespaceEntry, Attributes {
 
     /**
      * Gather/scatter read.
+     * <strong>
+     * The SAGA specification refers to error codes in POSIX, but it
+     * is very strange to do that in Java. Errors just result in an IOException.
+     * </strong>
      * @param iovecs array of IOVecs determining how much to read and where
      * to store it.
      */
@@ -93,6 +106,10 @@ public interface File extends NamespaceEntry, Attributes {
 
     /**
      * Gather/scatter write.
+     * <strong>
+     * The SAGA specification refers to error codes in POSIX, but it
+     * is very strange to do that in Java. Errors just result in an IOException.
+     * </strong>
      * @param iovecs array of IOVecs determining how much to write and where
      * to obtain the data from.
      */
@@ -110,29 +127,37 @@ public interface File extends NamespaceEntry, Attributes {
      */
     public int sizeP(String pattern)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, BadParameter, Timeout, NoSuccess;
+            IncorrectState, PermissionDenied, BadParameter, Timeout, NoSuccess;
 
     /**
      * Pattern-based read.
+     * <strong>
+     * The SAGA specification refers to error codes in POSIX, but it
+     * is very strange to do that in Java. Errors just result in an IOException.
+     * </strong>
      * @param pattern specification for the read operation.
      * @param buffer to store data into.
      * @return number of succesfully read bytes.
      */
     public int readP(String pattern, Buffer buffer)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, BadParameter, IncorrectState, AlreadyExists,
-            DoesNotExist, Timeout, NoSuccess, IOException;
+            PermissionDenied, BadParameter, IncorrectState,
+            Timeout, NoSuccess, IOException;
 
     /**
      * Pattern-based write.
+     * <strong>
+     * The SAGA specification refers to error codes in POSIX, but it
+     * is very strange to do that in Java. Errors just result in an IOException.
+     * </strong>
      * @param pattern specification for the write operation.
      * @param buffer to be written.
      * @return number of succesfully written bytes.
      */
     public int writeP(String pattern, Buffer buffer)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, BadParameter, IncorrectState, AlreadyExists,
-            DoesNotExist, Timeout, NoSuccess, IOException;
+            PermissionDenied, BadParameter, IncorrectState,
+            Timeout, NoSuccess, IOException;
 
     // extended I/O
 
@@ -153,10 +178,14 @@ public interface File extends NamespaceEntry, Attributes {
      */
     public int sizeE(String emode, String spec)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, BadParameter, Timeout, NoSuccess;
+            IncorrectState, PermissionDenied, BadParameter, Timeout, NoSuccess;
 
     /**
      * Extended read.
+     * <strong>
+     * The SAGA specification refers to error codes in POSIX, but it
+     * is very strange to do that in Java. Errors just result in an IOException.
+     * </strong>
      * @param emode extended mode to use.
      * @param spec specification of read operation.
      * @param buffer to store the data read.
@@ -169,6 +198,10 @@ public interface File extends NamespaceEntry, Attributes {
 
     /**
      * Extended write.
+     * <strong>
+     * The SAGA specification refers to error codes in POSIX, but it
+     * is very strange to do that in Java. Errors just result in an IOException.
+     * </strong>
      * @param emode extended mode to use.
      * @param spec specification of write operation.
      * @param buffer data to write.
@@ -193,7 +226,7 @@ public interface File extends NamespaceEntry, Attributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Long> getSize(TaskMode mode)
+    public Task<Long> getSize(TaskMode mode)
         throws NotImplemented;
 
     // POSIX-like I/O
@@ -211,7 +244,7 @@ public interface File extends NamespaceEntry, Attributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Integer> read(TaskMode mode, int len, Buffer buffer)
+    public Task<Integer> read(TaskMode mode, int len, Buffer buffer)
         throws NotImplemented;
 
     /**
@@ -225,7 +258,7 @@ public interface File extends NamespaceEntry, Attributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Integer> write(TaskMode mode, int len, Buffer buffer)
+    public Task<Integer> write(TaskMode mode, int len, Buffer buffer)
         throws NotImplemented;
 
     /**
@@ -238,7 +271,7 @@ public interface File extends NamespaceEntry, Attributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Long> seek(TaskMode mode, long offset, SeekMode whence)
+    public Task<Long> seek(TaskMode mode, long offset, SeekMode whence)
         throws NotImplemented;
 
     // Scattered I/O
@@ -278,7 +311,7 @@ public interface File extends NamespaceEntry, Attributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Integer> sizeP(TaskMode mode, String pattern)
+    public Task<Integer> sizeP(TaskMode mode, String pattern)
         throws NotImplemented;
 
     /**
@@ -290,7 +323,7 @@ public interface File extends NamespaceEntry, Attributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Integer> readP(TaskMode mode, String pattern, Buffer buffer)
+    public Task<Integer> readP(TaskMode mode, String pattern, Buffer buffer)
         throws NotImplemented;
 
     /**
@@ -302,7 +335,7 @@ public interface File extends NamespaceEntry, Attributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Integer> writeP(TaskMode mode, String pattern, Buffer buffer)
+    public Task<Integer> writeP(TaskMode mode, String pattern, Buffer buffer)
         throws NotImplemented; 
 
     // extended I/O
@@ -315,7 +348,7 @@ public interface File extends NamespaceEntry, Attributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<List<String>> modesE(TaskMode mode)
+    public Task<List<String>> modesE(TaskMode mode)
         throws NotImplemented;
 
     /**
@@ -328,7 +361,7 @@ public interface File extends NamespaceEntry, Attributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Integer> sizeE(TaskMode mode, String emode, String spec)
+    public Task<Integer> sizeE(TaskMode mode, String emode, String spec)
         throws NotImplemented;
 
     /**
@@ -341,7 +374,7 @@ public interface File extends NamespaceEntry, Attributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Integer> readE(TaskMode mode, String emode, String spec,
+    public Task<Integer> readE(TaskMode mode, String emode, String spec,
             Buffer buffer)
         throws NotImplemented;
 
@@ -355,7 +388,7 @@ public interface File extends NamespaceEntry, Attributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Integer> writeE(TaskMode mode, String emode, String spec,
+    public Task<Integer> writeE(TaskMode mode, String emode, String spec,
             Buffer buffer)
         throws NotImplemented;
 }

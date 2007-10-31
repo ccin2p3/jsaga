@@ -3,9 +3,9 @@ package org.ogf.saga.stream;
 import java.io.IOException;
 import java.util.List;
 
-import org.ogf.saga.SagaBase;
-import org.ogf.saga.URI;
-import org.ogf.saga.attributes.Attributes;
+import org.ogf.saga.SagaObject;
+import org.ogf.saga.URL;
+import org.ogf.saga.attributes.AsyncAttributes;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.AuthenticationFailed;
@@ -20,13 +20,66 @@ import org.ogf.saga.monitoring.AsyncMonitorable;
 import org.ogf.saga.task.Async;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
-import org.ogf.saga.task.RVTask;
 
 /**
  * A client stream object.
  */
-public interface Stream extends SagaBase, Async, Attributes,
+public interface Stream extends SagaObject, Async, AsyncAttributes,
        AsyncMonitorable {
+
+    // Optional attributes
+
+    /** Attribute name, determines size of send buffer. */
+    public static final String BUFSIZE = "Bufsize";
+
+    /**
+     * Attribute name, determines the amount of idle time before dropping
+     * the connection, in seconds.
+     */
+    public static final String TIMEOUT = "Timeout";
+
+    /**
+     * Attribute name, determines if read/writes are blocking or not.
+     * If this attribute is not supported, implementation must do blocking.
+     */
+    public static final String BLOCKING = "Blocking";
+
+    /**
+     * Attribute name, determines if data are compressed before/after transfer.
+     */
+    public static final String COMPRESSION = "Compression";
+
+    /** Attribute name, determines if packets are sent without delay. */
+    public static final String NODELAY = "Nodelay";
+
+    /** Attribute name, determines if all sent data MUST arrive. */
+    public static final String RELIABLE = "Reliable";
+
+    // Metrics
+
+    /**
+     * Metric name, fires if the state of the stream changes, and has the
+     * value of the new state.
+     */
+    public static final String STREAM_STATE = "stream.state";
+
+    /**
+     * Metric name, fires if the stream gets readable (which means that a
+     * subsequent read() can successfully read one or more bytes of data).
+     */
+    public static final String STREAM_READ = "stream.read";
+
+    /**
+     * Metric name, fires if the stream gets writable (which means that a
+     * subsequent write() can successfully write one or more bytes of data).
+     */
+    public static final String STREAM_WRITE = "stream.write";
+
+    /** Metric name, fires if the stream has an error condition. */
+    public static final String STREAM_EXCEPTION = "stream.exception";
+
+    /** Metric name, fires if the stream gets dropped by the remote party. */
+    public static final String STREAM_DROPPED = "stream.dropped";
 
     // inspection methods
 
@@ -36,7 +89,7 @@ public interface Stream extends SagaBase, Async, Attributes,
      * call, <code>null</code> is returned.
      * @return the URL.
      */
-    public URI getUrl()
+    public URL getUrl()
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
                PermissionDenied, IncorrectState, Timeout, NoSuccess;
 
@@ -60,8 +113,7 @@ public interface Stream extends SagaBase, Async, Attributes,
      */
     public void connect()
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-               PermissionDenied, IncorrectState, BadParameter, Timeout,
-               NoSuccess;
+               PermissionDenied, IncorrectState, Timeout, NoSuccess;
 
     /**
      * Checks if the stream is ready for I/O, or if it has entered the
@@ -71,7 +123,7 @@ public interface Stream extends SagaBase, Async, Attributes,
      * @param what the activities to wait for.
      * @return the activities that apply.
      */
-    public List<Activity> waitStream(Activity... what)
+    public List<Activity> waitStream(int what)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
                PermissionDenied, IncorrectState, NoSuccess;
 
@@ -83,7 +135,7 @@ public interface Stream extends SagaBase, Async, Attributes,
      * @param timeoutInSeconds the timout in seconds.
      * @return the activities that apply.
      */
-    public List<Activity> waitStream(float timeoutInSeconds, Activity... what)
+    public List<Activity> waitStream(float timeoutInSeconds, int what)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
                PermissionDenied, IncorrectState, NoSuccess;
 
@@ -111,7 +163,9 @@ public interface Stream extends SagaBase, Async, Attributes,
      * @param buffer the buffer to store into.
      * @return the number of bytes read.
      * @exception IOException deviation from the SAGA specs: thrown in case
-     *     of an error.
+     *     of an error, where the SAGA specs describe a return of a negative
+     *     value, corresponding to negatives of the respective ERRNO error
+     *     code.
      */
     public int read(int len, Buffer buffer)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
@@ -126,7 +180,9 @@ public interface Stream extends SagaBase, Async, Attributes,
      * @param buffer the data to be sent.
      * @return the number of bytes written.
      * @exception IOException deviation from the SAGA specs: thrown in case
-     *     of an error.
+     *     of an error, where the SAGA specs describe a return of a negative
+     *     value, corresponding to negatives of the respective ERRNO error
+     *     code.
      */
     public int write(int len, Buffer buffer)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
@@ -148,7 +204,7 @@ public interface Stream extends SagaBase, Async, Attributes,
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<URI> getUrl(TaskMode mode)
+    public Task<URL> getUrl(TaskMode mode)
         throws NotImplemented;
 
     /**
@@ -159,7 +215,7 @@ public interface Stream extends SagaBase, Async, Attributes,
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Context> getContext(TaskMode mode)
+    public Task<Context> getContext(TaskMode mode)
         throws NotImplemented;
 
     // management methods
@@ -189,7 +245,7 @@ public interface Stream extends SagaBase, Async, Attributes,
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<List<Activity>> waitStream(TaskMode mode, Activity... what)
+    public Task<List<Activity>> waitStream(TaskMode mode, int what)
         throws NotImplemented;
 
     /**
@@ -204,8 +260,8 @@ public interface Stream extends SagaBase, Async, Attributes,
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<List<Activity>> waitStream(TaskMode mode,
-            float timeoutInSeconds, Activity... what)
+    public Task<List<Activity>> waitStream(TaskMode mode,
+            float timeoutInSeconds, int what)
         throws NotImplemented;
 
     /**
@@ -243,7 +299,7 @@ public interface Stream extends SagaBase, Async, Attributes,
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Integer> read(TaskMode mode, int len, Buffer buffer)
+    public Task<Integer> read(TaskMode mode, int len, Buffer buffer)
         throws NotImplemented;
 
     /**
@@ -260,6 +316,6 @@ public interface Stream extends SagaBase, Async, Attributes,
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Integer> write(TaskMode mode, int len, Buffer buffer)
+    public Task<Integer> write(TaskMode mode, int len, Buffer buffer)
         throws NotImplemented;
 }

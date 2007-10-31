@@ -1,6 +1,6 @@
 package org.ogf.saga.error;
 
-import org.ogf.saga.SagaBase;
+import org.ogf.saga.SagaObject;
 
 /**
  * This exception indicates that a method fails because none of the available
@@ -49,7 +49,7 @@ public class AuthenticationFailed extends Exception {
      * @param message the detail message.
      * @param object the associated SAGA object.
      */
-    public AuthenticationFailed(String message, SagaBase object) {
+    public AuthenticationFailed(String message, SagaObject object) {
         super(message, object);
     }
 }

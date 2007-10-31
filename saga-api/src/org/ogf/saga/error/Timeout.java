@@ -1,6 +1,6 @@
 package org.ogf.saga.error;
 
-import org.ogf.saga.SagaBase;
+import org.ogf.saga.SagaObject;
 
 /**
  * This exception indicates that a remote operation did not complete
@@ -51,7 +51,7 @@ public class Timeout extends Exception {
      * @param message the detail message.
      * @param object the associated SAGA object.
      */
-    public Timeout(String message, SagaBase object) {
+    public Timeout(String message, SagaObject object) {
         super(message, object);
     }
 }

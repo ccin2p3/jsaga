@@ -1,6 +1,6 @@
 package org.ogf.saga.logicalfile;
 
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.namespace.abstracts.AbstractNSEntryReadTest;
 
 import java.util.List;
@@ -24,12 +24,12 @@ public class LogicalFileReadTest extends AbstractNSEntryReadTest {
 
     public void test_listLocations() throws Exception {
         if (m_file instanceof LogicalFile) {
-            List<URI> locations = ((LogicalFile)m_file).listLocations();
+            List<URL> locations = ((LogicalFile)m_file).listLocations();
             assertEquals(
                     1,
                     locations.size());
             assertEquals(
-                    m_physicalFileUri.toString(),
+                    m_physicalFileUrl.toString(),
                     locations.get(0).toString());
         } else {
             fail("Not an instance of class: LogicalFile");

@@ -1,6 +1,6 @@
 package org.ogf.saga.namespace.abstracts;
 
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.namespace.Flags;
 
 import java.util.List;
@@ -23,14 +23,14 @@ public abstract class AbstractNSDirectoryListTest extends AbstractNSDirectoryTes
     }
 
     public void test_changeDir() throws Exception {
-        m_dir.changeDir(new URI(".."));
+        m_dir.changeDir(new URL(".."));
         assertEquals(
                 DEFAULT_ROOTNAME,
                 m_dir.getName()+"/");
     }
 
     public void test_list() throws Exception {
-        List list = m_dir.list(DEFAULT_FILEPATTERN, Flags.NONE);
+        List list = m_dir.list(DEFAULT_FILEPATTERN, Flags.NONE.getValue());
         assertEquals(
                 1,
                 list.size());
@@ -40,7 +40,7 @@ public abstract class AbstractNSDirectoryListTest extends AbstractNSDirectoryTes
     }
 
     public void test_find() throws Exception {
-        List list = m_dir.find(DEFAULT_FILEPATTERN, Flags.NONE);
+        List list = m_dir.find(DEFAULT_FILEPATTERN, Flags.NONE.getValue());
         assertEquals(
                 1,
                 list.size());
@@ -50,14 +50,14 @@ public abstract class AbstractNSDirectoryListTest extends AbstractNSDirectoryTes
     }
 
     public void test_find_norecurse() throws Exception {
-        List list = m_root.find(DEFAULT_FILEPATTERN, Flags.NONE);
+        List list = m_root.find(DEFAULT_FILEPATTERN, Flags.NONE.getValue());
         assertEquals(
                 0,
                 list.size());
     }
 
     public void test_find_recurse() throws Exception {
-        List list = m_root.find(DEFAULT_FILEPATTERN, Flags.RECURSIVE);
+        List list = m_root.find(DEFAULT_FILEPATTERN, Flags.RECURSIVE.getValue());
         assertEquals(
                 1,
                 list.size());
@@ -80,11 +80,11 @@ public abstract class AbstractNSDirectoryListTest extends AbstractNSDirectoryTes
 
     /////////////////////////////////// overloaded methods ///////////////////////////////////
 
-    public void test_isDirectory() throws Exception {
-        assertTrue(m_dir.isDirectory(Flags.NONE));
+    public void test_isDir() throws Exception {
+        assertTrue(m_dir.isDir());
     }
 
     public void test_isEntry() throws Exception {
-        assertFalse(m_dir.isEntry(Flags.NONE));
+        assertFalse(m_dir.isEntry());
     }
 }

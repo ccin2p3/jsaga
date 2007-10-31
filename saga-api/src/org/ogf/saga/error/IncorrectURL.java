@@ -1,6 +1,6 @@
 package org.ogf.saga.error;
 
-import org.ogf.saga.SagaBase;
+import org.ogf.saga.SagaObject;
 
 /**
  * This exception indicates that a method is given an URL argument that could
@@ -48,7 +48,7 @@ public class IncorrectURL extends Exception {
      * @param message the detail message.
      * @param object the associated SAGA object.
      */
-    public IncorrectURL(String message, SagaBase object) {
+    public IncorrectURL(String message, SagaObject object) {
         super(message, object);
     }
 }

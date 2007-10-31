@@ -1,6 +1,6 @@
 package org.ogf.saga.error;
 
-import org.ogf.saga.SagaBase;
+import org.ogf.saga.SagaObject;
 
 /**
  * This exception indicate that an operation cannot succeed because the
@@ -48,7 +48,7 @@ public class AlreadyExists extends Exception {
      * @param message the detail message.
      * @param object the associated SAGA object.
      */
-    public AlreadyExists(String message, SagaBase object) {
+    public AlreadyExists(String message, SagaObject object) {
         super(message, object);
     }
 }

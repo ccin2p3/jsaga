@@ -1,6 +1,8 @@
 package org.ogf.saga.session;
 
 import org.ogf.saga.bootstrap.ImplementationBootstrapLoader;
+import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NotImplemented;
 
 /**
  * Factory for creating sessions.
@@ -22,7 +24,8 @@ public abstract class SessionFactory {
      * session are reflected in the default session.
      * @return the session.
      */
-    protected abstract Session doCreateSession(boolean defaults);
+    protected abstract Session doCreateSession(boolean defaults)
+            throws NotImplemented, NoSuccess;
     
     /**
      * Creates a session.
@@ -31,8 +34,19 @@ public abstract class SessionFactory {
      * session are reflected in the default session.
      * @return the session.
      */
-    public static Session createSession(boolean defaults) {
+    public static Session createSession(boolean defaults)
+            throws NotImplemented, NoSuccess { 
         initFactory();
         return factory.doCreateSession(defaults);
+    }
+
+    /**
+     * Returns the default session, with all the default contexts.
+     * Later modifications to this session are reflected in the default session.
+     * @return the session.
+     */
+    public static Session createSession()
+            throws NotImplemented, NoSuccess { 
+        return createSession(true);
     }
 }

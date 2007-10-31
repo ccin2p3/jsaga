@@ -10,33 +10,29 @@ import org.ogf.saga.error.Timeout;
 import org.ogf.saga.task.Async;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
-import org.ogf.saga.task.RVTask;
 
 /**
  * This interface describes methods to query and set permissions.
  */
 public interface Permissions extends Async {
 
-    // In the SAGA API specification, there is one method: set_permission,
-    // with a boolean argument "allow".
-
     /**
-     * Enables the specified permissions for the specified id.
+     * Allows the specified permissions for the specified id.
      * An id of "*" enables the permissions for all.
      * @param id the id.
      * @param permissions the permissions to enable.
      */
-    public void enablePermissions(String id, Permission... permissions)
+    public void permissionsAllow(String id, int permissions)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
             PermissionDenied, BadParameter, Timeout, NoSuccess;
 
     /**
-     * Disables the specified permissions for the specified id.
+     * Denies the specified permissions for the specified id.
      * An id of "*" disables the permissions for all.
      * @param id the id.
      * @param permissions the permissions to disable.
      */
-    public void disablePermissions(String id, Permission... permissions)
+    public void permissionsDeny(String id, int permissions)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
             PermissionDenied, BadParameter, Timeout, NoSuccess;
 
@@ -49,9 +45,9 @@ public interface Permissions extends Async {
      * @return <code>true</code> if the specified permissions are enabled
      *     for the specified id.
      */
-    public boolean areEnabled(String id, Permission... permissions)
+    public boolean permissionsCheck(String id, int permissions)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, Timeout, NoSuccess;
+            PermissionDenied, BadParameter, Timeout, NoSuccess;
 
     /**
      * Gets the owner id of the entity.
@@ -80,8 +76,8 @@ public interface Permissions extends Async {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public Task enablePermissions(TaskMode mode, String id,
-            Permission... permissions)
+    public Task permissionsAllow(TaskMode mode, String id,
+            int permissions)
         throws NotImplemented;
 
     /**
@@ -95,8 +91,8 @@ public interface Permissions extends Async {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public Task disablePermissions(TaskMode mode, String id,
-            Permission... permissions)
+    public Task permissionsDeny(TaskMode mode, String id,
+            int permissions)
         throws NotImplemented;
 
     /**
@@ -110,8 +106,8 @@ public interface Permissions extends Async {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Boolean> areEnabled(TaskMode mode, String id,
-            Permission... permissions)
+    public Task<Boolean> permissionsCheck(TaskMode mode, String id,
+            int permissions)
         throws NotImplemented;
 
     /**
@@ -121,7 +117,7 @@ public interface Permissions extends Async {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<String> getOwner(TaskMode mode)
+    public Task<String> getOwner(TaskMode mode)
         throws NotImplemented;
 
     /**
@@ -131,6 +127,6 @@ public interface Permissions extends Async {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<String> getGroup(TaskMode mode)
+    public Task<String> getGroup(TaskMode mode)
         throws NotImplemented;
 }

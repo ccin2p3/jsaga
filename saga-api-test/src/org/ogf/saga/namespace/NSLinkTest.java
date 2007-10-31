@@ -1,6 +1,6 @@
 package org.ogf.saga.namespace;
 
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
 
 /* ***************************************************
@@ -21,50 +21,50 @@ public class NSLinkTest extends AbstractNSEntryTest {
     private static final String DEFAULT_LINKNAME_2 = "link2.txt";
 
     // configuration
-    private URI m_linkUri;
-    private URI m_linkUri2;
+    private URL m_linkUrl;
+    private URL m_linkUrl2;
 
     // setup
-    private NamespaceEntry m_link;
+    private NSEntry m_link;
 
     public NSLinkTest(String protocol) throws Exception {
         super(protocol);
-        m_linkUri = m_rootUri.resolve(DEFAULT_LINKNAME);
-        m_linkUri2 = m_rootUri.resolve(DEFAULT_LINKNAME_2);
+        m_linkUrl = createURL(m_rootUrl, DEFAULT_LINKNAME);
+        m_linkUrl2 = createURL(m_rootUrl, DEFAULT_LINKNAME_2);
     }
 
     protected void setUp() throws Exception {
         super.setUp();
-        m_file.link(m_linkUri, Flags.NONE);
-        m_link = NamespaceFactory.createNamespaceEntry(m_session, m_linkUri, Flags.NONE);
+        m_file.link(m_linkUrl, Flags.NONE.getValue());
+        m_link = NSFactory.createNSEntry(m_session, m_linkUrl, Flags.NONE.getValue());
     }
 
     /////////////////////////////////// file link tests ///////////////////////////////////
 
     public void test_isLink() throws Exception {
-        assertFalse(m_file.isLink(Flags.NONE));
-        assertTrue(m_link.isLink(Flags.NONE));
+        assertFalse(m_file.isLink());
+        assertTrue(m_link.isLink());
     }
 
     public void test_readLink() throws Exception {
         assertEquals(
-                m_fileUri.toString(),
+                m_fileUrl.toString(),
                 m_link.readLink().toString());
     }
 
     public void test_link() throws Exception {
-        m_link.link(m_linkUri2, Flags.NONE);
-        NamespaceEntry link2 = NamespaceFactory.createNamespaceEntry(m_session, m_linkUri2, Flags.NONE);
+        m_link.link(m_linkUrl2, Flags.NONE.getValue());
+        NSEntry link2 = NSFactory.createNSEntry(m_session, m_linkUrl2, Flags.NONE.getValue());
         assertEquals(
-                m_linkUri.toString(),
+                m_linkUrl.toString(),
                 link2.readLink().toString());
     }
 
     public void test_link_dereferenced() throws Exception {
-        m_link.link(m_linkUri2, Flags.DEREFERENCE);
-        NamespaceEntry link2 = NamespaceFactory.createNamespaceEntry(m_session, m_linkUri2, Flags.NONE);
+        m_link.link(m_linkUrl2, Flags.DEREFERENCE.getValue());
+        NSEntry link2 = NSFactory.createNSEntry(m_session, m_linkUrl2, Flags.NONE.getValue());
         assertEquals(
-                m_fileUri.toString(),
+                m_fileUrl.toString(),
                 link2.readLink().toString());
     }
 }

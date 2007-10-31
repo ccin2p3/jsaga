@@ -1,23 +1,21 @@
 package org.ogf.saga.file;
 
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.bootstrap.ImplementationBootstrapLoader;
 import org.ogf.saga.error.AlreadyExists;
 import org.ogf.saga.error.AuthenticationFailed;
 import org.ogf.saga.error.AuthorizationFailed;
 import org.ogf.saga.error.BadParameter;
 import org.ogf.saga.error.DoesNotExist;
-import org.ogf.saga.error.IncorrectSession;
 import org.ogf.saga.error.IncorrectState;
 import org.ogf.saga.error.IncorrectURL;
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.error.PermissionDenied;
 import org.ogf.saga.error.Timeout;
-import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.TaskMode;
-import org.ogf.saga.task.RVTask;
+import org.ogf.saga.task.Task;
 
 /**
  * Factory for objects from the namespace package.
@@ -48,9 +46,8 @@ public abstract class FileFactory {
      * @param flags the open mode.
      * @return the file instance.
      */
-    protected abstract File doCreateFile(Session session, URI name,
-            Flags... flags)
-        throws NotImplemented, IncorrectURL, IncorrectSession,
+    protected abstract File doCreateFile(Session session, URL name, int flags)
+        throws NotImplemented, IncorrectURL,
             AuthenticationFailed, AuthorizationFailed, PermissionDenied,
             BadParameter, IncorrectState, AlreadyExists, DoesNotExist,
             Timeout, NoSuccess;
@@ -62,12 +59,13 @@ public abstract class FileFactory {
      * @param flags the open mode.
      * @return the directory instance.
      */
-    protected abstract Directory doCreateDirectory(Session session, URI name,
-            Flags... flags)
-        throws NotImplemented, IncorrectURL, IncorrectSession,
+    protected abstract Directory doCreateDirectory(Session session, URL name,
+            int flags)
+        throws NotImplemented, IncorrectURL,
             AuthenticationFailed, AuthorizationFailed, PermissionDenied,
             BadParameter, IncorrectState, AlreadyExists, DoesNotExist,
             Timeout, NoSuccess;
+    //sreynaud: IncorrectState added for consistency with method doCreateFile
     
     /**
      * Creates a Task that creates a File. To be provided by the implementation.
@@ -79,8 +77,8 @@ public abstract class FileFactory {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    protected abstract RVTask<File> doCreateFile(TaskMode mode,
-            Session session, URI name, Flags... flags)
+    protected abstract Task<File> doCreateFile(TaskMode mode,
+            Session session, URL name, int flags)
         throws NotImplemented;
     
     /**
@@ -94,8 +92,8 @@ public abstract class FileFactory {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    protected abstract RVTask<Directory> doCreateDirectory(
-            TaskMode mode, Session session, URI name, Flags... flags)
+    protected abstract Task<Directory> doCreateDirectory(
+            TaskMode mode, Session session, URL name, int flags)
         throws NotImplemented;
     
     /**
@@ -117,8 +115,8 @@ public abstract class FileFactory {
      * @param flags the open mode.
      * @return the file instance.
      */
-    public static File createFile(Session session, URI name, Flags... flags)
-        throws NotImplemented, IncorrectURL, IncorrectSession,
+    public static File createFile(Session session, URL name, int flags)
+        throws NotImplemented, IncorrectURL,
             AuthenticationFailed, AuthorizationFailed, PermissionDenied,
             BadParameter, IncorrectState, AlreadyExists, DoesNotExist,
             Timeout, NoSuccess {
@@ -133,15 +131,16 @@ public abstract class FileFactory {
      * @param flags the open mode.
      * @return the directory instance.
      */
-    public static Directory createDirectory(Session session, URI name,
-            Flags... flags)
-        throws NotImplemented, IncorrectURL, IncorrectSession,
+    public static Directory createDirectory(Session session, URL name,
+            int flags)
+        throws NotImplemented, IncorrectURL,
             AuthenticationFailed, AuthorizationFailed, PermissionDenied,
             BadParameter, IncorrectState, AlreadyExists, DoesNotExist,
             Timeout, NoSuccess {
         initializeFactory();
         return factory.doCreateDirectory(session, name, flags);
     }
+    //sreynaud: IncorrectState added for consistency with method doCreateFile
     
     /**
      * Creates a Task that creates a File.
@@ -153,8 +152,8 @@ public abstract class FileFactory {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public static RVTask<File> createFile(TaskMode mode,
-            Session session, URI name, Flags... flags)
+    public static Task<File> createFile(TaskMode mode,
+            Session session, URL name, int flags)
         throws NotImplemented {
         initializeFactory();
         return factory.doCreateFile(mode, session, name, flags);
@@ -170,8 +169,8 @@ public abstract class FileFactory {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public static RVTask<Directory> createDirectory(TaskMode mode,
-            Session session, URI name, Flags... flags)
+    public static Task<Directory> createDirectory(TaskMode mode,
+            Session session, URL name, int flags)
         throws NotImplemented {
         initializeFactory();
         return factory.doCreateDirectory(mode, session, name, flags);

@@ -1,7 +1,7 @@
 package org.ogf.saga.namespace.abstracts;
 
 import org.ogf.saga.namespace.Flags;
-import org.ogf.saga.namespace.NamespaceDirectory;
+import org.ogf.saga.namespace.NSDirectory;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -17,7 +17,7 @@ import org.ogf.saga.namespace.NamespaceDirectory;
  */
 public abstract class AbstractNSDirectoryTest extends AbstractNSEntryTest {
     // setup
-    protected NamespaceDirectory m_dir;
+    protected NSDirectory m_dir;
 
     public AbstractNSDirectoryTest(String protocol) throws Exception {
         super(protocol);
@@ -25,7 +25,7 @@ public abstract class AbstractNSDirectoryTest extends AbstractNSEntryTest {
 
     protected void setUp() throws Exception {
         super.setUp();
-        m_dir = m_root.openDir(m_dirUri, Flags.NONE);
+        m_dir = m_root.openDir(m_dirUrl, Flags.NONE.getValue());
     }
 
     protected void tearDown() throws Exception {

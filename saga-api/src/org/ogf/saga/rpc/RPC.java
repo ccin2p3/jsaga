@@ -1,7 +1,7 @@
 package org.ogf.saga.rpc;
 
-import org.ogf.saga.SagaBase;
-import org.ogf.saga.attributes.Attributes;
+import org.ogf.saga.SagaObject;
+import org.ogf.saga.attributes.AsyncAttributes;
 import org.ogf.saga.error.AuthenticationFailed;
 import org.ogf.saga.error.AuthorizationFailed;
 import org.ogf.saga.error.BadParameter;
@@ -20,7 +20,7 @@ import org.ogf.saga.task.TaskMode;
  * The <code>RPC</code> class represents a remote function handle
  * that can be called repeatedly.
  */
-public interface RPC extends SagaBase, Async, Attributes {
+public interface RPC extends SagaObject, Async, AsyncAttributes {
 
     /**
      * Calls the remote procedure.

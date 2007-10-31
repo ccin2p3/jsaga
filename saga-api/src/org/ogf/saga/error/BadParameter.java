@@ -1,6 +1,6 @@
 package org.ogf.saga.error;
 
-import org.ogf.saga.SagaBase;
+import org.ogf.saga.SagaObject;
 
 /**
  * This exception indicates that one or more of the parameters of an
@@ -51,7 +51,7 @@ public class BadParameter extends Exception {
      * @param message the detail message.
      * @param object the associated SAGA object.
      */
-    public BadParameter(String message, SagaBase object) {
+    public BadParameter(String message, SagaObject object) {
         super(message, object);
     }
 }

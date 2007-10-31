@@ -1,6 +1,6 @@
 package org.ogf.saga.buffer;
 
-import org.ogf.saga.SagaBase;
+import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.BadParameter;
 import org.ogf.saga.error.DoesNotExist;
 import org.ogf.saga.error.IncorrectState;
@@ -9,10 +9,12 @@ import org.ogf.saga.error.NotImplemented;
 /**
  * Encapsulates a sequence of bytes to be used for I/O operations.
  * ??? Should we just use java.nio.ByteBuffer instead ??? Probably yes.
+ * An implementation could encapsulate a java.nio.ByteBuffer in a Buffer,
+ * too.
  * ???Java mostly uses <code>int</code> for buffer sizes. Should we use
  * <code>long</code>???
  */
-public interface Buffer extends SagaBase {
+public interface Buffer extends SagaObject {
 
     /**
      * Sets the size of the buffer. This method is semantically equivalent

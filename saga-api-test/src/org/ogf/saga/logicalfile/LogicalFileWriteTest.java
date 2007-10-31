@@ -6,7 +6,7 @@ import org.ogf.saga.error.DoesNotExist;
 import org.ogf.saga.file.Directory;
 import org.ogf.saga.file.File;
 import org.ogf.saga.namespace.Flags;
-import org.ogf.saga.namespace.NamespaceFactory;
+import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.namespace.abstracts.AbstractNSEntryWriteTest;
 
 /* ***************************************************
@@ -29,13 +29,13 @@ public class LogicalFileWriteTest extends AbstractNSEntryWriteTest {
     public void test_addLocation() throws Exception {
         if (m_file instanceof LogicalFile) {
             // should be ignored (already exist)
-            ((LogicalFile)m_file).addLocation(m_physicalFileUri);
+            ((LogicalFile)m_file).addLocation(m_physicalFileUrl);
             assertEquals(
                     1,
                     ((LogicalFile)m_file).listLocations().size());
 
             // add
-            ((LogicalFile)m_file).addLocation(m_physicalFileUri2);
+            ((LogicalFile)m_file).addLocation(m_physicalFileUrl2);
             assertEquals(
                     2,
                     ((LogicalFile)m_file).listLocations().size());
@@ -48,7 +48,7 @@ public class LogicalFileWriteTest extends AbstractNSEntryWriteTest {
         if (m_file instanceof LogicalFile) {
             // should throw an exception (does not exist)
             try {
-                ((LogicalFile)m_file).removeLocation(m_physicalFileUri2);
+                ((LogicalFile)m_file).removeLocation(m_physicalFileUrl2);
                 fail("Expected DoesNotExist exception");
             } catch(DoesNotExist e) {
                 assertEquals(
@@ -57,7 +57,7 @@ public class LogicalFileWriteTest extends AbstractNSEntryWriteTest {
             }
 
             // add
-            ((LogicalFile)m_file).removeLocation(m_physicalFileUri);
+            ((LogicalFile)m_file).removeLocation(m_physicalFileUrl);
             assertEquals(
                     0,
                     ((LogicalFile)m_file).listLocations().size());
@@ -68,12 +68,12 @@ public class LogicalFileWriteTest extends AbstractNSEntryWriteTest {
 
     public void test_updateLocation() throws Exception {
         if (m_file instanceof LogicalFile) {
-            ((LogicalFile)m_file).updateLocation(m_physicalFileUri, m_physicalFileUri2);
+            ((LogicalFile)m_file).updateLocation(m_physicalFileUrl, m_physicalFileUrl2);
             assertEquals(
                     1,
                     ((LogicalFile)m_file).listLocations().size());
             assertEquals(
-                    m_physicalFileUri2.toString(),
+                    m_physicalFileUrl2.toString(),
                     ((LogicalFile)m_file).listLocations().get(0).toString());
         } else {
             fail("Not an instance of class: LogicalFile");
@@ -83,23 +83,23 @@ public class LogicalFileWriteTest extends AbstractNSEntryWriteTest {
     public void test_replicate() throws Exception {
         if (m_file instanceof LogicalFile) {
             // setUp()
-            Directory physicalRoot = (Directory) NamespaceFactory.createNamespaceDirectory(m_session, m_physicalRootUri, FLAGS_ROOT);
-            File physicalFile = (File) physicalRoot.open(m_physicalFileUri, FLAGS_FILE);
+            Directory physicalRoot = (Directory) NSFactory.createNSDirectory(m_session, m_physicalRootUrl, FLAGS_ROOT);
+            File physicalFile = (File) physicalRoot.open(m_physicalFileUrl, FLAGS_FILE);
             Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT.getBytes());
             physicalFile.write(buffer.getSize(), buffer);
             physicalFile.close();
 
             // replicate
-            ((LogicalFile)m_file).replicate(m_physicalFileUri2, Flags.NONE);
+            ((LogicalFile)m_file).replicate(m_physicalFileUrl2, Flags.NONE.getValue());
             assertEquals(
                     2,
                     ((LogicalFile)m_file).listLocations().size());
 
             // read new replica
-            checkWrited(m_physicalFileUri2, DEFAULT_CONTENT);
+            checkWrited(m_physicalFileUrl2, DEFAULT_CONTENT);
             
             // tearDown()
-            physicalRoot.remove(Flags.RECURSIVE);
+            physicalRoot.remove(Flags.RECURSIVE.getValue());
             physicalRoot.close();
         } else {
             fail("Not an instance of class: LogicalFile");

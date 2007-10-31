@@ -7,7 +7,7 @@ import org.ogf.saga.file.FileFactory;
 import org.ogf.saga.job.JobFactory;
 import org.ogf.saga.logicalfile.LogicalFileFactory;
 import org.ogf.saga.monitoring.MonitoringFactory;
-import org.ogf.saga.namespace.NamespaceFactory;
+import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.rpc.RPCFactory;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.stream.StreamFactory;
@@ -67,7 +67,7 @@ public interface SagaFactory {
      * @return the namespace factory.
      * @exception NotImplemented is thrown when namespaces are not implemented.
      */
-    NamespaceFactory createNamespaceFactory() throws NotImplemented;
+    NSFactory createNamespaceFactory() throws NotImplemented;
 
     /**
      * Creates a factory for the Saga RPC package.

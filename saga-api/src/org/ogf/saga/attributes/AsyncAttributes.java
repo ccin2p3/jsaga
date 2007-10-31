@@ -3,7 +3,6 @@ package org.ogf.saga.attributes;
 import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
-import org.ogf.saga.task.RVTask;
 
 /**
  * Task versions of all methods from the <code>Attributes</code> interface.
@@ -19,8 +18,8 @@ public interface AsyncAttributes extends Attributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<String> setAttribute(TaskMode mode, String key, String value)
-        throws NotImplemented;
+    public Task setAttribute(TaskMode mode, String key,
+            String value) throws NotImplemented;
 
     /**
      * Creates a task that obtains the value of an attribute.
@@ -30,7 +29,7 @@ public interface AsyncAttributes extends Attributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<String> getAttribute(TaskMode mode, String key)
+    public Task<String> getAttribute(TaskMode mode, String key)
         throws NotImplemented;
 
     /**
@@ -42,7 +41,7 @@ public interface AsyncAttributes extends Attributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<String[]> setVectorAttribute(TaskMode mode, String key,
+    public Task setVectorAttribute(TaskMode mode, String key,
             String[] values)
         throws NotImplemented;
 
@@ -55,7 +54,7 @@ public interface AsyncAttributes extends Attributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<String[]> getVectorAttribute(TaskMode mode, String key)
+    public Task<String[]> getVectorAttribute(TaskMode mode, String key)
         throws NotImplemented;
 
     /**
@@ -76,20 +75,18 @@ public interface AsyncAttributes extends Attributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<String[]> listAttributes(TaskMode mode)
+    public Task<String[]> listAttributes(TaskMode mode)
         throws NotImplemented;
     
     /**
      * Creates a task that finds matching attributes.
      * @param mode determines the initial state of the task.
-     * @param keyPattern key search pattern.
-     * @param valuePattern value search pattern.
+     * @param pattern the search pattern.
      * @return the task.
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<String[]> findAttributes(TaskMode mode, String keyPattern,
-            String valuePattern)
+    public Task<String[]> findAttributes(TaskMode mode, String pattern)
         throws NotImplemented;
 
     /**
@@ -100,7 +97,7 @@ public interface AsyncAttributes extends Attributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Boolean> isReadOnlyAttribute(TaskMode mode, String key)
+    public Task<Boolean> isReadOnlyAttribute(TaskMode mode, String key)
         throws NotImplemented;
 
     /**
@@ -111,18 +108,18 @@ public interface AsyncAttributes extends Attributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Boolean> isWritableAttribute(TaskMode mode, String key)
+    public Task<Boolean> isWritableAttribute(TaskMode mode, String key)
         throws NotImplemented;
 
     /**
-     * Creates a task that checks the attribute mode for being removeable.
+     * Creates a task that checks the attribute mode for being removable.
      * @param mode determines the initial state of the task.
      * @param key the attribute key.
      * @return the task.
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Boolean> isRemoveableAttribute(TaskMode mode, String key)
+    public Task<Boolean> isRemovableAttribute(TaskMode mode, String key)
         throws NotImplemented;
 
     /**
@@ -133,6 +130,6 @@ public interface AsyncAttributes extends Attributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Boolean> isVectorAttribute(TaskMode mode, String key)
+    public Task<Boolean> isVectorAttribute(TaskMode mode, String key)
         throws NotImplemented;
 }

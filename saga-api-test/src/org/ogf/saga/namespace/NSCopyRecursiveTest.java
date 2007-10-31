@@ -1,6 +1,6 @@
 package org.ogf.saga.namespace;
 
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.abstracts.AbstractNSCopyTest;
 
@@ -24,51 +24,51 @@ public class NSCopyRecursiveTest extends AbstractNSCopyTest {
     }
 
     public void test_copy_norecurse() throws Exception {
-        URI target = m_dirUri2.resolve(DEFAULT_DIRNAME);
+        URL target = createURL(m_dirUrl2, DEFAULT_DIRNAME);
         try {
-            m_dir.copy(m_dirUri2, Flags.NONE);
+            m_dir.copy(m_dirUrl2, Flags.NONE.getValue());
             fail("Expected BadParameter exception");
         } catch(BadParameter e) {
         }
         try {
-            NamespaceFactory.createNamespaceDirectory(m_session, target, Flags.NONE);
+            NSFactory.createNSDirectory(m_session, target, Flags.NONE.getValue());
             fail("Expected DoesNotExist exception");
         } catch(DoesNotExist e) {
         }
     }
 
     public void test_copy_recurse() throws Exception {
-        URI target = m_dirUri2.resolve(DEFAULT_DIRNAME).resolve(DEFAULT_FILENAME);
-        m_dir.copy(m_dirUri2, Flags.RECURSIVE);
+        URL target = createURL(m_dirUrl2, DEFAULT_DIRNAME+DEFAULT_FILENAME);
+        m_dir.copy(m_dirUrl2, Flags.RECURSIVE.getValue());
         checkCopied(target, DEFAULT_CONTENT);
     }
 
     public void test_copy_recurse_nooverwrite() throws Exception {
-        URI target = m_rootUri2.resolve(DEFAULT_DIRNAME).resolve(DEFAULT_FILENAME);
+        URL target = createURL(m_rootUrl2, DEFAULT_DIRNAME+DEFAULT_FILENAME);
         try {
-            m_dir.copy(m_rootUri2, Flags.RECURSIVE);
+            m_dir.copy(m_rootUrl2, Flags.RECURSIVE.getValue());
             fail("Expected AlreadyExists exception");
         } catch(AlreadyExists e) {
         }
         try {
-            NamespaceFactory.createNamespaceEntry(m_session, target, Flags.NONE);
+            NSFactory.createNSEntry(m_session, target, Flags.NONE.getValue());
             fail("Expected DoesNotExist exception");
         } catch(DoesNotExist e) {
         }
     }
 
     public void test_copy_recurse_overwrite() throws Exception {
-        URI target = m_rootUri2.resolve(DEFAULT_DIRNAME).resolve(DEFAULT_FILENAME);
-        m_dir.copy(m_rootUri2, Flags.RECURSIVE, Flags.OVERWRITE);
+        URL target = createURL(m_rootUrl2, DEFAULT_DIRNAME+DEFAULT_FILENAME);
+        m_dir.copy(m_rootUrl2, Flags.RECURSIVE.or(Flags.OVERWRITE));
         checkCopied(target, DEFAULT_CONTENT);
     }
 
     public void test_move_recurse() throws Exception {
-        URI target = m_dirUri2.resolve(DEFAULT_DIRNAME).resolve(DEFAULT_FILENAME);
-        m_dir.move(m_dirUri2, Flags.RECURSIVE);
+        URL target = createURL(m_dirUrl2, DEFAULT_DIRNAME+DEFAULT_FILENAME);
+        m_dir.move(m_dirUrl2, Flags.RECURSIVE.getValue());
         checkCopied(target, DEFAULT_CONTENT);
         try {
-            NamespaceFactory.createNamespaceDirectory(m_session, m_dirUri, Flags.NONE);
+            NSFactory.createNSDirectory(m_session, m_dirUrl, Flags.NONE.getValue());
             fail("Expected DoesNotExist exception");
         } catch(DoesNotExist e) {
         }

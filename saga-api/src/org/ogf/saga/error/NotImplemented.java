@@ -1,6 +1,6 @@
 package org.ogf.saga.error;
 
-import org.ogf.saga.SagaBase;
+import org.ogf.saga.SagaObject;
 
 /**
  * This exception indicates that a SAGA method is not implemented.
@@ -49,7 +49,7 @@ public class NotImplemented extends Exception {
      * @param message the detail message.
      * @param object the associated SAGA object.
      */
-    public NotImplemented(String message, SagaBase object) {
+    public NotImplemented(String message, SagaObject object) {
         super(message, object);
     }
 }

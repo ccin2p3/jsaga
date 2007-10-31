@@ -1,6 +1,6 @@
 package org.ogf.saga.namespace.abstracts;
 
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.file.Directory;
@@ -24,73 +24,75 @@ import java.util.List;
  *
  */
 public abstract class AbstractNSCopyTest extends AbstractNSDirectoryTest {
+    protected static final int FLAGS_BYPASSEXIST = 4096;
+
     // test data
     protected static final String DEFAULT_ROOTNAME_2 = "root2/";
     protected static final String DEFAULT_FILENAME_2 = "file2.txt";
-    protected static final String DEFAULT_CONTENT_2 = "Content of file 2 on base2.uri...";
+    protected static final String DEFAULT_CONTENT_2 = "Content of file 2 on base2.url...";
 
     // configuration
-    protected URI m_rootUri2;
-    protected URI m_dirUri2;
-    protected URI m_fileUri2;
+    protected URL m_rootUrl2;
+    protected URL m_dirUrl2;
+    protected URL m_fileUrl2;
 
     // setup
-    protected NamespaceDirectory m_root2;
+    protected NSDirectory m_root2;
     protected Directory m_physicalRoot;
 
     public AbstractNSCopyTest(String protocol, String targetProtocol) throws Exception {
         super(protocol);
-        URI baseUri2;
+        URL baseUrl2;
         if (protocol.equals(targetProtocol)) {
-            if (getOptionalProperty(protocol, CONFIG_BASE2_URI) != null) {
-                baseUri2 = new URI(getOptionalProperty(protocol, CONFIG_BASE2_URI));
+            if (getOptionalProperty(protocol, CONFIG_BASE2_URL) != null) {
+                baseUrl2 = new URL(getOptionalProperty(protocol, CONFIG_BASE2_URL));
             } else {
-                baseUri2 = new URI(getRequiredProperty(protocol, CONFIG_BASE_URI));
+                baseUrl2 = new URL(getRequiredProperty(protocol, CONFIG_BASE_URL));
             }
         } else {
-            baseUri2 = new URI(getRequiredProperty(targetProtocol, CONFIG_BASE_URI));
+            baseUrl2 = new URL(getRequiredProperty(targetProtocol, CONFIG_BASE_URL));
         }
-        m_rootUri2 = baseUri2.resolve(DEFAULT_ROOTNAME_2);
-        m_dirUri2 = m_rootUri2.resolve(DEFAULT_DIRNAME);
-        m_fileUri2 = m_dirUri2.resolve(DEFAULT_FILENAME_2);
-        if (m_session==null && baseUri2.getFragment()!=null) {
+        m_rootUrl2 = createURL(baseUrl2, DEFAULT_ROOTNAME_2);
+        m_dirUrl2 = createURL(m_rootUrl2, DEFAULT_DIRNAME);
+        m_fileUrl2 = createURL(m_dirUrl2, DEFAULT_FILENAME_2);
+        if (m_session==null && baseUrl2.getFragment()!=null) {
             m_session = SessionFactory.createSession(true);
         }
-        if (m_physicalRootUri==null && getOptionalProperty(targetProtocol, CONFIG_PHYSICAL_PROTOCOL) != null) {
+        if (m_physicalRootUrl ==null && getOptionalProperty(targetProtocol, CONFIG_PHYSICAL_PROTOCOL) != null) {
             String physicalProtocol = getOptionalProperty(targetProtocol, CONFIG_PHYSICAL_PROTOCOL);
-            URI basePhysicalUri = new URI(getRequiredProperty(physicalProtocol, CONFIG_BASE_URI));
-            m_physicalRootUri = basePhysicalUri.resolve(DEFAULT_ROOTNAME);
-            m_physicalFileUri = m_physicalRootUri.resolve(DEFAULT_PHYSICAL);
-            m_physicalFileUri2 = m_physicalRootUri.resolve(DEFAULT_PHYSICAL2);
+            URL basePhysicalUrl = new URL(getRequiredProperty(physicalProtocol, CONFIG_BASE_URL));
+            m_physicalRootUrl = createURL(basePhysicalUrl, DEFAULT_ROOTNAME);
+            m_physicalFileUrl = createURL(m_physicalRootUrl, DEFAULT_PHYSICAL);
+            m_physicalFileUrl2 = createURL(m_physicalRootUrl, DEFAULT_PHYSICAL2);
         }
     }
 
     protected void setUp() throws Exception {
         super.setUp();
         try {
-            if (m_rootUri2 != null) {
-                m_root2 = NamespaceFactory.createNamespaceDirectory(m_session, m_rootUri2, FLAGS_ROOT);
-                if (m_fileUri2 != null) {
-                    NamespaceEntry file2 = m_root2.open(m_fileUri2, FLAGS_FILE);
+            if (m_rootUrl2 != null) {
+                m_root2 = NSFactory.createNSDirectory(m_session, m_rootUrl2, FLAGS_ROOT);
+                if (m_fileUrl2 != null) {
+                    NSEntry file2 = m_root2.open(m_fileUrl2, FLAGS_FILE);
                     if (file2 instanceof File) {
                         Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT_2.getBytes());
                         ((File)file2).write(buffer.getSize(), buffer);
                     } else if (file2 instanceof LogicalFile) {
-                        ((LogicalFile)file2).addLocation(m_physicalFileUri2);
+                        ((LogicalFile)file2).addLocation(m_physicalFileUrl2);
                     }
                     file2.close();
                 }
             }
-            if (m_physicalRootUri != null) {
-                m_physicalRoot = (Directory) NamespaceFactory.createNamespaceDirectory(m_session, m_physicalRootUri, FLAGS_ROOT);
-                if (m_physicalFileUri != null) {
-                    File physicalFile = (File) m_physicalRoot.open(m_physicalFileUri, FLAGS_FILE);
+            if (m_physicalRootUrl != null) {
+                m_physicalRoot = (Directory) NSFactory.createNSDirectory(m_session, m_physicalRootUrl, FLAGS_ROOT);
+                if (m_physicalFileUrl != null) {
+                    File physicalFile = (File) m_physicalRoot.open(m_physicalFileUrl, FLAGS_FILE);
                     Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT.getBytes());
                     physicalFile.write(buffer.getSize(), buffer);
                     physicalFile.close(0);
                 }
-                if (m_physicalFileUri2 != null) {
-                    File physicalFile = (File) m_physicalRoot.open(m_physicalFileUri2, FLAGS_FILE);
+                if (m_physicalFileUrl2 != null) {
+                    File physicalFile = (File) m_physicalRoot.open(m_physicalFileUrl2, FLAGS_FILE);
                     Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT_2.getBytes());
                     physicalFile.write(buffer.getSize(), buffer);
                     physicalFile.close(0);
@@ -104,11 +106,11 @@ public abstract class AbstractNSCopyTest extends AbstractNSDirectoryTest {
 
     protected void tearDown() throws Exception {
         if (m_root2 != null) {
-            m_root2.remove(Flags.RECURSIVE);
+            m_root2.remove(Flags.RECURSIVE.getValue());
             m_root2.close();
         }
         if (m_physicalRoot != null) {
-            m_physicalRoot.remove(Flags.RECURSIVE);
+            m_physicalRoot.remove(Flags.RECURSIVE.getValue());
             m_physicalRoot.close();
         }
         super.tearDown();
@@ -116,14 +118,14 @@ public abstract class AbstractNSCopyTest extends AbstractNSDirectoryTest {
 
     //////////////////////////////////////// protected methods ////////////////////////////////////////
 
-    protected void checkCopied(URI uri, String expectedContent) throws Exception {
-        NamespaceEntry entry = NamespaceFactory.createNamespaceEntry(m_session, uri, Flags.READ);
+    protected void checkCopied(URL url, String expectedContent) throws Exception {
+        NSEntry entry = NSFactory.createNSEntry(m_session, url, Flags.READ.getValue());
         File reader;
         if (entry instanceof LogicalFile) {
-            List<URI> physicalUris = ((LogicalFile)entry).listLocations();
-            assertNotNull(physicalUris);
-            assertTrue(physicalUris.size() > 0);
-            reader = (File) NamespaceFactory.createNamespaceEntry(m_session, physicalUris.get(0), Flags.READ);
+            List<URL> physicalUrls = ((LogicalFile)entry).listLocations();
+            assertNotNull(physicalUrls);
+            assertTrue(physicalUrls.size() > 0);
+            reader = (File) NSFactory.createNSEntry(m_session, physicalUrls.get(0), Flags.READ.getValue());
         } else {
             reader = (File) entry;
         }

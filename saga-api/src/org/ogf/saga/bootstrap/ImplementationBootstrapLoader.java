@@ -10,7 +10,7 @@ import org.ogf.saga.file.FileFactory;
 import org.ogf.saga.job.JobFactory;
 import org.ogf.saga.logicalfile.LogicalFileFactory;
 import org.ogf.saga.monitoring.MonitoringFactory;
-import org.ogf.saga.namespace.NamespaceFactory;
+import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.rpc.RPCFactory;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.stream.StreamFactory;
@@ -133,7 +133,7 @@ public class ImplementationBootstrapLoader {
      * @return a namespace factory.
      * @throws NotImplemented is thrown when namespace is not implemented.
      */
-    public static NamespaceFactory createNamespaceFactory()
+    public static NSFactory createNamespaceFactory()
         throws NotImplemented {
         initFactory();
         return factory.createNamespaceFactory();

@@ -4,7 +4,7 @@ import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.error.AlreadyExists;
 import org.ogf.saga.namespace.Flags;
-import org.ogf.saga.namespace.NamespaceFactory;
+import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
 
 /* ***************************************************
@@ -30,10 +30,10 @@ public class FileWriteTest extends AbstractNSEntryTest {
     public void test_write_nooverwrite() throws Exception {
         if (m_file instanceof File) {
             try {
-                NamespaceFactory.createNamespaceEntry(m_session, m_fileUri, Flags.WRITE, Flags.EXCL);
+                NSFactory.createNSEntry(m_session, m_fileUrl, Flags.WRITE.or(Flags.EXCL));
                 fail("Expected AlreadyExist exception");
             } catch(AlreadyExists e) {
-                checkWrited(m_fileUri, DEFAULT_CONTENT);
+                checkWrited(m_fileUrl, DEFAULT_CONTENT);
             }
         } else {
             fail("Not an instance of class: File");
@@ -43,10 +43,10 @@ public class FileWriteTest extends AbstractNSEntryTest {
     public void test_write_overwrite() throws Exception {
         if (m_file instanceof File) {
             Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT2.getBytes());
-            File writer = (File) NamespaceFactory.createNamespaceEntry(m_session, m_fileUri, Flags.WRITE);
+            File writer = (File) NSFactory.createNSEntry(m_session, m_fileUrl, Flags.WRITE.getValue());
             writer.write(buffer.getSize(), buffer);
             writer.close(0);
-            checkWrited(m_fileUri, DEFAULT_CONTENT2);
+            checkWrited(m_fileUrl, DEFAULT_CONTENT2);
         } else {
             fail("Not an instance of class: File");
         }
@@ -55,10 +55,10 @@ public class FileWriteTest extends AbstractNSEntryTest {
     public void test_write_append() throws Exception {
         if (m_file instanceof File) {
             Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT2.getBytes());
-            File writer = (File) NamespaceFactory.createNamespaceEntry(m_session, m_fileUri, Flags.WRITE, Flags.APPEND);
+            File writer = (File) NSFactory.createNSEntry(m_session, m_fileUrl, Flags.WRITE.or(Flags.APPEND));
             writer.write(buffer.getSize(), buffer);
             writer.close(0);
-            checkWrited(m_fileUri, DEFAULT_CONTENT+DEFAULT_CONTENT2);
+            checkWrited(m_fileUrl, DEFAULT_CONTENT+DEFAULT_CONTENT2);
         } else {
             fail("Not an instance of class: File");
         }

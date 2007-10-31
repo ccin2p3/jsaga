@@ -2,7 +2,7 @@ package org.ogf.saga.namespace.abstracts;
 
 import org.ogf.saga.error.DoesNotExist;
 import org.ogf.saga.namespace.Flags;
-import org.ogf.saga.namespace.NamespaceFactory;
+import org.ogf.saga.namespace.NSFactory;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -22,9 +22,9 @@ public abstract class AbstractNSEntryWriteTest extends AbstractNSEntryTest {
     }
 
     public void test_remove() throws Exception {
-        m_file.remove(Flags.NONE);
+        m_file.remove(Flags.NONE.getValue());
         try {
-            NamespaceFactory.createNamespaceEntry(m_session, m_fileUri, Flags.NONE);
+            NSFactory.createNSEntry(m_session, m_fileUrl, Flags.NONE.getValue());
             fail("Expected DoesNotExist exception");
         } catch(DoesNotExist e) {
         }

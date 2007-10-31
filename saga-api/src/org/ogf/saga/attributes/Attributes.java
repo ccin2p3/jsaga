@@ -1,6 +1,5 @@
 package org.ogf.saga.attributes;
 
-import org.ogf.saga.SagaBase;
 import org.ogf.saga.error.AuthenticationFailed;
 import org.ogf.saga.error.AuthorizationFailed;
 import org.ogf.saga.error.BadParameter;
@@ -9,7 +8,6 @@ import org.ogf.saga.error.IncorrectState;
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.error.PermissionDenied;
-import org.ogf.saga.error.ReadOnly;
 import org.ogf.saga.error.Timeout;
 
 /**
@@ -17,18 +15,17 @@ import org.ogf.saga.error.Timeout;
  * of SAGA objects.
  * Attributes map a key to a value.
  */
-public interface Attributes extends SagaBase {
-
+public interface Attributes {
+    
     /**
      * Sets an attribute to a value.
      * @param key the attribute key.
      * @param value value to set the attribute to.
-     * @return the old value of this attribute, or <code>null</code>.
      */
-    public String setAttribute(String key, String value)
+    public void setAttribute(String key, String value)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
             PermissionDenied, IncorrectState, BadParameter,
-            ReadOnly, DoesNotExist, Timeout, NoSuccess;
+            DoesNotExist, Timeout, NoSuccess;
 
     /**
      * Gets the value of an attribute.
@@ -37,19 +34,17 @@ public interface Attributes extends SagaBase {
      */
     public String getAttribute(String key)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, IncorrectState, ReadOnly,
-            DoesNotExist, Timeout, NoSuccess;
+            PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess;
 
     /**
      * Sets an attribute to an array of values.
      * @param key the attribute key.
      * @param values values to set the attribute to.
-     * @return the old values of this attribute, or <code>null</code>.
      */
-    public String[] setVectorAttribute(String key, String[] values)
+    public void setVectorAttribute(String key, String[] values)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
             PermissionDenied, IncorrectState, BadParameter,
-            ReadOnly, DoesNotExist, Timeout, NoSuccess;
+            DoesNotExist, Timeout, NoSuccess;
 
     /**
      * Gets the array of values associated with an attribute.
@@ -58,8 +53,7 @@ public interface Attributes extends SagaBase {
      */
     public String[] getVectorAttribute(String key)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, IncorrectState, ReadOnly,
-            DoesNotExist, Timeout, NoSuccess;
+            PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess;
 
     /**
      * Removes an attribute.
@@ -67,7 +61,7 @@ public interface Attributes extends SagaBase {
      */
     public void removeAttribute(String key)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, DoesNotExist, ReadOnly, Timeout, NoSuccess;
+            PermissionDenied, DoesNotExist, Timeout, NoSuccess;
     
     /**
      * Gets the list of attribute keys.
@@ -79,11 +73,10 @@ public interface Attributes extends SagaBase {
     
     /**
      * Finds matching attributes.
-     * @param keyPattern key search pattern.
-     * @param valuePattern value search pattern.
+     * @param pattern the search pattern.
      * @return the list of matching attribute keys.
      */
-    public String[] findAttributes(String keyPattern, String valuePattern)
+    public String[] findAttributes(String pattern)
         throws NotImplemented, BadParameter, AuthenticationFailed,
             AuthorizationFailed, PermissionDenied, Timeout, NoSuccess;
 
@@ -106,11 +99,11 @@ public interface Attributes extends SagaBase {
             PermissionDenied, DoesNotExist, Timeout, NoSuccess;
 
     /**
-     * Checks the attribute for being removeable.
+     * Checks the attribute for being removable.
      * @param key the attribute key.
-     * @return <code>true</code> if the attribute exists and is removeable.
+     * @return <code>true</code> if the attribute exists and is removable.
      */
-    public boolean isRemoveableAttribute(String key)
+    public boolean isRemovableAttribute(String key)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
             PermissionDenied, DoesNotExist, Timeout, NoSuccess;
 

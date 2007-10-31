@@ -1,10 +1,10 @@
 package org.ogf.saga.stream;
 
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.bootstrap.ImplementationBootstrapLoader;
 import org.ogf.saga.error.AuthenticationFailed;
 import org.ogf.saga.error.AuthorizationFailed;
-import org.ogf.saga.error.IncorrectSession;
+import org.ogf.saga.error.BadParameter;
 import org.ogf.saga.error.IncorrectURL;
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.NotImplemented;
@@ -12,7 +12,7 @@ import org.ogf.saga.error.PermissionDenied;
 import org.ogf.saga.error.Timeout;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.TaskMode;
-import org.ogf.saga.task.RVTask;
+import org.ogf.saga.task.Task;
 
 /**
  * Factory for objects from the stream package.
@@ -34,8 +34,8 @@ public abstract class StreamFactory {
      * @param name location of the stream service.
      * @return the stream.
      */
-    protected abstract Stream doCreateStream(Session session, URI name)
-        throws NotImplemented, IncorrectURL, IncorrectSession,
+    protected abstract Stream doCreateStream(Session session, URL name)
+        throws NotImplemented, IncorrectURL, BadParameter,
                 AuthenticationFailed, AuthorizationFailed, PermissionDenied,
                 Timeout, NoSuccess;
     
@@ -46,8 +46,8 @@ public abstract class StreamFactory {
      * @return the service.
      */
     protected abstract StreamService doCreateStreamService(Session session,
-            URI name)
-        throws NotImplemented, IncorrectURL, IncorrectSession,
+            URL name)
+        throws NotImplemented, IncorrectURL, BadParameter,
                 AuthenticationFailed, AuthorizationFailed, PermissionDenied,
                 Timeout, NoSuccess;
     
@@ -61,8 +61,8 @@ public abstract class StreamFactory {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    protected abstract RVTask<Stream> doCreateStream(TaskMode mode,
-            Session session, URI name)
+    protected abstract Task<Stream> doCreateStream(TaskMode mode,
+            Session session, URL name)
         throws NotImplemented;
     
     /**
@@ -75,8 +75,8 @@ public abstract class StreamFactory {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    protected abstract RVTask<StreamService> doCreateStreamService(
-            TaskMode mode, Session session, URI name)
+    protected abstract Task<StreamService> doCreateStreamService(
+            TaskMode mode, Session session, URL name)
         throws NotImplemented;
     
     /**
@@ -85,8 +85,8 @@ public abstract class StreamFactory {
      * @param name location of the stream service.
      * @return the stream.
      */
-    public static Stream createStream(Session session, URI name)
-        throws NotImplemented, IncorrectURL, IncorrectSession,
+    public static Stream createStream(Session session, URL name)
+        throws NotImplemented, IncorrectURL, BadParameter,
             AuthenticationFailed, AuthorizationFailed, PermissionDenied,
             Timeout, NoSuccess {
         initializeFactory();
@@ -99,8 +99,8 @@ public abstract class StreamFactory {
      * @param name location of the service.
      * @return the service.
      */
-    public static StreamService createStreamService(Session session, URI name)
-        throws NotImplemented, IncorrectURL, IncorrectSession,
+    public static StreamService createStreamService(Session session, URL name)
+        throws NotImplemented, IncorrectURL, BadParameter,
             AuthenticationFailed, AuthorizationFailed, PermissionDenied,
             Timeout, NoSuccess {
         initializeFactory();
@@ -116,8 +116,8 @@ public abstract class StreamFactory {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public static RVTask<Stream> createStream(TaskMode mode, Session session,
-            URI name) throws NotImplemented {
+    public static Task<Stream> createStream(TaskMode mode, Session session,
+            URL name) throws NotImplemented {
         initializeFactory();
         return factory.doCreateStream(mode, session, name);
     }
@@ -131,8 +131,8 @@ public abstract class StreamFactory {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public static RVTask<StreamService> createStreamService(TaskMode mode,
-            Session session, URI name) throws NotImplemented {
+    public static Task<StreamService> createStreamService(TaskMode mode,
+            Session session, URL name) throws NotImplemented {
         initializeFactory();
         return factory.doCreateStreamService(mode, session, name);
     }

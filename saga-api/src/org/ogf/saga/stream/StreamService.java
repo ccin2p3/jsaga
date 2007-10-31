@@ -1,10 +1,9 @@
 package org.ogf.saga.stream;
 
-import org.ogf.saga.SagaBase;
-import org.ogf.saga.URI;
+import org.ogf.saga.SagaObject;
+import org.ogf.saga.URL;
 import org.ogf.saga.error.AuthenticationFailed;
 import org.ogf.saga.error.AuthorizationFailed;
-import org.ogf.saga.error.BadParameter;
 import org.ogf.saga.error.IncorrectState;
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.NotImplemented;
@@ -15,20 +14,27 @@ import org.ogf.saga.permissions.Permissions;
 import org.ogf.saga.task.Async;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
-import org.ogf.saga.task.RVTask;
 
 /**
  * A <code>StreamService</code> object establishes a listening/server object
  * that waits for client connections. It is similar to a serversocket.
  */
-public interface StreamService extends SagaBase, Async, AsyncMonitorable,
+public interface StreamService extends SagaObject, Async, AsyncMonitorable,
         Permissions {
+
+    // Metrics
+
+    /** Metric name, fires if a client connects. */
+    public static final String STREAMSERVER_CLIENTCONNECT
+            = "stream_server.client_connect";
+
+    // Methods
 
     /**
      * Obtains the URL to be used to connect to this server.
      * @return the URL.
      */
-    public URI getUrl()
+    public URL getUrl()
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
                PermissionDenied, IncorrectState, Timeout, NoSuccess;
 
@@ -40,7 +46,7 @@ public interface StreamService extends SagaBase, Async, AsyncMonitorable,
      */
     public Stream serve()
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-               PermissionDenied, IncorrectState, BadParameter, NoSuccess;
+               PermissionDenied, IncorrectState, Timeout, NoSuccess;
 
     /**
      * Waits for incoming client connections (like an accept of a
@@ -51,7 +57,7 @@ public interface StreamService extends SagaBase, Async, AsyncMonitorable,
      */
     public Stream serve(float timeoutInSeconds)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-               PermissionDenied, IncorrectState, BadParameter, NoSuccess;
+               PermissionDenied, IncorrectState, Timeout, NoSuccess;
 
     /**
      * Closes a stream service.
@@ -78,7 +84,7 @@ public interface StreamService extends SagaBase, Async, AsyncMonitorable,
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<URI> getUrl(TaskMode mode)
+    public Task<URL> getUrl(TaskMode mode)
         throws NotImplemented;
 
     /**
@@ -90,7 +96,7 @@ public interface StreamService extends SagaBase, Async, AsyncMonitorable,
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Stream> serve(TaskMode mode)
+    public Task<Stream> serve(TaskMode mode)
         throws NotImplemented;
 
     /**
@@ -103,7 +109,7 @@ public interface StreamService extends SagaBase, Async, AsyncMonitorable,
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Stream> serve(TaskMode mode, float timeoutInSeconds)
+    public Task<Stream> serve(TaskMode mode, float timeoutInSeconds)
         throws NotImplemented;
 
     /**

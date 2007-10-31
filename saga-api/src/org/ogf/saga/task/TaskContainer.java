@@ -1,6 +1,6 @@
 package org.ogf.saga.task;
 
-import org.ogf.saga.SagaBase;
+import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.DoesNotExist;
 import org.ogf.saga.error.IncorrectState;
 import org.ogf.saga.error.NoSuccess;
@@ -11,14 +11,20 @@ import org.ogf.saga.monitoring.Monitorable;
 /**
  * Container object for tasks.
  */
-public interface TaskContainer extends SagaBase, Monitorable {
+public interface TaskContainer extends SagaObject, Monitorable {
+
+    /**
+     * Metric name: fires on state changes of any task in the container,
+     * and has the value of that task's handle.
+     */
+    public static final String TASKCONTAINERSTATE = "TaskContainer.state";
 
     /**
      * Adds a task to the task container.
      * @param task the task to add.
      * @return a handle allowing for removal of the task.
      */
-    public int add(Task task);
+    public int add(Task task) throws NotImplemented, Timeout, NoSuccess;
 
     /**
      * Removes the task identified by the specified cookie from this container.
@@ -40,7 +46,7 @@ public interface TaskContainer extends SagaBase, Monitorable {
      * @return the finished tasks.
      */
     public Task[] waitTasks(WaitMode mode)
-        throws NotImplemented, IncorrectState, DoesNotExist, NoSuccess;
+        throws NotImplemented, IncorrectState, DoesNotExist, Timeout, NoSuccess;
 
     /**
      * Waits for one or more of the tasks to end up in a final state.
@@ -49,7 +55,7 @@ public interface TaskContainer extends SagaBase, Monitorable {
      * @return the finished tasks.
      */
     public Task[] waitTasks(float timeoutInSeconds, WaitMode mode)
-        throws NotImplemented, IncorrectState, DoesNotExist, NoSuccess;
+        throws NotImplemented, IncorrectState, DoesNotExist, Timeout, NoSuccess;
 
     /**
      * Cancels all the asynchronous operations in the container.

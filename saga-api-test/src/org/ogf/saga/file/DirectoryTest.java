@@ -1,6 +1,6 @@
 package org.ogf.saga.file;
 
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.namespace.abstracts.AbstractNSDirectoryTest;
 
@@ -22,7 +22,7 @@ public class DirectoryTest extends AbstractNSDirectoryTest {
     }
 
     public void test_openDir() throws Exception {
-        NamespaceDirectory dir = m_dir.openDir(new URI(".."), Flags.NONE);
+        NSDirectory dir = m_dir.openDir(new URL(".."), Flags.NONE.getValue());
         assertTrue(
                 dir instanceof Directory);
         assertEquals(
@@ -31,7 +31,7 @@ public class DirectoryTest extends AbstractNSDirectoryTest {
     }
 
     public void test_openEntry() throws Exception {
-        NamespaceEntry entry = m_dir.open(new URI(DEFAULT_FILENAME), Flags.NONE);
+        NSEntry entry = m_dir.open(new URL(DEFAULT_FILENAME), Flags.NONE.getValue());
         assertTrue(
                 entry instanceof File);
         assertEquals(

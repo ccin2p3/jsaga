@@ -2,6 +2,7 @@ package org.ogf.saga.monitoring;
 
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.AuthorizationFailed;
+import org.ogf.saga.error.NotImplemented;
 
 /**
  * Asynchronous handler for metric changes.
@@ -16,5 +17,5 @@ public interface Callback {
      * @return wether the callback stays registered.
      */
     public boolean cb(Monitorable mt, Metric metric, Context ctx)
-        throws AuthorizationFailed;
+        throws NotImplemented, AuthorizationFailed;
 }

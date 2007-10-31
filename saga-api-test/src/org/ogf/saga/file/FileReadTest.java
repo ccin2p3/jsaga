@@ -3,7 +3,7 @@ package org.ogf.saga.file;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.namespace.Flags;
-import org.ogf.saga.namespace.NamespaceFactory;
+import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
 
 /* ***************************************************
@@ -36,7 +36,7 @@ public class FileReadTest extends AbstractNSEntryTest {
     public void test_read_applicationManagedBuffer() throws Exception {
         if (m_file instanceof File) {
             Buffer buffer = BufferFactory.createBuffer(new byte[1024]);
-            File reader = (File) NamespaceFactory.createNamespaceEntry(m_session, m_fileUri, Flags.READ);
+            File reader = (File) NSFactory.createNSEntry(m_session, m_fileUrl, Flags.READ.getValue());
             reader.read(1024, buffer);
             byte[] bytes = new byte[DEFAULT_CONTENT.length()];
             System.arraycopy(buffer.getData(), 0, bytes, 0, DEFAULT_CONTENT.length());
@@ -51,7 +51,7 @@ public class FileReadTest extends AbstractNSEntryTest {
 
     public void test_read() throws Exception {
         if (m_file instanceof File) {
-            checkWrited(m_fileUri, DEFAULT_CONTENT);
+            checkWrited(m_fileUrl, DEFAULT_CONTENT);
         } else {
             fail("Not an instance of class: File");
         }

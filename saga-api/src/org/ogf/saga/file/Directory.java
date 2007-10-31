@@ -1,27 +1,25 @@
 package org.ogf.saga.file;
 
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.error.AlreadyExists;
 import org.ogf.saga.error.AuthenticationFailed;
 import org.ogf.saga.error.AuthorizationFailed;
 import org.ogf.saga.error.BadParameter;
 import org.ogf.saga.error.DoesNotExist;
-import org.ogf.saga.error.IncorrectSession;
 import org.ogf.saga.error.IncorrectState;
 import org.ogf.saga.error.IncorrectURL;
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.error.PermissionDenied;
 import org.ogf.saga.error.Timeout;
-import org.ogf.saga.namespace.Flags;
-import org.ogf.saga.namespace.NamespaceDirectory;
+import org.ogf.saga.namespace.NSDirectory;
 import org.ogf.saga.task.TaskMode;
-import org.ogf.saga.task.RVTask;
+import org.ogf.saga.task.Task;
 
 /**
  * A Directory instance represents an open directory.
  */
-public interface Directory extends NamespaceDirectory {
+public interface Directory extends NSDirectory {
 
     // Inspection methods
 
@@ -31,19 +29,19 @@ public interface Directory extends NamespaceDirectory {
      * @param flags mode for operation.
      * @return the size.
      */
-    public long getSize(URI name, Flags... flags)
+    public long getSize(URL name, int flags)
         throws NotImplemented, IncorrectURL, AuthenticationFailed,
             AuthorizationFailed, PermissionDenied, BadParameter,
             IncorrectState, DoesNotExist, Timeout, NoSuccess;
 
     /**
      * Tests the name for being a directory entry.
-     * Is an alias for {@link NamespaceDirectory#isEntry}.
+     * Is an alias for {@link NSDirectory#isEntry}.
      * @param name to be tested.
      * @param flags flags for the operation.
      * @return <code>true</code> if the name represents a non-directory entry.
      */
-    public boolean isFile(URI name, Flags... flags)
+    public boolean isFile(URL name, int flags)
         throws NotImplemented, IncorrectURL, AuthenticationFailed,
             AuthorizationFailed, PermissionDenied, BadParameter,
             IncorrectState, Timeout, NoSuccess;
@@ -61,8 +59,8 @@ public interface Directory extends NamespaceDirectory {
      * @param flags defining the operation modus.
      * @return the opened directory instance.
      */
-    public Directory openDirectory(URI name, Flags... flags)
-        throws NotImplemented, IncorrectURL, IncorrectSession,
+    public Directory openDirectory(URL name, int flags)
+        throws NotImplemented, IncorrectURL,
             AuthenticationFailed, AuthorizationFailed, PermissionDenied,
             BadParameter, IncorrectState, AlreadyExists, DoesNotExist,
             Timeout, NoSuccess;
@@ -73,8 +71,8 @@ public interface Directory extends NamespaceDirectory {
      * @param flags defining the operation modus.
      * @return the opened file instance.
      */
-    public File openFile(URI name, Flags... flags)
-        throws NotImplemented, IncorrectURL, IncorrectSession,
+    public File openFile(URL name, int flags)
+        throws NotImplemented, IncorrectURL,
             AuthenticationFailed, AuthorizationFailed, PermissionDenied,
             BadParameter, IncorrectState, AlreadyExists, DoesNotExist,
             Timeout, NoSuccess;
@@ -92,12 +90,12 @@ public interface Directory extends NamespaceDirectory {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Long> getSize(TaskMode mode, URI name, Flags... flags)
+    public Task<Long> getSize(TaskMode mode, URL name, int flags)
         throws NotImplemented;
 
     /**
      * Creates a task that tests the name for being a directory entry.
-     * Is an alias for {@link NamespaceDirectory#isEntry}.
+     * Is an alias for {@link NSDirectory#isEntry}.
      * @param mode the task mode.
      * @param name to be tested.
      * @param flags flags for the operation.
@@ -105,7 +103,7 @@ public interface Directory extends NamespaceDirectory {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Boolean> isFile(TaskMode mode, URI name, Flags... flags)
+    public Task<Boolean> isFile(TaskMode mode, URL name, int flags)
         throws NotImplemented;
 
     /**
@@ -117,8 +115,8 @@ public interface Directory extends NamespaceDirectory {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Directory> openDirectory(TaskMode mode, URI name,
-            Flags... flags)
+    public Task<Directory> openDirectory(TaskMode mode, URL name,
+            int flags)
         throws NotImplemented;
 
     /**
@@ -130,6 +128,6 @@ public interface Directory extends NamespaceDirectory {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<File> openFile(TaskMode mode, URI name, Flags... flags)
+    public Task<File> openFile(TaskMode mode, URL name, int flags)
         throws NotImplemented;
 }

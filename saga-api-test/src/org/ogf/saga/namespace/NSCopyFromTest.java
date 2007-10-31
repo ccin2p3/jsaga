@@ -1,6 +1,6 @@
 package org.ogf.saga.namespace;
 
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.error.DoesNotExist;
 import org.ogf.saga.namespace.abstracts.AbstractNSCopyTest;
 
@@ -25,24 +25,22 @@ public class NSCopyFromTest extends AbstractNSCopyTest {
     }
 
     public void test_copy() throws Exception {
-        URI target = m_dirUri.resolve("unexisting.txt");
-        NamespaceEntry newFile = null;
+        URL target = createURL(m_dirUrl, "unexisting.txt");
+        NSEntry newFile = null;
         try {
-            System.setProperty("saga.existence.check.skip", "true");
-            newFile = NamespaceFactory.createNamespaceEntry(m_session, target, Flags.NONE);
-            System.setProperty("saga.existence.check.skip", "false");
+            newFile = NSFactory.createNSEntry(m_session, target, FLAGS_BYPASSEXIST);
         } catch(DoesNotExist e) {
             fail("Unexpected DoesNotExist exception");
         }
-        copyFrom(newFile, m_fileUri2, Flags.NONE);
+        copyFrom(newFile, m_fileUrl2, Flags.NONE.getValue());
         checkCopied(target, DEFAULT_CONTENT_2);
     }
 
 /*
     public void test_copy_nooverwrite() throws Exception {
-        URI target = m_fileUri;
+        URL target = m_fileUrl;
         try {
-            copyFrom(m_file, m_fileUri2, Flags.NONE);
+            copyFrom(m_file, m_fileUrl2, Flags.NONE);
             fail("Expected AlreadyExist exception");
         } catch(AlreadyExists e) {
             checkCopied(target, DEFAULT_CONTENT);
@@ -51,15 +49,15 @@ public class NSCopyFromTest extends AbstractNSCopyTest {
 */
 
     public void test_copy_overwrite() throws Exception {
-        URI target = m_fileUri;
-        copyFrom(m_file, m_fileUri2, Flags.OVERWRITE);
+        URL target = m_fileUrl;
+        copyFrom(m_file, m_fileUrl2, Flags.OVERWRITE.getValue());
         checkCopied(target, DEFAULT_CONTENT_2);
     }
 
-    private static void copyFrom(NamespaceEntry entry, URI uri, Flags... flags) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        Method m = entry.getClass().getMethod("copyFrom", URI.class, Flags[].class);
+    private static void copyFrom(NSEntry entry, URL url, int flags) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        Method m = entry.getClass().getMethod("copyFrom", URL.class, int.class);
         if (m != null) {
-            m.invoke(entry, uri, flags);
+            m.invoke(entry, url, flags);
         }
     }
 }

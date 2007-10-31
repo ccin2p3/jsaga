@@ -3,7 +3,6 @@ package org.ogf.saga.monitoring;
 import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
-import org.ogf.saga.task.RVTask;
 
 /**
  * This interface defines the task versions of the <code>Monitorable</code>
@@ -18,7 +17,7 @@ public interface AsyncMonitorable extends Monitorable {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<String[]> listMetrics(TaskMode mode)
+    public Task<String[]> listMetrics(TaskMode mode)
         throws NotImplemented;
 
     /**
@@ -29,7 +28,7 @@ public interface AsyncMonitorable extends Monitorable {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Metric> getMetric(TaskMode mode, String name)
+    public Task<Metric> getMetric(TaskMode mode, String name)
         throws NotImplemented;
 
     /**
@@ -41,7 +40,7 @@ public interface AsyncMonitorable extends Monitorable {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Integer> addCallback(TaskMode mode, String name, Callback cb)
+    public Task<Integer> addCallback(TaskMode mode, String name, Callback cb)
         throws NotImplemented;
 
     /**

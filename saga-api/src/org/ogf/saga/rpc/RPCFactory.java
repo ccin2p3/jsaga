@@ -1,12 +1,11 @@
 package org.ogf.saga.rpc;
 
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.bootstrap.ImplementationBootstrapLoader;
 import org.ogf.saga.error.AuthenticationFailed;
 import org.ogf.saga.error.AuthorizationFailed;
 import org.ogf.saga.error.BadParameter;
 import org.ogf.saga.error.DoesNotExist;
-import org.ogf.saga.error.IncorrectSession;
 import org.ogf.saga.error.IncorrectURL;
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.NotImplemented;
@@ -14,7 +13,7 @@ import org.ogf.saga.error.PermissionDenied;
 import org.ogf.saga.error.Timeout;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.TaskMode;
-import org.ogf.saga.task.RVTask;
+import org.ogf.saga.task.Task;
 
 /**
  * Factory for objects from the rpc package.
@@ -36,7 +35,7 @@ public abstract class RPCFactory {
      * @return the parameter.
      */
     protected abstract Parameter doCreateParameter(byte[] data, IOMode mode)
-        throws BadParameter;
+        throws BadParameter, NoSuccess;
     
     /**
      * Creates a RPC handle instance. To be provided by the implementation.
@@ -44,8 +43,8 @@ public abstract class RPCFactory {
      * @param funcname specification of the remote procedure.
      * @return the RPC handle instance.
      */
-    protected abstract RPC doCreateRPC(Session session, URI funcname)
-        throws NotImplemented, IncorrectURL, IncorrectSession,
+    protected abstract RPC doCreateRPC(Session session, URL funcname)
+        throws NotImplemented, IncorrectURL,
             AuthenticationFailed, AuthorizationFailed, PermissionDenied,
             BadParameter, DoesNotExist, Timeout, NoSuccess;
     
@@ -59,8 +58,8 @@ public abstract class RPCFactory {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    protected abstract RVTask<RPC> doCreateRPC(TaskMode mode,
-            Session session, URI funcname)
+    protected abstract Task<RPC> doCreateRPC(TaskMode mode,
+            Session session, URL funcname)
         throws NotImplemented;
     
     /**
@@ -71,7 +70,7 @@ public abstract class RPCFactory {
      * @return the parameter.
      */
     public static Parameter createParameter(byte[] data, IOMode mode)
-        throws BadParameter {
+        throws BadParameter, NoSuccess {
         initializeFactory();
         return factory.doCreateParameter(data, mode);
     }
@@ -82,8 +81,8 @@ public abstract class RPCFactory {
      * @param funcname specification of the remote procedure.
      * @return the RPC handle instance.
      */
-    public static RPC createRPC(Session session, URI funcname)
-        throws NotImplemented, IncorrectURL, IncorrectSession,
+    public static RPC createRPC(Session session, URL funcname)
+        throws NotImplemented, IncorrectURL,
             AuthenticationFailed, AuthorizationFailed, PermissionDenied,
                 BadParameter, DoesNotExist, Timeout, NoSuccess {
         initializeFactory();
@@ -99,8 +98,8 @@ public abstract class RPCFactory {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public static RVTask<RPC> createRPC(TaskMode mode, Session session,
-            URI funcname) throws NotImplemented {
+    public static Task<RPC> createRPC(TaskMode mode, Session session,
+            URL funcname) throws NotImplemented {
         initializeFactory();
         return factory.doCreateRPC(mode, session, funcname);
     }

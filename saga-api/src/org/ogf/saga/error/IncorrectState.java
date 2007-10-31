@@ -1,6 +1,6 @@
 package org.ogf.saga.error;
 
-import org.ogf.saga.SagaBase;
+import org.ogf.saga.SagaObject;
 
 /**
  * This exception indicates that the object on which a method is called is in a
@@ -48,7 +48,7 @@ public class IncorrectState extends Exception {
      * @param message the detail message.
      * @param object the associated SAGA object.
      */
-    public IncorrectState(String message, SagaBase object) {
+    public IncorrectState(String message, SagaObject object) {
         super(message, object);
     }
 }

@@ -49,5 +49,6 @@ public interface Monitorable {
      * @param cookie identifies the callback to be removed.
      */
     public void removeCallback(String name, int cookie)
-        throws NotImplemented, DoesNotExist, BadParameter, Timeout, NoSuccess;
+        throws NotImplemented, DoesNotExist, BadParameter, Timeout, NoSuccess,
+            AuthenticationFailed, AuthorizationFailed, PermissionDenied;
 }

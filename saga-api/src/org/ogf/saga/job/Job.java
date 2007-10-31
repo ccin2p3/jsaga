@@ -3,7 +3,7 @@ package org.ogf.saga.job;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.ogf.saga.attributes.Attributes;
+import org.ogf.saga.attributes.AsyncAttributes;
 import org.ogf.saga.error.AuthenticationFailed;
 import org.ogf.saga.error.AuthorizationFailed;
 import org.ogf.saga.error.BadParameter;
@@ -17,9 +17,68 @@ import org.ogf.saga.permissions.Permissions;
 import org.ogf.saga.task.Async;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
-import org.ogf.saga.task.RVTask;
 
-public interface Job extends Task, Async, Attributes, Permissions {
+public interface Job extends Task, Async, AsyncAttributes, Permissions {
+
+    // Required attributes:
+
+    /** Attribute name, SAGA representation of the job identifier. */
+    public static final String JOBID = "JobID";
+
+    // Optional attributes:
+
+    /**
+     * Attribute name, list of host names or IP addresses allocated to run
+     * this job.
+     */
+    public static final String EXECUTIONHOSTS = "ExecutionHosts";
+
+    /**
+     * Attribute name, time stamp of the job creation in the resource manager.
+     */
+    public static final String CREATED = "Created";
+
+    /** Attribute name, time stamp indicating when the job started running. */
+    public static final String STARTED = "Started";
+
+    /** Attribute name, time stamp indicating when the job finished. */
+    public static final String FINISHED = "Finished";
+
+    /** Attribute name, working directory on the execution host. */
+    public static final String WORKINGDIRECTORY = "WorkingDirectory";
+
+    /** Attribute name, process exit code. */
+    public static final String EXITCODE = "ExitCode";
+
+    /** Attribute name, signal number which caused the job to exit. */
+    public static final String TERMSIG = "Termsig";
+
+    // Required metrics:
+
+    /** Metric name, fires on state changes of the job. */
+    public static final String JOB_STATE = "job.state";
+
+    // Optional metrics:
+
+    /** Metric name, fires as a job changes its state detail. */
+    public static final String JOB_STATEDETAIL = "job.state_detail";
+
+    /** Metric name, fires as a job receives a signal. */
+    public static final String JOB_SIGNAL = "job.signal";
+
+    /** Metric name, number of CPU seconds consumed by the job. */
+    public static final String JOB_CPUTIME = "job.cpu_time";
+
+    /** Metric name, current aggregate memory usage of the job. */
+    public static final String JOB_MEMORYUSE = "job.memory_use";
+
+    /** Metric name, current aggregate virtual memory usage of the job. */
+    public static final String JOB_VMEMORYUSE = "job.vmemory_use";
+
+    /** Metric name, current performance. */
+    public static final String JOB_PERFORMANCE = "job.performance";
+
+    // Methods
 
     /**
      * Retrieves the job description that was used to submit this job
@@ -28,7 +87,7 @@ public interface Job extends Task, Async, Attributes, Permissions {
      */
     public JobDescription getJobDescription()
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, DoesNotExist, Timeout, IncorrectState, NoSuccess;
+            PermissionDenied, DoesNotExist, Timeout, NoSuccess;
 
     /**
      * Returns the input stream of this job (to which can be written).
@@ -109,7 +168,7 @@ public interface Job extends Task, Async, Attributes, Permissions {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<JobDescription> getJobDescription(TaskMode mode)
+    public Task<JobDescription> getJobDescription(TaskMode mode)
         throws NotImplemented;
 
     /**
@@ -120,7 +179,7 @@ public interface Job extends Task, Async, Attributes, Permissions {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<OutputStream> getStdin(TaskMode mode)
+    public Task<OutputStream> getStdin(TaskMode mode)
         throws NotImplemented;
 
     /**
@@ -131,7 +190,7 @@ public interface Job extends Task, Async, Attributes, Permissions {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<InputStream> getStdout(TaskMode mode)
+    public Task<InputStream> getStdout(TaskMode mode)
         throws NotImplemented;
 
     /**
@@ -142,7 +201,7 @@ public interface Job extends Task, Async, Attributes, Permissions {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<InputStream> getStderr(TaskMode mode)
+    public Task<InputStream> getStderr(TaskMode mode)
         throws NotImplemented;
 
     /**

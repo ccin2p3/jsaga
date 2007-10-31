@@ -3,7 +3,6 @@ package org.ogf.saga.monitoring;
 import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
-import org.ogf.saga.task.RVTask;
 
 /**
  * This interface specifies the Async versions of the methods in
@@ -18,7 +17,7 @@ public interface AsyncSteerable extends Steerable {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Boolean> addMetric(TaskMode mode, Metric metric)
+    public Task<Boolean> addMetric(TaskMode mode, Metric metric)
         throws NotImplemented;
 
     /**

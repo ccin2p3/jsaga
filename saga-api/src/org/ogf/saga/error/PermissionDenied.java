@@ -1,6 +1,6 @@
 package org.ogf.saga.error;
 
-import org.ogf.saga.SagaBase;
+import org.ogf.saga.SagaObject;
 
 /**
  * This exception indicates that the identity used for the operation
@@ -50,7 +50,7 @@ public class PermissionDenied extends Exception {
      * @param message the detail message.
      * @param object the associated SAGA object.
      */
-    public PermissionDenied(String message, SagaBase object) {
+    public PermissionDenied(String message, SagaObject object) {
         super(message, object);
     }
 }

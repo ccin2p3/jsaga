@@ -2,7 +2,7 @@ package org.ogf.saga.job;
 
 import java.util.List;
 
-import org.ogf.saga.SagaBase;
+import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.AuthenticationFailed;
 import org.ogf.saga.error.AuthorizationFailed;
 import org.ogf.saga.error.BadParameter;
@@ -13,16 +13,16 @@ import org.ogf.saga.error.PermissionDenied;
 import org.ogf.saga.error.Timeout;
 import org.ogf.saga.task.Async;
 import org.ogf.saga.task.TaskMode;
-import org.ogf.saga.task.RVTask;
+import org.ogf.saga.task.Task;
 
 /**
- * A JobService represents a resource management backend.
- * It allows for job creation, sumbission, and discovery.
+ * A JobService represents a resource management back-end.
+ * It allows for job creation, submission, and discovery.
  * Deviation from the SAGA specification: the convenience method
  * <code>runJob</code> is not included here, because it cannot
  * easily be specified in Java, since Java has no OUT parameters. 
  */
-public interface JobService extends SagaBase, Async {
+public interface JobService extends SagaObject, Async {
 
     /**
      * Creates a job instance as specified by the job description provided.
@@ -38,7 +38,7 @@ public interface JobService extends SagaBase, Async {
     /**
      * Obtains the list of jobs that are currently known to the
      * resource manager.
-     * @return a list of job ids.
+     * @return a list of job identifications.
      */
     public List<String> list() throws NotImplemented, AuthenticationFailed,
            AuthorizationFailed, PermissionDenied, Timeout, NoSuccess;
@@ -71,7 +71,7 @@ public interface JobService extends SagaBase, Async {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Job> createJob(TaskMode mode, JobDescription jd)
+    public Task<Job> createJob(TaskMode mode, JobDescription jd)
         throws NotImplemented;
 
     /**
@@ -82,7 +82,7 @@ public interface JobService extends SagaBase, Async {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<List<String>> list(TaskMode mode)
+    public Task<List<String>> list(TaskMode mode)
         throws NotImplemented;
 
     /**
@@ -94,7 +94,7 @@ public interface JobService extends SagaBase, Async {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<Job> getJob(TaskMode mode, String jobId)
+    public Task<Job> getJob(TaskMode mode, String jobId)
         throws NotImplemented;
 
     /**
@@ -105,6 +105,6 @@ public interface JobService extends SagaBase, Async {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public RVTask<JobSelf> getSelf(TaskMode mode)
+    public Task<JobSelf> getSelf(TaskMode mode)
         throws NotImplemented;
 }

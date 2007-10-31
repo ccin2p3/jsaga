@@ -1,5 +1,6 @@
 package org.ogf.saga.namespace;
 
+import org.ogf.saga.URL;
 import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
 
 /* ***************************************************
@@ -19,16 +20,18 @@ public class NSEntryTest extends AbstractNSEntryTest {
         super(protocol);
     }
 
-    public void test_getURI() throws Exception {
+    public void test_getURL() throws Exception {
+        URL expected = new URL(m_fileUrl.toString());
+        expected.setFragment(null);
         assertEquals(
-                m_fileUri.toString(),
-                m_file.getURI().toString());
+                expected.toString(),
+                m_file.getURL().toString());
     }
 
     public void test_getCWD() throws Exception {
         assertEquals(
-                m_rootUri.resolve(DEFAULT_DIRNAME).toString(),
-                m_file.getCWD().toString());
+                createURL(m_rootUrl, DEFAULT_DIRNAME).getPath(),
+                m_file.getCWD());
     }
 
     public void test_getName() throws Exception {

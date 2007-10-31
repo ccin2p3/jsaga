@@ -8,7 +8,6 @@ import org.ogf.saga.error.IncorrectState;
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.error.PermissionDenied;
-import org.ogf.saga.error.ReadOnly;
 import org.ogf.saga.error.Timeout;
 
 /**
@@ -23,7 +22,7 @@ public interface Steerable {
      */
     public boolean addMetric(Metric metric)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, AlreadyExists, ReadOnly, Timeout, NoSuccess;
+            PermissionDenied, AlreadyExists, Timeout, NoSuccess;
 
     /**
      * Removes a metric instance.
@@ -31,7 +30,7 @@ public interface Steerable {
      */
     public void removeMetric(String name)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, DoesNotExist, ReadOnly, Timeout, NoSuccess;
+            PermissionDenied, DoesNotExist, Timeout, NoSuccess;
 
     /**
      * Pushes a new metric value to the backend.
@@ -39,6 +38,6 @@ public interface Steerable {
      */
     public void fireMetric(String name)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, IncorrectState, DoesNotExist, ReadOnly, Timeout,
+            PermissionDenied, IncorrectState, DoesNotExist, Timeout,
             NoSuccess;
 }

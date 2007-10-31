@@ -1,6 +1,6 @@
 package org.ogf.saga.namespace.abstracts;
 
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.error.NotImplemented;
@@ -31,40 +31,40 @@ public abstract class AbstractNSEntryTest extends AbstractNSTest {
     protected static final String DEFAULT_CONTENT = "Content of file 1...";
     protected static final String DEFAULT_PHYSICAL = "physical1.txt";
     protected static final String DEFAULT_PHYSICAL2 = "physical2.txt";
-    protected static final Flags[] FLAGS_ROOT = new Flags[]{Flags.CREATE, Flags.EXCL};
-    protected static final Flags[] FLAGS_FILE = new Flags[]{Flags.WRITE, Flags.EXCL, Flags.CREATEPARENTS};
+    protected static final int FLAGS_ROOT = Flags.CREATE.or(Flags.EXCL);
+    protected static final int FLAGS_FILE = Flags.WRITE.or(Flags.EXCL.or(Flags.CREATEPARENTS));
 
     // configuration
-    protected URI m_rootUri;
-    protected URI m_dirUri;
-    protected URI m_fileUri;
-    protected URI m_physicalRootUri;
-    protected URI m_physicalFileUri;
-    protected URI m_physicalFileUri2;
+    protected URL m_rootUrl;
+    protected URL m_dirUrl;
+    protected URL m_fileUrl;
+    protected URL m_physicalRootUrl;
+    protected URL m_physicalFileUrl;
+    protected URL m_physicalFileUrl2;
     protected Session m_session;
 
     // setup
-    protected NamespaceDirectory m_root;
-    protected NamespaceEntry m_file;
+    protected NSDirectory m_root;
+    protected NSEntry m_file;
     protected boolean m_toBeRemoved;
 
     public AbstractNSEntryTest(String protocol) throws Exception {
         super();
 
         // configure
-        URI baseUri = new URI(getRequiredProperty(protocol, CONFIG_BASE_URI));
-        m_rootUri = baseUri.resolve(DEFAULT_ROOTNAME);
-        m_dirUri = m_rootUri.resolve(DEFAULT_DIRNAME);
-        m_fileUri = m_dirUri.resolve(DEFAULT_FILENAME);
-        if (baseUri.getFragment() != null) {
+        URL baseUrl = new URL(getRequiredProperty(protocol, CONFIG_BASE_URL));
+        m_rootUrl = createURL(baseUrl, DEFAULT_ROOTNAME);
+        m_dirUrl = createURL(m_rootUrl, DEFAULT_DIRNAME);
+        m_fileUrl = createURL(m_dirUrl, DEFAULT_FILENAME);
+        if (baseUrl.getFragment() != null) {
             m_session = SessionFactory.createSession(true);
         }
         if (getOptionalProperty(protocol, CONFIG_PHYSICAL_PROTOCOL) != null) {
             String physicalProtocol = getOptionalProperty(protocol, CONFIG_PHYSICAL_PROTOCOL);
-            URI basePhysicalUri = new URI(getRequiredProperty(physicalProtocol, CONFIG_BASE_URI));
-            m_physicalRootUri = basePhysicalUri.resolve(DEFAULT_ROOTNAME);
-            m_physicalFileUri = m_physicalRootUri.resolve(DEFAULT_PHYSICAL);
-            m_physicalFileUri2 = m_physicalRootUri.resolve(DEFAULT_PHYSICAL2);
+            URL basePhysicalUrl = new URL(getRequiredProperty(physicalProtocol, CONFIG_BASE_URL));
+            m_physicalRootUrl = createURL(basePhysicalUrl, DEFAULT_ROOTNAME);
+            m_physicalFileUrl = createURL(m_physicalRootUrl, DEFAULT_PHYSICAL);
+            m_physicalFileUrl2 = createURL(m_physicalRootUrl, DEFAULT_PHYSICAL2);
         }
     }
 
@@ -72,22 +72,22 @@ public abstract class AbstractNSEntryTest extends AbstractNSTest {
     protected void setUp() throws Exception {
         super.setUp();
         try {
-            m_root = NamespaceFactory.createNamespaceDirectory(m_session, m_rootUri, FLAGS_ROOT);
-            m_file = m_root.open(m_fileUri, FLAGS_FILE);
+            m_root = NSFactory.createNSDirectory(m_session, m_rootUrl, FLAGS_ROOT);
+            m_file = m_root.open(m_fileUrl, FLAGS_FILE);
             if (m_file instanceof File) {
                 Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT.getBytes());
                 ((File)m_file).write(buffer.getSize(), buffer);
             } else if (m_file instanceof LogicalFile) {
-                if (m_physicalFileUri == null) {
+                if (m_physicalFileUrl == null) {
                     throw new Exception("Configuration is missing required property: "+CONFIG_PHYSICAL_PROTOCOL);
                 }
-                ((LogicalFile)m_file).addLocation(m_physicalFileUri);
+                ((LogicalFile)m_file).addLocation(m_physicalFileUrl);
             }
             m_file.close();
             m_toBeRemoved = true;
         } catch(NotImplemented e) {
-            m_root = NamespaceFactory.createNamespaceDirectory(m_session, m_rootUri, Flags.NONE);
-            m_file = m_root.open(m_fileUri, Flags.NONE);
+            m_root = NSFactory.createNSDirectory(m_session, m_rootUrl, Flags.NONE.getValue());
+            m_file = m_root.open(m_fileUrl, Flags.NONE.getValue());
             m_toBeRemoved = false;
         } catch(Exception e) {
 //            try{this.tearDown();}catch(Exception e2){/**/}
@@ -101,7 +101,7 @@ public abstract class AbstractNSEntryTest extends AbstractNSTest {
             m_file.close();
         }
         if (m_toBeRemoved) {
-            m_root.remove(Flags.RECURSIVE);
+            m_root.remove(Flags.RECURSIVE.getValue());
         }
         if (m_root != null) {
             m_root.close();
@@ -111,9 +111,9 @@ public abstract class AbstractNSEntryTest extends AbstractNSTest {
 
     //////////////////////////////////////// protected methods ////////////////////////////////////////
 
-    protected void checkWrited(URI uri, String expected) throws Exception {
+    protected void checkWrited(URL url, String expected) throws Exception {
         Buffer buffer = BufferFactory.createBuffer(1024);
-        File reader = (File) NamespaceFactory.createNamespaceEntry(m_session, uri, Flags.READ);
+        File reader = (File) NSFactory.createNSEntry(m_session, url, Flags.READ.getValue());
         int len = reader.read(1024, buffer);
         assertEquals(
                 expected,

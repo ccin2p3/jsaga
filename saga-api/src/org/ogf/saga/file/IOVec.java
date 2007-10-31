@@ -9,6 +9,8 @@ import org.ogf.saga.error.BadParameter;
  */
 public interface IOVec extends Buffer {
 
+    // TODO offset ???
+
     /**
      * Sets the lenIn attribute.
      * @param len the value for the attribute.

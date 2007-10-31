@@ -1,6 +1,6 @@
 package org.ogf.saga.error;
 
-import org.ogf.saga.SagaBase;
+import org.ogf.saga.SagaObject;
 
 /**
  * This is the base class for all exceptions in SAGA.
@@ -11,7 +11,7 @@ public abstract class Exception extends java.lang.Exception {
 
     private static final long serialVersionUID = 1L;
     
-    private transient final SagaBase object;
+    private transient final SagaObject object;
 
     /**
      * Constructs a new SAGA exception.
@@ -56,7 +56,7 @@ public abstract class Exception extends java.lang.Exception {
      * @param message the detail message.
      * @param object the SAGA object associated with the exception.
      */
-    public Exception(String message, SagaBase object) {
+    public Exception(String message, SagaObject object) {
         super(message);
         this.object = object;
     }
@@ -66,7 +66,7 @@ public abstract class Exception extends java.lang.Exception {
      * <code>null</code>.
      * @return the associated SAGA object.
      */
-    public SagaBase getObject() {
+    public SagaObject getObject() {
         return object;
     }
     

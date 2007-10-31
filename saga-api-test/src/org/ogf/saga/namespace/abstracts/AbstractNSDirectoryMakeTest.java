@@ -2,7 +2,7 @@ package org.ogf.saga.namespace.abstracts;
 
 import org.ogf.saga.error.DoesNotExist;
 import org.ogf.saga.namespace.Flags;
-import org.ogf.saga.namespace.NamespaceFactory;
+import org.ogf.saga.namespace.NSFactory;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -22,9 +22,9 @@ public abstract class AbstractNSDirectoryMakeTest extends AbstractNSDirectoryTes
     }
 
     public void test_remove() throws Exception {
-        m_dir.remove(Flags.RECURSIVE);
+        m_dir.remove(Flags.RECURSIVE.getValue());
         try {
-            NamespaceFactory.createNamespaceDirectory(m_session, m_dirUri, Flags.NONE);
+            NSFactory.createNSDirectory(m_session, m_dirUrl, Flags.NONE.getValue());
             fail("Expected DoesNotExist exception");
         } catch(DoesNotExist e) {
         }
