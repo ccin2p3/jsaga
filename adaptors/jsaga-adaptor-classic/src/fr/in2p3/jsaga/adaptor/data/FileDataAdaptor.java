@@ -26,6 +26,8 @@ import java.util.Map;
  *
  */
 public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader, DirectoryWriter, DataRename {
+    private String m_drive;
+
     public Usage getUsage() {
         return null;
     }
@@ -51,7 +53,7 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
     }
 
     public void connect(String userInfo, String host, int port, Map attributes) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {
-        // do nothing
+        m_drive = host;
     }
 
     public void disconnect() throws NoSuccess {
@@ -59,7 +61,8 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
     }
 
     public boolean exists(String absolutePath) throws PermissionDenied, Timeout, NoSuccess {
-        return new File(absolutePath).exists();
+        String correctedAbsolutePath = this.urlToPath(absolutePath);
+        return new File(correctedAbsolutePath).exists();
     }
 
     public boolean isDirectory(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
@@ -156,8 +159,9 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
 
     ////////////////////////////////////// private methods //////////////////////////////////////
 
-    private static File newEntry(String absolutePath) throws DoesNotExist {
-        File entry = new File(absolutePath);
+    private File newEntry(String absolutePath) throws DoesNotExist {
+        String correctedAbsolutePath = this.urlToPath(absolutePath);
+        File entry = new File(correctedAbsolutePath);
         if (entry.exists()) {
             return entry;
         } else {
@@ -165,8 +169,8 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
         }
     }
 
-    private static File newFile(String absolutePath) throws BadParameter, DoesNotExist {
-        File entry = newEntry(absolutePath);
+    private File newFile(String absolutePath) throws BadParameter, DoesNotExist {
+        File entry = this.newEntry(absolutePath);
         if (entry.isFile()) {
             return entry;
         } else {
@@ -174,12 +178,20 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
         }
     }
 
-    private static File newDirectory(String absolutePath) throws BadParameter, DoesNotExist {
-        File entry = newEntry(absolutePath);
+    private File newDirectory(String absolutePath) throws BadParameter, DoesNotExist {
+        File entry = this.newEntry(absolutePath);
         if (entry.isDirectory()) {
             return entry;
         } else {
             throw new BadParameter("Entry is a file: "+absolutePath);
+        }
+    }
+
+    private String urlToPath(String url) {
+        if (m_drive != null) {
+            return m_drive+":"+url.replaceAll("%20", " ");
+        } else {
+            return url.replaceAll("%20", " ");
         }
     }
 }
