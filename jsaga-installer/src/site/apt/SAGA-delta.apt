@@ -11,15 +11,15 @@ Differences with SAGA specification
 
 * Data management
 
-    * Add fragment at the end of URI to refer to a specific security context factory
+    * Add fragment at the end of URL to refer to a specific security context factory
 
-    * Add system properties "saga.existence.check.skip" to disable existence check when creating NamespaceEntry instances
+    * Add flag (FLAGS_BYPASSEXIST=4096) to disable existence check when creating NamespaceEntry instances
       (then an IncorrectState exception embedding a DoesNotExist exception may be thrown on subsequent methods invocations).
 
     * Add some methods. These methods are accessible when casting NamespaceEntry instances to AbstractNamespaceEntryImpl,
       or by casting NamespaceDirectory instances to AbstractNamespaceDirectoryImpl.
 
-        * exist(): Check if current entry exist (use this if property saga.existence.check.skip=true).
+        * exist(): Check if current entry exist (use this if created with flag FLAGS_BYPASSEXIST).
           This reduces the number of queries sent to the server.
 
         * copyFrom(): Copy remote source entry to current entry.
