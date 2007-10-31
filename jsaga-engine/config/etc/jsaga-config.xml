@@ -6,7 +6,7 @@
             <attribute name="VomsDir" value="etc/vomsdir"/>
             <instance/>
         </context>
-        <context type="MyProxy">
+        <context type="MyProxy" deactivated="true">
             <attribute name="Server" value="cclcgproxli01.in2p3.fr:7512"/>
             <instance/>
         </context>
