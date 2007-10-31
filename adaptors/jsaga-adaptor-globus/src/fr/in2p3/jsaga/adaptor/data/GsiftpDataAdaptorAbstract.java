@@ -303,7 +303,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         }
     }
 
-    protected static NoSuccess rethrowException(Exception exception) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    protected NoSuccess rethrowException(Exception exception) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         try {
             throw rethrowExceptionFull(exception);
         } catch (AlreadyExists e) {
@@ -311,7 +311,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         }
     }
 
-    private static NoSuccess rethrowExceptionFull(Exception exception) throws PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+    private NoSuccess rethrowExceptionFull(Exception exception) throws PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
         try {
             throw exception;
         } catch (IllegalArgumentException e) {
@@ -328,23 +328,9 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
                             case 112:
                                 throw new Timeout(e);
                             case 500:
-                                String msg = unexpectedReplyCode.getReply().getMessage();
-                                if (msg.indexOf("No such") > -1) {
-                                    throw new DoesNotExist(unexpectedReplyCode);
-                                } else if (msg.indexOf("exists") > -1) {
-                                    throw new AlreadyExists(unexpectedReplyCode);
-                                } else if (msg.indexOf("Permission denied") > -1) {
-                                    throw new PermissionDenied(e);
-                                } else {
-                                    throw new NoSuccess(e);
-                                }
+                            case 521:
                             case 550:
-                                msg = unexpectedReplyCode.getReply().getMessage();
-                                if (msg.indexOf("No such") > -1) {
-                                    throw new DoesNotExist(unexpectedReplyCode);
-                                } else {
-                                    throw new NoSuccess(e);
-                                }
+                                this.rethrowParsedException(unexpectedReplyCode);
                             default:
                                 throw new NoSuccess(e);
                         }
@@ -364,4 +350,5 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
             throw new NoSuccess(e);
         }
     }
+    protected abstract void rethrowParsedException(UnexpectedReplyCodeException e) throws DoesNotExist, AlreadyExists, PermissionDenied, NoSuccess;
 }

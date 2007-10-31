@@ -3,7 +3,11 @@ package fr.in2p3.jsaga.adaptor.security;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
+import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityAdaptor;
+import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.globus.common.CoGProperties;
+import org.globus.gsi.GlobusCredential;
+import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.gridforum.jgss.ExtendedGSSCredential;
 import org.gridforum.jgss.ExtendedGSSManager;
 import org.ietf.jgss.GSSCredential;
@@ -12,6 +16,7 @@ import org.ogf.saga.error.BadParameter;
 import org.ogf.saga.error.IncorrectState;
 
 import java.io.*;
+import java.security.cert.X509Certificate;
 import java.util.Map;
 
 /* ***************************************************
@@ -31,6 +36,7 @@ public abstract class GlobusSecurityAdaptorBuilder implements SecurityAdaptorBui
     private static final Usage LOCAL_PROXY_FILE = new UFile("UserProxy");
 
     public abstract String getType();
+    public abstract boolean checkType(GSSCredential proxy);
 
     public Class getSecurityAdaptorClass() {
         return GlobusSecurityAdaptor.class;
@@ -83,14 +89,21 @@ public abstract class GlobusSecurityAdaptorBuilder implements SecurityAdaptorBui
     }
 
     public SecurityAdaptor createSecurityAdaptor(Map attributes) throws Exception {
+        GSSCredential cred;
         if (LOCAL_PROXY_OBJECT.getMissingValues(attributes) == null) {
-            return new GlobusSecurityAdaptor((GSSCredential) attributes.get("UserProxyObject"));
+            String base64 = (String) attributes.get("UserProxyObject");
+            cred = InMemoryProxySecurityAdaptor.toGSSCredential(base64);
         } else if (LOCAL_PROXY_FILE.getMissingValues(attributes) == null) {
             CoGProperties.getDefault().setCaCertLocations((String) attributes.get("CertDir"));
             File proxyFile = new File((String) attributes.get("UserProxy"));
-            return new GlobusSecurityAdaptor(load(proxyFile));
+            cred = load(proxyFile);
         } else {
             throw new BadParameter("Missing attribute(s): "+this.getUsage().getMissingValues(attributes));
+        }
+        if (this.checkType(cred) && !hasNonCriticalExtensions(cred)) {
+            return new GlobusSecurityAdaptor(cred);
+        } else {
+            throw new IncorrectState("Security context is not of type: "+this.getType());
         }
     }
 
@@ -106,5 +119,17 @@ public abstract class GlobusSecurityAdaptorBuilder implements SecurityAdaptorBui
                 GSSCredential.DEFAULT_LIFETIME,
                 null, // use default mechanism: GSI
                 GSSCredential.INITIATE_AND_ACCEPT);
+    }
+
+    private static boolean hasNonCriticalExtensions(GSSCredential proxy) {
+        if (proxy instanceof GlobusGSSCredentialImpl) {
+            GlobusCredential globusProxy = ((GlobusGSSCredentialImpl)proxy).getGlobusCredential();
+            X509Certificate cert = globusProxy.getCertificateChain()[0];
+            if (cert instanceof X509CertificateObject) {
+                X509CertificateObject bouncyCert = (X509CertificateObject) cert;
+                return bouncyCert.getNonCriticalExtensionOIDs()!=null && !bouncyCert.getNonCriticalExtensionOIDs().isEmpty();
+            }
+        }
+        return false;
     }
 }

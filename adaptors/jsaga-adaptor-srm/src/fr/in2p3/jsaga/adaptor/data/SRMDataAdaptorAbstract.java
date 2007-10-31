@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.data;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
@@ -13,6 +14,7 @@ import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.*;
 
 import java.util.Map;
+import java.util.StringTokenizer;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -27,8 +29,10 @@ import java.util.Map;
  *
  */
 public abstract class SRMDataAdaptorAbstract implements DataAdaptor {
+    private static final String TRANSFER_PROTOCOLS = "TransferProtocols";    
     protected static SimpleProvider s_provider;
     protected GSSCredential m_credential;
+    protected String[] m_transferProtocols;
 
     static {
         s_provider = new SimpleProvider();
@@ -40,12 +44,23 @@ public abstract class SRMDataAdaptorAbstract implements DataAdaptor {
 
     protected abstract void ping() throws BadParameter, NoSuccess;
 
+    public void connect(String userInfo, String host, int port, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+        if (attributes!=null && attributes.containsKey(TRANSFER_PROTOCOLS)) {
+            String value = (String) attributes.get(TRANSFER_PROTOCOLS);
+            StringTokenizer tokenizer = new StringTokenizer(value, ", \t\n\r\f");
+            m_transferProtocols = new String[tokenizer.countTokens()];
+            for (int i=0; i<m_transferProtocols.length; i++) {
+                m_transferProtocols[i] = tokenizer.nextToken();
+            }
+        }
+    }
+
     public Usage getUsage() {
-        return null;
+        return new UOptional(TRANSFER_PROTOCOLS);
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectState {
-        return null;
+        return new Default[]{new Default(TRANSFER_PROTOCOLS, "gsiftp")};
     }
 
     public Class[] getSupportedSecurityAdaptorClasses() {
@@ -58,9 +73,5 @@ public abstract class SRMDataAdaptorAbstract implements DataAdaptor {
 
     public int getDefaultPort() {
         return 8443;
-    }
-
-    public void disconnect() throws NoSuccess {
-        // do nothing
     }
 }

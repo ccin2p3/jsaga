@@ -1,5 +1,7 @@
 package fr.in2p3.jsaga.adaptor.data;
 
+import org.apache.axis.client.Stub;
+import org.globus.axis.gsi.GSIConstants;
 import org.ogf.saga.error.*;
 import org.ogf.srm11.bean.FileMetaData;
 import org.ogf.srm11.service.ISRM;
@@ -9,8 +11,8 @@ import javax.xml.rpc.ServiceException;
 import java.lang.Exception;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Map;
 import java.rmi.RemoteException;
+import java.util.Map;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -25,23 +27,33 @@ import java.rmi.RemoteException;
  *
  */
 public class SRM11DataAdaptor extends SRMDataAdaptorAbstract implements DataAdaptor {
+    private static final String SERVICE_PROTOCOL = "httpg";
+    private static final String SERVICE_PATH = "/srm/managerv1";
     private ISRM m_stub;
 
     public String[] getSchemeAliases() {
         return new String[]{"srm11"};
     }
 
-    public void connect(String userInfo, String host, int port, Map attributes) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {
-        //todo: support security context at non-default location!
-        String wsdl = "httpg://ccsrm.in2p3.fr:8443/srm/managerv1";
-        SRMServerV1Locator service = new SRMServerV1Locator(s_provider);
+    public void connect(String userInfo, String host, int port, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+        super.connect(userInfo, host, port, attributes);
         try {
-            m_stub = service.getISRM(new URL(wsdl));
+            URL serviceUrl = new URL(SERVICE_PROTOCOL, host, port, SERVICE_PATH);
+            SRMServerV1Locator service = new SRMServerV1Locator(s_provider);
+            m_stub = service.getISRM(serviceUrl);
+            // set security
+            Stub stub = (Stub) m_stub;
+            stub._setProperty(GSIConstants.GSI_CREDENTIALS, m_credential);
+//            stub._setProperty(GSIConstants.GSI_MODE, GSIConstants.GSI_MODE_FULL_DELEG);
         } catch (ServiceException e) {
             throw new NoSuccess(e);
         } catch (MalformedURLException e) {
             throw new NoSuccess(e);
         }
+    }
+
+    public void disconnect() throws NoSuccess {
+        // do nothing
     }
 
     protected void ping() throws NoSuccess {

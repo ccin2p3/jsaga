@@ -67,6 +67,9 @@ public class SRM22FileAttributes extends FileAttributes {
             m_permission = PermissionBytes.UNKNOWN;
         }
 
+        // set owner
+        m_owner = entry.getOwnerPermission().getUserID();
+
         // set last modified
         m_lastModified = entry.getLastModificationTime().getTimeInMillis();
     }

@@ -1,5 +1,10 @@
 package fr.in2p3.jsaga.adaptor.security;
 
+import org.globus.gsi.CertUtil;
+import org.globus.gsi.GlobusCredential;
+import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
+import org.ietf.jgss.GSSCredential;
+
 import java.util.Map;
 
 /* ***************************************************
@@ -17,6 +22,15 @@ import java.util.Map;
 public class GlobusSecurityAdaptorBuilderExtendedLegacy extends GlobusSecurityAdaptorBuilderExtendedAbstract {
     public String getType() {
         return "GlobusLegacy";
+    }
+
+    public boolean checkType(GSSCredential proxy) {
+        if (proxy instanceof GlobusGSSCredentialImpl) {
+            GlobusCredential globusProxy = ((GlobusGSSCredentialImpl)proxy).getGlobusCredential();
+            return CertUtil.isGsi2Proxy(globusProxy.getProxyType());
+        } else {
+            return false;
+        }
     }
 
     public void initBuilder(Map attributes, String contextId) throws Exception {

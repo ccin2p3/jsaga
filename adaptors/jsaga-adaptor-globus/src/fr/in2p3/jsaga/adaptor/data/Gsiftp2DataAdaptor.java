@@ -7,6 +7,7 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import org.globus.ftp.GridFTPSession;
 import org.globus.ftp.MlsxEntry;
 import org.globus.ftp.exception.ServerException;
+import org.globus.ftp.exception.UnexpectedReplyCodeException;
 import org.ogf.saga.error.*;
 
 import java.io.IOException;
@@ -111,5 +112,18 @@ public class Gsiftp2DataAdaptor extends GsiftpDataAdaptorAbstract {
             }
         }
         return (FileAttributes[]) files.toArray(new FileAttributes[files.size()]);
+    }
+
+    protected void rethrowParsedException(UnexpectedReplyCodeException e) throws DoesNotExist, AlreadyExists, PermissionDenied, NoSuccess {
+        String message = e.getReply().getMessage();
+        if (message.indexOf("No such") > -1) {
+            throw new DoesNotExist(e);
+        } else if (message.indexOf("exists") > -1) {
+            throw new AlreadyExists(e);
+        } else if (message.indexOf("Permission denied") > -1) {
+            throw new PermissionDenied(e);
+        } else {
+            throw new NoSuccess(e);
+        }
     }
 }

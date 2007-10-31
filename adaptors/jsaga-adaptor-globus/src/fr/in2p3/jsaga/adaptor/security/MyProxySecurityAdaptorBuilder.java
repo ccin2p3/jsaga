@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.adaptor.security;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
+import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.usage.UProxyFile;
 import fr.in2p3.jsaga.adaptor.security.usage.UProxyObject;
 import org.globus.myproxy.MyProxy;
@@ -97,31 +98,31 @@ public class MyProxySecurityAdaptorBuilder implements SecurityAdaptorBuilder {
     }
 
     public SecurityAdaptor createSecurityAdaptor(Map attributes) throws Exception {
-        String userName = (String) attributes.get("UserName");
-        String myProxyPass = (String) attributes.get("MyProxyPass");
+        GSSCredential cred;
         if (LOCAL_PROXY_OBJECT.getMissingValues(attributes) == null) {
-            return new MyProxySecurityAdaptor((GSSCredential) attributes.get("UserProxyObject"), userName, myProxyPass);
+            cred = InMemoryProxySecurityAdaptor.toGSSCredential((String) attributes.get("UserProxyObject"));
         } else if (LOCAL_PROXY_FILE.getMissingValues(attributes) == null) {
-            return new MyProxySecurityAdaptor(load(new File((String) attributes.get("UserProxy"))), userName, myProxyPass);
+            cred = load(new File((String) attributes.get("UserProxy")));
         } else if (RENEW_PROXY_OBJECT_WITH_PASS.getMissingValues(attributes) == null) {
-            return new MyProxySecurityAdaptor(renewCredential(null, attributes), userName, myProxyPass);
+            cred = renewCredential(null, attributes);
         } else if (RENEW_PROXY_FILE_WITH_PASS.getMissingValues(attributes) == null) {
-            GSSCredential cred = renewCredential(null, attributes);
+            cred = renewCredential(null, attributes);
             save(new File((String) attributes.get("UserProxy")), cred);
-            return new MyProxySecurityAdaptor(cred, userName, myProxyPass);
 /*
         } else if (RENEW_PROXY_OBJECT_WITH_PROXY.getMissingValues(attributes) == null) {
             GSSCredential oldCred = (GSSCredential) attributes.get("UserProxyObject");
-            return new MyProxySecurityAdaptor(renewCredential(oldCred, attributes), userName, myProxyPass);
+            cred = renewCredential(oldCred, attributes);
         } else if (RENEW_PROXY_FILE_WITH_PROXY.getMissingValues(attributes) == null) {
             GSSCredential oldCred = load(new File((String) attributes.get("UserProxy")));
-            GSSCredential cred = renewCredential(oldCred, attributes);
+            cred = renewCredential(oldCred, attributes);
             save(new File((String) attributes.get("UserProxy")), cred);
-            return new MyProxySecurityAdaptor(cred, userName, myProxyPass);
 */
         } else {
             throw new BadParameter("Missing attribute(s): "+this.getUsage().getMissingValues(attributes));
         }
+        String userName = (String) attributes.get("UserName");
+        String myProxyPass = (String) attributes.get("MyProxyPass");
+        return new MyProxySecurityAdaptor(cred, userName, myProxyPass);
     }
 
     private static GSSCredential renewCredential(GSSCredential oldCred, Map attributes) throws ParseException, URISyntaxException, MyProxyException {

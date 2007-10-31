@@ -2,24 +2,18 @@ package fr.in2p3.jsaga.adaptor.data;
 
 import fr.in2p3.jsaga.adaptor.data.read.*;
 import fr.in2p3.jsaga.adaptor.data.write.DirectoryWriter;
-import fr.in2p3.jsaga.adaptor.data.write.LogicalWriterAsync;
+import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
 import org.apache.axis.client.Stub;
 import org.globus.axis.gsi.GSIConstants;
-//import org.gridforum.jgss.ExtendedGSSCredential;
-//import org.gridforum.jgss.ExtendedGSSManager;
-//import org.ietf.jgss.GSSCredential;
-import org.ogf.saga.URI;
 import org.ogf.saga.error.*;
 import org.ogf.srm22.*;
 
 import javax.xml.rpc.ServiceException;
-//import java.io.File;
-//import java.io.FileInputStream;
-import java.lang.Exception;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URISyntaxException;
 import java.rmi.RemoteException;
-import java.util.HashMap;
 import java.util.Map;
 
 /* ***************************************************
@@ -34,40 +28,17 @@ import java.util.Map;
 /**
  * TODO: implement DataCopy when it will be supported also by DPM
  */
-public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements DirectoryReader {//, DirectoryWriter, LogicalReaderAsync, LogicalWriterAsync {
+public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements DirectoryReader, DirectoryWriter, FileReader, FileWriter {
     private static final String SERVICE_PROTOCOL = "httpg";
     private static final String SERVICE_PATH = "/srm/managerv2";
     private ISRM m_stub;
-    private Map m_tokenForGetRequest;
-    private Map m_tokenForPutRequest;
-
-    public static void main(String[] args) throws Exception {
-        SRM22DataAdaptor adaptor = new SRM22DataAdaptor();
-
-        // load credential
-/*
-        File proxyFile = new File("E:\\User Settings\\Bureau\\x509up_u_sylvain reynaud");
-        byte [] proxyBytes = new byte[(int) proxyFile.length()];
-        FileInputStream in = new FileInputStream(proxyFile);
-        in.read(proxyBytes);
-        in.close();
-        ExtendedGSSManager manager = (ExtendedGSSManager) ExtendedGSSManager.getInstance();
-        adaptor.m_credential = manager.createCredential(proxyBytes, ExtendedGSSCredential.IMPEXP_OPAQUE, GSSCredential.DEFAULT_LIFETIME, null, GSSCredential.INITIATE_AND_ACCEPT);
-*/
-
-        // test
-        adaptor.connect(null, "ccsrmtestv2.in2p3.fr", 8443, null);
-        TMetaDataPathDetail metadata = adaptor.getMetaData("/pnfs/in2p3.fr/data/dteam");
-        TMetaDataPathDetail[] list = metadata.getArrayOfSubPaths().getPathDetailArray();
-        for (int i=0; list!=null && i<list.length; i++) {
-            System.out.println(list[i].getPath());
-        }
-    }
+    private String m_readToken;
+    private String m_writeToken;
 
     public SRM22DataAdaptor() {
-        super();
-        m_tokenForGetRequest = new HashMap();
-        m_tokenForPutRequest = new HashMap();
+        m_stub = null;
+        m_readToken = null;
+        m_writeToken = null;
     }
 
     public String[] getSchemeAliases() {
@@ -75,10 +46,11 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements Director
     }
 
     public void connect(String userInfo, String host, int port, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+        super.connect(userInfo, host, port, attributes);
         try {
-            URL serviceUri = new URL(SERVICE_PROTOCOL, host, port, SERVICE_PATH);
+            java.net.URL serviceUrl = new java.net.URL(SERVICE_PROTOCOL, host, port, SERVICE_PATH);
             SRMServiceLocator service = new SRMServiceLocator(s_provider);
-            m_stub = service.getsrm(serviceUri);
+            m_stub = service.getsrm(serviceUrl);
             // set security
             Stub stub = (Stub) m_stub;
             stub._setProperty(GSIConstants.GSI_CREDENTIALS, m_credential);
@@ -86,6 +58,23 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements Director
         } catch (MalformedURLException e) {
             throw new NoSuccess("unexpected exception", e);
         } catch (ServiceException e) {
+            throw new NoSuccess(e);
+        }
+    }
+
+    public void disconnect() throws NoSuccess {
+        try {
+            if (m_readToken != null) {
+                this.closeInputStream(null);
+            }
+            if (m_writeToken != null) {
+                this.closeOutputStream(null);
+            }
+        } catch (PermissionDenied e) {
+            throw new NoSuccess(e);
+        } catch (DoesNotExist e) {
+            throw new NoSuccess(e);
+        } catch (Timeout e) {
             throw new NoSuccess(e);
         }
     }
@@ -120,28 +109,33 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements Director
         return metadata.getType().equals(TFileType.FILE);
     }
 
-    public String[] listLocations(String logicalEntry) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        org.apache.axis.types.URI uri = toSrmURI(logicalEntry);
+    public long getSize(String absolutePath) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+        TMetaDataPathDetail metadata = this.getMetaData(absolutePath);
+        return metadata.getSize().longValue();
+    }
+
+    public InputStream getInputStream(String absolutePath) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+        if (m_readToken != null) {
+            throw new NoSuccess("Input stream already opened !");
+        }
+        org.apache.axis.types.URI logicalUri = toSrmURI(absolutePath);
         SrmPrepareToGetRequest request = new SrmPrepareToGetRequest();
         request.setArrayOfFileRequests(new ArrayOfTGetFileRequest(new TGetFileRequest[]{
-                new TGetFileRequest(uri, new TDirOption(false, Boolean.FALSE, new Integer(0)))}));
-        SrmPrepareToGetResponse response;
+                new TGetFileRequest(logicalUri, new TDirOption(false, Boolean.FALSE, new Integer(0)))}));
+        request.setTransferParameters(new TTransferParameters(
+                TAccessPattern.TRANSFER_MODE, TConnectionType.WAN, null, new ArrayOfString(m_transferProtocols)));
+        java.net.URI transferUrl;
         try {
-            response = m_stub.srmPrepareToGet(request);
-        } catch (RemoteException e) {
-            throw new Timeout(e);
-        }
-        // save request token
-        String token = response.getRequestToken();
-        m_tokenForGetRequest.put(logicalEntry, token);
-        // wait for physical file to be staged
-        TStatusCode status = response.getReturnStatus().getStatusCode();
-        TGetRequestFileStatus fileStatus = response.getArrayOfFileStatuses().getStatusArray(0);
-        try {
+            SrmPrepareToGetResponse response = m_stub.srmPrepareToGet(request);
+            // save request token
+            m_readToken = response.getRequestToken();
+            // wait for physical file to be staged
+            TStatusCode status = response.getReturnStatus().getStatusCode();
+            TGetRequestFileStatus fileStatus = response.getArrayOfFileStatuses().getStatusArray(0);
             long period = 15000;    // 15 seconds
             SrmStatusOfGetRequestRequest request2 = new SrmStatusOfGetRequestRequest();
-            request2.setRequestToken(token);
-            request2.setArrayOfSourceSURLs(new ArrayOfAnyURI(new org.apache.axis.types.URI[]{uri}));
+            request2.setRequestToken(m_readToken);
+            request2.setArrayOfSourceSURLs(new ArrayOfAnyURI(new org.apache.axis.types.URI[]{logicalUri}));
             while (status.equals(TStatusCode.SRM_REQUEST_QUEUED) || status.equals(TStatusCode.SRM_REQUEST_INPROGRESS)) {
                 try {
                     Thread.currentThread().sleep(period);
@@ -151,28 +145,36 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements Director
                 status = response2.getReturnStatus().getStatusCode();
                 fileStatus = response2.getArrayOfFileStatuses().getStatusArray(0);
             }
+            status = fileStatus.getStatus().getStatusCode();
+            if (status.equals(TStatusCode.SRM_FILE_PINNED)) {
+                transferUrl = new java.net.URI(fileStatus.getTransferURL().toString());
+            } else {
+                String explanation = fileStatus.getStatus().getExplanation();
+                if (status.equals(TStatusCode.SRM_AUTHORIZATION_FAILURE)) {
+                    throw new PermissionDenied(explanation);
+                } else if (status.equals(TStatusCode.SRM_INVALID_PATH)) {
+                    throw new DoesNotExist(explanation);
+                } else if (status.equals(TStatusCode.SRM_FILE_LIFETIME_EXPIRED)) {
+                    throw new Timeout(explanation);
+                } else {
+                    throw new NoSuccess(status.getValue()+": "+explanation);
+                }
+            }
         } catch (RemoteException e) {
             throw new Timeout(e);
+        } catch (URISyntaxException e) {
+            throw new NoSuccess(e);
         }
-        status = fileStatus.getStatus().getStatusCode();
-        if (status.equals(TStatusCode.SRM_FILE_PINNED)) {
-            return new String[]{fileStatus.getTransferURL().toString()};
-        } else {
-            throwException_for_listLocations(fileStatus.getStatus());
-            throw new NoSuccess("unexpected exception: should never occur");
-        }
+        // connect to transfer server
+        SagaDataAdaptor adaptor = new SagaDataAdaptor(transferUrl, m_credential);
+        return adaptor.getInputStream(transferUrl.getPath());
     }
-    public void listLocationsDone(String logicalEntry) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        org.apache.axis.types.URI uri = toSrmURI(logicalEntry);
-        // get request token
-        String token = (String) m_tokenForGetRequest.remove(logicalEntry);
-        if (token == null) {
-            throw new NoSuccess("No request token found for entry: "+logicalEntry);
-        }
-        // notify server
+    private void closeInputStream(String logicalEntry) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        //todo
+//        org.apache.axis.types.URI logicalUri = toSrmURI(logicalEntry);
         SrmReleaseFilesRequest request = new SrmReleaseFilesRequest();
-        request.setRequestToken(token);
-        request.setArrayOfSURLs(new ArrayOfAnyURI(new org.apache.axis.types.URI[]{uri}));
+        request.setRequestToken(m_readToken);
+//        request.setArrayOfSURLs(new ArrayOfAnyURI(new org.apache.axis.types.URI[]{logicalUri}));
         request.setDoRemove(Boolean.TRUE);
         SrmReleaseFilesResponse response;
         try {
@@ -183,47 +185,39 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements Director
         TSURLReturnStatus fileStatus = response.getArrayOfFileStatuses().getStatusArray(0);
         TStatusCode status = fileStatus.getStatus().getStatusCode();
         if (! status.equals(TStatusCode.SRM_SUCCESS)) {
-            throwException_for_listLocations(fileStatus.getStatus());
-        }
-    }
-    private void throwException_for_listLocations(TReturnStatus s) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        TStatusCode status = s.getStatusCode();
-        String explanation = s.getExplanation();
-        if (status.equals(TStatusCode.SRM_AUTHORIZATION_FAILURE)) {
-            throw new PermissionDenied(explanation);
-        } else if (status.equals(TStatusCode.SRM_INVALID_PATH)) {
-            throw new DoesNotExist(explanation);
-        } else if (status.equals(TStatusCode.SRM_FILE_LIFETIME_EXPIRED)) {
-            throw new Timeout(explanation);
-        } else {
-            throw new NoSuccess(status.getValue()+": "+explanation);
+            String explanation = fileStatus.getStatus().getExplanation();
+            if (status.equals(TStatusCode.SRM_AUTHORIZATION_FAILURE)) {
+                throw new PermissionDenied(explanation);
+            } else if (status.equals(TStatusCode.SRM_INVALID_PATH)) {
+                throw new DoesNotExist(explanation);
+            } else if (status.equals(TStatusCode.SRM_FILE_LIFETIME_EXPIRED)) {
+                throw new Timeout(explanation);
+            } else {
+                throw new NoSuccess(status.getValue()+": "+explanation);
+            }
         }
     }
 
-    /**
-     * @param logicalEntry the SURL
-     * @param replicaEntry is ignored
-     */
-    public void addLocation(String logicalEntry, URI replicaEntry) throws PermissionDenied, IncorrectState, Timeout, NoSuccess {
-        org.apache.axis.types.URI uri = toSrmURI(logicalEntry);
+    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append) throws PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        if (m_writeToken != null) {
+            throw new NoSuccess("Output stream already opened !");
+        }
+        org.apache.axis.types.URI uri = toSrmURI(parentAbsolutePath+"/"+fileName);
         SrmPrepareToPutRequest request = new SrmPrepareToPutRequest();
         request.setArrayOfFileRequests(new ArrayOfTPutFileRequest(new TPutFileRequest[]{new TPutFileRequest(uri, null)}));
-        SrmPrepareToPutResponse response;
+        request.setTransferParameters(new TTransferParameters(
+                TAccessPattern.TRANSFER_MODE, TConnectionType.WAN, null, new ArrayOfString(m_transferProtocols)));
+        java.net.URI transferUrl;
         try {
-            response = m_stub.srmPrepareToPut(request);
-        } catch (RemoteException e) {
-            throw new Timeout(e);
-        }
-        // save request token
-        String token = response.getRequestToken();
-        m_tokenForPutRequest.put(logicalEntry, token);
-        // wait for physical space to be ready
-        TStatusCode status = response.getReturnStatus().getStatusCode();
-        TPutRequestFileStatus fileStatus = response.getArrayOfFileStatuses().getStatusArray(0);
-        try {
+            SrmPrepareToPutResponse response = m_stub.srmPrepareToPut(request);
+            // save request token
+            m_writeToken = response.getRequestToken();
+            // wait for physical space to be ready
+            TStatusCode status = response.getReturnStatus().getStatusCode();
+            TPutRequestFileStatus fileStatus = response.getArrayOfFileStatuses().getStatusArray(0);
             long period = 15000;    // 15 seconds
             SrmStatusOfPutRequestRequest request2 = new SrmStatusOfPutRequestRequest();
-            request2.setRequestToken(token);
+            request2.setRequestToken(m_writeToken);
             request2.setArrayOfTargetSURLs(new ArrayOfAnyURI(new org.apache.axis.types.URI[]{uri}));
             while (status.equals(TStatusCode.SRM_REQUEST_QUEUED) || status.equals(TStatusCode.SRM_REQUEST_INPROGRESS)) {
                 try {
@@ -234,28 +228,40 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements Director
                 status = response2.getReturnStatus().getStatusCode();
                 fileStatus = response2.getArrayOfFileStatuses().getStatusArray(0);
             }
+            status = fileStatus.getStatus().getStatusCode();
+            if (status.equals(TStatusCode.SRM_SPACE_AVAILABLE)) {
+                transferUrl = new java.net.URI(fileStatus.getTransferURL().toString());
+                // OK
+            } else {
+                String explanation = fileStatus.getStatus().getExplanation();
+                if (status.equals(TStatusCode.SRM_AUTHORIZATION_FAILURE)) {
+                    throw new PermissionDenied(explanation);
+                } else if (status.equals(TStatusCode.SRM_INVALID_PATH) || status.equals(TStatusCode.SRM_DUPLICATION_ERROR)) {
+                    throw new DoesNotExist(explanation);
+                } else if (status.equals(TStatusCode.SRM_SPACE_LIFETIME_EXPIRED)) {
+                    throw new Timeout(explanation);
+                } else {
+                    throw new NoSuccess(status.getValue()+": "+explanation);
+                }
+            }
         } catch (RemoteException e) {
             throw new Timeout(e);
+        } catch (URISyntaxException e) {
+            throw new NoSuccess(e);
         }
-        status = fileStatus.getStatus().getStatusCode();
-        if (status.equals(TStatusCode.SRM_SPACE_AVAILABLE)) {
-            // OK
-        } else {
-            throwException_for_addLocation(fileStatus.getStatus());
-            throw new NoSuccess("unexpected exception: should never occur");
-        }
+        // connect to transfer server
+        SagaDataAdaptor adaptor = new SagaDataAdaptor(transferUrl, m_credential);
+        int pos = transferUrl.getPath().lastIndexOf('/');
+        String transferParentPath = (pos>0 ? transferUrl.getPath().substring(0, pos) : "/");
+        String transferFileName = (pos>-1 ? transferUrl.getPath().substring(pos+1) : transferUrl.getPath());
+        return adaptor.getOutputStream(transferParentPath, transferFileName, exclusive, append);
     }
-    public void addLocationDone(String logicalEntry, URI replicaEntry) throws PermissionDenied, IncorrectState, Timeout, NoSuccess {
-        org.apache.axis.types.URI uri = toSrmURI(logicalEntry);
-        // get request token
-        String token = (String) m_tokenForPutRequest.remove(logicalEntry);
-        if (token == null) {
-            throw new NoSuccess("No request token found for entry: "+logicalEntry);
-        }
-        // notify server
+    private void closeOutputStream(String logicalEntry) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        //todo
+//        org.apache.axis.types.URI logicalUri = toSrmURI(logicalEntry);
         SrmPutDoneRequest request = new SrmPutDoneRequest();
-        request.setRequestToken(token);
-        request.setArrayOfSURLs(new ArrayOfAnyURI(new org.apache.axis.types.URI[]{uri}));
+        request.setRequestToken(m_writeToken);
+//        request.setArrayOfSURLs(new ArrayOfAnyURI(new org.apache.axis.types.URI[]{logicalUri}));
         SrmPutDoneResponse response;
         try {
             response = m_stub.srmPutDone(request);
@@ -265,45 +271,13 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements Director
         TSURLReturnStatus fileStatus = response.getArrayOfFileStatuses().getStatusArray(0);
         TStatusCode status = fileStatus.getStatus().getStatusCode();
         if (! status.equals(TStatusCode.SRM_SUCCESS)) {
-            throwException_for_addLocation(fileStatus.getStatus());
-        }
-    }
-    private void throwException_for_addLocation(TReturnStatus s) throws PermissionDenied, IncorrectState, Timeout, NoSuccess {
-        TStatusCode status = s.getStatusCode();
-        String explanation = s.getExplanation();
-        if (status.equals(TStatusCode.SRM_AUTHORIZATION_FAILURE)) {
-            throw new PermissionDenied(explanation);
-        } else if (status.equals(TStatusCode.SRM_INVALID_PATH) || status.equals(TStatusCode.SRM_DUPLICATION_ERROR)) {
-            throw new IncorrectState(explanation);
-        } else if (status.equals(TStatusCode.SRM_SPACE_LIFETIME_EXPIRED)) {
-            throw new Timeout(explanation);
-        } else {
-            throw new NoSuccess(status.getValue()+": "+explanation);
-        }
-    }
-
-    public void removeLocation(String logicalEntry, URI replicaEntry) throws PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
-        org.apache.axis.types.URI uri = toSrmURI(logicalEntry);
-        SrmPurgeFromSpaceRequest request = new SrmPurgeFromSpaceRequest();
-        request.setArrayOfSURLs(new ArrayOfAnyURI(new org.apache.axis.types.URI[]{uri}));
-        SrmPurgeFromSpaceResponse response;
-        try {
-            response = m_stub.srmPurgeFromSpace(request);
-        } catch (RemoteException e) {
-            throw new NoSuccess(e);
-        }
-        if (! response.getReturnStatus().getStatusCode().equals(TStatusCode.SRM_SUCCESS)) {
-            TSURLReturnStatus fileStatus = response.getArrayOfFileStatuses().getStatusArray(0);
-            TStatusCode status = fileStatus.getStatus().getStatusCode();
             String explanation = fileStatus.getStatus().getExplanation();
             if (status.equals(TStatusCode.SRM_AUTHORIZATION_FAILURE)) {
                 throw new PermissionDenied(explanation);
-            } else if (status.equals(TStatusCode.SRM_INVALID_PATH)) {
-                throw new IncorrectState(explanation);
-            } else if (status.equals(TStatusCode.SRM_FILE_LOST)) {
+            } else if (status.equals(TStatusCode.SRM_INVALID_PATH) || status.equals(TStatusCode.SRM_DUPLICATION_ERROR)) {
                 throw new DoesNotExist(explanation);
-            } else if (status.equals(TStatusCode.SRM_LAST_COPY)) {
-                // ignore
+            } else if (status.equals(TStatusCode.SRM_SPACE_LIFETIME_EXPIRED)) {
+                throw new Timeout(explanation);
             } else {
                 throw new NoSuccess(status.getValue()+": "+explanation);
             }
@@ -394,6 +368,8 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements Director
             }
         }
     }
+
+    //////////////////////////////////////// private methods ////////////////////////////////////////
 
     private TMetaDataPathDetail getMetaData(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         org.apache.axis.types.URI uri = toSrmURI(absolutePath);

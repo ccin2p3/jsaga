@@ -1,12 +1,11 @@
 package fr.in2p3.jsaga.adaptor.data;
 
+import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import org.ogf.saga.error.*;
 
 import java.util.Map;
-
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
