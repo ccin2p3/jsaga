@@ -29,6 +29,7 @@ public abstract class FileAttributes {
     protected int m_type = UNKNOWN_TYPE;
     protected long m_size = -1;
     protected PermissionBytes m_permission = PermissionBytes.UNKNOWN;
+    protected String m_owner = null;
     protected long m_lastModified = 0;
 
     public String getName() {
@@ -46,6 +47,10 @@ public abstract class FileAttributes {
         buf.append(contains(m_permission, Permission.WRITE) ? 'w' : '-');
         buf.append(contains(m_permission, Permission.EXEC) ? 'x' : '-');
         buf.append(' ');
+        if (m_owner != null) {
+            buf.append(format(m_owner, 8));
+            buf.append(' ');
+        }
         buf.append(format(""+m_size, 10));
         buf.append(' ');
         buf.append(new SimpleDateFormat("MMM-dd-yyyy HH:mm", Locale.ENGLISH).format(new Date(m_lastModified)));
