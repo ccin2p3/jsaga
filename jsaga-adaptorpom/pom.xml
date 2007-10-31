@@ -12,7 +12,7 @@
     <packaging>pom</packaging>
     <name>Parent POM for adaptors</name>
     <description>This is the project definition common to all the JSAGA adaptors.</description>
-    <!-- base uri for inheriting projects -->
+    <!-- base url for inheriting projects -->
     <scm>
         <connection>${scm.root}/adaptors</connection>
         <developerConnection>${devscm.root}/adaptors</developerConnection>
