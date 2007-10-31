@@ -31,6 +31,14 @@ public class UserPassSecurityAdaptor implements SecurityAdaptor {
         return m_userPass;
     }
 
+    public String getUserID() {
+        return m_userName;
+    }
+
+    public int getTimeLeft() {
+        return INFINITE;
+    }
+
     public void close() throws Exception {
         // do nothing
     }

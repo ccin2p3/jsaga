@@ -25,11 +25,15 @@ public class UserPassExpirableSecurityAdaptor extends UserPassSecurityAdaptor {
         m_expiryDate = expiryDate;
     }
 
+    public int getTimeLeft() {
+        int currentDate = (int) (System.currentTimeMillis()/1000);
+        return m_expiryDate - currentDate;
+    }
+
     public void dump(PrintStream out) {
         super.dump(out);
         // display time left
-        int currentDate = (int) (System.currentTimeMillis()/1000);
-        int timeleft = m_expiryDate - currentDate;
+        int timeleft = this.getTimeLeft();
         out.println("  timeleft : "+ GSSCredentialSecurityAdaptor.format(timeleft>0 ? timeleft : 0));
     }
 }
