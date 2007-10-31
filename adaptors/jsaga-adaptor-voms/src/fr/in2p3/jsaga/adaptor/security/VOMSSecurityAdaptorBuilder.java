@@ -3,7 +3,11 @@ package fr.in2p3.jsaga.adaptor.security;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
+import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityAdaptor;
+import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.globus.common.CoGProperties;
+import org.globus.gsi.GlobusCredential;
+import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.gridforum.jgss.ExtendedGSSCredential;
 import org.gridforum.jgss.ExtendedGSSManager;
 import org.ietf.jgss.GSSCredential;
@@ -12,6 +16,7 @@ import org.ogf.saga.error.BadParameter;
 import org.ogf.saga.error.IncorrectState;
 
 import java.io.*;
+import java.security.cert.X509Certificate;
 import java.util.Map;
 
 /* ***************************************************
@@ -89,14 +94,22 @@ public class VOMSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
     }
 
     public SecurityAdaptor createSecurityAdaptor(Map attributes) throws Exception {
+        GSSCredential cred;
         if (LOCAL_PROXY_OBJECT.getMissingValues(attributes) == null) {
-            return new VOMSSecurityAdaptor((GSSCredential) attributes.get("UserProxyObject"));
+            String base64 = (String) attributes.get("UserProxyObject");
+            cred = InMemoryProxySecurityAdaptor.toGSSCredential(base64);
         } else if (LOCAL_PROXY_FILE.getMissingValues(attributes) == null) {
             CoGProperties.getDefault().setCaCertLocations((String) attributes.get("CertDir"));
             File proxyFile = new File((String) attributes.get("UserProxy"));
-            return new VOMSSecurityAdaptor(load(proxyFile));
+            cred = load(proxyFile);
         } else {
             throw new BadParameter("Missing attribute(s): "+this.getUsage().getMissingValues(attributes));
+        }
+        // check if proxy contains extension
+        if (hasNonCriticalExtensions(cred)) {
+            return new VOMSSecurityAdaptor(cred);
+        } else {
+            throw new IncorrectState("Security context is not of type: "+this.getType());
         }
     }
 
@@ -112,5 +125,17 @@ public class VOMSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
                 GSSCredential.DEFAULT_LIFETIME,
                 null, // use default mechanism: GSI
                 GSSCredential.INITIATE_AND_ACCEPT);
+    }
+
+    private static boolean hasNonCriticalExtensions(GSSCredential proxy) {
+        if (proxy instanceof GlobusGSSCredentialImpl) {
+            GlobusCredential globusProxy = ((GlobusGSSCredentialImpl)proxy).getGlobusCredential();
+            X509Certificate cert = globusProxy.getCertificateChain()[0];
+            if (cert instanceof X509CertificateObject) {
+                X509CertificateObject bouncyCert = (X509CertificateObject) cert;
+                return bouncyCert.getNonCriticalExtensionOIDs()!=null && !bouncyCert.getNonCriticalExtensionOIDs().isEmpty();
+            }
+        }
+        return false;
     }
 }

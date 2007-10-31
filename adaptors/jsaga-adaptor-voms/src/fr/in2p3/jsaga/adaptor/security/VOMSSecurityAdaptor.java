@@ -1,6 +1,8 @@
 package fr.in2p3.jsaga.adaptor.security;
 
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
+import org.glite.security.voms.VOMSAttribute;
+import org.glite.security.voms.VOMSValidator;
 import org.globus.gsi.CertUtil;
 import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
@@ -8,6 +10,8 @@ import org.globus.util.Util;
 import org.ietf.jgss.GSSCredential;
 
 import java.io.PrintStream;
+import java.util.Iterator;
+import java.util.Vector;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -43,16 +47,19 @@ public class VOMSSecurityAdaptor extends GSSCredentialSecurityAdaptor implements
         out.println("  timeleft : "+Util.formatTimeSec(globusProxy.getTimeLeft()));
 
         // VOMS specific
-        out.println("  === VO extension information ===");
-        out.println("  Not implemented yet...");
-/*
-        out.println("  VO        : dteam");
-        out.println("  subject   : /O=GRID-FR/C=FR/O=CNRS/OU=CC-LYON/CN=Sylvain Reynaud");
-        out.println("  issuer    : /DC=ch/DC=cern/OU=computers/CN=voms.cern.ch");
-        out.println("  attribute : /dteam/Role=NULL/Capability=NULL");
-        out.println("  attribute : /dteam/france/Role=NULL/Capability=NULL");
-        out.println("  attribute : /dteam/france/IN2P3-CC/Role=NULL/Capability=NULL");
-        out.println("  timeleft  : 11:59:37");
-*/
+        Vector v = VOMSValidator.parse(globusProxy.getCertificateChain());
+        for (int i=0; i<v.size(); i++) {
+            VOMSAttribute attr = (VOMSAttribute) v.elementAt(i);
+            out.println("  === VO "+attr.getVO()+" extension information ===");
+            out.println("  VO        : "+attr.getVO());
+            out.println("  subject   : "+globusProxy.getIdentity());
+            out.println("  issuer    : "+attr.getIssuerX509());
+            for (Iterator it=attr.getFullyQualifiedAttributes().iterator(); it.hasNext(); ) {
+                out.println("  attribute : "+it.next());
+            }
+            long timeleft = (attr.getNotAfter().getTime() - System.currentTimeMillis()) / 1000;
+            if(timeleft<0) timeleft=0;
+            out.println("  timeleft  : "+Util.formatTimeSec(timeleft));
+        }
     }
 }
