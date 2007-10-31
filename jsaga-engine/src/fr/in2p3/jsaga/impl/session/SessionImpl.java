@@ -1,9 +1,9 @@
 package fr.in2p3.jsaga.impl.session;
 
-import fr.in2p3.jsaga.impl.AbstractSagaBaseImpl;
+import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.ogf.saga.ObjectType;
-import org.ogf.saga.SagaBase;
+import org.ogf.saga.SagaObject;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.DoesNotExist;
 import org.ogf.saga.session.Session;
@@ -23,7 +23,7 @@ import java.util.List;
 /**
  *
  */
-public class SessionImpl extends AbstractSagaBaseImpl implements Session {
+public class SessionImpl extends AbstractSagaObjectImpl implements Session {
     private List<Context> m_contexts;
 
     /** constructor */
@@ -32,13 +32,11 @@ public class SessionImpl extends AbstractSagaBaseImpl implements Session {
         m_contexts = new ArrayList<Context>();
     }
 
-    /** constructor for deepCopy */
-    protected SessionImpl(SessionImpl source) {
-        super((AbstractSagaBaseImpl) source);
-        m_contexts = deepCopy(source.m_contexts);
-    }
-    public SagaBase deepCopy() {
-        return new SessionImpl(this);
+    /** clone */
+    public SagaObject clone() throws CloneNotSupportedException {
+        SessionImpl clone = (SessionImpl) super.clone();
+        clone.m_contexts = clone(m_contexts);
+        return clone;
     }
 
     public ObjectType getType() {
@@ -55,8 +53,8 @@ public class SessionImpl extends AbstractSagaBaseImpl implements Session {
         m_contexts.remove(context);
     }
 
-    public List<Context> listContexts() {
-        return m_contexts;
+    public Context[] listContexts() {
+        return m_contexts.toArray(new Context[m_contexts.size()]);
     }
 
     public void close() {

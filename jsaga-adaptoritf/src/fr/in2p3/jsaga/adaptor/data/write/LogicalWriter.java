@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.data.write;
 
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 
 /* ***************************************************
@@ -23,7 +23,7 @@ public interface LogicalWriter extends DataWriterAdaptor {
      * @param replicaEntry location to add to set.
      * @throws IncorrectState if <code>logicalEntry</code> does not exist.
      */
-    public void addLocation(String logicalEntry, URI replicaEntry)
+    public void addLocation(String logicalEntry, URL replicaEntry)
         throws PermissionDenied, IncorrectState, Timeout, NoSuccess;
 
     /**
@@ -33,6 +33,6 @@ public interface LogicalWriter extends DataWriterAdaptor {
      * @throws IncorrectState if <code>logicalEntry</code> does not exist.
      * @throws DoesNotExist if the location is not in the set of replicas.
      */
-    public void removeLocation(String logicalEntry, URI replicaEntry)
+    public void removeLocation(String logicalEntry, URL replicaEntry)
         throws PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess;
 }

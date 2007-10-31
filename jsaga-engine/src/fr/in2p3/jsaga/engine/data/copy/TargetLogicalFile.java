@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.engine.data.copy;
 
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.logicalfile.LogicalFileFactory;
@@ -29,15 +29,15 @@ public class TargetLogicalFile {
         m_targetFile = targetFile;
     }
 
-    public void getFromLogicalFile(Session session, URI source, FlagsBytes sourceFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    public void getFromLogicalFile(Session session, URL source, FlagsBytes sourceFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
         // get location of source physical file
         LogicalFile sourceLogicalFile = createSourceLogicalFile(session, source, sourceFlags);
         try {
-            List<URI> sourceLocations = sourceLogicalFile.listLocations();
+            List<URL> sourceLocations = sourceLogicalFile.listLocations();
             if (sourceLocations!=null && sourceLocations.size()>0) {
                 // remove all target locations
                 try {
-                    List<URI> targetLocations = m_targetFile.listLocations();
+                    List<URL> targetLocations = m_targetFile.listLocations();
                     for (int i=0; targetLocations!=null && i<targetLocations.size(); i++) {
                         m_targetFile.removeLocation(targetLocations.get(i));
                     }
@@ -49,21 +49,15 @@ public class TargetLogicalFile {
                     m_targetFile.addLocation(sourceLocations.get(i));
                 }
             }
-        } catch (IncorrectURL e) {
-            throw new NoSuccess(e);
         } finally {
             sourceLogicalFile.close();
         }
     }
 
-    public static LogicalFile createSourceLogicalFile(Session session, URI source, FlagsBytes flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
-        Flags[] correctedFlags = flags.remove(Flags.OVERWRITE);
+    public static LogicalFile createSourceLogicalFile(Session session, URL source, FlagsBytes flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
+        int correctedFlags = flags.remove(Flags.OVERWRITE);
         try {
             return LogicalFileFactory.createLogicalFile(session, source, correctedFlags);
-        } catch (IncorrectURL e) {
-            throw new NoSuccess("Failed to list locations for logical file: "+source, e);
-        } catch (IncorrectSession e) {
-            throw new NoSuccess("Failed to list locations for logical file: "+source, e);
         } catch (AlreadyExists e) {
             throw new NoSuccess("Unexpected exception: AlreadyExists", e);
         }

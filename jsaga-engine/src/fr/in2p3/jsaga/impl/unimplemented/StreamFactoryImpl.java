@@ -1,10 +1,10 @@
 package fr.in2p3.jsaga.impl.unimplemented;
 
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.stream.*;
-import org.ogf.saga.task.RVTask;
+import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
 
 /* ***************************************************
@@ -20,19 +20,19 @@ import org.ogf.saga.task.TaskMode;
  *
  */
 public class StreamFactoryImpl extends StreamFactory {
-    protected Stream doCreateStream(Session session, URI name) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
+    protected Stream doCreateStream(Session session, URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
         throw new NotImplemented("Not implemented by the SAGA engine");
     }
 
-    protected StreamService doCreateStreamService(Session session, URI name) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
+    protected StreamService doCreateStreamService(Session session, URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
         throw new NotImplemented("Not implemented by the SAGA engine");
     }
 
-    protected RVTask<Stream> doCreateStream(TaskMode mode, Session session, URI name) throws NotImplemented {
+    protected Task<Stream> doCreateStream(TaskMode mode, Session session, URL name) throws NotImplemented {
         throw new NotImplemented("Not implemented by the SAGA engine");
     }
 
-    protected RVTask<StreamService> doCreateStreamService(TaskMode mode, Session session, URI name) throws NotImplemented {
+    protected Task<StreamService> doCreateStreamService(TaskMode mode, Session session, URL name) throws NotImplemented {
         throw new NotImplemented("Not implemented by the SAGA engine");
     }
 }

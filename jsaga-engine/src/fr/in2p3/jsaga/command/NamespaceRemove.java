@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.*;
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
@@ -23,7 +23,7 @@ public class NamespaceRemove extends AbstractCommand {
     private static final String OPT_RECURSIVE = "r", LONGOPT_RECURSIVE = "recursive";
 
     public NamespaceRemove() {
-        super("jsaga-rm", new String[]{"URI"}, new String[]{OPT_HELP, LONGOPT_HELP});
+        super("jsaga-rm", new String[]{"URL"}, new String[]{OPT_HELP, LONGOPT_HELP});
     }
 
     public static void main(String[] args) throws Exception {
@@ -38,19 +38,19 @@ public class NamespaceRemove extends AbstractCommand {
         else
         {
             // get arguments
-            URI uri = new URI(command.m_nonOptionValues[0]);
+            URL url = new URL(command.m_nonOptionValues[0].replaceAll(" ", "%20"));
             Flags flags = (line.hasOption(OPT_RECURSIVE) ? Flags.RECURSIVE : Flags.NONE);
 
             // execute command
             Session session = SessionFactory.createSession(true);
-            NamespaceEntry entry;
-            if (uri.getPath().endsWith("/")) {
-                entry = NamespaceFactory.createNamespaceDirectory(session, uri, Flags.NONE);
+            NSEntry entry;
+            if (url.getPath().endsWith("/")) {
+                entry = NSFactory.createNSDirectory(session, url, Flags.NONE.getValue());
             } else {
-                entry = NamespaceFactory.createNamespaceEntry(session, uri, Flags.NONE);
+                entry = NSFactory.createNSEntry(session, url, Flags.NONE.getValue());
             }
-            entry.remove(flags);
-            entry.close(0.0f);
+            entry.remove(flags.getValue());
+            entry.close();
         }
     }
 

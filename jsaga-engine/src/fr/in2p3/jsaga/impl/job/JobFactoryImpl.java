@@ -1,10 +1,10 @@
 package fr.in2p3.jsaga.impl.job;
 
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
-import org.ogf.saga.task.RVTask;
+import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
 
 /* ***************************************************
@@ -28,11 +28,11 @@ public class JobFactoryImpl extends JobFactory {
         throw new NotImplemented("not implemented yet..."); //todo: implement method doCreateJobDescription()
     }
 
-    protected JobService doCreateJobService(Session session, URI rm) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    protected JobService doCreateJobService(Session session, URL rm) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
         throw new NotImplemented("not implemented yet..."); //todo: implement method doCreateJobService()
     }
 
-    protected RVTask<JobService> doCreateJobService(TaskMode mode, Session session, URI rm) throws NotImplemented {
+    protected Task<JobService> doCreateJobService(TaskMode mode, Session session, URL rm) throws NotImplemented {
         throw new NotImplemented("Not implemented by the SAGA engine");
     }
 }

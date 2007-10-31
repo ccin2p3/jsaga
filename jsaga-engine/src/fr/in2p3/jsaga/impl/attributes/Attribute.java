@@ -15,7 +15,7 @@ import org.ogf.saga.error.*;
 /**
  *
  */
-public abstract class Attribute {
+public abstract class Attribute implements Cloneable {
     private String m_key;
     private boolean m_isSupported;
     private boolean m_isReadOnly;
@@ -33,11 +33,13 @@ public abstract class Attribute {
         this(key, true, false);
     }
 
-    /** constructor for deepCopy */
-    protected Attribute(Attribute source) {
-        m_key = source.m_key;
-        m_isSupported = source.m_isSupported;
-        m_isReadOnly = source.m_isReadOnly;
+    /** clone */
+    public Object clone() throws CloneNotSupportedException {
+        Attribute clone = (Attribute) super.clone();
+        clone.m_key = m_key;
+        clone.m_isSupported = m_isSupported;
+        clone.m_isReadOnly = m_isReadOnly;
+        return clone;
     }
 
     public String getKey() {
@@ -50,10 +52,10 @@ public abstract class Attribute {
         return m_isReadOnly;
     }
 
-    public abstract void setValue(String value) throws NotImplemented, ReadOnly, IncorrectState;
+    public abstract void setValue(String value) throws NotImplemented, PermissionDenied, IncorrectState;
     public abstract String getValue() throws NotImplemented, IncorrectState;
 
-    public abstract void setValues(String[] values) throws NotImplemented, ReadOnly, IncorrectState;
+    public abstract void setValues(String[] values) throws NotImplemented, PermissionDenied, IncorrectState;
     public abstract String[] getValues() throws NotImplemented, IncorrectState;
 
     public abstract boolean equals(Object o);
@@ -66,9 +68,9 @@ public abstract class Attribute {
             throw new NotImplemented("Attribute "+m_key+" not available in this implementation");
         }
     }
-    protected void checkWritable() throws ReadOnly {
+    protected void checkWritable() throws PermissionDenied {
         if (m_isReadOnly) {
-            throw new ReadOnly("Attribute "+m_key+" not writable");
+            throw new PermissionDenied("Attribute "+m_key+" not writable");
         }
     }
 

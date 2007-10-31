@@ -9,7 +9,7 @@ import fr.in2p3.jsaga.engine.config.bean.ProtocolEngineConfiguration;
 import fr.in2p3.jsaga.engine.schema.config.Protocol;
 import fr.in2p3.jsaga.engine.security.DataContextSelector;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 
@@ -39,12 +39,12 @@ public class DataAdaptorFactory {
     }
 
     /**
-     * Create a new instance of data adaptor for URI <code>service</code> and connect to service.
-     * @param service the URI of the service
+     * Create a new instance of data adaptor for URL <code>service</code> and connect to service.
+     * @param service the URL of the service
      * @param session the security session
      * @return the data adaptor instance
      */
-    public DataAdaptor getDataAdaptor(URI service, Session session) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    public DataAdaptor getDataAdaptor(URL service, Session session) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
         if (service==null || service.getScheme()==null) {
             throw new IncorrectURL("Invalid entry name");
         }
@@ -57,14 +57,14 @@ public class DataAdaptorFactory {
     }
 
     /**
-     * Create a new instance of data adaptor for URI <code>service</code> and connect to service.
+     * Create a new instance of data adaptor for URL <code>service</code> and connect to service.
      * <br>Note: only 'scheme' is needed for creation, but 'userid' and 'hostname' might be useful
      * for caching data adaptor instances.
-     * @param service the URI of the service
+     * @param service the URL of the service
      * @param context the security context
      * @return the data adaptor instance
      */
-    private DataAdaptor getDataAdaptor(URI service, ContextImpl context) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    private DataAdaptor getDataAdaptor(URL service, ContextImpl context) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         // create instance
         Class clazz = m_descriptor.getClass(service.getScheme());
         DataAdaptor dataAdaptor;

@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.impl.monitoring;
 
 import fr.in2p3.jsaga.impl.attributes.AbstractAttributesImpl;
 import org.ogf.saga.ObjectType;
-import org.ogf.saga.SagaBase;
+import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
 import org.ogf.saga.monitoring.Callback;
 import org.ogf.saga.monitoring.Metric;
@@ -40,12 +40,13 @@ public class MetricImpl extends AbstractAttributesImpl implements Metric {
         m_cookieGenerator = 1;
     }
 
-    /** constructor for deepCopy */
-    protected MetricImpl(MetricImpl source) {
-        super(source);
-    }
-    public SagaBase deepCopy() {
-        return new MetricImpl(this);
+    /** clone */
+    public SagaObject clone() throws CloneNotSupportedException {
+        MetricImpl clone = (MetricImpl) super.clone();
+        clone.m_callbacks = clone(m_callbacks);
+        clone.m_mode = m_mode;
+        clone.m_cookieGenerator = m_cookieGenerator;
+        return clone;
     }
 
     public ObjectType getType() {
@@ -66,7 +67,7 @@ public class MetricImpl extends AbstractAttributesImpl implements Metric {
         m_callbacks.remove(cookie);
     }
 
-    public void fire() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, ReadOnly, Timeout, NoSuccess {
+    public void fire() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
         switch(m_mode) {
             case FINAL:
                 throw new IncorrectState("Can not fire callback on a Final metric", this);

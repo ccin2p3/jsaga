@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.impl.context;
 
 import org.ogf.saga.context.Context;
 import org.ogf.saga.context.ContextFactory;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -17,11 +17,7 @@ import org.ogf.saga.error.NoSuccess;
  *
  */
 public class ContextFactoryImpl extends ContextFactory {
-    protected Context doCreateContext() {
-        try {
-            return new ContextImpl();
-        } catch (NoSuccess e) {
-            throw new RuntimeException(e);
-        }
+    protected Context doCreateContext(String type) throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+        return new ContextImpl(type);
     }
 }

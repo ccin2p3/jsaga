@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.adaptor.data.optimise;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 
 /* ***************************************************
@@ -26,13 +26,13 @@ public interface DataCopyDelegated extends DataAdaptor {
 
     /**
      * Request a transfer task.
-     * @param sourceAbsoluteURI the path of the file to be copied.
-     * @param targetAbsoluteURI the URI of the file to copy to.
+     * @param sourceAbsoluteUrl the path of the file to be copied.
+     * @param targetAbsoluteUrl the URL of the file to copy to.
      * @param overwrite if true, then target is overwrited if it exists.
-     * @throws AlreadyExists if <code>targetAbsoluteURI</code> already exists and <code>overwrite</code> is false.
-     * @throws DoesNotExist if <code>sourceAbsoluteURI</code> does not exist.
+     * @throws AlreadyExists if <code>targetAbsoluteUrl</code> already exists and <code>overwrite</code> is false.
+     * @throws DoesNotExist if <code>sourceAbsoluteUrl</code> does not exist.
      */
-    public void requestTransfer(URI sourceAbsoluteURI, URI targetAbsoluteURI, boolean overwrite) throws DoesNotExist, AlreadyExists;
+    public void requestTransfer(URL sourceAbsoluteUrl, URL targetAbsoluteUrl, boolean overwrite) throws DoesNotExist, AlreadyExists;
 
     /**
      * Monitor the requested transfer task.

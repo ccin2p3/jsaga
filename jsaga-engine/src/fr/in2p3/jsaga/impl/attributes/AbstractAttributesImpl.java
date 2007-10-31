@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.impl.attributes;
 
-import fr.in2p3.jsaga.impl.AbstractSagaBaseImpl;
+import org.ogf.saga.SagaObject;
 import org.ogf.saga.attributes.Attributes;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
@@ -19,7 +19,7 @@ import java.util.*;
 /**
  *
  */
-public abstract class AbstractAttributesImpl extends AbstractSagaBaseImpl implements Attributes {
+public abstract class AbstractAttributesImpl extends AbstractAttributesTaskImpl implements Attributes {
     private Map<String,Attribute> m_attributes;
     private boolean m_isExtensible;
 
@@ -34,14 +34,15 @@ public abstract class AbstractAttributesImpl extends AbstractSagaBaseImpl implem
         this(session, false);
     }
 
-    /** constructor for deepCopy */
-    protected AbstractAttributesImpl(AbstractAttributesImpl source) {
-        super(source);
-        m_attributes = deepCopy(source.m_attributes);
-        m_isExtensible = source.m_isExtensible;
+    /** clone */
+    public SagaObject clone() throws CloneNotSupportedException {
+        AbstractAttributesImpl clone = (AbstractAttributesImpl) super.clone();
+        clone.m_attributes = clone(m_attributes);
+        clone.m_isExtensible = m_isExtensible;
+        return clone;
     }
 
-    public String setAttribute(String key, String value) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, BadParameter, ReadOnly, DoesNotExist, Timeout, NoSuccess {
+    public void setAttribute(String key, String value) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, BadParameter, DoesNotExist, Timeout, NoSuccess {
         Attribute attribute = m_attributes.get(key);
         if (attribute != null) {
             attribute.setValue(value);
@@ -50,10 +51,9 @@ public abstract class AbstractAttributesImpl extends AbstractSagaBaseImpl implem
         } else {
             throw new DoesNotExist("Attribute "+key+" does not exist", this);
         }
-        return value;
     }
 
-    public String getAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, ReadOnly, DoesNotExist, Timeout, NoSuccess {
+    public String getAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
         Attribute attribute = m_attributes.get(key);
         if (attribute != null) {
             return attribute.getValue();
@@ -62,7 +62,7 @@ public abstract class AbstractAttributesImpl extends AbstractSagaBaseImpl implem
         }
     }
 
-    public String[] setVectorAttribute(String key, String[] values) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, BadParameter, ReadOnly, DoesNotExist, Timeout, NoSuccess {
+    public void setVectorAttribute(String key, String[] values) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, BadParameter, DoesNotExist, Timeout, NoSuccess {
         Attribute attribute = m_attributes.get(key);
         if (attribute != null) {
             attribute.setValues(values);
@@ -71,10 +71,9 @@ public abstract class AbstractAttributesImpl extends AbstractSagaBaseImpl implem
         } else {
             throw new DoesNotExist("Attribute "+key+" does not exist", this);
         }
-        return values;
     }
 
-    public String[] getVectorAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, ReadOnly, DoesNotExist, Timeout, NoSuccess {
+    public String[] getVectorAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
         Attribute attribute = m_attributes.get(key);
         if (attribute != null) {
             return attribute.getValues();
@@ -83,7 +82,7 @@ public abstract class AbstractAttributesImpl extends AbstractSagaBaseImpl implem
         }
     }
 
-    public void removeAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, ReadOnly, Timeout, NoSuccess {
+    public void removeAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         if (!m_isExtensible) {
             throw new NoSuccess("Object does not support removing attributes", this);
         }
@@ -92,7 +91,7 @@ public abstract class AbstractAttributesImpl extends AbstractSagaBaseImpl implem
             if (!attribute.isReadOnly()) {
                 m_attributes.remove(key);
             } else {
-                throw new ReadOnly("Attribute "+key+" not removable", this);
+                throw new PermissionDenied("Attribute "+key+" not removable", this);
             }
         } else {
             throw new DoesNotExist("Attribute "+key+" does not exist", this);
@@ -103,39 +102,11 @@ public abstract class AbstractAttributesImpl extends AbstractSagaBaseImpl implem
         return m_attributes.keySet().toArray(new String[m_attributes.keySet().size()]);
     }
 
-    public String[] findAttributes(String keyPattern, String valuePattern) throws NotImplemented, BadParameter, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
+    public String[] findAttributes(String pattern) throws NotImplemented, BadParameter, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
         List<String> foundKeys = new ArrayList<String>();
         for (Attribute attribute : m_attributes.values()) {
-            if (keyPattern == null || attribute.getKey().matches(keyPattern)) {
-                if (attribute.isSupported()) {
-                    // supported attribute
-                    boolean matched = false;
-                    try {
-                        if (attribute instanceof AttributeScalar) {
-                            String value = attribute.getValue();
-                            if (!matched) {
-                                matched = (valuePattern == null || value.matches(valuePattern));
-                            }
-                        } else if (attribute instanceof AttributeVector) {
-                            String[] values = attribute.getValues();
-                            for (int i = 0; !matched && i < values.length; i++) {
-                                matched = (valuePattern == null || values[i].matches(valuePattern));
-                            }
-                        }
-                        if (matched) {
-                            foundKeys.add(attribute.getKey());
-                        }
-                    } catch (IncorrectState incorrectState) {
-                        // should never occur
-                    }
-                } else {
-                    // unsupported attribute
-                    if (valuePattern == null) {
-                        foundKeys.add(attribute.getKey());
-                    } else {
-                        // unsupported attribute can not match
-                    }
-                }
+            if (pattern == null || attribute.getKey().matches(pattern)) {
+                foundKeys.add(attribute.getKey());
             }
         }
         return foundKeys.toArray(new String[foundKeys.size()]);
@@ -159,7 +130,7 @@ public abstract class AbstractAttributesImpl extends AbstractSagaBaseImpl implem
         }
     }
 
-    public boolean isRemoveableAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isRemovableAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         Attribute attribute = m_attributes.get(key);
         if (attribute != null) {
             return m_isExtensible;

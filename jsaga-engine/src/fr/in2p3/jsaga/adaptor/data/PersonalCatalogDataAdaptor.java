@@ -11,7 +11,7 @@ import fr.in2p3.jsaga.adaptor.data.write.DirectoryWriter;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
 import fr.in2p3.jsaga.adaptor.schema.data.catalog.*;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 
 import java.util.Map;
@@ -83,7 +83,7 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
         return entry instanceof FileType;
     }
 
-    public void addLocation(String logicalEntry, URI replicaEntry) throws PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public void addLocation(String logicalEntry, URL replicaEntry) throws PermissionDenied, IncorrectState, Timeout, NoSuccess {
         // get or create logical entry
         File file;
         try {
@@ -102,7 +102,7 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
         if(Base.DEBUG) m_catalog.commit();
     }
 
-    public void removeLocation(String logicalEntry, URI replicaEntry) throws PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    public void removeLocation(String logicalEntry, URL replicaEntry) throws PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
         // get logical entry
         File file = m_catalog.getFile(logicalEntry);
         // remove replica location

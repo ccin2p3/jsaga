@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.engine.data.copy;
 
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytesPhysical;
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.logicalfile.LogicalFileFactory;
@@ -30,13 +30,13 @@ public class SourceLogicalFile {
         m_sourceFile = sourceFile;
     }
 
-    public void putToPhysicalFile(Session session, URI target, FlagsBytes targetFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
-        // get location of source entry (may be logical or physical)
-        List<URI> sourceLocations = m_sourceFile.listLocations();
+    public void putToPhysicalFile(Session session, URL target, FlagsBytes targetFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
+        // get location of source entry (may be logical or physical
+        List<URL> sourceLocations = m_sourceFile.listLocations();
         if (sourceLocations!=null && sourceLocations.size()>0) {
             // open source entry
-            URI source = sourceLocations.get(0);
-            NamespaceEntry sourceEntry = createSourceNSEntry(session, source);
+            URL source = sourceLocations.get(0);
+            NSEntry sourceEntry = createSourceNSEntry(session, source);
 
             // copy
             sourceEntry.copy(target, targetFlags.remove(Flags.NONE));
@@ -44,13 +44,13 @@ public class SourceLogicalFile {
             // close source entry (but not the source logical file)
             sourceEntry.close();
         } else {
-            throw new NoSuccess("No location found for logical file: "+m_sourceFile.getURI());
+            throw new NoSuccess("No location found for logical file: "+m_sourceFile.getURL());
         }
     }
 
-    public void putToLogicalFile(Session session, URI target, FlagsBytes targetFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
+    public void putToLogicalFile(Session session, URL target, FlagsBytes targetFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
         // get location of source physical file
-        List<URI> sourceLocations = m_sourceFile.listLocations();
+        List<URL> sourceLocations = m_sourceFile.listLocations();
         if (sourceLocations!=null && sourceLocations.size()>0) {
             // open target logical file
             LogicalFile targetLogicalFile = createTargetLogicalFile(session, target, targetFlags);
@@ -59,7 +59,7 @@ public class SourceLogicalFile {
                 if (targetFlags.contains(Flags.OVERWRITE)) {
                     // remove all target locations
                     try {
-                        List<URI> targetLocations = targetLogicalFile.listLocations();
+                        List<URL> targetLocations = targetLogicalFile.listLocations();
                         for (int i=0; targetLocations !=null && i< targetLocations.size(); i++) {
                             targetLogicalFile.removeLocation(targetLocations.get(i));
                         }
@@ -71,8 +71,6 @@ public class SourceLogicalFile {
                 for (int i=0; sourceLocations!=null && i<sourceLocations.size(); i++) {
                     targetLogicalFile.addLocation(sourceLocations.get(i));
                 }
-            } catch (IncorrectURL e) {
-                throw new NoSuccess(e);
             } catch (DoesNotExist e) {
                 throw new NoSuccess("Unexpected exception: DoesNotExist", e);
             } finally {
@@ -82,13 +80,9 @@ public class SourceLogicalFile {
         }
     }
 
-    public static NamespaceEntry createSourceNSEntry(Session session, URI source) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
+    public static NSEntry createSourceNSEntry(Session session, URL source) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
         try {
-            return NamespaceFactory.createNamespaceEntry(session, source, Flags.NONE);
-        } catch (IncorrectURL e) {
-            throw new NoSuccess(e);
-        } catch (IncorrectSession e) {
-            throw new NoSuccess(e);
+            return NSFactory.createNSEntry(session, source, Flags.NONE.getValue());
         } catch (AlreadyExists e) {
             throw new NoSuccess("Unexpected exception: AlreadyExists");
         } catch (DoesNotExist doesNotExist) {
@@ -96,18 +90,14 @@ public class SourceLogicalFile {
         }
     }
 
-    public static LogicalFile createTargetLogicalFile(Session session, URI target, FlagsBytes flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
+    public static LogicalFile createTargetLogicalFile(Session session, URL target, FlagsBytes flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
         FlagsBytes correctedBytes = flags.or(FlagsBytesPhysical.WRITE).or(FlagsBytes.CREATE);
-        Flags[] correctedFlags =
+        int correctedFlags =
                 (correctedBytes.contains(Flags.OVERWRITE)
                         ? correctedBytes.remove(Flags.OVERWRITE)
                         : correctedBytes.add(Flags.EXCL));
         try {
             return LogicalFileFactory.createLogicalFile(session, target, correctedFlags);
-        } catch (IncorrectURL e) {
-            throw new NoSuccess(e);
-        } catch (IncorrectSession e) {
-            throw new NoSuccess(e);
         } catch (DoesNotExist e) {
             throw new NoSuccess("Unexpected exception: DoesNotExist", e);
         } catch (AlreadyExists alreadyExists) {

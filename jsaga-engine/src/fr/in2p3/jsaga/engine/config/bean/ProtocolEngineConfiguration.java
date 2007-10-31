@@ -5,10 +5,10 @@ import fr.in2p3.jsaga.engine.config.*;
 import fr.in2p3.jsaga.engine.config.adaptor.DataAdaptorDescriptor;
 import fr.in2p3.jsaga.engine.schema.config.*;
 import fr.in2p3.jsaga.helpers.StringArray;
-import org.ogf.saga.URI;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.URL;
+import org.ogf.saga.error.*;
 
+import java.lang.Exception;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,16 +73,16 @@ public class ProtocolEngineConfiguration {
     }
 
     /**
-     * Find the context to be used with <code>uri</code>
+     * Find the context to be used with <code>url</code>
      */
-    public ContextInstanceRef[] listContextInstanceCandidates(URI uri) throws BadParameter, NoSuccess {
-        if (uri != null) {
+    public ContextInstanceRef[] listContextInstanceCandidates(URL url) throws NotImplemented, BadParameter, NoSuccess {
+        if (url != null) {
             return this.listContextInstanceCandidates(
-                    findProtocol(uri.getScheme()),
-                    uri.getHost(),
-                    uri.getFragment());
+                    findProtocol(url.getScheme()),
+                    url.getHost(),
+                    url.getFragment());
         } else {
-            throw new BadParameter("URI is null");
+            throw new BadParameter("URL is null");
         }
     }
 

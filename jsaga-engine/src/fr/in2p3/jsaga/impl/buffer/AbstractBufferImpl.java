@@ -1,7 +1,8 @@
 package fr.in2p3.jsaga.impl.buffer;
 
-import fr.in2p3.jsaga.impl.AbstractSagaBaseImpl;
+import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import org.ogf.saga.ObjectType;
+import org.ogf.saga.SagaObject;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.error.*;
 
@@ -17,12 +18,18 @@ import org.ogf.saga.error.*;
 /**
  *
  */
-public abstract class AbstractBufferImpl extends AbstractSagaBaseImpl implements Buffer {
+public abstract class AbstractBufferImpl extends AbstractSagaObjectImpl implements Buffer {
     protected byte[] m_buffer;
 
     /** constructor */
     public AbstractBufferImpl() {
         m_buffer = null;
+    }
+
+    /** clone */
+    public SagaObject clone() throws CloneNotSupportedException {
+        // do not assign m_buffer here (see inherited classes)
+        return super.clone();
     }
 
     public ObjectType getType() {

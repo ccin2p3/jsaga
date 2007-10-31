@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.command;
 
-import fr.in2p3.jsaga.impl.namespace.AbstractNamespaceEntryImpl;
+import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
 import org.apache.commons.cli.*;
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
@@ -26,8 +26,10 @@ public class NamespaceTest extends AbstractCommand {
     private static final String OPT_ISDIRECTORY = "d", LONGOPT_ISDIRECTORY = "directory";
     private static final String OPT_ISLINK = "L", LONGOPT_ISLINK = "link";
 
+    private static final int FLAGS_BYPASSEXIST = 4096;
+
     public NamespaceTest() {
-        super("jsaga-test", new String[]{"URI"}, new String[]{OPT_HELP, LONGOPT_HELP});
+        super("jsaga-test", new String[]{"URL"}, new String[]{OPT_HELP, LONGOPT_HELP});
     }
 
     public static void main(String[] args) throws Exception {
@@ -35,7 +37,6 @@ public class NamespaceTest extends AbstractCommand {
         CommandLine line = command.parse(args);
 
         System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
-        System.setProperty("saga.existence.check.skip", "true");
         if (line.hasOption(OPT_HELP))
         {
             command.printHelpAndExit(null);
@@ -43,20 +44,20 @@ public class NamespaceTest extends AbstractCommand {
         else
         {
             // get arguments
-            URI uri = new URI(command.m_nonOptionValues[0]);
+            URL url = new URL(command.m_nonOptionValues[0].replaceAll(" ", "%20"));
 
             // execute command
             Session session = SessionFactory.createSession(true);
-            NamespaceEntry entry = NamespaceFactory.createNamespaceEntry(session, uri, Flags.NONE);
+            NSEntry entry = NSFactory.createNSEntry(session, url, FLAGS_BYPASSEXIST);
             boolean success;
             if (line.hasOption(OPT_EXISTS)) {
-                success = ((AbstractNamespaceEntryImpl)entry).exists();
+                success = ((AbstractNSEntryImpl)entry).exists();
             } else if (line.hasOption(OPT_ISFILE)) {
-                success = entry.isEntry(Flags.NONE);
+                success = entry.isEntry();
             } else if (line.hasOption(OPT_ISDIRECTORY)) {
-                success = entry.isDirectory(Flags.NONE);
+                success = entry.isDir();
             } else if (line.hasOption(OPT_ISLINK)) {
-                success = entry.isLink(Flags.NONE);
+                success = entry.isLink();
             } else {
                 throw new Exception("Unexpected exception");
             }

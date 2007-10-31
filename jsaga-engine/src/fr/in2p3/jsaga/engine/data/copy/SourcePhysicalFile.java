@@ -3,7 +3,7 @@ package fr.in2p3.jsaga.engine.data.copy;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytesPhysical;
 import fr.in2p3.jsaga.impl.file.FileImpl;
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.file.FileFactory;
 import org.ogf.saga.namespace.Flags;
@@ -32,7 +32,7 @@ public class SourcePhysicalFile {
         m_sourceFile = sourceFile;
     }
 
-    public void putToPhysicalFile(Session session, URI target, FlagsBytes targetFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
+    public void putToPhysicalFile(Session session, URL target, FlagsBytes targetFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
         IOException closingException = null;
 
         // open source file if it exists
@@ -40,7 +40,7 @@ public class SourcePhysicalFile {
         try {
             in = m_sourceFile.newInputStream();
         } catch (DoesNotExist doesNotExist) {
-            throw new IncorrectState("Source file does not exist: "+m_sourceFile.getURI(), doesNotExist);
+            throw new IncorrectState("Source file does not exist: "+m_sourceFile.getURL(), doesNotExist);
         }
 
         // start to read if it exists
@@ -52,7 +52,7 @@ public class SourcePhysicalFile {
             try {
                 in.close();
             } catch (IOException e1) {/*ignore*/}
-            throw new IncorrectState("Source file does not exist: "+m_sourceFile.getURI(), e);
+            throw new IncorrectState("Source file does not exist: "+m_sourceFile.getURL(), e);
         }
 
         // open target file and copy
@@ -95,18 +95,14 @@ public class SourcePhysicalFile {
         }
     }
 
-    public static FileImpl createTargetFile(Session session, URI target, FlagsBytes flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
+    public static FileImpl createTargetFile(Session session, URL target, FlagsBytes flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
         FlagsBytes correctedBytes = flags.or(FlagsBytesPhysical.WRITE).or(FlagsBytes.CREATE);
-        Flags[] correctedFlags =
+        int correctedFlags =
                 (correctedBytes.contains(Flags.OVERWRITE)
                         ? correctedBytes.remove(Flags.OVERWRITE)
                         : correctedBytes.add(Flags.EXCL));
         try {
             return (FileImpl) FileFactory.createFile(session, target, correctedFlags);
-        } catch (IncorrectURL e) {
-            throw new NoSuccess(e);
-        } catch (IncorrectSession e) {
-            throw new NoSuccess(e);
         } catch (DoesNotExist e) {
             throw new NoSuccess("Unexpected exception: DoesNotExist", e);
         } catch (AlreadyExists alreadyExists) {

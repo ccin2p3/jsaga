@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.*;
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
@@ -23,7 +23,7 @@ public class NamespaceCopy extends AbstractCommand {
     private static final String OPT_RECURSIVE = "r", LONGOPT_RECURSIVE = "recursive";
 
     public NamespaceCopy() {
-        super("jsaga-cp", new String[]{"Source URI", "Target URI"}, new String[]{OPT_HELP, LONGOPT_HELP});
+        super("jsaga-cp", new String[]{"Source URL", "Target URL"}, new String[]{OPT_HELP, LONGOPT_HELP});
     }
 
     public static void main(String[] args) throws Exception {
@@ -38,20 +38,20 @@ public class NamespaceCopy extends AbstractCommand {
         else
         {
             // get arguments
-            URI source = new URI(command.m_nonOptionValues[0]);
-            URI target = new URI(command.m_nonOptionValues[1]);
+            URL source = new URL(command.m_nonOptionValues[0].replaceAll(" ", "%20"));
+            URL target = new URL(command.m_nonOptionValues[1]);
             Flags flags = (line.hasOption(OPT_RECURSIVE) ? Flags.RECURSIVE : Flags.NONE);
 
             // execute command
             Session session = SessionFactory.createSession(true);
-            NamespaceEntry entry;
+            NSEntry entry;
             if (source.getPath().endsWith("/")) {
-                entry = NamespaceFactory.createNamespaceDirectory(session, source, Flags.NONE);
+                entry = NSFactory.createNSDirectory(session, source, Flags.NONE.getValue());
             } else {
-                entry = NamespaceFactory.createNamespaceEntry(session, source, Flags.NONE);
+                entry = NSFactory.createNSEntry(session, source, Flags.NONE.getValue());
             }
-            entry.copy(target, flags);
-            entry.close(0.0f);
+            entry.copy(target, flags.getValue());
+            entry.close();
         }
     }
 

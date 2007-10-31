@@ -24,7 +24,7 @@ public class PermissionBytes {
 
     private int value;
 
-    PermissionBytes(int value) {
+    public PermissionBytes(int value) {
         this.value = value;
     }
 

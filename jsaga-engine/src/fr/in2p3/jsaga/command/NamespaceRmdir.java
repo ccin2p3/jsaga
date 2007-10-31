@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.*;
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
@@ -22,7 +22,7 @@ public class NamespaceRmdir extends AbstractCommand {
     private static final String OPT_HELP = "h", LONGOPT_HELP = "help";
 
     public NamespaceRmdir() {
-        super("jsaga-rmdir", new String[]{"URI"}, new String[]{OPT_HELP, LONGOPT_HELP});
+        super("jsaga-rmdir", new String[]{"URL"}, new String[]{OPT_HELP, LONGOPT_HELP});
     }
 
     public static void main(String[] args) throws Exception {
@@ -37,12 +37,12 @@ public class NamespaceRmdir extends AbstractCommand {
         else
         {
             // get arguments
-            URI uri = new URI(command.m_nonOptionValues[0]);
+            URL url = new URL(command.m_nonOptionValues[0].replaceAll(" ", "%20"));
 
             // execute command
             Session session = SessionFactory.createSession(true);
-            NamespaceDirectory dir = NamespaceFactory.createNamespaceDirectory(session, uri, Flags.NONE);
-            dir.remove(Flags.NONE);
+            NSDirectory dir = NSFactory.createNSDirectory(session, url, Flags.NONE.getValue());
+            dir.remove(Flags.NONE.getValue());
             dir.close();
         }
     }

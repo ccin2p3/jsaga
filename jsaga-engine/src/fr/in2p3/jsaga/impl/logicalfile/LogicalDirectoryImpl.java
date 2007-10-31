@@ -4,7 +4,8 @@ import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.MetaDataReader;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
-import fr.in2p3.jsaga.impl.namespace.AbstractNamespaceEntryImpl;
+import fr.in2p3.jsaga.helpers.URLFactory;
+import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
 import org.ogf.saga.*;
 import org.ogf.saga.error.*;
 import org.ogf.saga.logicalfile.LogicalDirectory;
@@ -29,21 +30,18 @@ import java.util.regex.Pattern;
  */
 public class LogicalDirectoryImpl extends AbstractLogicalDirectoryTaskImpl implements LogicalDirectory {
     /** constructor for factory */
-    public LogicalDirectoryImpl(Session session, URI uri, DataAdaptor adaptor, Flags... flags) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(session, uri, adaptor, flags);
+    public LogicalDirectoryImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        super(session, url, adaptor, flags);
     }
 
     /** constructor for open() */
-    public LogicalDirectoryImpl(AbstractNamespaceEntryImpl entry, URI uri, Flags... flags) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(entry, uri, flags);
+    public LogicalDirectoryImpl(AbstractNSEntryImpl entry, URL url, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        super(entry, url, flags);
     }
 
-    /** constructor for deepCopy */
-    protected LogicalDirectoryImpl(LogicalDirectoryImpl source) {
-        super(source);
-    }
-    public SagaBase deepCopy() {
-        return new LogicalDirectoryImpl(this);
+    /** clone */
+    public SagaObject clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 
     public ObjectType getType() {
@@ -51,79 +49,86 @@ public class LogicalDirectoryImpl extends AbstractLogicalDirectoryTaskImpl imple
     }
 
     /** implements super.openDir() */
-    public NamespaceDirectory openDir(URI name, Flags... flags) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public NSDirectory openDir(URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         return this.openLogicalDir(name, flags);
     }
 
     /** implements super.open() */
-    public NamespaceEntry open(URI name, Flags... flags) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public NSEntry open(URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         return this.openLogicalFile(name, flags);
     }
 
-    public boolean isFile(URI name, Flags... flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    public boolean isFile(URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         return super.isEntry(name, flags);
     }
 
     /** search in meta-data */
-    public List<String> find(String namePattern, String[] keyPattern, String[] valPattern, Flags... flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        FlagsBytes effectiveFlags = new FlagsBytes(Flags.RECURSIVE, flags);
+    public List<String> find(String namePattern, String[] attrPattern, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+        FlagsBytes effectiveFlags = new FlagsBytes(flags);
         if (effectiveFlags.contains(Flags.DEREFERENCE)) {
-            return ((LogicalDirectoryImpl)this._dereferenceDir()).find(namePattern, keyPattern, valPattern, effectiveFlags.remove(Flags.DEREFERENCE));
+            try {
+                return ((LogicalDirectoryImpl)this._dereferenceDir()).find(namePattern, attrPattern, effectiveFlags.remove(Flags.DEREFERENCE));
+            } catch (IncorrectURL e) {
+                throw new NoSuccess(e);
+            }
         }
-        effectiveFlags.checkAllowed(Flags.RECURSIVE, Flags.DEREFERENCE);
+        effectiveFlags.checkAllowed(Flags.RECURSIVE.or(Flags.DEREFERENCE));
 
         // convert meta-data keys and values to map
-        int keyLen = (keyPattern!=null ? keyPattern.length : 0);
-        int valLen = (valPattern!=null ? valPattern.length : 0);
-        if (keyLen != valLen) {
-            throw new BadParameter("Number of meta-data key and value must be the same: "+keyLen+"/"+valLen, this);
-        }
         Map<String,String> keyValuePatterns = new HashMap<String,String>();
-        for (int i=0; i<keyLen; i++) {
-            keyValuePatterns.put(keyPattern[i], valPattern[i]);
+        for (int i=0; attrPattern!=null && i<attrPattern.length; i++) {
+            String[] pair = attrPattern[i].split("=");
+            String key = pair[0];
+            String value = pair[1];
+            keyValuePatterns.put(key, value);
         }
 
         // search
         List<String> matchingPath = new ArrayList<String>();
         if (keyValuePatterns.isEmpty()) {
-            for (URI current : super.find(namePattern, flags)) {
+            for (URL current : super.find(namePattern, flags)) {
                 matchingPath.add(current.getPath());
             }
         } else if (m_adaptor instanceof MetaDataReader) {
             Pattern p = _toRegexp(namePattern);
             this._doFind(p, keyValuePatterns, effectiveFlags, matchingPath, CURRENT_DIR_RELATIVE_PATH);
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+m_uri.getScheme(), this);
+            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
         return matchingPath;
     }
-    private void _doFind(Pattern p, Map keyValuePatterns, FlagsBytes effectiveFlags, List<String> matchingPath, URI currentRelativePath) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    private void _doFind(Pattern p, Map keyValuePatterns, FlagsBytes effectiveFlags, List<String> matchingPath, URL currentRelativePath) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         // for each child
         FileAttributes[] childs;
         try {
-            childs = ((MetaDataReader)m_adaptor).listAttributes(m_uri.getPath(), keyValuePatterns);
+            childs = ((MetaDataReader)m_adaptor).listAttributes(m_url.getPath(), keyValuePatterns);
         } catch (DoesNotExist doesNotExist) {
-            throw new IncorrectState("Logical directory does not exist: "+m_uri, doesNotExist);
+            throw new IncorrectState("Logical directory does not exist: "+ m_url, doesNotExist);
         }
         for (int i=0; i<childs.length; i++) {
             if (p==null || p.matcher(childs[i].getName()).matches()) {
                 // add child relative path
-                URI childRelativePath = currentRelativePath.resolve(childs[i].getName());
+                URL childRelativePath = URLFactory.createURL(currentRelativePath, childs[i].getName());
                 matchingPath.add(childRelativePath.getPath());
                 // may recurse
                 if (effectiveFlags.contains(Flags.RECURSIVE) && childs[i].getType()==FileAttributes.DIRECTORY_TYPE) {
-                    LogicalDirectoryImpl childDir = (LogicalDirectoryImpl) this._openNSDir(childRelativePath);
+                    LogicalDirectoryImpl childDir;
+                    try {
+                        childDir = (LogicalDirectoryImpl) this._openNSDir(childRelativePath);
+                    } catch (IncorrectURL e) {
+                        throw new NoSuccess(e);
+                    }
                     childDir._doFind(p, keyValuePatterns, effectiveFlags, matchingPath, childRelativePath);
                 }
             }
         }
     }
 
-    public LogicalDirectory openLogicalDir(URI relativePath, Flags... flags) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return new LogicalDirectoryImpl(this, super._resolveRelativeURI(relativePath), flags);
+    public LogicalDirectory openLogicalDir(URL relativePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        return new LogicalDirectoryImpl(this, super._resolveRelativeURL(relativePath), flags);
     }
 
-    public LogicalFile openLogicalFile(URI relativePath, Flags... flags) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return new LogicalFileImpl(this, super._resolveRelativeURI(relativePath), flags);
+    public LogicalFile openLogicalFile(URL relativePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        return new LogicalFileImpl(this, super._resolveRelativeURL(relativePath), flags);
     }
 }

@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.impl.buffer;
 
-import org.ogf.saga.SagaBase;
+import org.ogf.saga.SagaObject;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.error.BadParameter;
 import org.ogf.saga.error.NotImplemented;
@@ -18,22 +18,22 @@ import org.ogf.saga.error.NotImplemented;
  *
  */
 public class ImplementationAllocatedBufferImpl extends AbstractBufferImpl implements Buffer {
+    /** constructor */
     public ImplementationAllocatedBufferImpl(int size) throws BadParameter, NotImplemented {
         super();
         this.setSize(size);
     }
 
-    /** constructor for deepCopy: copy buffer content */
-    public ImplementationAllocatedBufferImpl(ImplementationAllocatedBufferImpl source) {
-        if (source.m_buffer != null) {
-            m_buffer = new byte[source.m_buffer.length];
-            System.arraycopy(source.m_buffer, 0, m_buffer, 0, m_buffer.length);
+    /** clone: copy buffer content */
+    public SagaObject clone() throws CloneNotSupportedException {
+        ImplementationAllocatedBufferImpl clone = (ImplementationAllocatedBufferImpl) super.clone();
+        if (m_buffer != null) {
+            clone.m_buffer = new byte[m_buffer.length];
+            System.arraycopy(m_buffer, 0, clone.m_buffer, 0, m_buffer.length);
         } else {
-            m_buffer = null;
+            clone.m_buffer = null;
         }
-    }
-    public SagaBase deepCopy() {
-        return new ImplementationAllocatedBufferImpl(this);
+        return clone;
     }
 
     public void setSize(int size) throws NotImplemented, BadParameter {

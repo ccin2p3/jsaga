@@ -9,7 +9,7 @@ import fr.in2p3.jsaga.impl.file.FileFactoryImpl;
 import fr.in2p3.jsaga.impl.job.JobFactoryImpl;
 import fr.in2p3.jsaga.impl.logicalfile.LogicalFileFactoryImpl;
 import fr.in2p3.jsaga.impl.monitoring.MonitoringFactoryImpl;
-import fr.in2p3.jsaga.impl.namespace.NamespaceFactoryImpl;
+import fr.in2p3.jsaga.impl.namespace.NSFactoryImpl;
 import fr.in2p3.jsaga.impl.session.SessionFactoryImpl;
 import fr.in2p3.jsaga.impl.task.TaskFactoryImpl;
 import fr.in2p3.jsaga.impl.unimplemented.RPCFactoryImpl;
@@ -21,7 +21,7 @@ import org.ogf.saga.file.FileFactory;
 import org.ogf.saga.job.JobFactory;
 import org.ogf.saga.logicalfile.LogicalFileFactory;
 import org.ogf.saga.monitoring.MonitoringFactory;
-import org.ogf.saga.namespace.NamespaceFactory;
+import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.rpc.RPCFactory;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.stream.StreamFactory;
@@ -71,8 +71,8 @@ public class SagaFactoryImpl implements SagaFactory {
         return new MonitoringFactoryImpl();
     }
 
-    public NamespaceFactory createNamespaceFactory() throws NotImplemented {
-        return new NamespaceFactoryImpl(m_adaptorFactory);
+    public NSFactory createNamespaceFactory() throws NotImplemented {
+        return new NSFactoryImpl(m_adaptorFactory);
     }
 
     public RPCFactory createRPCFactory() {

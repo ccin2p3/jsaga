@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.*;
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
@@ -23,7 +23,7 @@ public class NamespaceMakeDir extends AbstractCommand {
     private static final String OPT_CREATEPARENTS = "p", LONGOPT_CREATEPARENTS = "parents";
 
     public NamespaceMakeDir() {
-        super("jsaga-mkdir", new String[]{"URI"}, new String[]{OPT_HELP, LONGOPT_HELP});
+        super("jsaga-mkdir", new String[]{"URL"}, new String[]{OPT_HELP, LONGOPT_HELP});
     }
 
     public static void main(String[] args) throws Exception {
@@ -38,15 +38,15 @@ public class NamespaceMakeDir extends AbstractCommand {
         else
         {
             // get arguments
-            URI uri = new URI(command.m_nonOptionValues[0]);
-            Flags[] flags = (line.hasOption(OPT_CREATEPARENTS)
-                    ? new Flags[]{Flags.CREATE, Flags.CREATEPARENTS}
-                    : new Flags[]{Flags.CREATE});
+            URL url = new URL(command.m_nonOptionValues[0].replaceAll(" ", "%20"));
+            int flags = (line.hasOption(OPT_CREATEPARENTS)
+                    ? Flags.CREATE.or(Flags.CREATEPARENTS)
+                    : Flags.CREATE.getValue());
 
             // execute command
             Session session = SessionFactory.createSession(true);
-            NamespaceDirectory dir = NamespaceFactory.createNamespaceDirectory(session, uri, flags);
-            dir.close(0.0f);
+            NSDirectory dir = NSFactory.createNSDirectory(session, url, flags);
+            dir.close();
         }
     }
 

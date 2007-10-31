@@ -1,7 +1,8 @@
 package fr.in2p3.jsaga.impl.task;
 
 import fr.in2p3.jsaga.impl.monitoring.AbstractMonitorableImpl;
-import org.ogf.saga.SagaBase;
+import org.ogf.saga.ObjectType;
+import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.*;
@@ -29,13 +30,15 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
         m_tasks = new HashMap<Integer,Task>();
     }
 
-    /** constructor for deepCopy */
-    protected TaskContainerImpl(TaskContainerImpl source) {
-        super(source);
-        m_tasks = deepCopy(source.m_tasks);
+    /** clone */
+    public SagaObject clone() throws CloneNotSupportedException {
+        TaskContainerImpl clone = (TaskContainerImpl) super.clone();
+        clone.m_tasks = clone(m_tasks);
+        return clone;
     }
-    public SagaBase deepCopy() {
-        return new TaskContainerImpl(this);
+
+    public ObjectType getType() {
+        return ObjectType.TASKCONTAINER;
     }
 
     public int add(Task task) {

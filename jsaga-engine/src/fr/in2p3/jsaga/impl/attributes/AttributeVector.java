@@ -33,9 +33,12 @@ public class AttributeVector extends Attribute {
         m_values = toVector(value);
     }
 
-    /** constructor for deepCopy */
-    public AttributeVector(AttributeVector source) {
-        super(source);
+    /** clone */
+    public Object clone() throws CloneNotSupportedException {
+        AttributeVector clone = (AttributeVector) super.clone();
+        clone.m_values = new String[m_values.length];
+        System.arraycopy(m_values, 0, clone.m_values, 0, m_values.length);
+        return clone;
     }
 
     public void setValue(String value) throws IncorrectState {
@@ -46,7 +49,7 @@ public class AttributeVector extends Attribute {
         throw new IncorrectState("Attribute "+super.getKey()+" not scalar");
     }
 
-    public void setValues(String[] values) throws NotImplemented, ReadOnly {
+    public void setValues(String[] values) throws NotImplemented, PermissionDenied {
         checkSupported();
         checkWritable();
         m_values = values;

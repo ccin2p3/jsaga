@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.engine.data.copy;
 
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.impl.file.FileImpl;
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.file.FileFactory;
 import org.ogf.saga.logicalfile.LogicalFile;
@@ -33,7 +33,7 @@ public class TargetPhysicalFile {
         m_targetFile = targetFile;
     }
 
-    public void getFromPhysicalFile(Session session, URI source, FlagsBytes sourceFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    public void getFromPhysicalFile(Session session, URL source, FlagsBytes sourceFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
         IOException closingException = null;
 
         // open source file if it exists
@@ -82,7 +82,7 @@ public class TargetPhysicalFile {
                 }
             }
         } catch (AlreadyExists alreadyExists) {
-            throw new IncorrectState("Target file already exists: "+m_targetFile.getURI(), alreadyExists);
+            throw new IncorrectState("Target file already exists: "+m_targetFile.getURL(), alreadyExists);
         } finally {
             try {
                 sourceFile.close();
@@ -95,15 +95,15 @@ public class TargetPhysicalFile {
         }
     }
 
-    public void getFromLogicalFile(Session session, URI source, FlagsBytes sourceFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    public void getFromLogicalFile(Session session, URL source, FlagsBytes sourceFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
         // get location of source physical file
         LogicalFile sourceLogicalFile = TargetLogicalFile.createSourceLogicalFile(session, source, sourceFlags);
-        List<URI> sourceLocations = sourceLogicalFile.listLocations();
+        List<URL> sourceLocations = sourceLogicalFile.listLocations();
         if (sourceLocations!=null && sourceLocations.size()>0) {
             // get source physical file
-            URI sourcePhysicalUri = sourceLocations.get(0);
+            URL sourcePhysicalUrl = sourceLocations.get(0);
             // copy
-            m_targetFile.copyFrom(sourcePhysicalUri, sourceFlags.remove(Flags.NONE));
+            m_targetFile.copyFrom(sourcePhysicalUrl, sourceFlags.remove(Flags.NONE));
             // close source logical file
             sourceLogicalFile.close();
         } else {
@@ -111,13 +111,9 @@ public class TargetPhysicalFile {
         }
     }
 
-    public static FileImpl createSourceFile(Session session, URI source) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    public static FileImpl createSourceFile(Session session, URL source) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
         try {
-            return (FileImpl) FileFactory.createFile(session, source, Flags.READ);
-        } catch (IncorrectURL e) {
-            throw new NoSuccess(e);
-        } catch (IncorrectSession e) {
-            throw new NoSuccess(e);
+            return (FileImpl) FileFactory.createFile(session, source, Flags.READ.getValue());
         } catch (AlreadyExists e) {
             throw new NoSuccess("Unexpected exception: DoesNotExist", e);
         } catch (DoesNotExist doesNotExist) {

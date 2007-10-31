@@ -1,8 +1,6 @@
 package fr.in2p3.jsaga;
 
-import org.ogf.saga.URI;
-
-import java.net.URISyntaxException;
+import org.ogf.saga.URL;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -17,12 +15,12 @@ import java.net.URISyntaxException;
  *
  */
 public class uri {
-    public static String protocol(String uri) throws URISyntaxException {
-        return new URI(uri).getScheme();
+    public static String protocol(String uri) throws Exception {
+        return new URL(uri).getScheme();
     }
 
-    public static String host(String uri) throws URISyntaxException {
-        String host = new URI(uri).getHost();
+    public static String host(String uri) throws Exception {
+        String host = new URL(uri).getHost();
         if (host != null) {
             return host;
         } else {
@@ -30,32 +28,32 @@ public class uri {
         }
     }
 
-    public static String basedirURI(String uri) throws URISyntaxException {
-        URI u = new URI(uri);
+    public static String basedirURI(String uri) throws Exception {
+        URL u = new URL(uri);
         return new java.net.URI(u.getScheme(), u.getUserInfo(), u.getHost(), u.getPort(), _basedirPath(u), null, null).toString();
     }
 
-    public static String basedirPath(String uri) throws URISyntaxException {
-        return _basedirPath(new URI(uri));
+    public static String basedirPath(String uri) throws Exception {
+        return _basedirPath(new URL(uri));
     }
 
-    public static String filename(String uri) throws URISyntaxException {
-        return _filename(new URI(uri));
+    public static String filename(String uri) throws Exception {
+        return _filename(new URL(uri));
     }
 
-    public static String context(String uri) throws URISyntaxException {
-        return new URI(uri).getFragment();
+    public static String context(String uri) throws Exception {
+        return new URL(uri).getFragment();
     }
 
-    public static boolean isDirectory(String uri) throws URISyntaxException {
-        return new URI(uri).getPath().endsWith("/");
+    public static boolean isDirectory(String uri) throws Exception {
+        return new URL(uri).getPath().endsWith("/");
     }
 
-    public static boolean isRelative(String uri) throws URISyntaxException {
-        return new URI(uri).getPath().startsWith("/");
+    public static boolean isRelative(String uri) throws Exception {
+        return new URL(uri).getPath().startsWith("/");
     }
 
-    public static String _basedirPath(URI uri) {
+    public static String _basedirPath(URL uri) throws Exception {
         String[] array = uri.getPath().split("/");
         if (array.length > 0) {
             StringBuffer buffer = new StringBuffer();
@@ -76,7 +74,7 @@ public class uri {
         }
     }
 
-    public static String _filename(URI uri) {
+    public static String _filename(URL uri) throws Exception {
         String[] array = uri.getPath().split("/");
         if (array.length > 0) {
             return array[array.length-1];

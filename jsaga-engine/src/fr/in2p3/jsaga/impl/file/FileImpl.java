@@ -12,7 +12,8 @@ import fr.in2p3.jsaga.engine.data.copy.TargetPhysicalFile;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytesPhysical;
 import fr.in2p3.jsaga.engine.schema.config.Protocol;
-import fr.in2p3.jsaga.impl.namespace.AbstractNamespaceEntryImpl;
+import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
+import fr.in2p3.jsaga.impl.namespace.JSAGAFlags;
 import org.ogf.saga.*;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.error.*;
@@ -40,36 +41,36 @@ public class FileImpl extends AbstractFileImpl implements File {
     protected InputStream m_inStream;
 
     /** constructor for factory */
-    public FileImpl(Session session, URI uri, DataAdaptor adaptor, Flags... flags) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(session, uri, adaptor, flags);
+    public FileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        super(session, url, adaptor, flags);
         this.init(flags);
     }
 
     /** constructor for open() */
-    public FileImpl(AbstractNamespaceEntryImpl entry, URI uri, Flags... flags) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(entry, uri, flags);
+    public FileImpl(AbstractNSEntryImpl entry, URL url, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        super(entry, url, flags);
         this.init(flags);
     }
 
-    private void init(Flags... flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        FlagsBytes effectiveFlags = new FlagsBytesPhysical(Flags.READ, flags);
+    private void init(int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        FlagsBytes effectiveFlags = new FlagsBytesPhysical(flags);
         if (effectiveFlags.contains(Flags.READ)) {
             if (m_adaptor instanceof FileReader) {
                 try {
-                    m_inStream = ((FileReader)m_adaptor).getInputStream(m_uri.getPath());
+                    m_inStream = ((FileReader)m_adaptor).getInputStream(m_url.getPath());
                 } catch(DoesNotExist e) {
-                    throw new DoesNotExist("File does not exist: "+m_uri, e.getCause());
+                    throw new DoesNotExist("File does not exist: "+ m_url, e.getCause());
                 }
                 if (m_inStream == null) {
                     throw new NoSuccess("[ADAPTOR ERROR] Method getInputStream() must return an InputStream instance", this);
                 }
             } else {
-                throw new NotImplemented("Not supported for this protocol: "+m_uri.getScheme(), this);
+                throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
             }
         }
         if (effectiveFlags.contains(Flags.WRITE)) {
             if (m_adaptor instanceof FileWriter) {
-                URI parent = super._getParentDirURI();
+                URL parent = super._getParentDirURL();
                 String fileName = super.getName();
                 boolean exclusive = effectiveFlags.contains(Flags.EXCL);
                 boolean append = effectiveFlags.contains(Flags.APPEND);
@@ -87,38 +88,36 @@ public class FileImpl extends AbstractFileImpl implements File {
                         throw new DoesNotExist("Parent directory does not exist: "+parent, e.getCause());
                     }
                 } catch(AlreadyExists e) {
-                    throw new AlreadyExists("File already exists: "+m_uri, e.getCause());
+                    throw new AlreadyExists("File already exists: "+ m_url, e.getCause());
                 }
                 if (m_outStream == null) {
                     throw new NoSuccess("[ADAPTOR ERROR] Method getOutputStream() must return an OutputStream instance", this);
                 }
             } else {
-                throw new NotImplemented("Not supported for this protocol: "+m_uri.getScheme(), this);
+                throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
             }
         } else if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
             this._makeParentDirs();
         }
-        if (!m_skipExistenceCheck && !effectiveFlags.contains(Flags.READ) && !effectiveFlags.contains(Flags.WRITE)) {
-            if (m_adaptor instanceof DataReaderAdaptor && !((DataReaderAdaptor)m_adaptor).exists(m_uri.getPath())) {
-                throw new DoesNotExist("File does not exist: "+m_uri);
+        if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !effectiveFlags.contains(Flags.READ) && !effectiveFlags.contains(Flags.WRITE)) {
+            if (m_adaptor instanceof DataReaderAdaptor && !((DataReaderAdaptor)m_adaptor).exists(m_url.getPath())) {
+                throw new DoesNotExist("File does not exist: "+ m_url);
             }
         }
     }
 
-    /** constructor for deepCopy */
-    protected FileImpl(FileImpl source) {
-        super(source);
-        m_inStream = source.m_inStream;
-    }
-    public SagaBase deepCopy() {
-        return new FileImpl(this);
+    /** clone */
+    public SagaObject clone() throws CloneNotSupportedException {
+        FileImpl clone = (FileImpl) super.clone();
+        clone.m_inStream = m_inStream;
+        return clone;
     }
 
     public ObjectType getType() {
         return ObjectType.FILE;
     }
 
-    ///////////////////////////// override some NamespaceEntry methods /////////////////////////////
+    ///////////////////////////// override some NSEntry methods /////////////////////////////
 
     /** override super.close() in order to close opened input and output streams */
     public synchronized void close() throws NotImplemented, IncorrectState, NoSuccess {
@@ -144,37 +143,38 @@ public class FileImpl extends AbstractFileImpl implements File {
     }
 
     /** implements super.copy() */
-    public void copy(URI target, Flags... flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
-        FlagsBytes effectiveFlags = new FlagsBytes(Flags.NONE, flags);
+    public void copy(URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
+        FlagsBytes effectiveFlags = new FlagsBytes(flags);
         if (effectiveFlags.contains(Flags.DEREFERENCE)) {
             this._dereferenceEntry().copy(target, effectiveFlags.remove(Flags.DEREFERENCE));
             return; //==========> EXIT
         }
-        effectiveFlags.checkAllowed(Flags.DEREFERENCE, Flags.CREATEPARENTS, Flags.OVERWRITE);
+        effectiveFlags.checkAllowed(Flags.DEREFERENCE.or(Flags.CREATEPARENTS.or(Flags.OVERWRITE)));
         boolean overwrite = effectiveFlags.contains(Flags.OVERWRITE);
-        URI effectiveTarget = this._getEffectiveURI(target);
+        URL effectiveTarget = this._getEffectiveURL(target);
         if (m_outStream != null) {
             try {m_outStream.close();} catch (IOException e) {/*ignore*/}
         }
-        if (m_adaptor instanceof DataCopyDelegated && m_uri.getScheme().equals(effectiveTarget.getScheme())) {
+        if (m_adaptor instanceof DataCopyDelegated && m_url.getScheme().equals(effectiveTarget.getScheme())) {
             try {
                 ((DataCopyDelegated)m_adaptor).requestTransfer(
-                        m_uri,
+                        m_url,
                         effectiveTarget,
                         overwrite);
             } catch (DoesNotExist doesNotExist) {
-                throw new IncorrectState("Source file does not exist: "+m_uri, doesNotExist);
+                throw new IncorrectState("Source file does not exist: "+ m_url, doesNotExist);
             } catch (AlreadyExists alreadyExists) {
                 throw new AlreadyExists("Target entry already exists: "+effectiveTarget, alreadyExists.getCause());
             }
-        } else if (m_adaptor instanceof DataCopy && m_uri.getScheme().equals(effectiveTarget.getScheme())) {
+        } else if (m_adaptor instanceof DataCopy && m_url.getScheme().equals(effectiveTarget.getScheme())) {
             try {
+                int targetPort = (effectiveTarget.getPort()>0 ? effectiveTarget.getPort() : m_adaptor.getDefaultPort());
                 ((DataCopy)m_adaptor).copy(
-                        m_uri.getPath(),
-                        effectiveTarget.getHost(), effectiveTarget.getPort(), effectiveTarget.getPath(),
+                        m_url.getPath(),
+                        effectiveTarget.getHost(), targetPort, effectiveTarget.getPath(),
                         overwrite);
             } catch (DoesNotExist doesNotExist) {
-                throw new IncorrectState("Source file does not exist: "+m_uri, doesNotExist);
+                throw new IncorrectState("Source file does not exist: "+ m_url, doesNotExist);
             } catch (AlreadyExists alreadyExists) {
                 throw new AlreadyExists("Target entry already exists: "+effectiveTarget, alreadyExists.getCause());
             }
@@ -182,67 +182,67 @@ public class FileImpl extends AbstractFileImpl implements File {
         } else if (m_adaptor instanceof DataGet) {
             FileImpl targetFile = SourcePhysicalFile.createTargetFile(m_session, effectiveTarget, effectiveFlags);
             try {
-                ((DataGet)m_adaptor).getToStream(m_uri.getPath(), targetFile.getOutputStream());
+                ((DataGet)m_adaptor).getToStream(m_url.getPath(), targetFile.getOutputStream());
             } catch (DoesNotExist doesNotExist) {
-                throw new IncorrectState("Source file does not exist: "+m_uri, doesNotExist);
+                throw new IncorrectState("Source file does not exist: "+m_url, doesNotExist);
             }
             targetFile.close();
 */
         } else if (m_adaptor instanceof FileReader) {
             Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(target.getScheme());
             if (descriptor.hasLogical() && descriptor.getLogical()) {
-                throw new BadParameter("Maybe what you want to do is to register to logical file the following location: "+m_uri.toString());
+                throw new BadParameter("Maybe what you want to do is to register to logical file the following location: "+ m_url.toString());
             } else {
                 SourcePhysicalFile source = new SourcePhysicalFile(this);
                 source.putToPhysicalFile(m_session, effectiveTarget, effectiveFlags);
             }
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+m_uri.getScheme(), this);
+            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
 
     /** implements super.copyFrom() */
-    public void copyFrom(URI source, Flags... flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
-        FlagsBytes effectiveFlags = new FlagsBytes(Flags.NONE, flags);
+    public void copyFrom(URL source, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
+        FlagsBytes effectiveFlags = new FlagsBytes(flags);
         if (effectiveFlags.contains(Flags.DEREFERENCE)) {
             this._dereferenceEntry().copyFrom(source, effectiveFlags.remove(Flags.DEREFERENCE));
             return; //==========> EXIT
         }
-        effectiveFlags.checkAllowed(Flags.DEREFERENCE, Flags.OVERWRITE);
+        effectiveFlags.checkAllowed(Flags.DEREFERENCE.or(Flags.OVERWRITE));
         boolean overwrite = effectiveFlags.contains(Flags.OVERWRITE);
-        URI effectiveSource = this._getEffectiveURI(source);
+        URL effectiveSource = this._getEffectiveURL(source);
         if (m_inStream != null) {
             try {m_inStream.close();} catch (IOException e) {/*ignore*/}
         }
-        if (m_adaptor instanceof DataCopyDelegated && m_uri.getScheme().equals(effectiveSource.getScheme())) {
+        if (m_adaptor instanceof DataCopyDelegated && m_url.getScheme().equals(effectiveSource.getScheme())) {
             try {
                 ((DataCopyDelegated)m_adaptor).requestTransfer(
                         effectiveSource,
-                        m_uri,
+                        m_url,
                         overwrite);
             } catch (DoesNotExist doesNotExist) {
                 throw new DoesNotExist("Source file does not exist: "+effectiveSource, doesNotExist.getCause());
             } catch (AlreadyExists alreadyExists) {
-                throw new IncorrectState("Target entry already exists: "+m_uri, alreadyExists);
+                throw new IncorrectState("Target entry already exists: "+ m_url, alreadyExists);
             }
-        } else if (m_adaptor instanceof DataCopy && m_uri.getScheme().equals(effectiveSource.getScheme())) {
+        } else if (m_adaptor instanceof DataCopy && m_url.getScheme().equals(effectiveSource.getScheme())) {
             try {
                 ((DataCopy)m_adaptor).copyFrom(
                         effectiveSource.getHost(), effectiveSource.getPort(), effectiveSource.getPath(),
-                        m_uri.getPath(),
+                        m_url.getPath(),
                         overwrite);
             } catch (DoesNotExist doesNotExist) {
                 throw new DoesNotExist("Source file does not exist: "+effectiveSource, doesNotExist.getCause());
             } catch (AlreadyExists alreadyExists) {
-                throw new IncorrectState("Target entry already exists: "+m_uri, alreadyExists);
+                throw new IncorrectState("Target entry already exists: "+ m_url, alreadyExists);
             }
 /*
         } else if (m_adaptor instanceof DataPut) {
             FileImpl sourceFile = TargetPhysicalFile.createSourceFile(m_session, effectiveSource);
             try {
-                ((DataPut)m_adaptor).putFromStream(m_uri.getPath(), sourceFile.getInputStream(), false);
+                ((DataPut)m_adaptor).putFromStream(m_url.getPath(), sourceFile.getInputStream(), false);
             } catch (AlreadyExists alreadyExists) {
-                throw new IncorrectState("Target entry already exists: "+m_uri, alreadyExists);
+                throw new IncorrectState("Target entry already exists: "+m_url, alreadyExists);
             }
             sourceFile.close();
 */
@@ -255,34 +255,34 @@ public class FileImpl extends AbstractFileImpl implements File {
                 target.getFromPhysicalFile(m_session, effectiveSource, effectiveFlags);
             }
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+m_uri.getScheme(), this);
+            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
 
     /** implements super.openDir() */
-    public NamespaceDirectory openDir(URI absolutePath, Flags... flags) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return new DirectoryImpl(this, super._resolveAbsoluteURI(absolutePath), flags);
+    public NSDirectory openDir(URL absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        return new DirectoryImpl(this, super._resolveAbsoluteURL(absolutePath), flags);
     }
 
     /** implements super.open() */
-    public NamespaceEntry open(URI absolutePath, Flags... flags) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return new FileImpl(this, super._resolveAbsoluteURI(absolutePath), flags);
+    public NSEntry open(URL absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        return new FileImpl(this, super._resolveAbsoluteURL(absolutePath), flags);
     }
 
     /////////////////////////////////// implementation of interface ///////////////////////////////////
 
-    public long getSize() throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    public long getSize() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         if (m_adaptor instanceof FileReader) {
             if (m_outStream != null) {
                 try {m_outStream.close();} catch (IOException e) {/*ignore*/}
             }
             try {
-                return ((FileReader)m_adaptor).getSize(m_uri.getPath());
+                return ((FileReader)m_adaptor).getSize(m_url.getPath());
             } catch (DoesNotExist doesNotExist) {
-                throw new IncorrectState("File does not exist: "+m_uri, doesNotExist);
+                throw new IncorrectState("File does not exist: "+ m_url, doesNotExist);
             }
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+m_uri.getScheme(), this);
+            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
 
@@ -315,7 +315,7 @@ public class FileImpl extends AbstractFileImpl implements File {
             }
             return readlen;
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+m_uri.getScheme(), this);
+            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
 
@@ -339,7 +339,7 @@ public class FileImpl extends AbstractFileImpl implements File {
             }
             return len;
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+m_uri.getScheme(), this);
+            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
 
@@ -359,11 +359,11 @@ public class FileImpl extends AbstractFileImpl implements File {
         throw new NotImplemented("Not implemented by the SAGA engine", this);
     }
 
-    public int readP(String pattern, Buffer buffer) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess, IOException {
+    public int readP(String pattern, Buffer buffer) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IOException {
         throw new NotImplemented("Not implemented by the SAGA engine", this);
     }
 
-    public int writeP(String pattern, Buffer buffer) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess, IOException {
+    public int writeP(String pattern, Buffer buffer) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IOException {
         throw new NotImplemented("Not implemented by the SAGA engine", this);
     }
 
@@ -394,12 +394,12 @@ public class FileImpl extends AbstractFileImpl implements File {
     }
 
     public InputStream newInputStream() throws NotImplemented, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
-        String absolutePath = super.getURI().getPath();
+        String absolutePath = super.getURL().getPath();
         return ((FileReader) m_adaptor).getInputStream(absolutePath);
     }
 
     public OutputStream newOutputStream(boolean overwrite) throws NotImplemented, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        String parentAbsolutePath = super._getParentDirURI().getPath();
+        String parentAbsolutePath = super._getParentDirURL().getPath();
         String fileName = super.getName();
         boolean exclusive = !overwrite;
         boolean append = false;

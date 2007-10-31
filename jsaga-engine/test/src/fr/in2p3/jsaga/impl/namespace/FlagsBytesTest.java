@@ -18,62 +18,57 @@ import fr.in2p3.jsaga.engine.data.flags.*;
  *
  */
 public class FlagsBytesTest extends TestCase {
-    public void test_contructor() {
-        assertFalse(new FlagsBytes(Flags.RECURSIVE, Flags.NONE).contains(Flags.RECURSIVE));
-        assertTrue(new FlagsBytes(Flags.RECURSIVE, (Flags)null).contains(Flags.RECURSIVE));
-    }
-
     public void test_filterNonBaseFlags() {
-        FlagsBytes flags = new FlagsBytes(null, Flags.TRUNCATE, Flags.READ, Flags.EXCL);
+        FlagsBytes flags = new FlagsBytes(Flags.TRUNCATE.or(Flags.READ.or(Flags.EXCL)));
         assertFalse(flags.contains(Flags.TRUNCATE));
         assertFalse(flags.contains(Flags.READ));
         assertTrue(flags.contains(Flags.EXCL));
     }
 
     public void test_filterNonLogicalFlags() {
-        FlagsBytes flags = new FlagsBytesLogical(null, Flags.TRUNCATE, Flags.READ, Flags.EXCL);
+        FlagsBytes flags = new FlagsBytesLogical(Flags.TRUNCATE.or(Flags.READ.or(Flags.EXCL)));
         assertFalse(flags.contains(Flags.TRUNCATE));
         assertTrue(flags.contains(Flags.READ));
         assertTrue(flags.contains(Flags.EXCL));
     }
 
     public void test_filterNonPhysicalFlags() {
-        FlagsBytes flags = new FlagsBytesPhysical(null, Flags.TRUNCATE, Flags.READ, Flags.EXCL);
+        FlagsBytes flags = new FlagsBytesPhysical(Flags.TRUNCATE.or(Flags.READ.or(Flags.EXCL)));
         assertTrue(flags.contains(Flags.TRUNCATE));
         assertTrue(flags.contains(Flags.READ));
         assertTrue(flags.contains(Flags.EXCL));
     }
 
     public void test_contains() {
-        FlagsBytes flags = new FlagsBytes(null, Flags.CREATE, Flags.EXCL);
+        FlagsBytes flags = new FlagsBytes(Flags.CREATE.or(Flags.EXCL));
         assertFalse(flags.contains(Flags.RECURSIVE));
-        flags = new FlagsBytes(null, Flags.CREATE, Flags.EXCL);
+        flags = new FlagsBytes(Flags.CREATE.or(Flags.EXCL));
         assertTrue(flags.contains(Flags.EXCL));
     }
 
     public void test_checkAllowed() {
-        FlagsBytes flags = new FlagsBytesPhysical(null, Flags.TRUNCATE, Flags.READ, Flags.EXCL);
+        FlagsBytes flags = new FlagsBytesPhysical(Flags.TRUNCATE.or(Flags.READ.or(Flags.EXCL)));
         try {
-            flags.checkAllowed(Flags.TRUNCATE, Flags.READ, Flags.EXCL ,Flags.RECURSIVE);
+            flags.checkAllowed(Flags.TRUNCATE.or(Flags.READ.or(Flags.EXCL.or(Flags.RECURSIVE))));
         } catch(BadParameter e) {
             fail("Unexpected BadParameter exception: "+e.getMessage());
         }
         try {
-            flags.checkAllowed(Flags.READ, Flags.EXCL, Flags.RECURSIVE);
+            flags.checkAllowed(Flags.READ.or(Flags.EXCL.or(Flags.RECURSIVE)));
             fail("Expected BadParameter exception");
         } catch(BadParameter e) {
         }
     }
 
     public void test_checkRequired() {
-        FlagsBytes flags = new FlagsBytesPhysical(null, Flags.TRUNCATE, Flags.READ, Flags.EXCL);
+        FlagsBytes flags = new FlagsBytesPhysical(Flags.TRUNCATE.or(Flags.READ.or(Flags.EXCL)));
         try {
-            flags.checkRequired(Flags.READ, Flags.EXCL);
+            flags.checkRequired(Flags.READ.or(Flags.EXCL));
         } catch(BadParameter e) {
             fail("Unexpected BadParameter exception: "+e.getMessage());
         }
         try {
-            flags.checkRequired(Flags.READ, Flags.EXCL, Flags.RECURSIVE);
+            flags.checkRequired(Flags.READ.or(Flags.EXCL.or(Flags.RECURSIVE)));
             fail("Expected BadParameter exception");
         } catch(BadParameter e) {
         }

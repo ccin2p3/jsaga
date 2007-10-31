@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.command;
 
-import fr.in2p3.jsaga.impl.namespace.AbstractNamespaceDirectoryImpl;
+import fr.in2p3.jsaga.impl.namespace.AbstractNSDirectoryImpl;
 import org.apache.commons.cli.*;
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
@@ -28,7 +28,7 @@ public class NamespaceList extends AbstractCommand {
     private static final String OPT_PATTERN = "p", LONGOPT_PATTERN = "pattern";
 
     public NamespaceList() {
-        super("jsaga-ls", new String[]{"URI"}, new String[]{OPT_HELP, LONGOPT_HELP});
+        super("jsaga-ls", new String[]{"URL"}, new String[]{OPT_HELP, LONGOPT_HELP});
     }
 
     public static void main(String[] args) throws Exception {
@@ -43,23 +43,25 @@ public class NamespaceList extends AbstractCommand {
         else
         {
             // get arguments
-            URI uri = new URI(command.m_nonOptionValues[0]);
+            URL url = new URL(command.m_nonOptionValues[0].replaceAll(" ", "%20"));
             String pattern = line.getOptionValue(OPT_PATTERN);
 
             // get list
             Session session = SessionFactory.createSession(true);
-            NamespaceDirectory dir = NamespaceFactory.createNamespaceDirectory(session, uri, Flags.NONE);
+            NSDirectory dir = NSFactory.createNSDirectory(session, url, Flags.NONE.getValue());
             List list;
             if (line.hasOption(OPT_LONG)) {
-                list = ((AbstractNamespaceDirectoryImpl)dir).listWithLongFormat(pattern, Flags.NONE);
+                list = ((AbstractNSDirectoryImpl)dir).listWithLongFormat(pattern, Flags.NONE.getValue());
             } else {
-                list = dir.list(pattern, Flags.NONE);
+                list = dir.list(pattern, Flags.NONE.getValue());
             }
-            dir.close(0.0f);
+            dir.close();
 
             // display list
             for (Iterator it=list.iterator(); it.hasNext(); ) {
-                System.out.println(it.next());
+                Object file = it.next();
+                String fileCorrected = (file instanceof URL ? file.toString().replaceAll("%20", " ") : (String) file);
+                System.out.println(fileCorrected);
             }
         }
     }

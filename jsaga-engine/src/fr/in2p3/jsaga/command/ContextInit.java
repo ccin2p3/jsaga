@@ -9,8 +9,6 @@ import org.ogf.saga.context.ContextFactory;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 
-import java.util.Iterator;
-
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -42,11 +40,11 @@ public class ContextInit extends AbstractCommand {
         else if (command.m_nonOptionValues.length == 0)
         {
             Session session = SessionFactory.createSession(true);
-            for (Iterator it=session.listContexts().iterator(); it.hasNext(); ) {
-                Context context = (Context) it.next();
-                ((ContextImpl) context).init();
+            Context[] contexts = session.listContexts();
+            for (int i=0; i<contexts.length; i++) {
+                ((ContextImpl) contexts[i]).init();
             }
-            session.close(0.0f);
+            session.close();
         }
         else if (command.m_nonOptionValues.length == 1)
         {

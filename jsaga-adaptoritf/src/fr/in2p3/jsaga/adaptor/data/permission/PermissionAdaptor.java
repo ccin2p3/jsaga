@@ -24,7 +24,7 @@ public interface PermissionAdaptor extends DataAdaptor {
      * @param id the id.
      * @param permissions the permissions to enable.
      */
-    public void enablePermissions(String absolutePath, String id, PermissionBytes permissions)
+    public void permissionsAllow(String absolutePath, String id, PermissionBytes permissions)
             throws PermissionDenied, Timeout, NoSuccess;
 
     /**
@@ -35,7 +35,7 @@ public interface PermissionAdaptor extends DataAdaptor {
      * @param id the id.
      * @param permissions the permissions to disable.
      */
-    public void disablePermissions(String absolutePath, String id, PermissionBytes permissions)
+    public void permissionsDeny(String absolutePath, String id, PermissionBytes permissions)
             throws PermissionDenied, Timeout, NoSuccess;
 
     /**
@@ -49,7 +49,7 @@ public interface PermissionAdaptor extends DataAdaptor {
      * @return <code>true</code> if the specified permissions are enabled
      *     for the specified id.
      */
-    public boolean areEnabled(String absolutePath, String id, PermissionBytes permissions)
+    public boolean permissionsCheck(String absolutePath, String id, PermissionBytes permissions)
             throws PermissionDenied, Timeout, NoSuccess;
 
     /**

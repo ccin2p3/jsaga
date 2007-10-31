@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.*;
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.file.File;
@@ -27,7 +27,7 @@ public class NamespaceCat extends AbstractCommand {
     private static final String OPT_HELP = "h", LONGOPT_HELP = "help";
 
     public NamespaceCat() {
-        super("jsaga-cat", new String[]{"Source URI"}, new String[]{OPT_HELP, LONGOPT_HELP});
+        super("jsaga-cat", new String[]{"Source URL"}, new String[]{OPT_HELP, LONGOPT_HELP});
     }
 
     public static void main(String[] args) throws Exception {
@@ -42,15 +42,15 @@ public class NamespaceCat extends AbstractCommand {
         else
         {
             // get arguments
-            URI source = new URI(command.m_nonOptionValues[0]);
+            URL source = new URL(command.m_nonOptionValues[0].replaceAll(" ", "%20"));
 
             // execute command
             Session session = SessionFactory.createSession(true);
-            NamespaceEntry entry = NamespaceFactory.createNamespaceEntry(session, source, Flags.READ);
+            NSEntry entry = NSFactory.createNSEntry(session, source, Flags.READ.getValue());
             try {
                 while (entry instanceof LogicalFile) {
-                    URI effectiveSource = entry.readLink();
-                    NamespaceEntry effectiveEntry = NamespaceFactory.createNamespaceEntry(session, effectiveSource, Flags.READ);
+                    URL effectiveSource = entry.readLink();
+                    NSEntry effectiveEntry = NSFactory.createNSEntry(session, effectiveSource, Flags.READ.getValue());
                     entry.close();
                     entry = effectiveEntry;
                 }
@@ -61,8 +61,8 @@ public class NamespaceCat extends AbstractCommand {
                         System.out.write(buffer.getData(), 0, len);
                     }
                     buffer.close();
-                } else if (entry instanceof NamespaceDirectory) {
-                    System.err.println("Is a directory: "+entry.getURI());
+                } else if (entry instanceof NSDirectory) {
+                    System.err.println("Is a directory: "+entry.getURL());
                 }
             } finally {
                 entry.close();

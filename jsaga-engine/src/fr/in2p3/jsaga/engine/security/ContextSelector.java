@@ -1,11 +1,9 @@
 package fr.in2p3.jsaga.engine.security;
 
 import fr.in2p3.jsaga.impl.context.ContextImpl;
+import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
-
-import java.util.Iterator;
-import java.util.List;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -37,9 +35,9 @@ public class ContextSelector {
             throw new IncorrectState("No session");
         }
         boolean typeFound = false;
-        List list = m_session.listContexts();
-        for (Iterator it=list.iterator(); it.hasNext(); ) {
-            ContextImpl context = (ContextImpl) it.next();
+        Context[] contexts = m_session.listContexts();
+        for (int i=0; i<contexts.length; i++) {
+            ContextImpl context = (ContextImpl) contexts[i];
             try {
                 if (context.getAttribute("Type").equals(type)) {
                     typeFound = true;
@@ -48,7 +46,6 @@ public class ContextSelector {
                     }
                 }
             } catch(DoesNotExist e) {
-            } catch(ReadOnly e) {
             }
         }
         if (typeFound) {
@@ -65,15 +62,14 @@ public class ContextSelector {
         if (m_session == null) {
             throw new IncorrectState("No session");
         }
-        List list = m_session.listContexts();
-        for (Iterator it=list.iterator(); it.hasNext(); ) {
-            ContextImpl context = (ContextImpl) it.next();
+        Context[] contexts = m_session.listContexts();
+        for (int i=0; i<contexts.length; i++) {
+            ContextImpl context = (ContextImpl) contexts[i];
             try {
                 if (context.getAttribute("Name").equals(name)) {
                     return context;
                 }
             } catch(DoesNotExist e) {
-            } catch(ReadOnly e) {
             }
         }
         throw new IncorrectState("Session has no context instance with name: "+name);

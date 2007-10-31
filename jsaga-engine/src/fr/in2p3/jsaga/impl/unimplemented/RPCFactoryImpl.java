@@ -1,10 +1,10 @@
 package fr.in2p3.jsaga.impl.unimplemented;
 
-import org.ogf.saga.URI;
+import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.rpc.*;
 import org.ogf.saga.session.Session;
-import org.ogf.saga.task.RVTask;
+import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
 
 /* ***************************************************
@@ -24,11 +24,11 @@ public class RPCFactoryImpl extends RPCFactory {
         throw new BadParameter("Not implemented by the SAGA engine");
     }
 
-    protected RPC doCreateRPC(Session session, URI funcname) throws NotImplemented, IncorrectURL, IncorrectSession, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    protected RPC doCreateRPC(Session session, URL funcname) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         throw new NotImplemented("Not implemented by the SAGA engine");
     }
 
-    protected RVTask<RPC> doCreateRPC(TaskMode mode, Session session, URI funcname) throws NotImplemented {
+    protected Task<RPC> doCreateRPC(TaskMode mode, Session session, URL funcname) throws NotImplemented {
         throw new NotImplemented("Not implemented by the SAGA engine");
     }
 }

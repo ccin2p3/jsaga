@@ -33,13 +33,14 @@ public class AttributeScalar extends Attribute {
         m_value = toScalar(values);
     }
 
-    /** constructor for deepCopy */
-    public AttributeScalar(AttributeScalar source) {
-        super(source);
-        m_value = source.m_value;
+    /** clone */
+    public Object clone() throws CloneNotSupportedException {
+        AttributeScalar clone = (AttributeScalar) super.clone();
+        clone.m_value = m_value;
+        return clone;
     }
 
-    public void setValue(String value) throws NotImplemented, ReadOnly {
+    public void setValue(String value) throws NotImplemented, PermissionDenied {
         checkSupported();
         checkWritable();
         m_value = value;
