@@ -61,7 +61,7 @@
             <fileset os="unix" dir="bin/" includes="*.sh" targetdir="$INSTALL_PATH/bin/"/>
             <xsl:for-each select="$scripts/script/text()">
                 <xsl:variable name="script">$INSTALL_PATH/bin/<xsl:value-of select="."/>.sh</xsl:variable>
-                <parsable os="unix" targetfile="$INSTALL_PATH/bin/*.sh" type="shell"/>
+                <parsable os="unix" targetfile="{$script}" type="shell"/>
                 <executable os="unix" targetfile="{$script}" stage="never"/>
             </xsl:for-each>
 
