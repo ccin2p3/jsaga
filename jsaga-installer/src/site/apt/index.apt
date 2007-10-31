@@ -4,19 +4,20 @@ JSAGA
  ({{{http://forge.ogf.org/sf/go/doc13771?nav=1}SAGA}}) specification from
  the Open Grid Forum ({{{http://forge.ogf.org/}OGF}}).
 
- This implementation enables to transparently use resources of several
+ Extensible via plugins and customizable via configuration files, this
+ implementation enables a uniform access to the resources of several
  grids supporting heterogeneous security, data management and execution
  management technologies.
 
- The goal of JSAGA is to provide an extensible (plugins) and customizable
- (configuration files) implementation, which does not only enable
- submitting jobs on various grid middleware components, but which also
- automatically and efficiently convey the input/output files of the jobs
- to/from the worker nodes.
- Selecting the best transfer path for each file requires considering many
- parameters, such as the caracteristics of the selected grid and site,
- the caracteristics of the transfer protocol and security context used to
- access the file, the caracteristics of the file itself.
+ JSAGA does not only enable submitting jobs on various grid middleware
+ components, it also enables a transparent usage of grid deployments, by
+ selecting the appropriate security context to connect to the resource
+ and by conveying the input/output files of the jobs to/from the worker
+ nodes. The selection of the transfer path depends on many parameters,
+ including the caracteristics of the selected grid and site, the
+ caracteristics of the file transfer protocol, the availability of the
+ security contexts needed to access the data management resources, the
+ caracteristics of the file itself.
 
  JSAGA hides all this complexity and enables submitting jobs to several
  grids, by using a single job description written in Job Submission
