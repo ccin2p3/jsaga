@@ -6,6 +6,7 @@ Adaptors
 | <<Context Type>> | <<Module>> |
 *------------------+--+
 | UserPass         | Core |
+| InMemoryProxy    |
 *------------------+--+
 | Globus           | jsaga-adaptor-globus |
 | GlobusLegacy     |
@@ -25,15 +26,15 @@ Adaptors
 | file         |                             | jsaga-adaptor-classic |
 *--------------+--+--+
 | gsiftp       | Globus, GlobusLegacy, GlobusRFC820 | jsaga-adaptor-globus |
-| gsiftp-new   | MyProxy                     |
+| gsiftp-new   | MyProxy, InMemoryProxy      |
 | gsiftp-old   | VOMS                        |
 *--------------+--+--+
 | gsiftp-win   | Globus, GlobusLegacy, GlobusRFC820 | jsaga-adaptor-globus |
-|              | MyProxy                     |
+|              | MyProxy, InMemoryProxy      |
 *--------------+--+--+
 | srm          | Globus, GlobusLegacy, GlobusRFC820 | jsaga-adaptor-srm |
-| srm22        | MyProxy                     |
-| srm11        | VOMS                        |
+| srm22        | MyProxy, InMemoryProxy      |
+| (srm11)      | VOMS                        |
 *--------------+--+--+
 
 * Execution Management Adaptors
