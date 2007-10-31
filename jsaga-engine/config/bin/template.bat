@@ -5,9 +5,10 @@ REM # set arguments
 set ARGS=
 set SEP= 
 :beginArgs
-if "%1_"=="_" goto endArgs
+set CURRENT=%~1
+if "%CURRENT%_"=="_" goto endArgs
 set ARGS=%ARGS%%SEP%%1
-set OPTION=%1
+set OPTION=%CURRENT%
 if "%OPTION:~0,2%"=="-D" (set SEP==) else (set SEP= )
 shift
 goto beginArgs
