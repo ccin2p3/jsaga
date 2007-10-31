@@ -15,6 +15,18 @@ import java.io.PrintStream;
  *
  */
 public interface SecurityAdaptor {
+    public static final int INFINITE = -1;
+
+    /**
+     * @return the identifier of the user.
+     */
+    public String getUserID() throws Exception;
+
+    /**
+     * @return the time left or <code>INFINITE</code>.
+     */
+    public int getTimeLeft() throws Exception;
+
     /**
      * Close the context (implementation may be empty).
      */

@@ -17,7 +17,7 @@ import java.io.PrintStream;
 /**
  *
  */
-public class GSSCredentialSecurityAdaptor implements SecurityAdaptor {
+public abstract class GSSCredentialSecurityAdaptor implements SecurityAdaptor {
     protected GSSCredential m_proxy;
 
     public GSSCredentialSecurityAdaptor(GSSCredential proxy) {
@@ -26,6 +26,14 @@ public class GSSCredentialSecurityAdaptor implements SecurityAdaptor {
 
     public GSSCredential getGSSCredential() {
         return m_proxy;
+    }
+
+    public String getUserID() throws Exception {
+        return m_proxy.getName().toString();
+    }
+
+    public int getTimeLeft() throws Exception {
+        return m_proxy.getRemainingLifetime();
     }
 
     public void close() throws Exception {
