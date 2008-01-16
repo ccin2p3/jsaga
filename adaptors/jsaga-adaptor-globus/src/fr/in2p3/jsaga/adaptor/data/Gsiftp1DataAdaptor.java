@@ -25,7 +25,6 @@ import java.util.Vector;
  *
  */
 
-// Test ND
 public class Gsiftp1DataAdaptor extends GsiftpDataAdaptorAbstract {
     public String[] getSchemeAliases() {
         return new String[]{"gsiftp-old", "gridftp-old", "gsiftp1", "gridftp1"};
