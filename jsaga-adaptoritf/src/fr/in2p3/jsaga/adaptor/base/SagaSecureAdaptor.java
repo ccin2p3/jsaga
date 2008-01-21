@@ -1,6 +1,9 @@
 package fr.in2p3.jsaga.adaptor.base;
 
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import org.ogf.saga.error.*;
+
+import java.util.Map;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -25,4 +28,26 @@ public interface SagaSecureAdaptor extends SagaBaseAdaptor {
      * @param securityAdaptor the security adaptor.
      */
     public void setSecurityAdaptor(SecurityAdaptor securityAdaptor);
+
+    /**
+     * @return the default server port.
+     */
+    public int getDefaultPort();
+
+    /**
+     * Connect to the server and initialize the connection with the provided <code>attributes</code>.
+     * @param userInfo the user login
+     * @param host the server
+     * @param port the port
+     * @param basePath the base path
+     * @param attributes the provided attributes
+     */
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess;
+
+    /**
+     * Disconnect from the server.
+     */
+    public void disconnect()
+        throws NoSuccess;
 }

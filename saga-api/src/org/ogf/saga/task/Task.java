@@ -1,5 +1,7 @@
 package org.ogf.saga.task;
 
+import java.util.concurrent.Future;
+
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.AlreadyExists;
 import org.ogf.saga.error.AuthenticationFailed;
@@ -19,7 +21,7 @@ import org.ogf.saga.monitoring.Monitorable;
  * The generic parameter <code>E</code> denotes the type of the return
  * value of the asynchronous method call.
  */
-public interface Task<E> extends SagaObject, Monitorable {
+public interface Task<E> extends SagaObject, Monitorable, Future<E> {
 
     /**
      * Metric name: fires on task state change, and has the literal value
@@ -38,7 +40,7 @@ public interface Task<E> extends SagaObject, Monitorable {
      * The SAGA API specifies that this method is called <code>wait</code>,
      * for Java the name needs to be changed slightly.
      */
-    public void waitTask()
+    public void waitFor()
         throws NotImplemented, IncorrectState, Timeout, NoSuccess;
 
     /**
@@ -48,7 +50,7 @@ public interface Task<E> extends SagaObject, Monitorable {
      * @param timeoutInSeconds maximum number of seconds to wait.
      * @return <code>true</code> if the task is finished within the specified time.
      */
-    public boolean waitTask(float timeoutInSeconds)
+    public boolean waitFor(float timeoutInSeconds)
         throws NotImplemented, IncorrectState, Timeout, NoSuccess;
 
     /**
@@ -89,7 +91,7 @@ public interface Task<E> extends SagaObject, Monitorable {
      * Gets the object from which the task was created.
      * @return the object this task was created from.
      */
-    public SagaObject getObject()
+    public <T> T getObject()
         throws NotImplemented, Timeout, NoSuccess;
 
     /**

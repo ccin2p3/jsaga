@@ -58,7 +58,7 @@ public class EmulatorDataAdaptor implements FileReader, FileWriter, DirectoryRea
         return 1234;
     }
 
-    public void connect(String userInfo, String host, int port, Map attributes) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {
         m_server = new DataEmulatorConnection(this.getSchemeAliases()[0], host, port);
         if(Base.DEBUG) m_server.commit();
     }
@@ -97,8 +97,13 @@ public class EmulatorDataAdaptor implements FileReader, FileWriter, DirectoryRea
         return new ByteArrayInputStream(content.getBytes());
     }
 
-    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append) throws PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        DirectoryType parent = m_server.getDirectory(parentAbsolutePath);
+    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+        DirectoryType parent;
+        try {
+            parent = m_server.getDirectory(parentAbsolutePath);
+        } catch (DoesNotExist e) {
+            throw new ParentDoesNotExist("Parent directory does not exist");
+        }
         File file;
         try {
             file = m_server.getFile(parent, fileName);
@@ -130,8 +135,13 @@ public class EmulatorDataAdaptor implements FileReader, FileWriter, DirectoryRea
         return ret;
     }
 
-    public void makeDir(String parentAbsolutePath, String directoryName) throws PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        DirectoryType parent = m_server.getDirectory(parentAbsolutePath);
+    public void makeDir(String parentAbsolutePath, String directoryName) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+        DirectoryType parent;
+        try {
+            parent = m_server.getDirectory(parentAbsolutePath);
+        } catch (DoesNotExist e) {
+            throw new ParentDoesNotExist("Parent directory does not exist");
+        }
         try {
             m_server.getEntry(parent, directoryName);
             throw new AlreadyExists("Entry already exists");

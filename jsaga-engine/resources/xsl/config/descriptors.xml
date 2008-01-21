@@ -1,70 +1,53 @@
 <effective-config xmlns="http://www.in2p3.fr/jsaga">
     <!-- languages -->
-    <language name="jsdl"
-              parse="fr.in2p3.jsaga.adaptor.language.XMLLanguageAdaptor"
-              validate="schema/jsdl-extended.xsd.xml"/>
-    <language name="rsl2"
-              parse="fr.in2p3.jsaga.adaptor.language.RSLLanguageAdaptor"
-              transform="../../etc/in2p3_jsaga_globus/RSL2_to_JSDL.xsl"/>
-    <language name="rsl4"
-              parse="fr.in2p3.jsaga.adaptor.language.XMLLanguageAdaptor"
-              validate="share/schema/wsrf/in2p3_jsaga_globus/rsl_v4.xsd"
-              transform="../../etc/in2p3_jsaga_globus/RSL4_to_JSDL.xsl"/>
-    <language name="jdl"
-              parse="fr.in2p3.jsaga.adaptor.language.ClassadLanguageAdaptor"
-              validate="share/schema/wsrf/in2p3_jsaga_glite/JDL_classad_definition.txt"
-              transform="../../etc/in2p3_jsaga_glite/JDL_to_JSDL.xsl"/>
-    <language name="pbs"
-              parse="fr.in2p3.jsaga.adaptor.language.HeaderLanguageAdaptor"
-              transform="../../etc/in2p3_jsaga_pbs/PBS_to_JSDL.xsl"/>
-    <language name="legacy"
-              parse="fr.in2p3.jsaga.adaptor.language.XMLLanguageAdaptor"
-              validate="share/schema/wsrf/in2p3_jsaga_legacy/legacy.xsd"
-              transform="../../etc/in2p3_jsaga_legacy/legacy_to_JSDL.xsl"/>
-    <language name="saga"
-              parse="fr.in2p3.jsaga.adaptor.language.PropertiesLanguageAdaptor"
-              transform="../../etc/in2p3_jsaga_saga/SAGA_to_JSDL.xsl"/>
+    <language name="jsdl" impl="fr.in2p3.jsaga.adaptor.language.JSDLLanguageAdaptor"/>
+    <language name="rsl2" impl="fr.in2p3.jsaga.adaptor.language.RSL2LanguageAdaptor"/>
+    <language name="rsl4" impl="fr.in2p3.jsaga.adaptor.language.RSL4LanguageAdaptor"/>
+    <language name="jdl" impl="fr.in2p3.jsaga.adaptor.language.JDLLanguageAdaptor"/>
+    <language name="pbs" impl="fr.in2p3.jsaga.adaptor.language.PBSLanguageAdaptor"/>
+    <language name="legacy" impl="fr.in2p3.jsaga.adaptor.language.LegacyLanguageAdaptor"/>
+    <language name="saga" impl="fr.in2p3.jsaga.adaptor.language.SAGALanguageAdaptor"/>
 
     <!-- context instances -->
-    <contextInstance type="Globus" indice="0" impl="fr.in2p3.jsaga.adaptor.security.GlobusContextAdaptor"
-             usage="((_UserProxyObject_ | +UserProxy+ | (UserProxy &lt;UserCert> &lt;UserKey> *UserPass* [LifeTime] [Limited] [ProxyType])) &lt;CertDir>)">
+    <contextInstance type="Globus" indice="0" impl="fr.in2p3.jsaga.adaptor.security.GlobusSecurityAdaptorBuilder"
+             usage="((_UserProxyObject_ | +UserProxy+ | (UserProxy &lt;UserCert> &lt;UserKey> *UserPass* [LifeTime] [Limited] [ProxyType])) &lt;CertRepository>)">
         <attribute name="UserProxy" value="C:\DOCUME~1\SYLVAI~1\LOCALS~1\Temp\x509up_u[uid]"/>
         <attribute name="UserCert" value="E:\User Settings/.globus/usercert.pem"/>
         <attribute name="UserKey" value="E:\User Settings/.globus/userkey.pem"/>
-        <attribute name="CertDir" value="/etc/grid-security/certificates/"/>
+        <attribute name="CertRepository" value="/etc/grid-security/certificates/"/>
         <attribute name="LifeTime" value="PT12H"/>
         <attribute name="Limited" value="False"/>
-        <init usage="((UserProxy &lt;UserCert> &lt;UserKey> *UserPass* [LifeTime] [Limited] [ProxyType]) &lt;CertDir>)"/>
+        <init usage="((UserProxy &lt;UserCert> &lt;UserKey> *UserPass* [LifeTime] [Limited] [ProxyType]) &lt;CertRepository>)"/>
     </contextInstance>
-    <contextInstance type="MyProxy" indice="0" impl="fr.in2p3.jsaga.adaptor.security.MyProxyContextAdaptor"
-             usage="((_UserProxyObject_ | +UserProxy+ | (UserName MyProxyPass) | (UserProxy &lt;UserCert> &lt;UserKey> *UserPass* Server [LifeTime] [UserName] [MyProxyPass])) &lt;CertDir>)">
+    <contextInstance type="MyProxy" indice="0" impl="fr.in2p3.jsaga.adaptor.security.MyProxySecurityAdaptorBuilder"
+             usage="((_UserProxyObject_ | +UserProxy+ | (UserID MyProxyPass) | (UserProxy &lt;UserCert> &lt;UserKey> *UserPass* Server [LifeTime] [UserID] [MyProxyPass])) &lt;CertRepository>)">
         <attribute name="UserProxy" value="C:\DOCUME~1\SYLVAI~1\LOCALS~1\Temp\x509up_u[uid]"/>
         <attribute name="UserCert" value="E:\User Settings/.globus/usercert.pem"/>
         <attribute name="UserKey" value="E:\User Settings/.globus/userkey.pem"/>
-        <attribute name="CertDir" value="/etc/grid-security/certificates/"/>
-        <init usage="((UserProxy &lt;UserCert> &lt;UserKey> *UserPass* Server [LifeTime] [UserName] [MyProxyPass]) &lt;CertDir>)"/>
+        <attribute name="CertRepository" value="/etc/grid-security/certificates/"/>
+        <init usage="((UserProxy &lt;UserCert> &lt;UserKey> *UserPass* Server [LifeTime] [UserID] [MyProxyPass]) &lt;CertRepository>)"/>
     </contextInstance>
-    <contextInstance type="VOMS" indice="0" impl="fr.in2p3.jsaga.adaptor.security.VOMSContextAdaptor"
-             usage="((_UserProxyObject_ | +UserProxy+ | (UserProxy &lt;UserCert> &lt;UserKey> *UserPass* Server UserVO [LifeTime] [UserFQAN])) &lt;CertDir>)">
+    <contextInstance type="VOMS" indice="0" impl="fr.in2p3.jsaga.adaptor.security.VOMSSecurityAdaptorBuilder"
+             usage="((_UserProxyObject_ | +UserProxy+ | (UserProxy &lt;UserCert> &lt;UserKey> *UserPass* Server UserVO [LifeTime] [UserFQAN])) &lt;CertRepository>)">
         <attribute name="UserProxy" value="C:\DOCUME~1\SYLVAI~1\LOCALS~1\Temp\x509up_u[uid]"/>
         <attribute name="UserCert" value="E:\User Settings/.globus/usercert.pem"/>
         <attribute name="UserKey" value="E:\User Settings/.globus/userkey.pem"/>
-        <attribute name="CertDir" value="/etc/grid-security/certificates/"/>
-        <init usage="((UserProxy &lt;UserCert> &lt;UserKey> *UserPass* Server UserVO [LifeTime] [UserFQAN]) &lt;CertDir>)"/>
+        <attribute name="CertRepository" value="/etc/grid-security/certificates/"/>
+        <init usage="((UserProxy &lt;UserCert> &lt;UserKey> *UserPass* Server UserVO [LifeTime] [UserFQAN]) &lt;CertRepository>)"/>
     </contextInstance>
-    <contextInstance type="SSH" indice="0" impl="fr.in2p3.jsaga.adaptor.security.SSHContextAdaptor"
-             usage="((&lt;UserCert> &lt;UserKey>) | (UserName *UserPass*))">
+    <contextInstance type="SSH" indice="0" impl="fr.in2p3.jsaga.adaptor.security.SSHSecurityAdaptorBuilder"
+             usage="((&lt;UserCert> &lt;UserKey>) | (UserID *UserPass*))">
         <attribute name="UserCert" value="E:\User Settings/.ssh/id_dsa.pub"/>
         <attribute name="UserKey" value="E:\User Settings/.ssh/id_dsa"/>
     </contextInstance>
-    <contextInstance type="X509" indice="0" impl="fr.in2p3.jsaga.adaptor.security.X509ContextAdaptor"
+    <contextInstance type="X509" indice="0" impl="fr.in2p3.jsaga.adaptor.security.X509SecurityAdaptorBuilder"
              usage="(&lt;UserCert> *UserPass* Alias)">
         <attribute name="UserCert" value="E:\User Settings/.keystore"/>
         <attribute name="UserPass" value="changeme"/>
     </contextInstance>
     <contextInstance type="UserPass" indice="0" impl="fr.in2p3.jsaga.adaptor.security.UserPassSecurityAdaptorBuilder"
-             usage="(UserName *UserPass*)">
-        <attribute name="UserName" value="anonymous"/>
+             usage="(UserID *UserPass*)">
+        <attribute name="UserID" value="anonymous"/>
         <attribute name="UserPass" value="anon"/>
     </contextInstance>
 
@@ -123,10 +106,12 @@
     </protocol>
 
     <!-- jobmgt -->
-    <jobservice type="Gatekeeper" impl="fr.in2p3.jsaga.adaptor.job.GatekeeperJobAdaptor" bulk="false">
+    <jobservice type="gatekeeper" impl="fr.in2p3.jsaga.adaptor.job.GatekeeperJobControlAdaptor" bulk="false">
+        <monitor impl="fr.in2p3.jsaga.adaptor.job.GatekeeperJobMonitorAdaptor"/>
         <supportedContextType>Globus</supportedContextType>
     </jobservice>
-    <jobservice type="WMS" impl="fr.in2p3.jsaga.adaptor.job.WMSJobAdaptor" bulk="true">
+    <jobservice type="wms" impl="fr.in2p3.jsaga.adaptor.job.WMSJobControlAdaptor" bulk="true">
+        <monitor impl="fr.in2p3.jsaga.adaptor.job.LBJobMonitorAdaptor"/>
         <supportedContextType>Globus</supportedContextType>
         <supportedContextType>MyProxy</supportedContextType>
         <supportedContextType>VOMS</supportedContextType>
@@ -135,7 +120,8 @@
         <supportedProtocolScheme>gsiftp</supportedProtocolScheme>
         <supportedProtocolScheme>file</supportedProtocolScheme>
     </jobservice>
-    <jobservice type="SSH" impl="fr.in2p3.jsaga.adaptor.job.SSHJobAdaptor" bulk="false">
+    <jobservice type="ssh" impl="fr.in2p3.jsaga.adaptor.job.SSHJobControlAdaptor" bulk="false">
+        <monitor impl="fr.in2p3.jsaga.adaptor.job.SSHJobMonitorAdaptor"/>
         <supportedContextType>SSH</supportedContextType>
     </jobservice>
 </effective-config>

@@ -32,6 +32,8 @@ public abstract class SRMDataAdaptorAbstract implements DataAdaptor {
     private static final String TRANSFER_PROTOCOLS = "TransferProtocols";    
     protected static SimpleProvider s_provider;
     protected GSSCredential m_credential;
+    protected String m_host;
+    protected int m_port;
     protected String[] m_transferProtocols;
 
     static {
@@ -44,7 +46,9 @@ public abstract class SRMDataAdaptorAbstract implements DataAdaptor {
 
     protected abstract void ping() throws BadParameter, NoSuccess;
 
-    public void connect(String userInfo, String host, int port, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+        m_host = host;
+        m_port = port;
         if (attributes!=null && attributes.containsKey(TRANSFER_PROTOCOLS)) {
             String value = (String) attributes.get(TRANSFER_PROTOCOLS);
             StringTokenizer tokenizer = new StringTokenizer(value, ", \t\n\r\f");

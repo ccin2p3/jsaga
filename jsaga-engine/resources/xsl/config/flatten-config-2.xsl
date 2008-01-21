@@ -9,7 +9,7 @@
 
     <xsl:template match="/">
         <effective-config>
-            <xsl:copy-of select="@*"/>
+            <xsl:copy-of select="/cfg:effective-config/@*"/>
             <xsl:comment> security </xsl:comment>
             <xsl:apply-templates select="/cfg:effective-config/cfg:contextInstance"/>
             <xsl:comment> protocols </xsl:comment>

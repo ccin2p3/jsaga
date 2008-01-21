@@ -25,7 +25,7 @@ public class LogicalDirectoryListTest extends AbstractNSDirectoryListTest {
 
     public void test_find() throws Exception {
         if (m_dir instanceof LogicalDirectory) {
-            List list = ((LogicalDirectory)m_dir).find(DEFAULT_FILEPATTERN, null, Flags.NONE.getValue());
+            List<URL> list = ((LogicalDirectory)m_dir).find(DEFAULT_FILEPATTERN, null, Flags.NONE.getValue());
             assertEquals(
                     1,
                     list.size());
@@ -40,7 +40,7 @@ public class LogicalDirectoryListTest extends AbstractNSDirectoryListTest {
     public void test_find_norecurse() throws Exception {
         if (m_dir instanceof LogicalDirectory) {
             LogicalDirectory root = (LogicalDirectory) m_dir.openDir(new URL(".."), Flags.NONE.getValue());
-            List list = root.find(DEFAULT_FILEPATTERN, null, Flags.NONE.getValue());
+            List<URL> list = root.find(DEFAULT_FILEPATTERN, null, Flags.NONE.getValue());
             assertEquals(
                     0,
                     list.size());
@@ -52,7 +52,7 @@ public class LogicalDirectoryListTest extends AbstractNSDirectoryListTest {
     public void test_find_recurse() throws Exception {
         if (m_dir instanceof LogicalDirectory) {
             LogicalDirectory root = (LogicalDirectory) m_dir.openDir(new URL(".."), Flags.NONE.getValue());
-            List list = root.find(DEFAULT_FILEPATTERN, null, Flags.RECURSIVE.getValue());
+            List<URL> list = root.find(DEFAULT_FILEPATTERN, null, Flags.RECURSIVE.getValue());
             assertEquals(
                     1,
                     list.size());
@@ -66,8 +66,8 @@ public class LogicalDirectoryListTest extends AbstractNSDirectoryListTest {
 
     public void test_isFile() throws Exception {
         if (m_dir instanceof LogicalDirectory) {
-            assertFalse(((LogicalDirectory)m_dir).isFile(new URL(".."), Flags.NONE.getValue()));
-            assertTrue(((LogicalDirectory)m_dir).isFile(new URL(DEFAULT_FILENAME), Flags.NONE.getValue()));
+            assertFalse(((LogicalDirectory)m_dir).isFile(new URL("..")));
+            assertTrue(((LogicalDirectory)m_dir).isFile(new URL(DEFAULT_FILENAME)));
         } else {
             fail("Not an instance of class: LogicalDirectory");
         }

@@ -18,7 +18,7 @@ import org.ogf.saga.task.Async;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
 
-public interface Job extends Task, Async, AsyncAttributes, Permissions {
+public interface Job extends Task<Object>, Async, AsyncAttributes, Permissions {
 
     // Required attributes:
 

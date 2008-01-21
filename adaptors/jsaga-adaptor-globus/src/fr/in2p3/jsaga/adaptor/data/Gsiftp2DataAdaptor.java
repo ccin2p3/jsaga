@@ -42,8 +42,8 @@ public class Gsiftp2DataAdaptor extends GsiftpDataAdaptorAbstract {
     }
 
     /** override super.connect() to set data channel protection level */
-    public void connect(String userInfo, String host, int port, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
-        super.connect(userInfo, host, port, attributes);
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+        super.connect(userInfo, host, port, basePath, attributes);
         if (attributes!=null && attributes.containsKey(PROTECTION)) {
             String value = ((String) attributes.get(PROTECTION)).toLowerCase();
 

@@ -11,7 +11,7 @@ public abstract class SessionFactory {
     
     private static SessionFactory factory;
     
-    private synchronized static void initFactory(){
+    private synchronized static void initFactory() {
         if(factory == null) {
             factory = ImplementationBootstrapLoader.createSessionFactory();    
         } 

@@ -1,13 +1,14 @@
 package fr.in2p3.jsaga.impl.namespace;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
+import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.read.*;
 import fr.in2p3.jsaga.adaptor.data.write.DirectoryWriter;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
+import fr.in2p3.jsaga.helpers.SAGAPattern;
 import fr.in2p3.jsaga.helpers.URLFactory;
 import org.ogf.saga.ObjectType;
 import org.ogf.saga.URL;
-import org.ogf.saga.attributes.Attributes;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
@@ -29,20 +30,20 @@ import java.util.regex.Pattern;
 /**
  *
  */
-public abstract class AbstractNSDirectoryImpl extends AbstractNSDirectoryTaskImpl implements NSDirectory, Attributes {
+public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryImpl implements NSDirectory {
     /** constructor for factory */
-    public AbstractNSDirectoryImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public AbstractNSDirectoryImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         super(session, URLFactory.toDirectoryURL(url), adaptor, flags);
         this.init(flags);
     }
 
     /** constructor for open() */
-    public AbstractNSDirectoryImpl(AbstractNSEntryImpl entry, URL url, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public AbstractNSDirectoryImpl(AbstractNSEntryImpl entry, URL url, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         super(entry, URLFactory.toDirectoryURL(url), flags);
         this.init(flags);
     }
 
-    private void init(int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    private void init(int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         FlagsBytes effectiveFlags = new FlagsBytes(flags);
         if (effectiveFlags.contains(Flags.CREATE)) {
             if (m_adaptor instanceof DirectoryWriter) {
@@ -54,15 +55,19 @@ public abstract class AbstractNSDirectoryImpl extends AbstractNSDirectoryTaskImp
                     }
                 }
                 URL parent = super._getParentDirURL();
-                String directoryName = super.getName();
+                String directoryName = super._getEntryName();
                 try {
                     // try to make current directory
                     ((DirectoryWriter)m_adaptor).makeDir(parent.getPath(), directoryName);
-                } catch(DoesNotExist e) {
+                } catch(ParentDoesNotExist e) {
                     // make parent directories, then retry
                     if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
                         this._makeParentDirs();
-                        ((DirectoryWriter)m_adaptor).makeDir(parent.getPath(), directoryName);
+                        try {
+                            ((DirectoryWriter)m_adaptor).makeDir(parent.getPath(), directoryName);
+                        } catch (ParentDoesNotExist e2) {
+                            throw new DoesNotExist("Failed to create parent directory: "+parent, e.getCause());
+                        }
                     } else {
                         throw new DoesNotExist("Parent directory does not exist: "+parent, e.getCause());
                     }
@@ -97,6 +102,17 @@ public abstract class AbstractNSDirectoryImpl extends AbstractNSDirectoryTaskImp
     public List<URL> list(String pattern, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IncorrectURL {
         return this._list(pattern, false, flags);
     }
+    public List<URL> list(String pattern) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IncorrectURL {
+        return this.list(pattern, Flags.NONE.getValue());
+    }
+
+    public List<URL> list(int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IncorrectURL {
+        return this._list(null, false, flags);
+    }
+    public List<URL> list() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IncorrectURL {
+        return this.list(Flags.NONE.getValue());
+    }
+
     public List<String> listWithLongFormat(String pattern, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IncorrectURL {
         return this._list(pattern, true, flags);
     }
@@ -107,7 +123,7 @@ public abstract class AbstractNSDirectoryImpl extends AbstractNSDirectoryTaskImp
         }
         effectiveFlags.checkAllowed(Flags.DEREFERENCE.getValue());
         if (m_adaptor instanceof DirectoryReader) {
-            Pattern p = _toRegexp(pattern);
+            Pattern p = SAGAPattern.toRegexp(pattern);
             List<Object> matchingNames = new ArrayList<Object>();
             // for each child
             FileAttributes[] childs = this._listAttributes(m_url.getPath());
@@ -141,13 +157,17 @@ public abstract class AbstractNSDirectoryImpl extends AbstractNSDirectoryTaskImp
         // search
         List<URL> matchingPath = new ArrayList<URL>();
         if (m_adaptor instanceof DirectoryReader) {
-            Pattern p = _toRegexp(pattern);
+            Pattern p = SAGAPattern.toRegexp(pattern);
             this._doFind(p, effectiveFlags, matchingPath, CURRENT_DIR_RELATIVE_PATH);
         } else {
             throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
         return matchingPath;
     }
+    public List<URL> find(String pattern) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+        return this.find(pattern, Flags.RECURSIVE.getValue());
+    }
+
     private void _doFind(Pattern p, FlagsBytes effectiveFlags, List<URL> matchingPath, URL currentRelativePath) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         // for each child
         FileAttributes[] childs = this._listAttributes(m_url.getPath());
@@ -180,20 +200,20 @@ public abstract class AbstractNSDirectoryImpl extends AbstractNSDirectoryTaskImp
         return ((AbstractNSEntryImpl)this._openNSEntry(name)).exists();
     }
 
-    public boolean isDir(URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        return this._openNSEntry(name, flags).isDir();
+    public boolean isDir(URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, DoesNotExist {
+        return this._openNSEntryWithDoesNotExist(name).isDir();
     }
 
-    public boolean isEntry(URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        return this._openNSEntry(name, flags).isEntry();
+    public boolean isEntry(URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, DoesNotExist {
+        return this._openNSEntryWithDoesNotExist(name).isEntry();
     }
 
-    public boolean isLink(URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        return this._openNSEntry(name, flags).isLink();
+    public boolean isLink(URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, DoesNotExist {
+        return this._openNSEntryWithDoesNotExist(name).isLink();
     }
 
-    public URL readLink(URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        return this._openNSEntry(name).readLink();
+    public URL readLink(URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, DoesNotExist {
+        return this._openNSEntryWithDoesNotExist(name).readLink();
     }
 
     private String[] m_entriesCache = null;
@@ -228,64 +248,143 @@ public abstract class AbstractNSDirectoryImpl extends AbstractNSDirectoryTaskImp
     public void copy(URL source, URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectURL, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         this._openNSEntry(source).copy(target, flags);
     }
+    public void copy(URL source, URL target) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectURL, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        this.copy(source, target, Flags.NONE.getValue());
+    }
+
+    public void copy(String sourcePattern, URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectURL, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        if (SAGAPattern.hasWildcard(sourcePattern)) {
+            for (URL source : this.list(sourcePattern)) {
+                this._openNSEntry(source).copy(target, flags);
+            }
+        } else {
+            URL source = new URL(sourcePattern);
+            this._openNSEntry(source).copy(target, flags);
+        }
+    }
+    public void copy(String sourcePattern, URL target) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectURL, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        this.copy(sourcePattern, target, Flags.NONE.getValue());
+    }
 
     public void link(URL source, URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectURL, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         this._openNSEntry(source).link(target, flags);
+    }
+    public void link(URL source, URL target) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectURL, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        this.link(source, target, Flags.NONE.getValue());
+    }
+
+    public void link(String sourcePattern, URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectURL, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        if (SAGAPattern.hasWildcard(sourcePattern)) {
+            for (URL source : this.list(sourcePattern)) {
+                this._openNSEntry(source);
+            }
+        } else {
+            URL source = new URL(sourcePattern);
+            this._openNSEntry(source).link(target, flags);
+        }
+    }
+    public void link(String sourcePattern, URL target) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectURL, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        this.link(sourcePattern, target, Flags.NONE.getValue());
     }
 
     public void move(URL source, URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectURL, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         this._openNSEntry(source).move(target, flags);
     }
+    public void move(URL source, URL target) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectURL, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        this.move(source, target, Flags.NONE.getValue());
+    }
+    
+    public void move(String sourcePattern, URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectURL, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        if (SAGAPattern.hasWildcard(sourcePattern)) {
+            for (URL source : this.list(sourcePattern)) {
+                this._openNSEntry(source);
+            }
+        } else {
+            URL source = new URL(sourcePattern);
+            this._openNSEntry(source).move(target, flags);
+        }
+    }
+    public void move(String sourcePattern, URL target) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectURL, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        this.move(sourcePattern, target, Flags.NONE.getValue());
+    }
 
     public void remove(URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectURL, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
         this._openNSEntry(target).remove(flags);
+    }
+    public void remove(URL target) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectURL, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+        this.remove(target, Flags.NONE.getValue());
+    }
+    
+    public void remove(String targetPattern, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectURL, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+        if (SAGAPattern.hasWildcard(targetPattern)) {
+            for (URL target : this.list(targetPattern)) {
+                this._openNSEntry(target).remove(flags);
+            }
+        } else {
+            URL target = new URL(targetPattern);
+            this._openNSEntry(target).remove(flags);
+        }
+    }
+    public void remove(String targetPattern) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectURL, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+        this.remove(targetPattern, Flags.NONE.getValue());
     }
 
     public void makeDir(URL target, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         int makeDirFlags = Flags.CREATE.or(flags);
         NSFactory.createNSDirectory(m_session, target, makeDirFlags);
     }
+    public void makeDir(URL target) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        this.makeDir(target, Flags.NONE.getValue());
+    }
 
     public void permissionsAllow(URL target, String id, int permissions, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, BadParameter, Timeout, NoSuccess {
-        try {
+        this._openNSEntry(target, flags).permissionsAllow(id, permissions);
+    }
+    public void permissionsAllow(URL target, String id, int permissions) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, BadParameter, Timeout, NoSuccess {
+        this.permissionsAllow(target, id, permissions, Flags.NONE.getValue());
+    }
+
+    public void permissionsAllow(String targetPattern, String id, int permissions, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, BadParameter, Timeout, NoSuccess {
+        if (SAGAPattern.hasWildcard(targetPattern)) {
+            try {
+                for (URL target : this.list(targetPattern)) {
+                    this._openNSEntry(target, flags).permissionsAllow(id, permissions);
+                }
+            } catch(IncorrectURL e) {throw new NoSuccess(e);}
+        } else {
+            URL target = new URL(targetPattern);
             this._openNSEntry(target, flags).permissionsAllow(id, permissions);
-        } catch (IncorrectURL e) {
-            throw new NoSuccess(e);
         }
+    }
+    public void permissionsAllow(String targetPattern, String id, int permissions) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, BadParameter, Timeout, NoSuccess {
+        this.permissionsAllow(targetPattern, id, permissions, Flags.NONE.getValue());
     }
 
     public void permissionsDeny(URL target, String id, int permissions, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
-        try {
+        this._openNSEntry(target, flags).permissionsDeny(id, permissions);
+    }
+    public void permissionsDeny(URL target, String id, int permissions) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+        this.permissionsDeny(target, id, permissions, Flags.NONE.getValue());
+    }
+    
+    public void permissionsDeny(String targetPattern, String id, int permissions, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+        if (SAGAPattern.hasWildcard(targetPattern)) {
+            try {
+                for (URL target : this.list(targetPattern)) {
+                    this._openNSEntry(target, flags).permissionsDeny(id, permissions);
+                }
+            } catch(IncorrectURL e) {throw new NoSuccess(e);
+            } catch(IncorrectState e) {throw new NoSuccess(e);}
+        } else {
+            URL target = new URL(targetPattern);
             this._openNSEntry(target, flags).permissionsDeny(id, permissions);
-        } catch (IncorrectURL e) {
-            throw new NoSuccess(e);
-        } catch (IncorrectState e) {
-            throw new NoSuccess(e);
         }
+    }
+    public void permissionsDeny(String targetPattern, String id, int permissions) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+        this.permissionsDeny(targetPattern, id, permissions, Flags.NONE.getValue());
     }
 
     ///////////////////////////////////////// protected methods /////////////////////////////////////////
-
-    /**
-     * Convert wildcards to a regular expression.
-     * @param pattern file name with wildcards supported by SAGA.
-     * @return a compiled regular expression.
-     */
-    protected static Pattern _toRegexp(String pattern) {
-        if (pattern==null || pattern.equals("") || pattern.equals("*")) {
-            return null;
-        } else {
-            // escape some characters
-            String regexp = pattern;
-            regexp = regexp.replaceAll("\\.", "\\\\.");
-            // convert wildcards to regular expression
-            regexp = regexp.replaceAll("\\*", ".*");
-            regexp = regexp.replaceAll("\\?", ".?");
-            regexp = regexp.replaceAll("\\[!", "[^");
-            // compile regular expression
-            return Pattern.compile(regexp);
-        }
-    }
 
     protected static URL CURRENT_DIR_RELATIVE_PATH;
     static {
@@ -318,11 +417,22 @@ public abstract class AbstractNSDirectoryImpl extends AbstractNSDirectoryTaskImp
         return filenames;
     }
 
-    private NSEntry _openNSEntry(URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    private NSEntry _openNSEntry(URL name, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
         try {
             return this.open(name, flags);
+        } catch (IncorrectURL e) {
+            throw new NoSuccess(e);
+        } catch (IncorrectState e) {
+            throw new NoSuccess(e);
         } catch (DoesNotExist e) {
-            throw new IncorrectState(e);
+            throw new NoSuccess(e);
+        } catch (AlreadyExists e) {
+            throw new NoSuccess(e);
+        }
+    }
+    private NSEntry _openNSEntryWithDoesNotExist(URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+        try {
+            return this.open(name, Flags.NONE.getValue());
         } catch (AlreadyExists e) {
             throw new IncorrectState(e);
         }

@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.command;
 
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.security.InitializableSecurityAdaptorBuilder;
+import fr.in2p3.jsaga.adaptor.security.ExpirableSecurityAdaptorBuilder;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptorBuilder;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.config.bean.EngineConfiguration;
@@ -121,7 +121,7 @@ public class Help extends AbstractCommand {
                     SecurityAdaptorBuilder adaptor = SecurityAdaptorBuilderFactory.getInstance().getSecurityAdaptorBuilder(ctx.getType());
                     if (line.hasOption(OPT_SECURITY_INIT)) {
                         if (ctx.getInit() != null) {
-                            Usage missing = ((InitializableSecurityAdaptorBuilder)adaptor).getInitUsage().getMissingValues(attributes);
+                            Usage missing = ((ExpirableSecurityAdaptorBuilder)adaptor).getInitUsage().getMissingValues(attributes);
                             formatter.append(new String[] {ctx.getType(), ""+ctx.getIndice(), ctx.getName(),
                                     (missing!=null ? missing.toString() : null)});
                         }

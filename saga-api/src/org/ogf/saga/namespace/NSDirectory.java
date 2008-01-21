@@ -46,6 +46,37 @@ public interface NSDirectory extends NSEntry {
             IncorrectURL;
 
     /**
+     * Lists entries in the directory.
+     * The only allowed flag is DEREFERENCE.
+     * @param flags defining the operation modus.
+     * @return the directory entries.
+     */
+    public List<URL> list(int flags)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess,
+            IncorrectURL;
+    
+    /**
+     * Lists entries in the directory that match the specified pattern.
+     * If the pattern is an empty string, all entries are listed.
+     * @param pattern name or pattern to list.
+     * @return the matching entries.
+     */
+    public List<URL> list(String pattern)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess,
+            IncorrectURL;
+ 
+    /**
+     * Lists entries in the directory.
+     * @return the directory entries.
+     */
+    public List<URL> list()
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess,
+            IncorrectURL;
+    
+    /**
      * Finds entries in the directory and below that match the specified
      * pattern.
      * If the pattern is an empty string, all entries are listed.
@@ -57,6 +88,17 @@ public interface NSDirectory extends NSEntry {
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
             PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess;
 
+    /**
+     * Finds entries in the directory and below that match the specified
+     * pattern.
+     * If the pattern is an empty string, all entries are listed.
+     * @param pattern name or pattern to find.
+     * @return the matching entries.
+     */
+    public List<URL> find(String pattern)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess;
+    
     /**
      * Queries for the existence of an entry.
      * @param name to be tested for existence.
@@ -70,33 +112,30 @@ public interface NSDirectory extends NSEntry {
     /**
      * Tests the name for being a directory.
      * @param name to be tested.
-     * @param flags flags for the operation.
      * @return <code>true</code> if the name represents a directory.
      */
-    public boolean isDir(URL name, int flags)
-        throws NotImplemented, IncorrectURL, AuthenticationFailed,
+    public boolean isDir(URL name)
+        throws NotImplemented, IncorrectURL, DoesNotExist, AuthenticationFailed,
             AuthorizationFailed, PermissionDenied, BadParameter,
             IncorrectState, Timeout, NoSuccess;
 
     /**
      * Tests the name for being a namespace entry. 
      * @param name to be tested.
-     * @param flags flags for the operation.
      * @return <code>true</code> if the name represents a non-directory entry.
      */
-    public boolean isEntry(URL name, int flags)
-        throws NotImplemented, IncorrectURL, AuthenticationFailed,
+    public boolean isEntry(URL name)
+        throws NotImplemented, IncorrectURL, DoesNotExist, AuthenticationFailed,
             AuthorizationFailed, PermissionDenied, BadParameter,
             IncorrectState, Timeout, NoSuccess;
 
     /**
      * Tests the name for being a link.
      * @param name to be tested.
-     * @param flags flags for the operation.
      * @return <code>true</code> if the name represents a link.
      */
-    public boolean isLink(URL name, int flags)
-        throws NotImplemented, IncorrectURL, AuthenticationFailed,
+    public boolean isLink(URL name)
+        throws NotImplemented, IncorrectURL, DoesNotExist, AuthenticationFailed,
             AuthorizationFailed, PermissionDenied, BadParameter,
             IncorrectState, Timeout, NoSuccess;
 
@@ -106,7 +145,7 @@ public interface NSDirectory extends NSEntry {
      * @return the resolved name.
      */
     public URL readLink(URL name)
-        throws NotImplemented, IncorrectURL, AuthenticationFailed,
+        throws NotImplemented, IncorrectURL, DoesNotExist, AuthenticationFailed,
             AuthorizationFailed, PermissionDenied, BadParameter,
             IncorrectState, Timeout, NoSuccess;
 
@@ -126,7 +165,7 @@ public interface NSDirectory extends NSEntry {
      * enumeration defined by getNumEntries().
      * @param entry index of the entry to get.
      * @return the name of the entry.
-     * @exception DoesNotExist is thrown when the index is invalid.
+     * @exception DoesNotExistException is thrown when the index is invalid.
      */
     public URL getEntry(int entry)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
@@ -145,6 +184,39 @@ public interface NSDirectory extends NSEntry {
             AlreadyExists, DoesNotExist, Timeout, NoSuccess;
 
     /**
+     * Copies the source entry to another part of the namespace.
+     * @param source name to copy.
+     * @param target name to copy to.
+     */
+    public void copy(URL source, URL target)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, IncorrectURL, BadParameter, IncorrectState,
+            AlreadyExists, DoesNotExist, Timeout, NoSuccess;  
+ 
+    /**
+     * Copies the source entry to another part of the namespace. The source
+     * may contain wildcards.
+     * @param source name to copy.
+     * @param target name to copy to.
+     * @param flags defining the operation modus.
+     */
+    public void copy(String source, URL target, int flags)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, IncorrectURL, BadParameter, IncorrectState,
+            AlreadyExists, DoesNotExist, Timeout, NoSuccess;
+
+    /**
+     * Copies the source entry to another part of the namespace. The source
+     * may contain wildcards. 
+     * @param source name to copy.
+     * @param target name to copy to.
+     */
+    public void copy(String source, URL target)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, IncorrectURL, BadParameter, IncorrectState,
+            AlreadyExists, DoesNotExist, Timeout, NoSuccess;  
+    
+    /**
      * Creates a symbolic link from the specified target to the
      * specified source.
      * @param source name to link to.
@@ -156,6 +228,40 @@ public interface NSDirectory extends NSEntry {
             PermissionDenied, IncorrectURL, BadParameter, IncorrectState,
             AlreadyExists, DoesNotExist, Timeout, NoSuccess;
 
+    /**
+     * Creates a symbolic link from the specified target to the
+     * specified source.
+     * @param source name to link to.
+     * @param target name of the link.
+     */
+    public void link(URL source, URL target)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, IncorrectURL, BadParameter, IncorrectState,
+            AlreadyExists, DoesNotExist, Timeout, NoSuccess;
+    
+    /**
+     * Creates a symbolic link from the specified target to the
+     * specified source. The source may contain wildcards.
+     * @param source name to link to.
+     * @param target name of the link.
+     * @param flags defining the operation modus.
+     */
+    public void link(String source, URL target, int flags)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, IncorrectURL, BadParameter, IncorrectState,
+            AlreadyExists, DoesNotExist, Timeout, NoSuccess;
+
+    /**
+     * Creates a symbolic link from the specified target to the
+     * specified source. The source may contain wildcards.
+     * @param source name to link to.
+     * @param target name of the link.
+     */
+    public void link(String source, URL target)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, IncorrectURL, BadParameter, IncorrectState,
+            AlreadyExists, DoesNotExist, Timeout, NoSuccess;
+    
     /**
      * Renames the specified source to the specified target, or move the
      * specified source to the specified target if the target is a directory.
@@ -169,6 +275,42 @@ public interface NSDirectory extends NSEntry {
             AlreadyExists, DoesNotExist, Timeout, NoSuccess;
 
     /**
+     * Renames the specified source to the specified target, or move the
+     * specified source to the specified target if the target is a directory.
+     * @param source name to move.
+     * @param target name to move to.
+     */
+    public void move(URL source, URL target)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, IncorrectURL, BadParameter, IncorrectState,
+            AlreadyExists, DoesNotExist, Timeout, NoSuccess;
+    
+    /**
+     * Renames the specified source to the specified target, or move the
+     * specified source to the specified target if the target is a directory.
+     * The source may contain wildcards.
+     * @param source name to move.
+     * @param target name to move to.
+     * @param flags defining the operation modus.
+     */
+    public void move(String source, URL target, int flags)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, IncorrectURL, BadParameter, IncorrectState,
+            AlreadyExists, DoesNotExist, Timeout, NoSuccess;
+
+    /**
+     * Renames the specified source to the specified target, or move the
+     * specified source to the specified target if the target is a directory.
+     * The source may contain wildcards.
+     * @param source name to move.
+     * @param target name to move to.
+     */
+    public void move(String source, URL target)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, IncorrectURL, BadParameter, IncorrectState,
+            AlreadyExists, DoesNotExist, Timeout, NoSuccess;
+    
+    /**
      * Removes the specified entry.
      * @param target name to remove.
      * @param flags defining the operation modus.
@@ -179,11 +321,50 @@ public interface NSDirectory extends NSEntry {
             DoesNotExist, Timeout, NoSuccess;
 
     /**
+     * Removes the specified entry.
+     * @param target name to remove.
+     */
+    public void remove(URL target)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, IncorrectURL, BadParameter, IncorrectState,
+            DoesNotExist, Timeout, NoSuccess;
+    
+    /**
+     * Removes the specified entry.
+     * The target string may contain wildcards.
+     * @param target name to remove.
+     * @param flags defining the operation modus.
+     */
+    public void remove(String target, int flags)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, IncorrectURL, BadParameter, IncorrectState,
+            DoesNotExist, Timeout, NoSuccess;
+
+    /**
+     * Removes the specified entry.
+     * The target string may contain wildcards.
+     * @param target name to remove.
+     */
+    public void remove(String target)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, IncorrectURL, BadParameter, IncorrectState,
+            DoesNotExist, Timeout, NoSuccess;
+    
+    /**
      * Creates a new directory.
      * @param target directory to create.
      * @param flags defining the operation modus.
      */
     public void makeDir(URL target, int flags)
+        throws NotImplemented, IncorrectURL, AuthenticationFailed,
+            AuthorizationFailed, PermissionDenied, BadParameter,
+            IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess;
+
+    /**
+     * Creates a new directory.
+     * @param target directory to create.
+     */
+    public void makeDir(URL target)
         throws NotImplemented, IncorrectURL, AuthenticationFailed,
             AuthorizationFailed, PermissionDenied, BadParameter,
             IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess;
@@ -201,6 +382,17 @@ public interface NSDirectory extends NSEntry {
             Timeout, NoSuccess;
 
     /**
+     * Creates a new <code>NamespaceDirectory</code> instance.
+     * @param name directory to open.
+     * @return the opened directory instance.
+     */
+    public NSDirectory openDir(URL name)
+        throws NotImplemented, IncorrectURL,
+            AuthenticationFailed, AuthorizationFailed, PermissionDenied,
+            BadParameter, IncorrectState, AlreadyExists, DoesNotExist,
+            Timeout, NoSuccess;
+    
+    /**
      * Creates a new <code>NamespaceEntry</code> instance.
      * @param name entry to open.
      * @param flags defining the operation modus.
@@ -212,6 +404,17 @@ public interface NSDirectory extends NSEntry {
             BadParameter, IncorrectState, AlreadyExists, DoesNotExist,
             Timeout, NoSuccess;
 
+    /**
+     * Creates a new <code>NamespaceEntry</code> instance.
+     * @param name entry to open.
+     * @return the opened entry instance.
+     */
+    public NSEntry open(URL name)
+        throws NotImplemented, IncorrectURL,
+            AuthenticationFailed, AuthorizationFailed, PermissionDenied,
+            BadParameter, IncorrectState, AlreadyExists, DoesNotExist,
+            Timeout, NoSuccess;
+    
     /**
      * Allows the specified permissions for the specified id.
      * An id of "*" enables the permissions for all.
@@ -226,6 +429,41 @@ public interface NSDirectory extends NSEntry {
             PermissionDenied, IncorrectState, BadParameter, Timeout, NoSuccess;
 
     /**
+     * Allows the specified permissions for the specified id.
+     * An id of "*" enables the permissions for all.
+     * @param target the entry affected.
+     * @param id the id.
+     * @param permissions the permissions to enable.
+     */
+    public void permissionsAllow(URL target, String id, int permissions)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, IncorrectState, BadParameter, Timeout, NoSuccess;
+    
+    /**
+     * Allows the specified permissions for the specified id.
+     * An id of "*" enables the permissions for all.
+     * @param target the entry affected.
+     * @param id the id.
+     * @param permissions the permissions to enable.
+     * @param flags the only allowed flags are RECURSIVE and DEREFERENCE.
+     */
+    public void permissionsAllow(String target, String id, int permissions,
+            int flags)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, IncorrectState, BadParameter, Timeout, NoSuccess;
+
+    /**
+     * Allows the specified permissions for the specified id.
+     * An id of "*" enables the permissions for all.
+     * @param target the entry affected.
+     * @param id the id.
+     * @param permissions the permissions to enable.
+     */
+    public void permissionsAllow(String target, String id, int permissions)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, IncorrectState, BadParameter, Timeout, NoSuccess;
+    
+    /**
      * Denies the specified permissions for the specified id.
      * An id of "*" disables the permissions for all.
      * @param target the entry affected.
@@ -237,7 +475,42 @@ public interface NSDirectory extends NSEntry {
             int flags)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
             PermissionDenied, BadParameter, Timeout, NoSuccess;
-
+    
+    /**
+     * Denies the specified permissions for the specified id.
+     * An id of "*" disables the permissions for all.
+     * @param target the entry affected.
+     * @param id the id.
+     * @param permissions the permissions to disable.
+     */
+    public void permissionsDeny(URL target, String id, int permissions)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, BadParameter, Timeout, NoSuccess;
+    
+    /**
+     * Denies the specified permissions for the specified id.
+     * An id of "*" disables the permissions for all.
+     * @param target the entry affected.
+     * @param id the id.
+     * @param permissions the permissions to disable.
+     * @param flags the only allowed flags are RECURSIVE and DEREFERENCE.
+     */
+    public void permissionsDeny(String target, String id, int permissions,
+            int flags)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, BadParameter, Timeout, NoSuccess;
+    
+    /**
+     * Denies the specified permissions for the specified id.
+     * An id of "*" disables the permissions for all.
+     * @param target the entry affected.
+     * @param id the id.
+     * @param permissions the permissions to disable.
+     */
+    public void permissionsDeny(String target, String id, int permissions)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, BadParameter, Timeout, NoSuccess;
+    
     //
     // Task versions ...
     //
@@ -268,6 +541,41 @@ public interface NSDirectory extends NSEntry {
         throws NotImplemented;
 
     /**
+     * Creates a task that lists entries in the directory that match
+     * the specified pattern.
+     * If the pattern is an empty string, all entries are listed.
+     * The only allowed flag is DEREFERENCE.
+     * @param mode the task mode.
+     * @param pattern name or pattern to list.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task<List<URL>> list(TaskMode mode, String pattern)
+        throws NotImplemented;
+ 
+    /**
+     * Creates a task that lists entries in the directory.
+     * The only allowed flag is DEREFERENCE.
+     * @param mode the task mode.
+     * @param flags defining the operation modus.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task<List<URL>> list(TaskMode mode, int flags)
+        throws NotImplemented;
+
+    /**
+     * Creates a task that lists entries in the directory.
+     * @param mode the task mode.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task<List<URL>> list(TaskMode mode) throws NotImplemented;
+    
+    /**
      * Creates a task that finds entries in the directory and below that
      * match the specified pattern.
      * If the pattern is an empty string, all entries are listed.
@@ -283,6 +591,20 @@ public interface NSDirectory extends NSEntry {
         throws NotImplemented;
 
     /**
+     * Creates a task that finds entries in the directory and below that
+     * match the specified pattern.
+     * If the pattern is an empty string, all entries are listed.
+     * @param mode the task mode.
+     * @return the task.
+     * @param pattern name or pattern to find.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task<List<URL>> find(TaskMode mode, String pattern)
+        throws NotImplemented;
+    
+    /**
      * Creates a task that queries for the existence of an entry.
      * @param mode the task mode.
      * @param name to be tested for existence.
@@ -297,36 +619,33 @@ public interface NSDirectory extends NSEntry {
      * Creates a task that tests the name for being a directory.
      * @param mode the task mode.
      * @param name to be tested.
-     * @param flags flags for the operation.
      * @return the task.
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public Task<Boolean> isDir(TaskMode mode, URL name, int flags)
+    public Task<Boolean> isDir(TaskMode mode, URL name)
         throws NotImplemented;
 
     /**
      * Creates a task that tests the name for being a namespace entry. 
      * @param mode the task mode.
      * @param name to be tested.
-     * @param flags flags for the operation.
      * @return the task.
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public Task<Boolean> isEntry(TaskMode mode, URL name, int flags)
+    public Task<Boolean> isEntry(TaskMode mode, URL name)
         throws NotImplemented;
 
     /**
      * Creates a task that tests the name for being a link.
      * @param mode the task mode.
      * @param name to be tested.
-     * @param flags flags for the operation.
      * @return the task.
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public Task<Boolean> isLink(TaskMode mode, URL name, int flags)
+    public Task<Boolean> isLink(TaskMode mode, URL name)
         throws NotImplemented;
 
     /**
@@ -377,6 +696,46 @@ public interface NSDirectory extends NSEntry {
         throws NotImplemented;
 
     /**
+     * Creates a task that copies source the entry to another part of
+     * the namespace.
+     * @param mode the task mode.
+     * @param source name to copy.
+     * @param target name to copy to.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task copy(TaskMode mode, URL source, URL target)
+        throws NotImplemented;
+
+    /**
+     * Creates a task that copies the source entry to another part of
+     * the namespace. The source may contain wildcards.
+     * @param mode the task mode.
+     * @param source name to copy.
+     * @param target name to copy to.
+     * @param flags defining the operation modus.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task copy(TaskMode mode, String source, URL target, int flags)
+        throws NotImplemented;
+
+    /**
+     * Creates a task that copies the source entry to another part of
+     * the namespace. The source may contain wildcards.
+     * @param mode the task mode.
+     * @param source name to copy.
+     * @param target name to copy to.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task copy(TaskMode mode, String source, URL target)
+        throws NotImplemented;
+    
+    /**
      * Creates a task that creates a symbolic link from the specified
      * target to the specified source.
      * @param mode the task mode.
@@ -390,6 +749,46 @@ public interface NSDirectory extends NSEntry {
     public Task link(TaskMode mode, URL source, URL target, int flags)
         throws NotImplemented;
 
+    /**
+     * Creates a task that creates a symbolic link from the specified
+     * target to the specified source.
+     * @param mode the task mode.
+     * @param source name to link to.
+     * @param target name of the link.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task link(TaskMode mode, URL source, URL target)
+        throws NotImplemented;
+    
+    /**
+     * Creates a task that creates a symbolic link from the specified
+     * target to the specified source. The source may contain wildcards.
+     * @param mode the task mode.
+     * @param source name to link to.
+     * @param target name of the link.
+     * @param flags defining the operation modus.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task link(TaskMode mode, String source, URL target, int flags)
+        throws NotImplemented;
+
+    /**
+     * Creates a task that creates a symbolic link from the specified
+     * target to the specified source. The source may contain wildcards.
+     * @param mode the task mode.
+     * @param source name to link to.
+     * @param target name of the link.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task link(TaskMode mode, String source, URL target)
+        throws NotImplemented;
+    
     /**
      * Creates a task that renames the specified source to the specified target,
      * or move the specified source to the specified target if the target is a
@@ -406,6 +805,49 @@ public interface NSDirectory extends NSEntry {
         throws NotImplemented;
 
     /**
+     * Creates a task that renames the specified source to the specified target,
+     * or move the specified source to the specified target if the target is a
+     * directory.
+     * @param mode the task mode.
+     * @param source name to move.
+     * @param target name to move to.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task move(TaskMode mode, URL source, URL target)
+        throws NotImplemented;
+    
+    /**
+     * Creates a task that renames the specified source to the specified target,
+     * or move the specified source to the specified target if the target is a
+     * directory. The source may contain wildcards.
+     * @param mode the task mode.
+     * @param source name to move.
+     * @param target name to move to.
+     * @param flags defining the operation modus.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task move(TaskMode mode, String source, URL target, int flags)
+        throws NotImplemented;
+
+    /**
+     * Creates a task that renames the specified source to the specified target,
+     * or move the specified source to the specified target if the target is a
+     * directory. The source may contain wildcards.
+     * @param mode the task mode.
+     * @param source name to move.
+     * @param target name to move to.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task move(TaskMode mode, String source, URL target)
+        throws NotImplemented;
+    
+    /**
      * Creates a task that removes the specified entry.
      * @param mode the task mode.
      * @param target name to remove.
@@ -415,6 +857,42 @@ public interface NSDirectory extends NSEntry {
      *     method is not implemented.
      */
     public Task remove(TaskMode mode, URL target, int flags)
+        throws NotImplemented;
+    
+    /**
+     * Creates a task that removes the specified entry.
+     * @param mode the task mode.
+     * @param target name to remove.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task remove(TaskMode mode, URL target)
+        throws NotImplemented;
+    
+    /**
+     * Creates a task that removes the specified entry.
+     * The target may contain wildcards.
+     * @param mode the task mode.
+     * @param target name to remove.
+     * @param flags defining the operation modus.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task remove(TaskMode mode, String target, int flags)
+        throws NotImplemented;
+    
+    /**
+     * Creates a task that removes the specified entry.
+     * The target may contain wildcards.
+     * @param mode the task mode.
+     * @param target name to remove.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task remove(TaskMode mode, String target)
         throws NotImplemented;
 
     /**
@@ -430,6 +908,17 @@ public interface NSDirectory extends NSEntry {
         throws NotImplemented;
 
     /**
+     * Creates a task that creates a new directory.
+     * @param mode the task mode.
+     * @param target directory to create.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task makeDir(TaskMode mode, URL target)
+        throws NotImplemented;
+    
+    /**
      * Creates a task that creates a new <code>NamespaceDirectory</code>
      * instance.
      * @param mode the task mode.
@@ -444,6 +933,18 @@ public interface NSDirectory extends NSEntry {
         throws NotImplemented;
 
     /**
+     * Creates a task that creates a new <code>NamespaceDirectory</code>
+     * instance.
+     * @param mode the task mode.
+     * @param name directory to open.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task<NSDirectory> openDir(TaskMode mode, URL name)
+        throws NotImplemented;
+    
+    /**
      * Creates a task that creates a new <code>NamespaceEntry</code> instance.
      * @param mode the task mode.
      * @param name entry to open.
@@ -455,6 +956,17 @@ public interface NSDirectory extends NSEntry {
     public Task<NSEntry> open(TaskMode mode, URL name, int flags)
         throws NotImplemented;
 
+    /**
+     * Creates a task that creates a new <code>NamespaceEntry</code> instance.
+     * @param mode the task mode.
+     * @param name entry to open.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task<NSEntry> open(TaskMode mode, URL name)
+        throws NotImplemented;
+    
     /**
      * Creates a task that enables the specified permissions for the
      * specified id.
@@ -473,6 +985,55 @@ public interface NSDirectory extends NSEntry {
         throws NotImplemented;
 
     /**
+     * Creates a task that enables the specified permissions for the
+     * specified id.
+     * An id of "*" enables the permissions for all.
+     * @param mode determines the initial state of the task.
+     * @param target the entry affected.
+     * @param id the id.
+     * @param permissions the permissions to enable.
+     * @return the task object.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task permissionsAllow(TaskMode mode, URL target, String id,
+            int permissions)
+        throws NotImplemented;
+    
+    /**
+     * Creates a task that enables the specified permissions for the
+     * specified id. The target may contain wildcards.
+     * An id of "*" enables the permissions for all.
+     * @param mode determines the initial state of the task.
+     * @param target the entry affected.
+     * @param id the id.
+     * @param permissions the permissions to enable.
+     * @param flags the only allowed flags are RECURSIVE and DEREFERENCE.
+     * @return the task object.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task permissionsAllow(TaskMode mode, String target, String id,
+            int permissions, int flags)
+        throws NotImplemented;
+
+    /**
+     * Creates a task that enables the specified permissions for the
+     * specified id. The target may contain wildcards.
+     * An id of "*" enables the permissions for all.
+     * @param mode determines the initial state of the task.
+     * @param target the entry affected.
+     * @param id the id.
+     * @param permissions the permissions to enable.
+     * @return the task object.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task permissionsAllow(TaskMode mode, String target, String id,
+            int permissions)
+        throws NotImplemented;
+    
+    /**
      * Creates a task that disables the specified permissions for the
      * specified id.
      * An id of "*" disables the permissions for all.
@@ -487,5 +1048,54 @@ public interface NSDirectory extends NSEntry {
      */
     public Task permissionsDeny(TaskMode mode, URL target, String id,
             int permissions, int flags)
+        throws NotImplemented;
+    
+    /**
+     * Creates a task that disables the specified permissions for the
+     * specified id.
+     * An id of "*" disables the permissions for all.
+     * @param mode determines the initial state of the task.
+     * @param target the entry affected.
+     * @param id the id.
+     * @param permissions the permissions to disable.
+     * @return the task object.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task permissionsDeny(TaskMode mode, URL target, String id,
+            int permissions)
+        throws NotImplemented;
+    
+    /**
+     * Creates a task that disables the specified permissions for the
+     * specified id. The target may contain wildcards.
+     * An id of "*" disables the permissions for all.
+     * @param mode determines the initial state of the task.
+     * @param target the entry affected.
+     * @param id the id.
+     * @param permissions the permissions to disable.
+     * @param flags the only allowed flags are RECURSIVE and DEREFERENCE.
+     * @return the task object.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task permissionsDeny(TaskMode mode, String target, String id,
+            int permissions, int flags)
+        throws NotImplemented;
+    
+    /**
+     * Creates a task that disables the specified permissions for the
+     * specified id. The target may contain wildcards.
+     * An id of "*" disables the permissions for all.
+     * @param mode determines the initial state of the task.
+     * @param target the entry affected.
+     * @param id the id.
+     * @param permissions the permissions to disable.
+     * @return the task object.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task permissionsDeny(TaskMode mode, String target, String id,
+            int permissions)
         throws NotImplemented;
 }

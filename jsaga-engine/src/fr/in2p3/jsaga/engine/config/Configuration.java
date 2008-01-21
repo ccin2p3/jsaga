@@ -21,7 +21,7 @@ import java.io.*;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   ${NAME}
+* File:   Configuration
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
 * Date:   20 juin 2007
 * ***************************************************
@@ -36,9 +36,9 @@ public class Configuration {
 
     private static final String ADAPTOR_DESCRIPTORS = "adaptor-descriptors";
     private static final String XI_RAW_CONFIG = "raw-config.xi";
-    private static final String XSL_FLATTEN_CONFIG_1 = "flatten-config-1.xsl";
-    private static final String XSL_FLATTEN_CONFIG_2 = "flatten-config-2.xsl";
-    private static final String XSL_MERGED_CONFIG = "merged-config.xsl";
+    private static final String XSL_FLATTEN_CONFIG_1 = "xsl/config/flatten-config-1.xsl";
+    private static final String XSL_FLATTEN_CONFIG_2 = "xsl/config/flatten-config-2.xsl";
+    private static final String XSL_MERGED_CONFIG = "xsl/config/merged-config.xsl";
 
     private static Configuration _instance = null;
 
@@ -62,7 +62,6 @@ public class Configuration {
         if (!Base.JSAGA_CONFIG.exists()) {
             throw new FileNotFoundException("Configuration file does not exist: "+Base.JSAGA_CONFIG.getAbsolutePath());
         }
-        String xslBaseDir = "xsl/config";
         File baseDir = new File(Base.JSAGA_VAR, "jsaga-config");
         if(!baseDir.exists()) baseDir.mkdir();
 
@@ -79,6 +78,7 @@ public class Configuration {
         EffectiveConfig mergedConfig;
         Unmarshaller unmarshaller = new Unmarshaller(EffectiveConfig.class);
         unmarshaller.setIgnoreExtraAttributes(false);
+        unmarshaller.setValidation(true);
         if (sameDescMD5 && sameConfigMD5 && XML_MERGED_CONFIG.exists() && !ALWAYS_RELOAD_CONFIG) {
             // *** load merged config from file ***
             Reader reader = new InputStreamReader(new FileInputStream(XML_MERGED_CONFIG));
@@ -91,7 +91,7 @@ public class Configuration {
             Document rawConfig = parser.parse(new ByteArrayInputStream(data), new File(baseDir, XI_RAW_CONFIG));
 
             // transform config
-            XSLTransformerFactory tFactory = new XSLTransformerFactory(xslBaseDir, baseDir);
+            XSLTransformerFactory tFactory = XSLTransformerFactory.getInstance();
             data = tFactory.create(XSL_FLATTEN_CONFIG_1).transform(rawConfig);
             data = tFactory.create(XSL_FLATTEN_CONFIG_2).transform(data);
 

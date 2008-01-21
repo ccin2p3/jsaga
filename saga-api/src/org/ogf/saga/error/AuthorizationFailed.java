@@ -14,6 +14,7 @@ public class AuthorizationFailed extends Exception {
      * Constructs an AuthorizationFailed exception.
      */
     public AuthorizationFailed() {
+        super(AUTHORIZATION_FAILED);
     }
 
     /**
@@ -22,7 +23,7 @@ public class AuthorizationFailed extends Exception {
      * @param message the detail message.
      */
     public AuthorizationFailed(String message) {
-        super(message);
+        super(AUTHORIZATION_FAILED, message);
     }
 
     /**
@@ -30,7 +31,7 @@ public class AuthorizationFailed extends Exception {
      * @param cause the cause.
      */
     public AuthorizationFailed(Throwable cause) {
-        super(cause);
+        super(AUTHORIZATION_FAILED, cause);
     }
 
     /**
@@ -40,7 +41,7 @@ public class AuthorizationFailed extends Exception {
      * @param cause the cause.
      */
     public AuthorizationFailed(String message, Throwable cause) {
-        super(message, cause);
+        super(AUTHORIZATION_FAILED, message, cause);
     }
 
     /**
@@ -50,6 +51,6 @@ public class AuthorizationFailed extends Exception {
      * @param object the associated SAGA object.
      */
     public AuthorizationFailed(String message, SagaObject object) {
-        super(message, object);
+        super(AUTHORIZATION_FAILED, message, object);
     }
 }

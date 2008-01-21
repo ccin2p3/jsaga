@@ -28,7 +28,11 @@ public enum ObjectType {
     STREAMSERVICE (20),
     STREAM (21),
     PARAMETER (22),
-    RPC (23);
+    RPC (23),
+    
+    // Added object type for Java bindings.
+    FILEINPUTSTREAM(24),
+    FILEOUTPUTSTREAM(25);
 
 
     private int value;

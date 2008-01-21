@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.resource;
 
-import fr.in2p3.jsaga.adaptor.language.JobDescriptionContainer;
+import org.w3c.dom.Document;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -15,6 +15,6 @@ import fr.in2p3.jsaga.adaptor.language.JobDescriptionContainer;
  *
  */
 public interface GridSelectionAdaptor {
-    public SelectedGrid select(JobDescriptionContainer desc, String[] args)
+    public SelectedGrid select(Document jsdlDOM, String[] args)
         throws NoMatch, AmbiguousMatch;
 }

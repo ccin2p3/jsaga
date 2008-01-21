@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.engine.config.adaptor;
 
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.security.InitializableSecurityAdaptorBuilder;
+import fr.in2p3.jsaga.adaptor.security.ExpirableSecurityAdaptorBuilder;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptorBuilder;
 import fr.in2p3.jsaga.engine.schema.config.ContextInstance;
 import fr.in2p3.jsaga.engine.schema.config.Init;
@@ -44,8 +44,8 @@ public class SecurityAdaptorDescriptor {
             if (usage != null) {
                 m_usages.put(adaptor.getType(), usage);
             }
-            if (adaptor instanceof InitializableSecurityAdaptorBuilder) {
-                Usage initUsage = ((InitializableSecurityAdaptorBuilder)adaptor).getInitUsage();
+            if (adaptor instanceof ExpirableSecurityAdaptorBuilder) {
+                Usage initUsage = ((ExpirableSecurityAdaptorBuilder)adaptor).getInitUsage();
                 if (initUsage != null) {
                     m_initUsages.put(adaptor.getType(), initUsage);
                 }
@@ -112,8 +112,8 @@ public class SecurityAdaptorDescriptor {
         ctx.setType(adaptor.getType());
         ctx.setIndice(0);
         ctx.setImpl(adaptor.getClass().getName());
-        if (adaptor instanceof InitializableSecurityAdaptorBuilder) {
-            String usage = ((InitializableSecurityAdaptorBuilder)adaptor).getInitUsage().toString();
+        if (adaptor instanceof ExpirableSecurityAdaptorBuilder) {
+            String usage = ((ExpirableSecurityAdaptorBuilder)adaptor).getInitUsage().toString();
             Init init = new Init();
             init.setUsage(usage);
             ctx.setInit(init);

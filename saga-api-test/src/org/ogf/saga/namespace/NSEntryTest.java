@@ -29,14 +29,16 @@ public class NSEntryTest extends AbstractNSEntryTest {
     }
 
     public void test_getCWD() throws Exception {
+        URL expected = new URL(m_dirUrl.toString());
+        expected.setFragment(null);
         assertEquals(
-                createURL(m_rootUrl, DEFAULT_DIRNAME).getPath(),
-                m_file.getCWD());
+                expected.toString(),
+                m_file.getCWD().toString());
     }
 
     public void test_getName() throws Exception {
         assertEquals(
                 DEFAULT_FILENAME,
-                m_file.getName());
+                m_file.getName().getPath());
     }
 }

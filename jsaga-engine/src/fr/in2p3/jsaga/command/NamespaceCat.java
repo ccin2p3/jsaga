@@ -56,13 +56,13 @@ public class NamespaceCat extends AbstractCommand {
                 }
                 if (entry instanceof File) {
                     File file = (File) entry;
-                    Buffer buffer = BufferFactory.createBuffer(new byte[BUFFER_SIZE]);
-                    for (int len=0; (len=file.read(BUFFER_SIZE, buffer)) > -1; ) {
+                    Buffer buffer = BufferFactory.createBuffer(BUFFER_SIZE);
+                    for (int len; (len=file.read(buffer)) > -1; ) {
                         System.out.write(buffer.getData(), 0, len);
                     }
                     buffer.close();
                 } else if (entry instanceof NSDirectory) {
-                    System.err.println("Is a directory: "+entry.getURL());
+                    throw new Exception("Entry is a directory: "+entry.getURL());
                 }
             } finally {
                 entry.close();

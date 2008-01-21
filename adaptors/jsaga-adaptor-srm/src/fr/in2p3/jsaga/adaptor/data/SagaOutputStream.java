@@ -29,7 +29,7 @@ public class SagaOutputStream extends OutputStream {
     public void write(int i) throws IOException {
         try {
             Buffer buffer = BufferFactory.createBuffer(1);
-            if (m_file.write(1, buffer) == 1) {
+            if (m_file.write(buffer, 1) == 1) {
                 return;
             }
         } catch (Exception e) {
@@ -41,7 +41,7 @@ public class SagaOutputStream extends OutputStream {
     public void write(byte[] bytes, int off, int len) throws IOException {
         try {
             Buffer buffer = BufferFactory.createBuffer(bytes);
-            if (m_file.write(len, buffer) > 0) {
+            if (m_file.write(buffer, len) > 0) {
                 return;
             }
         } catch (Exception e) {

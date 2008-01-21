@@ -11,6 +11,7 @@ import org.globus.gsi.proxy.ext.ProxyPolicy;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.error.BadParameter;
+import org.ogf.saga.context.Context;
 
 import java.text.ParseException;
 import java.util.Map;
@@ -40,19 +41,19 @@ public class GlobusProxyFactory extends GlobusProxyFactoryAbstract {
 
     public GlobusProxyFactory(Map attributes, int oid) throws BadParameter, ParseException {
         // required attributes
-        super((String) attributes.get("UserPass")); // UserPass is ignored if key is not encrypted
-        CoGProperties.getDefault().setCaCertLocations((String) attributes.get("CertDir"));
-        m_proxyFile = (String) attributes.get("UserProxy");
-        m_certFile = (String) attributes.get("UserCert");
-        m_keyFile = (String) attributes.get("UserKey");
+        super((String) attributes.get(Context.USERPASS)); // UserPass is ignored if key is not encrypted
+        CoGProperties.getDefault().setCaCertLocations((String) attributes.get(Context.CERTREPOSITORY));
+        m_proxyFile = (String) attributes.get(Context.USERPROXY);
+        m_certFile = (String) attributes.get(Context.USERCERT);
+        m_keyFile = (String) attributes.get(Context.USERKEY);
         
         // optional attributes
-        if (attributes.containsKey("LifeTime")) {
-            lifetime = UDuration.toInt(attributes.get("LifeTime"));
+        if (attributes.containsKey(Context.LIFETIME)) {
+            lifetime = UDuration.toInt(attributes.get(Context.LIFETIME));
         }
         boolean limited = false;
-        if (attributes.containsKey("Delegation")) {
-            limited = ((String)attributes.get("Delegation")).equalsIgnoreCase("limited");
+        if (attributes.containsKey(GlobusContext.DELEGATION)) {
+            limited = ((String)attributes.get(GlobusContext.DELEGATION)).equalsIgnoreCase("limited");
         }
         switch(oid) {
             case OID_OLD:

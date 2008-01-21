@@ -7,6 +7,7 @@ import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityAdaptor;
 import org.ogf.saga.error.BadParameter;
 import org.ogf.saga.error.IncorrectState;
+import org.ogf.saga.context.Context;
 
 import java.util.Map;
 
@@ -32,8 +33,8 @@ public class InMemoryProxySecurityAdaptorBuilder implements SecurityAdaptorBuild
     }
 
     public Usage getUsage() {
-        return new UNoPrompt("UserProxy");
-//        return new UAnd(new Usage[]{new UNoPrompt("UserProxy"), new UFile("CertDir")});
+        return new UNoPrompt(Context.USERPROXY);
+//        return new UAnd(new Usage[]{new UNoPrompt(Context.USERPROXY), new UFile(Context.CERTREPOSITORY)});
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectState {
@@ -41,7 +42,7 @@ public class InMemoryProxySecurityAdaptorBuilder implements SecurityAdaptorBuild
 /*
         EnvironmentVariables env = EnvironmentVariables.getInstance();
         return new Default[]{
-                new Default("CertDir", new File[]{
+                new Default(Context.CERTREPOSITORY, new File[]{
                         new File(env.getProperty("X509_CERT_DIR")+""),
                         new File(System.getProperty("user.home")+"/.globus/certificates/"),
                         new File("/etc/grid-security/certificates/")})
@@ -50,11 +51,11 @@ public class InMemoryProxySecurityAdaptorBuilder implements SecurityAdaptorBuild
     }
 
     public SecurityAdaptor createSecurityAdaptor(Map attributes) throws Exception {
-        String base64 = (String) attributes.get("UserProxy");
+        String base64 = (String) attributes.get(Context.USERPROXY);
         if (base64 != null) {
             return new InMemoryProxySecurityAdaptor(base64);
         } else {
-            throw new BadParameter("Missing attribute: UserProxy");
+            throw new BadParameter("Missing attribute: "+Context.USERPROXY);
         }
     }
 }

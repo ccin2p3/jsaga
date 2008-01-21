@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.adaptor.security;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import org.globus.util.Util;
 import org.ogf.saga.error.BadParameter;
+import org.ogf.saga.context.Context;
 
 import java.util.Map;
 
@@ -18,15 +19,15 @@ import java.util.Map;
 /**
  *
  */
-public abstract class GlobusSecurityAdaptorBuilderExtendedAbstract extends GlobusSecurityAdaptorBuilder implements InitializableSecurityAdaptorBuilder {
+public abstract class GlobusSecurityAdaptorBuilderExtendedAbstract extends GlobusSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuilder {
     private static final Usage CREATE_PROXY = new UAnd(new Usage[]{
-            new U("UserProxy"), new UFile("UserCert"), new UFile("UserKey"), new UHidden("UserPass"), new UFile("CertDir"),
-            new UDuration("LifeTime") {
+            new U(Context.USERPROXY), new UFile(Context.USERCERT), new UFile(Context.USERKEY), new UHidden(Context.USERPASS), new UFile(Context.CERTREPOSITORY),
+            new UDuration(Context.LIFETIME) {
                 protected Object throwExceptionIfInvalid(Object value) throws Exception {
                     return (value!=null ? super.throwExceptionIfInvalid(value) : null);
                 }
             },
-            new UOptional("Delegation") {
+            new UOptional(GlobusContext.DELEGATION) {
                 protected Object throwExceptionIfInvalid(Object value) throws Exception {
                     if (super.throwExceptionIfInvalid(value) != null) {
                         String v = (String) value;
@@ -46,7 +47,7 @@ public abstract class GlobusSecurityAdaptorBuilderExtendedAbstract extends Globu
     public abstract void initBuilder(Map attributes, String contextId) throws Exception;
 
     public void destroyBuilder(Map attributes, String contextId) throws Exception {
-        String proxyFile = (String) attributes.get("UserProxy");
+        String proxyFile = (String) attributes.get(Context.USERPROXY);
         Util.destroy(proxyFile);
     }
 }

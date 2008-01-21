@@ -56,7 +56,7 @@ public interface Metric extends SagaObject, Attributes {
      */
     public void removeCallback(int cookie)
         throws NotImplemented, BadParameter, AuthenticationFailed,
-            AuthorizationFailed,PermissionDenied, IncorrectState, Timeout,
+            AuthorizationFailed, PermissionDenied, Timeout,
             NoSuccess;
 
     /**

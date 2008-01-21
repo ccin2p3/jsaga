@@ -14,6 +14,7 @@ public class IncorrectState extends Exception {
      * Constructs an IncorrectState exception.
      */
     public IncorrectState() {
+        super(INCORRECT_STATE);
     }
 
     /**
@@ -21,7 +22,7 @@ public class IncorrectState extends Exception {
      * @param message the detail message.
      */
     public IncorrectState(String message) {
-        super(message);
+        super(INCORRECT_STATE, message);
     }
 
     /**
@@ -29,7 +30,7 @@ public class IncorrectState extends Exception {
      * @param cause the cause.
      */
     public IncorrectState(Throwable cause) {
-        super(cause);
+        super(INCORRECT_STATE, cause);
     }
 
     /**
@@ -39,7 +40,7 @@ public class IncorrectState extends Exception {
      * @param cause the cause.
      */
     public IncorrectState(String message, Throwable cause) {
-        super(message, cause);
+        super(INCORRECT_STATE, message, cause);
     }
 
     /**
@@ -49,6 +50,6 @@ public class IncorrectState extends Exception {
      * @param object the associated SAGA object.
      */
     public IncorrectState(String message, SagaObject object) {
-        super(message, object);
+        super(INCORRECT_STATE, message, object);
     }
 }

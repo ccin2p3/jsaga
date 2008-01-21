@@ -76,7 +76,7 @@ public abstract class AbstractNSCopyTest extends AbstractNSDirectoryTest {
                     NSEntry file2 = m_root2.open(m_fileUrl2, FLAGS_FILE);
                     if (file2 instanceof File) {
                         Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT_2.getBytes());
-                        ((File)file2).write(buffer.getSize(), buffer);
+                        ((File)file2).write(buffer);
                     } else if (file2 instanceof LogicalFile) {
                         ((LogicalFile)file2).addLocation(m_physicalFileUrl2);
                     }
@@ -88,13 +88,13 @@ public abstract class AbstractNSCopyTest extends AbstractNSDirectoryTest {
                 if (m_physicalFileUrl != null) {
                     File physicalFile = (File) m_physicalRoot.open(m_physicalFileUrl, FLAGS_FILE);
                     Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT.getBytes());
-                    physicalFile.write(buffer.getSize(), buffer);
+                    physicalFile.write(buffer);
                     physicalFile.close(0);
                 }
                 if (m_physicalFileUrl2 != null) {
                     File physicalFile = (File) m_physicalRoot.open(m_physicalFileUrl2, FLAGS_FILE);
                     Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT_2.getBytes());
-                    physicalFile.write(buffer.getSize(), buffer);
+                    physicalFile.write(buffer);
                     physicalFile.close(0);
                 }
             }
@@ -130,7 +130,7 @@ public abstract class AbstractNSCopyTest extends AbstractNSDirectoryTest {
             reader = (File) entry;
         }
         Buffer buffer = BufferFactory.createBuffer(1024);
-        int len = reader.read(1024, buffer);
+        int len = reader.read(buffer);
         assertEquals(
                 expectedContent,
                 new String(buffer.getData(), 0, len));

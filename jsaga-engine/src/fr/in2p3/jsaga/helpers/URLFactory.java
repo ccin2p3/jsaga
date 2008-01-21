@@ -18,6 +18,18 @@ import java.net.URISyntaxException;
  *
  */
 public class URLFactory {
+    public static boolean isDirectory(URL url) throws NotImplemented {
+        String path = url.getPath();
+        return path.endsWith("/") || path.endsWith("/.") || path.endsWith("/..") || path.equals(".") || path.equals("..");
+    }
+
+    public static URL toFileURL(URL url) throws NotImplemented, BadParameter {
+        if (isDirectory(url)) {
+            throw new BadParameter("File URL must not end with slash: "+url.getURL());
+        }
+        return url;
+    }
+
     public static URL toDirectoryURL(URL url) throws NotImplemented, BadParameter {
         String path = url.getPath();
         if (!path.endsWith("/")) {

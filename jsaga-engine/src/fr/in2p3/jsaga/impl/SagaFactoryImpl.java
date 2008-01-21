@@ -2,17 +2,19 @@ package fr.in2p3.jsaga.impl;
 
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.config.ConfigurationException;
-import fr.in2p3.jsaga.engine.factories.DataAdaptorFactory;
+import fr.in2p3.jsaga.engine.factories.*;
 import fr.in2p3.jsaga.impl.buffer.BufferFactoryImpl;
 import fr.in2p3.jsaga.impl.context.ContextFactoryImpl;
 import fr.in2p3.jsaga.impl.file.FileFactoryImpl;
 import fr.in2p3.jsaga.impl.job.JobFactoryImpl;
+import fr.in2p3.jsaga.impl.jobcollection.JobCollectionFactoryImpl;
 import fr.in2p3.jsaga.impl.logicalfile.LogicalFileFactoryImpl;
 import fr.in2p3.jsaga.impl.monitoring.MonitoringFactoryImpl;
 import fr.in2p3.jsaga.impl.namespace.NSFactoryImpl;
 import fr.in2p3.jsaga.impl.session.SessionFactoryImpl;
 import fr.in2p3.jsaga.impl.task.TaskFactoryImpl;
 import fr.in2p3.jsaga.impl.unimplemented.RPCFactoryImpl;
+import fr.in2p3.jsaga.jobcollection.JobCollectionFactory;
 import org.ogf.saga.bootstrap.SagaFactory;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.context.ContextFactory;
@@ -40,11 +42,17 @@ import org.ogf.saga.task.TaskFactory;
  *
  */
 public class SagaFactoryImpl implements SagaFactory {
-    private DataAdaptorFactory m_adaptorFactory;
+    private DataAdaptorFactory m_dataAdaptorFactory;
+    private LanguageAdaptorFactory m_languageAdaptorFactory;
+    private JobAdaptorFactory m_jobAdaptorFactory;
+    private JobMonitorAdaptorFactory m_jobMonitorAdaptorFactory;
 
     public SagaFactoryImpl() throws ConfigurationException {
         Configuration config = Configuration.getInstance();
-        m_adaptorFactory = new DataAdaptorFactory(config);
+        m_dataAdaptorFactory = new DataAdaptorFactory(config);
+        m_languageAdaptorFactory = new LanguageAdaptorFactory(config);
+        m_jobAdaptorFactory = new JobAdaptorFactory(config);
+        m_jobMonitorAdaptorFactory = new JobMonitorAdaptorFactory(config);
     }
 
     public BufferFactory createBufferFactory() throws NotImplemented {
@@ -56,15 +64,15 @@ public class SagaFactoryImpl implements SagaFactory {
     }
 
     public FileFactory createFileFactory() {
-        return new FileFactoryImpl(m_adaptorFactory);
+        return new FileFactoryImpl(m_dataAdaptorFactory);
     }
 
     public JobFactory createJobFactory() throws NotImplemented {
-        return new JobFactoryImpl();
+        return new JobFactoryImpl(m_jobAdaptorFactory, m_jobMonitorAdaptorFactory);
     }
 
     public LogicalFileFactory createLogicalFileFactory() throws NotImplemented {
-        return new LogicalFileFactoryImpl(m_adaptorFactory);
+        return new LogicalFileFactoryImpl(m_dataAdaptorFactory);
     }
 
     public MonitoringFactory createMonitoringFactory() throws NotImplemented {
@@ -72,7 +80,7 @@ public class SagaFactoryImpl implements SagaFactory {
     }
 
     public NSFactory createNamespaceFactory() throws NotImplemented {
-        return new NSFactoryImpl(m_adaptorFactory);
+        return new NSFactoryImpl(m_dataAdaptorFactory);
     }
 
     public RPCFactory createRPCFactory() {
@@ -89,5 +97,9 @@ public class SagaFactoryImpl implements SagaFactory {
 
     public TaskFactory createTaskFactory() throws NotImplemented {
         return new TaskFactoryImpl();
+    }
+
+    public JobCollectionFactory createJobCollectionFactory() throws NotImplemented {
+        return new JobCollectionFactoryImpl(m_languageAdaptorFactory);
     }
 }

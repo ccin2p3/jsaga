@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.language;
 
-import java.io.IOException;
+import fr.in2p3.jsaga.adaptor.language.abstracts.AbstractLanguageAdaptorXML;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -14,12 +14,21 @@ import java.io.IOException;
 /**
  *
  */
-public class JSDLLanguageAdaptor extends AbstractXMLLanguageAdaptor implements LanguageAdaptor {
-    public void loadLanguageDefinitionResources() throws IOException {
-        super.loadLanguageDefinitionResources(new String[]{
+public class JSDLLanguageAdaptor extends AbstractLanguageAdaptorXML implements LanguageAdaptor {
+    public String getName() {
+        return "JSDL";
+    }
+
+    public void initParser() throws Exception {
+        super._initParser(new String[]{
                 "schema/jsdl-extended.xsd.xml",
                 "schema/jsdl-extension.xsd",
-                "schema/jsdl-posix.xsd-6.xsd",
-                "schema/jsdl.xsd-18.xsd"});
+                "schema/jsdl-posix.xsd",
+                "schema/jsdl-spmd.xsd",
+                "schema/jsdl.xsd"});
+    }
+
+    public String getTranslator() {
+        return null;
     }
 }

@@ -8,7 +8,6 @@ import fr.in2p3.jsaga.adaptor.data.write.DirectoryWriter;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.helpers.URLFactory;
 import org.ogf.saga.URL;
-import org.ogf.saga.attributes.Attributes;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
@@ -25,7 +24,7 @@ import org.ogf.saga.session.Session;
 /**
  * This class override some methods of AbstractNSEntryImpl for directories
  */
-public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl implements NSDirectory, Attributes {
+public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl implements NSDirectory {
     /** constructor for factory */
     public AbstractNSEntryDirImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         super(session, url, adaptor, flags);
@@ -37,12 +36,12 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
     }
 
     /** override super.getCWD() */
-    public String getCWD() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
-        return m_url.getPath();
+    public URL getCWD() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+        return m_url.normalize();
     }
 
     /** override super.copy() */
-    public void copy(URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
+    public void copy(URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
         FlagsBytes effectiveFlags = new FlagsBytes(flags);
         if (effectiveFlags.contains(Flags.DEREFERENCE)) {
             this._dereferenceDir().copy(target, effectiveFlags.remove(Flags.DEREFERENCE));
@@ -109,7 +108,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
     }
 
     /** override super.move() */
-    public void move(URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
+    public void move(URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
         FlagsBytes effectiveFlags = new FlagsBytes(flags);
         if (effectiveFlags.contains(Flags.DEREFERENCE)) {
             this._dereferenceDir().move(target, effectiveFlags.remove(Flags.DEREFERENCE));
@@ -188,7 +187,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             }
             // remove this directory
             URL parent = super._getParentDirURL();
-            String directoryName = super.getName();
+            String directoryName = super._getEntryName();
             try {
                 ((DirectoryWriter)m_adaptor).removeDir(parent.getPath(), directoryName);
             } catch (DoesNotExist doesNotExist) {
@@ -204,7 +203,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
     /** override super._getEffectiveURL() */
     protected URL _getEffectiveURL(URL target) throws NotImplemented, IncorrectState, BadParameter, Timeout, NoSuccess {
         if (target.getPath().endsWith("/")) {
-            return URLFactory.createURL(target, this.getName()+"/");
+            return URLFactory.createURL(target, super._getEntryName()+"/");
         } else {
             return target;
         }
@@ -222,6 +221,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         }
     }
 
+    //does not throw DoesNotExist because it would mean "parent directory does not exist"
     protected NSEntry _openNS(FileAttributes attr) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IncorrectURL {
         switch(attr.getType()) {
             case FileAttributes.DIRECTORY_TYPE:
@@ -231,14 +231,16 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
                 return this._openNSEntry(new URL(attr.getName()));
             case FileAttributes.UNKNOWN_TYPE:
             default:
-                if (this.isDir(new URL(attr.getName()), Flags.NONE.getValue())) {
+                NSEntry entry = this._openNSEntry(new URL(attr.getName()));
+                if (entry.isDir()) {
                     return this._openNSDir(new URL(attr.getName()));
                 } else {
-                    return this._openNSEntry(new URL(attr.getName()));
+                    return entry;
                 }
         }
     }
 
+    //does not throw DoesNotExist because it would mean "parent directory does not exist"
     protected NSDirectory _openNSDir(URL name) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IncorrectURL {
         try {
             return this.openDir(name, Flags.NONE.getValue());
@@ -249,6 +251,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         }
     }
 
+    //does not throw DoesNotExist because it would mean "parent directory does not exist"
     protected NSEntry _openNSEntry(URL name) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IncorrectURL {
         try {
             return this.open(name, Flags.NONE.getValue());
@@ -259,7 +262,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         }
     }
 
-    protected void _makeDir(URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
+    protected void _makeDir(URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
         // set makeDirFlags
         int makeDirFlags = Flags.CREATE.getValue();
         if (! Flags.OVERWRITE.isSet(flags)) {
@@ -270,10 +273,6 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         }
 
         // makeDir
-        try {
-            NSFactory.createNSDirectory(m_session, target, makeDirFlags);
-        } catch (DoesNotExist e) {
-            throw new NoSuccess(e);
-        }
+        NSFactory.createNSDirectory(m_session, target, makeDirFlags);
     }
 }

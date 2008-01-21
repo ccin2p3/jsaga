@@ -14,6 +14,7 @@ import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.error.BadParameter;
 import org.ogf.saga.error.IncorrectState;
+import org.ogf.saga.context.Context;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -37,15 +38,15 @@ public class MyProxySecurityAdaptorBuilder implements SecurityAdaptorBuilder {
 //    private static final int MIN_LIFETIME_FOR_RENEW = 30*60;    // 30 minutes
     private static final int DEFAULT_DELEGATED_PROXY_LIFETIME = 12*3600;
 
-    private static final Usage LOCAL_PROXY_OBJECT = new UProxyObject("UserProxyObject", MIN_LIFETIME_FOR_USING);
-    private static final Usage LOCAL_PROXY_FILE = new UProxyFile("UserProxy", MIN_LIFETIME_FOR_USING);
+    private static final Usage LOCAL_PROXY_OBJECT = new UProxyObject(GlobusContext.USERPROXYOBJECT, MIN_LIFETIME_FOR_USING);
+    private static final Usage LOCAL_PROXY_FILE = new UProxyFile(Context.USERPROXY, MIN_LIFETIME_FOR_USING);
     private static final Usage RENEW_PROXY_OBJECT_WITH_PASS = new UAnd(new Usage[]{
-            new UNoPrompt("UserProxyObject"), new U("UserName"), new UHidden("MyProxyPass")});
+            new UNoPrompt(GlobusContext.USERPROXYOBJECT), new U(Context.USERID), new UHidden(GlobusContext.MYPROXYPASS)});
     private static final Usage RENEW_PROXY_FILE_WITH_PASS = new UAnd(new Usage[]{
-            new U("UserProxy"), new U("UserName"), new UHidden("MyProxyPass")});
+            new U(Context.USERPROXY), new U(Context.USERID), new UHidden(GlobusContext.MYPROXYPASS)});
 /*
-    private static final Usage RENEW_PROXY_OBJECT_WITH_PROXY = new UProxyObject("UserProxyObject", MIN_LIFETIME_FOR_RENEW);
-    private static final Usage RENEW_PROXY_FILE_WITH_PROXY = new UProxyFile("UserProxy", MIN_LIFETIME_FOR_RENEW);
+    private static final Usage RENEW_PROXY_OBJECT_WITH_PROXY = new UProxyObject(GlobusContext.USERPROXYOBJECT, MIN_LIFETIME_FOR_RENEW);
+    private static final Usage RENEW_PROXY_FILE_WITH_PROXY = new UProxyFile(Context.USERPROXY, MIN_LIFETIME_FOR_RENEW);
 */
 
     public String getType() {
@@ -65,14 +66,14 @@ public class MyProxySecurityAdaptorBuilder implements SecurityAdaptorBuilder {
                         RENEW_PROXY_OBJECT_WITH_PASS, RENEW_PROXY_FILE_WITH_PASS,
 //                        RENEW_PROXY_OBJECT_WITH_PROXY, RENEW_PROXY_FILE_WITH_PROXY,
                 }),
-                new UFile("CertDir")
+                new UFile(Context.CERTREPOSITORY)
         });
     }
 
     public Default[] getDefaults(Map map) throws IncorrectState {
         EnvironmentVariables env = EnvironmentVariables.getInstance();
         return new Default[]{
-                new Default("UserProxy", new String[]{
+                new Default(Context.USERPROXY, new String[]{
                         env.getProperty("X509_USER_PROXY"),
                         System.getProperty("java.io.tmpdir")+System.getProperty("file.separator")+"x509up_u"+
                                 (System.getProperty("os.name").toLowerCase().startsWith("windows")
@@ -82,60 +83,60 @@ public class MyProxySecurityAdaptorBuilder implements SecurityAdaptorBuilder {
                                                 : GlobusSecurityAdaptorBuilder.getUnixUID()
                                           )
                                 )}),
-                new Default("UserCert", new File[]{
+                new Default(Context.USERCERT, new File[]{
                         new File(env.getProperty("X509_USER_CERT")+""),
                         new File(System.getProperty("user.home")+"/.globus/usercert.pem")}),
-                new Default("UserKey", new File[]{
+                new Default(Context.USERKEY, new File[]{
                         new File(env.getProperty("X509_USER_KEY")+""),
                         new File(System.getProperty("user.home")+"/.globus/userkey.pem")}),
-                new Default("CertDir", new File[]{
+                new Default(Context.CERTREPOSITORY, new File[]{
                         new File(env.getProperty("X509_CERT_DIR")+""),
                         new File(System.getProperty("user.home")+"/.globus/certificates/"),
                         new File("/etc/grid-security/certificates/")}),
-                new Default("Server", env.getProperty("MYPROXY_SERVER")),
-                new Default("UserName", System.getProperty("user.name")),
+                new Default(Context.SERVER, env.getProperty("MYPROXY_SERVER")),
+                new Default(Context.USERID, System.getProperty("user.name")),
         };
     }
 
     public SecurityAdaptor createSecurityAdaptor(Map attributes) throws Exception {
         GSSCredential cred;
         if (LOCAL_PROXY_OBJECT.getMissingValues(attributes) == null) {
-            cred = InMemoryProxySecurityAdaptor.toGSSCredential((String) attributes.get("UserProxyObject"));
+            cred = InMemoryProxySecurityAdaptor.toGSSCredential((String) attributes.get(GlobusContext.USERPROXYOBJECT));
         } else if (LOCAL_PROXY_FILE.getMissingValues(attributes) == null) {
-            cred = load(new File((String) attributes.get("UserProxy")));
+            cred = load(new File((String) attributes.get(Context.USERPROXY)));
         } else if (RENEW_PROXY_OBJECT_WITH_PASS.getMissingValues(attributes) == null) {
             cred = renewCredential(null, attributes);
         } else if (RENEW_PROXY_FILE_WITH_PASS.getMissingValues(attributes) == null) {
             cred = renewCredential(null, attributes);
-            save(new File((String) attributes.get("UserProxy")), cred);
+            save(new File((String) attributes.get(Context.USERPROXY)), cred);
 /*
         } else if (RENEW_PROXY_OBJECT_WITH_PROXY.getMissingValues(attributes) == null) {
-            GSSCredential oldCred = (GSSCredential) attributes.get("UserProxyObject");
+            GSSCredential oldCred = (GSSCredential) attributes.get(GlobusContext.USERPROXYOBJECT);
             cred = renewCredential(oldCred, attributes);
         } else if (RENEW_PROXY_FILE_WITH_PROXY.getMissingValues(attributes) == null) {
-            GSSCredential oldCred = load(new File((String) attributes.get("UserProxy")));
+            GSSCredential oldCred = load(new File((String) attributes.get(Context.USERPROXY)));
             cred = renewCredential(oldCred, attributes);
-            save(new File((String) attributes.get("UserProxy")), cred);
+            save(new File((String) attributes.get(Context.USERPROXY)), cred);
 */
         } else {
             throw new BadParameter("Missing attribute(s): "+this.getUsage().getMissingValues(attributes));
         }
-        String userName = (String) attributes.get("UserName");
-        String myProxyPass = (String) attributes.get("MyProxyPass");
-        return new MyProxySecurityAdaptor(cred, userName, myProxyPass);
+        String userId = (String) attributes.get(Context.USERID);
+        String myProxyPass = (String) attributes.get(GlobusContext.MYPROXYPASS);
+        return new MyProxySecurityAdaptor(cred, userId, myProxyPass);
     }
 
     private static GSSCredential renewCredential(GSSCredential oldCred, Map attributes) throws ParseException, URISyntaxException, MyProxyException {
-        String userName = (String) attributes.get("UserName");
-        String myProxyPass = (String) attributes.get("MyProxyPass");
-        int delegatedLifetime = attributes.containsKey("LifeTime")
-                ? UDuration.toInt(attributes.get("LifeTime"))
+        String userId = (String) attributes.get(Context.USERID);
+        String myProxyPass = (String) attributes.get(GlobusContext.MYPROXYPASS);
+        int delegatedLifetime = attributes.containsKey(Context.LIFETIME)
+                ? UDuration.toInt(attributes.get(Context.LIFETIME))
                 : DEFAULT_DELEGATED_PROXY_LIFETIME;  // effective lifetime for delegated proxy
-        return createMyProxy(attributes).get(oldCred, userName, myProxyPass, delegatedLifetime);
+        return createMyProxy(attributes).get(oldCred, userId, myProxyPass, delegatedLifetime);
     }
 
     protected static MyProxy createMyProxy(Map attributes) throws URISyntaxException {
-        String[] server = ((String) attributes.get("Server")).split(":");
+        String[] server = ((String) attributes.get(Context.SERVER)).split(":");
         String host = server[0];
         int port = (server.length>1 ? Integer.parseInt(server[1]) : MyProxy.DEFAULT_PORT);
         MyProxy myProxy = new MyProxy(host, port);

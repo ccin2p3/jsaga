@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.impl.logicalfile;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
+import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyDelegated;
 import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
@@ -12,6 +13,7 @@ import fr.in2p3.jsaga.engine.data.copy.TargetLogicalFile;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytesLogical;
 import fr.in2p3.jsaga.engine.schema.config.Protocol;
+import fr.in2p3.jsaga.helpers.URLFactory;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
 import fr.in2p3.jsaga.impl.namespace.JSAGAFlags;
 import org.ogf.saga.*;
@@ -35,20 +37,20 @@ import java.util.List;
 /**
  *
  */
-public class LogicalFileImpl extends AbstractLogicalFileTaskImpl implements LogicalFile {
+public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements LogicalFile {
     /** constructor for factory */
-    public LogicalFileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(session, url, adaptor, flags);
+    public LogicalFileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        super(session, URLFactory.toFileURL(url), adaptor, flags);
         this.init(flags);
     }
 
     /** constructor for open() */
-    public LogicalFileImpl(AbstractNSEntryImpl entry, URL url, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(entry, url, flags);
+    public LogicalFileImpl(AbstractNSEntryImpl entry, URL url, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        super(entry, URLFactory.toFileURL(url), flags);
         this.init(flags);
     }
 
-    private void init(int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    private void init(int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         FlagsBytes effectiveFlags = new FlagsBytesLogical(flags);
         if (effectiveFlags.contains(Flags.CREATE)) {
             if (m_adaptor instanceof LogicalWriter) {
@@ -81,7 +83,7 @@ public class LogicalFileImpl extends AbstractLogicalFileTaskImpl implements Logi
     }
 
     /** implements super.copy() */
-    public void copy(URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
+    public void copy(URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
         FlagsBytes effectiveFlags = new FlagsBytes(flags);
         if (effectiveFlags.contains(Flags.DEREFERENCE)) {
             this._dereferenceEntry().copy(target, effectiveFlags.remove(Flags.DEREFERENCE));
@@ -107,6 +109,8 @@ public class LogicalFileImpl extends AbstractLogicalFileTaskImpl implements Logi
                         m_url.getPath(),
                         effectiveTarget.getHost(), effectiveTarget.getPort(), effectiveTarget.getPath(),
                         overwrite);
+            } catch (ParentDoesNotExist parentDoesNotExist) {
+                throw new DoesNotExist("Target parent directory does not exist: "+effectiveTarget.resolve(new URL(".")), parentDoesNotExist);
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("Logical file does not exist: "+ m_url, doesNotExist);
             } catch (AlreadyExists alreadyExists) {
@@ -174,7 +178,11 @@ public class LogicalFileImpl extends AbstractLogicalFileTaskImpl implements Logi
     }
 
     public NSEntry open(URL absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return new LogicalFileImpl(this, super._resolveAbsoluteURL(absolutePath), flags);
+        if (URLFactory.isDirectory(absolutePath)) {
+            return new LogicalDirectoryImpl(this, super._resolveAbsoluteURL(absolutePath), flags);
+        } else {
+            return new LogicalFileImpl(this, super._resolveAbsoluteURL(absolutePath), flags);
+        }
     }
 
     public void addLocation(URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
@@ -231,6 +239,10 @@ public class LogicalFileImpl extends AbstractLogicalFileTaskImpl implements Logi
             throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
+    public void replicate(URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        this.replicate(name, Flags.NONE.getValue());
+    }
+
     private void _replicate_step1(URL physicalTarget, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         final String MESSAGE = "Failed to copy replica (state is still consistent)";
         try {

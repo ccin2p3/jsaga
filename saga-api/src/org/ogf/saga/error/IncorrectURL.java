@@ -14,6 +14,7 @@ public class IncorrectURL extends Exception {
      * Constructs an IncorrectURL exception.
      */
     public IncorrectURL() {
+        super(INCORRECT_URL);
     }
 
     /**
@@ -21,7 +22,7 @@ public class IncorrectURL extends Exception {
      * @param message the detail message.
      */
     public IncorrectURL(String message) {
-        super(message);
+        super(INCORRECT_URL, message);
     }
 
     /**
@@ -29,7 +30,7 @@ public class IncorrectURL extends Exception {
      * @param cause the cause.
      */
     public IncorrectURL(Throwable cause) {
-        super(cause);
+        super(INCORRECT_URL, cause);
     }
 
     /**
@@ -39,7 +40,7 @@ public class IncorrectURL extends Exception {
      * @param cause the cause.
      */
     public IncorrectURL(String message, Throwable cause) {
-        super(message, cause);
+        super(INCORRECT_URL, message, cause);
     }
 
     /**
@@ -49,6 +50,6 @@ public class IncorrectURL extends Exception {
      * @param object the associated SAGA object.
      */
     public IncorrectURL(String message, SagaObject object) {
-        super(message, object);
+        super(INCORRECT_URL, message, object);
     }
 }

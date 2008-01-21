@@ -8,7 +8,7 @@
          ###########################################################################
     -->
     <xsl:output method="xml" indent="yes"/>
-    <xsl:param name="config" select="document('etc/job-defaults.jsdl')"/>
+    <xsl:param name="config" select="document('etc/example/job-defaults.jsdl')"/>
 
     <!-- entry point -->
     <xsl:template match="/">

@@ -17,7 +17,7 @@ public interface TaskContainer extends SagaObject, Monitorable {
      * Metric name: fires on state changes of any task in the container,
      * and has the value of that task's handle.
      */
-    public static final String TASKCONTAINERSTATE = "TaskContainer.state";
+    public static final String TASKCONTAINER_STATE = "TaskContainer.state";
 
     /**
      * Adds a task to the task container.
@@ -29,8 +29,9 @@ public interface TaskContainer extends SagaObject, Monitorable {
     /**
      * Removes the task identified by the specified cookie from this container.
      * @param cookie identifies the task.
+     * @return the task.
      */
-    public void remove(int cookie)
+    public <T> Task<T> remove(int cookie)
         throws NotImplemented, DoesNotExist, Timeout, NoSuccess;
 
     /**
@@ -41,20 +42,24 @@ public interface TaskContainer extends SagaObject, Monitorable {
 
     /**
      * Waits for one or more of the tasks to end up in a final state.
-     * This method blocks indefinately.
+     * This method blocks indefinately. One of the finished tasks is returned,
+     * and removed from the task container.
      * @param mode wait for ALL or ANY task.
-     * @return the finished tasks.
+     * @return any of the finished tasks.
      */
-    public Task[] waitTasks(WaitMode mode)
+    public Task waitFor(WaitMode mode)
         throws NotImplemented, IncorrectState, DoesNotExist, Timeout, NoSuccess;
 
     /**
      * Waits for one or more of the tasks to end up in a final state.
+     * One of the finished tasks is returned, and removed from the task
+     * container. If none of the tasks is finished within the specified
+     * timeout, <code>null</code> is returned.
      * @param timeoutInSeconds number of seconds to wait.
      * @param mode wait for ALL or ANY task.
      * @return the finished tasks.
      */
-    public Task[] waitTasks(float timeoutInSeconds, WaitMode mode)
+    public Task waitFor(float timeoutInSeconds, WaitMode mode)
         throws NotImplemented, IncorrectState, DoesNotExist, Timeout, NoSuccess;
 
     /**
@@ -95,7 +100,7 @@ public interface TaskContainer extends SagaObject, Monitorable {
      * @param cookie the integer identifying the task.
      * @return the task.
      */
-    public Task getTask(int cookie)
+    public <T> Task<T> getTask(int cookie)
         throws NotImplemented, DoesNotExist, Timeout, NoSuccess;
 
     /**

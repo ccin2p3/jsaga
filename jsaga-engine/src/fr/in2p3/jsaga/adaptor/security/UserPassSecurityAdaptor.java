@@ -15,24 +15,20 @@ import java.io.PrintStream;
  *
  */
 public class UserPassSecurityAdaptor implements SecurityAdaptor {
-    private String m_userName;
+    private String m_userId;
     private String m_userPass;
 
-    public UserPassSecurityAdaptor(String userName, String userPass) {
-        m_userName = userName;
+    public UserPassSecurityAdaptor(String userId, String userPass) {
+        m_userId = userId;
         m_userPass = userPass;
     }
 
-    public String getUserName() {
-        return m_userName;
+    public String getUserID() {
+        return m_userId;
     }
 
     public String getUserPass() {
         return m_userPass;
-    }
-
-    public String getUserID() {
-        return m_userName;
     }
 
     public int getTimeLeft() {
@@ -44,7 +40,7 @@ public class UserPassSecurityAdaptor implements SecurityAdaptor {
     }
 
     public void dump(PrintStream out) {
-        out.println("  UserName : "+m_userName);
+        out.println("  UserID : "+ m_userId);
         out.print("  UserPass : ");
         for (int i=0; m_userPass!=null && i<m_userPass.length(); i++) {
             out.print('*');

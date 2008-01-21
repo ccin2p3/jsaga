@@ -26,7 +26,7 @@ public abstract class AbstractNSDirectoryListTest extends AbstractNSDirectoryTes
         m_dir.changeDir(new URL(".."));
         assertEquals(
                 DEFAULT_ROOTNAME,
-                m_dir.getName()+"/");
+                m_dir.getName().getPath()+"/");
     }
 
     public void test_list() throws Exception {

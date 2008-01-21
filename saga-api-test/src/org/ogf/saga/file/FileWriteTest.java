@@ -44,7 +44,7 @@ public class FileWriteTest extends AbstractNSEntryTest {
         if (m_file instanceof File) {
             Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT2.getBytes());
             File writer = (File) NSFactory.createNSEntry(m_session, m_fileUrl, Flags.WRITE.getValue());
-            writer.write(buffer.getSize(), buffer);
+            writer.write(buffer);
             writer.close(0);
             checkWrited(m_fileUrl, DEFAULT_CONTENT2);
         } else {
@@ -56,7 +56,7 @@ public class FileWriteTest extends AbstractNSEntryTest {
         if (m_file instanceof File) {
             Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT2.getBytes());
             File writer = (File) NSFactory.createNSEntry(m_session, m_fileUrl, Flags.WRITE.or(Flags.APPEND));
-            writer.write(buffer.getSize(), buffer);
+            writer.write(buffer);
             writer.close(0);
             checkWrited(m_fileUrl, DEFAULT_CONTENT+DEFAULT_CONTENT2);
         } else {

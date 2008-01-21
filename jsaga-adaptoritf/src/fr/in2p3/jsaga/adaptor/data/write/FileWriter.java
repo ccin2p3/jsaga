@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.adaptor.data.write;
 
+import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import org.ogf.saga.error.*;
 
 import java.io.OutputStream;
@@ -26,8 +27,8 @@ public interface FileWriter extends DataWriterAdaptor {
      * @return an output stream.
      * @throws BadParameter if <code>parentAbsolutePath</code> is not a directory.
      * @throws AlreadyExists if <code>fileName</code> already exists and <code>exclusive</code> and <code>append</code> are both false.
-     * @throws DoesNotExist if <code>parentAbsolutePath</code> does not exist.
+     * @throws ParentDoesNotExist if <code>parentAbsolutePath</code> does not exist.
      */
     public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append)
-        throws PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess;
+        throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess;
 }

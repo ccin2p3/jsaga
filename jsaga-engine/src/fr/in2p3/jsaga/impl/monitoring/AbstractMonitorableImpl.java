@@ -6,6 +6,7 @@ import org.ogf.saga.error.*;
 import org.ogf.saga.monitoring.*;
 import org.ogf.saga.session.Session;
 
+import java.lang.Exception;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,14 +51,10 @@ public abstract class AbstractMonitorableImpl extends AbstractSagaObjectImpl imp
         }
     }
 
-    public int addCallback(String name, Callback cb) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public int addCallback(String name, Callback cb) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess, IncorrectState {
         Metric metric = m_metrics.get(name);
         if (metric != null) {
-            try {
-                return metric.addCallback(cb);
-            } catch (IncorrectState e) {
-                throw new NoSuccess(e);
-            }
+            return metric.addCallback(cb);
         } else {
             throw new DoesNotExist("Metric "+name+" does not exist", this);
         }
@@ -66,13 +63,21 @@ public abstract class AbstractMonitorableImpl extends AbstractSagaObjectImpl imp
     public void removeCallback(String name, int cookie) throws NotImplemented, DoesNotExist, BadParameter, Timeout, NoSuccess, AuthenticationFailed, AuthorizationFailed, PermissionDenied {
         Metric metric = m_metrics.get(name);
         if (metric != null) {
-            try {
-                metric.removeCallback(cookie);
-            } catch (IncorrectState e) {
-                throw new NoSuccess(e);
-            }
+            metric.removeCallback(cookie);
         } else {
             throw new DoesNotExist("Metric "+name+" does not exist", this);
         }
+    }
+
+    //////////////////////////////////////////// internal methods ////////////////////////////////////////////
+
+    public MetricImpl _addMetric(MetricImpl metric) throws NoSuccess {
+        try {
+            String name = metric.getAttribute(Metric.NAME);
+            m_metrics.put(name, metric);
+        } catch (Exception e) {
+            throw new NoSuccess(e);
+        }
+        return metric;
     }
 }

@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.resource;
 
-import fr.in2p3.jsaga.adaptor.language.JobDescriptionContainer;
+import org.w3c.dom.Document;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -19,21 +19,21 @@ public interface ResourceSelectionAdaptor {
      * Initialise resource selection algorithm
      * <br>Notes:
      * <br>MAY perform the match-making once for ALL jobs of the collection
-     * @param desc JSDL or native job description
+     * @param jsdlDOM the job description in JSDL
      * @param nbJobsTotal Total number of jobs in collection
      */
-    public void init(JobDescriptionContainer desc, int nbJobsTotal);
+    public void init(Document jsdlDOM, int nbJobsTotal);
 
     /**
      * Select a set of available resources
      * <br>Notes:
      * <br>MUST perform ranking for current job subset
      * <br>MAY perform the match-making also
-     * @param desc JSDL or native job description
+     * @param jsdlDOM the job description in JSDL
      * @param maxSlots Number of jobs to submit
      * @return set of available resources
      */
-    public SelectedResource[] select(JobDescriptionContainer desc, int maxSlots);
+    public SelectedResource[] select(Document jsdlDOM, int maxSlots);
 
     /**
      * Notify status of terminated job

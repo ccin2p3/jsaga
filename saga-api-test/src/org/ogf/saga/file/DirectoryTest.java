@@ -27,7 +27,7 @@ public class DirectoryTest extends AbstractNSDirectoryTest {
                 dir instanceof Directory);
         assertEquals(
                 DEFAULT_ROOTNAME,
-                dir.getName()+"/");
+                dir.getName().getPath()+"/");
     }
 
     public void test_openEntry() throws Exception {
@@ -36,6 +36,6 @@ public class DirectoryTest extends AbstractNSDirectoryTest {
                 entry instanceof File);
         assertEquals(
                 DEFAULT_FILENAME,
-                entry.getName());
+                entry.getName().getPath());
     }
 }

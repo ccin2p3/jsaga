@@ -14,6 +14,7 @@ public class DoesNotExist extends Exception {
      * Constructs a DoesNotExist exception.
      */
     public DoesNotExist() {
+        super(DOES_NOT_EXIST);
     }
 
     /**
@@ -22,7 +23,7 @@ public class DoesNotExist extends Exception {
      * @param message the detail message.
      */
     public DoesNotExist(String message) {
-        super(message);
+        super(DOES_NOT_EXIST, message);
     }
 
     /**
@@ -30,7 +31,7 @@ public class DoesNotExist extends Exception {
      * @param cause the cause.
      */
     public DoesNotExist(Throwable cause) {
-        super(cause);
+        super(DOES_NOT_EXIST, cause);
     }
 
     /**
@@ -41,7 +42,7 @@ public class DoesNotExist extends Exception {
      * 
      */
     public DoesNotExist(String message, Throwable cause) {
-        super(message, cause);
+        super(DOES_NOT_EXIST, message, cause);
     }
     
     /**
@@ -51,6 +52,6 @@ public class DoesNotExist extends Exception {
      * @param object the associated SAGA object.
      */
     public DoesNotExist(String message, SagaObject object) {
-        super(message, object);
+        super(DOES_NOT_EXIST, message, object);
     }
 }

@@ -24,6 +24,7 @@ public abstract class AbstractCommand {
     private Options m_options;
     private String[] m_nonOptionNames;
     private String[] m_standaloneOptionNames;
+    private Parser m_parser;
     protected String[] m_nonOptionValues;
 
     protected abstract Options createOptions();
@@ -32,17 +33,23 @@ public abstract class AbstractCommand {
      * @param appName the application name
      * @param nonOptionNames the names of non-options (required if <code>standaloneOptionNames</code> not null)
      * @param standaloneOptionNames the names of standalone options (i.e. options that do not require non-options)
+     * @param parser the command line parser
      */
-    protected AbstractCommand(String appName, String[] nonOptionNames, String[] standaloneOptionNames) {
+    protected AbstractCommand(String appName, String[] nonOptionNames, String[] standaloneOptionNames, Parser parser) {
         m_appName = appName;
         m_options = this.createOptions();
         m_nonOptionNames = nonOptionNames;
         m_standaloneOptionNames = standaloneOptionNames;
+        m_parser = (parser!=null ? parser : new PosixParser());
         m_nonOptionValues = null;
     }
 
+    protected AbstractCommand(String appName, String[] nonOptionNames, String[] standaloneOptionNames) {
+        this(appName, nonOptionNames, standaloneOptionNames, null);
+    }
+
     protected AbstractCommand(String appName) {
-        this(appName, null, null);
+        this(appName, null, null, null);
     }
 
     protected CommandLine parse(String[] args) {
@@ -65,7 +72,7 @@ public abstract class AbstractCommand {
         // parse
         try {
             boolean stopAtNonOption = (m_nonOptionNames==null || m_nonOptionNames.length==0);
-            CommandLine line = new PosixParser().parse(m_options, newArgs, stopAtNonOption);
+            CommandLine line = m_parser.parse(m_options, newArgs, stopAtNonOption);
             m_nonOptionValues = line.getArgs();
             if (m_nonOptionNames!=null && m_nonOptionValues.length>m_nonOptionNames.length) {
                 throw new UnrecognizedOptionException("Unexpected option: "+ m_nonOptionValues[m_nonOptionNames.length]);

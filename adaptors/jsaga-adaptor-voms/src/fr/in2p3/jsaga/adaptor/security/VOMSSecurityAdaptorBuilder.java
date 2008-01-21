@@ -12,10 +12,11 @@ import org.gridforum.jgss.ExtendedGSSCredential;
 import org.gridforum.jgss.ExtendedGSSManager;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.IncorrectState;
+import org.ogf.saga.error.*;
+import org.ogf.saga.context.Context;
 
 import java.io.*;
+import java.lang.Exception;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 
@@ -32,8 +33,10 @@ import java.util.Map;
  *
  */
 public class VOMSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
-    private static final Usage LOCAL_PROXY_OBJECT = new UNoPrompt("UserProxyObject");
-    private static final Usage LOCAL_PROXY_FILE = new UFile("UserProxy");
+    protected static final String VOMSDIR = "VomsDir";
+    private static final String USERPROXYOBJECT = "UserProxyObject";
+    private static final Usage LOCAL_PROXY_OBJECT = new UNoPrompt(USERPROXYOBJECT);
+    private static final Usage LOCAL_PROXY_FILE = new UFile(Context.USERPROXY);
 
     public String getType() {
         return "VOMS";
@@ -46,15 +49,15 @@ public class VOMSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
     public Usage getUsage() {
         return new UAnd(new Usage[]{
                 new UOr(new Usage[]{LOCAL_PROXY_OBJECT, LOCAL_PROXY_FILE}),
-                new UFile("CertDir"),
-                new UFile("VomsDir")
+                new UFile(Context.CERTREPOSITORY),
+                new UFile(VOMSDIR)
         });
     }
 
     public Default[] getDefaults(Map map) throws IncorrectState {
         EnvironmentVariables env = EnvironmentVariables.getInstance();
         return new Default[]{
-                new Default("UserProxy", new String[]{
+                new Default(Context.USERPROXY, new String[]{
                         env.getProperty("X509_USER_PROXY"),
                         System.getProperty("java.io.tmpdir")+System.getProperty("file.separator")+"x509up_u"+
                                 (System.getProperty("os.name").toLowerCase().startsWith("windows")
@@ -64,21 +67,21 @@ public class VOMSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
                                                 : getUnixUID()
                                           )
                                 )}),
-                new Default("UserCert", new File[]{
+                new Default(Context.USERCERT, new File[]{
                         new File(env.getProperty("X509_USER_CERT")+""),
                         new File(System.getProperty("user.home")+"/.globus/usercert.pem")}),
-                new Default("UserKey", new File[]{
+                new Default(Context.USERKEY, new File[]{
                         new File(env.getProperty("X509_USER_KEY")+""),
                         new File(System.getProperty("user.home")+"/.globus/userkey.pem")}),
-                new Default("CertDir", new File[]{
+                new Default(Context.CERTREPOSITORY, new File[]{
                         new File(env.getProperty("X509_CERT_DIR")+""),
                         new File(System.getProperty("user.home")+"/.globus/certificates/"),
                         new File("/etc/grid-security/certificates/")}),
-                new Default("VomsDir", new File[]{
+                new Default(VOMSDIR, new File[]{
                         new File(env.getProperty("X509_VOMS_DIR")+""),
                         new File(System.getProperty("user.home")+"/.globus/vomsdir/"),
                         new File("/etc/grid-security/vomsdir/")}),
-                new Default("LifeTime", "PT12H")
+                new Default(Context.LIFETIME, "PT12H")
         };
     }
     protected static String getUnixUID() throws IncorrectState {
@@ -96,11 +99,11 @@ public class VOMSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
     public SecurityAdaptor createSecurityAdaptor(Map attributes) throws Exception {
         GSSCredential cred;
         if (LOCAL_PROXY_OBJECT.getMissingValues(attributes) == null) {
-            String base64 = (String) attributes.get("UserProxyObject");
+            String base64 = (String) attributes.get(USERPROXYOBJECT);
             cred = InMemoryProxySecurityAdaptor.toGSSCredential(base64);
         } else if (LOCAL_PROXY_FILE.getMissingValues(attributes) == null) {
-            CoGProperties.getDefault().setCaCertLocations((String) attributes.get("CertDir"));
-            File proxyFile = new File((String) attributes.get("UserProxy"));
+            CoGProperties.getDefault().setCaCertLocations((String) attributes.get(Context.CERTREPOSITORY));
+            File proxyFile = new File((String) attributes.get(Context.USERPROXY));
             cred = load(proxyFile);
         } else {
             throw new BadParameter("Missing attribute(s): "+this.getUsage().getMissingValues(attributes));
@@ -109,7 +112,7 @@ public class VOMSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
         if (hasNonCriticalExtensions(cred)) {
             return new VOMSSecurityAdaptor(cred);
         } else {
-            throw new IncorrectState("Security context is not of type: "+this.getType());
+            throw new NoSuccess("Security context is not of type: "+this.getType());
         }
     }
 

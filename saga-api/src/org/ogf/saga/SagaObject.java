@@ -11,6 +11,12 @@ import org.ogf.saga.error.DoesNotExist;
  * extends Cloneable.
  */
 public interface SagaObject extends Cloneable {
+    
+    /** Timeout constant: wait forever. */
+    public static final float WAIT_FOREVER = -1.0F;
+    
+    /** Timeout constant: don't wait. */
+    public static final float NO_WAIT = 0.0F;
 
     /**
      * Returns a shallow copy of the session from which this object was

@@ -81,12 +81,12 @@ public interface AsyncAttributes extends Attributes {
     /**
      * Creates a task that finds matching attributes.
      * @param mode determines the initial state of the task.
-     * @param pattern the search pattern.
+     * @param patterns the search patterns.
      * @return the task.
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public Task<String[]> findAttributes(TaskMode mode, String pattern)
+    public Task<String[]> findAttributes(TaskMode mode, String... patterns)
         throws NotImplemented;
 
     /**

@@ -71,6 +71,16 @@ public interface LogicalFile extends NSEntry, AsyncAttributes {
         throws NotImplemented, IncorrectURL, AuthenticationFailed,
             AuthorizationFailed, PermissionDenied, BadParameter,
             IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess;
+    
+    /**
+     * Replicates a file from any of the known locations to a new location,
+     * with default flags NONE.
+     * @param name location to replicate to.
+     */
+    public void replicate(URL name)
+        throws NotImplemented, IncorrectURL, AuthenticationFailed,
+            AuthorizationFailed, PermissionDenied, BadParameter,
+            IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess;
 
     //
     // Task versions ...
@@ -131,5 +141,17 @@ public interface LogicalFile extends NSEntry, AsyncAttributes {
      *     method is not implemented.
      */
     public Task replicate(TaskMode mode, URL name, int flags)
+        throws NotImplemented;
+    
+    /**
+     * Creates a task that replicates a file from any of the known locations
+     * to a new location, with default flags NONE.
+     * @param mode the task mode.
+     * @param name location to replicate to.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task replicate(TaskMode mode, URL name)
         throws NotImplemented;
 }

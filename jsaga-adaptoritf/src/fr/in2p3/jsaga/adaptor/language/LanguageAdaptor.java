@@ -1,9 +1,9 @@
 package fr.in2p3.jsaga.adaptor.language;
 
 import org.ogf.saga.error.BadParameter;
+import org.ogf.saga.error.NoSuccess;
 import org.w3c.dom.Document;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 /* ***************************************************
@@ -19,6 +19,27 @@ import java.io.InputStream;
  *
  */
 public interface LanguageAdaptor {
-    public void loadLanguageDefinitionResources() throws IOException;
-    public Document jobDescriptionToDOM(InputStream xmlStream) throws BadParameter;
+    /**
+     * @return the name of the language
+     */
+    public String getName();
+
+    /**
+     * Initialize the job description parser (expl: load language definition resources)
+     */
+    public void initParser() throws Exception;
+
+    /**
+     * Parse the job description
+     * @param jobDescStream the job description
+     * @return the job description as an XML document
+     * @throws BadParameter if a syntax error occured
+     * @throws NoSuccess if another error occured
+     */
+    public Document parseJobDescription(InputStream jobDescStream) throws BadParameter, NoSuccess;
+
+    /**
+     * @return the path to the stylesheet to transform the XML job description to JSDL
+     */
+    public String getTranslator();
 }

@@ -29,16 +29,15 @@ public interface LogicalDirectory extends NSDirectory, AsyncAttributes {
      * Tests the name for being a logical file.
      * Is an alias for {@link NSDirectory#isEntry}.
      * @param name to be tested.
-     * @param flags flags for the operation.
      * @return <code>true</code> if the name represents a non-directory entry.
      */
-    public boolean isFile(URL name, int flags)
+    public boolean isFile(URL name)
         throws NotImplemented, IncorrectURL, AuthenticationFailed,
             AuthorizationFailed, PermissionDenied, BadParameter,
-            IncorrectState, Timeout, NoSuccess;
+            DoesNotExist, IncorrectState, Timeout, NoSuccess;
 
     /**
-     * Finds entries in the current directory and below, with matching names
+     * Finds entries in the current directory and possibly below, with matching names
      * and matching meta data.
      * @param namePattern pattern for names of entries to be found.
      * @param attrPattern  pattern for meta data keys/values of entries to be
@@ -46,12 +45,25 @@ public interface LogicalDirectory extends NSDirectory, AsyncAttributes {
      * @param flags       flags defining the operation modus.
      * @return the list of matching entries.
      */
-    public List<String> find(String namePattern, String[] attrPattern,
+    public List<URL> find(String namePattern, String[] attrPattern,
             int flags)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
             PermissionDenied, BadParameter, IncorrectState, Timeout,
             NoSuccess;
 
+    /**
+     * Finds entries in the current directory and below, with matching names
+     * and matching meta data.
+     * @param namePattern pattern for names of entries to be found.
+     * @param attrPattern  pattern for meta data keys/values of entries to be
+     *          found.
+     * @return the list of matching entries.
+     */
+    public List<URL> find(String namePattern, String[] attrPattern)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, BadParameter, IncorrectState, Timeout,
+            NoSuccess;
+    
     // openLogicalDir and openLogicalFile: names changed with respect
     // to specs  because of Java restriction: cannot redefine methods with
     // just a different return type.
@@ -69,12 +81,34 @@ public interface LogicalDirectory extends NSDirectory, AsyncAttributes {
             Timeout, NoSuccess;
 
     /**
+     * Creates a new <code>LogicalDirectory</code> instance with read flag.
+     * @param name directory to open.
+     * @return the opened directory instance.
+     */
+    public LogicalDirectory openLogicalDir(URL name)
+        throws NotImplemented, IncorrectURL, 
+            AuthenticationFailed, AuthorizationFailed, PermissionDenied,
+            BadParameter, IncorrectState, AlreadyExists, DoesNotExist,
+            Timeout, NoSuccess;
+
+    /**
      * Creates a new <code>LogicalFile</code> instance.
      * @param name logical file to open.
      * @param flags defining the operation modus.
      * @return the opened logical file.
      */
     public LogicalFile openLogicalFile(URL name, int flags)
+        throws NotImplemented, IncorrectURL,
+            AuthenticationFailed, AuthorizationFailed, PermissionDenied,
+            BadParameter, IncorrectState, AlreadyExists, DoesNotExist,
+            Timeout, NoSuccess;
+    
+    /**
+     * Creates a new <code>LogicalFile</code> instance with read flag.
+     * @param name logical file to open.
+     * @return the opened logical file.
+     */
+    public LogicalFile openLogicalFile(URL name)
         throws NotImplemented, IncorrectURL,
             AuthenticationFailed, AuthorizationFailed, PermissionDenied,
             BadParameter, IncorrectState, AlreadyExists, DoesNotExist,
@@ -87,12 +121,11 @@ public interface LogicalDirectory extends NSDirectory, AsyncAttributes {
      * Is an alias for {@link NSDirectory#isEntry}.
      * @param mode the task mode.
      * @param name to be tested.
-     * @param flags defining operation modus.
      * @return the task.
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public Task<Boolean> isFile(TaskMode mode, URL name, int flags)
+    public Task<Boolean> isFile(TaskMode mode, URL name)
         throws NotImplemented ;
 
     /**
@@ -107,10 +140,25 @@ public interface LogicalDirectory extends NSDirectory, AsyncAttributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public Task<List<String>> find(TaskMode mode, String namePattern,
+    public Task<List<URL>> find(TaskMode mode, String namePattern,
             String[] attrPattern, int flags)
         throws NotImplemented;
 
+    /**
+     * Creates a task that finds entries in the current directory and below,
+     * with matching names and matching meta data.
+     * @param mode        the task mode.
+     * @param namePattern pattern for names of entries to be found.
+     * @param attrPattern pattern for meta data keys/values of entries to be
+     *          found.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task<List<URL>> find(TaskMode mode, String namePattern,
+            String[] attrPattern)
+        throws NotImplemented;
+    
     /**
      * Creates a task that creates a new <code>LogicalDirectory</code>
      * instance.
@@ -124,11 +172,23 @@ public interface LogicalDirectory extends NSDirectory, AsyncAttributes {
     public Task<LogicalDirectory> openLogicalDir(TaskMode mode, URL name,
             int flags)
         throws NotImplemented;
+    
+    /**
+     * Creates a task that creates a new <code>LogicalDirectory</code>
+     * instance.
+     * @param mode the task mode.
+     * @param name directory to open.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task<LogicalDirectory> openLogicalDir(TaskMode mode, URL name)
+        throws NotImplemented;
 
     /**
      * Creates a task that creates a new <code>LogicalFile</code> instance.
      * @param mode the task mode.
-     * @param name the gile to open.
+     * @param name the file to open.
      * @param flags defining the operation modus.
      * @return the task.
      * @exception NotImplemented is thrown when the task version of this
@@ -136,5 +196,16 @@ public interface LogicalDirectory extends NSDirectory, AsyncAttributes {
      */
     public Task<LogicalFile> openLogicalFile(TaskMode mode, URL name,
             int flags)
+        throws NotImplemented;
+    
+    /**
+     * Creates a task that creates a new <code>LogicalFile</code> instance.
+     * @param mode the task mode.
+     * @param name the file to open.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task<LogicalFile> openLogicalFile(TaskMode mode, URL name)
         throws NotImplemented;
 }

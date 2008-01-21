@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.adaptor.security;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.engine.config.attributes.FilePropertiesAttributesParser;
+import org.ogf.saga.context.Context;
 import org.ogf.saga.error.BadParameter;
 import org.ogf.saga.error.IncorrectState;
 
@@ -23,16 +24,17 @@ import java.util.Properties;
 /**
  *
  */
-public class UserPassSecurityAdaptorBuilderExtended extends UserPassSecurityAdaptorBuilder implements InitializableSecurityAdaptorBuilder {
-    private static final Usage CRYPTED = new UAnd(new Usage[]{new U("UserName"), new U("UserPassCrypted")});
+public class UserPassSecurityAdaptorBuilderExtended extends UserPassSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuilder {
+    private static final String USERPASSCRYPTED = "UserPassCrypted";
+    private static final Usage CRYPTED = new UAnd(new Usage[]{new U(Context.USERID), new U(USERPASSCRYPTED)});
 
     /** override super.getUsage() to add attribute UserPassCrypted */
     public Usage getUsage() {
         return new UAnd(new Usage[]{
-                new U("UserName"),
+                new U(Context.USERID),
                 new UOr(new Usage[]{
-                        new UHidden("UserPass"),
-                        new U("UserPassCrypted")
+                        new UHidden(Context.USERPASS),
+                        new U(USERPASSCRYPTED)
                 })
         });
     }
@@ -40,9 +42,9 @@ public class UserPassSecurityAdaptorBuilderExtended extends UserPassSecurityAdap
     /** override super.getDefaults() to add attribute LifeTime */
     public Default[] getDefaults(Map attributes) throws IncorrectState {
         return new Default[]{
-                new Default("UserName", "anonymous"),
-                new Default("UserPass", "anon"),
-                new Default("LifeTime", "PT12H")
+                new Default(Context.USERID, "anonymous"),
+                new Default(Context.USERPASS, "anon"),
+                new Default(Context.LIFETIME, "PT12H")
         };
     }
 
@@ -50,8 +52,8 @@ public class UserPassSecurityAdaptorBuilderExtended extends UserPassSecurityAdap
         if (UNCRYPTED.getMissingValues(attributes) == null) {
             return super.createSecurityAdaptor(attributes);
         } else if (CRYPTED.getMissingValues(attributes) == null) {
-            String name = (String) attributes.get("UserName");
-            String cryptedPassword = (String) attributes.get("UserPassCrypted");
+            String name = (String) attributes.get(Context.USERID);
+            String cryptedPassword = (String) attributes.get(USERPASSCRYPTED);
             PasswordDecrypterSingleton decrypter = PasswordDecrypterSingleton.getInstance();
             int expiryDate = decrypter.getExpiryDate();
             int currentDate = (int) (System.currentTimeMillis()/1000);
@@ -69,9 +71,9 @@ public class UserPassSecurityAdaptorBuilderExtended extends UserPassSecurityAdap
 
     public Usage getInitUsage() {
         return new UAnd(new Usage[]{
-                new U("UserName"),
-                new UHidden("UserPass"),
-                new UDuration("LifeTime") {
+                new U(Context.USERID),
+                new UHidden(Context.USERPASS),
+                new UDuration(Context.LIFETIME) {
                     protected Object throwExceptionIfInvalid(Object value) throws Exception {
                         return (value!=null ? super.throwExceptionIfInvalid(value) : null);
                     }
@@ -81,10 +83,10 @@ public class UserPassSecurityAdaptorBuilderExtended extends UserPassSecurityAdap
 
     public void initBuilder(Map attributes, String contextId) throws Exception {
         // get attributes
-        String name = (String) attributes.get("UserName");
-        String password = (String) attributes.get("UserPass");
-        int lifetime = (attributes.containsKey("LifeTime")
-                ? UDuration.toInt(attributes.get("LifeTime"))
+        String name = (String) attributes.get(Context.USERID);
+        String password = (String) attributes.get(Context.USERPASS);
+        int lifetime = (attributes.containsKey(Context.LIFETIME)
+                ? UDuration.toInt(attributes.get(Context.LIFETIME))
                 : 12*3600);
 
         // encrypt password
@@ -93,15 +95,15 @@ public class UserPassSecurityAdaptorBuilderExtended extends UserPassSecurityAdap
         // write to user properties file
         Properties prop = new Properties();
         prop.load(new FileInputStream(FilePropertiesAttributesParser.FILE));
-        prop.setProperty(contextId+".UserName", name);
-        prop.setProperty(contextId+".UserPassCrypted", cryptedPassword);
+        prop.setProperty(contextId+"."+Context.USERID, name);
+        prop.setProperty(contextId+"."+USERPASSCRYPTED, cryptedPassword);
         prop.store(new FileOutputStream(FilePropertiesAttributesParser.FILE), "JSAGA user attributes");
     }
 
     public void destroyBuilder(Map attributes, String contextId) throws Exception {
         Properties prop = new Properties();
         prop.load(new FileInputStream(FilePropertiesAttributesParser.FILE));
-        prop.remove(contextId+".UserPassCrypted");
+        prop.remove(contextId+"."+USERPASSCRYPTED);
         prop.store(new FileOutputStream(FilePropertiesAttributesParser.FILE), "JSAGA user attributes");
     }
 }

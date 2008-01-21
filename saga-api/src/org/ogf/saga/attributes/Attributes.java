@@ -17,6 +17,20 @@ import org.ogf.saga.error.Timeout;
  */
 public interface Attributes {
     
+    // Attribute types
+    public static final String STRING = "String";
+    public static final String INT = "Int";
+    public static final String ENUM = "Enum";
+    public static final String FLOAT = "Float";
+    public static final String BOOL = "Bool";
+    public static final String TIME = "Time";
+    // For "trigger" metrics:
+    public static final String TRIGGER = "Trigger";
+    
+    // Boolean values:
+    public static final String TRUE = "True";
+    public static final String FALSE = "False";
+
     /**
      * Sets an attribute to a value.
      * @param key the attribute key.
@@ -73,10 +87,10 @@ public interface Attributes {
     
     /**
      * Finds matching attributes.
-     * @param pattern the search pattern.
+     * @param patterns the search patterns.
      * @return the list of matching attribute keys.
      */
-    public String[] findAttributes(String pattern)
+    public String[] findAttributes(String... patterns)
         throws NotImplemented, BadParameter, AuthenticationFailed,
             AuthorizationFailed, PermissionDenied, Timeout, NoSuccess;
 

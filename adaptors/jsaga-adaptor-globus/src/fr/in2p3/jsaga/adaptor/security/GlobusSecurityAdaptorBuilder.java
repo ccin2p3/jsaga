@@ -12,10 +12,11 @@ import org.gridforum.jgss.ExtendedGSSCredential;
 import org.gridforum.jgss.ExtendedGSSManager;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.IncorrectState;
+import org.ogf.saga.error.*;
+import org.ogf.saga.context.Context;
 
 import java.io.*;
+import java.lang.Exception;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 
@@ -32,8 +33,8 @@ import java.util.Map;
  *
  */
 public abstract class GlobusSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
-    private static final Usage LOCAL_PROXY_OBJECT = new UNoPrompt("UserProxyObject");
-    private static final Usage LOCAL_PROXY_FILE = new UFile("UserProxy");
+    private static final Usage LOCAL_PROXY_OBJECT = new UNoPrompt(GlobusContext.USERPROXYOBJECT);
+    private static final Usage LOCAL_PROXY_FILE = new UFile(Context.USERPROXY);
 
     public abstract String getType();
     public abstract boolean checkType(GSSCredential proxy);
@@ -45,14 +46,14 @@ public abstract class GlobusSecurityAdaptorBuilder implements SecurityAdaptorBui
     public Usage getUsage() {
         return new UAnd(new Usage[]{
                 new UOr(new Usage[]{LOCAL_PROXY_OBJECT, LOCAL_PROXY_FILE}),
-                new UFile("CertDir")
+                new UFile(Context.CERTREPOSITORY)
         });
     }
 
     public Default[] getDefaults(Map map) throws IncorrectState {
         EnvironmentVariables env = EnvironmentVariables.getInstance();
         return new Default[]{
-                new Default("UserProxy", new String[]{
+                new Default(Context.USERPROXY, new String[]{
                         env.getProperty("X509_USER_PROXY"),
                         System.getProperty("java.io.tmpdir")+System.getProperty("file.separator")+"x509up_u"+
                                 (System.getProperty("os.name").toLowerCase().startsWith("windows")
@@ -62,18 +63,18 @@ public abstract class GlobusSecurityAdaptorBuilder implements SecurityAdaptorBui
                                                 : getUnixUID()
                                           )
                                 )}),
-                new Default("UserCert", new File[]{
+                new Default(Context.USERCERT, new File[]{
                         new File(env.getProperty("X509_USER_CERT")+""),
                         new File(System.getProperty("user.home")+"/.globus/usercert.pem")}),
-                new Default("UserKey", new File[]{
+                new Default(Context.USERKEY, new File[]{
                         new File(env.getProperty("X509_USER_KEY")+""),
                         new File(System.getProperty("user.home")+"/.globus/userkey.pem")}),
-                new Default("CertDir", new File[]{
+                new Default(Context.CERTREPOSITORY, new File[]{
                         new File(env.getProperty("X509_CERT_DIR")+""),
                         new File(System.getProperty("user.home")+"/.globus/certificates/"),
                         new File("/etc/grid-security/certificates/")}),
-                new Default("LifeTime", "PT12H"),
-                new Default("Delegation", "full")
+                new Default(Context.LIFETIME, "PT12H"),
+                new Default(GlobusContext.DELEGATION, "full")
         };
     }
     protected static String getUnixUID() throws IncorrectState {
@@ -91,11 +92,11 @@ public abstract class GlobusSecurityAdaptorBuilder implements SecurityAdaptorBui
     public SecurityAdaptor createSecurityAdaptor(Map attributes) throws Exception {
         GSSCredential cred;
         if (LOCAL_PROXY_OBJECT.getMissingValues(attributes) == null) {
-            String base64 = (String) attributes.get("UserProxyObject");
+            String base64 = (String) attributes.get(GlobusContext.USERPROXYOBJECT);
             cred = InMemoryProxySecurityAdaptor.toGSSCredential(base64);
         } else if (LOCAL_PROXY_FILE.getMissingValues(attributes) == null) {
-            CoGProperties.getDefault().setCaCertLocations((String) attributes.get("CertDir"));
-            File proxyFile = new File((String) attributes.get("UserProxy"));
+            CoGProperties.getDefault().setCaCertLocations((String) attributes.get(Context.CERTREPOSITORY));
+            File proxyFile = new File((String) attributes.get(Context.USERPROXY));
             cred = load(proxyFile);
         } else {
             throw new BadParameter("Missing attribute(s): "+this.getUsage().getMissingValues(attributes));
@@ -103,7 +104,7 @@ public abstract class GlobusSecurityAdaptorBuilder implements SecurityAdaptorBui
         if (this.checkType(cred) && !hasNonCriticalExtensions(cred)) {
             return new GlobusSecurityAdaptor(cred);
         } else {
-            throw new IncorrectState("Security context is not of type: "+this.getType());
+            throw new NoSuccess("Security context is not of type: "+this.getType());
         }
     }
 

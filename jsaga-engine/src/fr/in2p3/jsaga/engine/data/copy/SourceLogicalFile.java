@@ -30,7 +30,7 @@ public class SourceLogicalFile {
         m_sourceFile = sourceFile;
     }
 
-    public void putToPhysicalFile(Session session, URL target, FlagsBytes targetFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
+    public void putToPhysicalFile(Session session, URL target, FlagsBytes targetFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
         // get location of source entry (may be logical or physical
         List<URL> sourceLocations = m_sourceFile.listLocations();
         if (sourceLocations!=null && sourceLocations.size()>0) {

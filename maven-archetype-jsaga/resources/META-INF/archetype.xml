@@ -2,6 +2,7 @@
     <id>maven-archetype-jsaga</id>
     <sources>
         <source>src/data/MyProtocolDataAdaptor.java</source>
+        <source>src/site/site.xml</source>
     </sources>
     <testSources>
         <source>test/src/data/MyProtocolDataAdaptorTest.java</source>

@@ -3,15 +3,17 @@ package fr.in2p3.jsaga.impl.permissions;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionAdaptor;
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
-import fr.in2p3.jsaga.impl.attributes.AbstractAttributesImpl;
+import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
+import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.URL;
-import org.ogf.saga.attributes.Attributes;
 import org.ogf.saga.error.*;
 import org.ogf.saga.permissions.Permissions;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
+
+import java.lang.Exception;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -25,7 +27,7 @@ import org.ogf.saga.task.TaskMode;
 /**
  *
  */
-public abstract class AbstractDataPermissionsImpl extends AbstractAttributesImpl implements Permissions, Attributes {
+public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl implements Permissions {
     protected URL m_url;
     protected DataAdaptor m_adaptor;
 
@@ -51,6 +53,8 @@ public abstract class AbstractDataPermissionsImpl extends AbstractAttributesImpl
         clone.m_adaptor = m_adaptor;
         return clone;
     }
+
+    //////////////////////////////////////////// Synchronous ////////////////////////////////////////////
 
     public void permissionsAllow(String id, int permissions) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
         if (m_adaptor instanceof PermissionAdaptor) {
@@ -95,23 +99,65 @@ public abstract class AbstractDataPermissionsImpl extends AbstractAttributesImpl
         }
     }
 
+    //////////////////////////////////////////// Asynchronous ////////////////////////////////////////////
+
     public Task permissionsAllow(TaskMode mode, String id, int permissions) throws NotImplemented {
-        throw new NotImplemented("Not implemented by the SAGA engine", this);
+        try {
+            return prepareTask(mode, new GenericThreadedTask(
+                    m_session,
+                    this,
+                    AbstractDataPermissionsImpl.class.getMethod("permissionsAllow", new Class[]{String.class, int.class}),
+                    new Object[]{id, permissions}));
+        } catch (Exception e) {
+            throw new NotImplemented(e);
+        }
     }
 
     public Task permissionsDeny(TaskMode mode, String id, int permissions) throws NotImplemented {
-        throw new NotImplemented("Not implemented by the SAGA engine", this);
+        try {
+            return prepareTask(mode, new GenericThreadedTask(
+                    m_session,
+                    this,
+                    AbstractDataPermissionsImpl.class.getMethod("permissionsDeny", new Class[]{String.class, int.class}),
+                    new Object[]{id, permissions}));
+        } catch (Exception e) {
+            throw new NotImplemented(e);
+        }
     }
 
     public Task<Boolean> permissionsCheck(TaskMode mode, String id, int permissions) throws NotImplemented {
-        throw new NotImplemented("Not implemented by the SAGA engine", this);
+        try {
+            return prepareTask(mode, new GenericThreadedTask(
+                    m_session,
+                    this,
+                    AbstractDataPermissionsImpl.class.getMethod("permissionsCheck", new Class[]{String.class, int.class}),
+                    new Object[]{id, permissions}));
+        } catch (Exception e) {
+            throw new NotImplemented(e);
+        }
     }
 
     public Task<String> getOwner(TaskMode mode) throws NotImplemented {
-        throw new NotImplemented("Not implemented by the SAGA engine", this);
+        try {
+            return prepareTask(mode, new GenericThreadedTask(
+                    m_session,
+                    this,
+                    AbstractDataPermissionsImpl.class.getMethod("getOwner", new Class[]{}),
+                    new Object[]{}));
+        } catch (Exception e) {
+            throw new NotImplemented(e);
+        }
     }
 
     public Task<String> getGroup(TaskMode mode) throws NotImplemented {
-        throw new NotImplemented("Not implemented by the SAGA engine", this);
+        try {
+            return prepareTask(mode, new GenericThreadedTask(
+                    m_session,
+                    this,
+                    AbstractDataPermissionsImpl.class.getMethod("getGroup", new Class[]{}),
+                    new Object[]{}));
+        } catch (Exception e) {
+            throw new NotImplemented(e);
+        }
     }
 }

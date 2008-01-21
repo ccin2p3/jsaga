@@ -14,6 +14,7 @@ public class AlreadyExists extends Exception {
      * Constructs an AlreadyExists exception.
      */
     public AlreadyExists() {
+        super(ALREADY_EXISTS);
     }
 
     /**
@@ -21,7 +22,7 @@ public class AlreadyExists extends Exception {
      * @param message the detail message.
      */
     public AlreadyExists(String message) {
-        super(message);
+        super(ALREADY_EXISTS, message);
     }
 
     /**
@@ -29,7 +30,7 @@ public class AlreadyExists extends Exception {
      * @param cause the cause.
      */
     public AlreadyExists(Throwable cause) {
-        super(cause);
+        super(ALREADY_EXISTS, cause);
     }
 
     /**
@@ -39,7 +40,7 @@ public class AlreadyExists extends Exception {
      * @param cause the cause.
      */
     public AlreadyExists(String message, Throwable cause) {
-        super(message, cause);
+        super(ALREADY_EXISTS, message, cause);
     }
 
     /**
@@ -49,6 +50,6 @@ public class AlreadyExists extends Exception {
      * @param object the associated SAGA object.
      */
     public AlreadyExists(String message, SagaObject object) {
-        super(message, object);
+        super(ALREADY_EXISTS, message, object);
     }
 }

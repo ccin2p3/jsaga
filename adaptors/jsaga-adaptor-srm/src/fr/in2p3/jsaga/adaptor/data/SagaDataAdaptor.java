@@ -52,13 +52,13 @@ public class SagaDataAdaptor implements FileReader, FileWriter, DataCopy, DataRe
     public SagaDataAdaptor(URI url, GSSCredential cred) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         try {
             Context context = ContextFactory.createContext();
-            context.setAttribute("Type", "GSSCredential");
+            context.setAttribute("Type", "InMemoryProxy");
             context.setAttribute("Indice", "0");
             context.setAttribute("UserProxy", InMemoryProxySecurityAdaptor.toBase64(cred));
             Session session = SessionFactory.createSession(false);
             session.addContext(context);
-            URL rootUrl = new URL(url.toString());
-            rootUrl.setFragment("#GSSCredential[0]");
+            URL rootUrl = new URL(url.resolve(".").toString());
+            rootUrl.setFragment("InMemoryProxy[0]");
             m_root = NSFactory.createNSDirectory(session, rootUrl, Flags.NONE.getValue());
         } catch (NotImplemented e) {
             throw new NoSuccess(e);
@@ -75,7 +75,7 @@ public class SagaDataAdaptor implements FileReader, FileWriter, DataCopy, DataRe
         }
     }
 
-    public void connect(String userInfo, String host, int port, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
         // do nothing
     }
 
@@ -166,7 +166,7 @@ public class SagaDataAdaptor implements FileReader, FileWriter, DataCopy, DataRe
         }
     }
 
-    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append) throws PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
         NSEntry entry;
         try {
             int flags = (exclusive ? Flags.EXCL : Flags.NONE).or(append ? Flags.APPEND : Flags.NONE);
@@ -183,7 +183,7 @@ public class SagaDataAdaptor implements FileReader, FileWriter, DataCopy, DataRe
         }
     }
 
-    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, ParentDoesNotExist, Timeout, NoSuccess {
         try {
             String protocol = m_root.getURL().getScheme();
             URL targetUrl = new URL(getURLString(protocol, targetHost, targetPort, targetAbsolutePath));
@@ -200,7 +200,7 @@ public class SagaDataAdaptor implements FileReader, FileWriter, DataCopy, DataRe
         }
     }
 
-    public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+    public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         URL sourceUrl;
         try {
             String protocol = m_root.getURL().getScheme();
@@ -270,7 +270,7 @@ public class SagaDataAdaptor implements FileReader, FileWriter, DataCopy, DataRe
 
     private static String getURLString(String scheme, String host, int port, String path) throws IncorrectURL {
         try {
-            return new java.net.URI(scheme, null, host, port, path, null, "#GSSCredential[0]").toString();
+            return new java.net.URI(scheme, null, host, port, path, null, "InMemoryProxy[0]").toString();
         } catch (URISyntaxException e) {
             throw new IncorrectURL(e);
         }

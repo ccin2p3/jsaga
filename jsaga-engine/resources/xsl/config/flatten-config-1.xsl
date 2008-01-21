@@ -9,6 +9,7 @@
 
     <xsl:template match="/">
         <effective-config>
+            <xsl:copy-of select="/cfg:config/@*"/>
             <xsl:comment> security </xsl:comment>
             <xsl:apply-templates select="/cfg:config/cfg:security/cfg:context/cfg:instance"/>
             <xsl:comment> protocols </xsl:comment>
@@ -59,13 +60,19 @@
     </xsl:template>
 
     <xsl:template match="cfg:JOBSERVICE">
+        <xsl:variable name="type">
+            <xsl:choose>
+                <xsl:when test="@type"><xsl:value-of select="@type"/></xsl:when>
+                <xsl:otherwise><xsl:value-of select="@name"/></xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
         <xsl:variable name="path">
             <xsl:for-each select="ancestor::cfg:GRID[@name]">
                 <xsl:value-of select="@name"/><xsl:text>/</xsl:text>
             </xsl:for-each>
-            <xsl:value-of select="@type"/>
+            <xsl:value-of select="$type"/>
         </xsl:variable>
-        <jobservice path="{$path}">
+        <jobservice type="{$type}" path="{$path}">
             <xsl:copy-of select="@*"/>
             <xsl:for-each select="cfg:attribute">
                 <attribute><xsl:copy-of select="@*"/></attribute>
@@ -77,7 +84,7 @@
                 <xsl:message terminate="yes">Several context instances match job service: <xsl:value-of select="$path"/></xsl:message>
             </xsl:if>
             <xsl:apply-templates select="$matchJobservice">
-                <xsl:with-param name="jobType" select="@type"/>
+                <xsl:with-param name="jobType" select="$type"/>
             </xsl:apply-templates>
         </jobservice>
     </xsl:template>

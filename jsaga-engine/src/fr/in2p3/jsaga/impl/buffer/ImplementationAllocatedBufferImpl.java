@@ -2,8 +2,7 @@ package fr.in2p3.jsaga.impl.buffer;
 
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.buffer.Buffer;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.NotImplemented;
+import org.ogf.saga.error.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -19,7 +18,7 @@ import org.ogf.saga.error.NotImplemented;
  */
 public class ImplementationAllocatedBufferImpl extends AbstractBufferImpl implements Buffer {
     /** constructor */
-    public ImplementationAllocatedBufferImpl(int size) throws BadParameter, NotImplemented {
+    public ImplementationAllocatedBufferImpl(int size) throws BadParameter, NotImplemented, NoSuccess {
         super();
         this.setSize(size);
     }
@@ -36,7 +35,7 @@ public class ImplementationAllocatedBufferImpl extends AbstractBufferImpl implem
         return clone;
     }
 
-    public void setSize(int size) throws NotImplemented, BadParameter {
+    public void setSize(int size) throws NotImplemented, BadParameter, NoSuccess {
         if (size > -1) {
             m_buffer = new byte[size];
         } else {
@@ -44,7 +43,15 @@ public class ImplementationAllocatedBufferImpl extends AbstractBufferImpl implem
         }
     }
 
-    public void setData(byte[] data) throws NotImplemented, BadParameter {
+    public void setSize() throws NotImplemented, BadParameter, NoSuccess {
+        if (m_buffer != null) {
+            m_buffer = new byte[m_buffer.length];
+        } else {
+            throw new NotImplemented("You must specify either the buffer or its size");
+        }
+    }
+
+    public void setData(byte[] data) throws NotImplemented, BadParameter, NoSuccess {
         throw new NotImplemented("Not allowed to change the byte[] of an implementation-allocated buffer", this);
     }
 }

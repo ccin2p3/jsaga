@@ -1,7 +1,6 @@
 package org.ogf.saga.rpc;
 
 import org.ogf.saga.SagaObject;
-import org.ogf.saga.attributes.AsyncAttributes;
 import org.ogf.saga.error.AuthenticationFailed;
 import org.ogf.saga.error.AuthorizationFailed;
 import org.ogf.saga.error.BadParameter;
@@ -12,6 +11,7 @@ import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.error.PermissionDenied;
 import org.ogf.saga.error.Timeout;
+import org.ogf.saga.permissions.Permissions;
 import org.ogf.saga.task.Async;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
@@ -20,7 +20,7 @@ import org.ogf.saga.task.TaskMode;
  * The <code>RPC</code> class represents a remote function handle
  * that can be called repeatedly.
  */
-public interface RPC extends SagaObject, Async, AsyncAttributes {
+public interface RPC extends SagaObject, Async, Permissions {
 
     /**
      * Calls the remote procedure.
@@ -31,7 +31,7 @@ public interface RPC extends SagaObject, Async, AsyncAttributes {
      * @exception NoSuccess is thrown for arbitrary backend failures, with
      *     a descriptive error message.
      */
-    public void call(Parameter[] parameters)
+    public void call(Parameter... parameters)
         throws NotImplemented, IncorrectURL,
             AuthenticationFailed, AuthorizationFailed,
             PermissionDenied, BadParameter, IncorrectState, DoesNotExist,
@@ -66,7 +66,7 @@ public interface RPC extends SagaObject, Async, AsyncAttributes {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public Task call(TaskMode mode, Parameter[] parameters)
+    public Task call(TaskMode mode, Parameter... parameters)
         throws NotImplemented;
 
     /**

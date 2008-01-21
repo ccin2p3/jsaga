@@ -4,12 +4,10 @@ import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.error.BadParameter;
 
 /**
- * Extends the <code>Buffer</code> interface with  lenIn and lenOut
- * attributes.
+ * Extends the <code>Buffer</code> interface with lenIn, lenOut, and
+ * offset attributes.
  */
 public interface IOVec extends Buffer {
-
-    // TODO offset ???
 
     /**
      * Sets the lenIn attribute.
@@ -29,4 +27,17 @@ public interface IOVec extends Buffer {
      * @return the lenOut value.
      */
     int getLenOut();
+
+    /**
+     * Sets the offset attribute.
+     * @param offset the value for the attribute.
+     */
+    void setOffset(int offset)
+        throws BadParameter;
+
+    /**
+     * Retrieves the current value of the offset attribute.
+     * @return the offset value.
+     */
+    int getOffset();
 }

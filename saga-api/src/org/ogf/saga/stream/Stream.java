@@ -1,7 +1,6 @@
 package org.ogf.saga.stream;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.URL;
@@ -107,9 +106,6 @@ public interface Stream extends SagaObject, Async, AsyncAttributes,
     /**
      * Establishes a connection to the target defined during the construction
      * of the stream.
-     * ??? The SAGA specification is not clear on what is to be returned
-     * here. The specification sais Context, the detailed specs say
-     * void. ???
      */
     public void connect()
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
@@ -123,7 +119,7 @@ public interface Stream extends SagaObject, Async, AsyncAttributes,
      * @param what the activities to wait for.
      * @return the activities that apply.
      */
-    public List<Activity> waitStream(int what)
+    public int waitStream(int what)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
                PermissionDenied, IncorrectState, NoSuccess;
 
@@ -132,10 +128,10 @@ public interface Stream extends SagaObject, Async, AsyncAttributes,
      * ERROR state. It will only check for the specified activities.
      * If the timeout expires, an empty list is returned.
      * @param what the activities to wait for.
-     * @param timeoutInSeconds the timout in seconds.
+     * @param timeoutInSeconds the timeout in seconds.
      * @return the activities that apply.
      */
-    public List<Activity> waitStream(float timeoutInSeconds, int what)
+    public int waitStream(int what, float timeoutInSeconds)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
                PermissionDenied, IncorrectState, NoSuccess;
 
@@ -167,11 +163,25 @@ public interface Stream extends SagaObject, Async, AsyncAttributes,
      *     value, corresponding to negatives of the respective ERRNO error
      *     code.
      */
-    public int read(int len, Buffer buffer)
+    public int read(Buffer buffer, int len)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
                PermissionDenied, BadParameter, IncorrectState, Timeout,
                NoSuccess, IOException;
 
+    /**
+     * Reads a raw buffer from the stream.
+     * @param buffer the buffer to store into.
+     * @return the number of bytes read.
+     * @exception IOException deviation from the SAGA specs: thrown in case
+     *     of an error, where the SAGA specs describe a return of a negative
+     *     value, corresponding to negatives of the respective ERRNO error
+     *     code.
+     */
+    public int read(Buffer buffer)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+               PermissionDenied, BadParameter, IncorrectState, Timeout,
+               NoSuccess, IOException;
+ 
     /**
      * Writes a raw buffer to the stream.
      * Note: if the buffer contains less data than the specified len, only
@@ -184,11 +194,24 @@ public interface Stream extends SagaObject, Async, AsyncAttributes,
      *     value, corresponding to negatives of the respective ERRNO error
      *     code.
      */
-    public int write(int len, Buffer buffer)
+    public int write(Buffer buffer, int len)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
                PermissionDenied, BadParameter, IncorrectState, Timeout,
                NoSuccess, IOException;
 
+    /**
+     * Writes a raw buffer to the stream.
+     * @param buffer the data to be sent.
+     * @return the number of bytes written.
+     * @exception IOException deviation from the SAGA specs: thrown in case
+     *     of an error, where the SAGA specs describe a return of a negative
+     *     value, corresponding to negatives of the respective ERRNO error
+     *     code.
+     */
+    public int write(Buffer buffer)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+               PermissionDenied, BadParameter, IncorrectState, Timeout,
+               NoSuccess, IOException;
     //
     // Task versions ...
     //
@@ -224,9 +247,6 @@ public interface Stream extends SagaObject, Async, AsyncAttributes,
      * Returns a task that
      * establishes a connection to the target defined during the construction
      * of the stream.
-     * ??? The SAGA specification is not clear on what is to be returned
-     * here. The specification sais Context, the detailed specs say
-     * void. ???
      * @param mode the task mode.
      * @return the task.
      * @exception NotImplemented is thrown when the task version of this
@@ -245,7 +265,7 @@ public interface Stream extends SagaObject, Async, AsyncAttributes,
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public Task<List<Activity>> waitStream(TaskMode mode, int what)
+    public Task<Integer> waitStream(TaskMode mode, int what)
         throws NotImplemented;
 
     /**
@@ -260,8 +280,8 @@ public interface Stream extends SagaObject, Async, AsyncAttributes,
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public Task<List<Activity>> waitStream(TaskMode mode,
-            float timeoutInSeconds, int what)
+    public Task<Integer> waitStream(TaskMode mode, int what,
+            float timeoutInSeconds)
         throws NotImplemented;
 
     /**
@@ -292,14 +312,22 @@ public interface Stream extends SagaObject, Async, AsyncAttributes,
      * @param mode the task mode.
      * @param len the maximum number of bytes to be read.
      * @param buffer the buffer to store into.
-     * @return the number of bytes read.
-     * @exception IOException deviation from the SAGA specs: thrown in case
-     *     of an error.
      * @return the task.
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public Task<Integer> read(TaskMode mode, int len, Buffer buffer)
+    public Task<Integer> read(TaskMode mode, Buffer buffer, int len)
+        throws NotImplemented;
+
+    /**
+     * Creates a task that reads a raw buffer from the stream.
+     * @param mode the task mode.
+     * @param buffer the buffer to store into.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task<Integer> read(TaskMode mode, Buffer buffer)
         throws NotImplemented;
 
     /**
@@ -316,6 +344,17 @@ public interface Stream extends SagaObject, Async, AsyncAttributes,
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public Task<Integer> write(TaskMode mode, int len, Buffer buffer)
+    public Task<Integer> write(TaskMode mode, Buffer buffer, int len)
+        throws NotImplemented;
+    
+    /**
+     * Creates a task that writes a raw buffer to the stream.
+     * @param mode the task mode.
+     * @param buffer the data to be sent.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task<Integer> write(TaskMode mode, Buffer buffer)
         throws NotImplemented;
 }

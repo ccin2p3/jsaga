@@ -15,6 +15,7 @@ public class BadParameter extends Exception {
      * Constructs a BadParameter exception.
      */
     public BadParameter() {
+        super(BAD_PARAMETER);
     }
 
     /**
@@ -23,7 +24,7 @@ public class BadParameter extends Exception {
      * @param message the detail message.
      */
     public BadParameter(String message) {
-        super(message);
+        super(BAD_PARAMETER, message);
     }
 
     /**
@@ -31,7 +32,7 @@ public class BadParameter extends Exception {
      * @param cause the cause.
      */
     public BadParameter(Throwable cause) {
-        super(cause);
+        super(BAD_PARAMETER, cause);
     }
 
     /**
@@ -42,7 +43,7 @@ public class BadParameter extends Exception {
      * 
      */
     public BadParameter(String message, Throwable cause) {
-        super(message, cause);
+        super(BAD_PARAMETER, message, cause);
     }
     
     /**
@@ -52,6 +53,6 @@ public class BadParameter extends Exception {
      * @param object the associated SAGA object.
      */
     public BadParameter(String message, SagaObject object) {
-        super(message, object);
+        super(BAD_PARAMETER, message, object);
     }
 }

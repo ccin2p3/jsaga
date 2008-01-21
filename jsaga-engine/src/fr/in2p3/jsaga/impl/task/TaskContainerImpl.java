@@ -47,10 +47,12 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
         return cookie;
     }
 
-    public void remove(int cookie) throws NotImplemented, DoesNotExist, Timeout, NoSuccess {
-        if (m_tasks.remove(cookie) == null) {
+    public <T> Task<T> remove(int cookie) throws NotImplemented, DoesNotExist, Timeout, NoSuccess {
+        Task task = m_tasks.remove(cookie);
+        if (task == null) {
             throw new DoesNotExist("Task not in task container: "+cookie, this);
         }
+        return task;
     }
 
     public void run() throws NotImplemented, IncorrectState, DoesNotExist, Timeout, NoSuccess {
@@ -59,39 +61,30 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
         }
     }
 
-    public Task[] waitTasks(WaitMode mode) throws NotImplemented, IncorrectState, DoesNotExist, NoSuccess {
-        List<Task> finishedTasks = new ArrayList<Task>();
-        try {
-            while(true) {
-                // check state
-                if (isFinished(finishedTasks, mode)) {
-                    throw new InterruptedException();
-                }
-
-                // wait
-                Thread.currentThread().sleep(100);
-            }
-        } catch(InterruptedException e) {/*ignore*/}
-        // return newly finished tasks
-        return finishedTasks.toArray(new Task[finishedTasks.size()]);
+    public Task waitFor(WaitMode mode) throws NotImplemented, IncorrectState, DoesNotExist, NoSuccess {
+        return this.waitFor(WAIT_FOREVER, mode);
     }
 
-    public Task[] waitTasks(float timeoutInSeconds, WaitMode mode) throws NotImplemented, IncorrectState, DoesNotExist, NoSuccess {
-        List<Task> finishedTasks = new ArrayList<Task>();
+    public Task waitFor(float timeoutInSeconds, WaitMode mode) throws NotImplemented, IncorrectState, DoesNotExist, NoSuccess {
+        Task task = null;
         try {
-            long endTime = (timeoutInSeconds>=0.0f ? System.currentTimeMillis()+(long)timeoutInSeconds : -1);
-            while(endTime>0 && System.currentTimeMillis()<endTime) {
-                // check state
-                if (isFinished(finishedTasks, mode)) {
-                    throw new InterruptedException();
-                }
-
-                // wait
+            boolean forever;
+            long endTime;
+            if (timeoutInSeconds == WAIT_FOREVER) {
+                forever = true;
+                endTime = -1;
+            } else if (timeoutInSeconds == NO_WAIT) {
+                forever = false;
+                endTime = -1;
+            } else {
+                forever = false;
+                endTime = System.currentTimeMillis() + (long) timeoutInSeconds;
+            }
+            while((task=this.getFinished(mode))==null && (forever || System.currentTimeMillis()<endTime)) {
                 Thread.currentThread().sleep(100);
             }
         } catch(InterruptedException e) {/*ignore*/}
-        // return newly finished tasks
-        return finishedTasks.toArray(new Task[finishedTasks.size()]);
+        return task;
     }
 
     public void cancel() throws NotImplemented, IncorrectState, DoesNotExist, Timeout, NoSuccess {
@@ -119,13 +112,12 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
         return cookies;
     }
 
-    public Task getTask(int cookie) throws NotImplemented, DoesNotExist, Timeout, NoSuccess {
+    public <T> Task<T> getTask(int cookie) throws NotImplemented, DoesNotExist, Timeout, NoSuccess {
         Task task = m_tasks.get(cookie);
-        if (task != null) {
-            return task;
-        } else {
+        if (task == null) {
             throw new DoesNotExist("Task not in task container: "+cookie, this);
         }
+        return task;
     }
 
     public Task[] getTasks() throws NotImplemented, Timeout, NoSuccess {
@@ -140,35 +132,38 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
         return states.toArray(new State[states.size()]);
     }
 
-    private boolean isFinished(List<Task> finishedTasks, WaitMode mode) throws NotImplemented, NoSuccess {
-        // remove newly finished tasks
-        for (Iterator it=m_tasks.values().iterator(); it.hasNext(); ) {
-            Task task = (Task) it.next();
-            try {
-                switch(task.getState()) {
-                    case DONE:
-                    case CANCELED:
-                    case FAILED:
-                        finishedTasks.add(task);
-                        it.remove();
-                }
-            } catch (Timeout e) {
-                // unknown state: try again on next occurence
-            }
-        }
-
-        // evaluate stop condition
+    private Task getFinished(WaitMode mode) throws NotImplemented {
         switch(mode) {
             case ALL:
-                if (finishedTasks.size() == m_tasks.size()) {
-                    return true;
-                }
-                break;
+                return getFinishedAll();
             case ANY:
-                if (finishedTasks.size() > 0) {
-                    return true;
-                }
+                return getFinishedAny();
+            default:
+                throw new NotImplemented("INTERNAL ERROR: unexpected exception");
         }
-        return false;
+    }
+    private Task getFinishedAll() {
+        Integer cookie = null;
+        for (Map.Entry<Integer,Task> entry : m_tasks.entrySet()) {
+            cookie = entry.getKey();
+            Task task = entry.getValue();
+            if (!task.isDone()) {
+                return null;
+            }
+        }
+        if (cookie != null) {
+            return m_tasks.remove(cookie);
+        }
+        return null;
+    }
+    private Task getFinishedAny() {
+        for (Map.Entry<Integer,Task> entry : m_tasks.entrySet()) {
+            Integer cookie = entry.getKey();
+            Task task = entry.getValue();
+            if (task.isDone()) {
+                return m_tasks.remove(cookie);
+            }
+        }
+        return null;
     }
 }

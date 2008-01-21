@@ -80,13 +80,17 @@
     <element name="sandbox"><complexType><complexContent><extension base="tns:PluginType">
         <attribute name="defaultIntermediary" type="anyURI" use="optional"/>
     </extension></complexContent></complexType></element>
-    <element name="JOBSERVICE"><complexType>
+    <element name="JOBSERVICE"><complexType><complexContent><extension base="tns:ObjectType">
         <sequence>
+            <element name="monitor" minOccurs="0" maxOccurs="1"><complexType><complexContent><extension base="tns:ObjectType">
+                <attribute name="impl" type="string" use="required"/>
+            </extension></complexContent></complexType></element>
             <element ref="tns:sandbox" minOccurs="0" maxOccurs="1"/>
             <element ref="tns:protocol" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
-        <attribute name="type" type="string" use="required"/>
-    </complexType></element>
+        <attribute name="name" type="string" use="required"/>
+        <attribute name="type" type="string" use="optional"/>
+    </extension></complexContent></complexType></element>
 
     <!-- root-child types -->
     <element name="security">
@@ -101,16 +105,22 @@
             <field xpath="@type"/>
         </unique>
     </element>
-    <element name="GRID"><complexType>
-        <sequence>
-            <element ref="tns:GRID" minOccurs="0" maxOccurs="unbounded"/>
-            <element ref="tns:JOBSERVICE" minOccurs="0" maxOccurs="unbounded"/>
-            <element ref="tns:sandbox" minOccurs="0" maxOccurs="1"/>
-            <element ref="tns:protocol" minOccurs="0" maxOccurs="unbounded"/>
-        </sequence>
-        <attribute name="name" type="string" use="optional"/>
-        <anyAttribute namespace="##other" processContents="lax"/>
-    </complexType></element>
+    <element name="GRID">
+        <complexType>
+            <sequence>
+                <element ref="tns:GRID" minOccurs="0" maxOccurs="unbounded"/>
+                <element ref="tns:JOBSERVICE" minOccurs="0" maxOccurs="unbounded"/>
+                <element ref="tns:sandbox" minOccurs="0" maxOccurs="1"/>
+                <element ref="tns:protocol" minOccurs="0" maxOccurs="unbounded"/>
+            </sequence>
+            <attribute name="name" type="string" use="optional"/>
+            <anyAttribute namespace="##other" processContents="lax"/>
+        </complexType>
+        <unique name="uniqueJOBSERVICE">
+            <selector xpath=".//tns:JOBSERVICE"/>
+            <field xpath="@name"/>
+        </unique>
+    </element>
 
     <!-- root types -->
     <element name="config"><complexType>
@@ -118,5 +128,6 @@
             <element ref="tns:security" minOccurs="1" maxOccurs="1"/>
             <element ref="tns:GRID" minOccurs="1" maxOccurs="1"/>
         </sequence>
+        <attribute name="localIntermediary" type="anyURI" use="optional"/>
     </complexType></element>
 </schema>

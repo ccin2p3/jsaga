@@ -6,6 +6,7 @@ import org.ogf.saga.error.AlreadyExists;
 import org.ogf.saga.error.AuthenticationFailed;
 import org.ogf.saga.error.AuthorizationFailed;
 import org.ogf.saga.error.BadParameter;
+import org.ogf.saga.error.DoesNotExist;
 import org.ogf.saga.error.IncorrectState;
 import org.ogf.saga.error.IncorrectURL;
 import org.ogf.saga.error.NoSuccess;
@@ -33,14 +34,14 @@ public interface NSEntry extends SagaObject, Async, Permissions {
      * Obtains the current working directory for the entry.
      * @return the current working directory.
      */
-    public String getCWD()
+    public URL getCWD()
         throws NotImplemented, IncorrectState, Timeout, NoSuccess;
 
     /**
      * Obtains the name part of the URL of this entry.
      * @return the name part.
      */
-    public String getName()
+    public URL getName()
         throws NotImplemented, IncorrectState, Timeout, NoSuccess;
 
     /**
@@ -86,8 +87,17 @@ public interface NSEntry extends SagaObject, Async, Permissions {
     public void copy(URL target, int flags)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
             PermissionDenied, BadParameter, IncorrectState, AlreadyExists,
-            Timeout, NoSuccess, IncorrectURL;
+            DoesNotExist, Timeout, NoSuccess, IncorrectURL;
 
+    /**
+     * Copies this entry to another part of the namespace.
+     * @param target the name to copy to.
+     */
+    public void copy(URL target)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, BadParameter, IncorrectState, AlreadyExists,
+            DoesNotExist, Timeout, NoSuccess, IncorrectURL;
+    
     /**
      * Creates a symbolic link from the target to this entry.
      * @param target the name that will have the symbolic link to this entry.
@@ -99,6 +109,15 @@ public interface NSEntry extends SagaObject, Async, Permissions {
             Timeout, NoSuccess, IncorrectURL;
 
     /**
+     * Creates a symbolic link from the target to this entry.
+     * @param target the name that will have the symbolic link to this entry.
+     */
+    public void link(URL target)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, BadParameter, IncorrectState, AlreadyExists,
+            Timeout, NoSuccess, IncorrectURL;
+    
+    /**
      * Renames this entry to the target, or moves this entry to the target
      * if it is a directory.
      * @param target the name to move to.
@@ -107,14 +126,31 @@ public interface NSEntry extends SagaObject, Async, Permissions {
     public void move(URL target, int flags)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
             PermissionDenied, BadParameter, IncorrectState, AlreadyExists,
-            Timeout, NoSuccess, IncorrectURL;
+            DoesNotExist, Timeout, NoSuccess, IncorrectURL;
 
+    /**
+     * Renames this entry to the target, or moves this entry to the target
+     * if it is a directory.
+     * @param target the name to move to.
+     */
+    public void move(URL target)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, BadParameter, IncorrectState, AlreadyExists,
+            DoesNotExist, Timeout, NoSuccess, IncorrectURL;
 
     /**
      * Removes this entry and closes it.
      * @param flags defining the operation modus.
      */
     public void remove(int flags)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess;
+
+
+    /**
+     * Removes this entry and closes it.
+     */
+    public void remove()
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
             PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess;
 
@@ -146,7 +182,7 @@ public interface NSEntry extends SagaObject, Async, Permissions {
             int flags)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
             PermissionDenied, IncorrectState, BadParameter, Timeout, NoSuccess;
-
+ 
     /**
      * Denies the specified permissions for the specified id.
      * An id of "*" disables the permissions for all.
@@ -157,7 +193,7 @@ public interface NSEntry extends SagaObject, Async, Permissions {
     public void permissionsDeny(String id, int permissions,
             int flags)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, BadParameter, Timeout, NoSuccess;
+            IncorrectState, PermissionDenied, BadParameter, Timeout, NoSuccess;
 
     //
     // Task versions ...
@@ -174,7 +210,7 @@ public interface NSEntry extends SagaObject, Async, Permissions {
         throws NotImplemented;
 
     /**
-     * Creates a task that obtains an URL representing the current working
+     * Creates a task that obtains a String representing the current working
      * directory for the entry.
      * @param mode the task mode.
      * @return the task.
@@ -191,20 +227,17 @@ public interface NSEntry extends SagaObject, Async, Permissions {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public Task<String> getName(TaskMode mode)
+    public Task<URL> getName(TaskMode mode)
         throws NotImplemented;
 
     /**
      * Creates a task that tests this entry for being a directory.
      * @param mode the task mode.
-     * @param flags flags for the operation. The only allowed flag is
-     *     DEREFERENCE. Other flags cause a BadParameter exception.
      * @return the task.
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public Task<Boolean> isDir(TaskMode mode, int flags)
-        throws NotImplemented;
+    public Task<Boolean> isDir(TaskMode mode) throws NotImplemented;
 
     /**
      * Creates a task that tests this entry for being a namespace entry.
@@ -212,26 +245,20 @@ public interface NSEntry extends SagaObject, Async, Permissions {
      * a link or a directory, this method returns <code>false</code>, although
      * strictly speaking, directories and links are namespace entries as well.
      * @param mode the task mode.
-     * @param flags flags for the operation. The only allowed flag is
-     *     DEREFERENCE. Other flags cause a BadParameter exception.
      * @return the task.
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public Task<Boolean> isEntry(TaskMode mode, int flags)
-        throws NotImplemented;
+    public Task<Boolean> isEntry(TaskMode mode) throws NotImplemented;
 
     /**
      * Creates a task that tests this entry for being a link.
      * @param mode the task mode.
-     * @param flags flags for the operation. The only allowed flag is
-     *     DEREFERENCE. Other flags cause a BadParameter exception.
      * @return the task.
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public Task<Boolean> isLink(TaskMode mode, int flags)
-        throws NotImplemented;
+    public Task<Boolean> isLink(TaskMode mode) throws NotImplemented;
     
     /**
      * Creates a task that returns the URL representing the link target.
@@ -257,6 +284,16 @@ public interface NSEntry extends SagaObject, Async, Permissions {
         throws NotImplemented;
 
     /**
+     * Creates a task that copies this entry to another part of the namespace.
+     * @param mode the task mode.
+     * @param target the name to copy to.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task copy(TaskMode mode, URL target) throws NotImplemented;
+
+    /**
      * Creates a task that creates a symbolic link from the target to this
      * entry.
      * @param mode the task mode.
@@ -268,6 +305,17 @@ public interface NSEntry extends SagaObject, Async, Permissions {
      */
     public Task link(TaskMode mode, URL target, int flags)
         throws NotImplemented;
+
+    /**
+     * Creates a task that creates a symbolic link from the target to this
+     * entry.
+     * @param mode the task mode.
+     * @param target the name that will have the symbolic link to this entry.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task link(TaskMode mode, URL target) throws NotImplemented;
 
     /**
      * Creates a task that renames this entry to the target, or moves this
@@ -283,6 +331,17 @@ public interface NSEntry extends SagaObject, Async, Permissions {
         throws NotImplemented;
 
     /**
+     * Creates a task that renames this entry to the target, or moves this
+     * entry to the target if it is a directory.
+     * @param mode the task mode.
+     * @param target the name to move to.
+      * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task move(TaskMode mode, URL target) throws NotImplemented;
+    
+    /**
      * Creates a task that removes this entry and closes it.
      * @param mode the task mode.
      * @param flags defining the operation modus.
@@ -292,6 +351,16 @@ public interface NSEntry extends SagaObject, Async, Permissions {
      */
     public Task remove(TaskMode mode, int flags)
         throws NotImplemented;
+
+    /**
+     * Creates a task that removes this entry and closes it.
+     * @param mode the task mode.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    
+    public Task remove(TaskMode mode) throws NotImplemented;
 
     /**
      * Creates a task that closes this entry.

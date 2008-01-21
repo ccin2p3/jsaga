@@ -54,7 +54,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <testExcludes>
-                        <testExclude>*IntegrationTestSuite.java</testExclude>
+                        <testExclude>integration/*.java</testExclude>
                     </testExcludes>
                 </configuration>
             </plugin>
@@ -65,8 +65,7 @@
             <id>Integration Testing</id>
             <activation>
                 <property>
-                    <name>maven.integration-test.skip</name>
-                    <value>false</value>
+                    <name>integration-test</name>
                 </property>
             </activation>
             <build>
@@ -111,7 +110,7 @@
                                 </goals>
                                 <configuration>
                                     <includes>
-                                        <include>*IntegrationTestSuite.java</include>
+                                        <include>integration/${integration-test}.java</include>
                                     </includes>
                                     <systemProperties>
                                         <property>

@@ -21,18 +21,18 @@ import java.io.PrintStream;
  *
  */
 public class MyProxySecurityAdaptor extends GSSCredentialSecurityAdaptor implements SecurityAdaptor {
-    private String m_userName;
+    private String m_userId;
     private String m_myProxyPass;
 
-    public MyProxySecurityAdaptor(GSSCredential proxy, String userName, String myProxyPass) {
+    public MyProxySecurityAdaptor(GSSCredential proxy, String userId, String myProxyPass) {
         super(proxy);
-        m_userName = userName;
+        m_userId = userId;
         m_myProxyPass = myProxyPass;
     }
 
     /** override super.dump() */
     public void dump(PrintStream out) throws Exception {
-        CredentialInfo info = new MyProxy().info(m_proxy, m_userName, m_myProxyPass);
+        CredentialInfo info = new MyProxy().info(m_proxy, m_userId, m_myProxyPass);
         if (info.getName() != null) {
             out.println("  "+info.getName()+":");
         } else {

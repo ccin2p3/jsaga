@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.impl.file;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
+import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyDelegated;
 import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
@@ -12,6 +13,7 @@ import fr.in2p3.jsaga.engine.data.copy.TargetPhysicalFile;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytesPhysical;
 import fr.in2p3.jsaga.engine.schema.config.Protocol;
+import fr.in2p3.jsaga.helpers.URLFactory;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
 import fr.in2p3.jsaga.impl.namespace.JSAGAFlags;
 import org.ogf.saga.*;
@@ -37,22 +39,22 @@ import java.util.List;
 /**
  *
  */
-public class FileImpl extends AbstractFileImpl implements File {
+public class FileImpl extends AbstractAsyncFileImpl implements File {
     protected InputStream m_inStream;
 
     /** constructor for factory */
-    public FileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(session, url, adaptor, flags);
+    public FileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        super(session, URLFactory.toFileURL(url), adaptor, flags);
         this.init(flags);
     }
 
     /** constructor for open() */
-    public FileImpl(AbstractNSEntryImpl entry, URL url, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(entry, url, flags);
+    public FileImpl(AbstractNSEntryImpl entry, URL url, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        super(entry, URLFactory.toFileURL(url), flags);
         this.init(flags);
     }
 
-    private void init(int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    private void init(int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         FlagsBytes effectiveFlags = new FlagsBytesPhysical(flags);
         if (effectiveFlags.contains(Flags.READ)) {
             if (m_adaptor instanceof FileReader) {
@@ -71,7 +73,7 @@ public class FileImpl extends AbstractFileImpl implements File {
         if (effectiveFlags.contains(Flags.WRITE)) {
             if (m_adaptor instanceof FileWriter) {
                 URL parent = super._getParentDirURL();
-                String fileName = super.getName();
+                String fileName = super._getEntryName();
                 boolean exclusive = effectiveFlags.contains(Flags.EXCL);
                 boolean append = effectiveFlags.contains(Flags.APPEND);
                 if (exclusive && append) {
@@ -79,11 +81,15 @@ public class FileImpl extends AbstractFileImpl implements File {
                 }
                 try {
                     m_outStream = ((FileWriter)m_adaptor).getOutputStream(parent.getPath(), fileName, exclusive, append);
-                } catch(DoesNotExist e) {
+                } catch(ParentDoesNotExist e) {
                     // make parent directories, then retry
                     if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
                         this._makeParentDirs();
-                        m_outStream = ((FileWriter)m_adaptor).getOutputStream(parent.getPath(), fileName, exclusive, append);
+                        try {
+                            m_outStream = ((FileWriter)m_adaptor).getOutputStream(parent.getPath(), fileName, exclusive, append);
+                        } catch (ParentDoesNotExist e2) {
+                            throw new DoesNotExist("Failed to create parent directory: "+parent, e2.getCause());
+                        }
                     } else {
                         throw new DoesNotExist("Parent directory does not exist: "+parent, e.getCause());
                     }
@@ -143,7 +149,7 @@ public class FileImpl extends AbstractFileImpl implements File {
     }
 
     /** implements super.copy() */
-    public void copy(URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
+    public void copy(URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
         FlagsBytes effectiveFlags = new FlagsBytes(flags);
         if (effectiveFlags.contains(Flags.DEREFERENCE)) {
             this._dereferenceEntry().copy(target, effectiveFlags.remove(Flags.DEREFERENCE));
@@ -173,6 +179,8 @@ public class FileImpl extends AbstractFileImpl implements File {
                         m_url.getPath(),
                         effectiveTarget.getHost(), targetPort, effectiveTarget.getPath(),
                         overwrite);
+            } catch (ParentDoesNotExist parentDoesNotExist) {
+                throw new DoesNotExist("Target parent directory does not exist: "+effectiveTarget.resolve(new URL(".")), parentDoesNotExist);
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("Source file does not exist: "+ m_url, doesNotExist);
             } catch (AlreadyExists alreadyExists) {
@@ -266,12 +274,16 @@ public class FileImpl extends AbstractFileImpl implements File {
 
     /** implements super.open() */
     public NSEntry open(URL absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return new FileImpl(this, super._resolveAbsoluteURL(absolutePath), flags);
+        if (URLFactory.isDirectory(absolutePath)) {
+            return new DirectoryImpl(this, super._resolveAbsoluteURL(absolutePath), flags);
+        } else {
+            return new FileImpl(this, super._resolveAbsoluteURL(absolutePath), flags);
+        }
     }
 
     /////////////////////////////////// implementation of interface ///////////////////////////////////
 
-    public long getSize() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    public long getSize() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
         if (m_adaptor instanceof FileReader) {
             if (m_outStream != null) {
                 try {m_outStream.close();} catch (IOException e) {/*ignore*/}
@@ -280,13 +292,15 @@ public class FileImpl extends AbstractFileImpl implements File {
                 return ((FileReader)m_adaptor).getSize(m_url.getPath());
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("File does not exist: "+ m_url, doesNotExist);
+            } catch (BadParameter badParameter) {
+                throw new IncorrectState("Entry is not a file: "+ m_url, badParameter);
             }
         } else {
             throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
 
-    public int read(int len, Buffer buffer) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IOException {
+    public int read(Buffer buffer, int len) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IOException {
         final int EOF = -1;
         if (m_inStream == null) {
             throw new IncorrectState("Reading file requires READ or READWRITE flags", this);
@@ -318,8 +332,11 @@ public class FileImpl extends AbstractFileImpl implements File {
             throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
+    public int read(Buffer buffer) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IOException {
+        return this.read(buffer, buffer.getSize());
+    }
 
-    public int write(int len, Buffer buffer) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IOException {
+    public int write(Buffer buffer, int len) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IOException {
         if (m_outStream == null) {
             throw new IncorrectState("Writing file requires WRITE or READWRITE flags", this);
         }
@@ -341,6 +358,9 @@ public class FileImpl extends AbstractFileImpl implements File {
         } else {
             throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
+    }
+    public int write(Buffer buffer) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IOException {
+        return this.write(buffer, buffer.getSize());
     }
 
     public long seek(long offset, SeekMode whence) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess, IOException {
@@ -400,9 +420,13 @@ public class FileImpl extends AbstractFileImpl implements File {
 
     public OutputStream newOutputStream(boolean overwrite) throws NotImplemented, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         String parentAbsolutePath = super._getParentDirURL().getPath();
-        String fileName = super.getName();
+        String fileName = super._getEntryName();
         boolean exclusive = !overwrite;
         boolean append = false;
-        return ((FileWriter) m_adaptor).getOutputStream(parentAbsolutePath, fileName, exclusive, append);
+        try {
+            return ((FileWriter) m_adaptor).getOutputStream(parentAbsolutePath, fileName, exclusive, append);
+        } catch (ParentDoesNotExist e) {
+            throw new DoesNotExist(e);
+        }
     }
 }

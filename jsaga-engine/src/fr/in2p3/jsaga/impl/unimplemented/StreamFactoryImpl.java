@@ -28,11 +28,19 @@ public class StreamFactoryImpl extends StreamFactory {
         throw new NotImplemented("Not implemented by the SAGA engine");
     }
 
+    protected StreamService doCreateStreamService(Session session) throws NotImplemented, IncorrectURL, BadParameter, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
+        throw new NotImplemented("Not implemented by the SAGA engine");
+    }
+
     protected Task<Stream> doCreateStream(TaskMode mode, Session session, URL name) throws NotImplemented {
         throw new NotImplemented("Not implemented by the SAGA engine");
     }
 
     protected Task<StreamService> doCreateStreamService(TaskMode mode, Session session, URL name) throws NotImplemented {
+        throw new NotImplemented("Not implemented by the SAGA engine");
+    }
+
+    protected Task<StreamService> doCreateStreamService(TaskMode mode, Session session) throws NotImplemented {
         throw new NotImplemented("Not implemented by the SAGA engine");
     }
 }

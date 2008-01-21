@@ -35,7 +35,7 @@ public class DataContextSelector extends ContextSelector {
         return context.getContextId();
     }
 
-    public ContextImpl selectContextByURI(URL url) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    public ContextImpl selectContextByURI(URL url) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
         ContextImpl[] candidates = this.listContextByURI(url);
         switch(candidates.length) {
             case 0:
@@ -48,14 +48,14 @@ public class DataContextSelector extends ContextSelector {
         }
     }
 
-    private ContextImpl[] listContextByURI(URL url) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    private ContextImpl[] listContextByURI(URL url) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
         ProtocolEngineConfiguration config = Configuration.getInstance().getConfigurations().getProtocolCfg();
         ContextInstanceRef[] refArray = config.listContextInstanceCandidates(url);
         List ctxList = new ArrayList();
         for (int i=0; i<refArray.length; i++) {
             ContextInstanceRef ref = refArray[i];
-            ContextImpl context = super.selectContextByTypeIndice(ref.getType(), ""+ref.getIndice());
             try {
+                ContextImpl context = super.selectContextByTypeIndice(ref.getType(), ""+ref.getIndice());
                 context.createSecurityAdaptor();
                 ctxList.add(context);
             } catch(Exception e) {/*ignore*/}

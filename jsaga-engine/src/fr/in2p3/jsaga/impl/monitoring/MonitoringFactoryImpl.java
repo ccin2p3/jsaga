@@ -4,8 +4,6 @@ import org.ogf.saga.error.*;
 import org.ogf.saga.monitoring.Metric;
 import org.ogf.saga.monitoring.MonitoringFactory;
 
-import java.lang.Exception;
-
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -20,14 +18,6 @@ import java.lang.Exception;
  */
 public class MonitoringFactoryImpl extends MonitoringFactory {
     protected Metric doCreateMetric(String name, String desc, String mode, String unit, String type, String value) throws NotImplemented, BadParameter, Timeout, NoSuccess {
-        Metric metric = new MetricImpl(name, desc, Mode.valueOf(mode), unit, type);
-        if (value != null) {
-            try {
-                metric.setAttribute("Value", value);
-            } catch (Exception e) {
-                throw new NoSuccess(e);
-            }
-        }
-        return metric;
+        return new MetricImpl(name, desc, MetricMode.valueOf(mode), unit, MetricType.valueOf(type), value);
     }
 }

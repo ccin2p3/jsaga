@@ -48,7 +48,6 @@
     <xsl:template match="ext:Parametric">
         <xsl:variable name="nbslots" select="count(/jsdl:JobDefinition/jsdl:JobDescription[contains(jsdl:JobIdentification/jsdl:JobName/text(),'@{PARAM}')]/ext:SelectedResource)"/>
         <ext:Parametric>
-            <xsl:apply-templates select="@* | * | text() | comment()"/>
             <xsl:attribute name="count">
                 <xsl:for-each select="/jsdl:JobDefinition/ext:JobCollection/ext:Parametric">
                     <xsl:value-of select="@count - $nbslots"/>
@@ -59,6 +58,7 @@
                     <xsl:value-of select="@start + ($nbslots * @step)"/>
                 </xsl:for-each>
             </xsl:attribute>
+            <xsl:apply-templates select="@* | * | text() | comment()"/>
         </ext:Parametric>
     </xsl:template>
 

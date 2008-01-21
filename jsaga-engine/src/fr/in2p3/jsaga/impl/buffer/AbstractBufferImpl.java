@@ -52,11 +52,11 @@ public abstract class AbstractBufferImpl extends AbstractSagaObjectImpl implemen
         }
     }
 
-    public void close() throws NotImplemented, IncorrectState {
+    public void close() throws NotImplemented {
         m_buffer = null;
     }
 
-    public void close(float timeoutInSeconds) throws NotImplemented, IncorrectState {
+    public void close(float timeoutInSeconds) throws NotImplemented {
         this.close();
     }
 }

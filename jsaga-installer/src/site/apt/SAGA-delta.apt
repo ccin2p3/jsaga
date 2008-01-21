@@ -1,4 +1,8 @@
-Differences with SAGA specification
+Modifications on SAGA Java Binding
+
+    * URL.getPath() returns a relative path if URL is <scheme>://./<path>
+
+Add-ons to SAGA specification
 
 * Security management
 

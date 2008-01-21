@@ -35,14 +35,23 @@ public interface Directory extends NSDirectory {
             IncorrectState, DoesNotExist, Timeout, NoSuccess;
 
     /**
+     * Returns the number of bytes in the specified file.
+     * @param name name of file to inspect.
+     * @return the size.
+     */
+    public long getSize(URL name)
+        throws NotImplemented, IncorrectURL, AuthenticationFailed,
+            AuthorizationFailed, PermissionDenied, BadParameter,
+            IncorrectState, DoesNotExist, Timeout, NoSuccess;
+    
+    /**
      * Tests the name for being a directory entry.
      * Is an alias for {@link NSDirectory#isEntry}.
      * @param name to be tested.
-     * @param flags flags for the operation.
      * @return <code>true</code> if the name represents a non-directory entry.
      */
-    public boolean isFile(URL name, int flags)
-        throws NotImplemented, IncorrectURL, AuthenticationFailed,
+    public boolean isFile(URL name)
+        throws NotImplemented, IncorrectURL, DoesNotExist, AuthenticationFailed,
             AuthorizationFailed, PermissionDenied, BadParameter,
             IncorrectState, Timeout, NoSuccess;
 
@@ -66,6 +75,17 @@ public interface Directory extends NSDirectory {
             Timeout, NoSuccess;
 
     /**
+     * Creates a new <code>Directory</code> instance.
+     * @param name directory to open.
+     * @return the opened directory instance.
+     */
+    public Directory openDirectory(URL name)
+        throws NotImplemented, IncorrectURL,
+            AuthenticationFailed, AuthorizationFailed, PermissionDenied,
+            BadParameter, IncorrectState, AlreadyExists, DoesNotExist,
+            Timeout, NoSuccess;
+
+    /**
      * Creates a new <code>File</code> instance.
      * @param name file to open.
      * @param flags defining the operation modus.
@@ -77,6 +97,51 @@ public interface Directory extends NSDirectory {
             BadParameter, IncorrectState, AlreadyExists, DoesNotExist,
             Timeout, NoSuccess;
 
+    /**
+     * Creates a new <code>File</code> instance.
+     * @param name file to open.
+     * @return the opened file instance.
+     */
+    public File openFile(URL name)
+        throws NotImplemented, IncorrectURL,
+            AuthenticationFailed, AuthorizationFailed, PermissionDenied,
+            BadParameter, IncorrectState, AlreadyExists, DoesNotExist,
+            Timeout, NoSuccess;
+
+    /**
+     * Creates a new <code>FileInputStream</code> instance.
+     * @param name file to open.
+     * @return the input stream.
+     */
+    public FileInputStream openFileInputStream(URL name)
+        throws NotImplemented, IncorrectURL,
+            AuthenticationFailed, AuthorizationFailed, PermissionDenied,
+            BadParameter, IncorrectState, AlreadyExists, DoesNotExist,
+            Timeout, NoSuccess;
+ 
+    /**
+     * Creates a new <code>FileOutputStream</code> instance.
+     * @param name file to open.
+     * @return the output stream.
+     */
+    public FileOutputStream openFileOutputStream(URL name)
+        throws NotImplemented, IncorrectURL,
+            AuthenticationFailed, AuthorizationFailed, PermissionDenied,
+            BadParameter, IncorrectState, AlreadyExists, DoesNotExist,
+            Timeout, NoSuccess;
+ 
+    /**
+     * Creates a new <code>FileOutputStream</code> instance.
+     * @param name file to open.
+     * @param append when set, the stream appends to the file.
+     * @return the output stream.
+     */
+    public FileOutputStream openFileOutputStream(URL name, boolean append)
+        throws NotImplemented, IncorrectURL,
+            AuthenticationFailed, AuthorizationFailed, PermissionDenied,
+            BadParameter, IncorrectState, AlreadyExists, DoesNotExist,
+            Timeout, NoSuccess;
+    
     //
     // Task versions
     //
@@ -92,18 +157,28 @@ public interface Directory extends NSDirectory {
      */
     public Task<Long> getSize(TaskMode mode, URL name, int flags)
         throws NotImplemented;
-
+    
+    /**
+     * Creates a task that retrieves the number of bytes in the specified file.
+     * @param mode the task mode.
+     * @param name name of file to inspect.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task<Long> getSize(TaskMode mode, URL name)
+        throws NotImplemented;
+    
     /**
      * Creates a task that tests the name for being a directory entry.
      * Is an alias for {@link NSDirectory#isEntry}.
      * @param mode the task mode.
      * @param name to be tested.
-     * @param flags flags for the operation.
      * @return the task.
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public Task<Boolean> isFile(TaskMode mode, URL name, int flags)
+    public Task<Boolean> isFile(TaskMode mode, URL name)
         throws NotImplemented;
 
     /**
@@ -120,6 +195,17 @@ public interface Directory extends NSDirectory {
         throws NotImplemented;
 
     /**
+     * Creates a task that creates a new <code>Directory</code> instance.
+     * @param mode the task mode.
+     * @param name directory to open.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task<Directory> openDirectory(TaskMode mode, URL name)
+        throws NotImplemented;
+    
+    /**
      * Creates a task that creates a new <code>File</code> instance.
      * @param mode the task mode.
      * @param name file to open.
@@ -130,4 +216,50 @@ public interface Directory extends NSDirectory {
      */
     public Task<File> openFile(TaskMode mode, URL name, int flags)
         throws NotImplemented;
+    
+    /**
+     * Creates a task that creates a new <code>File</code> instance.
+     * @param mode the task mode.
+     * @param name file to open.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task<File> openFile(TaskMode mode, URL name)
+        throws NotImplemented;
+    
+    /**
+     * Creates a task that creates a new <code>FileInputStream</code> instance.
+     * @param mode the task mode.
+     * @param name file to open.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task<FileInputStream> openFileInputStream(TaskMode mode, URL name)
+        throws NotImplemented;
+   
+    /**
+     * Creates a task that creates a new <code>FileOutputStream</code> instance.
+     * @param mode the task mode.
+     * @param name file to open.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task<FileOutputStream> openFileOutputStream(TaskMode mode, URL name)
+        throws NotImplemented;
+    
+    /**
+     * Creates a task that creates a new <code>FileOutputStream</code> instance.
+     * @param mode the task mode.
+     * @param name file to open.
+     * @param append when set, the file is opened for appending.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task<FileOutputStream> openFileOutputStream(TaskMode mode, URL name, boolean append)
+        throws NotImplemented;
+    
 }

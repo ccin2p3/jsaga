@@ -14,10 +14,10 @@ JSAGA
  selecting the appropriate security context to connect to the resource
  and by conveying the input/output files of the jobs to/from the worker
  nodes. The selection of the transfer path depends on many parameters,
- including the caracteristics of the selected grid and site, the
- caracteristics of the file transfer protocol, the availability of the
+ including the characteristics of the selected grid and site, the
+ characteristics of the file transfer protocol, the availability of the
  security contexts needed to access the data management resources, the
- caracteristics of the file itself.
+ characteristics of the file itself.
 
  JSAGA hides all this complexity and enables submitting jobs to several
  grids, by using a single job description written in Job Submission

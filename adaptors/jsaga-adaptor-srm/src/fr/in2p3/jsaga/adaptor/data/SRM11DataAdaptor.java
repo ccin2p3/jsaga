@@ -35,8 +35,8 @@ public class SRM11DataAdaptor extends SRMDataAdaptorAbstract implements DataAdap
         return new String[]{"srm11"};
     }
 
-    public void connect(String userInfo, String host, int port, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
-        super.connect(userInfo, host, port, attributes);
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+        super.connect(userInfo, host, port, basePath, attributes);
         try {
             URL serviceUrl = new URL(SERVICE_PROTOCOL, host, port, SERVICE_PATH);
             SRMServerV1Locator service = new SRMServerV1Locator(s_provider);
@@ -68,7 +68,7 @@ public class SRM11DataAdaptor extends SRMDataAdaptorAbstract implements DataAdap
 
     public static void main(String[] args) throws Exception {
         SRM11DataAdaptor adaptor = new SRM11DataAdaptor();
-        adaptor.connect(null, null, 0, null);
+        adaptor.connect(null, null, 0, null, null);
         String uri = "srm://ccsrm.in2p3.fr:8443//pnfs/in2p3.fr/data/dteam/sylvain";
         FileMetaData[] array = adaptor.m_stub.getFileMetaData(new String[]{uri});
         System.out.println("Web Service Response size : " + array[0].getSize());

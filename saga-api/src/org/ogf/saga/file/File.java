@@ -19,8 +19,7 @@ import org.ogf.saga.task.TaskMode;
 /**
  * The File interface represents an open file descriptor for reads/writes on a
  * physical file.
- * Deviation: the SAGA specification refers to error codes in POSIX, but it is
- * very strange to do that in Java. Errors should just result in an IOException.
+ * Errors result in an IOException, not a POSIX error code.
  */
 public interface File extends NSEntry {
 
@@ -28,13 +27,12 @@ public interface File extends NSEntry {
 
     /**
      * Returns the number of bytes in the file.
+     * 
      * @return the size.
      */
     public long getSize()
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, BadParameter,
-            IncorrectState, Timeout, NoSuccess;
-    //sreynaud: BadParameter added for consistency with methods read/write
+            PermissionDenied, IncorrectState, Timeout, NoSuccess;
 
     // POSIX-like I/O
 
@@ -43,42 +41,61 @@ public interface File extends NSEntry {
      * Returns the number of bytes read, or 0 at end-of-file.
      * Note: this call is blocking. The async version can be used
      * to implement non-blocking reads.
-     * <strong>
-     * The SAGA specification refers to error codes in POSIX, but it
-     * is very strange to do that in Java. Errors just result in an IOException.
-     * </strong>
-     * @param len the number of bytes to be read.
+     * 
      * @param buffer the buffer to read data into.
+     * @param len the number of bytes to be read.
      * @return the number of bytes read.
      */
-    public int read(int len, Buffer buffer)
+    public int read(Buffer buffer, int len)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
             PermissionDenied, BadParameter,
             IncorrectState, Timeout, NoSuccess, IOException;
 
+    /**
+     * Reads up to the buffer's size from the file into the buffer.
+     * Returns the number of bytes read, or 0 at end-of-file.
+     * Note: this call is blocking. The async version can be used
+     * to implement non-blocking reads.
+     * 
+     * @param buffer the buffer to read data into.
+     * @return the number of bytes read.
+     */
+    public int read(Buffer buffer)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, BadParameter,
+            IncorrectState, Timeout, NoSuccess, IOException;
+    
     /**
      * Writes up to <code>len</code> bytes from the buffer to the file
      * at the current file position.
      * Returns the number of bytes written.
-     * <strong>
-     * The SAGA specification refers to error codes in POSIX, but it
-     * is very strange to do that in Java. Errors just result in an IOException.
-     * </strong>
-     * @param len the number of bytes to be written.
+     * 
      * @param buffer the buffer to write data from.
+     * @param len the number of bytes to be written.
      * @return the number of bytes written.
      */
-    public int write(int len, Buffer buffer)
+    public int write(Buffer buffer, int len)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
             PermissionDenied, BadParameter,
             IncorrectState, Timeout, NoSuccess, IOException;
 
     /**
+     * Writes up to the buffer's size bytes from the buffer to the file
+     * at the current file position.
+     * Returns the number of bytes written.
+     * 
+     * @param buffer the buffer to write data from.
+     * @return the number of bytes written.
+     */
+    public int write(Buffer buffer)
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, BadParameter,
+            IncorrectState, Timeout, NoSuccess, IOException;
+    
+
+    /**
      * Repositions the current file position as requested.
-     * <strong>
-     * The SAGA specification refers to error codes in POSIX, but it
-     * is very strange to do that in Java. Errors just result in an IOException.
-     * </strong>
+     * 
      * @param offset offset in bytes to move pointer.
      * @param whence determines from where the offset is relative.
      * @return the position after the seek.
@@ -92,10 +109,7 @@ public interface File extends NSEntry {
 
     /**
      * Gather/scatter read.
-     * <strong>
-     * The SAGA specification refers to error codes in POSIX, but it
-     * is very strange to do that in Java. Errors just result in an IOException.
-     * </strong>
+     * 
      * @param iovecs array of IOVecs determining how much to read and where
      * to store it.
      */
@@ -106,10 +120,7 @@ public interface File extends NSEntry {
 
     /**
      * Gather/scatter write.
-     * <strong>
-     * The SAGA specification refers to error codes in POSIX, but it
-     * is very strange to do that in Java. Errors just result in an IOException.
-     * </strong>
+     * 
      * @param iovecs array of IOVecs determining how much to write and where
      * to obtain the data from.
      */
@@ -131,10 +142,7 @@ public interface File extends NSEntry {
 
     /**
      * Pattern-based read.
-     * <strong>
-     * The SAGA specification refers to error codes in POSIX, but it
-     * is very strange to do that in Java. Errors just result in an IOException.
-     * </strong>
+     * 
      * @param pattern specification for the read operation.
      * @param buffer to store data into.
      * @return number of succesfully read bytes.
@@ -146,10 +154,7 @@ public interface File extends NSEntry {
 
     /**
      * Pattern-based write.
-     * <strong>
-     * The SAGA specification refers to error codes in POSIX, but it
-     * is very strange to do that in Java. Errors just result in an IOException.
-     * </strong>
+     * 
      * @param pattern specification for the write operation.
      * @param buffer to be written.
      * @return number of succesfully written bytes.
@@ -182,10 +187,7 @@ public interface File extends NSEntry {
 
     /**
      * Extended read.
-     * <strong>
-     * The SAGA specification refers to error codes in POSIX, but it
-     * is very strange to do that in Java. Errors just result in an IOException.
-     * </strong>
+     * 
      * @param emode extended mode to use.
      * @param spec specification of read operation.
      * @param buffer to store the data read.
@@ -198,10 +200,7 @@ public interface File extends NSEntry {
 
     /**
      * Extended write.
-     * <strong>
-     * The SAGA specification refers to error codes in POSIX, but it
-     * is very strange to do that in Java. Errors just result in an IOException.
-     * </strong>
+     * 
      * @param emode extended mode to use.
      * @param spec specification of write operation.
      * @param buffer data to write.
@@ -234,9 +233,8 @@ public interface File extends NSEntry {
     /**
      * Creates a task that reads up to <code>len</code> bytes from the file
      * into the buffer.
-     * The number returned by the task is the number of bytes read, or -1 at
-     * end-of-file. 0 could be returned for non-blocking reads when no data
-     * is available.
+     * The number returned by the task is the number of bytes read, or 0 at
+     * end-of-file.
      * @param mode the task mode.
      * @param len the number of bytes to be read.
      * @param buffer the buffer to read data into.
@@ -244,9 +242,23 @@ public interface File extends NSEntry {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public Task<Integer> read(TaskMode mode, int len, Buffer buffer)
+    public Task<Integer> read(TaskMode mode, Buffer buffer, int len)
         throws NotImplemented;
 
+    /**
+     * Creates a task that reads up to the buffer's size bytes from the file
+     * into the buffer.
+     * The number returned by the task is the number of bytes read, or 0 at
+     * end-of-file.
+     * @param mode the task mode.
+     * @param buffer the buffer to read data into.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task<Integer> read(TaskMode mode, Buffer buffer)
+        throws NotImplemented;
+    
     /**
      * Creates a task that writes up to <code>len</code> bytes from the buffer
      * to the file at the current file position.
@@ -258,9 +270,22 @@ public interface File extends NSEntry {
      * @exception NotImplemented is thrown when the task version of this
      *     method is not implemented.
      */
-    public Task<Integer> write(TaskMode mode, int len, Buffer buffer)
+    public Task<Integer> write(TaskMode mode, Buffer buffer, int len)
         throws NotImplemented;
 
+    /**
+     * Creates a task that writes up to the buffer's size bytes from the buffer
+     * to the file at the current file position.
+     * The number returned by the task is the number of bytes written.
+     * @param mode the task mode.
+     * @param buffer the buffer to write data from.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public Task<Integer> write(TaskMode mode, Buffer buffer)
+        throws NotImplemented;
+    
     /**
      * Creates a task that repositions the current file position as requested.
      * The number returned by the task is the new file position.

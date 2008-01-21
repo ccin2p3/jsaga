@@ -13,6 +13,7 @@ public class NotImplemented extends Exception {
      * Constructs a NotImplemented exception.
      */
     public NotImplemented() {
+        super(NOT_IMPLEMENTED);
     }
 
     /**
@@ -21,7 +22,7 @@ public class NotImplemented extends Exception {
      * @param message the detail message.
      */
     public NotImplemented(String message) {
-        super(message);
+        super(NOT_IMPLEMENTED, message);
     }
 
     /**
@@ -29,7 +30,7 @@ public class NotImplemented extends Exception {
      * @param cause the cause.
      */
     public NotImplemented(Throwable cause) {
-        super(cause);
+        super(NOT_IMPLEMENTED, cause);
     }
 
     /**
@@ -40,7 +41,7 @@ public class NotImplemented extends Exception {
      * 
      */
     public NotImplemented(String message, Throwable cause) {
-        super(message, cause);
+        super(NOT_IMPLEMENTED, message, cause);
     }
     
     /**
@@ -50,6 +51,6 @@ public class NotImplemented extends Exception {
      * @param object the associated SAGA object.
      */
     public NotImplemented(String message, SagaObject object) {
-        super(message, object);
+        super(NOT_IMPLEMENTED, message, object);
     }
 }

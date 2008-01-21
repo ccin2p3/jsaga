@@ -37,7 +37,7 @@ public class FileReadTest extends AbstractNSEntryTest {
         if (m_file instanceof File) {
             Buffer buffer = BufferFactory.createBuffer(new byte[1024]);
             File reader = (File) NSFactory.createNSEntry(m_session, m_fileUrl, Flags.READ.getValue());
-            reader.read(1024, buffer);
+            reader.read(buffer);
             byte[] bytes = new byte[DEFAULT_CONTENT.length()];
             System.arraycopy(buffer.getData(), 0, bytes, 0, DEFAULT_CONTENT.length());
             assertEquals(

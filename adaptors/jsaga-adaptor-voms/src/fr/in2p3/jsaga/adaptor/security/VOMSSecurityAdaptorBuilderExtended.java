@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.adaptor.security;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import org.glite.security.voms.contact.*;
 import org.globus.util.Util;
+import org.ogf.saga.context.Context;
 import org.ogf.saga.error.BadParameter;
 
 import java.net.URI;
@@ -21,16 +22,19 @@ import java.util.Map;
 /**
  *
  */
-public class VOMSSecurityAdaptorBuilderExtended extends VOMSSecurityAdaptorBuilder implements InitializableSecurityAdaptorBuilder {
+public class VOMSSecurityAdaptorBuilderExtended extends VOMSSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuilder {
+    private static final String USERFQAN = "UserFQAN";
+    private static final String DELEGATION = "Delegation";
+    private static final String PROXYTYPE = "ProxyType";
     private static final Usage CREATE_PROXY = new UAnd(new Usage[]{
-            new U("UserProxy"), new UFile("UserCert"), new UFile("UserKey"), new UHidden("UserPass"), new UFile("CertDir"),
-            new U("Server"), new U("UserVO"), new UOptional("UserFQAN"),
-            new UDuration("LifeTime") {
+            new U(Context.USERPROXY), new UFile(Context.USERCERT), new UFile(Context.USERKEY), new UHidden(Context.USERPASS), new UFile(Context.CERTREPOSITORY),
+            new U(Context.SERVER), new U(Context.USERVO), new UOptional(USERFQAN),
+            new UDuration(Context.LIFETIME) {
                 protected Object throwExceptionIfInvalid(Object value) throws Exception {
                     return (value!=null ? super.throwExceptionIfInvalid(value) : null);
                 }
             },
-            new UOptional("Delegation") {
+            new UOptional(DELEGATION) {
                 protected Object throwExceptionIfInvalid(Object value) throws Exception {
                     if (super.throwExceptionIfInvalid(value) != null) {
                         String v = (String) value;
@@ -41,7 +45,7 @@ public class VOMSSecurityAdaptorBuilderExtended extends VOMSSecurityAdaptorBuild
                     return value;
                 }
             },
-            new UOptional("ProxyType") {
+            new UOptional(PROXYTYPE) {
                 protected Object throwExceptionIfInvalid(Object value) throws Exception {
                     if (super.throwExceptionIfInvalid(value) != null) {
                         String v = (String) value;
@@ -66,11 +70,11 @@ public class VOMSSecurityAdaptorBuilderExtended extends VOMSSecurityAdaptorBuild
     private static final int DELEGATION_FULL = 3;   // default
     public void initBuilder(Map attributes, String contextId) throws Exception {
         // required attributes
-        System.setProperty("X509_USER_CERT", (String) attributes.get("UserCert"));
-        System.setProperty("X509_USER_KEY", (String) attributes.get("UserKey"));
-        System.setProperty("X509_CERT_DIR", (String) attributes.get("CertDir"));
-        System.setProperty("VOMSDIR", (String) attributes.get("VomsDir"));
-        URI uri = new URI((String) attributes.get("Server"));
+        System.setProperty("X509_USER_CERT", (String) attributes.get(Context.USERCERT));
+        System.setProperty("X509_USER_KEY", (String) attributes.get(Context.USERKEY));
+        System.setProperty("X509_CERT_DIR", (String) attributes.get(Context.CERTREPOSITORY));
+        System.setProperty("VOMSDIR", (String) attributes.get(VOMSDIR));
+        URI uri = new URI((String) attributes.get(Context.SERVER));
         if (uri.getHost()==null) {
             throw new BadParameter("Attribute Server has no host name: "+uri.toString());
         }
@@ -78,38 +82,40 @@ public class VOMSSecurityAdaptorBuilderExtended extends VOMSSecurityAdaptorBuild
         server.setHostName(uri.getHost());
         server.setPort(uri.getPort());
         server.setHostDn(uri.getPath());
-        server.setVoName((String) attributes.get("UserVO"));
-        VOMSProxyInit proxyInit = !"".equals(attributes.get("UserPass"))
-                ? VOMSProxyInit.instance((String) attributes.get("UserPass"))
+        server.setVoName((String) attributes.get(Context.USERVO));
+        VOMSProxyInit proxyInit = !"".equals(attributes.get(Context.USERPASS))
+                ? VOMSProxyInit.instance((String) attributes.get(Context.USERPASS))
                 : VOMSProxyInit.instance();
         proxyInit.addVomsServer(server);
-        proxyInit.setProxyOutputFile((String) attributes.get("UserProxy"));
+        proxyInit.setProxyOutputFile((String) attributes.get(Context.USERPROXY));
         VOMSRequestOptions o = new VOMSRequestOptions();
-        o.setVoName((String) attributes.get("UserVO"));
+        o.setVoName((String) attributes.get(Context.USERVO));
 
         // optional attributes
-        if (attributes.containsKey("UserFQAN")) {
-            o.addFQAN((String) attributes.get("UserFQAN"));
+        if (attributes.containsKey(USERFQAN)) {
+            o.addFQAN((String) attributes.get(USERFQAN));
         }
-        if (attributes.containsKey("LifeTime")) {
-            int lifetime = UDuration.toInt(attributes.get("LifeTime"));
+        if (attributes.containsKey(Context.LIFETIME)) {
+            int lifetime = UDuration.toInt(attributes.get(Context.LIFETIME));
             proxyInit.setProxyLifetime(lifetime);
         }
-        if (attributes.containsKey("Delegation")) {
-            if (((String)attributes.get("Delegation")).equalsIgnoreCase("none")) {
+        if (attributes.containsKey(DELEGATION)) {
+            String delegation = (String) attributes.get(DELEGATION);
+            if (delegation.equalsIgnoreCase("none")) {
                 proxyInit.setDelegationType(DELEGATION_NONE);
-            } else if (((String)attributes.get("Delegation")).equalsIgnoreCase("limited")) {
+            } else if (delegation.equalsIgnoreCase("limited")) {
                 proxyInit.setDelegationType(DELEGATION_LIMITED);
-            } else if (((String)attributes.get("Delegation")).equalsIgnoreCase("full")) {
+            } else if (delegation.equalsIgnoreCase("full")) {
                 proxyInit.setDelegationType(DELEGATION_FULL);
             }
         }
-        if (attributes.containsKey("ProxyType")) {
-            if (((String)attributes.get("ProxyType")).equalsIgnoreCase("old")) {
+        if (attributes.containsKey(PROXYTYPE)) {
+            String proxyType = (String) attributes.get(PROXYTYPE);
+            if (proxyType.equalsIgnoreCase("old")) {
                 proxyInit.setProxyType(OID_OLD);
-            } else if (((String)attributes.get("ProxyType")).equalsIgnoreCase("globus")) {
+            } else if (proxyType.equalsIgnoreCase("globus")) {
                 proxyInit.setProxyType(OID_GLOBUS);
-            } else if (((String)attributes.get("ProxyType")).equalsIgnoreCase("RFC820")) {
+            } else if (proxyType.equalsIgnoreCase("RFC820")) {
                 proxyInit.setProxyType(OID_RFC820);
             }
         }
@@ -121,7 +127,7 @@ public class VOMSSecurityAdaptorBuilderExtended extends VOMSSecurityAdaptorBuild
     }
 
     public void destroyBuilder(Map attributes, String contextId) throws Exception {
-        String proxyFile = (String) attributes.get("UserProxy");
+        String proxyFile = (String) attributes.get(Context.USERPROXY);
         Util.destroy(proxyFile);
     }
 }

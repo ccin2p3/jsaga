@@ -51,9 +51,9 @@ public class SRMDataAdaptor implements DataAdaptor {
         return m_adaptor.getDefaultPort();
     }
 
-    public void connect(String userInfo, String host, int port, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
         // connect
-        m_adaptor.connect(userInfo, host, port, attributes);
+        m_adaptor.connect(userInfo, host, port, null, attributes);
 
         // check version
         try {
@@ -62,7 +62,7 @@ public class SRMDataAdaptor implements DataAdaptor {
         } catch(BadParameter e) {
             // v 1.1 => reconnect
             m_adaptor = new SRM11DataAdaptor();
-            m_adaptor.connect(userInfo, host, port, attributes);
+            m_adaptor.connect(userInfo, host, port, null, attributes);
         }
     }
 

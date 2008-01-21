@@ -24,6 +24,14 @@ public class RPCFactoryImpl extends RPCFactory {
         throw new BadParameter("Not implemented by the SAGA engine");
     }
 
+    protected Parameter doCreateParameter(IOMode mode) throws NotImplemented, BadParameter, NoSuccess {
+        throw new NotImplemented("Not implemented by the SAGA engine");
+    }
+
+    protected Parameter doCreateParameter(int sz, IOMode mode) throws NotImplemented, BadParameter, NoSuccess {
+        throw new NotImplemented("Not implemented by the SAGA engine");
+    }
+
     protected RPC doCreateRPC(Session session, URL funcname) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         throw new NotImplemented("Not implemented by the SAGA engine");
     }

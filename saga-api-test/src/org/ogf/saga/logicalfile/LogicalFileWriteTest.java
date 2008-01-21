@@ -86,7 +86,7 @@ public class LogicalFileWriteTest extends AbstractNSEntryWriteTest {
             Directory physicalRoot = (Directory) NSFactory.createNSDirectory(m_session, m_physicalRootUrl, FLAGS_ROOT);
             File physicalFile = (File) physicalRoot.open(m_physicalFileUrl, FLAGS_FILE);
             Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT.getBytes());
-            physicalFile.write(buffer.getSize(), buffer);
+            physicalFile.write(buffer);
             physicalFile.close();
 
             // replicate

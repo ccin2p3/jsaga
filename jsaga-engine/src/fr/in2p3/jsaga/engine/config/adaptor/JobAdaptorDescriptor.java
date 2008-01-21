@@ -2,8 +2,10 @@ package fr.in2p3.jsaga.engine.config.adaptor;
 
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.ListJobControl;
+import fr.in2p3.jsaga.adaptor.job.control.BulkJobSubmit;
+import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.engine.schema.config.Jobservice;
+import fr.in2p3.jsaga.engine.schema.config.Monitor;
 import org.ogf.saga.error.NoSuccess;
 
 import java.util.HashMap;
@@ -60,13 +62,20 @@ public class JobAdaptorDescriptor {
         Jobservice jobservice = new Jobservice();
         jobservice.setType(adaptor.getType());
         jobservice.setImpl(adaptor.getClass().getName());
-        jobservice.setBulk(adaptor instanceof ListJobControl);
+        jobservice.setBulk(adaptor instanceof BulkJobSubmit);
         if (adaptor.getSupportedSecurityAdaptorClasses() != null) {
             String[] supportedContextTypes = securityDesc.getSupportedContextTypes(adaptor.getSupportedSecurityAdaptorClasses());
             jobservice.setSupportedContextType(supportedContextTypes);
         }
         if (adaptor.getSupportedSandboxProtocols() != null) {
             jobservice.setSupportedProtocolScheme(adaptor.getSupportedSandboxProtocols());
+        }
+        JobMonitorAdaptor monitorAdaptor = adaptor.getDefaultJobMonitor();
+        if (monitorAdaptor != null) {
+            Monitor monitor = new Monitor();
+            monitor.setImpl(monitorAdaptor.getClass().getName());
+            AdaptorDescriptors.setDefaults(monitor, monitorAdaptor);
+            jobservice.setMonitor(monitor);
         }
         if (adaptor.getUsage() != null) {
             jobservice.setUsage(adaptor.getUsage().toString());

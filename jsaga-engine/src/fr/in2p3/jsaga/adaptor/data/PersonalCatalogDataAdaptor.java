@@ -55,7 +55,7 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
         return 0;
     }
 
-    public void connect(String userInfo, String host, int port, Map attributes) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {
         m_catalog = DataCatalogHandler.getInstance();
         if(Base.DEBUG) m_catalog.commit();
     }
@@ -132,8 +132,13 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
         return ret;
     }
 
-    public void makeDir(String parentAbsolutePath, String directoryName) throws PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        DirectoryType parent = m_catalog.getDirectory(parentAbsolutePath);
+    public void makeDir(String parentAbsolutePath, String directoryName) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+        DirectoryType parent;
+        try {
+            parent = m_catalog.getDirectory(parentAbsolutePath);
+        } catch (DoesNotExist e) {
+            throw new ParentDoesNotExist("Parent directory does not exist");
+        }
         try {
             m_catalog.getEntry(parent, directoryName);
             throw new AlreadyExists("Entry already exists");

@@ -29,7 +29,7 @@ public class SagaInputStream extends InputStream {
     public int read() throws IOException {
         try {
             Buffer buffer = BufferFactory.createBuffer(1);
-            if (m_file.read(1, buffer) == 1) {
+            if (m_file.read(buffer, 1) == 1) {
                 return buffer.getData()[0];
             }
         } catch (Exception e) {
@@ -41,7 +41,7 @@ public class SagaInputStream extends InputStream {
     public int read(byte[] bytes, int off, int len) throws IOException {
         try {
             Buffer buffer = BufferFactory.createBuffer(bytes);
-            return m_file.read(len, buffer);
+            return m_file.read(buffer, len);
         } catch (Exception e) {
             throw new IOException(e.getMessage());
         }

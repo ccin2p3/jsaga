@@ -8,6 +8,7 @@ import fr.in2p3.jsaga.adaptor.data.read.FileReader;
 import fr.in2p3.jsaga.adaptor.data.write.DirectoryWriter;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import org.globus.ftp.FeatureList;
 import org.globus.ftp.exception.ServerException;
 import org.ogf.saga.error.*;
 
@@ -57,32 +58,40 @@ public class GsiftpDataAdaptor implements FileReader, FileWriter, DirectoryReade
         return m_adaptor.getDefaultPort();
     }
 
-    public void connect(String userInfo, String host, int port, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
         // connect
-        m_adaptor.connect(userInfo, host, port, attributes);
+        m_adaptor.connect(userInfo, host, port, null, attributes);
 
         // check version
-        boolean old;
+        FeatureList fl;
         try {
-            m_adaptor.m_client.quote("HELP MLSD");
-            old = false;
-        } catch (ServerException e) {
-            if (e.getMessage().indexOf("Unknown command MLSD") > -1) {
-                old = true;
-            } else {
-                // unknown
-                throw new NoSuccess(e);
-            }
+            fl = m_adaptor.m_client.getFeatureList();
         } catch (IOException e) {
+            throw new NoSuccess(e);
+        } catch (ServerException e) {
             throw new NoSuccess(e);
         }
 
-        // may replace implementation
+        // replace implementation
         GsiftpDataAdaptorAbstract sav = m_adaptor;
-        if (old) {
-            m_adaptor = new Gsiftp1DataAdaptor();
+        if (fl.contains("PARALLEL") && fl.contains("SIZE") && fl.contains("ERET") && fl.contains("ESTO")) {
+            // <*>              = PARALLEL, SIZE, ERET, ESTO
+            if (fl.contains("DCAU") && fl.contains("MDTM") && fl.contains("REST STREAM")) {
+                // <globus>     = <*> + DCAU, MDTM, "REST STREAM"
+                if (fl.contains("SPAS") && fl.contains("SPOR")) {
+                    // <new>    = <globus> + MLST..., SPAS, SPOR, UTF8, "LANG EN"
+                    m_adaptor = new Gsiftp2DataAdaptor();
+                } else {
+                    // <old>    = <globus>
+                    m_adaptor = new Gsiftp1DataAdaptor();
+                }
+            } else if (fl.contains("SBUF") && fl.contains("EOF")) {
+                // <oldDCache>  = <*> + SBUF + EOF
+                // <newDCache>  = <*> + SBUF + EOF + GETPUT, CKSM, SCKS, MODEX
+                m_adaptor = new GsiftpDCacheDataAdaptor();
+            }
         } else {
-            m_adaptor = new Gsiftp2DataAdaptor();
+            throw new NotImplemented("Unsupported server implementation");
         }
         m_adaptor.m_client = sav.m_client;
         m_adaptor.m_credential = sav.m_credential;
@@ -112,7 +121,7 @@ public class GsiftpDataAdaptor implements FileReader, FileWriter, DirectoryReade
         return m_adaptor.getInputStream(absolutePath);
     }
 
-    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append) throws PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
         return m_adaptor.getOutputStream(parentAbsolutePath, fileName, exclusive, append);
     }
 
@@ -126,11 +135,11 @@ public class GsiftpDataAdaptor implements FileReader, FileWriter, DirectoryReade
         m_adaptor.putFromStream(absolutePath, stream, append);
     }
 
-    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, ParentDoesNotExist, Timeout, NoSuccess {
         m_adaptor.copy(sourceAbsolutePath, targetHost, targetPort, targetAbsolutePath, overwrite);
     }
 
-    public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+    public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         m_adaptor.copyFrom(sourceHost, sourcePort, sourceAbsolutePath, targetAbsolutePath, overwrite);
     }
 
@@ -146,7 +155,7 @@ public class GsiftpDataAdaptor implements FileReader, FileWriter, DirectoryReade
         return m_adaptor.listAttributes(absolutePath);
     }
 
-    public void makeDir(String parentAbsolutePath, String directoryName) throws PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public void makeDir(String parentAbsolutePath, String directoryName) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
         m_adaptor.makeDir(parentAbsolutePath, directoryName);
     }
 

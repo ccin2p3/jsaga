@@ -4,6 +4,7 @@ import fr.in2p3.jsaga.adaptor.base.SagaBaseAdaptor;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
+import fr.in2p3.jsaga.adaptor.language.LanguageAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptorBuilder;
 import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.schema.config.*;
@@ -30,6 +31,7 @@ public class AdaptorDescriptors {
     private SecurityAdaptorDescriptor m_securityDesc;
     private DataAdaptorDescriptor m_dataDesc;
     private JobAdaptorDescriptor m_jobDesc;
+    private LanguageAdaptorDescriptor m_languageDesc;
     private EffectiveConfig m_xml;
 
     public AdaptorDescriptors() throws ConfigurationException {
@@ -38,6 +40,7 @@ public class AdaptorDescriptors {
             m_securityDesc = new SecurityAdaptorDescriptor(loader.getClasses(SecurityAdaptorBuilder.class));
             m_dataDesc = new DataAdaptorDescriptor(loader.getClasses(DataAdaptor.class), m_securityDesc);
             m_jobDesc = new JobAdaptorDescriptor(loader.getClasses(JobAdaptor.class), m_securityDesc);
+            m_languageDesc = new LanguageAdaptorDescriptor(loader.getClasses(LanguageAdaptor.class));
         } catch(Exception e) {
             throw new ConfigurationException(e);
         }
@@ -45,6 +48,8 @@ public class AdaptorDescriptors {
         m_xml.setContextInstance(m_securityDesc.m_xml);
         m_xml.setProtocol(m_dataDesc.m_xml);
         m_xml.setJobservice(m_jobDesc.m_xml);
+        m_xml.setLanguage(m_languageDesc.m_xml);
+        setRootAttributes(m_xml);
     }
 
     public SecurityAdaptorDescriptor getSecurityDesc() {
@@ -59,6 +64,10 @@ public class AdaptorDescriptors {
         return m_jobDesc;
     }
 
+    public LanguageAdaptorDescriptor getLanguageDesc() {
+        return m_languageDesc;
+    }
+
     public byte[] toByteArray() throws IOException, ValidationException, MarshalException {
         ByteArrayOutputStream xmlStream = new ByteArrayOutputStream();
 
@@ -67,6 +76,7 @@ public class AdaptorDescriptors {
         Marshaller m = new Marshaller(new OutputStreamWriter(xmlStream));
         m.setNamespaceMapping(null, "http://www.in2p3.fr/jsaga");
         m.setSuppressNamespaces(true);
+        m.setValidation(false); //no validation because some required attributes can not be set from adaptors
         m.marshal(m_xml);
 
         // build DOM
@@ -92,5 +102,12 @@ public class AdaptorDescriptors {
             }
             bean.setAttribute((Attribute[]) list.toArray(new Attribute[list.size()]));
         }
+    }
+
+    private static void setRootAttributes(EffectiveConfig xml) {
+        String tmpPath = (System.getProperty("file.separator").equals("\\")
+                ? "/"+System.getProperty("java.io.tmpdir").replaceAll("\\\\", "/")
+                : System.getProperty("java.io.tmpdir"));
+        xml.setLocalIntermediary("file://"+tmpPath);
     }
 }

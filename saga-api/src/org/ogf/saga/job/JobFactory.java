@@ -8,8 +8,10 @@ import org.ogf.saga.error.IncorrectURL;
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.error.PermissionDenied;
+import org.ogf.saga.error.SagaError;
 import org.ogf.saga.error.Timeout;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.task.TaskMode;
 import org.ogf.saga.task.Task;
 
@@ -98,5 +100,118 @@ public abstract class JobFactory {
             TaskMode mode, Session session, URL rm) throws NotImplemented {
         initializeFactory();
         return factory.doCreateJobService(mode, session, rm);
+    }
+    
+    /**
+     * Creates a job service.
+     * @param session the session handle.
+     * @return the job service.
+     */
+    public static JobService createJobService(Session session) 
+        throws NotImplemented, IncorrectURL,
+            AuthenticationFailed, AuthorizationFailed, PermissionDenied,
+            Timeout, NoSuccess {
+        URL url;
+        try {
+            url = new URL("");
+        } catch(Throwable e) {
+            throw new SagaError("Should not happen", e);
+        }
+        initializeFactory();
+        return factory.doCreateJobService(session, url);
+    }
+
+    /**
+     * Creates a task that creates a job service, using a default contact string.
+     * @param mode the task mode.
+     * @param session the session handle.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     */
+    public static Task<JobService> createJobService(
+            TaskMode mode, Session session) throws NotImplemented {
+        URL url;
+        try {
+            url = new URL("");
+        } catch(Throwable e) {
+            throw new SagaError("Should not happen", e);
+        }
+        initializeFactory();
+        return factory.doCreateJobService(mode, session, url);
+    }
+
+    /**
+     * Creates a job service, using the default session.
+     * @param rm contact string for the resource manager.
+     * @return the job service.
+     */
+    public static JobService createJobService(URL rm) 
+        throws NotImplemented, IncorrectURL,
+            AuthenticationFailed, AuthorizationFailed, PermissionDenied,
+            Timeout, NoSuccess {
+        Session session = SessionFactory.createSession();
+        initializeFactory();
+        return factory.doCreateJobService(session, rm);
+    }
+ 
+    /**
+     * Creates a task that creates a job service, using the default session.
+     * @param mode the task mode.
+     * @param rm contact string for the resource manager.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     * @exception NoSuccess is thrown when the default session could not be
+     *     created.
+     */
+    public static Task<JobService> createJobService(
+            TaskMode mode, URL rm) throws NotImplemented, NoSuccess {
+        Session session = SessionFactory.createSession();
+        initializeFactory();
+        return factory.doCreateJobService(mode, session, rm);
+    }
+    
+    /**
+     * Creates a job service, using the default session and default contact
+     * string.
+     * @return the job service.
+     */
+    public static JobService createJobService() 
+        throws NotImplemented, IncorrectURL,
+            AuthenticationFailed, AuthorizationFailed, PermissionDenied,
+            Timeout, NoSuccess {
+        URL url;
+        try {
+            url = new URL("");
+        } catch(Throwable e) {
+            throw new SagaError("Should not happen", e);
+        }
+        Session session = SessionFactory.createSession();
+        initializeFactory();
+        return factory.doCreateJobService(session, url);
+    }
+
+    /**
+     * Creates a task that creates a job service, using the default session
+     * and default contact string.
+     * @param mode the task mode.
+     * @return the task.
+     * @exception NotImplemented is thrown when the task version of this
+     *     method is not implemented.
+     * @exception NoSuccess is thrown when the default session could not be
+     *     created.
+     */
+    public static Task<JobService> createJobService(
+            TaskMode mode) throws NotImplemented, NoSuccess {
+        URL url;
+        try {
+            url = new URL("");
+        } catch(Throwable e) {
+            throw new SagaError("Should not happen", e);
+        }
+        Session session = SessionFactory.createSession();
+        initializeFactory();
+        return factory.doCreateJobService(mode, session, url);
     }
 }

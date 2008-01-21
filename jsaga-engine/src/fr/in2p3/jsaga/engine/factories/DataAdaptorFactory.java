@@ -44,7 +44,7 @@ public class DataAdaptorFactory {
      * @param session the security session
      * @return the data adaptor instance
      */
-    public DataAdaptor getDataAdaptor(URL service, Session session) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    public DataAdaptor getDataAdaptor(URL service, Session session) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         if (service==null || service.getScheme()==null) {
             throw new IncorrectURL("Invalid entry name");
         }
@@ -64,7 +64,7 @@ public class DataAdaptorFactory {
      * @param context the security context
      * @return the data adaptor instance
      */
-    private DataAdaptor getDataAdaptor(URL service, ContextImpl context) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    private DataAdaptor getDataAdaptor(URL service, ContextImpl context) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
         // create instance
         Class clazz = m_descriptor.getClass(service.getScheme());
         DataAdaptor dataAdaptor;
@@ -93,7 +93,7 @@ public class DataAdaptorFactory {
 
         // connect
         int port = (service.getPort()>0 ? service.getPort() : dataAdaptor.getDefaultPort());
-        dataAdaptor.connect(service.getUserInfo(), service.getHost(), port, attributes);
+        dataAdaptor.connect(service.getUserInfo(), service.getHost(), port, null, attributes);
         return dataAdaptor;
     }
 }

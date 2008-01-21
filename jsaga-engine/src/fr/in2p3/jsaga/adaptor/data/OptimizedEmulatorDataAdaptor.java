@@ -31,7 +31,7 @@ public class OptimizedEmulatorDataAdaptor extends EmulatorDataAdaptor implements
         return new String[]{"otest", "oemulated"};
     }
 
-    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, ParentDoesNotExist, Timeout, NoSuccess {
         File file = m_server.getFile(sourceAbsolutePath);
         DataEmulatorConnection targetServer = new DataEmulatorConnection(this.getSchemeAliases()[0], targetHost, targetPort);
 
@@ -52,12 +52,17 @@ public class OptimizedEmulatorDataAdaptor extends EmulatorDataAdaptor implements
         fileClone.setName(targetServer.getEntryName(targetAbsolutePath));
 
         // add clone to target server
-        DirectoryType parent = targetServer.getParentDirectory(targetAbsolutePath);
+        DirectoryType parent;
+        try {
+            parent = targetServer.getParentDirectory(targetAbsolutePath);
+        } catch (DoesNotExist e) {
+            throw new ParentDoesNotExist("Parent directory does not exist");
+        }
         parent.addFile(fileClone);
         if(Base.DEBUG) targetServer.commit();
     }
 
-    public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+    public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         DataEmulatorConnection sourceServer = new DataEmulatorConnection(this.getSchemeAliases()[0], sourceHost, sourcePort);
         File file = sourceServer.getFile(sourceAbsolutePath);
 

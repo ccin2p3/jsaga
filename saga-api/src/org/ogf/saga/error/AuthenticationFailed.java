@@ -14,6 +14,7 @@ public class AuthenticationFailed extends Exception {
      * Constructs an AuthenticationFailed exception.
      */
     public AuthenticationFailed() {
+        super(AUTHENTICATION_FAILED);
     }
 
     /**
@@ -22,7 +23,7 @@ public class AuthenticationFailed extends Exception {
      * @param message the detail message.
      */
     public AuthenticationFailed(String message) {
-        super(message);
+        super(AUTHENTICATION_FAILED, message);
     }
 
     /**
@@ -30,7 +31,7 @@ public class AuthenticationFailed extends Exception {
      * @param cause the cause.
      */
     public AuthenticationFailed(Throwable cause) {
-        super(cause);
+        super(AUTHENTICATION_FAILED, cause);
     }
 
     /**
@@ -40,7 +41,7 @@ public class AuthenticationFailed extends Exception {
      * @param cause the cause.
      */
     public AuthenticationFailed(String message, Throwable cause) {
-        super(message, cause);
+        super(AUTHENTICATION_FAILED, message, cause);
     }
 
     /**
@@ -50,6 +51,6 @@ public class AuthenticationFailed extends Exception {
      * @param object the associated SAGA object.
      */
     public AuthenticationFailed(String message, SagaObject object) {
-        super(message, object);
+        super(AUTHENTICATION_FAILED, message, object);
     }
 }

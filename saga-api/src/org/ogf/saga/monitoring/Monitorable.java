@@ -4,6 +4,7 @@ import org.ogf.saga.error.AuthenticationFailed;
 import org.ogf.saga.error.AuthorizationFailed;
 import org.ogf.saga.error.BadParameter;
 import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.IncorrectState;
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.error.PermissionDenied;
@@ -40,7 +41,7 @@ public interface Monitorable {
      */
     public int addCallback(String name, Callback cb)
         throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, DoesNotExist, Timeout, NoSuccess;
+            PermissionDenied, DoesNotExist, Timeout, NoSuccess, IncorrectState;
 
     /**
      * Removes the specified callback.

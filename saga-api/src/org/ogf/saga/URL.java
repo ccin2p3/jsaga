@@ -25,8 +25,12 @@ public class URL {
         try {
             u = new URI(url);
         } catch(URISyntaxException e) {
-            throw new BadParameter("syntax error in url");
+            throw new BadParameter("syntax error in url", e);
         }
+    }
+    
+    private URL(URI u) {
+        this.u = u;
     }
 
     /**
@@ -39,7 +43,7 @@ public class URL {
         try {
             u = new URI(url);
         } catch(URISyntaxException e) {
-            throw new BadParameter("syntax error in url");
+            throw new BadParameter("syntax error in url", e);
         }
     }
 
@@ -71,7 +75,7 @@ public class URL {
             u = new URI(u.getScheme(), u.getUserInfo(), u.getHost(),
                     u.getPort(), u.getPath(), u.getQuery(), fragment);
         } catch(URISyntaxException e) {
-            throw new BadParameter("syntax error in fragment");
+            throw new BadParameter("syntax error in fragment", e);
         }
     }
 
@@ -94,7 +98,7 @@ public class URL {
             u = new URI(u.getScheme(), u.getUserInfo(), host,
                     u.getPort(), u.getPath(), u.getQuery(), u.getFragment());
         } catch(URISyntaxException e) {
-            throw new BadParameter("syntax error in host");
+            throw new BadParameter("syntax error in host", e);
         }
     }
 
@@ -103,7 +107,12 @@ public class URL {
      * @return the path.
      */
     public String getPath() throws NotImplemented {
-        return u.getPath();
+        if (".".equals(u.getAuthority())) {
+            return u.getPath().substring(1);
+        } else {
+            return u.getPath();
+        }
+        //sreynaud: returns a relative path if URL is <scheme>://./<path>
     }
 
     /**
@@ -117,7 +126,7 @@ public class URL {
             u = new URI(u.getScheme(), u.getUserInfo(), u.getHost(),
                     u.getPort(), path, u.getQuery(), u.getFragment());
         } catch(URISyntaxException e) {
-            throw new BadParameter("syntax error in host");
+            throw new BadParameter("syntax error in host", e);
         }
     }
 
@@ -140,7 +149,7 @@ public class URL {
             u = new URI(u.getScheme(), u.getUserInfo(), u.getHost(),
                     port, u.getPath(), u.getQuery(), u.getFragment());
         } catch(URISyntaxException e) {
-            throw new BadParameter("syntax error in port");     // ???
+            throw new BadParameter("syntax error in port", e);     // ???
         }
     }
 
@@ -163,7 +172,7 @@ public class URL {
             u = new URI(u.getScheme(), u.getUserInfo(), u.getHost(),
                     u.getPort(), u.getPath(), query, u.getFragment());
         } catch(URISyntaxException e) {
-            throw new BadParameter("syntax error in query");
+            throw new BadParameter("syntax error in query", e);
         }
     }
 
@@ -186,7 +195,7 @@ public class URL {
             u = new URI(scheme, u.getUserInfo(), u.getHost(),
                     u.getPort(), u.getPath(), u.getQuery(), u.getFragment());
         } catch(URISyntaxException e) {
-            throw new BadParameter("syntax error in scheme");
+            throw new BadParameter("syntax error in scheme", e);
         }
     }
 
@@ -210,7 +219,7 @@ public class URL {
             u = new URI(u.getScheme(), userInfo, u.getHost(),
                     u.getPort(), u.getPath(), u.getQuery(), u.getFragment());
         } catch(URISyntaxException e) {
-            throw new BadParameter("syntax error in query");
+            throw new BadParameter("syntax error in query", e);
         }
     }
 
@@ -221,7 +230,7 @@ public class URL {
      * @exception BadParameter is thrown when there is a syntax error in the
      *     new URL.
      */
-    public String translate(String scheme) throws NotImplemented, BadParameter,
+    public URL translate(String scheme) throws NotImplemented, BadParameter,
            NoSuccess {
         try {
             URI url = new URI(scheme, u.getUserInfo(), u.getHost(),
@@ -229,9 +238,9 @@ public class URL {
             // Not quite correct: the SAGA specs say that NoSuccess should be
             // thrown when the scheme is not supported. How to check this
             // here ???
-            return url.toString();
+            return new URL(url);
         } catch(URISyntaxException e) {
-            throw new BadParameter("syntax error in scheme");
+            throw new BadParameter("syntax error in scheme", e);
         }
     }
 
@@ -252,5 +261,39 @@ public class URL {
 
     public String toString() {
         return u.toString();
+    }
+    
+    /**
+     * See {@link java.net.URI#resolve(java.net.URI)}.
+     * @param url the url to resolve with respect to this one.
+     * @return the resolved url.
+     */
+    public URL resolve(URL url) throws NoSuccess {
+        URI uri = u.resolve(url.u);
+        if (uri == url.u) {
+            return url;
+        }
+        
+        return new URL(uri);
+    }
+    
+    /**
+     * See {@link java.net.URI#isAbsolute()}.
+     * @return whether this URL is an absolute URL.
+     */
+    public boolean isAbsolute() {
+        return u.isAbsolute();
+    }
+    
+    /**
+     * See {@link java.net.URI#normalize()}.
+     * @return a normalized URL.
+     */
+    public URL normalize() {
+        URI uri = u.normalize();
+        if (uri == u) {
+            return this;
+        }
+        return new URL(uri);
     }
 }

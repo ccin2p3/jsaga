@@ -17,38 +17,19 @@ import org.ogf.saga.task.State;
 * ***************************************************
 * Description:                                      */
 /**
- * -r local://localhost -CandidateHost localhost -Executable job.sh -FileTransfer input>input,output<<output
+ * -r local://localhost -Executable job.sh -FileTransfer input>input,output<<output
  */
 public class JobRun extends AbstractCommand {
     private static final String OPT_HELP = "h", LONGOPT_HELP = "help";
-    // job service
+    // required arguments
     private static final String OPT_JOB_SERVICE = "s", LONGOPT_JOB_SERVICE = "service";
-    // job description
-    private static final String EXECUTABLE = "Executable";
-    private static final String ARGUMENTS = "Arguments";
-    private static final String ENVIRONMENT = "Environment";
-    private static final String WORKING_DIRECTORY = "WorkingDirectory";
-    private static final String INTERACTIVE = "Interactive";
-    private static final String INPUT = "Input";
-    private static final String OUTPUT = "Output";
-    private static final String ERROR = "Error";
-    private static final String JOB_CONTACT = "JobContact";
-    private static final String JOB_NAME = "JobName";
-    private static final String FILE_TRANSFER = "FileTransfer";
-    private static final String CLEANUP = "Cleanup";
-    private static final String JOB_START_TIME = "JobStartTime";
-    private static final String DEADLINE = "Deadline";
-    private static final String CPU_ARCHITECTURE = "CPUArchitecture";
-    private static final String OPERATING_SYSTEM_TYPE = "OperatingSystemType";
-    private static final String CANDIDATE_HOSTS = "CandidateHosts";
-    private static final String QUEUE = "Queue";
-    private static final String NUMBER_OF_PROCESSES = "NumberOfProcesses";
-    private static final String PROCESSES_PER_HOST = "ProcessesPerHost";
-    private static final String THREADS_PER_PROCESS = "ThreadsPerProcess";
-    private static final String SPMD_VARIATION = "SPMDVariation";
+    // optional arguments
+    private static final String OPT_BATCH = "b", LONGOPT_BATCH = "batch";
+    // attribute names missing in interface JobDescription
+    private static final String JOBNAME = "JobName";
 
     protected JobRun() {
-        super("jsaga-job-run", null, null);
+        super("jsaga-job-run", null, null, new GnuParser());
     }
 
     public static void main(String[] args) throws Exception {
@@ -63,7 +44,7 @@ public class JobRun extends AbstractCommand {
         else
         {
             // get arguments
-            URL serviceURL = new URL(line.getOptionValue(OPT_JOB_SERVICE));
+            URL serviceURL = new URL(line.getOptionValue(OPT_JOB_SERVICE).replaceAll(" ", "%20"));
             JobDescription desc = createJobDescription(line);
 
             // submit
@@ -72,32 +53,22 @@ public class JobRun extends AbstractCommand {
             Job job = service.createJob(desc);
             job.run();
 
-            // wait
-            State previousState = State.NEW;
-            boolean isFinished = false;
-            while (!isFinished) {
-                State currentState = job.getState();
-                if (currentState.compareTo(previousState) != 0) {
-                    if (State.RUNNING.compareTo(currentState) == 0) {
-                        System.out.println("Job is running.");
-                    } else if (State.SUSPENDED.compareTo(currentState) == 0) {
-                        System.out.println("Job is suspended.");
-                    } else if (State.DONE.compareTo(currentState) == 0) {
-                        System.out.println("Job completed successfully.");
-                        isFinished = true;
-                    } else if (State.CANCELED.compareTo(currentState) == 0) {
-                        System.out.println("Job canceled.");
-                        isFinished = true;
-                    } else if (State.FAILED.compareTo(currentState) == 0) {
-                        System.out.println("Job failed with "+job.getAttribute("ExitCode"));
-                        isFinished = true;
-                    } else {
-                        throw new Exception("Unexpected state: "+ currentState);
-                    }
+            if (line.hasOption(OPT_BATCH)) {
+                String jobId = job.getAttribute(Job.JOBID);
+                System.out.println(jobId);
+            } else {
+                // wait
+                job.waitFor();
+
+                // display final state
+                State state = job.getState();
+                if (State.DONE.compareTo(state) == 0) {
+                    System.out.println("Job completed successfully.");
+                } else {
+                    System.err.println("Job did not complete successfully, final state is: "+state);
                 }
-                Thread.currentThread().sleep(100);
-                previousState = currentState;
             }
+            System.exit(0);
         }
     }
 
@@ -109,7 +80,7 @@ public class JobRun extends AbstractCommand {
                 .withLongOpt(LONGOPT_HELP)
                 .create(OPT_HELP));
 
-        // job service
+        // required arguments
         opt.addOption(OptionBuilder.withDescription("the URL of the job service")
                 .isRequired(true)
                 .hasArg()
@@ -117,64 +88,77 @@ public class JobRun extends AbstractCommand {
                 .withLongOpt(LONGOPT_JOB_SERVICE)
                 .create(OPT_JOB_SERVICE));
 
+        // optional arguments
+        opt.addOption(OptionBuilder.withDescription("exit immediatly after having submitted the job, " +
+                "and print the job ID on the standard output.")
+                .withLongOpt(LONGOPT_BATCH)
+                .create(OPT_BATCH));
+
         // job description
-        opt.addOption(OptionBuilder.withDescription("command to execute.").isRequired(true).hasArg().create(EXECUTABLE));
-        opt.addOption(OptionBuilder.withDescription("positional parameters for the command.").hasArgs().create(ARGUMENTS));
-        opt.addOption(OptionBuilder.withDescription("set of environment variables for the job").hasArgs().withValueSeparator().create(ENVIRONMENT));
-        opt.addOption(OptionBuilder.withDescription("working directory for the job").hasArg().create(WORKING_DIRECTORY));
-        opt.addOption(OptionBuilder.withDescription("run the job in interactive mode").create(INTERACTIVE));
-        opt.addOption(OptionBuilder.withDescription("pathname of the standard input file").hasArg().create(INPUT));
-        opt.addOption(OptionBuilder.withDescription("pathname of the standard output file").hasArg().create(OUTPUT));
-        opt.addOption(OptionBuilder.withDescription("pathname of the standard error file").hasArg().create(ERROR));
-        opt.addOption(OptionBuilder.withDescription("set of endpoints describing where to report").hasArgs().create(JOB_CONTACT));
-        opt.addOption(OptionBuilder.withDescription("job name to be attached to the job submission").hasArg().create(JOB_NAME));
-        opt.addOption(OptionBuilder.withDescription("a list of file transfer directives").hasArgs().create(FILE_TRANSFER));
-        opt.addOption(OptionBuilder.withDescription("defines if output files get removed after the job finishes").hasArg().create(CLEANUP));
-        opt.addOption(OptionBuilder.withDescription("time at which a job should be scheduled").hasArg().create(JOB_START_TIME));
-        opt.addOption(OptionBuilder.withDescription("hard deadline after which the resource manager should cancel the job").hasArg().create(DEADLINE));
-        opt.addOption(OptionBuilder.withDescription("compatible processor for job submission").hasArgs().create(CPU_ARCHITECTURE));
-        opt.addOption(OptionBuilder.withDescription("compatible operating system for job submission").hasArgs().create(OPERATING_SYSTEM_TYPE));
-        opt.addOption(OptionBuilder.withDescription("list of host names which are to be considered by the resource manager as candidate targets").hasArgs().create(CANDIDATE_HOSTS));
-        opt.addOption(OptionBuilder.withDescription("name of a queue to place the job into").hasArg().create(QUEUE));
-        opt.addOption(OptionBuilder.withDescription("number of process instances to start").hasArg().create(NUMBER_OF_PROCESSES));
-        opt.addOption(OptionBuilder.withDescription("number of processes to start per host").hasArg().create(PROCESSES_PER_HOST));
-        opt.addOption(OptionBuilder.withDescription("expected number of threads per process").hasArg().create(THREADS_PER_PROCESS));
-        opt.addOption(OptionBuilder.withDescription("SPMD job type and startup mechanism").hasArg().create(SPMD_VARIATION));
+        opt.addOption(o("job name to be attached to the job submission").hasArg().create(JOBNAME));
+        opt.addOption(o("command to execute").isRequired(true).hasArg().create(JobDescription.EXECUTABLE));
+        opt.addOption(o("positional parameters for the command").hasArgs().create(JobDescription.ARGUMENTS));
+        opt.addOption(o("SPMD job type and startup mechanism").hasArg().create(JobDescription.SPMDVARIATION));
+        opt.addOption(o("total number of cpus requested for this job").hasArg().create(JobDescription.TOTALCPUCOUNT));
+        opt.addOption(o("number of process instances to start").hasArg().create(JobDescription.NUMBEROFPROCESSES));
+        opt.addOption(o("number of processes to start per host").hasArg().create(JobDescription.PROCESSESPERHOST));
+        opt.addOption(o("expected number of threads per process").hasArg().create(JobDescription.THREADSPERPROCESS));
+        opt.addOption(o("set of environment variables for the job").hasArgs().withValueSeparator().create(JobDescription.ENVIRONMENT));
+        opt.addOption(o("working directory for the job").hasArg().create(JobDescription.WORKINGDIRECTORY));
+        opt.addOption(o("run the job in interactive mode").create(JobDescription.INTERACTIVE));
+        opt.addOption(o("pathname of the standard input file").hasArg().create(JobDescription.INPUT));
+        opt.addOption(o("pathname of the standard output file").hasArg().create(JobDescription.OUTPUT));
+        opt.addOption(o("pathname of the standard error file").hasArg().create(JobDescription.ERROR));
+        opt.addOption(o("a list of file transfer directives").hasArgs().create(JobDescription.FILETRANSFER));
+        opt.addOption(o("defines if output files get removed after the job finishes").hasArg().create(JobDescription.CLEANUP));
+        opt.addOption(o("time at which a job should be scheduled").hasArg().create(JobDescription.JOBSTARTTIME));
+        opt.addOption(o("estimated total number of CPU seconds which the job will require").hasArg().create(JobDescription.TOTALCPUTIME));
+        opt.addOption(o("estimated amount of memory the job requires").hasArg().create(JobDescription.TOTALPHYSICALMEMORY));
+        opt.addOption(o("compatible processor for job submission").hasArgs().create(JobDescription.CPUARCHITECTURE));
+        opt.addOption(o("compatible operating system for job submission").hasArgs().create(JobDescription.OPERATINGSYSTEMTYPE));
+        opt.addOption(o("list of host names which are to be considered by the resource manager as candidate targets").hasArgs().create(JobDescription.CANDIDATEHOSTS));
+        opt.addOption(o("name of a queue to place the job into").hasArg().create(JobDescription.QUEUE));
+        opt.addOption(o("set of endpoints describing where to report").hasArgs().create(JobDescription.JOBCONTACT));
 
         // returns
         return opt;
     }
+    private static OptionBuilder o(String description) {
+        return OptionBuilder.withDescription(description);
+    }
 
     private static JobDescription createJobDescription(CommandLine line) throws Exception {
         JobDescription desc = JobFactory.createJobDescription();
-        setRequired(desc, line, EXECUTABLE);
-        setOptMulti(desc, line, ARGUMENTS);
-        setOptMulti(desc, line, ENVIRONMENT);
-        setOptional(desc, line, WORKING_DIRECTORY);
-        setReqNoArg(desc, line, INTERACTIVE);
-        setOptional(desc, line, INPUT);
-        setOptional(desc, line, OUTPUT);
-        setOptional(desc, line, ERROR);
-        setOptMulti(desc, line, JOB_CONTACT);
-        setOptional(desc, line, JOB_NAME);
-        setOptMulti(desc, line, FILE_TRANSFER);
-        setOptional(desc, line, CLEANUP);
-        setOptional(desc, line, JOB_START_TIME);
-        setOptional(desc, line, DEADLINE);
-        setOptMulti(desc, line, CPU_ARCHITECTURE);
-        setOptMulti(desc, line, OPERATING_SYSTEM_TYPE);
-        setOptMulti(desc, line, CANDIDATE_HOSTS);
-        setOptional(desc, line, QUEUE);
-        setOptional(desc, line, NUMBER_OF_PROCESSES);
-        setOptional(desc, line, PROCESSES_PER_HOST);
-        setOptional(desc, line, THREADS_PER_PROCESS);
-        setOptional(desc, line, SPMD_VARIATION);
+        setOptional(desc, line, JOBNAME);
+        setRequired(desc, line, JobDescription.EXECUTABLE);
+        setOptMulti(desc, line, JobDescription.ARGUMENTS);
+        setOptional(desc, line, JobDescription.SPMDVARIATION);
+        setOptional(desc, line, JobDescription.TOTALCPUCOUNT);
+        setOptional(desc, line, JobDescription.NUMBEROFPROCESSES);
+        setOptional(desc, line, JobDescription.PROCESSESPERHOST);
+        setOptional(desc, line, JobDescription.THREADSPERPROCESS);
+        setOptMulti(desc, line, JobDescription.ENVIRONMENT);
+        setOptional(desc, line, JobDescription.WORKINGDIRECTORY);
+        setOptNoArg(desc, line, JobDescription.INTERACTIVE);
+        setOptional(desc, line, JobDescription.INPUT);
+        setOptional(desc, line, JobDescription.OUTPUT);
+        setOptional(desc, line, JobDescription.ERROR);
+        setOptMulti(desc, line, JobDescription.FILETRANSFER);
+        setOptional(desc, line, JobDescription.CLEANUP);
+        setOptional(desc, line, JobDescription.JOBSTARTTIME);
+        setOptional(desc, line, JobDescription.TOTALCPUTIME);
+        setOptional(desc, line, JobDescription.TOTALPHYSICALMEMORY);
+        setOptMulti(desc, line, JobDescription.CPUARCHITECTURE);
+        setOptMulti(desc, line, JobDescription.OPERATINGSYSTEMTYPE);
+        setOptMulti(desc, line, JobDescription.CANDIDATEHOSTS);
+        setOptional(desc, line, JobDescription.QUEUE);
+        setOptMulti(desc, line, JobDescription.JOBCONTACT);
         return desc;
     }
     private static void setRequired(JobDescription desc, CommandLine line, String name) throws Exception {
         desc.setAttribute(name, line.getOptionValue(name));
     }
-    private static void setReqNoArg(JobDescription desc, CommandLine line, String name) throws Exception {
+    private static void setOptNoArg(JobDescription desc, CommandLine line, String name) throws Exception {
         desc.setAttribute(name, Boolean.toString(line.hasOption(name)));
     }
     private static void setOptional(JobDescription desc, CommandLine line, String name) throws Exception {

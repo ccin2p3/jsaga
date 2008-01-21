@@ -1,5 +1,6 @@
 package org.ogf.saga.namespace.abstracts;
 
+import org.ogf.saga.AbstractTest;
 import org.ogf.saga.URL;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
@@ -22,7 +23,7 @@ import org.ogf.saga.session.SessionFactory;
 /**
  *
  */
-public abstract class AbstractNSEntryTest extends AbstractNSTest {
+public abstract class AbstractNSEntryTest extends AbstractTest {
     // test data
     protected static final String DEFAULT_ROOTNAME = "root/";
     protected static final String DEFAULT_DIRNAME = "dir/";
@@ -52,7 +53,7 @@ public abstract class AbstractNSEntryTest extends AbstractNSTest {
         super();
 
         // configure
-        URL baseUrl = new URL(getRequiredProperty(protocol, CONFIG_BASE_URL));
+        URL baseUrl = new URL(getRequiredProperty(protocol, CONFIG_BASE_URL).replaceAll(" ", "%20"));
         m_rootUrl = createURL(baseUrl, DEFAULT_ROOTNAME);
         m_dirUrl = createURL(m_rootUrl, DEFAULT_DIRNAME);
         m_fileUrl = createURL(m_dirUrl, DEFAULT_FILENAME);
@@ -76,7 +77,7 @@ public abstract class AbstractNSEntryTest extends AbstractNSTest {
             m_file = m_root.open(m_fileUrl, FLAGS_FILE);
             if (m_file instanceof File) {
                 Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT.getBytes());
-                ((File)m_file).write(buffer.getSize(), buffer);
+                ((File)m_file).write(buffer);
             } else if (m_file instanceof LogicalFile) {
                 if (m_physicalFileUrl == null) {
                     throw new Exception("Configuration is missing required property: "+CONFIG_PHYSICAL_PROTOCOL);
@@ -114,7 +115,7 @@ public abstract class AbstractNSEntryTest extends AbstractNSTest {
     protected void checkWrited(URL url, String expected) throws Exception {
         Buffer buffer = BufferFactory.createBuffer(1024);
         File reader = (File) NSFactory.createNSEntry(m_session, url, Flags.READ.getValue());
-        int len = reader.read(1024, buffer);
+        int len = reader.read(buffer);
         assertEquals(
                 expected,
                 new String(buffer.getData(), 0, len));

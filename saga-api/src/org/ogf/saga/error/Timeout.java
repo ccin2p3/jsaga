@@ -15,6 +15,7 @@ public class Timeout extends Exception {
      * Constructs a Timeout exception.
      */
     public Timeout() {
+        super(TIMEOUT);
     }
 
     /**
@@ -23,7 +24,7 @@ public class Timeout extends Exception {
      * @param message the detail message.
      */
     public Timeout(String message) {
-        super(message);
+        super(TIMEOUT, message);
     }
 
     /**
@@ -31,7 +32,7 @@ public class Timeout extends Exception {
      * @param cause the cause.
      */
     public Timeout(Throwable cause) {
-        super(cause);
+        super(TIMEOUT, cause);
     }
 
     /**
@@ -42,7 +43,7 @@ public class Timeout extends Exception {
      * 
      */
     public Timeout(String message, Throwable cause) {
-        super(message, cause);
+        super(TIMEOUT, message, cause);
     }
     
     /**
@@ -52,6 +53,6 @@ public class Timeout extends Exception {
      * @param object the associated SAGA object.
      */
     public Timeout(String message, SagaObject object) {
-        super(message, object);
+        super(TIMEOUT, message, object);
     }
 }

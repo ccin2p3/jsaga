@@ -74,7 +74,7 @@ public class DataEmulatorGrid {
             throw new AuthenticationFailed("No security context found");
         }
         SecureServer s = findSecureServer(protocol, host, port);
-        String login = security.getUserName();
+        String login = security.getUserID();
         String password = security.getUserPass();
         for (int i=0; i<s.getUserCount(); i++) {
             if (s.getUser(i).getLogin().equals(login)) {

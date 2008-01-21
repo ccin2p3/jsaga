@@ -4,12 +4,15 @@ import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
 import org.ogf.saga.ObjectType;
 import org.ogf.saga.SagaObject;
-import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.task.Task;
+import org.ogf.saga.task.TaskMode;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.Serializable;
+import java.lang.Exception;
 import java.util.*;
 
 /* ***************************************************
@@ -65,6 +68,22 @@ public abstract class AbstractSagaObjectImpl implements SagaObject {
     public abstract ObjectType getType();
 
     ///////////////////////////////////////// protected methods /////////////////////////////////////////
+
+    public static Task prepareTask(TaskMode mode, Task task) throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+        switch(mode) {
+            case TASK:
+                return task;
+            case ASYNC:
+                task.run();
+                return task;
+            case SYNC:
+                task.run();
+                task.waitFor();
+                return task;
+            default:
+                throw new NotImplemented("INTERNAL ERROR: unexpected exception");
+        }        
+    }
 
     // helpers
     protected static Map clone(Map source) throws CloneNotSupportedException {

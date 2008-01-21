@@ -14,6 +14,7 @@ public class NoSuccess extends Exception {
      * Constructs a NoSuccess exception.
      */
     public NoSuccess() {
+        super(NO_SUCCESS);
     }
 
     /**
@@ -22,7 +23,7 @@ public class NoSuccess extends Exception {
      * @param message the detail message.
      */
     public NoSuccess(String message) {
-        super(message);
+        super(NO_SUCCESS, message);
     }
 
     /**
@@ -30,7 +31,7 @@ public class NoSuccess extends Exception {
      * @param cause the cause.
      */
     public NoSuccess(Throwable cause) {
-        super(cause);
+        super(NO_SUCCESS, cause);
     }
 
     /**
@@ -41,7 +42,7 @@ public class NoSuccess extends Exception {
      * 
      */
     public NoSuccess(String message, Throwable cause) {
-        super(message, cause);
+        super(NO_SUCCESS, message, cause);
     }
     
     /**
@@ -51,6 +52,6 @@ public class NoSuccess extends Exception {
      * @param object the associated SAGA object.
      */
     public NoSuccess(String message, SagaObject object) {
-        super(message, object);
+        super(NO_SUCCESS, message, object);
     }
 }

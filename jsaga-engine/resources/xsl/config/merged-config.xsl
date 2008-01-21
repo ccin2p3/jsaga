@@ -11,7 +11,8 @@
 
     <xsl:template match="/">
         <effective-config>
-            <xsl:copy-of select="@*"/>
+            <xsl:copy-of select="$descriptors/@*"/>
+            <xsl:copy-of select="$configuration/@*"/><!-- may overwrite $descriptors attributes -->
             <xsl:comment> languages </xsl:comment>
             <xsl:apply-templates select="$descriptors/cfg:language"/>
             <xsl:comment> security </xsl:comment>
@@ -57,10 +58,23 @@
     <xsl:template match="cfg:jobservice">
         <xsl:variable name="conf" select="."/>
         <xsl:variable name="desc" select="$descriptors/cfg:jobservice[@type=$conf/@type]"/>
-        <jobservice>
+        <xsl:variable name="name">
+            <xsl:choose>
+                <xsl:when test="@name"><xsl:value-of select="@name"/></xsl:when>
+                <xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="path">
+            <xsl:choose>
+                <xsl:when test="@path"><xsl:value-of select="@path"/></xsl:when>
+                <xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        <jobservice name="{$name}" path="{$path}">
             <xsl:copy-of select="$desc/@*[not(name()=name($conf/@*))] | $conf/@*"/>
             <xsl:apply-templates select="$desc/cfg:attribute[not(@name=$conf/cfg:attribute/@name)] | $conf/cfg:attribute"/>
             <xsl:apply-templates select="$conf/cfg:pathAlias"/>
+            <xsl:apply-templates select="$desc/cfg:monitor[not($conf/cfg:monitor)] | $conf/cfg:monitor"/>
             <xsl:apply-templates select="$desc/cfg:supportedContextType"/>
             <xsl:apply-templates select="$desc/cfg:supportedProtocolScheme"/>
             <xsl:apply-templates select="$conf/cfg:sandbox"/>

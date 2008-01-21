@@ -19,8 +19,8 @@ import java.io.PrintStream;
 public class UserPassExpirableSecurityAdaptor extends UserPassSecurityAdaptor {
     private int m_expiryDate;
 
-    public UserPassExpirableSecurityAdaptor(String userName, String userPass, int expiryDate) {
-        super(userName, userPass);
+    public UserPassExpirableSecurityAdaptor(String userId, String userPass, int expiryDate) {
+        super(userId, userPass);
         // set expiration date
         m_expiryDate = expiryDate;
     }

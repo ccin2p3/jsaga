@@ -9,7 +9,6 @@ import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.helpers.URLFactory;
 import org.ogf.saga.*;
-import org.ogf.saga.attributes.Attributes;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
@@ -28,7 +27,7 @@ import org.ogf.saga.task.TaskMode;
 /**
  *
  */
-public abstract class AbstractNSEntryImpl extends AbstractNSEntryTaskImpl implements NSEntry, Attributes {
+public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl implements NSEntry {
     private boolean m_disconnectable;
 
     /** constructor for factory */
@@ -65,16 +64,22 @@ public abstract class AbstractNSEntryImpl extends AbstractNSEntryTaskImpl implem
         return m_url;
     }
 
-    public String getCWD() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
-        String path = m_url.getPath();
-        while(path.endsWith("/")) {
-            path = path.substring(0, path.length()-1);
+    public URL getCWD() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+        try {
+            return m_url.resolve(new URL("."));
+        } catch (BadParameter e) {
+            throw new NoSuccess(e);
         }
-        int pos = path.lastIndexOf('/');
-        return (pos>-1 ? path.substring(0,pos+1) : "/");
     }
 
-    public String getName() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public URL getName() throws NotImplemented, Timeout, NoSuccess {
+        try {
+            return new URL(this._getEntryName());
+        } catch (BadParameter e) {
+            throw new NoSuccess(e);
+        }
+    }
+    protected String _getEntryName() throws NotImplemented {
         String[] names = m_url.getPath().split("/");
         String name;
         if (names.length > 0) {
@@ -88,7 +93,7 @@ public abstract class AbstractNSEntryImpl extends AbstractNSEntryTaskImpl implem
         return name;
     }
 
-    public boolean exists() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    public boolean exists() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
         if (m_adaptor instanceof DataReaderAdaptor) {
             return ((DataReaderAdaptor)m_adaptor).exists(m_url.getPath());
         } else {
@@ -150,8 +155,15 @@ public abstract class AbstractNSEntryImpl extends AbstractNSEntryTaskImpl implem
         }
     }
 
-    public abstract void copy(URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess, IncorrectURL;
+    public abstract void copy(URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, AlreadyExists, Timeout, NoSuccess, IncorrectURL;
+    public void copy(URL target) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
+        this.copy(target, Flags.NONE.getValue());
+    }
+
     public abstract void copyFrom(URL source, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess, IncorrectURL;
+    public void copyFrom(URL target) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
+        this.copyFrom(target, Flags.NONE.getValue());
+    }
 
     /**
      * Create a link to the physical entry <code>m_url</code>.<br>
@@ -199,8 +211,11 @@ public abstract class AbstractNSEntryImpl extends AbstractNSEntryTaskImpl implem
             throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme());
         }
     }
+    public void link(URL target) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
+        this.link(target, Flags.NONE.getValue());
+    }
 
-    public void move(URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
+    public void move(URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
         FlagsBytes effectiveFlags = new FlagsBytes(flags);
         if (effectiveFlags.contains(Flags.DEREFERENCE)) {
             this._dereferenceEntry().move(target, effectiveFlags.remove(Flags.DEREFERENCE));
@@ -227,6 +242,9 @@ public abstract class AbstractNSEntryImpl extends AbstractNSEntryTaskImpl implem
             this.remove(flags);
         }
     }
+    public void move(URL target) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
+        this.move(target, Flags.NONE.getValue());
+    }
 
     public void remove(int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         FlagsBytes effectiveFlags = new FlagsBytes(flags);
@@ -241,7 +259,7 @@ public abstract class AbstractNSEntryImpl extends AbstractNSEntryTaskImpl implem
         effectiveFlags.checkAllowed(Flags.DEREFERENCE.getValue());
         if (m_adaptor instanceof DataWriterAdaptor) {
             URL parent = this._getParentDirURL();
-            String fileName = this.getName();
+            String fileName = this._getEntryName();
             try {
                 ((DataWriterAdaptor)m_adaptor).removeFile(parent.getPath(), fileName);
             } catch (DoesNotExist doesNotExist) {
@@ -250,6 +268,9 @@ public abstract class AbstractNSEntryImpl extends AbstractNSEntryTaskImpl implem
         } else {
             throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme());
         }
+    }
+    public void remove() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+        this.remove(Flags.NONE.getValue());
     }
 
     private boolean m_disconnected = false;
@@ -346,7 +367,7 @@ public abstract class AbstractNSEntryImpl extends AbstractNSEntryTaskImpl implem
 
     protected URL _getEffectiveURL(URL target) throws NotImplemented, BadParameter, IncorrectState, Timeout, NoSuccess {
         if (target.getPath().endsWith("/")) {
-            return URLFactory.createURL(target, this.getName());
+            return URLFactory.createURL(target, this._getEntryName());
         } else {
             return target;
         }
@@ -356,11 +377,13 @@ public abstract class AbstractNSEntryImpl extends AbstractNSEntryTaskImpl implem
         return URLFactory.createParentURL(m_url);
     }
 
-    protected void _makeParentDirs() throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
+    protected void _makeParentDirs() throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, Timeout, NoSuccess {
         try {
             URL parent = this._getParentDirURL();
             this.openDir(parent, Flags.CREATE.or(Flags.CREATEPARENTS));
         } catch (DoesNotExist e) {
+            throw new NoSuccess(e);
+        } catch (IncorrectState e) {
             throw new NoSuccess(e);
         }
     }

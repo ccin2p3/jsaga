@@ -56,7 +56,7 @@ public interface JobDescription extends SagaObject, Attributes {
     public static final String FILETRANSFER = "FileTransfer";
 
     /**
-     * Attribute name, defines wether output files get removed after the
+     * Attribute name, defines whether output files get removed after the
      * job finishes.
      */
     public static final String CLEANUP = "Cleanup";
@@ -83,13 +83,13 @@ public interface JobDescription extends SagaObject, Attributes {
      * Attribute name, list of host names which are to be considered by the
      * resource manager as candidate targets.
      */
-    public static final String CANDIDATEHOSTS = "CandidateHots";
+    public static final String CANDIDATEHOSTS = "CandidateHosts";
 
     /** Attribute name, name of queue to place the job into. */
     public static final String QUEUE = "Queue";
 
     /**
-     * Attribute name, set of endpoints where to report job state transitions.
+     * Attribute name, set of end points where to report job state transitions.
      */
     public static final String JOBCONTACT = "JobContact";
 }

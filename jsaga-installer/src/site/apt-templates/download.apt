@@ -3,7 +3,7 @@ Download JSAGA
 * System Requirements
 
 *-------------+--+
-| <<JDK>>     | {{{http://java.sun.com/j2se/1.4.2/download.html}JDK 1.4.2}} (or above) |
+| <<JDK>>     | {{{http://java.sun.com/j2se/1.5/download.html}JDK 1.5}} (or above) |
 *-------------+--+
 | <<Operating | Some adaptors may require a specific release of linux. Such adaptors can be  |
 | System>>    | installed on a separate host and used remotely through the "Remote Adaptor". |

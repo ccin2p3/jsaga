@@ -2,8 +2,7 @@ package fr.in2p3.jsaga.impl.buffer;
 
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.buffer.Buffer;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.NotImplemented;
+import org.ogf.saga.error.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -19,7 +18,7 @@ import org.ogf.saga.error.NotImplemented;
  */
 public class ApplicationAllocatedBufferImpl extends AbstractBufferImpl implements Buffer {
     /** constructor */
-    public ApplicationAllocatedBufferImpl(byte[] data) throws BadParameter, NotImplemented {
+    public ApplicationAllocatedBufferImpl(byte[] data) throws BadParameter, NotImplemented, NoSuccess {
         super();
         this.setData(data);
     }
@@ -31,11 +30,15 @@ public class ApplicationAllocatedBufferImpl extends AbstractBufferImpl implement
         return clone;
     }
 
-    public void setSize(int size) throws NotImplemented, BadParameter {
+    public void setSize(int size) throws NotImplemented, BadParameter, NoSuccess {
         throw new NotImplemented("Not allowed to change the size of an application-allocated buffer", this);
     }
 
-    public void setData(byte[] data) throws NotImplemented, BadParameter {
+    public void setSize() throws NotImplemented, BadParameter, NoSuccess {
+        throw new NotImplemented("Not allowed to change the size of an application-allocated buffer", this);
+    }
+
+    public void setData(byte[] data) throws NotImplemented, BadParameter, NoSuccess {
         if (data != null) {
             m_buffer = data;
         } else {

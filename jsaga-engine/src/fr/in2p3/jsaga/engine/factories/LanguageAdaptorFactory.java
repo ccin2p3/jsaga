@@ -1,7 +1,9 @@
 package fr.in2p3.jsaga.engine.factories;
 
 import fr.in2p3.jsaga.adaptor.language.LanguageAdaptor;
-import fr.in2p3.jsaga.engine.schema.config.Language;
+import fr.in2p3.jsaga.engine.config.Configuration;
+import fr.in2p3.jsaga.engine.config.adaptor.LanguageAdaptorDescriptor;
+import org.ogf.saga.error.NoSuccess;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -13,20 +15,36 @@ import fr.in2p3.jsaga.engine.schema.config.Language;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * Create and manage language adaptors
  */
 public class LanguageAdaptorFactory {
-    public static LanguageAdaptor getLanguageAdaptor(String name) throws Exception {
-        Language config = new Language();
-        config.setName(name);
-        config.setParse("fr.in2p3.jsaga.adaptor.language.JSDLLanguageAdaptor");
-        
-        // Get config parameters
-        Class clazz = Class.forName(config.getParse());
+    private LanguageAdaptorDescriptor m_descriptor;
 
-        // Create instance
-        LanguageAdaptor parser = (LanguageAdaptor) clazz.newInstance();
-        parser.loadLanguageDefinitionResources();
-        return parser;
+    public LanguageAdaptorFactory(Configuration configuration) {
+        m_descriptor = configuration.getDescriptors().getLanguageDesc();
+    }
+
+    /**
+     * Create a new instance of language adaptor for <code>language</code>.
+     * @param language the name of the language
+     * @return the language adaptor instance
+     */
+    public LanguageAdaptor getLanguageAdaptor(String language) throws NoSuccess {
+        // create instance
+        Class clazz = m_descriptor.getClass(language);
+        LanguageAdaptor adaptor;
+        try {
+            adaptor = (LanguageAdaptor) clazz.newInstance();
+        } catch (Exception e) {
+            throw new NoSuccess(e);
+        }
+
+        // initialize adaptor
+        try {
+            adaptor.initParser();
+        } catch (Exception e) {
+            throw new NoSuccess(e);
+        }
+        return adaptor;
     }
 }

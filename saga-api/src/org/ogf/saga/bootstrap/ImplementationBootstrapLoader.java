@@ -40,7 +40,7 @@ public class ImplementationBootstrapLoader {
     
             // Try to obtain a class instance of it, using the current
             // class loader, and running the static initializers.
-            Class factoryClass;
+            Class<?> factoryClass;
             try {
                 factoryClass = Class.forName(factoryName);
             } catch(ClassNotFoundException e) {

@@ -55,7 +55,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         return 2811;
     }
 
-    public void connect(String userInfo, String host, int port, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
         try {
             m_client = new GridFTPClient(host, port);
             m_client.setAuthorization(HostAuthorization.getInstance());
@@ -139,14 +139,14 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         return new GsiftpInputStream(m_client, absolutePath);
     }
 
-    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append) throws PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
         String absolutePath = parentAbsolutePath+fileName;
         if (exclusive && this.exists(absolutePath)) {
             // need to check existence explicitely, else exception is never thrown
             throw new AlreadyExists("File already exists");
         } else if (!this.exists(parentAbsolutePath)) {
             // need to check existence explicitely, else exception is thrown to late (when writing bytes)
-            throw new DoesNotExist("Parent directory does not exist");
+            throw new ParentDoesNotExist("Parent directory does not exist");
         }
         try {
             m_client.setType(GridFTPSession.TYPE_IMAGE);
@@ -154,7 +154,11 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
             m_client.setPassive();
             m_client.setLocalActive();
         } catch (Exception e) {
-            throw rethrowExceptionFull(e);
+            try {
+                throw rethrowExceptionFull(e);
+            } catch (DoesNotExist e2) {
+                throw new NoSuccess(e2);
+            }
         }
         return new GsiftpOutputStream(m_client, absolutePath, append);
     }
@@ -191,11 +195,11 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         }
     }
 
-    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, ParentDoesNotExist, Timeout, NoSuccess {
         // connect to peer server
         GsiftpDataAdaptorAbstract targetAdaptor = new Gsiftp1DataAdaptor();
         targetAdaptor.m_credential = m_credential;
-        targetAdaptor.connect(null, targetHost, targetPort, null);
+        targetAdaptor.connect(null, targetHost, targetPort, null, null);
 
         //todo: remove this block when overwriting target file will work (it only works with UrlCopy)
         if (overwrite && targetAdaptor.exists(targetAbsolutePath)) {
@@ -231,11 +235,11 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         }
     }
 
-    public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+    public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         // connect to peer server
         GsiftpDataAdaptorAbstract sourceAdaptor = new Gsiftp1DataAdaptor();
         sourceAdaptor.m_credential = m_credential;
-        sourceAdaptor.connect(null, sourceHost, sourcePort, null);
+        sourceAdaptor.connect(null, sourceHost, sourcePort, null, null);
 
         //todo: remove this block when overwriting target file will work (it only works with UrlCopy)
         if (overwrite && this.exists(targetAbsolutePath)) {
@@ -287,11 +291,15 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         }
     }
 
-    public void makeDir(String parentAbsolutePath, String directoryName) throws PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public void makeDir(String parentAbsolutePath, String directoryName) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
         try {
             m_client.makeDir(parentAbsolutePath+"/"+directoryName);
         } catch (Exception e) {
-            throw rethrowExceptionFull(e);
+            try {
+                throw rethrowExceptionFull(e);
+            } catch (DoesNotExist e2) {
+                throw new NoSuccess(e2);
+            }
         }
     }
 
@@ -311,6 +319,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         }
     }
 
+    //todo: convert missing parent directory error to ParentDoesNotExist exception
     private NoSuccess rethrowExceptionFull(Exception exception) throws PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
         try {
             throw exception;

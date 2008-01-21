@@ -33,6 +33,8 @@ import java.util.*;
  *
  */
 public class ContextImpl extends AbstractAttributesImpl implements Context {
+    private static final String NAME = "Name";
+    private static final String INDICE = "Indice";
     private static Log s_logger = LogFactory.getLog(ContextImpl.class);
     private SecurityAdaptorBuilder m_adaptorBuilder;
     private SecurityAdaptor m_adaptor;
@@ -41,9 +43,9 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     public ContextImpl(String type) throws NoSuccess {
         super(null, true);  //not attached to a session, isExtensible=true
         if (type!=null && !type.equals("")) {
-            this._setAttr("Type", type);
+            this._setAttr(Context.TYPE, type);
         } else {
-            this._setAttr("Type", "Unknown");
+            this._setAttr(Context.TYPE, "Unknown");
         }
         m_adaptorBuilder = null;
         m_adaptor = null;
@@ -67,7 +69,7 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     public void setAttribute(String key, String value) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, BadParameter, DoesNotExist, Timeout, NoSuccess {
         if (!this.isInitialized(key)) {
             m_adaptorBuilder = SecurityAdaptorBuilderFactory.getInstance().getSecurityAdaptorBuilder(value);
-        } else if (key.equals("Type")) {
+        } else if (key.equals(Context.TYPE)) {
             throw new IncorrectState("Not allowed to change the type of context: "+ m_adaptorBuilder.getType(), this);
         }
         super.setAttribute(key, value);
@@ -75,7 +77,7 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     /** override super.getAttribute() */
     public String getAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
         try {
-            if (key.equals("UserID")) {
+            if (key.equals(Context.USERID)) {
                 return this.getAdaptor().getUserID();
             } else if (key.equals("TimeLeft")) {
                 return ""+this.getAdaptor().getTimeLeft();
@@ -92,7 +94,7 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     public void setVectorAttribute(String key, String[] values) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, BadParameter, DoesNotExist, Timeout, NoSuccess {
         if (!this.isInitialized(key)) {
             m_adaptorBuilder = SecurityAdaptorBuilderFactory.getInstance().getSecurityAdaptorBuilder(values!=null && values.length>0 ? values[0] : null);
-        } else if (key.equals("Type")) {
+        } else if (key.equals(Context.TYPE)) {
             throw new IncorrectState("Not allowed to change the type of context: "+ m_adaptorBuilder.getType(), this);
         }
         super.setVectorAttribute(key, values);
@@ -112,15 +114,15 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
 
         // get context instance configuration
         ContextInstance xmlInstance = Configuration.getInstance().getConfigurations().getContextCfg().findContextInstance(
-                super._getOptionalAttribute("Type"),
-                super._getOptionalAttribute("Indice"));
+                super._getOptionalAttribute(Context.TYPE),
+                super._getOptionalAttribute(INDICE));
 
         // set context instance identifiers
         if (xmlInstance.hasIndice()) {
-            _setAttr("Indice", String.valueOf(xmlInstance.getIndice()));
+            _setAttr(INDICE, String.valueOf(xmlInstance.getIndice()));
         }
         if (xmlInstance.getName() != null) {
-            _setAttr("Name", xmlInstance.getName());
+            _setAttr(NAME, xmlInstance.getName());
         }
 
         // set context instance default attributes
@@ -162,10 +164,10 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
         if (m_adaptorBuilder == null) {
             throw new IncorrectState("Please set context type prior to invoking any other operation", this);
         }
-        if (!(m_adaptorBuilder instanceof InitializableSecurityAdaptorBuilder)) {
+        if (!(m_adaptorBuilder instanceof ExpirableSecurityAdaptorBuilder)) {
             return; //ignore
         }
-        InitializableSecurityAdaptorBuilder initAdaptorBuilder = (InitializableSecurityAdaptorBuilder) m_adaptorBuilder;
+        ExpirableSecurityAdaptorBuilder initAdaptorBuilder = (ExpirableSecurityAdaptorBuilder) m_adaptorBuilder;
         this.checkUsage(initAdaptorBuilder.getInitUsage());
         try {
             initAdaptorBuilder.initBuilder(super._getAttributesMap(), this.getContextId());
@@ -181,10 +183,10 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
         if (m_adaptorBuilder == null) {
             throw new IncorrectState("Please set context type prior to invoking any other operation", this);
         }
-        if (!(m_adaptorBuilder instanceof InitializableSecurityAdaptorBuilder)) {
+        if (!(m_adaptorBuilder instanceof ExpirableSecurityAdaptorBuilder)) {
             return; //ignore
         }
-        InitializableSecurityAdaptorBuilder initAdaptorBuilder = (InitializableSecurityAdaptorBuilder) m_adaptorBuilder;
+        ExpirableSecurityAdaptorBuilder initAdaptorBuilder = (ExpirableSecurityAdaptorBuilder) m_adaptorBuilder;
         try {
             initAdaptorBuilder.destroyBuilder(super._getAttributesMap(), this.getContextId());
         } catch (Exception e) {
@@ -195,15 +197,13 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     /**
      * This method is specific to JSAGA implementation.
      */
-    public SecurityAdaptor createSecurityAdaptor() throws NotImplemented, BadParameter, IncorrectState, NoSuccess {
-        this.checkUsage(m_adaptorBuilder.getUsage());
+    public SecurityAdaptor createSecurityAdaptor() throws NotImplemented, BadParameter, NoSuccess {
         try {
+            this.checkUsage(m_adaptorBuilder.getUsage());
             m_adaptor = m_adaptorBuilder.createSecurityAdaptor(super._getAttributesMap());
         } catch (NotImplemented e) {
             throw e;
         } catch (BadParameter e) {
-            throw e;
-        } catch (IncorrectState e) {
             throw e;
         } catch (NoSuccess e) {
             throw e;
@@ -243,9 +243,9 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
      * This method is specific to JSAGA implementation.
      */
     public String getContextId() throws NotImplemented, IncorrectState {
-        return (super._getOptionalAttribute("Name")!=null
-                ? super._getOptionalAttribute("Name")
-                : super._getOptionalAttribute("Type")+"["+ super._getOptionalAttribute("Indice")+"]");
+        return (super._getOptionalAttribute(NAME)!=null
+                ? super._getOptionalAttribute(NAME)
+                : super._getOptionalAttribute(Context.TYPE)+"["+ super._getOptionalAttribute(INDICE)+"]");
     }
 
     /////////////////////////////////////// private methods ///////////////////////////////////////
@@ -255,13 +255,13 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
             throw new IncorrectState("Attribute key is null");
         }
         if (m_adaptorBuilder == null) {
-            if (key.equals("Type")) {
+            if (key.equals(Context.TYPE)) {
                 return false;
             } else {
                 throw new IncorrectState("Please set context type prior to invoking any other operation", this);
             }
         } else {
-            if (key.equals("Type") || key.equals("Indice") || key.equals("Name")) {
+            if (key.equals(Context.TYPE) || key.equals(INDICE) || key.equals(NAME)) {
                 return true;
             } else if (m_adaptorBuilder.getUsage().containsName(key)) {
                 return true;

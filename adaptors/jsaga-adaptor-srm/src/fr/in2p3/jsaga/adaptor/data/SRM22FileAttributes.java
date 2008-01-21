@@ -63,12 +63,12 @@ public class SRM22FileAttributes extends FileAttributes {
             } else if (perm.equals(TPermissionMode.RWX)) {
                 m_permission = PermissionBytes.READ.or(PermissionBytes.WRITE).or(PermissionBytes.EXEC);
             }
-        } else {
-            m_permission = PermissionBytes.UNKNOWN;
         }
 
         // set owner
-        m_owner = entry.getOwnerPermission().getUserID();
+        if (entry.getOwnerPermission() != null) {
+            m_owner = entry.getOwnerPermission().getUserID();
+        }
 
         // set last modified
         m_lastModified = entry.getLastModificationTime().getTimeInMillis();

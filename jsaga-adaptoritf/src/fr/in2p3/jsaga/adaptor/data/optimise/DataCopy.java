@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.data.optimise;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
+import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import org.ogf.saga.error.*;
 
 /* ***************************************************
@@ -26,9 +27,10 @@ public interface DataCopy extends DataAdaptor {
      * @throws BadParameter if <code>sourceAbsolutePath</code> is not a file.
      * @throws AlreadyExists if <code>targetAbsolutePath</code> already exists and <code>overwrite</code> is false.
      * @throws DoesNotExist if <code>sourceAbsolutePath</code> does not exist.
+     * @throws ParentDoesNotExist if parent of <code>targetAbsolutePath</code> does not exist.
      */
     public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite)
-        throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess;
+        throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, ParentDoesNotExist, Timeout, NoSuccess;
 
     /**
      * Copy this entry to another part of the namespace.
@@ -42,5 +44,5 @@ public interface DataCopy extends DataAdaptor {
      * @throws DoesNotExist if <code>sourceAbsolutePath</code> does not exist.
      */
     public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite)
-        throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess;
+        throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess;
 }

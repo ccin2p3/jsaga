@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.adaptor.security;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
+import org.ogf.saga.context.Context;
 import org.ogf.saga.error.IncorrectState;
 
 import java.util.Map;
@@ -19,7 +20,7 @@ import java.util.Map;
  *
  */
 public class UserPassSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
-    protected static final Usage UNCRYPTED = new UAnd(new Usage[]{new U("UserName"), new UHidden("UserPass")});
+    protected static final Usage UNCRYPTED = new UAnd(new Usage[]{new U(Context.USERID), new UHidden(Context.USERPASS)});
 
     public String getType() {
         return "UserPass";
@@ -35,14 +36,14 @@ public class UserPassSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
 
     public Default[] getDefaults(Map attributes) throws IncorrectState {
         return new Default[]{
-                new Default("UserName", "anonymous"),
-                new Default("UserPass", "anon")
+                new Default(Context.USERID, "anonymous"),
+                new Default(Context.USERPASS, "anon")
         };
     }
 
     public SecurityAdaptor createSecurityAdaptor(Map attributes) throws Exception {
         return new UserPassSecurityAdaptor(
-                (String) attributes.get("UserName"),
-                (String) attributes.get("UserPass"));
+                (String) attributes.get(Context.USERID),
+                (String) attributes.get(Context.USERPASS));
     }
 }

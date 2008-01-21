@@ -14,7 +14,7 @@ import org.ogf.saga.error.*;
 /**
  * This class is a friend of AbstractAttributesImpl
  */
-public class AttributeVector extends Attribute {
+public class AttributeVector extends AttributeAbstract {
     private String[] m_values;
 
     /** constructor for friend classes */
@@ -41,22 +41,29 @@ public class AttributeVector extends Attribute {
         return clone;
     }
 
+    /** override Attribute.setValue() */
     public void setValue(String value) throws IncorrectState {
         throw new IncorrectState("Attribute "+super.getKey()+" not scalar");
     }
 
+    /** override Attribute.getValue() */
     public String getValue() throws IncorrectState {
         throw new IncorrectState("Attribute "+super.getKey()+" not scalar");
     }
 
-    public void setValues(String[] values) throws NotImplemented, PermissionDenied {
-        checkSupported();
-        checkWritable();
+    public void _setValue(String value) {
+        m_values = toVector(value);
+    }
+
+    public String _getValue() {
+        return toScalar(m_values);
+    }
+
+    public void _setValues(String[] values) {
         m_values = values;
     }
 
-    public String[] getValues() throws NotImplemented {
-        checkSupported();
+    public String[] _getValues() {
         return m_values;
     }
 

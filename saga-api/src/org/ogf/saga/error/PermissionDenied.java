@@ -14,6 +14,7 @@ public class PermissionDenied extends Exception {
      * Constructs a PermissionDenied exception.
      */
     public PermissionDenied() {
+        super(PERMISSION_DENIED);
     }
 
     /**
@@ -22,7 +23,7 @@ public class PermissionDenied extends Exception {
      * @param message the detail message.
      */
     public PermissionDenied(String message) {
-        super(message);
+        super(PERMISSION_DENIED, message);
     }
 
     /**
@@ -30,7 +31,7 @@ public class PermissionDenied extends Exception {
      * @param cause the cause.
      */
     public PermissionDenied(Throwable cause) {
-        super(cause);
+        super(PERMISSION_DENIED, cause);
     }
 
     /**
@@ -41,7 +42,7 @@ public class PermissionDenied extends Exception {
      * 
      */
     public PermissionDenied(String message, Throwable cause) {
-        super(message, cause);
+        super(PERMISSION_DENIED, message, cause);
     }
     
     /**
@@ -51,6 +52,6 @@ public class PermissionDenied extends Exception {
      * @param object the associated SAGA object.
      */
     public PermissionDenied(String message, SagaObject object) {
-        super(message, object);
+        super(PERMISSION_DENIED, message, object);
     }
 }

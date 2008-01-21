@@ -1,12 +1,15 @@
 package fr.in2p3.jsaga.engine.config.bean;
 
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.engine.config.ConfAttributesMap;
-import fr.in2p3.jsaga.engine.config.UserAttributesMap;
+import fr.in2p3.jsaga.engine.config.*;
 import fr.in2p3.jsaga.engine.config.adaptor.JobAdaptorDescriptor;
-import fr.in2p3.jsaga.engine.schema.config.Attribute;
-import fr.in2p3.jsaga.engine.schema.config.Jobservice;
-import org.ogf.saga.error.NoSuccess;
+import fr.in2p3.jsaga.engine.schema.config.*;
+import org.ogf.saga.URL;
+import org.ogf.saga.error.*;
+
+import java.lang.Exception;
+import java.util.ArrayList;
+import java.util.List;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -54,17 +57,73 @@ public class JobserviceEngineConfiguration {
         }
     }
 
-    public Jobservice findJobservice(String path) throws NoSuccess {
+    public Jobservice[] toXMLArray() {
+        return m_jobservice;
+    }
+
+    public Jobservice findJobservice(String name) throws NoSuccess {
         for (int j=0; j<m_jobservice.length; j++) {
             Jobservice service = m_jobservice[j];
-            if (service.getPath().equals(path)) {
+            if (service.getName().equals(name)) {
                 return service;
             }
         }
-        throw new NoSuccess("No job-service matches path: "+path);
+        throw new NoSuccess("No job-service matches name: "+name);
     }
 
-    public Jobservice[] toXMLArray() {
-        return m_jobservice;
+    /**
+     * Find the context to be used with <code>url</code>
+     */
+    public ContextInstanceRef[] listContextInstanceCandidates(URL url) throws NotImplemented, BadParameter, NoSuccess {
+        if (url != null) {
+            return this.listContextInstanceCandidates(
+                    findJobservice(url.getScheme()),
+                    url.getHost(),
+                    url.getFragment());
+        } else {
+            throw new BadParameter("URL is null");
+        }
+    }
+
+    public ContextInstanceRef[] listContextInstanceCandidates(Jobservice service, String hostname, String fragment) throws NoSuccess {
+        ContextEngineConfiguration config = Configuration.getInstance().getConfigurations().getContextCfg();
+        if (fragment != null) {
+            ContextInstance[] ctxArray = config.listContextInstanceArrayById(fragment);
+            switch(ctxArray.length) {
+                case 0:
+                    throw new NoSuccess("No context instance matches: "+fragment);
+                case 1:
+                    return new ContextInstanceRef[]{toContextInstanceRef(ctxArray[0])};
+                default:
+                    return toContextInstanceRefArray(ctxArray);
+            }
+        } else {
+            // if no context instance is configured, then all supported context instances are eligible
+            List list = new ArrayList();
+            for (int c=0; c<service.getSupportedContextTypeCount(); c++) {
+                String type = service.getSupportedContextType(c);
+                ContextInstance[] ctxArray = config.listContextInstanceArray(type);
+                ContextInstanceRef[] refArray = toContextInstanceRefArray(ctxArray);
+                for (int i=0; i<refArray.length; i++) {
+                    list.add(refArray[i]);
+                }
+            }
+            return (ContextInstanceRef[]) list.toArray(new ContextInstanceRef[list.size()]);
+        }
+    }
+
+    private static ContextInstanceRef[] toContextInstanceRefArray(ContextInstance[] ctxArray) {
+        ContextInstanceRef[] refArray = new ContextInstanceRef[ctxArray.length];
+        for (int i=0; i<ctxArray.length; i++) {
+            refArray[i] = toContextInstanceRef(ctxArray[i]);
+        }
+        return refArray;
+    }
+    private static ContextInstanceRef toContextInstanceRef(ContextInstance ctx) {
+        ContextInstanceRef ref = new ContextInstanceRef();
+        ref.setType(ctx.getType());
+        ref.setIndice(ctx.getIndice());
+        ref.setName(ctx.getName());
+        return ref;
     }
 }
