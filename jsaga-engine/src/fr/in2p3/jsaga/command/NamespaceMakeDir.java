@@ -20,6 +20,7 @@ import org.ogf.saga.session.SessionFactory;
  */
 public class NamespaceMakeDir extends AbstractCommand {
     private static final String OPT_HELP = "h", LONGOPT_HELP = "help";
+    private static final String OPT_NOT_EXCL = "f", LONGOPT_NOT_EXCL = "force";
     private static final String OPT_CREATEPARENTS = "p", LONGOPT_CREATEPARENTS = "parents";
 
     public NamespaceMakeDir() {
@@ -39,9 +40,10 @@ public class NamespaceMakeDir extends AbstractCommand {
         {
             // get arguments
             URL url = new URL(command.m_nonOptionValues[0].replaceAll(" ", "%20"));
-            int flags = (line.hasOption(OPT_CREATEPARENTS)
-                    ? Flags.CREATE.or(Flags.CREATEPARENTS)
-                    : Flags.CREATE.getValue());
+            int flags =(line.hasOption(OPT_NOT_EXCL) ? Flags.NONE : Flags.EXCL)
+                    .or(line.hasOption(OPT_CREATEPARENTS)
+                            ? Flags.CREATE.or(Flags.CREATEPARENTS)
+                            : Flags.CREATE.getValue());
 
             // execute command
             Session session = SessionFactory.createSession(true);
@@ -55,6 +57,10 @@ public class NamespaceMakeDir extends AbstractCommand {
         opt.addOption(OptionBuilder.withDescription("Display this help and exit")
                 .withLongOpt(LONGOPT_HELP)
                 .create(OPT_HELP));
+        opt.addOption(OptionBuilder.withDescription("Do not fail if target already exist")
+                .isRequired(false)
+                .withLongOpt(LONGOPT_NOT_EXCL)
+                .create(OPT_NOT_EXCL));
         opt.addOption(OptionBuilder.withDescription("Make parent directories as needed")
                 .isRequired(false)
                 .withLongOpt(LONGOPT_CREATEPARENTS)

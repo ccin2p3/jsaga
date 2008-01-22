@@ -20,6 +20,7 @@ import org.ogf.saga.session.SessionFactory;
  */
 public class NamespaceMove extends AbstractCommand {
     private static final String OPT_HELP = "h", LONGOPT_HELP = "help";
+    private static final String OPT_NOT_OVERWRITE = "i", LONGOPT_NOT_OVERWRITE = "interactive";
     private static final String OPT_RECURSIVE = "r", LONGOPT_RECURSIVE = "recursive";
 
     public NamespaceMove() {
@@ -40,7 +41,8 @@ public class NamespaceMove extends AbstractCommand {
             // get arguments
             URL source = new URL(command.m_nonOptionValues[0].replaceAll(" ", "%20"));
             URL target = new URL(command.m_nonOptionValues[1].replaceAll(" ", "%20"));
-            Flags flags = (line.hasOption(OPT_RECURSIVE) ? Flags.RECURSIVE : Flags.NONE);
+            int flags =(line.hasOption(OPT_NOT_OVERWRITE) ? Flags.NONE : Flags.OVERWRITE)
+                    .or(line.hasOption(OPT_RECURSIVE) ? Flags.RECURSIVE : Flags.NONE);
 
             // execute command
             Session session = SessionFactory.createSession(true);
@@ -50,7 +52,7 @@ public class NamespaceMove extends AbstractCommand {
             } else {
                 entry = NSFactory.createNSEntry(session, source, Flags.NONE.getValue());
             }
-            entry.move(target, flags.getValue());
+            entry.move(target, flags);
             entry.close();
         }
     }
@@ -60,6 +62,10 @@ public class NamespaceMove extends AbstractCommand {
         opt.addOption(OptionBuilder.withDescription("Display this help and exit")
                 .withLongOpt(LONGOPT_HELP)
                 .create(OPT_HELP));
+        opt.addOption(OptionBuilder.withDescription("Do not overwrite target")
+                .isRequired(false)
+                .withLongOpt(LONGOPT_NOT_OVERWRITE)
+                .create(OPT_NOT_OVERWRITE));
         opt.addOption(OptionBuilder.withDescription("Move recursively")
                 .isRequired(false)
                 .withLongOpt(LONGOPT_RECURSIVE)
