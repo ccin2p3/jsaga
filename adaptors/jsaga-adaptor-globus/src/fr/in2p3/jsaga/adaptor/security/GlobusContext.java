@@ -13,6 +13,7 @@ package fr.in2p3.jsaga.adaptor.security;
  *
  */
 public class GlobusContext {
+    public static final String USERCERTKEY = "UserCertKey";
     public static final String USERPROXYOBJECT = "UserProxyObject";
     public static final String DELEGATION = "Delegation";
     public static final String MYPROXYPASS = "MyProxyPass";

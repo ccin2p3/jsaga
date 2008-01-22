@@ -23,11 +23,16 @@ import java.util.Map;
  *
  */
 public class VOMSSecurityAdaptorBuilderExtended extends VOMSSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuilder {
+    private static final String USERCERTKEY = "UserCertKey";
     private static final String USERFQAN = "UserFQAN";
     private static final String DELEGATION = "Delegation";
     private static final String PROXYTYPE = "ProxyType";
     private static final Usage CREATE_PROXY = new UAnd(new Usage[]{
-            new U(Context.USERPROXY), new UFile(Context.USERCERT), new UFile(Context.USERKEY), new UHidden(Context.USERPASS), new UFile(Context.CERTREPOSITORY),
+            new UOr(new Usage[]{
+                    new UAnd(new Usage[]{new UFile(Context.USERCERT), new UFile(Context.USERKEY)}),
+                    new UFile(USERCERTKEY)
+            }),
+            new U(Context.USERPROXY), new UHidden(Context.USERPASS), new UFile(Context.CERTREPOSITORY),
             new U(Context.SERVER), new U(Context.USERVO), new UOptional(USERFQAN),
             new UDuration(Context.LIFETIME) {
                 protected Object throwExceptionIfInvalid(Object value) throws Exception {
@@ -90,7 +95,7 @@ public class VOMSSecurityAdaptorBuilderExtended extends VOMSSecurityAdaptorBuild
         proxyInit.setProxyOutputFile((String) attributes.get(Context.USERPROXY));
         VOMSRequestOptions o = new VOMSRequestOptions();
         o.setVoName((String) attributes.get(Context.USERVO));
-        
+
         // optional attributes
         if (attributes.containsKey(USERFQAN)) {
             o.addFQAN((String) attributes.get(USERFQAN));

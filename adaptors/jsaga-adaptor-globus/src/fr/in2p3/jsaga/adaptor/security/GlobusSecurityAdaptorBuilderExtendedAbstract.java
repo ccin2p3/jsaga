@@ -21,7 +21,11 @@ import java.util.Map;
  */
 public abstract class GlobusSecurityAdaptorBuilderExtendedAbstract extends GlobusSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuilder {
     private static final Usage CREATE_PROXY = new UAnd(new Usage[]{
-            new U(Context.USERPROXY), new UFile(Context.USERCERT), new UFile(Context.USERKEY), new UHidden(Context.USERPASS), new UFile(Context.CERTREPOSITORY),
+            new UOr(new Usage[]{
+                    new UAnd(new Usage[]{new UFile(Context.USERCERT), new UFile(Context.USERKEY)}),
+                    new UFile(GlobusContext.USERCERTKEY)
+            }),
+            new U(Context.USERPROXY), new UHidden(Context.USERPASS), new UFile(Context.CERTREPOSITORY),
             new UDuration(Context.LIFETIME) {
                 protected Object throwExceptionIfInvalid(Object value) throws Exception {
                     return (value!=null ? super.throwExceptionIfInvalid(value) : null);
