@@ -90,7 +90,7 @@ public class VOMSSecurityAdaptorBuilderExtended extends VOMSSecurityAdaptorBuild
         proxyInit.setProxyOutputFile((String) attributes.get(Context.USERPROXY));
         VOMSRequestOptions o = new VOMSRequestOptions();
         o.setVoName((String) attributes.get(Context.USERVO));
-
+        
         // optional attributes
         if (attributes.containsKey(USERFQAN)) {
             o.addFQAN((String) attributes.get(USERFQAN));
@@ -98,6 +98,7 @@ public class VOMSSecurityAdaptorBuilderExtended extends VOMSSecurityAdaptorBuild
         if (attributes.containsKey(Context.LIFETIME)) {
             int lifetime = UDuration.toInt(attributes.get(Context.LIFETIME));
             proxyInit.setProxyLifetime(lifetime);
+            o.setLifetime(lifetime);
         }
         if (attributes.containsKey(DELEGATION)) {
             String delegation = (String) attributes.get(DELEGATION);
