@@ -131,7 +131,7 @@ public class GsiftpDataAdaptor implements FileReader, FileWriter, DirectoryReade
     }
 
     /** does not work */
-    public void putFromStream(String absolutePath, InputStream stream, boolean append) throws PermissionDenied, BadParameter, AlreadyExists, Timeout, NoSuccess {
+    public void putFromStream(String absolutePath, InputStream stream, boolean append) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
         m_adaptor.putFromStream(absolutePath, stream, append);
     }
 

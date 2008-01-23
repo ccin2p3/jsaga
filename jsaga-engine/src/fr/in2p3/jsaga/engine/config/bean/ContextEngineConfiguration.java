@@ -48,6 +48,7 @@ public class ContextEngineConfiguration {
             ctx.setAttribute(attrs.toArray());
 
             // update configured attributes with user attributes
+            this.updateAttributes(userAttributes, ctx, ctx.getType());  //common to all instances of this type
             this.updateAttributes(userAttributes, ctx, ctx.getType()+"["+ctx.getIndice()+"]");
             this.updateAttributes(userAttributes, ctx, ctx.getName());
         }

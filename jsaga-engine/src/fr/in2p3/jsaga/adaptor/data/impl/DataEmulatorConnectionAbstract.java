@@ -1,9 +1,9 @@
 package fr.in2p3.jsaga.adaptor.data.impl;
 
 import fr.in2p3.jsaga.adaptor.schema.data.emulator.*;
-import org.ogf.saga.error.*;
+import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.NoSuccess;
 
-import java.lang.Exception;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,13 +68,13 @@ public abstract class DataEmulatorConnectionAbstract {
     }
 
     // remove
-    public void removeDirectory(String absolutePath) throws DoesNotExist, BadParameter {
+    public void removeDirectory(String absolutePath) throws DoesNotExist, NoSuccess {
         removeDirectory(getParentDirectory(absolutePath), getEntryName(absolutePath));
     }
-    public void removeDirectory(DirectoryType parent, String name) throws DoesNotExist, BadParameter {
+    public void removeDirectory(DirectoryType parent, String name) throws DoesNotExist, NoSuccess {
         Directory dir = getDirectory(parent, name);
         if (dir.getDirectoryCount()>0 || dir.getFileCount()>0) {
-            throw new BadParameter("Directory is not empty: "+name);
+            throw new NoSuccess("Directory is not empty: "+name);
         }
         parent.removeDirectory(dir);
     }
