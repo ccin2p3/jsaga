@@ -6,10 +6,10 @@ import fr.in2p3.jsaga.adaptor.schema.data.catalog.File;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
-import org.ogf.saga.error.*;
+import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.NoSuccess;
 
 import java.io.*;
-import java.lang.Exception;
 import java.util.*;
 
 /* ***************************************************

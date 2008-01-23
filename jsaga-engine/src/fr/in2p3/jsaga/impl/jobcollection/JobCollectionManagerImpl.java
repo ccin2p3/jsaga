@@ -1,7 +1,6 @@
 package fr.in2p3.jsaga.impl.jobcollection;
 
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
-import fr.in2p3.jsaga.impl.jobcollection.JobCollectionImpl;
 import fr.in2p3.jsaga.jobcollection.*;
 import org.ogf.saga.ObjectType;
 import org.ogf.saga.SagaObject;

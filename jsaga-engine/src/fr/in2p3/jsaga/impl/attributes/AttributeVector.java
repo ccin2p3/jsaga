@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.impl.attributes;
 
-import org.ogf.saga.error.*;
+import org.ogf.saga.error.IncorrectState;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***

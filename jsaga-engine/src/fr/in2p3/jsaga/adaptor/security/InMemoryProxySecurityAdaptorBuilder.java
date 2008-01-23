@@ -5,9 +5,9 @@ import fr.in2p3.jsaga.adaptor.base.usage.UNoPrompt;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityAdaptor;
+import org.ogf.saga.context.Context;
 import org.ogf.saga.error.BadParameter;
 import org.ogf.saga.error.IncorrectState;
-import org.ogf.saga.context.Context;
 
 import java.util.Map;
 
