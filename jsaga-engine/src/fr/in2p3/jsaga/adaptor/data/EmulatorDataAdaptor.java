@@ -31,7 +31,9 @@ import java.util.Map;
 /**
  *
  */
-public class EmulatorDataAdaptor implements FileReader, FileWriter, DirectoryReader, DirectoryWriter, LinkAdaptor {
+public class EmulatorDataAdaptor implements FileReader, FileWriter, DirectoryReader, DirectoryWriter, LinkAdaptor
+//        , FilteredDirectoryReader
+{
     protected DataEmulatorConnectionAbstract m_server;
 
     public Usage getUsage() {
@@ -182,5 +184,16 @@ public class EmulatorDataAdaptor implements FileReader, FileWriter, DirectoryRea
             link = m_server.addFile(linkAbsolutePath);
         }
         link.setLink(sourceAbsolutePath);
+    }
+
+    ///////////////////////////////////////// optional interfaces /////////////////////////////////////////
+
+    public FileAttributes[] listDirectories(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        EntryType[] list = m_server.listDirectories(absolutePath);
+        FileAttributes[] ret = new FileAttributes[list.length];
+        for (int i=0; i<list.length; i++) {
+            ret[i] = new EmulatorFileAttributes(list[i]);
+        }
+        return ret;
     }
 }

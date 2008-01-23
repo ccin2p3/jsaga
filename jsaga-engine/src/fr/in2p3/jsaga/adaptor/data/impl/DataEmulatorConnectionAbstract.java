@@ -139,7 +139,7 @@ public abstract class DataEmulatorConnectionAbstract {
             return new EntryType[]{entry};
         }
     }
-    public EntryType[] listEntries(DirectoryType parent) {
+    private EntryType[] listEntries(DirectoryType parent) {
         List list = new ArrayList();
         for (int i=0; i<parent.getDirectoryCount(); i++) {
             list.add(parent.getDirectory(i));
@@ -148,6 +148,23 @@ public abstract class DataEmulatorConnectionAbstract {
             list.add(parent.getFile(i));
         }
         return (EntryType[]) list.toArray(new EntryType[list.size()]);
+    }
+
+    // list directories only
+    public DirectoryType[] listDirectories(String absolutePath) throws DoesNotExist {
+        EntryType entry = this.getEntry(absolutePath);
+        if (entry instanceof DirectoryType) {
+            return listDirectories((DirectoryType)entry);
+        } else {
+            return new DirectoryType[]{};
+        }
+    }
+    private DirectoryType[] listDirectories(DirectoryType parent) {
+        List list = new ArrayList();
+        for (int i=0; i<parent.getDirectoryCount(); i++) {
+            list.add(parent.getDirectory(i));
+        }
+        return (DirectoryType[]) list.toArray(new DirectoryType[list.size()]);
     }
 
     ////////////////////////////////////////// friend methods /////////////////////////////////////////
