@@ -5,6 +5,7 @@ import org.globus.common.CoGProperties;
 import org.globus.common.Version;
 import org.globus.gsi.CertUtil;
 import org.globus.gsi.GSIConstants;
+import org.globus.gsi.GlobusCredentialException;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.gsi.proxy.ext.ProxyCertInfo;
 import org.globus.gsi.proxy.ext.ProxyPolicy;
@@ -36,7 +37,7 @@ public class GlobusProxyFactory extends GlobusProxyFactoryAbstract {
     private String m_certFile = "";
     private String m_proxyFile = "";
     private String m_keyFile = null;
-    private boolean m_verify = true;
+    private boolean m_verify = false;
     private boolean m_globusStyle = false;
 
     public GlobusProxyFactory(Map attributes, int oid) throws BadParameter, ParseException {
@@ -113,8 +114,12 @@ public class GlobusProxyFactory extends GlobusProxyFactoryAbstract {
         super.setDebug(false);
         super.setQuiet(false);
         super.setStdin(false);
-        
         super.createProxy(m_certFile, m_keyFile, m_verify, m_globusStyle, m_proxyFile);
+        try {
+			proxy.verify();
+		} catch (GlobusCredentialException e) {
+			throw new GSSException(e.getErrorCode());
+		}
         return new GlobusGSSCredentialImpl(proxy, GSSCredential.INITIATE_ONLY);
     }
     
