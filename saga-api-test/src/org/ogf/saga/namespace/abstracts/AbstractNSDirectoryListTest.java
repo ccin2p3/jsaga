@@ -39,6 +39,22 @@ public abstract class AbstractNSDirectoryListTest extends AbstractNSDirectoryTes
                 list.get(0).toString());
     }
 
+    public void test_list_directories() throws Exception {
+        List list = m_root.list("*/", Flags.NONE.getValue());
+        assertEquals(
+                1,
+                list.size());
+        assertEquals(DEFAULT_DIRNAME,
+                list.get(0).toString());
+    }
+
+    public void test_list_no_directory() throws Exception {
+        List list = m_dir.list("*/", Flags.NONE.getValue());
+        assertEquals(
+                0,
+                list.size());
+    }
+
     public void test_find() throws Exception {
         List list = m_dir.find(DEFAULT_FILEPATTERN, Flags.NONE.getValue());
         assertEquals(
