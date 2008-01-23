@@ -47,7 +47,7 @@ public class ContextInfo extends AbstractCommand {
             for (int i=0; i<contexts.length; i++) {
                 Context context = contexts[i];
                 // print title
-                String type = context.getAttribute("Type");
+                String type = context.getAttribute(Context.TYPE);
                 String indice = context.getAttribute("Indice");
                 String name;
                 try {
@@ -70,7 +70,7 @@ public class ContextInfo extends AbstractCommand {
             ContextInstance[] xmlContext = Configuration.getInstance().getConfigurations().getContextCfg().listContextInstanceArrayById(id);
             for (int i=0; i<xmlContext.length; i++) {
                 Context context = ContextFactory.createContext();
-                context.setAttribute("Type", xmlContext[i].getType());
+                context.setAttribute(Context.TYPE, xmlContext[i].getType());
                 context.setAttribute("Indice", ""+xmlContext[i].getIndice());
                 context.setDefaults();
                 // print context

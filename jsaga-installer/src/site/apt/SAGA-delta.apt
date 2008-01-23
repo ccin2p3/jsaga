@@ -34,6 +34,8 @@ Add-ons to SAGA specification
 
     * Few differences in implementation of behavior with some flags (see comments in source code)
 
+        * NSEntry.remove() allow no RECURSIVE flag for directory in order to support a "rmdir-like" behavior.
+
 * Job management
 
     * Will also support JSDL for job description.

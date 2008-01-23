@@ -52,7 +52,7 @@ public class ContextInit extends AbstractCommand {
             ContextInstance[] xmlContext = Configuration.getInstance().getConfigurations().getContextCfg().listContextInstanceArrayById(id);
             for (int i=0; i<xmlContext.length; i++) {
                 Context context = ContextFactory.createContext();
-                context.setAttribute("Type", xmlContext[i].getType());
+                context.setAttribute(Context.TYPE, xmlContext[i].getType());
                 context.setAttribute("Indice", ""+xmlContext[i].getIndice());
                 context.setDefaults();
                 ((ContextImpl) context).init();
