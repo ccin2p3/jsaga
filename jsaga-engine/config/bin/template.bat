@@ -3,7 +3,7 @@ setlocal enabledelayedexpansion
 
 REM # set arguments
 set ARGS=
-set SEP= 
+set SEP=
 :beginArgs
 set CURRENT=%~1
 if "%CURRENT%_"=="_" goto endArgs
@@ -17,7 +17,7 @@ goto beginArgs
 REM # set JSAGA_HOME
 if "%JSAGA_HOME%_"=="_" (
   if exist "$INSTALL_PATH" (
-    set JSAGA_HOME="$INSTALL_PATH"
+    set JSAGA_HOME=$INSTALL_PATH
   ) else (
     set JSAGA_HOME=.
   )
@@ -25,17 +25,17 @@ if "%JSAGA_HOME%_"=="_" (
 
 REM # set system properties
 set PROPERTIES=
-set PROPERTIES=%PROPERTIES% -DJSAGA_HOME=%JSAGA_HOME%
+set PROPERTIES=%PROPERTIES% -DJSAGA_HOME="%JSAGA_HOME%"
 set PROPERTIES=%PROPERTIES% -Dinteractive
 rem set PROPERTIES=%PROPERTIES% -Ddebug
-rem set PROPERTIES=%PROPERTIES% -Dconfig=%JSAGA_HOME%\etc\example\jsaga-config.xml
+rem set PROPERTIES=%PROPERTIES% -Dconfig="%JSAGA_HOME%\etc\example\jsaga-config.xml"
 
 REM # set classpath
 set CLASSPATH=.
-for %%i in (%JSAGA_HOME%\lib\*.jar) do (
+for %%i in ("%JSAGA_HOME%\lib\*.jar") do (
   set CLASSPATH=!CLASSPATH!;%%i
 )
-for %%i in (%JSAGA_HOME%\lib-adaptors\*.jar) do (
+for %%i in ("%JSAGA_HOME%\lib-adaptors\*.jar") do (
   set CLASSPATH=!CLASSPATH!;%%i
 )
 
@@ -43,11 +43,11 @@ REM # set java
 if "%JAVA_HOME%_"=="_" (
   set JAVA=java
 ) else (
-  set JAVA=%JAVA_HOME%\bin\java
+  set JAVA="%JAVA_HOME%\bin\java"
 )
 
 REM # run command
-set CMD="%JAVA%" %PROPERTIES% -cp "%CLASSPATH%" ${class.name} %ARGS%
+set CMD=%JAVA% %PROPERTIES% -cp "%CLASSPATH%" ${class.name} %ARGS%
 if "%DEBUG%_"=="_" (
   %CMD%
 ) else (

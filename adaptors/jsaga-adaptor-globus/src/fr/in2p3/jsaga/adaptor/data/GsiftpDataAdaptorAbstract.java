@@ -157,7 +157,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
             try {
                 throw rethrowExceptionFull(e);
             } catch (DoesNotExist e2) {
-                throw new NoSuccess(e2);
+                throw new ParentDoesNotExist(e);
             }
         }
         return new GsiftpOutputStream(m_client, absolutePath, append);
@@ -178,7 +178,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
     }
 
     /** does not work */
-    public void putFromStream(String absolutePath, InputStream stream, boolean append) throws PermissionDenied, BadParameter, AlreadyExists, Timeout, NoSuccess {
+    public void putFromStream(String absolutePath, InputStream stream, boolean append) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
         final int DEFAULT_BUFFER_SIZE = 16384;
         try {
             m_client.put(
@@ -189,8 +189,8 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         } catch (Exception e) {
             try {
                 throw rethrowExceptionFull(e);
-            } catch (DoesNotExist e1) {
-                throw new NoSuccess(e1);
+            } catch (DoesNotExist e2) {
+                throw new ParentDoesNotExist(e);
             }
         }
     }
@@ -298,7 +298,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
             try {
                 throw rethrowExceptionFull(e);
             } catch (DoesNotExist e2) {
-                throw new NoSuccess(e2);
+                throw new ParentDoesNotExist(e);
             }
         }
     }
@@ -319,7 +319,6 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         }
     }
 
-    //todo: convert missing parent directory error to ParentDoesNotExist exception
     private NoSuccess rethrowExceptionFull(Exception exception) throws PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
         try {
             throw exception;
