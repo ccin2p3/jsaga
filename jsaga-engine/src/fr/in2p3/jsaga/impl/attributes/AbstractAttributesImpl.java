@@ -189,8 +189,9 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
 
     //////////////////////////////////////////// protected methods ////////////////////////////////////////////
 
-    public void _addAttribute(AttributeImpl attribute) {
+    public AttributeImpl _addAttribute(AttributeImpl attribute) {
         m_attributes.put(attribute.getKey(), attribute);
+        return attribute;
     }
 
     protected void _addUnsupportedAttribute(String key) {

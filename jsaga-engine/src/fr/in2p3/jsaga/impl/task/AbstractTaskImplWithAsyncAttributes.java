@@ -126,7 +126,6 @@ public abstract class AbstractTaskImplWithAsyncAttributes<E> extends AbstractTas
     //////////////////////////////////////////// internal methods ////////////////////////////////////////////
 
     public AttributeImpl _addAttribute(AttributeImpl attribute) {
-        m_attributes._addAttribute(attribute);
-        return attribute;
+        return m_attributes._addAttribute(attribute);
     }
 }
