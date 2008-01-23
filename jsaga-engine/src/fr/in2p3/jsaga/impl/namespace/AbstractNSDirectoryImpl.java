@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.impl.namespace;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
+import fr.in2p3.jsaga.adaptor.data.optimise.FilteredDirectoryReader;
 import fr.in2p3.jsaga.adaptor.data.read.*;
 import fr.in2p3.jsaga.adaptor.data.write.DirectoryWriter;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
@@ -122,25 +123,35 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
             return this._dereferenceDir()._list(pattern, longFormat, effectiveFlags.remove(Flags.DEREFERENCE));
         }
         effectiveFlags.checkAllowed(Flags.DEREFERENCE.getValue());
-        if (m_adaptor instanceof DirectoryReader) {
-            Pattern p = SAGAPattern.toRegexp(pattern);
-            List<Object> matchingNames = new ArrayList<Object>();
-            // for each child
-            FileAttributes[] childs = this._listAttributes(m_url.getPath());
-            for (int i=0; i<childs.length; i++) {
-                if (p==null || p.matcher(childs[i].getName()).matches()) {
-                    if (longFormat) {
-                        matchingNames.add(childs[i].toString());
-                    } else {
-                        String correctedName = childs[i].getName().replaceAll(" ", "%20");
-                        matchingNames.add(new URL(correctedName));
-                    }
+
+        // get list
+        FileAttributes[] childs;
+        try {
+            if (m_adaptor instanceof FilteredDirectoryReader && pattern.endsWith("/")) {
+                childs = ((FilteredDirectoryReader)m_adaptor).listDirectories(m_url.getPath());
+            } else if (m_adaptor instanceof DirectoryReader) {
+                childs = ((DirectoryReader)m_adaptor).listAttributes(m_url.getPath());
+            } else {
+                throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
+            }
+        } catch (DoesNotExist e) {
+            throw new IncorrectState("Directory does not exist: "+m_url.getPath(), e);
+        }
+
+        // filter
+        Pattern p = SAGAPattern.toRegexp(pattern);
+        List<Object> matchingNames = new ArrayList<Object>();
+        for (int i=0; i<childs.length; i++) {
+            if (p==null || p.matcher(childs[i].getName()).matches()) {
+                if (longFormat) {
+                    matchingNames.add(childs[i].toString());
+                } else {
+                    String correctedName = childs[i].getName().replaceAll(" ", "%20");
+                    matchingNames.add(new URL(correctedName));
                 }
             }
-            return matchingNames;
-        } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
+        return matchingNames;
     }
 
     public List<URL> find(String pattern, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
@@ -173,12 +184,7 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         FileAttributes[] childs = this._listAttributes(m_url.getPath());
         for (int i=0; i<childs.length; i++) {
             // set child relative path
-            URL childRelativePath;
-            if (childs[i].getType() == FileAttributes.DIRECTORY_TYPE) {
-                childRelativePath = URLFactory.createURL(currentRelativePath, childs[i].getName()+"/");
-            } else {
-                childRelativePath = URLFactory.createURL(currentRelativePath, childs[i].getName());
-            }
+            URL childRelativePath = URLFactory.createURL(currentRelativePath, childs[i].getName());
             // add child relative path to matching list
             if (p==null || p.matcher(childs[i].getName()).matches()) {
                 matchingPath.add(childRelativePath);
