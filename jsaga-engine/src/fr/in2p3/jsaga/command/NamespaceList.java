@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.command;
 
+import fr.in2p3.jsaga.helpers.SAGAPattern;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSDirectoryImpl;
 import org.apache.commons.cli.*;
 import org.ogf.saga.URL;
@@ -9,6 +10,8 @@ import org.ogf.saga.session.SessionFactory;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -25,7 +28,6 @@ import java.util.List;
 public class NamespaceList extends AbstractCommand {
     private static final String OPT_HELP = "h", LONGOPT_HELP = "help";
     private static final String OPT_LONG = "l", LONGOPT_LONG = "long";
-    private static final String OPT_PATTERN = "p", LONGOPT_PATTERN = "pattern";
 
     public NamespaceList() {
         super("jsaga-ls", new String[]{"URL"}, new String[]{OPT_HELP, LONGOPT_HELP});
@@ -42,9 +44,23 @@ public class NamespaceList extends AbstractCommand {
         }
         else
         {
-            // get arguments
-            URL url = new URL(command.m_nonOptionValues[0].replaceAll(" ", "%20"));
-            String pattern = line.getOptionValue(OPT_PATTERN);
+            // get URL and pattern from arguments
+            String arg = command.m_nonOptionValues[0].replaceAll(" ", "%20");
+            URL url;
+            String pattern;
+            if (SAGAPattern.hasWildcard(arg)) {
+                Matcher matcher = Pattern.compile("((.*)/)*(.*/)/*").matcher(arg);
+                if (matcher.matches() && matcher.groupCount()>1) {
+                    url = new URL(matcher.group(1));
+                    pattern = matcher.group(3);
+                } else {
+                    url = new URL(arg.substring(0, arg.lastIndexOf('/')+1));
+                    pattern = arg.substring(arg.lastIndexOf('/')+1);
+                }
+            } else {
+                url = new URL(arg);
+                pattern = null;
+            }
 
             // get list
             Session session = SessionFactory.createSession(true);
@@ -75,12 +91,6 @@ public class NamespaceList extends AbstractCommand {
                 .isRequired(false)
                 .withLongOpt(LONGOPT_LONG)
                 .create(OPT_LONG));
-        opt.addOption(OptionBuilder.withDescription("Filter with names matching pattern <value>")
-                .isRequired(false)
-                .hasArg()
-                .withArgName("value")
-                .withLongOpt(LONGOPT_PATTERN)
-                .create(OPT_PATTERN));
         return opt;
     }
 }
