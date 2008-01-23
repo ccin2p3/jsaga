@@ -4,6 +4,7 @@ import org.globus.gsi.CertUtil;
 import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.ietf.jgss.GSSCredential;
+import org.ogf.saga.error.BadParameter;
 
 import java.util.Map;
 
@@ -34,6 +35,10 @@ public class GlobusSecurityAdaptorBuilderExtended extends GlobusSecurityAdaptorB
     }
 
     public void initBuilder(Map attributes, String contextId) throws Exception {
-        new GlobusProxyFactory(attributes, GlobusProxyFactory.OID_GLOBUS).createProxy();
+    	try {
+    		new GlobusProxyFactory(attributes, GlobusProxyFactory.OID_GLOBUS).createProxy();
+    	} catch (NullPointerException e) {
+			throw new BadParameter("Bad passphrase");
+		}
     }
 }
