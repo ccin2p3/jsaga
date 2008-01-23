@@ -69,6 +69,9 @@ public abstract class GlobusSecurityAdaptorBuilder implements SecurityAdaptorBui
                 new Default(Context.USERKEY, new File[]{
                         new File(env.getProperty("X509_USER_KEY")+""),
                         new File(System.getProperty("user.home")+"/.globus/userkey.pem")}),
+                new Default(GlobusContext.USERCERTKEY, new File[]{
+                        new File(env.getProperty("PKCS12_USER_CERT")+""),
+                        new File(System.getProperty("user.home")+"/.globus/usercert.p12")}),
                 new Default(Context.CERTREPOSITORY, new File[]{
                         new File(env.getProperty("X509_CERT_DIR")+""),
                         new File(System.getProperty("user.home")+"/.globus/certificates/"),
