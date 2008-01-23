@@ -33,7 +33,12 @@ public abstract class FileAttributes {
     protected long m_lastModified = 0;
 
     public String getName() {
-        return m_name;
+        switch(m_type) {
+            case DIRECTORY_TYPE:
+                return m_name+"/";
+            default:
+                return m_name;
+        }
     }
 
     public int getType() {
