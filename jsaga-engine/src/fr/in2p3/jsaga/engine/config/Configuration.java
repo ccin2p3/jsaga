@@ -32,7 +32,7 @@ import java.io.*;
 public class Configuration {
     public static final String XSD_CONFIG = "schema/jsaga-config.xsd.xml";
     public static final File XML_MERGED_CONFIG = new File(Base.JSAGA_VAR, "jsaga-merged-config.xml");
-    private static boolean ALWAYS_RELOAD_CONFIG = true;
+    private static boolean ALWAYS_RELOAD_CONFIG = false;    //false is twice faster than true
 
     private static final String ADAPTOR_DESCRIPTORS = "adaptor-descriptors";
     private static final String XI_RAW_CONFIG = "raw-config.xi";
