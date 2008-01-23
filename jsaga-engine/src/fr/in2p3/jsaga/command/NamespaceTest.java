@@ -3,7 +3,9 @@ package fr.in2p3.jsaga.command;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
 import org.apache.commons.cli.*;
 import org.ogf.saga.URL;
-import org.ogf.saga.namespace.*;
+import org.ogf.saga.error.IncorrectState;
+import org.ogf.saga.namespace.NSEntry;
+import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 
@@ -53,11 +55,23 @@ public class NamespaceTest extends AbstractCommand {
             if (line.hasOption(OPT_EXISTS)) {
                 success = ((AbstractNSEntryImpl)entry).exists();
             } else if (line.hasOption(OPT_ISFILE)) {
-                success = entry.isEntry();
+                try {
+                    success = entry.isEntry();
+                } catch(IncorrectState e) {
+                    success = false;
+                }
             } else if (line.hasOption(OPT_ISDIRECTORY)) {
-                success = entry.isDir();
+                try {
+                    success = entry.isDir();
+                } catch(IncorrectState e) {
+                    success = false;
+                }
             } else if (line.hasOption(OPT_ISLINK)) {
-                success = entry.isLink();
+                try {
+                    success = entry.isLink();
+                } catch(IncorrectState e) {
+                    success = false;
+                }
             } else {
                 throw new Exception("Unexpected exception");
             }
