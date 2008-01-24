@@ -93,13 +93,13 @@ public class EmulatorDataAdaptor implements FileReader, FileWriter, DirectoryRea
         return file.getContent().length();
     }
 
-    public InputStream getInputStream(String absolutePath) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         File file = m_server.getFile(absolutePath);
         String content = file.getContent()!=null ? file.getContent() : "";
         return new ByteArrayInputStream(content.getBytes());
     }
 
-    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
         DirectoryType parent;
         try {
             parent = m_server.getDirectory(parentAbsolutePath);
@@ -122,13 +122,13 @@ public class EmulatorDataAdaptor implements FileReader, FileWriter, DirectoryRea
         return new EmulatorOutputStream(m_server, file);
     }
 
-    public void removeFile(String parentAbsolutePath, String fileName) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         DirectoryType parent = m_server.getDirectory(parentAbsolutePath);
         m_server.removeFile(parent, fileName);
         if(Base.DEBUG) m_server.commit();
     }
 
-    public FileAttributes[] listAttributes(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         EntryType[] list = m_server.listEntries(absolutePath);
         FileAttributes[] ret = new FileAttributes[list.length];
         for (int i=0; i<list.length; i++) {
@@ -137,7 +137,7 @@ public class EmulatorDataAdaptor implements FileReader, FileWriter, DirectoryRea
         return ret;
     }
 
-    public void makeDir(String parentAbsolutePath, String directoryName) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+    public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
         DirectoryType parent;
         try {
             parent = m_server.getDirectory(parentAbsolutePath);
@@ -153,7 +153,7 @@ public class EmulatorDataAdaptor implements FileReader, FileWriter, DirectoryRea
         if(Base.DEBUG) m_server.commit();
     }
 
-    public void removeDir(String parentAbsolutePath, String directoryName) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         DirectoryType parent = m_server.getDirectory(parentAbsolutePath);
         m_server.removeDirectory(parent, directoryName);
         if(Base.DEBUG) m_server.commit();

@@ -29,10 +29,11 @@ public interface DataCopyDelegated extends DataAdaptor {
      * @param sourceAbsoluteUrl the path of the file to be copied.
      * @param targetAbsoluteUrl the URL of the file to copy to.
      * @param overwrite if true, then target is overwrited if it exists.
+     * @param additionalArgs adaptor specific arguments
      * @throws AlreadyExists if <code>targetAbsoluteUrl</code> already exists and <code>overwrite</code> is false.
      * @throws DoesNotExist if <code>sourceAbsoluteUrl</code> does not exist.
      */
-    public void requestTransfer(URL sourceAbsoluteUrl, URL targetAbsoluteUrl, boolean overwrite) throws DoesNotExist, AlreadyExists;
+    public void requestTransfer(URL sourceAbsoluteUrl, URL targetAbsoluteUrl, boolean overwrite, String additionalArgs) throws DoesNotExist, AlreadyExists;
 
     /**
      * Monitor the requested transfer task.

@@ -157,7 +157,7 @@ public class SagaDataAdaptor implements FileReader, FileWriter, DataCopy, DataRe
         }
     }
 
-    public InputStream getInputStream(String absolutePath) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         NSEntry entry = this.getEntry(absolutePath);
         if (entry instanceof File) {
             return new SagaInputStream((File) entry);
@@ -166,7 +166,7 @@ public class SagaDataAdaptor implements FileReader, FileWriter, DataCopy, DataRe
         }
     }
 
-    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
         NSEntry entry;
         try {
             int flags = (exclusive ? Flags.EXCL : Flags.NONE).or(append ? Flags.APPEND : Flags.NONE);
@@ -183,7 +183,7 @@ public class SagaDataAdaptor implements FileReader, FileWriter, DataCopy, DataRe
         }
     }
 
-    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, ParentDoesNotExist, Timeout, NoSuccess {
+    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, ParentDoesNotExist, Timeout, NoSuccess {
         try {
             String protocol = m_root.getURL().getScheme();
             URL targetUrl = new URL(getURLString(protocol, targetHost, targetPort, targetAbsolutePath));
@@ -200,7 +200,7 @@ public class SagaDataAdaptor implements FileReader, FileWriter, DataCopy, DataRe
         }
     }
 
-    public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         URL sourceUrl;
         try {
             String protocol = m_root.getURL().getScheme();
@@ -227,7 +227,7 @@ public class SagaDataAdaptor implements FileReader, FileWriter, DataCopy, DataRe
         }
     }
 
-    public void rename(String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite) throws PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+    public void rename(String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
         try {
             int flags = (overwrite ? Flags.OVERWRITE : Flags.NONE).getValue();
             this.getEntry(sourceAbsolutePath).move(
@@ -246,7 +246,7 @@ public class SagaDataAdaptor implements FileReader, FileWriter, DataCopy, DataRe
         }
     }
 
-    public void removeFile(String parentAbsolutePath, String fileName) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         try {
             this.getEntry(parentAbsolutePath+"/"+fileName).remove(Flags.NONE.getValue());
         } catch (IncorrectState e) {

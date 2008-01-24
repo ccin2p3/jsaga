@@ -41,7 +41,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
     public abstract Usage getUsage();
     public abstract Default[] getDefaults(Map attributes) throws IncorrectState;
     public abstract boolean isDirectory(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
-    public abstract FileAttributes[] listAttributes(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
+    public abstract FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
 
     public Class[] getSupportedSecurityAdaptorClasses() {
         return new Class[]{GSSCredentialSecurityAdaptor.class};
@@ -127,7 +127,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         }
     }
 
-    public InputStream getInputStream(String absolutePath) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         try {
             m_client.setType(GridFTPSession.TYPE_IMAGE);
             m_client.setMode(GridFTPSession.MODE_STREAM); //MODE_EBLOCK induce error: "451 refusing to store with active mode"
@@ -139,7 +139,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         return new GsiftpInputStream(m_client, absolutePath);
     }
 
-    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
         String absolutePath = parentAbsolutePath+fileName;
         if (exclusive && this.exists(absolutePath)) {
             // need to check existence explicitely, else exception is never thrown
@@ -164,7 +164,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
     }
 
     /** does not work */
-    public void getToStream(String absolutePath, OutputStream stream) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void getToStream(String absolutePath, OutputStream stream, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         final boolean autoFlush = false;
         final boolean ignoreOffset = true;
         try {
@@ -178,7 +178,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
     }
 
     /** does not work */
-    public void putFromStream(String absolutePath, InputStream stream, boolean append) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+    public void putFromStream(String absolutePath, InputStream stream, boolean append, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
         final int DEFAULT_BUFFER_SIZE = 16384;
         try {
             m_client.put(
@@ -195,7 +195,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         }
     }
 
-    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, ParentDoesNotExist, Timeout, NoSuccess {
+    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, ParentDoesNotExist, Timeout, NoSuccess {
         // connect to peer server
         GsiftpDataAdaptorAbstract targetAdaptor = new Gsiftp1DataAdaptor();
         targetAdaptor.m_credential = m_credential;
@@ -235,7 +235,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         }
     }
 
-    public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         // connect to peer server
         GsiftpDataAdaptorAbstract sourceAdaptor = new Gsiftp1DataAdaptor();
         sourceAdaptor.m_credential = m_credential;
@@ -275,7 +275,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         }
     }
 
-    public void rename(String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite) throws PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+    public void rename(String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
         try {
             m_client.rename(sourceAbsolutePath, targetAbsolutePath);
         } catch (Exception e) {
@@ -283,7 +283,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         }
     }
 
-    public void removeFile(String parentAbsolutePath, String fileName) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         try {
             m_client.deleteFile(parentAbsolutePath+"/"+fileName);
         } catch (Exception e) {
@@ -291,7 +291,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         }
     }
 
-    public void makeDir(String parentAbsolutePath, String directoryName) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+    public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
         try {
             m_client.makeDir(parentAbsolutePath+"/"+directoryName);
         } catch (Exception e) {
@@ -303,7 +303,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         }
     }
 
-    public void removeDir(String parentAbsolutePath, String directoryName) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         try {
             m_client.deleteDir(parentAbsolutePath+"/"+directoryName);
         } catch (Exception e) {

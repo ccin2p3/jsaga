@@ -125,7 +125,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         {
             boolean overwrite = effectiveFlags.contains(Flags.OVERWRITE);
             try {
-                ((DataRename)m_adaptor).rename(m_url.getPath(), effectiveTarget.getPath(), overwrite);
+                ((DataRename)m_adaptor).rename(m_url.getPath(), effectiveTarget.getPath(), overwrite, m_url.getQuery());
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("Directory does not exist: "+ m_url, doesNotExist);
             } catch (AlreadyExists alreadyExists) {
@@ -189,7 +189,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             URL parent = super._getParentDirURL();
             String directoryName = super._getEntryName();
             try {
-                ((DirectoryWriter)m_adaptor).removeDir(parent.getPath(), directoryName);
+                ((DirectoryWriter)m_adaptor).removeDir(parent.getPath(), directoryName, m_url.getQuery());
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("Directory does not exist: "+ m_url, doesNotExist);
             }
@@ -212,7 +212,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
     protected FileAttributes[] _listAttributes(String absolutePath) throws NotImplemented, PermissionDenied, IncorrectState, Timeout, NoSuccess {
         if (m_adaptor instanceof DirectoryReader) {
             try {
-                return ((DirectoryReader)m_adaptor).listAttributes(absolutePath);
+                return ((DirectoryReader)m_adaptor).listAttributes(absolutePath, m_url.getQuery());
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("Directory does not exist: "+absolutePath, doesNotExist);
             }

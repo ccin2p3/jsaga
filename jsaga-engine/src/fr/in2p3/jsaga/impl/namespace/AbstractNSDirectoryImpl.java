@@ -60,13 +60,13 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
                 String directoryName = super._getEntryName();
                 try {
                     // try to make current directory
-                    ((DirectoryWriter)m_adaptor).makeDir(parent.getPath(), directoryName);
+                    ((DirectoryWriter)m_adaptor).makeDir(parent.getPath(), directoryName, m_url.getQuery());
                 } catch(ParentDoesNotExist e) {
                     // make parent directories, then retry
                     if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
                         this._makeParentDirs();
                         try {
-                            ((DirectoryWriter)m_adaptor).makeDir(parent.getPath(), directoryName);
+                            ((DirectoryWriter)m_adaptor).makeDir(parent.getPath(), directoryName, m_url.getQuery());
                         } catch (ParentDoesNotExist e2) {
                             throw new DoesNotExist("Failed to create parent directory: "+parent, e.getCause());
                         }
@@ -126,9 +126,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         FileAttributes[] childs;
         try {
             if (m_adaptor instanceof FilteredDirectoryReader && pattern.endsWith("/")) {
-                childs = ((FilteredDirectoryReader)m_adaptor).listDirectories(m_url.getPath());
+                childs = ((FilteredDirectoryReader)m_adaptor).listDirectories(m_url.getPath(), m_url.getQuery());
             } else if (m_adaptor instanceof DirectoryReader) {
-                childs = ((DirectoryReader)m_adaptor).listAttributes(m_url.getPath());
+                childs = ((DirectoryReader)m_adaptor).listAttributes(m_url.getPath(), m_url.getQuery());
             } else {
                 throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
             }

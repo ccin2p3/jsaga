@@ -120,7 +120,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements Director
         return metadata.getSize().longValue();
     }
 
-    public InputStream getInputStream(String absolutePath) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         org.apache.axis.types.URI logicalUri = this.toSrmURI(absolutePath);
         SrmPrepareToGetRequest request = new SrmPrepareToGetRequest();
         request.setArrayOfFileRequests(new ArrayOfTGetFileRequest(new TGetFileRequest[]{
@@ -186,7 +186,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements Director
         }
         // connect to transfer server
         SagaDataAdaptor adaptor = new SagaDataAdaptor(transferUrl, m_credential);
-        return adaptor.getInputStream(transferUrl.getPath());
+        return adaptor.getInputStream(transferUrl.getPath(), null);
     }
     private void closeInputStream(String token, String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         org.apache.axis.types.URI logicalUri = toSrmURI(absolutePath);
@@ -225,7 +225,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements Director
         }
     }
 
-    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
         org.apache.axis.types.URI logicalUri = this.toSrmURI(parentAbsolutePath+"/"+fileName);
         SrmPrepareToPutRequest request = new SrmPrepareToPutRequest();
         request.setArrayOfFileRequests(new ArrayOfTPutFileRequest(new TPutFileRequest[]{new TPutFileRequest(logicalUri, null)}));
@@ -298,7 +298,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements Director
         int pos = transferUrl.getPath().lastIndexOf('/');
         String transferParentPath = (pos>0 ? transferUrl.getPath().substring(0, pos) : "/");
         String transferFileName = (pos>-1 ? transferUrl.getPath().substring(pos+1) : transferUrl.getPath());
-        return adaptor.getOutputStream(transferParentPath, transferFileName, exclusive, append);
+        return adaptor.getOutputStream(transferParentPath, transferFileName, exclusive, append, null);
     }
     private void closeOutputStream(String token, String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         org.apache.axis.types.URI logicalUri = toSrmURI(absolutePath);
@@ -336,7 +336,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements Director
         }
     }
 
-    public FileAttributes[] listAttributes(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         TMetaDataPathDetail metadata = this.getMetaData(absolutePath);
         TMetaDataPathDetail[] list = metadata.getArrayOfSubPaths().getPathDetailArray();
         if (list != null) {
@@ -350,7 +350,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements Director
         }
     }
 
-    public void makeDir(String parentAbsolutePath, String directoryName) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+    public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
         org.apache.axis.types.URI uri = this.toSrmURI(parentAbsolutePath+"/"+directoryName);
         SrmMkdirRequest request = new SrmMkdirRequest();
         request.setSURL(uri);
@@ -373,7 +373,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements Director
         }
     }
 
-    public void removeDir(String parentAbsolutePath, String directoryName) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         org.apache.axis.types.URI uri = this.toSrmURI(parentAbsolutePath+"/"+directoryName);
         SrmRmdirRequest request = new SrmRmdirRequest();
         request.setSURL(uri);
@@ -397,7 +397,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements Director
         }
     }
 
-    public void removeFile(String parentAbsolutePath, String fileName) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         org.apache.axis.types.URI uri = this.toSrmURI(parentAbsolutePath+"/"+fileName);
         SrmRmRequest request = new SrmRmRequest();
         request.setArrayOfSURLs(new ArrayOfAnyURI(new org.apache.axis.types.URI[]{uri}));

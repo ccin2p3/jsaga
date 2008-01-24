@@ -231,7 +231,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
                 && (m_url.getPort()==effectiveTarget.getPort()))
         {
             try {
-                ((DataRename)m_adaptor).rename(m_url.getPath(), effectiveTarget.getPath(), overwrite);
+                ((DataRename)m_adaptor).rename(m_url.getPath(), effectiveTarget.getPath(), overwrite, m_url.getQuery());
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("File does not exist: "+ m_url, doesNotExist);
             } catch (AlreadyExists alreadyExists) {
@@ -261,7 +261,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             URL parent = this._getParentDirURL();
             String fileName = this._getEntryName();
             try {
-                ((DataWriterAdaptor)m_adaptor).removeFile(parent.getPath(), fileName);
+                ((DataWriterAdaptor)m_adaptor).removeFile(parent.getPath(), fileName, m_url.getQuery());
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("File does not exist: "+ m_url, doesNotExist);
             }

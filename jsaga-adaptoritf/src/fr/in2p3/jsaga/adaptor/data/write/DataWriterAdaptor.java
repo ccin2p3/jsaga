@@ -20,9 +20,10 @@ public interface DataWriterAdaptor extends DataAdaptor {
      * Removes the file <code>absolutePath</code>.
      * @param parentAbsolutePath the parent directory.
      * @param fileName the file to remove.
+     * @param additionalArgs adaptor specific arguments
      * @throws BadParameter if <code>absolutePath</code> is a directory.
      * @throws DoesNotExist if <code>absolutePath</code> does not exist.
      */
-    public void removeFile(String parentAbsolutePath, String fileName)
+    public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs)
         throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess;
 }

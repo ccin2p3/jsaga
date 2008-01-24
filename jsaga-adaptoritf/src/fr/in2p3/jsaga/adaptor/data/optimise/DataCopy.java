@@ -24,12 +24,13 @@ public interface DataCopy extends DataAdaptor {
      * @param targetPort the post of the target server.
      * @param targetAbsolutePath the path of the file to copy to.
      * @param overwrite if true, then target is overwrited if it exists.
+     * @param additionalArgs adaptor specific arguments
      * @throws BadParameter if <code>sourceAbsolutePath</code> is not a file.
      * @throws AlreadyExists if <code>targetAbsolutePath</code> already exists and <code>overwrite</code> is false.
      * @throws DoesNotExist if <code>sourceAbsolutePath</code> does not exist.
      * @throws ParentDoesNotExist if parent of <code>targetAbsolutePath</code> does not exist.
      */
-    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite)
+    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite, String additionalArgs)
         throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, ParentDoesNotExist, Timeout, NoSuccess;
 
     /**
@@ -39,10 +40,11 @@ public interface DataCopy extends DataAdaptor {
      * @param sourceAbsolutePath the path of the file to be copied.
      * @param targetAbsolutePath the path of the file to copy to.
      * @param overwrite if true, then target is overwrited if it exists.
+     * @param additionalArgs adaptor specific arguments
      * @throws BadParameter if <code>sourceAbsolutePath</code> is not a file.
      * @throws AlreadyExists if <code>targetAbsolutePath</code> already exists and <code>overwrite</code> is false.
      * @throws DoesNotExist if <code>sourceAbsolutePath</code> does not exist.
      */
-    public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite)
+    public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs)
         throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess;
 }

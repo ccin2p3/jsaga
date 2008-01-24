@@ -31,7 +31,7 @@ public class OptimizedEmulatorDataAdaptor extends EmulatorDataAdaptor implements
         return new String[]{"otest", "oemulated"};
     }
 
-    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, ParentDoesNotExist, Timeout, NoSuccess {
+    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, ParentDoesNotExist, Timeout, NoSuccess {
         File file = m_server.getFile(sourceAbsolutePath);
         DataEmulatorConnection targetServer = new DataEmulatorConnection(this.getSchemeAliases()[0], targetHost, targetPort);
 
@@ -62,7 +62,7 @@ public class OptimizedEmulatorDataAdaptor extends EmulatorDataAdaptor implements
         if(Base.DEBUG) targetServer.commit();
     }
 
-    public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         DataEmulatorConnection sourceServer = new DataEmulatorConnection(this.getSchemeAliases()[0], sourceHost, sourcePort);
         File file = sourceServer.getFile(sourceAbsolutePath);
 
@@ -88,7 +88,7 @@ public class OptimizedEmulatorDataAdaptor extends EmulatorDataAdaptor implements
         if(Base.DEBUG) m_server.commit();
     }
 
-    public void rename(String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite) throws PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+    public void rename(String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
         // get parents and entry names
         DirectoryType sourceParent = m_server.getParentDirectory(sourceAbsolutePath);
         DirectoryType targetParent = m_server.getParentDirectory(targetAbsolutePath);

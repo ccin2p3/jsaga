@@ -80,7 +80,7 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
         return newFile(absolutePath).length();
     }
 
-    public InputStream getInputStream(String absolutePath) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         try {
             File file = newFile(absolutePath);
             return new FileInputStream(file);
@@ -89,7 +89,7 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
         }
     }
 
-    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
         File parentDirectory;
         try {
             parentDirectory = newDirectory(parentAbsolutePath);
@@ -114,7 +114,7 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
         }
     }
 
-    public void removeFile(String parentAbsolutePath, String fileName) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         File parentDirectory = newDirectory(parentAbsolutePath);
         File file = new File(parentDirectory, fileName);
         if (!file.exists()) {
@@ -124,7 +124,7 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
         }
     }
 
-    public FileAttributes[] listAttributes(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         File[] list;
         File entry = this.newPath(absolutePath);
         if (entry == null) {
@@ -144,7 +144,7 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
         return ret;
     }
 
-    public void makeDir(String parentAbsolutePath, String directoryName) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+    public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
         File parentDirectory;
         try {
             parentDirectory = newDirectory(parentAbsolutePath);
@@ -159,7 +159,7 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
         }
     }
 
-    public void removeDir(String parentAbsolutePath, String directoryName) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         File parentDirectory = newDirectory(parentAbsolutePath);
         File directory = new File(parentDirectory, directoryName);
         if (!directory.exists()) {
@@ -169,7 +169,7 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
         }
     }
 
-    public void rename(String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite) throws PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+    public void rename(String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
         File source = newEntry(sourceAbsolutePath);
         File target = newPath(targetAbsolutePath);
         if (!overwrite && target!=null && target.exists()) {

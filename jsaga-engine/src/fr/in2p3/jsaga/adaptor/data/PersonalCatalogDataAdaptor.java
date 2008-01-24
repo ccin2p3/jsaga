@@ -83,7 +83,7 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
         return entry instanceof FileType;
     }
 
-    public void addLocation(String logicalEntry, URL replicaEntry) throws PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public void addLocation(String logicalEntry, URL replicaEntry, String additionalArgs) throws PermissionDenied, IncorrectState, Timeout, NoSuccess {
         // get or create logical entry
         File file;
         try {
@@ -102,7 +102,7 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
         if(Base.DEBUG) m_catalog.commit();
     }
 
-    public void removeLocation(String logicalEntry, URL replicaEntry) throws PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    public void removeLocation(String logicalEntry, URL replicaEntry, String additionalArgs) throws PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
         // get logical entry
         File file = m_catalog.getFile(logicalEntry);
         // remove replica location
@@ -112,18 +112,18 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
         if(Base.DEBUG) m_catalog.commit();
     }
 
-    public void removeFile(String parentAbsolutePath, String fileName) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         DirectoryType parent = m_catalog.getDirectory(parentAbsolutePath);
         m_catalog.removeFile(parent, fileName);
         if(Base.DEBUG) m_catalog.commit();
     }
 
-    public String[] listLocations(String logicalEntry) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public String[] listLocations(String logicalEntry, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         File file = m_catalog.getFile(logicalEntry);
         return file.getReplica();
     }
 
-    public FileAttributes[] listAttributes(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         EntryType[] list = m_catalog.listEntries(absolutePath);
         FileAttributes[] ret = new FileAttributes[list.length];
         for (int i=0; i<list.length; i++) {
@@ -132,7 +132,7 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
         return ret;
     }
 
-    public void makeDir(String parentAbsolutePath, String directoryName) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+    public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
         DirectoryType parent;
         try {
             parent = m_catalog.getDirectory(parentAbsolutePath);
@@ -148,7 +148,7 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
         if(Base.DEBUG) m_catalog.commit();
     }
 
-    public void removeDir(String parentAbsolutePath, String directoryName) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         DirectoryType parent = m_catalog.getDirectory(parentAbsolutePath);
         m_catalog.removeDirectory(parent, directoryName);
         if(Base.DEBUG) m_catalog.commit();

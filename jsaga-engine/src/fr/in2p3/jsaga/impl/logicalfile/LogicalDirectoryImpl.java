@@ -116,7 +116,7 @@ public class LogicalDirectoryImpl extends AbstractAsyncLogicalDirectoryImpl impl
         // for each child
         FileAttributes[] childs;
         try {
-            childs = ((MetaDataReader)m_adaptor).listAttributes(m_url.getPath(), keyValuePatterns);
+            childs = ((MetaDataReader)m_adaptor).listAttributes(m_url.getPath(), keyValuePatterns, m_url.getQuery());
         } catch (DoesNotExist doesNotExist) {
             throw new IncorrectState("Logical directory does not exist: "+ m_url, doesNotExist);
         }

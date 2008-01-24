@@ -89,7 +89,7 @@ public class Gsiftp2DataAdaptor extends GsiftpDataAdaptorAbstract {
     }
 
     /** override super.listAttributes() to use mlsd command */
-    public FileAttributes[] listAttributes(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         Vector v;
         try {
             m_client.setMode(GridFTPSession.MODE_STREAM);

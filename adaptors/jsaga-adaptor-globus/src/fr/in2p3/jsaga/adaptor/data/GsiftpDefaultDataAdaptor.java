@@ -37,7 +37,7 @@ public class GsiftpDefaultDataAdaptor extends GsiftpDataAdaptorAbstract {
         throw new NoSuccess("INTERNAL ERROR: this should never occur");
     }
 
-    public FileAttributes[] listAttributes(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         throw new NoSuccess("INTERNAL ERROR: this should never occur");
     }
 

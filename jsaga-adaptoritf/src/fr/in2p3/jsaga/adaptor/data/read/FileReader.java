@@ -30,10 +30,11 @@ public interface FileReader extends DataReaderAdaptor {
     /**
      * Get an input stream for the file <code>absolutePath</code>.
      * @param absolutePath the file to read from.
+     * @param additionalArgs adaptor specific arguments
      * @return an input stream.
      * @throws BadParameter if <code>absolutePath</code> is not a file.
      * @throws DoesNotExist if <code>absolutePath</code> does not exist.
      */
-    public InputStream getInputStream(String absolutePath)
+    public InputStream getInputStream(String absolutePath, String additionalArgs)
         throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess;
 }

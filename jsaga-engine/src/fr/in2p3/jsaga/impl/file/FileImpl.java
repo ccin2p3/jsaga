@@ -59,7 +59,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         if (effectiveFlags.contains(Flags.READ)) {
             if (m_adaptor instanceof FileReader) {
                 try {
-                    m_inStream = ((FileReader)m_adaptor).getInputStream(m_url.getPath());
+                    m_inStream = ((FileReader)m_adaptor).getInputStream(m_url.getPath(), m_url.getQuery());
                 } catch(DoesNotExist e) {
                     throw new DoesNotExist("File does not exist: "+ m_url, e.getCause());
                 }
@@ -80,13 +80,13 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
                     throw new BadParameter("Incompatible flags: EXCL and APPEND");
                 }
                 try {
-                    m_outStream = ((FileWriter)m_adaptor).getOutputStream(parent.getPath(), fileName, exclusive, append);
+                    m_outStream = ((FileWriter)m_adaptor).getOutputStream(parent.getPath(), fileName, exclusive, append, m_url.getQuery());
                 } catch(ParentDoesNotExist e) {
                     // make parent directories, then retry
                     if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
                         this._makeParentDirs();
                         try {
-                            m_outStream = ((FileWriter)m_adaptor).getOutputStream(parent.getPath(), fileName, exclusive, append);
+                            m_outStream = ((FileWriter)m_adaptor).getOutputStream(parent.getPath(), fileName, exclusive, append, m_url.getQuery());
                         } catch (ParentDoesNotExist e2) {
                             throw new DoesNotExist("Failed to create parent directory: "+parent, e2.getCause());
                         }
@@ -166,7 +166,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
                 ((DataCopyDelegated)m_adaptor).requestTransfer(
                         m_url,
                         effectiveTarget,
-                        overwrite);
+                        overwrite, m_url.getQuery());
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("Source file does not exist: "+ m_url, doesNotExist);
             } catch (AlreadyExists alreadyExists) {
@@ -178,7 +178,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
                 ((DataCopy)m_adaptor).copy(
                         m_url.getPath(),
                         effectiveTarget.getHost(), targetPort, effectiveTarget.getPath(),
-                        overwrite);
+                        overwrite, m_url.getQuery());
             } catch (ParentDoesNotExist parentDoesNotExist) {
                 throw new DoesNotExist("Target parent directory does not exist: "+effectiveTarget.resolve(new URL(".")), parentDoesNotExist);
             } catch (DoesNotExist doesNotExist) {
@@ -227,7 +227,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
                 ((DataCopyDelegated)m_adaptor).requestTransfer(
                         effectiveSource,
                         m_url,
-                        overwrite);
+                        overwrite, m_url.getQuery());
             } catch (DoesNotExist doesNotExist) {
                 throw new DoesNotExist("Source file does not exist: "+effectiveSource, doesNotExist.getCause());
             } catch (AlreadyExists alreadyExists) {
@@ -238,7 +238,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
                 ((DataCopy)m_adaptor).copyFrom(
                         effectiveSource.getHost(), effectiveSource.getPort(), effectiveSource.getPath(),
                         m_url.getPath(),
-                        overwrite);
+                        overwrite, m_url.getQuery());
             } catch (DoesNotExist doesNotExist) {
                 throw new DoesNotExist("Source file does not exist: "+effectiveSource, doesNotExist.getCause());
             } catch (AlreadyExists alreadyExists) {
@@ -415,7 +415,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
 
     public InputStream newInputStream() throws NotImplemented, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
         String absolutePath = super.getURL().getPath();
-        return ((FileReader) m_adaptor).getInputStream(absolutePath);
+        return ((FileReader) m_adaptor).getInputStream(absolutePath, m_url.getQuery());
     }
 
     public OutputStream newOutputStream(boolean overwrite) throws NotImplemented, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
@@ -424,7 +424,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         boolean exclusive = !overwrite;
         boolean append = false;
         try {
-            return ((FileWriter) m_adaptor).getOutputStream(parentAbsolutePath, fileName, exclusive, append);
+            return ((FileWriter) m_adaptor).getOutputStream(parentAbsolutePath, fileName, exclusive, append, m_url.getQuery());
         } catch (ParentDoesNotExist e) {
             throw new DoesNotExist(e);
         }

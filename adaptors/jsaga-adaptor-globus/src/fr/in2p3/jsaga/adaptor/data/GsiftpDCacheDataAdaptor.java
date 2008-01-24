@@ -79,7 +79,7 @@ public class GsiftpDCacheDataAdaptor extends GsiftpDataAdaptorAbstract {
 
     //fixme: listAttributes does not work
     /** MLSD command is not supported */
-    public FileAttributes[] listAttributes(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         Vector v;
         try {
             m_client.setMode(GridFTPSession.MODE_STREAM);
