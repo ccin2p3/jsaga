@@ -108,7 +108,7 @@ public class URL {
      */
     public String getPath() throws NotImplemented {
         if (".".equals(u.getAuthority())) {
-            return u.getPath().substring(1);
+            return "."+u.getPath();
         } else {
             return u.getPath();
         }
@@ -123,8 +123,14 @@ public class URL {
      */
     public void setPath(String path) throws NotImplemented, BadParameter {
         try {
-            u = new URI(u.getScheme(), u.getUserInfo(), u.getHost(),
-                    u.getPort(), path, u.getQuery(), u.getFragment());
+            if (path.startsWith("./")) {
+                u = new URI(u.getScheme(), u.getAuthority(),
+                        path.substring(1), u.getQuery(), u.getFragment());
+            } else {
+                u = new URI(u.getScheme(), u.getUserInfo(), u.getHost(),
+                        u.getPort(), path, u.getQuery(), u.getFragment());
+            }
+            //sreynaud: accepts relative path
         } catch(URISyntaxException e) {
             throw new BadParameter("syntax error in host", e);
         }
