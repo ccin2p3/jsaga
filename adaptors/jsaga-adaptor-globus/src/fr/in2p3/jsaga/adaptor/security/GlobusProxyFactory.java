@@ -45,15 +45,13 @@ public class GlobusProxyFactory extends GlobusProxyFactoryAbstract {
         super((String) attributes.get(Context.USERPASS)); // UserPass is ignored if key is not encrypted
         CoGProperties.getDefault().setCaCertLocations((String) attributes.get(Context.CERTREPOSITORY));
         m_proxyFile = (String) attributes.get(Context.USERPROXY);
-        if(attributes.containsKey(Context.USERCERT) &&
-        		attributes.get(Context.USERCERT) != null
-        		&& attributes.containsKey(Context.USERKEY) && 
+        if(attributes.get(Context.USERCERT) != null &&
         		attributes.get(Context.USERKEY) != null) {
         	setCertificateFormat(CERTIFICATE_PEM);
             m_certFile = (String) attributes.get(Context.USERCERT);
             m_keyFile = (String) attributes.get(Context.USERKEY);
         }
-        else if (attributes.containsKey(GlobusContext.USERCERTKEY)) {
+        else if (attributes.get(GlobusContext.USERCERTKEY) != null) {
         	setCertificateFormat(CERTIFICATE_PKCS12);
         	m_certFile = (String) attributes.get(GlobusContext.USERCERTKEY);
         	m_keyFile = (String) attributes.get(GlobusContext.USERCERTKEY);
