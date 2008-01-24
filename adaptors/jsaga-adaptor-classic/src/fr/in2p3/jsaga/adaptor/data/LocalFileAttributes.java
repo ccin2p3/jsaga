@@ -19,7 +19,9 @@ import java.io.File;
  */
 public class LocalFileAttributes extends FileAttributes {
     public LocalFileAttributes(File entry) {
-        m_name = entry.getName();
+        m_name = (entry.getParentFile()!=null
+                ? entry.getName()
+                : "/"+entry.getPath().substring(0,2));  // format Windows drive to enable inclusion in URL
 
         m_type = entry.isDirectory()
                 ? FileAttributes.DIRECTORY_TYPE

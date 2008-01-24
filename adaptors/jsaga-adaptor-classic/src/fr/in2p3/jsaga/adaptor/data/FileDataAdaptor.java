@@ -26,6 +26,7 @@ import java.util.Map;
  *
  */
 public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader, DirectoryWriter, DataRename {
+    private static final boolean s_isWindows = System.getProperty("os.name").startsWith("Windows");
     private String m_drive;
 
     public Usage getUsage() {
@@ -53,7 +54,9 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {
-        m_drive = host;
+        if (s_isWindows) {
+            m_drive = host;
+        }
     }
 
     public void disconnect() throws NoSuccess {
@@ -61,7 +64,8 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
     }
 
     public boolean exists(String absolutePath) throws PermissionDenied, Timeout, NoSuccess {
-        return newPath(absolutePath).exists();
+        File entry = newPath(absolutePath);
+        return entry==null || entry.exists();
     }
 
     public boolean isDirectory(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
@@ -121,7 +125,15 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
     }
 
     public FileAttributes[] listAttributes(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        File[] list = newEntry(absolutePath).listFiles();
+        File[] list;
+        File entry = this.newPath(absolutePath);
+        if (entry == null) {
+            list = File.listRoots();
+        } else if (entry.exists()) {
+            list = newEntry(absolutePath).listFiles();
+        } else {
+            throw new DoesNotExist("Entry does not exist");
+        }
         if (list == null) {
             throw new PermissionDenied("Permission denied");
         }
@@ -160,31 +172,40 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
     public void rename(String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite) throws PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
         File source = newEntry(sourceAbsolutePath);
         File target = newPath(targetAbsolutePath);
-        if (!overwrite && target.exists()) {
-            throw new AlreadyExists("Entry already exists");
+        if (!overwrite && target!=null && target.exists()) {
+            throw new AlreadyExists("Target entry already exists");
         }
         source.renameTo(target);
     }
 
     ////////////////////////////////////// private methods //////////////////////////////////////
 
-    private File newPath(String absolutePath) {
-        String correctedAbsolutePath = (m_drive != null
-                ? m_drive+":"+absolutePath.replaceAll("%20", " ")
-                : absolutePath.replaceAll("%20", " "));
-        return new File(correctedAbsolutePath);
+    private File newPath(String absolutePath) throws NoSuccess {
+        if (s_isWindows) {
+            if (m_drive != null) {
+                return new File(m_drive+":"+absolutePath.replaceAll("%20", " "));
+            } else if (absolutePath.matches("/+([A-Za-z]:).*") || absolutePath.startsWith("./")) {
+                return new File(absolutePath.replaceAll("%20", " "));
+            } else if (absolutePath.matches("/+")) {
+                return null;
+            } else {
+                throw new NoSuccess("Absolute path in Windows must start with drive letter");
+            }
+        } else {
+            return new File(absolutePath.replaceAll("%20", " "));
+        }
     }
 
-    private File newEntry(String absolutePath) throws DoesNotExist {
+    private File newEntry(String absolutePath) throws DoesNotExist, NoSuccess {
         File entry = this.newPath(absolutePath);
-        if (entry.exists()) {
+        if (entry!=null && entry.exists()) {
             return entry;
         } else {
             throw new DoesNotExist("Entry does not exist");
         }
     }
 
-    private File newFile(String absolutePath) throws BadParameter, DoesNotExist {
+    private File newFile(String absolutePath) throws BadParameter, DoesNotExist, NoSuccess {
         File entry = this.newEntry(absolutePath);
         if (entry.isFile()) {
             return entry;
@@ -193,7 +214,7 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
         }
     }
 
-    private File newDirectory(String absolutePath) throws BadParameter, DoesNotExist {
+    private File newDirectory(String absolutePath) throws BadParameter, DoesNotExist, NoSuccess {
         File entry = this.newEntry(absolutePath);
         if (entry.isDirectory()) {
             return entry;
