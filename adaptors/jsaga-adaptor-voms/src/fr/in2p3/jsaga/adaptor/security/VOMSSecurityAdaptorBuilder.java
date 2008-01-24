@@ -6,6 +6,7 @@ import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityAdaptor;
 import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.globus.common.CoGProperties;
+import org.globus.gsi.CertUtil;
 import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.gridforum.jgss.ExtendedGSSCredential;
@@ -33,7 +34,8 @@ import java.util.Map;
  *
  */
 public class VOMSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
-    protected static final String VOMSDIR = "VomsDir";
+	protected static final String USERCERTKEY = "UserCertKey";
+	 protected static final String VOMSDIR = "VomsDir";
     private static final String USERPROXYOBJECT = "UserProxyObject";
     private static final Usage LOCAL_PROXY_OBJECT = new UNoPrompt(USERPROXYOBJECT);
     private static final Usage LOCAL_PROXY_FILE = new UFile(Context.USERPROXY);
@@ -73,8 +75,11 @@ public class VOMSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
                 new Default(Context.USERKEY, new File[]{
                         new File(env.getProperty("X509_USER_KEY")+""),
                         new File(System.getProperty("user.home")+"/.globus/userkey.pem")}),
+                new Default(USERCERTKEY, new File[]{
+                        new File(env.getProperty("PKCS12_USER_CERT")+""),
+                        new File(System.getProperty("user.home")+"/.globus/usercert.p12")}),                        
                 new Default(Context.CERTREPOSITORY, new File[]{
-                        new File(env.getProperty("X509_CERT_DIR")+""),
+                        new File(env.getProperty("CADIR")+""),
                         new File(System.getProperty("user.home")+"/.globus/certificates/"),
                         new File("/etc/grid-security/certificates/")}),
                 new Default(VOMSDIR, new File[]{
@@ -109,6 +114,36 @@ public class VOMSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
             throw new BadParameter("Missing attribute(s): "+this.getUsage().getMissingValues(attributes));
         }
         // check if proxy contains extension
+        /*GlobusCredential globusProxy = ((GlobusGSSCredentialImpl)cred).getGlobusCredential();        
+        if(hasNonCriticalExtensions(cred)) {
+    		if(CertUtil.isGsi3Proxy(globusProxy.getProxyType())){
+        		// check for Globus proxy
+        		System.out.println("Is a VOMSGlobus proxy");    		
+        	}
+        	else if(CertUtil.isGsi2Proxy(globusProxy.getProxyType())){
+        		// check for Globus proxy
+        		System.out.println("Is a VOMSGlobusLegacy proxy");    		
+        	}
+        	else if(CertUtil.isGsi4Proxy(globusProxy.getProxyType())){
+        		// check for Globus proxy
+        		System.out.println("Is a VOMSGlobusRFC820 proxy");    		
+        	} 
+    	}
+    	else {
+    		if(CertUtil.isGsi3Proxy(globusProxy.getProxyType())){
+    			// check for Globus proxy
+	    		System.out.println("Is a Globus proxy");    		
+	    	}
+	    	else if(CertUtil.isGsi2Proxy(globusProxy.getProxyType())){
+	    		// check for Globus proxy
+	    		System.out.println("Is a GlobusLegacy proxy");    		
+	    	}
+	    	else if(CertUtil.isGsi4Proxy(globusProxy.getProxyType())){
+	    		// check for Globus proxy
+	    		System.out.println("Is a GlobusRFC820 proxy");    		
+	    	}
+    	}*/
+        
         if (hasNonCriticalExtensions(cred)) {
             return new VOMSSecurityAdaptor(cred);
         } else {
@@ -131,7 +166,7 @@ public class VOMSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
     }
 
     private static boolean hasNonCriticalExtensions(GSSCredential proxy) {
-        if (proxy instanceof GlobusGSSCredentialImpl) {
+    	 if (proxy instanceof GlobusGSSCredentialImpl) {
             GlobusCredential globusProxy = ((GlobusGSSCredentialImpl)proxy).getGlobusCredential();
             X509Certificate cert = globusProxy.getCertificateChain()[0];
             if (cert instanceof X509CertificateObject) {

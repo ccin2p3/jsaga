@@ -1,14 +1,21 @@
 package fr.in2p3.jsaga.adaptor.security;
 
 import fr.in2p3.jsaga.adaptor.base.usage.*;
+
+import org.glite.security.voms.VOMSAttribute;
+import org.glite.security.voms.VOMSValidator;
 import org.glite.security.voms.contact.*;
+import org.globus.gsi.GlobusCredential;
+import org.globus.gsi.bc.BouncyCastleCertProcessingFactory;
 import org.globus.util.Util;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.BadParameter;
+import org.ogf.saga.error.NoSuccess;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Vector;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -23,7 +30,6 @@ import java.util.Map;
  *
  */
 public class VOMSSecurityAdaptorBuilderExtended extends VOMSSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuilder {
-    private static final String USERCERTKEY = "UserCertKey";
     private static final String USERFQAN = "UserFQAN";
     private static final String DELEGATION = "Delegation";
     private static final String PROXYTYPE = "ProxyType";
@@ -73,12 +79,26 @@ public class VOMSSecurityAdaptorBuilderExtended extends VOMSSecurityAdaptorBuild
     private static final int DELEGATION_NONE = 1;
     private static final int DELEGATION_LIMITED = 2;
     private static final int DELEGATION_FULL = 3;   // default
+    
     public void initBuilder(Map attributes, String contextId) throws Exception {
         // required attributes
-        System.setProperty("X509_USER_CERT", (String) attributes.get(Context.USERCERT));
-        System.setProperty("X509_USER_KEY", (String) attributes.get(Context.USERKEY));
         System.setProperty("X509_CERT_DIR", (String) attributes.get(Context.CERTREPOSITORY));
+        System.setProperty("CADIR", (String) attributes.get(Context.CERTREPOSITORY));
         System.setProperty("VOMSDIR", (String) attributes.get(VOMSDIR));
+        
+        // optional attributes
+        if(attributes.get(Context.USERCERT) != null && 
+        		attributes.get(Context.USERKEY) != null) {
+        	System.setProperty("X509_USER_CERT", (String) attributes.get(Context.USERCERT));
+            System.setProperty("X509_USER_KEY", (String) attributes.get(Context.USERKEY));
+        }
+        else if (attributes.get(USERCERTKEY) != null) {
+        	System.setProperty("PKCS12_USER_CERT", (String) attributes.get(USERCERTKEY));
+        }
+        else {
+        	throw new BadParameter("Invalid case, either PEM or PKCS12 certificates is supported");
+        }
+        
         URI uri = new URI((String) attributes.get(Context.SERVER));
         if (uri.getHost()==null) {
             throw new BadParameter("Attribute Server has no host name: "+uri.toString());
@@ -101,7 +121,7 @@ public class VOMSSecurityAdaptorBuilderExtended extends VOMSSecurityAdaptorBuild
             o.addFQAN((String) attributes.get(USERFQAN));
         }
         if (attributes.containsKey(Context.LIFETIME)) {
-            int lifetime = UDuration.toInt(attributes.get(Context.LIFETIME));
+        	int lifetime = UDuration.toInt(attributes.get(Context.LIFETIME));
             proxyInit.setProxyLifetime(lifetime);
             o.setLifetime(lifetime);
         }
@@ -127,9 +147,28 @@ public class VOMSSecurityAdaptorBuilderExtended extends VOMSSecurityAdaptorBuild
         }
 
         // create
+        GlobusCredential globusProxy = null;
         ArrayList options = new ArrayList();
         options.add(o);
-        proxyInit.getVomsProxy(options);
+        if(((String) attributes.get(Context.USERVO)).equals("NOVO")) {
+        	// TEST to create gridProxy : 
+        	globusProxy = proxyInit.getVomsProxy(null);
+        }
+        else { 
+        	globusProxy = proxyInit.getVomsProxy(options);
+	        // validate
+	        try {
+		        Vector v = VOMSValidator.parse(globusProxy.getCertificateChain());
+		        for (int i=0; i<v.size(); i++) {
+		            VOMSAttribute attr = (VOMSAttribute) v.elementAt(i);
+		            if(!attr.getVO().equals((String) attributes.get(Context.USERVO)))
+		            	throw new NoSuccess("The VO name of the created VOMS proxy ('"+attr.getVO()+"') does not match with the required VO name ('"+ (String) attributes.get(Context.USERVO)+"').");
+		        }
+	        }
+	        catch (IllegalArgumentException iAE) {
+	        	throw new BadParameter("The lifetime may be too long : "+iAE.getMessage());
+	        }
+        }
     }
 
     public void destroyBuilder(Map attributes, String contextId) throws Exception {
