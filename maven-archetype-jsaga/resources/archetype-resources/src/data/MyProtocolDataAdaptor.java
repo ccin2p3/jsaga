@@ -1,8 +1,12 @@
 package ${package}.data;
 
+import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import org.ogf.saga.error.*;
+
+import java.util.Map;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -17,7 +21,19 @@ import org.ogf.saga.error.*;
  *
  */
 public class MyProtocolDataAdaptor implements DataAdaptor {
-    public String[] getSupportedContextTypes() {
+    public Usage getUsage() {
+        return null;
+    }
+
+    public Default[] getDefaults(Map attributes) throws IncorrectState {
+        return null;
+    }
+
+    public String[] getSchemeAliases() {
+        return new String[]{"myprotocol", "altprotocol"};
+    }
+
+    public Class[] getSupportedSecurityAdaptorClasses() {
         return null;
     }
 
@@ -25,15 +41,11 @@ public class MyProtocolDataAdaptor implements DataAdaptor {
         // set security context
     }
 
-    public String getScheme() {
-        return "myprotocol";
+    public int getDefaultPort() {
+        return 0;
     }
 
-    public String[] getSchemeAliases() {
-        return new String[]{"altprotocol"};
-    }
-
-    public void connect(String userInfo, String host, int port) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
         // connect to server
     }
 
