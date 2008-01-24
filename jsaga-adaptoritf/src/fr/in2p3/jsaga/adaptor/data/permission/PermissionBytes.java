@@ -1,5 +1,7 @@
 package fr.in2p3.jsaga.adaptor.data.permission;
 
+import org.ogf.saga.permissions.Permission;
+
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -38,5 +40,9 @@ public class PermissionBytes {
 
     public PermissionBytes or(PermissionBytes perm) {
         return new PermissionBytes(this.value | perm.value);
+    }
+
+    public boolean contains(final Permission ref) {
+        return (value & ref.getValue()) > 0;
     }
 }

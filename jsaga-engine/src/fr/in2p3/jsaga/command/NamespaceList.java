@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.command;
 
+import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.helpers.SAGAPattern;
-import fr.in2p3.jsaga.impl.namespace.AbstractNSDirectoryImpl;
 import org.apache.commons.cli.*;
 import org.ogf.saga.URL;
 import org.ogf.saga.namespace.*;
@@ -65,19 +65,17 @@ public class NamespaceList extends AbstractCommand {
             // get list
             Session session = SessionFactory.createSession(true);
             NSDirectory dir = NSFactory.createNSDirectory(session, url, Flags.NONE.getValue());
-            List list;
-            if (line.hasOption(OPT_LONG)) {
-                list = ((AbstractNSDirectoryImpl)dir).listWithLongFormat(pattern, Flags.NONE.getValue());
-            } else {
-                list = dir.list(pattern, Flags.NONE.getValue());
-            }
+            List<URL> list = dir.list(pattern, Flags.NONE.getValue());
             dir.close();
 
             // display list
-            for (Iterator it=list.iterator(); it.hasNext(); ) {
-                Object file = it.next();
-                String fileCorrected = (file instanceof URL ? file.toString().replaceAll("%20", " ") : (String) file);
-                System.out.println(fileCorrected);
+            for (Iterator<URL> it=list.iterator(); it.hasNext(); ) {
+                URL entry = it.next();
+                if (line.hasOption(OPT_LONG) && entry instanceof JSagaURL) {
+                    System.out.println(((JSagaURL)entry).getLongFormat());
+                } else {
+                    System.out.println(entry.toString().replaceAll("%20", " "));
+                }
             }
         }
     }

@@ -45,12 +45,28 @@ public abstract class FileAttributes {
         return m_type;
     }
 
+    public long getSize() {
+        return m_size;
+    }
+
+    public PermissionBytes getPermission() {
+        return m_permission;
+    }
+
+    public String getOwner() {
+        return m_owner;
+    }
+
+    public long getLastModified() {
+        return m_lastModified;
+    }
+
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append(m_type ==DIRECTORY_TYPE ? 'd' : '-');
-        buf.append(contains(m_permission, Permission.READ) ? 'r' : '-');
-        buf.append(contains(m_permission, Permission.WRITE) ? 'w' : '-');
-        buf.append(contains(m_permission, Permission.EXEC) ? 'x' : '-');
+        buf.append(m_permission.contains(Permission.READ) ? 'r' : '-');
+        buf.append(m_permission.contains(Permission.WRITE) ? 'w' : '-');
+        buf.append(m_permission.contains(Permission.EXEC) ? 'x' : '-');
         buf.append(' ');
         if (m_owner != null) {
             buf.append(format(m_owner, 8));
@@ -60,12 +76,8 @@ public abstract class FileAttributes {
         buf.append(' ');
         buf.append(new SimpleDateFormat("MMM-dd-yyyy HH:mm", Locale.ENGLISH).format(new Date(m_lastModified)));
         buf.append(' ');
-        buf.append(m_name);
+        buf.append(this.getName());
         return buf.toString();
-    }
-
-    private boolean contains(PermissionBytes permission, final Permission ref) {
-        return (permission.getValue() & ref.getValue()) > 0;
     }
 
     private StringBuffer format(String value, int length) {

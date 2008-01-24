@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl.namespace;
 
+import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.optimise.FilteredDirectoryReader;
@@ -101,26 +102,23 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
     }
 
     public List<URL> list(String pattern, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IncorrectURL {
-        return this._list(pattern, false, flags);
+        return this._list(pattern, flags);
     }
     public List<URL> list(String pattern) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IncorrectURL {
         return this.list(pattern, Flags.NONE.getValue());
     }
 
     public List<URL> list(int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IncorrectURL {
-        return this._list(null, false, flags);
+        return this._list(null, flags);
     }
     public List<URL> list() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IncorrectURL {
         return this.list(Flags.NONE.getValue());
     }
 
-    public List<String> listWithLongFormat(String pattern, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IncorrectURL {
-        return this._list(pattern, true, flags);
-    }
-    private List _list(String pattern, boolean longFormat, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IncorrectURL {
+    private List<URL> _list(String pattern, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IncorrectURL {
         FlagsBytes effectiveFlags = new FlagsBytes(flags);
         if (effectiveFlags.contains(Flags.DEREFERENCE)) {
-            return this._dereferenceDir()._list(pattern, longFormat, effectiveFlags.remove(Flags.DEREFERENCE));
+            return this._dereferenceDir()._list(pattern, effectiveFlags.remove(Flags.DEREFERENCE));
         }
         effectiveFlags.checkAllowed(Flags.DEREFERENCE.getValue());
 
@@ -140,15 +138,10 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
 
         // filter
         Pattern p = SAGAPattern.toRegexp(pattern);
-        List<Object> matchingNames = new ArrayList<Object>();
+        List<URL> matchingNames = new ArrayList<URL>();
         for (int i=0; i<childs.length; i++) {
             if (p==null || p.matcher(childs[i].getName()).matches()) {
-                if (longFormat) {
-                    matchingNames.add(childs[i].toString());
-                } else {
-                    String correctedName = childs[i].getName().replaceAll(" ", "%20");
-                    matchingNames.add(new URL(correctedName));
-                }
+                matchingNames.add(new JSagaURL(childs[i]));
             }
         }
         return matchingNames;
