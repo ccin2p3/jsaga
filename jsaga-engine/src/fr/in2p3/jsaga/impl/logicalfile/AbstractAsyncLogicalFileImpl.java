@@ -26,7 +26,7 @@ import java.util.List;
 /**
  *
  */
-public abstract class AbstractAsyncLogicalFileImpl extends AbstractNSEntryImplWithAsyncAttributes implements LogicalFile {
+public abstract class AbstractAsyncLogicalFileImpl extends AbstractNSEntryImplWithMetaData implements LogicalFile {
     /** constructor for factory */
     public AbstractAsyncLogicalFileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         super(session, url, adaptor, flags);

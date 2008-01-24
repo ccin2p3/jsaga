@@ -27,7 +27,7 @@ import java.util.List;
 /**
  *
  */
-public abstract class AbstractAsyncLogicalDirectoryImpl extends AbstractNSDirectoryImplWithAsyncAttributes implements LogicalDirectory {
+public abstract class AbstractAsyncLogicalDirectoryImpl extends AbstractNSDirectoryImplWithMetaData implements LogicalDirectory {
     /** constructor for factory */
     public AbstractAsyncLogicalDirectoryImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         super(session, url, adaptor, flags);
