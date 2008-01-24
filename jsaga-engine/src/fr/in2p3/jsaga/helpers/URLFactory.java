@@ -63,7 +63,8 @@ public class URLFactory {
         } catch (URISyntaxException e) {
             throw new BadParameter(e);
         }
-        java.net.URI uri = baseUri.resolve(name);
+        String relativePath = name + (baseUri.getFragment()!=null ? "#"+baseUri.getFragment() : "");
+        java.net.URI uri = baseUri.resolve(relativePath);
         return new URL(uri.toString());
     }
 }

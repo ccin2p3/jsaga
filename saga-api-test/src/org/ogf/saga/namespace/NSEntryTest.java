@@ -21,8 +21,7 @@ public class NSEntryTest extends AbstractNSEntryTest {
     }
 
     public void test_getURL() throws Exception {
-        URL expected = new URL(m_fileUrl.toString());
-        expected.setFragment(null);
+        URL expected = m_fileUrl;
         assertEquals(
                 expected.toString(),
                 m_file.getURL().toString());
