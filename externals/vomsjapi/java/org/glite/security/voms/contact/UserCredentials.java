@@ -164,6 +164,11 @@ public class UserCredentials {
 
                 userKey.decrypt( password );
 
+            } catch ( javax.crypto.BadPaddingException e ) {
+
+                throw new VOMSException( "Error decrypting private key, passord may be wrong: "
+                        + e.getMessage());
+
             } catch ( InvalidKeyException e ) {
 
                 log.error( "Error decrypting private key: "
@@ -212,9 +217,11 @@ public class UserCredentials {
             // Take the first alias and hope it is the right one...
             String alias = (String)aliases.nextElement();
 
-            userChain = (X509Certificate[]) ks.getCertificateChain( alias);
-            userCert=(X509Certificate) ks.getCertificate( alias );
+		userCert=(X509Certificate) ks.getCertificate( alias );
             userKey = new BouncyCastleOpenSSLKey((PrivateKey)ks.getKey( alias, keyPassword.toCharArray()));
+            //userChain = (X509Certificate[]) ks.getCertificateChain( alias);
+            userChain = new X509Certificate[1];
+		userChain[0] = userCert;
             
         
         } catch ( Exception e ) {
@@ -223,7 +230,7 @@ public class UserCredentials {
             
             if (log.isDebugEnabled())
                 log.error( "Error importing pkcs12 certificate: "+e.getMessage(),e );
-        
+        	e.printStackTrace();
             throw new VOMSException(e);
         }    
         
@@ -258,14 +265,15 @@ public class UserCredentials {
                 return;
                 
             }catch (VOMSException e) {
-                log.debug ("Error parsing credentials:"+e.getMessage());
+                //log.debug ("Error parsing credentials:"+e.getMessage());
                 if (log.isDebugEnabled())
                     log.debug(e.getMessage(),e);
+		throw e;
             }
 
         }
         
-        log.debug( "Looking for pem certificates in "+System.getProperty( "user.home" )+File.separator+".globus" );
+        /*log.debug( "Looking for pem certificates in "+System.getProperty( "user.home" )+File.separator+".globus" );
         
         File globusCert = new File (System.getProperty( "user.home" )+File.separator+".globus"+File.separator+"usercert.pem");
         File globusKey = new File (System.getProperty( "user.home" )+File.separator+".globus"+File.separator+"userkey.pem");
@@ -280,7 +288,7 @@ public class UserCredentials {
             log.debug ("Error parsing credentials:"+e.getMessage());
             if (log.isDebugEnabled())
                 log.debug(e.getMessage(),e);
-        }
+        }*/
         
         // PKCS12 credentials support
         if (pkcs12UserCert!=null){
@@ -289,22 +297,23 @@ public class UserCredentials {
             File pkcs12File = null;
             
             try {
-                
-                pkcs12File = new File(System.getProperty( "user.home" )+File.separator+".globus" +File.separator+"usercert.p12");
+		// resolve bug load pkcs12UserCert and not default value
+                //pkcs12File = new File(System.getProperty( "user.home" )+File.separator+".globus" +File.separator+"usercert.p12");
+                pkcs12File = new File(pkcs12UserCert);
                 loadPKCS12Credentials( pkcs12File, (pkcs12UserKeyPassword != null)? pkcs12UserKeyPassword: keyPassword);
                 log.debug( "Credentials loaded succesfully." );
                 return;
                 
             }catch(VOMSException e){
-                log.debug ("Error parsing credentials from "+pkcs12File+":"+e.getMessage());
+                //log.debug ("Error parsing credentials from "+pkcs12File+":"+e.getMessage());
                 if (log.isDebugEnabled())
                     log.debug(e.getMessage(),e);
-                
-            }   
+		throw e;
+            }
             
         }
         
-        log.debug( "Looking for pkcs12 certificate in "+ System.getProperty( "user.home" )+File.separator+".globus"+File.separator+"usercert.p12");
+        /*log.debug( "Looking for pkcs12 certificate in "+ System.getProperty( "user.home" )+File.separator+".globus"+File.separator+"usercert.p12");
         
         File pkcs12File = null;
         
@@ -320,7 +329,7 @@ public class UserCredentials {
             if (log.isDebugEnabled())
                 log.debug(e.getMessage(),e);
             
-        }
+        }*/
         
         throw new VOMSException("No user credentials found!");
     }

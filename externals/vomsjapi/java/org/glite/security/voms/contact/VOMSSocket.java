@@ -58,26 +58,28 @@ public class VOMSSocket {
     
     GlobusCredential proxy = null;
         
-    int proxyType = VOMSProxyBuilder.DEFAULT_PROXY_TYPE;
-    
+    //int proxyType = VOMSProxyBuilder.DEFAULT_PROXY_TYPE;
+    int delegationType = VOMSProxyBuilder.DEFAULT_DELEGATION_TYPE ;
+
     private GssSocket socket = null;
     
-    public static VOMSSocket instance(UserCredentials cred, String hostDN, int proxyType){
-        return new VOMSSocket(cred, hostDN, proxyType);
+    public static VOMSSocket instance(UserCredentials cred, String hostDN, int delegationType){
+        return new VOMSSocket(cred, hostDN, delegationType);
         
     }
     
     public static VOMSSocket instance(UserCredentials cred, String hostDN){
         
-        return new VOMSSocket(cred, hostDN, VOMSProxyBuilder.DEFAULT_PROXY_TYPE);
-        
+        //return new VOMSSocket(cred, hostDN, VOMSProxyBuilder.DEFAULT_PROXY_TYPE);
+        return new VOMSSocket(cred, hostDN, VOMSProxyBuilder.DEFAULT_DELEGATION_TYPE);
+
     }
     
-    private VOMSSocket(UserCredentials cred, String hostDN, int proxyType){
+    private VOMSSocket(UserCredentials cred, String hostDN, int delegationType){
         
         this.cred = cred;
         this.hostDN = hostDN;
-        this.proxyType = proxyType;
+        this.delegationType= delegationType;
     }
     
     /**
@@ -106,8 +108,9 @@ public class VOMSSocket {
         log.debug( "hostDN:"+hostDN );
         GSSCredential clientCreds;
                 
-        proxy = VOMSProxyBuilder.buildProxy( cred, VOMSProxyBuilder.DEFAULT_PROXY_LIFETIME, proxyType);
-        
+       // proxy = VOMSProxyBuilder.buildProxy( cred, VOMSProxyBuilder.DEFAULT_PROXY_LIFETIME, proxyType);
+         proxy = VOMSProxyBuilder.buildProxy( cred, VOMSProxyBuilder.DEFAULT_PROXY_LIFETIME, delegationType);
+
         try {
             
             clientCreds = (GSSCredential)new GlobusGSSCredentialImpl( proxy , GSSCredential.INITIATE_ONLY ) ;

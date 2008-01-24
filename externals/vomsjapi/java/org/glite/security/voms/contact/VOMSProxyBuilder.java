@@ -171,7 +171,8 @@ public class VOMSProxyBuilder {
      * @return a {@link GlobusCredential} object that represents the proxy.
      */
     public static GlobusCredential buildProxy (UserCredentials cred){
-        return buildProxy( cred, 3600, DEFAULT_PROXY_TYPE );
+       // return buildProxy( cred, 3600, DEFAULT_PROXY_TYPE );
+	 return buildProxy( cred, 3600, DEFAULT_DELEGATION_TYPE);
     }
     
     
@@ -183,19 +184,20 @@ public class VOMSProxyBuilder {
      * @param lifetime, the lifetime (in seconds) of the generated proxy.
      * @return a {@link GlobusCredential} object that represents the proxy.
      */
-    public static GlobusCredential buildProxy( UserCredentials cred, int lifetime, int proxyType  ) {
+    public static GlobusCredential buildProxy( UserCredentials cred, int lifetime, int delegationMode  ) {
 
         BouncyCastleCertProcessingFactory factory = BouncyCastleCertProcessingFactory
                 .getDefault();
 
         try {
 
+	// factory.createCredential(cred.getUserChain(),  cred.getUserKey().getPrivateKey(),512, lifetime, GSIConstants.DELEGATION_FULL );
             return factory.createCredential(
                     cred.getUserChain(), 
                     cred.getUserKey().getPrivateKey(),
                     512, 
                     lifetime, 
-                    GSIConstants.DELEGATION_FULL );
+                    delegationMode   );
 
         } catch ( GeneralSecurityException e ) {
             log.error("Error creating temp proxy: "+e.getMessage());

@@ -216,7 +216,7 @@ public class VOMSProxyInit {
     
     protected GlobusCredential getGridProxy(){
         
-        GlobusCredential proxy = VOMSProxyBuilder.buildProxy( userCredentials, proxyLifetime, proxyType);
+        GlobusCredential proxy = VOMSProxyBuilder.buildProxy( userCredentials, proxyLifetime, delegationType );
         
         try{
             
