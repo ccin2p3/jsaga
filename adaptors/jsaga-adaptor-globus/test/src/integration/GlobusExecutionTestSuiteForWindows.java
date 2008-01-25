@@ -16,20 +16,20 @@ import org.ogf.saga.job.JobRunTest;
 /**
  *
  */
-public class GlobusExecutionTestSuite extends TestSuite {
+public class GlobusExecutionTestSuiteForWindows extends TestSuite {
     // test cases
     public static class GlobusJobRunTest extends JobRunTest {
-        public GlobusJobRunTest() throws Exception {super("gatekeeper");}
+        public GlobusJobRunTest() throws Exception {super("gatekeeper-test");}
         public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
 
-    public GlobusExecutionTestSuite() throws Exception {
+    public GlobusExecutionTestSuiteForWindows() throws Exception {
         super();
         // test cases
         this.addTestSuite(GlobusJobRunTest.class);
     }
 
     public static Test suite() throws Exception {
-        return new GlobusExecutionTestSuite();
+        return new GlobusExecutionTestSuiteForWindows();
     }
 }
