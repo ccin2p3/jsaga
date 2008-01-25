@@ -47,7 +47,7 @@ public abstract class GatekeeperJobAdaptorAbstract implements SagaSecureAdaptor 
         } catch (GramException e) {
             switch(e.getErrorCode()) {
                 case GRAMProtocolErrorConstants.ERROR_PROTOCOL_FAILED:
-                    throw new AuthenticationFailed("Proxy is expired", e);
+                    throw new AuthenticationFailed("Proxy may expired", e);
                 case GRAMProtocolErrorConstants.ERROR_AUTHORIZATION:
                     throw new AuthorizationFailed(e);
                 case GRAMProtocolErrorConstants.INVALID_JOB_CONTACT:
