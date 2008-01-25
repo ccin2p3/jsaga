@@ -120,7 +120,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
                 endTime = -1;
             } else {
                 forever = false;
-                endTime = System.currentTimeMillis() + (long) timeoutInSeconds;
+                endTime = System.currentTimeMillis() + (long) timeoutInSeconds*1000;
             }
             while(!this.isDone() && (forever || System.currentTimeMillis()<endTime)) {
                 Thread.currentThread().sleep(100);
