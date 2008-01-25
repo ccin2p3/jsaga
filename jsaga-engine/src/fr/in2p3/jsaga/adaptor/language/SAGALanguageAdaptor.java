@@ -19,29 +19,31 @@ public class SAGALanguageAdaptor extends AbstractLanguageAdaptorProperties imple
     private static final String[] REQUIRED_PROPERTY_NAMES = new String[] {
             JobDescription.EXECUTABLE};
     private static final String[] OPTIONAL_PROPERTY_NAMES = new String[] {
+            "JobName",
+            JobDescription.SPMDVARIATION,
+            JobDescription.TOTALCPUCOUNT,
+            JobDescription.NUMBEROFPROCESSES,
+            JobDescription.PROCESSESPERHOST,
+            JobDescription.THREADSPERPROCESS,
             JobDescription.WORKINGDIRECTORY,
             JobDescription.INTERACTIVE,
             JobDescription.INPUT,
             JobDescription.OUTPUT,
             JobDescription.ERROR,
-            "JobName",
             JobDescription.CLEANUP,
             JobDescription.JOBSTARTTIME,
-            "Deadline",
-            JobDescription.QUEUE,
-            JobDescription.NUMBEROFPROCESSES,
-            JobDescription.PROCESSESPERHOST,
-            JobDescription.THREADSPERPROCESS,
-            JobDescription.SPMDVARIATION};
+            JobDescription.TOTALCPUTIME,
+            JobDescription.TOTALPHYSICALMEMORY,
+            JobDescription.QUEUE};
     private static final String[] REQUIRED_VECTOR_PROPERTY_NAMES = new String[] {};
     private static final String[] OPTIONAL_VECTOR_PROPERTY_NAMES = new String[] {
             JobDescription.ARGUMENTS,
             JobDescription.ENVIRONMENT,
-            JobDescription.JOBCONTACT,
             JobDescription.FILETRANSFER,
             JobDescription.CPUARCHITECTURE,
             JobDescription.OPERATINGSYSTEMTYPE,
-            JobDescription.CANDIDATEHOSTS};
+            JobDescription.CANDIDATEHOSTS,
+            JobDescription.JOBCONTACT};
 
     public String getName() {
         return "SAGA";
