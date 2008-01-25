@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.engine.config;
 
 import fr.in2p3.jsaga.engine.config.attributes.UserAttributesParser;
 import fr.in2p3.jsaga.engine.schema.config.Attribute;
+import fr.in2p3.jsaga.engine.schema.config.types.AttributeSourceType;
 
 import java.util.*;
 
@@ -39,6 +40,7 @@ public class UserAttributesMap {
                     if (!newValue.equals("")) {
                         // attribute is modified
                         attr.setValue(newValue);
+                        attr.setSource(AttributeSourceType.USERPROPERTIES);
                         newAttributes.add(attr);
                     } else {
                         // attribute is removed
@@ -60,6 +62,7 @@ public class UserAttributesMap {
                         Attribute attr = new Attribute();
                         attr.setName(newName);
                         attr.setValue(newValue);
+                        attr.setSource(AttributeSourceType.USERPROPERTIES);
                         newAttributes.add(attr);
                     } else {
                         // attribute is ignored

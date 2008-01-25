@@ -1,7 +1,8 @@
 package fr.in2p3.jsaga.engine.config.bean;
 
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.engine.config.*;
+import fr.in2p3.jsaga.engine.config.Configuration;
+import fr.in2p3.jsaga.engine.config.UserAttributesMap;
 import fr.in2p3.jsaga.engine.config.adaptor.JobAdaptorDescriptor;
 import fr.in2p3.jsaga.engine.schema.config.*;
 import org.ogf.saga.URL;
@@ -31,17 +32,14 @@ public class JobserviceEngineConfiguration {
         for (int i=0; m_jobservice!=null && i<m_jobservice.length; i++) {
             Jobservice job = m_jobservice[i];
 
-            // get attributes
-            ConfAttributesMap attrs = new ConfAttributesMap(job.getAttribute());
-
-            // update configured attributes with usages
+            // correct configured attributes according to usage
             Usage usage = desc.getUsage(job.getType());
             if (usage != null) {
-                usage.updateAttributes(attrs.getMap());
+                for (int a=0; a<job.getAttributeCount(); a++) {
+                    Attribute attr = job.getAttribute(a);
+                    attr.setValue(usage.correctValue(attr.getName(), attr.getValue()));
+                }
             }
-
-            // set new attributes
-            job.setAttribute(attrs.toArray());
 
             // update configured attributes with user attributes
             this.updateAttributes(userAttributes, job, job.getPath());

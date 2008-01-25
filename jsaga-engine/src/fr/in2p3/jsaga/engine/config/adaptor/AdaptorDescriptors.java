@@ -8,6 +8,7 @@ import fr.in2p3.jsaga.adaptor.language.LanguageAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptorBuilder;
 import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.schema.config.*;
+import fr.in2p3.jsaga.engine.schema.config.types.AttributeSourceType;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.*;
 import org.ogf.saga.error.IncorrectState;
@@ -97,6 +98,7 @@ public class AdaptorDescriptors {
                     Attribute attr = new Attribute();
                     attr.setName(defaults[d].getName());
                     attr.setValue(defaults[d].getValue());
+                    attr.setSource(AttributeSourceType.ADAPTORDEFAULTS);
                     list.add(attr);
                 }
             }

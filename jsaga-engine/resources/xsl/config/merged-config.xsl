@@ -89,6 +89,15 @@
         </jobservice>
     </xsl:template>
 
+    <xsl:template match="cfg:attribute">
+        <attribute>
+            <xsl:copy-of select="@*"/>
+            <xsl:if test="not(@source)">
+                <xsl:attribute name="source">EngineConfiguration</xsl:attribute>
+            </xsl:if>
+        </attribute>
+    </xsl:template>
+
     <xsl:template match="*">
         <xsl:element name="{name()}">
             <xsl:copy-of select="@*"/>

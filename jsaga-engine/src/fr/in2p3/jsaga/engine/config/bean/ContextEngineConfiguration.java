@@ -1,7 +1,8 @@
 package fr.in2p3.jsaga.engine.config.bean;
 
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.engine.config.*;
+import fr.in2p3.jsaga.engine.config.AmbiguityException;
+import fr.in2p3.jsaga.engine.config.UserAttributesMap;
 import fr.in2p3.jsaga.engine.config.adaptor.SecurityAdaptorDescriptor;
 import fr.in2p3.jsaga.engine.schema.config.*;
 import org.ogf.saga.error.NoSuccess;
@@ -31,21 +32,21 @@ public class ContextEngineConfiguration {
         for (int i=0; m_contextInstance!=null && i<m_contextInstance.length; i++) {
             ContextInstance ctx = m_contextInstance[i];
 
-            // get attributes
-            ConfAttributesMap attrs = new ConfAttributesMap(ctx.getAttribute());
-
-            // update configured attributes with usages and init usages
+            // correct configured attributes according to usage and init usage
             Usage usage = desc.getUsage(ctx.getType());
             if (usage != null) {
-                usage.updateAttributes(attrs.getMap());
+                for (int a=0; a<ctx.getAttributeCount(); a++) {
+                    Attribute attr = ctx.getAttribute(a);
+                    attr.setValue(usage.correctValue(attr.getName(), attr.getValue()));
+                }
             }
             Usage initUsage = desc.getInitUsage(ctx.getType());
             if (initUsage != null) {
-                initUsage.updateAttributes(attrs.getMap());
+                for (int a=0; a<ctx.getAttributeCount(); a++) {
+                    Attribute attr = ctx.getAttribute(a);
+                    attr.setValue(initUsage.correctValue(attr.getName(), attr.getValue()));
+                }
             }
-
-            // set new attributes
-            ctx.setAttribute(attrs.toArray());
 
             // update configured attributes with user attributes
             this.updateAttributes(userAttributes, ctx, ctx.getType());  //common to all instances of this type

@@ -21,6 +21,11 @@
             <element name="attribute" minOccurs="0" maxOccurs="unbounded"><complexType>
                 <attribute name="name" type='string' use="required"/>
                 <attribute name="value" type="string" use="optional"/><!-- no value means 'unset attribute' -->
+                <attribute name="source" use="optional"><simpleType><restriction base="string">
+                    <enumeration value="AdaptorDefaults"/>
+                    <enumeration value="EngineConfiguration"/>
+                    <enumeration value="UserProperties"/>
+                </restriction></simpleType></attribute>
             </complexType></element>
         </sequence>
     </complexType>

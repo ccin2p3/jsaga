@@ -1,7 +1,8 @@
 package fr.in2p3.jsaga.engine.config.bean;
 
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.engine.config.*;
+import fr.in2p3.jsaga.engine.config.Configuration;
+import fr.in2p3.jsaga.engine.config.UserAttributesMap;
 import fr.in2p3.jsaga.engine.config.adaptor.DataAdaptorDescriptor;
 import fr.in2p3.jsaga.engine.schema.config.*;
 import fr.in2p3.jsaga.helpers.StringArray;
@@ -32,17 +33,14 @@ public class ProtocolEngineConfiguration {
         for (int i=0; m_protocol!=null && i<m_protocol.length; i++) {
             Protocol prt = m_protocol[i];
 
-            // get attributes
-            ConfAttributesMap attrs = new ConfAttributesMap(prt.getAttribute());
-
-            // update configured attributes with usages
+            // correct configured attributes according to usage
             Usage usage = desc.getUsage(prt.getScheme());
             if (usage != null) {
-                usage.updateAttributes(attrs.getMap());
+                for (int a=0; a<prt.getAttributeCount(); a++) {
+                    Attribute attr = prt.getAttribute(a);
+                    attr.setValue(usage.correctValue(attr.getName(), attr.getValue()));
+                }
             }
-
-            // set new attributes
-            prt.setAttribute(attrs.toArray());
 
             // update configured attributes with user attributes
             this.updateAttributes(userAttributes, prt, prt.getScheme());
