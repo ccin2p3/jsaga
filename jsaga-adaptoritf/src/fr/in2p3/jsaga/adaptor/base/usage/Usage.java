@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public interface Usage {
     public boolean containsName(String attributeName);
-    public void updateAttributes(Map attributes) throws Exception;
+    public String correctValue(String attributeName, String attributeValue) throws Exception;
     public Usage getMissingValues(Map attributes);
     public void promptForValues(Map attributes, String id) throws Exception;
     public String toString();

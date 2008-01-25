@@ -26,13 +26,12 @@ public class U implements Usage {
         return attributeName.equals(m_name);
     }
 
-    public void updateAttributes(Map attributes) throws Exception {
-        Object value = attributes.get(m_name);
-        if (value != null) {
-            Object newValue = this.updateValue(value);
-            if (!value.equals(newValue)) {
-                attributes.put(m_name, newValue);
-            }
+    /** Default implementation to override if needed */
+    public String correctValue(String attributeName, String attributeValue) throws Exception {
+        if (m_name.equals(attributeName)) {
+            return attributeValue;
+        } else {
+            return null;
         }
     }
 
@@ -80,13 +79,6 @@ public class U implements Usage {
         } else {
             return null;
         }
-    }
-
-    /**
-     * To be overloaded if needed
-     */
-    protected Object updateValue(Object value) throws Exception {
-        return value;
     }
 
     /**

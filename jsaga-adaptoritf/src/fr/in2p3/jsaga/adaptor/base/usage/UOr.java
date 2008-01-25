@@ -30,10 +30,14 @@ public class UOr implements Usage {
         return false;
     }
 
-    public void updateAttributes(Map attributes) throws Exception {
+    public String correctValue(String attributeName, String attributeValue) throws Exception {
         for (int i=0; m_or!=null && i<m_or.length; i++) {
-            m_or[i].updateAttributes(attributes);
+            String correctedValue = m_or[i].correctValue(attributeName, attributeValue);
+            if (correctedValue != null) {
+                return correctedValue;
+            }
         }
+        return null;
     }
 
     public Usage getMissingValues(Map attributes) {

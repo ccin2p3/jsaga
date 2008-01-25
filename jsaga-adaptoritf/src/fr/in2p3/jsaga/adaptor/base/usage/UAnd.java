@@ -30,10 +30,14 @@ public class UAnd implements Usage {
         return false;
     }
 
-    public void updateAttributes(Map attributes) throws Exception {
+    public String correctValue(String attributeName, String attributeValue) throws Exception {
         for (int i=0; m_and!=null && i<m_and.length; i++) {
-            m_and[i].updateAttributes(attributes);
+            String correctedValue = m_and[i].correctValue(attributeName, attributeValue);
+            if (correctedValue != null) {
+                return correctedValue;
+            }
         }
+        return null;
     }
 
     public Usage getMissingValues(Map attributes) {
