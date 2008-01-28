@@ -19,7 +19,7 @@ import org.ogf.saga.job.JobRunTest;
 public class GlobusExecutionTestSuiteForWindows extends TestSuite {
     // test cases
     public static class GlobusJobRunTest extends JobRunTest {
-        public GlobusJobRunTest() throws Exception {super("gatekeeper-test");}
+        public GlobusJobRunTest() throws Exception {super("gatekeeper-windows");}
         public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
 
