@@ -1,5 +1,8 @@
 package fr.in2p3.jsaga.adaptor.base.usage;
 
+import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.NoSuccess;
+
 import java.util.*;
 
 /* ***************************************************
@@ -16,9 +19,11 @@ import java.util.*;
  */
 public class UOr implements Usage {
     private Usage[] m_or;
+    private int m_weight;
 
     public UOr(Usage[] usage) {
         m_or = usage;
+        m_weight = -1;
     }
 
     public final boolean containsName(String attributeName) {
@@ -30,14 +35,55 @@ public class UOr implements Usage {
         return false;
     }
 
-    public String correctValue(String attributeName, String attributeValue) throws Exception {
+    /**
+     * Set weight (equals to the max weight of sub-usages)
+     */
+    public void setWeight(Map weights) {
+        m_weight = -1;
         for (int i=0; m_or!=null && i<m_or.length; i++) {
-            String correctedValue = m_or[i].correctValue(attributeName, attributeValue);
-            if (correctedValue != null) {
-                return correctedValue;
+            m_or[i].setWeight(weights);
+            int weight = m_or[i].getWeight();
+            if (weight > m_weight) {
+                m_weight = weight;
             }
         }
-        return null;
+    }
+
+    public int getWeight() {
+        return m_weight;
+    }
+
+    public String correctValue(String attributeName, String attributeValue) throws DoesNotExist, NoSuccess {
+        // try with selected alternative
+        int selectedAlternative = this.selectAlternative();
+        try {
+            return m_or[selectedAlternative].correctValue(attributeName, attributeValue);
+        } catch(DoesNotExist e) {
+            // do nothing
+        }
+
+        // remove ambiguities with unselected alternatives
+        for (int i=0; m_or!=null && i<m_or.length; i++) {
+            if (i != selectedAlternative) {
+                try {
+                    if (m_or[i].correctValue(attributeName, attributeValue) != null) {
+                        return null;
+                    }
+                } catch(DoesNotExist e) {
+                    // do nothing
+                }
+            }
+        }
+        throw new DoesNotExist("Attribute not found: "+attributeName);
+    }
+    private int selectAlternative() throws NoSuccess {
+        // returns the 1st alternative with max weight
+        for (int i=0; m_or!=null && i<m_or.length; i++) {
+            if (m_weight == m_or[i].getWeight()) {
+                return i;
+            }
+        }
+        throw new NoSuccess("INTERNAL ERROR: unexpected exception");
     }
 
     public Usage getMissingValues(Map attributes) {

@@ -1,9 +1,10 @@
 package fr.in2p3.jsaga.adaptor.base.usage;
 
 import fr.in2p3.jsaga.Base;
+import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.NoSuccess;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -27,16 +28,20 @@ public class UFile extends U {
     }
 
     /** override U.correctValue() */
-    public String correctValue(String attributeName, String attributeValue) throws Exception {
+    public String correctValue(String attributeName, String attributeValue) throws DoesNotExist, NoSuccess {
         String filename = super.correctValue(attributeName, attributeValue);
         if (filename != null) {
             File file = new File(filename);
             if (!file.isAbsolute()) {
                 file = new File(Base.JSAGA_HOME, file.getPath());
             }
-            return file.getCanonicalPath();
+            try {
+                return file.getCanonicalPath();
+            } catch (IOException e) {
+                throw new NoSuccess(e);
+            }
         } else {
-            return null;
+            return attributeValue;
         }
     }
 

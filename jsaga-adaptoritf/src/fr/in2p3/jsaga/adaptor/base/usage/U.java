@@ -1,5 +1,8 @@
 package fr.in2p3.jsaga.adaptor.base.usage;
 
+import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.NoSuccess;
+
 import java.io.*;
 import java.util.Map;
 
@@ -17,21 +20,34 @@ import java.util.Map;
  */
 public class U implements Usage {
     protected String m_name;
+    private int m_weight;
 
     public U(String name) {
         m_name = name;
+        m_weight = -1;
     }
 
     public final boolean containsName(String attributeName) {
         return attributeName.equals(m_name);
     }
 
+    public void setWeight(Map weights) {
+        Integer weight = (Integer) weights.get(m_name);
+        if (weight != null) {
+            m_weight = weight.intValue();
+        }
+    }
+
+    public int getWeight() {
+        return m_weight;
+    }
+
     /** Default implementation to override if needed */
-    public String correctValue(String attributeName, String attributeValue) throws Exception {
+    public String correctValue(String attributeName, String attributeValue) throws DoesNotExist, NoSuccess {
         if (m_name.equals(attributeName)) {
             return attributeValue;
         } else {
-            return null;
+            throw new DoesNotExist("Attribute not found: "+attributeName);
         }
     }
 
