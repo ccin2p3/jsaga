@@ -53,11 +53,6 @@
             </xsl:for-each>
         </host>
     </xsl:template>
-    <xsl:template name="CONTEXT_INSTANCE_REF">
-        <contextInstanceRef type="{../@type}" indice="{count(preceding-sibling::cfg:instance)}">
-            <xsl:copy-of select="@*"/>
-        </contextInstanceRef>
-    </xsl:template>
 
     <xsl:template match="cfg:JOBSERVICE">
         <xsl:variable name="type">
@@ -70,7 +65,7 @@
             <xsl:for-each select="ancestor::cfg:GRID[@name]">
                 <xsl:value-of select="@name"/><xsl:text>/</xsl:text>
             </xsl:for-each>
-            <xsl:value-of select="$type"/>
+            <xsl:value-of select="@name"/>
         </xsl:variable>
         <jobservice type="{$type}" path="{$path}">
             <xsl:copy-of select="@*"/>
@@ -79,13 +74,9 @@
             </xsl:for-each>
             <xsl:call-template name="SANDBOX_CONTAINER"/>
             <xsl:call-template name="PROTOCOL_CONTAINER"/>
-            <xsl:variable name="matchJobservice" select="/cfg:config/cfg:security/cfg:context/cfg:instance/cfg:matchJobservice[starts-with($path,@path)]"/>
-            <xsl:if test="count($matchJobservice) > 1">
-                <xsl:message terminate="yes">Several context instances match job service: <xsl:value-of select="$path"/></xsl:message>
-            </xsl:if>
-            <xsl:apply-templates select="$matchJobservice">
-                <xsl:with-param name="jobType" select="$type"/>
-            </xsl:apply-templates>
+            <xsl:for-each select="/cfg:config/cfg:security/cfg:context/cfg:instance[starts-with(cfg:matchJobservice/@path,$path)]">
+                <xsl:call-template name="CONTEXT_INSTANCE_REF"/>
+            </xsl:for-each>
         </jobservice>
     </xsl:template>
     <xsl:template name="SANDBOX_CONTAINER">
@@ -143,17 +134,10 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-    <xsl:template match="cfg:matchJobservice">
-        <xsl:param name="jobType"/>
-        <xsl:variable name="type" select="../../@type"/>
-        <context>
-            <xsl:copy-of select="../../@*"/>
-            <xsl:for-each select="..">
-                <instance indice="{count(preceding-sibling::cfg:instance)}">
-                    <xsl:copy-of select="@*"/>
-                </instance>
-            </xsl:for-each>
-        </context>
+    <xsl:template name="CONTEXT_INSTANCE_REF">
+        <contextInstanceRef type="{../@type}" indice="{count(preceding-sibling::cfg:instance)}">
+            <xsl:copy-of select="@*"/>
+        </contextInstanceRef>
     </xsl:template>
     <xsl:template match="*">
         <xsl:element name="{name()}">

@@ -79,7 +79,7 @@
             <xsl:apply-templates select="$desc/cfg:supportedProtocolScheme"/>
             <xsl:apply-templates select="$conf/cfg:sandbox"/>
             <xsl:apply-templates select="$conf/cfg:protocolRef"/>
-            <xsl:apply-templates select="$conf/contextInstanceRef"/>
+            <xsl:apply-templates select="$conf/cfg:contextInstanceRef"/>
             <xsl:if test="$conf/cfg:contextInstanceRef/@type and not($conf/cfg:contextInstanceRef/@type=$desc/cfg:supportedContextType/text())">
                 <xsl:message terminate="yes">
                     <xsl:text>ERROR: Job service '</xsl:text><xsl:value-of select="@type"/>

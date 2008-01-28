@@ -111,7 +111,7 @@
                 </sequence>
                 <attribute name="scheme" type='string' use="required"/>
             </extension></complexContent></complexType></element>
-            <element ref="tns:contextInstanceRef" minOccurs="0" maxOccurs="1"/>
+            <element ref="tns:contextInstanceRef" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
         <attribute name="type" type="string" use="required"/><!-- from adaptor descriptor -->
         <attribute name="impl" type="string" use="required"/><!-- from adaptor descriptor -->
