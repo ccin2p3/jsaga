@@ -9,6 +9,7 @@ import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
 import org.ogf.saga.task.Task;
 
+import java.lang.Exception;
 import java.util.concurrent.*;
 
 /* ***************************************************
@@ -32,7 +33,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
     private org.ogf.saga.error.Exception m_exception;
 
     /** constructor */
-    public AbstractTaskImpl(Session session, Object object) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public AbstractTaskImpl(Session session, Object object, boolean create) throws NotImplemented, BadParameter, Timeout, NoSuccess {
         super(session);
 
         // set metrics
@@ -42,10 +43,10 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
                 MetricMode.ReadOnly,
                 "1",
                 MetricType.Enum,
-                State.NEW));
+                create ? State.NEW : null));
 
         // internal
-        m_object = object;
+        m_object = (object!=null ? object : this);
         m_result = null;
         m_exception = null;
     }
@@ -132,7 +133,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
 
     // exit immediatly
     public synchronized void cancel() throws NotImplemented, IncorrectState, NoSuccess {
-        switch(m_metric_TaskState.getValue()) {
+        switch(m_metric_TaskState.getValue(State.RUNNING)) {
             case NEW:
                 throw new IncorrectState("Can not cancel task in state: NEW", this); //as specified in SAGA
             case DONE:
@@ -159,20 +160,29 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
     }
 
     public State getState() throws NotImplemented, Timeout, NoSuccess {
-        //todo: do not refresh when state is not expired (optimization)
-        this.refreshState(m_metric_TaskState);
-        return m_metric_TaskState.getValue();
+        switch(m_metric_TaskState.getValue(State.RUNNING)) {
+            case DONE:
+            case CANCELED:
+            case FAILED:
+                return m_metric_TaskState.getValue();
+            default:
+                if (!m_metric_TaskState.isListening()) {
+                    this.refreshState(m_metric_TaskState);
+                }
+                return m_metric_TaskState.getValue();
+        }
     }
 
     public E getResult() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
         this.waitFor();
-        switch(m_metric_TaskState.getValue()) {
+        switch(m_metric_TaskState.getValue(State.DONE)) {
             case NEW:
             case FAILED:
             case CANCELED:
                 throw new IncorrectState("Can not get result for task in state: "+ m_metric_TaskState.getValue().name());
+            default:
+                return m_result;
         }
-        return m_result;
     }
 
     public <T> T getObject() throws NotImplemented, Timeout, NoSuccess {
@@ -180,7 +190,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
     }
 
     public void rethrow() throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        switch(m_metric_TaskState.getValue()) {
+        switch(m_metric_TaskState.getValue(State.FAILED)) {
             case FAILED:
                 if (m_exception != null) {
                     try {throw m_exception;}
@@ -207,7 +217,14 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
     //////////////////////////////////////////// interface TaskCallback ////////////////////////////////////////////
 
     public synchronized void setState(State state) {
-        m_metric_TaskState.setValue(state, this);
+        switch(m_metric_TaskState.getValue(State.RUNNING)) {
+            case DONE:
+            case CANCELED:
+            case FAILED:
+                return;
+            default:
+                m_metric_TaskState.setValue(state, this);
+        }
     }
 
     public synchronized void setResult(E result) {
@@ -231,7 +248,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
      * @return false if the task could not be cancelled, typically because it has already completed normally; true otherwise
      */
     public boolean cancel(boolean mayInterruptIfRunning) {
-        switch(m_metric_TaskState.getValue()) {
+        switch(m_metric_TaskState.getValue(State.RUNNING)) {
             case NEW:
                 m_metric_TaskState.setValue(State.CANCELED, this);   //as specified in java.util.concurrent
                 return true;
@@ -262,6 +279,14 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
      * @return true if this task completed.
      */
     public boolean isDone() {
+        if (m_metric_TaskState.getValue() == null) {
+            // try to refresh state
+            try {
+                this.refreshState(m_metric_TaskState);
+            } catch (Exception e) {
+                return false;
+            }
+        }
         switch(m_metric_TaskState.getValue()) {
             case DONE:
             case CANCELED:
@@ -284,7 +309,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
         } catch (org.ogf.saga.error.Exception e) {
             throw new ExecutionException(e);
         }
-        switch(m_metric_TaskState.getValue()) {
+        switch(m_metric_TaskState.getValue(State.DONE)) {
             case DONE:
                 return m_result;
             case CANCELED:
@@ -312,7 +337,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
         } catch (org.ogf.saga.error.Exception e) {
             throw new ExecutionException(e);
         }
-        switch(m_metric_TaskState.getValue()) {
+        switch(m_metric_TaskState.getValue(State.DONE)) {
             case DONE:
                 return m_result;
             case CANCELED:
