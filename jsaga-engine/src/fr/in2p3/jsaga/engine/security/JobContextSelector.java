@@ -51,15 +51,24 @@ public class JobContextSelector extends ContextSelector {
     private ContextImpl[] listContextByURI(URL url) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         JobserviceEngineConfiguration config = Configuration.getInstance().getConfigurations().getJobserviceCfg();
         ContextInstanceRef[] refArray = config.listContextInstanceCandidates(url);
-        List ctxList = new ArrayList();
-        for (int i=0; i<refArray.length; i++) {
-            ContextInstanceRef ref = refArray[i];
-            ContextImpl context = super.selectContextByTypeIndice(ref.getType(), ""+ref.getIndice());
-            try {
-                context.createSecurityAdaptor();
-                ctxList.add(context);
-            } catch(Exception e) {/*ignore*/}
+        if (refArray.length > 0) {
+            List ctxList = new ArrayList();
+            for (int i=0; i<refArray.length; i++) {
+                ContextInstanceRef ref = refArray[i];
+                ContextImpl context = super.selectContextByTypeIndice(ref.getType(), ""+ref.getIndice());
+                try {
+                    context.createSecurityAdaptor();
+                    ctxList.add(context);
+                } catch(Exception e) {/*ignore*/}
+            }
+            switch(ctxList.size()) {
+                case 0:
+                    throw new NoSuccess("None of the candidate security contexts is valid for URL: "+url.toString());
+                default:
+                    return (ContextImpl[]) ctxList.toArray(new ContextImpl[ctxList.size()]);
+            }
+        } else {
+            return new ContextImpl[0];
         }
-        return (ContextImpl[]) ctxList.toArray(new ContextImpl[ctxList.size()]);
     }
 }

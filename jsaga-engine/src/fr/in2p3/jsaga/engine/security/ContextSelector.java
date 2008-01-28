@@ -24,7 +24,7 @@ public class ContextSelector {
         m_session = session;
     }
 
-    public ContextImpl selectContextByTypeIndice(String type, String indice) throws BadParameter, IncorrectState, Timeout, PermissionDenied, NoSuccess, AuthorizationFailed, NotImplemented, AuthenticationFailed {
+    public ContextImpl selectContextByTypeIndice(String type, String indice) throws BadParameter, Timeout, PermissionDenied, NoSuccess, AuthorizationFailed, NotImplemented, AuthenticationFailed {
         if (type == null) {
             throw new BadParameter("Provided context type is: null");
         }
@@ -32,7 +32,7 @@ public class ContextSelector {
             throw new BadParameter("Provided context instance indice is: null");
         }
         if (m_session == null) {
-            throw new IncorrectState("No session");
+            throw new NoSuccess("No session");
         }
         boolean typeFound = false;
         Context[] contexts = m_session.listContexts();
@@ -45,22 +45,23 @@ public class ContextSelector {
                         return context;
                     }
                 }
+            } catch(IncorrectState e) {
             } catch(DoesNotExist e) {
             }
         }
         if (typeFound) {
-            throw new IncorrectState("Session has no context of type: "+type);
+            throw new NoSuccess("Session has no context of type: "+type);
         } else {
-            throw new IncorrectState("Session has no context instance with indice: "+indice);
+            throw new NoSuccess("Session has no context instance with indice: "+indice);
         }
     }
 
-    public ContextImpl selectContextByName(String name) throws BadParameter, IncorrectState, Timeout, PermissionDenied, NoSuccess, AuthorizationFailed, NotImplemented, AuthenticationFailed {
+    public ContextImpl selectContextByName(String name) throws BadParameter, Timeout, PermissionDenied, NoSuccess, AuthorizationFailed, NotImplemented, AuthenticationFailed {
         if (name == null) {
             throw new BadParameter("Provided context instance name is: null");
         }
         if (m_session == null) {
-            throw new IncorrectState("No session");
+            throw new NoSuccess("No session");
         }
         Context[] contexts = m_session.listContexts();
         for (int i=0; i<contexts.length; i++) {
@@ -69,9 +70,10 @@ public class ContextSelector {
                 if (context.getAttribute("Name").equals(name)) {
                     return context;
                 }
+            } catch(IncorrectState e) {
             } catch(DoesNotExist e) {
             }
         }
-        throw new IncorrectState("Session has no context instance with name: "+name);
+        throw new NoSuccess("Session has no context instance with name: "+name);
     }
 }
