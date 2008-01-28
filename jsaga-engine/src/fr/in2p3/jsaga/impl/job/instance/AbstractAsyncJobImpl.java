@@ -2,7 +2,6 @@ package fr.in2p3.jsaga.impl.job.instance;
 
 import fr.in2p3.jsaga.impl.permissions.AbstractJobPermissionsImpl;
 import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
-import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.Job;
 import org.ogf.saga.job.JobDescription;
@@ -28,8 +27,8 @@ import java.lang.Exception;
  */
 public abstract class AbstractAsyncJobImpl extends AbstractJobPermissionsImpl implements Job {
     /** constructor */
-    public AbstractAsyncJobImpl(Session session, SagaObject object) throws NotImplemented, BadParameter, Timeout, NoSuccess {
-        super(session, object);
+    public AbstractAsyncJobImpl(Session session, boolean create) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+        super(session, create);
     }
 
     public Task<JobDescription> getJobDescription(TaskMode mode) throws NotImplemented {

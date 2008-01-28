@@ -10,8 +10,7 @@ import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 
 import java.lang.Exception;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -34,11 +33,22 @@ public class ProtocolEngineConfiguration {
             Protocol prt = m_protocol[i];
 
             // correct configured attributes according to usage
+            Map<String,Integer> weights = new HashMap<String,Integer>();
+            for (int a=0; a<prt.getAttributeCount(); a++) {
+                Attribute attr = prt.getAttribute(a);
+                weights.put(attr.getName(), attr.getSource().getType());
+            }
             Usage usage = desc.getUsage(prt.getScheme());
             if (usage != null) {
+                usage.setWeight(weights);
                 for (int a=0; a<prt.getAttributeCount(); a++) {
                     Attribute attr = prt.getAttribute(a);
-                    attr.setValue(usage.correctValue(attr.getName(), attr.getValue()));
+                    try {
+                        String correctedValue = usage.correctValue(attr.getName(), attr.getValue());
+                        attr.setValue(correctedValue);
+                    } catch(DoesNotExist e) {
+                        // do nothing
+                    }
                 }
             }
 

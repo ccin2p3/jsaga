@@ -29,7 +29,7 @@ public class GenericThreadedTask extends AbstractTaskImpl implements Task {
 
     /** constructor */
     public GenericThreadedTask(Session session, Object object, Method method, Object[] arguments) throws NotImplemented, BadParameter, Timeout, NoSuccess {
-        super(session, object);
+        super(session, object, true);
         this.init(method, arguments);
     }
 

@@ -33,6 +33,7 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
     private MetricType m_type;
     private Map<Integer,Callback> m_callbacks;
     private int m_cookieGenerator;
+    private boolean m_isListening;
 
     /** constructor */
     public MetricImpl(String name, String desc, MetricMode mode, String unit, MetricType type, E initialValue) {
@@ -49,6 +50,7 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
         m_type = type;
         m_callbacks = new HashMap<Integer,Callback>();
         m_cookieGenerator = 1;
+        m_isListening = false;
     }
 
     /** clone */
@@ -62,6 +64,7 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
         clone.m_type = m_type;
         clone.m_callbacks = clone(m_callbacks);
         clone.m_cookieGenerator = m_cookieGenerator;
+        clone.m_isListening = m_isListening;
         return clone;
     }
 
@@ -71,6 +74,10 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
 
     public void setTask(AbstractTaskImpl task) {
         m_task = task;
+    }
+
+    public boolean isListening() {
+        return m_isListening;
     }
 
     /**
@@ -93,6 +100,15 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
      */
     public E getValue() {
         return m_value;
+    }
+
+    /**
+     * The SAGA engine implementation SHOULD use this method instead of method getAttribute.
+     * @param defaultValue the default value
+     * @return the current value if not null, else return the default value
+     */
+    public E getValue(E defaultValue) {
+        return m_value!=null ? m_value : defaultValue;
     }
 
     /**
@@ -147,6 +163,7 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
                 throw new NoSuccess("INTERNAL ERROR: unexpected exception");
         }
         if (m_callbacks.size() > 0) {
+            m_isListening = true;
             m_task.startListening(this);
         }
         return cookie;
@@ -156,6 +173,7 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
         m_callbacks.remove(cookie);
         if (m_callbacks.size() == 0) {
             m_task.stopListening(this);
+            m_isListening = false;
         }
     }
 

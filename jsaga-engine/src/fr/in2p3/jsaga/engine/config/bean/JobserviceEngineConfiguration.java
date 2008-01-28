@@ -9,8 +9,7 @@ import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 
 import java.lang.Exception;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -33,11 +32,22 @@ public class JobserviceEngineConfiguration {
             Jobservice job = m_jobservice[i];
 
             // correct configured attributes according to usage
+            Map<String,Integer> weights = new HashMap<String,Integer>();
+            for (int a=0; a<job.getAttributeCount(); a++) {
+                Attribute attr = job.getAttribute(a);
+                weights.put(attr.getName(), attr.getSource().getType());
+            }
             Usage usage = desc.getUsage(job.getType());
             if (usage != null) {
+                usage.setWeight(weights);
                 for (int a=0; a<job.getAttributeCount(); a++) {
                     Attribute attr = job.getAttribute(a);
-                    attr.setValue(usage.correctValue(attr.getName(), attr.getValue()));
+                    try {
+                        String correctedValue = usage.correctValue(attr.getName(), attr.getValue());
+                        attr.setValue(correctedValue);
+                    } catch(DoesNotExist e) {
+                        // do nothing
+                    }
                 }
             }
 
@@ -95,6 +105,9 @@ public class JobserviceEngineConfiguration {
                 default:
                     return toContextInstanceRefArray(ctxArray);
             }
+        } else if (service.getContextInstanceRefCount() > 0) {
+            // if no context instance is specified, then all configured context instances are eligible
+            return service.getContextInstanceRef();
         } else {
             // if no context instance is configured, then all supported context instances are eligible
             List list = new ArrayList();

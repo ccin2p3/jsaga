@@ -42,7 +42,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
 
     /** constructor for submission */
     public JobImpl(Session session, JobDescription description, String nativeJobDesc, JobControlAdaptor controlAdaptor, JobMonitorService monitorService) throws NotImplemented, BadParameter, Timeout, NoSuccess {
-        this(session, controlAdaptor, monitorService);
+        this(session, controlAdaptor, monitorService, true);
         m_jsdl = description;
         m_nativeJobDesc = nativeJobDesc;
         m_nativeJobId = null;
@@ -50,15 +50,15 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
 
     /** constructor for control and monitoring only */
     public JobImpl(Session session, String nativeJobId, JobControlAdaptor controlAdaptor, JobMonitorService monitorService) throws NotImplemented, BadParameter, Timeout, NoSuccess {
-        this(session, controlAdaptor, monitorService);
+        this(session, controlAdaptor, monitorService, false);
         m_jsdl = null;
         m_nativeJobDesc = null;
         m_nativeJobId = nativeJobId;
     }
 
     /** common to all contructors */
-    private JobImpl(Session session, JobControlAdaptor controlAdaptor, JobMonitorService monitorService) throws NotImplemented, BadParameter, Timeout, NoSuccess {
-        super(session, null);
+    private JobImpl(Session session, JobControlAdaptor controlAdaptor, JobMonitorService monitorService, boolean create) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+        super(session, create);
         m_attributes = new JobAttributes(this);
         m_metrics = new JobMetrics(this);
         m_controlAdaptor = controlAdaptor;
