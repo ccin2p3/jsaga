@@ -18,7 +18,7 @@ import java.util.*;
  *
  */
 public class FilePropertiesAttributesParser extends AbstractAttributesParser {
-    public static final File FILE = new File(new File(System.getProperty("user.home")), ".globus/jsaga-user.properties");
+    public static final File FILE = new File(new File(System.getProperty("user.home")), "jsaga-user.properties");
 
     public FilePropertiesAttributesParser(Map map) {
         super(map);
