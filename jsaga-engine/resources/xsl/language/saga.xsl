@@ -48,7 +48,7 @@
                             <posix:Argument><xsl:value-of select="."/></posix:Argument>
                         </xsl:for-each>
                         <xsl:for-each select="vectorAttribute[@name='Environment']/value/text()">
-                            <posix:Environment name="substring-before(.,'=')"><xsl:value-of select="substring-after(.,'=')"/></posix:Environment>
+                            <posix:Environment name="{substring-before(.,'=')}"><xsl:value-of select="substring-after(.,'=')"/></posix:Environment>
                         </xsl:for-each>
                     </posix:POSIXApplication>
                     <spmd:SPMDApplication>
