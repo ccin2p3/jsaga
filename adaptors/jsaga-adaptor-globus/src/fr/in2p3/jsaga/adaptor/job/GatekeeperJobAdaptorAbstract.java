@@ -41,7 +41,10 @@ public abstract class GatekeeperJobAdaptorAbstract implements SagaSecureAdaptor 
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
-        m_serverUrl = host+":"+port+":"+basePath;
+    	if(basePath.indexOf("=") > -1)
+    		m_serverUrl = host+":"+port+":"+basePath;
+    	else
+    		m_serverUrl = host+":"+port+basePath;
         try {
             Gram.ping(m_credential, m_serverUrl);
         } catch (GramException e) {
