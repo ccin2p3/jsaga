@@ -10,7 +10,8 @@ import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 
 import java.lang.Exception;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -32,30 +33,34 @@ public class ProtocolEngineConfiguration {
         for (int i=0; m_protocol!=null && i<m_protocol.length; i++) {
             Protocol prt = m_protocol[i];
 
-            // correct configured attributes according to usage
-            Map<String,Integer> weights = new HashMap<String,Integer>();
-            for (int a=0; a<prt.getAttributeCount(); a++) {
-                Attribute attr = prt.getAttribute(a);
-                weights.put(attr.getName(), attr.getSource().getType());
-            }
-            Usage usage = desc.getUsage(prt.getScheme());
-            if (usage != null) {
-                usage.setWeight(weights);
-                for (int a=0; a<prt.getAttributeCount(); a++) {
-                    Attribute attr = prt.getAttribute(a);
-                    try {
-                        String correctedValue = usage.correctValue(attr.getName(), attr.getValue());
-                        attr.setValue(correctedValue);
-                    } catch(DoesNotExist e) {
-                        // do nothing
-                    }
-                }
-            }
-
             // update configured attributes with user attributes
             this.updateAttributes(userAttributes, prt, prt.getScheme());
             for (int a=0; a<prt.getSchemeAliasCount(); a++) {
                 this.updateAttributes(userAttributes, prt, prt.getSchemeAlias(a));
+            }
+
+            // get usage
+            Usage usage = desc.getUsage(prt.getScheme());
+            if (usage != null) {
+                usage.resetWeight();
+            }
+
+            // correct configured attributes according to usage
+            for (int a=0; a<prt.getAttributeCount(); a++) {
+                Attribute attr = prt.getAttribute(a);
+                if (attr.getValue() != null) {
+                    try {
+                        attr.setValue(usage.correctValue(attr.getName(), attr.getValue(), attr.getSource().getType()));
+                    } catch(DoesNotExist e) {/*do nothing*/}
+                }
+            }
+
+            // remove ambiguity
+            for (int a=0; a<prt.getAttributeCount(); a++) {
+                Attribute attr = prt.getAttribute(a);
+                if (usage!=null && usage.removeValue(attr.getName())) {
+                    attr.setValue(null);
+                }
             }
         }
     }

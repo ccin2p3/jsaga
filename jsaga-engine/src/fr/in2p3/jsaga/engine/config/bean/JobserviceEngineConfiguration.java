@@ -9,7 +9,8 @@ import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 
 import java.lang.Exception;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -31,30 +32,34 @@ public class JobserviceEngineConfiguration {
         for (int i=0; m_jobservice!=null && i<m_jobservice.length; i++) {
             Jobservice job = m_jobservice[i];
 
-            // correct configured attributes according to usage
-            Map<String,Integer> weights = new HashMap<String,Integer>();
-            for (int a=0; a<job.getAttributeCount(); a++) {
-                Attribute attr = job.getAttribute(a);
-                weights.put(attr.getName(), attr.getSource().getType());
-            }
-            Usage usage = desc.getUsage(job.getType());
-            if (usage != null) {
-                usage.setWeight(weights);
-                for (int a=0; a<job.getAttributeCount(); a++) {
-                    Attribute attr = job.getAttribute(a);
-                    try {
-                        String correctedValue = usage.correctValue(attr.getName(), attr.getValue());
-                        attr.setValue(correctedValue);
-                    } catch(DoesNotExist e) {
-                        // do nothing
-                    }
-                }
-            }
-
             // update configured attributes with user attributes
             this.updateAttributes(userAttributes, job, job.getPath());
             for (int a=0; a<job.getPathAliasCount(); a++) {
                 this.updateAttributes(userAttributes, job, job.getPathAlias(a));
+            }
+
+            // get usage
+            Usage usage = desc.getUsage(job.getType());
+            if (usage != null) {
+                usage.resetWeight();
+            }
+            
+            // correct configured attributes according to usage
+            for (int a=0; a<job.getAttributeCount(); a++) {
+                Attribute attr = job.getAttribute(a);
+                if (attr.getValue() != null) {
+                    try {
+                        attr.setValue(usage.correctValue(attr.getName(), attr.getValue(), attr.getSource().getType()));
+                    } catch(DoesNotExist e) {/*do nothing*/}
+                }
+            }
+
+            // remove ambiguity
+            for (int a=0; a<job.getAttributeCount(); a++) {
+                Attribute attr = job.getAttribute(a);
+                if (usage!=null && usage.removeValue(attr.getName())) {
+                    attr.setValue(null);
+                }
             }
         }
     }

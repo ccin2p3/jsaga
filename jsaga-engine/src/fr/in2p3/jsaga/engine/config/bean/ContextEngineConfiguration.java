@@ -8,7 +8,8 @@ import fr.in2p3.jsaga.engine.schema.config.*;
 import org.ogf.saga.error.DoesNotExist;
 import org.ogf.saga.error.NoSuccess;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,43 +33,46 @@ public class ContextEngineConfiguration {
         for (int i=0; m_contextInstance!=null && i<m_contextInstance.length; i++) {
             ContextInstance ctx = m_contextInstance[i];
 
-            // correct configured attributes according to usage and init usage
-            Map<String,Integer> weights = new HashMap<String,Integer>();
-            for (int a=0; a<ctx.getAttributeCount(); a++) {
-                Attribute attr = ctx.getAttribute(a);
-                weights.put(attr.getName(), attr.getSource().getType());
-            }
-            Usage usage = desc.getUsage(ctx.getType());
-            if (usage != null) {
-                usage.setWeight(weights);
-                for (int a=0; a<ctx.getAttributeCount(); a++) {
-                    Attribute attr = ctx.getAttribute(a);
-                    try {
-                        String correctedValue = usage.correctValue(attr.getName(), attr.getValue());
-                        attr.setValue(correctedValue);
-                    } catch(DoesNotExist e) {
-                        // do nothing
-                    }
-                }
-            }
-            Usage initUsage = desc.getInitUsage(ctx.getType());
-            if (initUsage != null) {
-                initUsage.setWeight(weights);
-                for (int a=0; a<ctx.getAttributeCount(); a++) {
-                    Attribute attr = ctx.getAttribute(a);
-                    try {
-                        String correctedValue = initUsage.correctValue(attr.getName(), attr.getValue());
-                        attr.setValue(correctedValue);
-                    } catch(DoesNotExist e) {
-                        // do nothing
-                    }
-                }
-            }
-
             // update configured attributes with user attributes
             this.updateAttributes(userAttributes, ctx, ctx.getType());  //common to all instances of this type
             this.updateAttributes(userAttributes, ctx, ctx.getType()+"["+ctx.getIndice()+"]");
             this.updateAttributes(userAttributes, ctx, ctx.getName());
+
+            // get usage and init usage
+            Usage usage = desc.getUsage(ctx.getType());
+            if (usage != null) {
+                usage.resetWeight();
+            }
+            Usage initUsage = desc.getInitUsage(ctx.getType());
+            if (initUsage != null) {
+                initUsage.resetWeight();
+            }
+
+            // correct configured attributes according to usage and init usage
+            for (int a=0; a<ctx.getAttributeCount(); a++) {
+                Attribute attr = ctx.getAttribute(a);
+                if (usage != null) {
+                    try {
+                        attr.setValue(usage.correctValue(attr.getName(), attr.getValue(), attr.getSource().getType()));
+                    } catch(DoesNotExist e) {/*do nothing*/}
+                }
+                if (initUsage != null) {
+                    try {
+                        attr.setValue(initUsage.correctValue(attr.getName(), attr.getValue(), attr.getSource().getType()));
+                    } catch(DoesNotExist e) {/*do nothing*/}
+                }
+            }
+
+            // remove ambiguity
+            for (int a=0; a<ctx.getAttributeCount(); a++) {
+                Attribute attr = ctx.getAttribute(a);
+                if (usage!=null && usage.removeValue(attr.getName())) {
+                    attr.setValue(null);
+                }
+                if (initUsage!=null && initUsage.removeValue(attr.getName())) {
+                    attr.setValue(null);
+                }
+            }
         }
     }
     private void updateAttributes(UserAttributesMap userAttributes, ContextInstance ctx, String id) {
