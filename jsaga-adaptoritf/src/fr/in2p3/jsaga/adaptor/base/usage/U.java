@@ -1,7 +1,6 @@
 package fr.in2p3.jsaga.adaptor.base.usage;
 
 import org.ogf.saga.error.DoesNotExist;
-import org.ogf.saga.error.NoSuccess;
 
 import java.io.*;
 import java.util.Map;
@@ -20,7 +19,7 @@ import java.util.Map;
  */
 public class U implements Usage {
     protected String m_name;
-    private int m_weight;
+    protected int m_weight;
 
     public U(String name) {
         m_name = name;
@@ -31,10 +30,23 @@ public class U implements Usage {
         return attributeName.equals(m_name);
     }
 
-    public void setWeight(Map weights) {
-        Integer weight = (Integer) weights.get(m_name);
-        if (weight != null) {
-            m_weight = weight.intValue();
+    public void resetWeight() {
+        m_weight = -1;
+    }
+
+    /** Default implementation to override if needed */
+    public String correctValue(String attributeName, String attributeValue, int attributeWeight) throws DoesNotExist {
+        if (m_name.equals(attributeName)) {
+            try {
+                this.throwExceptionIfInvalid(attributeValue);
+                m_weight = attributeWeight;
+                return attributeValue;
+            } catch (Exception e) {
+                m_weight = -1;
+                return null;
+            }
+        } else {
+            throw new DoesNotExist("Attribute not found: "+attributeName);
         }
     }
 
@@ -42,13 +54,9 @@ public class U implements Usage {
         return m_weight;
     }
 
-    /** Default implementation to override if needed */
-    public String correctValue(String attributeName, String attributeValue) throws DoesNotExist, NoSuccess {
-        if (m_name.equals(attributeName)) {
-            return attributeValue;
-        } else {
-            throw new DoesNotExist("Attribute not found: "+attributeName);
-        }
+    /** placeholder */
+    public boolean removeValue(String attributeName) {
+        return false;
     }
 
     public final Usage getMissingValues(Map attributes) {

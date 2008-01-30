@@ -1,7 +1,6 @@
 package fr.in2p3.jsaga.adaptor.base.usage;
 
 import org.ogf.saga.error.DoesNotExist;
-import org.ogf.saga.error.NoSuccess;
 
 import java.util.*;
 
@@ -19,11 +18,9 @@ import java.util.*;
  */
 public class UAnd implements Usage {
     private Usage[] m_and;
-    private int m_weight;
 
     public UAnd(Usage[] usage) {
         m_and = usage;
-        m_weight = -1;
     }
 
     public final boolean containsName(String attributeName) {
@@ -35,36 +32,49 @@ public class UAnd implements Usage {
         return false;
     }
 
-    /**
-     * Set weight (equals to -1 if at least one attribute is missing, else to the max weight of sub-usages)
-     */
-    public void setWeight(Map weights) {
-        m_weight = -1;
+    public void resetWeight() {
         for (int i=0; m_and!=null && i<m_and.length; i++) {
-            m_and[i].setWeight(weights);
-            int weight = m_and[i].getWeight();
-            if (weight == -1) {
-                m_weight = -1;
-                return;
-            } else if (weight > m_weight) {
-                m_weight = weight;
-            }
+            m_and[i].resetWeight();
         }
     }
 
-    public int getWeight() {
-        return m_weight;
-    }
-
-    public String correctValue(String attributeName, String attributeValue) throws DoesNotExist, NoSuccess {
+    public String correctValue(String attributeName, String attributeValue, int attributeWeight) throws DoesNotExist {
         for (int i=0; m_and!=null && i<m_and.length; i++) {
             try {
-                return m_and[i].correctValue(attributeName, attributeValue);
+                return m_and[i].correctValue(attributeName, attributeValue, attributeWeight);
             } catch(DoesNotExist e) {
-                // do nothing
+                // next iteration
             }
         }
         throw new DoesNotExist("Attribute not found: "+attributeName);
+    }
+
+    /**
+     * @return -1 if the weight of at least one sub-usage is -1, else the max weight of sub-usages
+     */
+    public int getWeight() {
+        int maxWeight = -1;
+        for (int i=0; m_and!=null && i<m_and.length; i++) {
+            int weight = m_and[i].getWeight();
+            if (weight == -1) {
+                return -1;
+            } else if (weight > maxWeight) {
+                maxWeight = weight;
+            }
+        }
+        return maxWeight;
+    }
+
+    /**
+     * @return true if at least one sub-usage returns true
+     */
+    public boolean removeValue(String attributeName) {
+        for (int i=0; m_and!=null && i<m_and.length; i++) {
+            if (m_and[i].removeValue(attributeName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Usage getMissingValues(Map attributes) {

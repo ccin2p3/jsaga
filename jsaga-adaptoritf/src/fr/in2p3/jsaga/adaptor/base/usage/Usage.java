@@ -1,7 +1,6 @@
 package fr.in2p3.jsaga.adaptor.base.usage;
 
 import org.ogf.saga.error.DoesNotExist;
-import org.ogf.saga.error.NoSuccess;
 
 import java.util.Map;
 
@@ -26,10 +25,19 @@ public interface Usage {
     public boolean containsName(String attributeName);
 
     /**
-     * Set the weight of this usage instance
-     * @param weights the weights of all the attributes
+     * Reset the weight of all attributes to -1
      */
-    public void setWeight(Map weights);
+    public void resetWeight();
+
+    /**
+     * Correct the value according to this usage
+     * @param attributeName the name of the attribute to correct
+     * @param attributeValue the value of the attribute to correct
+     * @param attributeWeight the weight of the attribute
+     * @return the corrected value
+     * @throws DoesNotExist if the attribute is not contained within this usage instance
+     */
+    public String correctValue(String attributeName, String attributeValue, int attributeWeight) throws DoesNotExist;
 
     /**
      * Get the weight of this usage instance
@@ -38,14 +46,9 @@ public interface Usage {
     public int getWeight();
 
     /**
-     * Correct the value according to this usage
-     * @param attributeName the name of the attribute to correct
-     * @param attributeValue the value of the attribute to correct
-     * @return the corrected value
-     * @throws DoesNotExist if the attribute is not contained within this usage instance
-     * @throws NoSuccess if the correction failed
+     * @return true if the value of the attribute <code>attributeName</code> must be removed
      */
-    public String correctValue(String attributeName, String attributeValue) throws DoesNotExist, NoSuccess;
+    public boolean removeValue(String attributeName);
 
     /**
      * Build a usage instance containing missing attributes only

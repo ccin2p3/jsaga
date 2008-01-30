@@ -2,7 +2,6 @@ package fr.in2p3.jsaga.adaptor.base.usage;
 
 import fr.in2p3.jsaga.Base;
 import org.ogf.saga.error.DoesNotExist;
-import org.ogf.saga.error.NoSuccess;
 
 import java.io.*;
 
@@ -28,25 +27,31 @@ public class UFile extends U {
     }
 
     /** override U.correctValue() */
-    public String correctValue(String attributeName, String attributeValue) throws DoesNotExist, NoSuccess {
-        String filename = super.correctValue(attributeName, attributeValue);
-        if (filename != null) {
-            File file = new File(filename);
-            if (!file.isAbsolute()) {
-                file = new File(Base.JSAGA_HOME, file.getPath());
-            }
+    public String correctValue(String attributeName, String attributeValue, int attributeWeight) throws DoesNotExist {
+        if (m_name.equals(attributeName)) {
             try {
-                return file.getCanonicalPath();
-            } catch (IOException e) {
-                throw new NoSuccess(e);
+                File file = (File) this.throwExceptionIfInvalid(attributeValue);
+                m_weight = attributeWeight;
+                // returns corrected path
+                try {
+                    return file.getCanonicalPath();
+                } catch (IOException e) {
+                    return file.getAbsolutePath();
+                }
+            } catch (Exception e) {
+                m_weight = -1;
+                return null;
             }
         } else {
-            return attributeValue;
+            throw new DoesNotExist("Attribute not found: "+attributeName);
         }
     }
 
     protected Object throwExceptionIfInvalid(Object value) throws Exception {
         File file = new File((String) super.throwExceptionIfInvalid(value));
+        if (!file.isAbsolute()) {
+            file = new File(Base.JSAGA_HOME, file.getPath());
+        }
         if (!file.exists()) {
             throw new FileNotFoundException("File not found: "+file.getAbsolutePath());
         }
