@@ -9,17 +9,13 @@
     <xsl:template match="/attributes">
         <!-- check unsupported attributes -->
         <xsl:if test="attribute[@name='Interactive']/@value='true'">
-            <xsl:message terminate="yes">Unsupported value for attribute key: Interactive</xsl:message>
+            <xsl:message terminate="yes">Interactive jobs are currently not supported by JSAGA</xsl:message>
         </xsl:if>
         <xsl:if test="attribute[@name='JobStartTime']/@value">
             <xsl:message terminate="yes">Unsupported attribute key: JobStartTime</xsl:message>
         </xsl:if>
         <xsl:if test="vectorAttribute[@name='JobContact']/value/text()">
             <xsl:message terminate="yes">Unsupported attribute key: JobContact</xsl:message>
-        </xsl:if>
-        <xsl:if test="attribute[@name='Queue']/@value">
-            <!-- TODO -->
-            <xsl:message terminate="yes">Not implemented yet: Queue</xsl:message>
         </xsl:if>
 
         <!-- job definition -->
@@ -28,6 +24,9 @@
                 <jsdl:JobIdentification>
                     <xsl:for-each select="attribute[@name='JobName']/@value">
                         <jsdl:JobName><xsl:value-of select="."/></jsdl:JobName>
+                    </xsl:for-each>
+                    <xsl:for-each select="attribute[@name='Queue']/@value">
+                        <jsdl:JobAnnotation><xsl:value-of select="."/></jsdl:JobAnnotation>
                     </xsl:for-each>
                 </jsdl:JobIdentification>
                 <jsdl:Application>
