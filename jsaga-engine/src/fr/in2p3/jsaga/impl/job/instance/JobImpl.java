@@ -96,6 +96,9 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     }
 
     protected boolean doCancel() {
+        if (m_nativeJobId == null) {
+            throw new RuntimeException("INTERNAL ERROR: JobID not initialized");
+        }
         try {
             m_controlAdaptor.cancel(m_nativeJobId);
             return true;
@@ -106,16 +109,24 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
 
     //todo: do not change state if it is not conform to the states graph (because notified state may be more recent)
     protected void refreshState(MetricImpl<State> metric_state) throws NotImplemented, Timeout, NoSuccess {
-        State newState = m_monitorService.getState(m_nativeJobId);
+        State newState = m_nativeJobId!=null
+                ? m_monitorService.getState(m_nativeJobId)
+                : State.NEW;
         metric_state.setValue(newState, this);
         //todo: update subState and stateDetail
     }
 
     public void startListening(Metric metric) throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+        if (m_nativeJobId == null) {
+            throw new IncorrectState("Can not listen to job in 'New' state", this);
+        }
         m_monitorService.startListening(m_nativeJobId, this);
     }
 
     public void stopListening(Metric metric) throws NotImplemented, Timeout, NoSuccess {
+        if (m_nativeJobId == null) {
+            throw new RuntimeException("INTERNAL ERROR: JobID not initialized");
+        }
         m_monitorService.stopListening(m_nativeJobId);
     }
 
@@ -126,18 +137,21 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     }
 
     public OutputStream getStdin() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, IncorrectState, NoSuccess {
-        throw new NotImplemented("Not implemented by the SAGA engine", this);
+        throw new NotImplemented("Interactive jobs are currently not supported by JSAGA", this);
     }
 
     public InputStream getStdout() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, IncorrectState, NoSuccess {
-        throw new NotImplemented("Not implemented by the SAGA engine", this);
+        throw new NotImplemented("Interactive jobs are currently not supported by JSAGA", this);
     }
 
     public InputStream getStderr() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, IncorrectState, NoSuccess {
-        throw new NotImplemented("Not implemented by the SAGA engine", this);
+        throw new NotImplemented("Interactive jobs are currently not supported by JSAGA", this);
     }
 
     public void suspend() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+        if (m_nativeJobId == null) {
+            throw new IncorrectState("Can not suspend job in 'New' state", this);
+        }
         if (m_controlAdaptor instanceof HoldableJobAdaptor && m_controlAdaptor instanceof SuspendableJobAdaptor) {
             if (! ((HoldableJobAdaptor)m_controlAdaptor).hold(m_nativeJobId)) {
                 if (! ((SuspendableJobAdaptor)m_controlAdaptor).suspend(m_nativeJobId)) {
@@ -158,6 +172,9 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     }
 
     public void resume() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+        if (m_nativeJobId == null) {
+            throw new IncorrectState("Can not resume job in 'New' state", this);
+        }
         if (m_controlAdaptor instanceof HoldableJobAdaptor && m_controlAdaptor instanceof SuspendableJobAdaptor) {
             if (! ((HoldableJobAdaptor)m_controlAdaptor).release(m_nativeJobId)) {
                 if (! ((SuspendableJobAdaptor)m_controlAdaptor).resume(m_nativeJobId)) {
@@ -178,6 +195,9 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     }
 
     public void checkpoint() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+        if (m_nativeJobId == null) {
+            throw new IncorrectState("Can not checkpoint job in 'New' state", this);
+        }
         if (m_controlAdaptor instanceof CheckpointableJobAdaptor) {
             if (! ((CheckpointableJobAdaptor)m_controlAdaptor).checkpoint(m_nativeJobId)) {
                 throw new NoSuccess("Failed to checkpoint job: "+m_nativeJobId);
@@ -188,11 +208,17 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     }
 
     public void migrate(JobDescription jd) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+        if (m_nativeJobId == null) {
+            throw new IncorrectState("Can not migrate job in 'New' state", this);
+        }
         throw new NotImplemented("Not implemented yet..."); //todo: implement method migrate()
 //        if (super.cancel(true)) {   //synchronous cancel (not the SAGA cancel)
     }
 
     public void signal(int signum) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+        if (m_nativeJobId == null) {
+            throw new IncorrectState("Can not send signal to job in 'New' state", this);
+        }
         if (m_controlAdaptor instanceof SignalableJobAdaptor) {
             if (! ((SignalableJobAdaptor)m_controlAdaptor).signal(m_nativeJobId, signum)) {
                 throw new NoSuccess("Failed to signal job: "+m_nativeJobId);
