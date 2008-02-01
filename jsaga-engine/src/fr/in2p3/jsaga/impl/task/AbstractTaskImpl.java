@@ -135,7 +135,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
     public synchronized void cancel() throws NotImplemented, IncorrectState, NoSuccess {
         switch(m_metric_TaskState.getValue(State.RUNNING)) {
             case NEW:
-                throw new IncorrectState("Can not cancel task in state: NEW", this); //as specified in SAGA
+                throw new IncorrectState("Can not cancel task in 'New' state", this); //as specified in SAGA
             case DONE:
             case CANCELED:
             case FAILED:
