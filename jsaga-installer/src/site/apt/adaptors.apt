@@ -39,18 +39,22 @@ Adaptors
 
 * Execution Management Adaptors
 
-~~** Job Submission Adaptors
+** Job Submission Adaptors
 
-~~*-----------------+--+
-~~| <<Job Service>> | <<Module>> |
-~~*-----------------+--+
-~~| Gatekeeper      | jsaga-adaptor-globus |
-~~*-----------------+--+
+*-----------------+--+
+| <<Job Service>> | <<Module>> |
+*-----------------+--+
+| Gatekeeper      | jsaga-adaptor-globus |
+*-----------------+--+
 
-~~** Langage Adaptors
+** Langage Adaptors
 
-~~*--------------+--+
-~~| <<Language>> | <<Module>> |
-~~*--------------+--+
-~~| JSDL         | Core |
-~~*--------------+--+
+*-------------------+--+
+| <<Job Language>>  | <<Module>> |
+*-------------------+--+
+| JSDL + extensions | Core |
+*-------------------+--+
+| SAGA              | Core |
+*-------------------+--+
+| JDL               | jsaga-adaptor-jdl |
+*-------------------+--+
