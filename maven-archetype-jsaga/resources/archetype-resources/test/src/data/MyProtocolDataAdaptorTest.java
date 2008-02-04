@@ -18,6 +18,6 @@ public class MyProtocolDataAdaptorTest extends TestCase {
     public void test_getScheme() {
         assertEquals(
                 "myprotocol",
-                new MyProtocolDataAdaptor().getScheme());
+                new MyProtocolDataAdaptor().getSchemeAliases()[0]);
     }
 }
