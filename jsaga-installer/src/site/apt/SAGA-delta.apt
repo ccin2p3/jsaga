@@ -1,8 +1,4 @@
-Modifications on SAGA Java Binding
-
-    * Class URL is modified to support relative paths (<scheme>://./<path>) and to be extendable
-
-Add-ons to SAGA specification
+Deviations from SAGA specifications
 
 * Security management
 
@@ -15,29 +11,41 @@ Add-ons to SAGA specification
 
 * Data management
 
-    * Add fragment at the end of URL to refer to a specific security context factory
+    * URL
 
-    * Add flag (FLAGS_BYPASSEXIST=4096) to disable existence check when creating NamespaceEntry instances
-      (then an IncorrectState exception embedding a DoesNotExist exception may be thrown on subsequent methods invocations).
+        * Query (?...) at the end of URL refers to adaptor-specific parameters
 
-    * Add some methods. These methods are accessible when casting NamespaceEntry instances to AbstractNamespaceEntryImpl,
-      or by casting NamespaceDirectory instances to AbstractNamespaceDirectoryImpl.
+        * Fragment (#...) at the end of URL refers to a specific security context factory
+
+        * Class URL is modified to support relative paths (<scheme>://./<path>) and to be extendable
+          <(NOTE: this is the only modification made on the SAGA Java Binding, and it will disappear when a URL factory will be provided)>
+
+    * Add flag (FLAGS_BYPASSEXIST=4096) to disable existence check when creating NSEntry instances
+      (then an IncorrectState exception embedding a DoesNotExist exception may be thrown on subsequent method invocations).
+
+    * Add some methods to enable reducing the number of messages with the server. These methods are accessible
+      by casting NSEntry instances to AbstractNSEntryImpl and NSDirectory instances to AbstractNSDirectoryImpl.
 
         * exist(): Check if current entry exist (use this if created with flag FLAGS_BYPASSEXIST).
-          This reduces the number of queries sent to the server.
 
         * copyFrom(): Copy remote source entry to current entry.
-          This reduces the number of connections to the target server.
 
-        * list(): Returns a List of URL instances with additional methods to get entry attributes.
+        * list(): Returns a List of URL instances with additional methods to get entry attributes (cast them to JSagaURL).
 
     * Few differences in implementation of behavior with some flags (see comments in source code)
 
-        * NSEntry.remove() allow no RECURSIVE flag for directory in order to support a "rmdir-like" behavior.
+        * NSEntry.remove() allow no RECURSIVE flag for directory in order to enable "rmdir-like" behavior.
 
 * Job management
 
-    * Will also support JSDL for job description.
+    * Some job description attributes are not supported by JSAGA.
+      Attributes marked as ’not supported by JSDL’ might disappear in future versions of the SAGA API.
+
+        * Interactive (will be supported in the future)
+
+        * JobStartTime (not supported by JSDL)
+
+        * JobContact (not supported by JSDL)
 
 * Streams, Remote Procedure Call and future...
 
