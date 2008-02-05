@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl.job.instance;
 
+import fr.in2p3.jsaga.adaptor.job.SubState;
 import fr.in2p3.jsaga.impl.monitoring.*;
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.job.Job;
@@ -20,6 +21,8 @@ import org.ogf.saga.task.State;
 public class JobMetrics {
     MetricImpl<State> m_State;
     MetricImpl<String> m_StateDetail;
+    /** deviation from SAGA specification */
+    MetricImpl<String> m_SubState;
 
     /** constructor */
     JobMetrics(JobImpl job) throws NoSuccess {
@@ -36,7 +39,14 @@ public class JobMetrics {
                 MetricMode.ReadOnly,
                 "1",
                 MetricType.String,
-                "NEW:Unknown"));
+                "Unknown:Unknown"));
+        m_SubState = job._addMetric(new MetricImpl<String>(
+                JobImpl.JOB_SUBSTATE,
+                "fires on sub-state changes of the job (deviation from SAGA specification)",
+                MetricMode.ReadOnly,
+                "1",
+                MetricType.String,
+                SubState.SUBMITTED.toString()));
     }
 
     /** clone */
@@ -44,6 +54,7 @@ public class JobMetrics {
         JobMetrics clone = (JobMetrics) super.clone();
         clone.m_State = m_State.clone();
         clone.m_StateDetail = m_StateDetail.clone();
+        clone.m_SubState = m_SubState.clone();
         return clone;
     }
 }
