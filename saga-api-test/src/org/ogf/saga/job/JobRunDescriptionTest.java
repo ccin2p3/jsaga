@@ -1,7 +1,6 @@
 package org.ogf.saga.job;
 
 import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.job.abstracts.AbstractJobTest;
 import org.ogf.saga.job.abstracts.Attribute;
 import org.ogf.saga.job.abstracts.AttributeVector;
@@ -21,74 +20,35 @@ import org.ogf.saga.task.State;
 
 public class JobRunDescriptionTest extends AbstractJobTest {
 	
-		
 	public JobRunDescriptionTest(String jobprotocol) throws Exception {
         super(jobprotocol);
     }
 
     /**
-     * Runs job on a requested working directory and check stdout
+     * Runs job on a requested working directory
      */
     public void test_run_inWorkingDirectory() throws Exception {
         
     	// prepare
-    	String directory = "/tmp";
     	Attribute[] attributes = new Attribute[1];
-    	attributes[0] = new Attribute(JobDescription.WORKINGDIRECTORY, directory);
+    	attributes[0] = new Attribute(JobDescription.WORKINGDIRECTORY, "/dummy");
     	JobDescription desc = createJob("/bin/pwd", attributes, null);
     	
-    	// submit
-        Job job = runJob(desc);
-        
-        // wait for the end
-        job.waitFor();       
-
-        // check job for DONE status
-        checkStatus(job.getState(), State.DONE);
-
-        // get stdout
-        try {
-	        // check
-	        assertEquals(
-	                containStringInOutput(directory),
-	                true);
+    	Job job = null;
+    	try {
+	    	// submit
+	        job = runJob(desc);
+	        fail("Expected NoSuccess exception");
         }
-        catch (NotImplemented notImplemented) {
-        	System.err.println("WARNING :  'containStringInOutput' not implemented in plugin");
+        catch (NoSuccess noSuccess) {
         }
+        finally {
+        	if(job != null) {
+        		job.waitFor(DEFAULT_FINALY_TIMEOUT);
+        	}
+        }        
     }
     
-    /**
-     * Runs job with requested environment variable and check stdout
-     */
-    public void test_run_environnement() throws Exception {
-        
-    	// prepare
-    	String key = "MYVAR", value="Testing";
-    	AttributeVector[] attributes = new AttributeVector[1];
-    	attributes[0] = new AttributeVector(JobDescription.ENVIRONMENT, new String[]{key+"="+value});
-    	JobDescription desc =  createJob("/bin/env", null, attributes);
-    	
-    	// submit
-        Job job = runJob(desc);
-        
-        // wait for the end
-        job.waitFor();       
-
-        // check job for DONE status
-        checkStatus(job.getState(), State.DONE);
-
-        // get stdout
-        try {
-	        // check
-	        assertEquals(
-	        		containStringInOutput(value),
-	                true);
-        }
-        catch (NotImplemented notImplemented) {
-        	System.err.println("WARNING : 'containStringInOutput' not implemented in plugin");
-        }
-    }
    
     /**
      * Runs job, requests an impossible queue and expects FAILED status

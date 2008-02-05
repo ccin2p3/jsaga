@@ -1,6 +1,5 @@
 package org.ogf.saga.job.abstracts;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -153,17 +152,7 @@ public class AbstractJobTest extends AbstractTest {
     	if(jobState != wantedStatus) {
         	throw new Exception("Invalid status "+jobState+": must be "+wantedStatus+".");
         }
-	}
-    
-    /**
-     * Checks if the job output contains a string
-     * @param stringToTestInEnv The string to check in job output
-     * @return True is the job output contains the string
-     * @throws IOException
-     */
-    protected boolean containStringInOutput(String stringToTestInOutput) throws NotImplemented {
-    	throw new NotImplemented();
-	}
+	}    
     
     protected void printCurrentDate() {
     	DateFormat df = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
