@@ -170,8 +170,7 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
     }
 
     public void removeCallback(int cookie) throws NotImplemented, BadParameter, AuthenticationFailed, AuthorizationFailed,PermissionDenied, Timeout, NoSuccess {
-        m_callbacks.remove(cookie);
-        if (m_callbacks.size() == 0) {
+        if (m_callbacks.remove(cookie)!=null && m_callbacks.size()==0) {
             m_task.stopListening(this);
             m_isListening = false;
         }
@@ -254,7 +253,7 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
             try {
                 boolean stayRegistered = callback.cb(mt, this, null);
                 if (!stayRegistered) {
-                    m_callbacks.remove(cookie);
+                    this.removeCallback(cookie);
                 }
             } catch (Throwable e) {
                 s_logger.warn("Failed to invoke callback: "+callback.getClass().getName(), e);
