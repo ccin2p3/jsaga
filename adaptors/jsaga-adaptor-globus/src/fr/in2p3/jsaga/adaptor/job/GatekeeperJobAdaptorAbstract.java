@@ -16,6 +16,8 @@ import org.ietf.jgss.GSSException;
 import org.ogf.saga.error.*;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Map;
 
 /* ***************************************************
@@ -52,9 +54,12 @@ public abstract class GatekeeperJobAdaptorAbstract implements SagaSecureAdaptor 
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectState {
-    	//TODO get default IP
-        //return new Default[]{new Default(IP_ADDRESS, "none")};
-    	return null;
+    	try {
+			String defaultIp = InetAddress.getLocalHost().getHostAddress();
+	    	return new Default[]{new Default(IP_ADDRESS, defaultIp)};
+		} catch (UnknownHostException e) {
+			return null;
+		}
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
