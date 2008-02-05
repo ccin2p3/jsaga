@@ -5,6 +5,12 @@
         <artifactId>in2p3-site-skin</artifactId>
         <version>current</version>
     </skin>
+    <bannerLeft><src>images/logo-jsaga.png</src><alt>JSAGA</alt></bannerLeft>
+    <bannerRight><src>images/logo-cc.png</src><alt>CC-IN2P3</alt></bannerRight>
+    <poweredBy>
+        <logo name="CC-IN2P3" href="http://cc.in2p3.fr/" img="http://cc.in2p3.fr/images/site/logoCC72.gif"/>
+        <logo name="British Telecom" href="http://www.bt.com/" img="http://www.bt.com/static/wa/homepage/images/logo_75x36.gif"/>
+    </poweredBy>    
     <body>
         <links>
             <item name="ANR" href="http://www.agence-nationale-recherche.fr"/>
@@ -18,9 +24,9 @@
             <item name="Presentations" href="presentations.html"/>
         </menu>
         <menu name="User Documentation">
-            <item name="SAGA Specification" href="http://forge.ogf.org/sf/docman/do/downloadDocument/projects.saga-core-wg/docman.root.drafts/doc13771"/>
+            <item name="SAGA Specification" href="http://www.ogf.org/documents/GFD.90.pdf"/>
             <item name="SAGA Java Binding" href="saga-api/index.html"/>
-            <item name="SAGA add-ons" href="SAGA-delta.html"/>
+            <item name="Deviations from SAGA" href="SAGA-delta.html"/>
             <item name="JSDL Specification" href="http://www.ogf.org/documents/GFD.56.pdf"/>
             <item name="Tips" href="tips.html"/>
         </menu>
@@ -37,5 +43,6 @@
             <item name="VOMS" href="adaptors/jsaga-adaptor-voms/index.html"/>
             <item name="SRM" href="adaptors/jsaga-adaptor-srm/index.html"/>
         </menu>
+        <menu name="Adaptors provided by..."/>
     </body>
 </project>

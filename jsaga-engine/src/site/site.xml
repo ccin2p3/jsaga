@@ -5,6 +5,8 @@
         <artifactId>in2p3-site-skin</artifactId>
         <version>current</version>
     </skin>
+    <bannerLeft><src>images/logo-jsaga.png</src><alt>JSAGA</alt></bannerLeft>
+    <bannerRight><src>images/logo-cc.png</src><alt>CC-IN2P3</alt></bannerRight>
     <body>
         <links>
             <item name="ANR" href="http://www.agence-nationale-recherche.fr"/>
