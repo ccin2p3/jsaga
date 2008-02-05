@@ -24,6 +24,8 @@ public class JobAttributes implements Cloneable {
     AttributeImpl<Date> m_Created;
     AttributeImpl<Date> m_Started;
     AttributeImpl<Date> m_Finished;
+    /** deviation from SAGA specification */
+    AttributeImpl<String> m_NativeJobDescription;
 
     /** constructor */
     JobAttributes(JobImpl job) {
@@ -51,6 +53,12 @@ public class JobAttributes implements Cloneable {
                 MetricMode.ReadOnly,
                 MetricType.Time,
                 null));
+        m_NativeJobDescription = job._addAttribute(new AttributeImpl<String>(
+                JobImpl.NATIVEJOBDESCRIPTION,
+                "job description understood by the job service (deviation from SAGA specification)",
+                MetricMode.ReadOnly,
+                MetricType.String,
+                null));
     }
 
     /** clone */
@@ -60,6 +68,7 @@ public class JobAttributes implements Cloneable {
         clone.m_Created = m_Created.clone();
         clone.m_Started = m_Started.clone();
         clone.m_Finished = m_Finished.clone();
+        clone.m_NativeJobDescription = m_NativeJobDescription.clone();
         return clone;
     }
 }
