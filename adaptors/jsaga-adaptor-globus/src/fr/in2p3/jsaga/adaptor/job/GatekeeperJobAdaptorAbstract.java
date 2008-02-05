@@ -1,8 +1,13 @@
 package fr.in2p3.jsaga.adaptor.job;
 
 import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
+import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
+
+import org.globus.common.CoGProperties;
 import org.globus.gram.Gram;
 import org.globus.gram.GramException;
 import org.globus.gram.internal.GRAMProtocolErrorConstants;
@@ -10,6 +15,7 @@ import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.error.*;
 
+import java.io.IOException;
 import java.util.Map;
 
 /* ***************************************************
@@ -27,7 +33,8 @@ import java.util.Map;
 public abstract class GatekeeperJobAdaptorAbstract implements SagaSecureAdaptor {
     protected GSSCredential m_credential;
     protected String m_serverUrl;
-
+    private static final String IP_ADDRESS = "IPAddress";
+    
     public Class[] getSupportedSecurityAdaptorClasses() {
         return new Class[]{GSSCredentialSecurityAdaptor.class};
     }
@@ -39,12 +46,29 @@ public abstract class GatekeeperJobAdaptorAbstract implements SagaSecureAdaptor 
     public int getDefaultPort() {
         return 2119;
     }
+    
+    public Usage getUsage() {
+        return new UOptional(IP_ADDRESS);
+    }
+
+    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    	//TODO get default IP
+        //return new Default[]{new Default(IP_ADDRESS, "none")};
+    	return null;
+    }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
     	if(basePath.indexOf("=") > -1)
     		m_serverUrl = host+":"+port+":"+basePath;
     	else
     		m_serverUrl = host+":"+port+basePath;
+    	// Overload cog properties
+    	if (attributes!=null && attributes.containsKey(IP_ADDRESS)) {
+            String value = ((String) attributes.get(IP_ADDRESS));
+        	CoGProperties loadedCogProperties= CoGProperties.getDefault();
+    		loadedCogProperties.setIPAddress(value);
+    		CoGProperties.setDefault(loadedCogProperties);
+    	}
         try {
             Gram.ping(m_credential, m_serverUrl);
         } catch (GramException e) {
