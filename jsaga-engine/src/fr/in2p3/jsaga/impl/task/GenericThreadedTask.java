@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.impl.task;
 
-import fr.in2p3.jsaga.impl.monitoring.MetricImpl;
 import org.ogf.saga.error.*;
 import org.ogf.saga.monitoring.Metric;
 import org.ogf.saga.session.Session;
@@ -67,7 +66,7 @@ public class GenericThreadedTask extends AbstractTaskImpl implements Task {
         }
     }
 
-    protected void refreshState(MetricImpl metric_state) {
+    protected void refreshState() {
         // do nothing
     }
 

@@ -79,10 +79,9 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
     protected abstract boolean doCancel();
 
     /**
-     * refresh the value of the metric <code>metric_state</code>
-     * @param metric_state the metric to refresh
+     * refresh the task state
      */
-    protected abstract void refreshState(MetricImpl<State> metric_state) throws NotImplemented, Timeout, NoSuccess;
+    protected abstract void refreshState() throws NotImplemented, Timeout, NoSuccess;
 
     /**
      * start listening to value changes of the metric <code>metric</code>
@@ -167,7 +166,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
                 return m_metric_TaskState.getValue();
             default:
                 if (!m_metric_TaskState.isListening()) {
-                    this.refreshState(m_metric_TaskState);
+                    this.refreshState();
                 }
                 return m_metric_TaskState.getValue();
         }
@@ -282,7 +281,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
         if (m_metric_TaskState.getValue() == null) {
             // try to refresh state
             try {
-                this.refreshState(m_metric_TaskState);
+                this.refreshState();
             } catch (Exception e) {
                 return false;
             }
