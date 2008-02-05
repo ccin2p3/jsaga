@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.engine.job.monitor.request;
 
+import fr.in2p3.jsaga.adaptor.job.SubState;
 import fr.in2p3.jsaga.adaptor.job.monitor.*;
 import org.ogf.saga.error.*;
 
@@ -23,17 +24,24 @@ public class JobStatusRequestor {
     }
 
     public JobStatus getJobStatus(String nativeJobId) throws NotImplemented, Timeout, NoSuccess {
-        if (m_adaptor instanceof QueryIndividualJob) {
-            return ((QueryIndividualJob) m_adaptor).getStatus(nativeJobId);
-        } else if (m_adaptor instanceof QueryListJob) {
-            JobStatus[] statusArray = ((QueryListJob) m_adaptor).getStatusList(new String[]{nativeJobId});
-            return findJobStatus(statusArray, nativeJobId);
-        } else if (m_adaptor instanceof QueryFilteredJob) {
-            //todo: get filter string (e.g. jobCollectionName) ?
-            JobStatus[] statusArray = ((QueryFilteredJob) m_adaptor).getFilteredStatus(null);
-            return findJobStatus(statusArray, nativeJobId);
+        if (nativeJobId != null) {
+            if (m_adaptor instanceof QueryIndividualJob) {
+                return ((QueryIndividualJob) m_adaptor).getStatus(nativeJobId);
+            } else if (m_adaptor instanceof QueryListJob) {
+                JobStatus[] statusArray = ((QueryListJob) m_adaptor).getStatusList(new String[]{nativeJobId});
+                return findJobStatus(statusArray, nativeJobId);
+            } else if (m_adaptor instanceof QueryFilteredJob) {
+                //todo: get filter string (e.g. jobCollectionName) ?
+                JobStatus[] statusArray = ((QueryFilteredJob) m_adaptor).getFilteredStatus(null);
+                return findJobStatus(statusArray, nativeJobId);
+            } else {
+                throw new NotImplemented("Querying job status not implemented for adaptor: "+ m_adaptor.getClass().getName());
+            }
         } else {
-            throw new NotImplemented("Querying job status not implemented for adaptor: "+ m_adaptor.getClass().getName());
+            return new JobStatus(nativeJobId, 0, "Unknown"){
+                public String getModel() {return "Unknown";}
+                public SubState getSubState() {return SubState.SUBMITTED;}
+            };
         }
     }
 
