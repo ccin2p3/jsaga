@@ -104,7 +104,7 @@ public class JobRunDescriptionTest extends AbstractJobTest {
         
     	// prepare a job witch requires 250 Gb of RAM
     	Attribute[] attributes = new Attribute[1];
-    	attributes[0] = new Attribute(JobDescription.TOTALPHYSICALMEMORY, "0");
+    	attributes[0] = new Attribute(JobDescription.TOTALPHYSICALMEMORY, "2500000000");
     	AttributeVector[] attributesV = new AttributeVector[1];
     	attributesV[0] = new AttributeVector(JobDescription.ARGUMENTS, new String[]{"30"});    
     	JobDescription desc =  createJob(DEFAULT_LONG_JOB_BINARY, attributes, attributesV);

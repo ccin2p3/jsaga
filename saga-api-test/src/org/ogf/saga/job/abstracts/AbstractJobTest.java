@@ -6,6 +6,8 @@ import java.util.Date;
 
 import org.ogf.saga.AbstractTest;
 import org.ogf.saga.URL;
+import org.ogf.saga.context.Context;
+import org.ogf.saga.error.AuthorizationFailed;
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.error.Timeout;
@@ -13,9 +15,13 @@ import org.ogf.saga.job.Job;
 import org.ogf.saga.job.JobDescription;
 import org.ogf.saga.job.JobFactory;
 import org.ogf.saga.job.JobService;
+import org.ogf.saga.monitoring.Callback;
+import org.ogf.saga.monitoring.Metric;
+import org.ogf.saga.monitoring.Monitorable;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.task.State;
+import org.ogf.saga.task.Task;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -34,6 +40,7 @@ public class AbstractJobTest extends AbstractTest {
 	protected int DEFAULT_FINALY_TIMEOUT = 60 ;
 	protected String DEFAULT_SIMPLE_JOB_BINARY = "/bin/date" ;
 	protected String DEFAULT_LONG_JOB_BINARY = "/bin/sleep" ;
+	protected static final int MAX_QUEUING_TIME = 60;
 
     // configuration
     protected URL m_jobservice;
@@ -150,7 +157,7 @@ public class AbstractJobTest extends AbstractTest {
      */
     protected void checkStatus(State jobState, State wantedStatus) throws Exception {
     	if(jobState != wantedStatus) {
-        	throw new Exception("Invalid status "+jobState+": must be "+wantedStatus+".");
+        	fail("Invalid status "+jobState+": must be "+wantedStatus+".");
         }
 	}    
     
@@ -163,4 +170,46 @@ public class AbstractJobTest extends AbstractTest {
 		System.out.println("Status: "+job.getState());
 	}
 
+
+    private String m_subState;
+    protected boolean waitForSubState(Job job, String subState, float timeoutInSeconds) throws Exception {
+    	m_subState = job.getMetric("job.sub_state").getAttribute(Metric.VALUE);
+        int cookie = job.addCallback("job.sub_state", new Callback(){
+            public boolean cb(Monitorable mt, Metric metric, Context ctx) throws NotImplemented, AuthorizationFailed {
+                try {
+                	m_subState = metric.getAttribute(Metric.VALUE);
+                } catch (Exception e) {
+                    throw new NotImplemented(e);
+                }
+                return true;
+            }
+        });
+        try {
+            boolean forever;
+            long endTime;
+            if (timeoutInSeconds == Task.WAIT_FOREVER) {
+                forever = true;
+                endTime = -1;
+            } else if (timeoutInSeconds == Task.NO_WAIT) {
+                forever = false;
+                endTime = -1;
+            } else {
+                forever = false;
+                endTime = System.currentTimeMillis() + (long) timeoutInSeconds*1000;
+            }
+            while(!this.isEndedOrSubState(subState) && (forever || System.currentTimeMillis()<endTime)) {
+            	Thread.currentThread().sleep(100);
+            }
+        } catch (InterruptedException e) {/*ignore*/}
+        job.removeCallback("job.sub_state", cookie);
+        return this.isEndedOrSubState(subState);
+    }
+    
+    private boolean isEndedOrSubState( String subState) {
+    	return m_subState.equals(subState) ||
+    		m_subState.equals("CANCELED") ||
+    		m_subState.equals("DONE") ||    		
+    		m_subState.equals("FAILED_ERROR") ||
+    		m_subState.equals("FAILED_ABORTED");
+    }
 }

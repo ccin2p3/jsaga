@@ -36,11 +36,11 @@ public class JobRunOptionalTest extends AbstractJobTest {
         // submit
         Job job = runJob(desc);
         
-        // wait for RUNNING state or TODO for 10 seconds
-        job.waitFor(10);
-        
-        // check job for RUNNING status
-        checkStatus(job.getState(), State.RUNNING);
+        // wait for RUNNING state (deviation from SAGA specification)
+        if (! super.waitForSubState(job, "RUNNING_ACTIVE", MAX_QUEUING_TIME)) {
+        	job.waitFor(DEFAULT_FINALY_TIMEOUT);
+            fail("Job did not enter RUNNING_ACTIVE state within "+MAX_QUEUING_TIME+" seconds");
+        }
         
         try {
         	
@@ -106,20 +106,20 @@ public class JobRunOptionalTest extends AbstractJobTest {
         // submit
         Job job = runJob(desc);
         
-        // wait for RUNNING state or TODO for 10 seconds
-        job.waitFor(10);
-        
-        // check job for RUNNING status
-        checkStatus(job.getState(), State.RUNNING);
+       // wait for RUNNING state (deviation from SAGA specification)
+        if (! super.waitForSubState(job, "RUNNING_ACTIVE", MAX_QUEUING_TIME)) {
+        	job.waitFor(DEFAULT_FINALY_TIMEOUT);
+            fail("Job did not enter RUNNING_ACTIVE state within "+MAX_QUEUING_TIME+" seconds");
+        }
         
         // resume job
         job.suspend();
         
-        // wait for SUSPENDED state or TODO for 5 seconds
-        job.waitFor(5);
-        
-        // check job for RUNNING status
-        checkStatus(job.getState(), State.SUSPENDED);
+        // wait for SUSPENDED state
+        if (! super.waitForSubState(job, "SUSPENDED", MAX_QUEUING_TIME)) {
+        	job.waitFor(DEFAULT_FINALY_TIMEOUT);
+            fail("Job did not enter SUSPENDED state within "+MAX_QUEUING_TIME+" seconds");
+        }
         
         try {
 	        // resume job
