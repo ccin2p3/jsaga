@@ -66,9 +66,8 @@ public class JobRunDescriptionTest extends AbstractJobTest {
     	// prepare
     	String key = "MYVAR", value="Testing";
     	AttributeVector[] attributes = new AttributeVector[1];
-    	//attributes[0] = new AttributeVector(JobDescription.ENVIRONMENT, new String[]{key+"="+value});
-    	attributes[0] = new AttributeVector(JobDescription.ARGUMENTS, new String[]{"$HOME"});
-    	JobDescription desc =  createJob("/bin/echo", null, attributes);
+    	attributes[0] = new AttributeVector(JobDescription.ENVIRONMENT, new String[]{key+"="+value});
+    	JobDescription desc =  createJob("/bin/env", null, attributes);
     	
     	// submit
         Job job = runJob(desc);
@@ -105,7 +104,6 @@ public class JobRunDescriptionTest extends AbstractJobTest {
     	try {
 	    	// submit
 	        job = runJob(desc);
-	        //TODO : NoSuccess but BadParameter
 	        fail("Expected NoSuccess exception");
         }
         catch (NoSuccess noSuccess) {
@@ -146,8 +144,10 @@ public class JobRunDescriptionTest extends AbstractJobTest {
         
     	// prepare a job witch requires 250 Gb of RAM
     	Attribute[] attributes = new Attribute[1];
-    	attributes[0] = new Attribute(JobDescription.TOTALPHYSICALMEMORY, "250000");
-    	JobDescription desc =  createJob(DEFAULT_SIMPLE_JOB_BINARY, attributes, null);
+    	attributes[0] = new Attribute(JobDescription.TOTALPHYSICALMEMORY, "0");
+    	AttributeVector[] attributesV = new AttributeVector[1];
+    	attributesV[0] = new AttributeVector(JobDescription.ARGUMENTS, new String[]{"30"});    
+    	JobDescription desc =  createJob(DEFAULT_LONG_JOB_BINARY, attributes, attributesV);
     	    	
     	// submit
         Job job = runJob(desc);
@@ -160,31 +160,7 @@ public class JobRunDescriptionTest extends AbstractJobTest {
                 State.FAILED,
                 job.getState());       
     }
-    
-    /**
-     * Runs MPI job and expects done status
-     */
-    public void test_run_MPI() throws Exception {
         
-    	// prepare a job start a mpi binary
-    	Attribute[] attributes = new Attribute[3];
-    	attributes[0] = new Attribute(JobDescription.SPMDVARIATION, "mpi");
-    	attributes[1] = new Attribute(JobDescription.NUMBEROFPROCESSES, "2");
-    	attributes[2] = new Attribute(JobDescription.PROCESSESPERHOST, "2");
-    	JobDescription desc =  createJob("helloMpi", attributes, null);
-    	
-    	// submit
-        Job job = runJob(desc);
-        
-        // wait for the end
-        job.waitFor();  
-        
-        // check job status
-        assertEquals(
-                State.DONE,
-                job.getState());       
-    }
-    
     /**
      * Runs simple job and expects done status
      */
