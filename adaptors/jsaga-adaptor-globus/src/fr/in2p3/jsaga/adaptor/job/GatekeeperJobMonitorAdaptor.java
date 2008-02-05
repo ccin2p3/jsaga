@@ -57,8 +57,10 @@ public class GatekeeperJobMonitorAdaptor extends GatekeeperJobAdaptorAbstract im
         try {
             job.bind();
         } catch (GramException e) {
-            job.removeListener(listener);
-            if (e.getErrorCode() == GramException.CONNECTION_FAILED) {
+        	job.removeListener(listener);
+            if (e.getErrorCode() == GramException.CONNECTION_FAILED ||
+            		e.getErrorCode() == GramException.JOB_QUERY_DENIAL ||
+            		e.getErrorCode() == GramException.HTTP_UNFRAME_FAILED) {
                 //WARNING: Globus does not distinguish job DONE and job manager stopped
                 GatekeeperJobStatus status = new GatekeeperJobStatus(nativeJobId, GRAMConstants.STATUS_DONE, "DONE");
                 notifier.notifyChange(status);
@@ -76,7 +78,9 @@ public class GatekeeperJobMonitorAdaptor extends GatekeeperJobAdaptorAbstract im
         try {
             job.unbind();
         } catch (GramException e) {
-            if (e.getErrorCode() == GramException.CONNECTION_FAILED) {
+        	if (e.getErrorCode() == GramException.CONNECTION_FAILED ||
+            		e.getErrorCode() == GramException.JOB_QUERY_DENIAL ||
+            		e.getErrorCode() == GramException.HTTP_UNFRAME_FAILED) {
                 // ignore (Globus does not distinguish job DONE and job manager stopped)
             } else {
                 this.rethrowException(e);
