@@ -31,7 +31,7 @@ public abstract class AbstractJobStatusListener implements JobRegistry {
         // try to notify initial status
         try {
             JobStatus status = m_requestor.getJobStatus(nativeJobId);
-            callback.setState(status.getSagaState(), status.getStateDetail());
+            callback.setState(status.getSagaState(), status.getStateDetail(), status.getSubState());
         } catch (NotImplemented e) {
             // ignore if no QueryJob interface is implemented
         }

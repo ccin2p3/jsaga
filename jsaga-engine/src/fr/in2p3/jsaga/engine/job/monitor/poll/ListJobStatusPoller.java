@@ -39,7 +39,7 @@ public class ListJobStatusPoller extends AbstractJobStatusPoller {
                 JobMonitorCallback callback = (JobMonitorCallback) m_subscribedJobs.get(nativeJobId);
                 if (callback != null) {
                     JobStatus status = statusArray[i];
-                    callback.setState(status.getSagaState(), status.getStateDetail());
+                    callback.setState(status.getSagaState(), status.getStateDetail(), status.getSubState());
                 }
             }
         } catch (Exception e) {

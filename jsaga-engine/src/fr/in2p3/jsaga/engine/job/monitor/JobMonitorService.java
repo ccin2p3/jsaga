@@ -7,7 +7,6 @@ import fr.in2p3.jsaga.engine.job.monitor.poll.*;
 import fr.in2p3.jsaga.engine.job.monitor.request.JobStatusRequestor;
 import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
-import org.ogf.saga.task.State;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -65,8 +64,8 @@ public class JobMonitorService {
         return m_url;
     }
 
-    public State getState(String nativeJobId) throws NotImplemented, Timeout, NoSuccess {
-        return m_requestor.getJobStatus(nativeJobId).getSagaState();
+    public JobStatus getState(String nativeJobId) throws NotImplemented, Timeout, NoSuccess {
+        return m_requestor.getJobStatus(nativeJobId);
     }
 
     public void startListening(String nativeJobId, JobMonitorCallback callback) throws NotImplemented, IncorrectState, Timeout, NoSuccess {
