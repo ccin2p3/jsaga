@@ -15,20 +15,22 @@ import org.ogf.saga.task.State;
  *
  */
 public class SubState {
-    private static final int SUBMIT=0;  public static final SubState SUBMITTED=new SubState(SUBMIT);
-    private static final int RUNN_Q=1;  public static final SubState RUNNING_QUEUED=new SubState(RUNN_Q);
-    private static final int RUNN_A=2;  public static final SubState RUNNING_ACTIVE=new SubState(RUNN_A);
-    private static final int _DONE_=3;  public static final SubState DONE=new SubState(_DONE_);
-    private static final int CANCEL=4;  public static final SubState CANCELED=new SubState(CANCEL);
-    private static final int FAIL_E=5;  public static final SubState FAILED_ERROR=new SubState(FAIL_E);
-    private static final int FAIL_A=6;  public static final SubState FAILED_ABORTED=new SubState(FAIL_A);
-    private static final int SUSP_Q=7;  public static final SubState SUSPENDED_QUEUED=new SubState(SUSP_Q);
-    private static final int SUSP_A=8;  public static final SubState SUSPENDED_ACTIVE=new SubState(SUSP_A);
+    private static final int SUBMIT=0;  public static final SubState SUBMITTED=new SubState(SUBMIT, "SUBMITTED");
+    private static final int RUNN_Q=1;  public static final SubState RUNNING_QUEUED=new SubState(RUNN_Q, "RUNNING_QUEUED");
+    private static final int RUNN_A=2;  public static final SubState RUNNING_ACTIVE=new SubState(RUNN_A, "RUNNING_ACTIVE");
+    private static final int _DONE_=3;  public static final SubState DONE=new SubState(_DONE_, "DONE");
+    private static final int CANCEL=4;  public static final SubState CANCELED=new SubState(CANCEL, "CANCELED");
+    private static final int FAIL_E=5;  public static final SubState FAILED_ERROR=new SubState(FAIL_E, "FAILED_ERROR");
+    private static final int FAIL_A=6;  public static final SubState FAILED_ABORTED=new SubState(FAIL_A, "FAILED_ABORTED");
+    private static final int SUSP_Q=7;  public static final SubState SUSPENDED_QUEUED=new SubState(SUSP_Q, "SUSPENDED_QUEUED");
+    private static final int SUSP_A=8;  public static final SubState SUSPENDED_ACTIVE=new SubState(SUSP_A, "SUSPENDED_ACTIVE");
 
     private int value;
+    private String label;
 
-    SubState(int value) {
+    SubState(int value, String label) {
         this.value = value;
+        this.label = label;
     }
 
     /**
@@ -37,6 +39,10 @@ public class SubState {
      */
     public int getValue() {
         return value;
+    }
+
+    public String toString() {
+        return label;
     }
 
     public State toSagaState() {
