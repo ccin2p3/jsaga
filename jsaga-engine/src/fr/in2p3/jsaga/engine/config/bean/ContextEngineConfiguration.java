@@ -39,10 +39,13 @@ public class ContextEngineConfiguration {
             this.updateAttributes(userAttributes, ctx, ctx.getName());
 
             // get usage and init usage
+//todo: split attributes in two parts (usage and initUsage)
+/* WORKAROUND to bug (initUsage.UserProxy may be removed if usage.<UserProxy> and proxy file does not exist yet)
             Usage usage = desc.getUsage(ctx.getType());
             if (usage != null) {
                 usage.resetWeight();
             }
+*/
             Usage initUsage = desc.getInitUsage(ctx.getType());
             if (initUsage != null) {
                 initUsage.resetWeight();
@@ -51,11 +54,13 @@ public class ContextEngineConfiguration {
             // correct configured attributes according to usage and init usage
             for (int a=0; a<ctx.getAttributeCount(); a++) {
                 Attribute attr = ctx.getAttribute(a);
+/*
                 if (usage != null) {
                     try {
                         attr.setValue(usage.correctValue(attr.getName(), attr.getValue(), attr.getSource().getType()));
-                    } catch(DoesNotExist e) {/*do nothing*/}
+                    } catch(DoesNotExist e) {}
                 }
+*/
                 if (initUsage != null) {
                     try {
                         attr.setValue(initUsage.correctValue(attr.getName(), attr.getValue(), attr.getSource().getType()));
@@ -66,9 +71,11 @@ public class ContextEngineConfiguration {
             // remove ambiguity
             for (int a=0; a<ctx.getAttributeCount(); a++) {
                 Attribute attr = ctx.getAttribute(a);
+/*
                 if (usage!=null && usage.removeValue(attr.getName())) {
                     attr.setValue(null);
                 }
+*/
                 if (initUsage!=null && initUsage.removeValue(attr.getName())) {
                     attr.setValue(null);
                 }
