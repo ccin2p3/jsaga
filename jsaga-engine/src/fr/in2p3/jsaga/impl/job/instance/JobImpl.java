@@ -1,10 +1,11 @@
 package fr.in2p3.jsaga.impl.job.instance;
 
+import fr.in2p3.jsaga.adaptor.job.SubState;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.*;
+import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorCallback;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
-import fr.in2p3.jsaga.impl.monitoring.MetricImpl;
 import org.ogf.saga.ObjectType;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
@@ -30,29 +31,30 @@ import java.io.OutputStream;
  *
  */
 public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCallback {
-    // depends on constructor
+    /** Job attribute (deviation from SAGA specification) */
+    public static final String NATIVEJOBDESCRIPTION = "NativeJobDescription";
+    /** Job metric (deviation from SAGA specification) */
+    public static final String JOB_SUBSTATE = "job.sub_state";
+
     private JobControlAdaptor m_controlAdaptor;
     private JobMonitorService m_monitorService;
-    private JobDescription m_jsdl;
-    // common
     private JobAttributes m_attributes;
     private JobMetrics m_metrics;
-    private String m_nativeJobDesc;
+    private JobDescription m_jobDescription;
     private String m_nativeJobId;
 
     /** constructor for submission */
-    public JobImpl(Session session, JobDescription description, String nativeJobDesc, JobControlAdaptor controlAdaptor, JobMonitorService monitorService) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public JobImpl(Session session, JobDescription jobDesc, String nativeJobDesc, JobControlAdaptor controlAdaptor, JobMonitorService monitorService) throws NotImplemented, BadParameter, Timeout, NoSuccess {
         this(session, controlAdaptor, monitorService, true);
-        m_jsdl = description;
-        m_nativeJobDesc = nativeJobDesc;
+        m_attributes.m_NativeJobDescription.setObject(nativeJobDesc);
+        m_jobDescription = jobDesc;
         m_nativeJobId = null;
     }
 
     /** constructor for control and monitoring only */
     public JobImpl(Session session, String nativeJobId, JobControlAdaptor controlAdaptor, JobMonitorService monitorService) throws NotImplemented, BadParameter, Timeout, NoSuccess {
         this(session, controlAdaptor, monitorService, false);
-        m_jsdl = null;
-        m_nativeJobDesc = null;
+        m_jobDescription = null;
         m_nativeJobId = nativeJobId;
     }
 
@@ -72,8 +74,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
         clone.m_metrics = m_metrics.clone();
         clone.m_controlAdaptor = m_controlAdaptor;
         clone.m_monitorService = m_monitorService;
-        clone.m_jsdl = m_jsdl;
-        clone.m_nativeJobDesc = m_nativeJobDesc;
+        clone.m_jobDescription = m_jobDescription;
         clone.m_nativeJobId = m_nativeJobId;
         return clone;
     }
@@ -86,7 +87,8 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
 
     protected void doSubmit() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
         try {
-            m_nativeJobId = m_controlAdaptor.submit(m_nativeJobDesc);
+            String nativeJobDesc = m_attributes.m_NativeJobDescription.getObject();
+            m_nativeJobId = m_controlAdaptor.submit(nativeJobDesc);
             String monitorUrl = m_monitorService.getURL().toString().replaceAll("%20", " ");
             String sagaJobId = "["+monitorUrl+"]-["+m_nativeJobId+"]";
             m_attributes.m_JobId.setObject(sagaJobId);
@@ -108,12 +110,9 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     }
 
     //todo: do not change state if it is not conform to the states graph (because notified state may be more recent)
-    protected void refreshState(MetricImpl<State> metric_state) throws NotImplemented, Timeout, NoSuccess {
-        State newState = m_nativeJobId!=null
-                ? m_monitorService.getState(m_nativeJobId)
-                : State.NEW;
-        metric_state.setValue(newState, this);
-        //todo: update subState and stateDetail
+    protected void refreshState() throws NotImplemented, Timeout, NoSuccess {
+        JobStatus status = m_monitorService.getState(m_nativeJobId);
+        this.setState(status.getSagaState(), status.getStateDetail(), status.getSubState());
     }
 
     public void startListening(Metric metric) throws NotImplemented, IncorrectState, Timeout, NoSuccess {
@@ -133,7 +132,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     ////////////////////////////////////// implementation of Job //////////////////////////////////////
 
     public JobDescription getJobDescription() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        return m_jsdl;
+        return m_jobDescription;
     }
 
     public OutputStream getStdin() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, IncorrectState, NoSuccess {
@@ -230,8 +229,17 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
 
     ////////////////////////////////////// implementation of JobMonitorCallback //////////////////////////////////////
 
-    public void setState(State state, String stateDetail) {
+    public void setState(State state, String stateDetail, SubState subState) {
         super.setState(state);
-        m_metrics.m_StateDetail.setValue(stateDetail, this);
+        switch(m_metrics.m_State.getValue(State.RUNNING)) {
+            case DONE:
+            case CANCELED:
+            case FAILED:
+                return;
+            default:
+                m_metrics.m_State.setValue(state, this);
+                m_metrics.m_StateDetail.setValue(stateDetail, this);
+                m_metrics.m_SubState.setValue(subState.toString(), this);
+        }
     }
 }
