@@ -8,13 +8,13 @@
     <xsl:output method="xml" indent="yes"/>
     <xsl:template match="/attributes">
         <!-- check unsupported attributes -->
-        <xsl:if test="attribute[@name='Interactive']/@value='true'">
+        <xsl:if test="Interactive/@value='true'">
             <xsl:message terminate="yes">Interactive jobs are currently not supported by JSAGA</xsl:message>
         </xsl:if>
-        <xsl:if test="attribute[@name='JobStartTime']/@value">
+        <xsl:if test="JobStartTime/@value">
             <xsl:message terminate="yes">Unsupported attribute key: JobStartTime</xsl:message>
         </xsl:if>
-        <xsl:if test="vectorAttribute[@name='JobContact']/value/text()">
+        <xsl:if test="JobContact/value/text()">
             <xsl:message terminate="yes">Unsupported attribute key: JobContact</xsl:message>
         </xsl:if>
 
@@ -22,84 +22,84 @@
         <jsdl:JobDefinition>
             <jsdl:JobDescription>
                 <jsdl:JobIdentification>
-                    <xsl:for-each select="attribute[@name='JobName']/@value">
+                    <xsl:for-each select="JobName/@value">
                         <jsdl:JobName><xsl:value-of select="."/></jsdl:JobName>
                     </xsl:for-each>
-                    <xsl:for-each select="attribute[@name='Queue']/@value">
+                    <xsl:for-each select="Queue/@value">
                         <jsdl:JobAnnotation><xsl:value-of select="."/></jsdl:JobAnnotation>
                     </xsl:for-each>
                 </jsdl:JobIdentification>
                 <jsdl:Application>
                     <posix:POSIXApplication>
-                        <xsl:for-each select="attribute[@name='Executable']/@value">
+                        <xsl:for-each select="Executable/@value">
                             <posix:Executable filesystemName="WorkingDirectory"><xsl:value-of select="."/></posix:Executable>
                         </xsl:for-each>
-                        <xsl:for-each select="attribute[@name='Input']/@value">
+                        <xsl:for-each select="Input/@value">
                             <posix:Input filesystemName="WorkingDirectory"><xsl:value-of select="."/></posix:Input>
                         </xsl:for-each>
-                        <xsl:for-each select="attribute[@name='Output']/@value">
+                        <xsl:for-each select="Output/@value">
                             <posix:Output filesystemName="WorkingDirectory"><xsl:value-of select="."/></posix:Output>
                         </xsl:for-each>
-                        <xsl:for-each select="attribute[@name='Error']/@value">
+                        <xsl:for-each select="Error/@value">
                             <posix:Error filesystemName="WorkingDirectory"><xsl:value-of select="."/></posix:Error>
                         </xsl:for-each>
-                        <xsl:for-each select="vectorAttribute[@name='Arguments']/value/text()">
+                        <xsl:for-each select="Arguments/value/text()">
                             <posix:Argument><xsl:value-of select="."/></posix:Argument>
                         </xsl:for-each>
-                        <xsl:for-each select="vectorAttribute[@name='Environment']/value/text()">
+                        <xsl:for-each select="Environment/value/text()">
                             <posix:Environment name="{substring-before(.,'=')}"><xsl:value-of select="substring-after(.,'=')"/></posix:Environment>
                         </xsl:for-each>
                     </posix:POSIXApplication>
                     <spmd:SPMDApplication>
-                        <xsl:for-each select="attribute[@name='NumberOfProcesses']/@value">
+                        <xsl:for-each select="NumberOfProcesses/@value">
                             <spmd:NumberOfProcesses><xsl:value-of select="."/></spmd:NumberOfProcesses>
                         </xsl:for-each>
-                        <xsl:for-each select="attribute[@name='ProcessesPerHost']/@value">
+                        <xsl:for-each select="ProcessesPerHost/@value">
                             <spmd:ProcessesPerHost><xsl:value-of select="."/></spmd:ProcessesPerHost>
                         </xsl:for-each>
-                        <xsl:for-each select="attribute[@name='ThreadsPerProcess']/@value">
+                        <xsl:for-each select="ThreadsPerProcess/@value">
                             <spmd:ThreadsPerProcess><xsl:value-of select="."/></spmd:ThreadsPerProcess>
                         </xsl:for-each>
-                        <xsl:for-each select="attribute[@name='SPMDVariation']/@value">
+                        <xsl:for-each select="SPMDVariation/@value">
                             <spmd:SPMDVariation><xsl:value-of select="."/></spmd:SPMDVariation>
                         </xsl:for-each>
                     </spmd:SPMDApplication>
                 </jsdl:Application>
                 <jsdl:Resources>
-                    <xsl:for-each select="attribute[@name='WorkingDirectory']/@value">
+                    <xsl:for-each select="WorkingDirectory/@value">
                         <jsdl:FileSystem name="WorkingDirectory">
                             <jsdl:FileSystemType>temporary</jsdl:FileSystemType>
                             <jsdl:MountPoint><xsl:value-of select="."/></jsdl:MountPoint>
                         </jsdl:FileSystem>
                     </xsl:for-each>
-                    <xsl:for-each select="attribute[@name='TotalCPUCount']/@value">
+                    <xsl:for-each select="TotalCPUCount/@value">
                         <jsdl:TotalCPUCount>
                             <jsdl:Exact><xsl:value-of select="."/></jsdl:Exact>
                         </jsdl:TotalCPUCount>
                     </xsl:for-each>
-                    <xsl:for-each select="attribute[@name='TotalCPUTime']/@value">
+                    <xsl:for-each select="TotalCPUTime/@value">
                         <jsdl:TotalCPUTime>
                             <jsdl:UpperBoundedRange exclusiveBound="false"><xsl:value-of select="."/></jsdl:UpperBoundedRange>
                         </jsdl:TotalCPUTime>
                     </xsl:for-each>
-                    <xsl:for-each select="attribute[@name='TotalPhysicalMemory']/@value">
+                    <xsl:for-each select="TotalPhysicalMemory/@value">
                         <jsdl:TotalPhysicalMemory>
                             <jsdl:UpperBoundedRange exclusiveBound="false"><xsl:value-of select="."/></jsdl:UpperBoundedRange>
                         </jsdl:TotalPhysicalMemory>
                     </xsl:for-each>
-                    <xsl:for-each select="vectorAttribute[@name='CPUArchitecture']/value/text()">
+                    <xsl:for-each select="CPUArchitecture/value/text()">
                         <jsdl:CPUArchitecture>
                             <jsdl:CPUArchitectureName><xsl:value-of select="."/></jsdl:CPUArchitectureName>
                         </jsdl:CPUArchitecture>
                     </xsl:for-each>
-                    <xsl:for-each select="vectorAttribute[@name='OperatingSystemType']/value/text()">
+                    <xsl:for-each select="OperatingSystemType/value/text()">
                         <jsdl:OperatingSystem>
                             <jsdl:OperatingSystemType>
                                 <jsdl:OperatingSystemName><xsl:value-of select="."/></jsdl:OperatingSystemName>
                             </jsdl:OperatingSystemType>
                         </jsdl:OperatingSystem>
                     </xsl:for-each>
-                    <xsl:for-each select="vectorAttribute[@name='CandidateHosts']">
+                    <xsl:for-each select="CandidateHosts">
                         <jsdl:CandidateHosts>
                             <xsl:for-each select="value/text()">
                                 <jsdl:HostName><xsl:value-of select="."/></jsdl:HostName>
@@ -107,7 +107,7 @@
                         </jsdl:CandidateHosts>
                     </xsl:for-each>
                 </jsdl:Resources>
-                <xsl:for-each select="vectorAttribute[@name='FileTransfer']/value/text()">
+                <xsl:for-each select="FileTransfer/value/text()">
                     <jsdl:DataStaging>
                         <xsl:choose>
                             <xsl:when test="contains(.,'>>')">
@@ -143,7 +143,7 @@
                             </xsl:otherwise>
                         </xsl:choose>
                         <jsdl:FilesystemName>WorkingDirectory</jsdl:FilesystemName>
-                        <xsl:for-each select="/attributes/attribute[@name='Cleanup']/@value">
+                        <xsl:for-each select="/attributes/Cleanup/@value">
                             <jsdl:DeleteOnTermination><xsl:value-of select="."/></jsdl:DeleteOnTermination>
                         </xsl:for-each>
                     </jsdl:DataStaging>
