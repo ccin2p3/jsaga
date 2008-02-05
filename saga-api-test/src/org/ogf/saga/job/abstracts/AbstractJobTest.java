@@ -173,8 +173,7 @@ public class AbstractJobTest extends AbstractTest {
 
     private String m_subState;
     protected boolean waitForSubState(Job job, String subState, float timeoutInSeconds) throws Exception {
-    	m_subState = job.getMetric("job.sub_state").getAttribute(Metric.VALUE);
-        int cookie = job.addCallback("job.sub_state", new Callback(){
+    	int cookie = job.addCallback("job.sub_state", new Callback(){
             public boolean cb(Monitorable mt, Metric metric, Context ctx) throws NotImplemented, AuthorizationFailed {
                 try {
                 	m_subState = metric.getAttribute(Metric.VALUE);
@@ -184,6 +183,7 @@ public class AbstractJobTest extends AbstractTest {
                 return true;
             }
         });
+    	m_subState = job.getMetric("job.sub_state").getAttribute(Metric.VALUE);        
         try {
             boolean forever;
             long endTime;
