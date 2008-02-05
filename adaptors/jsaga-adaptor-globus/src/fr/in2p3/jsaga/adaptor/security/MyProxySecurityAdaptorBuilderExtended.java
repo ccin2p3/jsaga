@@ -24,7 +24,7 @@ public class MyProxySecurityAdaptorBuilderExtended extends MyProxySecurityAdapto
     private static final int DEFAULT_STORED_PROXY_LIFETIME = 7*12*3600;
 
     private static final Usage CREATE_PROXY = new UAnd(new Usage[]{
-            new U(Context.USERPROXY), new UFile(Context.USERCERT), new UFile(Context.USERKEY), new UHidden(Context.USERPASS), new UFile(Context.CERTREPOSITORY),
+            new UFilePath(Context.USERPROXY), new UFile(Context.USERCERT), new UFile(Context.USERKEY), new UHidden(Context.USERPASS), new UFile(Context.CERTREPOSITORY),
             new U(Context.SERVER),
             new U(Context.USERID),
             new UHidden(GlobusContext.MYPROXYPASS),

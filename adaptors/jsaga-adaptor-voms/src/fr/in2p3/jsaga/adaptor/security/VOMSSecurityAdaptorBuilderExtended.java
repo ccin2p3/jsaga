@@ -1,21 +1,17 @@
 package fr.in2p3.jsaga.adaptor.security;
 
 import fr.in2p3.jsaga.adaptor.base.usage.*;
-
 import org.glite.security.voms.VOMSAttribute;
 import org.glite.security.voms.VOMSValidator;
 import org.glite.security.voms.contact.*;
 import org.globus.gsi.GlobusCredential;
-import org.globus.gsi.bc.BouncyCastleCertProcessingFactory;
 import org.globus.util.Util;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.BadParameter;
 import org.ogf.saga.error.NoSuccess;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -38,7 +34,7 @@ public class VOMSSecurityAdaptorBuilderExtended extends VOMSSecurityAdaptorBuild
                     new UAnd(new Usage[]{new UFile(Context.USERCERT), new UFile(Context.USERKEY)}),
                     new UFile(USERCERTKEY)
             }),
-            new U(Context.USERPROXY), new UHidden(Context.USERPASS), new UFile(Context.CERTREPOSITORY),
+            new UFilePath(Context.USERPROXY), new UHidden(Context.USERPASS), new UFile(Context.CERTREPOSITORY),
             new U(Context.SERVER), new U(Context.USERVO), new UOptional(USERFQAN),
             new UDuration(Context.LIFETIME) {
                 protected Object throwExceptionIfInvalid(Object value) throws Exception {

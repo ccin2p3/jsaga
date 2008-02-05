@@ -2,8 +2,8 @@ package fr.in2p3.jsaga.adaptor.security;
 
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import org.globus.util.Util;
-import org.ogf.saga.error.BadParameter;
 import org.ogf.saga.context.Context;
+import org.ogf.saga.error.BadParameter;
 
 import java.util.Map;
 
@@ -25,7 +25,7 @@ public abstract class GlobusSecurityAdaptorBuilderExtendedAbstract extends Globu
                     new UAnd(new Usage[]{new UFile(Context.USERCERT), new UFile(Context.USERKEY)}),
                     new UFile(GlobusContext.USERCERTKEY)
             }),
-            new U(Context.USERPROXY), new UHidden(Context.USERPASS), new UFile(Context.CERTREPOSITORY),
+            new UFilePath(Context.USERPROXY), new UHidden(Context.USERPASS), new UFile(Context.CERTREPOSITORY),
             new UDuration(Context.LIFETIME) {
                 protected Object throwExceptionIfInvalid(Object value) throws Exception {
                     return (value!=null ? super.throwExceptionIfInvalid(value) : null);
