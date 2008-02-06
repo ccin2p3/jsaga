@@ -79,9 +79,10 @@ public class JobRunWithPrequisiteTest extends AbstractJobTest {
     public void test_run_environnement() throws Exception {
         
     	// prepare
-    	String key = "MYVAR", value="Testing";
+    	String key1 = "MYVAR1", value1="Testing1";
+    	String key2 = "MYVAR2", value2="Testing2";
     	AttributeVector[] attributes = new AttributeVector[1];
-    	attributes[0] = new AttributeVector(JobDescription.ENVIRONMENT, new String[]{key+"="+value});
+    	attributes[0] = new AttributeVector(JobDescription.ENVIRONMENT, new String[]{key1+"="+value1, key2+"="+value2 });
     	JobDescription desc =  createJob("/bin/env", null, attributes);
     	
     	// submit
