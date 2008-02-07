@@ -29,7 +29,7 @@ public class GatekeeperJobStatus extends JobStatus {
     }
 
     public SubState getSubState() {
-        switch(m_nativeStateCode) {
+        switch(((Integer)m_nativeStateCode).intValue()) {
             case GRAMConstants.STATUS_UNSUBMITTED:
                 return SubState.SUBMITTED;
 

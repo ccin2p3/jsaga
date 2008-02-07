@@ -38,7 +38,7 @@ public class JobStatusRequestor {
                 throw new NotImplemented("Querying job status not implemented for adaptor: "+ m_adaptor.getClass().getName());
             }
         } else {
-            return new JobStatus(nativeJobId, 0, "Unknown"){
+            return new JobStatus(nativeJobId, new Integer(0), "Unknown"){
                 public String getModel() {return "Unknown";}
                 public SubState getSubState() {return SubState.SUBMITTED;}
             };

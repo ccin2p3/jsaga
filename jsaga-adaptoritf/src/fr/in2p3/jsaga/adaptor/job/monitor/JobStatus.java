@@ -17,14 +17,14 @@ import org.ogf.saga.task.State;
  */
 public abstract class JobStatus {
     private String m_nativeJobId;
-    protected int m_nativeStateCode;
+    protected Object m_nativeStateCode;
     protected String m_nativeStateString;
     protected String m_nativeCause;
 
-    public JobStatus(String jobId, int stateCode, String stateString) {
+    public JobStatus(String jobId, Object stateCode, String stateString) {
         this(jobId, stateCode, stateString, null);
     }
-    public JobStatus(String jobId, int stateCode, String stateString, String cause) {
+    public JobStatus(String jobId, Object stateCode, String stateString, String cause) {
         m_nativeJobId = jobId;
         m_nativeStateCode = stateCode;
         m_nativeStateString = stateString;
