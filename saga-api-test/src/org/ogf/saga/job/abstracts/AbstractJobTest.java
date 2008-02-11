@@ -84,7 +84,6 @@ public class AbstractJobTest extends AbstractTest {
     /**
      * Creates a new job description
      * @param executable A string with the executable path
-     * @param arguments A string array with the executable arguments
      * @param attributes A string array with the job attributes
      * @return The job description
      * @throws Exception
