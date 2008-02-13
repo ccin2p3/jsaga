@@ -77,7 +77,7 @@ public class AttributeSerializer<E> {
                     return value.toString();
             }
         } else {
-            return "";
+            return null;
         }
     }
 

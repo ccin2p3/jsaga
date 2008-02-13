@@ -1,7 +1,9 @@
 package fr.in2p3.jsaga.adaptor.security.impl;
 
 import org.ietf.jgss.GSSCredential;
+import org.ogf.saga.context.Context;
 import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NotImplemented;
 
 import java.io.*;
 
@@ -20,6 +22,15 @@ import java.io.*;
 public class InMemoryProxySecurityAdaptor extends GSSCredentialSecurityAdaptor {
     public InMemoryProxySecurityAdaptor(String base64) throws NoSuccess {
         super(toGSSCredential(base64));
+    }
+
+    /** override super.getAttribute() */
+    public String getAttribute(String key) throws NotImplemented, NoSuccess {
+        if (Context.USERPROXY.equals(key)) {
+            return toBase64(m_proxy);
+        } else {
+            return super.getAttribute(key);
+        }
     }
 
     public static String toBase64(GSSCredential proxy) throws NoSuccess {

@@ -17,31 +17,22 @@ import java.util.*;
  *
  */
 public class UAnd implements Usage {
+    private int m_id;
     private Usage[] m_and;
 
     public UAnd(Usage[] usage) {
+        this(-1, usage);
+    }
+
+    public UAnd(int id, Usage[] usage) {
+        m_id = id;
         m_and = usage;
     }
 
-    public final boolean containsName(String attributeName) {
-        for (int i=0; m_and!=null && i<m_and.length; i++) {
-            if (m_and[i].containsName(attributeName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void resetWeight() {
-        for (int i=0; m_and!=null && i<m_and.length; i++) {
-            m_and[i].resetWeight();
-        }
-    }
-
-    public String correctValue(String attributeName, String attributeValue, int attributeWeight) throws DoesNotExist {
+    public String correctValue(String attributeName, String attributeValue) throws DoesNotExist {
         for (int i=0; m_and!=null && i<m_and.length; i++) {
             try {
-                return m_and[i].correctValue(attributeName, attributeValue, attributeWeight);
+                return m_and[i].correctValue(attributeName, attributeValue);
             } catch(DoesNotExist e) {
                 // next iteration
             }
@@ -49,32 +40,19 @@ public class UAnd implements Usage {
         throw new DoesNotExist("Attribute not found: "+attributeName);
     }
 
-    /**
-     * @return -1 if the weight of at least one sub-usage is -1, else the max weight of sub-usages
-     */
-    public int getWeight() {
-        int maxWeight = -1;
+    public int getFirstMatchingUsage(Map attributes) throws DoesNotExist {
+        int firstMatchingUsage = -1;
         for (int i=0; m_and!=null && i<m_and.length; i++) {
-            int weight = m_and[i].getWeight();
-            if (weight == -1) {
-                return -1;
-            } else if (weight > maxWeight) {
-                maxWeight = weight;
+            int id = m_and[i].getFirstMatchingUsage(attributes);
+            if (firstMatchingUsage==-1 && id>-1) {
+                firstMatchingUsage = id;
             }
         }
-        return maxWeight;
-    }
-
-    /**
-     * @return true if at least one sub-usage returns true
-     */
-    public boolean removeValue(String attributeName) {
-        for (int i=0; m_and!=null && i<m_and.length; i++) {
-            if (m_and[i].removeValue(attributeName)) {
-                return true;
-            }
+        if (firstMatchingUsage > -1) {
+            return firstMatchingUsage;
+        } else {
+            return m_id;
         }
-        return false;
     }
 
     public Usage getMissingValues(Map attributes) {
@@ -90,13 +68,7 @@ public class UAnd implements Usage {
         } else if (missing.size() == 1) {
             return (Usage) missing.get(0);
         } else {
-            return new UAnd((Usage[]) missing.toArray(new Usage[missing.size()]));
-        }
-    }
-
-    public void promptForValues(Map attributes, String id) throws Exception {
-        for (int i=0; m_and!=null && i<m_and.length; i++) {
-            m_and[i].promptForValues(attributes, id);
+            return new UAnd(m_id, (Usage[]) missing.toArray(new Usage[missing.size()]));
         }
     }
 

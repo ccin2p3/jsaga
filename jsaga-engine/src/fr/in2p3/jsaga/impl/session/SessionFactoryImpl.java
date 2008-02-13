@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.impl.session;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.schema.config.ContextInstance;
 import fr.in2p3.jsaga.impl.context.ContextFactoryImpl;
+import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
@@ -30,13 +31,13 @@ public class SessionFactoryImpl extends SessionFactory {
                 // create default contexts
                 for (ContextInstance xmlInstance : xmlInstanceArray) {
                     // create context
-                    Context context = ContextFactoryImpl.createContext();
-                    context.setAttribute("Type", xmlInstance.getType());
+                    Context context = ContextFactoryImpl.createContext();   //NOTE: no type here, else setDefaults() is invoked
+                    context.setAttribute(Context.TYPE, xmlInstance.getType());
                     if (xmlInstance.hasIndice()) {
-                        context.setAttribute("Indice", String.valueOf(xmlInstance.getIndice()));
+                        context.setAttribute(ContextImpl.INDICE, String.valueOf(xmlInstance.getIndice()));
                     }
                     if (xmlInstance.getName() != null) {
-                        context.setAttribute("Name", xmlInstance.getName());
+                        context.setAttribute(ContextImpl.NAME, xmlInstance.getName());
                     }
 
                     // set context defaults

@@ -39,27 +39,16 @@ public class ProtocolEngineConfiguration {
                 this.updateAttributes(userAttributes, prt, prt.getSchemeAlias(a));
             }
 
-            // get usage
+            // correct configured attributes according to usage
             Usage usage = desc.getUsage(prt.getScheme());
             if (usage != null) {
-                usage.resetWeight();
-            }
-
-            // correct configured attributes according to usage
-            for (int a=0; a<prt.getAttributeCount(); a++) {
-                Attribute attr = prt.getAttribute(a);
-                if (attr.getValue() != null) {
-                    try {
-                        attr.setValue(usage.correctValue(attr.getName(), attr.getValue(), attr.getSource().getType()));
-                    } catch(DoesNotExist e) {/*do nothing*/}
-                }
-            }
-
-            // remove ambiguity
-            for (int a=0; a<prt.getAttributeCount(); a++) {
-                Attribute attr = prt.getAttribute(a);
-                if (usage!=null && usage.removeValue(attr.getName())) {
-                    attr.setValue(null);
+                for (int a=0; a<prt.getAttributeCount(); a++) {
+                    Attribute attr = prt.getAttribute(a);
+                    if (attr.getValue() != null) {
+                        try {
+                            attr.setValue(usage.correctValue(attr.getName(), attr.getValue()));
+                        } catch(DoesNotExist e) {/*do nothing*/}
+                    }
                 }
             }
         }

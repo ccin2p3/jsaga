@@ -76,7 +76,12 @@ public class DataAdaptorFactory {
 
         // set security
         if (context != null) {
-            SecurityAdaptor securityAdaptor = context.createSecurityAdaptor();
+            SecurityAdaptor securityAdaptor;
+            try {
+                securityAdaptor = context.getAdaptor();
+            } catch (IncorrectState e) {
+                throw new NoSuccess(e);
+            }
             if (SecurityAdaptorDescriptor.isSupported(securityAdaptor.getClass(), dataAdaptor.getSupportedSecurityAdaptorClasses())) {
                 dataAdaptor.setSecurityAdaptor(securityAdaptor);
             } else {

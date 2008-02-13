@@ -20,6 +20,10 @@ public class UFile extends UFilePath {
         super(name);
     }
 
+    public UFile(int id, String name) {
+        super(id, name);
+    }
+
     public String toString() {
         return "<"+m_name+">";
     }

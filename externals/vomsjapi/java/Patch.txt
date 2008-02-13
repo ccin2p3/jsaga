@@ -13,7 +13,7 @@ Caused by: org.glite.voms.contact.VOMSException: Error communicating with server
         at org.glite.voms.contact.VOMSProxyInit.contactServer(VOMSProxyInit.java:353)
         at org.glite.voms.contact.VOMSProxyInit.getVomsAC(VOMSProxyInit.java:131)
         at org.glite.voms.contact.VOMSProxyInit.getVomsProxy(VOMSProxyInit.java:256)
-        at fr.in2p3.jsaga.adaptor.security.VOMSSecurityAdaptorBuilderExtended.initBuilder(VOMSSecurityAdaptorBuilderExtended.java:152)
+        at fr.in2p3.jsaga.adaptor.security.VOMSSecurityAdaptorBuilder.createSecurityAdaptor(VOMSSecurityAdaptorBuilderExtended.java:152)
         at fr.in2p3.jsaga.impl.context.ContextImpl.init(ContextImpl.java:173)
         ... 1 more
 Caused by: org.globus.common.ChainedIOException: Authentication failed [Caused by: Failure unspecified at GSS-API level [Caused by: Unknown CA]]

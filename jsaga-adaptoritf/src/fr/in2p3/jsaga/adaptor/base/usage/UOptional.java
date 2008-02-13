@@ -1,5 +1,9 @@
 package fr.in2p3.jsaga.adaptor.base.usage;
 
+import org.ogf.saga.error.DoesNotExist;
+
+import java.util.Map;
+
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -19,6 +23,10 @@ public class UOptional extends U {
 
     public String toString() {
         return "["+m_name+"]";
+    }
+
+    public int getFirstMatchingUsage(Map attributes) throws DoesNotExist {
+        return m_id;
     }
 
     protected Object throwExceptionIfInvalid(Object value) throws Exception {

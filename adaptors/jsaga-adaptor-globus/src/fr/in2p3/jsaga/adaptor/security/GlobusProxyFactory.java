@@ -3,16 +3,14 @@ package fr.in2p3.jsaga.adaptor.security;
 import fr.in2p3.jsaga.adaptor.base.usage.UDuration;
 import org.globus.common.CoGProperties;
 import org.globus.common.Version;
-import org.globus.gsi.CertUtil;
-import org.globus.gsi.GSIConstants;
-import org.globus.gsi.GlobusCredentialException;
+import org.globus.gsi.*;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.gsi.proxy.ext.ProxyCertInfo;
 import org.globus.gsi.proxy.ext.ProxyPolicy;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
-import org.ogf.saga.error.BadParameter;
 import org.ogf.saga.context.Context;
+import org.ogf.saga.error.BadParameter;
 
 import java.text.ParseException;
 import java.util.Map;
@@ -40,24 +38,23 @@ public class GlobusProxyFactory extends GlobusProxyFactoryAbstract {
     private boolean m_verify = false;
     private boolean m_globusStyle = false;
 
-    public GlobusProxyFactory(Map attributes, int oid) throws BadParameter, ParseException {
+    public GlobusProxyFactory(Map attributes, int oid, int certificateFormat) throws BadParameter, ParseException {
         // required attributes
         super((String) attributes.get(Context.USERPASS)); // UserPass is ignored if key is not encrypted
         CoGProperties.getDefault().setCaCertLocations((String) attributes.get(Context.CERTREPOSITORY));
         m_proxyFile = (String) attributes.get(Context.USERPROXY);
-        if(attributes.get(Context.USERCERT) != null &&
-        		attributes.get(Context.USERKEY) != null) {
-        	setCertificateFormat(CERTIFICATE_PEM);
-            m_certFile = (String) attributes.get(Context.USERCERT);
-            m_keyFile = (String) attributes.get(Context.USERKEY);
-        }
-        else if (attributes.get(GlobusContext.USERCERTKEY) != null) {
-        	setCertificateFormat(CERTIFICATE_PKCS12);
-        	m_certFile = (String) attributes.get(GlobusContext.USERCERTKEY);
-        	m_keyFile = (String) attributes.get(GlobusContext.USERCERTKEY);
-        }
-        else {
-        	throw new BadParameter("Invalid case, either PEM or PKCS12 certificates is supported");
+        super.setCertificateFormat(certificateFormat);
+        switch(certificateFormat) {
+            case CERTIFICATE_PEM:
+                m_certFile = (String) attributes.get(Context.USERCERT);
+                m_keyFile = (String) attributes.get(Context.USERKEY);
+                break;
+            case CERTIFICATE_PKCS12:
+                m_certFile = (String) attributes.get(GlobusContext.USERCERTKEY);
+                m_keyFile = (String) attributes.get(GlobusContext.USERCERTKEY);
+                break;
+            default:
+                throw new BadParameter("Invalid case, either PEM or PKCS12 certificates is supported");
         }
         
         // optional attributes

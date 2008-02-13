@@ -6,15 +6,15 @@ import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityAdaptor;
 import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.globus.common.CoGProperties;
-import org.globus.gsi.CertUtil;
 import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
+import org.globus.util.Util;
 import org.gridforum.jgss.ExtendedGSSCredential;
 import org.gridforum.jgss.ExtendedGSSManager;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
-import org.ogf.saga.error.*;
 import org.ogf.saga.context.Context;
+import org.ogf.saga.error.*;
 
 import java.io.*;
 import java.lang.Exception;
@@ -33,12 +33,11 @@ import java.util.Map;
 /**
  *
  */
-public class VOMSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
-	protected static final String USERCERTKEY = "UserCertKey";
-	 protected static final String VOMSDIR = "VomsDir";
-    private static final String USERPROXYOBJECT = "UserProxyObject";
-    private static final Usage LOCAL_PROXY_OBJECT = new UNoPrompt(USERPROXYOBJECT);
-    private static final Usage LOCAL_PROXY_FILE = new UFile(Context.USERPROXY);
+public class VOMSSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuilder {
+    private static final int USAGE_INIT_PKCS12 = 1;
+    private static final int USAGE_INIT_PEM = 2;
+    private static final int USAGE_MEMORY = 3;
+    private static final int USAGE_LOAD = 4;
 
     public String getType() {
         return "VOMS";
@@ -50,9 +49,47 @@ public class VOMSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
 
     public Usage getUsage() {
         return new UAnd(new Usage[]{
-                new UOr(new Usage[]{LOCAL_PROXY_OBJECT, LOCAL_PROXY_FILE}),
+                new UOr(new Usage[]{
+                        new UAnd(new Usage[]{
+                                new UOr(new Usage[]{
+                                        new UFile(USAGE_INIT_PKCS12, VOMSContext.USERCERTKEY),
+                                        new UAnd(USAGE_INIT_PEM, new Usage[]{new UFile(Context.USERCERT), new UFile(Context.USERKEY)})
+                                }),
+                                new UFilePath(Context.USERPROXY), new UHidden(Context.USERPASS),
+                                new U(Context.SERVER), new U(Context.USERVO), new UOptional(VOMSContext.USERFQAN),
+                                new UDuration(Context.LIFETIME) {
+                                    protected Object throwExceptionIfInvalid(Object value) throws Exception {
+                                        return (value!=null ? super.throwExceptionIfInvalid(value) : null);
+                                    }
+                                },
+                                new UOptional(VOMSContext.DELEGATION) {
+                                    protected Object throwExceptionIfInvalid(Object value) throws Exception {
+                                        if (super.throwExceptionIfInvalid(value) != null) {
+                                            String v = (String) value;
+                                            if (!v.equalsIgnoreCase("none") && !v.equalsIgnoreCase("limited") && !v.equalsIgnoreCase("full")) {
+                                                throw new BadParameter("Expected: none | limited | full");
+                                            }
+                                        }
+                                        return value;
+                                    }
+                                },
+                                new UOptional(VOMSContext.PROXYTYPE) {
+                                    protected Object throwExceptionIfInvalid(Object value) throws Exception {
+                                        if (super.throwExceptionIfInvalid(value) != null) {
+                                            String v = (String) value;
+                                            if (!v.equalsIgnoreCase("old") && !v.equalsIgnoreCase("globus") && !v.equalsIgnoreCase("RFC820")) {
+                                                throw new BadParameter("Expected: old | globus | RFC820");
+                                            }
+                                        }
+                                        return value;
+                                    }
+                                }
+                        }),
+                        new UNoPrompt(USAGE_MEMORY, VOMSContext.USERPROXYOBJECT),
+                        new UFile(USAGE_LOAD, Context.USERPROXY)
+                }),
                 new UFile(Context.CERTREPOSITORY),
-                new UFile(VOMSDIR)
+                new UFile(VOMSContext.VOMSDIR)
         });
     }
 
@@ -75,14 +112,11 @@ public class VOMSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
                 new Default(Context.USERKEY, new File[]{
                         new File(env.getProperty("X509_USER_KEY")+""),
                         new File(System.getProperty("user.home")+"/.globus/userkey.pem")}),
-                new Default(USERCERTKEY, new File[]{
-                        new File(env.getProperty("PKCS12_USER_CERT")+""),
-                        new File(System.getProperty("user.home")+"/.globus/usercert.p12")}),                        
                 new Default(Context.CERTREPOSITORY, new File[]{
                         new File(env.getProperty("CADIR")+""),
                         new File(System.getProperty("user.home")+"/.globus/certificates/"),
                         new File("/etc/grid-security/certificates/")}),
-                new Default(VOMSDIR, new File[]{
+                new Default(VOMSContext.VOMSDIR, new File[]{
                         new File(env.getProperty("X509_VOMS_DIR")+""),
                         new File(System.getProperty("user.home")+"/.globus/vomsdir/"),
                         new File("/etc/grid-security/vomsdir/")}),
@@ -101,18 +135,44 @@ public class VOMSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
         }
     }
 
-    public SecurityAdaptor createSecurityAdaptor(Map attributes) throws Exception {
-        GSSCredential cred;
-        if (LOCAL_PROXY_OBJECT.getMissingValues(attributes) == null) {
-            String base64 = (String) attributes.get(USERPROXYOBJECT);
-            cred = InMemoryProxySecurityAdaptor.toGSSCredential(base64);
-        } else if (LOCAL_PROXY_FILE.getMissingValues(attributes) == null) {
-            CoGProperties.getDefault().setCaCertLocations((String) attributes.get(Context.CERTREPOSITORY));
-            File proxyFile = new File((String) attributes.get(Context.USERPROXY));
-            cred = load(proxyFile);
-        } else {
-            throw new BadParameter("Missing attribute(s): "+this.getUsage().getMissingValues(attributes));
+    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectState, NoSuccess {
+        try {
+            switch(usage) {
+                case USAGE_INIT_PKCS12:
+                {
+                    GSSCredential cred = new VOMSProxyFactory(attributes, VOMSProxyFactory.CERTIFICATE_PKCS12).createProxy();
+                    return this.createSecurityAdaptor(cred);
+                }
+                case USAGE_INIT_PEM:
+                {
+                    GSSCredential cred = new VOMSProxyFactory(attributes, VOMSProxyFactory.CERTIFICATE_PEM).createProxy();
+                    return this.createSecurityAdaptor(cred);
+                }
+                case USAGE_MEMORY:
+                {
+                    String base64 = (String) attributes.get(VOMSContext.USERPROXYOBJECT);
+                    GSSCredential cred = InMemoryProxySecurityAdaptor.toGSSCredential(base64);
+                    return this.createSecurityAdaptor(cred);
+                }
+                case USAGE_LOAD:
+                {
+                    CoGProperties.getDefault().setCaCertLocations((String) attributes.get(Context.CERTREPOSITORY));
+                    File proxyFile = new File((String) attributes.get(Context.USERPROXY));
+                    GSSCredential cred = load(proxyFile);
+                    return this.createSecurityAdaptor(cred);
+                }
+                default:
+                    throw new NoSuccess("INTERNAL ERROR: unexpected exception");
+            }
+        } catch(IncorrectState e) {
+            throw e;
+        } catch(NoSuccess e) {
+            throw e;
+        } catch(Exception e) {
+            throw new NoSuccess(e);
         }
+    }
+    private SecurityAdaptor createSecurityAdaptor(GSSCredential cred) throws IncorrectState {
         // check if proxy contains extension
         /*GlobusCredential globusProxy = ((GlobusGSSCredentialImpl)cred).getGlobusCredential();        
         if(hasNonCriticalExtensions(cred)) {
@@ -143,12 +203,16 @@ public class VOMSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
 	    		System.out.println("Is a GlobusRFC820 proxy");    		
 	    	}
     	}*/
-        
         if (hasNonCriticalExtensions(cred)) {
             return new VOMSSecurityAdaptor(cred);
         } else {
-            throw new NoSuccess("Security context is not of type: "+this.getType());
+            throw new IncorrectState("Security context is not of type: "+this.getType());
         }
+    }
+
+    public void destroySecurityAdaptor(Map attributes, String contextId) throws Exception {
+        String proxyFile = (String) attributes.get(Context.USERPROXY);
+        Util.destroy(proxyFile);
     }
 
     private static GSSCredential load(File proxyFile) throws IOException, GSSException {

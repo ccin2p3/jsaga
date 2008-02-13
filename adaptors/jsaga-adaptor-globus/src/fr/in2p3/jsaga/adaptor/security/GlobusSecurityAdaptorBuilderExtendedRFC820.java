@@ -4,9 +4,6 @@ import org.globus.gsi.CertUtil;
 import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.ietf.jgss.GSSCredential;
-import org.ogf.saga.error.BadParameter;
-
-import java.util.Map;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -20,25 +17,21 @@ import java.util.Map;
 /**
  *
  */
-public class GlobusSecurityAdaptorBuilderExtendedRFC820 extends GlobusSecurityAdaptorBuilderExtendedAbstract {
+public class GlobusSecurityAdaptorBuilderExtendedRFC820 extends GlobusSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuilder {
     public String getType() {
         return "GlobusRFC820";
     }
 
-    public boolean checkType(GSSCredential proxy) {
+    protected int getGlobusType() {
+        return GlobusProxyFactory.OID_RFC820;
+    }
+
+    protected boolean checkType(GSSCredential proxy) {
         if (proxy instanceof GlobusGSSCredentialImpl) {
             GlobusCredential globusProxy = ((GlobusGSSCredentialImpl)proxy).getGlobusCredential();
             return CertUtil.isGsi4Proxy(globusProxy.getProxyType());
         } else {
             return false;
         }        
-    }
-
-    public void initBuilder(Map attributes, String contextId) throws Exception {
-        try {
-        	new GlobusProxyFactory(attributes, GlobusProxyFactory.OID_RFC820).createProxy();
-        } catch (NullPointerException e) {
-			throw new BadParameter("Bad passphrase");
-		}
     }
 }

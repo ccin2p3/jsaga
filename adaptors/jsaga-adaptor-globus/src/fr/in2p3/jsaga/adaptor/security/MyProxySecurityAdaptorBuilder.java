@@ -8,13 +8,14 @@ import fr.in2p3.jsaga.adaptor.security.usage.UProxyFile;
 import fr.in2p3.jsaga.adaptor.security.usage.UProxyObject;
 import org.globus.myproxy.MyProxy;
 import org.globus.myproxy.MyProxyException;
+import org.globus.util.Util;
 import org.gridforum.jgss.ExtendedGSSCredential;
 import org.gridforum.jgss.ExtendedGSSManager;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.IncorrectState;
 import org.ogf.saga.context.Context;
+import org.ogf.saga.error.IncorrectState;
+import org.ogf.saga.error.NoSuccess;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -33,21 +34,20 @@ import java.util.Map;
 /**
  *
  */
-public class MyProxySecurityAdaptorBuilder implements SecurityAdaptorBuilder {
+public class MyProxySecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuilder {
+//    private static final int USAGE_INIT_PKCS12 = 1;
+    private static final int USAGE_INIT_PEM = 2;
+    private static final int USAGE_LOCAL_MEMORY = 3;
+    private static final int USAGE_LOCAL_LOAD = 4;
+    private static final int USAGE_RENEW_MEMORY_WITH_PASSPHRASE = 5;
+    private static final int USAGE_RENEW_LOAD_WITH_PASSPHRASE = 6;
+//    private static final int USAGE_RENEW_MEMORY_WITH_PROXY = 7;
+//    private static final int USAGE_RENEW_LOAD_WITH_PROXY = 8;
+
     private static final int MIN_LIFETIME_FOR_USING = 3*3600;   // 3 hours
 //    private static final int MIN_LIFETIME_FOR_RENEW = 30*60;    // 30 minutes
+    private static final int DEFAULT_STORED_PROXY_LIFETIME = 7*12*3600;
     private static final int DEFAULT_DELEGATED_PROXY_LIFETIME = 12*3600;
-
-    private static final Usage LOCAL_PROXY_OBJECT = new UProxyObject(GlobusContext.USERPROXYOBJECT, MIN_LIFETIME_FOR_USING);
-    private static final Usage LOCAL_PROXY_FILE = new UProxyFile(Context.USERPROXY, MIN_LIFETIME_FOR_USING);
-    private static final Usage RENEW_PROXY_OBJECT_WITH_PASS = new UAnd(new Usage[]{
-            new UNoPrompt(GlobusContext.USERPROXYOBJECT), new U(Context.USERID), new UHidden(GlobusContext.MYPROXYPASS)});
-    private static final Usage RENEW_PROXY_FILE_WITH_PASS = new UAnd(new Usage[]{
-            new U(Context.USERPROXY), new U(Context.USERID), new UHidden(GlobusContext.MYPROXYPASS)});
-/*
-    private static final Usage RENEW_PROXY_OBJECT_WITH_PROXY = new UProxyObject(GlobusContext.USERPROXYOBJECT, MIN_LIFETIME_FOR_RENEW);
-    private static final Usage RENEW_PROXY_FILE_WITH_PROXY = new UProxyFile(Context.USERPROXY, MIN_LIFETIME_FOR_RENEW);
-*/
 
     public String getType() {
         return "MyProxy";
@@ -60,11 +60,41 @@ public class MyProxySecurityAdaptorBuilder implements SecurityAdaptorBuilder {
     public Usage getUsage() {
         return new UAnd(new Usage[]{
                 new UOr(new Usage[]{
+                        new UAnd(USAGE_INIT_PEM, new Usage[]{
+                                new UFile(Context.USERCERT), new UFile(Context.USERKEY),
+                                new UFilePath(Context.USERPROXY), new UHidden(Context.USERPASS),
+                                new U(Context.SERVER),
+                                new U(Context.USERID),
+                                new UHidden(GlobusContext.MYPROXYPASS),
+/*
+                                new UOptional(Context.USERID),
+                                new UHidden(GlobusContext.MYPROXYPASS) {
+                                    public String toString() {return "[*"+m_name+"*]";}
+                                    protected void throwExceptionIfInvalid(Object value) throws Exception {}
+                                },
+*/
+                                new UDuration(Context.LIFETIME) {
+                                    protected Object throwExceptionIfInvalid(Object value) throws Exception {
+                                        return (value!=null ? super.throwExceptionIfInvalid(value) : null);
+                                    }
+                                },
+                        }),
+
                         // local proxy
-                        LOCAL_PROXY_OBJECT, LOCAL_PROXY_FILE,
-                        // get proxy from server
-                        RENEW_PROXY_OBJECT_WITH_PASS, RENEW_PROXY_FILE_WITH_PASS,
-//                        RENEW_PROXY_OBJECT_WITH_PROXY, RENEW_PROXY_FILE_WITH_PROXY,
+                        new UProxyObject(USAGE_LOCAL_MEMORY, GlobusContext.USERPROXYOBJECT, MIN_LIFETIME_FOR_USING),
+                        new UProxyFile(USAGE_LOCAL_LOAD, Context.USERPROXY, MIN_LIFETIME_FOR_USING),
+
+                        // get proxy from server with passphrase
+                        new UAnd(USAGE_RENEW_MEMORY_WITH_PASSPHRASE, new Usage[]{
+                                new UNoPrompt(GlobusContext.USERPROXYOBJECT), new U(Context.USERID), new UHidden(GlobusContext.MYPROXYPASS)}),
+                        new UAnd(USAGE_RENEW_LOAD_WITH_PASSPHRASE, new Usage[]{
+                                new U(Context.USERPROXY), new U(Context.USERID), new UHidden(GlobusContext.MYPROXYPASS)})
+
+                        // get proxy from server with old proxy
+/*
+                        new UProxyObject(USAGE_RENEW_MEMORY_WITH_PROXY, GlobusContext.USERPROXYOBJECT, MIN_LIFETIME_FOR_RENEW),
+                        new UProxyFile(USAGE_RENEW_LOAD_WITH_PROXY, Context.USERPROXY, MIN_LIFETIME_FOR_RENEW)
+*/
                 }),
                 new UFile(Context.CERTREPOSITORY)
         });
@@ -98,32 +128,79 @@ public class MyProxySecurityAdaptorBuilder implements SecurityAdaptorBuilder {
         };
     }
 
-    public SecurityAdaptor createSecurityAdaptor(Map attributes) throws Exception {
-        GSSCredential cred;
-        if (LOCAL_PROXY_OBJECT.getMissingValues(attributes) == null) {
-            cred = InMemoryProxySecurityAdaptor.toGSSCredential((String) attributes.get(GlobusContext.USERPROXYOBJECT));
-        } else if (LOCAL_PROXY_FILE.getMissingValues(attributes) == null) {
-            cred = load(new File((String) attributes.get(Context.USERPROXY)));
-        } else if (RENEW_PROXY_OBJECT_WITH_PASS.getMissingValues(attributes) == null) {
-            cred = renewCredential(null, attributes);
-        } else if (RENEW_PROXY_FILE_WITH_PASS.getMissingValues(attributes) == null) {
-            cred = renewCredential(null, attributes);
-            save(new File((String) attributes.get(Context.USERPROXY)), cred);
+    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectState, NoSuccess {
+        try {
+            switch(usage) {
+                case USAGE_INIT_PEM:
+                {
+                    // create proxy
+                    GSSCredential cred = new GlobusProxyFactory(attributes, GlobusProxyFactory.OID_OLD, GlobusProxyFactory.CERTIFICATE_PEM).createProxy();
+                    // send it to MyProxy server
+                    String userId = (String) attributes.get(Context.USERID);
+                    String myProxyPass = (String) attributes.get(GlobusContext.MYPROXYPASS);
+                    int storedLifetime = attributes.containsKey(Context.LIFETIME)
+                            ? UDuration.toInt(attributes.get(Context.LIFETIME))
+                            : DEFAULT_STORED_PROXY_LIFETIME;  // default lifetime for stored proxies
+                    createMyProxy(attributes).put(cred, userId, myProxyPass, storedLifetime);
+                    // returns
+                    return this.createSecurityAdaptor(cred, attributes);
+                }
+                case USAGE_LOCAL_MEMORY:
+                {
+                    GSSCredential cred = InMemoryProxySecurityAdaptor.toGSSCredential((String) attributes.get(GlobusContext.USERPROXYOBJECT));
+                    return this.createSecurityAdaptor(cred, attributes);
+                }
+                case USAGE_LOCAL_LOAD:
+                {
+                    GSSCredential cred = load(new File((String) attributes.get(Context.USERPROXY)));
+                    return this.createSecurityAdaptor(cred, attributes);
+                }
+                case USAGE_RENEW_MEMORY_WITH_PASSPHRASE:
+                {
+                    GSSCredential cred = renewCredential(null, attributes);
+                    return this.createSecurityAdaptor(cred, attributes);
+                }
+                case USAGE_RENEW_LOAD_WITH_PASSPHRASE:
+                {
+                    GSSCredential cred = renewCredential(null, attributes);
+                    save(new File((String) attributes.get(Context.USERPROXY)), cred);
+                    return this.createSecurityAdaptor(cred, attributes);
+                }
 /*
-        } else if (RENEW_PROXY_OBJECT_WITH_PROXY.getMissingValues(attributes) == null) {
-            GSSCredential oldCred = (GSSCredential) attributes.get(GlobusContext.USERPROXYOBJECT);
-            cred = renewCredential(oldCred, attributes);
-        } else if (RENEW_PROXY_FILE_WITH_PROXY.getMissingValues(attributes) == null) {
-            GSSCredential oldCred = load(new File((String) attributes.get(Context.USERPROXY)));
-            cred = renewCredential(oldCred, attributes);
-            save(new File((String) attributes.get(Context.USERPROXY)), cred);
+                case USAGE_RENEW_MEMORY_WITH_PROXY:
+                {
+                    GSSCredential oldCred = (GSSCredential) attributes.get(GlobusContext.USERPROXYOBJECT);
+                    GSSCredential cred = renewCredential(oldCred, attributes);
+                    return this.createSecurityAdaptor(cred, attributes);
+                }
+                case USAGE_RENEW_LOAD_WITH_PROXY:
+                {
+                    GSSCredential oldCred = load(new File((String) attributes.get(Context.USERPROXY)));
+                    GSSCredential cred = renewCredential(oldCred, attributes);
+                    save(new File((String) attributes.get(Context.USERPROXY)), cred);
+                    return this.createSecurityAdaptor(cred, attributes);
+                }
 */
-        } else {
-            throw new BadParameter("Missing attribute(s): "+this.getUsage().getMissingValues(attributes));
+                default:
+                    throw new NoSuccess("INTERNAL ERROR: unexpected exception");
+            }
+        } catch(IncorrectState e) {
+            throw e;
+        } catch(NoSuccess e) {
+            throw e;
+        } catch(Exception e) {
+            throw new NoSuccess(e);
         }
+    }
+    private SecurityAdaptor createSecurityAdaptor(GSSCredential cred, Map attributes) throws IncorrectState {
         String userId = (String) attributes.get(Context.USERID);
         String myProxyPass = (String) attributes.get(GlobusContext.MYPROXYPASS);
         return new MyProxySecurityAdaptor(cred, userId, myProxyPass);
+    }
+
+    public void destroySecurityAdaptor(Map attributes, String contextId) throws Exception {
+        String proxyFile = (String) attributes.get(Context.USERPROXY);
+        Util.destroy(proxyFile);
     }
 
     private static GSSCredential renewCredential(GSSCredential oldCred, Map attributes) throws ParseException, URISyntaxException, MyProxyException {

@@ -23,25 +23,10 @@ public class UOr implements Usage {
         m_or = usage;
     }
 
-    public final boolean containsName(String attributeName) {
-        for (int i=0; m_or!=null && i<m_or.length; i++) {
-            if (m_or[i].containsName(attributeName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void resetWeight() {
-        for (int i=0; m_or!=null && i<m_or.length; i++) {
-            m_or[i].resetWeight();
-        }
-    }
-
-    public String correctValue(String attributeName, String attributeValue, int attributeWeight) throws DoesNotExist {
+    public String correctValue(String attributeName, String attributeValue) throws DoesNotExist {
         for (int i=0; m_or!=null && i<m_or.length; i++) {
             try {
-                return m_or[i].correctValue(attributeName, attributeValue, attributeWeight);
+                return m_or[i].correctValue(attributeName, attributeValue);
             } catch(DoesNotExist e) {
                 // next iteration
             }
@@ -49,44 +34,18 @@ public class UOr implements Usage {
         throw new DoesNotExist("Attribute not found: "+attributeName);
     }
 
-    /**
-     * @return the max weight of sub-usages
-     */
-    public int getWeight() {
-        int maxWeight = -1;
+    public int getFirstMatchingUsage(Map attributes) throws DoesNotExist {
         for (int i=0; m_or!=null && i<m_or.length; i++) {
-            int weight = m_or[i].getWeight();
-            if (weight > maxWeight) {
-                maxWeight = weight;
-            }
-        }
-        return maxWeight;
-    }
-
-    /**
-     * @return true if the attribute is not contained in the selected alternative, but contained in another one
-     */
-    public boolean removeValue(String attributeName) {
-        // selected alternative = alternative with max weight
-        int selectedAlternative = 0;
-        for (int i=0,maxWeight=-1; m_or!=null && i<m_or.length; i++) {
-            int weight = m_or[i].getWeight();
-            if (weight > maxWeight) {
-                selectedAlternative = i;
-                maxWeight = weight;
-            }
-        }
-        // test alternatives
-        if (m_or[selectedAlternative].containsName(attributeName)) {
-            return false;
-        } else {
-            for (int i=0; m_or!=null && i<m_or.length; i++) {
-                if (i!=selectedAlternative && m_or[i].containsName(attributeName)) {
-                    return true;
+            try {
+                int id = m_or[i].getFirstMatchingUsage(attributes);
+                if (id > -1) {
+                    return id;
                 }
+            } catch(DoesNotExist e) {
+                // try next
             }
-            return false;
         }
+        throw new DoesNotExist("No matching usage found");
     }
 
     public Usage getMissingValues(Map attributes) {
@@ -104,20 +63,6 @@ public class UOr implements Usage {
         } else {
             return new UOr((Usage[]) missing.toArray(new Usage[missing.size()]));
         }
-    }
-
-    public void promptForValues(Map attributes, String id) throws Exception {
-        for (int i=0; m_or!=null && i<m_or.length; i++) {
-            if (i > 0) {
-                System.out.println(" => Trying next alternative: "+m_or[i].toString());
-            }
-            try {
-                m_or[i].promptForValues(attributes, id);
-                return; //found a valid alternative
-            } catch(Exception e) {
-            }
-        }
-        throw new Exception("Missing attributes: "+this.getMissingValues(attributes).toString());
     }
 
     public String toString() {

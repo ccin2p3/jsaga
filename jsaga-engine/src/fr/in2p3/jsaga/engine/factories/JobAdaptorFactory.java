@@ -76,7 +76,7 @@ public class JobAdaptorFactory {
 
         // set security
         if (context != null) {
-            SecurityAdaptor securityAdaptor = context.createSecurityAdaptor();
+            SecurityAdaptor securityAdaptor = context.getAdaptor();
             if (SecurityAdaptorDescriptor.isSupported(securityAdaptor.getClass(), jobAdaptor.getSupportedSecurityAdaptorClasses())) {
                 jobAdaptor.setSecurityAdaptor(securityAdaptor);
             } else {

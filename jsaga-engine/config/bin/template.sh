@@ -26,7 +26,6 @@ fi
 # set system properties
 PROPERTIES=
 PROPERTIES="${PROPERTIES} -DJSAGA_HOME=$JSAGA_HOME"
-PROPERTIES="${PROPERTIES} -Dinteractive"
 #PROPERTIES="${PROPERTIES} -Ddebug"
 #PROPERTIES="${PROPERTIES} -Dconfig=$JSAGA_HOME/etc/example/jsaga-config.xml"
 

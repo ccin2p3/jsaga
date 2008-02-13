@@ -2,6 +2,10 @@ package fr.in2p3.jsaga.adaptor.security.impl;
 
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import org.ietf.jgss.GSSCredential;
+import org.ietf.jgss.GSSException;
+import org.ogf.saga.context.Context;
+import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NotImplemented;
 
 import java.io.PrintStream;
 
@@ -32,8 +36,16 @@ public abstract class GSSCredentialSecurityAdaptor implements SecurityAdaptor {
         return m_proxy.getName().toString();
     }
 
-    public int getTimeLeft() throws Exception {
-        return m_proxy.getRemainingLifetime();
+    public String getAttribute(String key) throws NotImplemented, NoSuccess {
+        if (Context.LIFETIME.equals(key)) {
+            try {
+                return ""+m_proxy.getRemainingLifetime();
+            } catch (GSSException e) {
+                throw new NoSuccess(e);
+            }
+        } else {
+            throw new NotImplemented("Attribute not supported: "+key);
+        }
     }
 
     public void close() throws Exception {
@@ -41,8 +53,8 @@ public abstract class GSSCredentialSecurityAdaptor implements SecurityAdaptor {
     }
 
     public void dump(PrintStream out) throws Exception {
-        out.println("  subject  : "+m_proxy.getName());
-        out.println("  timeleft : "+format(m_proxy.getRemainingLifetime()));
+        out.println("  UserID   : "+this.getUserID());
+        out.println("  LifeTime : "+format(m_proxy.getRemainingLifetime()));
     }
 
     public static String format(int seconds) {

@@ -1,6 +1,9 @@
 package fr.in2p3.jsaga.adaptor.security;
 
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
+import org.ogf.saga.context.Context;
+import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NotImplemented;
 
 import java.io.PrintStream;
 
@@ -25,15 +28,23 @@ public class UserPassExpirableSecurityAdaptor extends UserPassSecurityAdaptor {
         m_expiryDate = expiryDate;
     }
 
-    public int getTimeLeft() {
-        int currentDate = (int) (System.currentTimeMillis()/1000);
-        return m_expiryDate - currentDate;
+    /** override super.getAttribute() */
+    public String getAttribute(String key) throws NotImplemented, NoSuccess {
+        if (Context.LIFETIME.equals(key)) {
+            return ""+this.getLifeTime();
+        } else {
+            return super.getAttribute(key);
+        }
     }
 
-    public void dump(PrintStream out) {
+    public void dump(PrintStream out) throws Exception {
         super.dump(out);
-        // display time left
-        int timeleft = this.getTimeLeft();
-        out.println("  timeleft : "+ GSSCredentialSecurityAdaptor.format(timeleft>0 ? timeleft : 0));
+        out.println("  LifeTime : "+GSSCredentialSecurityAdaptor.format(this.getLifeTime()));
+    }
+
+    private int getLifeTime() {
+        int currentDate = (int) (System.currentTimeMillis()/1000);
+        int lifeTime = m_expiryDate - currentDate;
+        return (lifeTime>0 ? lifeTime : 0);
     }
 }

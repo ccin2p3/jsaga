@@ -19,8 +19,8 @@ import org.ogf.saga.error.IncorrectState;
 public class UProxyObject extends UNoPrompt {
     private int m_minLifeTime;
 
-    public UProxyObject(String name, int minLifeTime) {
-        super(name);
+    public UProxyObject(int id, String name, int minLifeTime) {
+        super(id, name);
         m_minLifeTime = minLifeTime;
     }
 

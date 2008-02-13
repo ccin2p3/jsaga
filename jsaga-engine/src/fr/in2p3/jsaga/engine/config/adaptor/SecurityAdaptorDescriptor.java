@@ -1,10 +1,8 @@
 package fr.in2p3.jsaga.engine.config.adaptor;
 
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.security.ExpirableSecurityAdaptorBuilder;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptorBuilder;
 import fr.in2p3.jsaga.engine.schema.config.ContextInstance;
-import fr.in2p3.jsaga.engine.schema.config.Init;
 import org.ogf.saga.error.NoSuccess;
 
 import java.util.*;
@@ -25,14 +23,12 @@ public class SecurityAdaptorDescriptor {
     private Map m_builderClasses;
     private Map m_classes;
     private Map m_usages;
-    private Map m_initUsages;
     protected ContextInstance[] m_xml;
 
     public SecurityAdaptorDescriptor(Class[] adaptorClasses) throws IllegalAccessException, InstantiationException {
         m_builderClasses = new HashMap();
         m_classes = new HashMap();
         m_usages = new HashMap();
-        m_initUsages = new HashMap();
         m_xml = new ContextInstance[adaptorClasses.length];
         for (int i=0; i<adaptorClasses.length; i++) {
             SecurityAdaptorBuilder adaptor = (SecurityAdaptorBuilder) adaptorClasses[i].newInstance();
@@ -43,12 +39,6 @@ public class SecurityAdaptorDescriptor {
             Usage usage = adaptor.getUsage();
             if (usage != null) {
                 m_usages.put(adaptor.getType(), usage);
-            }
-            if (adaptor instanceof ExpirableSecurityAdaptorBuilder) {
-                Usage initUsage = ((ExpirableSecurityAdaptorBuilder)adaptor).getInitUsage();
-                if (initUsage != null) {
-                    m_initUsages.put(adaptor.getType(), initUsage);
-                }
             }
             m_xml[i] = toXML(adaptor);
         }
@@ -65,10 +55,6 @@ public class SecurityAdaptorDescriptor {
 
     public Usage getUsage(String type) {
         return (Usage) m_usages.get(type);
-    }
-
-    public Usage getInitUsage(String type) {
-        return (Usage) m_initUsages.get(type);
     }
 
     public String[] getSupportedContextTypes(Class[] supportedSecurityAdaptorClasses) {
@@ -112,12 +98,6 @@ public class SecurityAdaptorDescriptor {
         ctx.setType(adaptor.getType());
         ctx.setIndice(0);
         ctx.setImpl(adaptor.getClass().getName());
-        if (adaptor instanceof ExpirableSecurityAdaptorBuilder) {
-            String usage = ((ExpirableSecurityAdaptorBuilder)adaptor).getInitUsage().toString();
-            Init init = new Init();
-            init.setUsage(usage);
-            ctx.setInit(init);
-        }
         if (adaptor.getUsage() != null) {
             ctx.setUsage(adaptor.getUsage().toString());
         }

@@ -6,7 +6,7 @@ import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.apache.commons.cli.*;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.context.ContextFactory;
-import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 
@@ -22,13 +22,12 @@ import org.ogf.saga.session.SessionFactory;
 /**
  *
  */
-public class ContextInfo extends AbstractCommand {
+public class ContextInfo extends AbstractContextCommand {
     private static final String OPT_HELP = "h", LONGOPT_HELP = "help";
-    private static final String OPT_USERID = "u", LONGOPT_USERID = "userid";
-    private static final String OPT_TIMELEFT = "t", LONGOPT_TIMELEFT = "timeleft";
+    private static final String OPT_ATTRIBUTE = "a", LONGOPT_ATTRIBUTE = "attribute";
 
     public ContextInfo() {
-        super("jsaga-context-info", new String[]{"contextId"}, null);
+        super("jsaga-context-info");
     }
 
     public static void main(String[] args) throws Exception {
@@ -46,52 +45,50 @@ public class ContextInfo extends AbstractCommand {
             Context[] contexts = session.listContexts();
             for (int i=0; i<contexts.length; i++) {
                 Context context = contexts[i];
+
                 // print title
-                String type = context.getAttribute(Context.TYPE);
-                String indice = context.getAttribute("Indice");
-                String name;
-                try {
-                    name = context.getAttribute("Name");
-                } catch (DoesNotExist e) {
-                    name = null;
-                }
-                System.out.println(
-                        (type!=null ? type : "???") +
-                        (indice!=null ? "["+indice+"]" : "") +
-                        (name!=null ? ": "+name : ""));
+                System.out.println("Security context: "+getContextId(context));
+
                 // print context
-                printContext(context, line, "  ");
+                print(context, line);
             }
             session.close();
         }
         else if (command.m_nonOptionValues.length == 1)
         {
-            String id = command.m_nonOptionValues[0];
-            ContextInstance[] xmlContext = Configuration.getInstance().getConfigurations().getContextCfg().listContextInstanceArrayById(id);
+            String contextId = command.m_nonOptionValues[0];
+            ContextInstance[] xmlContext = Configuration.getInstance().getConfigurations().getContextCfg().listContextInstanceArrayById(contextId);
             for (int i=0; i<xmlContext.length; i++) {
+                // set context
                 Context context = ContextFactory.createContext();
                 context.setAttribute(Context.TYPE, xmlContext[i].getType());
-                context.setAttribute("Indice", ""+xmlContext[i].getIndice());
+                context.setAttribute(INDICE, ""+xmlContext[i].getIndice());
                 context.setDefaults();
+
+                // print title
+                if (xmlContext.length > 1) {
+                    System.out.println("Security context: "+getContextId(context));
+                }
+
                 // print context
-                printContext(context, line, "");
-                // close
+                print(context, line);
+
+                // close context
                 ((ContextImpl) context).close();
             }
         }
     }
 
-    private static void printContext(Context context, CommandLine line, String indent) throws Exception {
-        if (line.hasOption(OPT_USERID) || line.hasOption(OPT_TIMELEFT)) {
+    private static void print(Context context, CommandLine line) {
+        if (line.hasOption(OPT_ATTRIBUTE)) {
             try {
-                if (line.hasOption(OPT_USERID)) {
-                    System.out.println(indent+context.getAttribute("UserID"));
-                } else if (line.hasOption(OPT_TIMELEFT)) {
-                    System.out.println(indent+context.getAttribute("TimeLeft"));
-                }
-            } catch (Exception e) {
-                System.out.println(indent+"Not initialized: ["+e.getMessage()+"]");
+                System.out.println("  "+context.getAttribute(line.getOptionValue(OPT_ATTRIBUTE)));
+            } catch(NotImplemented e) {
+                System.out.println("  Attribute not supported ["+e.getMessage()+"]");
+            } catch(Exception e) {
+                System.out.println("  Context not initialized ["+e.getMessage()+"]");
             }
+            System.out.println();
         } else {
             System.out.println(context);
         }
@@ -105,18 +102,12 @@ public class ContextInfo extends AbstractCommand {
                 .withLongOpt(LONGOPT_HELP)
                 .create(OPT_HELP));
 
-        // options group
-        OptionGroup group = new OptionGroup();
-        group.setRequired(false);
-        {
-            group.addOption(OptionBuilder.withDescription("Print UserID attribute only")
-                    .withLongOpt(LONGOPT_USERID)
-                    .create(OPT_USERID));
-            group.addOption(OptionBuilder.withDescription("Print TimeLeft attribute only")
-                    .withLongOpt(LONGOPT_TIMELEFT)
-                    .create(OPT_TIMELEFT));
-        }
-        opt.addOptionGroup(group);
+        // options
+        opt.addOption(OptionBuilder.withDescription("Query context instance(s) for attribute <attr> only")
+                .withArgName("attr")
+                .hasArg()
+                .withLongOpt(LONGOPT_ATTRIBUTE)
+                .create(OPT_ATTRIBUTE));
 
         // system properties
         opt.addOption(OptionBuilder.withDescription("Set context instance attribute (e.g. -DVOMS[0].UserVO=dteam)")

@@ -38,10 +38,10 @@ public abstract class GlobusProxyFactoryAbstract extends ProxyInit {
     private PrivateKey userKey;
     private int certificateFormat = 0;
 
-    protected final int CERTIFICATE_PEM = 0;
-    protected final int CERTIFICATE_PKCS12 = 1;
-    protected final int CERT = 0;
-    private final int KEY = 1;
+    protected static final int CERTIFICATE_PEM = 0;
+    protected static final int CERTIFICATE_PKCS12 = 1;
+    protected static final int CERT = 0;
+    private static final int KEY = 1;
 
     public GlobusProxyFactoryAbstract(String passphrase) {
         m_exception = null;

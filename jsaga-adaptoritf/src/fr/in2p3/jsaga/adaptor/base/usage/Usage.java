@@ -18,37 +18,20 @@ import java.util.Map;
  */
 public interface Usage {
     /**
-     * Test if the attribute <code>attributeName</code> is contained within this usage instance
-     * @param attributeName the name of the attribute to search for
-     * @return true if the attribute is contained within this usage instance, else false
-     */
-    public boolean containsName(String attributeName);
-
-    /**
-     * Reset the weight of all attributes to -1
-     */
-    public void resetWeight();
-
-    /**
      * Correct the value according to this usage
      * @param attributeName the name of the attribute to correct
      * @param attributeValue the value of the attribute to correct
-     * @param attributeWeight the weight of the attribute
      * @return the corrected value
      * @throws DoesNotExist if the attribute is not contained within this usage instance
      */
-    public String correctValue(String attributeName, String attributeValue, int attributeWeight) throws DoesNotExist;
+    public String correctValue(String attributeName, String attributeValue) throws DoesNotExist;
 
     /**
-     * Get the weight of this usage instance
-     * @return the weight
+     * @param attributes a map containing all the attributes
+     * @return the first matching usage
+     * @throws DoesNotExist if no usage matches the attributes
      */
-    public int getWeight();
-
-    /**
-     * @return true if the value of the attribute <code>attributeName</code> must be removed
-     */
-    public boolean removeValue(String attributeName);
+    public int getFirstMatchingUsage(Map attributes) throws DoesNotExist;
 
     /**
      * Build a usage instance containing missing attributes only
@@ -56,13 +39,6 @@ public interface Usage {
      * @return a usage instance containing missing attributes only
      */
     public Usage getMissingValues(Map attributes);
-
-    /**
-     * Prompt the user for entering missing attribute values
-     * @param attributes a map containing the missing attributes
-     * @param id the identifier of the associated SAGA object
-     */
-    public void promptForValues(Map attributes, String id) throws Exception;
 
     /**
      * @return a string representation of this usage instance

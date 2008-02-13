@@ -38,27 +38,16 @@ public class JobserviceEngineConfiguration {
                 this.updateAttributes(userAttributes, job, job.getPathAlias(a));
             }
 
-            // get usage
+            // correct configured attributes according to usage
             Usage usage = desc.getUsage(job.getType());
             if (usage != null) {
-                usage.resetWeight();
-            }
-            
-            // correct configured attributes according to usage
-            for (int a=0; a<job.getAttributeCount(); a++) {
-                Attribute attr = job.getAttribute(a);
-                if (attr.getValue() != null) {
-                    try {
-                        attr.setValue(usage.correctValue(attr.getName(), attr.getValue(), attr.getSource().getType()));
-                    } catch(DoesNotExist e) {/*do nothing*/}
-                }
-            }
-
-            // remove ambiguity
-            for (int a=0; a<job.getAttributeCount(); a++) {
-                Attribute attr = job.getAttribute(a);
-                if (usage!=null && usage.removeValue(attr.getName())) {
-                    attr.setValue(null);
+                for (int a=0; a<job.getAttributeCount(); a++) {
+                    Attribute attr = job.getAttribute(a);
+                    if (attr.getValue() != null) {
+                        try {
+                            attr.setValue(usage.correctValue(attr.getName(), attr.getValue()));
+                        } catch(DoesNotExist e) {/*do nothing*/}
+                    }
                 }
             }
         }

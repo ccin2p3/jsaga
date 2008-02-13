@@ -1,5 +1,8 @@
 package fr.in2p3.jsaga.adaptor.security;
 
+import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NotImplemented;
+
 import java.io.PrintStream;
 
 /* ***************************************************
@@ -15,7 +18,7 @@ import java.io.PrintStream;
  *
  */
 public interface SecurityAdaptor {
-    public static final int INFINITE = -1;
+    public static final int INFINITE_LIFETIME = -1;
 
     /**
      * @return the identifier of the user.
@@ -23,9 +26,11 @@ public interface SecurityAdaptor {
     public String getUserID() throws Exception;
 
     /**
-     * @return the time left or <code>INFINITE</code>.
+     * @return the value of the attribute (other than UserID)
+     * @throws NotImplemented if the attribute <code>key</code> is not supported by this adaptor
+     * @throws NoSuccess if the adaptor failed to get the value of attribute <code>key</code>
      */
-    public int getTimeLeft() throws Exception;
+    public String getAttribute(String key) throws NotImplemented, NoSuccess;
 
     /**
      * Close the context (implementation may be empty).

@@ -1,7 +1,5 @@
 package fr.in2p3.jsaga.adaptor.base.usage;
 
-import java.util.Map;
-
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -19,13 +17,11 @@ public class UNoPrompt extends U {
         super(name);
     }
 
-    public String toString() {
-        return "_"+m_name+"_";
+    public UNoPrompt(int id, String name) {
+        super(id, name);
     }
 
-    public void promptForValues(Map attributes, String id) throws Exception {
-        if (!attributes.containsKey(m_name)) {
-            throw new Exception("Can not prompt for attribute: "+m_name);
-        }
+    public String toString() {
+        return "_"+m_name+"_";
     }
 }

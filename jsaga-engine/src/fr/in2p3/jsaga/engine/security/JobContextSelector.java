@@ -57,7 +57,7 @@ public class JobContextSelector extends ContextSelector {
                 ContextInstanceRef ref = refArray[i];
                 ContextImpl context = super.selectContextByTypeIndice(ref.getType(), ""+ref.getIndice());
                 try {
-                    context.createSecurityAdaptor();
+                    context.getAdaptor();
                     ctxList.add(context);
                 } catch(Exception e) {/*ignore*/}
             }

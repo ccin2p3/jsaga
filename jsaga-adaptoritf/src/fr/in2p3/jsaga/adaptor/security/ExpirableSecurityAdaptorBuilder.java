@@ -1,7 +1,5 @@
 package fr.in2p3.jsaga.adaptor.security;
 
-import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-
 import java.util.Map;
 
 /* ***************************************************
@@ -18,21 +16,9 @@ import java.util.Map;
  */
 public interface ExpirableSecurityAdaptorBuilder extends SecurityAdaptorBuilder {
     /**
-     * Get the expected usage for the initialization of this context.
-     * @return the description of the expected usage.
-     */
-    public Usage getInitUsage();
-
-    /**
-     * Initialize a security context with the provided attributes, and make it persistent for current user.
+     * Destroy persisted state of security context
      * @param attributes the provided attributes.
      * @param contextId can be either a context name or a pair (context type + indice)
      */
-    public void initBuilder(Map attributes, String contextId) throws Exception;
-
-    /**
-     * Permanently destroy a security context for current user.
-     * @param contextId can be either a context name or a pair (context type + indice)
-     */
-    public void destroyBuilder(Map attributes, String contextId) throws Exception;
+    public void destroySecurityAdaptor(Map attributes, String contextId) throws Exception;
 }

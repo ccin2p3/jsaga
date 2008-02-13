@@ -6,8 +6,8 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityAdaptor;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.BadParameter;
 import org.ogf.saga.error.IncorrectState;
+import org.ogf.saga.error.NoSuccess;
 
 import java.util.Map;
 
@@ -50,12 +50,12 @@ public class InMemoryProxySecurityAdaptorBuilder implements SecurityAdaptorBuild
 */
     }
 
-    public SecurityAdaptor createSecurityAdaptor(Map attributes) throws Exception {
+    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectState, NoSuccess {
         String base64 = (String) attributes.get(Context.USERPROXY);
         if (base64 != null) {
             return new InMemoryProxySecurityAdaptor(base64);
         } else {
-            throw new BadParameter("Missing attribute: "+Context.USERPROXY);
+            throw new NoSuccess("Attribute is null: "+Context.USERPROXY);
         }
     }
 }

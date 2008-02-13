@@ -1,7 +1,6 @@
 package fr.in2p3.jsaga.command;
 
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.security.ExpirableSecurityAdaptorBuilder;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptorBuilder;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.config.bean.EngineConfiguration;
@@ -28,7 +27,6 @@ import java.util.*;
 public class Help extends AbstractCommand {
     private static final String OPT_HELP = "h", LONGOPT_HELP = "help";
     private static final String OPT_VERSION = "v", LONGOPT_VERSION = "version";
-    private static final String OPT_SECURITY_INIT = "i", LONGOPT_SECURITY_INIT = "init";
     private static final String OPT_SECURITY = "s", LONGOPT_SECURITY = "security",
             ARG_SECURITY_USAGE = "usage", ARG_SECURITY_DEFAULT = "default", ARG_SECURITY_MISSING = "missing",
             USAGE_OPT_SECURITY = "<mode> = "+ARG_SECURITY_USAGE+" | "+ ARG_SECURITY_DEFAULT +" | "+ARG_SECURITY_MISSING;
@@ -60,11 +58,9 @@ public class Help extends AbstractCommand {
             System.out.println("JSAGA implementation version: "+p.getImplementationVersion());
 
         }
-        else if (line.hasOption(OPT_SECURITY_INIT) || line.hasOption(OPT_SECURITY))
+        else if (line.hasOption(OPT_SECURITY))
         {
-            String arg = line.hasOption(OPT_SECURITY_INIT)
-                    ? line.getOptionValue(OPT_SECURITY_INIT)
-                    : line.getOptionValue(OPT_SECURITY);
+            String arg = line.getOptionValue(OPT_SECURITY);
 
             ContextInstance[] ctxArray = config.getContextCfg().toXMLArray();
             String LEGENDE = "\nwhere:\n"+
@@ -78,13 +74,7 @@ public class Help extends AbstractCommand {
                 for (int c=0; c<ctxArray.length; c++) {
                     ContextInstance ctx = ctxArray[c];
                     if (ctx.getIndice() == 0) {
-                        if (line.hasOption(OPT_SECURITY_INIT)) {
-                            if (ctx.getInit() != null) {
-                                formatter.append(new String[] {ctx.getType(), ctx.getInit().getUsage()});
-                            }
-                        } else {
-                            formatter.append(new String[] {ctx.getType(), ctx.getUsage()});
-                        }
+                        formatter.append(new String[] {ctx.getType(), ctx.getUsage()});
                     }
                 }
                 formatter.dump(System.out);
@@ -99,13 +89,7 @@ public class Help extends AbstractCommand {
                         String indice = (a==0 ? ""+ctx.getIndice() : null);
                         String name = (a==0 ? ctx.getName() : null);
                         String attribute = ctx.getAttribute(a).getName()+" = "+ctx.getAttribute(a).getValue();
-                        if (line.hasOption(OPT_SECURITY_INIT)) {
-                            if (ctx.getInit() != null) {
-                                formatter.append(new String[] {type, indice, name, attribute});
-                            }
-                        } else {
-                            formatter.append(new String[] {type, indice, name, attribute});
-                        }
+                        formatter.append(new String[] {type, indice, name, attribute});
                     }
                 }
                 formatter.dump(System.out);
@@ -119,17 +103,9 @@ public class Help extends AbstractCommand {
                         attributes.put(ctx.getAttribute(i).getName(), ctx.getAttribute(i).getValue());
                     }
                     SecurityAdaptorBuilder adaptor = SecurityAdaptorBuilderFactory.getInstance().getSecurityAdaptorBuilder(ctx.getType());
-                    if (line.hasOption(OPT_SECURITY_INIT)) {
-                        if (ctx.getInit() != null) {
-                            Usage missing = ((ExpirableSecurityAdaptorBuilder)adaptor).getInitUsage().getMissingValues(attributes);
-                            formatter.append(new String[] {ctx.getType(), ""+ctx.getIndice(), ctx.getName(),
-                                    (missing!=null ? missing.toString() : null)});
-                        }
-                    } else {
-                        Usage missing = adaptor.getUsage().getMissingValues(attributes);
-                        formatter.append(new String[] {ctx.getType(), ""+ctx.getIndice(), ctx.getName(),
-                                (missing!=null ? missing.toString() : null)});
-                    }
+                    Usage missing = adaptor.getUsage().getMissingValues(attributes);
+                    formatter.append(new String[] {ctx.getType(), ""+ctx.getIndice(), ctx.getName(),
+                            (missing!=null ? missing.toString() : null)});
                 }
                 formatter.dump(System.out);
                 System.out.print(LEGENDE);
@@ -230,11 +206,6 @@ public class Help extends AbstractCommand {
             group.addOption(OptionBuilder.withDescription("Output version information and exit")
                     .withLongOpt(LONGOPT_VERSION)
                     .create(OPT_VERSION));
-            group.addOption(OptionBuilder.withDescription("Information about security context initialization.\n"+ USAGE_OPT_SECURITY)
-                    .withLongOpt(LONGOPT_SECURITY_INIT)
-                    .withArgName("mode")
-                    .hasArg()
-                    .create(OPT_SECURITY_INIT));
             group.addOption(OptionBuilder.withDescription("Information about security context instances.\n"+ USAGE_OPT_SECURITY)
                     .withLongOpt(LONGOPT_SECURITY)
                     .withArgName("mode")

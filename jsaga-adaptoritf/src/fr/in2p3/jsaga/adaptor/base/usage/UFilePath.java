@@ -23,12 +23,15 @@ public class UFilePath extends U {
         super(name);
     }
 
+    public UFilePath(int id, String name) {
+        super(id, name);
+    }
+
     /** override U.correctValue() */
-    public String correctValue(String attributeName, String attributeValue, int attributeWeight) throws DoesNotExist {
+    public String correctValue(String attributeName, String attributeValue) throws DoesNotExist {
         if (m_name.equals(attributeName)) {
             try {
                 File file = (File) this.throwExceptionIfInvalid(attributeValue);
-                m_weight = attributeWeight;
                 // returns corrected path
                 try {
                     return file.getCanonicalPath();
@@ -36,7 +39,6 @@ public class UFilePath extends U {
                     return file.getAbsolutePath();
                 }
             } catch (Exception e) {
-                m_weight = -1;
                 return null;
             }
         } else {

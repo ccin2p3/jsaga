@@ -2,7 +2,6 @@ package fr.in2p3.jsaga.adaptor.base.usage;
 
 import org.ogf.saga.error.DoesNotExist;
 
-import java.io.*;
 import java.util.Map;
 
 /* ***************************************************
@@ -18,31 +17,25 @@ import java.util.Map;
  *
  */
 public class U implements Usage {
+    protected int m_id;
     protected String m_name;
-    protected int m_weight;
 
     public U(String name) {
+        this(-1, name);
+    }
+
+    public U(int id, String name) {
+        m_id = id;
         m_name = name;
-        m_weight = -1;
-    }
-
-    public final boolean containsName(String attributeName) {
-        return attributeName.equals(m_name);
-    }
-
-    public void resetWeight() {
-        m_weight = -1;
     }
 
     /** Default implementation to override if needed */
-    public String correctValue(String attributeName, String attributeValue, int attributeWeight) throws DoesNotExist {
+    public String correctValue(String attributeName, String attributeValue) throws DoesNotExist {
         if (m_name.equals(attributeName)) {
             try {
                 this.throwExceptionIfInvalid(attributeValue);
-                m_weight = attributeWeight;
                 return attributeValue;
             } catch (Exception e) {
-                m_weight = -1;
                 return null;
             }
         } else {
@@ -50,13 +43,17 @@ public class U implements Usage {
         }
     }
 
-    public int getWeight() {
-        return m_weight;
-    }
-
-    /** placeholder */
-    public boolean removeValue(String attributeName) {
-        return false;
+    public int getFirstMatchingUsage(Map attributes) throws DoesNotExist {
+        if (attributes.containsKey(m_name)) {
+            try {
+                this.throwExceptionIfInvalid(attributes.get(m_name));
+                return m_id;
+            } catch (Exception e) {
+                return -1;
+            }
+        } else {
+            throw new DoesNotExist("Attribute not found: "+m_name);
+        }
     }
 
     public final Usage getMissingValues(Map attributes) {
@@ -71,38 +68,8 @@ public class U implements Usage {
     /**
      * To be overloaded if needed
      */
-    public void promptForValues(Map attributes, String id) throws Exception {
-        if (!attributes.containsKey(m_name)) {
-            System.out.println("Enter value for attribute '"+m_name+"' of security context instance '"+id+"'");
-            String value = this.getUserInput();
-            try {
-                this.throwExceptionIfInvalid(value);
-                attributes.put(m_name, value);
-            } catch(Exception e) {
-                System.out.println("Error: "+e.getMessage());
-                throw e;
-            }
-        }
-    }
-
-    /**
-     * To be overloaded if needed
-     */
     public String toString() {
         return m_name;
-    }
-
-    /**
-     * To be overloaded if needed
-     */
-    protected String getUserInput() throws IOException {
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        String line = in.readLine().trim();
-        if (line.length() > 0) {
-            return line;
-        } else {
-            return null;
-        }
     }
 
     /**

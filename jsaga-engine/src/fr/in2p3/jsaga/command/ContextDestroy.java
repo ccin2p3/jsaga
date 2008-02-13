@@ -21,11 +21,11 @@ import org.ogf.saga.session.SessionFactory;
 /**
  *
  */
-public class ContextDestroy extends AbstractCommand {
+public class ContextDestroy extends AbstractContextCommand {
     private static final String OPT_HELP = "h", LONGOPT_HELP = "help";
 
     public ContextDestroy() {
-        super("jsaga-context-destroy", new String[]{"contextId"}, null);
+        super("jsaga-context-destroy");
     }
 
     public static void main(String[] args) throws Exception {
@@ -52,8 +52,8 @@ public class ContextDestroy extends AbstractCommand {
             ContextInstance[] xmlContext = Configuration.getInstance().getConfigurations().getContextCfg().listContextInstanceArrayById(id);
             for (int i=0; i<xmlContext.length; i++) {
                 Context context = ContextFactory.createContext();
-                context.setAttribute("Type", xmlContext[i].getType());
-                context.setAttribute("Indice", ""+xmlContext[i].getIndice());
+                context.setAttribute(Context.TYPE, xmlContext[i].getType());
+                context.setAttribute(INDICE, ""+xmlContext[i].getIndice());
                 context.setDefaults();
                 ((ContextImpl) context).destroy();
                 ((ContextImpl) context).close();

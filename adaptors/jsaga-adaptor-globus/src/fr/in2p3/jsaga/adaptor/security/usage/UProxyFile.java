@@ -24,8 +24,8 @@ import java.io.*;
 public class UProxyFile extends UFile {
     private int m_minLifeTime;
 
-    public UProxyFile(String name, int minLifeTime) {
-        super(name);
+    public UProxyFile(int id, String name, int minLifeTime) {
+        super(id, name);
         m_minLifeTime = minLifeTime;
     }
 

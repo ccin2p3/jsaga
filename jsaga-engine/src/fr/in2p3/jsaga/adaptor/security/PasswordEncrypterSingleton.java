@@ -60,7 +60,7 @@ public class PasswordEncrypterSingleton extends PasswordAbstract {
         return new BASE64Encoder().encode(crypted);
     }
 
-    private static int getExpiryDate(int lifetime) {
+    public static int getExpiryDate(int lifetime) {
         return (int) (System.currentTimeMillis()/1000) + lifetime;
     }
 

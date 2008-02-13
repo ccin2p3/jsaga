@@ -26,7 +26,6 @@ if "%JSAGA_HOME%_"=="_" (
 REM # set system properties
 set PROPERTIES=
 set PROPERTIES=%PROPERTIES% -DJSAGA_HOME="%JSAGA_HOME%"
-set PROPERTIES=%PROPERTIES% -Dinteractive
 rem set PROPERTIES=%PROPERTIES% -Ddebug
 rem set PROPERTIES=%PROPERTIES% -Dconfig="%JSAGA_HOME%\etc\example\jsaga-config.xml"
 

@@ -52,11 +52,6 @@
     </complexType></element>
 
     <element name="contextInstance"><complexType><complexContent><extension base="tns:ObjectType">
-        <sequence>
-            <element name="init" minOccurs="0" maxOccurs="1"><complexType>
-                <attribute name="usage" type="string" use="required"/><!-- from adaptor descriptor -->
-            </complexType></element>
-        </sequence>
         <attribute name="type" type="string" use="required"/><!-- from adaptor descriptor -->
         <attribute name="impl" type="string" use="required"/><!-- from adaptor descriptor -->
         <attribute name="usage" type="string" use="optional"/><!-- from adaptor descriptor -->
