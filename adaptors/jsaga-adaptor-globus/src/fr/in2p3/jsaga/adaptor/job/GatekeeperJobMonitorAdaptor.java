@@ -40,14 +40,14 @@ public class GatekeeperJobMonitorAdaptor extends GatekeeperJobAdaptorAbstract im
         } catch (GramException e) {
             if (e.getErrorCode() == GramException.ERROR_CONTACTING_JOB_MANAGER) {
                 //WARNING: Globus does not distinguish job DONE and job manager stopped
-                return new GatekeeperJobStatus(nativeJobId, GRAMConstants.STATUS_DONE, "DONE");
+                return new GatekeeperJobStatus(nativeJobId, new Integer(GRAMConstants.STATUS_DONE), "DONE");
             } else {
                 this.rethrowException(e);
             }
         } catch (GSSException e) {
             throw new NoSuccess(e);
         }
-        return new GatekeeperJobStatus(nativeJobId, job.getStatus(), job.getStatusAsString());
+        return new GatekeeperJobStatus(nativeJobId, new Integer(job.getStatus()), job.getStatusAsString());
     }
 
     public void subscribeJob(String nativeJobId, JobStatusNotifier notifier) throws Timeout, NoSuccess {
@@ -62,7 +62,7 @@ public class GatekeeperJobMonitorAdaptor extends GatekeeperJobAdaptorAbstract im
             		e.getErrorCode() == GramException.JOB_QUERY_DENIAL ||
             		e.getErrorCode() == GramException.HTTP_UNFRAME_FAILED) {
                 //WARNING: Globus does not distinguish job DONE and job manager stopped
-                GatekeeperJobStatus status = new GatekeeperJobStatus(nativeJobId, GRAMConstants.STATUS_DONE, "DONE");
+                GatekeeperJobStatus status = new GatekeeperJobStatus(nativeJobId, new Integer(GRAMConstants.STATUS_DONE), "DONE");
                 notifier.notifyChange(status);
             } else {
                 this.rethrowException(e);

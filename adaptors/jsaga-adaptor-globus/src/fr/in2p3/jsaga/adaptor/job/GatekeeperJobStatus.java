@@ -16,11 +16,11 @@ import org.globus.gram.internal.GRAMConstants;
  *
  */
 public class GatekeeperJobStatus extends JobStatus {
-    public GatekeeperJobStatus(String jobId, int stateCode, String stateString) {
+    public GatekeeperJobStatus(String jobId, Object stateCode, String stateString) {
         super(jobId, stateCode, stateString);
     }
 
-    public GatekeeperJobStatus(String jobId, int stateCode, String stateString, String cause) {
+    public GatekeeperJobStatus(String jobId, Object stateCode, String stateString, String cause) {
         super(jobId, stateCode, stateString, cause);
     }
 

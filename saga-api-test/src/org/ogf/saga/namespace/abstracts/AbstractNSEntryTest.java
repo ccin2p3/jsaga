@@ -57,9 +57,7 @@ public abstract class AbstractNSEntryTest extends AbstractTest {
         m_rootUrl = createURL(baseUrl, DEFAULT_ROOTNAME);
         m_dirUrl = createURL(m_rootUrl, DEFAULT_DIRNAME);
         m_fileUrl = createURL(m_dirUrl, DEFAULT_FILENAME);
-        if (baseUrl.getFragment() != null) {
-            m_session = SessionFactory.createSession(true);
-        }
+        m_session = SessionFactory.createSession(true);
         if (getOptionalProperty(protocol, CONFIG_PHYSICAL_PROTOCOL) != null) {
             String physicalProtocol = getOptionalProperty(protocol, CONFIG_PHYSICAL_PROTOCOL);
             URL basePhysicalUrl = new URL(getRequiredProperty(physicalProtocol, CONFIG_BASE_URL));

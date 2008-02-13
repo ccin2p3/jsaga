@@ -208,7 +208,9 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
         for (Map.Entry<String, Attribute> entry : m_attributes.entrySet()) {
             String key = entry.getKey();
             Attribute attr = entry.getValue();
-            map.put(key, attr.getValue());
+            if (attr.getValue() != null) {
+                map.put(key, attr.getValue());
+            }
         }
         return map;
     }

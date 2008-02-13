@@ -51,9 +51,7 @@ public class AbstractJobTest extends AbstractTest {
 
         // configure
         m_jobservice = new URL(getRequiredProperty(jobprotocol, CONFIG_JOBSERVICE_URL).replaceAll(" ", "%20"));
-        if (m_jobservice.getFragment() != null) {
-            m_session = SessionFactory.createSession(true);
-        }
+        m_session = SessionFactory.createSession(true);
     }
     
     /**

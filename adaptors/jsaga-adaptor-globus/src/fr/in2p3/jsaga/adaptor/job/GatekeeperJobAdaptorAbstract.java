@@ -6,7 +6,6 @@ import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
-
 import org.globus.common.CoGProperties;
 import org.globus.gram.Gram;
 import org.globus.gram.GramException;
@@ -15,7 +14,6 @@ import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.error.*;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
