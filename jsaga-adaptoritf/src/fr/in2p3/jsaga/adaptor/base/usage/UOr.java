@@ -54,11 +54,12 @@ public class UOr implements Usage {
             Usage m = m_or[i].getMissingValues(attributes);
             if (m != null) {
                 missing.add(m);
+            } else {
+                //at least one alternative matches
+                return null;
             }
         }
-        if (missing.size() < m_or.length) {
-            return null;
-        } else if (missing.size() == 1) {
+        if (missing.size() == 1) {
             return (Usage) missing.get(0);
         } else {
             return new UOr((Usage[]) missing.toArray(new Usage[missing.size()]));
