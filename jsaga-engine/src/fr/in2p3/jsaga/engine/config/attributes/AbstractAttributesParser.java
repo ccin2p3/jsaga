@@ -31,7 +31,7 @@ public abstract class AbstractAttributesParser {
     public abstract void parse() throws ConfigurationException;
 
     /**
-     * @param id can be either a name or a pair (type + indice)
+     * @param id the name of the instance
      * @param attributeName the name of the attribute
      * @param attributeValue the value of the attribute
      */
@@ -45,7 +45,7 @@ public abstract class AbstractAttributesParser {
     }
 
     /**
-     * @param id can be either a name or a pair (type + indice)
+     * @param id the name of the instance
      * @return the user attributes
      */
     public Properties getUserAttributes(String id) {
