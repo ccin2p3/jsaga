@@ -60,6 +60,7 @@ public class JobAdaptorDescriptor {
 
     private static Jobservice toXML(JobAdaptor adaptor, SecurityAdaptorDescriptor securityDesc) {
         Jobservice jobservice = new Jobservice();
+        jobservice.setScheme(adaptor.getType()); // default identifier
         jobservice.setType(adaptor.getType());
         jobservice.setImpl(adaptor.getClass().getName());
         jobservice.setBulk(adaptor instanceof BulkJobSubmit);

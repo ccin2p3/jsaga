@@ -88,8 +88,8 @@
             <element ref="tns:sandbox" minOccurs="0" maxOccurs="1"/>
             <element ref="tns:protocol" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
-        <attribute name="name" type="string" use="required"/>
-        <attribute name="type" type="string" use="optional"/>
+        <attribute name="type" type="string" use="required"/>
+        <attribute name="scheme" type="string" use="optional"/>
     </extension></complexContent></complexType></element>
 
     <!-- root-child types -->

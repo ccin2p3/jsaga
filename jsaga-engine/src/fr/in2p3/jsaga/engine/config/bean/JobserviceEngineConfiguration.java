@@ -63,14 +63,14 @@ public class JobserviceEngineConfiguration {
         return m_jobservice;
     }
 
-    public Jobservice findJobservice(String name) throws NoSuccess {
+    public Jobservice findJobservice(String scheme) throws NoSuccess {
         for (int j=0; j<m_jobservice.length; j++) {
             Jobservice service = m_jobservice[j];
-            if (service.getName().equals(name)) {
+            if (service.getScheme().equals(scheme)) {
                 return service;
             }
         }
-        throw new NoSuccess("No job-service matches name: "+name);
+        throw new NoSuccess("No job-service matches scheme: "+ scheme);
     }
 
     /**
@@ -90,7 +90,7 @@ public class JobserviceEngineConfiguration {
     public ContextInstanceRef[] listContextInstanceCandidates(Jobservice service, String hostname, String fragment) throws NoSuccess {
         ContextEngineConfiguration config = Configuration.getInstance().getConfigurations().getContextCfg();
         if (fragment != null) {
-            ContextInstance[] ctxArray = config.listContextInstanceArrayById(fragment);
+            ContextInstance[] ctxArray = config.listContextInstanceArray(fragment);
             switch(ctxArray.length) {
                 case 0:
                     throw new NoSuccess("No context instance matches: "+fragment);
@@ -107,7 +107,7 @@ public class JobserviceEngineConfiguration {
             List list = new ArrayList();
             for (int c=0; c<service.getSupportedContextTypeCount(); c++) {
                 String type = service.getSupportedContextType(c);
-                ContextInstance[] ctxArray = config.listContextInstanceArray(type);
+                ContextInstance[] ctxArray = config.listContextInstanceArrayByType(type);
                 ContextInstanceRef[] refArray = toContextInstanceRefArray(ctxArray);
                 for (int i=0; i<refArray.length; i++) {
                     list.add(refArray[i]);
@@ -126,8 +126,6 @@ public class JobserviceEngineConfiguration {
     }
     private static ContextInstanceRef toContextInstanceRef(ContextInstance ctx) {
         ContextInstanceRef ref = new ContextInstanceRef();
-        ref.setType(ctx.getType());
-        ref.setIndice(ctx.getIndice());
         ref.setName(ctx.getName());
         return ref;
     }

@@ -4,6 +4,7 @@ import fr.in2p3.jsaga.adaptor.security.SecurityAdaptorBuilder;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.config.adaptor.SecurityAdaptorDescriptor;
+import fr.in2p3.jsaga.engine.schema.config.ContextInstance;
 import org.ogf.saga.error.NoSuccess;
 
 /* ***************************************************
@@ -33,7 +34,16 @@ public class SecurityAdaptorBuilderFactory {
         m_descriptor = Configuration.getInstance().getDescriptors().getSecurityDesc();
     }
 
-    public SecurityAdaptorBuilder getSecurityAdaptorBuilder(String type) throws NoSuccess {
+    public SecurityAdaptorBuilder getSecurityAdaptorBuilder(String id) throws NoSuccess {
+        ContextInstance byName = Configuration.getInstance().getConfigurations().getContextCfg().findContextInstanceByName(id);
+        if (byName != null) {
+            return this.getSecurityAdaptorBuilderByType(byName.getType());
+        } else {
+            return this.getSecurityAdaptorBuilderByType(id);
+        }
+    }
+
+    private SecurityAdaptorBuilder getSecurityAdaptorBuilderByType(String type) throws NoSuccess {
         // create instance
         Class clazz = m_descriptor.getBuilderClass(type);
         SecurityAdaptorBuilder adaptorBuilder;

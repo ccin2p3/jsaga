@@ -20,8 +20,9 @@
     </xsl:template>
 
     <xsl:template match="cfg:instance">
-        <contextInstance indice="{count(preceding-sibling::cfg:instance)}">
-            <xsl:copy-of select="../@* | @*"/>
+        <contextInstance>
+            <xsl:call-template name="ATTRIBUTE_CONTEXT_NAME"/>
+            <xsl:copy-of select="../@*"/>
             <xsl:variable name="this" select="."/>
             <xsl:for-each select="../cfg:attribute[not(@name=$this/cfg:attribute/@name)] | cfg:attribute">
                 <attribute><xsl:copy-of select="@*"/></attribute>
@@ -32,9 +33,9 @@
     <xsl:template match="cfg:matchProtocol">
         <xsl:variable name="this" select="."/>
         <protocol scheme="{@scheme}">
-            <xsl:apply-templates select="/cfg:config/cfg:security/cfg:context/cfg:instance[cfg:matchProtocol/@scheme=$this/@scheme]/cfg:domain"/>
-            <xsl:for-each select="/cfg:config/cfg:security/cfg:context/cfg:instance[cfg:matchProtocol/@scheme=$this/@scheme]">
-                <xsl:call-template name="CONTEXT_INSTANCE_REF"/>
+            <xsl:apply-templates select="/cfg:config/cfg:security/cfg:context[not(@deactivated='true')]/cfg:instance[cfg:matchProtocol/@scheme=$this/@scheme]/cfg:domain"/>
+            <xsl:for-each select="/cfg:config/cfg:security/cfg:context[not(@deactivated='true')]/cfg:instance[cfg:matchProtocol/@scheme=$this/@scheme]">
+                <contextInstanceRef><xsl:call-template name="ATTRIBUTE_CONTEXT_NAME"/></contextInstanceRef>
             </xsl:for-each>
         </protocol>
     </xsl:template>
@@ -42,40 +43,40 @@
         <domain name="{@name}">
             <xsl:apply-templates select="cfg:host"/>
             <xsl:for-each select="..">
-                <xsl:call-template name="CONTEXT_INSTANCE_REF"/>
+                <contextInstanceRef><xsl:call-template name="ATTRIBUTE_CONTEXT_NAME"/></contextInstanceRef>
             </xsl:for-each>
         </domain>
     </xsl:template>
     <xsl:template match="cfg:host">
         <host name="{@name}">
             <xsl:for-each select="../..">
-                <xsl:call-template name="CONTEXT_INSTANCE_REF"/>
+                <contextInstanceRef><xsl:call-template name="ATTRIBUTE_CONTEXT_NAME"/></contextInstanceRef>
             </xsl:for-each>
         </host>
     </xsl:template>
 
     <xsl:template match="cfg:JOBSERVICE">
-        <xsl:variable name="type">
+        <xsl:variable name="scheme">
             <xsl:choose>
-                <xsl:when test="@type"><xsl:value-of select="@type"/></xsl:when>
-                <xsl:otherwise><xsl:value-of select="@name"/></xsl:otherwise>
+                <xsl:when test="@scheme"><xsl:value-of select="@scheme"/></xsl:when>
+                <xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
         <xsl:variable name="path">
             <xsl:for-each select="ancestor::cfg:GRID[@name]">
                 <xsl:value-of select="@name"/><xsl:text>/</xsl:text>
             </xsl:for-each>
-            <xsl:value-of select="@name"/>
+            <xsl:value-of select="$scheme"/>
         </xsl:variable>
-        <jobservice type="{$type}" path="{$path}">
+        <jobservice scheme="{$scheme}" type="@type" path="{$path}">
             <xsl:copy-of select="@*"/>
             <xsl:for-each select="cfg:attribute">
                 <attribute><xsl:copy-of select="@*"/></attribute>
             </xsl:for-each>
             <xsl:call-template name="SANDBOX_CONTAINER"/>
             <xsl:call-template name="PROTOCOL_CONTAINER"/>
-            <xsl:for-each select="/cfg:config/cfg:security/cfg:context/cfg:instance[starts-with(cfg:matchJobservice/@path,$path)]">
-                <xsl:call-template name="CONTEXT_INSTANCE_REF"/>
+            <xsl:for-each select="/cfg:config/cfg:security/cfg:context[not(@deactivated='true')]/cfg:instance[starts-with(concat($path,'/'), concat(cfg:matchJobservice/@path,'/'))]">
+                <contextInstanceRef><xsl:call-template name="ATTRIBUTE_CONTEXT_NAME"/></contextInstanceRef>
             </xsl:for-each>
         </jobservice>
     </xsl:template>
@@ -134,10 +135,14 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-    <xsl:template name="CONTEXT_INSTANCE_REF">
-        <contextInstanceRef type="{../@type}" indice="{count(preceding-sibling::cfg:instance)}">
-            <xsl:copy-of select="@*"/>
-        </contextInstanceRef>
+    <xsl:template name="ATTRIBUTE_CONTEXT_NAME">
+        <xsl:attribute name="name">
+            <xsl:choose>
+                <xsl:when test="@name"><xsl:value-of select="@name"/></xsl:when>
+                <xsl:when test="count(../cfg:instance) = 1"><xsl:value-of select="../@type"/></xsl:when>
+                <xsl:otherwise><xsl:value-of select="concat(../@type,'[',count(preceding-sibling::cfg:instance),']')"/></xsl:otherwise>
+            </xsl:choose>
+        </xsl:attribute>        
     </xsl:template>
     <xsl:template match="*">
         <xsl:element name="{name()}">

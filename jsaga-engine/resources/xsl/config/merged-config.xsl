@@ -46,31 +46,22 @@
             <xsl:apply-templates select="$desc/cfg:supportedContextType"/>
             <xsl:apply-templates select="$conf/cfg:domain"/>
             <xsl:apply-templates select="$conf/cfg:contextInstanceRef"/>
-            <xsl:if test="$conf/cfg:contextInstanceRef/@type and not($conf/cfg:contextInstanceRef/@type=$desc/cfg:supportedContextType/text())">
-                <xsl:message terminate="yes">
-                    <xsl:text>ERROR: Protocol '</xsl:text><xsl:value-of select="@scheme"/>
-                    <xsl:text>' does not support this context type: </xsl:text><xsl:value-of select="$conf/cfg:contextInstanceRef/@type"/>
-                </xsl:message>
-            </xsl:if>
+            <xsl:for-each select="$conf/cfg:contextInstanceRef/@name">
+                <xsl:variable name="name" select="."/>
+                <xsl:if test="not($configuration/cfg:contextInstance[@name=$name]/@type = $desc/cfg:supportedContextType/text())">
+                    <xsl:message terminate="yes">
+                        <xsl:text>ERROR: Protocol '</xsl:text><xsl:value-of select="$desc/@scheme"/>
+                        <xsl:text>' does not support this context: </xsl:text><xsl:value-of select="$name"/>
+                    </xsl:message>
+                </xsl:if>
+            </xsl:for-each>
         </protocol>
     </xsl:template>
 
     <xsl:template match="cfg:jobservice">
         <xsl:variable name="conf" select="."/>
         <xsl:variable name="desc" select="$descriptors/cfg:jobservice[@type=$conf/@type]"/>
-        <xsl:variable name="name">
-            <xsl:choose>
-                <xsl:when test="@name"><xsl:value-of select="@name"/></xsl:when>
-                <xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
-        <xsl:variable name="path">
-            <xsl:choose>
-                <xsl:when test="@path"><xsl:value-of select="@path"/></xsl:when>
-                <xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
-        <jobservice name="{$name}" path="{$path}">
+        <jobservice>
             <xsl:copy-of select="$desc/@*[not(name()=name($conf/@*))] | $conf/@*"/>
             <xsl:apply-templates select="$desc/cfg:attribute[not(@name=$conf/cfg:attribute/@name)] | $conf/cfg:attribute"/>
             <xsl:apply-templates select="$conf/cfg:pathAlias"/>
@@ -80,12 +71,15 @@
             <xsl:apply-templates select="$conf/cfg:sandbox"/>
             <xsl:apply-templates select="$conf/cfg:protocolRef"/>
             <xsl:apply-templates select="$conf/cfg:contextInstanceRef"/>
-            <xsl:if test="$conf/cfg:contextInstanceRef/@type and not($conf/cfg:contextInstanceRef/@type=$desc/cfg:supportedContextType/text())">
-                <xsl:message terminate="yes">
-                    <xsl:text>ERROR: Job service '</xsl:text><xsl:value-of select="@type"/>
-                    <xsl:text>' does not support this context type: </xsl:text><xsl:value-of select="$conf/cfg:contextInstanceRef/@type"/>
-                </xsl:message>
-            </xsl:if>
+            <xsl:for-each select="$conf/cfg:contextInstanceRef/@name">
+                <xsl:variable name="name" select="."/>
+                <xsl:if test="not($configuration/cfg:contextInstance[@name=$name]/@type = $desc/cfg:supportedContextType/text())">
+                    <xsl:message terminate="yes">
+                        <xsl:text>ERROR: Job service '</xsl:text><xsl:value-of select="$desc/@scheme"/>
+                        <xsl:text>' does not support this context: </xsl:text><xsl:value-of select="$name"/>
+                    </xsl:message>
+                </xsl:if>
+            </xsl:for-each>
         </jobservice>
     </xsl:template>
 

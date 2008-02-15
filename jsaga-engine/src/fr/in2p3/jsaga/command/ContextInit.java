@@ -24,11 +24,11 @@ import java.io.*;
 /**
  * Initialise context for one or all configured grids
  */
-public class ContextInit extends AbstractContextCommand {
+public class ContextInit extends AbstractCommand {
     private static final String OPT_HELP = "h", LONGOPT_HELP = "help";
 
     public ContextInit() {
-        super("jsaga-context-init");
+        super("jsaga-context-init", new String[]{"contextId"}, null);
     }
     
     public static void main(String[] args) throws Exception {
@@ -47,12 +47,12 @@ public class ContextInit extends AbstractContextCommand {
             for (int i=0; i<contexts.length; i++) {
                 // get context configuration
                 ContextInstance xmlContext = Configuration.getInstance().getConfigurations().getContextCfg().findContextInstance(
-                        contexts[i].getAttribute(Context.TYPE), contexts[i].getAttribute(INDICE));
+                        contexts[i].getAttribute(Context.TYPE));
 
                 // set UserPass attribute
                 setUserPass(contexts[i], xmlContext);
 
-                // throw exception if context is still not initialized
+                // trigger initialization of context
                 contexts[i].getAttribute(Context.USERID);
             }
             session.close();
@@ -60,18 +60,17 @@ public class ContextInit extends AbstractContextCommand {
         else if (command.m_nonOptionValues.length == 1)
         {
             String id = command.m_nonOptionValues[0];
-            ContextInstance[] xmlContexts = Configuration.getInstance().getConfigurations().getContextCfg().listContextInstanceArrayById(id);
+            ContextInstance[] xmlContexts = Configuration.getInstance().getConfigurations().getContextCfg().listContextInstanceArray(id);
             for (int i=0; i<xmlContexts.length; i++) {
                 // set context
                 Context context = ContextFactory.createContext();
-                context.setAttribute(Context.TYPE, xmlContexts[i].getType());
-                context.setAttribute(INDICE, ""+xmlContexts[i].getIndice());
+                context.setAttribute(Context.TYPE, xmlContexts[i].getName());
                 context.setDefaults();
 
                 // set UserPass attribute
                 setUserPass(context, xmlContexts[i]);
 
-                // throw exception if context is still not initialized
+                // trigger initialization of context
                 context.getAttribute(Context.USERID);
 
                 // close context
@@ -83,7 +82,7 @@ public class ContextInit extends AbstractContextCommand {
     private static void setUserPass(Context context, ContextInstance config) throws Exception {
         if (config.getUsage()!=null && config.getUsage().contains(Context.USERPASS) && !containsUserPass(config)) {
             // prompt for UserPass
-            System.out.println("Enter UserPass for security context: "+getContextId(context));
+            System.out.println("Enter UserPass for security context: "+context.getAttribute(Context.TYPE));
             String userPass = getUserInput();
 
             // set UserPass

@@ -95,8 +95,8 @@ public class SecurityAdaptorDescriptor {
 
     private static ContextInstance toXML(SecurityAdaptorBuilder adaptor) {
         ContextInstance ctx = new ContextInstance();
+        ctx.setName(adaptor.getType()); // default identifier
         ctx.setType(adaptor.getType());
-        ctx.setIndice(0);
         ctx.setImpl(adaptor.getClass().getName());
         if (adaptor.getUsage() != null) {
             ctx.setUsage(adaptor.getUsage().toString());

@@ -19,8 +19,6 @@ import org.ogf.saga.context.Context;
  */
 public class ContextAttributes implements Cloneable {
     AttributeImpl<String> m_type;
-    AttributeImpl<Integer> m_indice;
-    AttributeImpl<String> m_name;
 
     /** constructor */
     ContextAttributes(ContextImpl context) {
@@ -30,26 +28,12 @@ public class ContextAttributes implements Cloneable {
                 MetricMode.Final,
                 MetricType.String,
                 "Unknown"));
-        m_indice = context._addAttribute(new AttributeImpl<String>(
-                ContextImpl.INDICE,
-                "indice of the context instance (relative to a type)",
-                MetricMode.Final,
-                MetricType.Int,
-                null));
-        m_name = context._addAttribute(new AttributeImpl<String>(
-                ContextImpl.NAME,
-                "name of the context instance",
-                MetricMode.ReadWrite,
-                MetricType.String,
-                null));
     }
 
     /** clone */
     public ContextAttributes clone() throws CloneNotSupportedException {
         ContextAttributes clone = (ContextAttributes) super.clone();
         clone.m_type = m_type.clone();
-        clone.m_indice = m_indice.clone();
-        clone.m_name = m_name.clone();
         return clone;
     }
 }

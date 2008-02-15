@@ -73,39 +73,34 @@ public class Help extends AbstractCommand {
                         "Type", "Attributes usage"});
                 for (int c=0; c<ctxArray.length; c++) {
                     ContextInstance ctx = ctxArray[c];
-                    if (ctx.getIndice() == 0) {
-                        formatter.append(new String[] {ctx.getType(), ctx.getUsage()});
-                    }
+                    formatter.append(new String[] {ctx.getName(), ctx.getUsage()});
                 }
                 formatter.dump(System.out);
                 System.out.print(LEGENDE);
             } else if (arg.equals(ARG_SECURITY_DEFAULT)) {
                 ASCIITableFormatter formatter = new ASCIITableFormatter(new String[] {
-                        "Type", "Indice", "Name", "Default attributes"});
+                        "Type", "Default attributes"});
                 for (int c=0; c<ctxArray.length; c++) {
                     ContextInstance ctx = ctxArray[c];
                     for (int a=0; a<ctx.getAttributeCount(); a++) {
-                        String type = (a==0 ? ctx.getType() : null);
-                        String indice = (a==0 ? ""+ctx.getIndice() : null);
-                        String name = (a==0 ? ctx.getName() : null);
                         String attribute = ctx.getAttribute(a).getName()+" = "+ctx.getAttribute(a).getValue();
-                        formatter.append(new String[] {type, indice, name, attribute});
+                        formatter.append(new String[] {(a==0 ? ctx.getName() : null), attribute});
                     }
                 }
                 formatter.dump(System.out);
             } else if (arg.equals(ARG_SECURITY_MISSING)) {
                 ASCIITableFormatter formatter = new ASCIITableFormatter(new String[] {
-                        "Type", "Indice", "Name", "Missing attributes"});
+                        "Type", "Missing attributes"});
                 for (int c=0; c<ctxArray.length; c++) {
                     ContextInstance ctx = ctxArray[c];
                     Map attributes = new HashMap();
                     for (int i=0; i<ctx.getAttributeCount(); i++) {
                         attributes.put(ctx.getAttribute(i).getName(), ctx.getAttribute(i).getValue());
                     }
-                    SecurityAdaptorBuilder adaptor = SecurityAdaptorBuilderFactory.getInstance().getSecurityAdaptorBuilder(ctx.getType());
-                    Usage missing = adaptor.getUsage().getMissingValues(attributes);
-                    formatter.append(new String[] {ctx.getType(), ""+ctx.getIndice(), ctx.getName(),
-                            (missing!=null ? missing.toString() : null)});
+                    SecurityAdaptorBuilder adaptor = SecurityAdaptorBuilderFactory.getInstance().getSecurityAdaptorBuilder(ctx.getName());
+                    Usage usage = adaptor.getUsage();
+                    Usage missing = (usage!=null ? usage.getMissingValues(attributes) : null);
+                    formatter.append(new String[] {ctx.getName(), (missing!=null ? missing.toString() : null)});
                 }
                 formatter.dump(System.out);
                 System.out.print(LEGENDE);
@@ -183,11 +178,7 @@ public class Help extends AbstractCommand {
         String[] strArray = new String[ctxArray.length];
         for (int c=0; c<ctxArray.length; c++) {
             ContextInstanceRef ctx = ctxArray[c];
-            if (ctx.getName() != null) {
-                strArray[c] = ctx.getName();
-            } else {
-                strArray[c] = ctx.getType()+"["+ctx.getIndice()+"]";
-            }
+            strArray[c] = ctx.getName();
         }
         // string array to comma-separated string
         return StringArray.arrayToString(strArray, ", ");

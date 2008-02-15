@@ -30,45 +30,47 @@ public class JobContextSelector extends ContextSelector {
         super(session);
     }
 
-    public String selectContextByURI_as_fragment(URL url) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        ContextImpl context = this.selectContextByURI(url);
-        return context.getContextId();
-    }
-
     public ContextImpl selectContextByURI(URL url) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        ContextImpl[] candidates = this.listContextByURI(url);
-        switch(candidates.length) {
-            case 0:
-                return null;
-            case 1:
-                return candidates[0];
-            default:
-                //todo: try all candidates to resolve ambiguity
-                throw new AmbiguityException("Several contexts matched for URL:"+url.toString());
-        }
-    }
-
-    private ContextImpl[] listContextByURI(URL url) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         JobserviceEngineConfiguration config = Configuration.getInstance().getConfigurations().getJobserviceCfg();
         ContextInstanceRef[] refArray = config.listContextInstanceCandidates(url);
-        if (refArray.length > 0) {
-            List ctxList = new ArrayList();
-            for (int i=0; i<refArray.length; i++) {
-                ContextInstanceRef ref = refArray[i];
-                ContextImpl context = super.selectContextByTypeIndice(ref.getType(), ""+ref.getIndice());
+        switch(refArray.length) {
+            case 0:
+            {
+                return null;
+            }
+            case 1:
+            {
+                ContextInstanceRef ref = refArray[0];
+                ContextImpl context = super.selectContextByName(ref.getName());
                 try {
                     context.getAdaptor();
-                    ctxList.add(context);
-                } catch(Exception e) {/*ignore*/}
+                } catch(Exception e) {
+                    throw new NoSuccess("Invalid context: "+ref.getName(), e);
+                }
+                return context;
             }
-            switch(ctxList.size()) {
-                case 0:
-                    throw new NoSuccess("None of the candidate security contexts is valid for URL: "+url.toString());
-                default:
-                    return (ContextImpl[]) ctxList.toArray(new ContextImpl[ctxList.size()]);
+            default:
+            {
+                List ctxList = new ArrayList();
+                for (int i=0; i<refArray.length; i++) {
+                    ContextInstanceRef ref = refArray[i];
+                    ContextImpl context = super.selectContextByName(ref.getName());
+                    try {
+                        context.getAdaptor();
+                        ctxList.add(context);
+                    } catch(Exception e) {
+                        // ignore invalid contexts
+                    }
+                }
+                switch(ctxList.size()) {
+                    case 0:
+                        throw new NoSuccess("None of the candidate security contexts is valid for URL: "+url.toString());
+                    case 1:
+                        return (ContextImpl) ctxList.get(0);
+                    default:
+                        throw new AmbiguityException("Several contexts matched for URL:"+url.toString());
+                }
             }
-        } else {
-            return new ContextImpl[0];
         }
     }
 }

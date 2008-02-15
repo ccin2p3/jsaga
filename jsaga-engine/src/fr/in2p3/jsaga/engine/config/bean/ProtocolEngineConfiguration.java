@@ -91,7 +91,7 @@ public class ProtocolEngineConfiguration {
     public ContextInstanceRef[] listContextInstanceCandidates(Protocol protocol, String hostname, String fragment) throws NoSuccess {
         ContextEngineConfiguration config = Configuration.getInstance().getConfigurations().getContextCfg();
         if (fragment != null) {
-            ContextInstance[] ctxArray = config.listContextInstanceArrayById(fragment);
+            ContextInstance[] ctxArray = config.listContextInstanceArray(fragment);
             switch(ctxArray.length) {
                 case 0:
                     throw new NoSuccess("No context instance matches: "+fragment);
@@ -116,7 +116,7 @@ public class ProtocolEngineConfiguration {
                 List list = new ArrayList();
                 for (int c=0; c<protocol.getSupportedContextTypeCount(); c++) {
                     String type = protocol.getSupportedContextType(c);
-                    ContextInstance[] ctxArray = config.listContextInstanceArray(type);
+                    ContextInstance[] ctxArray = config.listContextInstanceArrayByType(type);
                     ContextInstanceRef[] refArray = toContextInstanceRefArray(ctxArray);
                     for (int i=0; i<refArray.length; i++) {
                         list.add(refArray[i]);
@@ -152,8 +152,6 @@ public class ProtocolEngineConfiguration {
     }
     private static ContextInstanceRef toContextInstanceRef(ContextInstance ctx) {
         ContextInstanceRef ref = new ContextInstanceRef();
-        ref.setType(ctx.getType());
-        ref.setIndice(ctx.getIndice());
         ref.setName(ctx.getName());
         return ref;
     }

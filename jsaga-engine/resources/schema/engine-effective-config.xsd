@@ -40,9 +40,7 @@
         </choice>
     </complexType>
     <element name="contextInstanceRef"><complexType>
-        <attribute name="type" type="string" use="required"/>
-        <attribute name="indice" type="int" use="required"/>
-        <attribute name="name" type="string" use="optional"/>
+        <attribute name="name" type="string" use="required"/>
     </complexType></element>
 
     <!-- main types -->
@@ -52,11 +50,10 @@
     </complexType></element>
 
     <element name="contextInstance"><complexType><complexContent><extension base="tns:ObjectType">
+        <attribute name="name" type="string" use="required"/><!-- from adaptor descriptor -->
         <attribute name="type" type="string" use="required"/><!-- from adaptor descriptor -->
         <attribute name="impl" type="string" use="required"/><!-- from adaptor descriptor -->
         <attribute name="usage" type="string" use="optional"/><!-- from adaptor descriptor -->
-        <attribute name="indice" type="int" use="optional"/>
-        <attribute name="name" type="string" use="optional"/>
     </extension></complexContent></complexType></element>
 
     <element name="protocol"><complexType><complexContent><extension base="tns:ObjectType">
@@ -108,11 +105,11 @@
             </extension></complexContent></complexType></element>
             <element ref="tns:contextInstanceRef" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
+        <attribute name="scheme" type="string" use="required"/><!-- from adaptor descriptor -->
         <attribute name="type" type="string" use="required"/><!-- from adaptor descriptor -->
         <attribute name="impl" type="string" use="required"/><!-- from adaptor descriptor -->
         <attribute name="bulk" type="boolean" use="required"/><!-- from adaptor descriptor -->
         <attribute name="usage" type="string" use="optional"/><!-- from adaptor descriptor -->
-        <attribute name="name" type="string" use="optional"/>
         <attribute name="path" type="string" use="optional"/>
     </extension></complexContent></complexType></element>
     <complexType name="FileManagementWorkerType"><simpleContent><extension base="string"><!-- should be CDATA -->
