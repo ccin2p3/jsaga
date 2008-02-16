@@ -8,6 +8,8 @@ import fr.in2p3.jsaga.engine.job.monitor.request.JobStatusRequestor;
 import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 
+import java.util.Timer;
+
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -24,6 +26,7 @@ public class JobMonitorService {
     private URL m_url;
     private JobStatusRequestor m_requestor;
     private JobRegistry m_registry;
+    private Timer m_timer;
 
     /** constructor */
     public JobMonitorService(URL url, JobMonitorAdaptor adaptor) throws NotImplemented, Timeout, NoSuccess {
@@ -39,16 +42,19 @@ public class JobMonitorService {
         } else if (adaptor instanceof ListenIndividualJob) {
             m_registry = new IndividualJobStatusListener((ListenIndividualJob)adaptor, m_requestor);
         } else if (adaptor instanceof QueryJob) {
+            AbstractJobStatusPoller poller;
             if (adaptor instanceof QueryFilteredJob) {
-                m_registry = new FilteredJobStatusPoller((QueryFilteredJob)adaptor);
+                poller = new FilteredJobStatusPoller((QueryFilteredJob)adaptor);
             } else if (adaptor instanceof QueryListJob) {
-                m_registry = new ListJobStatusPoller((QueryListJob)adaptor);
+                poller = new ListJobStatusPoller((QueryListJob)adaptor);
             } else if (adaptor instanceof QueryIndividualJob) {
-                m_registry = new IndividualJobStatusPoller((QueryIndividualJob)adaptor);
+                poller = new IndividualJobStatusPoller((QueryIndividualJob)adaptor);
             } else {
                 throw new NotImplemented("Querying job status not implemented for adaptor: "+adaptor.getClass().getName());
             }
-            //todo: start the timer...
+            m_registry = poller;
+            m_timer = new Timer();
+            m_timer.schedule(poller, 0, 1000);
         } else {
             throw new NotImplemented("Adaptor does not implement any monitoring interface: "+adaptor.getClass().getName());
         }
@@ -57,7 +63,7 @@ public class JobMonitorService {
     /** destructor */
     protected void finalize() throws Throwable {
         super.finalize();
-        //todo: stop the timer
+        m_timer.cancel();
     }
 
     public URL getURL() {
