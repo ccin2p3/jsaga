@@ -68,7 +68,7 @@ public class JobDescriptionTest extends AbstractJobTest {
         this.change(JobDescription.CLEANUP, JobDescription.FALSE);
     }
     public void test_totalCPUTime() throws Exception {
-        this.change(JobDescription.TOTALCPUTIME, "2");
+        this.change(JobDescription.TOTALCPUTIME, "120");
     }
     public void test_totalPhysicalMemory() throws Exception {
         this.change(JobDescription.TOTALPHYSICALMEMORY, "2048");
@@ -108,7 +108,7 @@ public class JobDescriptionTest extends AbstractJobTest {
         m_jobDescription.setVectorAttribute(JobDescription.FILETRANSFER, new String[]{"myfile>myf", "file1<f1"});
         m_jobDescription.setAttribute(JobDescription.CLEANUP, JobDescription.FALSE);
         // JobDescription.JOBSTARTTIME is not supported by JSAGA
-        m_jobDescription.setAttribute(JobDescription.TOTALCPUTIME, "1");
+        m_jobDescription.setAttribute(JobDescription.TOTALCPUTIME, "60");
         m_jobDescription.setAttribute(JobDescription.TOTALPHYSICALMEMORY, "1024");
         m_jobDescription.setVectorAttribute(JobDescription.CPUARCHITECTURE, new String[]{"x86", "x86_32"});
         m_jobDescription.setVectorAttribute(JobDescription.OPERATINGSYSTEMTYPE, new String[]{"LINUX", "WIN95"});
