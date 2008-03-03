@@ -4,11 +4,8 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.advanced.SignalableJobAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.advanced.SuspendableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.globus.gram.*;
-import org.globus.gram.internal.GRAMConstants;
 import org.globus.gram.internal.GRAMProtocolErrorConstants;
 import org.globus.rsl.*;
 import org.ietf.jgss.GSSException;
@@ -29,7 +26,7 @@ import java.util.Map;
 /**
  *
  */
-public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract implements JobControlAdaptor, SuspendableJobAdaptor, SignalableJobAdaptor {
+public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract implements JobControlAdaptor {
     private static final String SHELLPATH = "ShellPath";
     private Map m_parameters;
 
@@ -80,7 +77,8 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
         }
         GramJob job = new GramJob(m_credential, rslTree.toRSL(true));
         try {
-            Gram.request(m_serverUrl, job);
+        	// boolean set if the job is not interactive
+            Gram.request(m_serverUrl, job, false);
         } catch (GramException e) {
             this.rethrowException(e);
         } catch (GSSException e) {
@@ -105,7 +103,7 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
         }
     }
 
-    public boolean suspend(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess {
+    /*public boolean suspend(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess {
         return this.signal(nativeJobId, GRAMConstants.SIGNAL_SUSPEND);
     }
 
@@ -129,7 +127,7 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
             throw new NoSuccess(e);
         }
         return errorCode==0;
-    }
+    }*/
 
     private void rethrowException(GramException e) throws PermissionDenied, Timeout, NoSuccess {
         switch(e.getErrorCode()) {
