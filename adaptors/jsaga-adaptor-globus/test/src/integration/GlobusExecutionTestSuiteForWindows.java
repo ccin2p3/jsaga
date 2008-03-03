@@ -46,6 +46,7 @@ public class GlobusExecutionTestSuiteForWindows extends TestSuite {
         public void test_resume_running() { System.out.println("the test_resume_running ignored : personal gatekeeper does not support this"); };
         public void test_suspend_done() { System.out.println("the test_suspend_done ignored : personal gatekeeper does not support this"); };
         public void test_suspend_running() { System.out.println("the test_resume_running ignored : personal gatekeeper does not support this"); };
+        public void test_listJob() { System.out.println("the test_listJob ignored : personal gatekeeper does not support this but MUST BE REACTIVATED when the jsaga-engine will support this"); };
     }
     
  	// test cases
