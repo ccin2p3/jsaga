@@ -48,6 +48,10 @@ public abstract class AbstractTest extends TestCase {
         return m_properties.getProperty(protocol+"."+name);
     }
 
+    protected String getOptionalProperty(String protocol, String name, String defaultValue) {
+        return m_properties.getProperty(protocol+"."+name, defaultValue);
+    }
+
     protected String getRequiredProperty(String protocol, String name) throws Exception {
         String value = m_properties.getProperty(protocol+"."+name);
         if (value != null) {
