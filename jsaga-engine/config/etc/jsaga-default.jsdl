@@ -1,0 +1,27 @@
+<JobDefinition xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl" xmlns:ext="http://www.in2p3.fr/jsdl-extension">
+    <JobDescription>
+        <Resources/><!-- <Resources> is needed for automatically adding <Tag> elements -->
+        <DataStaging>
+            <FilesystemName>WorkingDirectory</FilesystemName>
+            <CreationFlag>dontOverwrite</CreationFlag>
+            <DeleteOnTermination>true</DeleteOnTermination>
+            <ext:CopyLocally>false</ext:CopyLocally>
+        </DataStaging>
+        <ext:JobRetry INSERT="true"><!-- @INSERT enables adding <JobRetry> if missing -->
+            <ext:Retry status="queued" maxTime="PT80S">3</ext:Retry>
+            <ext:Retry status="running" maxTime="PT6M">2</ext:Retry>
+            <ext:Retry status="failed">1</ext:Retry>
+        </ext:JobRetry>
+        <ext:SelectedResource>
+            <ext:StandaloneWorker>false</ext:StandaloneWorker>
+        </ext:SelectedResource>
+    </JobDescription>
+    <ext:JobCollection>
+        <ext:Termination INSERT="true">
+            <ext:Abort failed="0.2"/>
+            <ext:Abort aborted="0.2"/>
+            <ext:Abort maxTime="PT2H"/>
+            <ext:Complete maxTime="PT20M" completed="1.0"/>
+        </ext:Termination>
+    </ext:JobCollection>
+</JobDefinition>
