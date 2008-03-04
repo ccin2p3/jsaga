@@ -16,10 +16,11 @@
 
   <!-- aggregation -->
   <modules>
+    <module>jsaga-adaptor-default</module>
     <module>jsaga-adaptor-classic</module>
     <module>jsaga-adaptor-globus</module>
     <module>jsaga-adaptor-voms</module>
     <module>jsaga-adaptor-srm</module>
-    <!--<module>jsaga-adaptor-jdl</module>--><!-- MUST BE BUILT SEPARATELY (bug in javacc-maven-plugin) -->
+    <module>jsaga-adaptor-jdl</module>
   </modules>
 </project>
