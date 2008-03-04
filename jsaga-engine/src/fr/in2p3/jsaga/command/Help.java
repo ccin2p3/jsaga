@@ -4,6 +4,7 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptorBuilder;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.config.bean.EngineConfiguration;
+import fr.in2p3.jsaga.engine.config.bean.ServiceEngineConfigurationAbstract;
 import fr.in2p3.jsaga.engine.factories.SecurityAdaptorBuilderFactory;
 import fr.in2p3.jsaga.engine.schema.config.*;
 import fr.in2p3.jsaga.helpers.ASCIITableFormatter;
@@ -62,7 +63,7 @@ public class Help extends AbstractCommand {
         {
             String arg = line.getOptionValue(OPT_SECURITY);
 
-            ContextInstance[] ctxArray = config.getContextCfg().toXMLArray();
+            Context[] ctxArray = config.getContextCfg().toXMLArray();
             String LEGENDE = "\nwhere:\n"+
                     "\t_Attribute_\tcan not be entered from the prompt\n"+
                     "\t*Attribute*\tis a hidden attribute\n"+
@@ -72,7 +73,7 @@ public class Help extends AbstractCommand {
                 ASCIITableFormatter formatter = new ASCIITableFormatter(new String[] {
                         "Type", "Attributes usage"});
                 for (int c=0; c<ctxArray.length; c++) {
-                    ContextInstance ctx = ctxArray[c];
+                    Context ctx = ctxArray[c];
                     formatter.append(new String[] {ctx.getName(), ctx.getUsage()});
                 }
                 formatter.dump(System.out);
@@ -81,7 +82,7 @@ public class Help extends AbstractCommand {
                 ASCIITableFormatter formatter = new ASCIITableFormatter(new String[] {
                         "Type", "Default attributes"});
                 for (int c=0; c<ctxArray.length; c++) {
-                    ContextInstance ctx = ctxArray[c];
+                    Context ctx = ctxArray[c];
                     for (int a=0; a<ctx.getAttributeCount(); a++) {
                         String attribute = ctx.getAttribute(a).getName()+" = "+ctx.getAttribute(a).getValue();
                         formatter.append(new String[] {(a==0 ? ctx.getName() : null), attribute});
@@ -92,7 +93,7 @@ public class Help extends AbstractCommand {
                 ASCIITableFormatter formatter = new ASCIITableFormatter(new String[] {
                         "Type", "Missing attributes"});
                 for (int c=0; c<ctxArray.length; c++) {
-                    ContextInstance ctx = ctxArray[c];
+                    Context ctx = ctxArray[c];
                     Map attributes = new HashMap();
                     for (int i=0; i<ctx.getAttributeCount(); i++) {
                         attributes.put(ctx.getAttribute(i).getName(), ctx.getAttribute(i).getValue());
@@ -112,44 +113,31 @@ public class Help extends AbstractCommand {
         {
             Protocol[] protocolArray = config.getProtocolCfg().toXMLArray();
             ASCIITableFormatter formatter = new ASCIITableFormatter(new String[] {
-                    "Protocol", "Aliases / Host patterns", "Ambiguous security contexts"});
+                    "Protocol", "Aliases / Host pattern", "Service name"});
             for (int p=0; p<protocolArray.length; p++) {
                 Protocol protocol = protocolArray[p];
-                Set hostnameSet = getHostnames(protocol);
-                if (hostnameSet.size() == 1) {
-                    ContextInstanceRef[] ctxArray = config.getProtocolCfg().listContextInstanceCandidates(protocol, "*.*", null);
-                    formatter.append(new String[] {
-                            protocol.getScheme(),
-                            StringArray.arrayToString(protocol.getSchemeAlias(), ","),
-                            ctxArray.length>1 ? contextArrayToString(ctxArray) : null});
-                } else {
-                    formatter.append(new String[] {
-                            protocol.getScheme(),
-                            StringArray.arrayToString(protocol.getSchemeAlias(), ","),
-                            null});
-                    for (Iterator it= hostnameSet.iterator(); it.hasNext(); ) {
-                        String hostname = (String) it.next();
-                        ContextInstanceRef[] ctxArray = config.getProtocolCfg().listContextInstanceCandidates(protocol, hostname, null);
-                        if (ctxArray.length > 1) {
-                            formatter.append(new String[] {
-                                    null,
-                                    "    "+hostname,
-                                    contextArrayToString(ctxArray)});
-                        }
-                    }
-                }
+                printHostnames(
+                        formatter,
+                        protocol.getScheme(),
+                        StringArray.arrayToString(protocol.getSchemeAlias(), ","),
+                        config.getProtocolCfg(),
+                        protocol.getMapping());
             }
             formatter.dump(System.out);
         }
         else if (line.hasOption(OPT_JOB))
         {
-            Jobservice[] jobArray = config.getJobserviceCfg().toXMLArray();
+            Execution[] jobArray = config.getJobserviceCfg().toXMLArray();
             ASCIITableFormatter formatter = new ASCIITableFormatter(new String[] {
-                    "Type", "Path"});
+                    "Execution", "Aliases / Host pattern", "Service name"});
             for (int i=0; i<jobArray.length; i++) {
-                Jobservice job = jobArray[i];
-                formatter.append(new String[] {
-                        job.getType(), job.getPath()});
+                Execution job = jobArray[i];
+                printHostnames(
+                        formatter,
+                        job.getScheme(),
+                        StringArray.arrayToString(job.getSchemeAlias(), ","),
+                        config.getJobserviceCfg(),
+                        job.getMapping());
             }
             formatter.dump(System.out);
         }
@@ -159,25 +147,54 @@ public class Help extends AbstractCommand {
         }
     }
 
-    private static Set getHostnames(Protocol protocol) {
+    private static void printHostnames(ASCIITableFormatter formatter, String column1, String column2, ServiceEngineConfigurationAbstract config, Mapping mapping) throws Exception {
+        Set hostnameSet = getHostnames(mapping);
+        if (hostnameSet.size() == 1) {
+            ServiceRef[] serviceRefs = config.listServiceRefByHostname(mapping, "*.*");
+            formatter.append(new String[] {
+                    column1,
+                    column2,
+                    serviceRefs.length>0 ? serviceRefArrayToString(serviceRefs) : null});
+        } else {
+            formatter.append(new String[] {
+                    column1,
+                    column2,
+                    null});
+            for (Iterator it= hostnameSet.iterator(); it.hasNext(); ) {
+                String hostname = (String) it.next();
+                ServiceRef[] serviceRefs = config.listServiceRefByHostname(mapping, hostname);
+                if (serviceRefs.length > 0) {
+                    formatter.append(new String[] {
+                            null,
+                            "    "+hostname,
+                            serviceRefArrayToString(serviceRefs)});
+                }
+            }
+        }
+    }
+
+    private static Set getHostnames(Mapping mapping) {
         Set hostnameSet = new HashSet();
-        for (int d=0; d<protocol.getDomainCount(); d++) {
-            Domain domain = protocol.getDomain(d);
+        for (int d=0; d<mapping.getDomainCount(); d++) {
+            Domain domain = mapping.getDomain(d);
             for (int h=0; h<domain.getHostCount(); h++) {
                 Host host = domain.getHost(h);
-                hostnameSet.add(host.getName()+"*."+domain.getName());
+                hostnameSet.add(host.getPrefix()+"*"+getDomain(domain.getName()));
             }
-            hostnameSet.add("*."+domain.getName());
+            hostnameSet.add("*"+getDomain(domain.getName()));
         }
         hostnameSet.add("*.*");
         return hostnameSet;
     }
+    private static String getDomain(String domainName) {
+        return (domainName!=null ? "."+domainName : "");
+    }
 
-    private static String contextArrayToString(ContextInstanceRef ctxArray[]) {
+    private static String serviceRefArrayToString(ServiceRef ctxArray[]) {
         // convert to string array
         String[] strArray = new String[ctxArray.length];
         for (int c=0; c<ctxArray.length; c++) {
-            ContextInstanceRef ctx = ctxArray[c];
+            ServiceRef ctx = ctxArray[c];
             strArray[c] = ctx.getName();
         }
         // string array to comma-separated string

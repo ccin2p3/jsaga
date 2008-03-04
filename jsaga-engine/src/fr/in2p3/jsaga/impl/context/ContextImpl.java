@@ -5,7 +5,6 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.*;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.factories.SecurityAdaptorBuilderFactory;
-import fr.in2p3.jsaga.engine.schema.config.ContextInstance;
 import fr.in2p3.jsaga.impl.attributes.AbstractAttributesImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -149,7 +148,7 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
         }
 
         // set default attributes with config
-        ContextInstance config = Configuration.getInstance().getConfigurations().getContextCfg().findContextInstance(
+        fr.in2p3.jsaga.engine.schema.config.Context config = Configuration.getInstance().getConfigurations().getContextCfg().findContext(
                 m_attributes.m_type.getObject());
         try {
             // set default attributes, from effective configuration

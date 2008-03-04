@@ -57,15 +57,11 @@ public class JobFactoryImpl extends JobFactory {
             controlAdaptor = m_adaptorFactory.getJobControlAdaptor(rm, session);
         } catch (BadParameter e) {
             throw new NoSuccess(e);
-        } catch (IncorrectState e) {
-            throw new NoSuccess(e);
         }
         JobMonitorService monitorService;
         try {
             monitorService = m_monitorServiceFactory.getJobMonitorService(rm, session);
         } catch (BadParameter e) {
-            throw new NoSuccess(e);
-        } catch (IncorrectState e) {
             throw new NoSuccess(e);
         }
         return new JobServiceImpl(session, rm, controlAdaptor, monitorService);
