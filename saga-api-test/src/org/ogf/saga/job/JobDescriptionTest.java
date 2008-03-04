@@ -32,6 +32,7 @@ public class JobDescriptionTest extends AbstractJobTest {
         this.change(JobDescription.ARGUMENTS, new String[]{"arg", "arg2"});
     }
     public void test_spmdVariation() throws Exception {
+    	// TODO : get first value
         this.change(JobDescription.SPMDVARIATION, "MPICH2");
     }
     public void test_totalCPUCount() throws Exception {
@@ -94,7 +95,7 @@ public class JobDescriptionTest extends AbstractJobTest {
         // attributes to be supported by the adaptor
         m_jobDescription.setAttribute(JobDescription.EXECUTABLE, "/bin/executable1");
         m_jobDescription.setVectorAttribute(JobDescription.ARGUMENTS, new String[]{"arg", "arg1"});
-        m_jobDescription.setAttribute(JobDescription.SPMDVARIATION, "MPICH1");
+        m_jobDescription.setAttribute(JobDescription.SPMDVARIATION, "None");
         m_jobDescription.setAttribute(JobDescription.TOTALCPUCOUNT, "1");
         m_jobDescription.setAttribute(JobDescription.NUMBEROFPROCESSES, "2");
         m_jobDescription.setAttribute(JobDescription.PROCESSESPERHOST, "1");
