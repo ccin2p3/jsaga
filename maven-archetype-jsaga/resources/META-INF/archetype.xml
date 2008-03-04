@@ -2,7 +2,6 @@
     <id>maven-archetype-jsaga</id>
     <sources>
         <source>src/data/MyProtocolDataAdaptor.java</source>
-        <source>src/site/site.xml</source>
     </sources>
     <testSources>
         <source>test/src/data/MyProtocolDataAdaptorTest.java</source>
@@ -10,6 +9,7 @@
     <resources>
         <resource>resources/META-INF/adaptor.properties</resource>
         <resource>profiles.xml</resource>
+        <resource>src/site/site.xml</resource>
     </resources>
     <testResources>
         <resource>test/resources/saga-test.properties</resource>
