@@ -1,7 +1,6 @@
 package fr.in2p3.jsaga.impl.session;
 
 import fr.in2p3.jsaga.engine.config.Configuration;
-import fr.in2p3.jsaga.engine.schema.config.ContextInstance;
 import fr.in2p3.jsaga.impl.context.ContextFactoryImpl;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.session.Session;
@@ -25,10 +24,10 @@ public class SessionFactoryImpl extends SessionFactory {
         if (defaults) {
             try {
                 // load config
-                ContextInstance[] xmlInstanceArray = Configuration.getInstance().getConfigurations().getContextCfg().toXMLArray();
+                fr.in2p3.jsaga.engine.schema.config.Context[] xmlInstanceArray = Configuration.getInstance().getConfigurations().getContextCfg().toXMLArray();
 
                 // create default contexts
-                for (ContextInstance xmlInstance : xmlInstanceArray) {
+                for (fr.in2p3.jsaga.engine.schema.config.Context xmlInstance : xmlInstanceArray) {
                     // create context
                     Context context = ContextFactoryImpl.createContext();   //NOTE: no type here, else setDefaults() is invoked
                     context.setAttribute(Context.TYPE, xmlInstance.getName());
