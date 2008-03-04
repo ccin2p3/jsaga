@@ -1,7 +1,6 @@
 package fr.in2p3.jsaga.command;
 
 import fr.in2p3.jsaga.engine.config.Configuration;
-import fr.in2p3.jsaga.engine.schema.config.ContextInstance;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.apache.commons.cli.*;
 import org.ogf.saga.context.Context;
@@ -49,7 +48,7 @@ public class ContextDestroy extends AbstractCommand {
         else if (command.m_nonOptionValues.length == 1)
         {
             String id = command.m_nonOptionValues[0];
-            ContextInstance[] xmlContext = Configuration.getInstance().getConfigurations().getContextCfg().listContextInstanceArray(id);
+            fr.in2p3.jsaga.engine.schema.config.Context[] xmlContext = Configuration.getInstance().getConfigurations().getContextCfg().listContextsArray(id);
             for (int i=0; i<xmlContext.length; i++) {
                 Context context = ContextFactory.createContext();
                 context.setAttribute(Context.TYPE, xmlContext[i].getName());

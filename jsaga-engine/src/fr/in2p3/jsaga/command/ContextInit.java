@@ -2,7 +2,6 @@ package fr.in2p3.jsaga.command;
 
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.schema.config.Attribute;
-import fr.in2p3.jsaga.engine.schema.config.ContextInstance;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.apache.commons.cli.*;
 import org.ogf.saga.context.Context;
@@ -46,7 +45,7 @@ public class ContextInit extends AbstractCommand {
             Context[] contexts = session.listContexts();
             for (int i=0; i<contexts.length; i++) {
                 // get context configuration
-                ContextInstance xmlContext = Configuration.getInstance().getConfigurations().getContextCfg().findContextInstance(
+                fr.in2p3.jsaga.engine.schema.config.Context xmlContext = Configuration.getInstance().getConfigurations().getContextCfg().findContext(
                         contexts[i].getAttribute(Context.TYPE));
 
                 // set UserPass attribute
@@ -60,7 +59,7 @@ public class ContextInit extends AbstractCommand {
         else if (command.m_nonOptionValues.length == 1)
         {
             String id = command.m_nonOptionValues[0];
-            ContextInstance[] xmlContexts = Configuration.getInstance().getConfigurations().getContextCfg().listContextInstanceArray(id);
+            fr.in2p3.jsaga.engine.schema.config.Context[] xmlContexts = Configuration.getInstance().getConfigurations().getContextCfg().listContextsArray(id);
             for (int i=0; i<xmlContexts.length; i++) {
                 // set context
                 Context context = ContextFactory.createContext();
@@ -79,7 +78,7 @@ public class ContextInit extends AbstractCommand {
         }
     }
 
-    private static void setUserPass(Context context, ContextInstance config) throws Exception {
+    private static void setUserPass(Context context, fr.in2p3.jsaga.engine.schema.config.Context config) throws Exception {
         if (config.getUsage()!=null && config.getUsage().contains(Context.USERPASS) && !containsUserPass(config)) {
             // prompt for UserPass
             System.out.println("Enter UserPass for security context: "+context.getAttribute(Context.TYPE));
@@ -92,7 +91,7 @@ public class ContextInit extends AbstractCommand {
         }
     }
 
-    private static boolean containsUserPass(ContextInstance config) {
+    private static boolean containsUserPass(fr.in2p3.jsaga.engine.schema.config.Context config) {
         for (int i=0; i<config.getAttributeCount(); i++) {
             Attribute attr = config.getAttribute(i);
             if (attr.getName().equals(Context.USERPASS)) {
