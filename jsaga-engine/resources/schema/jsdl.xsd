@@ -161,7 +161,7 @@ This document and the information contained herein is provided on an "AS IS" bas
 	<!--=====================================================================-->
 	<xsd:complexType name="JobDefinition_Type">
 		<xsd:sequence>
-			<xsd:element ref="jsdl:JobDescription" maxOccurs="unbounded"/><!-- JSAGA modification -->
+			<xsd:element ref="jsdl:JobDescription"/>
 			<xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
 		<xsd:attribute name="id" type="xsd:ID" use="optional"/>
