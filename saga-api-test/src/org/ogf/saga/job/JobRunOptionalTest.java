@@ -3,6 +3,7 @@ package org.ogf.saga.job;
 import java.util.List;
 
 import org.ogf.saga.error.IncorrectState;
+import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.job.abstracts.AbstractJobTest;
 import org.ogf.saga.task.State;
@@ -223,7 +224,7 @@ public class JobRunOptionalTest extends AbstractJobTest {
     	for (int i = 0; i < numberOfJobs; i++) {
     		if(newJob[i].getException() != null) {
     			allJobsAreDone = false;
-    			System.err.println("The job number "+i+" is failed:"+newJob[i].getException().getMessage());
+    			throw new NoSuccess("The job number "+i+" is failed:"+newJob[i].getException().getMessage());
     		}
 		}
     	
