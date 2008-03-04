@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.engine.config;
 
 import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.engine.config.adaptor.AdaptorDescriptors;
+import fr.in2p3.jsaga.engine.config.attributes.*;
 import fr.in2p3.jsaga.engine.config.bean.EngineConfiguration;
 import fr.in2p3.jsaga.engine.schema.config.EffectiveConfig;
 import fr.in2p3.jsaga.helpers.MD5Digester;
@@ -13,8 +14,10 @@ import org.exolab.castor.xml.Unmarshaller;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Source;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 
 /* ***************************************************
@@ -36,9 +39,11 @@ public class Configuration {
 
     private static final String ADAPTOR_DESCRIPTORS = "adaptor-descriptors";
     private static final String XI_RAW_CONFIG = "raw-config.xi";
-    private static final String XSL_FLATTEN_CONFIG_1 = "xsl/config/flatten-config-1.xsl";
-    private static final String XSL_FLATTEN_CONFIG_2 = "xsl/config/flatten-config-2.xsl";
-    private static final String XSL_MERGED_CONFIG = "xsl/config/merged-config.xsl";
+    private static final String XSL_1_DEAMBIGUISED_CONFIG = "xsl/config/1-deambiguised-config.xsl";
+    private static final String XSL_2_EXPANDED_CONFIG = "xsl/config/2-expanded-config.xsl";
+    private static final String XSL_3_FLATTEN_CONFIG = "xsl/config/3-flatten-config.xsl";
+    private static final String XSL_4_MERGED_CONFIG = "xsl/config/4-merged-config.xsl";
+    private static final String XSL_5_ENGINE_CONFIG = "xsl/config/5-engine-config.xsl";
 
     private static Configuration _instance = null;
 
@@ -90,11 +95,6 @@ public class Configuration {
             XMLFileParser parser = new XMLFileParser(new String[]{XSD_CONFIG});
             Document rawConfig = parser.parse(new ByteArrayInputStream(data), new File(baseDir, XI_RAW_CONFIG));
 
-            // transform config
-            XSLTransformerFactory tFactory = XSLTransformerFactory.getInstance();
-            data = tFactory.create(XSL_FLATTEN_CONFIG_1).transform(rawConfig);
-            data = tFactory.create(XSL_FLATTEN_CONFIG_2).transform(data);
-
             // parse adaptor descriptors document (Note: ignored by stylesheet if marshalled from EffectiveConfig)
 //            final String DEBUG = "xsl/config/descriptors.xml";
 //            Source desc = new javax.xml.transform.stream.StreamSource(Configuration.class.getClassLoader().getResourceAsStream(DEBUG));
@@ -102,9 +102,20 @@ public class Configuration {
             f.setNamespaceAware(true);
             Source desc = new DOMSource(f.newDocumentBuilder().parse(new ByteArrayInputStream(descBytes)));
 
-            // merge config and adaptor descriptors
-            Document doc = tFactory.create(XSL_MERGED_CONFIG, new ConfigurationURIResolver(desc)).transformToDOM(data);
+            // transform config
+            XSLTransformerFactory tFactory = XSLTransformerFactory.getInstance();
+            data = tFactory.create(XSL_1_DEAMBIGUISED_CONFIG).transform(rawConfig);
+            data = tFactory.create(XSL_2_EXPANDED_CONFIG).transform(data);
+            data = tFactory.create(XSL_3_FLATTEN_CONFIG).transform(data);
+            data = tFactory.create(XSL_4_MERGED_CONFIG, new ConfigurationURIResolver(desc)).transform(data);
+            Document doc = tFactory.create(XSL_5_ENGINE_CONFIG).transformToDOM(data);
+
+            // parse merged config
             mergedConfig = (EffectiveConfig) unmarshaller.unmarshal(doc);
+
+            // update attributes with system properties and adaptor usages
+            new SystemPropertiesAttributesParser(mergedConfig).updateAttributes();
+            new AdaptorUsageAttributesParser(mergedConfig, m_descriptors).updateAttributes();
 
             // save merged config to file
             LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
@@ -112,8 +123,25 @@ public class Configuration {
             Marshaller.marshal(mergedConfig, writer);
         }
 
+        // update attributes with user properties file and command line arguments
+        new FilePropertiesAttributesParser(mergedConfig).updateAttributes();
+        new CommandLineAttributesParser(mergedConfig).updateAttributes();
+
         // serialize config
-        m_configurations = new EngineConfiguration(mergedConfig, m_descriptors);
+        m_configurations = new EngineConfiguration(mergedConfig);
+
+        // generate job structure
+        File jobStructure = new File(Base.JSAGA_VAR, "jsaga-job-structure.xml");
+        if (!jobStructure.exists()) {
+            Transformer t = TransformerFactory.newInstance().newTransformer(new StreamSource(
+                    Configuration.class.getClassLoader().getResourceAsStream("xsl/jsaga-job-structure.xsl")));
+            t.setURIResolver(new URIResolver(){
+                public Source resolve(String href, String base) throws TransformerException {
+                    return new StreamSource(Configuration.class.getClassLoader().getResourceAsStream(href));
+                }
+            });
+            t.transform(new StreamSource(new ByteArrayInputStream("<dummy/>".getBytes())), new StreamResult(jobStructure));
+        }
     }
 
     public AdaptorDescriptors getDescriptors() {

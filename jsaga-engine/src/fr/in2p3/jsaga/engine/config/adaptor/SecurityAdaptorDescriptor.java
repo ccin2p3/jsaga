@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.engine.config.adaptor;
 
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptorBuilder;
-import fr.in2p3.jsaga.engine.schema.config.ContextInstance;
+import fr.in2p3.jsaga.engine.schema.config.Context;
 import org.ogf.saga.error.NoSuccess;
 
 import java.util.*;
@@ -23,13 +23,13 @@ public class SecurityAdaptorDescriptor {
     private Map m_builderClasses;
     private Map m_classes;
     private Map m_usages;
-    protected ContextInstance[] m_xml;
+    protected Context[] m_xml;
 
     public SecurityAdaptorDescriptor(Class[] adaptorClasses) throws IllegalAccessException, InstantiationException {
         m_builderClasses = new HashMap();
         m_classes = new HashMap();
         m_usages = new HashMap();
-        m_xml = new ContextInstance[adaptorClasses.length];
+        m_xml = new Context[adaptorClasses.length];
         for (int i=0; i<adaptorClasses.length; i++) {
             SecurityAdaptorBuilder adaptor = (SecurityAdaptorBuilder) adaptorClasses[i].newInstance();
 
@@ -93,8 +93,8 @@ public class SecurityAdaptorDescriptor {
         }
     }
 
-    private static ContextInstance toXML(SecurityAdaptorBuilder adaptor) {
-        ContextInstance ctx = new ContextInstance();
+    private static Context toXML(SecurityAdaptorBuilder adaptor) {
+        Context ctx = new Context();
         ctx.setName(adaptor.getType()); // default identifier
         ctx.setType(adaptor.getType());
         ctx.setImpl(adaptor.getClass().getName());

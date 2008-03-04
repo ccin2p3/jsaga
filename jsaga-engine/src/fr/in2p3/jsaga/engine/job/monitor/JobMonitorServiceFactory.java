@@ -30,7 +30,7 @@ public class JobMonitorServiceFactory {
         m_services = new HashMap<URL,JobMonitorService>();
     }
 
-    public JobMonitorService getJobMonitorService(URL controlURL, Session session) throws Timeout, PermissionDenied, IncorrectState, NoSuccess, BadParameter, IncorrectURL, AuthorizationFailed, NotImplemented, AuthenticationFailed {
+    public JobMonitorService getJobMonitorService(URL controlURL, Session session) throws Timeout, PermissionDenied, NoSuccess, BadParameter, IncorrectURL, AuthorizationFailed, NotImplemented, AuthenticationFailed {
         URL monitorURL = null;  //todo: get monitorURL from controlURL
         if (monitorURL == null) {
             monitorURL = controlURL;

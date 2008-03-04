@@ -3,13 +3,14 @@ package fr.in2p3.jsaga.engine.factories;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.engine.config.Configuration;
+import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.config.adaptor.JobAdaptorDescriptor;
 import fr.in2p3.jsaga.engine.config.adaptor.SecurityAdaptorDescriptor;
 import fr.in2p3.jsaga.engine.config.bean.JobserviceEngineConfiguration;
-import fr.in2p3.jsaga.engine.schema.config.Jobservice;
-import fr.in2p3.jsaga.engine.security.JobContextSelector;
+import fr.in2p3.jsaga.engine.schema.config.JobService;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.ogf.saga.URL;
+import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 
@@ -29,41 +30,30 @@ import java.util.Map;
 /**
  *
  */
-public class JobAdaptorFactory {
+public class JobAdaptorFactory extends ServiceAdaptorFactory {
     private JobAdaptorDescriptor m_descriptor;
     private JobserviceEngineConfiguration m_configuration;
 
     public JobAdaptorFactory(Configuration configuration) {
+        super(configuration.getConfigurations().getContextCfg());
         m_descriptor = configuration.getDescriptors().getJobDesc();
         m_configuration = configuration.getConfigurations().getJobserviceCfg();
     }
 
     /**
-     * Create a new instance of job control adaptor for URL <code>service</code> and connect to service.
-     * @param service the URL of the service
+     * Create a new instance of job control adaptor for URL <code>url</code> and connect to service.
+     * todo: cache job adaptor instances with "scheme://userInfo@host:port"
+     * @param url the URL of the service
      * @param session the security session
      * @return the job control adaptor instance
      */
-    public JobControlAdaptor getJobControlAdaptor(URL service, Session session) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        if (service==null || service.getScheme()==null) {
-            throw new IncorrectURL("Invalid entry name: "+service);
+    public JobControlAdaptor getJobControlAdaptor(URL url, Session session) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+        if (url==null || url.getScheme()==null) {
+            throw new IncorrectURL("Invalid entry name: "+url);
         }
-        ContextImpl context = new JobContextSelector(session).selectContextByURI(service);
-        if (context != null) {
-            return this.getJobControlAdaptor(service, context);
-        } else {
-            return this.getJobControlAdaptor(service, (ContextImpl)null);
-        }
-    }
 
-    /**
-     * Create a new instance of job control adaptor for URL <code>service</code> and connect to service.
-     * @param service the URL of the service
-     * @param context the security context
-     * @return the job control adaptor instance
-     */
-    private JobControlAdaptor getJobControlAdaptor(URL service, ContextImpl context) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        Jobservice config = m_configuration.findJobservice(service.getScheme());
+        // get config
+        JobService config = m_configuration.findJobService(url);
 
         // create instance
         Class clazz = m_descriptor.getClass(config.getType());
@@ -74,13 +64,45 @@ public class JobAdaptorFactory {
             throw new NoSuccess(e);
         }
 
-        // set security
+        // get security context
+        ContextImpl context;
+        if (config.getContextRef() != null) {
+            context = super.findContext(session, config.getContextRef());
+            if (context == null) {
+                throw new ConfigurationException("INTERNAL ERROR: effective-config may be inconsistent");
+            }
+        } else if (url.getFragment() != null) {
+            context = super.findContext(session, url.getFragment());
+            if (context == null) {
+                throw new NoSuccess("Security context not found: "+url.getFragment());
+            }
+        } else if (config.getSupportedContextTypeCount() > 0) {
+            context = super.findContext(session, config.getSupportedContextType());
+            if (context == null) {
+                throw new NoSuccess("None of the supported security context is valid");
+            }
+        } else {
+            context = null;
+        }
+
+        // set security adaptor
         if (context != null) {
-            SecurityAdaptor securityAdaptor = context.getAdaptor();
+            SecurityAdaptor securityAdaptor;
+            try {
+                securityAdaptor = context.getAdaptor();
+            } catch (IncorrectState e) {
+                String contextType;
+                try {
+                    contextType = context.getAttribute(Context.TYPE);
+                } catch (Exception e2) {
+                    throw new NoSuccess(e);
+                }
+                throw new NoSuccess("Bad security context: "+contextType, e);
+            }
             if (SecurityAdaptorDescriptor.isSupported(securityAdaptor.getClass(), jobAdaptor.getSupportedSecurityAdaptorClasses())) {
                 jobAdaptor.setSecurityAdaptor(securityAdaptor);
             } else {
-                throw new AuthenticationFailed("Security context class '"+ securityAdaptor.getClass().getName() +"' not supported for protocol: "+service.getScheme());
+                throw new AuthenticationFailed("Security context class '"+ securityAdaptor.getClass().getName() +"' not supported for protocol: "+url.getScheme());
             }
         }
 
@@ -91,8 +113,8 @@ public class JobAdaptorFactory {
         }
 
         // connect
-        int port = (service.getPort()>0 ? service.getPort() : jobAdaptor.getDefaultPort());
-        jobAdaptor.connect(service.getUserInfo(), service.getHost(), port, service.getPath(), attributes);
+        int port = (url.getPort()>0 ? url.getPort() : jobAdaptor.getDefaultPort());
+        jobAdaptor.connect(url.getUserInfo(), url.getHost(), port, url.getPath(), attributes);
         return jobAdaptor;
     }
 }

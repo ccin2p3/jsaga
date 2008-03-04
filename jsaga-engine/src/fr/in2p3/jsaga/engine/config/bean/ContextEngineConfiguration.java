@@ -1,11 +1,6 @@
 package fr.in2p3.jsaga.engine.config.bean;
 
-import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.engine.config.UserAttributesMap;
-import fr.in2p3.jsaga.engine.config.adaptor.SecurityAdaptorDescriptor;
-import fr.in2p3.jsaga.engine.schema.config.Attribute;
-import fr.in2p3.jsaga.engine.schema.config.ContextInstance;
-import org.ogf.saga.error.DoesNotExist;
+import fr.in2p3.jsaga.engine.schema.config.Context;
 import org.ogf.saga.error.NoSuccess;
 
 import java.util.ArrayList;
@@ -24,45 +19,19 @@ import java.util.List;
  *
  */
 public class ContextEngineConfiguration {
-    private ContextInstance[] m_contextInstance;
+    private Context[] m_context;
 
-    public ContextEngineConfiguration(ContextInstance[] config, SecurityAdaptorDescriptor desc, UserAttributesMap userAttributes) throws Exception {
-        m_contextInstance = config;
-        for (int i=0; m_contextInstance!=null && i<m_contextInstance.length; i++) {
-            ContextInstance ctx = m_contextInstance[i];
-
-            // update configured attributes with user attributes
-            this.updateAttributes(userAttributes, ctx, ctx.getType());  //common to all instances of this type
-            this.updateAttributes(userAttributes, ctx, ctx.getName());
-
-            // correct configured attributes according to usage
-            Usage usage = desc.getUsage(ctx.getType());
-            if (usage != null) {
-                for (int a=0; a<ctx.getAttributeCount(); a++) {
-                    Attribute attr = ctx.getAttribute(a);
-                    if (attr.getValue() != null) {
-                        try {
-                            attr.setValue(usage.correctValue(attr.getName(), attr.getValue()));
-                        } catch(DoesNotExist e) {}
-                    }
-                }
-            }
-        }
-    }
-    private void updateAttributes(UserAttributesMap userAttributes, ContextInstance ctx, String id) {
-        Attribute[] attributes = userAttributes.update(ctx.getAttribute(), id);
-        if (attributes != null) {
-            ctx.setAttribute(attributes);
-        }
+    public ContextEngineConfiguration(Context[] config) {
+        m_context = config;
     }
 
     /**
      * @param id may be a context or a context type
      * @throws NoSuccess if no match or ambiguity
      */
-    public ContextInstance findContextInstance(String id) throws NoSuccess {
+    public Context findContext(String id) throws NoSuccess {
         if (id != null) {
-            ContextInstance[] ctxArray = this.listContextInstanceArray(id);
+            Context[] ctxArray = this.listContextsArray(id);
             switch(ctxArray.length) {
                 case 0:
                     throw new NoSuccess("No context instance matches: "+id);
@@ -79,15 +48,15 @@ public class ContextEngineConfiguration {
     /**
      * @param id may be a context or a context type
      */
-    public ContextInstance[] listContextInstanceArray(String id) throws NoSuccess {
+    public Context[] listContextsArray(String id) throws NoSuccess {
         if (id != null) {
             // try by name
-            ContextInstance ctx = this.findContextInstanceByName(id);
+            Context ctx = this.findContextByName(id);
             if (ctx != null) {
-                return new ContextInstance[]{ctx};
+                return new Context[]{ctx};
             } else {
                 // try by type
-                return this.listContextInstanceArrayByType(id);
+                return this.listContextsArrayByType(id);
             }
         } else {
             throw new NoSuccess("Null context identifier");
@@ -98,12 +67,12 @@ public class ContextEngineConfiguration {
      * @return null if no match
      * @throws NoSuccess if null context name
      */
-    public ContextInstance findContextInstanceByName(String name) throws NoSuccess {
+    public Context findContextByName(String name) throws NoSuccess {
         if (name != null) {
-            for (int c=0; c<m_contextInstance.length; c++) {
-                ContextInstance xmlInstance = m_contextInstance[c];
-                if (xmlInstance.getName()!=null && xmlInstance.getName().equals(name)) {
-                    return xmlInstance;
+            for (int c=0; c<m_context.length; c++) {
+                Context context = m_context[c];
+                if (context.getName()!=null && context.getName().equals(name)) {
+                    return context;
                 }
             }
             return null;
@@ -116,22 +85,22 @@ public class ContextEngineConfiguration {
      * @return empty array if no match
      * @throws NoSuccess if null context type
      */
-    ContextInstance[] listContextInstanceArrayByType(String type) throws NoSuccess {
+    public Context[] listContextsArrayByType(String type) throws NoSuccess {
         if (type != null) {
             List list = new ArrayList();
-            for (int c=0; c<m_contextInstance.length; c++) {
-                ContextInstance xmlInstance = m_contextInstance[c];
-                if (xmlInstance.getType().equals(type)) {
-                    list.add(xmlInstance);
+            for (int c=0; c<m_context.length; c++) {
+                Context context = m_context[c];
+                if (context.getType().equals(type)) {
+                    list.add(context);
                 }
             }
-            return (ContextInstance[]) list.toArray(new ContextInstance[list.size()]);
+            return (Context[]) list.toArray(new Context[list.size()]);
         } else {
             throw new NoSuccess("Null context type");
         }
     }
 
-    public ContextInstance[] toXMLArray() {
-        return m_contextInstance;
+    public Context[] toXMLArray() {
+        return m_context;
     }
 }

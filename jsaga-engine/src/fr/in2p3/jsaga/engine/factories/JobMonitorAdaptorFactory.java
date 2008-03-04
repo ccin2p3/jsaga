@@ -3,10 +3,11 @@ package fr.in2p3.jsaga.engine.factories;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.engine.config.Configuration;
+import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.config.adaptor.SecurityAdaptorDescriptor;
 import fr.in2p3.jsaga.engine.config.bean.JobserviceEngineConfiguration;
+import fr.in2p3.jsaga.engine.schema.config.JobService;
 import fr.in2p3.jsaga.engine.schema.config.Monitor;
-import fr.in2p3.jsaga.engine.security.JobContextSelector;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
@@ -28,39 +29,29 @@ import java.util.Map;
 /**
  *
  */
-public class JobMonitorAdaptorFactory {
+public class JobMonitorAdaptorFactory extends ServiceAdaptorFactory {
     private JobserviceEngineConfiguration m_configuration;
 
     public JobMonitorAdaptorFactory(Configuration configuration) {
+        super(configuration.getConfigurations().getContextCfg());
         m_configuration = configuration.getConfigurations().getJobserviceCfg();
     }
 
     /**
-     * Create a new instance of job monitor adaptor for URL <code>service</code> and connect to service.
-     * @param service the URL of the service
+     * Create a new instance of job monitor adaptor for URL <code>url</code> and connect to service.
+     * todo: cache job monitor adaptor instances with "scheme://userInfo@host:port"
+     * @param url the URL of the service
      * @param session the security session
      * @return the job monitor adaptor instance
      */
-    public JobMonitorAdaptor getJobMonitorAdaptor(URL service, Session session) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        if (service==null || service.getScheme()==null) {
-            throw new IncorrectURL("Invalid entry name: "+service);
+    public JobMonitorAdaptor getJobMonitorAdaptor(URL url, Session session) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+        if (url==null || url.getScheme()==null) {
+            throw new IncorrectURL("Invalid entry name: "+url);
         }
-        ContextImpl context = new JobContextSelector(session).selectContextByURI(service);
-        if (context != null) {
-            return this.getJobMonitorAdaptor(service, context);
-        } else {
-            return this.getJobMonitorAdaptor(service, (ContextImpl)null);
-        }
-    }
 
-    /**
-     * Create a new instance of job monitor adaptor for URL <code>service</code> and connect to service.
-     * @param service the URL of the service
-     * @param context the security context
-     * @return the job monitor adaptor instance
-     */
-    private JobMonitorAdaptor getJobMonitorAdaptor(URL service, ContextImpl context) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        Monitor config = m_configuration.findJobservice(service.getScheme()).getMonitor();
+        // get config
+        JobService jobServiceConfig = m_configuration.findJobService(url);
+        Monitor config = jobServiceConfig.getMonitor();
         if (config == null) {
             return null;
         }
@@ -74,13 +65,39 @@ public class JobMonitorAdaptorFactory {
             throw new NoSuccess(e);
         }
 
-        // set security
+        // get security context
+        ContextImpl context;
+        if (jobServiceConfig.getContextRef() != null) {
+            context = super.findContext(session, jobServiceConfig.getContextRef());
+            if (context == null) {
+                throw new ConfigurationException("INTERNAL ERROR: effective-config may be inconsistent");
+            }
+        } else if (url.getFragment() != null) {
+            context = super.findContext(session, url.getFragment());
+            if (context == null) {
+                throw new NoSuccess("Security context not found: "+url.getFragment());
+            }
+        } else if (jobServiceConfig.getSupportedContextTypeCount() > 0) {
+            context = super.findContext(session, jobServiceConfig.getSupportedContextType());
+            if (context == null) {
+                throw new NoSuccess("None of the supported security context is valid");
+            }
+        } else {
+            context = null;
+        }
+
+        // set security adaptor
         if (context != null) {
-            SecurityAdaptor securityAdaptor = context.getAdaptor();
+            SecurityAdaptor securityAdaptor;
+            try {
+                securityAdaptor = context.getAdaptor();
+            } catch (IncorrectState e) {
+                throw new NoSuccess(e);
+            }
             if (SecurityAdaptorDescriptor.isSupported(securityAdaptor.getClass(), monitorAdaptor.getSupportedSecurityAdaptorClasses())) {
                 monitorAdaptor.setSecurityAdaptor(securityAdaptor);
             } else {
-                throw new AuthenticationFailed("Security context class '"+ securityAdaptor.getClass().getName() +"' not supported for protocol: "+service.getScheme());
+                throw new AuthenticationFailed("Security context class '"+ securityAdaptor.getClass().getName() +"' not supported for protocol: "+url.getScheme());
             }
         }
 
@@ -91,8 +108,8 @@ public class JobMonitorAdaptorFactory {
         }
 
         // connect
-        int port = (service.getPort()>0 ? service.getPort() : monitorAdaptor.getDefaultPort());
-        monitorAdaptor.connect(service.getUserInfo(), service.getHost(), port, service.getPath(), attributes);
+        int port = (url.getPort()>0 ? url.getPort() : monitorAdaptor.getDefaultPort());
+        monitorAdaptor.connect(url.getUserInfo(), url.getHost(), port, url.getPath(), attributes);
         return monitorAdaptor;
     }
 }

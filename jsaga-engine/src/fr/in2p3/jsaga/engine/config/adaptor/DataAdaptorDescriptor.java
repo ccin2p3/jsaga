@@ -8,6 +8,7 @@ import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
 import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
+import fr.in2p3.jsaga.engine.schema.config.DataService;
 import fr.in2p3.jsaga.engine.schema.config.Protocol;
 import org.ogf.saga.error.NoSuccess;
 
@@ -73,8 +74,7 @@ public class DataAdaptorDescriptor {
 
     private static Protocol toXML(DataAdaptor adaptor, SecurityAdaptorDescriptor securityDesc) {
         Protocol protocol = new Protocol();
-        protocol.setScheme(adaptor.getSchemeAliases()[0]);
-        protocol.setImpl(adaptor.getClass().getName());
+        protocol.setScheme(adaptor.getSchemeAliases()[0]); // default identifier
         protocol.setRead(adaptor instanceof DataReaderAdaptor);
         protocol.setWrite(adaptor instanceof DataWriterAdaptor);
         protocol.setThirdparty(adaptor instanceof DataCopy || adaptor instanceof DataCopyDelegated);
@@ -85,14 +85,21 @@ public class DataAdaptorDescriptor {
             System.arraycopy(schemeAndSchemeAliases, 1, schemeAliases, 0, schemeAliases.length);
             protocol.setSchemeAlias(schemeAliases);
         }
+
+        // add default data service
+        DataService service = new DataService();
+        service.setName("default");
+        service.setType(adaptor.getSchemeAliases()[0]);
+        service.setImpl(adaptor.getClass().getName());
         if (adaptor.getSupportedSecurityAdaptorClasses() != null) {
             String[] supportedContextTypes = securityDesc.getSupportedContextTypes(adaptor.getSupportedSecurityAdaptorClasses());
-            protocol.setSupportedContextType(supportedContextTypes);
+            service.setSupportedContextType(supportedContextTypes);
         }
         if (adaptor.getUsage() != null) {
-            protocol.setUsage(adaptor.getUsage().toString());
+            service.setUsage(adaptor.getUsage().toString());
         }
-        AdaptorDescriptors.setDefaults(protocol, adaptor);
+        AdaptorDescriptors.setDefaults(service, adaptor);
+        protocol.addDataService(service);
         return protocol;
     }
 }

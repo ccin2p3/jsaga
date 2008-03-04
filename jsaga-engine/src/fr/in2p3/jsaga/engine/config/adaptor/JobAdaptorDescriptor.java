@@ -4,8 +4,7 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.BulkJobSubmit;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
-import fr.in2p3.jsaga.engine.schema.config.Jobservice;
-import fr.in2p3.jsaga.engine.schema.config.Monitor;
+import fr.in2p3.jsaga.engine.schema.config.*;
 import org.ogf.saga.error.NoSuccess;
 
 import java.util.HashMap;
@@ -26,12 +25,12 @@ import java.util.Map;
 public class JobAdaptorDescriptor {
     private Map m_classes;
     private Map m_usages;
-    protected Jobservice[] m_xml;
+    protected Execution[] m_xml;
 
     public JobAdaptorDescriptor(Class[] adaptorClasses, SecurityAdaptorDescriptor securityDesc) throws IllegalAccessException, InstantiationException {
         m_classes = new HashMap();
         m_usages = new HashMap();
-        m_xml = new Jobservice[adaptorClasses.length];
+        m_xml = new Execution[adaptorClasses.length];
         for (int i=0; i<adaptorClasses.length; i++) {
             JobAdaptor adaptor = (JobAdaptor) adaptorClasses[i].newInstance();
 
@@ -58,30 +57,38 @@ public class JobAdaptorDescriptor {
         return (Usage) m_usages.get(type);
     }
 
-    private static Jobservice toXML(JobAdaptor adaptor, SecurityAdaptorDescriptor securityDesc) {
-        Jobservice jobservice = new Jobservice();
-        jobservice.setScheme(adaptor.getType()); // default identifier
-        jobservice.setType(adaptor.getType());
-        jobservice.setImpl(adaptor.getClass().getName());
-        jobservice.setBulk(adaptor instanceof BulkJobSubmit);
+    private static Execution toXML(JobAdaptor adaptor, SecurityAdaptorDescriptor securityDesc) {
+        Execution execution = new Execution();
+        execution.setScheme(adaptor.getType()); // default identifier
+        execution.setBulk(adaptor instanceof BulkJobSubmit);
+
+        // add default job service
+        JobService service = new JobService();
+        service.setName("default");
+        service.setType(adaptor.getType());
+        service.setImpl(adaptor.getClass().getName());
         if (adaptor.getSupportedSecurityAdaptorClasses() != null) {
             String[] supportedContextTypes = securityDesc.getSupportedContextTypes(adaptor.getSupportedSecurityAdaptorClasses());
-            jobservice.setSupportedContextType(supportedContextTypes);
+            service.setSupportedContextType(supportedContextTypes);
         }
+        FileStaging staging = new FileStaging();
         if (adaptor.getSupportedSandboxProtocols() != null) {
-            jobservice.setSupportedProtocolScheme(adaptor.getSupportedSandboxProtocols());
+            String[] supportedProtocolSchemes = adaptor.getSupportedSandboxProtocols();
+            staging.setSupportedProtocolScheme(supportedProtocolSchemes);
         }
+        service.setFileStaging(staging);
         JobMonitorAdaptor monitorAdaptor = adaptor.getDefaultJobMonitor();
         if (monitorAdaptor != null) {
             Monitor monitor = new Monitor();
             monitor.setImpl(monitorAdaptor.getClass().getName());
             AdaptorDescriptors.setDefaults(monitor, monitorAdaptor);
-            jobservice.setMonitor(monitor);
+            service.setMonitor(monitor);
         }
         if (adaptor.getUsage() != null) {
-            jobservice.setUsage(adaptor.getUsage().toString());
+            service.setUsage(adaptor.getUsage().toString());
         }
-        AdaptorDescriptors.setDefaults(jobservice, adaptor);
-        return jobservice;
+        AdaptorDescriptors.setDefaults(service, adaptor);
+        execution.addJobService(service);
+        return execution;
     }
 }

@@ -1,17 +1,11 @@
 package fr.in2p3.jsaga.engine.config.bean;
 
-import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.engine.config.Configuration;
-import fr.in2p3.jsaga.engine.config.UserAttributesMap;
-import fr.in2p3.jsaga.engine.config.adaptor.DataAdaptorDescriptor;
+import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.schema.config.*;
 import fr.in2p3.jsaga.helpers.StringArray;
 import org.ogf.saga.URL;
-import org.ogf.saga.error.*;
-
-import java.lang.Exception;
-import java.util.ArrayList;
-import java.util.List;
+import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NotImplemented;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -25,43 +19,50 @@ import java.util.List;
 /**
  *
  */
-public class ProtocolEngineConfiguration {
+public class ProtocolEngineConfiguration extends ServiceEngineConfigurationAbstract {
     private Protocol[] m_protocol;
 
-    public ProtocolEngineConfiguration(Protocol[] protocol, DataAdaptorDescriptor desc, UserAttributesMap userAttributes) throws Exception {
+    public ProtocolEngineConfiguration(Protocol[] protocol) {
         m_protocol = protocol;
-        for (int i=0; m_protocol!=null && i<m_protocol.length; i++) {
-            Protocol prt = m_protocol[i];
-
-            // update configured attributes with user attributes
-            this.updateAttributes(userAttributes, prt, prt.getScheme());
-            for (int a=0; a<prt.getSchemeAliasCount(); a++) {
-                this.updateAttributes(userAttributes, prt, prt.getSchemeAlias(a));
-            }
-
-            // correct configured attributes according to usage
-            Usage usage = desc.getUsage(prt.getScheme());
-            if (usage != null) {
-                for (int a=0; a<prt.getAttributeCount(); a++) {
-                    Attribute attr = prt.getAttribute(a);
-                    if (attr.getValue() != null) {
-                        try {
-                            attr.setValue(usage.correctValue(attr.getName(), attr.getValue()));
-                        } catch(DoesNotExist e) {/*do nothing*/}
-                    }
-                }
-            }
-        }
-    }
-    private void updateAttributes(UserAttributesMap userAttributes, Protocol protocol, String id) {
-        Attribute[] attributes = userAttributes.update(protocol.getAttribute(), id);
-        if (attributes != null) {
-            protocol.setAttribute(attributes);
-        }
     }
 
     public Protocol[] toXMLArray() {
         return m_protocol;
+    }
+
+    public DataService findDataService(URL url) throws NotImplemented, NoSuccess {
+        if (url != null) {
+            Protocol protocol = findProtocol(url.getScheme());
+            if (url.getFragment() != null) {
+                String serviceRef = url.getFragment();
+                DataService service = this.findDataService(protocol, serviceRef);
+                if (service != null) {
+                    return service;
+                } else if (protocol.getDataService(0).getContextRef() == null) {
+                    return protocol.getDataService(0);
+                } else {
+                    throw new NoSuccess("Data service not found: "+serviceRef);
+                }
+            } else {
+                ServiceRef[] arrayRef = super.listServiceRefByHostname(protocol.getMapping(), url.getHost());
+                switch(arrayRef.length) {
+                    case 0:
+                        throw new NoSuccess("No data service matches hostname: "+url.getHost());
+                    case 1:
+                        String serviceRef = arrayRef[0].getName();
+                        DataService service = this.findDataService(protocol, serviceRef);
+                        if (service != null) {
+                            return service;
+                        } else {
+                            throw new ConfigurationException("INTERNAL ERROR: effective-config may be inconsistent");
+                        }
+                    default:
+                        throw new NoSuccess("Ambiguity: several data services match hostname: "+url.getHost());
+                }
+            }
+        } else {
+            throw new NoSuccess("URL is null");
+        }
     }
 
     public Protocol findProtocol(String scheme) throws NoSuccess {
@@ -71,88 +72,16 @@ public class ProtocolEngineConfiguration {
                 return protocol;
             }
         }
-        throw new NoSuccess("No protocol matches scheme: "+scheme);
+        throw new NoSuccess("Protocol not found: "+scheme);
     }
 
-    /**
-     * Find the context to be used with <code>url</code>
-     */
-    public ContextInstanceRef[] listContextInstanceCandidates(URL url) throws NotImplemented, BadParameter, NoSuccess {
-        if (url != null) {
-            return this.listContextInstanceCandidates(
-                    findProtocol(url.getScheme()),
-                    url.getHost(),
-                    url.getFragment());
-        } else {
-            throw new BadParameter("URL is null");
-        }
-    }
-
-    public ContextInstanceRef[] listContextInstanceCandidates(Protocol protocol, String hostname, String fragment) throws NoSuccess {
-        ContextEngineConfiguration config = Configuration.getInstance().getConfigurations().getContextCfg();
-        if (fragment != null) {
-            ContextInstance[] ctxArray = config.listContextInstanceArray(fragment);
-            switch(ctxArray.length) {
-                case 0:
-                    throw new NoSuccess("No context instance matches: "+fragment);
-                case 1:
-                    return new ContextInstanceRef[]{toContextInstanceRef(ctxArray[0])};
-                default:
-                    // try to restrict with context instances filtered by hostname
-                    ContextInstanceRef[] ctxArrayByHostname = this.listContextInstancesByHostname(protocol, hostname);
-                    if (ctxArrayByHostname.length > 0) {
-                        return ctxArrayByHostname;
-                    } else {
-                        return toContextInstanceRefArray(ctxArray);
-                    }
-            }
-        } else {
-            // restrict with context instances filtered by hostname
-            ContextInstanceRef[] ctxArrayByHostname = this.listContextInstancesByHostname(protocol, hostname);
-            if (ctxArrayByHostname.length > 0) {
-                return ctxArrayByHostname;
-            } else {
-                // if no context instance is configured, then all supported context instances are eligible
-                List list = new ArrayList();
-                for (int c=0; c<protocol.getSupportedContextTypeCount(); c++) {
-                    String type = protocol.getSupportedContextType(c);
-                    ContextInstance[] ctxArray = config.listContextInstanceArrayByType(type);
-                    ContextInstanceRef[] refArray = toContextInstanceRefArray(ctxArray);
-                    for (int i=0; i<refArray.length; i++) {
-                        list.add(refArray[i]);
-                    }
-                }
-                return (ContextInstanceRef[]) list.toArray(new ContextInstanceRef[list.size()]);
+    private DataService findDataService(Protocol protocol, String serviceRef) {
+        for (int s=0; s<protocol.getDataServiceCount(); s++) {
+            DataService service = protocol.getDataService(s);
+            if (service.getName().equals(serviceRef)) {
+                return service;
             }
         }
-    }
-
-    private ContextInstanceRef[] listContextInstancesByHostname(Protocol protocol, String hostname) throws NoSuccess {
-        for (int d=0; d<protocol.getDomainCount(); d++) {
-            Domain domain = protocol.getDomain(d);
-            if (hostname.endsWith("."+domain.getName())) {
-                for (int h=0; h<domain.getHostCount(); h++) {
-                    Host host = domain.getHost(h);
-                    if (hostname.startsWith(host.getName())) {
-                        return host.getContextInstanceRef();
-                    }
-                }
-                return domain.getContextInstanceRef();
-            }
-        }
-        return protocol.getContextInstanceRef();
-    }
-
-    private static ContextInstanceRef[] toContextInstanceRefArray(ContextInstance[] ctxArray) {
-        ContextInstanceRef[] refArray = new ContextInstanceRef[ctxArray.length];
-        for (int i=0; i<ctxArray.length; i++) {
-            refArray[i] = toContextInstanceRef(ctxArray[i]);
-        }
-        return refArray;
-    }
-    private static ContextInstanceRef toContextInstanceRef(ContextInstance ctx) {
-        ContextInstanceRef ref = new ContextInstanceRef();
-        ref.setName(ctx.getName());
-        return ref;
+        return null;
     }
 }

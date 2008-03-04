@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.engine.config.attributes;
 
 import fr.in2p3.jsaga.engine.config.ConfigurationException;
+import fr.in2p3.jsaga.engine.schema.config.EffectiveConfig;
 
 import java.io.*;
 import java.util.*;
@@ -15,16 +16,16 @@ import java.util.*;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * Update attributes with user properties file
  */
-public class FilePropertiesAttributesParser extends AbstractAttributesParser {
+public class FilePropertiesAttributesParser extends AbstractAttributesParser implements AttributesParser {
     public static final File FILE = new File(new File(System.getProperty("user.home")), "jsaga-user.properties");
 
-    public FilePropertiesAttributesParser(Map map) {
-        super(map);
+    public FilePropertiesAttributesParser(EffectiveConfig config) {
+        super(config);
     }
     
-    public void parse() throws ConfigurationException {
+    public void updateAttributes() throws ConfigurationException {
         if (FILE.exists()) {
             // load properties file
             Properties prop = new Properties();
@@ -37,14 +38,9 @@ public class FilePropertiesAttributesParser extends AbstractAttributesParser {
             // convert to map of properties
             for (Iterator it=prop.entrySet().iterator(); it.hasNext(); ) {
                 Map.Entry entry = (Map.Entry) it.next();
-                String propName = (String) entry.getKey();
-                String attributeValue = (String) entry.getValue();
-                String[] array = propName.split("\\.");
-                if (array.length == 2) {
-                    String id = array[0];
-                    String attributeName = array[1];
-                    super.addAttribute(id, attributeName, attributeValue);
-                }
+                String propertyName = (String) entry.getKey();
+                String propertyValue = (String) entry.getValue();
+                super.updateOrInsertAttribute(propertyName, propertyValue);
             }
         }
     }

@@ -4,7 +4,7 @@ import fr.in2p3.jsaga.adaptor.security.SecurityAdaptorBuilder;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.config.adaptor.SecurityAdaptorDescriptor;
-import fr.in2p3.jsaga.engine.schema.config.ContextInstance;
+import fr.in2p3.jsaga.engine.schema.config.Context;
 import org.ogf.saga.error.NoSuccess;
 
 /* ***************************************************
@@ -35,7 +35,7 @@ public class SecurityAdaptorBuilderFactory {
     }
 
     public SecurityAdaptorBuilder getSecurityAdaptorBuilder(String id) throws NoSuccess {
-        ContextInstance byName = Configuration.getInstance().getConfigurations().getContextCfg().findContextInstanceByName(id);
+        Context byName = Configuration.getInstance().getConfigurations().getContextCfg().findContextByName(id);
         if (byName != null) {
             return this.getSecurityAdaptorBuilderByType(byName.getType());
         } else {

@@ -1,8 +1,5 @@
 package fr.in2p3.jsaga.engine.config.bean;
 
-import fr.in2p3.jsaga.engine.config.ConfigurationException;
-import fr.in2p3.jsaga.engine.config.UserAttributesMap;
-import fr.in2p3.jsaga.engine.config.adaptor.AdaptorDescriptors;
 import fr.in2p3.jsaga.engine.schema.config.EffectiveConfig;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.*;
@@ -27,15 +24,10 @@ public class EngineConfiguration {
     private JobserviceEngineConfiguration m_jobserviceCfg;
     private EffectiveConfig m_xml;
 
-    public EngineConfiguration(EffectiveConfig mergedConfig, AdaptorDescriptors desc) throws ConfigurationException {
-        UserAttributesMap userAttributes = new UserAttributesMap();
-        try {
-            m_contextCfg = new ContextEngineConfiguration(mergedConfig.getContextInstance(), desc.getSecurityDesc(), userAttributes);
-            m_protocolCfg = new ProtocolEngineConfiguration(mergedConfig.getProtocol(), desc.getDataDesc(), userAttributes);
-            m_jobserviceCfg = new JobserviceEngineConfiguration(mergedConfig.getJobservice(), desc.getJobDesc(), userAttributes);
-        } catch (Exception e) {
-            throw new ConfigurationException(e);
-        }
+    public EngineConfiguration(EffectiveConfig mergedConfig) {
+        m_contextCfg = new ContextEngineConfiguration(mergedConfig.getContext());
+        m_protocolCfg = new ProtocolEngineConfiguration(mergedConfig.getProtocol());
+        m_jobserviceCfg = new JobserviceEngineConfiguration(mergedConfig.getExecution());
         m_xml = mergedConfig;
     }
 

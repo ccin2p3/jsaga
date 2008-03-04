@@ -1,16 +1,10 @@
 package fr.in2p3.jsaga.engine.config.bean;
 
-import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.engine.config.Configuration;
-import fr.in2p3.jsaga.engine.config.UserAttributesMap;
-import fr.in2p3.jsaga.engine.config.adaptor.JobAdaptorDescriptor;
+import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.schema.config.*;
 import org.ogf.saga.URL;
-import org.ogf.saga.error.*;
-
-import java.lang.Exception;
-import java.util.ArrayList;
-import java.util.List;
+import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NotImplemented;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -24,109 +18,69 @@ import java.util.List;
 /**
  *
  */
-public class JobserviceEngineConfiguration {
-    private Jobservice[] m_jobservice;
+public class JobserviceEngineConfiguration extends ServiceEngineConfigurationAbstract {
+    private Execution[] m_execution;
 
-    public JobserviceEngineConfiguration(Jobservice[] jobservice, JobAdaptorDescriptor desc, UserAttributesMap userAttributes) throws Exception {
-        m_jobservice = jobservice;
-        for (int i=0; m_jobservice!=null && i<m_jobservice.length; i++) {
-            Jobservice job = m_jobservice[i];
+    public JobserviceEngineConfiguration(Execution[] execution) {
+        m_execution = execution;
+    }
 
-            // update configured attributes with user attributes
-            this.updateAttributes(userAttributes, job, job.getPath());
-            for (int a=0; a<job.getPathAliasCount(); a++) {
-                this.updateAttributes(userAttributes, job, job.getPathAlias(a));
-            }
+    public Execution[] toXMLArray() {
+        return m_execution;
+    }
 
-            // correct configured attributes according to usage
-            Usage usage = desc.getUsage(job.getType());
-            if (usage != null) {
-                for (int a=0; a<job.getAttributeCount(); a++) {
-                    Attribute attr = job.getAttribute(a);
-                    if (attr.getValue() != null) {
-                        try {
-                            attr.setValue(usage.correctValue(attr.getName(), attr.getValue()));
-                        } catch(DoesNotExist e) {/*do nothing*/}
-                    }
+    public JobService findJobService(URL url) throws NotImplemented, NoSuccess {
+        if (url != null) {
+            Execution execution = findExecution(url.getScheme());
+            if (url.getFragment() != null) {
+                String serviceRef = url.getFragment();
+                JobService service = this.findJobService(execution, serviceRef);
+                if (service != null) {
+                    return service;
+                } else if (execution.getJobService(0).getContextRef() == null) {
+                    return execution.getJobService(0);
+                } else {
+                    throw new NoSuccess("Job service not found: "+serviceRef);
+                }
+            } else {
+                ServiceRef[] arrayRef = super.listServiceRefByHostname(execution.getMapping(), url.getHost());
+                switch(arrayRef.length) {
+                    case 0:
+                        throw new NoSuccess("No job service matches hostname: "+url.getHost());
+                    case 1:
+                        String serviceRef = arrayRef[0].getName();
+                        JobService service = this.findJobService(execution, serviceRef);
+                        if (service != null) {
+                            return service;
+                        } else {
+                            throw new ConfigurationException("INTERNAL ERROR: effective-config may be inconsistent");
+                        }
+                    default:
+                        throw new NoSuccess("Ambiguity: several job services match hostname: "+url.getHost());
                 }
             }
-        }
-    }
-    private void updateAttributes(UserAttributesMap userAttributes, Jobservice job, String id) {
-        Attribute[] attributes = userAttributes.update(job.getAttribute(), id);
-        if (attributes != null) {
-            job.setAttribute(attributes);
+        } else {
+            throw new NoSuccess("URL is null");
         }
     }
 
-    public Jobservice[] toXMLArray() {
-        return m_jobservice;
+    public Execution findExecution(String scheme) throws NoSuccess {
+        for (int j=0; j<m_execution.length; j++) {
+            Execution job = m_execution[j];
+            if (job.getScheme().equals(scheme)) {
+                return job;
+            }
+        }
+        throw new NoSuccess("No execution manager matches scheme: "+ scheme);
     }
 
-    public Jobservice findJobservice(String scheme) throws NoSuccess {
-        for (int j=0; j<m_jobservice.length; j++) {
-            Jobservice service = m_jobservice[j];
-            if (service.getScheme().equals(scheme)) {
+    private JobService findJobService(Execution execution, String serviceRef) throws NoSuccess {
+        for (int s=0; s<execution.getJobServiceCount(); s++) {
+            JobService service = execution.getJobService(s);
+            if (service.getName().equals(serviceRef)) {
                 return service;
             }
         }
-        throw new NoSuccess("No job-service matches scheme: "+ scheme);
-    }
-
-    /**
-     * Find the context to be used with <code>url</code>
-     */
-    public ContextInstanceRef[] listContextInstanceCandidates(URL url) throws NotImplemented, BadParameter, NoSuccess {
-        if (url != null) {
-            return this.listContextInstanceCandidates(
-                    findJobservice(url.getScheme()),
-                    url.getHost(),
-                    url.getFragment());
-        } else {
-            throw new BadParameter("URL is null");
-        }
-    }
-
-    public ContextInstanceRef[] listContextInstanceCandidates(Jobservice service, String hostname, String fragment) throws NoSuccess {
-        ContextEngineConfiguration config = Configuration.getInstance().getConfigurations().getContextCfg();
-        if (fragment != null) {
-            ContextInstance[] ctxArray = config.listContextInstanceArray(fragment);
-            switch(ctxArray.length) {
-                case 0:
-                    throw new NoSuccess("No context instance matches: "+fragment);
-                case 1:
-                    return new ContextInstanceRef[]{toContextInstanceRef(ctxArray[0])};
-                default:
-                    return toContextInstanceRefArray(ctxArray);
-            }
-        } else if (service.getContextInstanceRefCount() > 0) {
-            // if no context instance is specified, then all configured context instances are eligible
-            return service.getContextInstanceRef();
-        } else {
-            // if no context instance is configured, then all supported context instances are eligible
-            List list = new ArrayList();
-            for (int c=0; c<service.getSupportedContextTypeCount(); c++) {
-                String type = service.getSupportedContextType(c);
-                ContextInstance[] ctxArray = config.listContextInstanceArrayByType(type);
-                ContextInstanceRef[] refArray = toContextInstanceRefArray(ctxArray);
-                for (int i=0; i<refArray.length; i++) {
-                    list.add(refArray[i]);
-                }
-            }
-            return (ContextInstanceRef[]) list.toArray(new ContextInstanceRef[list.size()]);
-        }
-    }
-
-    private static ContextInstanceRef[] toContextInstanceRefArray(ContextInstance[] ctxArray) {
-        ContextInstanceRef[] refArray = new ContextInstanceRef[ctxArray.length];
-        for (int i=0; i<ctxArray.length; i++) {
-            refArray[i] = toContextInstanceRef(ctxArray[i]);
-        }
-        return refArray;
-    }
-    private static ContextInstanceRef toContextInstanceRef(ContextInstance ctx) {
-        ContextInstanceRef ref = new ContextInstanceRef();
-        ref.setName(ctx.getName());
-        return ref;
+        return null;
     }
 }
