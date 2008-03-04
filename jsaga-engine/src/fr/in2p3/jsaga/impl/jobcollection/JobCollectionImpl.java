@@ -44,8 +44,8 @@ public class JobCollectionImpl extends TaskContainerImpl implements JobCollectio
         in.read(resources);
         in.close();
         // preprocess
-        JobPreprocessor preprocessor = new JobPreprocessor();
-        preprocessor.preprocess(m_description.getJSDL(), resources);
+        JobPreprocessor preprocessor = new JobPreprocessor(m_description.getJSDL());
+        preprocessor.preprocess(resources);
         preprocessor.dump();
     }
 }
