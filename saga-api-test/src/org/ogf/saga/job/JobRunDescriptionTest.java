@@ -38,13 +38,20 @@ public class JobRunDescriptionTest extends AbstractJobTest {
     	try {
 	    	// submit
 	        job = runJob(desc);
-	        fail("Expected NoSuccess exception");
+	        
+	        // wait for end
+	        job.waitFor();
+	        
+	        assertEquals(
+	                State.FAILED,
+	                job.getState());
         }
         catch (NoSuccess noSuccess) {
+        	// test may be successful
         }
         finally {
         	if(job != null) {
-        		job.waitFor(DEFAULT_FINALY_TIMEOUT);
+        		job.waitFor(Float.valueOf(FINALY_TIMEOUT));
         	}
         }        
     }
@@ -64,13 +71,20 @@ public class JobRunDescriptionTest extends AbstractJobTest {
     	try {
 	    	// submit
 	        job = runJob(desc);
-	        fail("Expected NoSuccess exception");
+	        
+	        // wait for end
+	        job.waitFor();
+	        
+	        assertEquals(
+	                State.FAILED,
+	                job.getState()); 	        
         }
         catch (NoSuccess noSuccess) {
+        	// test may be successful
         }
         finally {
         	if(job != null) {
-        		job.waitFor(DEFAULT_FINALY_TIMEOUT);
+        		job.waitFor(Float.valueOf(FINALY_TIMEOUT));
         	}
         }
     }
@@ -83,7 +97,7 @@ public class JobRunDescriptionTest extends AbstractJobTest {
     	// prepare a simple job
     	JobDescription desc = createSimpleJob();
     	// and inform the scheduler to the estimate time is 14 days
-    	desc.setAttribute(JobDescription.TOTALCPUTIME, String.valueOf(DEFAULT_JOB_DURATION*2*60*24*14));
+    	desc.setAttribute(JobDescription.TOTALCPUTIME, String.valueOf(60*60*24*14));
     	
     	// submit
         Job job = runJob(desc);
@@ -98,16 +112,16 @@ public class JobRunDescriptionTest extends AbstractJobTest {
     }
     
     /**
-     * Runs simple job, requests impossible quantity of memory and expects failed status
+     * Runs simple job, requests 1 Go of memory and expects DONE status (it is just an information)
      */
     public void test_run_memoryRequirement() throws Exception {
         
-    	// prepare a job witch requires 250 Gb of RAM
+    	// prepare a job witch requires 1 Gb of RAM
     	Attribute[] attributes = new Attribute[1];
-    	attributes[0] = new Attribute(JobDescription.TOTALPHYSICALMEMORY, "2500000000");
+    	attributes[0] = new Attribute(JobDescription.TOTALPHYSICALMEMORY, "1024");
     	AttributeVector[] attributesV = new AttributeVector[1];
     	attributesV[0] = new AttributeVector(JobDescription.ARGUMENTS, new String[]{"30"});    
-    	JobDescription desc =  createJob(DEFAULT_LONG_JOB_BINARY, attributes, attributesV);
+    	JobDescription desc =  createJob(LONG_JOB_BINARY, attributes, attributesV);
     	    	
     	// submit
         Job job = runJob(desc);
@@ -117,12 +131,12 @@ public class JobRunDescriptionTest extends AbstractJobTest {
         
         // check job status
         assertEquals(
-                State.FAILED,
+                State.DONE,
                 job.getState());       
     }
         
     /**
-     * Runs simple job and expects done status
+     * Runs simple job and expects FAILED status
      */
     public void test_run_processRequirement() throws Exception {
         
@@ -130,7 +144,7 @@ public class JobRunDescriptionTest extends AbstractJobTest {
     	Attribute[] attributes = new Attribute[2];
     	attributes[0] = new Attribute(JobDescription.NUMBEROFPROCESSES, "1000000");
     	attributes[1] = new Attribute(JobDescription.PROCESSESPERHOST, "1");
-    	JobDescription desc =  createJob(DEFAULT_SIMPLE_JOB_BINARY, attributes, null);
+    	JobDescription desc =  createJob(SIMPLE_JOB_BINARY, attributes, null);
     	
     	// submit
         Job job = runJob(desc);

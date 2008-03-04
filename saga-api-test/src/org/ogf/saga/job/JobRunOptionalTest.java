@@ -31,14 +31,14 @@ public class JobRunOptionalTest extends AbstractJobTest {
     public void test_suspend_running() throws Exception {
         
     	// prepare
-    	JobDescription desc = createLongJob(DEFAULT_JOB_DURATION);
+    	JobDescription desc = createLongJob();
     	
         // submit
         Job job = runJob(desc);
         
         // wait for RUNNING state (deviation from SAGA specification)
-        if (! super.waitForSubState(job, "RUNNING_ACTIVE", MAX_QUEUING_TIME)) {
-        	job.waitFor(DEFAULT_FINALY_TIMEOUT);
+        if (! super.waitForSubState(job, "RUNNING_ACTIVE")) {
+        	job.waitFor(Float.valueOf(FINALY_TIMEOUT));
             fail("Job did not enter RUNNING_ACTIVE state within "+MAX_QUEUING_TIME+" seconds");
         }
         
@@ -55,11 +55,8 @@ public class JobRunOptionalTest extends AbstractJobTest {
 	                State.SUSPENDED,
 	                job.getState());
         }
-        catch (NotImplemented notImplemented) {
-        	System.err.println("WARNING : "+this.getName()+" not implemented in plugin");
-        }
         finally {
-        	job.waitFor(DEFAULT_FINALY_TIMEOUT);
+        	job.waitFor(Float.valueOf(FINALY_TIMEOUT));
         }
     }
     
@@ -87,11 +84,8 @@ public class JobRunOptionalTest extends AbstractJobTest {
         }
         catch (IncorrectState incorrectState) {
         }
-        catch (NotImplemented notImplemented) {
-        	System.err.println("WARNING : "+this.getName()+" not implemented in plugin");
-        }
         finally {
-        	job.waitFor(DEFAULT_FINALY_TIMEOUT);
+        	job.waitFor(Float.valueOf(FINALY_TIMEOUT));
         }
     }
     
@@ -101,23 +95,29 @@ public class JobRunOptionalTest extends AbstractJobTest {
     public void test_resume_running() throws Exception {
         
     	// prepare
-    	JobDescription desc = createLongJob(DEFAULT_JOB_DURATION);
+    	JobDescription desc = createLongJob();
     	
         // submit
         Job job = runJob(desc);
         
        // wait for RUNNING state (deviation from SAGA specification)
-        if (! super.waitForSubState(job, "RUNNING_ACTIVE", MAX_QUEUING_TIME)) {
-        	job.waitFor(DEFAULT_FINALY_TIMEOUT);
+        if (! super.waitForSubState(job, "RUNNING_ACTIVE")) {
+        	job.waitFor(Float.valueOf(FINALY_TIMEOUT));
             fail("Job did not enter RUNNING_ACTIVE state within "+MAX_QUEUING_TIME+" seconds");
         }
         
-        // resume job
-        job.suspend();
+        try {
+        	// suspend job
+        	job.suspend();
+        }
+        catch (NotImplemented notImplemented) {
+        	job.waitFor(Float.valueOf(FINALY_TIMEOUT));
+        	throw notImplemented;
+        }
         
         // wait for SUSPENDED state
-        if (! super.waitForSubState(job, "SUSPENDED", MAX_QUEUING_TIME)) {
-        	job.waitFor(DEFAULT_FINALY_TIMEOUT);
+        if (! super.waitForSubState(job, "SUSPENDED")) {
+        	job.waitFor(Float.valueOf(FINALY_TIMEOUT));
             fail("Job did not enter SUSPENDED state within "+MAX_QUEUING_TIME+" seconds");
         }
         
@@ -135,11 +135,8 @@ public class JobRunOptionalTest extends AbstractJobTest {
         }
         catch (IncorrectState incorrectState) {
         }
-        catch (NotImplemented notImplemented) {
-        	System.err.println("WARNING : "+this.getName()+" not implemented in plugin");
-        }
         finally {
-        	job.waitFor(DEFAULT_FINALY_TIMEOUT);
+        	job.waitFor(Float.valueOf(FINALY_TIMEOUT));
         }
     }
     
@@ -167,11 +164,8 @@ public class JobRunOptionalTest extends AbstractJobTest {
         }
         catch (IncorrectState incorrectState) {
         }
-        catch (NotImplemented notImplemented) {
-        	System.err.println("WARNING : "+this.getName()+" not implemented in plugin");
-        }
         finally {
-        	job.waitFor(DEFAULT_FINALY_TIMEOUT);
+        	job.waitFor(Float.valueOf(FINALY_TIMEOUT));
         }
     }
     
@@ -181,7 +175,7 @@ public class JobRunOptionalTest extends AbstractJobTest {
     public void test_listJob() throws Exception {
         
     	// prepare
-    	JobDescription desc = createLongJob(DEFAULT_JOB_DURATION);
+    	JobDescription desc = createLongJob();
     	
         // submit
         Job job = runJob(desc);
@@ -199,11 +193,42 @@ public class JobRunOptionalTest extends AbstractJobTest {
 	                true,
 	                jobIsInList);
         }
-        catch (NotImplemented notImplemented) {
-        	System.err.println("WARNING : "+this.getName()+" not implemented in plugin");
-        }
         finally {
-        	job.waitFor(DEFAULT_FINALY_TIMEOUT);
+        	job.waitFor(Float.valueOf(FINALY_TIMEOUT));
         }
+    }
+    
+    
+	/**
+     * Runs simple jobs on the same time
+     */
+    public void test_multiJob() throws Exception {
+        
+    	int numberOfJobs = Integer.parseInt(MULTIJOB_NUMBER);
+
+		// jobs
+    	StartJob[] newJob = new StartJob[numberOfJobs];
+    	
+    	// create and start jobs
+    	for (int i = 0; i < numberOfJobs; i++) {
+    		newJob[i] = new StartJob(m_session, m_jobservice, i);
+    		newJob[i].start();
+		}
+    
+    	for (int i = 0; i < numberOfJobs; i++) {
+    		newJob[i].join();
+		}
+    	
+    	boolean allJobsAreDone = true;
+    	for (int i = 0; i < numberOfJobs; i++) {
+    		if(newJob[i].getException() != null) {
+    			allJobsAreDone = false;
+    			System.err.println("The job number "+i+" is failed:"+newJob[i].getException().getMessage());
+    		}
+		}
+    	
+    	 assertEquals(
+	                true,
+	                allJobsAreDone);
     }
 }

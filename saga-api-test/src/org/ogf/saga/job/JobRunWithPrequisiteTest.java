@@ -32,7 +32,8 @@ public class JobRunWithPrequisiteTest extends AbstractJobTest {
         
     	// prepare a job start a mpi binary
     	Attribute[] attributes = new Attribute[3];
-    	attributes[0] = new Attribute(JobDescription.SPMDVARIATION, "mpi");
+    	// TODO : get first suuported attribute SPMDVariation
+    	attributes[0] = new Attribute(JobDescription.SPMDVARIATION, "MPI");
     	attributes[1] = new Attribute(JobDescription.NUMBEROFPROCESSES, "2");
     	attributes[2] = new Attribute(JobDescription.PROCESSESPERHOST, "2");
     	JobDescription desc =  createJob("helloMpi", attributes, null);
@@ -81,9 +82,9 @@ public class JobRunWithPrequisiteTest extends AbstractJobTest {
     	// prepare
     	String key1 = "MYVAR1", value1="Testing1";
     	String key2 = "MYVAR2", value2="Testing2";
-    	AttributeVector[] attributes = new AttributeVector[1];
-    	attributes[0] = new AttributeVector(JobDescription.ENVIRONMENT, new String[]{key1+"="+value1, key2+"="+value2 });
-    	JobDescription desc =  createJob("/bin/env", null, attributes);
+    	AttributeVector[] attributesV = new AttributeVector[1];
+    	attributesV[0] = new AttributeVector(JobDescription.ENVIRONMENT, new String[]{key1+"="+value1, key2+"="+value2 });
+    	JobDescription desc =  createJob("/bin/env", null, attributesV);
     	
     	// submit
         Job job = runJob(desc);

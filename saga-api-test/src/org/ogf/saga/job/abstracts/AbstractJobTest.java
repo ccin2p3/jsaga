@@ -35,12 +35,21 @@ import org.ogf.saga.task.Task;
 
 public class AbstractJobTest extends AbstractTest {
 	
+	// values
+	protected String SIMPLE_JOB_BINARY 	= "simpleJobBinary";
+	protected String MAX_QUEUING_TIME 	= "maxQueuingTime";
+	protected String LONG_JOB_BINARY  	= "longJobBinary";
+	protected String LONG_JOB_DURATION 	= "longJobDuration";
+	protected String FINALY_TIMEOUT  	= "finalyTimeout";
+	protected String MULTIJOB_NUMBER	= "multiJobNumber";
+		
 	// set default values
-	protected int DEFAULT_JOB_DURATION = 30 ;
-	protected int DEFAULT_FINALY_TIMEOUT = 60 ;
-	protected String DEFAULT_SIMPLE_JOB_BINARY = "/bin/date" ;
-	protected String DEFAULT_LONG_JOB_BINARY = "/bin/sleep" ;
-	protected static final int MAX_QUEUING_TIME = 60;
+	private static final String DEFAULT_LONG_JOB_DURATION 	= "30";
+	private static final String DEFAULT_FINALY_TIMEOUT 		= "60" ;
+	private static final String DEFAULT_SIMPLE_JOB_BINARY 	= "/bin/date" ;
+	private static final String DEFAULT_LONG_JOB_BINARY 	= "/bin/sleep" ;
+	private static final String DEFAULT_MAX_QUEUING_TIME 	= "60";
+	private static final String DEFAULT_MULTIJOB_NUMBER 	= "10";
 
     // configuration
     protected URL m_jobservice;
@@ -52,6 +61,14 @@ public class AbstractJobTest extends AbstractTest {
         // configure
         m_jobservice = new URL(getRequiredProperty(jobprotocol, CONFIG_JOBSERVICE_URL).replaceAll(" ", "%20"));
         m_session = SessionFactory.createSession(true);
+        
+        // init values
+        SIMPLE_JOB_BINARY = super.getOptionalProperty(jobprotocol, SIMPLE_JOB_BINARY, DEFAULT_SIMPLE_JOB_BINARY);
+       	LONG_JOB_BINARY = super.getOptionalProperty(jobprotocol, LONG_JOB_BINARY, DEFAULT_LONG_JOB_BINARY);
+       	LONG_JOB_DURATION = super.getOptionalProperty(jobprotocol, LONG_JOB_DURATION, DEFAULT_LONG_JOB_DURATION);	
+        FINALY_TIMEOUT = super.getOptionalProperty(jobprotocol, FINALY_TIMEOUT, DEFAULT_FINALY_TIMEOUT);
+        MAX_QUEUING_TIME = super.getOptionalProperty(jobprotocol, MAX_QUEUING_TIME, DEFAULT_MAX_QUEUING_TIME);
+        MULTIJOB_NUMBER = super.getOptionalProperty(jobprotocol, MULTIJOB_NUMBER, DEFAULT_MULTIJOB_NUMBER);       	
     }
     
     /**
@@ -75,7 +92,6 @@ public class AbstractJobTest extends AbstractTest {
     protected Job runJob(JobDescription desc) throws Exception  {
         Job job = createJob(desc);
         job.run();
-        //System.out.println("Job Id :"+job.getAttribute(Job.JOBID));
         return job;
     }
     
@@ -111,8 +127,9 @@ public class AbstractJobTest extends AbstractTest {
      * @throws Exception
      */
     protected JobDescription createSimpleJob() throws Exception {
-    	return createJob(DEFAULT_SIMPLE_JOB_BINARY, null, null);
+    	return createJob(SIMPLE_JOB_BINARY, null, null);
     }
+    
     
     /**
      * Job which write 'Test' on stdout
@@ -121,9 +138,9 @@ public class AbstractJobTest extends AbstractTest {
      * @throws Exception
      */
     protected JobDescription createWriteJob(String textToPrint) throws Exception {
-    	AttributeVector[] attributes = new AttributeVector[1];
-    	attributes[0] = new AttributeVector(JobDescription.ARGUMENTS,new String[]{textToPrint});    	
-    	return createJob("/bin/echo", null, attributes);
+    	AttributeVector[] attributesV = new AttributeVector[1];
+    	attributesV[0] = new AttributeVector(JobDescription.ARGUMENTS,new String[]{textToPrint});    	
+    	return createJob("/bin/echo", null, attributesV);
     }
     
     /**
@@ -140,10 +157,10 @@ public class AbstractJobTest extends AbstractTest {
      * @return The job description
      * @throws Exception
      */
-    protected JobDescription createLongJob(int duration) throws Exception {
-    	AttributeVector[] attributes = new AttributeVector[1];
-    	attributes[0] = new AttributeVector(JobDescription.ARGUMENTS, new String[]{String.valueOf(duration)});
-    	return createJob(DEFAULT_LONG_JOB_BINARY, null, attributes);
+    protected JobDescription createLongJob() throws Exception {
+    	AttributeVector[] attributesV = new AttributeVector[1];
+    	attributesV[0] = new AttributeVector(JobDescription.ARGUMENTS, new String[]{LONG_JOB_DURATION});
+    	return createJob(LONG_JOB_BINARY, null, attributesV);
     }
 
     /**
@@ -169,7 +186,8 @@ public class AbstractJobTest extends AbstractTest {
 
 
     private String m_subState;
-    protected boolean waitForSubState(Job job, String subState, float timeoutInSeconds) throws Exception {
+    protected boolean waitForSubState(Job job, String subState) throws Exception {
+    	float timeoutInSeconds = Float.valueOf(MAX_QUEUING_TIME);
     	int cookie = job.addCallback("job.sub_state", new Callback(){
             public boolean cb(Monitorable mt, Metric metric, Context ctx) throws NotImplemented, AuthorizationFailed {
                 try {
