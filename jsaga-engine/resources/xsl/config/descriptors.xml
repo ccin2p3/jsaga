@@ -9,119 +9,167 @@
     <language name="saga" impl="fr.in2p3.jsaga.adaptor.language.SAGALanguageAdaptor"/>
 
     <!-- context instances -->
-    <contextInstance type="Globus" impl="fr.in2p3.jsaga.adaptor.security.GlobusSecurityAdaptorBuilder"
-             usage="((_UserProxyObject_ | +UserProxy+ | (UserProxy &lt;UserCert> &lt;UserKey> *UserPass* [LifeTime] [Limited] [ProxyType])) &lt;CertRepository>)">
+    <context name="Globus" type="Globus" impl="fr.in2p3.jsaga.adaptor.security.GlobusSecurityAdaptorBuilder"
+             usage="((((&lt;UserCertKey> | (&lt;UserCert> &lt;UserKey>)) UserProxy *UserPass* LifeTime [Delegation]) | _UserProxyObject_ | &lt;UserProxy>) &lt;CertRepository>)">
         <attribute name="UserProxy" value="C:\DOCUME~1\SYLVAI~1\LOCALS~1\Temp\x509up_u[uid]"/>
         <attribute name="UserCert" value="E:\User Settings/.globus/usercert.pem"/>
         <attribute name="UserKey" value="E:\User Settings/.globus/userkey.pem"/>
         <attribute name="CertRepository" value="/etc/grid-security/certificates/"/>
         <attribute name="LifeTime" value="PT12H"/>
         <attribute name="Limited" value="False"/>
-        <init usage="((UserProxy &lt;UserCert> &lt;UserKey> *UserPass* [LifeTime] [Limited] [ProxyType]) &lt;CertRepository>)"/>
-    </contextInstance>
-    <contextInstance type="MyProxy" impl="fr.in2p3.jsaga.adaptor.security.MyProxySecurityAdaptorBuilder"
-             usage="((_UserProxyObject_ | +UserProxy+ | (UserID MyProxyPass) | (UserProxy &lt;UserCert> &lt;UserKey> *UserPass* Server [LifeTime] [UserID] [MyProxyPass])) &lt;CertRepository>)">
+    </context>
+    <context name="MyProxy" type="MyProxy" impl="fr.in2p3.jsaga.adaptor.security.MyProxySecurityAdaptorBuilder"
+             usage="(((&lt;UserCert> &lt;UserKey> UserProxy *UserPass* Server UserID *MyProxyPass* LifeTime) | _UserProxyObject:10800_ | &lt;UserProxy:10800> | (_UserProxyObject_ UserID *MyProxyPass*) | (UserProxy UserID *MyProxyPass*)) &lt;CertRepository>)">
         <attribute name="UserProxy" value="C:\DOCUME~1\SYLVAI~1\LOCALS~1\Temp\x509up_u[uid]"/>
         <attribute name="UserCert" value="E:\User Settings/.globus/usercert.pem"/>
         <attribute name="UserKey" value="E:\User Settings/.globus/userkey.pem"/>
         <attribute name="CertRepository" value="/etc/grid-security/certificates/"/>
-        <init usage="((UserProxy &lt;UserCert> &lt;UserKey> *UserPass* Server [LifeTime] [UserID] [MyProxyPass]) &lt;CertRepository>)"/>
-    </contextInstance>
-    <contextInstance type="VOMS" impl="fr.in2p3.jsaga.adaptor.security.VOMSSecurityAdaptorBuilder"
-             usage="((_UserProxyObject_ | +UserProxy+ | (UserProxy &lt;UserCert> &lt;UserKey> *UserPass* Server UserVO [LifeTime] [UserFQAN])) &lt;CertRepository>)">
+    </context>
+    <context name="VOMS" type="VOMS" impl="fr.in2p3.jsaga.adaptor.security.VOMSSecurityAdaptorBuilder"
+             usage="((((&lt;UserCertKey> | (&lt;UserCert> &lt;UserKey>)) UserProxy *UserPass* Server UserVO [UserFQAN] LifeTime [Delegation] [ProxyType]) | _UserProxyObject_ | &lt;UserProxy>) &lt;CertRepository> &lt;VomsDir>)">
         <attribute name="UserProxy" value="C:\DOCUME~1\SYLVAI~1\LOCALS~1\Temp\x509up_u[uid]"/>
         <attribute name="UserCert" value="E:\User Settings/.globus/usercert.pem"/>
         <attribute name="UserKey" value="E:\User Settings/.globus/userkey.pem"/>
         <attribute name="CertRepository" value="/etc/grid-security/certificates/"/>
-        <init usage="((UserProxy &lt;UserCert> &lt;UserKey> *UserPass* Server UserVO [LifeTime] [UserFQAN]) &lt;CertRepository>)"/>
-    </contextInstance>
-    <contextInstance type="SSH" impl="fr.in2p3.jsaga.adaptor.security.SSHSecurityAdaptorBuilder"
-             usage="((&lt;UserCert> &lt;UserKey>) | (UserID *UserPass*))">
+    </context>
+    <context name="SSH" type="SSH" impl="fr.in2p3.jsaga.adaptor.security.SSHSecurityAdaptorBuilder"
+             usage="((UserID *UserPass*) | (&lt;UserCert> &lt;UserKey>))">
         <attribute name="UserCert" value="E:\User Settings/.ssh/id_dsa.pub"/>
         <attribute name="UserKey" value="E:\User Settings/.ssh/id_dsa"/>
-    </contextInstance>
-    <contextInstance type="X509" impl="fr.in2p3.jsaga.adaptor.security.X509SecurityAdaptorBuilder"
+    </context>
+    <context name="X509" type="X509" impl="fr.in2p3.jsaga.adaptor.security.X509SecurityAdaptorBuilder"
              usage="(&lt;UserCert> *UserPass* Alias)">
         <attribute name="UserCert" value="E:\User Settings/.keystore"/>
         <attribute name="UserPass" value="changeme"/>
-    </contextInstance>
-    <contextInstance type="UserPass" impl="fr.in2p3.jsaga.adaptor.security.UserPassSecurityAdaptorBuilder"
-             usage="(UserID *UserPass*)">
+    </context>
+    <context name="UserPass" type="UserPass" impl="fr.in2p3.jsaga.adaptor.security.UserPassSecurityAdaptorBuilder"
+             usage="(UserID ((*UserPass* LifeTime) | *UserPass* | UserPassCrypted))">
         <attribute name="UserID" value="anonymous"/>
         <attribute name="UserPass" value="anon"/>
-    </contextInstance>
+    </context>
 
     <!-- protocols -->
-    <protocol scheme="file" impl="fr.in2p3.jsaga.adaptor.data.FileDataAdaptor" read="true" write="true" thirdparty="true" logical="true">
-        <schemeAlias>local</schemeAlias>
+    <protocol scheme="file" read="true" write="true" thirdparty="true" logical="true">
+        <dataService name="default" type="file" impl="fr.in2p3.jsaga.adaptor.data.FileDataAdaptor"/>
     </protocol>
-    <protocol scheme="http" impl="fr.in2p3.jsaga.adaptor.data.HTTPDataAdaptor" read="true" write="false" thirdparty="false" logical="false"/>
-    <protocol scheme="https" impl="fr.in2p3.jsaga.adaptor.data.HTTPSDataAdaptor" read="true" write="false" thirdparty="false" logical="false">
-        <supportedContextType>X509</supportedContextType>
+    <protocol scheme="http" read="true" write="false" thirdparty="false" logical="false">
+        <dataService name="default" type="http" impl="fr.in2p3.jsaga.adaptor.data.HTTPDataAdaptor"/>
     </protocol>
-    <protocol scheme="ftp" impl="fr.in2p3.jsaga.adaptor.data.FTPDataAdaptor" read="true" write="true" thirdparty="false" logical="false">
-        <supportedContextType>UserPass</supportedContextType>
+    <protocol scheme="https" read="true" write="false" thirdparty="false" logical="false">
+        <dataService name="default" type="https" impl="fr.in2p3.jsaga.adaptor.data.HTTPSDataAdaptor">
+            <supportedContextType>X509</supportedContextType>
+        </dataService>
     </protocol>
-    <protocol scheme="sftp" impl="fr.in2p3.jsaga.adaptor.data.SFTPDataAdaptor" read="true" write="true" thirdparty="false" logical="false">
-        <supportedContextType>SSH</supportedContextType>
+    <protocol scheme="ftp" read="true" write="true" thirdparty="false" logical="false">
+        <dataService name="default" type="ftp" impl="fr.in2p3.jsaga.adaptor.data.FTPDataAdaptor">
+            <supportedContextType>UserPass</supportedContextType>
+        </dataService>
     </protocol>
-    <protocol scheme="mail" impl="fr.in2p3.jsaga.adaptor.data.SMTPDataAdaptor" read="false" write="true" thirdparty="false" logical="false">
-        <schemeAlias>mailto</schemeAlias>
-        <schemeAlias>smtp</schemeAlias>
+    <protocol scheme="sftp" read="true" write="true" thirdparty="false" logical="false">
+        <dataService name="default" type="sftp" impl="fr.in2p3.jsaga.adaptor.data.SFTPDataAdaptor">
+            <supportedContextType>SSH</supportedContextType>
+        </dataService>
     </protocol>
-    <protocol scheme="gzip" impl="fr.in2p3.jsaga.adaptor.data.GZipDataAdaptor" read="true" write="true" thirdparty="false" logical="false"/>
-    <protocol scheme="tar" impl="fr.in2p3.jsaga.adaptor.data.TarDataAdaptor" read="true" write="true" thirdparty="false" logical="false"/>
-    <protocol scheme="enc" impl="fr.in2p3.jsaga.adaptor.data.EncryptDataAdaptor" read="true" write="true" thirdparty="false" logical="false"/>
-    <protocol scheme="catalog" impl="fr.in2p3.jsaga.adaptor.data.PersonalCatalogDataAdaptor" read="true" write="true" thirdparty="false" logical="true"/>
-    <protocol scheme="test" impl="fr.in2p3.jsaga.adaptor.data.TestDataAdaptor" read="true" write="true" thirdparty="true" logical="false">
-        <schemeAlias>emulated</schemeAlias>
+    <protocol scheme="smtp" read="false" write="true" thirdparty="false" logical="false">
+        <dataService name="default" type="smtp" impl="fr.in2p3.jsaga.adaptor.data.SMTPDataAdaptor"/>
     </protocol>
-    <protocol scheme="gsiftp" impl="fr.in2p3.jsaga.adaptor.data.GSIFTPDataAdaptor" read="true" write="true" thirdparty="true" logical="false">
-        <schemeAlias>gridftp</schemeAlias>
-        <supportedContextType>Globus</supportedContextType>
-        <supportedContextType>MyProxy</supportedContextType>
-        <supportedContextType>VOMS</supportedContextType>
+    <protocol scheme="gzip" read="true" write="true" thirdparty="false" logical="false">
+        <dataService name="default" type="gzip" impl="fr.in2p3.jsaga.adaptor.data.GZipDataAdaptor"/>
     </protocol>
-    <protocol scheme="gsiftp-old" impl="fr.in2p3.jsaga.adaptor.data.GSIFTPDataAdaptor_old" read="true" write="true" thirdparty="true" logical="false">
-        <schemeAlias>gridftp-old</schemeAlias>
-        <schemeAlias>gridftp-v1</schemeAlias>
-        <schemeAlias>gsiftp-v1</schemeAlias>
-        <supportedContextType>Globus</supportedContextType>
-        <supportedContextType>MyProxy</supportedContextType>
-        <supportedContextType>VOMS</supportedContextType>
+    <protocol scheme="tar" read="true" write="true" thirdparty="false" logical="false">
+        <dataService name="default" type="tar" impl="fr.in2p3.jsaga.adaptor.data.TarDataAdaptor"/>
     </protocol>
-    <protocol scheme="srm" impl="fr.in2p3.jsaga.adaptor.data.SRMDataAdaptor" read="true" write="true" thirdparty="true" logical="true">
-        <attribute name="protocols" value="dcap,rfio,gsiftp"/>
-        <supportedContextType>Globus</supportedContextType>
-        <supportedContextType>MyProxy</supportedContextType>
-        <supportedContextType>VOMS</supportedContextType>
+    <protocol scheme="enc" read="true" write="true" thirdparty="false" logical="false">
+        <dataService name="default" type="enc" impl="fr.in2p3.jsaga.adaptor.data.EncryptDataAdaptor"/>
     </protocol>
-    <protocol scheme="lfn" impl="fr.in2p3.jsaga.adaptor.data.LFCDataAdaptor" read="true" write="true" thirdparty="true" logical="true">
-        <supportedContextType>Globus</supportedContextType>
-        <supportedContextType>MyProxy</supportedContextType>
-        <supportedContextType>VOMS</supportedContextType>
+    <protocol scheme="catalog" read="true" write="true" thirdparty="false" logical="true">
+        <dataService name="default" type="catalog" impl="fr.in2p3.jsaga.adaptor.data.PersonalCatalogDataAdaptor"/>
     </protocol>
-    <protocol scheme="srb" impl="fr.in2p3.jsaga.adaptor.data.SRBDataAdaptor" read="true" write="true" thirdparty="false" logical="true">
-        <supportedContextType>UserPass</supportedContextType>
+    <protocol scheme="test" read="true" write="true" thirdparty="true" logical="false">
+        <dataService name="default" type="test" impl="fr.in2p3.jsaga.adaptor.data.TestDataAdaptor"/>
+    </protocol>
+    <protocol scheme="gsiftp" read="true" write="true" thirdparty="true" logical="false">
+        <dataService name="default" type="gsiftp" impl="fr.in2p3.jsaga.adaptor.data.GSIFTPDataAdaptor">
+            <supportedContextType>Globus</supportedContextType>
+            <supportedContextType>MyProxy</supportedContextType>
+            <supportedContextType>VOMS</supportedContextType>
+        </dataService>
+    </protocol>
+    <protocol scheme="gsiftp-new" read="true" write="true" thirdparty="true" logical="false">
+        <dataService name="default" type="gsiftp-new" impl="fr.in2p3.jsaga.adaptor.data.GSIFTPDataAdaptor_new">
+            <supportedContextType>Globus</supportedContextType>
+            <supportedContextType>MyProxy</supportedContextType>
+            <supportedContextType>VOMS</supportedContextType>
+        </dataService>
+    </protocol>
+    <protocol scheme="gsiftp-old" read="true" write="true" thirdparty="true" logical="false">
+        <dataService name="default" type="gsiftp-old" impl="fr.in2p3.jsaga.adaptor.data.GSIFTPDataAdaptor_old">
+            <supportedContextType>Globus</supportedContextType>
+            <supportedContextType>MyProxy</supportedContextType>
+            <supportedContextType>VOMS</supportedContextType>
+        </dataService>
+    </protocol>
+    <protocol scheme="srm" read="true" write="true" thirdparty="true" logical="true">
+        <dataService name="default" type="srm" impl="fr.in2p3.jsaga.adaptor.data.SRMDataAdaptor">
+            <attribute name="TransferProtocols" value="dcap,rfio,gsiftp"/>
+            <supportedContextType>Globus</supportedContextType>
+            <supportedContextType>MyProxy</supportedContextType>
+            <supportedContextType>VOMS</supportedContextType>
+        </dataService>
+    </protocol>
+    <protocol scheme="lfn" read="true" write="true" thirdparty="true" logical="true">
+        <dataService name="default" type="lfn" impl="fr.in2p3.jsaga.adaptor.data.LFCDataAdaptor">
+            <supportedContextType>Globus</supportedContextType>
+            <supportedContextType>MyProxy</supportedContextType>
+            <supportedContextType>VOMS</supportedContextType>
+        </dataService>
+    </protocol>
+    <protocol scheme="srb" read="true" write="true" thirdparty="false" logical="true">
+        <dataService name="default" type="srb" impl="fr.in2p3.jsaga.adaptor.data.SRBDataAdaptor">
+            <supportedContextType>UserPass</supportedContextType>
+            <supportedContextType>Globus</supportedContextType>
+            <supportedContextType>MyProxy</supportedContextType>
+            <supportedContextType>VOMS</supportedContextType>
+        </dataService>
     </protocol>
 
-    <!-- jobmgt -->
-    <jobservice type="gatekeeper" impl="fr.in2p3.jsaga.adaptor.job.GatekeeperJobControlAdaptor" bulk="false">
-        <monitor impl="fr.in2p3.jsaga.adaptor.job.GatekeeperJobMonitorAdaptor"/>
-        <supportedContextType>Globus</supportedContextType>
-    </jobservice>
-    <jobservice type="wms" impl="fr.in2p3.jsaga.adaptor.job.WMSJobControlAdaptor" bulk="true">
-        <monitor impl="fr.in2p3.jsaga.adaptor.job.LBJobMonitorAdaptor"/>
-        <supportedContextType>Globus</supportedContextType>
-        <supportedContextType>MyProxy</supportedContextType>
-        <supportedContextType>VOMS</supportedContextType>
-        <supportedProtocolScheme>lfn</supportedProtocolScheme>
-        <supportedProtocolScheme>srm</supportedProtocolScheme>
-        <supportedProtocolScheme>gsiftp</supportedProtocolScheme>
-        <supportedProtocolScheme>file</supportedProtocolScheme>
-    </jobservice>
-    <jobservice type="ssh" impl="fr.in2p3.jsaga.adaptor.job.SSHJobControlAdaptor" bulk="false">
-        <monitor impl="fr.in2p3.jsaga.adaptor.job.SSHJobMonitorAdaptor"/>
-        <supportedContextType>SSH</supportedContextType>
-    </jobservice>
+    <!-- execution -->
+    <execution scheme="gatekeeper" bulk="false">
+        <jobService name="default" type="gatekeeper" impl="fr.in2p3.jsaga.adaptor.job.GatekeeperJobControlAdaptor">
+            <monitor impl="fr.in2p3.jsaga.adaptor.job.GatekeeperJobMonitorAdaptor"/>
+            <supportedContextType>Globus</supportedContextType>
+            <supportedContextType>MyProxy</supportedContextType>
+            <supportedContextType>VOMS</supportedContextType>
+            <fileStaging/>
+        </jobService>
+    </execution>
+    <execution scheme="jjs" bulk="false">
+        <jobService name="default" type="jjs" impl="fr.in2p3.jsaga.adaptor.job.JJSJobControlAdaptor">
+            <monitor impl="fr.in2p3.jsaga.adaptor.job.JJSJobMonitorAdaptor"/>
+            <supportedContextType>Globus</supportedContextType>
+            <supportedContextType>VOMS</supportedContextType>
+            <fileStaging/>
+        </jobService>
+    </execution>
+    <execution scheme="wms" bulk="true">
+        <jobService name="default" type="wms" impl="fr.in2p3.jsaga.adaptor.job.WMSJobControlAdaptor">
+            <monitor impl="fr.in2p3.jsaga.adaptor.job.LBJobMonitorAdaptor"/>
+            <supportedContextType>Globus</supportedContextType>
+            <supportedContextType>MyProxy</supportedContextType>
+            <supportedContextType>VOMS</supportedContextType>
+            <fileStaging>
+                <supportedProtocolScheme>lfn</supportedProtocolScheme>
+                <supportedProtocolScheme>srm</supportedProtocolScheme>
+                <supportedProtocolScheme>gsiftp</supportedProtocolScheme>
+                <supportedProtocolScheme>file</supportedProtocolScheme>
+            </fileStaging>
+        </jobService>
+    </execution>
+    <execution scheme="ssh" bulk="false">
+        <jobService name="default" type="ssh" impl="fr.in2p3.jsaga.adaptor.job.SSHJobControlAdaptor">
+            <monitor impl="fr.in2p3.jsaga.adaptor.job.SSHJobMonitorAdaptor"/>
+            <supportedContextType>SSH</supportedContextType>
+            <fileStaging/>
+        </jobService>
+    </execution>
 </effective-config>
