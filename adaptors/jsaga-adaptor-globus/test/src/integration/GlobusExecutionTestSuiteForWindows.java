@@ -32,8 +32,14 @@ public class GlobusExecutionTestSuiteForWindows extends TestSuite {
     }
     
 	// test cases
-    public static class GlobusJobRunBasicTest extends JobRunBasicTest {
-        public GlobusJobRunBasicTest() throws Exception {super("gatekeeper-windows");}
+    public static class GlobusJobRunMinimalTest extends JobRunMinimalTest {
+        public GlobusJobRunMinimalTest() throws Exception {super("gatekeeper-windows");}
+        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
+    }
+    
+	// test cases
+    public static class GlobusJobRunRequiredTest extends JobRunRequiredTest {
+        public GlobusJobRunRequiredTest() throws Exception {super("gatekeeper-windows");}
         public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
         public void test_run_error() { System.out.println("the test_run_error ignored : personal gatekeeper does not support this"); };
     }
@@ -59,7 +65,8 @@ public class GlobusExecutionTestSuiteForWindows extends TestSuite {
         super();
         // test cases
         this.addTestSuite(GlobusJobDescriptionTest.class);
-        this.addTestSuite(GlobusJobRunBasicTest.class);
+        this.addTestSuite(GlobusJobRunMinimalTest.class);
+        this.addTestSuite(GlobusJobRunRequiredTest.class);
         this.addTestSuite(GlobusJobRunOptionalTest.class);
         this.addTestSuite(GlobusJobRunDescriptionTest.class);
     }

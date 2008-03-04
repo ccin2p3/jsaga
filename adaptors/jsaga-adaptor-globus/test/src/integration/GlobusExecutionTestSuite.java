@@ -32,8 +32,14 @@ public class GlobusExecutionTestSuite extends TestSuite {
     }
 
     // test cases
-    public static class GlobusJobRunBasicTest extends JobRunBasicTest {
-        public GlobusJobRunBasicTest() throws Exception {super("gatekeeper");}
+    public static class GlobusJobRunMinimalTest extends JobRunMinimalTest {
+        public GlobusJobRunMinimalTest() throws Exception {super("gatekeeper");}
+        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
+    }
+    
+    // test cases
+    public static class GlobusJobRunRequiredTest extends JobRunRequiredTest {
+        public GlobusJobRunRequiredTest() throws Exception {super("gatekeeper");}
         public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     
@@ -57,8 +63,9 @@ public class GlobusExecutionTestSuite extends TestSuite {
     public GlobusExecutionTestSuite() throws Exception {
         super();
         // test cases
+        this.addTestSuite(GlobusJobRunMinimalTest.class);
         this.addTestSuite(GlobusJobDescriptionTest.class);
-        this.addTestSuite(GlobusJobRunBasicTest.class);
+        this.addTestSuite(GlobusJobRunRequiredTest.class);
         this.addTestSuite(GlobusJobRunOptionalTest.class);
         this.addTestSuite(GlobusJobRunDescriptionTest.class);
     }
