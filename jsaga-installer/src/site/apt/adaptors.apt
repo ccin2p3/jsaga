@@ -58,3 +58,11 @@ Adaptors
 *-------------------+--+
 | JDL               | jsaga-adaptor-jdl |
 *-------------------+--+
+
+** Other Adaptors (expression evaluation & file staging)
+
+*------------+
+| <<Module>> |
+*------------+
+| jsaga-adaptor-default |
+*------------+
