@@ -2,10 +2,8 @@ Deviations from SAGA specifications
 
 * Security management
 
-    * Add attributes "Indice" and "Name" to refer to a specific security context factory
-
-    * Add method init(): available by casting your Context instance to ContextImpl.
-      This initialise the context factory (e.g. grid-proxy-init, voms-proxy-init, myproxy-init, ...)
+    * Context.TYPE: may refer to one of the configured security contexts
+      (JSAGA supports several configuration of the same context type).
 
     * Override method toString(): this dump a description of the security context instance.
 
@@ -15,7 +13,7 @@ Deviations from SAGA specifications
 
         * Query (?...) at the end of URL refers to adaptor-specific parameters
 
-        * Fragment (#...) at the end of URL refers to a specific security context factory
+        * Fragment (#...) at the end of URL refers to a specific configuration of the protocol
 
         * Class URL is modified to support relative paths (<scheme>://./<path>) and to be extendable
           <(NOTE: this is the only modification made on the SAGA Java Binding, and it will disappear when a URL factory will be provided)>
@@ -29,8 +27,6 @@ Deviations from SAGA specifications
         * exist(): Check if current entry exist (use this if created with flag FLAGS_BYPASSEXIST).
 
         * copyFrom(): Copy remote source entry to current entry.
-
-        * list(): Returns a List of URL instances with additional methods to get entry attributes (cast them to JSagaURL).
 
     * Few differences in implementation of behavior with some flags (see comments in source code)
 
@@ -47,6 +43,6 @@ Deviations from SAGA specifications
 
         * JobContact (not supported by JSDL)
 
-* Streams, Remote Procedure Call and future...
+* Streams, Remote Procedure Call
 
     * Will not be implemented.
