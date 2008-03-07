@@ -27,6 +27,8 @@ Deviations from SAGA specifications
         * exist(): Check if current entry exist (use this if created with flag FLAGS_BYPASSEXIST).
 
         * copyFrom(): Copy remote source entry to current entry.
+        
+        * getLastModified(): Return the date of last modification.
 
     * Few differences in implementation of behavior with some flags (see comments in source code)
 
