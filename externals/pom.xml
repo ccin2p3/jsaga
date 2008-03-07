@@ -24,6 +24,15 @@
     <module>puretls</module>
     <module>cryptix32</module>
     <module>cryptix-asn1</module>
-    <module>vomsjapi</module>
+    <module>vomsjapi</module>    
+    <module>addressing-1.0</module>
+    <module>commonj</module>
+    <module>concurrent</module>
+	<module>opensaml</module>
+	<module>wsgram-api</module>
+	<module>wms-api</module>
+	<!-- <module>u6-api</module>  -->
+	<module>wss4j</module>
+	<module>xmlsec</module>
   </modules>
 </project>
