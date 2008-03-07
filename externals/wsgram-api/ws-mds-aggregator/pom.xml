@@ -1,0 +1,53 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.globus</groupId>
+    <artifactId>ws-mds-aggregator</artifactId>
+    <version>4.0.0</version>
+	<packaging>jar</packaging>
+    <name>Stubs for MDS Aggregator service</name>
+    <build>
+		<resources>
+			<resource>
+				<directory>resources</directory>
+			</resource>
+		</resources>
+        <plugins>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+						<phase>generate-sources</phase>
+                        <configuration>
+							<tasks>
+							 <property name="compile_classpath" refid="maven.compile.classpath"/>
+
+								<!-- Build stubs for ws-mds-aggregator -->
+								<ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
+									<property location="${basedir}/resources/wsdl/schema/mds/aggregator" name="source.stubs.dir"/>
+									<property name="wsdl.file" value="AggregatorServiceGroup_service.wsdl"/>
+									<property location="${project.build.directory}/generated-sources" name="target.stubs.dir"/>
+								</ant>
+								<ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
+									<property location="${basedir}/resources/wsdl/schema/mds/aggregator" name="source.stubs.dir"/>
+									<property name="wsdl.file" value="AggregatorServiceGroupEntry_service.wsdl"/>
+									<property location="${project.build.directory}/generated-sources" name="target.stubs.dir"/>
+								</ant>
+							</tasks>
+							<sourceRoot>${project.build.directory}/generated-sources</sourceRoot>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+                    </execution>	
+				</executions>
+            </plugin>
+		</plugins>
+    </build>
+    <dependencies>
+		<dependency>
+            <groupId>org.globus</groupId>
+            <artifactId>wsrf-core</artifactId>
+            <version>4.0.0</version>
+        </dependency> 
+	</dependencies>
+</project>

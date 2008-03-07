@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  Portions of this file Copyright 1999-2005 University of Chicago
+  Portions of this file Copyright 1999-2005 The University of Southern California.
+  
+  This file or a portion of this file is licensed under the
+  terms of the Globus Toolkit Public License, found at
+  http://www.globus.org/toolkit/download/license.html.
+  If you redistribute this file, with or without
+  modifications, you must include this notice in the file.
+-->
+<wsdl:definitions name="ReliableFileTransferFactory" targetNamespace="http://www.globus.org/namespaces/2004/10/rft" xmlns:wsrp="http://docs.oasis-open.org/wsrf/2004/06/wsrf-WS-ResourceProperties-1.2-draft-01.xsd" xmlns:wsbf="http://docs.oasis-open.org/wsrf/2004/06/wsrf-WS-BaseFaults-1.2-draft-01.xsd" xmlns:tns="http://www.globus.org/namespaces/2004/10/rft" xmlns:wsrpw="http://docs.oasis-open.org/wsrf/2004/06/wsrf-WS-ResourceProperties-1.2-draft-01.wsdl" xmlns:wsdlpp="http://www.globus.org/namespaces/2004/10/WSDLPreprocessor" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/03/addressing" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsrl="http://docs.oasis-open.org/wsrf/2004/06/wsrf-WS-ResourceLifetime-1.2-draft-01.wsdl" xmlns:wsnt="http://docs.oasis-open.org/wsn/2004/06/wsn-WS-BaseNotification-1.2-draft-01.wsdl">
+  <wsdl:import namespace="http://docs.oasis-open.org/wsrf/2004/06/wsrf-WS-ResourceLifetime-1.2-draft-01.wsdl" location="../../wsrf/lifetime/WS-ResourceLifetime.wsdl"/>
+  <wsdl:import namespace="http://docs.oasis-open.org/wsrf/2004/06/wsrf-WS-ResourceProperties-1.2-draft-01.wsdl" location="../../wsrf/properties/WS-ResourceProperties.wsdl"/>
+  <wsdl:import namespace="http://docs.oasis-open.org/wsn/2004/06/wsn-WS-BaseNotification-1.2-draft-01.wsdl" location="../../wsrf/notification/WS-BaseN.wsdl"/>
+  <wsdl:types>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.globus.org/namespaces/2004/10/rft" xmlns:tns="http://www.globus.org/namespaces/2004/10/rft" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/03/addressing">
+
+            <xsd:include schemaLocation="reliable_transfer_types.xsd"/>
+
+            <!--
+            <xsd:import
+                namespace="http://www.ibm.com/xmlns/stdwip/web-services/WS-ServiceGroup"
+                schemaLocation="../wsrf/servicegroup/WS-ServiceGroup.xsd"/>
+            -->
+
+            <xsd:import namespace="http://schemas.xmlsoap.org/ws/2004/03/addressing" schemaLocation="../../ws/addressing/WS-Addressing.xsd"/>
+            
+            <xsd:import namespace="http://docs.oasis-open.org/wsrf/2004/06/wsrf-WS-BaseFaults-1.2-draft-01.xsd" schemaLocation="../../wsrf/faults/WS-BaseFaults.xsd"/>
+
+                <!--Resource property element declarations-->
+            <xsd:element name="DelegationServiceEPR" type="wsa:EndpointReferenceType"/>
+            <xsd:element name="ActiveResourceInstances" type="xsd:int"/>
+            <xsd:element name="TotalNumberOfTransfers" type="xsd:long"/>
+            <xsd:element name="TotalNumberOfActiveTransfers" type="xsd:long"/>
+            <xsd:element name="TotalNumberOfBytesTransferred" type="xsd:long"/>
+            <xsd:element name="RFTFactoryStartTime" type="xsd:dateTime"/>
+
+            <!--Resource property document declaration-->
+            <xsd:element name="ReliableFileTransferFactoryProperties">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element ref="tns:ActiveResourceInstances"/>
+                        <xsd:element ref="tns:TotalNumberOfTransfers"/>
+                        <xsd:element ref="tns:TotalNumberOfActiveTransfers"/>
+                        <xsd:element ref="tns:TotalNumberOfBytesTransferred"/>
+                        <xsd:element ref="tns:RFTFactoryStartTime"/>
+                        <xsd:element ref="tns:DelegationServiceEPR"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+          <!-- Operational input/outout type declarations -->
+          <xsd:element name="createReliableFileTransferRequest" type="tns:CreateReliableFileTransferInputType"/>
+          <xsd:complexType name="CreateReliableFileTransferInputType">
+              <xsd:sequence>
+
+                  <xsd:element minOccurs="0" name="InitialTerminationTime" nillable="true" type="xsd:dateTime"/>
+
+                <xsd:choice>
+                    <xsd:element ref="tns:transferRequest"/>
+                    <xsd:element ref="tns:deleteRequest"/>
+                </xsd:choice>
+
+              </xsd:sequence>
+          </xsd:complexType>
+
+          <xsd:element name="createReliableFileTransferResponse" type="tns:CreateReliableFileTransferOutputType"/>
+          <xsd:complexType name="CreateReliableFileTransferOutputType">
+              <xsd:sequence>
+                  <xsd:element name="NewTerminationTime" nillable="true" type="xsd:dateTime"/>
+                  <xsd:element name="CurrentTime" type="xsd:dateTime"/>
+                  <xsd:element name="reliableTransferEPR" type="wsa:EndpointReferenceType"/>
+              </xsd:sequence>
+          </xsd:complexType>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="createReliableFileTransferFaultMessage">
+    <wsdl:part name="fault" element="wsbf:BaseFault"/>
+  </wsdl:message>
+  <wsdl:message name="createReliableFileTransferOuputMessage">
+    <wsdl:part name="parameters" element="tns:createReliableFileTransferResponse"/>
+  </wsdl:message>
+  <wsdl:message name="createReliableFileTransferInputMessage">
+    <wsdl:part name="parameters" element="tns:createReliableFileTransferRequest"/>
+  </wsdl:message>
+  <wsdl:portType name="ReliableFileTransferFactoryPortType" wsrp:ResourceProperties="tns:ReliableFileTransferFactoryProperties">
+    <wsdl:operation name="createReliableFileTransfer">
+      <wsdl:input message="tns:createReliableFileTransferInputMessage"/>
+      <wsdl:output message="tns:createReliableFileTransferOuputMessage"/>
+      <wsdl:fault name="createReliableFileTransferFault" message="tns:createReliableFileTransferFaultMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="QueryResourceProperties">
+      <wsdl:input name="QueryResourcePropertiesRequest" message="wsrpw:QueryResourcePropertiesRequest" wsa:Action="http://docs.oasis-open.org/wsrf/2004/06/wsrf-WS-ResourceProperties/QueryResourceProperties"/>
+      <wsdl:output name="QueryResourcePropertiesResponse" message="wsrpw:QueryResourcePropertiesResponse" wsa:Action="http://docs.oasis-open.org/wsrf/2004/06/wsrf-WS-ResourceProperties/QueryResourcePropertiesResponse"/>
+      <wsdl:fault name="InvalidResourcePropertyQNameFault" message="wsrpw:InvalidResourcePropertyQNameFault"/>
+      <wsdl:fault name="InvalidQueryExpressionFault" message="wsrpw:InvalidQueryExpressionFault"/>
+      <wsdl:fault name="QueryEvaluationErrorFault" message="wsrpw:QueryEvaluationErrorFault"/>
+      <wsdl:fault name="ResourceUnknownFault" message="wsrpw:ResourceUnknownFault"/>
+      <wsdl:fault name="UnknownQueryExpressionDialectFault" message="wsrpw:UnknownQueryExpressionDialectFault"/>
+    </wsdl:operation>
+    <wsdl:operation name="GetMultipleResourceProperties">
+      <wsdl:input name="GetMultipleResourcePropertiesRequest" message="wsrpw:GetMultipleResourcePropertiesRequest" wsa:Action="http://docs.oasis-open.org/wsrf/2004/06/wsrf-WS-ResourceProperties/GetMultipleResourceProperties"/>
+      <wsdl:output name="GetMultipleResourcePropertiesResponse" message="wsrpw:GetMultipleResourcePropertiesResponse" wsa:Action="http://docs.oasis-open.org/wsrf/2004/06/wsrf-WS-ResourceProperties/GetMultipleResourcePropertiesResponse"/>
+      <wsdl:fault name="InvalidResourcePropertyQNameFault" message="wsrpw:InvalidResourcePropertyQNameFault"/>
+      <wsdl:fault name="ResourceUnknownFault" message="wsrpw:ResourceUnknownFault"/>
+    </wsdl:operation>
+    <wsdl:operation name="GetResourceProperty">
+      <wsdl:input name="GetResourcePropertyRequest" message="wsrpw:GetResourcePropertyRequest" wsa:Action="http://docs.oasis-open.org/wsrf/2004/06/wsrf-WS-ResourceProperties/GetResourceProperty"/>
+      <wsdl:output name="GetResourcePropertyResponse" message="wsrpw:GetResourcePropertyResponse" wsa:Action="http://docs.oasis-open.org/wsrf/2004/06/wsrf-WS-ResourceProperties/GetResourcePropertyResponse"/>
+      <wsdl:fault name="InvalidResourcePropertyQNameFault" message="wsrpw:InvalidResourcePropertyQNameFault"/>
+      <wsdl:fault name="ResourceUnknownFault" message="wsrpw:ResourceUnknownFault"/>
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

@@ -1,0 +1,1 @@
+Du to the jar aggregation, remove the directory META-INF of the initial jar.

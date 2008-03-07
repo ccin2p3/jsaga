@@ -1,0 +1,23 @@
+<assembly>
+  <id></id>
+  <formats>
+    <format>jar</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <moduleSets>
+    <moduleSet>
+      <binaries>
+		<outputFileNameMapping></outputFileNameMapping>
+        <outputDirectory></outputDirectory>
+		<includeDependencies>false</includeDependencies>
+        <unpack>true</unpack>
+      </binaries>
+    </moduleSet>
+  </moduleSets>
+ <dependencySets>
+	<dependencySet>
+		<outputFileNameMapping></outputFileNameMapping>
+		<unpack>true</unpack>
+	</dependencySet>
+</dependencySets>
+</assembly>

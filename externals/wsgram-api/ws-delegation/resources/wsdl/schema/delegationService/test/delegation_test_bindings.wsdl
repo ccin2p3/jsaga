@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  Portions of this file Copyright 1999-2005 University of Chicago
+  Portions of this file Copyright 1999-2005 The University of Southern California.
+  
+  This file or a portion of this file is licensed under the
+  terms of the Globus Toolkit Public License, found at
+  http://www.globus.org/toolkit/download/license.html.
+  If you redistribute this file, with or without
+  modifications, you must include this notice in the file.
+-->
+<wsdl:definitions name="DelegationTest" targetNamespace="http://www.globus.org/08/2004/delegationService/test/bindings" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:porttype="http://www.globus.org/08/2004/delegationService/test" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:import namespace="http://www.globus.org/08/2004/delegationService/test" location="delegation_test_port_type.wsdl"/>
+  <wsdl:binding name="DelegationTestPortTypeSOAPBinding" type="porttype:DelegationTestPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="create">
+      <soap:operation soapAction="http://www.globus.org/08/2004/delegationService/test/DelegationTestPortType/createRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getCallbackCount">
+      <soap:operation soapAction="http://www.globus.org/08/2004/delegationService/test/DelegationTestPortType/getCallbackCountRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+</wsdl:definitions>

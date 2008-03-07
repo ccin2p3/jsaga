@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.globus</groupId>
+    <artifactId>wsgram-api</artifactId>
+    <version>4.0.0</version>
+	<packaging>pom</packaging>
+	<name>WS GRAM external libraries</name>
+	<description>These are the external libraries for the WS GRAM adaptor.</description>
+    <url>http://www.globus.org/</url>
+	<build>
+		<directory>build</directory>
+	    <plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+					<executions>
+					    <execution>
+							<phase>package</phase>
+							<goals>
+								<goal>assembly</goal>
+	                        </goals>
+		                </execution>
+			        </executions>
+			        <configuration>
+						<descriptors>
+				            <descriptor>assembly.xml</descriptor>
+			          </descriptors>
+			        </configuration>
+		    </plugin>
+			<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-file-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-jar</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>
+                                    <source>${project.build.directory}/${artifactId}-${version}.jar</source>
+                                    <destination>${basedir}/${artifactId}.jar</destination>
+                                </file>
+                            </files>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+			<!-- Commented because clean build directory is made by pom-java -->
+			<!-- <plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>clean</phase>
+					</execution>
+				</executions>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>${basedir}</directory>
+							<includes>
+								<include>${artifactId}.jar</include>
+							</includes>
+							<followSymlinks>false</followSymlinks>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin> -->
+		</plugins>
+	</build>
+	<dependencies>
+        <dependency>
+            <groupId>org.globus</groupId>
+            <artifactId>globus_usage_packets_common</artifactId>
+            <version>4.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+		<dependency>
+            <groupId>org.globus</groupId>
+            <artifactId>wsrf-provider-jce</artifactId>
+            <version>4.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+	</dependencies>
+  	<modules>
+<!--		<module>opensaml</module>
+		<module>addressing-1.0</module> -->
+		<module>wss4j-globus</module>
+		<module>wsrf-usage</module>
+		<module>wsrf-tools</module>
+		<module>ws-delegation</module>
+		<module>ws-rendezvous</module>
+		<module>wsrf-common</module>
+		<module>wsrf-core</module>
+		<module>ws-mds-aggregator</module>
+		<module>ws-gram</module>
+  	</modules>
+</project>

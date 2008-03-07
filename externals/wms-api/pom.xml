@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <!-- declaration -->
+  <parent>
+        <groupId>fr.in2p3.parent</groupId>
+        <artifactId>in2p3-external-pom</artifactId>
+        <version>current</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.glite</groupId>
+  <artifactId>wms-api</artifactId>
+  <version>3.1</version>
+  <name>WMS external libraries</name>
+  <description>These are the external libraries for the WMS adaptors.</description>
+  <url>https://grid.ct.infn.it/twiki/bin/view/GILDA/ApiJavaWMProxy</url>
+  <dependencies>
+        <dependency>
+            <groupId>axis</groupId>
+            <artifactId>axis</artifactId>
+            <version>1.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.8</version>
+        </dependency>
+		<dependency>
+            <groupId>org.globus</groupId>
+            <artifactId>cog-jglobus</artifactId>
+            <version>gt4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.globus</groupId>
+            <artifactId>cog-axis</artifactId>
+            <version>gt4</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+</project>

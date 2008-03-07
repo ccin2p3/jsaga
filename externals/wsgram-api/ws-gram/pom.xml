@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+    <groupId>org.globus</groupId>
+    <artifactId>ws-gram</artifactId>
+    <version>4.0.0</version>
+    <name>Stubs for WS Gram</name>
+    <build>
+		<sourceDirectory>java</sourceDirectory>
+		<resources>
+			<resource>
+				<directory>resources</directory>
+			</resource>
+		</resources>
+        <plugins>
+            <plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+						<phase>generate-sources</phase>
+                        <configuration>
+							<tasks>
+							 <property name="compile_classpath" refid="maven.compile.classpath"/>
+
+								<!-- Build stubs for ws-gram-common -->
+								<!-- managed job factory stubs -->
+								<ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
+									<property name="wsdl.file"
+										value="managed_job_factory_service.wsdl"/>
+									<property name="source.stubs.dir"
+											  value="${basedir}/resources/wsdl/schema/gram"/>
+									<property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
+								</ant>
+
+								<!-- managed job stubs -->
+								<ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
+									<property name="wsdl.file"
+										value="managed_job_service.wsdl"/>
+									<property name="source.stubs.dir"
+											  value="${basedir}/resources/wsdl/schema/gram"/>
+									<property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
+								</ant>
+
+								<!-- managed executable job stubs -->
+								<ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
+									<property name="wsdl.file"
+										value="managed_executable_job_service.wsdl"/>
+									<property name="source.stubs.dir"
+											  value="${basedir}/resources/wsdl/schema/gram"/>
+									<property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
+								</ant>
+
+								<!-- internal data structures for persistence -->
+								<ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
+									<property name="wsdl.file"
+										value="managed_executable_job_state.wsdl"/>
+									<property name="source.stubs.dir"
+											  value="${basedir}/resources/wsdl/schema/gram"/>
+									<property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
+								</ant>
+
+								<!-- managed multi job stubs -->
+								<ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
+									<property name="wsdl.file"
+										value="managed_multi_job_service.wsdl"/>
+									<property name="source.stubs.dir"
+											  value="${basedir}/resources/wsdl/schema/gram"/>
+									<property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
+								</ant>
+
+								<!-- internal data structures for persistence -->
+								<ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
+									<property name="wsdl.file"
+										value="managed_multi_job_state.wsdl"/>
+									<property name="source.stubs.dir"
+											  value="${basedir}/resources/wsdl/schema/gram"/>
+									<property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
+								</ant>
+
+								<!-- file system map config stubs -->
+								<ant antfile="${basedir}/config/globus_wsrf_build_stubs.xml" target="generateStubs">
+									<property name="wsdl.file"
+										value="file_system_map_config.wsdl"/>
+									<property name="source.stubs.dir"
+											  value="${basedir}/resources/wsdl/schema/gram"/>
+									<property name="target.stubs.dir" location="${project.build.directory}/generated-sources"/>
+								</ant>
+
+								<copy toDir="${project.build.directory}/generated-sources/org/globus/mds/glue" overwrite="yes">
+									<fileset dir="${basedir}/config/glue" casesensitive="yes">
+										<include name="**/*"/>
+						            </fileset>
+								</copy>
+
+							</tasks>							
+							<sourceRoot>${project.build.directory}/generated-sources</sourceRoot>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+                    </execution>	
+				</executions>
+            </plugin>
+		</plugins>
+    </build>
+	<dependencies>
+        <dependency>
+            <groupId>org.globus</groupId>
+            <artifactId>ws-rendezvous</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.globus</groupId>
+            <artifactId>ws-delegation</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+		<dependency>
+			<groupId>directory-naming</groupId>
+			<artifactId>naming-java</artifactId>
+			<version>0.8</version>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+</project>
