@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><project>
+<parent>
+    <groupId>fr.in2p3.jsaga</groupId>
+    <artifactId>jsaga-adaptorpom</artifactId>
+    <version>current</version>
+</parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fr.in2p3.jsaga.adaptor.wsgram</groupId>
+  <artifactId>jsaga-adaptor-wsgram</artifactId>
+  <name>Adaptor for Globus Toolkit 4.0</name>
+  <version>0.9.1-SNAPSHOT</version>
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <testSourceDirectory>test/src</testSourceDirectory>
+    <resources>
+      <resource>
+        <directory>resources</directory>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>test/resources</directory>
+      </testResource>
+    </testResources>
+  </build>
+  <dependencies>
+	<!-- common -->
+    <dependency>
+      <groupId>fr.in2p3.jsaga</groupId>
+      <artifactId>jsaga-adaptoritf</artifactId>
+      <version>0.9.1-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.ogf.saga</groupId>
+      <artifactId>saga-api</artifactId>
+      <version>0.9.1-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.ogf.saga</groupId>
+      <artifactId>saga-api</artifactId>
+      <version>0.9.1-SNAPSHOT</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>fr.in2p3.jsaga</groupId>
+      <artifactId>jsaga-engine</artifactId>
+      <version>0.9.1-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>fr.in2p3.jsaga.adaptor</groupId>
+      <artifactId>jsaga-adaptor-globus</artifactId>
+      <version>0.9.1-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
+	<!-- adaptor specific -->
+	<dependency>
+		<groupId>org.globus</groupId>
+		<artifactId>wsgram-api</artifactId>
+		<version>4.0.0</version>
+	</dependency>
+  </dependencies>
+</project>
