@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.command;
 
-import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.helpers.SAGAPattern;
 import org.apache.commons.cli.*;
 import org.ogf.saga.URL;
@@ -8,7 +7,6 @@ import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,11 +67,13 @@ public class NamespaceList extends AbstractCommand {
             dir.close();
 
             // display list
-            for (Iterator<URL> it=list.iterator(); it.hasNext(); ) {
-                URL entry = it.next();
-                if (line.hasOption(OPT_LONG) && entry instanceof JSagaURL) {
-                    System.out.println(((JSagaURL)entry).getLongFormat());
-                } else {
+            if (line.hasOption(OPT_LONG)) {
+                EntryLongFormat formatter = new EntryLongFormat(dir);
+                for (URL entry : list) {
+                    System.out.println(formatter.toString(entry));
+                }
+            } else {
+                for (URL entry : list) {
                     System.out.println(entry.toString().replaceAll("%20", " "));
                 }
             }

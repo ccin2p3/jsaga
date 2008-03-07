@@ -83,8 +83,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
             }
         } else if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
             this._makeParentDirs();
-        } else if (! JSAGAFlags.BYPASSEXIST.isSet(flags)) {
-            if (m_adaptor instanceof DataReaderAdaptor && !((DataReaderAdaptor)m_adaptor).exists(m_url.getPath())) {
+        } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !(m_url instanceof JSagaURL) && m_adaptor instanceof DataReaderAdaptor) {
+            boolean exists = ((DataReaderAdaptor)m_adaptor).exists(m_url.getPath());
+            if (! exists) {
                 throw new DoesNotExist("Directory does not exist: "+ m_url);
             }
         }
@@ -404,7 +405,7 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else if (relativePath.getHost()!=null && !relativePath.getHost().equals(m_url.getHost())) {
             throw new IncorrectURL("You must not modify the host of the URL: "+ m_url.getHost());
         }
-        return URLFactory.createURL(m_url, relativePath.getPath());
+        return URLFactory.createURL(m_url, relativePath);
     }
 
     private String[] _listNames(String absolutePath) throws NotImplemented, PermissionDenied, IncorrectState, Timeout, NoSuccess {

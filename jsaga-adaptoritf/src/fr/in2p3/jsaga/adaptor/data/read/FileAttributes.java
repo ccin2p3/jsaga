@@ -1,11 +1,6 @@
 package fr.in2p3.jsaga.adaptor.data.read;
 
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
-import org.ogf.saga.permissions.Permission;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -30,6 +25,7 @@ public abstract class FileAttributes {
     protected long m_size = -1;
     protected PermissionBytes m_permission = PermissionBytes.UNKNOWN;
     protected String m_owner = null;
+    protected String m_group = null;
     protected long m_lastModified = 0;
 
     public String getName() {
@@ -57,35 +53,11 @@ public abstract class FileAttributes {
         return m_owner;
     }
 
+    public String getGroup() {
+        return m_group;
+    }
+
     public long getLastModified() {
         return m_lastModified;
-    }
-
-    public String toString() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(m_type ==DIRECTORY_TYPE ? 'd' : '-');
-        buf.append(m_permission.contains(Permission.READ) ? 'r' : '-');
-        buf.append(m_permission.contains(Permission.WRITE) ? 'w' : '-');
-        buf.append(m_permission.contains(Permission.EXEC) ? 'x' : '-');
-        buf.append(' ');
-        if (m_owner != null) {
-            buf.append(format(m_owner, 8));
-            buf.append(' ');
-        }
-        buf.append(format(""+m_size, 10));
-        buf.append(' ');
-        buf.append(new SimpleDateFormat("MMM-dd-yyyy HH:mm", Locale.ENGLISH).format(new Date(m_lastModified)));
-        buf.append(' ');
-        buf.append(this.getName());
-        return buf.toString();
-    }
-
-    private StringBuffer format(String value, int length) {
-        StringBuffer buf = new StringBuffer();
-        for (int i=value.length(); i<length; i++) {
-            buf.append(' ');
-        }
-        buf.append(value);
-        return buf;
     }
 }

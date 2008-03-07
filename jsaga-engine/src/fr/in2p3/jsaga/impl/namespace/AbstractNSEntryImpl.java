@@ -1,10 +1,12 @@
 package fr.in2p3.jsaga.impl.namespace;
 
+import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.link.LinkAdaptor;
 import fr.in2p3.jsaga.adaptor.data.link.NotLink;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
 import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
+import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.helpers.URLFactory;
@@ -14,6 +16,8 @@ import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
+
+import java.util.Date;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -74,7 +78,12 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
 
     public URL getName() throws NotImplemented, Timeout, NoSuccess {
         try {
-            return new URL(this._getEntryName());
+            String name = this._getEntryName();
+            if (name != null) {
+                return new URL(name.replaceAll(" ", "%20"));
+            } else {
+                return null;
+            }
         } catch (BadParameter e) {
             throw new NoSuccess(e);
         }
@@ -102,7 +111,9 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
     }
 
     public boolean isDir() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        if (m_adaptor instanceof DataReaderAdaptor) {
+        if (m_url instanceof JSagaURL) {
+            return ((JSagaURL)m_url).getAttributes().getType() == FileAttributes.DIRECTORY_TYPE;
+        } else if (m_adaptor instanceof DataReaderAdaptor) {
             try {
                 return ((DataReaderAdaptor)m_adaptor).isDirectory(m_url.getPath());
             } catch (DoesNotExist doesNotExist) {
@@ -114,7 +125,9 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
     }
 
     public boolean isEntry() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        if (m_adaptor instanceof DataReaderAdaptor) {
+        if (m_url instanceof JSagaURL) {
+            return ((JSagaURL)m_url).getAttributes().getType() == FileAttributes.FILE_TYPE;
+        } else if (m_adaptor instanceof DataReaderAdaptor) {
             try {
                 return ((DataReaderAdaptor)m_adaptor).isEntry(m_url.getPath());
             } catch (DoesNotExist doesNotExist) {
@@ -126,7 +139,9 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
     }
 
     public boolean isLink() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        if (m_adaptor instanceof LinkAdaptor) {
+        if (m_url instanceof JSagaURL) {
+            return ((JSagaURL)m_url).getAttributes().getType() == FileAttributes.LINK_TYPE;
+        } else if (m_adaptor instanceof LinkAdaptor) {
             try {
                 return ((LinkAdaptor)m_adaptor).isLink(m_url.getPath());
             } catch (DoesNotExist doesNotExist) {
@@ -323,6 +338,17 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
 
     public Task close(TaskMode mode, float timeoutInSeconds) throws NotImplemented {
         throw new NotImplemented("Not implemented by the SAGA engine", this);
+    }
+
+    /** deviation from SAGA specification */
+    public Date getLastModified() throws NotImplemented {
+        if (m_url instanceof JSagaURL) {
+            long lastModified = ((JSagaURL)m_url).getAttributes().getLastModified();
+            if (lastModified > 0) {
+                return new Date(lastModified);
+            }
+        }
+        throw new NotImplemented("Not supported for this protocol: "+m_url.getScheme());
     }
 
     ///////////////////////////////////////// protected methods /////////////////////////////////////////

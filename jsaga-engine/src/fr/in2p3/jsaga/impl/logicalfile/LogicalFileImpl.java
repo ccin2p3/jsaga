@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl.logicalfile;
 
+import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
@@ -66,8 +67,9 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
             }
         } else if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
             this._makeParentDirs();
-        } else if (! JSAGAFlags.BYPASSEXIST.isSet(flags)) {
-            if (m_adaptor instanceof DataReaderAdaptor && !((DataReaderAdaptor)m_adaptor).exists(m_url.getPath())) {
+        } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !(m_url instanceof JSagaURL) && m_adaptor instanceof DataReaderAdaptor) {
+            boolean exists = ((DataReaderAdaptor)m_adaptor).exists(m_url.getPath());
+            if (! exists) {
                 throw new DoesNotExist("Logical file does not exist: "+ m_url);
             }
         }

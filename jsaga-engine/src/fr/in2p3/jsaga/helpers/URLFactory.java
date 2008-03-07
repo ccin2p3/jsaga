@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.helpers;
 
+import fr.in2p3.jsaga.JSagaURL;
 import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 
@@ -38,6 +39,22 @@ public class URLFactory {
         return url;
     }
 
+    public static URL createURL(URL base, URL relativePath) throws NotImplemented, BadParameter, NoSuccess {
+        // check URL
+        boolean isDir = base.getPath().endsWith("/");
+        boolean isAbsolute = relativePath.getPath().startsWith("/");
+        if (!isDir && !isAbsolute) {
+            throw new BadParameter("INTERNAL ERROR: path must be relative to a directory: "+base.getURL());
+        }
+        // resolve
+        String absolutePath = resolve(base, relativePath.getPath());
+        if (relativePath instanceof JSagaURL) {
+            return new JSagaURL(((JSagaURL)relativePath).getAttributes(), absolutePath);
+        } else {
+            return new URL(absolutePath);
+        }
+    }
+
     public static URL createURL(URL base, String name) throws NotImplemented, BadParameter, NoSuccess {
         // check URL
         boolean isDir = base.getPath().endsWith("/");
@@ -46,17 +63,17 @@ public class URLFactory {
             throw new BadParameter("INTERNAL ERROR: path must be relative to a directory: "+base.getURL());
         }
         // resolve
-        return resolve(base, name);
+        return new URL(resolve(base, name));
     }
 
     public static URL createParentURL(URL base) throws NotImplemented, BadParameter, NoSuccess {
         // get parent directory
         String parent = (base.getPath().endsWith("/") ? ".." : ".");
         // resolve
-        return resolve(base, parent);
+        return new URL(resolve(base, parent));
     }
 
-    private static URL resolve(URL base, String name) throws NotImplemented, BadParameter, NoSuccess {
+    private static String resolve(URL base, String name) throws NotImplemented, BadParameter, NoSuccess {
         java.net.URI baseUri;
         try {
             baseUri = new java.net.URI(base.getURL());
@@ -64,7 +81,8 @@ public class URLFactory {
             throw new BadParameter(e);
         }
         String relativePath = name + (baseUri.getFragment()!=null ? "#"+baseUri.getFragment() : "");
+        relativePath = relativePath.replaceAll(" ", "%20");
         java.net.URI uri = baseUri.resolve(relativePath);
-        return new URL(uri.toString());
+        return uri.toString();
     }
 }

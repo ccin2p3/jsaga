@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl.file;
 
+import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
@@ -105,8 +106,11 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         } else if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
             this._makeParentDirs();
         }
-        if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !effectiveFlags.contains(Flags.READ) && !effectiveFlags.contains(Flags.WRITE)) {
-            if (m_adaptor instanceof DataReaderAdaptor && !((DataReaderAdaptor)m_adaptor).exists(m_url.getPath())) {
+        if (effectiveFlags.contains(Flags.READ) || effectiveFlags.contains(Flags.WRITE)) {
+            // exists check already done
+        } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !(m_url instanceof JSagaURL) && m_adaptor instanceof DataReaderAdaptor) {
+            boolean exists = ((DataReaderAdaptor)m_adaptor).exists(m_url.getPath());
+            if (! exists) {
                 throw new DoesNotExist("File does not exist: "+ m_url);
             }
         }
@@ -284,6 +288,12 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
     /////////////////////////////////// implementation of interface ///////////////////////////////////
 
     public long getSize() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+        if (m_url instanceof JSagaURL) {
+            long size = ((JSagaURL)m_url).getAttributes().getSize();
+            if (size > -1) {
+                return size;
+            }
+        }
         if (m_adaptor instanceof FileReader) {
             if (m_outStream != null) {
                 try {m_outStream.close();} catch (IOException e) {/*ignore*/}

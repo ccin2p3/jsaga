@@ -43,6 +43,10 @@ public class PermissionBytes {
     }
 
     public boolean contains(final Permission ref) {
-        return (value & ref.getValue()) > 0;
+        return (value & ref.getValue()) == ref.getValue();
+    }
+
+    public boolean containsAll(final int refValue) {
+        return (value & refValue) == refValue;
     }
 }

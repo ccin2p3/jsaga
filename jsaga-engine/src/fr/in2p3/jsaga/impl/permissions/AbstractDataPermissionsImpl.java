@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl.permissions;
 
+import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionAdaptor;
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
@@ -75,6 +76,17 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
     }
 
     public boolean permissionsCheck(String id, int permissions) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
+        if (m_url instanceof JSagaURL) {
+            PermissionBytes perm = ((JSagaURL)m_url).getAttributes().getPermission();
+            if (perm != null) {
+                String owner = ((JSagaURL)m_url).getAttributes().getOwner();
+                boolean checkOwnerPerm = (owner!=null && owner.equals(id));
+                boolean checkAllPerm = (owner==null && (id==null || id.equals("*")));
+                if (checkOwnerPerm || checkAllPerm) {
+                    return perm.containsAll(permissions);
+                }
+            }
+        }
         if (m_adaptor instanceof PermissionAdaptor) {
             PermissionBytes effectivePermissions = new PermissionBytes(permissions);
             return ((PermissionAdaptor)m_adaptor).permissionsCheck(m_url.getPath(), id, effectivePermissions);
@@ -84,6 +96,12 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
     }
 
     public String getOwner() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
+        if (m_url instanceof JSagaURL) {
+            String owner = ((JSagaURL)m_url).getAttributes().getOwner();
+            if (owner != null) {
+                return owner;
+            }
+        }
         if (m_adaptor instanceof PermissionAdaptor) {
             return ((PermissionAdaptor)m_adaptor).getOwner(m_url.getPath());
         } else {
@@ -92,6 +110,12 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
     }
 
     public String getGroup() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
+        if (m_url instanceof JSagaURL) {
+            String group = ((JSagaURL)m_url).getAttributes().getGroup();
+            if (group != null) {
+                return group;
+            }
+        }
         if (m_adaptor instanceof PermissionAdaptor) {
             return ((PermissionAdaptor)m_adaptor).getGroup(m_url.getPath());
         } else {
