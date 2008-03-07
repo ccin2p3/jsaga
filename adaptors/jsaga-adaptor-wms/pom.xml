@@ -1,0 +1,58 @@
+	<?xml version="1.0" encoding="UTF-8"?><project>
+    <parent>
+        <groupId>fr.in2p3.parent</groupId>
+        <artifactId>in2p3-external-pom</artifactId>
+        <version>current</version>
+    </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fr.in2p3.jsaga.adaptor</groupId>
+  <artifactId>jsaga-adaptor-wms</artifactId>
+  <name>Adaptor for Glite WMS</name>
+  <version>1.0-SNAPSHOT</version>
+  <dependencies>
+		<dependency>
+		  <groupId>fr.in2p3.jsaga</groupId>
+		  <artifactId>jsaga-adaptoritf</artifactId>
+		  <version>0.9.1-SNAPSHOT</version>
+		  <scope>provided</scope>
+		</dependency>
+		<dependency>
+		  <groupId>org.ogf.saga</groupId>
+		  <artifactId>saga-api</artifactId>
+		  <version>0.9.1-SNAPSHOT</version>
+		  <scope>provided</scope>
+		</dependency>
+		<dependency>
+		  <groupId>org.ogf.saga</groupId>
+		  <artifactId>saga-api</artifactId>
+		  <version>0.9.1-SNAPSHOT</version>
+		  <type>test-jar</type>
+		  <scope>test</scope>
+		</dependency>
+		<dependency>
+		  <groupId>fr.in2p3.jsaga</groupId>
+		  <artifactId>jsaga-engine</artifactId>
+		  <version>0.9.1-SNAPSHOT</version>
+		  <scope>test</scope>
+		</dependency>
+        <!-- adaptor specific -->
+		<dependency>
+            <groupId>org.glite</groupId>
+            <artifactId>wms-api</artifactId>
+            <version>3.1</version>
+			<scope>compile</scope>
+        </dependency>
+		<dependency>
+            <groupId>org.condor</groupId>
+            <artifactId>classad</artifactId>
+            <version>2.2</version>
+			 <scope>compile</scope>
+        </dependency>
+		<!-- TODO : remove because not required --> 
+		<dependency>
+			<groupId>fr.in2p3.jsaga.adaptor</groupId>
+		    <artifactId>jsaga-adaptor-voms</artifactId>
+		    <version>0.9.1-SNAPSHOT</version>
+		</dependency>
+  </dependencies>
+</project>
