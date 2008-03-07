@@ -62,11 +62,6 @@
         </dependency>
 		<dependency>
 			<groupId>directory-naming</groupId>
-			<artifactId>naming-core</artifactId>
-			<version>0.8</version>
-        </dependency>
-		<dependency>
-			<groupId>directory-naming</groupId>
 			<artifactId>naming-factory</artifactId>
 			<version>0.8</version>
         </dependency>
@@ -83,12 +78,6 @@
             <scope>compile</scope>
         </dependency>
 		<dependency>
-			<groupId>xalan</groupId>
-			<artifactId>xalan</artifactId>
-            <version>2.6.0</version>
-            <scope>compile</scope>
-        </dependency>
-		<dependency>
 			<groupId>xmlsec</groupId>
 			<artifactId>xmlsec</artifactId>
 			<version>1.4.1</version>
@@ -102,11 +91,6 @@
 			<groupId>commons-digester</groupId>
 			<artifactId>commons-digester</artifactId>
 			<version>1.5</version>
-		</dependency>
-		<dependency>
-			<groupId>xml-security</groupId>
-			<artifactId>xmlsec</artifactId>
-			<version>1.2.1</version>
 		</dependency>
 		<dependency>
 		    <groupId>org.globus</groupId>
