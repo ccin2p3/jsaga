@@ -42,7 +42,7 @@ public class NamespaceCat extends AbstractCommand {
         else
         {
             // get arguments
-            URL source = new URL(command.m_nonOptionValues[0].replaceAll(" ", "%20"));
+            URL source = URLFactory.create(command.m_nonOptionValues[0]);
 
             // execute command
             Session session = SessionFactory.createSession(true);

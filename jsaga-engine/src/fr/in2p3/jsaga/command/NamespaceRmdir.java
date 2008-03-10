@@ -37,7 +37,7 @@ public class NamespaceRmdir extends AbstractCommand {
         else
         {
             // get arguments
-            URL url = new URL(command.m_nonOptionValues[0].replaceAll(" ", "%20"));
+            URL url = URLFactory.create(command.m_nonOptionValues[0]);
 
             // execute command
             Session session = SessionFactory.createSession(true);

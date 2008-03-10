@@ -39,8 +39,8 @@ public class NamespaceCopy extends AbstractCommand {
         else
         {
             // get arguments
-            URL source = new URL(command.m_nonOptionValues[0].replaceAll(" ", "%20"));
-            URL target = new URL(command.m_nonOptionValues[1].replaceAll(" ", "%20"));
+            URL source = URLFactory.create(command.m_nonOptionValues[0]);
+            URL target = URLFactory.create(command.m_nonOptionValues[1]);
             int flags =(line.hasOption(OPT_NOT_OVERWRITE) ? Flags.NONE : Flags.OVERWRITE)
                     .or(line.hasOption(OPT_RECURSIVE) ? Flags.RECURSIVE : Flags.NONE);
 

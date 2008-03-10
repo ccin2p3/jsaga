@@ -47,7 +47,7 @@ public class JobStatus extends AbstractCommand {
             Pattern pattern = Pattern.compile("\\[(.*)\\]-\\[(.*)\\]");
             Matcher matcher = pattern.matcher(command.m_nonOptionValues[0]);
             if (matcher.find()) {
-                serviceURL = new URL(matcher.group(1).replaceAll(" ", "%20"));
+                serviceURL = URLFactory.create(matcher.group(1));
                 nativeJobId = matcher.group(2);
             } else {
                 throw new BadParameter("Job ID does not match regular expression: "+pattern.pattern());

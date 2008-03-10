@@ -44,7 +44,7 @@ public class JobRun extends AbstractCommand {
         else
         {
             // get arguments
-            URL serviceURL = new URL(line.getOptionValue(OPT_JOB_SERVICE).replaceAll(" ", "%20"));
+            URL serviceURL = URLFactory.create(line.getOptionValue(OPT_JOB_SERVICE));
             JobDescription desc = createJobDescription(line);
 
             // submit

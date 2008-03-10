@@ -64,7 +64,7 @@ public class NamespaceLogical extends AbstractCommand {
     }
 
     private LogicalFile getLogicalFile() throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess, IncorrectState, AlreadyExists {
-        URL logicalUrl = new URL(m_nonOptionValues[0].replaceAll(" ", "%20"));
+        URL logicalUrl = URLFactory.create(m_nonOptionValues[0]);
         Session session = SessionFactory.createSession(true);
         NSEntry entry = NSFactory.createNSEntry(session, logicalUrl, Flags.NONE.getValue());
         if (entry instanceof LogicalFile) {

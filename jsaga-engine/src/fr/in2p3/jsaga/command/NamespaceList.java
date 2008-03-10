@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.command;
 
+import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.helpers.SAGAPattern;
 import org.apache.commons.cli.*;
 import org.ogf.saga.URL;
@@ -43,20 +44,20 @@ public class NamespaceList extends AbstractCommand {
         else
         {
             // get URL and pattern from arguments
-            String arg = command.m_nonOptionValues[0].replaceAll(" ", "%20");
+            String arg = command.m_nonOptionValues[0];
             URL url;
             String pattern;
             if (SAGAPattern.hasWildcard(arg)) {
                 Matcher matcher = Pattern.compile("((.*)/)*(.*/)/*").matcher(arg);
                 if (matcher.matches() && matcher.groupCount()>1) {
-                    url = new URL(matcher.group(1));
+                    url = URLFactory.create(matcher.group(1));
                     pattern = matcher.group(3);
                 } else {
-                    url = new URL(arg.substring(0, arg.lastIndexOf('/')+1));
+                    url = URLFactory.create(arg.substring(0, arg.lastIndexOf('/')+1));
                     pattern = arg.substring(arg.lastIndexOf('/')+1);
                 }
             } else {
-                url = new URL(arg);
+                url = URLFactory.create(arg);
                 pattern = null;
             }
 
@@ -74,7 +75,7 @@ public class NamespaceList extends AbstractCommand {
                 }
             } else {
                 for (URL entry : list) {
-                    System.out.println(entry.toString().replaceAll("%20", " "));
+                    System.out.println(JSagaURL.decode(entry.toString()));
                 }
             }
         }
