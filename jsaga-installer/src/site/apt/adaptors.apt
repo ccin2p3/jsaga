@@ -34,7 +34,10 @@ Adaptors
 *--------------+--+--+
 | srm          | Globus, GlobusLegacy, GlobusRFC820 | jsaga-adaptor-srm |
 | srm22        | MyProxy, InMemoryProxy      |
-| (srm11)      | VOMS                        |
+| (en cours...)| VOMS                        |
+*--------------+--+--+
+| lfc          | "/tmp/x509u_up$UID"         | jsaga-adaptor-lfc |
+| (en cours...)|
 *--------------+--+--+
 
 * Execution Management Adaptors
@@ -45,6 +48,13 @@ Adaptors
 | <<Job Service>> | <<Module>> |
 *-----------------+--+
 | Gatekeeper      | jsaga-adaptor-globus |
+*-----------------+--+
+| WS-GRAM         | jsaga-adaptor-wsgram |
+*-----------------+--+
+| gLite-WMS       | jsaga-adaptor-wms |
+*-----------------+--+
+| Unicore 6       | jsaga-adaptor-? |
+| (en cours...)   |
 *-----------------+--+
 
 ** Langage Adaptors
