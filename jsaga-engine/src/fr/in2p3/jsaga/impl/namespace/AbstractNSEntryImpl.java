@@ -104,7 +104,8 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
 
     public boolean exists() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
         if (m_adaptor instanceof DataReaderAdaptor) {
-            return ((DataReaderAdaptor)m_adaptor).exists(m_url.getPath());
+            return ((DataReaderAdaptor)m_adaptor).exists(
+                    JSagaURL.decode(m_url.getPath()));
         } else {
             throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
@@ -115,7 +116,8 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             return ((JSagaURL)m_url).getAttributes().getType() == FileAttributes.DIRECTORY_TYPE;
         } else if (m_adaptor instanceof DataReaderAdaptor) {
             try {
-                return ((DataReaderAdaptor)m_adaptor).isDirectory(m_url.getPath());
+                return ((DataReaderAdaptor)m_adaptor).isDirectory(
+                        JSagaURL.decode(m_url.getPath()));
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("Entry does not exist: "+ m_url, doesNotExist);
             }
@@ -129,7 +131,8 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             return ((JSagaURL)m_url).getAttributes().getType() == FileAttributes.FILE_TYPE;
         } else if (m_adaptor instanceof DataReaderAdaptor) {
             try {
-                return ((DataReaderAdaptor)m_adaptor).isEntry(m_url.getPath());
+                return ((DataReaderAdaptor)m_adaptor).isEntry(
+                        JSagaURL.decode(m_url.getPath()));
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("Entry does not exist: "+ m_url, doesNotExist);
             }
@@ -143,7 +146,8 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             return ((JSagaURL)m_url).getAttributes().getType() == FileAttributes.LINK_TYPE;
         } else if (m_adaptor instanceof LinkAdaptor) {
             try {
-                return ((LinkAdaptor)m_adaptor).isLink(m_url.getPath());
+                return ((LinkAdaptor)m_adaptor).isLink(
+                        JSagaURL.decode(m_url.getPath()));
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("Link does not exist: "+ m_url, doesNotExist);
             }
@@ -157,7 +161,8 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             String absolutePath;
             try {
                 try {
-                    absolutePath = ((LinkAdaptor)m_adaptor).readLink(m_url.getPath());
+                    absolutePath = ((LinkAdaptor)m_adaptor).readLink(
+                            JSagaURL.decode(m_url.getPath()));
                 } catch (DoesNotExist doesNotExist) {
                     throw new IncorrectState("Link does not exist: "+ m_url, doesNotExist);
                 }
@@ -200,7 +205,10 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             boolean overwrite = effectiveFlags.contains(Flags.OVERWRITE);
             try {
                 try {
-                    ((LinkAdaptor)m_adaptor).link(m_url.getPath(), effectiveLink.getPath(), overwrite);
+                    ((LinkAdaptor)m_adaptor).link(
+                            JSagaURL.decode(m_url.getPath()),
+                            JSagaURL.decode(effectiveLink.getPath()),
+                            overwrite);
                 } catch (DoesNotExist doesNotExist) {
                     throw new IncorrectState("Entry does not exist: "+ m_url, doesNotExist);
                 } catch (AlreadyExists alreadyExists) {
@@ -212,7 +220,10 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
                     this._makeParentDirs();
                     // create link
                     try {
-                        ((LinkAdaptor)m_adaptor).link(m_url.getPath(), effectiveLink.getPath(), overwrite);
+                        ((LinkAdaptor)m_adaptor).link(
+                                JSagaURL.decode(m_url.getPath()),
+                                JSagaURL.decode(effectiveLink.getPath()),
+                                overwrite);
                     } catch (DoesNotExist doesNotExist) {
                         throw new IncorrectState("Entry does not exist: "+ m_url, doesNotExist);
                     } catch (AlreadyExists alreadyExists) {
@@ -246,7 +257,11 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
                 && (m_url.getPort()==effectiveTarget.getPort()))
         {
             try {
-                ((DataRename)m_adaptor).rename(m_url.getPath(), effectiveTarget.getPath(), overwrite, m_url.getQuery());
+                ((DataRename)m_adaptor).rename(
+                        JSagaURL.decode(m_url.getPath()),
+                        JSagaURL.decode(effectiveTarget.getPath()),
+                        overwrite,
+                        m_url.getQuery());
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("File does not exist: "+ m_url, doesNotExist);
             } catch (AlreadyExists alreadyExists) {
@@ -276,7 +291,10 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             URL parent = this._getParentDirURL();
             String fileName = this._getEntryName();
             try {
-                ((DataWriterAdaptor)m_adaptor).removeFile(parent.getPath(), fileName, m_url.getQuery());
+                ((DataWriterAdaptor)m_adaptor).removeFile(
+                        JSagaURL.decode(parent.getPath()),
+                        fileName,
+                        m_url.getQuery());
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("File does not exist: "+ m_url, doesNotExist);
             }

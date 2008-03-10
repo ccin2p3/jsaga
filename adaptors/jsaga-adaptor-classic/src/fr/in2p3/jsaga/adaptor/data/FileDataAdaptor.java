@@ -183,16 +183,16 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
     private File newPath(String absolutePath) throws NoSuccess {
         if (s_isWindows) {
             if (m_drive != null) {
-                return new File(m_drive+":"+absolutePath.replaceAll("%20", " "));
+                return new File(m_drive+":"+absolutePath);
             } else if (absolutePath.matches("/+([A-Za-z]:).*") || absolutePath.startsWith("./")) {
-                return new File(absolutePath.replaceAll("%20", " "));
+                return new File(absolutePath);
             } else if (absolutePath.matches("/+")) {
                 return null;
             } else {
                 throw new NoSuccess("Absolute path in Windows must start with drive letter");
             }
         } else {
-            return new File(absolutePath.replaceAll("%20", " "));
+            return new File(absolutePath);
         }
     }
 

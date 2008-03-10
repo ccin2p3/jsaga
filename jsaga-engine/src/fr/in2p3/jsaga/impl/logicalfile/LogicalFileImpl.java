@@ -68,7 +68,8 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
         } else if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
             this._makeParentDirs();
         } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !(m_url instanceof JSagaURL) && m_adaptor instanceof DataReaderAdaptor) {
-            boolean exists = ((DataReaderAdaptor)m_adaptor).exists(m_url.getPath());
+            boolean exists = ((DataReaderAdaptor)m_adaptor).exists(
+                    JSagaURL.decode(m_url.getPath()));
             if (! exists) {
                 throw new DoesNotExist("Logical file does not exist: "+ m_url);
             }
@@ -189,7 +190,10 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
 
     public void addLocation(URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         if (m_adaptor instanceof LogicalWriter) {
-            ((LogicalWriter)m_adaptor).addLocation(m_url.getPath(), name, m_url.getQuery());
+            ((LogicalWriter)m_adaptor).addLocation(
+                    JSagaURL.decode(m_url.getPath()),
+                    name,
+                    m_url.getQuery());
         } else {
             throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
@@ -197,7 +201,10 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
 
     public void removeLocation(URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
         if (m_adaptor instanceof LogicalWriter) {
-            ((LogicalWriter)m_adaptor).removeLocation(m_url.getPath(), name, m_url.getQuery());
+            ((LogicalWriter)m_adaptor).removeLocation(
+                    JSagaURL.decode(m_url.getPath()),
+                    name,
+                    m_url.getQuery());
         } else {
             throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
@@ -205,8 +212,14 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
 
     public void updateLocation(URL nameOld, URL nameNew) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         if (m_adaptor instanceof LogicalWriter) {
-            ((LogicalWriter)m_adaptor).addLocation(m_url.getPath(), nameNew, m_url.getQuery());
-            ((LogicalWriter)m_adaptor).removeLocation(m_url.getPath(), nameOld, m_url.getQuery());
+            ((LogicalWriter)m_adaptor).addLocation(
+                    JSagaURL.decode(m_url.getPath()),
+                    nameNew,
+                    m_url.getQuery());
+            ((LogicalWriter)m_adaptor).removeLocation(
+                    JSagaURL.decode(m_url.getPath()),
+                    nameOld,
+                    m_url.getQuery());
         } else {
             throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
@@ -215,7 +228,9 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
     public List<URL> listLocations() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
         if (m_adaptor instanceof LogicalReader) {
             try {
-                String[] array = ((LogicalReader)m_adaptor).listLocations(m_url.getPath(), m_url.getQuery());
+                String[] array = ((LogicalReader)m_adaptor).listLocations(
+                        JSagaURL.decode(m_url.getPath()),
+                        m_url.getQuery());
                 List<URL> list = new ArrayList<URL>();
                 try {
                     for (String location : array) {
