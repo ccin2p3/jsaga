@@ -43,7 +43,7 @@ public class ListJobStatusPoller extends AbstractJobStatusPoller {
                 }
             }
         } catch (Exception e) {
-            s_logger.warn("Failed to get status for list of jobs");
+            s_logger.warn("Failed to get status for list of jobs", e);
         }
     }
 }

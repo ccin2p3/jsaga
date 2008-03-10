@@ -40,7 +40,7 @@ public class IndividualJobStatusPoller extends AbstractJobStatusPoller {
                 JobStatus status = m_adaptor.getStatus(nativeJobId);
                 callback.setState(status.getSagaState(), status.getStateDetail(), status.getSubState());
             } catch (Exception e) {
-                s_logger.warn("Failed to get status for job: "+ nativeJobId);
+                s_logger.warn("Failed to get status for job: "+ nativeJobId, e);
             }
         }
     }
