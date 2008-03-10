@@ -6,6 +6,7 @@
                 exclude-result-prefixes="cfg">
     <xsl:output method="xml" indent="yes"/>
     <xsl:strip-space elements="*"/>
+    <xsl:param name="stopOnMissing" select="'false'"/>
     <xsl:variable name="descriptors" select="document('descriptors.xml')/*"/>
 
     <xsl:template match="/">
@@ -15,13 +16,13 @@
             <xsl:comment> languages </xsl:comment>
             <xsl:apply-templates select="$descriptors/cfg:language"/>
             <xsl:comment> security </xsl:comment>
-            <xsl:apply-templates select="$cfg/cfg:context[@type=$descriptors/cfg:context/@type and not(@deactivated='true')]"/>
+            <xsl:apply-templates select="$cfg/cfg:context[not(@deactivated='true')]"/>
             <xsl:copy-of select="$descriptors/cfg:context[not(@type=$cfg/cfg:context/@type)]"/>
             <xsl:comment> protocols </xsl:comment>
-            <xsl:apply-templates select="$cfg/cfg:protocol[cfg:dataService/@type=$descriptors/cfg:protocol/cfg:dataService/@type]"/>
+            <xsl:apply-templates select="$cfg/cfg:protocol[not(@deactivated='true')]"/>
             <xsl:copy-of select="$descriptors/cfg:protocol[not(cfg:dataService/@type=$cfg/cfg:protocol/cfg:dataService/@type)]"/>
             <xsl:comment> execution </xsl:comment>
-            <xsl:apply-templates select="$cfg/cfg:execution[cfg:jobService/@type=$descriptors/cfg:execution/cfg:jobService/@type]"/>
+            <xsl:apply-templates select="$cfg/cfg:execution[not(@deactivated='true')]"/>
             <xsl:copy-of select="$descriptors/cfg:execution[not(cfg:jobService/@type=$cfg/cfg:execution/cfg:jobService/@type)]"/>
         </effective-config>
     </xsl:template>
@@ -29,22 +30,42 @@
     <xsl:template match="cfg:context">
         <xsl:variable name="conf" select="."/>
         <xsl:variable name="desc" select="$descriptors/cfg:context[@type=$conf/@type]"/>
-        <context>
-            <xsl:copy-of select="$desc/@*[not(name()=name($conf/@*))] | $conf/@*"/>
-            <xsl:apply-templates select="$desc/cfg:attribute[not(@name=$conf/cfg:attribute/@name)] | $conf/cfg:attribute"/>
-        </context>
+        <xsl:choose>
+            <xsl:when test="not($desc) and $stopOnMissing='false'">
+                <xsl:message terminate="no">Missing plugin for: <xsl:value-of select="@type"/></xsl:message>
+            </xsl:when>
+            <xsl:when test="not($desc) and $stopOnMissing='true'">
+                <xsl:message terminate="yes">Missing plugin for: <xsl:value-of select="@type"/></xsl:message>
+            </xsl:when>
+            <xsl:otherwise>
+                <context>
+                    <xsl:copy-of select="$desc/@*[not(name()=name($conf/@*))] | $conf/@*"/>
+                    <xsl:apply-templates select="$desc/cfg:attribute[not(@name=$conf/cfg:attribute/@name)] | $conf/cfg:attribute"/>
+                </context>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <xsl:template match="cfg:protocol">
         <xsl:variable name="conf" select="."/>
         <xsl:variable name="desc" select="$descriptors/cfg:protocol[cfg:dataService/@type=$conf/cfg:dataService[1]/@type]"/>
-        <protocol>
-            <xsl:copy-of select="$desc/@*[not(name()=name($conf/@*))] | $conf/@*"/>
-            <xsl:apply-templates select="$conf/cfg:schemeAlias"/>
-            <xsl:apply-templates select="$conf/cfg:dataService[@type=$descriptors/cfg:protocol/cfg:dataService/@type]"/>
-            <!-- add default if all context types are filtered -->
-            <xsl:copy-of select="$desc/cfg:dataService[not(cfg:supportedContextType=$conf/cfg:dataService/@contextType)]"/>
-        </protocol>
+        <xsl:choose>
+            <xsl:when test="not($desc) and $stopOnMissing='false'">
+                <xsl:message terminate="no">Missing plugin for: <xsl:value-of select="cfg:dataService[1]/@type"/></xsl:message>
+            </xsl:when>
+            <xsl:when test="not($desc) and $stopOnMissing='true'">
+                <xsl:message terminate="yes">Missing plugin for: <xsl:value-of select="cfg:dataService[1]/@type"/></xsl:message>                
+            </xsl:when>
+            <xsl:otherwise>
+                <protocol>
+                    <xsl:copy-of select="$desc/@*[not(name()=name($conf/@*))] | $conf/@*"/>
+                    <xsl:apply-templates select="$conf/cfg:schemeAlias"/>
+                    <xsl:apply-templates select="$conf/cfg:dataService[@type=$descriptors/cfg:protocol/cfg:dataService/@type]"/>
+                    <!-- add default if all context types are filtered -->
+                    <xsl:copy-of select="$desc/cfg:dataService[not(cfg:supportedContextType=$conf/cfg:dataService/@contextType)]"/>
+                </protocol>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
     <xsl:template match="cfg:dataService">
         <xsl:variable name="conf" select="."/>
@@ -63,13 +84,23 @@
     <xsl:template match="cfg:execution">
         <xsl:variable name="conf" select="."/>
         <xsl:variable name="desc" select="$descriptors/cfg:execution[cfg:jobService/@type=$conf/cfg:jobService[1]/@type]"/>
-        <execution>
-            <xsl:copy-of select="$desc/@*[not(name()=name($conf/@*))] | $conf/@*"/>
-            <xsl:apply-templates select="$conf/cfg:schemeAlias"/>
-            <xsl:apply-templates select="$conf/cfg:jobService[@type=$descriptors/cfg:execution/cfg:jobService/@type]"/>
-            <!-- add default if all context types are filtered -->
-            <xsl:copy-of select="$desc/cfg:jobService[not(cfg:supportedContextType=$conf/cfg:jobService/@contextType)]"/>
-        </execution>
+        <xsl:choose>
+            <xsl:when test="not($desc) and $stopOnMissing='false'">
+                <xsl:message terminate="no">Missing plugin for: <xsl:value-of select="cfg:jobService[1]/@type"/></xsl:message>
+            </xsl:when>
+            <xsl:when test="not($desc) and $stopOnMissing='true'">
+                <xsl:message terminate="yes">Missing plugin for: <xsl:value-of select="cfg:jobService[1]/@type"/></xsl:message>                
+            </xsl:when>
+            <xsl:otherwise>
+                <execution>
+                    <xsl:copy-of select="$desc/@*[not(name()=name($conf/@*))] | $conf/@*"/>
+                    <xsl:apply-templates select="$conf/cfg:schemeAlias"/>
+                    <xsl:apply-templates select="$conf/cfg:jobService[@type=$descriptors/cfg:execution/cfg:jobService/@type]"/>
+                    <!-- add default if all context types are filtered -->
+                    <xsl:copy-of select="$desc/cfg:jobService[not(cfg:supportedContextType=$conf/cfg:jobService/@contextType)]"/>
+                </execution>                
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
     <xsl:template match="cfg:jobService">
         <xsl:variable name="conf" select="."/>
