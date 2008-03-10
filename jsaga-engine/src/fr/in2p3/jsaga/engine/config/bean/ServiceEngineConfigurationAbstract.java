@@ -20,7 +20,9 @@ public class ServiceEngineConfigurationAbstract {
         if (mapping != null) {
             for (int d=0; d<mapping.getDomainCount(); d++) {
                 Domain domain = mapping.getDomain(d);
-                if (hostname.endsWith(getDomain(domain.getName()))) {
+                if ((domain.getName()!=null && hostname.endsWith("."+domain.getName())) ||
+                    (domain.getName()==null && hostname.indexOf(".")==-1))
+                {
                     for (int h=0; h<domain.getHostCount(); h++) {
                         Host host = domain.getHost(h);
                         if (hostname.startsWith(host.getPrefix())) {
