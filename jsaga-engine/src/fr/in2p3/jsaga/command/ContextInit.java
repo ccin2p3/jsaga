@@ -8,6 +8,7 @@ import org.ogf.saga.context.Context;
 import org.ogf.saga.context.ContextFactory;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
+import org.ogf.saga.error.BadParameter;
 
 import java.io.*;
 
@@ -60,6 +61,9 @@ public class ContextInit extends AbstractCommand {
         {
             String id = command.m_nonOptionValues[0];
             fr.in2p3.jsaga.engine.schema.config.Context[] xmlContexts = Configuration.getInstance().getConfigurations().getContextCfg().listContextsArray(id);
+            if (xmlContexts.length == 0) {
+                throw new BadParameter("Context type not found: "+id);
+            }
             for (int i=0; i<xmlContexts.length; i++) {
                 // set context
                 Context context = ContextFactory.createContext();
