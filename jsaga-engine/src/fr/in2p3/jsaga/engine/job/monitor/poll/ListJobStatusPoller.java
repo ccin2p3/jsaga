@@ -29,16 +29,18 @@ public class ListJobStatusPoller extends AbstractJobStatusPoller {
 
     public void run() {
         String[] jobsToQuery;
-        synchronized(this) {
-            jobsToQuery = (String[]) m_subscribedJobs.keySet().toArray(new String[m_subscribedJobs.size()]);
+        synchronized(m_subscribedJobs) {
+            jobsToQuery = m_subscribedJobs.keySet().toArray(new String[m_subscribedJobs.size()]);
         }
         try {
             JobStatus[] statusArray = m_adaptor.getStatusList(jobsToQuery);
-            for (int i=0; i<statusArray.length; i++) {
-                String nativeJobId = statusArray[i].getNativeJobId();
-                JobMonitorCallback callback = (JobMonitorCallback) m_subscribedJobs.get(nativeJobId);
+            for (JobStatus status : statusArray) {
+                String nativeJobId = status.getNativeJobId();
+                JobMonitorCallback callback;
+                synchronized(m_subscribedJobs) {
+                    callback = m_subscribedJobs.get(nativeJobId);
+                }
                 if (callback != null) {
-                    JobStatus status = statusArray[i];
                     callback.setState(status.getSagaState(), status.getStateDetail(), status.getSubState());
                 }
             }

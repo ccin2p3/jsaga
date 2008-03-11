@@ -6,7 +6,6 @@ import fr.in2p3.jsaga.engine.job.monitor.JobMonitorCallback;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.Iterator;
 import java.util.Map;
 
 /* ***************************************************
@@ -32,8 +31,11 @@ public class IndividualJobStatusPoller extends AbstractJobStatusPoller {
 
     public void run() {
         //todo: should be multi-threaded
-        for (Iterator it=m_subscribedJobs.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry entry = (Map.Entry) it.next();
+        Map.Entry[] entries;
+        synchronized(m_subscribedJobs) {
+            entries = m_subscribedJobs.entrySet().toArray(new Map.Entry[m_subscribedJobs.size()]);
+        }
+        for (Map.Entry entry : entries) {
             String nativeJobId = (String) entry.getKey();
             JobMonitorCallback callback = (JobMonitorCallback) entry.getValue();
             try {

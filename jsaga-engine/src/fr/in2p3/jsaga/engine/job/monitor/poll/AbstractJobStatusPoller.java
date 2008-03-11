@@ -18,17 +18,21 @@ import java.util.*;
  *
  */
 public abstract class AbstractJobStatusPoller extends TimerTask implements JobRegistry {
-    protected Map m_subscribedJobs;
+    protected final Map<String,JobMonitorCallback> m_subscribedJobs;
 
     public AbstractJobStatusPoller() {
-        m_subscribedJobs = new HashMap();
+        m_subscribedJobs = new HashMap<String,JobMonitorCallback>();
     }
 
-    public synchronized void subscribeJob(String nativeJobId, JobMonitorCallback callback) {
-        m_subscribedJobs.put(nativeJobId, callback);
+    public void subscribeJob(String nativeJobId, JobMonitorCallback callback) {
+        synchronized(m_subscribedJobs) {
+            m_subscribedJobs.put(nativeJobId, callback);
+        }
     }
 
-    public synchronized void unsubscribeJob(String nativeJobId) {
-        m_subscribedJobs.remove(nativeJobId);
+    public void unsubscribeJob(String nativeJobId) {
+        synchronized(m_subscribedJobs) {
+            m_subscribedJobs.remove(nativeJobId);
+        }
     }
 }
