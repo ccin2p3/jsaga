@@ -36,20 +36,20 @@ import org.ogf.saga.task.Task;
 public class AbstractJobTest extends AbstractTest {
 	
 	// values
-	protected String SIMPLE_JOB_BINARY 	= "simpleJobBinary";
-	protected String MAX_QUEUING_TIME 	= "maxQueuingTime";
-	protected String LONG_JOB_BINARY  	= "longJobBinary";
-	protected String LONG_JOB_DURATION 	= "longJobDuration";
-	protected String FINALY_TIMEOUT  	= "finalyTimeout";
-	protected String MULTIJOB_NUMBER	= "multiJobNumber";
+	protected String SIMPLE_JOB_BINARY 			= "simpleJobBinary";
+	protected String MAX_QUEUING_TIME 			= "maxQueuingTime";
+	protected String LONG_JOB_BINARY  			= "longJobBinary";
+	protected String LONG_JOB_DURATION 			= "longJobDuration";
+	protected String FINALY_TIMEOUT  			= "finalyTimeout";
+	protected String SIMULTANEOUS_JOB_NUMBER	= "simultaneousJobNumber";
 		
 	// set default values
-	private static final String DEFAULT_LONG_JOB_DURATION 	= "30";
-	private static final String DEFAULT_FINALY_TIMEOUT 		= "60" ;
-	private static final String DEFAULT_SIMPLE_JOB_BINARY 	= "/bin/date" ;
-	private static final String DEFAULT_LONG_JOB_BINARY 	= "/bin/sleep" ;
-	private static final String DEFAULT_MAX_QUEUING_TIME 	= "60";
-	private static final String DEFAULT_MULTIJOB_NUMBER 	= "10";
+	private static final String DEFAULT_LONG_JOB_DURATION 			= "30";
+	private static final String DEFAULT_FINALY_TIMEOUT 				= "60" ;
+	private static final String DEFAULT_SIMPLE_JOB_BINARY 			= "/bin/date" ;
+	private static final String DEFAULT_LONG_JOB_BINARY 			= "/bin/sleep" ;
+	private static final String DEFAULT_MAX_QUEUING_TIME 			= "60";
+	private static final String DEFAULT_SIMULTANEOUS_JOB_NUMBER 	= "5";
 
     // configuration
     protected URL m_jobservice;
@@ -68,7 +68,7 @@ public class AbstractJobTest extends AbstractTest {
        	LONG_JOB_DURATION = super.getOptionalProperty(jobprotocol, LONG_JOB_DURATION, DEFAULT_LONG_JOB_DURATION);	
         FINALY_TIMEOUT = super.getOptionalProperty(jobprotocol, FINALY_TIMEOUT, DEFAULT_FINALY_TIMEOUT);
         MAX_QUEUING_TIME = super.getOptionalProperty(jobprotocol, MAX_QUEUING_TIME, DEFAULT_MAX_QUEUING_TIME);
-        MULTIJOB_NUMBER = super.getOptionalProperty(jobprotocol, MULTIJOB_NUMBER, DEFAULT_MULTIJOB_NUMBER);       	
+        SIMULTANEOUS_JOB_NUMBER = super.getOptionalProperty(jobprotocol, SIMULTANEOUS_JOB_NUMBER, DEFAULT_SIMULTANEOUS_JOB_NUMBER);       	
     }
     
     /**
