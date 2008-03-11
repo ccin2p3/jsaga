@@ -2,6 +2,8 @@ package fr.in2p3.jsaga.adaptor.wms.job;
 
 import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.U;
+import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
@@ -33,8 +35,11 @@ import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.io.urlcopy.UrlCopy;
 import org.globus.util.GlobusURL;
 import org.ogf.saga.error.AuthenticationFailed;
+import org.ogf.saga.error.AuthorizationFailed;
+import org.ogf.saga.error.BadParameter;
 import org.ogf.saga.error.IncorrectState;
 import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.error.Timeout;
 
 import java.io.File;
@@ -63,21 +68,40 @@ import javax.xml.rpc.ServiceException;
  */
 public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements QueryIndividualJob {
 		
+	public static final String DEFAULT_PORT = "DefaultPort";
+	protected int m_lbPort;
+
+	// Should never be invoked 
+	public int getDefaultPort() {
+		return 9003;
+	}
+	
     public Usage getUsage() {
-        return null;    // no usage
+        return new UAnd(new Usage[]{new U(DEFAULT_PORT)});
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectState {
-        return null;    // no default
+    	return new Default[]{
+    			new Default(DEFAULT_PORT, "9003")};
     }
+  
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    	// TODO move when cleanup will be move to Control
+    	super.connect(userInfo, host, port, basePath, attributes);
+    	if(attributes.containsKey(DEFAULT_PORT))
+    		m_lbPort = Integer.parseInt((String) attributes.get(DEFAULT_PORT));
+    }
+
+    public void disconnect() throws NoSuccess {    	
+	}
     
     public JobStatus getStatus(String nativeJobId) throws Timeout, NoSuccess {
     	
     	try {
 
     		URL jobUrl = new URL(nativeJobId);
-	        URL lbURL = new URL(jobUrl.getProtocol(), jobUrl.getHost(), jobUrl.getPort() , "");  
-	        
+	        URL lbURL = new URL(jobUrl.getProtocol(), jobUrl.getHost(), m_lbPort , "");  
+    		
 	        // Set provider
 	        SimpleProvider provider = new SimpleProvider();
 	        SimpleTargetedChain c = null;
@@ -186,18 +210,20 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
     			}
         	} 
 	        // create WMP Client
-        	AxisProperties.setProperty(EngineConfigurationFactoryDefault.OPTION_CLIENT_CONFIG_FILE,clientConfigFile);			
-        	WMProxyAPI m_client = new WMProxyAPI (m_serverUrl, m_tmpProxyFile.getAbsolutePath(), caLoc);
+        	AxisProperties.setProperty(EngineConfigurationFactoryDefault.OPTION_CLIENT_CONFIG_FILE,
+        			clientConfigFile);
+        	System.out.println("WMS : "+m_wmsServerUrl);
+        	WMProxyAPI m_clientClean = new WMProxyAPI (m_wmsServerUrl, m_tmpProxyFile.getAbsolutePath(), caLoc);
 	    	
 	    	// put proxy
-	    	String proxy = m_client.getProxyReq (m_delegationId);
-            m_client.grstPutProxy(m_delegationId, proxy);
+	    	String proxy = m_clientClean.getProxyReq (m_delegationId);
+	    	m_clientClean.grstPutProxy(m_delegationId, proxy);
             
             try {
 				String gliteLogDir = rootLogDir + new URL(jobId).getPath() + File.separator;
 				
 	            //Use the "gsiftp" transfer protocols to retrieve the list of files produced by the jobs.
-	            StringAndLongList result = m_client.getOutputFileList(jobId, "gsiftp");        
+	            StringAndLongList result = m_clientClean.getOutputFileList(jobId, "gsiftp");        
 	            if ( result != null ) 
 	            {
 	                // list of files+their size
@@ -249,7 +275,7 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	                }
 	            }
 	            // purge        
-	            m_client.jobPurge(jobId);
+	            m_clientClean.jobPurge(jobId);
 			}
 			catch (Exception e) {
 				throw new NoSuccess(e);
@@ -266,7 +292,6 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 			throw new NoSuccess(e);
 		} 
 		finally {
-			System.out.println("Clean proxy file");
 			// clean proxy
 			if(m_tmpProxyFile != null && 
 					m_tmpProxyFile.exists()) {

@@ -2,6 +2,8 @@ package fr.in2p3.jsaga.adaptor.wms.job;
 
 import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
+import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
@@ -56,18 +58,25 @@ import java.util.Map;
  */
 public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobControlAdaptor {
     
+	public static final String LBSERVER = "LBServer";
+
     private Map m_parameters;
     private WMProxyAPI m_client;
     private String m_delegationId = "myId";
+    protected String m_lbServerUrl;
     
     public String getType() {
         return "wms";
     }
 
-    public Usage getUsage() {
-        return null;
+    public int getDefaultPort() {
+        return 7443;
     }
-
+    
+    public Usage getUsage() {
+        return new UAnd(new Usage[]{new UOptional(LBSERVER)}); 
+    }
+    
     public Default[] getDefaults(Map attributes) throws IncorrectState {
     	return null;    // no default
     }
@@ -89,11 +98,16 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
-        super.connect(userInfo, host, port, basePath, attributes);
-        m_parameters = attributes;
+    	
+    	super.connect(userInfo, host, port, basePath, attributes);    	
+    	//m_wmsServerUrl = "https://"+host+":"+port+basePath;
+    	if(attributes.containsKey(LBSERVER))
+    		m_lbServerUrl = (String) attributes.get(LBSERVER);
+    	
+    	m_parameters = attributes;
         
         // get certificate directory
-    	System.out.println("Ca Cert location :"+(String)attributes.get(Context.CERTREPOSITORY));
+    	System.out.println("TODO : replace Ca Cert location :"+(String)attributes.get(Context.CERTREPOSITORY));
     	String caLoc = CoGProperties.getDefault().getCaCertLocations();
     	
         // save proxy file
@@ -129,7 +143,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
         	} 
 	        // create WMP Client
         	AxisProperties.setProperty(EngineConfigurationFactoryDefault.OPTION_CLIENT_CONFIG_FILE,clientConfigFile);			
-	    	m_client = new WMProxyAPI (m_serverUrl, m_tmpProxyFile.getAbsolutePath(), caLoc);
+	    	m_client = new WMProxyAPI (m_wmsServerUrl, m_tmpProxyFile.getAbsolutePath(), caLoc);
 	    	
 	    	// put proxy
 	    	String proxy = m_client.getProxyReq (m_delegationId);
@@ -151,11 +165,11 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
 			disconnect();
 			throw new AuthenticationFailed(e);
 		} 
+		
         // ping service
         if(false) {
             try {
-            	//System.out.println("WMS Version :"+m_client.getVersion());
-				m_client.getVersion();
+            	m_client.getVersion();
 			} catch (AuthenticationFaultException e) {
 				disconnect();
 				throw new AuthenticationFailed(e);
@@ -169,14 +183,20 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
 
     public void disconnect() throws NoSuccess {
         m_parameters = null;
-        super.disconnect();        
+        m_wmsServerUrl = null;
+        m_credential = null;
+        m_client = null;
     }
-
+    
     public String submit(String jobDesc) throws PermissionDenied, Timeout, NoSuccess {
     	try {
     		
-    		//System.out.println("WMS Job description:"+jobDesc);
-            // parse
+    		//if LB Address is specified, add tag in JDL
+    		if(m_lbServerUrl != null && !m_lbServerUrl.equals("")) {
+    			jobDesc += "LBAddress=\""+m_lbServerUrl+"\";";	
+    		}
+    		
+    		// parse    		
     		if(true) {
 	    		try {
 					AdParser.parseJdl(jobDesc);
@@ -190,11 +210,8 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
             	if ( result != null ) {
     				// list of CE's+their ranks
     				StringAndLongType[] list = (StringAndLongType[]) result.getFile ();
-    				if (list != null) {
-                        System.out.println(list.length +" Computing Elements matching your job requirements had been found :");
-    				} 
-    				else 
-    					throw new NoSuccess("No Computing Element matching your job requirements has been found!");
+    				if (list == null)
+                        throw new NoSuccess("No Computing Element matching your job requirements has been found!");
     			}
             	else 
             		throw new NoSuccess("No Computing Element matching your job requirements has been found!");
