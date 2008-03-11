@@ -199,20 +199,54 @@ public class JobRunOptionalTest extends AbstractJobTest {
         }
     }
     
-    
 	/**
-     * Runs simple jobs on the same time
+     * Runs long jobs on the same time with the one job service
      */
-    public void test_multiJob() throws Exception {
+    public void test_simultaneousLongJob() throws Exception {
         
-    	int numberOfJobs = Integer.parseInt(MULTIJOB_NUMBER);
+    	int numberOfJobs = Integer.parseInt(SIMULTANEOUS_JOB_NUMBER);
 
 		// jobs
     	StartJob[] newJob = new StartJob[numberOfJobs];
     	
     	// create and start jobs
+    	JobService m_service = JobFactory.createJobService(m_session, m_jobservice); 
+		for (int i = 0; i < numberOfJobs; i++) {
+        	newJob[i] = new StartJob(m_service, i, true);
+    		newJob[i].start();
+		}
+    
     	for (int i = 0; i < numberOfJobs; i++) {
-    		newJob[i] = new StartJob(m_session, m_jobservice, i);
+    		newJob[i].join();
+		}
+    	
+    	boolean allJobsAreDone = true;
+    	for (int i = 0; i < numberOfJobs; i++) {
+    		if(newJob[i].getException() != null) {
+    			allJobsAreDone = false;
+    			throw new NoSuccess("The job number "+i+" is failed:"+newJob[i].getException().getMessage());
+    		}
+		}
+    	
+    	 assertEquals(
+	                true,
+	                allJobsAreDone);
+    }
+
+	/**
+     * Runs short jobs on the same time with the one job service
+     */
+    public void test_simultaneousShortJob() throws Exception {
+        
+    	int numberOfJobs = Integer.parseInt(SIMULTANEOUS_JOB_NUMBER);
+
+		// jobs
+    	StartJob[] newJob = new StartJob[numberOfJobs];
+    	
+    	// create and start jobs
+    	JobService m_service = JobFactory.createJobService(m_session, m_jobservice); 
+		for (int i = 0; i < numberOfJobs; i++) {
+        	newJob[i] = new StartJob(m_service, i, false);
     		newJob[i].start();
 		}
     
