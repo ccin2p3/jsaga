@@ -36,11 +36,10 @@ public class JSagaURL extends URL {
     }
 
     public static String encodeUrl(String url) {
-        int query = url.indexOf('?');
-        int fragment = (query>-1 ? url.indexOf('#',query) : url.indexOf('#'));
-        if (query > -1) {
+        int query, fragment;
+        if ((query=url.lastIndexOf('?')) > -1) {
             return encodePath(url.substring(0,query)) + url.substring(query);
-        } else if (fragment > -1) {
+        } else if ((fragment=url.lastIndexOf('#')) > -1) {
             return encodePath(url.substring(0,fragment)) + url.substring(fragment);
         } else {
             return encodePath(url);
