@@ -27,7 +27,7 @@ public class JSagaURL extends URL {
 
     /** constructor for relativePath */
     public JSagaURL(FileAttributes attributes) throws NotImplemented, BadParameter, NoSuccess {
-        super(encode(attributes.getName()));
+        super(encodePath(attributes.getName()));
         m_attributes = attributes;
     }
 
@@ -35,9 +35,20 @@ public class JSagaURL extends URL {
         return m_attributes;
     }
 
-    public static String encode(String url) {
+    public static String encodeUrl(String url) {
+        int query = url.indexOf('?');
+        int fragment = (query>-1 ? url.indexOf('#',query) : url.indexOf('#'));
+        if (query > -1) {
+            return encodePath(url.substring(0,query)) + url.substring(query);
+        } else if (fragment > -1) {
+            return encodePath(url.substring(0,fragment)) + url.substring(fragment);
+        } else {
+            return encodePath(url);
+        }
+    }
+    public static String encodePath(String path) {
         StringBuffer buffer = new StringBuffer();
-        char[] array = url.toCharArray();
+        char[] array = path.toCharArray();
         for (int i=0; i<array.length; i++) {
             char c = array[i];
             if (isIllegal(c)) {
@@ -53,9 +64,14 @@ public class JSagaURL extends URL {
     private static boolean isIllegal(char c) {
         if (c>32 && c<128) {
             switch(c) {
+                // illegal characters
                 case '"': case '%': case '<': case '>': case '[': case '\\': case ']':
                 case '^': case '`': case '{': case '|': case '}': case 127:
                     return true;
+                // reserved characters
+                case '#': case '?':
+                    return true;
+                // other characters
                 default:
                     return false;
             }
