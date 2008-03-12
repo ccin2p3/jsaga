@@ -3,8 +3,7 @@ package fr.in2p3.jsaga.impl.monitoring;
 import fr.in2p3.jsaga.helpers.AttributeSerializer;
 import fr.in2p3.jsaga.impl.attributes.AbstractAttributesImpl;
 import fr.in2p3.jsaga.impl.task.AbstractTaskImpl;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.ogf.saga.ObjectType;
 import org.ogf.saga.error.*;
 import org.ogf.saga.monitoring.*;
@@ -24,7 +23,7 @@ import java.util.*;
  *
  */
 public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
-    private static Log s_logger = LogFactory.getLog(MetricImpl.class);
+    private static Logger s_logger = Logger.getLogger(MetricImpl.class);
     // attributes
     protected E m_value;
     // internal

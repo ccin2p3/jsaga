@@ -6,8 +6,7 @@ import fr.in2p3.jsaga.adaptor.security.*;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.factories.SecurityAdaptorBuilderFactory;
 import fr.in2p3.jsaga.impl.attributes.AbstractAttributesImpl;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.ogf.saga.ObjectType;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.context.Context;
@@ -31,7 +30,7 @@ import java.util.Map;
  *
  */
 public class ContextImpl extends AbstractAttributesImpl implements Context {
-    private static Log s_logger = LogFactory.getLog(ContextImpl.class);
+    private static Logger s_logger = Logger.getLogger(ContextImpl.class);
     private ContextAttributes m_attributes;
     private SecurityAdaptorBuilder m_adaptorBuilder;
     private SecurityAdaptor m_adaptor;

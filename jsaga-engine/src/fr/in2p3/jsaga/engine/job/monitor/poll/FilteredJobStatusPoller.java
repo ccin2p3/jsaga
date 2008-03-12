@@ -1,8 +1,7 @@
 package fr.in2p3.jsaga.engine.job.monitor.poll;
 
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryFilteredJob;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -17,7 +16,7 @@ import org.apache.commons.logging.LogFactory;
  *
  */
 public class FilteredJobStatusPoller extends AbstractJobStatusPoller {
-    private static Log s_logger = LogFactory.getLog(FilteredJobStatusPoller.class);
+    private static Logger s_logger = Logger.getLogger(FilteredJobStatusPoller.class);
     private QueryFilteredJob m_adaptor;
 
     public FilteredJobStatusPoller(QueryFilteredJob adaptor) {

@@ -3,8 +3,7 @@ package fr.in2p3.jsaga.engine.job.monitor.poll;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorCallback;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 import java.util.Map;
 
@@ -21,7 +20,7 @@ import java.util.Map;
  *
  */
 public class IndividualJobStatusPoller extends AbstractJobStatusPoller {
-    private static Log s_logger = LogFactory.getLog(IndividualJobStatusPoller.class);
+    private static Logger s_logger = Logger.getLogger(IndividualJobStatusPoller.class);
     private QueryIndividualJob m_adaptor;
 
     public IndividualJobStatusPoller(QueryIndividualJob adaptor) {
