@@ -31,11 +31,6 @@ public class Base {
         }
     }
 
-    public static final File JSAGA_CONFIG =
-            System.getProperty("config")!=null
-                    ? new File(System.getProperty("config"))
-                    : new File(Base.JSAGA_HOME, "etc/jsaga-config.xml");
-
     public static final boolean DEBUG =
             System.getProperty("debug")!=null && !System.getProperty("debug").equalsIgnoreCase("false");
 }

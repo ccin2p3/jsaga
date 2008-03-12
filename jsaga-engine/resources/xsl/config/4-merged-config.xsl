@@ -6,7 +6,7 @@
                 exclude-result-prefixes="cfg">
     <xsl:output method="xml" indent="yes"/>
     <xsl:strip-space elements="*"/>
-    <xsl:param name="stopOnMissing" select="'false'"/>
+    <xsl:param name="ignore.missing.adaptor" select="'true'"/>
     <xsl:variable name="descriptors" select="document('descriptors.xml')/*"/>
 
     <xsl:template match="/">
@@ -31,10 +31,10 @@
         <xsl:variable name="conf" select="."/>
         <xsl:variable name="desc" select="$descriptors/cfg:context[@type=$conf/@type]"/>
         <xsl:choose>
-            <xsl:when test="not($desc) and $stopOnMissing='false'">
+            <xsl:when test="not($desc) and $ignore.missing.adaptor='true'">
                 <xsl:message terminate="no">Missing plugin for: <xsl:value-of select="@type"/></xsl:message>
             </xsl:when>
-            <xsl:when test="not($desc) and $stopOnMissing='true'">
+            <xsl:when test="not($desc) and $ignore.missing.adaptor='false'">
                 <xsl:message terminate="yes">Missing plugin for: <xsl:value-of select="@type"/></xsl:message>
             </xsl:when>
             <xsl:otherwise>
@@ -50,10 +50,10 @@
         <xsl:variable name="conf" select="."/>
         <xsl:variable name="desc" select="$descriptors/cfg:protocol[cfg:dataService/@type=$conf/cfg:dataService[1]/@type]"/>
         <xsl:choose>
-            <xsl:when test="not($desc) and $stopOnMissing='false'">
+            <xsl:when test="not($desc) and $ignore.missing.adaptor='true'">
                 <xsl:message terminate="no">Missing plugin for: <xsl:value-of select="cfg:dataService[1]/@type"/></xsl:message>
             </xsl:when>
-            <xsl:when test="not($desc) and $stopOnMissing='true'">
+            <xsl:when test="not($desc) and $ignore.missing.adaptor='false'">
                 <xsl:message terminate="yes">Missing plugin for: <xsl:value-of select="cfg:dataService[1]/@type"/></xsl:message>                
             </xsl:when>
             <xsl:otherwise>
@@ -85,10 +85,10 @@
         <xsl:variable name="conf" select="."/>
         <xsl:variable name="desc" select="$descriptors/cfg:execution[cfg:jobService/@type=$conf/cfg:jobService[1]/@type]"/>
         <xsl:choose>
-            <xsl:when test="not($desc) and $stopOnMissing='false'">
+            <xsl:when test="not($desc) and $ignore.missing.adaptor='true'">
                 <xsl:message terminate="no">Missing plugin for: <xsl:value-of select="cfg:jobService[1]/@type"/></xsl:message>
             </xsl:when>
-            <xsl:when test="not($desc) and $stopOnMissing='true'">
+            <xsl:when test="not($desc) and $ignore.missing.adaptor='false'">
                 <xsl:message terminate="yes">Missing plugin for: <xsl:value-of select="cfg:jobService[1]/@type"/></xsl:message>                
             </xsl:when>
             <xsl:otherwise>

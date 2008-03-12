@@ -27,7 +27,6 @@ REM # set system properties
 set PROPERTIES=
 set PROPERTIES=%PROPERTIES% -DJSAGA_HOME="%JSAGA_HOME%"
 rem set PROPERTIES=%PROPERTIES% -Ddebug
-rem set PROPERTIES=%PROPERTIES% -Dconfig="%JSAGA_HOME%\etc\example\jsaga-config.xml"
 
 REM # set classpath
 set CLASSPATH=.

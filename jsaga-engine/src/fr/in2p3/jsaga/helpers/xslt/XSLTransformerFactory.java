@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.helpers.xslt;
 
 import fr.in2p3.jsaga.Base;
+import fr.in2p3.jsaga.EngineProperties;
 
 import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamSource;
@@ -94,6 +95,10 @@ public class XSLTransformerFactory {
         // set transformer
         transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
         transformer.setURIResolver(uriResolver);
+        for (Iterator it=EngineProperties.getProperties().entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry entry = (Map.Entry) it.next();
+            transformer.setParameter((String) entry.getKey(), entry.getValue());
+        }
         for (Iterator it=parameters.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry entry = (Map.Entry) it.next();
             transformer.setParameter((String) entry.getKey(), entry.getValue());

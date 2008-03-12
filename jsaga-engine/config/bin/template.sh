@@ -27,7 +27,6 @@ fi
 PROPERTIES=
 PROPERTIES="${PROPERTIES} -DJSAGA_HOME=$JSAGA_HOME"
 #PROPERTIES="${PROPERTIES} -Ddebug"
-#PROPERTIES="${PROPERTIES} -Dconfig=$JSAGA_HOME/etc/example/jsaga-config.xml"
 
 # set classpath
 CLASSPATH=.
