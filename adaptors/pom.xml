@@ -24,6 +24,6 @@
     <module>jsaga-adaptor-jdl</module>
     <module>jsaga-adaptor-wsgram</module>
     <module>jsaga-adaptor-wms</module>
-	<module>jsaga-adaptor-u6</module>
+	<module>jsaga-adaptor-unicore6</module>
   </modules>
 </project>
