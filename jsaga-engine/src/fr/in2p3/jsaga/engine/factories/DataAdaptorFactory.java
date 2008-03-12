@@ -107,7 +107,7 @@ public class DataAdaptorFactory extends ServiceAdaptorFactory {
 
         // connect
         int port = (url.getPort()>0 ? url.getPort() : dataAdaptor.getDefaultPort());
-        dataAdaptor.connect(url.getUserInfo(), url.getHost(), port, null, attributes);
+        dataAdaptor.connect(url.getUserInfo(), url.getHost(), port, url.getPath(), attributes);
         return dataAdaptor;
     }
 }
