@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+
+MODIFIED VERSION of http://www.ggf.org/namespaces/OGSABasicProfile-1.0.xsd
+
+uses 2005/08 addressing
+
+GGF Copyright
+
+-->
+<xsd:schema  
+    xmlns="http://www.w3.org/2001/XMLSchema" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"  
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:wsa="http://www.w3.org/2005/08/addressing"
+    xmlns:ogsa-bp="http://www.ggf.org/namespaces/OGSABasicProfile-1.0.xsd" 
+    elementFormDefault="qualified" 
+    attributeFormDefault="unqualified"  
+    targetNamespace="http://www.ggf.org/namespaces/OGSABasicProfile-1.0.xsd"> 
+    
+    <!--modified schemaLocation
+    <xsd:import
+    namespace="http://www.w3.org/2005/08/addressing"
+    schemaLocation="http://www.w3.org/2005/08/addressing/" />
+    -->
+    <xsd:import
+        namespace="http://www.w3.org/2005/08/addressing"/>
+
+    <xsd:simpleType name="QNameListType">
+        <xsd:list itemType="xsd:QName"/> 
+    </xsd:simpleType> 
+ 
+    <xsd:element name="ResourcePropertyNames"
+        type="ogsa-bp:QNameListType"/>
+    
+    <xsd:element name="FinalWSResourceInterface" 
+        type="xsd:QName"/>
+    
+    <xsd:element name="WSResourceInterfaces" 
+        type="ogsa-bp:QNameListType"/> 
+    
+    <xsd:element name="ResourceEndpointReference" 
+        type="wsa:EndpointReferenceType" /> 
+    
+</xsd:schema> 

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema 
+    targetNamespace="http://unigrids.org/2006/04/services/tss"
+    xmlns:tss="http://unigrids.org/2006/04/services/tss"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:wsa="http://www.w3.org/2005/08/addressing"
+    xmlns:wsrf-bf="http://docs.oasis-open.org/wsrf/bf-2"
+    xmlns:wsrf-rl="http://docs.oasis-open.org/wsrf/rl-2"
+    xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+    xmlns:jsdl-posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
+    xmlns:unigrids="http://unigrids.org/2006/04/types"
+    xmlns:ogsa-bp="http://www.ggf.org/namespaces/OGSABasicProfile-1.0.xsd"
+    elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+  <!--  ========== Import WS-Addressing Types ============ -->
+  <xsd:import
+      namespace="http://www.w3.org/2005/08/addressing"/>
+      
+  <!--  ========== Import JSDL ============ -->
+  <xsd:import
+    namespace="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"/>
+  
+  <!--  ========== Import Base Profile Types ============ -->
+  <xsd:import
+      namespace="http://www.ggf.org/namespaces/OGSABasicProfile-1.0.xsd"
+      schemaLocation="bp-2.xsd"/>
+    
+  <!--  ========== Import UniGridS types============ -->
+  <xsd:import
+      namespace="http://unigrids.org/2006/04/types"
+      schemaLocation="unigridsTypes.xsd"/>
+  
+  <!--  ========== Import Base Faults ============ --> 
+  <xsd:import 
+      namespace="http://docs.oasis-open.org/wsrf/bf-2"/>
+
+  <!--  ========== Import Lifetime ============ --> 
+  <xsd:import 
+      namespace="http://docs.oasis-open.org/wsrf/rl-2"/>
+  	 
+  <!--  ========== TSR Properties============ --> 
+  <xsd:element name="Name" type="xsd:string"/>
+  <xsd:element name="TotalNumberOfJobs" type="xsd:integer"/>
+  <xsd:element name="JobReference" type="wsa:EndpointReferenceType"/>
+  
+  <xsd:complexType name="ApplicationResourceType">
+  	<xsd:sequence>
+  		<xsd:element ref="jsdl:ApplicationName"/>
+  		<xsd:element ref="jsdl:ApplicationVersion" minOccurs="0"/>
+  		<xsd:element ref="jsdl:Description" minOccurs="0"/>
+  		<xsd:element ref="unigrids:Metadata" minOccurs="0"/>
+  	</xsd:sequence>
+  	<xsd:attribute name="applicationType" type="xsd:QName"/>
+  </xsd:complexType>
+
+  <xsd:element name="ApplicationResource" type="tss:ApplicationResourceType"/>
+
+  <xsd:element name="Xlogin" type="xsd:string"/>
+
+  <xsd:element name="SupportsReservation" type="xsd:boolean"/>
+
+  <xsd:element name="TargetSystemProperties">
+   <xsd:complexType>
+	<xsd:sequence>
+		<xsd:element ref="tss:Name"/>
+        <xsd:element ref="unigrids:UpSince"/>
+		<xsd:element ref="tss:TotalNumberOfJobs" minOccurs="0"/>
+		<xsd:element ref="tss:JobReference" minOccurs="0" maxOccurs="unbounded"/>
+		<xsd:element ref="jsdl:Description" minOccurs="0"/>
+		<xsd:element ref="jsdl:IndividualPhysicalMemory" minOccurs="0"/>
+		<xsd:element ref="jsdl:IndividualCPUTime" minOccurs="0"/>
+        <xsd:element ref="jsdl:IndividualCPUCount" minOccurs="0"/>
+		<xsd:element ref="jsdl:TotalResourceCount" minOccurs="0"/>
+		<xsd:element ref="jsdl:OperatingSystem" minOccurs="0"/>
+		<xsd:element ref="tss:ApplicationResource" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="tss:Xlogin" minOccurs="0" maxOccurs="unbounded"/>
+		<xsd:element ref="unigrids:Processor" minOccurs="0"/>
+		<xsd:element ref="unigrids:TextInfo" minOccurs="0" maxOccurs="unbounded"/>
+		<xsd:element ref="unigrids:NumericInfo" minOccurs="0" maxOccurs="unbounded"/>
+		<xsd:element ref="unigrids:SiteResource" minOccurs="0" maxOccurs="unbounded"/>
+		<xsd:element ref="tss:SupportsReservation"/>
+		<xsd:element ref="unigrids:StorageReference" minOccurs="0" maxOccurs="unbounded"/>
+		<xsd:element ref="ogsa-bp:ResourcePropertyNames"/>
+		<xsd:element ref="ogsa-bp:FinalWSResourceInterface"/>
+		<xsd:element ref="ogsa-bp:WSResourceInterfaces"/>
+		<xsd:element ref="ogsa-bp:ResourceEndpointReference"/>
+		<xsd:element ref="wsrf-rl:CurrentTime"/>
+		<xsd:element ref="wsrf-rl:TerminationTime" minOccurs="0"/>
+		<xsd:any minOccurs="0" maxOccurs="unbounded"/>
+	 </xsd:sequence>
+	</xsd:complexType>
+  </xsd:element>
+
+  <!--  ========== Message Types for Submit  ============ --> 
+    
+  <xsd:element name="Submit">
+    <xsd:complexType>
+	  <xsd:sequence>
+		<xsd:element ref="jsdl:JobDefinition"/>
+		<xsd:element ref="wsrf-rl:TerminationTime" minOccurs="0"/>
+	  </xsd:sequence>
+	</xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="SubmitResponse">
+    <xsd:complexType>
+	  <xsd:sequence>
+        <xsd:element name="JobReference" type="wsa:EndpointReferenceType"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:complexType name="JobNotSubmittedFaultType">
+    <xsd:complexContent>
+	  <xsd:extension base="wsrf-bf:BaseFaultType"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+      
+  <xsd:element name="JobNotSubmittedFault" 
+      type="tss:JobNotSubmittedFaultType"/>
+</xsd:schema>

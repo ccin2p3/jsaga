@@ -1,0 +1,9 @@
+<xb:config xmlns:xb="http://xml.apache.org/xmlbeans/2004/02/xbean/config" >
+ 
+  <xb:namespace uri="##any">
+    <xb:prefix></xb:prefix>
+    <xb:suffix></xb:suffix>
+  </xb:namespace>
+
+</xb:config>
+

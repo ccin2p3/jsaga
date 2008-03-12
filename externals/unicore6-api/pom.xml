@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <!-- declaration -->
+  <parent>
+	<groupId>fr.in2p3.parent</groupId>
+	<artifactId>in2p3-external-pom</artifactId>
+	<version>current</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>de.fzj.unicore</groupId>
+  <artifactId>unicore6-api</artifactId>
+  <version>6.1</version>
+  <name>U6 external libraries</name>
+  <description>These are the external libraries for the U6 adaptor.</description>
+    <dependencies>
+        <dependency>
+            <groupId>javax.xml</groupId>
+            <artifactId>jsr173-api</artifactId>
+            <version>1.0</version>
+        </dependency>
+    </dependencies>
+</project>

@@ -1,0 +1,155 @@
+<xsd:schema 
+    targetNamespace="http://unigrids.org/2006/04/types"
+    xmlns:unigrids="http://unigrids.org/2006/04/types"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+    xmlns:wsa="http://www.w3.org/2005/08/addressing"
+    elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+  <!--  ========== Borrow Resource Types from JSDL Draft ============ --> 
+  <xsd:import
+      namespace="http://schemas.ggf.org/jsdl/2005/11/jsdl"/>
+
+  <xsd:import
+     namespace="http://www.w3.org/2005/08/addressing" />
+
+  <xsd:simpleType name="StorageTypeEnumeration">
+	<xsd:restriction base="xsd:string">
+		<xsd:enumeration value="Home"/>
+		<xsd:enumeration value="Temp"/>
+		<xsd:enumeration value="Root"/>
+		<xsd:enumeration value="Work"/>
+		<xsd:enumeration value="StorageServer"/>
+	</xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:element name="StorageEndpointReference" type="wsa:EndpointReferenceType"/>
+  
+  <xsd:complexType name="StorageReferenceType">
+    <xsd:sequence>
+      <xsd:element name="Type" type="unigrids:StorageTypeEnumeration"/>
+      <xsd:element ref="unigrids:StorageEndpointReference"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="StorageReference" type="unigrids:StorageReferenceType"/>
+  
+  <xsd:complexType name="ProcessorType">
+    <xsd:sequence>
+      <xsd:element ref="jsdl:CPUArchitecture" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="jsdl:IndividualCPUSpeed" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="jsdl:IndividualCPUCount" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="jsdl:Description" minOccurs="0" maxOccurs="1"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="Processor" type="unigrids:ProcessorType"/>
+
+  <xsd:complexType name="NumericInfoType">
+    <xsd:sequence>
+      <xsd:element name="Name" type="xsd:string"/>
+      <xsd:element name="Value" type="xsd:double"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="NumericInfo" type="unigrids:NumericInfoType"/>
+
+  <xsd:complexType name="TextInfoType">
+    <xsd:sequence>
+      <xsd:element name="Name" type="xsd:string"/>
+      <xsd:element name="Value" type="xsd:string"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="TextInfo" type="unigrids:TextInfoType"/>
+  
+  <xsd:complexType name="SiteResourceType">
+    <xsd:sequence>
+      <xsd:element name="Name" type="xsd:string"/>
+      <xsd:element name="Description" type="xsd:string"/>
+      <xsd:element name="Value" type="jsdl:RangeValue_Type"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="SiteResource" type="unigrids:SiteResourceType"/>
+  
+  <xsd:complexType name="ContextInfoType">
+    <xsd:sequence>
+      <xsd:element name="Name" type="xsd:string"/>
+      <xsd:element name="Version" type="xsd:string"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="ContextInfo" type="unigrids:ContextInfoType"/>
+  
+  <xsd:complexType name="GridFileType">
+    <xsd:sequence>
+      <xsd:element name="Path" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="Size" type="xsd:long" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="IsDirectory" type="xsd:boolean" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="Permissions" type="unigrids:PermissionsType" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="ExtraInformation" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="LastModified" type="xsd:dateTime" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="IsOwner" type="xsd:boolean" minOccurs="0" maxOccurs="1"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="GridFile" type="unigrids:GridFileType"/>
+ 
+  <xsd:complexType name="PermissionsType">
+    <xsd:sequence>
+      <xsd:element name="Executable" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="Writable" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="Readable" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="Permissions" type="unigrids:PermissionsType"/>
+  
+  <xsd:simpleType name="StatusType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="UNDEFINED"/>
+      <xsd:enumeration value="READY"/>
+      <xsd:enumeration value="QUEUED"/>
+      <xsd:enumeration value="RUNNING"/>
+      <xsd:enumeration value="SUCCESSFUL"/>
+      <xsd:enumeration value="FAILED"/>
+      <xsd:enumeration value="STAGINGIN"/>
+      <xsd:enumeration value="STAGINGOUT"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  
+  <xsd:complexType name="StatusInfoType">
+     <xsd:sequence>
+       <xsd:element name="Status" type="unigrids:StatusType"/>
+       <xsd:element name="Description" type="jsdl:Description_Type"/>
+       <xsd:element name="ExitCode" type="xsd:integer" minOccurs="0"/>
+       <xsd:element name="Progress" type="xsd:float" minOccurs="0"/>
+     </xsd:sequence>
+  </xsd:complexType> 
+  <xsd:element name="StatusInfo" type="unigrids:StatusInfoType"/>
+  
+  <xsd:simpleType name="ProtocolType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="HTTP"/>
+      <xsd:enumeration value="HTTPS"/>
+      <xsd:enumeration value="BFT"/>
+      <xsd:enumeration value="FTP"/>
+      <xsd:enumeration value="TCPIP"/>
+      <xsd:enumeration value="GRIDFTP"/>
+      <xsd:enumeration value="UPL"/>
+      <xsd:enumeration value="SCP"/>
+      <xsd:enumeration value="RBYTEIO"/>
+      <xsd:enumeration value="SBYTEIO"/>
+      <xsd:enumeration value="USF"/>      
+	  <xsd:enumeration value="UDT"/>
+      <xsd:enumeration value="OTHER"/>
+
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:element name="Protocol" type="unigrids:ProtocolType"/>
+  
+  <xsd:complexType name="MetadataType">
+  	<xsd:sequence>
+  		<xsd:any namespace="##other" processContents="lax"/>
+  	</xsd:sequence>
+  </xsd:complexType>	
+  <xsd:element name="Metadata" type="unigrids:MetadataType"/>
+
+  <!-- used for publishing the uptime of services --> 
+  <xsd:element name="UpSince" type="xsd:dateTime"/>
+
+</xsd:schema>
+      
