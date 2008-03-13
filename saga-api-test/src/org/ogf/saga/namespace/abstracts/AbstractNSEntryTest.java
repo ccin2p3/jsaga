@@ -72,6 +72,7 @@ public abstract class AbstractNSEntryTest extends AbstractTest {
     protected void setUp() throws Exception {
         super.setUp();
         try {
+            // read-write protocol
             m_root = NSFactory.createNSDirectory(m_session, m_rootUrl, FLAGS_ROOT);
             m_file = m_root.open(m_fileUrl, FLAGS_FILE);
             if (m_file instanceof File) {
@@ -86,6 +87,7 @@ public abstract class AbstractNSEntryTest extends AbstractTest {
             m_file.close();
             m_toBeRemoved = true;
         } catch(NotImplemented e) {
+            // read-only protocol
             try {
                 m_root = NSFactory.createNSDirectory(m_session, m_rootUrl, Flags.NONE.getValue());
                 m_file = m_root.open(m_fileUrl, Flags.NONE.getValue());
