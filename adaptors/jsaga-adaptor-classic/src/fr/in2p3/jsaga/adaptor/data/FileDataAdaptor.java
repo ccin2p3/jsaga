@@ -12,6 +12,8 @@ import org.ogf.saga.error.*;
 
 import java.io.*;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -182,9 +184,12 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
 
     private File newPath(String absolutePath) throws NoSuccess {
         if (s_isWindows) {
+            Matcher m;
             if (m_drive != null) {
                 return new File(m_drive+":"+absolutePath);
-            } else if (absolutePath.matches("/+([A-Za-z]:).*") || absolutePath.startsWith("./")) {
+            } else if ( (m=Pattern.compile("/+(\\./+)+([A-Za-z]:.*)").matcher(absolutePath)).matches() ) {
+                return new File(m.group(m.groupCount()));
+            } else if (absolutePath.matches("/+[A-Za-z]:.*") || absolutePath.startsWith("./")) {
                 return new File(absolutePath);
             } else if (absolutePath.matches("/+")) {
                 return null;
