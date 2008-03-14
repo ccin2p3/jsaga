@@ -41,6 +41,7 @@ public class RByteIODataTestSuite extends TestSuite {
     }
     public static class RByteIOFileWriteTest extends FileWriteTest {
         public RByteIOFileWriteTest() throws Exception {super("rbyteio");}
+        public void test_write_append() { System.out.println("the test_write_append ignored : not supported"); }
         public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class RByteIONSCopyTest extends NSCopyTest {
