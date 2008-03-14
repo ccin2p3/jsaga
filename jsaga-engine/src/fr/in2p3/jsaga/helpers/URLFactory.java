@@ -80,8 +80,9 @@ public class URLFactory {
         } catch (URISyntaxException e) {
             throw new BadParameter(e);
         }
-        String relativePath = name + (baseUri.getFragment()!=null ? "#"+baseUri.getFragment() : "");
-        relativePath = relativePath.replaceAll(" ", "%20");
+        String relativePath = JSagaURL.encodePath(name)
+                + (baseUri.getQuery()!=null ? "?"+baseUri.getQuery() : "")
+                + (baseUri.getFragment()!=null ? "#"+baseUri.getFragment() : "");
         java.net.URI uri = baseUri.resolve(relativePath);
         return uri.toString();
     }

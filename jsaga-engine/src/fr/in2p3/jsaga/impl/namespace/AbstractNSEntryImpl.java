@@ -80,7 +80,13 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
         try {
             String name = this._getEntryName();
             if (name != null) {
-                return new URL(name.replaceAll(" ", "%20"));
+                if (name.matches("[A-Za-z]:")) {
+                    // windows drive
+                    return new URL("/"+name);
+                } else {
+                    // entry name
+                    return new URL(name.replaceAll(" ", "%20"));
+                }
             } else {
                 return null;
             }
