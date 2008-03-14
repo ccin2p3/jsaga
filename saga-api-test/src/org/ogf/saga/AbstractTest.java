@@ -57,7 +57,7 @@ public abstract class AbstractTest extends TestCase {
         if (value != null) {
             return value;
         } else {
-            throw new Exception("Configuration is missing required property: "+name);
+            throw new Exception("Test properties file is missing required property: "+protocol+"."+name);
         }
     }
 
