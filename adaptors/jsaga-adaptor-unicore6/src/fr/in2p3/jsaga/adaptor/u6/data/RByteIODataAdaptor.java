@@ -36,10 +36,8 @@ import com.intel.gpe.client2.transfers.FileExport;
 import com.intel.gpe.client2.transfers.FileImport;
 import com.intel.gpe.client2.transfers.TransferFailedException;
 import com.intel.gpe.clients.api.StorageClient;
-import com.intel.gpe.clients.api.exceptions.GPEDirectoryNotListedException;
+import com.intel.gpe.clients.api.exceptions.GPEException;
 import com.intel.gpe.clients.api.exceptions.GPEFileTransferProtocolNotSupportedException;
-import com.intel.gpe.clients.api.exceptions.GPEMiddlewareRemoteException;
-import com.intel.gpe.clients.api.exceptions.GPEMiddlewareServiceException;
 import com.intel.gpe.clients.api.exceptions.GPEResourceUnknownException;
 import com.intel.gpe.clients.api.exceptions.GPESecurityException;
 import com.intel.gpe.gridbeans.GPEFile;
@@ -63,10 +61,11 @@ import java.util.Vector;
  *
  */
 public class RByteIODataAdaptor extends U6Abstract 
-		implements DirectoryReader, DataPut, DataGet, DataRename, DirectoryWriter, FileWriter {
+		implements DirectoryReader, DataPut, DataGet,
+				DirectoryWriter, FileWriter, FileReader {
 		
     protected String m_serverFileSeparator ;
-    protected GPESecurityManager securityManager;
+    protected GPESecurityManager m_securityManager;
     protected StorageClient m_client;
 	
     public RByteIODataAdaptor() {
@@ -123,12 +122,12 @@ public class RByteIODataAdaptor extends U6Abstract
     	m_serverUrl = "https://"+host+":"+port+registryPath;    
 
     	// set security
-    	securityManager = this.setSecurity();
+    	m_securityManager = this.setSecurity();
     	
 		// get client that talks to registry
         try {
         	  // find target system that supports the specific application
-        	TargetSystemInfo targetSystemInfo = findTargetSystem(m_serverUrl, m_applicationName, securityManager);
+        	TargetSystemInfo targetSystemInfo = findTargetSystem(m_serverUrl, m_applicationName, m_securityManager);
         	m_client = targetSystemInfo.getTargetSystem().getStorage(storageName);
         	m_serverFileSeparator = m_client.getFileSeparator();
 		} catch (NoSuccess e) {
@@ -143,90 +142,86 @@ public class RByteIODataAdaptor extends U6Abstract
     }
     
     public boolean exists(String absolutePath) throws PermissionDenied, Timeout, NoSuccess {
-    	try {
-        	// prepare path
-    		absolutePath = getEntryPath(absolutePath);
-    		
-    		// get parent
-    		String parentDirectory = "";            
-			if(absolutePath.lastIndexOf(m_serverFileSeparator) > 0) {
-			    parentDirectory = absolutePath.substring(0,absolutePath.lastIndexOf(m_serverFileSeparator));
-			 }
-			// if absolutePath is the root
-			if(absolutePath.equals("")) {
-				return true;
-			}
+
+    	// prepare path
+		absolutePath = getEntryPath(absolutePath);
+		
+		// get parent
+		String parentDirectory = "";            
+		if(absolutePath.lastIndexOf(m_serverFileSeparator) > 0) {
+		    parentDirectory = absolutePath.substring(0,absolutePath.lastIndexOf(m_serverFileSeparator));
+		 }
+		
+		// if absolutePath is the root
+		if(absolutePath.equals("")) {
+			return true;
+		}
+		
+		try {			
 	        // check
-	        if(isDirectory(parentDirectory)) {
-		        List<com.intel.gpe.clients.api.GridFile> directoryList = m_client.listDirectory(parentDirectory);
-		        for (com.intel.gpe.clients.api.GridFile file : directoryList) {
-		            if(file.getPath().endsWith(absolutePath)) {
-		                return true;
-		            }
-		        }	        	
+	        List<com.intel.gpe.clients.api.GridFile> directoryList = m_client.listDirectory(parentDirectory);
+	        for (com.intel.gpe.clients.api.GridFile file : directoryList) {
+	            if(file.getPath().endsWith(absolutePath)) {
+	            	return true;
+	            }
 	        }
 	        return false;
 		} catch (GPEResourceUnknownException e) {
 			throw new NoSuccess(e);
 		} catch (GPESecurityException e) {
-			throw new NoSuccess(e);
-		} catch (GPEMiddlewareRemoteException e) {
-			throw new NoSuccess(e);
-		} catch (GPEMiddlewareServiceException e) {
-			throw new NoSuccess(e);
-		} catch (GPEDirectoryNotListedException e) {
-			throw new NoSuccess(e);
-		} catch (Exception e) {
-			throw new NoSuccess(e);
+			throw new PermissionDenied("Unable to check entry",e);
+		} catch (Throwable e) {
+			if(!exists(parentDirectory)) {
+				return false;
+			}
+			else {
+				throw new NoSuccess(e);
+			}
 		}
     }
 
     public boolean isDirectory(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    	// prepare path and connection
+		absolutePath = getEntryPath(absolutePath);
+		
+		// is root path
+		if(absolutePath.equals("")) {
+			return true;
+		}
+		
+		// get parent
+    	String parentDirectory = "";            
+        if(absolutePath.lastIndexOf(m_serverFileSeparator) > 0) {
+            parentDirectory = absolutePath.substring(0,absolutePath.lastIndexOf(m_serverFileSeparator));
+        }
     	try {
-        	// prepare path and connection
-    		absolutePath = getEntryPath(absolutePath);
-    		
-    		// check
-    		if(!exists(absolutePath)) {
-    			throw new DoesNotExist("The directory ["+absolutePath+"] does not exist.");
-    		}
-    		
-    		// is root path
-    		if(absolutePath.equals(""))
-    			return true;
-    		
-    		// get parent
-        	String parentDirectory = "";            
-	        if(absolutePath.lastIndexOf(m_serverFileSeparator) > 0) {
-	            parentDirectory = absolutePath.substring(0,absolutePath.lastIndexOf(m_serverFileSeparator));
-	        }
-	        
 	        // check
 	        List<com.intel.gpe.clients.api.GridFile> directoryList = m_client.listDirectory(parentDirectory);
 	        for (com.intel.gpe.clients.api.GridFile file : directoryList) {
-	            if(file.getPath().endsWith(absolutePath)) {
+	        	if(file.getPath().endsWith(absolutePath)) {
 	            	if(file.isDirectory()) {
-	                	return true;
+	            		return true;
 	            	}
 	            	else {
 	            		return false;
 	            	}
 	            }
 	        }
-	        // must be impossible
-	        return false;
-        } catch (GPEResourceUnknownException e) {
-			throw new NoSuccess(e);
-		} catch (GPESecurityException e) {
-			throw new NoSuccess(e);
-		} catch (GPEMiddlewareRemoteException e) {
-			throw new NoSuccess(e);
-		} catch (GPEMiddlewareServiceException e) {
-			throw new NoSuccess(e);
-		} catch (GPEDirectoryNotListedException e) {
-			throw new NoSuccess(e);
-		} catch (Exception e) {
-			throw new NoSuccess(e);
+	        // to be catch by Throwable
+	        throw new DoesNotExist("The directory does not exist.");
+        } catch (GPESecurityException e) {
+        	throw new PermissionDenied("Unable to check directory",e);
+		} catch (Throwable e) {
+	        // check
+			if(!exists(absolutePath)) {
+				throw new DoesNotExist("The directory does not exist.");
+			}
+			else  {
+				// must be impossible because listDirectory must throw an exception
+				System.err.println("'"+absolutePath+"' does not exist but exception is not throw !!!");
+				//return false;
+				throw new NoSuccess(e);
+			}
 		}
     }
 
@@ -235,24 +230,17 @@ public class RByteIODataAdaptor extends U6Abstract
     }
     
     public long getSize(String absolutePath) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-    	try {        	
-    		//prepare path and connection
-    		absolutePath = getEntryPath(absolutePath);
-    		
-    		// check source
-    		if(!exists(absolutePath)) {
-    			throw new DoesNotExist("The file ["+absolutePath+"] does not exist.");
-    		}
-    		
-    		// check source
-    		if(!isEntry(absolutePath)) {
-    			throw new BadParameter("The entry ["+absolutePath+"] is not a file.");
-    		}
-    		// get parent
-    		String parentDirectory = "";               
-			if(absolutePath.lastIndexOf(m_serverFileSeparator) > 0) {
-			    parentDirectory = absolutePath.substring(0,absolutePath.lastIndexOf(m_serverFileSeparator));
-			 }
+    	      	
+		//prepare path and connection
+		absolutePath = getEntryPath(absolutePath);
+		
+		// get parent
+		String parentDirectory = "";               
+		if(absolutePath.lastIndexOf(m_serverFileSeparator) > 0) {
+		    parentDirectory = absolutePath.substring(0,absolutePath.lastIndexOf(m_serverFileSeparator));
+		 }
+		
+		try {		
 	        // check
 	        List<com.intel.gpe.clients.api.GridFile> directoryList = m_client.listDirectory(parentDirectory);
 	        for (com.intel.gpe.clients.api.GridFile file : directoryList) {
@@ -260,78 +248,32 @@ public class RByteIODataAdaptor extends U6Abstract
 	            	return file.getSize();
 	            }
 	        }
-	        // must be impossible
+	        // to be catch by Throwable
             throw new DoesNotExist("Unable to find file : "+absolutePath);
-		} catch (GPEResourceUnknownException e) {
-			throw new NoSuccess(e);
 		} catch (GPESecurityException e) {
-			throw new NoSuccess(e);
-		} catch (GPEMiddlewareRemoteException e) {
-			throw new NoSuccess(e);
-		} catch (GPEMiddlewareServiceException e) {
-			throw new NoSuccess(e);
-		} catch (GPEDirectoryNotListedException e) {
-			throw new NoSuccess(e);
-		} catch (Exception e) {
-			throw new NoSuccess(e);
-		}
-    }
-   
-    public void rename(String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
-    	System.out.println("Renaming file "+sourceAbsolutePath + " to "+ targetAbsolutePath);
-        try {
-    		//prepare path and connection
-    		//m_client = newConnect(m_serverUrl);
-        	sourceAbsolutePath = getEntryPath(sourceAbsolutePath);
-        	targetAbsolutePath = getEntryPath(targetAbsolutePath);
-        	
-    		// check source
-    		if(!exists(sourceAbsolutePath)) {
-    			throw new DoesNotExist("The file ["+sourceAbsolutePath+"] does not exist.");
+			throw new PermissionDenied("Unable to get size",e);
+        } catch (Throwable e) {
+        	// check source
+    		if(!exists(absolutePath)) {
+    			throw new DoesNotExist("The file does not exist.");
     		}
     		
     		// check source
-    		if(!isEntry(sourceAbsolutePath)) {
-    			throw new BadParameter("The entry ["+sourceAbsolutePath+"] is not a file.");
+    		if(!isEntry(absolutePath)) {
+    			throw new BadParameter("The entry is not a file.");
     		}
-    		
-    		// check target
-    		if(exists(targetAbsolutePath) && !overwrite ) {
-    			throw new AlreadyExists("The file ["+targetAbsolutePath+"] already exists and overwrite is false.");
-    		}
-        	
-        	// start
-        	m_client.renameFile(sourceAbsolutePath, targetAbsolutePath);
-        } catch (GPESecurityException e) {
-			throw new PermissionDenied("Failed to rename file ["+sourceAbsolutePath+"]", e);
-		} catch (GPEMiddlewareServiceException e) {
-			throw new NoSuccess("Failed to rename file ["+sourceAbsolutePath+"]", e);
-		} catch (GPEResourceUnknownException e) {
-			throw new NoSuccess("Failed to rename file ["+sourceAbsolutePath+"]", e);
-		} catch (GPEMiddlewareRemoteException e) {
-			throw new NoSuccess("Failed to rename file ["+sourceAbsolutePath+"]", e);
-		} catch (Throwable e) {
-			throw new NoSuccess("Failed to rename file ["+sourceAbsolutePath+"]", e);
-		}
+    	
+    		throw new NoSuccess("Unable to get size",e);
+        }
     }
 
     public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-    	System.out.println("Deleting file "+fileName + " on directory "+ parentAbsolutePath);
-        try {
-    		//prepare path
-    		parentAbsolutePath = getEntryPath(parentAbsolutePath);
-        	
-    		// check parent
-    		if(!exists(parentAbsolutePath+fileName)) {
-    			throw new DoesNotExist("The file ["+parentAbsolutePath+"] does not exist.");
-    		}
-    		
-    		// check parent
-    		if(isDirectory(parentAbsolutePath+fileName)) {
-    			throw new BadParameter("The entry ["+parentAbsolutePath+"] is a directory.");
-    		}
+    	
+    	//prepare path
+		String absolutePath = getEntryPath(parentAbsolutePath + fileName);    	
+    	try {
         	// remove
-	        List<com.intel.gpe.clients.api.GridFile> directoryList = m_client.listDirectory(parentAbsolutePath);
+	        List<com.intel.gpe.clients.api.GridFile> directoryList = m_client.listDirectory(getEntryPath(parentAbsolutePath));
 	        for (com.intel.gpe.clients.api.GridFile gridFile : directoryList) {
 	            if(gridFile.getPath().endsWith(fileName)) {
 	                DeleteFileRequest requestRmFile = new DeleteFileRequest(m_client, gridFile);
@@ -339,32 +281,27 @@ public class RByteIODataAdaptor extends U6Abstract
 	                return;
 	            }
 	        }
-        } catch (IllegalAccessException e) {
-            throw new NoSuccess("Failed to remove file ["+fileName+"]", e);
-        } catch (GPESecurityException e) {
+    	} catch (GPESecurityException e) {
 			throw new PermissionDenied("Failed to remove file ["+fileName+"]", e);
-		} catch (GPEMiddlewareServiceException e) {
-			throw new NoSuccess("Failed to remove file ["+fileName+"]", e);
-		} catch (GPEResourceUnknownException e) {
-			throw new NoSuccess("Failed to remove file ["+fileName+"]", e);
-		} catch (GPEDirectoryNotListedException e) {
-			throw new NoSuccess("Failed to remove file ["+fileName+"]", e);
-		} catch (GPEMiddlewareRemoteException e) {
-			throw new NoSuccess("Failed to remove file ["+fileName+"]", e);
-		} catch (Throwable e) {
-			throw new NoSuccess("Failed to remove file ["+fileName+"]", e);
-		}
+        } catch (Throwable e) {
+    		// check file
+    		if(!exists(absolutePath)) {
+    			throw new DoesNotExist("The file ["+absolutePath+"] does not exist.");
+    		}
+    		
+    		// check file
+    		if(isDirectory(absolutePath)) {
+    			throw new BadParameter("The entry ["+absolutePath+"] is a directory.");
+    		}
+            throw new NoSuccess("Failed to remove file ["+fileName+"]", e);
+        }
     }
 
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {        
-    	try {
-        	// prepare path
-    		absolutePath = getEntryPath(absolutePath);
-    		
-    		// check parent
-    		if(!exists(absolutePath)) {
-    			throw new DoesNotExist("The entry ["+absolutePath+"] does not exist.");
-    		} 
+    	// prepare path
+		absolutePath = getEntryPath(absolutePath);
+		
+		try {
 	        List<com.intel.gpe.clients.api.GridFile> directoryList = m_client.listDirectory(absolutePath);
 	        Vector<RByteIOFileAttributes> entries = new Vector<RByteIOFileAttributes>();
 	        for (com.intel.gpe.clients.api.GridFile file : directoryList) {
@@ -375,83 +312,61 @@ public class RByteIODataAdaptor extends U6Abstract
 				list[i] = entries.get(i);
 			}
 	        return list;
-		} catch (GPEResourceUnknownException e) {
-			throw new NoSuccess(e);
 		} catch (GPESecurityException e) {
 			throw new NoSuccess(e);
-		} catch (GPEMiddlewareRemoteException e) {
-			throw new NoSuccess(e);
-		} catch (GPEMiddlewareServiceException e) {
-			throw new NoSuccess(e);
-		} catch (GPEDirectoryNotListedException e) {
-			throw new NoSuccess(e);
-		} catch (Exception e) {
-			throw new NoSuccess(e);
-		}      
+		} catch (Throwable e) {
+			// check parent
+			if(!exists(absolutePath)) {
+				throw new DoesNotExist("The entry ["+absolutePath+"] does not exist.");
+			} 
+			throw new NoSuccess("Failed to list attributes", e);
+		}     
     }
 
     public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
-    	System.out.println("Try to create "+directoryName+" on directory "+parentAbsolutePath);
-    	try {
-    		
-    		parentAbsolutePath = getEntryPath(parentAbsolutePath);    		
-    		// check parent
-    		if(!exists(parentAbsolutePath)) {
-    			throw new ParentDoesNotExist("The parent directory of ["+parentAbsolutePath+"] does not exist.");
-    		}    		
-    		// check parent
-    		if(!isDirectory(parentAbsolutePath)) {
-    			throw new BadParameter("The parent directory of ["+parentAbsolutePath+"] is not a directory.");
-    		}
-    		// check directory
-    		if(!isDirectory(parentAbsolutePath+directoryName)) {
-    			throw new AlreadyExists ("The directory ["+parentAbsolutePath+"] already exists.");
-    		}
+    	
+    	String absolutePath = getEntryPath(parentAbsolutePath + directoryName);
+    	// check parent
+		if(!exists(parentAbsolutePath)) {
+			throw new ParentDoesNotExist("The parent directory ["+parentAbsolutePath+"] of ["+directoryName+"] does not exist.");
+		}
+		// check parent
+		try {
+			if(!isDirectory(parentAbsolutePath))
+				throw new BadParameter("The parent directory is not a directory.");
+		}
+		catch(DoesNotExist e1) {
+			throw new BadParameter("The parent directory is not a directory.",e1);
+		}
+
+		// check existing
+		try {			
+			if(isDirectory(absolutePath))
+				throw new AlreadyExists ("The directory ["+absolutePath+"] already exists.");
+		}
+		catch(DoesNotExist e) {
+			// means that the directory does not exist
+		}
+
+    	try {    				
         	// make
-    		CreateDirectoryRequest request = new CreateDirectoryRequest(m_client, parentAbsolutePath +  directoryName);
-			request.perform();
-        } catch (IllegalAccessException e) {
-            throw new NoSuccess("Failed to make directory ["+directoryName+"]", e);
+    		CreateDirectoryRequest request = new CreateDirectoryRequest(m_client, absolutePath);
+			request.perform();			
         } catch (GPESecurityException e) {
 			throw new PermissionDenied("Failed to make directory ["+directoryName+"]", e);
-		} catch (GPEMiddlewareServiceException e) {
-			throw new NoSuccess("Failed to make directory ["+directoryName+"]", e);
-		} catch (GPEResourceUnknownException e) {
-			throw new NoSuccess("Failed to make directory ["+directoryName+"]", e);
-		} catch (GPEDirectoryNotListedException e) {
-			throw new NoSuccess("Failed to make directory ["+directoryName+"]", e);
-		} catch (GPEMiddlewareRemoteException e) {
-			throw new NoSuccess("Failed to make directory ["+directoryName+"]", e);
 		} catch (Throwable e) {
+			e.printStackTrace();			
 			throw new NoSuccess("Failed to make directory ["+directoryName+"]", e);
 		}
     }
 
     public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-    	System.out.println("Deleting directory "+directoryName+" on directory "+ parentAbsolutePath);
-        try {
-        	// prepare path
-    		parentAbsolutePath = getEntryPath(parentAbsolutePath);
-    		
-    		// check parent
-    		if(!exists(parentAbsolutePath+directoryName)) {
-    			throw new ParentDoesNotExist("The directory ["+parentAbsolutePath+"] does not exist.");
-    		}
-    		
-    		// check parent
-    		if(!isDirectory(parentAbsolutePath+directoryName)) {
-    			throw new BadParameter("The entry ["+parentAbsolutePath+"] is not a directory.");
-    		}
-
-    		// check childs
-    		System.out.println("Listing directory "+parentAbsolutePath+directoryName);
-        	List<com.intel.gpe.clients.api.GridFile> directoryList = m_client.listDirectory(parentAbsolutePath+directoryName);       
-	        if(directoryList.size() > 0) {
-	        	throw new BadParameter("The entry ["+parentAbsolutePath+"] is not a empty directory.");
-	        }
-        	
+    	// prepare path
+		String absolutePath = getEntryPath(parentAbsolutePath + directoryName) ;
+		
+		try {        	
     		// remove
-        	List<com.intel.gpe.clients.api.GridFile> parentDirectoryList = m_client.listDirectory(parentAbsolutePath);       
+        	List<com.intel.gpe.clients.api.GridFile> parentDirectoryList = m_client.listDirectory(getEntryPath(parentAbsolutePath));       
 	        for (com.intel.gpe.clients.api.GridFile file : parentDirectoryList) {
 	            if(file.getPath().endsWith(directoryName)) {
 	                DeleteFileRequest requestRmFile = new DeleteFileRequest(m_client, file);
@@ -459,20 +374,33 @@ public class RByteIODataAdaptor extends U6Abstract
 	                return ;
 	            }
 	        }
-            throw new DoesNotExist("Unable to find directory : "+directoryName);
-        } catch (IllegalAccessException e) {
-            throw new NoSuccess("Failed to remove directory ["+directoryName+"]", e);
+	        // to be catch by Throwable
+            //throw new DoesNotExist("Unable to find directory : "+directoryName);
         } catch (GPESecurityException e) {
 			throw new PermissionDenied("Failed to remove directory ["+directoryName+"]", e);
-		} catch (GPEMiddlewareServiceException e) {
-			throw new NoSuccess("Failed to remove directory ["+directoryName+"]", e);
-		} catch (GPEResourceUnknownException e) {
-			throw new NoSuccess("Failed to remove directory ["+directoryName+"]", e);
-		} catch (GPEDirectoryNotListedException e) {
-			throw new NoSuccess("Failed to remove directory ["+directoryName+"]", e);
-		} catch (GPEMiddlewareRemoteException e) {
-			throw new NoSuccess("Failed to remove directory ["+directoryName+"]", e);
 		} catch (Throwable e) {
+			
+    		// check directory
+    		if(!exists(absolutePath)) {
+    			throw new DoesNotExist("The directory ["+absolutePath+"] does not exist.");
+    		}
+    		
+    		// check directory
+    		if(!isDirectory(absolutePath)) {
+    			throw new BadParameter("The entry ["+absolutePath+"] is not a directory.");
+    		}
+    		
+    		// check childs
+    		List<com.intel.gpe.clients.api.GridFile> directoryList;
+			try {
+				directoryList = m_client.listDirectory(absolutePath);
+		        if(directoryList.size() > 0) {
+		        	throw new BadParameter("The entry ["+absolutePath+"] is not a empty directory.");
+		        }
+			} catch (GPEException e1) {
+				throw new BadParameter("The entry ["+absolutePath+"] is not a empty directory.");
+			} 
+	        
 			throw new NoSuccess("Failed to remove directory ["+directoryName+"]", e);
 		}
     }    
@@ -480,6 +408,10 @@ public class RByteIODataAdaptor extends U6Abstract
 	public void putFromStream(String absolutePath, InputStream stream,
 			boolean append, String additionalArgs) throws PermissionDenied,
 			BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+		if(append) {
+			throw new NoSuccess("Append not supported.");
+		}
+		
 		try {
     		// prepare path
     		absolutePath = getEntryPath(absolutePath);
@@ -490,7 +422,7 @@ public class RByteIODataAdaptor extends U6Abstract
         	int i;
 			for (i = 0; i < putters.size(); i++) {
 			    try {
-			         putters.get(i).putFile(securityManager, stream, inputFile.getM2());
+			         putters.get(i).putFile(m_securityManager, stream, inputFile.getM2());
 			     }
 			     catch (GPEFileTransferProtocolNotSupportedException e) {
 			         continue;
@@ -501,14 +433,8 @@ public class RByteIODataAdaptor extends U6Abstract
 			     throw new Exception(
 			             Messages.getString(MessagesKeys.common_requests_PutFilesRequest_Cannot_put_file_to_remote_location__no_suitable_protocol_found));
 			}            
-        } catch (IllegalAccessException e) {
-            throw new NoSuccess("Failed to download file ["+absolutePath+"]", e);
-        } catch (InstantiationException e) {
-        	throw new NoSuccess("Failed to download file ["+absolutePath+"]", e);
-		} catch (ClassNotFoundException e) {
-			throw new NoSuccess("Failed to download file ["+absolutePath+"]", e);
-		} catch (Throwable e) {
-			throw new NoSuccess("Failed to download file ["+absolutePath+"]", e);
+        } catch (Throwable e) {
+			throw new NoSuccess("Unable to put file", e);
 		}
 	}
 
@@ -526,7 +452,7 @@ public class RByteIODataAdaptor extends U6Abstract
             int i;
             for (i = 0; i < getters.size(); i++) {
                 try {
-                    getters.get(i).getFile(securityManager, outputFile.getM2(), stream, null);
+                    getters.get(i).getFile(m_securityManager, outputFile.getM2(), stream, null);
                 }
                 catch (GPEFileTransferProtocolNotSupportedException e) {
                     continue;
@@ -540,42 +466,59 @@ public class RByteIODataAdaptor extends U6Abstract
                 throw new Exception(Messages.getString(MessagesKeys.common_requests_GetFilesRequest_Cannot_fetch_file_from_remote_location__no_suitable_protocol_found));
             }
             
-        } catch (IllegalAccessException e) {
-            throw new NoSuccess("Failed to download file ["+absolutePath+"]", e);
-        } catch (InstantiationException e) {
-        	throw new NoSuccess("Failed to download file ["+absolutePath+"]", e);
-		} catch (ClassNotFoundException e) {
-			throw new NoSuccess("Failed to download file ["+absolutePath+"]", e);
-		} catch (Throwable e) {
-			throw new NoSuccess("Failed to download file ["+absolutePath+"]", e);
+        } catch (Throwable e) {
+			throw new NoSuccess("Unable to get file", e);
 		}
-	}
-	
-    private String getEntryPath(String path) throws NoSuccess, PermissionDenied  {
-        // the path must be like /DEMOSITE/services/<service name>/<storage name>/directory/file.txt
-        try {
-        	// if the request path ia a full path, containing service name
-        	if(path.indexOf(m_serviceName) > -1) {
-            	path  = path.substring(path.indexOf(m_serviceName)+m_serviceName.length()+1,path.length());
-            
-	            // remove the registry path and the storage path in the path name
-				path = path.substring(path.indexOf(m_serverFileSeparator)+1 ,path.length());
-            }
-	        // remove last file separator, a path cannot ends with a file separator 
-	        if(path.endsWith(m_serverFileSeparator)) {
-	            path = path.substring(0,path.length()-1);
-	        }
-            return path;
-        } catch (Exception e) {
-			throw new NoSuccess(e);
-		}
-    }
+	}	
 
-	public OutputStream getOutputStream(String parentAbsolutePath,
-			String fileName, boolean exclusive, boolean append,
+	public OutputStream getOutputStream(String parentAbsolutePath, String fileName,
+			boolean exclusive, boolean append,
 			String additionalArgs) throws PermissionDenied, BadParameter,
 			AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
-		// TODO Auto-generated method stub
-		return null;
+		
+		if(append) {
+			throw new NoSuccess("Append not supported.");
+		}
+        String absolutePath = getEntryPath(parentAbsolutePath)+m_serverFileSeparator+fileName;
+        try {
+        	return new RByteIOOutputStream(m_client, m_securityManager, absolutePath);
+        }
+        catch(NoSuccess e) {
+            if (exclusive && exists(absolutePath)) {
+                // need to check existence explicitly, else exception is never thrown
+                throw new AlreadyExists("File already exists");
+            } else if (!this.exists(parentAbsolutePath)) {
+                // need to check existence explicitly, else exception is thrown to late (when writing bytes)
+                throw new ParentDoesNotExist("Parent directory does not exist");
+            }
+            throw e;
+        }
 	}
+
+	public InputStream getInputStream(String absolutePath, String additionalArgs)
+			throws PermissionDenied, BadParameter, DoesNotExist, Timeout,
+			NoSuccess {
+		return new RByteIOInputStream(m_client, m_securityManager, getEntryPath(absolutePath));
+	}
+	
+
+    private String getEntryPath(String path) {
+        // the path must be like /DEMOSITE/services/<service name>/<storage name>/directory/file.txt
+    	// if the request path is a full path, containing service name
+    	if(path.indexOf(m_serviceName) > -1) {
+        	path  = path.substring(path.indexOf(m_serviceName)+m_serviceName.length()+1,path.length());
+        
+            // remove the registry path and the storage path in the path name
+			path = path.substring(path.indexOf(m_serverFileSeparator)+1 ,path.length());
+        }
+        // remove last file separator, a path cannot ends with a file separator 
+        if(path.endsWith(m_serverFileSeparator)) {
+            path = path.substring(0,path.length()-1);
+        }
+        // remove first file separator, a path cannot starts with a file separator 
+        if(path.startsWith(m_serverFileSeparator)) {
+            path = path.substring(1,path.length());
+        }
+        return path;
+    }
 }
