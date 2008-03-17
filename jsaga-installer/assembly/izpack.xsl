@@ -15,7 +15,7 @@
                     <author name="Sylvain Reynaud" email="sreynaud@in2p3.fr"/>
                 </authors>
             </info>
-            <guiprefs width="640" height="480" resizable="no"/>
+            <guiprefs width="640" height="480" resizable="yes"/>
             <locale>
                 <langpack iso3="eng"/>
                 <langpack iso3="fra"/>
