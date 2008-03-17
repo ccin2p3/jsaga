@@ -69,7 +69,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
                 throw new Timeout(throwable);
             }
         } catch (IOException e) {
-            if (e.getMessage()!=null && e.getMessage().indexOf("Authentication Error") > -1) {
+            if (e.getMessage()!=null && e.getMessage().indexOf("Authentication") > -1) {
                 throw new AuthenticationFailed(e);
             } else {
                 throw new Timeout(e);
