@@ -20,7 +20,7 @@ public class U6ExecutionTestSuiteMinimal extends TestSuite {
 
     // test cases
     public static class U6JobRunMinimalTest extends JobRunMinimalTest {
-        public U6JobRunMinimalTest() throws Exception {super("u6");}
+        public U6JobRunMinimalTest() throws Exception {super("unicore6");}
          public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     

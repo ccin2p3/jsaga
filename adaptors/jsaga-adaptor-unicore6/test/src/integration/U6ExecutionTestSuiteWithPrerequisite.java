@@ -20,7 +20,7 @@ import junit.framework.TestSuite;
 public class U6ExecutionTestSuiteWithPrerequisite extends TestSuite {
     // test cases
     public static class U6JobRunWithPrequisiteTest extends JobRunWithPrequisiteTest {
-        public U6JobRunWithPrequisiteTest() throws Exception {super("u6");}
+        public U6JobRunWithPrequisiteTest() throws Exception {super("unicore6");}
         public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
 
