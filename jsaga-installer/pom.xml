@@ -24,6 +24,13 @@
             </roles>
         </developer>
         <developer>
+            <name>Nicolas DEMESY</name>
+            <email>nicolas.demesy@bt.com</email>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
+        <developer>
             <name>Youri TCHINDA DJOU</name>
             <email>ytchinda@in2p3.fr</email>
             <roles>
@@ -141,6 +148,11 @@
         <!-- adaptors -->
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-default</artifactId>
+            <version>0.9.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-classic</artifactId>
             <version>0.9.1-SNAPSHOT</version>
         </dependency>
@@ -157,6 +169,26 @@
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-srm</artifactId>
+            <version>0.9.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-jdl</artifactId>
+            <version>0.9.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-wms</artifactId>
+            <version>0.9.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-wsgram</artifactId>
+            <version>0.9.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-unicore6</artifactId>
             <version>0.9.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
