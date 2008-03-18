@@ -50,18 +50,27 @@ public class JSagaURL extends URL {
         char[] array = path.toCharArray();
         for (int i=0; i<array.length; i++) {
             char c = array[i];
-            if (isIllegal(c)) {
-                buffer.append('%');
-                buffer.append(charToHex(c/16));
-                buffer.append(charToHex(c%16));
-            } else {
-                buffer.append(c);
+            if (c < 128) {      // ASCII
+                if (isIllegalASCII(c)) {
+                    appendHex(buffer, c);
+                } else {
+                    buffer.append(c);
+                }
+            } else {            // non-ASCII (must be converted to UTF-8 before encoding)
+                if (c <= 160) { // isIllegal
+                    appendHex(buffer, 0xC0 | (c >> 6));
+                    appendHex(buffer, 0x80 | (c & 0x3F));
+                } else {
+                    buffer.append(c);
+                }
             }
         }
         return buffer.toString();
     }
-    private static boolean isIllegal(char c) {
-        if (c>32 && c<128) {
+    private static boolean isIllegalASCII(char c) {
+        if (c <= 32) {
+            return true;
+        } else {
             switch(c) {
                 // illegal characters
                 case '"': case '%': case '<': case '>': case '[': case '\\': case ']':
@@ -74,44 +83,44 @@ public class JSagaURL extends URL {
                 default:
                     return false;
             }
-        } else {
-            return c <= 160;
         }
     }
-    private static char charToHex(int c) {
+    private static void appendHex(StringBuffer buffer, int c) {
         final char[] HEX = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
-        return HEX[c];
+        buffer.append('%');
+        buffer.append(HEX[c/16]);
+        buffer.append(HEX[c%16]);
     }
 
-    public static String decode(String url) {
+    // [scheme://][[user-info@]host[:port]][path][?query][#fragment]
+    public static String decode(URL url) throws NotImplemented {
         StringBuffer buffer = new StringBuffer();
-        char[] array = url.toCharArray();
-        for (int i=0; i<array.length; i++) {
-            char c = array[i];
-            if (c=='%' && i<array.length-2) {
-                char c1 = array[i+1];
-                char c2 = array[i+2];
-                if (isHex(c1) && isHex(c2)) {
-                    c = (char) (hexToChar(c1)*16 + hexToChar(c2));  // replace
-                    i += 2; // jump
-                }
+        if (url.getScheme() != null) {
+            buffer.append(url.getScheme());
+            buffer.append("://");
+        }
+        if (url.getHost() != null) {
+            if (url.getUserInfo() != null) {
+                buffer.append(url.getUserInfo());
+                buffer.append('@');
             }
-            buffer.append(c);
+            buffer.append(url.getHost());
+            if (url.getPort() != -1) {
+                buffer.append(':');
+                buffer.append(url.getPort());
+            }
+        }
+        if (url.getPath() != null) {
+            buffer.append(url.getPath());
+        }
+        if (url.getQuery() != null) {
+            buffer.append('?');
+            buffer.append(url.getQuery());
+        }
+        if (url.getFragment() != null) {
+            buffer.append('#');
+            buffer.append(url.getFragment());
         }
         return buffer.toString();
-    }
-    private static boolean isHex(char c) {
-        return (c>='0' && c<='9') || (c>='A' && c<='F') || (c>='a' && c<='f');
-    }
-    private static char hexToChar(char h) {
-        if (h>='0' && h<='9') {
-            return (char) (h - '0');
-        } else if (h>='A' && h<='F') {
-            return (char) (h - 'A' + 10);
-        } else if (h>='a' && h<='f') {
-            return (char) (h - 'a' + 10);
-        } else {
-            throw new RuntimeException("INTERNAL ERROR");
-        }
     }
 }
