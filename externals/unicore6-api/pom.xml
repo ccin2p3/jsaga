@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>javax.xml</groupId>
-            <artifactId>jsr173-api</artifactId>
+            <artifactId>jsr173</artifactId>
             <version>1.0</version>
         </dependency>
     </dependencies>

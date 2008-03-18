@@ -34,6 +34,6 @@
 	<module>unicore6-api</module>
 	<module>wss4j</module>
 	<module>xmlsec</module>
-	<module>jsr173-api</module>
+	<module>jsr173</module>
   </modules>
 </project>
