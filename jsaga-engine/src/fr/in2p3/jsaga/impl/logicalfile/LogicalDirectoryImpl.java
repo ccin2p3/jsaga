@@ -118,7 +118,7 @@ public class LogicalDirectoryImpl extends AbstractAsyncLogicalDirectoryImpl impl
         FileAttributes[] childs;
         try {
             childs = ((MetaDataReader)m_adaptor).listAttributes(
-                    JSagaURL.decode(m_url.getPath()),
+                    m_url.getPath(),
                     keyValuePatterns,
                     m_url.getQuery());
         } catch (DoesNotExist doesNotExist) {

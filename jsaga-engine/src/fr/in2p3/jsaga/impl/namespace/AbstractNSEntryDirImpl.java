@@ -55,7 +55,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             // make target directory
             this._makeDir(effectiveTarget, flags);
             // copy source childs
-            FileAttributes[] sourceChilds = this._listAttributes(JSagaURL.decode(m_url.getPath()));
+            FileAttributes[] sourceChilds = this._listAttributes(m_url.getPath());
             for (int i=0; i<sourceChilds.length; i++) {
                 NSEntry sourceChildEntry = this._openNS(sourceChilds[i]);
                 URL targetChild = URLFactory.createURL(effectiveTarget, sourceChilds[i].getName());
@@ -89,7 +89,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
                 throw new NoSuccess("Unexpected exception: AlreadyExists", e);
             }
             // copy source childs
-            FileAttributes[] sourceChilds = sourceDir._listAttributes(JSagaURL.decode(m_url.getPath()));
+            FileAttributes[] sourceChilds = sourceDir._listAttributes(m_url.getPath());
             for (int i=0; i<sourceChilds.length; i++) {
                 NSEntry sourceChildEntry = sourceDir._openNS(sourceChilds[i]);
                 URL targetChild = URLFactory.createURL(m_url, sourceChilds[i].getName());
@@ -127,8 +127,8 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             boolean overwrite = effectiveFlags.contains(Flags.OVERWRITE);
             try {
                 ((DataRename)m_adaptor).rename(
-                        JSagaURL.decode(m_url.getPath()),
-                        JSagaURL.decode(effectiveTarget.getPath()),
+                        m_url.getPath(),
+                        effectiveTarget.getPath(),
                         overwrite,
                         m_url.getQuery());
             } catch (DoesNotExist doesNotExist) {
@@ -140,7 +140,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             // make target directory
             this._makeDir(effectiveTarget, flags);
             // move source childs to target directory
-            FileAttributes[] sourceChilds = this._listAttributes(JSagaURL.decode(m_url.getPath()));
+            FileAttributes[] sourceChilds = this._listAttributes(m_url.getPath());
             for (int i=0; i<sourceChilds.length; i++) {
                 URL remoteChild = URLFactory.createURL(effectiveTarget, sourceChilds[i].getName());
                 NSEntry entry = this._openNS(sourceChilds[i]);
@@ -175,7 +175,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         if (m_adaptor instanceof DirectoryReader) {
             // remove source childs
             if (effectiveFlags.contains(Flags.RECURSIVE)) {
-                FileAttributes[] sourceChilds = this._listAttributes(JSagaURL.decode(m_url.getPath()));
+                FileAttributes[] sourceChilds = this._listAttributes(m_url.getPath());
                 for (int i=0; i<sourceChilds.length; i++) {
                     NSEntry entry;
                     try {
@@ -195,7 +195,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             String directoryName = super._getEntryName();
             try {
                 ((DirectoryWriter)m_adaptor).removeDir(
-                        JSagaURL.decode(parent.getPath()),
+                        parent.getPath(),
                         directoryName,
                         m_url.getQuery());
             } catch (DoesNotExist doesNotExist) {

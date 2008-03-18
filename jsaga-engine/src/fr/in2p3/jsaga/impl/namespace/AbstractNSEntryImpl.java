@@ -85,7 +85,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
                     return new URL("/"+name);
                 } else {
                     // entry name
-                    return new URL(name.replaceAll(" ", "%20"));
+                    return new URL(JSagaURL.encodePath(name));
                 }
             } else {
                 return null;
@@ -111,7 +111,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
     public boolean exists() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
         if (m_adaptor instanceof DataReaderAdaptor) {
             return ((DataReaderAdaptor)m_adaptor).exists(
-                    JSagaURL.decode(m_url.getPath()));
+                    m_url.getPath());
         } else {
             throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
@@ -123,7 +123,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
         } else if (m_adaptor instanceof DataReaderAdaptor) {
             try {
                 return ((DataReaderAdaptor)m_adaptor).isDirectory(
-                        JSagaURL.decode(m_url.getPath()));
+                        m_url.getPath());
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("Entry does not exist: "+ m_url, doesNotExist);
             }
@@ -138,7 +138,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
         } else if (m_adaptor instanceof DataReaderAdaptor) {
             try {
                 return ((DataReaderAdaptor)m_adaptor).isEntry(
-                        JSagaURL.decode(m_url.getPath()));
+                        m_url.getPath());
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("Entry does not exist: "+ m_url, doesNotExist);
             }
@@ -153,7 +153,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
         } else if (m_adaptor instanceof LinkAdaptor) {
             try {
                 return ((LinkAdaptor)m_adaptor).isLink(
-                        JSagaURL.decode(m_url.getPath()));
+                        m_url.getPath());
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("Link does not exist: "+ m_url, doesNotExist);
             }
@@ -168,7 +168,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             try {
                 try {
                     absolutePath = ((LinkAdaptor)m_adaptor).readLink(
-                            JSagaURL.decode(m_url.getPath()));
+                            m_url.getPath());
                 } catch (DoesNotExist doesNotExist) {
                     throw new IncorrectState("Link does not exist: "+ m_url, doesNotExist);
                 }
@@ -212,8 +212,8 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             try {
                 try {
                     ((LinkAdaptor)m_adaptor).link(
-                            JSagaURL.decode(m_url.getPath()),
-                            JSagaURL.decode(effectiveLink.getPath()),
+                            m_url.getPath(),
+                            effectiveLink.getPath(),
                             overwrite);
                 } catch (DoesNotExist doesNotExist) {
                     throw new IncorrectState("Entry does not exist: "+ m_url, doesNotExist);
@@ -227,8 +227,8 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
                     // create link
                     try {
                         ((LinkAdaptor)m_adaptor).link(
-                                JSagaURL.decode(m_url.getPath()),
-                                JSagaURL.decode(effectiveLink.getPath()),
+                                m_url.getPath(),
+                                effectiveLink.getPath(),
                                 overwrite);
                     } catch (DoesNotExist doesNotExist) {
                         throw new IncorrectState("Entry does not exist: "+ m_url, doesNotExist);
@@ -264,8 +264,8 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
         {
             try {
                 ((DataRename)m_adaptor).rename(
-                        JSagaURL.decode(m_url.getPath()),
-                        JSagaURL.decode(effectiveTarget.getPath()),
+                        m_url.getPath(),
+                        effectiveTarget.getPath(),
                         overwrite,
                         m_url.getQuery());
             } catch (DoesNotExist doesNotExist) {
@@ -298,7 +298,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             String fileName = this._getEntryName();
             try {
                 ((DataWriterAdaptor)m_adaptor).removeFile(
-                        JSagaURL.decode(parent.getPath()),
+                        parent.getPath(),
                         fileName,
                         m_url.getQuery());
             } catch (DoesNotExist doesNotExist) {

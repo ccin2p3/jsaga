@@ -61,7 +61,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
             if (m_adaptor instanceof FileReader) {
                 try {
                     m_inStream = ((FileReader)m_adaptor).getInputStream(
-                            JSagaURL.decode(m_url.getPath()),
+                            m_url.getPath(),
                             m_url.getQuery());
                 } catch(DoesNotExist e) {
                     throw new DoesNotExist("File does not exist: "+ m_url, e.getCause());
@@ -76,7 +76,6 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         if (effectiveFlags.contains(Flags.WRITE)) {
             if (m_adaptor instanceof FileWriter) {
                 URL parent = super._getParentDirURL();
-                String parentPath = JSagaURL.decode(parent.getPath());
                 String fileName = super._getEntryName();
                 boolean exclusive = effectiveFlags.contains(Flags.EXCL);
                 boolean append = effectiveFlags.contains(Flags.APPEND);
@@ -84,13 +83,13 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
                     throw new BadParameter("Incompatible flags: EXCL and APPEND");
                 }
                 try {
-                    m_outStream = ((FileWriter)m_adaptor).getOutputStream(parentPath, fileName, exclusive, append, m_url.getQuery());
+                    m_outStream = ((FileWriter)m_adaptor).getOutputStream(parent.getPath(), fileName, exclusive, append, m_url.getQuery());
                 } catch(ParentDoesNotExist e) {
                     // make parent directories, then retry
                     if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
                         this._makeParentDirs();
                         try {
-                            m_outStream = ((FileWriter)m_adaptor).getOutputStream(parentPath, fileName, exclusive, append, m_url.getQuery());
+                            m_outStream = ((FileWriter)m_adaptor).getOutputStream(parent.getPath(), fileName, exclusive, append, m_url.getQuery());
                         } catch (ParentDoesNotExist e2) {
                             throw new DoesNotExist("Failed to create parent directory: "+parent, e2.getCause());
                         }
@@ -112,8 +111,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         if (effectiveFlags.contains(Flags.READ) || effectiveFlags.contains(Flags.WRITE)) {
             // exists check already done
         } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !(m_url instanceof JSagaURL) && m_adaptor instanceof DataReaderAdaptor) {
-            boolean exists = ((DataReaderAdaptor)m_adaptor).exists(
-                    JSagaURL.decode(m_url.getPath()));
+            boolean exists = ((DataReaderAdaptor)m_adaptor).exists(m_url.getPath());
             if (! exists) {
                 throw new DoesNotExist("File does not exist: "+ m_url);
             }
@@ -184,8 +182,8 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
             try {
                 int targetPort = (effectiveTarget.getPort()>0 ? effectiveTarget.getPort() : m_adaptor.getDefaultPort());
                 ((DataCopy)m_adaptor).copy(
-                        JSagaURL.decode(m_url.getPath()),
-                        effectiveTarget.getHost(), targetPort, JSagaURL.decode(effectiveTarget.getPath()),
+                        m_url.getPath(),
+                        effectiveTarget.getHost(), targetPort, effectiveTarget.getPath(),
                         overwrite, m_url.getQuery());
             } catch (ParentDoesNotExist parentDoesNotExist) {
                 throw new DoesNotExist("Target parent directory does not exist: "+effectiveTarget.resolve(new URL(".")), parentDoesNotExist);
@@ -244,8 +242,8 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         } else if (m_adaptor instanceof DataCopy && m_url.getScheme().equals(effectiveSource.getScheme())) {
             try {
                 ((DataCopy)m_adaptor).copyFrom(
-                        effectiveSource.getHost(), effectiveSource.getPort(), JSagaURL.decode(effectiveSource.getPath()),
-                        JSagaURL.decode(m_url.getPath()),
+                        effectiveSource.getHost(), effectiveSource.getPort(), effectiveSource.getPath(),
+                        m_url.getPath(),
                         overwrite, m_url.getQuery());
             } catch (DoesNotExist doesNotExist) {
                 throw new DoesNotExist("Source file does not exist: "+effectiveSource, doesNotExist.getCause());
@@ -304,7 +302,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
             }
             try {
                 return ((FileReader)m_adaptor).getSize(
-                        JSagaURL.decode(m_url.getPath()));
+                        m_url.getPath());
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("File does not exist: "+ m_url, doesNotExist);
             } catch (BadParameter badParameter) {
@@ -429,12 +427,12 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
     }
 
     public InputStream newInputStream() throws NotImplemented, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
-        String absolutePath = JSagaURL.decode(super.getURL().getPath());
+        String absolutePath = super.getURL().getPath();
         return ((FileReader) m_adaptor).getInputStream(absolutePath, m_url.getQuery());
     }
 
     public OutputStream newOutputStream(boolean overwrite) throws NotImplemented, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        String parentAbsolutePath = JSagaURL.decode(super._getParentDirURL().getPath());
+        String parentAbsolutePath = super._getParentDirURL().getPath();
         String fileName = super._getEntryName();
         boolean exclusive = !overwrite;
         boolean append = false;

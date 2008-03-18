@@ -57,17 +57,16 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
                     }
                 }
                 URL parent = super._getParentDirURL();
-                String parentPath = JSagaURL.decode(parent.getPath());
                 String directoryName = super._getEntryName();
                 try {
                     // try to make current directory
-                    ((DirectoryWriter)m_adaptor).makeDir(parentPath, directoryName, m_url.getQuery());
+                    ((DirectoryWriter)m_adaptor).makeDir(parent.getPath(), directoryName, m_url.getQuery());
                 } catch(ParentDoesNotExist e) {
                     // make parent directories, then retry
                     if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
                         this._makeParentDirs();
                         try {
-                            ((DirectoryWriter)m_adaptor).makeDir(parentPath, directoryName, m_url.getQuery());
+                            ((DirectoryWriter)m_adaptor).makeDir(parent.getPath(), directoryName, m_url.getQuery());
                         } catch (ParentDoesNotExist e2) {
                             throw new DoesNotExist("Failed to create parent directory: "+parent, e.getCause());
                         }
@@ -85,8 +84,7 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
             this._makeParentDirs();
         } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !(m_url instanceof JSagaURL) && m_adaptor instanceof DataReaderAdaptor) {
-            boolean exists = ((DataReaderAdaptor)m_adaptor).exists(
-                    JSagaURL.decode(m_url.getPath()));
+            boolean exists = ((DataReaderAdaptor)m_adaptor).exists(m_url.getPath());
             if (! exists) {
                 throw new DoesNotExist("Directory does not exist: "+ m_url);
             }
@@ -130,11 +128,11 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         try {
             if (m_adaptor instanceof FilteredDirectoryReader && pattern.endsWith("/")) {
                 childs = ((FilteredDirectoryReader)m_adaptor).listDirectories(
-                        JSagaURL.decode(m_url.getPath()),
+                        m_url.getPath(),
                         m_url.getQuery());
             } else if (m_adaptor instanceof DirectoryReader) {
                 childs = ((DirectoryReader)m_adaptor).listAttributes(
-                        JSagaURL.decode(m_url.getPath()),
+                        m_url.getPath(),
                         m_url.getQuery());
             } else {
                 throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
@@ -181,7 +179,7 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
 
     private void _doFind(Pattern p, FlagsBytes effectiveFlags, List<URL> matchingPath, URL currentRelativePath) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         // for each child
-        FileAttributes[] childs = this._listAttributes(JSagaURL.decode(m_url.getPath()));
+        FileAttributes[] childs = this._listAttributes(m_url.getPath());
         for (int i=0; i<childs.length; i++) {
             // set child relative path
             URL childRelativePath = URLFactory.createURL(currentRelativePath, childs[i].getName());
@@ -225,7 +223,7 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
     private String[] m_entriesCache = null;
     public int getNumEntries() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
         if (m_adaptor instanceof DirectoryReader) {
-            m_entriesCache = this._listNames(JSagaURL.decode(m_url.getPath()));
+            m_entriesCache = this._listNames(m_url.getPath());
             return m_entriesCache.length;
         } else {
             throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
@@ -235,7 +233,7 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
     public URL getEntry(int entry) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
         if (m_adaptor instanceof DirectoryReader) {
             if (m_entriesCache == null) {
-                m_entriesCache = this._listNames(JSagaURL.decode(m_url.getPath()));
+                m_entriesCache = this._listNames(m_url.getPath());
             }
             if (entry < m_entriesCache.length) {
                 try {

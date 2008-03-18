@@ -61,7 +61,7 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
         if (m_adaptor instanceof PermissionAdaptor) {
             PermissionBytes effectivePermissions = new PermissionBytes(permissions);
             ((PermissionAdaptor)m_adaptor).permissionsAllow(
-                    JSagaURL.decode(m_url.getPath()),
+                    m_url.getPath(),
                     id,
                     effectivePermissions);
         } else {
@@ -73,7 +73,7 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
         if (m_adaptor instanceof PermissionAdaptor) {
             PermissionBytes effectivePermissions = new PermissionBytes(permissions);
             ((PermissionAdaptor)m_adaptor).permissionsDeny(
-                    JSagaURL.decode(m_url.getPath()),
+                    m_url.getPath(),
                     id,
                     effectivePermissions);
         } else {
@@ -96,7 +96,7 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
         if (m_adaptor instanceof PermissionAdaptor) {
             PermissionBytes effectivePermissions = new PermissionBytes(permissions);
             return ((PermissionAdaptor)m_adaptor).permissionsCheck(
-                    JSagaURL.decode(m_url.getPath()),
+                    m_url.getPath(),
                     id,
                     effectivePermissions);
         } else {
@@ -113,7 +113,7 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
         }
         if (m_adaptor instanceof PermissionAdaptor) {
             return ((PermissionAdaptor)m_adaptor).getOwner(
-                    JSagaURL.decode(m_url.getPath()));
+                    m_url.getPath());
         } else {
             throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
@@ -128,7 +128,7 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
         }
         if (m_adaptor instanceof PermissionAdaptor) {
             return ((PermissionAdaptor)m_adaptor).getGroup(
-                    JSagaURL.decode(m_url.getPath()));
+                    m_url.getPath());
         } else {
             throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
         }

@@ -47,7 +47,7 @@ public abstract class AbstractNSDirectoryImplWithMetaData extends AbstractNSDire
     public void setAttribute(String key, String value) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, BadParameter, DoesNotExist, Timeout, NoSuccess {
         if (m_adaptor instanceof MetaDataWriter) {
             ((MetaDataWriter)m_adaptor).setMetaData(
-                    JSagaURL.decode(m_url.getPath()),
+                    m_url.getPath(),
                     key,
                     value,
                     m_url.getQuery());
@@ -59,7 +59,7 @@ public abstract class AbstractNSDirectoryImplWithMetaData extends AbstractNSDire
     public String getAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
         if (m_adaptor instanceof MetaDataReader) {
             return ((MetaDataReader)m_adaptor).getMetaData(
-                    JSagaURL.decode(m_url.getPath()),
+                    m_url.getPath(),
                     key,
                     m_url.getQuery());
         } else {
@@ -78,7 +78,7 @@ public abstract class AbstractNSDirectoryImplWithMetaData extends AbstractNSDire
     public void removeAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         if (m_adaptor instanceof MetaDataWriter) {
             ((MetaDataWriter)m_adaptor).removeMetaData(
-                    JSagaURL.decode(m_url.getPath()),
+                    m_url.getPath(),
                     key,
                     m_url.getQuery());
         } else {
@@ -89,7 +89,7 @@ public abstract class AbstractNSDirectoryImplWithMetaData extends AbstractNSDire
     public String[] listAttributes() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
         if (m_adaptor instanceof MetaDataReader) {
             Map<String,String> attributes = ((MetaDataReader)m_adaptor).listMetaData(
-                    JSagaURL.decode(m_url.getPath()),
+                    m_url.getPath(),
                     m_url.getQuery());
             return attributes.keySet().toArray(new String[attributes.size()]);
         } else {
@@ -100,7 +100,7 @@ public abstract class AbstractNSDirectoryImplWithMetaData extends AbstractNSDire
     public String[] findAttributes(String... patterns) throws NotImplemented, BadParameter, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
         if (m_adaptor instanceof MetaDataReader) {
             Map<String,String> attributes = ((MetaDataReader)m_adaptor).listMetaData(
-                    JSagaURL.decode(m_url.getPath()),
+                    m_url.getPath(),
                     m_url.getQuery());
             return new SAGAPatternFinder(attributes).findKey(patterns);
         } else {
