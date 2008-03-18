@@ -75,7 +75,7 @@ public class NamespaceList extends AbstractCommand {
                 }
             } else {
                 for (URL entry : list) {
-                    System.out.println(JSagaURL.decode(entry.toString()));
+                    System.out.println(JSagaURL.decode(entry));
                 }
             }
         }

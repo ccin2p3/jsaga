@@ -113,7 +113,7 @@ public class EntryLongFormat {
     public String getName(NSEntry entry) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         try {
             URL nameUrl = entry.getName();
-            String name = (nameUrl!=null ? JSagaURL.decode(nameUrl.toString()) : "");
+            String name = (nameUrl!=null ? JSagaURL.decode(nameUrl) : "");
             if (this.isDir(entry)) {
                 name += "/";
             }
