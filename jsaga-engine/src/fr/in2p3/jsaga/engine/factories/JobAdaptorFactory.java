@@ -68,21 +68,24 @@ public class JobAdaptorFactory extends ServiceAdaptorFactory {
         ContextImpl context;
         if (config.getContextRef() != null) {
             context = super.findContext(session, config.getContextRef());
-            if (context == null) {
+            if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(jobAdaptor.getSupportedSecurityAdaptorClasses())) {
                 throw new ConfigurationException("INTERNAL ERROR: effective-config may be inconsistent");
             }
         } else if (url.getFragment() != null) {
             context = super.findContext(session, url.getFragment());
-            if (context == null) {
+            if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(jobAdaptor.getSupportedSecurityAdaptorClasses())) {
                 throw new NoSuccess("Security context not found: "+url.getFragment());
             }
         } else if (config.getSupportedContextTypeCount() > 0) {
             context = super.findContext(session, config.getSupportedContextType());
-            if (context == null) {
+            if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(jobAdaptor.getSupportedSecurityAdaptorClasses())) {
                 throw new NoSuccess("None of the supported security context is valid");
             }
         } else {
             context = null;
+            if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(jobAdaptor.getSupportedSecurityAdaptorClasses())) {
+                throw new NoSuccess("None of the supported security context is found");
+            }
         }
 
         // set security adaptor
@@ -91,13 +94,7 @@ public class JobAdaptorFactory extends ServiceAdaptorFactory {
             try {
                 securityAdaptor = context.getAdaptor();
             } catch (IncorrectState e) {
-                String contextType;
-                try {
-                    contextType = context.getAttribute(Context.TYPE);
-                } catch (Exception e2) {
-                    throw new NoSuccess(e);
-                }
-                throw new NoSuccess("Bad security context: "+contextType, e);
+                throw new NoSuccess("Bad security context: "+super.getContextType(context), e);
             }
             if (SecurityAdaptorDescriptor.isSupported(securityAdaptor.getClass(), jobAdaptor.getSupportedSecurityAdaptorClasses())) {
                 jobAdaptor.setSecurityAdaptor(securityAdaptor);

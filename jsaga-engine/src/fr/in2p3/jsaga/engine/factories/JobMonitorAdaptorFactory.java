@@ -69,21 +69,24 @@ public class JobMonitorAdaptorFactory extends ServiceAdaptorFactory {
         ContextImpl context;
         if (jobServiceConfig.getContextRef() != null) {
             context = super.findContext(session, jobServiceConfig.getContextRef());
-            if (context == null) {
+            if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(monitorAdaptor.getSupportedSecurityAdaptorClasses())) {
                 throw new ConfigurationException("INTERNAL ERROR: effective-config may be inconsistent");
             }
         } else if (url.getFragment() != null) {
             context = super.findContext(session, url.getFragment());
-            if (context == null) {
+            if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(monitorAdaptor.getSupportedSecurityAdaptorClasses())) {
                 throw new NoSuccess("Security context not found: "+url.getFragment());
             }
         } else if (jobServiceConfig.getSupportedContextTypeCount() > 0) {
             context = super.findContext(session, jobServiceConfig.getSupportedContextType());
-            if (context == null) {
+            if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(monitorAdaptor.getSupportedSecurityAdaptorClasses())) {
                 throw new NoSuccess("None of the supported security context is valid");
             }
         } else {
             context = null;
+            if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(monitorAdaptor.getSupportedSecurityAdaptorClasses())) {
+                throw new NoSuccess("None of the supported security context is found");
+            }
         }
 
         // set security adaptor
@@ -92,7 +95,7 @@ public class JobMonitorAdaptorFactory extends ServiceAdaptorFactory {
             try {
                 securityAdaptor = context.getAdaptor();
             } catch (IncorrectState e) {
-                throw new NoSuccess(e);
+                throw new NoSuccess("Bad security context: "+super.getContextType(context), e);
             }
             if (SecurityAdaptorDescriptor.isSupported(securityAdaptor.getClass(), monitorAdaptor.getSupportedSecurityAdaptorClasses())) {
                 monitorAdaptor.setSecurityAdaptor(securityAdaptor);

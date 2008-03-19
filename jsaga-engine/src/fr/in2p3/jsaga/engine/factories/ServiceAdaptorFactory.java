@@ -79,4 +79,12 @@ public class ServiceAdaptorFactory {
                 throw new AmbiguityException("Found several valid security contexts");
         }
     }
+
+    protected String getContextType(Context context) {
+        try {
+            return context.getAttribute(Context.TYPE);
+        } catch (Exception e) {
+            return "error ["+e.getMessage()+"]";
+        }
+    }
 }
