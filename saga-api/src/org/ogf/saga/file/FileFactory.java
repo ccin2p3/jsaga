@@ -38,7 +38,7 @@ public abstract class FileFactory {
      * @return the IOVec.
      */
     protected abstract IOVec doCreateIOVec(byte[] data, int lenIn)
-        throws BadParameter, NoSuccess;
+        throws BadParameter, NoSuccess, NotImplemented;
 
     /**
      * Creates an IOVec. To be provided by the implementation.
@@ -47,7 +47,7 @@ public abstract class FileFactory {
      * @return the IOVec.
      */
     protected abstract IOVec doCreateIOVec(int size, int lenIn)
-        throws BadParameter, NoSuccess;
+        throws BadParameter, NoSuccess, NotImplemented;
     
     /**
      * Creates an IOVec. To be provided by the implementation.
@@ -55,7 +55,7 @@ public abstract class FileFactory {
      * @return the IOVec.
      */
     protected abstract IOVec doCreateIOVec(byte[] data)
-        throws BadParameter, NoSuccess;
+        throws BadParameter, NoSuccess, NotImplemented;
 
     /**
      * Creates an IOVec. To be provided by the implementation.
@@ -63,7 +63,7 @@ public abstract class FileFactory {
      * @return the IOVec.
      */
     protected abstract IOVec doCreateIOVec(int size)
-        throws BadParameter, NoSuccess;
+        throws BadParameter, NoSuccess, NotImplemented;
     
     /**
      * Creates a File. To be provided by the implementation.
@@ -178,9 +178,10 @@ public abstract class FileFactory {
      * @param data data to be used.
      * @param lenIn number of bytes to read/write on readV/writeV.
      * @return the IOVec.
+     * @throws NotImplemented 
      */
     public static IOVec createIOVec(byte[] data, int lenIn)
-        throws BadParameter, NoSuccess {
+        throws BadParameter, NoSuccess, NotImplemented {
         initializeFactory();
         return factory.doCreateIOVec(data, lenIn);
     }
@@ -189,9 +190,10 @@ public abstract class FileFactory {
      * Creates an IOVec.
      * @param data data to be used.
      * @return the IOVec.
+     * @throws NotImplemented 
      */
     public static IOVec createIOVec(byte[] data)
-        throws BadParameter, NoSuccess {
+        throws BadParameter, NoSuccess, NotImplemented {
         initializeFactory();
         return factory.doCreateIOVec(data);
     }
@@ -201,9 +203,10 @@ public abstract class FileFactory {
      * @param size size of data to be used.
      * @param lenIn number of bytes to read/write on readV/writeV.
      * @return the IOVec.
+     * @throws NotImplemented 
      */
     public static IOVec createIOVec(int size, int lenIn)
-        throws BadParameter, NoSuccess {
+        throws BadParameter, NoSuccess, NotImplemented {
         initializeFactory();
         return factory.doCreateIOVec(size, lenIn);
     }
@@ -212,9 +215,10 @@ public abstract class FileFactory {
      * Creates an IOVec.
      * @param size size of data to be used.
      * @return the IOVec.
+     * @throws NotImplemented 
      */
     public static IOVec createIOVec(int size)
-        throws BadParameter, NoSuccess {
+        throws BadParameter, NoSuccess, NotImplemented {
         initializeFactory();
         return factory.doCreateIOVec(size);
     }
