@@ -146,7 +146,10 @@ public class Configuration {
                     return new StreamSource(Configuration.class.getClassLoader().getResourceAsStream(href));
                 }
             });
-            t.transform(new StreamSource(new ByteArrayInputStream("<dummy/>".getBytes())), new StreamResult(jobStructure));
+            Source source = new StreamSource(new ByteArrayInputStream("<dummy/>".getBytes()));
+            //bugfix: JAXB modify the file path if it is not encapsulated in an OutputStream
+            Result result = new StreamResult(new FileOutputStream(jobStructure));
+            t.transform(source, result);
         }
     }
 
