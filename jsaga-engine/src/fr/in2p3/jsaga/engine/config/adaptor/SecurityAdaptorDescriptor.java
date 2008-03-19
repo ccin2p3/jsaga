@@ -67,7 +67,19 @@ public class SecurityAdaptorDescriptor {
                 contextTypeSet.add(contextType);
             }
         }
+        if (isSupportedNoContext(supportedSecurityAdaptorClasses)) {
+            contextTypeSet.add("None");
+        }
         return (String[]) contextTypeSet.toArray(new String[contextTypeSet.size()]);
+    }
+
+    public static boolean isSupportedNoContext(Class[] supportedClazzArray) {
+        for (int i=0; supportedClazzArray!=null && i<supportedClazzArray.length; i++) {
+            if (supportedClazzArray[i] == null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean isSupported(Class securityAdaptorClazz, Class[] supportedClazzArray) {
