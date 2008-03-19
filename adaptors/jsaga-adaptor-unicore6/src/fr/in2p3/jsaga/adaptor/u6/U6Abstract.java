@@ -1,7 +1,9 @@
 package fr.in2p3.jsaga.adaptor.u6;
 
+import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,8 +47,13 @@ public class U6Abstract {
             logger.setLevel(Level.OFF);
 
             // now initialize security manager        
-            U6SecurityManagerImpl securityManager = new U6SecurityManagerImpl();            
-            securityManager.init(jksSecurityAdaptor.getCaCertificates(), jksSecurityAdaptor.getPublicKey(), jksSecurityAdaptor.getPrivateKey());
+            U6SecurityManagerImpl securityManager = new U6SecurityManagerImpl();
+            X509Certificate[] certs = jksSecurityAdaptor.getCaCertificates();
+            Vector<X509Certificate> caCertificateVector = new Vector<X509Certificate>();
+            for (int i = 0; i < certs.length; i++) {
+            	caCertificateVector.add(certs[i]);
+			}
+            securityManager.init(caCertificateVector, jksSecurityAdaptor.getPublicKey(), jksSecurityAdaptor.getPrivateKey());
             
 	    	if(securityManager == null) {
                 throw new AuthenticationFailed("Unable to initialize security manager");
