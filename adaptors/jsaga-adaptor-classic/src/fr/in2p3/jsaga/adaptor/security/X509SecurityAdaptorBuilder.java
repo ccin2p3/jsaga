@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.adaptor.security;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UFile;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.security.impl.X509SecurityAdaptor;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.IncorrectState;
 import org.ogf.saga.error.NoSuccess;
@@ -31,7 +32,7 @@ public class X509SecurityAdaptorBuilder implements SecurityAdaptorBuilder {
     }
 
     public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectState, NoSuccess {
-        return new X509SecurityAdaptor();
+        return null;    //todo
     }
 
     public Usage getUsage() {
