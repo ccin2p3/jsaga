@@ -15,8 +15,4 @@ import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
  *
  */
 public interface DataAdaptor extends SagaSecureAdaptor {
-    /**
-     * @return the aliases of the protocol scheme supported by this adaptor.
-     */
-    public String[] getSchemeAliases();
 }

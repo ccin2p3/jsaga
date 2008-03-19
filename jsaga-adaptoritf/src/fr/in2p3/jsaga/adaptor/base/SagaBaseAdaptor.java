@@ -20,6 +20,11 @@ import java.util.Map;
  */
 public interface SagaBaseAdaptor {
     /**
+     * @return the adaptor type (context type, data protocol or job type).
+     */
+    public String getType();
+
+    /**
      * Get the expected usage for this adaptor.
      * @return the description of the expected usage.
      */

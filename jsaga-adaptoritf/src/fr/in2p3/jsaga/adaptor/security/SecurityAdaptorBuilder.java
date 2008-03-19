@@ -20,11 +20,6 @@ import java.util.Map;
  */
 public interface SecurityAdaptorBuilder extends SagaBaseAdaptor {
     /**
-     * @return the context type.
-     */
-    public String getType();
-
-    /**
      * @return the security adaptor class instanciated by this builder.
      */
     public Class getSecurityAdaptorClass();

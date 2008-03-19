@@ -18,6 +18,6 @@ public class GsiftpDataAdaptorTest extends TestCase {
     public void test_getScheme() {
         assertEquals(
                 "gsiftp",
-                new GsiftpDataAdaptor().getSchemeAliases()[0]);
+                new GsiftpDataAdaptor().getType());
     }
 }

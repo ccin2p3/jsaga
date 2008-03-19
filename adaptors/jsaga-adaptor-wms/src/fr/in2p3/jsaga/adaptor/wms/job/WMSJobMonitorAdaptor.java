@@ -75,7 +75,11 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	public int getDefaultPort() {
 		return 9003;
 	}
-	
+
+    public String getType() {
+        return "wms";
+    }
+
     public Usage getUsage() {
         return new UAnd(new Usage[]{new U(DEFAULT_PORT)});
     }

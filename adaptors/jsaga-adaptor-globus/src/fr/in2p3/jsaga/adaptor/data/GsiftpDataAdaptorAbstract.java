@@ -37,7 +37,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
     protected GSSCredential m_credential;
     protected GridFTPClient m_client;
 
-    public abstract String[] getSchemeAliases();
+    public abstract String getType();
     public abstract Usage getUsage();
     public abstract Default[] getDefaults(Map attributes) throws IncorrectState;
     public abstract boolean isDirectory(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;

@@ -23,6 +23,10 @@ import java.util.Map;
 public class SecureEmulatorDataAdaptor extends EmulatorDataAdaptor {
     UserPassSecurityAdaptor m_securityAdaptor;
 
+    public String getType() {
+        return "stest";
+    }
+
     public Class[] getSupportedSecurityAdaptorClasses() {
         return new Class[]{UserPassSecurityAdaptor.class};
     }
@@ -31,16 +35,12 @@ public class SecureEmulatorDataAdaptor extends EmulatorDataAdaptor {
         m_securityAdaptor = (UserPassSecurityAdaptor) securityAdaptor;
     }
 
-    public String[] getSchemeAliases() {
-        return new String[]{"stest", "semulated"};
-    }
-
     public int getDefaultPort() {
         return 43;
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {
-        m_server = new DataEmulatorConnectionSecure(this.getSchemeAliases()[0], host, port, m_securityAdaptor);
+        m_server = new DataEmulatorConnectionSecure(this.getType(), host, port, m_securityAdaptor);
         if(Base.DEBUG) m_server.commit();
     }
 

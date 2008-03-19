@@ -26,6 +26,10 @@ import com.intel.gpe.clients.api.Status;
  */
 public class U6JobMonitorAdaptor extends U6JobAdaptorAbstract implements QueryIndividualJob {
 	// TODO QueryFilteredJob	    
+
+    public String getType() {
+        return "unicore6";
+    }
     
     public JobStatus getStatus(String nativeJobId) throws Timeout, NoSuccess {
 
@@ -91,5 +95,5 @@ public class U6JobMonitorAdaptor extends U6JobAdaptorAbstract implements QueryIn
 			throw new NoSuccess(e);
 		}
 	}*/
-    
+
 }

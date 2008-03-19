@@ -25,8 +25,8 @@ import java.io.IOException;
  *
  */
 public class GsiftpDCacheDataAdaptor extends GsiftpDataAdaptorAbstract {
-    public String[] getSchemeAliases() {
-        return new String[]{"gsiftp-dcache", "gsiftp-dca"};
+    public String getType() {
+        return "gsiftp-dcache";
     }
 
     /** setting protection level is not supported */

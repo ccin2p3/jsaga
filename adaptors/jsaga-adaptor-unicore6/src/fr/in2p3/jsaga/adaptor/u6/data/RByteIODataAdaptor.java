@@ -69,8 +69,8 @@ public class RByteIODataAdaptor extends U6Abstract
     public RByteIODataAdaptor() {
     }
 
-    public String[] getSchemeAliases() {
-        return new String[]{"rbyteio"};
+    public String getType() {
+        return "rbyteio";
     }
 
     public Usage getUsage() {

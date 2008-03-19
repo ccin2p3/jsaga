@@ -22,9 +22,9 @@ import java.util.Map;
  *
  */
 public class GsiftpWinDataAdaptor extends Gsiftp2DataAdaptor {
-    /** override super.getSchemeAliases() */
-    public String[] getSchemeAliases() {
-        return new String[]{"gsiftp-win", "gridftp-win"};
+    /** override super.getType() */
+    public String getType() {
+        return "gsiftp-win";
     }
 
     /** override super.getSupportedSecurityAdaptorClasses() because VOMS context type is not supported */

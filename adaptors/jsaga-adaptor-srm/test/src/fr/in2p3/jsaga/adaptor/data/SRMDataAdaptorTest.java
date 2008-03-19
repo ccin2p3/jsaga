@@ -18,6 +18,6 @@ public class SRMDataAdaptorTest extends TestCase {
     public void test_getScheme() {
         assertEquals(
                 "srm",
-                new SRMDataAdaptor().getSchemeAliases()[0]);
+                new SRMDataAdaptor().getType());
     }
 }

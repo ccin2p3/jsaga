@@ -27,8 +27,8 @@ public class SRMDataAdaptor implements DataAdaptor {
         m_adaptor = new SRM22DataAdaptor();
     }
 
-    public String[] getSchemeAliases() {
-        return new String[]{"srm"};
+    public String getType() {
+        return "srm";
     }
 
     public Usage getUsage() {

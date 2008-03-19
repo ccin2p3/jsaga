@@ -29,8 +29,8 @@ import java.util.*;
 public class Gsiftp2DataAdaptor extends GsiftpDataAdaptorAbstract {
     private static final String PROTECTION = "Protection";
 
-    public String[] getSchemeAliases() {
-        return new String[]{"gsiftp-new", "gridftp-new", "gsiftp2", "gridftp2"};
+    public String getType() {
+        return "gsiftp-v2";
     }
 
     public Usage getUsage() {

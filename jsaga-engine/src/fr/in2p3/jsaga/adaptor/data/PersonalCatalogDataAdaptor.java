@@ -31,6 +31,10 @@ import java.util.Map;
 public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter, DirectoryReader, DirectoryWriter, LinkAdaptor {
     private DataCatalogHandler m_catalog;
 
+    public String getType() {
+        return "catalog";
+    }
+
     public Usage getUsage() {
         return null;
     }
@@ -45,10 +49,6 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
 
     public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
         // do nothing
-    }
-
-    public String[] getSchemeAliases() {
-        return new String[]{"catalog"};
     }
 
     public int getDefaultPort() {

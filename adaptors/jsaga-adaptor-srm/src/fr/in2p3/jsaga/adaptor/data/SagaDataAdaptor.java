@@ -42,7 +42,7 @@ import java.util.Map;
 public class SagaDataAdaptor implements FileReader, FileWriter, DataCopy, DataRename {
     private NSDirectory m_root;
 
-    public String[] getSchemeAliases() {return null;}
+    public String getType() {return null;}
     public Usage getUsage() {return null;}
     public Default[] getDefaults(Map attributes) throws IncorrectState {return null;}
     public Class[] getSupportedSecurityAdaptorClasses() {return new Class[]{InMemoryProxySecurityAdaptor.class};}
@@ -53,12 +53,11 @@ public class SagaDataAdaptor implements FileReader, FileWriter, DataCopy, DataRe
         try {
             Context context = ContextFactory.createContext();
             context.setAttribute("Type", "InMemoryProxy");
-            context.setAttribute("Indice", "0");
             context.setAttribute("UserProxy", InMemoryProxySecurityAdaptor.toBase64(cred));
             Session session = SessionFactory.createSession(false);
             session.addContext(context);
             URL rootUrl = new URL(url.resolve(".").toString());
-            rootUrl.setFragment("InMemoryProxy[0]");
+            rootUrl.setFragment("InMemoryProxy");
             m_root = NSFactory.createNSDirectory(session, rootUrl, Flags.NONE.getValue());
         } catch (NotImplemented e) {
             throw new NoSuccess(e);

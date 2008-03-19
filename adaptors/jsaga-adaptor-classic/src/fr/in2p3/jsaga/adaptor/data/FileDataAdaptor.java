@@ -31,6 +31,10 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
     private static final boolean s_isWindows = System.getProperty("os.name").startsWith("Windows");
     private String m_drive;
 
+    public String getType() {
+        return "file";
+    }
+
     public Usage getUsage() {
         return null;
     }
@@ -45,10 +49,6 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
 
     public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
         // do nothing
-    }
-
-    public String[] getSchemeAliases() {
-        return new String[]{"file", "local"};
     }
 
     public int getDefaultPort() {

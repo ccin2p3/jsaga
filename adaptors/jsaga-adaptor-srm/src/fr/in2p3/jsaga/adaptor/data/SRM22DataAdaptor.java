@@ -41,8 +41,8 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements Director
         m_writenFiles = new ArrayList();
     }
 
-    public String[] getSchemeAliases() {
-        return new String[]{"srm"}; //todo: replace with srm22 when a generic plugin will be developed
+    public String getType() {
+        return "srm";   //todo: replace with srm-v2.2 when a generic plugin will be developed
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {

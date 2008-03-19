@@ -36,6 +36,10 @@ public class EmulatorDataAdaptor implements FileReader, FileWriter, DirectoryRea
 {
     protected DataEmulatorConnectionAbstract m_server;
 
+    public String getType() {
+        return "test";
+    }
+
     public Usage getUsage() {
         return null;
     }
@@ -52,16 +56,12 @@ public class EmulatorDataAdaptor implements FileReader, FileWriter, DirectoryRea
         // do nothing
     }
 
-    public String[] getSchemeAliases() {
-        return new String[]{"test", "emulated"};
-    }
-
     public int getDefaultPort() {
         return 1234;
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {
-        m_server = new DataEmulatorConnection(this.getSchemeAliases()[0], host, port);
+        m_server = new DataEmulatorConnection(this.getType(), host, port);
         if(Base.DEBUG) m_server.commit();
     }
 

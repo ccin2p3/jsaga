@@ -19,11 +19,6 @@ import java.util.Map;
  */
 public interface JobAdaptor extends SagaSecureAdaptor {
     /**
-     * @return the job service type.
-     */
-    public String getType();
-
-    /**
      * @return the protocol schemes supported by sandbox management, or null if no sandbox management.
      */
     public String[] getSupportedSandboxProtocols();

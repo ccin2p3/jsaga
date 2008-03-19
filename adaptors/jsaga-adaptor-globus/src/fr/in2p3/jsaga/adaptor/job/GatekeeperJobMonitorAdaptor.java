@@ -25,6 +25,10 @@ import java.util.Map;
  *
  */
 public class GatekeeperJobMonitorAdaptor extends GatekeeperJobAdaptorAbstract implements QueryIndividualJob, ListenIndividualJob {
+    public String getType() {
+        return "gatekeeper";
+    }
+
     public Usage getUsage() {
         return null;    // no usage
     }

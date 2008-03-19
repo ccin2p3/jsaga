@@ -38,7 +38,7 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
 
         // set URL
         m_url = url;
-        String scheme = adaptor.getSchemeAliases()[0];
+        String scheme = adaptor.getType();
         if (! url.getScheme().equals(scheme)) {
             m_url.setScheme(scheme);
         }

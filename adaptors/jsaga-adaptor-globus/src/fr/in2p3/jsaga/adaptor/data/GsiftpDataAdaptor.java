@@ -34,8 +34,8 @@ public class GsiftpDataAdaptor implements FileReader, FileWriter, DirectoryReade
         m_adaptor = new GsiftpDefaultDataAdaptor();
     }
 
-    public String[] getSchemeAliases() {
-        return new String[]{"gsiftp", "gridftp"};
+    public String getType() {
+        return "gsiftp";
     }
 
     public Usage getUsage() {

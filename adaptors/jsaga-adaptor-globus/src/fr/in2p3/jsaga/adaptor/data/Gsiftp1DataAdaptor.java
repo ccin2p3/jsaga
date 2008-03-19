@@ -25,8 +25,8 @@ import java.util.Vector;
  *
  */
 public class Gsiftp1DataAdaptor extends GsiftpDataAdaptorAbstract {
-    public String[] getSchemeAliases() {
-        return new String[]{"gsiftp-old", "gridftp-old", "gsiftp1", "gridftp1"};
+    public String getType() {
+        return "gsiftp-v1";
     }
 
     /** setting protection level is not supported */

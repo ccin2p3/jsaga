@@ -35,7 +35,11 @@ import java.util.Map;
  */
 public class WSGramJobMonitorAdaptor extends WSGramJobAdaptorAbstract implements QueryIndividualJob {
 	// ListenIndividualJob
-	
+
+    public String getType() {
+        return "wsgram";
+    }
+
     public Usage getUsage() {
         return null;    // no usage
     }

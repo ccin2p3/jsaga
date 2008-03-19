@@ -31,8 +31,8 @@ public class SRM11DataAdaptor extends SRMDataAdaptorAbstract implements DataAdap
     private static final String SERVICE_PATH = "/srm/managerv1";
     private ISRM m_stub;
 
-    public String[] getSchemeAliases() {
-        return new String[]{"srm11"};
+    public String getType() {
+        return "srm-v1.1";
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {

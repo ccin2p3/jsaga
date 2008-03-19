@@ -38,24 +38,21 @@ public class DataAdaptorDescriptor {
         m_xml = new Protocol[adaptorClasses.length];
         for (int i=0; i<adaptorClasses.length; i++) {
             DataAdaptor adaptor = (DataAdaptor) adaptorClasses[i].newInstance();
-            if (adaptor.getSchemeAliases()==null || adaptor.getSchemeAliases().length==0) {
-                throw new InstantiationException("Bad adaptor: no scheme defined");
+            if (adaptor.getType() == null) {
+                throw new InstantiationException("Bad adaptor: no type defined");
             }
 
             // map main scheme to adaptor usage (if it exist)
             Usage usage = adaptor.getUsage();
             if (usage != null) {
-                m_usages.put(adaptor.getSchemeAliases()[0], usage);
+                m_usages.put(adaptor.getType(), usage);
             }
 
             // convert adaptor to XML
             m_xml[i] = toXML(adaptor, securityDesc);
 
-            // map all scheme aliases to adaptor class
-            String[] alias = adaptor.getSchemeAliases();
-            for (int a=0; alias!=null && a<alias.length; a++) {
-                m_classes.put(alias[a], adaptorClasses[i]);
-            }
+            // map type to adaptor class
+            m_classes.put(adaptor.getType(), adaptorClasses[i]);
         }
     }
 
@@ -74,22 +71,16 @@ public class DataAdaptorDescriptor {
 
     private static Protocol toXML(DataAdaptor adaptor, SecurityAdaptorDescriptor securityDesc) {
         Protocol protocol = new Protocol();
-        protocol.setScheme(adaptor.getSchemeAliases()[0]); // default identifier
+        protocol.setScheme(adaptor.getType());
         protocol.setRead(adaptor instanceof DataReaderAdaptor);
         protocol.setWrite(adaptor instanceof DataWriterAdaptor);
         protocol.setThirdparty(adaptor instanceof DataCopy || adaptor instanceof DataCopyDelegated);
         protocol.setLogical(adaptor instanceof LogicalReader || adaptor instanceof LogicalWriter);
-        if (adaptor.getSchemeAliases() != null) {
-            String[] schemeAndSchemeAliases = adaptor.getSchemeAliases();
-            String[] schemeAliases = new String[schemeAndSchemeAliases.length-1];
-            System.arraycopy(schemeAndSchemeAliases, 1, schemeAliases, 0, schemeAliases.length);
-            protocol.setSchemeAlias(schemeAliases);
-        }
 
         // add default data service
         DataService service = new DataService();
         service.setName("default");
-        service.setType(adaptor.getSchemeAliases()[0]);
+        service.setType(adaptor.getType());
         service.setImpl(adaptor.getClass().getName());
         if (adaptor.getSupportedSecurityAdaptorClasses() != null) {
             String[] supportedContextTypes = securityDesc.getSupportedContextTypes(adaptor.getSupportedSecurityAdaptorClasses());

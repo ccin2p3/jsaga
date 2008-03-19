@@ -21,7 +21,7 @@ import java.util.Map;
  *
  */
 public class GsiftpDefaultDataAdaptor extends GsiftpDataAdaptorAbstract {
-    public String[] getSchemeAliases() {
+    public String getType() {
         throw new RuntimeException("INTERNAL ERROR: this should never occur");
     }
 
