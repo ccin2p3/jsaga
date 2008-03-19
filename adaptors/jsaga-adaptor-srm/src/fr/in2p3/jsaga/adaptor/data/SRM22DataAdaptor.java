@@ -489,7 +489,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements Director
         if (code.equals(TStatusCode.SRM_AUTHORIZATION_FAILURE)) {
             throw new PermissionDenied(explanation);
         } else if (code.equals(TStatusCode.SRM_NON_EMPTY_DIRECTORY)) {
-            throw new BadParameter(explanation);
+            throw new NoSuccess(explanation);
         } else if (code.equals(TStatusCode.SRM_INVALID_PATH)
                 || code.equals(TStatusCode.SRM_FILE_LOST)) {
             throw new DoesNotExist(explanation);
