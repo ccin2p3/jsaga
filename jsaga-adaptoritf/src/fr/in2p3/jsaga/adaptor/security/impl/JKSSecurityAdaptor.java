@@ -2,7 +2,6 @@ package fr.in2p3.jsaga.adaptor.security.impl;
 
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
-import java.util.Vector;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -16,18 +15,18 @@ import java.util.Vector;
 
 public class JKSSecurityAdaptor extends X509SecurityAdaptor {
 
-	private Vector<X509Certificate> caCertificates;
+	private X509Certificate[] caCertificates;
 
-	public Vector<X509Certificate> getCaCertificates() {
+	public X509Certificate[] getCaCertificates() {
 		return caCertificates;
 	}
 
-	public void setCaCertificates(Vector<X509Certificate> caCertificates) {
+	public void setCaCertificates(X509Certificate[] caCertificates) {
 		this.caCertificates = caCertificates;
 	}
 
 	public JKSSecurityAdaptor(PrivateKey privateKey, X509Certificate publicKey,
-			Vector<X509Certificate> caCertificates) {
+			X509Certificate[] caCertificates) {
 		super(privateKey, publicKey);
 		this.caCertificates = caCertificates;
 	}

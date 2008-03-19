@@ -109,18 +109,21 @@ public class JKSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
 	    	X509Certificate userCertificate = (X509Certificate) keyStore.getCertificate(alias);
 	    	
 	    	// load CA keys
-	    	Vector<X509Certificate> certificates = new Vector<X509Certificate>();
-			Enumeration<String> knownAliases = keyStore.aliases();
+	    	Vector loadCerts = new Vector();
+			Enumeration knownAliases = keyStore.aliases();
 	        while (knownAliases.hasMoreElements()) {
-	            String next = knownAliases.nextElement();
+	            String next = (String) knownAliases.nextElement();
 	            if (keyStore.isCertificateEntry(next)) {
 	                Certificate caCert = keyStore.getCertificate(next);
 	                if (caCert instanceof X509Certificate) {
-	                	certificates.add((X509Certificate)caCert);
+	                	loadCerts.add((X509Certificate)caCert);
 	                }
 	            }
 	        }
-	    	
+	    	X509Certificate[] certificates = new X509Certificate[loadCerts.size()];
+	    	for (int i = 0; i < certificates.length; i++) {
+	    		certificates[i] = (X509Certificate) loadCerts.get(i);
+			}
 	        return new JKSSecurityAdaptor(privateKey, userCertificate, certificates );   	
     	}
     	catch (Exception e) {
