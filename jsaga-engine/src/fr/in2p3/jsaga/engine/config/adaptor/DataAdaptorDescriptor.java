@@ -42,17 +42,13 @@ public class DataAdaptorDescriptor {
                 throw new InstantiationException("Bad adaptor: no type defined");
             }
 
-            // map main scheme to adaptor usage (if it exist)
+            // type
+            m_classes.put(adaptor.getType(), adaptorClasses[i]);
             Usage usage = adaptor.getUsage();
             if (usage != null) {
                 m_usages.put(adaptor.getType(), usage);
             }
-
-            // convert adaptor to XML
             m_xml[i] = toXML(adaptor, securityDesc);
-
-            // map type to adaptor class
-            m_classes.put(adaptor.getType(), adaptorClasses[i]);
         }
     }
 
