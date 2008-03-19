@@ -25,11 +25,12 @@ import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.error.PermissionDenied;
 import org.ogf.saga.error.Timeout;
 
-import com.intel.gpe.client2.common.configurators.FileProviderConfigurator;
 import com.intel.gpe.client2.common.i18n.Messages;
 import com.intel.gpe.client2.common.i18n.MessagesKeys;
 import com.intel.gpe.client2.common.requests.CreateDirectoryRequest;
 import com.intel.gpe.client2.common.requests.DeleteFileRequest;
+import com.intel.gpe.client2.common.transfers.byteio.RandomByteIOFileExportImpl;
+import com.intel.gpe.client2.common.transfers.byteio.RandomByteIOFileImportImpl;
 import com.intel.gpe.client2.providers.FileProvider;
 import com.intel.gpe.client2.transfers.FileExport;
 import com.intel.gpe.client2.transfers.FileImport;
@@ -295,6 +296,10 @@ public class RByteIODataAdaptor extends U6Abstract
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {        
     	// prepare path
 		absolutePath = getEntryPath(absolutePath);
+		// check parent
+		if(!exists(absolutePath)) {
+			throw new DoesNotExist("The entry ["+absolutePath+"] does not exist.");
+		} 
 		
 		try {
 	        List<com.intel.gpe.clients.api.GridFile> directoryList = m_client.listDirectory(absolutePath);
@@ -310,10 +315,6 @@ public class RByteIODataAdaptor extends U6Abstract
 		} catch (GPESecurityException e) {
 			throw new NoSuccess(e);
 		} catch (Throwable e) {
-			// check parent
-			if(!exists(absolutePath)) {
-				throw new DoesNotExist("The entry ["+absolutePath+"] does not exist.");
-			} 
 			throw new NoSuccess("Failed to list attributes", e);
 		}     
     }
@@ -368,7 +369,6 @@ public class RByteIODataAdaptor extends U6Abstract
 			// check children here, else no exception returned during deletion !			
 			List<com.intel.gpe.clients.api.GridFile> directoryList = m_client.listDirectory(absolutePath);
 	        if(directoryList.size() > 0) {
-	        	//TODO BadParameter
 	        	throw new NoSuccess("The entry ["+absolutePath+"] is not a empty directory.");
 	        }
 	        
@@ -418,8 +418,9 @@ public class RByteIODataAdaptor extends U6Abstract
     		absolutePath = getEntryPath(absolutePath);
     		
     		Pair<GPEFile, String> inputFile = new Pair<GPEFile, String>(null, absolutePath);
-        	FileProvider fileProvider = FileProviderConfigurator.getConfigurator().getFileProvider();                
-        	List<FileImport> putters = fileProvider.preparePutters(m_client);
+    		FileProvider fileProvider = new FileProvider();
+	        fileProvider.addFilePutter("RBYTEIO", RandomByteIOFileImportImpl.class);	        
+    		List<FileImport> putters = fileProvider.preparePutters(m_client);
         	int i;
 			for (i = 0; i < putters.size(); i++) {
 			    try {
@@ -448,8 +449,9 @@ public class RByteIODataAdaptor extends U6Abstract
     		
     		// copy
             Pair<GPEFile, String> outputFile = new Pair<GPEFile, String>(null, absolutePath);
-            FileProvider fileProvider = FileProviderConfigurator.getConfigurator().getFileProvider();
-            List<FileExport> getters = fileProvider.prepareGetters(m_client);
+            FileProvider fileProvider = new FileProvider();
+	        fileProvider.addFileGetter("RBYTEIO", RandomByteIOFileExportImpl.class);
+	        List<FileExport> getters = fileProvider.prepareGetters(m_client);
             int i;
             for (i = 0; i < getters.size(); i++) {
                 try {
