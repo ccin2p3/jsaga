@@ -1,22 +1,16 @@
 package fr.in2p3.jsaga.adaptor.u6.job;
 
-import fr.in2p3.jsaga.adaptor.base.defaults.Default;
-import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.adaptor.u6.TargetSystemInfo;
 
-import org.ogf.saga.error.AuthenticationFailed;
-import org.ogf.saga.error.AuthorizationFailed;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.IncorrectState;
 import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.error.PermissionDenied;
 import org.ogf.saga.error.Timeout;
 
-import com.intel.gpe.client2.common.configurators.FileProviderConfigurator;
 import com.intel.gpe.client2.common.requests.PutFilesRequest;
+import com.intel.gpe.client2.common.transfers.byteio.RandomByteIOFileExportImpl;
+import com.intel.gpe.client2.common.transfers.byteio.RandomByteIOFileImportImpl;
 import com.intel.gpe.client2.providers.FileProvider;
 import com.intel.gpe.client2.security.GPESecurityManager;
 import com.intel.gpe.clients.api.JobClient;
@@ -56,19 +50,9 @@ import java.util.Vector;
  *
  */
 public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobControlAdaptor{
-    
-	private Map m_parameters;
-    
+
     public String getType() {
         return "unicore6";
-    }
-
-    public Usage getUsage() {
-        return null;
-    }
-
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
-        return null;    // no default
     }
 
     public String[] getSupportedSandboxProtocols() {
@@ -80,26 +64,11 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
     }
 
     public Map getTranslatorParameters() {
-        return m_parameters;
-    }
+        return null;
+    } 
 
     public JobMonitorAdaptor getDefaultJobMonitor() {
         return new U6JobMonitorAdaptor();
-    }
-
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
-        super.connect(userInfo, host, port, basePath, attributes);
-        m_parameters = attributes;
-        
-        // get APPLICATION_NAME
-    	if(attributes.containsKey(APPLICATION_NAME))
-    		m_applicationName = (String) attributes.get(APPLICATION_NAME);
-    
-    }
-
-    public void disconnect() throws NoSuccess {
-        super.disconnect();
-        m_parameters = null;
     }
 
     public String submit(String jobDesc) throws PermissionDenied, Timeout, NoSuccess {
@@ -116,8 +85,8 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
 	        inputFiles.add(new Pair<GPEFile, String>(gpeFile, scriptFile.getName()));
 	        
 	        // get target
-	        GPESecurityManager securityManager = this.setSecurity();
-	        TargetSystemInfo targetSystemInfo = findTargetSystem(m_serverUrl, m_applicationName, securityManager);
+	        m_securityManager = this.setSecurity(m_credential);
+	        TargetSystemInfo targetSystemInfo = findTargetSystem();
 	        
 	        // Prepare the JSDL template
 	        JobType jobType = targetSystemInfo.getTargetSystem().getJobType(JobType.JobDefinitions.GPEJSDL);
@@ -132,7 +101,7 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
             // submit the job to target system and start it
 	    	Calendar terminationTime = Calendar.getInstance();
 	    	
-	        // TODO, set 1 day ?
+	        // TODO, set 1 hour ?
 	        terminationTime.add(Calendar.HOUR, 3600);
 	        
 	        // submit job
@@ -150,17 +119,17 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
 	        
 	        // upload script file
 	        StorageClient storage = jobClient.getWorkingDirectory();            
-	        FileProvider fileProvider = FileProviderConfigurator.getConfigurator().getFileProvider();
-	        PutFilesRequest request = new PutFilesRequest(fileProvider, storage, inputFiles, securityManager);
+	        FileProvider fileProvider = new FileProvider();
+	        fileProvider.addFileGetter("RBYTEIO", RandomByteIOFileExportImpl.class);
+	        fileProvider.addFilePutter("RBYTEIO", RandomByteIOFileImportImpl.class);
+	        PutFilesRequest request = new PutFilesRequest(fileProvider, storage, inputFiles, m_securityManager);
 	        request.perform();
             // clean script file
             scriptFile.delete();
             
 	        // start job
 	        jobClient.start();
-            
-            return ((AtomicJobClientImpl) jobClient).getId().toString();
-            
+            return ((AtomicJobClientImpl) jobClient).getId().toString();            
     	} catch (GPEWrongJobTypeException e) {
 			throw new NoSuccess(e);
 		} catch (Exception e) {
@@ -173,7 +142,7 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
     public void cancel(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess {    	
     	try {
     		// set security
-    		GPESecurityManager securityManager = this.setSecurity();	        
+    		GPESecurityManager securityManager = this.setSecurity(m_credential);	        
     		// get Job
     		JobClient jobClient = getJobById(nativeJobId, securityManager);
     		// abort
@@ -199,7 +168,7 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
 			NoSuccess {
 		try {
 			// set security
-    		GPESecurityManager securityManager = this.setSecurity();	        
+    		GPESecurityManager securityManager = this.setSecurity(m_credential);	        
     		// get Job
     		JobClient jobClient = getJobById(nativeJobId,securityManager);
     		// resume

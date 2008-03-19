@@ -10,7 +10,7 @@ import fr.in2p3.jsaga.adaptor.data.read.*;
 import fr.in2p3.jsaga.adaptor.data.write.DirectoryWriter;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.u6.TargetSystemInfo;
 import fr.in2p3.jsaga.adaptor.u6.U6Abstract;
 
@@ -31,7 +31,6 @@ import com.intel.gpe.client2.common.i18n.MessagesKeys;
 import com.intel.gpe.client2.common.requests.CreateDirectoryRequest;
 import com.intel.gpe.client2.common.requests.DeleteFileRequest;
 import com.intel.gpe.client2.providers.FileProvider;
-import com.intel.gpe.client2.security.GPESecurityManager;
 import com.intel.gpe.client2.transfers.FileExport;
 import com.intel.gpe.client2.transfers.FileImport;
 import com.intel.gpe.client2.transfers.TransferFailedException;
@@ -62,8 +61,8 @@ public class RByteIODataAdaptor extends U6Abstract
 		implements DirectoryReader, DataPut, DataGet,
 				DirectoryWriter, FileWriter, FileReader {
 		
+	protected JKSSecurityAdaptor m_credential;
     protected String m_serverFileSeparator ;
-    protected GPESecurityManager m_securityManager;
     protected StorageClient m_client;
 	
     public RByteIODataAdaptor() {
@@ -85,11 +84,11 @@ public class RByteIODataAdaptor extends U6Abstract
     }
 
     public Class[] getSupportedSecurityAdaptorClasses() {
-    	return new Class[]{GSSCredentialSecurityAdaptor.class};
+    	return new Class[]{JKSSecurityAdaptor.class};
     }
 
     public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
-        //
+    	 m_credential = (JKSSecurityAdaptor) securityAdaptor;
     }
 
     public int getDefaultPort() {
@@ -120,12 +119,12 @@ public class RByteIODataAdaptor extends U6Abstract
     	m_serverUrl = "https://"+host+":"+port+registryPath;    
 
     	// set security
-    	m_securityManager = this.setSecurity();
+    	m_securityManager = setSecurity(m_credential);
     	
 		// get client that talks to registry
         try {
         	  // find target system that supports the specific application
-        	TargetSystemInfo targetSystemInfo = findTargetSystem(m_serverUrl, m_applicationName, m_securityManager);
+        	TargetSystemInfo targetSystemInfo = findTargetSystem();
         	m_client = targetSystemInfo.getTargetSystem().getStorage(storageName);
         	if(m_client == null)
         		throw new NoSuccess("Unable to get storage:"+storageName);

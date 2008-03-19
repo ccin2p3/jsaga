@@ -1,27 +1,16 @@
 package fr.in2p3.jsaga.adaptor.u6.job;
 
-import fr.in2p3.jsaga.adaptor.base.defaults.Default;
-import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
 
 import org.ogf.saga.error.AuthenticationFailed;
-import org.ogf.saga.error.IncorrectState;
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.Timeout;
 
 import com.intel.gpe.client2.security.GPESecurityManager;
 import com.intel.gpe.clients.api.JobClient;
 import com.intel.gpe.clients.api.Status;
-import com.intel.gpe.clients.api.exceptions.GPEInvalidResourcePropertyQNameException;
-import com.intel.gpe.clients.api.exceptions.GPEMiddlewareRemoteException;
-import com.intel.gpe.clients.api.exceptions.GPEMiddlewareServiceException;
-import com.intel.gpe.clients.api.exceptions.GPEResourceNotDestroyedException;
-import com.intel.gpe.clients.api.exceptions.GPEResourceUnknownException;
-import com.intel.gpe.clients.api.exceptions.GPESecurityException;
-import com.intel.gpe.clients.api.exceptions.GPEUnmarshallingException;
 
-import java.util.Map;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -36,26 +25,18 @@ import java.util.Map;
  *
  */
 public class U6JobMonitorAdaptor extends U6JobAdaptorAbstract implements QueryIndividualJob {
-	// TODO QueryFilteredJob
-	
-    public Usage getUsage() {
-        return null;    // no usage
-    }
-
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
-        return null;    // no default
-    }    
+	// TODO QueryFilteredJob	    
     
     public JobStatus getStatus(String nativeJobId) throws Timeout, NoSuccess {
 
     	try {
     		
     		// set security
-    		GPESecurityManager securityManager = this.setSecurity();    		
+    		GPESecurityManager securityManager = this.setSecurity(m_credential);    		
 	        JobClient jobClient = getJobById(nativeJobId, securityManager);
     		Status jobStatus = jobClient.getStatus();
 			
-			// TODO : move to cleanup step
+    		// TODO : move to cleanup step
 			if(jobStatus.isFailed() || jobStatus.isSuccessful()) {
 				//try to get stdout & stderr						
 				try {
@@ -71,31 +52,13 @@ public class U6JobMonitorAdaptor extends U6JobAdaptorAbstract implements QueryIn
 		        // destroy
 				try {
 					jobClient.destroy();
-				} catch (GPEResourceUnknownException e1) {
-					e1.printStackTrace();
-				} catch (GPEResourceNotDestroyedException e1) {
-					e1.printStackTrace();
-				} catch (GPESecurityException e1) {
-					e1.printStackTrace();
-				} catch (GPEMiddlewareRemoteException e1) {
-					e1.printStackTrace();
-				} catch (GPEMiddlewareServiceException e1) {
+				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
 			}
 			return new U6JobStatus(nativeJobId, jobStatus, jobStatus.toString());			
-    	} catch (GPEInvalidResourcePropertyQNameException e) {
+    	} catch (Exception e) {
     		throw new NoSuccess(e);
-		} catch (GPEResourceUnknownException e) {
-			throw new NoSuccess(e);
-		} catch (GPEUnmarshallingException e) {
-			throw new NoSuccess(e);
-		} catch (GPEMiddlewareRemoteException e) {
-			throw new NoSuccess(e);
-		} catch (GPEMiddlewareServiceException e) {
-			throw new NoSuccess(e);
-		} catch (Exception e) {
-			throw new NoSuccess(e);
 		}
     }        
 

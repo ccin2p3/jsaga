@@ -6,10 +6,9 @@ import fr.in2p3.jsaga.adaptor.base.usage.U;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.u6.TargetSystemInfo;
 import fr.in2p3.jsaga.adaptor.u6.U6Abstract;
-
-import org.ietf.jgss.GSSCredential;
 
 import org.ogf.saga.error.AuthenticationFailed;
 import org.ogf.saga.error.AuthorizationFailed;
@@ -19,8 +18,9 @@ import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.error.Timeout;
 
-import com.intel.gpe.client2.common.configurators.FileProviderConfigurator;
 import com.intel.gpe.client2.common.requests.GetFilesRequest;
+import com.intel.gpe.client2.common.transfers.byteio.RandomByteIOFileExportImpl;
+import com.intel.gpe.client2.common.transfers.byteio.RandomByteIOFileImportImpl;
 import com.intel.gpe.client2.providers.FileProvider;
 import com.intel.gpe.client2.security.GPESecurityManager;
 import com.intel.gpe.client2.transfers.FileExport;
@@ -40,7 +40,6 @@ import com.intel.gpe.util.sets.Pair;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -58,14 +57,16 @@ import java.util.Map;
  */
 public abstract class U6JobAdaptorAbstract extends U6Abstract implements SagaSecureAdaptor {
 	
-    protected GSSCredential m_credential;
+	protected JKSSecurityAdaptor m_credential;
     protected String rootLogDir = System.getProperty("user.home") + File.separator;    
     
     public Class[] getSupportedSecurityAdaptorClasses() {
-        return null;
+        return new Class[]{JKSSecurityAdaptor.class};
     }
 
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {};
+    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
+    	 m_credential = (JKSSecurityAdaptor) securityAdaptor;
+    }
 
     public int getDefaultPort() {
         return 8080;
@@ -81,7 +82,11 @@ public abstract class U6JobAdaptorAbstract extends U6Abstract implements SagaSec
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
-    	m_serverUrl = "https://"+host+":"+port+basePath;    	
+    	m_serverUrl = "https://"+host+":"+port+basePath;
+    	
+    	// get APPLICATION_NAME
+    	if(attributes.containsKey(APPLICATION_NAME))
+    		m_applicationName = (String) attributes.get(APPLICATION_NAME);
     }
 
     public void disconnect() throws NoSuccess {
@@ -93,7 +98,8 @@ public abstract class U6JobAdaptorAbstract extends U6Abstract implements SagaSec
 		try {		
 	    	// TODO Optimize this
 	        // list jobs
-        	TargetSystemInfo targetSystemInfo = findTargetSystem(m_serverUrl, m_applicationName, securityManager);
+			m_securityManager = this.setSecurity(m_credential);	        
+        	TargetSystemInfo targetSystemInfo = findTargetSystem();
 	        List<JobClient> jobList = targetSystemInfo.getTargetSystem().getJobs();
 	        for (JobClient jobClient : jobList) {
 	        	String currentJobId = ((AtomicJobClientImpl) jobClient).getId().toString();
@@ -131,7 +137,9 @@ public abstract class U6JobAdaptorAbstract extends U6Abstract implements SagaSec
             }
     		
     		logDir = new File(logDir).getAbsolutePath()+File.separator;
-    		FileProvider fileProvider = FileProviderConfigurator.getConfigurator().getFileProvider();
+    		FileProvider fileProvider = new FileProvider();
+	        fileProvider.addFileGetter("RBYTEIO", RandomByteIOFileExportImpl.class);
+	        fileProvider.addFilePutter("RBYTEIO", RandomByteIOFileImportImpl.class);	        
     		StorageClient workingDirectory = jobClient.getWorkingDirectory();
             List<FileExport> getters = fileProvider.prepareGetters(workingDirectory);
            
