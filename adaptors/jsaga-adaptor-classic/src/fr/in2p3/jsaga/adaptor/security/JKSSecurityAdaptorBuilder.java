@@ -88,9 +88,9 @@ public class JKSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
 	    	else {
 	    		// only one key must be in the JKS
 		    	int numberOfPrivateKey = 0;
-		    	Enumeration<String> knownKeyAliases = keyStore.aliases();
+		    	Enumeration knownKeyAliases = keyStore.aliases();
 		    	while (knownKeyAliases.hasMoreElements()) {
-					String next = knownKeyAliases.nextElement();
+					String next = (String) knownKeyAliases.nextElement();
 					if (keyStore.isKeyEntry(next)) {
 						numberOfPrivateKey ++;
 						alias = next;
