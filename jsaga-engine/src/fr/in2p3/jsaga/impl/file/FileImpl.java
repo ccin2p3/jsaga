@@ -19,13 +19,11 @@ import fr.in2p3.jsaga.impl.namespace.*;
 import org.ogf.saga.*;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.error.*;
-import org.ogf.saga.file.File;
-import org.ogf.saga.file.FileInputStream;
 import org.ogf.saga.file.*;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.List;
 
 /* ***************************************************
@@ -177,7 +175,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         } else if (m_adaptor instanceof DataGet) {
             FileImpl targetFile = SourcePhysicalFile.createTargetFile(m_session, effectiveTarget, effectiveFlags);
             try {
-                ((DataGet)m_adaptor).getToStream(m_url.getPath(), targetFile.getOutputStream());
+                ((DataGet)m_adaptor).getToStream(m_url.getPath(), targetFile.getFileOutputStream());
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("Source file does not exist: "+m_url, doesNotExist);
             }
@@ -235,7 +233,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         } else if (m_adaptor instanceof DataPut) {
             FileImpl sourceFile = TargetPhysicalFile.createSourceFile(m_session, effectiveSource);
             try {
-                ((DataPut)m_adaptor).putFromStream(m_url.getPath(), sourceFile.getInputStream(), false);
+                ((DataPut)m_adaptor).putFromStream(m_url.getPath(), sourceFile.getFileInputStream(), false);
             } catch (AlreadyExists alreadyExists) {
                 throw new IncorrectState("Target entry already exists: "+m_url, alreadyExists);
             }
@@ -399,28 +397,23 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
 
     ////////////////////////////////// unofficial public methods //////////////////////////////////
 
-    public InputStream getInputStream() {
+    public FileInputStream getFileInputStream() {
         return m_inStream;
     }
 
-    public OutputStream getOutputStream() {
+    public FileOutputStream getFileOutputStream() {
         return m_outStream;
     }
 
-    public InputStream newInputStream() throws NotImplemented, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
-        String absolutePath = super.getURL().getPath();
-        return ((FileReader) m_adaptor).getInputStream(absolutePath, m_url.getQuery());
+    public FileInputStream newFileInputStream() throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+        boolean disconnectable = false;
+        return new FileInputStreamImpl(m_session, m_url, m_adaptor, disconnectable);
     }
 
-    public OutputStream newOutputStream(boolean overwrite) throws NotImplemented, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        String parentAbsolutePath = super._getParentDirURL().getPath();
-        String fileName = super._getEntryName();
+    public FileOutputStream newFileOutputStream(boolean overwrite) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        boolean disconnectable = false;
         boolean exclusive = !overwrite;
         boolean append = false;
-        try {
-            return ((FileWriter) m_adaptor).getOutputStream(parentAbsolutePath, fileName, exclusive, append, m_url.getQuery());
-        } catch (ParentDoesNotExist e) {
-            throw new DoesNotExist(e);
-        }
+        return new FileOutputStreamImpl(m_session, m_url, m_adaptor, disconnectable, exclusive, append);
     }
 }

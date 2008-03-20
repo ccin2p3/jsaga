@@ -4,12 +4,12 @@ import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.impl.file.FileImpl;
 import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
-import org.ogf.saga.file.FileFactory;
+import org.ogf.saga.file.*;
 import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.session.Session;
 
-import java.io.*;
+import java.io.IOException;
 import java.lang.Exception;
 import java.util.List;
 
@@ -38,7 +38,7 @@ public class TargetPhysicalFile {
 
         // open source file if it exists
         FileImpl sourceFile = createSourceFile(session, source);
-        InputStream in = sourceFile.getInputStream();
+        FileInputStream in = sourceFile.getFileInputStream();
 
         // start to read if it exists
         byte[] data = new byte[DEFAULT_BUFFER_SIZE];
@@ -56,7 +56,7 @@ public class TargetPhysicalFile {
         try {
             // sourceFlags may contains OVERWRITE flag for target
             boolean overwrite = sourceFlags.contains(Flags.OVERWRITE);
-            OutputStream out = m_targetFile.newOutputStream(overwrite);
+            FileOutputStream out = m_targetFile.newFileOutputStream(overwrite);
             try {
                 while (readlen > 0) {
                     int writelen;

@@ -5,11 +5,11 @@ import fr.in2p3.jsaga.engine.data.flags.FlagsBytesPhysical;
 import fr.in2p3.jsaga.impl.file.FileImpl;
 import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
-import org.ogf.saga.file.FileFactory;
+import org.ogf.saga.file.*;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.session.Session;
 
-import java.io.*;
+import java.io.IOException;
 import java.lang.Exception;
 
 /* ***************************************************
@@ -36,9 +36,9 @@ public class SourcePhysicalFile {
         IOException closingException = null;
 
         // open source file if it exists
-        InputStream in;
+        FileInputStream in;
         try {
-            in = m_sourceFile.newInputStream();
+            in = m_sourceFile.newFileInputStream();
         } catch (DoesNotExist doesNotExist) {
             throw new IncorrectState("Source file does not exist: "+m_sourceFile.getURL(), doesNotExist);
         }
@@ -59,7 +59,7 @@ public class SourcePhysicalFile {
         try {
             FileImpl targetFile = createTargetFile(session, target, targetFlags);
             try {
-                OutputStream out = targetFile.getOutputStream();
+                FileOutputStream out = targetFile.getFileOutputStream();
                 while (readlen > 0) {
                     int writelen;
                     for (int total=0; total<readlen; total+=writelen) {
