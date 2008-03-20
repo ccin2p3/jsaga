@@ -32,8 +32,12 @@ public class LocalFileAttributes extends FileAttributes {
         m_size = (entry.isFile() ? entry.length() : 0);
 
         m_permission = PermissionBytes.NONE;
-        if(entry.canRead()) m_permission.or(PermissionBytes.READ);
-        if(entry.canWrite()) m_permission.or(PermissionBytes.WRITE);
+        if(entry.canRead()) {
+            m_permission = m_permission.or(PermissionBytes.READ);
+        }
+        if(entry.canWrite()) {
+            m_permission = m_permission.or(PermissionBytes.WRITE);
+        }
 
         m_lastModified = entry.lastModified();
     }
