@@ -74,12 +74,16 @@ public class SecurityAdaptorDescriptor {
     }
 
     public static boolean isSupportedNoContext(Class[] supportedClazzArray) {
-        for (int i=0; supportedClazzArray!=null && i<supportedClazzArray.length; i++) {
-            if (supportedClazzArray[i] == null) {
-                return true;
+        if (supportedClazzArray!=null && supportedClazzArray.length>0) {
+            for (int i=0; supportedClazzArray!=null && i<supportedClazzArray.length; i++) {
+                if (supportedClazzArray[i] == null) {
+                    return true;
+                }
             }
+            return false;
+        } else {
+            return true;
         }
-        return false;
     }
 
     public static boolean isSupported(Class securityAdaptorClazz, Class[] supportedClazzArray) {
