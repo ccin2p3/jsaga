@@ -76,14 +76,14 @@
         <dependency>
             <groupId>org.globus</groupId>
             <artifactId>cog-url</artifactId>
-            <version>gt4</version>
+            <version>1.4</version>
             <scope>runtime</scope>
         </dependency>
         <!-- for testing -->
         <dependency>
             <groupId>org.globus</groupId>
             <artifactId>cog-jglobus</artifactId>
-            <version>gt4</version>
+            <version>1.4</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

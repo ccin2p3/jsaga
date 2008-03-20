@@ -28,7 +28,7 @@
 		<dependency>
             <groupId>org.globus</groupId>
             <artifactId>cog-jglobus</artifactId>
-            <version>gt4</version>
+            <version>1.4</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
