@@ -2,7 +2,9 @@ package fr.in2p3.jsaga.impl.file;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
+import fr.in2p3.jsaga.adaptor.data.read.FileReader;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
+import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
 import fr.in2p3.jsaga.engine.factories.DataAdaptorFactory;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
@@ -52,10 +54,12 @@ public class FileFactoryImpl extends FileFactory {
 
     protected File doCreateFile(Session session, URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session);
-        if (adaptor instanceof LogicalReader || adaptor instanceof LogicalWriter) {
-            throw new BadParameter("Not a physical file URL: "+name);
-        } else {
+        boolean isPhysical = adaptor instanceof FileReader || adaptor instanceof FileWriter;
+        boolean isLogical = adaptor instanceof LogicalReader || adaptor instanceof LogicalWriter;
+        if (isPhysical || !isLogical) {
             return new FileImpl(session, name, adaptor, flags);
+        } else {
+            throw new BadParameter("Not a physical file URL: "+name);
         }
     }
 
@@ -69,10 +73,12 @@ public class FileFactoryImpl extends FileFactory {
 
     protected Directory doCreateDirectory(Session session, URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session);
-        if (adaptor instanceof LogicalReader || adaptor instanceof LogicalWriter) {
-            throw new BadParameter("Not a physical directory URL: "+name);
-        } else {
+        boolean isPhysical = adaptor instanceof FileReader || adaptor instanceof FileWriter;
+        boolean isLogical = adaptor instanceof LogicalReader || adaptor instanceof LogicalWriter;
+        if (isPhysical || !isLogical) {
             return new DirectoryImpl(session, name, adaptor, flags);
+        } else {
+            throw new BadParameter("Not a physical directory URL: "+name);
         }
     }
 

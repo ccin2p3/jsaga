@@ -2,7 +2,9 @@ package fr.in2p3.jsaga.impl.logicalfile;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
+import fr.in2p3.jsaga.adaptor.data.read.FileReader;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
+import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
 import fr.in2p3.jsaga.engine.factories.DataAdaptorFactory;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
@@ -36,7 +38,9 @@ public class LogicalFileFactoryImpl extends LogicalFileFactory {
 
     protected LogicalFile doCreateLogicalFile(Session session, URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session);
-        if (adaptor instanceof LogicalReader || adaptor instanceof LogicalWriter) {
+        boolean isLogical = adaptor instanceof LogicalReader || adaptor instanceof LogicalWriter;
+        boolean isPhysical = adaptor instanceof FileReader || adaptor instanceof FileWriter;
+        if (isLogical || !isPhysical) {
             return new LogicalFileImpl(session, name, adaptor, flags);
         } else {
             throw new BadParameter("Not a logical file URL: "+name);
@@ -45,7 +49,9 @@ public class LogicalFileFactoryImpl extends LogicalFileFactory {
 
     protected LogicalDirectory doCreateLogicalDirectory(Session session, URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session);
-        if (adaptor instanceof LogicalReader || adaptor instanceof LogicalWriter) {
+        boolean isLogical = adaptor instanceof LogicalReader || adaptor instanceof LogicalWriter;
+        boolean isPhysical = adaptor instanceof FileReader || adaptor instanceof FileWriter;
+        if (isLogical || !isPhysical) {
             return new LogicalDirectoryImpl(session, name, adaptor, flags);
         } else {
             throw new BadParameter("Not a logical directory URL: "+name);

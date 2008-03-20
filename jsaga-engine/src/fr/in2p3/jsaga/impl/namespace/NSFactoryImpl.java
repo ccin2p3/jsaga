@@ -2,7 +2,9 @@ package fr.in2p3.jsaga.impl.namespace;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
+import fr.in2p3.jsaga.adaptor.data.read.FileReader;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
+import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
 import fr.in2p3.jsaga.engine.factories.DataAdaptorFactory;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import fr.in2p3.jsaga.impl.file.DirectoryImpl;
@@ -47,7 +49,7 @@ public class NSFactoryImpl extends NSFactory {
         if (name.getPath().endsWith("/")) {
             return this.doCreateNSDirectory(session, name, flags);
         } else {
-            return this.doCreateNamespaceFile(session, name, flags);
+            return this.doCreateNSFile(session, name, flags);
         }
     }
 
@@ -58,10 +60,12 @@ public class NSFactoryImpl extends NSFactory {
      */
     protected NSDirectory doCreateNSDirectory(Session session, URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session);
-        if (adaptor instanceof LogicalReader || adaptor instanceof LogicalWriter) {
-            return new LogicalDirectoryImpl(session, name, adaptor, flags);
-        } else {
+        boolean isPhysical = adaptor instanceof FileReader || adaptor instanceof FileWriter;
+        boolean isLogical = adaptor instanceof LogicalReader || adaptor instanceof LogicalWriter;
+        if (isPhysical || !isLogical) {
             return new DirectoryImpl(session, name, adaptor, flags);
+        } else {
+            return new LogicalDirectoryImpl(session, name, adaptor, flags);
         }
     }
 
@@ -70,12 +74,14 @@ public class NSFactoryImpl extends NSFactory {
      * <br> - do not check existance of entry if flag <code>JSAGAFlags.BYPASSEXIST</code> is set.
      * <br> - support the CREATEPARENTS flag (from specification of method makeDir).
      */
-    private NSEntry doCreateNamespaceFile(Session session, URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    private NSEntry doCreateNSFile(Session session, URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session);
-        if (adaptor instanceof LogicalReader || adaptor instanceof LogicalWriter) {
-            return new LogicalFileImpl(session, name, adaptor, flags);
-        } else {
+        boolean isPhysical = adaptor instanceof FileReader || adaptor instanceof FileWriter;
+        boolean isLogical = adaptor instanceof LogicalReader || adaptor instanceof LogicalWriter;
+        if (isPhysical || !isLogical) {
             return new FileImpl(session, name, adaptor, flags);
+        } else {
+            return new LogicalFileImpl(session, name, adaptor, flags);
         }
     }
 
