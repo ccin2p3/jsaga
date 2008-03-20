@@ -4,17 +4,13 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatusNotifier;
-import fr.in2p3.jsaga.adaptor.job.monitor.ListenIndividualJob;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
 
 import org.globus.exec.client.GramJob;
 import org.globus.exec.client.GramJobListener;
-import org.globus.exec.generated.StateEnumeration;
 import org.globus.gram.GramException;
 import org.globus.gram.internal.GRAMProtocolErrorConstants;
-import org.globus.wsrf.NoSuchResourceException;
 import org.ietf.jgss.GSSException;
-import org.ogf.saga.error.AuthenticationFailed;
 import org.ogf.saga.error.IncorrectState;
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.Timeout;
@@ -53,12 +49,7 @@ public class WSGramJobMonitorAdaptor extends WSGramJobAdaptorAbstract implements
         try {
 			job.refreshStatus();
 		} catch (GramException e) {
-            if (e.getErrorCode() == GramException.ERROR_CONTACTING_JOB_MANAGER) {
-                //WARNING: Globus does not distinguish job DONE and job manager stopped
-                return new WSGramJobStatus(nativeJobHandle, StateEnumeration.Done, "DONE");
-            } else {
-                this.rethrowException(e);
-            }
+            this.rethrowException(e);
         } catch (GSSException e) {
             throw new NoSuccess(e);
         } catch (Exception e) {
