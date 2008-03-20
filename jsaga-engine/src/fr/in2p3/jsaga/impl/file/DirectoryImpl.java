@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.impl.file;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.helpers.URLFactory;
+import fr.in2p3.jsaga.impl.namespace.AbstractNSDirectoryImpl;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
 import org.ogf.saga.*;
 import org.ogf.saga.error.*;
@@ -27,9 +28,14 @@ public class DirectoryImpl extends AbstractAsyncDirectoryImpl implements Directo
         super(session, url, adaptor, flags);
     }
 
-    /** constructor for open() */
-    public DirectoryImpl(AbstractNSEntryImpl entry, URL url, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(entry, url, flags);
+    /** constructor for NSDirectory.open() */
+    public DirectoryImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        super(dir, relativeUrl, flags);
+    }
+
+    /** constructor for NSEntry.openAbsolute() */
+    public DirectoryImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        super(entry, absolutePath, flags);
     }
 
     /** clone */
@@ -41,15 +47,29 @@ public class DirectoryImpl extends AbstractAsyncDirectoryImpl implements Directo
         return ObjectType.DIRECTORY;
     }
 
-    /** implements super.openDir() */
+    /////////////////////////////// class AbstractNSEntryImpl ///////////////////////////////
+
+    public NSDirectory openAbsoluteDir(String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        return new DirectoryImpl(this, absolutePath, flags);
+    }
+
+    public NSEntry openAbsolute(String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        if (URLFactory.isDirectory(absolutePath)) {
+            return new DirectoryImpl(this, absolutePath, flags);
+        } else {
+            return new FileImpl(this, absolutePath, flags);
+        }
+    }
+
+    /////////////////////////////////// interface NSEntry ///////////////////////////////////
+
     public NSDirectory openDir(URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         return this.openDirectory(name, flags);
     }
     public NSDirectory openDir(URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return this.openDir(name, Flags.READ.getValue());
+        return this.openDirectory(name);
     }
 
-    /** implements super.open() */
     public NSEntry open(URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         if (URLFactory.isDirectory(name)) {
             return this.openDirectory(name, flags);
@@ -58,8 +78,14 @@ public class DirectoryImpl extends AbstractAsyncDirectoryImpl implements Directo
         }
     }
     public NSEntry open(URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return this.open(name, Flags.READ.getValue());
+        if (URLFactory.isDirectory(name)) {
+            return this.openDirectory(name);
+        } else {
+            return this.openFile(name);
+        }
     }
+
+    /////////////////////////////////// interface Directory ///////////////////////////////////
 
     public long getSize(URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
         try {
@@ -76,18 +102,18 @@ public class DirectoryImpl extends AbstractAsyncDirectoryImpl implements Directo
         return super.isEntry(name);
     }
 
-    public Directory openDirectory(URL relativePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return new DirectoryImpl(this, super._resolveRelativeURL(relativePath), flags);
+    public Directory openDirectory(URL relativeUrl, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        return new DirectoryImpl(this, relativeUrl, flags);
     }
-    public Directory openDirectory(URL relativePath) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return this.openDirectory(relativePath, Flags.READ.getValue());
+    public Directory openDirectory(URL relativeUrl) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        return new DirectoryImpl(this, relativeUrl, Flags.READ.getValue());
     }
 
-    public File openFile(URL relativePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return new FileImpl(this, super._resolveRelativeURL(relativePath), flags);
+    public File openFile(URL relativeUrl, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        return new FileImpl(this, relativeUrl, flags);
     }
-    public File openFile(URL relativePath) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return this.openFile(relativePath, Flags.READ.getValue());
+    public File openFile(URL relativeUrl) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        return new FileImpl(this, relativeUrl, Flags.READ.getValue());
     }
 
     public FileInputStream openFileInputStream(URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {

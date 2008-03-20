@@ -32,9 +32,14 @@ public abstract class AbstractAsyncDirectoryImpl extends AbstractNSDirectoryImpl
         super(session, url, adaptor, flags);
     }
 
-    /** constructor for open() */
-    public AbstractAsyncDirectoryImpl(AbstractNSEntryImpl entry, URL url, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(entry, url, flags);
+    /** constructor for NSDirectory.open() */
+    public AbstractAsyncDirectoryImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        super(dir, relativeUrl, flags);
+    }
+
+    /** constructor for NSEntry.openAbsolute() */
+    public AbstractAsyncDirectoryImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        super(entry, absolutePath, flags);
     }
 
     public Task<Long> getSize(TaskMode mode, URL name, int flags) throws NotImplemented {

@@ -41,11 +41,38 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
         m_disconnectable = true;
     }
 
-    /** constructor for open() */
-    public AbstractNSEntryImpl(AbstractNSEntryImpl entry, URL url, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-        super(entry.m_session, url, entry.m_adaptor);
+    /** constructor for NSDirectory.open() */
+    public AbstractNSEntryImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+        super(dir.m_session, _resolveRelativeUrl(dir.m_url, relativeUrl), dir.m_adaptor);
         this.init(flags);
         m_disconnectable = false;
+    }
+    protected static URL _resolveRelativeUrl(URL baseUrl, URL relativeUrl) throws NotImplemented, IncorrectURL, BadParameter, NoSuccess {
+        if (relativeUrl==null) {
+            throw new IncorrectURL("URL must not be null");
+        } else if (relativeUrl.getScheme()!=null && !relativeUrl.getScheme().equals(baseUrl.getScheme())) {
+            throw new IncorrectURL("You must not modify the scheme of the URL: "+ baseUrl.getScheme());
+        } else if (relativeUrl.getUserInfo()!=null && !relativeUrl.getUserInfo().equals(baseUrl.getUserInfo())) {
+            throw new IncorrectURL("You must not modify the user part of the URL: "+ baseUrl.getUserInfo());
+        } else if (relativeUrl.getHost()!=null && !relativeUrl.getHost().equals(baseUrl.getHost())) {
+            throw new IncorrectURL("You must not modify the host of the URL: "+ baseUrl.getHost());
+        }
+        return URLFactory.createURL(baseUrl, relativeUrl);
+    }
+
+    /** constructor for NSEntry.openAbsolute() */
+    public AbstractNSEntryImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+        super(entry.m_session, _resolveAbsolutePath(entry.m_url, absolutePath), entry.m_adaptor);
+        this.init(flags);
+        m_disconnectable = false;
+    }
+    private static URL _resolveAbsolutePath(URL baseUrl, String absolutePath) throws NotImplemented, IncorrectURL, BadParameter, NoSuccess {
+        if (absolutePath==null) {
+            throw new IncorrectURL("URL must not be null");
+        } else if (! absolutePath.startsWith("/")) {
+            throw new IncorrectURL("URL must contain an absolute path: "+ baseUrl.getPath());
+        }
+        return URLFactory.createURL(baseUrl, absolutePath);
     }
 
     private void init(int flags) throws BadParameter {
@@ -377,12 +404,13 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
 
     ///////////////////////////////////////// protected methods /////////////////////////////////////////
 
-    public abstract NSDirectory openDir(URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess;
-    public abstract NSEntry open(URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess;
+    public abstract NSDirectory openAbsoluteDir(String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess;
+    public abstract NSEntry openAbsolute(String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess;
 
     protected AbstractNSDirectoryImpl _dereferenceDir()  throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         try {
-            return (AbstractNSDirectoryImpl) this.openDir(this.readLink(), Flags.NONE.getValue());
+            String absolutePath = this.readLink().getPath();
+            return (AbstractNSDirectoryImpl) this.openAbsoluteDir(absolutePath, Flags.NONE.getValue());
         } catch (AlreadyExists e) {
             throw new IncorrectState(e);
         } catch (DoesNotExist e) {
@@ -392,27 +420,13 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
 
     protected AbstractNSEntryImpl _dereferenceEntry()  throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         try {
-            return (AbstractNSEntryImpl) this.open(this.readLink(), Flags.NONE.getValue());
+            String absolutePath = this.readLink().getPath();
+            return (AbstractNSEntryImpl) this.openAbsolute(absolutePath, Flags.NONE.getValue());
         } catch (AlreadyExists e) {
             throw new IncorrectState(e);
         } catch (DoesNotExist e) {
             throw new IncorrectState(e);
         }
-    }
-
-    protected URL _resolveAbsoluteURL(URL absolutePath) throws NotImplemented, IncorrectURL, BadParameter, NoSuccess {
-        if (absolutePath==null) {
-            throw new IncorrectURL("URL must not be null");
-        } else if (absolutePath.getScheme()!=null && !absolutePath.getScheme().equals(m_url.getScheme())) {
-            throw new IncorrectURL("You must not modify the scheme of the URL: "+ m_url.getScheme());
-        } else if (absolutePath.getUserInfo()!=null && !absolutePath.getUserInfo().equals(m_url.getUserInfo())) {
-            throw new IncorrectURL("You must not modify the user part of the URL: "+ m_url.getUserInfo());
-        } else if (absolutePath.getHost()!=null && !absolutePath.getHost().equals(m_url.getHost())) {
-            throw new IncorrectURL("You must not modify the host of the URL: "+ m_url.getHost());
-        } else if (! absolutePath.getPath().startsWith("/")) {
-            throw new IncorrectURL("URL must contain an absolute path: "+ m_url.getPath());
-        }
-        return URLFactory.createURL(m_url, absolutePath.getPath());
     }
 
     protected URL _getEffectiveURL(URL target) throws NotImplemented, BadParameter, IncorrectState, Timeout, NoSuccess {
@@ -429,8 +443,8 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
 
     protected void _makeParentDirs() throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, Timeout, NoSuccess {
         try {
-            URL parent = this._getParentDirURL();
-            this.openDir(parent, Flags.CREATE.or(Flags.CREATEPARENTS));
+            String parentAbsolutePath = this._getParentDirURL().getPath();
+            this.openAbsoluteDir(parentAbsolutePath, Flags.CREATE.or(Flags.CREATEPARENTS));
         } catch (DoesNotExist e) {
             throw new NoSuccess(e);
         } catch (IncorrectState e) {

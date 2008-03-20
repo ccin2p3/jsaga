@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.impl.namespace;
 
-import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
 import fr.in2p3.jsaga.adaptor.data.read.DirectoryReader;
@@ -31,9 +30,14 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         super(session, url, adaptor, flags);
     }
 
-    /** constructor for open() */
-    public AbstractNSEntryDirImpl(AbstractNSEntryImpl entry, URL url, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-        super(entry, url, flags);
+    /** constructor for NSDirectory.open() */
+    public AbstractNSEntryDirImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+        super(dir, relativeUrl, flags);
+    }
+
+    /** constructor for NSEntry.openAbsolute() */
+    public AbstractNSEntryDirImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+        super(entry, absolutePath, flags);
     }
 
     /** override super.getCWD() */

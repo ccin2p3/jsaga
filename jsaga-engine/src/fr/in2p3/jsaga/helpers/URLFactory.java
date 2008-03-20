@@ -20,7 +20,9 @@ import java.net.URISyntaxException;
  */
 public class URLFactory {
     public static boolean isDirectory(URL url) throws NotImplemented {
-        String path = url.getPath();
+        return isDirectory(url.getPath());
+    }
+    public static boolean isDirectory(String path) throws NotImplemented {
         return path.endsWith("/") || path.endsWith("/.") || path.endsWith("/..") || path.equals(".") || path.equals("..");
     }
 
@@ -30,6 +32,12 @@ public class URLFactory {
         }
         return url;
     }
+    public static String toFilePath(String path) throws NotImplemented, BadParameter {
+        if (isDirectory(path)) {
+            throw new BadParameter("File path must not end with slash: "+path);
+        }
+        return path;
+    }
 
     public static URL toDirectoryURL(URL url) throws NotImplemented, BadParameter {
         String path = url.getPath();
@@ -37,6 +45,13 @@ public class URLFactory {
             url.setPath(path+"/");
         }
         return url;
+    }
+    public static String toDirectoryPath(String path) throws NotImplemented, BadParameter {
+        if (!path.endsWith("/")) {
+            return path+"/";
+        } else {
+            return path;
+        }
     }
 
     public static URL createURL(URL base, URL relativePath) throws NotImplemented, BadParameter, NoSuccess {

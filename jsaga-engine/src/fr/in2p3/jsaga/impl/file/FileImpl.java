@@ -15,8 +15,7 @@ import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytesPhysical;
 import fr.in2p3.jsaga.engine.schema.config.Protocol;
 import fr.in2p3.jsaga.helpers.URLFactory;
-import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
-import fr.in2p3.jsaga.impl.namespace.JSAGAFlags;
+import fr.in2p3.jsaga.impl.namespace.*;
 import org.ogf.saga.*;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.error.*;
@@ -49,9 +48,15 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         this.init(flags);
     }
 
-    /** constructor for open() */
-    public FileImpl(AbstractNSEntryImpl entry, URL url, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(entry, URLFactory.toFileURL(url), flags);
+    /** constructor for NSDirectory.open() */
+    public FileImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        super(dir, URLFactory.toFileURL(relativeUrl), flags);
+        this.init(flags);
+    }
+
+    /** constructor for NSEntry.openAbsolute() */
+    public FileImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        super(entry, URLFactory.toFilePath(absolutePath), flags);
         this.init(flags);
     }
 
@@ -273,21 +278,21 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         }
     }
 
-    /** implements super.openDir() */
-    public NSDirectory openDir(URL absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return new DirectoryImpl(this, super._resolveAbsoluteURL(absolutePath), flags);
+    ////////////////////////////// class AbstractNSEntryImpl //////////////////////////////
+
+    public NSDirectory openAbsoluteDir(String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        return new DirectoryImpl(this, absolutePath, flags);
     }
 
-    /** implements super.open() */
-    public NSEntry open(URL absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public NSEntry openAbsolute(String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         if (URLFactory.isDirectory(absolutePath)) {
-            return new DirectoryImpl(this, super._resolveAbsoluteURL(absolutePath), flags);
+            return new DirectoryImpl(this, absolutePath, flags);
         } else {
-            return new FileImpl(this, super._resolveAbsoluteURL(absolutePath), flags);
+            return new FileImpl(this, absolutePath, flags);
         }
     }
 
-    /////////////////////////////////// implementation of interface ///////////////////////////////////
+    /////////////////////////////////// interface File ///////////////////////////////////
 
     public long getSize() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
         if (m_url instanceof JSagaURL) {

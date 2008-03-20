@@ -1,12 +1,12 @@
 package fr.in2p3.jsaga.impl.logicalfile;
 
-import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.MetaDataReader;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.helpers.SAGAPattern;
 import fr.in2p3.jsaga.helpers.URLFactory;
+import fr.in2p3.jsaga.impl.namespace.AbstractNSDirectoryImpl;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
 import org.ogf.saga.*;
 import org.ogf.saga.error.*;
@@ -36,9 +36,14 @@ public class LogicalDirectoryImpl extends AbstractAsyncLogicalDirectoryImpl impl
         super(session, url, adaptor, flags);
     }
 
-    /** constructor for open() */
-    public LogicalDirectoryImpl(AbstractNSEntryImpl entry, URL url, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(entry, url, flags);
+    /** constructor for NSDirectory.open() */
+    public LogicalDirectoryImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        super(dir, relativeUrl, flags);
+    }
+
+    /** constructor for NSEntry.openAbsolute() */
+    public LogicalDirectoryImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        super(entry, absolutePath, flags);
     }
 
     /** clone */
@@ -50,15 +55,29 @@ public class LogicalDirectoryImpl extends AbstractAsyncLogicalDirectoryImpl impl
         return ObjectType.LOGICALDIRECTORY;
     }
 
-    /** implements super.openDir() */
+    /////////////////////////////// class AbstractNSEntryImpl ///////////////////////////////
+
+    public NSDirectory openAbsoluteDir(String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        return new LogicalDirectoryImpl(this, absolutePath, flags);
+    }
+
+    public NSEntry openAbsolute(String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        if (URLFactory.isDirectory(absolutePath)) {
+            return new LogicalDirectoryImpl(this, absolutePath, flags);
+        } else {
+            return new LogicalFileImpl(this, absolutePath, flags);
+        }
+    }
+
+    /////////////////////////////////// interface NSEntry ///////////////////////////////////
+
     public NSDirectory openDir(URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         return this.openLogicalDir(name, flags);
     }
     public NSDirectory openDir(URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return this.openDir(name, Flags.READ.getValue());
+        return this.openLogicalDir(name);
     }
 
-    /** implements super.open() */
     public NSEntry open(URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         if (URLFactory.isDirectory(name)) {
             return this.openLogicalDir(name, flags);
@@ -67,8 +86,14 @@ public class LogicalDirectoryImpl extends AbstractAsyncLogicalDirectoryImpl impl
         }
     }
     public NSEntry open(URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return this.open(name, Flags.READ.getValue());
+        if (URLFactory.isDirectory(name)) {
+            return this.openLogicalDir(name);
+        } else {
+            return this.openLogicalFile(name);
+        }
     }
+
+    /////////////////////////////// interface LogicalDirectory ///////////////////////////////
 
     public boolean isFile(URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
         return super.isEntry(name);
@@ -143,17 +168,17 @@ public class LogicalDirectoryImpl extends AbstractAsyncLogicalDirectoryImpl impl
         }
     }
 
-    public LogicalDirectory openLogicalDir(URL relativePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return new LogicalDirectoryImpl(this, super._resolveRelativeURL(relativePath), flags);
+    public LogicalDirectory openLogicalDir(URL relativeUrl, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        return new LogicalDirectoryImpl(this, relativeUrl, flags);
     }
-    public LogicalDirectory openLogicalDir(URL relativePath) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return this.openLogicalDir(relativePath, Flags.READ.getValue());
+    public LogicalDirectory openLogicalDir(URL relativeUrl) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        return new LogicalDirectoryImpl(this, relativeUrl, Flags.READ.getValue());
     }
 
-    public LogicalFile openLogicalFile(URL relativePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return new LogicalFileImpl(this, super._resolveRelativeURL(relativePath), flags);
+    public LogicalFile openLogicalFile(URL relativeUrl, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        return new LogicalFileImpl(this, relativeUrl, flags);
     }
-    public LogicalFile openLogicalFile(URL relativePath) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return this.openLogicalFile(relativePath, Flags.READ.getValue());
+    public LogicalFile openLogicalFile(URL relativeUrl) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        return new LogicalFileImpl(this, relativeUrl, Flags.READ.getValue());
     }
 }

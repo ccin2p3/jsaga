@@ -1,10 +1,10 @@
 package fr.in2p3.jsaga.impl.logicalfile;
 
-import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.MetaDataReader;
 import fr.in2p3.jsaga.adaptor.data.write.MetaDataWriter;
 import fr.in2p3.jsaga.helpers.SAGAPatternFinder;
+import fr.in2p3.jsaga.impl.namespace.AbstractNSDirectoryImpl;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
 import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
 import org.ogf.saga.URL;
@@ -36,9 +36,14 @@ public abstract class AbstractNSEntryImplWithMetaData extends AbstractNSEntryImp
         super(session, url, adaptor, flags);
     }
 
-    /** constructor for open() */
-    public AbstractNSEntryImplWithMetaData(AbstractNSEntryImpl entry, URL url, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-        super(entry, url, flags);
+    /** constructor for NSDirectory.open() */
+    public AbstractNSEntryImplWithMetaData(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+        super(dir, relativeUrl, flags);
+    }
+
+    /** constructor for NSEntry.openAbsolute() */
+    public AbstractNSEntryImplWithMetaData(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+        super(entry, absolutePath, flags);
     }
 
     ////////////////////////////////////// interface Attributes //////////////////////////////////////

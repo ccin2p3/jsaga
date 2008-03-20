@@ -39,9 +39,15 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         this.init(flags);
     }
 
-    /** constructor for open() */
-    public AbstractNSDirectoryImpl(AbstractNSEntryImpl entry, URL url, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(entry, URLFactory.toDirectoryURL(url), flags);
+    /** constructor for NSDirectory.open() */
+    public AbstractNSDirectoryImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        super(dir, URLFactory.toDirectoryURL(relativeUrl), flags);
+        this.init(flags);
+    }
+
+    /** constructor for NSEntry.openAbsolute() */
+    public AbstractNSDirectoryImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        super(entry, URLFactory.toDirectoryPath(absolutePath), flags);
         this.init(flags);
     }
 
@@ -99,7 +105,7 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         if (dir.getScheme()!=null || dir.getUserInfo()!=null || dir.getHost()!=null) {
             throw new IncorrectURL("Was expecting a absolute/relative path instead of: "+dir.toString());
         }
-        m_url = this._resolveRelativeURL(dir);
+        m_url = _resolveRelativeUrl(m_url, dir);
     }
 
     public List<URL> list(String pattern, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IncorrectURL {
@@ -397,19 +403,6 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    protected URL _resolveRelativeURL(URL relativePath) throws NotImplemented, IncorrectURL, BadParameter, NoSuccess {
-        if (relativePath==null) {
-            throw new IncorrectURL("URL must not be null");
-        } else if (relativePath.getScheme()!=null && !relativePath.getScheme().equals(m_url.getScheme())) {
-            throw new IncorrectURL("You must not modify the scheme of the URL: "+ m_url.getScheme());
-        } else if (relativePath.getUserInfo()!=null && !relativePath.getUserInfo().equals(m_url.getUserInfo())) {
-            throw new IncorrectURL("You must not modify the user part of the URL: "+ m_url.getUserInfo());
-        } else if (relativePath.getHost()!=null && !relativePath.getHost().equals(m_url.getHost())) {
-            throw new IncorrectURL("You must not modify the host of the URL: "+ m_url.getHost());
-        }
-        return URLFactory.createURL(m_url, relativePath);
     }
 
     private String[] _listNames(String absolutePath) throws NotImplemented, PermissionDenied, IncorrectState, Timeout, NoSuccess {
