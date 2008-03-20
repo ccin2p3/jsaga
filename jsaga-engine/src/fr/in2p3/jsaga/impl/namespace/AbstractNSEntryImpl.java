@@ -121,19 +121,6 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             throw new NoSuccess(e);
         }
     }
-    protected String _getEntryName() throws NotImplemented {
-        String[] names = m_url.getPath().split("/");
-        String name;
-        if (names.length > 0) {
-            name = names[names.length-1];
-            if (name.equals("")) {
-                name = null;
-            }
-        } else {
-            name = null;
-        }
-        return name;
-    }
 
     public boolean exists() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
         if (m_adaptor instanceof DataReaderAdaptor) {
@@ -438,7 +425,10 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
     }
 
     protected URL _getParentDirURL() throws NotImplemented, BadParameter, NoSuccess {
-        return URLFactory.createParentURL(m_url);
+        return URLFactory.getParentURL(m_url);
+    }
+    protected String _getEntryName() throws NotImplemented {
+        return URLFactory.getName(m_url);
     }
 
     protected void _makeParentDirs() throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, Timeout, NoSuccess {

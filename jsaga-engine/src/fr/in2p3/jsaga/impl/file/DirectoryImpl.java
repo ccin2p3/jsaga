@@ -116,13 +116,23 @@ public class DirectoryImpl extends AbstractAsyncDirectoryImpl implements Directo
         return new FileImpl(this, relativeUrl, Flags.READ.getValue());
     }
 
-    public FileInputStream openFileInputStream(URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        throw new NotImplemented("Not implemented yet..."); //todo: implement method openFileInputStream()
+    public FileInputStream openFileInputStream(URL relativeUrl) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        URL url = _resolveRelativeUrl(m_url, relativeUrl);
+        boolean disconnectable = false;
+        return new FileInputStreamImpl(m_session, url, m_adaptor, disconnectable);
     }
-    public FileOutputStream openFileOutputStream(URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        return this.openFileOutputStream(name, false);
+
+    public FileOutputStream openFileOutputStream(URL relativeUrl) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        URL url = _resolveRelativeUrl(m_url, relativeUrl);
+        boolean disconnectable = false;
+        boolean exclusive = false;
+        boolean append = false;
+        return new FileOutputStreamImpl(m_session, url, m_adaptor, disconnectable, exclusive, append);
     }
-    public FileOutputStream openFileOutputStream(URL name, boolean append) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        throw new NotImplemented("Not implemented yet..."); //todo: implement method openFileOutputStream()
+    public FileOutputStream openFileOutputStream(URL relativeUrl, boolean append) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        URL url = _resolveRelativeUrl(m_url, relativeUrl);
+        boolean disconnectable = false;
+        boolean exclusive = false;
+        return new FileOutputStreamImpl(m_session, url, m_adaptor, disconnectable, exclusive, append);
     }
 }

@@ -20,6 +20,7 @@ import org.ogf.saga.*;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.error.*;
 import org.ogf.saga.file.File;
+import org.ogf.saga.file.FileInputStream;
 import org.ogf.saga.file.*;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
@@ -40,7 +41,7 @@ import java.util.List;
  *
  */
 public class FileImpl extends AbstractAsyncFileImpl implements File {
-    protected InputStream m_inStream;
+    protected FileInputStream m_inStream;
 
     /** constructor for factory */
     public FileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
@@ -62,55 +63,30 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
 
     private void init(int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         FlagsBytes effectiveFlags = new FlagsBytesPhysical(flags);
+        boolean disconnectable = false;
         if (effectiveFlags.contains(Flags.READ)) {
-            if (m_adaptor instanceof FileReader) {
-                try {
-                    m_inStream = ((FileReader)m_adaptor).getInputStream(
-                            m_url.getPath(),
-                            m_url.getQuery());
-                } catch(DoesNotExist e) {
-                    throw new DoesNotExist("File does not exist: "+ m_url, e.getCause());
-                }
-                if (m_inStream == null) {
-                    throw new NoSuccess("[ADAPTOR ERROR] Method getInputStream() must return an InputStream instance", this);
-                }
-            } else {
-                throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
-            }
+            m_inStream = new FileInputStreamImpl(m_session, m_url, m_adaptor, disconnectable);
         }
         if (effectiveFlags.contains(Flags.WRITE)) {
-            if (m_adaptor instanceof FileWriter) {
-                URL parent = super._getParentDirURL();
-                String fileName = super._getEntryName();
-                boolean exclusive = effectiveFlags.contains(Flags.EXCL);
-                boolean append = effectiveFlags.contains(Flags.APPEND);
-                if (exclusive && append) {
-                    throw new BadParameter("Incompatible flags: EXCL and APPEND");
-                }
-                try {
-                    m_outStream = ((FileWriter)m_adaptor).getOutputStream(parent.getPath(), fileName, exclusive, append, m_url.getQuery());
-                } catch(ParentDoesNotExist e) {
-                    // make parent directories, then retry
-                    if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
-                        this._makeParentDirs();
-                        try {
-                            m_outStream = ((FileWriter)m_adaptor).getOutputStream(parent.getPath(), fileName, exclusive, append, m_url.getQuery());
-                        } catch (ParentDoesNotExist e2) {
-                            throw new DoesNotExist("Failed to create parent directory: "+parent, e2.getCause());
-                        }
-                    } else {
-                        throw new DoesNotExist("Parent directory does not exist: "+parent, e.getCause());
+            boolean exclusive = effectiveFlags.contains(Flags.EXCL);
+            boolean append = effectiveFlags.contains(Flags.APPEND);
+            try {
+                m_outStream = new FileOutputStreamImpl(m_session, m_url, m_adaptor, disconnectable, exclusive, append);
+            } catch(DoesNotExist e) {
+                // make parent directories, then retry
+                if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
+                    this._makeParentDirs();
+                    try {
+                        m_outStream = new FileOutputStreamImpl(m_session, m_url, m_adaptor, disconnectable, exclusive, append);
+                    } catch(DoesNotExist e2) {
+                        throw new DoesNotExist("Failed to create parent directory", e2.getCause());
                     }
-                } catch(AlreadyExists e) {
-                    throw new AlreadyExists("File already exists: "+ m_url, e.getCause());
+                } else {
+                    throw e;
                 }
-                if (m_outStream == null) {
-                    throw new NoSuccess("[ADAPTOR ERROR] Method getOutputStream() must return an OutputStream instance", this);
-                }
-            } else {
-                throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
             }
         } else if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
+            // make parent directories
             this._makeParentDirs();
         }
         if (effectiveFlags.contains(Flags.READ) || effectiveFlags.contains(Flags.WRITE)) {

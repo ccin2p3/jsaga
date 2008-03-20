@@ -1,10 +1,10 @@
 package fr.in2p3.jsaga.impl.file;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
-import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
 import fr.in2p3.jsaga.adaptor.data.read.FileReader;
-import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
+import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
+import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
 import fr.in2p3.jsaga.engine.factories.DataAdaptorFactory;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
@@ -64,11 +64,24 @@ public class FileFactoryImpl extends FileFactory {
     }
 
     protected FileInputStream doCreateFileInputStream(Session session, URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        throw new BadParameter("Not implemented yet...");   //todo: implement method doCreateFileInputStream()
+        DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session);
+        if (adaptor instanceof FileReader) {
+            boolean disconnectable = true;
+            return new FileInputStreamImpl(session, name, adaptor, disconnectable);
+        } else {
+            throw new NotImplemented("Not supported for this protocol: "+ name.getScheme());
+        }
     }
 
     protected FileOutputStream doCreateFileOutputStream(Session session, URL name, boolean append) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        throw new BadParameter("Not implemented yet...");   //todo: implement method doCreateFileOutputStream()
+        DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session);
+        if (adaptor instanceof FileWriter) {
+            boolean disconnectable = true;
+            boolean exclusive = false;
+            return new FileOutputStreamImpl(session, name, adaptor, disconnectable, exclusive, append);
+        } else {
+            throw new NotImplemented("Not supported for this protocol: "+ name.getScheme());
+        }
     }
 
     protected Directory doCreateDirectory(Session session, URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {

@@ -81,11 +81,25 @@ public class URLFactory {
         return new URL(resolve(base, name));
     }
 
-    public static URL createParentURL(URL base) throws NotImplemented, BadParameter, NoSuccess {
+    public static URL getParentURL(URL base) throws NotImplemented, BadParameter, NoSuccess {
         // get parent directory
         String parent = (base.getPath().endsWith("/") ? ".." : ".");
         // resolve
         return new URL(resolve(base, parent));
+    }
+
+    public static String getName(URL url) throws NotImplemented {
+        String[] names = url.getPath().split("/");
+        String name;
+        if (names.length > 0) {
+            name = names[names.length-1];
+            if (name.equals("")) {
+                name = null;
+            }
+        } else {
+            name = null;
+        }
+        return name;
     }
 
     private static String resolve(URL base, String name) throws NotImplemented, BadParameter, NoSuccess {

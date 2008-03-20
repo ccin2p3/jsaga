@@ -7,10 +7,10 @@ import org.ogf.saga.SagaObject;
 import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.file.File;
+import org.ogf.saga.file.FileOutputStream;
 import org.ogf.saga.session.Session;
 
 import java.io.IOException;
-import java.io.OutputStream;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -25,7 +25,7 @@ import java.io.OutputStream;
  *
  */
 public abstract class AbstractNSEntryImplWithStream extends AbstractNSEntryImpl implements File {
-    protected OutputStream m_outStream;
+    protected FileOutputStream m_outStream;
 
     /** constructor for factory */
     public AbstractNSEntryImplWithStream(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
