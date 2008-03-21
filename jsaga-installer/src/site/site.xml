@@ -37,11 +37,16 @@
             <item name="FAQ" href="faq.html"/>
         </menu>
         <menu name="Project Documentation" ref="reports"/>
-        <menu name="Adaptors">
+        <menu name="Adaptor Modules">
+            <item name="Default" href="adaptors/jsaga-adaptor-default/index.html"/>
             <item name="Classic" href="adaptors/jsaga-adaptor-classic/index.html"/>
-            <item name="Globus" href="adaptors/jsaga-adaptor-globus/index.html"/>
-            <item name="VOMS" href="adaptors/jsaga-adaptor-voms/index.html"/>
+            <item name="Globus 2.4" href="adaptors/jsaga-adaptor-globus/index.html"/>
+            <item name="Globus WS-GRAM" href="adaptors/jsaga-adaptor-wsgram/index.html"/>
+            <item name="gLite JDL" href="adaptors/jsaga-adaptor-jdl/index.html"/>
+            <item name="gLite WMS" href="adaptors/jsaga-adaptor-wms/index.html"/>
             <item name="SRM" href="adaptors/jsaga-adaptor-srm/index.html"/>
+            <item name="VOMS" href="adaptors/jsaga-adaptor-voms/index.html"/>
+            <item name="Unicore 6" href="adaptors/jsaga-adaptor-unicore6/index.html"/>
         </menu>
         <menu name="Adaptors provided by..."/>
     </body>
