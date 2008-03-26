@@ -18,17 +18,10 @@
     elementFormDefault="qualified"
     attributeFormDefault="unqualified">
 
-        <xsd:import
-            namespace="http://www.w3.org/2005/08/addressing"/>
-
-            <xsd:import
-                namespace="http://docs.oasis-open.org/wsrf/bf-2"/>
-
-            <xsd:import
-                namespace="http://docs.oasis-open.org/wsrf/rp-2"/>
-
-            <xsd:import
-                namespace="http://docs.oasis-open.org/wsrf/rl-2"/>
+    <xsd:import namespace="http://www.w3.org/2005/08/addressing"/>
+    <xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"/>
+    <xsd:import namespace="http://docs.oasis-open.org/wsrf/rp-2"/>
+    <xsd:import namespace="http://docs.oasis-open.org/wsrf/rl-2"/>
 
     <xsd:complexType name="TruncateNotPermittedFaultType">
         <xsd:complexContent>

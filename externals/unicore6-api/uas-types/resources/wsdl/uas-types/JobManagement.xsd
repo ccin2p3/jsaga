@@ -8,21 +8,17 @@
     xmlns:wsrf-rl="http://docs.oasis-open.org/wsrf/rl-2"
     xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
     xmlns:unigrids="http://unigrids.org/2006/04/types"
-    xmlns:ogsa-bp="http://www.ggf.org/namespaces/OGSABasicProfile-1.0.xsd"
+    xmlns:ogsa-bp="http://schemas.ggf.org/ogsa/2006/05/wsrf-bp"
     elementFormDefault="qualified" attributeFormDefault="unqualified">
     
   <!--  ========== Import BaseFaults Types ============ --> 
-  <xsd:import
-    namespace="http://docs.oasis-open.org/wsrf/bf-2"/>
+  <xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"/>
     
   <!--  ========== Import WS-Addressing Types ============ --> 
-  <xsd:import
-    namespace="http://www.w3.org/2005/08/addressing"/>
+  <xsd:import namespace="http://www.w3.org/2005/08/addressing"/>
    
   <!--  ========== Import Base Profile Types ============ -->
-  <xsd:import
-    namespace="http://www.ggf.org/namespaces/OGSABasicProfile-1.0.xsd"
-    schemaLocation="bp-2.xsd"/>
+  <xsd:import namespace="http://schemas.ggf.org/ogsa/2006/05/wsrf-bp"/>
   
   <!--  ========== Import Lifetime ============ --> 
   <xsd:import 

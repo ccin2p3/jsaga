@@ -1,7 +1,7 @@
 <!-- Schema defined in the SOAP Version 1.2 Part 1 specification
      Proposed Recommendation:
      http://www.w3.org/TR/2003/PR-soap12-part1-20030507/
-     $Id: soap-1.2.xsd,v 1.1 2008/03/12 11:38:26 demesy Exp $
+     $Id: soap-1.2.xsd,v 1.2 2008/03/26 12:54:59 demesy Exp $
 
      Copyright (C)2003 W3C(R) (MIT, ERCIM, Keio), All Rights Reserved.
      W3C viability, trademark, document use and software licensing rules

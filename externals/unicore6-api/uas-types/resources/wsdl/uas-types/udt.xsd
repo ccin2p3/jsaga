@@ -7,7 +7,7 @@
     xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
     xmlns:wsrf-rl="http://docs.oasis-open.org/wsrf/rl-2"
     xmlns:unigrids="http://unigrids.org/2006/04/types"
-    xmlns:ogsa-bp="http://www.ggf.org/namespaces/OGSABasicProfile-1.0.xsd"
+    xmlns:ogsa-bp="http://schemas.ggf.org/ogsa/2006/05/wsrf-bp"
     elementFormDefault="qualified" attributeFormDefault="unqualified">
       
   <!--  ========== Import UniGridS types============ --> 
@@ -21,13 +21,11 @@
 
   <!--  ========== Import Lifetime ============ -->
   <xsd:import
-      namespace="http://docs.oasis-open.org/wsrf/rl-2"
-      schemaLocation="http://docs.oasis-open.org/wsrf/rl-2.xsd"/>
+      namespace="http://docs.oasis-open.org/wsrf/rl-2"/>
   
   <!--  ========== Import Base Profile Types ============ -->
   <xsd:import
-    namespace="http://www.ggf.org/namespaces/OGSABasicProfile-1.0.xsd"
-    schemaLocation="bp-2.xsd"/>
+    namespace="http://schemas.ggf.org/ogsa/2006/05/wsrf-bp"/>
   
      <xsd:element name="ExchangeParametersRequest" type="udt:ExchangeParametersRequestType"/>
      <xsd:element name="ExchangeParametersResponse" type="udt:ExchangeParametersResponseType"/>

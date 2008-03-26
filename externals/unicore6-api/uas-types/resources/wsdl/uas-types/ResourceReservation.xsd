@@ -6,7 +6,7 @@
     xmlns:wsa="http://www.w3.org/2005/08/addressing"
     xmlns:wsrf-bf="http://docs.oasis-open.org/wsrf/bf-2"
     xmlns:wsrf-rl="http://docs.oasis-open.org/wsrf/rl-2"
-    xmlns:ogsa-bp="http://www.ggf.org/namespaces/OGSABasicProfile-1.0.xsd"
+    xmlns:ogsa-bp="http://schemas.ggf.org/ogsa/2006/05/wsrf-bp"
     xmlns:tsf="http://unigrids.org/2006/04/services/tsf"
     xmlns:unigrids="http://unigrids.org/2006/04/types"
     xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
@@ -22,16 +22,13 @@
       namespace="http://docs.oasis-open.org/wsrf/rl-2"/>
   
   <!--  ========== Import OGSA-WSRF Basic Profile Types ============ -->
-  <xsd:import
-      namespace="http://schemas.ggf.org/ogsa/2006/01/wsrf-bp"/>
+  <xsd:import namespace="http://schemas.ggf.org/ogsa/2006/05/wsrf-bp"/>
 
   <!--  ========== Import UniGridS types============ -->
-  <xsd:import
-      namespace="http://unigrids.org/2006/04/types" />
+  <xsd:import namespace="http://unigrids.org/2006/04/types" />
 
   <!--  ========== Import TSS types============ -->
-  <xsd:import
-      namespace="http://unigrids.org/2006/04/services/tss"/>
+  <xsd:import namespace="http://unigrids.org/2006/04/services/tss"/>
       
 
   <!--  ========== Message Types for making a ResourceReservation  ============ -->

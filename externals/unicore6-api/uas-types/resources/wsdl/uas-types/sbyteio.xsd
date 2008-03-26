@@ -18,24 +18,12 @@ modified sbyteio.xsd
     elementFormDefault="qualified"
     attributeFormDefault="unqualified">
 
-    <xsd:import
-        namespace="http://www.w3.org/2005/08/addressing"
-        />
+    <xsd:import namespace="http://www.w3.org/2005/08/addressing"/>
+    <xsd:import namespace="http://docs.oasis-open.org/wsrf/rp-2"/>
+    <xsd:import namespace="http://docs.oasis-open.org/wsrf/bf-2"/>
+    <xsd:import namespace="http://docs.oasis-open.org/wsrf/rl-2"/>
 
-    <xsd:import
-        namespace="http://docs.oasis-open.org/wsrf/rp-2"
-        />
-
-    <xsd:import
-        namespace="http://docs.oasis-open.org/wsrf/bf-2"
-        />
-    <xsd:import
-        namespace="http://docs.oasis-open.org/wsrf/rl-2"
-        />
-
-    <xsd:import
-        namespace="http://schemas.ggf.org/byteio/2005/10/byte-io"
-        />
+    <xsd:import namespace="http://schemas.ggf.org/byteio/2005/10/byte-io"/>
 
 
     <xsd:complexType name="SeekNotPermittedFaultType">

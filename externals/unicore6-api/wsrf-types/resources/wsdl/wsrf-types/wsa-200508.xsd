@@ -14,7 +14,7 @@
 
    [1] http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231
 
-   $Id: wsa-200508.xsd,v 1.1 2008/03/12 11:38:26 demesy Exp $
+   $Id: wsa-200508.xsd,v 1.2 2008/03/26 12:54:59 demesy Exp $
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.w3.org/2005/08/addressing" targetNamespace="http://www.w3.org/2005/08/addressing" blockDefault="#all" elementFormDefault="qualified" finalDefault="" attributeFormDefault="unqualified">
 	
