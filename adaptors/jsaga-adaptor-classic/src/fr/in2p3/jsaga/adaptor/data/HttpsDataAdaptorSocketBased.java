@@ -100,17 +100,34 @@ public class HttpsDataAdaptorSocketBased extends HttpDataAdaptorSocketBased impl
         if (m_baseUrl == null) {
             throw new NoSuccess("Connection is closed");
         }
+
+        // get path
         String path = absolutePath + (additionalArgs!=null ? "?"+additionalArgs : "");
+
+        // get request
+        HttpRequest request;
         try {
             SSLSocket socket = (SSLSocket) m_socketFactory.createSocket(m_baseUrl.getHost(), m_baseUrl.getPort());
-            socket.startHandshake();            
-            return new HttpRequest(requestType, path, socket);
+            socket.startHandshake();
+            request = new HttpRequest(requestType, path, socket);
         } catch (UnknownHostException e) {
             throw new DoesNotExist("Unknown host: "+m_baseUrl.getHost(), e);
         } catch (SSLHandshakeException e) {
             throw new PermissionDenied("User not allowed: "+m_userID, e);
         } catch (IOException e) {
             throw new NoSuccess(e);
+        }
+
+        // check status
+        String status = request.getStatus();
+        if (status.endsWith("200 OK")) {
+            return request;
+        } else if (status.endsWith("404 Not Found")) {
+            throw new DoesNotExist(status);
+        } else if (status.endsWith("403 Forbidden")) {
+            throw new PermissionDenied(status);
+        } else {
+            throw new NoSuccess(status);
         }
     }
 }
