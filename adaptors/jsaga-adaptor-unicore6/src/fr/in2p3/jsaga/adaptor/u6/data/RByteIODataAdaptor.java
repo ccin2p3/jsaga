@@ -57,12 +57,12 @@ import java.util.Vector;
  *
  */
 public class RByteIODataAdaptor extends U6Abstract 
-		implements FileWriterPutter, FileReaderGetter,
-				FileWriterStreamFactory, FileReaderStreamFactory {
+		implements FileWriterPutter, FileReaderGetter {
 		
 	protected JKSSecurityAdaptor m_credential;
     protected String m_serverFileSeparator ;
     protected StorageClient m_client;
+    private String rootDirectory = ".";
 	
     public RByteIODataAdaptor() {
     }
@@ -145,13 +145,13 @@ public class RByteIODataAdaptor extends U6Abstract
 		absolutePath = getEntryPath(absolutePath);
     	
 		// get parent
-		String parentDirectory = "";            
+		String parentDirectory = rootDirectory;            
 		if(absolutePath.lastIndexOf(m_serverFileSeparator) > 0) {
 		    parentDirectory = absolutePath.substring(0,absolutePath.lastIndexOf(m_serverFileSeparator));
 		 }
 		
 		// if absolutePath is the root
-		if(absolutePath.equals("")) {
+		if(absolutePath.equals(rootDirectory)) {
 			return true;
 		}
 		
@@ -181,12 +181,12 @@ public class RByteIODataAdaptor extends U6Abstract
 		absolutePath = getEntryPath(absolutePath);
     	
 		// is root path
-		if(absolutePath.equals("")) {
+		if(absolutePath.equals(rootDirectory)) {
 			return true;
 		}				
 		
 		// get parent
-    	String parentDirectory = "";            
+    	String parentDirectory = rootDirectory;            
         if(absolutePath.lastIndexOf(m_serverFileSeparator) > 0) {
             parentDirectory = absolutePath.substring(0,absolutePath.lastIndexOf(m_serverFileSeparator));
         }
@@ -226,7 +226,7 @@ public class RByteIODataAdaptor extends U6Abstract
 		absolutePath = getEntryPath(absolutePath);
 		
 		// get parent
-		String parentDirectory = "";               
+		String parentDirectory = rootDirectory;               
 		if(absolutePath.lastIndexOf(m_serverFileSeparator) > 0) {
 		    parentDirectory = absolutePath.substring(0,absolutePath.lastIndexOf(m_serverFileSeparator));
 		 }
@@ -470,33 +470,7 @@ public class RByteIODataAdaptor extends U6Abstract
         } catch (Throwable e) {
 			throw new NoSuccess("Unable to get file", e);
 		}
-	}	
-
-	public OutputStream getOutputStream(String parentAbsolutePath, String fileName,
-			boolean exclusive, boolean append,
-			String additionalArgs) throws PermissionDenied, BadParameter,
-			AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
-		
-		if(append) {
-			throw new NoSuccess("Append not supported.");
-		}
-        String absolutePath = getEntryPath(parentAbsolutePath)+m_serverFileSeparator+fileName;
-        if (exclusive && exists(absolutePath, additionalArgs)) {
-            // need to check existence explicitly, else exception is never thrown
-            throw new AlreadyExists("File already exists");
-        } else if (!this.exists(parentAbsolutePath, additionalArgs)) {
-            // need to check existence explicitly, else exception is thrown to late (when writing bytes)
-            throw new ParentDoesNotExist("Parent directory does not exist");
-        }
-        return new RByteIOOutputStream(m_client, m_securityManager, absolutePath);
 	}
-
-	public InputStream getInputStream(String absolutePath, String additionalArgs)
-			throws PermissionDenied, BadParameter, DoesNotExist, Timeout,
-			NoSuccess {
-		return new RByteIOInputStream(m_client, m_securityManager, getEntryPath(absolutePath));
-	}
-	
 
     private String getEntryPath(String path) {
         // the path must be like /DEMOSITE/services/<service name>/<storage name>/directory/file.txt
@@ -514,6 +488,10 @@ public class RByteIODataAdaptor extends U6Abstract
         // remove first file separator, a path cannot starts with a file separator 
         if(path.startsWith(m_serverFileSeparator)) {
             path = path.substring(1,path.length());
+        }
+        // replace root directory
+        if(path.equals("")) {
+            path = rootDirectory;
         }
         return path;
     }
