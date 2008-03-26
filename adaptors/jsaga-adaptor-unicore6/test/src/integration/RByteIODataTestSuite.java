@@ -60,6 +60,22 @@ public class RByteIODataTestSuite extends TestSuite {
         public RByteIONSMoveTest() throws Exception {super("rbyteio", "rbyteio");}
         public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
+    public static class RByteIO_to_EmulatorNSCopyTest extends NSCopyTest {
+        public RByteIO_to_EmulatorNSCopyTest() throws Exception {super("rbyteio", "test");}
+        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
+    }
+    public static class RByteIO_to_EmulatorNSCopyFromTest extends NSCopyFromTest {
+        public RByteIO_to_EmulatorNSCopyFromTest() throws Exception {super("rbyteio", "test");}
+        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
+    }
+    public static class RByteIO_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
+        public RByteIO_to_EmulatorNSCopyRecursiveTest() throws Exception {super("rbyteio", "test");}
+        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
+    }
+    public static class RByteIO_to_EmulatorNSMoveTest extends NSMoveTest {
+        public RByteIO_to_EmulatorNSMoveTest() throws Exception {super("rbyteio", "test");}
+        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
+    }
 
     public RByteIODataTestSuite() throws Exception {
         super();
