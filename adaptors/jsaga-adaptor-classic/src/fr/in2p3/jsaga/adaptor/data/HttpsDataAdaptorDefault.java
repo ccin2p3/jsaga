@@ -128,7 +128,7 @@ public class HttpsDataAdaptorDefault extends HttpDataAdaptorDefault implements F
         }
     }
 
-    protected HttpURLConnection getConnection(String absolutePath, String additionalArgs) throws DoesNotExist, NoSuccess {
+    protected HttpURLConnection getConnection(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, NoSuccess {
         HttpURLConnection connection = super.getConnection(absolutePath, additionalArgs);
         if (connection instanceof HttpsURLConnection) {
             // set HTTPS specific parameters
