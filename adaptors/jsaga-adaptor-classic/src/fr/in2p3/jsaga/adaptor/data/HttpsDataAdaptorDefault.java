@@ -27,7 +27,7 @@ import java.util.Map;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * NOTE: this adaptor does not work, use adaptor HttpsDataAdaptorSocketBased instead
  */
 public class HttpsDataAdaptorDefault extends HttpDataAdaptorDefault implements FileReaderStreamFactory {
     private static final String MUTUAL_AUTHENTICATION = "MutualAuthentication";
