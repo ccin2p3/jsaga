@@ -132,6 +132,9 @@ public abstract class AbstractNSCopyTest extends AbstractNSDirectoryTest {
         Buffer buffer = BufferFactory.createBuffer(1024);
         int len = reader.read(buffer);
         assertEquals(
+                expectedContent.length(),
+                len);
+        assertEquals(
                 expectedContent,
                 new String(buffer.getData(), 0, len));
         reader.close(0);
