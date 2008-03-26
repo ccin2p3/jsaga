@@ -22,8 +22,8 @@ public class NSMoveTest extends AbstractNSCopyTest {
     }
 
     public void test_move() throws Exception {
-        URL target = createURL(m_rootUrl2, DEFAULT_FILENAME);
-        m_file.move(m_rootUrl2, Flags.NONE.getValue());
+        URL target = createURL(m_dirUrl2, DEFAULT_FILENAME);
+        m_file.move(m_dirUrl2, Flags.NONE.getValue());
         checkCopied(target, DEFAULT_CONTENT);
         try {
             NSFactory.createNSEntry(m_session, m_fileUrl, Flags.NONE.getValue());
@@ -33,8 +33,8 @@ public class NSMoveTest extends AbstractNSCopyTest {
     }
 
     public void test_rename() throws Exception {
-        URL target = createURL(m_rootUrl, DEFAULT_FILENAME);
-        m_file.move(m_rootUrl, Flags.NONE.getValue());
+        URL target = createURL(m_dirUrl, DEFAULT_FILENAME);
+        m_file.move(m_dirUrl, Flags.NONE.getValue());
         checkCopied(target, DEFAULT_CONTENT);
         try {
             NSFactory.createNSEntry(m_session, m_fileUrl, Flags.NONE.getValue());
@@ -44,11 +44,11 @@ public class NSMoveTest extends AbstractNSCopyTest {
     }
 
     public void test_move_recurse() throws Exception {
-        URL target = createURL(m_dirUrl2, DEFAULT_DIRNAME+DEFAULT_FILENAME);
-        m_dir.move(m_dirUrl2, Flags.RECURSIVE.getValue());
+        URL target = createURL(m_subDirUrl2, DEFAULT_SUBDIRNAME +DEFAULT_FILENAME);
+        m_subDir.move(m_subDirUrl2, Flags.RECURSIVE.getValue());
         checkCopied(target, DEFAULT_CONTENT);
         try {
-            NSFactory.createNSDirectory(m_session, m_dirUrl, Flags.NONE.getValue());
+            NSFactory.createNSDirectory(m_session, m_subDirUrl, Flags.NONE.getValue());
             fail("Expected DoesNotExist exception");
         } catch(DoesNotExist e) {
         }

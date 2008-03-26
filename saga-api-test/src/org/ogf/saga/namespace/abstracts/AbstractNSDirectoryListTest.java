@@ -24,14 +24,14 @@ public abstract class AbstractNSDirectoryListTest extends AbstractNSDirectoryTes
     }
 
     public void test_changeDir() throws Exception {
-        m_dir.changeDir(new URL(".."));
+        m_subDir.changeDir(new URL(".."));
         assertEquals(
-                DEFAULT_ROOTNAME,
-                m_dir.getName().getPath()+"/");
+                DEFAULT_DIRNAME,
+                m_subDir.getName().getPath()+"/");
     }
 
     public void test_list() throws Exception {
-        List list = m_dir.list(DEFAULT_FILEPATTERN, Flags.NONE.getValue());
+        List list = m_subDir.list(DEFAULT_FILEPATTERN, Flags.NONE.getValue());
         assertEquals(
                 1,
                 list.size());
@@ -42,8 +42,8 @@ public abstract class AbstractNSDirectoryListTest extends AbstractNSDirectoryTes
 
     public void test_list_empty() throws Exception {
         try {
-            m_dir.remove(DEFAULT_FILENAME);
-            List list = m_dir.list();
+            m_subDir.remove(DEFAULT_FILENAME);
+            List list = m_subDir.list();
             assertEquals(
                     0,
                     list.size());
@@ -53,7 +53,7 @@ public abstract class AbstractNSDirectoryListTest extends AbstractNSDirectoryTes
     }
     
     public void test_list_file() throws Exception {
-        List list = m_dir.list(DEFAULT_FILENAME, Flags.NONE.getValue());
+        List list = m_subDir.list(DEFAULT_FILENAME, Flags.NONE.getValue());
         assertEquals(
                 1,
                 list.size());
@@ -63,23 +63,23 @@ public abstract class AbstractNSDirectoryListTest extends AbstractNSDirectoryTes
     }
 
     public void test_list_directories() throws Exception {
-        List list = m_root.list("*/", Flags.NONE.getValue());
+        List list = m_dir.list("*/", Flags.NONE.getValue());
         assertEquals(
                 1,
                 list.size());
-        assertEquals(DEFAULT_DIRNAME,
+        assertEquals(DEFAULT_SUBDIRNAME,
                 list.get(0).toString());
     }
 
     public void test_list_no_directory() throws Exception {
-        List list = m_dir.list("*/", Flags.NONE.getValue());
+        List list = m_subDir.list("*/", Flags.NONE.getValue());
         assertEquals(
                 0,
                 list.size());
     }
 
     public void test_find() throws Exception {
-        List list = m_dir.find(DEFAULT_FILEPATTERN, Flags.NONE.getValue());
+        List list = m_subDir.find(DEFAULT_FILEPATTERN, Flags.NONE.getValue());
         assertEquals(
                 1,
                 list.size());
@@ -89,41 +89,41 @@ public abstract class AbstractNSDirectoryListTest extends AbstractNSDirectoryTes
     }
 
     public void test_find_norecurse() throws Exception {
-        List list = m_root.find(DEFAULT_FILEPATTERN, Flags.NONE.getValue());
+        List list = m_dir.find(DEFAULT_FILEPATTERN, Flags.NONE.getValue());
         assertEquals(
                 0,
                 list.size());
     }
 
     public void test_find_recurse() throws Exception {
-        List list = m_root.find(DEFAULT_FILEPATTERN, Flags.RECURSIVE.getValue());
+        List list = m_dir.find(DEFAULT_FILEPATTERN, Flags.RECURSIVE.getValue());
         assertEquals(
                 1,
                 list.size());
         assertEquals(
-                DEFAULT_DIRNAME+DEFAULT_FILENAME,
+                DEFAULT_SUBDIRNAME +DEFAULT_FILENAME,
                 list.get(0).toString());
     }
 
     public void test_getNumEntries() throws Exception {
         assertEquals(
                 1,
-                m_dir.getNumEntries());
+                m_subDir.getNumEntries());
     }
 
     public void test_getEntry() throws Exception {
         assertEquals(
                 DEFAULT_FILENAME,
-                m_dir.getEntry(0).toString());
+                m_subDir.getEntry(0).toString());
     }
 
     /////////////////////////////////// overloaded methods ///////////////////////////////////
 
     public void test_isDir() throws Exception {
-        assertTrue(m_dir.isDir());
+        assertTrue(m_subDir.isDir());
     }
 
     public void test_isEntry() throws Exception {
-        assertFalse(m_dir.isEntry());
+        assertFalse(m_subDir.isEntry());
     }
 }

@@ -22,9 +22,9 @@ public class IntegrationClean extends AbstractNSCopyTest {
     protected void setUp() throws Exception {
         // do not invoke super.setUp()
         m_toBeRemoved = true;
-        m_root = NSFactory.createNSDirectory(m_session, m_rootUrl, Flags.NONE.getValue());
-        if (m_rootUrl2 != null) {
-            m_root2 = NSFactory.createNSDirectory(m_session, m_rootUrl2, Flags.NONE.getValue());
+        m_dir = NSFactory.createNSDirectory(m_session, m_dirUrl, Flags.NONE.getValue());
+        if (m_dirUrl2 != null) {
+            m_dir2 = NSFactory.createNSDirectory(m_session, m_dirUrl2, Flags.NONE.getValue());
         }
     }
 

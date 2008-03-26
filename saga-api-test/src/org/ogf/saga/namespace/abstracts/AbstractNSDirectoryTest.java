@@ -17,7 +17,7 @@ import org.ogf.saga.namespace.NSDirectory;
  */
 public abstract class AbstractNSDirectoryTest extends AbstractNSEntryTest {
     // setup
-    protected NSDirectory m_dir;
+    protected NSDirectory m_subDir;
 
     public AbstractNSDirectoryTest(String protocol) throws Exception {
         super(protocol);
@@ -25,12 +25,12 @@ public abstract class AbstractNSDirectoryTest extends AbstractNSEntryTest {
 
     protected void setUp() throws Exception {
         super.setUp();
-        m_dir = m_root.openDir(m_dirUrl, Flags.NONE.getValue());
+        m_subDir = m_dir.openDir(m_subDirUrl, Flags.NONE.getValue());
     }
 
     protected void tearDown() throws Exception {
-        if (m_dir != null) {
-            m_dir.close();
+        if (m_subDir != null) {
+            m_subDir.close();
         }
         super.tearDown();
     }

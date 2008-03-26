@@ -24,19 +24,19 @@ public class NSCopyTest extends AbstractNSCopyTest {
     }
 
     public void test_copy() throws Exception {
-        URL target = createURL(m_rootUrl2, DEFAULT_FILENAME);
-        m_file.copy(m_rootUrl2, Flags.NONE.getValue());
+        URL target = createURL(m_dirUrl2, DEFAULT_FILENAME);
+        m_file.copy(m_dirUrl2, Flags.NONE.getValue());
         checkCopied(target, DEFAULT_CONTENT);
     }
 
     public void test_copy_and_rename() throws Exception {
-        URL target = createURL(m_dirUrl2, "copy.txt");
+        URL target = createURL(m_subDirUrl2, "copy.txt");
         m_file.copy(target, Flags.NONE.getValue());
         checkCopied(target, DEFAULT_CONTENT);
     }
 
     public void test_copy_nooverwrite() throws Exception {
-        URL target = createURL(m_dirUrl2, DEFAULT_FILENAME_2);
+        URL target = createURL(m_subDirUrl2, DEFAULT_FILENAME_2);
         try {
             m_file.copy(target, Flags.NONE.getValue());
             fail("Expected AlreadyExist exception");
@@ -46,7 +46,7 @@ public class NSCopyTest extends AbstractNSCopyTest {
     }
 
     public void test_copy_overwrite() throws Exception {
-        URL target = createURL(m_dirUrl2, DEFAULT_FILENAME_2);
+        URL target = createURL(m_subDirUrl2, DEFAULT_FILENAME_2);
         m_file.copy(target, Flags.OVERWRITE.getValue());
         checkCopied(target, DEFAULT_CONTENT);
     }
@@ -54,17 +54,17 @@ public class NSCopyTest extends AbstractNSCopyTest {
     public void test_copy_lateExistenceCheck() throws Exception {
         NSEntry entry = null;
         try {
-            entry = NSFactory.createNSEntry(m_session, createURL(m_dirUrl, "unexisting.txt"), FLAGS_BYPASSEXIST);
+            entry = NSFactory.createNSEntry(m_session, createURL(m_subDirUrl, "unexisting.txt"), FLAGS_BYPASSEXIST);
         } catch(DoesNotExist e) {
             fail("Unexpected DoesNotExist exception");
         }
         try {
-            entry.copy(m_dirUrl2, Flags.NONE.getValue());
+            entry.copy(m_subDirUrl2, Flags.NONE.getValue());
             fail("Expected IncorrectState exception");
         } catch(IncorrectState e) {
         }
         try {
-            NSFactory.createNSEntry(m_session, createURL(m_dirUrl2, "unexisting.txt"), Flags.NONE.getValue());
+            NSFactory.createNSEntry(m_session, createURL(m_subDirUrl2, "unexisting.txt"), Flags.NONE.getValue());
             fail("Expected DoesNotExist exception");
         } catch(DoesNotExist e) {
         }

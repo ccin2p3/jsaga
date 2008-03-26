@@ -26,27 +26,27 @@ import org.ogf.saga.session.SessionFactory;
  */
 public abstract class AbstractNSEntryTest extends AbstractTest {
     // test data
-    protected static final String DEFAULT_ROOTNAME = "root/";
     protected static final String DEFAULT_DIRNAME = "dir/";
+    protected static final String DEFAULT_SUBDIRNAME = "subdir/";
     protected static final String DEFAULT_FILENAME = "file1.txt";
     protected static final String DEFAULT_FILEPATTERN = "file*";
     protected static final String DEFAULT_CONTENT = "Content of file 1...";
     protected static final String DEFAULT_PHYSICAL = "physical1.txt";
     protected static final String DEFAULT_PHYSICAL2 = "physical2.txt";
-    protected static final int FLAGS_ROOT = Flags.CREATE.or(Flags.EXCL);
+    protected static final int FLAGS_DIR = Flags.CREATE.or(Flags.EXCL);
     protected static final int FLAGS_FILE = Flags.WRITE.or(Flags.EXCL.or(Flags.CREATEPARENTS));
 
     // configuration
-    protected URL m_rootUrl;
     protected URL m_dirUrl;
+    protected URL m_subDirUrl;
     protected URL m_fileUrl;
-    protected URL m_physicalRootUrl;
+    protected URL m_physicalDirUrl;
     protected URL m_physicalFileUrl;
     protected URL m_physicalFileUrl2;
     protected Session m_session;
 
     // setup
-    protected NSDirectory m_root;
+    protected NSDirectory m_dir;
     protected NSEntry m_file;
     protected boolean m_toBeRemoved;
 
@@ -55,16 +55,16 @@ public abstract class AbstractNSEntryTest extends AbstractTest {
 
         // configure
         URL baseUrl = new URL(getRequiredProperty(protocol, CONFIG_BASE_URL).replaceAll(" ", "%20"));
-        m_rootUrl = createURL(baseUrl, DEFAULT_ROOTNAME);
-        m_dirUrl = createURL(m_rootUrl, DEFAULT_DIRNAME);
-        m_fileUrl = createURL(m_dirUrl, DEFAULT_FILENAME);
+        m_dirUrl = createURL(baseUrl, DEFAULT_DIRNAME);
+        m_subDirUrl = createURL(m_dirUrl, DEFAULT_SUBDIRNAME);
+        m_fileUrl = createURL(m_subDirUrl, DEFAULT_FILENAME);
         m_session = SessionFactory.createSession(true);
         if (getOptionalProperty(protocol, CONFIG_PHYSICAL_PROTOCOL) != null) {
             String physicalProtocol = getOptionalProperty(protocol, CONFIG_PHYSICAL_PROTOCOL);
             URL basePhysicalUrl = new URL(getRequiredProperty(physicalProtocol, CONFIG_BASE_URL));
-            m_physicalRootUrl = createURL(basePhysicalUrl, DEFAULT_ROOTNAME);
-            m_physicalFileUrl = createURL(m_physicalRootUrl, DEFAULT_PHYSICAL);
-            m_physicalFileUrl2 = createURL(m_physicalRootUrl, DEFAULT_PHYSICAL2);
+            m_physicalDirUrl = createURL(basePhysicalUrl, DEFAULT_DIRNAME);
+            m_physicalFileUrl = createURL(m_physicalDirUrl, DEFAULT_PHYSICAL);
+            m_physicalFileUrl2 = createURL(m_physicalDirUrl, DEFAULT_PHYSICAL2);
         }
     }
 
@@ -73,8 +73,8 @@ public abstract class AbstractNSEntryTest extends AbstractTest {
         super.setUp();
         try {
             // read-write protocol
-            m_root = NSFactory.createNSDirectory(m_session, m_rootUrl, FLAGS_ROOT);
-            m_file = m_root.open(m_fileUrl, FLAGS_FILE);
+            m_dir = NSFactory.createNSDirectory(m_session, m_dirUrl, FLAGS_DIR);
+            m_file = m_dir.open(m_fileUrl, FLAGS_FILE);
             if (m_file instanceof File) {
                 Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT.getBytes());
                 ((File)m_file).write(buffer);
@@ -89,8 +89,8 @@ public abstract class AbstractNSEntryTest extends AbstractTest {
         } catch(NotImplemented e) {
             // read-only protocol
             try {
-                m_root = NSFactory.createNSDirectory(m_session, m_rootUrl, Flags.NONE.getValue());
-                m_file = m_root.open(m_fileUrl, Flags.NONE.getValue());
+                m_dir = NSFactory.createNSDirectory(m_session, m_dirUrl, Flags.NONE.getValue());
+                m_file = m_dir.open(m_fileUrl, Flags.NONE.getValue());
                 m_toBeRemoved = false;
             } catch(DoesNotExist e2) {
                 throw new DoesNotExist("Please create the expected files and directories for test suite (http://grid.in2p3.fr/jsaga-dev/faq.html#create-test-entries)", e2);
@@ -107,10 +107,10 @@ public abstract class AbstractNSEntryTest extends AbstractTest {
             m_file.close();
         }
         if (m_toBeRemoved) {
-            m_root.remove(Flags.RECURSIVE.getValue());
+            m_dir.remove(Flags.RECURSIVE.getValue());
         }
-        if (m_root != null) {
-            m_root.close();
+        if (m_dir != null) {
+            m_dir.close();
         }
         super.tearDown();
     }

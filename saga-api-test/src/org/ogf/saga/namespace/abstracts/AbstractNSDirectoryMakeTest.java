@@ -21,13 +21,13 @@ import java.lang.Exception;
 public abstract class AbstractNSDirectoryMakeTest extends AbstractNSDirectoryTest {
 
 	// subdir configuration
-	protected static final String DEFAULT_SUBDIRNAME = "subdir/";
-	protected URL m_subDirUrl;
-    protected NSDirectory m_subDir;
+	protected static final String DEFAULT_SUBDIRNAME_2 = "subdir2/";
+	protected URL m_subDirUrl2;
+    protected NSDirectory m_subDir2;
 
     public AbstractNSDirectoryMakeTest(String protocol) throws Exception {
         super(protocol);
-        m_subDirUrl = createURL(m_dirUrl, DEFAULT_SUBDIRNAME);
+        m_subDirUrl2 = createURL(m_subDirUrl, DEFAULT_SUBDIRNAME_2);
     }
 
     protected void setUp() throws Exception {
@@ -35,35 +35,35 @@ public abstract class AbstractNSDirectoryMakeTest extends AbstractNSDirectoryTes
     }
 
     protected void tearDown() throws Exception {
-        if (m_subDir != null) {
-        	m_subDir.close();
+        if (m_subDir2 != null) {
+        	m_subDir2.close();
         }
         super.tearDown();
     }
 
     public void test_makeDir_child() throws Exception {
-    	m_dir.remove(Flags.RECURSIVE.getValue());
+    	m_subDir.remove(Flags.RECURSIVE.getValue());
         try {
-    		NSFactory.createNSDirectory(m_session, m_subDirUrl, Flags.CREATE.getValue());
+    		NSFactory.createNSDirectory(m_session, m_subDirUrl2, Flags.CREATE.getValue());
             fail("Expected DoesNotExist exception");
         } catch(DoesNotExist e) {
         }
     }
 
     public void test_makeDir_recursive() throws Exception {
-    	m_dir.remove(Flags.RECURSIVE.getValue());
-    	m_subDir = NSFactory.createNSDirectory(m_session, m_subDirUrl, Flags.CREATE.or(Flags.CREATEPARENTS));
-    	assertEquals(true, m_subDir.exists(m_subDirUrl));
+    	m_subDir.remove(Flags.RECURSIVE.getValue());
+    	m_subDir2 = NSFactory.createNSDirectory(m_session, m_subDirUrl2, Flags.CREATE.or(Flags.CREATEPARENTS));
+    	assertEquals(true, m_subDir2.exists(m_subDirUrl2));
     }
 
     public void test_makeDir_noexclusive() throws Exception {
-    	NSFactory.createNSDirectory(m_session, m_dirUrl, Flags.CREATE.getValue());
-		assertEquals(true, m_dir.exists(m_dirUrl));
+    	NSFactory.createNSDirectory(m_session, m_subDirUrl, Flags.CREATE.getValue());
+		assertEquals(true, m_subDir.exists(m_subDirUrl));
     }
 
     public void test_makeDir_exclusive() throws Exception {
     	try {
-    		NSFactory.createNSDirectory(m_session, m_dirUrl, Flags.CREATE.or(Flags.EXCL));
+    		NSFactory.createNSDirectory(m_session, m_subDirUrl, Flags.CREATE.or(Flags.EXCL));
             fail("Expected AlreadyExist exception");
         } catch(AlreadyExists e) {
         }
@@ -71,18 +71,18 @@ public abstract class AbstractNSDirectoryMakeTest extends AbstractNSDirectoryTes
 
 
     public void test_remove() throws Exception {
-        m_dir.remove(Flags.RECURSIVE.getValue());
+        m_subDir.remove(Flags.RECURSIVE.getValue());
         try {
-            NSFactory.createNSDirectory(m_session, m_dirUrl, Flags.NONE.getValue());
+            NSFactory.createNSDirectory(m_session, m_subDirUrl, Flags.NONE.getValue());
             fail("Expected DoesNotExist exception");
         } catch(DoesNotExist e) {
         }
     }
 
     public void test_remove_norecursive() throws Exception {
-    	m_subDir = m_root.openDir(m_subDirUrl, Flags.CREATE.getValue());
+    	m_subDir2 = m_dir.openDir(m_subDirUrl2, Flags.CREATE.getValue());
         try {
-        	m_dir.remove(Flags.NONE.getValue());
+        	m_subDir.remove(Flags.NONE.getValue());
             fail("Expected NoSuccess exception");
         } catch(NoSuccess e) {
         }

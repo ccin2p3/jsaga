@@ -22,16 +22,16 @@ public class DirectoryTest extends AbstractNSDirectoryTest {
     }
 
     public void test_openDir() throws Exception {
-        NSDirectory dir = m_dir.openDir(new URL(".."), Flags.NONE.getValue());
+        NSDirectory dir = m_subDir.openDir(new URL(".."), Flags.NONE.getValue());
         assertTrue(
                 dir instanceof Directory);
         assertEquals(
-                DEFAULT_ROOTNAME,
+                DEFAULT_DIRNAME,
                 dir.getName().getPath()+"/");
     }
 
     public void test_openEntry() throws Exception {
-        NSEntry entry = m_dir.open(new URL(DEFAULT_FILENAME), Flags.NONE.getValue());
+        NSEntry entry = m_subDir.open(new URL(DEFAULT_FILENAME), Flags.NONE.getValue());
         assertTrue(
                 entry instanceof File);
         assertEquals(

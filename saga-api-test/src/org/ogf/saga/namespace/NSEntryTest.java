@@ -29,7 +29,7 @@ public class NSEntryTest extends AbstractNSEntryTest {
     }
 
     public void test_getCWD() throws Exception {
-        URL expected = new URL(m_dirUrl.toString());
+        URL expected = new URL(m_subDirUrl.toString());
         expected.setFragment(null);
         assertEquals(
                 expected.toString(),
@@ -44,7 +44,7 @@ public class NSEntryTest extends AbstractNSEntryTest {
 
     public void test_unexisting() throws Exception {
         try {
-            NSFactory.createNSEntry(m_session, createURL(m_dirUrl, "unexisting.txt"), Flags.NONE.getValue());
+            NSFactory.createNSEntry(m_session, createURL(m_subDirUrl, "unexisting.txt"), Flags.NONE.getValue());
             fail("Expected DoesNotExist exception");
         } catch(DoesNotExist e) {
         }

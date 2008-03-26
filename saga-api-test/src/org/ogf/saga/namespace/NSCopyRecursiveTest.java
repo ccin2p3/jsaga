@@ -24,9 +24,9 @@ public class NSCopyRecursiveTest extends AbstractNSCopyTest {
     }
 
     public void test_copy_norecurse() throws Exception {
-        URL target = createURL(m_dirUrl2, DEFAULT_DIRNAME);
+        URL target = createURL(m_subDirUrl2, DEFAULT_SUBDIRNAME);
         try {
-            m_dir.copy(m_dirUrl2, Flags.NONE.getValue());
+            m_subDir.copy(m_subDirUrl2, Flags.NONE.getValue());
             fail("Expected BadParameter exception");
         } catch(BadParameter e) {
         }
@@ -38,15 +38,15 @@ public class NSCopyRecursiveTest extends AbstractNSCopyTest {
     }
 
     public void test_copy_recurse() throws Exception {
-        URL target = createURL(m_dirUrl2, DEFAULT_DIRNAME+DEFAULT_FILENAME);
-        m_dir.copy(m_dirUrl2, Flags.RECURSIVE.getValue());
+        URL target = createURL(m_subDirUrl2, DEFAULT_SUBDIRNAME +DEFAULT_FILENAME);
+        m_subDir.copy(m_subDirUrl2, Flags.RECURSIVE.getValue());
         checkCopied(target, DEFAULT_CONTENT);
     }
 
     public void test_copy_recurse_nooverwrite() throws Exception {
-        URL target = createURL(m_rootUrl2, DEFAULT_DIRNAME+DEFAULT_FILENAME);
+        URL target = createURL(m_dirUrl2, DEFAULT_SUBDIRNAME +DEFAULT_FILENAME);
         try {
-            m_dir.copy(m_rootUrl2, Flags.RECURSIVE.getValue());
+            m_subDir.copy(m_dirUrl2, Flags.RECURSIVE.getValue());
             fail("Expected AlreadyExists exception");
         } catch(AlreadyExists e) {
         }
@@ -58,8 +58,8 @@ public class NSCopyRecursiveTest extends AbstractNSCopyTest {
     }
 
     public void test_copy_recurse_overwrite() throws Exception {
-        URL target = createURL(m_rootUrl2, DEFAULT_DIRNAME+DEFAULT_FILENAME);
-        m_dir.copy(m_rootUrl2, Flags.RECURSIVE.or(Flags.OVERWRITE));
+        URL target = createURL(m_dirUrl2, DEFAULT_SUBDIRNAME +DEFAULT_FILENAME);
+        m_subDir.copy(m_dirUrl2, Flags.RECURSIVE.or(Flags.OVERWRITE));
         checkCopied(target, DEFAULT_CONTENT);
     }
 }

@@ -29,8 +29,8 @@ public class NSLinkTest extends AbstractNSEntryTest {
 
     public NSLinkTest(String protocol) throws Exception {
         super(protocol);
-        m_linkUrl = createURL(m_rootUrl, DEFAULT_LINKNAME);
-        m_linkUrl2 = createURL(m_rootUrl, DEFAULT_LINKNAME_2);
+        m_linkUrl = createURL(m_dirUrl, DEFAULT_LINKNAME);
+        m_linkUrl2 = createURL(m_dirUrl, DEFAULT_LINKNAME_2);
     }
 
     protected void setUp() throws Exception {

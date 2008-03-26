@@ -83,8 +83,8 @@ public class LogicalFileWriteTest extends AbstractNSEntryWriteTest {
     public void test_replicate() throws Exception {
         if (m_file instanceof LogicalFile) {
             // setUp()
-            Directory physicalRoot = (Directory) NSFactory.createNSDirectory(m_session, m_physicalRootUrl, FLAGS_ROOT);
-            File physicalFile = (File) physicalRoot.open(m_physicalFileUrl, FLAGS_FILE);
+            Directory physicalDir = (Directory) NSFactory.createNSDirectory(m_session, m_physicalDirUrl, FLAGS_DIR);
+            File physicalFile = (File) physicalDir.open(m_physicalFileUrl, FLAGS_FILE);
             Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT.getBytes());
             physicalFile.write(buffer);
             physicalFile.close();
@@ -99,8 +99,8 @@ public class LogicalFileWriteTest extends AbstractNSEntryWriteTest {
             checkWrited(m_physicalFileUrl2, DEFAULT_CONTENT);
             
             // tearDown()
-            physicalRoot.remove(Flags.RECURSIVE.getValue());
-            physicalRoot.close();
+            physicalDir.remove(Flags.RECURSIVE.getValue());
+            physicalDir.close();
         } else {
             fail("Not an instance of class: LogicalFile");
         }
