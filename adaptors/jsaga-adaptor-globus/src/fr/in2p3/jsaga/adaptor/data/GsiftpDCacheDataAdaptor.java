@@ -40,7 +40,7 @@ public class GsiftpDCacheDataAdaptor extends GsiftpDataAdaptorAbstract {
     }
 
     /** RNFR command is not supported */
-    public boolean exists(String absolutePath) throws PermissionDenied, Timeout, NoSuccess {
+    public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
         try {
             m_client.getSize(absolutePath);
             return true;
@@ -56,7 +56,7 @@ public class GsiftpDCacheDataAdaptor extends GsiftpDataAdaptorAbstract {
     }
 
     /** MLST command is not supported */
-    public boolean isDirectory(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isDirectory(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         boolean isDirectory;
         String savDir;
         try {

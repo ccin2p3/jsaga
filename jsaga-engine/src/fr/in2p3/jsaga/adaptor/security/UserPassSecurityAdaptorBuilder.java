@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.adaptor.security;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
+import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
 import fr.in2p3.jsaga.engine.config.attributes.FilePropertiesAttributesParser;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.IncorrectState;

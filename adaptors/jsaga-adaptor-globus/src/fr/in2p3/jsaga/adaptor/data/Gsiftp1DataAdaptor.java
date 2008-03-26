@@ -40,7 +40,7 @@ public class Gsiftp1DataAdaptor extends GsiftpDataAdaptorAbstract {
     }
 
     /** MLST command is not supported */
-    public boolean isDirectory(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isDirectory(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         boolean isDirectory;
         String savDir;
         try {

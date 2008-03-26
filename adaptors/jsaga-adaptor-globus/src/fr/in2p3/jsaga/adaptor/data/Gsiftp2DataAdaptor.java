@@ -74,7 +74,7 @@ public class Gsiftp2DataAdaptor extends GsiftpDataAdaptorAbstract {
     }
 
     /** override super.isDirectory() to use mlst command */
-    public boolean isDirectory(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isDirectory(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         try {
             m_client.setPassiveMode(false);
             MlsxEntry entry = m_client.mlst(absolutePath);

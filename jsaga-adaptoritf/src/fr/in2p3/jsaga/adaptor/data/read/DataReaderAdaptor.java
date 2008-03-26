@@ -19,18 +19,20 @@ public interface DataReaderAdaptor extends DataAdaptor {
     /**
      * Tests this entry for existing.
      * @param absolutePath the absolute path of the entry.
+     * @param additionalArgs adaptor specific arguments.
      * @return true if the entry exists.
      */
-    public boolean exists(String absolutePath)
+    public boolean exists(String absolutePath, String additionalArgs)
         throws PermissionDenied, Timeout, NoSuccess;
 
     /**
      * Tests this entry for being a directory.
      * @param absolutePath the absolute path of the entry.
+     * @param additionalArgs adaptor specific arguments.
      * @return true if the entry is a directory.
      * @throws DoesNotExist if <code>absolutePath</code> does not exist.
      */
-    public boolean isDirectory(String absolutePath)
+    public boolean isDirectory(String absolutePath, String additionalArgs)
         throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
 
     /**
@@ -38,9 +40,20 @@ public interface DataReaderAdaptor extends DataAdaptor {
      * a link or a directory, this method returns <code>false</code>, although
      * strictly speaking, directories and links are namespace entries as well.
      * @param absolutePath the absolute path of the entry.
+     * @param additionalArgs adaptor specific arguments.
      * @return true if the entry is a namespace entry.
      * @throws DoesNotExist if <code>absolutePath</code> does not exist.
      */
-    public boolean isEntry(String absolutePath)
+    public boolean isEntry(String absolutePath, String additionalArgs)
+        throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
+
+    /**
+     * Lists all the entries in the directory <code>absolutePath</code>.
+     * @param absolutePath the directory containing entries to list.
+     * @param additionalArgs adaptor specific arguments.
+     * @return the entry attributes.
+     * @throws DoesNotExist if <code>absolutePath</code> does not exist.
+     */
+    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs)
         throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
 }

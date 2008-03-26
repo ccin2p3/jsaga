@@ -33,7 +33,7 @@ public class GsiftpDefaultDataAdaptor extends GsiftpDataAdaptorAbstract {
         return null;
     }
 
-    public boolean isDirectory(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isDirectory(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         throw new NoSuccess("INTERNAL ERROR: this should never occur");
     }
 

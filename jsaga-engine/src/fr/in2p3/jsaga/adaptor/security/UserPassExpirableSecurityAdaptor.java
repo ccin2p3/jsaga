@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.security;
 
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.NotImplemented;

@@ -2,11 +2,11 @@ package fr.in2p3.jsaga.adaptor.data;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.data.optimise.*;
-import fr.in2p3.jsaga.adaptor.data.read.*;
-import fr.in2p3.jsaga.adaptor.data.read.FileReader;
-import fr.in2p3.jsaga.adaptor.data.write.DirectoryWriter;
-import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
+import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
+import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
+import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
+import fr.in2p3.jsaga.adaptor.data.read.FileReaderGetter;
+import fr.in2p3.jsaga.adaptor.data.write.FileWriterPutter;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import org.globus.ftp.FeatureList;
 import org.globus.ftp.exception.ServerException;
@@ -27,7 +27,7 @@ import java.util.Map;
 /**
  *
  */
-public class GsiftpDataAdaptor implements FileReader, FileWriter, DirectoryReader, DirectoryWriter, DataCopy, DataRename, DataGet, DataPut {
+public class GsiftpDataAdaptor implements FileReaderGetter, FileWriterPutter, DataCopy, DataRename {
     private GsiftpDataAdaptorAbstract m_adaptor;
 
     public GsiftpDataAdaptor() {
@@ -101,38 +101,28 @@ public class GsiftpDataAdaptor implements FileReader, FileWriter, DirectoryReade
         m_adaptor.disconnect();
     }
 
-    public boolean exists(String absolutePath) throws PermissionDenied, Timeout, NoSuccess {
-        return m_adaptor.exists(absolutePath);
+    public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
+        return m_adaptor.exists(absolutePath, additionalArgs);
     }
 
-    public boolean isDirectory(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        return m_adaptor.isDirectory(absolutePath);
+    public boolean isDirectory(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        return m_adaptor.isDirectory(absolutePath, additionalArgs);
     }
 
-    public boolean isEntry(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        return m_adaptor.isEntry(absolutePath);
+    public boolean isEntry(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        return m_adaptor.isEntry(absolutePath, additionalArgs);
     }
 
-    public long getSize(String absolutePath) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-        return m_adaptor.getSize(absolutePath);
+    public long getSize(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+        return m_adaptor.getSize(absolutePath, additionalArgs);
     }
 
-    public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-        return m_adaptor.getInputStream(absolutePath, additionalArgs);
+    public void getToStream(String absolutePath, String additionalArgs, OutputStream stream) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+        m_adaptor.getToStream(absolutePath, additionalArgs, stream);
     }
 
-    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
-        return m_adaptor.getOutputStream(parentAbsolutePath, fileName, exclusive, append, additionalArgs);
-    }
-
-    /** does not work */
-    public void getToStream(String absolutePath, OutputStream stream, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-        m_adaptor.getToStream(absolutePath, stream, additionalArgs);
-    }
-
-    /** does not work */
-    public void putFromStream(String absolutePath, InputStream stream, boolean append, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
-        m_adaptor.putFromStream(absolutePath, stream, append, additionalArgs);
+    public void putFromStream(String absolutePath, boolean append, String additionalArgs, InputStream stream) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+        m_adaptor.putFromStream(absolutePath, append, additionalArgs, stream);
     }
 
     public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, ParentDoesNotExist, Timeout, NoSuccess {

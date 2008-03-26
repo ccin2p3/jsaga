@@ -2,11 +2,11 @@ package fr.in2p3.jsaga.adaptor.data;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.data.optimise.*;
-import fr.in2p3.jsaga.adaptor.data.read.*;
-import fr.in2p3.jsaga.adaptor.data.read.FileReader;
-import fr.in2p3.jsaga.adaptor.data.write.DirectoryWriter;
-import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
+import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
+import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
+import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
+import fr.in2p3.jsaga.adaptor.data.read.FileReaderGetter;
+import fr.in2p3.jsaga.adaptor.data.write.FileWriterPutter;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
 import org.globus.common.ChainedIOException;
@@ -33,14 +33,14 @@ import java.util.Map;
 /**
  *
  */
-public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWriter, DirectoryReader, DirectoryWriter, DataCopy, DataRename, DataGet, DataPut {
+public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, FileWriterPutter, DataCopy, DataRename {
     protected GSSCredential m_credential;
     protected GridFTPClient m_client;
 
     public abstract String getType();
     public abstract Usage getUsage();
     public abstract Default[] getDefaults(Map attributes) throws IncorrectState;
-    public abstract boolean isDirectory(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
+    public abstract boolean isDirectory(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
     public abstract FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
 
     public Class[] getSupportedSecurityAdaptorClasses() {
@@ -101,7 +101,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         }
     }
 
-    public boolean exists(String absolutePath) throws PermissionDenied, Timeout, NoSuccess {
+    public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
         try {
             return m_client.exists(absolutePath);
         } catch (Exception e) {
@@ -115,11 +115,11 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         }
     }
 
-    public boolean isEntry(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        return !isDirectory(absolutePath);
+    public boolean isEntry(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        return !isDirectory(absolutePath, additionalArgs);
     }
 
-    public long getSize(String absolutePath) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public long getSize(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         try {
             return m_client.getSize(absolutePath);
         } catch (Exception e) {
@@ -127,47 +127,14 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         }
     }
 
-    public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void getToStream(String absolutePath, String additionalArgs, OutputStream stream) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+        final boolean autoFlush = false;
+        final boolean ignoreOffset = true;
         try {
             m_client.setType(GridFTPSession.TYPE_IMAGE);
             m_client.setMode(GridFTPSession.MODE_STREAM); //MODE_EBLOCK induce error: "451 refusing to store with active mode"
             m_client.setPassive();
             m_client.setLocalActive();
-        } catch (Exception e) {
-            throw rethrowException(e);
-        }
-        return new GsiftpInputStream(m_client, absolutePath);
-    }
-
-    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
-        String absolutePath = parentAbsolutePath+fileName;
-        if (exclusive && this.exists(absolutePath)) {
-            // need to check existence explicitely, else exception is never thrown
-            throw new AlreadyExists("File already exists");
-        } else if (!this.exists(parentAbsolutePath)) {
-            // need to check existence explicitely, else exception is thrown to late (when writing bytes)
-            throw new ParentDoesNotExist("Parent directory does not exist");
-        }
-        try {
-            m_client.setType(GridFTPSession.TYPE_IMAGE);
-            m_client.setMode(GridFTPSession.MODE_EBLOCK);
-            m_client.setPassive();
-            m_client.setLocalActive();
-        } catch (Exception e) {
-            try {
-                throw rethrowExceptionFull(e);
-            } catch (DoesNotExist e2) {
-                throw new ParentDoesNotExist(e);
-            }
-        }
-        return new GsiftpOutputStream(m_client, absolutePath, append);
-    }
-
-    /** does not work */
-    public void getToStream(String absolutePath, OutputStream stream, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-        final boolean autoFlush = false;
-        final boolean ignoreOffset = true;
-        try {
             m_client.get(
                     absolutePath,
                     new DataSinkStream(stream, autoFlush, ignoreOffset),
@@ -177,10 +144,13 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         }
     }
 
-    /** does not work */
-    public void putFromStream(String absolutePath, InputStream stream, boolean append, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+    public void putFromStream(String absolutePath, boolean append, String additionalArgs, InputStream stream) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
         final int DEFAULT_BUFFER_SIZE = 16384;
         try {
+            m_client.setType(GridFTPSession.TYPE_IMAGE);
+            m_client.setMode(GridFTPSession.MODE_EBLOCK);
+            m_client.setPassive();
+            m_client.setLocalActive();
             m_client.put(
                 absolutePath,
                 new DataSourceStream(stream, DEFAULT_BUFFER_SIZE),
@@ -202,7 +172,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         targetAdaptor.connect(null, targetHost, targetPort, null, null);
 
         //todo: remove this block when overwriting target file will work (it only works with UrlCopy)
-        if (overwrite && targetAdaptor.exists(targetAbsolutePath)) {
+        if (overwrite && targetAdaptor.exists(targetAbsolutePath, additionalArgs)) {
             try {
                 targetAdaptor.m_client.deleteFile(targetAbsolutePath);
             } catch (Exception e) {
@@ -211,7 +181,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         }
 
         // need to check existence of target explicitely, else exception is never thrown
-        if (!overwrite && targetAdaptor.exists(targetAbsolutePath)) {
+        if (!overwrite && targetAdaptor.exists(targetAbsolutePath, additionalArgs)) {
             throw new AlreadyExists("File already exists");
         }
 
@@ -242,7 +212,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         sourceAdaptor.connect(null, sourceHost, sourcePort, null, null);
 
         //todo: remove this block when overwriting target file will work (it only works with UrlCopy)
-        if (overwrite && this.exists(targetAbsolutePath)) {
+        if (overwrite && this.exists(targetAbsolutePath, additionalArgs)) {
             try {
                 m_client.deleteFile(targetAbsolutePath);
             } catch (Exception e) {
@@ -251,7 +221,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReader, FileWrite
         }
 
         // need to check existence of target explicitely, else exception is never thrown
-        if (!overwrite && this.exists(targetAbsolutePath)) {
+        if (!overwrite && this.exists(targetAbsolutePath, additionalArgs)) {
             throw new AlreadyExists("File already exists");
         }
 
