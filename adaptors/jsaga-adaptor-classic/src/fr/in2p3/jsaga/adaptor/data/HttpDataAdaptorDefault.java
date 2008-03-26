@@ -22,14 +22,8 @@ import java.net.*;
 public class HttpDataAdaptorDefault extends HttpDataAdaptorAbstract implements FileReaderStreamFactory {
     public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
         try {
-            URLConnection cnx = this.getConnection(absolutePath, additionalArgs);
-            String status = cnx.getHeaderField(null);
-            if (status.endsWith("200 OK")) {
-                return true;
-            } else if (status.endsWith("404 Not Found")) {
-                return false;
-            }
-            throw new NoSuccess(status);
+            this.getConnection(absolutePath, additionalArgs);
+            return true;
         } catch (DoesNotExist e) {
             return false;
         }
@@ -37,13 +31,7 @@ public class HttpDataAdaptorDefault extends HttpDataAdaptorAbstract implements F
 
     public boolean isDirectory(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         URLConnection cnx = this.getConnection(absolutePath, additionalArgs);
-        String status = cnx.getHeaderField(null);
-        if (status.endsWith("200 OK")) {
-            return (cnx.getLastModified() == 0);
-        } else if (status.endsWith("404 Not Found")) {
-            throw new DoesNotExist(status);
-        }
-        throw new NoSuccess(status);
+        return (cnx.getLastModified() == 0);
     }
 
     public long getSize(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
@@ -62,10 +50,12 @@ public class HttpDataAdaptorDefault extends HttpDataAdaptorAbstract implements F
         }
     }
 
-    protected HttpURLConnection getConnection(String absolutePath, String additionalArgs) throws DoesNotExist, NoSuccess {
+    protected HttpURLConnection getConnection(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, NoSuccess {
         if (m_baseUrl == null) {
             throw new NoSuccess("Connection is closed");
         }
+
+        // get URL
         URL url;
         try {
             String fullPath = absolutePath + (additionalArgs!=null ? "?"+additionalArgs : "");
@@ -73,14 +63,32 @@ public class HttpDataAdaptorDefault extends HttpDataAdaptorAbstract implements F
         } catch (MalformedURLException e) {
             throw new NoSuccess(e);
         }
+
+        // get connection
+        HttpURLConnection cnx;
         try {
-            return (HttpURLConnection) url.openConnection();
+            cnx = (HttpURLConnection) url.openConnection();
         } catch(NoRouteToHostException e) {
             throw new DoesNotExist("No route to host: "+url.getHost(), e);
         } catch(ConnectException e) {
             throw new NoSuccess("Failed to connect to server: "+url.getHost()+":"+url.getPort(), e);
         } catch(IOException e) {
             throw new NoSuccess(e);
+        }
+
+        // check status
+        String status = cnx.getHeaderField(null);
+        if (status == null) {
+            cnx.disconnect();
+            throw new NoSuccess("Failed to connect to url: "+url);
+        } else if (status.endsWith("200 OK")) {
+            return cnx;
+        } else if (status.endsWith("404 Not Found")) {
+            throw new DoesNotExist(status);
+        } else if (status.endsWith("403 Forbidden")) {
+            throw new PermissionDenied(status);
+        } else {
+            throw new NoSuccess(status);
         }
     }
 }
