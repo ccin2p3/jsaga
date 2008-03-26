@@ -125,7 +125,8 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
     public boolean exists() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
         if (m_adaptor instanceof DataReaderAdaptor) {
             return ((DataReaderAdaptor)m_adaptor).exists(
-                    m_url.getPath());
+                    m_url.getPath(),
+                    m_url.getQuery());
         } else {
             throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
@@ -137,7 +138,8 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
         } else if (m_adaptor instanceof DataReaderAdaptor) {
             try {
                 return ((DataReaderAdaptor)m_adaptor).isDirectory(
-                        m_url.getPath());
+                        m_url.getPath(),
+                        m_url.getQuery());
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("Entry does not exist: "+ m_url, doesNotExist);
             }
@@ -152,7 +154,8 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
         } else if (m_adaptor instanceof DataReaderAdaptor) {
             try {
                 return ((DataReaderAdaptor)m_adaptor).isEntry(
-                        m_url.getPath());
+                        m_url.getPath(),
+                        m_url.getQuery());
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("Entry does not exist: "+ m_url, doesNotExist);
             }

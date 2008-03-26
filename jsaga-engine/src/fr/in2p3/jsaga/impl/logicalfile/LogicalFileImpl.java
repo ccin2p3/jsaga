@@ -74,7 +74,8 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
             this._makeParentDirs();
         } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !(m_url instanceof JSagaURL) && m_adaptor instanceof DataReaderAdaptor) {
             boolean exists = ((DataReaderAdaptor)m_adaptor).exists(
-                    m_url.getPath());
+                    m_url.getPath(),
+                    m_url.getQuery());
             if (! exists) {
                 throw new DoesNotExist("Logical file does not exist: "+ m_url);
             }

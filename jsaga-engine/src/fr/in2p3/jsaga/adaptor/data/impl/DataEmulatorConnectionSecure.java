@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.adaptor.data.impl;
 
 import fr.in2p3.jsaga.adaptor.schema.data.emulator.SecureServer;
 import fr.in2p3.jsaga.adaptor.schema.data.emulator.ServerType;
-import fr.in2p3.jsaga.adaptor.security.UserPassSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
 import org.ogf.saga.error.*;
 
 /* ***************************************************

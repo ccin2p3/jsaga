@@ -4,8 +4,9 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
-import fr.in2p3.jsaga.adaptor.data.read.FileReader;
-import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
+import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
+import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
+import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityAdaptor;
 import org.ietf.jgss.GSSCredential;
@@ -39,7 +40,7 @@ import java.util.Map;
 /**
  *
  */
-public class SagaDataAdaptor implements FileReader, FileWriter, DataCopy, DataRename {
+public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStreamFactory, DataCopy, DataRename {
     private NSDirectory m_root;
 
     public String getType() {return null;}
@@ -88,7 +89,7 @@ public class SagaDataAdaptor implements FileReader, FileWriter, DataCopy, DataRe
         }
     }
 
-    public boolean exists(String absolutePath) throws PermissionDenied, Timeout, NoSuccess {
+    public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
         NSEntry entry = this.getEntry(absolutePath);
         try {
             return entry.isDir() || entry.isEntry() || entry.isLink();
@@ -105,7 +106,7 @@ public class SagaDataAdaptor implements FileReader, FileWriter, DataCopy, DataRe
         }
     }
 
-    public boolean isDirectory(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isDirectory(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         try {
             return this.getEntry(absolutePath).isDir();
         } catch (NotImplemented e) {
@@ -121,7 +122,7 @@ public class SagaDataAdaptor implements FileReader, FileWriter, DataCopy, DataRe
         }
     }
 
-    public boolean isEntry(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isEntry(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         try {
             return this.getEntry(absolutePath).isEntry();
         } catch (NotImplemented e) {
@@ -137,7 +138,7 @@ public class SagaDataAdaptor implements FileReader, FileWriter, DataCopy, DataRe
         }
     }
 
-    public long getSize(String absolutePath) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public long getSize(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         NSEntry entry = this.getEntry(absolutePath);
         if (entry instanceof File) {
             try {
@@ -257,6 +258,18 @@ public class SagaDataAdaptor implements FileReader, FileWriter, DataCopy, DataRe
         } catch (AuthenticationFailed e) {
             throw new NoSuccess(e);
         }
+    }
+
+    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        throw new NoSuccess("[INTERNAL ERROR] This method is not supposed to be used");
+    }
+
+    public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+        throw new NoSuccess("[INTERNAL ERROR] This method is not supposed to be used");
+    }
+
+    public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+        throw new NoSuccess("[INTERNAL ERROR] This method is not supposed to be used");
     }
 
     private NSEntry getEntry(String absolutePath) throws NoSuccess {

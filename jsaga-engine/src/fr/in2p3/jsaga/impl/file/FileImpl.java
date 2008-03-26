@@ -5,9 +5,9 @@ import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyDelegated;
-import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
-import fr.in2p3.jsaga.adaptor.data.read.FileReader;
+import fr.in2p3.jsaga.adaptor.data.read.*;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
+import fr.in2p3.jsaga.adaptor.data.write.FileWriterPutter;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.data.copy.SourcePhysicalFile;
 import fr.in2p3.jsaga.engine.data.copy.TargetPhysicalFile;
@@ -61,21 +61,20 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
 
     private void init(int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         FlagsBytes effectiveFlags = new FlagsBytesPhysical(flags);
-        boolean disconnectable = false;
         if (effectiveFlags.contains(Flags.READ)) {
-            m_inStream = new FileInputStreamImpl(m_session, m_url, m_adaptor, disconnectable);
+            m_inStream = FileFactoryImpl.openFileInputStream(m_session, m_url, m_adaptor);
         }
         if (effectiveFlags.contains(Flags.WRITE)) {
-            boolean exclusive = effectiveFlags.contains(Flags.EXCL);
             boolean append = effectiveFlags.contains(Flags.APPEND);
+            boolean exclusive = effectiveFlags.contains(Flags.EXCL);
             try {
-                m_outStream = new FileOutputStreamImpl(m_session, m_url, m_adaptor, disconnectable, exclusive, append);
+                m_outStream = FileFactoryImpl.openFileOutputStream(m_session, m_url, m_adaptor, append, exclusive);
             } catch(DoesNotExist e) {
                 // make parent directories, then retry
                 if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
                     this._makeParentDirs();
                     try {
-                        m_outStream = new FileOutputStreamImpl(m_session, m_url, m_adaptor, disconnectable, exclusive, append);
+                        m_outStream = FileFactoryImpl.openFileOutputStream(m_session, m_url, m_adaptor, append, exclusive);
                     } catch(DoesNotExist e2) {
                         throw new DoesNotExist("Failed to create parent directory", e2.getCause());
                     }
@@ -90,7 +89,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         if (effectiveFlags.contains(Flags.READ) || effectiveFlags.contains(Flags.WRITE)) {
             // exists check already done
         } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !(m_url instanceof JSagaURL) && m_adaptor instanceof DataReaderAdaptor) {
-            boolean exists = ((DataReaderAdaptor)m_adaptor).exists(m_url.getPath());
+            boolean exists = ((DataReaderAdaptor)m_adaptor).exists(m_url.getPath(), m_url.getQuery());
             if (! exists) {
                 throw new DoesNotExist("File does not exist: "+ m_url);
             }
@@ -171,17 +170,19 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
             } catch (AlreadyExists alreadyExists) {
                 throw new AlreadyExists("Target entry already exists: "+effectiveTarget, alreadyExists.getCause());
             }
-/*
-        } else if (m_adaptor instanceof DataGet) {
+        } else if (m_adaptor instanceof FileReaderGetter) {
             FileImpl targetFile = SourcePhysicalFile.createTargetFile(m_session, effectiveTarget, effectiveFlags);
             try {
-                ((DataGet)m_adaptor).getToStream(m_url.getPath(), targetFile.getFileOutputStream());
+                ((FileReaderGetter)m_adaptor).getToStream(
+                        m_url.getPath(),
+                        m_url.getQuery(),
+                        targetFile.getFileOutputStream());
             } catch (DoesNotExist doesNotExist) {
+                targetFile.remove();
                 throw new IncorrectState("Source file does not exist: "+m_url, doesNotExist);
             }
             targetFile.close();
-*/
-        } else if (m_adaptor instanceof FileReader) {
+        } else if (m_adaptor instanceof FileReaderStreamFactory) {
             Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(target.getScheme());
             if (descriptor.hasLogical() && descriptor.getLogical()) {
                 throw new BadParameter("Maybe what you want to do is to register to logical file the following location: "+ m_url.toString());
@@ -229,16 +230,20 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
             } catch (AlreadyExists alreadyExists) {
                 throw new IncorrectState("Target entry already exists: "+ m_url, alreadyExists);
             }
-/*
-        } else if (m_adaptor instanceof DataPut) {
+        } else if (m_adaptor instanceof FileWriterPutter) {
             FileImpl sourceFile = TargetPhysicalFile.createSourceFile(m_session, effectiveSource);
             try {
-                ((DataPut)m_adaptor).putFromStream(m_url.getPath(), sourceFile.getFileInputStream(), false);
+                ((FileWriterPutter)m_adaptor).putFromStream(
+                        m_url.getPath(),
+                        false,
+                        m_url.getQuery(),
+                        sourceFile.getFileInputStream());
+            } catch (ParentDoesNotExist parentDoesNotExist) {
+                throw new DoesNotExist("Target parent directory does not exist: "+m_url, parentDoesNotExist);
             } catch (AlreadyExists alreadyExists) {
                 throw new IncorrectState("Target entry already exists: "+m_url, alreadyExists);
             }
             sourceFile.close();
-*/
         } else if (m_adaptor instanceof FileWriter) {
             TargetPhysicalFile target = new TargetPhysicalFile(this);
             Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(source.getScheme());
@@ -281,7 +286,8 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
             }
             try {
                 return ((FileReader)m_adaptor).getSize(
-                        m_url.getPath());
+                        m_url.getPath(),
+                        m_url.getQuery());
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("File does not exist: "+ m_url, doesNotExist);
             } catch (BadParameter badParameter) {
@@ -406,14 +412,12 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
     }
 
     public FileInputStream newFileInputStream() throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
-        boolean disconnectable = false;
-        return new FileInputStreamImpl(m_session, m_url, m_adaptor, disconnectable);
+        return FileFactoryImpl.openFileInputStream(m_session, m_url, m_adaptor);
     }
 
     public FileOutputStream newFileOutputStream(boolean overwrite) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        boolean disconnectable = false;
-        boolean exclusive = !overwrite;
         boolean append = false;
-        return new FileOutputStreamImpl(m_session, m_url, m_adaptor, disconnectable, exclusive, append);
+        boolean exclusive = !overwrite;
+        return FileFactoryImpl.openFileOutputStream(m_session, m_url, m_adaptor, append, exclusive);
     }
 }

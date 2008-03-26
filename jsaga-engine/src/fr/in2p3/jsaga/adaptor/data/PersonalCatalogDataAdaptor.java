@@ -6,8 +6,8 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.impl.DataCatalogHandler;
 import fr.in2p3.jsaga.adaptor.data.link.LinkAdaptor;
 import fr.in2p3.jsaga.adaptor.data.link.NotLink;
-import fr.in2p3.jsaga.adaptor.data.read.*;
-import fr.in2p3.jsaga.adaptor.data.write.DirectoryWriter;
+import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
+import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
 import fr.in2p3.jsaga.adaptor.schema.data.catalog.*;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  *
  */
-public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter, DirectoryReader, DirectoryWriter, LinkAdaptor {
+public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor {
     private DataCatalogHandler m_catalog;
 
     public String getType() {
@@ -64,7 +64,7 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
         m_catalog.commit();
     }
 
-    public boolean exists(String absolutePath) throws PermissionDenied, Timeout, NoSuccess {
+    public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
         try {
             m_catalog.getEntry(absolutePath);
             return true;
@@ -73,12 +73,12 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
         }
     }
 
-    public boolean isDirectory(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isDirectory(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         EntryType entry = m_catalog.getEntry(absolutePath);
         return entry instanceof DirectoryType;
     }
 
-    public boolean isEntry(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isEntry(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         EntryType entry = m_catalog.getEntry(absolutePath);
         return entry instanceof FileType;
     }

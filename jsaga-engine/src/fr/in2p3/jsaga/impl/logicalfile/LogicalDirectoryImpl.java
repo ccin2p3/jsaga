@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.impl.logicalfile;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import fr.in2p3.jsaga.adaptor.data.read.MetaDataReader;
+import fr.in2p3.jsaga.adaptor.data.read.LogicalReaderMetaData;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.helpers.SAGAPattern;
 import fr.in2p3.jsaga.helpers.URLFactory;
@@ -126,7 +126,7 @@ public class LogicalDirectoryImpl extends AbstractAsyncLogicalDirectoryImpl impl
             for (URL current : super.find(namePattern, flags)) {
                 matchingPath.add(current);
             }
-        } else if (m_adaptor instanceof MetaDataReader) {
+        } else if (m_adaptor instanceof LogicalReaderMetaData) {
             Pattern p = SAGAPattern.toRegexp(namePattern);
             this._doFind(p, keyValuePatterns, effectiveFlags, matchingPath, CURRENT_DIR_RELATIVE_PATH);
         } else {
@@ -142,7 +142,7 @@ public class LogicalDirectoryImpl extends AbstractAsyncLogicalDirectoryImpl impl
         // for each child
         FileAttributes[] childs;
         try {
-            childs = ((MetaDataReader)m_adaptor).listAttributes(
+            childs = ((LogicalReaderMetaData)m_adaptor).listAttributes(
                     m_url.getPath(),
                     keyValuePatterns,
                     m_url.getQuery());

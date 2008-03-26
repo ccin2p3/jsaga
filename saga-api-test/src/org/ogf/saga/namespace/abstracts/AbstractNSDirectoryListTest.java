@@ -1,6 +1,7 @@
 package org.ogf.saga.namespace.abstracts;
 
 import org.ogf.saga.URL;
+import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.namespace.Flags;
 
 import java.util.List;
@@ -40,11 +41,15 @@ public abstract class AbstractNSDirectoryListTest extends AbstractNSDirectoryTes
     }
 
     public void test_list_empty() throws Exception {
-        m_dir.remove(DEFAULT_FILENAME);
-        List list = m_dir.list();
-        assertEquals(
-                0,
-                list.size());
+        try {
+            m_dir.remove(DEFAULT_FILENAME);
+            List list = m_dir.list();
+            assertEquals(
+                    0,
+                    list.size());
+        } catch(NotImplemented e) {
+            // ignore this test for read-only protocols
+        }
     }
     
     public void test_list_file() throws Exception {

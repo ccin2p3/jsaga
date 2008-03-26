@@ -2,10 +2,10 @@ package fr.in2p3.jsaga.adaptor.security;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptorBuilder;
 import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityAdaptor;
-
+import org.ogf.saga.context.Context;
+import org.ogf.saga.error.IncorrectState;
+import org.ogf.saga.error.NoSuccess;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,13 +13,7 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.Vector;
-
-import org.ogf.saga.context.Context;
-import org.ogf.saga.error.IncorrectState;
-import org.ogf.saga.error.NoSuccess;
+import java.util.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -124,7 +118,7 @@ public class JKSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
 	    	for (int i = 0; i < certificates.length; i++) {
 	    		certificates[i] = (X509Certificate) loadCerts.get(i);
 			}
-	        return new JKSSecurityAdaptor(privateKey, userCertificate, certificates );   	
+	        return new JKSSecurityAdaptor(keyStore, keyStorePass, alias, userPass, certificates);
     	}
     	catch (Exception e) {
     		throw new NoSuccess(e);

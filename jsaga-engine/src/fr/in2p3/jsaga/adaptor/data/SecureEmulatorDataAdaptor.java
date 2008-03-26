@@ -3,7 +3,7 @@ package fr.in2p3.jsaga.adaptor.data;
 import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.data.impl.DataEmulatorConnectionSecure;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.UserPassSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
 import org.ogf.saga.error.*;
 
 import java.util.Map;

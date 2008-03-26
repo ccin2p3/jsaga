@@ -65,15 +65,19 @@ public class NamespaceList extends AbstractCommand {
             Session session = SessionFactory.createSession(true);
             NSDirectory dir = NSFactory.createNSDirectory(session, url, Flags.NONE.getValue());
             List<URL> list = dir.list(pattern, Flags.NONE.getValue());
-            dir.close();
 
-            // display list
             if (line.hasOption(OPT_LONG)) {
+                // display list
                 EntryLongFormat formatter = new EntryLongFormat(dir);
                 for (URL entry : list) {
                     System.out.println(formatter.toString(entry));
                 }
+                // close connection
+                dir.close();
             } else {
+                // close connection
+                dir.close();
+                // display list
                 for (URL entry : list) {
                     System.out.println(JSagaURL.decode(entry));
                 }

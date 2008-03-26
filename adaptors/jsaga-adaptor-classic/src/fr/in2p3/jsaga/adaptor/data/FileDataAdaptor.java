@@ -3,10 +3,9 @@ package fr.in2p3.jsaga.adaptor.data;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
-import fr.in2p3.jsaga.adaptor.data.read.*;
-import fr.in2p3.jsaga.adaptor.data.read.FileReader;
-import fr.in2p3.jsaga.adaptor.data.write.DirectoryWriter;
-import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
+import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
+import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
+import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import org.ogf.saga.error.*;
 
@@ -27,7 +26,7 @@ import java.util.regex.Pattern;
 /**
  *
  */
-public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader, DirectoryWriter, DataRename {
+public class FileDataAdaptor implements FileReaderStreamFactory, FileWriterStreamFactory, DataRename {
     private static final boolean s_isWindows = System.getProperty("os.name").startsWith("Windows");
     private String m_drive;
 
@@ -65,20 +64,20 @@ public class FileDataAdaptor implements FileReader, FileWriter, DirectoryReader,
         // do nothing
     }
 
-    public boolean exists(String absolutePath) throws PermissionDenied, Timeout, NoSuccess {
+    public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
         File entry = newPath(absolutePath);
         return entry==null || entry.exists();
     }
 
-    public boolean isDirectory(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isDirectory(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         return newEntry(absolutePath).isDirectory();
     }
 
-    public boolean isEntry(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isEntry(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         return newEntry(absolutePath).isFile();
     }
 
-    public long getSize(String absolutePath) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public long getSize(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         return newFile(absolutePath).length();
     }
 

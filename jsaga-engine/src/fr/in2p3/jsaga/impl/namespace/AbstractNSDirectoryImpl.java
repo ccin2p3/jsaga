@@ -3,9 +3,10 @@ package fr.in2p3.jsaga.impl.namespace;
 import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
-import fr.in2p3.jsaga.adaptor.data.optimise.FilteredDirectoryReader;
-import fr.in2p3.jsaga.adaptor.data.read.*;
-import fr.in2p3.jsaga.adaptor.data.write.DirectoryWriter;
+import fr.in2p3.jsaga.adaptor.data.optimise.DataFilteredList;
+import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
+import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
+import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.helpers.SAGAPattern;
 import fr.in2p3.jsaga.helpers.URLFactory;
@@ -54,7 +55,7 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
     private void init(int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         FlagsBytes effectiveFlags = new FlagsBytes(flags);
         if (effectiveFlags.contains(Flags.CREATE)) {
-            if (m_adaptor instanceof DirectoryWriter) {
+            if (m_adaptor instanceof DataWriterAdaptor) {
                 if ("/".equals(m_url.getPath())) {
                     if (effectiveFlags.contains(Flags.EXCL)) {
                         throw new AlreadyExists("Not allowed to create root directory: "+ m_url.toString(), this);
@@ -66,13 +67,13 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
                 String directoryName = super._getEntryName();
                 try {
                     // try to make current directory
-                    ((DirectoryWriter)m_adaptor).makeDir(parent.getPath(), directoryName, m_url.getQuery());
+                    ((DataWriterAdaptor)m_adaptor).makeDir(parent.getPath(), directoryName, m_url.getQuery());
                 } catch(ParentDoesNotExist e) {
                     // make parent directories, then retry
                     if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
                         this._makeParentDirs();
                         try {
-                            ((DirectoryWriter)m_adaptor).makeDir(parent.getPath(), directoryName, m_url.getQuery());
+                            ((DataWriterAdaptor)m_adaptor).makeDir(parent.getPath(), directoryName, m_url.getQuery());
                         } catch (ParentDoesNotExist e2) {
                             throw new DoesNotExist("Failed to create parent directory: "+parent, e.getCause());
                         }
@@ -90,7 +91,7 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
             this._makeParentDirs();
         } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !(m_url instanceof JSagaURL) && m_adaptor instanceof DataReaderAdaptor) {
-            boolean exists = ((DataReaderAdaptor)m_adaptor).exists(m_url.getPath());
+            boolean exists = ((DataReaderAdaptor)m_adaptor).exists(m_url.getPath(), m_url.getQuery());
             if (! exists) {
                 throw new DoesNotExist("Directory does not exist: "+ m_url);
             }
@@ -132,12 +133,12 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         // get list
         FileAttributes[] childs;
         try {
-            if (m_adaptor instanceof FilteredDirectoryReader && pattern.endsWith("/")) {
-                childs = ((FilteredDirectoryReader)m_adaptor).listDirectories(
+            if (m_adaptor instanceof DataFilteredList && pattern.endsWith("/")) {
+                childs = ((DataFilteredList)m_adaptor).listDirectories(
                         m_url.getPath(),
                         m_url.getQuery());
-            } else if (m_adaptor instanceof DirectoryReader) {
-                childs = ((DirectoryReader)m_adaptor).listAttributes(
+            } else if (m_adaptor instanceof DataReaderAdaptor) {
+                childs = ((DataReaderAdaptor)m_adaptor).listAttributes(
                         m_url.getPath(),
                         m_url.getQuery());
             } else {
@@ -171,7 +172,7 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
 
         // search
         List<URL> matchingPath = new ArrayList<URL>();
-        if (m_adaptor instanceof DirectoryReader) {
+        if (m_adaptor instanceof DataReaderAdaptor) {
             Pattern p = SAGAPattern.toRegexp(pattern);
             this._doFind(p, effectiveFlags, matchingPath, CURRENT_DIR_RELATIVE_PATH);
         } else {
@@ -228,7 +229,7 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
 
     private String[] m_entriesCache = null;
     public int getNumEntries() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
-        if (m_adaptor instanceof DirectoryReader) {
+        if (m_adaptor instanceof DataReaderAdaptor) {
             m_entriesCache = this._listNames(m_url.getPath());
             return m_entriesCache.length;
         } else {
@@ -237,7 +238,7 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
     }
 
     public URL getEntry(int entry) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
-        if (m_adaptor instanceof DirectoryReader) {
+        if (m_adaptor instanceof DataReaderAdaptor) {
             if (m_entriesCache == null) {
                 m_entriesCache = this._listNames(m_url.getPath());
             }

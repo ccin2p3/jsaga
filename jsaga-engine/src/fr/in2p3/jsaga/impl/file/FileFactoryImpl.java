@@ -7,6 +7,7 @@ import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
 import fr.in2p3.jsaga.engine.factories.DataAdaptorFactory;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
+import fr.in2p3.jsaga.impl.file.stream.FileStreamFactoryImpl;
 import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
 import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
@@ -65,23 +66,23 @@ public class FileFactoryImpl extends FileFactory {
 
     protected FileInputStream doCreateFileInputStream(Session session, URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session);
-        if (adaptor instanceof FileReader) {
-            boolean disconnectable = true;
-            return new FileInputStreamImpl(session, name, adaptor, disconnectable);
-        } else {
-            throw new NotImplemented("Not supported for this protocol: "+ name.getScheme());
-        }
+        boolean disconnectable = true;
+        return FileStreamFactoryImpl.newFileInputStream(session, name, adaptor, disconnectable);
+    }
+    public static FileInputStream openFileInputStream(Session session, URL name, DataAdaptor adaptor) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+        boolean disconnectable = false;
+        return FileStreamFactoryImpl.newFileInputStream(session, name, adaptor, disconnectable);
     }
 
     protected FileOutputStream doCreateFileOutputStream(Session session, URL name, boolean append) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session);
-        if (adaptor instanceof FileWriter) {
-            boolean disconnectable = true;
-            boolean exclusive = false;
-            return new FileOutputStreamImpl(session, name, adaptor, disconnectable, exclusive, append);
-        } else {
-            throw new NotImplemented("Not supported for this protocol: "+ name.getScheme());
-        }
+        boolean disconnectable = true;
+        boolean exclusive = false;
+        return FileStreamFactoryImpl.newFileOutputStream(session, name, adaptor, disconnectable, append, exclusive);
+    }
+    public static FileOutputStream openFileOutputStream(Session session, URL name, DataAdaptor adaptor, boolean append, boolean exclusive) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        boolean disconnectable = false;
+        return FileStreamFactoryImpl.newFileOutputStream(session, name, adaptor, disconnectable, append, exclusive);
     }
 
     protected Directory doCreateDirectory(Session session, URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {

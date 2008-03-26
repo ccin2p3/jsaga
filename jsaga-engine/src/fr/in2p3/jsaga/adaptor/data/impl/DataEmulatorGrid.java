@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.adaptor.data.impl;
 
 import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.schema.data.emulator.*;
-import fr.in2p3.jsaga.adaptor.security.UserPassSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.*;
 import org.ogf.saga.error.AuthenticationFailed;

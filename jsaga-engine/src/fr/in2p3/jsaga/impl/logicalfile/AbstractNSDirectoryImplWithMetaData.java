@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.impl.logicalfile;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
-import fr.in2p3.jsaga.adaptor.data.read.MetaDataReader;
-import fr.in2p3.jsaga.adaptor.data.write.MetaDataWriter;
+import fr.in2p3.jsaga.adaptor.data.read.LogicalReaderMetaData;
+import fr.in2p3.jsaga.adaptor.data.write.LogicalWriterMetaData;
 import fr.in2p3.jsaga.helpers.SAGAPatternFinder;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSDirectoryImpl;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
@@ -49,8 +49,8 @@ public abstract class AbstractNSDirectoryImplWithMetaData extends AbstractNSDire
     ////////////////////////////////////// interface Attributes //////////////////////////////////////
 
     public void setAttribute(String key, String value) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, BadParameter, DoesNotExist, Timeout, NoSuccess {
-        if (m_adaptor instanceof MetaDataWriter) {
-            ((MetaDataWriter)m_adaptor).setMetaData(
+        if (m_adaptor instanceof LogicalWriterMetaData) {
+            ((LogicalWriterMetaData)m_adaptor).setMetaData(
                     m_url.getPath(),
                     key,
                     value,
@@ -61,8 +61,8 @@ public abstract class AbstractNSDirectoryImplWithMetaData extends AbstractNSDire
     }
 
     public String getAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
-        if (m_adaptor instanceof MetaDataReader) {
-            return ((MetaDataReader)m_adaptor).getMetaData(
+        if (m_adaptor instanceof LogicalReaderMetaData) {
+            return ((LogicalReaderMetaData)m_adaptor).getMetaData(
                     m_url.getPath(),
                     key,
                     m_url.getQuery());
@@ -80,8 +80,8 @@ public abstract class AbstractNSDirectoryImplWithMetaData extends AbstractNSDire
     }
 
     public void removeAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        if (m_adaptor instanceof MetaDataWriter) {
-            ((MetaDataWriter)m_adaptor).removeMetaData(
+        if (m_adaptor instanceof LogicalWriterMetaData) {
+            ((LogicalWriterMetaData)m_adaptor).removeMetaData(
                     m_url.getPath(),
                     key,
                     m_url.getQuery());
@@ -91,8 +91,8 @@ public abstract class AbstractNSDirectoryImplWithMetaData extends AbstractNSDire
     }
 
     public String[] listAttributes() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
-        if (m_adaptor instanceof MetaDataReader) {
-            Map<String,String> attributes = ((MetaDataReader)m_adaptor).listMetaData(
+        if (m_adaptor instanceof LogicalReaderMetaData) {
+            Map<String,String> attributes = ((LogicalReaderMetaData)m_adaptor).listMetaData(
                     m_url.getPath(),
                     m_url.getQuery());
             return attributes.keySet().toArray(new String[attributes.size()]);
@@ -102,8 +102,8 @@ public abstract class AbstractNSDirectoryImplWithMetaData extends AbstractNSDire
     }
 
     public String[] findAttributes(String... patterns) throws NotImplemented, BadParameter, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
-        if (m_adaptor instanceof MetaDataReader) {
-            Map<String,String> attributes = ((MetaDataReader)m_adaptor).listMetaData(
+        if (m_adaptor instanceof LogicalReaderMetaData) {
+            Map<String,String> attributes = ((LogicalReaderMetaData)m_adaptor).listMetaData(
                     m_url.getPath(),
                     m_url.getQuery());
             return new SAGAPatternFinder(attributes).findKey(patterns);

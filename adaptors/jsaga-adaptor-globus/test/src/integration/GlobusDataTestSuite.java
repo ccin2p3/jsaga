@@ -47,16 +47,32 @@ public class GlobusDataTestSuite extends TestSuite {
         public GsiftpNSCopyTest() throws Exception {super("gsiftp", "gsiftp");}
         public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
+    public static class GsiftpNSCopyFromTest extends NSCopyFromTest {
+        public GsiftpNSCopyFromTest() throws Exception {super("gsiftp", "gsiftp");}
+        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
+    }
     public static class GsiftpNSCopyRecursiveTest extends NSCopyRecursiveTest {
         public GsiftpNSCopyRecursiveTest() throws Exception {super("gsiftp", "gsiftp");}
+        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
+    }
+    public static class GsiftpNSMoveTest extends NSMoveTest {
+        public GsiftpNSMoveTest() throws Exception {super("gsiftp", "gsiftp");}
         public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class Gsiftp_to_EmulatorNSCopyTest extends NSCopyTest {
         public Gsiftp_to_EmulatorNSCopyTest() throws Exception {super("gsiftp", "test");}
         public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
+    public static class Gsiftp_to_EmulatorNSCopyFromTest extends NSCopyFromTest {
+        public Gsiftp_to_EmulatorNSCopyFromTest() throws Exception {super("gsiftp", "test");}
+        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
+    }
     public static class Gsiftp_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
         public Gsiftp_to_EmulatorNSCopyRecursiveTest() throws Exception {super("gsiftp", "test");}
+        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
+    }
+    public static class Gsiftp_to_EmulatorNSMoveTest extends NSMoveTest {
+        public Gsiftp_to_EmulatorNSMoveTest() throws Exception {super("gsiftp", "test");}
         public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
 
@@ -69,10 +85,16 @@ public class GlobusDataTestSuite extends TestSuite {
         this.addTestSuite(GsiftpDirectoryTest.class);
         this.addTestSuite(GsiftpFileReadTest.class);
         this.addTestSuite(GsiftpFileWriteTest.class);
+
         this.addTestSuite(GsiftpNSCopyTest.class);
+        this.addTestSuite(GsiftpNSCopyFromTest.class);
         this.addTestSuite(GsiftpNSCopyRecursiveTest.class);
+        this.addTestSuite(GsiftpNSMoveTest.class);
+
         this.addTestSuite(Gsiftp_to_EmulatorNSCopyTest.class);
+        this.addTestSuite(Gsiftp_to_EmulatorNSCopyFromTest.class);
         this.addTestSuite(Gsiftp_to_EmulatorNSCopyRecursiveTest.class);
+        this.addTestSuite(Gsiftp_to_EmulatorNSMoveTest.class);
     }
 
     public static Test suite() throws Exception {

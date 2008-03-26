@@ -7,10 +7,9 @@ import fr.in2p3.jsaga.adaptor.data.impl.DataEmulatorConnection;
 import fr.in2p3.jsaga.adaptor.data.impl.DataEmulatorConnectionAbstract;
 import fr.in2p3.jsaga.adaptor.data.link.LinkAdaptor;
 import fr.in2p3.jsaga.adaptor.data.link.NotLink;
-import fr.in2p3.jsaga.adaptor.data.read.*;
-import fr.in2p3.jsaga.adaptor.data.read.FileReader;
-import fr.in2p3.jsaga.adaptor.data.write.DirectoryWriter;
-import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
+import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
+import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
+import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
 import fr.in2p3.jsaga.adaptor.schema.data.emulator.*;
 import fr.in2p3.jsaga.adaptor.schema.data.emulator.File;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
@@ -31,8 +30,8 @@ import java.util.Map;
 /**
  *
  */
-public class EmulatorDataAdaptor implements FileReader, FileWriter, DirectoryReader, DirectoryWriter, LinkAdaptor
-//        , FilteredDirectoryReader
+public class EmulatorDataAdaptor implements FileReaderStreamFactory, FileWriterStreamFactory, LinkAdaptor
+//        , DataFilteredList
 {
     protected DataEmulatorConnectionAbstract m_server;
 
@@ -69,7 +68,7 @@ public class EmulatorDataAdaptor implements FileReader, FileWriter, DirectoryRea
         m_server.commit();
     }
 
-    public boolean exists(String absolutePath) throws PermissionDenied, Timeout, NoSuccess {
+    public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
         try {
             m_server.getEntry(absolutePath);
             return true;
@@ -78,17 +77,17 @@ public class EmulatorDataAdaptor implements FileReader, FileWriter, DirectoryRea
         }
     }
 
-    public boolean isDirectory(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isDirectory(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         EntryType entry = m_server.getEntry(absolutePath);
         return entry instanceof DirectoryType;
     }
 
-    public boolean isEntry(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isEntry(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         EntryType entry = m_server.getEntry(absolutePath);
         return entry instanceof FileType;
     }
 
-    public long getSize(String absolutePath) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public long getSize(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         File file = m_server.getFile(absolutePath);
         return file.getContent().length();
     }

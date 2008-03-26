@@ -118,21 +118,18 @@ public class DirectoryImpl extends AbstractAsyncDirectoryImpl implements Directo
 
     public FileInputStream openFileInputStream(URL relativeUrl) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         URL url = _resolveRelativeUrl(m_url, relativeUrl);
-        boolean disconnectable = false;
-        return new FileInputStreamImpl(m_session, url, m_adaptor, disconnectable);
+        return FileFactoryImpl.openFileInputStream(m_session, url, m_adaptor);
     }
 
     public FileOutputStream openFileOutputStream(URL relativeUrl) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         URL url = _resolveRelativeUrl(m_url, relativeUrl);
-        boolean disconnectable = false;
         boolean exclusive = false;
         boolean append = false;
-        return new FileOutputStreamImpl(m_session, url, m_adaptor, disconnectable, exclusive, append);
+        return FileFactoryImpl.openFileOutputStream(m_session, url, m_adaptor, append, exclusive);
     }
     public FileOutputStream openFileOutputStream(URL relativeUrl, boolean append) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
         URL url = _resolveRelativeUrl(m_url, relativeUrl);
-        boolean disconnectable = false;
         boolean exclusive = false;
-        return new FileOutputStreamImpl(m_session, url, m_adaptor, disconnectable, exclusive, append);
+        return FileFactoryImpl.openFileOutputStream(m_session, url, m_adaptor, append, exclusive);
     }
 }

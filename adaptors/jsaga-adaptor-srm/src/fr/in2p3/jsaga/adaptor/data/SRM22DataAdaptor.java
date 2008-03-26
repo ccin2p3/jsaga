@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.adaptor.data;
 
-import fr.in2p3.jsaga.adaptor.data.read.*;
-import fr.in2p3.jsaga.adaptor.data.write.DirectoryWriter;
-import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
+import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
+import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
+import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
 import org.apache.axis.client.Stub;
 import org.globus.axis.gsi.GSIConstants;
 import org.ogf.saga.error.*;
@@ -28,7 +28,7 @@ import java.util.*;
 /**
  * TODO: implement DataCopy when it will be supported also by DPM
  */
-public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements DirectoryReader, DirectoryWriter, FileReader, FileWriter {
+public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileReaderStreamFactory, FileWriterStreamFactory {
     private static final String SERVICE_PROTOCOL = "httpg";
     private static final String SERVICE_PATH = "/srm/managerv2";
     private ISRM m_stub;
@@ -96,7 +96,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements Director
         }
     }
 
-    public boolean exists(String absolutePath) throws PermissionDenied, Timeout, NoSuccess {
+    public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
         try {
             this.getMetaData(absolutePath);
             return true;
@@ -105,17 +105,17 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements Director
         }
     }
 
-    public boolean isDirectory(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isDirectory(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         TMetaDataPathDetail metadata = this.getMetaData(absolutePath);
         return metadata.getType().equals(TFileType.DIRECTORY);
     }
 
-    public boolean isEntry(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isEntry(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         TMetaDataPathDetail metadata = this.getMetaData(absolutePath);
         return metadata.getType().equals(TFileType.FILE);
     }
 
-    public long getSize(String absolutePath) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public long getSize(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         TMetaDataPathDetail metadata = this.getMetaData(absolutePath);
         return metadata.getSize().longValue();
     }

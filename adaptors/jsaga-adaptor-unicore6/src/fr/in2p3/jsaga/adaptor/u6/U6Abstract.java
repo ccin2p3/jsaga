@@ -53,7 +53,7 @@ public class U6Abstract {
             for (int i = 0; i < certs.length; i++) {
             	caCertificateVector.add(certs[i]);
 			}
-            securityManager.init(caCertificateVector, jksSecurityAdaptor.getPublicKey(), jksSecurityAdaptor.getPrivateKey());
+            securityManager.init(caCertificateVector, jksSecurityAdaptor.getCertificate(), jksSecurityAdaptor.getPrivateKey());
             
 	    	if(securityManager == null) {
                 throw new AuthenticationFailed("Unable to initialize security manager");

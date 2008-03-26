@@ -48,8 +48,16 @@ public class RByteIODataTestSuite extends TestSuite {
         public RByteIONSCopyTest() throws Exception {super("rbyteio", "rbyteio");}
         public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
+    public static class RByteIONSCopyFromTest extends NSCopyFromTest {
+        public RByteIONSCopyFromTest() throws Exception {super("rbyteio", "rbyteio");}
+        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
+    }
     public static class RByteIONSCopyRecursiveTest extends NSCopyRecursiveTest {
         public RByteIONSCopyRecursiveTest() throws Exception {super("rbyteio", "rbyteio");}
+        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
+    }
+    public static class RByteIONSMoveTest extends NSMoveTest {
+        public RByteIONSMoveTest() throws Exception {super("rbyteio", "rbyteio");}
         public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
 
@@ -63,7 +71,9 @@ public class RByteIODataTestSuite extends TestSuite {
         this.addTestSuite(RByteIOFileReadTest.class);
         this.addTestSuite(RByteIOFileWriteTest.class);
         this.addTestSuite(RByteIONSCopyTest.class);
+        this.addTestSuite(RByteIONSCopyFromTest.class);
         this.addTestSuite(RByteIONSCopyRecursiveTest.class);
+        this.addTestSuite(RByteIONSMoveTest.class);
     }
 
     public static Test suite() throws Exception {

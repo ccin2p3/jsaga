@@ -4,7 +4,7 @@ import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.NSFactory;
-import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
+import org.ogf.saga.namespace.abstracts.AbstractNSEntryReadTest;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -18,7 +18,7 @@ import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
 /**
  *
  */
-public class FileReadTest extends AbstractNSEntryTest {
+public class FileReadTest extends AbstractNSEntryReadTest {
     public FileReadTest(String protocol) throws Exception {
         super(protocol);
     }

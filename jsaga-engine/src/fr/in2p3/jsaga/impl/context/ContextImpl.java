@@ -249,11 +249,14 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
                 if (missing != null) {
                     throw new IncorrectState("Missing attribute(s): "+missing.toString(), this);
                 } else {
-                    throw new NoSuccess("INTERNAL ERROR: unexpected exception", this);
+                    throw new NoSuccess("[INTERNAL ERROR] Unexpected exception", this);
                 }
             }
             m_adaptor = m_adaptorBuilder.createSecurityAdaptor(
                     matching, attributes, m_attributes.m_type.getObject());
+            if (m_adaptor == null) {
+                throw new NotImplemented("[INTERNAL ERROR] Method createSecurityAdaptor should never return 'null'");
+            }
         }
         return m_adaptor;
     }

@@ -69,26 +69,4 @@ public class NSCopyTest extends AbstractNSCopyTest {
         } catch(DoesNotExist e) {
         }
     }
-
-    public void test_move() throws Exception {
-        URL target = createURL(m_rootUrl2, DEFAULT_FILENAME);
-        m_file.move(m_rootUrl2, Flags.NONE.getValue());
-        checkCopied(target, DEFAULT_CONTENT);
-        try {
-            NSFactory.createNSEntry(m_session, m_fileUrl, Flags.NONE.getValue());
-            fail("Expected DoesNotExist exception");
-        } catch(DoesNotExist e) {
-        }
-    }
-
-    public void test_rename() throws Exception {
-        URL target = createURL(m_rootUrl, DEFAULT_FILENAME);
-        m_file.move(m_rootUrl, Flags.NONE.getValue());
-        checkCopied(target, DEFAULT_CONTENT);
-        try {
-            NSFactory.createNSEntry(m_session, m_fileUrl, Flags.NONE.getValue());
-            fail("Expected DoesNotExist exception");
-        } catch(DoesNotExist e) {
-        }
-    }
 }

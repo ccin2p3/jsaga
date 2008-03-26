@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.security.impl;
 
-import java.security.PrivateKey;
+import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 
 /* ***************************************************
@@ -17,17 +17,12 @@ public class JKSSecurityAdaptor extends X509SecurityAdaptor {
 
 	private X509Certificate[] caCertificates;
 
-	public X509Certificate[] getCaCertificates() {
+    public JKSSecurityAdaptor(KeyStore keyStore, String keyStorePass, String userAlias, String userPass, X509Certificate[] caCertificates) throws Exception {
+        super(keyStore, keyStorePass, userAlias, userPass);
+        this.caCertificates = caCertificates;
+    }
+
+    public X509Certificate[] getCaCertificates() {
 		return caCertificates;
-	}
-
-	public void setCaCertificates(X509Certificate[] caCertificates) {
-		this.caCertificates = caCertificates;
-	}
-
-	public JKSSecurityAdaptor(PrivateKey privateKey, X509Certificate publicKey,
-			X509Certificate[] caCertificates) {
-		super(privateKey, publicKey);
-		this.caCertificates = caCertificates;
 	}
 }

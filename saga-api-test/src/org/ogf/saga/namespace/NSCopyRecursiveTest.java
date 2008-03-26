@@ -62,15 +62,4 @@ public class NSCopyRecursiveTest extends AbstractNSCopyTest {
         m_dir.copy(m_rootUrl2, Flags.RECURSIVE.or(Flags.OVERWRITE));
         checkCopied(target, DEFAULT_CONTENT);
     }
-
-    public void test_move_recurse() throws Exception {
-        URL target = createURL(m_dirUrl2, DEFAULT_DIRNAME+DEFAULT_FILENAME);
-        m_dir.move(m_dirUrl2, Flags.RECURSIVE.getValue());
-        checkCopied(target, DEFAULT_CONTENT);
-        try {
-            NSFactory.createNSDirectory(m_session, m_dirUrl, Flags.NONE.getValue());
-            fail("Expected DoesNotExist exception");
-        } catch(DoesNotExist e) {
-        }
-    }
 }

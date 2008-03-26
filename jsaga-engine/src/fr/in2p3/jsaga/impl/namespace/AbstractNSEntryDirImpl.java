@@ -2,9 +2,9 @@ package fr.in2p3.jsaga.impl.namespace;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
-import fr.in2p3.jsaga.adaptor.data.read.DirectoryReader;
+import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import fr.in2p3.jsaga.adaptor.data.write.DirectoryWriter;
+import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.helpers.URLFactory;
 import org.ogf.saga.URL;
@@ -55,7 +55,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         effectiveFlags.checkAllowed(Flags.RECURSIVE.or(Flags.DEREFERENCE.or(Flags.OVERWRITE.or(Flags.CREATEPARENTS))));
         effectiveFlags.checkRequired(Flags.RECURSIVE.getValue());
         URL effectiveTarget = this._getEffectiveURL(target);
-        if (m_adaptor instanceof DirectoryReader) {
+        if (m_adaptor instanceof DataReaderAdaptor) {
             // make target directory
             this._makeDir(effectiveTarget, flags);
             // copy source childs
@@ -84,7 +84,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         effectiveFlags.checkAllowed(Flags.RECURSIVE.or(Flags.DEREFERENCE.or(Flags.OVERWRITE)));
         effectiveFlags.checkRequired(Flags.RECURSIVE.getValue());
         URL effectiveSource = this._getEffectiveURL(source);
-        if (m_adaptor instanceof DirectoryWriter) {
+        if (m_adaptor instanceof DataWriterAdaptor) {
             // copy source childs
             AbstractNSDirectoryImpl sourceDir;
             try {
@@ -140,7 +140,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             } catch (AlreadyExists alreadyExists) {
                 throw new AlreadyExists("Target entry already exists: "+effectiveTarget, alreadyExists.getCause());
             }
-        } else if (m_adaptor instanceof DirectoryReader) {
+        } else if (m_adaptor instanceof DataReaderAdaptor) {
             // make target directory
             this._makeDir(effectiveTarget, flags);
             // move source childs to target directory
@@ -176,7 +176,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             return; //==========> EXIT
         }
         effectiveFlags.checkAllowed(Flags.RECURSIVE.or(Flags.DEREFERENCE));
-        if (m_adaptor instanceof DirectoryReader) {
+        if (m_adaptor instanceof DataReaderAdaptor && m_adaptor instanceof DataWriterAdaptor) {
             // remove source childs
             if (effectiveFlags.contains(Flags.RECURSIVE)) {
                 FileAttributes[] sourceChilds = this._listAttributes(m_url.getPath());
@@ -198,7 +198,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             URL parent = super._getParentDirURL();
             String directoryName = super._getEntryName();
             try {
-                ((DirectoryWriter)m_adaptor).removeDir(
+                ((DataWriterAdaptor)m_adaptor).removeDir(
                         parent.getPath(),
                         directoryName,
                         m_url.getQuery());
@@ -222,9 +222,9 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
     }
 
     protected FileAttributes[] _listAttributes(String absolutePath) throws NotImplemented, PermissionDenied, IncorrectState, Timeout, NoSuccess {
-        if (m_adaptor instanceof DirectoryReader) {
+        if (m_adaptor instanceof DataReaderAdaptor) {
             try {
-                return ((DirectoryReader)m_adaptor).listAttributes(absolutePath, m_url.getQuery());
+                return ((DataReaderAdaptor)m_adaptor).listAttributes(absolutePath, m_url.getQuery());
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("Directory does not exist: "+absolutePath, doesNotExist);
             }

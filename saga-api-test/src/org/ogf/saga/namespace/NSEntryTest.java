@@ -1,6 +1,7 @@
 package org.ogf.saga.namespace;
 
 import org.ogf.saga.URL;
+import org.ogf.saga.error.DoesNotExist;
 import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
 
 /* ***************************************************
@@ -39,5 +40,13 @@ public class NSEntryTest extends AbstractNSEntryTest {
         assertEquals(
                 DEFAULT_FILENAME,
                 m_file.getName().getPath());
+    }
+
+    public void test_unexisting() throws Exception {
+        try {
+            NSFactory.createNSEntry(m_session, createURL(m_dirUrl, "unexisting.txt"), Flags.NONE.getValue());
+            fail("Expected DoesNotExist exception");
+        } catch(DoesNotExist e) {
+        }
     }
 }

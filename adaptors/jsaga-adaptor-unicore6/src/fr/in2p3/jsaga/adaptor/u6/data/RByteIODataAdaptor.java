@@ -5,10 +5,8 @@ import fr.in2p3.jsaga.adaptor.base.usage.U;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
-import fr.in2p3.jsaga.adaptor.data.optimise.*;
 import fr.in2p3.jsaga.adaptor.data.read.*;
-import fr.in2p3.jsaga.adaptor.data.write.DirectoryWriter;
-import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
+import fr.in2p3.jsaga.adaptor.data.write.*;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.u6.TargetSystemInfo;
@@ -59,8 +57,8 @@ import java.util.Vector;
  *
  */
 public class RByteIODataAdaptor extends U6Abstract 
-		implements DirectoryReader, DataPut, DataGet,
-				DirectoryWriter, FileWriter, FileReader {
+		implements FileWriterPutter, FileReaderGetter,
+				FileWriterStreamFactory, FileReaderStreamFactory {
 		
 	protected JKSSecurityAdaptor m_credential;
     protected String m_serverFileSeparator ;
@@ -141,7 +139,7 @@ public class RByteIODataAdaptor extends U6Abstract
         //
     }
     
-    public boolean exists(String absolutePath) throws PermissionDenied, Timeout, NoSuccess {
+    public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
 
     	// prepare path
 		absolutePath = getEntryPath(absolutePath);
@@ -169,7 +167,7 @@ public class RByteIODataAdaptor extends U6Abstract
 		} catch (GPESecurityException e) {
 			throw new PermissionDenied("Unable to check entry",e);
 		} catch (Throwable e) {
-			if(!exists(parentDirectory)) {
+			if(!exists(parentDirectory, additionalArgs)) {
 				return false;
 			}
 			else {
@@ -178,7 +176,7 @@ public class RByteIODataAdaptor extends U6Abstract
 		}
     }
 
-    public boolean isDirectory(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isDirectory(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
     	// prepare path and connection
 		absolutePath = getEntryPath(absolutePath);
     	
@@ -211,18 +209,18 @@ public class RByteIODataAdaptor extends U6Abstract
         	throw new PermissionDenied("Unable to check directory",e);
 		} catch (Throwable e) {
 			// check
-			if(!exists(absolutePath)) {
+			if(!exists(absolutePath, additionalArgs)) {
 				throw new DoesNotExist("The directory does not exist.");
 			}
 			throw new NoSuccess(e);			
 		}
     }
 
-    public boolean isEntry(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        return !isDirectory(absolutePath);
+    public boolean isEntry(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        return !isDirectory(absolutePath, additionalArgs);
     }
     
-    public long getSize(String absolutePath) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public long getSize(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
     	      	
 		//prepare path and connection
 		absolutePath = getEntryPath(absolutePath);
@@ -247,12 +245,12 @@ public class RByteIODataAdaptor extends U6Abstract
 			throw new PermissionDenied("Unable to get size",e);
         } catch (Throwable e) {
         	// check source
-    		if(!exists(absolutePath)) {
+    		if(!exists(absolutePath, additionalArgs)) {
     			throw new DoesNotExist("The file does not exist.");
     		}
     		
     		// check source
-    		if(!isEntry(absolutePath)) {
+    		if(!isEntry(absolutePath, additionalArgs)) {
     			throw new BadParameter("The entry is not a file.");
     		}
     	
@@ -281,12 +279,12 @@ public class RByteIODataAdaptor extends U6Abstract
 			throw new PermissionDenied("Failed to remove file ["+fileName+"]", e);
         } catch (Throwable e) {
     		// check file
-    		if(!exists(absolutePath)) {
+    		if(!exists(absolutePath, additionalArgs)) {
     			throw new DoesNotExist("The file ["+absolutePath+"] does not exist.");
     		}
     		
     		// check file
-    		if(isDirectory(absolutePath)) {
+    		if(isDirectory(absolutePath, additionalArgs)) {
     			throw new BadParameter("The entry ["+absolutePath+"] is a directory.");
     		}
             throw new NoSuccess("Failed to remove file ["+fileName+"]", e);
@@ -297,7 +295,7 @@ public class RByteIODataAdaptor extends U6Abstract
     	// prepare path
 		absolutePath = getEntryPath(absolutePath);
 		// check parent
-		if(!exists(absolutePath)) {
+		if(!exists(absolutePath, additionalArgs)) {
 			throw new DoesNotExist("The entry ["+absolutePath+"] does not exist.");
 		} 
 		
@@ -324,7 +322,7 @@ public class RByteIODataAdaptor extends U6Abstract
     	
     	try {
     		// check parent here, else no exception returned during creation
-    		if(!exists(parentAbsolutePath)) {
+    		if(!exists(parentAbsolutePath, additionalArgs)) {
     			throw new ParentDoesNotExist("The parent directory ["+parentAbsolutePath+"] of ["+directoryName+"] does not exist.");
     		}
     		
@@ -342,7 +340,7 @@ public class RByteIODataAdaptor extends U6Abstract
 			
 			// check already exist
 			try {			
-				if(isDirectory(absolutePath))
+				if(isDirectory(absolutePath, additionalArgs))
 					throw new AlreadyExists ("The directory ["+absolutePath+"] already exists.");
 			}
 			catch(DoesNotExist e1) {
@@ -351,7 +349,7 @@ public class RByteIODataAdaptor extends U6Abstract
 			
 			// check parent
 			try {
-				if(!isDirectory(parentAbsolutePath))
+				if(!isDirectory(parentAbsolutePath, additionalArgs))
 					throw new BadParameter("The parent directory is not a directory.");
 			}
 			catch(DoesNotExist e1) {
@@ -393,12 +391,12 @@ public class RByteIODataAdaptor extends U6Abstract
 			}
 			
 			// check directory
-			if(!exists(absolutePath)) {
+			if(!exists(absolutePath, additionalArgs)) {
 				throw new DoesNotExist("The directory ["+absolutePath+"] does not exist.");
 			}
 			
 			// check directory
-			if(!isDirectory(absolutePath)) {
+			if(!isDirectory(absolutePath, additionalArgs)) {
 				throw new BadParameter("The entry ["+absolutePath+"] is not a directory.");
 			}
 				        
@@ -406,8 +404,8 @@ public class RByteIODataAdaptor extends U6Abstract
 		}
     }    
 
-	public void putFromStream(String absolutePath, InputStream stream,
-			boolean append, String additionalArgs) throws PermissionDenied,
+	public void putFromStream(String absolutePath, boolean append, String additionalArgs,
+			InputStream stream) throws PermissionDenied,
 			BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
 		if(append) {
 			throw new NoSuccess("Append not supported.");
@@ -440,8 +438,8 @@ public class RByteIODataAdaptor extends U6Abstract
 		}
 	}
 
-	public void getToStream(String absolutePath, OutputStream stream,
-			String additionalArgs) throws PermissionDenied, BadParameter,
+	public void getToStream(String absolutePath, String additionalArgs,
+			OutputStream stream) throws PermissionDenied, BadParameter,
 			DoesNotExist, Timeout, NoSuccess {
 		try {
     		// prepare path
@@ -483,10 +481,10 @@ public class RByteIODataAdaptor extends U6Abstract
 			throw new NoSuccess("Append not supported.");
 		}
         String absolutePath = getEntryPath(parentAbsolutePath)+m_serverFileSeparator+fileName;
-        if (exclusive && exists(absolutePath)) {
+        if (exclusive && exists(absolutePath, additionalArgs)) {
             // need to check existence explicitly, else exception is never thrown
             throw new AlreadyExists("File already exists");
-        } else if (!this.exists(parentAbsolutePath)) {
+        } else if (!this.exists(parentAbsolutePath, additionalArgs)) {
             // need to check existence explicitly, else exception is thrown to late (when writing bytes)
             throw new ParentDoesNotExist("Parent directory does not exist");
         }
