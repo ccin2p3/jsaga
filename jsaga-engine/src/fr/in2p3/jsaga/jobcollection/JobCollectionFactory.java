@@ -73,7 +73,7 @@ public abstract class JobCollectionFactory {
      * @param jobDescStream the job collection description stream.
      * @return the job collection description.
      */
-    public static JobCollectionDescription createJobDescription(String language, InputStream jobDescStream)
+    public static JobCollectionDescription createJobCollectionDescription(String language, InputStream jobDescStream)
         throws NotImplemented, BadParameter, NoSuccess {
         initializeFactory();
         return factory.doCreateJobCollectionDescription(language, jobDescStream);
