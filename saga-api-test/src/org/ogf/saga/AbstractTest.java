@@ -1,10 +1,14 @@
 package org.ogf.saga;
 
 import junit.framework.TestCase;
+
+import org.apache.log4j.Logger;
 import org.ogf.saga.error.*;
+import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
 
 import java.io.InputStream;
 import java.lang.Exception;
+import java.util.Date;
 import java.util.Properties;
 
 /* ***************************************************
@@ -30,11 +34,13 @@ public abstract class AbstractTest extends TestCase {
     protected static final String CONFIG_PHYSICAL_PROTOCOL = "physical.protocol";
 
     private Properties m_properties;
+    private static Logger s_logger = Logger.getLogger(AbstractNSEntryTest.class);
+    private long startTime;
+    private String methodName = "Unknown";
 
     public AbstractTest() throws Exception {
         // SAGA bootstrap
         System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
-
         // load test config
         InputStream stream = getClass().getClassLoader().getResourceAsStream("saga-test.properties");
         if (stream == null) {
@@ -44,6 +50,23 @@ public abstract class AbstractTest extends TestCase {
         m_properties.load(stream);
     }
 
+    /** Implicitly invoked before executing each test method */
+    protected void setUp() throws Exception {
+    	startTime = new Date().getTime();
+    	super.setUp();
+    }
+        
+    /** Implicitly invoked after executing each test method */
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        s_logger.debug(methodName+" - Duration: "+ (new Date().getTime() - startTime)+" ms");
+    }
+    
+    protected void setMethodName() {
+		methodName = new Exception().getStackTrace()[1].getMethodName();
+		s_logger.info(methodName);
+	}
+    
     protected String getOptionalProperty(String protocol, String name) {
         return m_properties.getProperty(protocol+"."+name);
     }
@@ -68,4 +91,7 @@ public abstract class AbstractTest extends TestCase {
         url.setPath(path);
         return url;
     }
+    
+
+
 }
