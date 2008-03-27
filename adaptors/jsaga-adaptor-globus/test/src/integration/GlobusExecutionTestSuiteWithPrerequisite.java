@@ -21,7 +21,6 @@ public class GlobusExecutionTestSuiteWithPrerequisite extends TestSuite {
     // test cases
     public static class GlobusJobRunWithPrequisiteTest extends JobRunWithPrequisiteTest {
         public GlobusJobRunWithPrequisiteTest() throws Exception {super("gatekeeper");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
 
     public GlobusExecutionTestSuiteWithPrerequisite() throws Exception {

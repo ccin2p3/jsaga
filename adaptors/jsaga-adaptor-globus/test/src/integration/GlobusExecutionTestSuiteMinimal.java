@@ -21,7 +21,6 @@ public class GlobusExecutionTestSuiteMinimal extends TestSuite {
     // test cases
     public static class GlobusJobRunMinimalTest extends JobRunMinimalTest {
         public GlobusJobRunMinimalTest() throws Exception {super("gatekeeper");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     
     public GlobusExecutionTestSuiteMinimal() throws Exception {

@@ -21,8 +21,7 @@ public class WSGramExecutionTestSuiteMinimal extends TestSuite {
     // test cases
     public static class WSGramJobRunMinimalTest extends JobRunMinimalTest {
         public WSGramJobRunMinimalTest() throws Exception {super("wsgram");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
-    }
+   }
     
     public WSGramExecutionTestSuiteMinimal() throws Exception {
         super();

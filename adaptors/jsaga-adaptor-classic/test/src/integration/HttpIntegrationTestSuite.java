@@ -20,27 +20,21 @@ import org.ogf.saga.namespace.*;
 public class HttpIntegrationTestSuite extends TestSuite {
     public static class HttpNSEntryTest extends NSEntryTest {
         public HttpNSEntryTest() throws Exception {super("http");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class HttpDirectoryListTest extends DirectoryListTest {
         public HttpDirectoryListTest() throws Exception {super("http");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class HttpDirectoryTest extends DirectoryTest {
         public HttpDirectoryTest() throws Exception {super("http");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class HttpFileReadTest extends FileReadTest {
         public HttpFileReadTest() throws Exception {super("http");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class Http_to_EmulatorNSCopyTest extends NSCopyTest {
         public Http_to_EmulatorNSCopyTest() throws Exception {super("http", "test");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class Http_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
         public Http_to_EmulatorNSCopyRecursiveTest() throws Exception {super("http", "test");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
 
     public HttpIntegrationTestSuite() throws Exception {

@@ -21,59 +21,45 @@ public class GlobusDataTestSuite extends TestSuite {
     // test cases
     public static class GsiftpNSEntryTest extends NSEntryTest {
         public GsiftpNSEntryTest() throws Exception {super("gsiftp");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class GsiftpDirectoryListTest extends DirectoryListTest {
         public GsiftpDirectoryListTest() throws Exception {super("gsiftp");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class GsiftpDirectoryMakeTest extends DirectoryMakeTest {
         public GsiftpDirectoryMakeTest() throws Exception {super("gsiftp");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class GsiftpDirectoryTest extends DirectoryTest {
         public GsiftpDirectoryTest() throws Exception {super("gsiftp");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class GsiftpFileReadTest extends FileReadTest {
         public GsiftpFileReadTest() throws Exception {super("gsiftp");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class GsiftpFileWriteTest extends FileWriteTest {
         public GsiftpFileWriteTest() throws Exception {super("gsiftp");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class GsiftpNSCopyTest extends NSCopyTest {
         public GsiftpNSCopyTest() throws Exception {super("gsiftp", "gsiftp");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class GsiftpNSCopyFromTest extends NSCopyFromTest {
         public GsiftpNSCopyFromTest() throws Exception {super("gsiftp", "gsiftp");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class GsiftpNSCopyRecursiveTest extends NSCopyRecursiveTest {
         public GsiftpNSCopyRecursiveTest() throws Exception {super("gsiftp", "gsiftp");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class GsiftpNSMoveTest extends NSMoveTest {
         public GsiftpNSMoveTest() throws Exception {super("gsiftp", "gsiftp");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class Gsiftp_to_EmulatorNSCopyTest extends NSCopyTest {
         public Gsiftp_to_EmulatorNSCopyTest() throws Exception {super("gsiftp", "test");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class Gsiftp_to_EmulatorNSCopyFromTest extends NSCopyFromTest {
         public Gsiftp_to_EmulatorNSCopyFromTest() throws Exception {super("gsiftp", "test");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class Gsiftp_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
         public Gsiftp_to_EmulatorNSCopyRecursiveTest() throws Exception {super("gsiftp", "test");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class Gsiftp_to_EmulatorNSMoveTest extends NSMoveTest {
         public Gsiftp_to_EmulatorNSMoveTest() throws Exception {super("gsiftp", "test");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
 
     public GlobusDataTestSuite() throws Exception {

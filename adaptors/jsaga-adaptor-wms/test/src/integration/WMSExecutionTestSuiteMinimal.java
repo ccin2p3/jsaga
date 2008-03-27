@@ -21,7 +21,6 @@ public class WMSExecutionTestSuiteMinimal extends TestSuite {
     // test cases
     public static class WMSJobRunMinimalTest extends JobRunMinimalTest {
         public WMSJobRunMinimalTest() throws Exception {super("wms");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     
     public WMSExecutionTestSuiteMinimal() throws Exception {

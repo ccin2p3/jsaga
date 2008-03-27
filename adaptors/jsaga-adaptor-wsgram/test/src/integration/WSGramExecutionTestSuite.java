@@ -21,7 +21,6 @@ public class WSGramExecutionTestSuite extends TestSuite {
     // test cases
     public static class WSGramJobDescriptionTest extends JobDescriptionTest {
         public WSGramJobDescriptionTest() throws Exception {super("wsgram");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
         public void test_totalCPUCount() { System.out.println("the test_totalCPUCount ignored : RSL v1.0 does not support this"); }
         public void test_threadsPerProcess() { System.out.println("the test_threadsPerProcess ignored : RSL v1.0 does not support this"); }
         public void test_fileTransfer() { System.out.println("the test_fileTransfer ignored : RSL v1.0 does not support this"); }
@@ -34,14 +33,12 @@ public class WSGramExecutionTestSuite extends TestSuite {
     // test cases
     public static class WSGramJobRunMinimalTest extends JobRunMinimalTest {
         public WSGramJobRunMinimalTest() throws Exception {super("wsgram");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     
     // test cases
     public static class WSGramJobRunRequiredTest extends JobRunRequiredTest {
         public WSGramJobRunRequiredTest() throws Exception {super("wsgram");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
-    }
+     }
     
     // test cases
     public static class WSGramJobRunOptionalTest extends JobRunOptionalTest {
@@ -51,13 +48,11 @@ public class WSGramExecutionTestSuite extends TestSuite {
         public void test_suspend_done() { System.out.println("the test_suspend_done ignored : wsgram does not support this"); };
         public void test_suspend_running() { System.out.println("the test_resume_running ignored : wsgram does not support this"); };
         public void test_listJob() { System.out.println("the test_listJob ignored : wsgram does not support this but MUST BE REACTIVATED when the jsaga-engine will support this"); };
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     
  	// test cases
     public static class WSGramJobRunDescriptionTest extends JobRunDescriptionTest {
         public WSGramJobRunDescriptionTest() throws Exception {super("wsgram");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
 
     public WSGramExecutionTestSuite() throws Exception {

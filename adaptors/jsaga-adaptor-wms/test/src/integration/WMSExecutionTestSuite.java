@@ -21,7 +21,6 @@ public class WMSExecutionTestSuite extends TestSuite {
     // test cases
     public static class WMSJobDescriptionTest extends JobDescriptionTest {
         public WMSJobDescriptionTest() throws Exception {super("wms");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
         public void test_totalCPUCount() { System.out.println("the test_totalCPUCount ignored : JDL does not support this"); }
         public void test_fileTransfer() { System.out.println("the test_fileTransfer ignored : JDL does not support this"); }
         public void test_cleanup() { System.out.println("the test_cleanup ignored : JDL does not support this"); }
@@ -30,13 +29,11 @@ public class WMSExecutionTestSuite extends TestSuite {
     // test cases
     public static class WMSJobRunMinimalTest extends JobRunMinimalTest {
         public WMSJobRunMinimalTest() throws Exception {super("wms");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     
     // test cases
     public static class WMSJobRunRequiredTest extends JobRunRequiredTest {
         public WMSJobRunRequiredTest() throws Exception {super("wms");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     
     // test cases
@@ -47,14 +44,12 @@ public class WMSExecutionTestSuite extends TestSuite {
         public void test_suspend_done() { System.out.println("the test_suspend_done ignored : personal gatekeeper does not support this"); };
         public void test_suspend_running() { System.out.println("the test_resume_running ignored : personal gatekeeper does not support this"); };
         public void test_listJob() { System.out.println("the test_listJob ignored : personal gatekeeper does not support this but MUST BE REACTIVATED when the jsaga-engine will support this"); };
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     
  	// test cases
     public static class WMSJobRunDescriptionTest extends JobRunDescriptionTest {
         public WMSJobRunDescriptionTest() throws Exception {super("wms");}
         //public void test_run_inWorkingDirectory() { System.out.println("the test_run_inWorkingDirectory ignored : wms does not support this"); };        
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
 
     public WMSExecutionTestSuite() throws Exception {

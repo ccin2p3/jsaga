@@ -21,7 +21,6 @@ public class WSGramExecutionTestSuiteWithPrerequisite extends TestSuite {
     // test cases
     public static class WSGramJobRunWithPrequisiteTest extends JobRunWithPrequisiteTest {
         public WSGramJobRunWithPrequisiteTest() throws Exception {super("wsgram");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
 
     public WSGramExecutionTestSuiteWithPrerequisite() throws Exception {
