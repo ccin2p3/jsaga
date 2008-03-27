@@ -170,7 +170,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
             } catch (AlreadyExists alreadyExists) {
                 throw new AlreadyExists("Target entry already exists: "+effectiveTarget, alreadyExists.getCause());
             }
-        } else if (m_adaptor instanceof FileReaderGetter) {
+        } else if (m_adaptor instanceof FileReaderGetter && !m_url.getScheme().equals(effectiveTarget.getScheme())) {
             FileImpl targetFile = SourcePhysicalFile.createTargetFile(m_session, effectiveTarget, effectiveFlags);
             try {
                 ((FileReaderGetter)m_adaptor).getToStream(
@@ -182,7 +182,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
                 throw new IncorrectState("Source file does not exist: "+m_url, doesNotExist);
             }
             targetFile.close();
-        } else if (m_adaptor instanceof FileReaderStreamFactory) {
+        } else if (m_adaptor instanceof FileReader) {
             Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(target.getScheme());
             if (descriptor.hasLogical() && descriptor.getLogical()) {
                 throw new BadParameter("Maybe what you want to do is to register to logical file the following location: "+ m_url.toString());
@@ -230,7 +230,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
             } catch (AlreadyExists alreadyExists) {
                 throw new IncorrectState("Target entry already exists: "+ m_url, alreadyExists);
             }
-        } else if (m_adaptor instanceof FileWriterPutter) {
+        } else if (m_adaptor instanceof FileWriterPutter && !m_url.getScheme().equals(effectiveSource.getScheme())) {
             FileImpl sourceFile = TargetPhysicalFile.createSourceFile(m_session, effectiveSource);
             try {
                 ((FileWriterPutter)m_adaptor).putFromStream(
