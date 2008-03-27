@@ -21,60 +21,46 @@ public class RByteIODataTestSuite extends TestSuite {
     // test cases
     public static class RByteIONSEntryTest extends NSEntryTest {
         public RByteIONSEntryTest() throws Exception {super("rbyteio");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class RByteIODirectoryListTest extends DirectoryListTest {
         public RByteIODirectoryListTest() throws Exception {super("rbyteio");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class RByteIODirectoryMakeTest extends DirectoryMakeTest {
         public RByteIODirectoryMakeTest() throws Exception {super("rbyteio");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class RByteIODirectoryTest extends DirectoryTest {
         public RByteIODirectoryTest() throws Exception {super("rbyteio");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class RByteIOFileReadTest extends FileReadTest {
         public RByteIOFileReadTest() throws Exception {super("rbyteio");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class RByteIOFileWriteTest extends FileWriteTest {
         public RByteIOFileWriteTest() throws Exception {super("rbyteio");}
         public void test_write_append() { System.out.println("the test_write_append ignored : not supported"); }
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class RByteIONSCopyTest extends NSCopyTest {
         public RByteIONSCopyTest() throws Exception {super("rbyteio", "rbyteio");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class RByteIONSCopyFromTest extends NSCopyFromTest {
         public RByteIONSCopyFromTest() throws Exception {super("rbyteio", "rbyteio");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class RByteIONSCopyRecursiveTest extends NSCopyRecursiveTest {
         public RByteIONSCopyRecursiveTest() throws Exception {super("rbyteio", "rbyteio");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class RByteIONSMoveTest extends NSMoveTest {
         public RByteIONSMoveTest() throws Exception {super("rbyteio", "rbyteio");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class RByteIO_to_EmulatorNSCopyTest extends NSCopyTest {
         public RByteIO_to_EmulatorNSCopyTest() throws Exception {super("rbyteio", "test");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class RByteIO_to_EmulatorNSCopyFromTest extends NSCopyFromTest {
         public RByteIO_to_EmulatorNSCopyFromTest() throws Exception {super("rbyteio", "test");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class RByteIO_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
         public RByteIO_to_EmulatorNSCopyRecursiveTest() throws Exception {super("rbyteio", "test");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class RByteIO_to_EmulatorNSMoveTest extends NSMoveTest {
         public RByteIO_to_EmulatorNSMoveTest() throws Exception {super("rbyteio", "test");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
 
     public RByteIODataTestSuite() throws Exception {
