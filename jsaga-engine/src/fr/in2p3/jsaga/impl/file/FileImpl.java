@@ -180,8 +180,9 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
             } catch (DoesNotExist doesNotExist) {
                 targetFile.remove();
                 throw new IncorrectState("Source file does not exist: "+m_url, doesNotExist);
+            } finally {
+                targetFile.close();
             }
-            targetFile.close();
         } else if (m_adaptor instanceof FileReader) {
             Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(target.getScheme());
             if (descriptor.hasLogical() && descriptor.getLogical()) {
@@ -242,8 +243,9 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
                 throw new DoesNotExist("Target parent directory does not exist: "+m_url, parentDoesNotExist);
             } catch (AlreadyExists alreadyExists) {
                 throw new IncorrectState("Target entry already exists: "+m_url, alreadyExists);
+            } finally {
+                sourceFile.close();
             }
-            sourceFile.close();
         } else if (m_adaptor instanceof FileWriter) {
             TargetPhysicalFile target = new TargetPhysicalFile(this);
             Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(source.getScheme());
