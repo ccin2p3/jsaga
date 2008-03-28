@@ -2,7 +2,9 @@ package fr.in2p3.jsaga.adaptor.wms.job;
 
 import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
+import fr.in2p3.jsaga.adaptor.base.usage.UFile;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
@@ -24,9 +26,9 @@ import org.glite.wms.wmproxy.ServiceURLException;
 import org.glite.wms.wmproxy.StringAndLongList;
 import org.glite.wms.wmproxy.StringAndLongType;
 import org.glite.wms.wmproxy.WMProxyAPI;
-import org.globus.common.CoGProperties;
 import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
+import org.ogf.saga.context.Context;
 import org.ogf.saga.error.AuthenticationFailed;
 import org.ogf.saga.error.AuthorizationFailed;
 import org.ogf.saga.error.BadParameter;
@@ -74,11 +76,19 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
     }
     
     public Usage getUsage() {
-        return new UAnd(new Usage[]{new UOptional(LBSERVER)}); 
+        return new UAnd(new Usage[]{
+        		new UOptional(LBSERVER),
+        		new UFile(Context.CERTREPOSITORY)}); 
     }
     
     public Default[] getDefaults(Map attributes) throws IncorrectState {
-    	return null;    // no default
+    	EnvironmentVariables env = EnvironmentVariables.getInstance();
+        return new Default[]{
+                new Default(Context.CERTREPOSITORY, new File[]{
+                        new File(env.getProperty("X509_CERT_DIR")+""),
+                        new File(System.getProperty("user.home")+"/.globus/certificates/"),
+                        new File("/etc/grid-security/certificates/")})
+                };
     }
 
     public String[] getSupportedSandboxProtocols() {
@@ -106,8 +116,8 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
     	m_parameters = attributes;
         
         // get certificate directory
-    	// TODO : caLoc = (String)attributes.get(Context.CERTREPOSITORY);
-    	String caLoc = CoGProperties.getDefault().getCaCertLocations();
+    	// This solution is temporary
+    	String caLoc = (String)attributes.get(Context.CERTREPOSITORY);
     	
         // save proxy file
         try {
