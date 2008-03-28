@@ -8,7 +8,6 @@ import org.w3c.dom.Element;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -33,7 +32,6 @@ public abstract class AbstractLanguageAdaptorProperties implements LanguageAdapt
 
     protected void _initParser(String[] requiredPropertyNames, String[] optionalPropertyNames,
                      String[] requiredVectorPropertyNames, String[] optionalVectorPropertyNames, String vectorPropertySeparator)
-            throws IOException, TransformerConfigurationException
     {
         m_requiredNames = new HashSet();
         addAll(m_requiredNames, requiredPropertyNames);
