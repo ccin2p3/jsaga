@@ -1,0 +1,76 @@
+package fr.in2p3.jsaga.adaptor.job;
+
+import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.monitor.*;
+import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import org.ogf.saga.error.*;
+import org.ogf.saga.task.State;
+
+import java.util.*;
+
+/* ***************************************************
+* *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
+* ***             http://cc.in2p3.fr/             ***
+* ***************************************************
+* File:   EmulatorJobAdaptor
+* Author: Sylvain Reynaud (sreynaud@in2p3.fr)
+* Date:   28 mars 2008
+* ***************************************************
+* Description:                                      */
+/**
+ *
+ */
+public class EmulatorJobAdaptor implements JobControlAdaptor, CleanableJobAdaptor, QueryIndividualJob {
+    private static Map<String,EmulatorJobStatus> s_status = new HashMap<String,EmulatorJobStatus>();
+
+    public String getType() {
+        return "test";
+    }
+
+    public Usage getUsage() {return null;}
+    public Default[] getDefaults(Map attributes) throws IncorrectState {return null;}
+    public Class[] getSupportedSecurityAdaptorClasses() {return null;}
+    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {}
+    public int getDefaultPort() {return 5678;}
+    public String[] getSupportedSandboxProtocols() {return null; /*todo: add "file://"*/}
+    public String getTranslator() {return null;}
+    public Map getTranslatorParameters() {return null;}
+    public JobMonitorAdaptor getDefaultJobMonitor() {return this;}
+
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+        //todo: split JobControlAdaptor and JobMonitorAdaptor
+        // => JobControlAdaptor: create new status map and register JobControlAdaptor
+        // => JobMonitorAdaptor: get status map from JobControlAdaptor
+    }
+
+    public void disconnect() throws NoSuccess {
+        //todo: split JobControlAdaptor and JobMonitorAdaptor
+        // => JobControlAdaptor: unregister JobControlAdaptor
+        // => JobMonitorAdaptor: do nothing
+    }
+
+    public String submit(String jobDesc) throws PermissionDenied, Timeout, NoSuccess {
+        String nativeJobId = UUID.randomUUID().toString();
+        s_status.put(nativeJobId, new EmulatorJobStatus(nativeJobId, SubState.SUBMITTED));
+        return nativeJobId;
+    }
+
+    public void cancel(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess {
+        s_status.put(nativeJobId, new EmulatorJobStatus(nativeJobId, SubState.CANCELED));
+    }
+
+    public void clean(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess {
+        s_status.remove(nativeJobId);
+    }
+
+    public JobStatus getStatus(String nativeJobId) throws Timeout, NoSuccess {
+        EmulatorJobStatus currentStatus = s_status.get(nativeJobId);
+        if (currentStatus.getSagaState()==State.NEW && currentStatus.getElapsedTime()>3000) {
+            s_status.put(nativeJobId, new EmulatorJobStatus(nativeJobId, SubState.DONE));
+        }
+        return s_status.get(nativeJobId);
+    }
+}
