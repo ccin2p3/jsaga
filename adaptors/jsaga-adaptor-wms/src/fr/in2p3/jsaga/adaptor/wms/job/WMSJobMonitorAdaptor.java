@@ -140,12 +140,6 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	        		//get Stdout/stderr and purge	        		
 					cleanUpJob(nativeJobId);
 					
-			        /*try {
-						Thread.sleep(5000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}*/
-					
 					// must return cleanUp state
 			        jobState = stub.jobStatus(nativeJobId,jobFlags );
 			        System.out.println("Status after clean:"+jobState.getState().getValue());
