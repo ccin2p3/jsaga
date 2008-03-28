@@ -68,7 +68,7 @@ public class EmulatorJobAdaptor implements JobControlAdaptor, CleanableJobAdapto
 
     public JobStatus getStatus(String nativeJobId) throws Timeout, NoSuccess {
         EmulatorJobStatus currentStatus = s_status.get(nativeJobId);
-        if (currentStatus.getSagaState()==State.NEW && currentStatus.getElapsedTime()>3000) {
+        if (currentStatus.getSagaState()==State.NEW && currentStatus.getElapsedTime()>1000) {
             s_status.put(nativeJobId, new EmulatorJobStatus(nativeJobId, SubState.DONE));
         }
         return s_status.get(nativeJobId);
