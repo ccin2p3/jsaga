@@ -51,7 +51,7 @@ import java.util.Map;
 * File:   U6JobAdaptorAbstract
 * Author: Nicolas DEMESY (nicolas.demesy@bt.com)
 * Date:   18 fev. 2008
-* ***************************************************
+* ***************************************************/
 /**
  *
  */

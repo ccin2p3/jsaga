@@ -22,10 +22,9 @@ import com.intel.gpe.clients.api.Status;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * TODO QueryFilteredJob when cleanup defined
  */
 public class U6JobMonitorAdaptor extends U6JobAdaptorAbstract implements QueryIndividualJob {
-	// TODO QueryFilteredJob	    
 
     public String getType() {
         return "unicore6";

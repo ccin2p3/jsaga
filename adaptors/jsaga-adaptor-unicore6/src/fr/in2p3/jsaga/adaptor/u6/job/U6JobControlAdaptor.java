@@ -45,9 +45,10 @@ import java.util.Vector;
 * File:   U6JobControlAdaptor
 * Author: Nicolas DEMESY (nicolas.demesy@bt.com)
 * Date:   18 fev. 2008
-* ***************************************************
+* ***************************************************/
 /**
- *
+ * TODO : support des pre-requis : utilisation direct du JSDL par Unicore
+ * TODO : test_run_memoryRequirement à tester pour savoir si il faut garder le test
  */
 public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobControlAdaptor{
 
@@ -101,7 +102,7 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
             // submit the job to target system and start it
 	    	Calendar terminationTime = Calendar.getInstance();
 	    	
-	        // TODO, set 1 hour ?
+	        // TODO, set 1 day ?
 	        terminationTime.add(Calendar.HOUR, 3600);
 	        
 	        // submit job

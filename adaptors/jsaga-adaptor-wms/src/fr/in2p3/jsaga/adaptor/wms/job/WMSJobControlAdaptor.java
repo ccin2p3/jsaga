@@ -27,7 +27,6 @@ import org.glite.wms.wmproxy.WMProxyAPI;
 import org.globus.common.CoGProperties;
 import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
-import org.ogf.saga.context.Context;
 import org.ogf.saga.error.AuthenticationFailed;
 import org.ogf.saga.error.AuthorizationFailed;
 import org.ogf.saga.error.BadParameter;
@@ -52,9 +51,10 @@ import java.util.Map;
 * File:   WMSJobControlAdaptor
 * Author: Nicolas DEMESY (nicolas.demesy@bt.com)
 * Date:   18 fev. 2008
-* ***************************************************
+* ***************************************************/
 /**
- *
+ * TODO : Update JDL with CPUARCHITECTURE, OPERATINGSYSTEMTYPE; TotalCPUTime
+ * TODO : Verify test_run_cpuTimeRequirement and test_run_processRequirement : Done in spite of Failed
  */
 public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobControlAdaptor {
     
@@ -100,14 +100,13 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
     	
     	super.connect(userInfo, host, port, basePath, attributes);    	
-    	//m_wmsServerUrl = "https://"+host+":"+port+basePath;
     	if(attributes.containsKey(LBSERVER))
     		m_lbServerUrl = (String) attributes.get(LBSERVER);
     	
     	m_parameters = attributes;
         
         // get certificate directory
-    	System.out.println("TODO : replace Ca Cert location :"+(String)attributes.get(Context.CERTREPOSITORY));
+    	// TODO : caLoc = (String)attributes.get(Context.CERTREPOSITORY);
     	String caLoc = CoGProperties.getDefault().getCaCertLocations();
     	
         // save proxy file

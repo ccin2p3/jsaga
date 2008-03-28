@@ -27,7 +27,7 @@ import java.util.Map;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ *  TODO : enable notification > debug bind() / unbind(), cf axis 1.2
  */
 public class WSGramJobMonitorAdaptor extends WSGramJobAdaptorAbstract implements QueryIndividualJob {
 	// ListenIndividualJob

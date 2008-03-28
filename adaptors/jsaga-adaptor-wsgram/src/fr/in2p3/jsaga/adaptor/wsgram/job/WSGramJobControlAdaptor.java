@@ -34,9 +34,10 @@ import java.util.Map;
 * File:   WSGramJobControlAdaptor
 * Author: Nicolas DEMESY (nicolas.demesy@bt.com)
 * Date:   6 fev. 2008
-* ***************************************************
+* ***************************************************/
 /**
- *
+ * TODO : setProtection
+ * TODO : during cleanup, remove proxy saved in server in $HOME/.globus/gram_proxy...
  */
 public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements JobControlAdaptor {
     private Map m_parameters;

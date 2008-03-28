@@ -64,7 +64,7 @@ import javax.xml.rpc.ServiceException;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * TODO : try to get status with stub.queryJobs(); 
  */
 public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements QueryIndividualJob {
 		
