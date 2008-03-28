@@ -6,7 +6,30 @@
                 xmlns:spmd="http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd"
                 xmlns:ext="http://www.in2p3.fr/jsdl-extension">
     <xsl:output method="xml" indent="yes"/>
-    <xsl:template match="/attributes">
+    <xsl:variable name="id">
+        <xsl:choose>
+            <xsl:when test="/attributes/JobName/@value">
+                <xsl:value-of select="/attributes/JobName/@value"/>
+            </xsl:when>
+            <xsl:otherwise><xsl:value-of select="generate-id(/attributes)"/></xsl:otherwise>
+        </xsl:choose>
+    </xsl:variable>
+
+    <xsl:template match="/">
+        <ext:JobCollection>
+            <ext:JobCollectionDescription>
+                <ext:JobCollectionIdentification>
+                    <ext:JobCollectionName><xsl:value-of select="$id"/></ext:JobCollectionName>
+                </ext:JobCollectionIdentification>
+                <ext:Parametric start="1" step="1" count="1"/>
+            </ext:JobCollectionDescription>
+            <ext:Job>
+                <xsl:apply-templates select="attributes"/>
+            </ext:Job>
+        </ext:JobCollection>
+    </xsl:template>
+
+    <xsl:template match="attributes">
         <!-- check unsupported attributes -->
         <xsl:if test="Interactive/@value='true'">
             <xsl:message terminate="yes">Interactive jobs are currently not supported by JSAGA</xsl:message>
@@ -22,9 +45,7 @@
         <jsdl:JobDefinition>
             <jsdl:JobDescription>
                 <jsdl:JobIdentification>
-                    <xsl:for-each select="JobName/@value">
-                        <jsdl:JobName><xsl:value-of select="."/></jsdl:JobName>
-                    </xsl:for-each>
+                    <jsdl:JobName><xsl:value-of select="$id"/></jsdl:JobName>
                     <xsl:for-each select="Queue/@value">
                         <jsdl:JobAnnotation><xsl:value-of select="."/></jsdl:JobAnnotation>
                     </xsl:for-each>

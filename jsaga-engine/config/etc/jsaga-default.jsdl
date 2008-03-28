@@ -1,27 +1,39 @@
-<JobDefinition xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl" xmlns:ext="http://www.in2p3.fr/jsdl-extension">
-    <JobDescription>
-        <Resources/><!-- <Resources> is needed for automatically adding <Tag> elements -->
-        <DataStaging>
-            <FilesystemName>WorkingDirectory</FilesystemName>
-            <CreationFlag>dontOverwrite</CreationFlag>
-            <DeleteOnTermination>true</DeleteOnTermination>
-            <ext:CopyLocally>false</ext:CopyLocally>
-        </DataStaging>
-        <ext:JobRetry INSERT="true"><!-- @INSERT enables adding <JobRetry> if missing -->
-            <ext:Retry status="queued" maxTime="PT80S">3</ext:Retry>
-            <ext:Retry status="running" maxTime="PT6M">2</ext:Retry>
-            <ext:Retry status="failed">1</ext:Retry>
-        </ext:JobRetry>
-        <ext:SelectedResource>
-            <ext:StandaloneWorker>false</ext:StandaloneWorker>
-        </ext:SelectedResource>
-    </JobDescription>
-    <ext:JobCollection>
-        <ext:Termination INSERT="true">
+<?xml version="1.0" encoding="UTF-8"?>
+<ext:JobCollection xmlns:ext="http://www.in2p3.fr/jsdl-extension">
+    <ext:JobCollectionDescription>
+        <ext:JobCollectionIdentification>
+            <ext:JobCollectionName>MYCOLLECTION</ext:JobCollectionName>
+        </ext:JobCollectionIdentification>
+        <ext:Parametric count="10" start="1" step="1"/>
+        <ext:Termination INSERT="true"><!-- @INSERT add <Termination> if it is missing -->
             <ext:Abort failed="0.2"/>
             <ext:Abort aborted="0.2"/>
-            <ext:Abort maxTime="PT2H"/>
-            <ext:Complete maxTime="PT20M" completed="1.0"/>
+            <ext:Abort maxTime="PT2H"/><!-- hard time limit -->
+            <ext:Complete maxTime="PT20M" completed="1.0"/><!-- soft time limit -->
         </ext:Termination>
-    </ext:JobCollection>
-</JobDefinition>
+    </ext:JobCollectionDescription>
+
+    <ext:Job>
+        <ext:JobLifetimeManagement INSERT="true"><!-- @INSERT add <JobLifetimeManagement> if it is missing -->
+            <ext:Retry count="3" status="queued" maxTime="PT80S"/>
+            <ext:Retry count="2" status="running" maxTime="PT6M"/>
+            <ext:Retry count="1" status="failed"/>
+        </ext:JobLifetimeManagement>
+        <ext:ResourceRequirements><!-- ignored if description has no <ResourceRequirements> -->
+            <ext:Resource>
+                <ext:StandaloneWorker>false</ext:StandaloneWorker>
+            </ext:Resource>
+        </ext:ResourceRequirements>
+        
+        <JobDefinition xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl">
+            <JobDescription>
+                <DataStaging><!-- ignored if description has no <DataStaging> -->
+                    <FilesystemName>WorkingDirectory</FilesystemName>
+                    <CreationFlag>dontOverwrite</CreationFlag>
+                    <DeleteOnTermination>true</DeleteOnTermination>
+                    <ext:CopyLocally>false</ext:CopyLocally>
+                </DataStaging>
+            </JobDescription>
+        </JobDefinition>
+    </ext:Job>
+</ext:JobCollection>

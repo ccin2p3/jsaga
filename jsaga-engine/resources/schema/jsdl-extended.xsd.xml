@@ -52,11 +52,9 @@
                             <element ref="ext:Shared" minOccurs="0" maxOccurs="1"/>
                         </sequence>
                     </extension></complexContent></complexType></element>
-                    <element ref="ext:JobRetry" minOccurs="0" maxOccurs="1"/>
-                    <element ref="ext:SelectedResource" minOccurs="0" maxOccurs="unbounded"/>
                 </sequence>
             </extension></complexContent></complexType></element>
-            <element ref="ext:JobCollection" minOccurs="0" maxOccurs="1"/>
+            <element ref="ext:Extension" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
     </extension></complexContent></complexType></element>
 </schema>
