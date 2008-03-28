@@ -82,13 +82,11 @@ public abstract class AbstractLanguageAdaptorProperties implements LanguageAdapt
             String name = (String) entry.getKey();
             String value = (String) entry.getValue();
             if (this.isProperty(name)) {
-                Element attribute = jobDescDOM.createElement("attribute");
-                attribute.setAttribute("name", name);
+                Element attribute = jobDescDOM.createElement(name);
                 attribute.setAttribute("value", value);
                 root.appendChild(attribute);
             } else if (this.isVectoryProperty(name)) {
-                Element vectorAttribute = jobDescDOM.createElement("vectorAttribute");
-                vectorAttribute.setAttribute("name", name);
+                Element vectorAttribute = jobDescDOM.createElement(name);
                 String[] values = value.split(m_vectoryPropertySeparator);
                 for (int i=0; i<values.length; i++) {
                     Element item = jobDescDOM.createElement("value");
