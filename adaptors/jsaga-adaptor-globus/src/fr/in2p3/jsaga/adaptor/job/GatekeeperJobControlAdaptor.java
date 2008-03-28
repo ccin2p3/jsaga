@@ -6,6 +6,7 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.globus.gram.*;
+import org.globus.gram.internal.GRAMConstants;
 import org.globus.gram.internal.GRAMProtocolErrorConstants;
 import org.globus.rsl.*;
 import org.ietf.jgss.GSSException;
@@ -71,14 +72,20 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
     public String submit(String jobDesc) throws PermissionDenied, Timeout, NoSuccess {
         RslNode rslTree;
         try {
-            rslTree = RSLParser.parse(jobDesc);
+        	rslTree = RSLParser.parse(jobDesc);
         } catch (ParseException e) {
             throw new NoSuccess(e);
         }
         GramJob job = new GramJob(m_credential, rslTree.toRSL(true));
         try {
-        	// boolean set if the job is not interactive
-            Gram.request(m_serverUrl, job, false);
+        	try {
+        		// boolean set if the job is not interactive
+            	Gram.request(m_serverUrl, job, false);
+        	}
+        	catch (WaitingForCommitException e) {
+        		// send signal to start job
+        		job.signal(GRAMConstants.SIGNAL_COMMIT_REQUEST);
+        	}
         } catch (GramException e) {
             this.rethrowException(e);
         } catch (GSSException e) {
