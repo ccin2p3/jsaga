@@ -50,7 +50,8 @@ public abstract class AbstractTest extends TestCase {
 
     /** Implicitly invoked before executing each test method */
     protected void setUp() throws Exception {
-    	logger.info(this.getName());
+    	if(logger.isInfoEnabled())
+    		logger.info(this.getName());
     	startTime = new Date().getTime();
     	super.setUp();
     }
@@ -58,7 +59,8 @@ public abstract class AbstractTest extends TestCase {
     /** Implicitly invoked after executing each test method */
     protected void tearDown() throws Exception {
         super.tearDown();
-        logger.debug(this.getName()+" - Duration: "+ (new Date().getTime() - startTime)+" ms");
+        if(logger.isDebugEnabled())
+        	logger.debug(this.getName()+" - Duration: "+ (new Date().getTime() - startTime)+" ms");
     }
     
     protected String getOptionalProperty(String protocol, String name) {
