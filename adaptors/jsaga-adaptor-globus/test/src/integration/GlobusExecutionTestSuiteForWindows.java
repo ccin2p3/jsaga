@@ -38,7 +38,7 @@ public class GlobusExecutionTestSuiteForWindows extends TestSuite {
 	// test cases
     public static class GlobusJobRunRequiredTest extends JobRunRequiredTest {
         public GlobusJobRunRequiredTest() throws Exception {super("gatekeeper-windows");}
-        public void test_run_error() { System.out.println("the test_run_error ignored : personal gatekeeper does not support this"); };
+        public void test_run_error() { System.out.println("the test_run_error ignored : personal gatekeeper return always DONE"); };
     }
     
     // test cases
@@ -54,6 +54,9 @@ public class GlobusExecutionTestSuiteForWindows extends TestSuite {
  	// test cases
     public static class GlobusJobRunDescriptionTest extends JobRunDescriptionTest {
         public GlobusJobRunDescriptionTest() throws Exception {super("gatekeeper-windows");}
+        public void test_run_queueRequirement() { System.out.println("the test_run_queueRequirement ignored : personal gatekeeper return always DONE"); };
+        public void test_run_cpuTimeRequirement() { System.out.println("the test_run_cpuTimeRequirement ignored : personal gatekeeper return always DONE"); };
+        public void test_run_processRequirement() { System.out.println("the test_run_processRequirement ignored : personal gatekeeper return always DONE"); };
     }
 
     public GlobusExecutionTestSuiteForWindows() throws Exception {
