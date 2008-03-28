@@ -52,13 +52,15 @@ import java.util.Vector;
 * File:   RByteIODataAdaptor
 * Author: Nicolas DEMESY (nicolas.demesy@bt.com)
 * Date:   5 mars 2008
-* ***************************************************
+* ***************************************************/
 /**
  *
  */
 public class RByteIODataAdaptor extends U6Abstract 
-		implements FileWriterPutter, FileReaderGetter {
-		
+		implements
+		 FileWriterPutter, FileReaderGetter
+		// FileReaderStreamFactory, FileWriterStreamFactory
+	{
 	protected JKSSecurityAdaptor m_credential;
     protected String m_serverFileSeparator ;
     protected StorageClient m_client;
@@ -95,7 +97,6 @@ public class RByteIODataAdaptor extends U6Abstract
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
-       
     	// get SERVICE_NAME
     	if(attributes.containsKey(SERVICE_NAME))
     		m_serviceName = (String) attributes.get(SERVICE_NAME);
@@ -140,7 +141,6 @@ public class RByteIODataAdaptor extends U6Abstract
     }
     
     public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
-
     	// prepare path
 		absolutePath = getEntryPath(absolutePath);
     	
@@ -157,7 +157,7 @@ public class RByteIODataAdaptor extends U6Abstract
 		
 		try {			
 	        // check
-	        List<com.intel.gpe.clients.api.GridFile> directoryList = m_client.listDirectory(parentDirectory);
+			List<com.intel.gpe.clients.api.GridFile> directoryList = m_client.listDirectory(parentDirectory);
 	        for (com.intel.gpe.clients.api.GridFile file : directoryList) {
 	            if(file.getPath().endsWith(absolutePath)) {
 	            	return true;
@@ -179,7 +179,7 @@ public class RByteIODataAdaptor extends U6Abstract
     public boolean isDirectory(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
     	// prepare path and connection
 		absolutePath = getEntryPath(absolutePath);
-    	
+		
 		// is root path
 		if(absolutePath.equals(rootDirectory)) {
 			return true;
@@ -221,8 +221,8 @@ public class RByteIODataAdaptor extends U6Abstract
     }
     
     public long getSize(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-    	      	
-		//prepare path and connection
+    	
+    	//prepare path and connection
 		absolutePath = getEntryPath(absolutePath);
 		
 		// get parent
@@ -259,7 +259,6 @@ public class RByteIODataAdaptor extends U6Abstract
     }
 
     public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-    	
     	//prepare path
 		String absolutePath = getEntryPath(parentAbsolutePath + fileName);    	
 
@@ -293,12 +292,8 @@ public class RByteIODataAdaptor extends U6Abstract
 
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {        
     	// prepare path
-		absolutePath = getEntryPath(absolutePath);
-		// check parent
-		if(!exists(absolutePath, additionalArgs)) {
-			throw new DoesNotExist("The entry ["+absolutePath+"] does not exist.");
-		} 
-		
+    	absolutePath = getEntryPath(absolutePath);
+    	
 		try {
 	        List<com.intel.gpe.clients.api.GridFile> directoryList = m_client.listDirectory(absolutePath);
 	        Vector<RByteIOFileAttributes> entries = new Vector<RByteIOFileAttributes>();
@@ -313,13 +308,16 @@ public class RByteIODataAdaptor extends U6Abstract
 		} catch (GPESecurityException e) {
 			throw new NoSuccess(e);
 		} catch (Throwable e) {
+			// check parent
+			if(!exists(absolutePath, additionalArgs)) {
+				throw new DoesNotExist("The entry ["+absolutePath+"] does not exist.");
+			}
 			throw new NoSuccess("Failed to list attributes", e);
-		}     
+		}
     }
 
     public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
     	String absolutePath = getEntryPath(parentAbsolutePath + directoryName);
-    	
     	try {
     		// check parent here, else no exception returned during creation
     		if(!exists(parentAbsolutePath, additionalArgs)) {
@@ -362,7 +360,6 @@ public class RByteIODataAdaptor extends U6Abstract
     public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
     	// prepare path
 		String absolutePath = getEntryPath(parentAbsolutePath + directoryName) ;
-				
 		try {  
 			// check children here, else no exception returned during deletion !			
 			List<com.intel.gpe.clients.api.GridFile> directoryList = m_client.listDirectory(absolutePath);
@@ -459,12 +456,12 @@ public class RByteIODataAdaptor extends U6Abstract
                     continue;
                 }
                 catch (TransferFailedException e) {
-                    throw e;
+                	throw e;
                 }
                 break;
             }
             if (i == getters.size()) {
-                throw new Exception(Messages.getString(MessagesKeys.common_requests_GetFilesRequest_Cannot_fetch_file_from_remote_location__no_suitable_protocol_found));
+            	throw new Exception(Messages.getString(MessagesKeys.common_requests_GetFilesRequest_Cannot_fetch_file_from_remote_location__no_suitable_protocol_found));
             }
             
         } catch (Throwable e) {
