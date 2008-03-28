@@ -19,7 +19,9 @@ public class DataIntegrationTestSuite extends TestSuite {
     public DataIntegrationTestSuite() throws Exception {
         super();
         this.addTest(FileIntegrationTestSuite.suite());
+        this.addTest(ZipIntegrationTestSuite.suite());
         this.addTest(HttpIntegrationTestSuite.suite());
+        this.addTest(HttpsIntegrationTestSuite.suite());
     }
 
     public static Test suite() throws Exception {
