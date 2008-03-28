@@ -49,7 +49,7 @@ public class SAGALanguageAdaptor extends AbstractLanguageAdaptorProperties imple
         return "SAGA";
     }
 
-    public void initParser() throws Exception {
+    public void initParser() {
         super._initParser(REQUIRED_PROPERTY_NAMES, OPTIONAL_PROPERTY_NAMES,
                 REQUIRED_VECTOR_PROPERTY_NAMES, OPTIONAL_VECTOR_PROPERTY_NAMES, ",");
     }

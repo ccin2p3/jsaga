@@ -2,12 +2,15 @@ package fr.in2p3.jsaga.impl.job.service;
 
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
-import org.ogf.saga.error.NotImplemented;
+import org.ogf.saga.URL;
+import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
 
+import java.lang.Exception;
 import java.util.List;
 
 /* ***************************************************
@@ -26,6 +29,41 @@ public abstract class AbstractAsyncJobServiceImpl extends AbstractSagaObjectImpl
     /** constructor */
     public AbstractAsyncJobServiceImpl(Session session) {
         super(session);
+    }
+
+    public Job runJob(String commandLine, String host, boolean interactive) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+        try {
+            // set job description
+            JobDescription desc = JobFactory.createJobDescription();
+            desc.setAttribute(JobDescription.EXECUTABLE, commandLine);
+            desc.setAttribute(JobDescription.INTERACTIVE, ""+interactive);
+            desc.setAttribute(JobDescription.CANDIDATEHOSTS, ""+host);
+
+            // set job service
+            Session session = SessionFactory.createSession(true);
+            URL serviceURL = new URL(host!=null ? host.replaceAll(" ", "%20") : "");
+            JobService service = JobFactory.createJobService(session, serviceURL);
+
+            // submit job
+            Job job = service.createJob(desc);
+            job.run();
+            return job;
+        } catch (IncorrectState e) {
+            throw new NoSuccess(e);
+        } catch (DoesNotExist e) {
+            throw new NoSuccess(e);
+        } catch (IncorrectURL e) {
+            throw new NoSuccess(e);
+        }
+    }
+    public Job runJob(String commandLine, String host) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+        return this.runJob(commandLine, host, false);
+    }
+    public Job runJob(String commandLine, boolean interactive) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+        return this.runJob(commandLine, "", interactive);
+    }
+    public Job runJob(String commandLine) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+        return this.runJob(commandLine, "", false);
     }
 
     public Task<Job> createJob(TaskMode mode, JobDescription jd) throws NotImplemented {

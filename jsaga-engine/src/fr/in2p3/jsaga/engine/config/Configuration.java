@@ -110,7 +110,7 @@ public class Configuration {
 
             // transform config
             XSLTransformerFactory tFactory = XSLTransformerFactory.getInstance();
-            data = tFactory.create(XSL_1_DEAMBIGUISED_CONFIG).transform(rawConfig);
+            data = tFactory.create(XSL_1_DEAMBIGUISED_CONFIG).transform(rawConfig.getDocumentElement());
             data = tFactory.create(XSL_2_EXPANDED_CONFIG).transform(data);
             data = tFactory.create(XSL_3_FLATTEN_CONFIG).transform(data);
             data = tFactory.create(XSL_4_MERGED_CONFIG, new ConfigurationURIResolver(desc)).transform(data);

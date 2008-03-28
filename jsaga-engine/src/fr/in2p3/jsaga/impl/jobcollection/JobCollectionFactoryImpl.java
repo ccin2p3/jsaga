@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl.jobcollection;
 
+import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.language.LanguageAdaptor;
 import fr.in2p3.jsaga.engine.factories.LanguageAdaptorFactory;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformer;
@@ -9,6 +10,11 @@ import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 import org.w3c.dom.Document;
 
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.File;
 import java.io.InputStream;
 import java.lang.Exception;
 
@@ -36,6 +42,15 @@ public class JobCollectionFactoryImpl extends JobCollectionFactory {
 
         // parse
         Document jobDescDOM = parser.parseJobDescription(jobDescStream);
+
+        // debug
+        if (Base.DEBUG) {
+            File debugFile = new File(new File(Base.JSAGA_VAR, "debug"), parser.getName()+".xml");
+            try {
+                TransformerFactory.newInstance().newTransformer().transform(
+                        new DOMSource(jobDescDOM), new StreamResult(debugFile));
+            } catch (TransformerException e) {}
+        }
 
         // translate to JSDL
         String stylesheet = parser.getTranslator();

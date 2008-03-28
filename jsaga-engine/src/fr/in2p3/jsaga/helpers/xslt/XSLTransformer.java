@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.helpers.xslt;
 import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.helpers.XMLFileParser;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -34,7 +35,7 @@ public class XSLTransformer {
         m_debugFile = debugFile;
     }
 
-    public byte[] transform(Document xmlInput) throws TransformerException, IOException {
+    public byte[] transform(Element xmlInput) throws TransformerException, IOException {
         return transform(new DOMSource(xmlInput));
     }
 

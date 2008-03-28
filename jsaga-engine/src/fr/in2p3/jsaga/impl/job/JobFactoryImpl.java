@@ -8,6 +8,7 @@ import fr.in2p3.jsaga.engine.job.monitor.JobMonitorServiceFactory;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import fr.in2p3.jsaga.impl.job.description.SAGAJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.job.service.JobServiceImpl;
+import fr.in2p3.jsaga.impl.job.service.LateBindedJobServiceImpl;
 import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
 import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
@@ -47,24 +48,25 @@ public class JobFactoryImpl extends JobFactory {
         }
     }
 
+    //NOTICE: resource discovery should NOT be done here because it should depend on the job description
     protected JobService doCreateJobService(Session session, URL rm) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
-        if (rm==null || rm.toString().equals("")) {
-            //NOTICE: resource discovery should NOT be done here because it should depend on the job description
-            throw new NotImplemented("Resource discovery is not implemented");
+        if (rm!=null && !rm.toString().equals("")) {
+            JobControlAdaptor controlAdaptor;
+            try {
+                controlAdaptor = m_adaptorFactory.getJobControlAdaptor(rm, session);
+            } catch (BadParameter e) {
+                throw new NoSuccess(e);
+            }
+            JobMonitorService monitorService;
+            try {
+                monitorService = m_monitorServiceFactory.getJobMonitorService(rm, session);
+            } catch (BadParameter e) {
+                throw new NoSuccess(e);
+            }
+            return new JobServiceImpl(session, rm, controlAdaptor, monitorService);
+        } else {
+            return new LateBindedJobServiceImpl(session);
         }
-        JobControlAdaptor controlAdaptor;
-        try {
-            controlAdaptor = m_adaptorFactory.getJobControlAdaptor(rm, session);
-        } catch (BadParameter e) {
-            throw new NoSuccess(e);
-        }
-        JobMonitorService monitorService;
-        try {
-            monitorService = m_monitorServiceFactory.getJobMonitorService(rm, session);
-        } catch (BadParameter e) {
-            throw new NoSuccess(e);
-        }
-        return new JobServiceImpl(session, rm, controlAdaptor, monitorService);
     }
 
     protected Task<JobService> doCreateJobService(TaskMode mode, Session session, URL rm) throws NotImplemented {

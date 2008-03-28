@@ -5,15 +5,14 @@ import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
 import fr.in2p3.jsaga.helpers.XMLFileParser;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformer;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformerFactory;
+import fr.in2p3.jsaga.impl.job.description.JSDLJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.job.description.SAGAJobDescriptionImpl;
-import fr.in2p3.jsaga.impl.job.description.SubJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.job.instance.JobImpl;
 import org.ogf.saga.*;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
-import org.ogf.saga.session.SessionFactory;
-import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import java.io.ByteArrayOutputStream;
 import java.lang.Exception;
@@ -58,10 +57,10 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
     }
 
     public Job createJob(JobDescription jobDesc) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
-        Document jsdlDOM;
+        Element jsdlDOM;
         if (jobDesc instanceof SAGAJobDescriptionImpl) {
-            jsdlDOM = ((SAGAJobDescriptionImpl) jobDesc).getJSDL().getOwnerDocument();
-        } else if (jobDesc instanceof SubJobDescriptionImpl) {
+            jsdlDOM = ((SAGAJobDescriptionImpl) jobDesc).getJSDL();
+        } else if (jobDesc instanceof JSDLJobDescriptionImpl) {
             throw new NotImplemented("Not implemented yet..."); //todo
         } else {
             throw new NotImplemented("Unsupported JobDescription implementation: "+jobDesc.getClass().getName());
@@ -86,41 +85,6 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
 
         // returns
         return new JobImpl(m_session, jobDesc, nativeJobDesc, m_controlAdaptor, m_monitorService);
-    }
-
-    public Job runJob(String commandLine, String host, boolean interactive) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
-        try {
-            // set job description
-            JobDescription desc = JobFactory.createJobDescription();
-            desc.setAttribute(JobDescription.EXECUTABLE, commandLine);
-            desc.setAttribute(JobDescription.INTERACTIVE, ""+interactive);
-            desc.setAttribute(JobDescription.CANDIDATEHOSTS, ""+host);
-
-            // set job service
-            Session session = SessionFactory.createSession(true);
-            URL serviceURL = new URL(host!=null ? host.replaceAll(" ", "%20") : "");
-            JobService service = JobFactory.createJobService(session, serviceURL);
-
-            // submit job
-            Job job = service.createJob(desc);
-            job.run();
-            return job;
-        } catch (IncorrectState e) {
-            throw new NoSuccess(e);
-        } catch (DoesNotExist e) {
-            throw new NoSuccess(e);
-        } catch (IncorrectURL e) {
-            throw new NoSuccess(e);
-        }
-    }
-    public Job runJob(String commandLine, String host) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
-        return this.runJob(commandLine, host, false);
-    }
-    public Job runJob(String commandLine, boolean interactive) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
-        return this.runJob(commandLine, "", interactive);
-    }
-    public Job runJob(String commandLine) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
-        return this.runJob(commandLine, "", false);
     }
 
     public List<String> list() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {

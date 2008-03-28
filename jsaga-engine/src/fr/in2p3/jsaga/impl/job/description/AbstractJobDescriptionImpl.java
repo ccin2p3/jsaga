@@ -2,7 +2,6 @@ package fr.in2p3.jsaga.impl.job.description;
 
 import fr.in2p3.jsaga.impl.attributes.AbstractAttributesImpl;
 import org.ogf.saga.ObjectType;
-import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.job.JobDescription;
 import org.w3c.dom.Element;
@@ -20,26 +19,14 @@ import org.w3c.dom.Element;
  *
  */
 public abstract class AbstractJobDescriptionImpl extends AbstractAttributesImpl implements JobDescription {
-    private Element m_jsdl;
-
     /** constructor */
-    public AbstractJobDescriptionImpl(Element jobDescDOM) {
-        super(null, true);
-        m_jsdl = jobDescDOM;
-    }
-
-    /** clone */
-    public SagaObject clone() throws CloneNotSupportedException {
-        AbstractJobDescriptionImpl clone = (AbstractJobDescriptionImpl) super.clone();
-        clone.m_jsdl = (Element) m_jsdl.cloneNode(true);
-        return clone;
+    public AbstractJobDescriptionImpl() {
+        super(null, true);  //isExtensible=true
     }
 
     public ObjectType getType() {
         return ObjectType.JOBDESCRIPTION;
     }
 
-    public Element getJSDL() throws NoSuccess {
-        return m_jsdl;
-    }
+    public abstract Element getJSDL() throws NoSuccess;
 }

@@ -29,6 +29,6 @@ public class JSDLLanguageAdaptor extends AbstractLanguageAdaptorXML implements L
     }
 
     public String getTranslator() {
-        return null;
+        return "xsl/language/jsdl.xsl";
     }
 }

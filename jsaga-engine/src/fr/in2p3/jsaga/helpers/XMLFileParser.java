@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.helpers;
 
 import fr.in2p3.jsaga.Base;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -92,6 +93,9 @@ public class XMLFileParser {
     }
 
     public static void dump(Document doc, OutputStream out) throws TransformerException {
+        dump(doc.getDocumentElement(), out);
+    }
+    public static void dump(Element doc, OutputStream out) throws TransformerException {
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
         transformer.setOutputProperty(javax.xml.transform.OutputKeys.METHOD, "xml");
         transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "yes");
