@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ext:JobCollection xmlns:ext="http://www.in2p3.fr/jsdl-extension">
+    <ext:JobCollectionDescription>
+        <ext:JobCollectionIdentification>
+            <ext:JobCollectionName>ref</ext:JobCollectionName>
+        </ext:JobCollectionIdentification>
+        <ext:Parametric count="10" start="1" step="1"/>
+    </ext:JobCollectionDescription>
+    <ext:Job>
+        <JobDefinition xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl">
+            <JobDescription>
+                <JobIdentification>
+                    <JobName>MYJOB_@{INDICE}</JobName>
+                </JobIdentification>
+
+                <Application>
+                    <!-- Application template identifier -->
+                    <ApplicationName>HelloWorld</ApplicationName>
+                    <ApplicationVersion>1.0</ApplicationVersion>
+                    <!-- Application definition -->
+                    <ext:ScriptApplication shell="/bin/sh"><![CDATA[$EXEC $INPUT > $STDOUT]]></ext:ScriptApplication>
+                    <p:POSIXApplication xmlns:p="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix">
+                        <p:Error>stderr.txt</p:Error>
+                    </p:POSIXApplication>
+                </Application>
+
+                <Resources>
+                    <CandidateHosts>
+                        <HostName>myhost.in2p3.fr</HostName>
+                        <HostName>otherhost.in2p3.fr</HostName>
+                    </CandidateHosts>
+                    <FileSystem name="HelloWorldDirectory">
+                        <FileSystemType>normal</FileSystemType>
+                        <MountPoint>HelloWorld/1.1</MountPoint>
+                        <ext:ParentFilesystemName>ApplicationsDirectory</ext:ParentFilesystemName>
+                        <ext:Tag>HELLOWORLD_1.1</ext:Tag>
+                    </FileSystem>
+                    <FileSystem name="HelloWorldDirectory">
+                        <FileSystemType>normal</FileSystemType>
+                        <MountPoint>HelloWorld/1.2</MountPoint>
+                        <ext:ParentFilesystemName>ApplicationsDirectory</ext:ParentFilesystemName>
+                        <ext:Tag>HELLOWORLD_1.2</ext:Tag>
+                    </FileSystem>
+                    <FileSystem name="DataBaseDirectory">
+                        <FileSystemType>normal</FileSystemType>
+                        <MountPoint>database/1.0</MountPoint>
+                        <ext:ParentFilesystemName>ApplicationsDirectory</ext:ParentFilesystemName>
+                        <ext:Tag>DATABASE_1.0</ext:Tag>
+                    </FileSystem>
+                </Resources>
+
+                <DataStaging name="EXEC">
+                    <FileName>bin/executable.exe</FileName>
+                    <FilesystemName>HelloWorldDirectory</FilesystemName>
+                    <CreationFlag>dontOverwrite</CreationFlag>
+                    <Source/>
+                </DataStaging>
+
+                <DataStaging name="EXEC">
+                    <FileName>executable.exe</FileName>
+                    <FilesystemName>WorkingDirectory</FilesystemName>
+                    <CreationFlag>overwrite</CreationFlag>
+                    <Source>
+                        <URI>gsiftp://host/repository/helloworld.c#EGEE_proxy</URI>
+                        <!-- target is ${WorkingDirectory}/${URI%/*} instead of <FilesystemName>/<FileName> -->
+                        <ext:Process>gcc -o $EXEC $@</ext:Process><!-- $@ is reserved for ${WorkingDirectory}/${URI%/*} -->
+                    </Source>
+                    <Target>
+                        <ext:Process><![CDATA[# delete the files missed by the job-wrapper]]></ext:Process>
+                    </Target>
+                </DataStaging>
+
+                <DataStaging name="INPUT">
+                    <FileName>data_@{INDICE}.dat</FileName>
+                    <FilesystemName>DataBaseDirectory</FilesystemName>
+                    <CreationFlag>dontOverwrite</CreationFlag>
+                    <Source/>
+                    <ext:CopyLocally>true</ext:CopyLocally>
+                </DataStaging>
+
+                <DataStaging name="STDOUT">
+                    <FileName>stdout.txt</FileName>
+                    <FilesystemName>WorkingDirectory</FilesystemName>
+                    <CreationFlag>overwrite</CreationFlag>
+                    <Target>
+                        <URI>file://./MYJOB_@{INDICE}.out</URI>
+                    </Target>
+                </DataStaging>
+            </JobDescription>
+        </JobDefinition>
+    </ext:Job>
+</ext:JobCollection>

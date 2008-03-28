@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:jsdl-posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
+        xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
+        xmlns:tns="http://www.in2p3.fr/jsdl-extension"
+        targetNamespace="http://www.in2p3.fr/jsdl-extension"
+        elementFormDefault="qualified">
+
+    <import schemaLocation="jsdl.xsd" namespace="http://schemas.ggf.org/jsdl/2005/11/jsdl"/>
+
+    <!-- selected resources -->
+    <element name="ResourceSelection"><complexType>
+        <sequence>
+            <element name="Resource" minOccurs="0" maxOccurs="unbounded"><complexType>
+                <sequence>
+                    <element name="Intermediary" minOccurs="0" maxOccurs="1" type="anyURI"/>
+                    <element name="StandaloneWorker" minOccurs="0" maxOccurs="1" type="boolean" default="false"/>
+                    <element name="Tag" minOccurs="0" maxOccurs="unbounded" type="string"/>
+                </sequence>
+                <attribute name="id" type="string" use="required"/>
+                <attribute name="nbslots" type="nonNegativeInteger" use="optional"/>
+            </complexType></element>
+        </sequence>
+    </complexType></element>
+
+    <!-- individual job -->
+    <element name="Job"><complexType>
+        <sequence>
+            <element name="JobLifetimeManagement" minOccurs="0" maxOccurs="1"><complexType>
+                <sequence>
+                    <element name="Retry" minOccurs="1" maxOccurs="unbounded"><complexType>
+                        <attribute name="count" use="required" type="positiveInteger"/>
+                        <attribute name="status" use="required"><simpleType><restriction base="string">
+                            <enumeration value="queued"/>
+                            <enumeration value="running"/>
+                            <enumeration value="aborted"/>
+                            <enumeration value="failed"/>
+                        </restriction></simpleType></attribute>
+                        <attribute name="maxTime" use="optional" type="duration"><annotation><documentation>
+                            Ignored for last retry iteration
+                        </documentation></annotation></attribute>
+                    </complexType></element>
+                </sequence>
+            </complexType></element>
+            <element ref="jsdl:JobDefinition" minOccurs="1" maxOccurs="1"/>
+        </sequence>
+    </complexType></element>
+    
+    <!-- collection of individual jobs -->
+    <element name="JobCollection"><complexType>
+        <sequence>
+            <element name="JobCollectionDescription" minOccurs="0" maxOccurs="1"><complexType>
+                <sequence>
+                    <element name="JobCollectionIdentification" minOccurs="0" maxOccurs="1"><complexType>
+                        <sequence>
+                            <element name="JobCollectionName" minOccurs="1" maxOccurs="1" type="string"/>
+                        </sequence>
+                    </complexType></element>
+                    <element name="Parametric" minOccurs="0" maxOccurs="1"><complexType>
+                        <attribute name="count" type="positiveInteger" use="required"/>
+                        <attribute name="start" type="int" use="required"/>
+                        <attribute name="step" type="positiveInteger" use="required"/>
+                    </complexType></element>
+                    <element name="Termination" minOccurs="0" maxOccurs="1"><complexType>
+                        <sequence>
+                            <element name="Abort" minOccurs="0" maxOccurs="unbounded" type="tns:TerminationType"/>
+                            <element name="Complete" minOccurs="0" maxOccurs="unbounded" type="tns:TerminationType"/>
+                        </sequence>
+                    </complexType></element>
+                </sequence>
+            </complexType></element>
+            <element ref="tns:Job" minOccurs="1" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType></element>
+    <complexType name="TerminationType">
+        <attribute name="maxTime" type="duration" use="optional"/>
+        <attribute name="aborted" type="tns:PercentType" use="optional"/>
+        <attribute name="failed" type="tns:PercentType" use="optional"/>
+        <attribute name="completed" type="tns:PercentType" use="optional"/>
+    </complexType>
+    <simpleType name="PercentType"><restriction base="float">
+        <minInclusive value="0.0"/>
+        <maxInclusive value="1.0"/>
+    </restriction></simpleType>
+</schema>

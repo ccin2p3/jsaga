@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ext:JobCollection xmlns:ext="http://www.in2p3.fr/jsdl-extension">
+    <ext:JobCollectionDescription>
+        <ext:JobCollectionIdentification>
+            <ext:JobCollectionName>sandbox</ext:JobCollectionName>
+        </ext:JobCollectionIdentification>
+        <ext:Parametric count="6" start="1" step="1"/>
+    </ext:JobCollectionDescription>
+    <ext:Job>
+        <JobDefinition xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl">
+            <JobDescription>
+                <JobIdentification>
+                    <JobName>MYJOB_@{INDICE}</JobName>
+                </JobIdentification>
+                <Application>
+                    <ext:ScriptApplication shell="/bin/sh"><![CDATA[$E $C0 $C1 $C2 <$D >$R 2>$STDERR]]></ext:ScriptApplication>
+                </Application>
+                <Resources>
+                    <FileSystem name="HelloWorldDirectory">
+                        <FileSystemType>normal</FileSystemType>
+                        <MountPoint>HelloWorld/1.1</MountPoint>
+                        <ext:ParentFilesystemName>ApplicationsDirectory</ext:ParentFilesystemName>
+                        <ext:Tag>HELLOWORLD_1.1</ext:Tag>
+                    </FileSystem>
+                    <FileSystem name="HelloWorldDirectory">
+                        <FileSystemType>normal</FileSystemType>
+                        <MountPoint>HelloWorld/1.2</MountPoint>
+                        <ext:ParentFilesystemName>ApplicationsDirectory</ext:ParentFilesystemName>
+                        <ext:Tag>HELLOWORLD_1.2</ext:Tag>
+                    </FileSystem>
+                </Resources>
+                <DataStaging name="C0">
+                    <FileName>config0.cfg</FileName>
+                    <CreationFlag>overwrite</CreationFlag>
+                    <Source><URI>file:///tmp/config0.cfg</URI></Source>
+                    <ext:Sandbox>true</ext:Sandbox>
+                </DataStaging>
+                <DataStaging name="C1">
+                    <FileName>config1.cfg</FileName>
+                    <CreationFlag>overwrite</CreationFlag>
+                    <Source><URI>https://host2:8443/private/configuration/config1.cfg#TEST_X509</URI></Source>
+                    <ext:Sandbox>true</ext:Sandbox>
+                </DataStaging>
+                <DataStaging name="C2">
+                    <FileName>config2.cfg</FileName>
+                    <CreationFlag>overwrite</CreationFlag>
+                    <Source><URI>http://host5:8080/public/configuration/config2.cfg</URI></Source>
+                    <ext:Sandbox>true</ext:Sandbox>
+                </DataStaging>
+                <DataStaging name="E">
+                    <FileName>bin/executable.exe</FileName>
+                    <FilesystemName>HelloWorldDirectory</FilesystemName>
+                    <CreationFlag>dontOverwrite</CreationFlag>
+                    <Source/>
+                    <ext:Sandbox>true</ext:Sandbox>
+                </DataStaging>
+                <DataStaging name="E">
+                    <FileName>executable-src/bin/executable.exe</FileName>
+                    <CreationFlag>overwrite</CreationFlag>
+                    <Source>
+                        <URI>gsiftp://host3:2811/repository/src/executable-src.tar.gz#EGEE_proxy</URI>
+                        <!-- target is ${WorkingDirectory}/${URI%/*} instead of <FilesystemName>/<FileName> -->
+                        <ext:Process>tar xzvf $@ ; cd executable-src ; make</ext:Process>
+                    </Source>
+                    <ext:Sandbox>true</ext:Sandbox>
+                </DataStaging>
+                <DataStaging name="D">
+                    <FileName>data.dat</FileName>
+                    <CreationFlag>overwrite</CreationFlag>
+                    <Source><URI>gsiftp://host4:2811/data/data_@{INDICE}.dat#OpenPlast_proxy</URI></Source>
+                    <ext:Sandbox>true</ext:Sandbox>
+                </DataStaging>
+                <DataStaging name="R">
+                    <FileName>result.dat</FileName>
+                    <CreationFlag>overwrite</CreationFlag>
+                    <Target><URI>mail://sreynaud@in2p3.fr/result_@{INDICE}.dat?host1</URI></Target>
+                    <ext:Sandbox>true</ext:Sandbox>
+                </DataStaging>
+                <DataStaging name="STDERR">
+                    <FileName>stderr.txt</FileName>
+                    <CreationFlag>overwrite</CreationFlag>
+                    <Target><URI>file:///tmp/stderr_@{INDICE}.txt</URI></Target>
+                    <ext:Sandbox>true</ext:Sandbox>
+                </DataStaging>
+            </JobDescription>
+        </JobDefinition>
+    </ext:Job>
+</ext:JobCollection>
