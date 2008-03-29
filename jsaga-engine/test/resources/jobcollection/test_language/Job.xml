@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ext:Job xmlns:ext="http://www.in2p3.fr/jsdl-extension">
+    <JobDefinition xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl">
+        <JobDescription>
+            <JobIdentification>
+                <JobName>test_language</JobName>
+            </JobIdentification>
+            <Application>
+                <p:POSIXApplication xmlns:p="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix">
+                    <p:Executable>/bin/date</p:Executable>
+                    <p:Output>stdout.txt</p:Output>
+                    <p:Error>stderr.txt</p:Error>
+                </p:POSIXApplication>
+            </Application>
+            <Resources/>
+        </JobDescription>
+    </JobDefinition>
+</ext:Job>
