@@ -21,16 +21,16 @@ import java.util.Map;
  *
  */
 public class MyProtocolDataAdaptor implements DataAdaptor {
+    public String getType() {
+        return "myprotocol";
+    }
+
     public Usage getUsage() {
         return null;
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectState {
         return null;
-    }
-
-    public String[] getSchemeAliases() {
-        return new String[]{"myprotocol", "altprotocol"};
     }
 
     public Class[] getSupportedSecurityAdaptorClasses() {
