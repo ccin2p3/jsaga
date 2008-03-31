@@ -53,9 +53,9 @@ public class GatekeeperJobMonitorAdaptor extends GatekeeperJobAdaptorAbstract im
         			// Send signal to clean jobmanager
     				job.signal(GRAMConstants.SIGNAL_COMMIT_END);
     			} catch (GramException e) {
-    				e.printStackTrace();
+    				logger.warn("Unable to send commit end signal", e);
     			} catch (GSSException e) {
-    				e.printStackTrace();
+    				logger.warn("Unable to send commit end signal", e);
     			}
         	}
         } catch (GramException e) {
