@@ -33,6 +33,7 @@ import java.util.Map;
 public abstract class GatekeeperJobAdaptorAbstract implements SagaSecureAdaptor {
     protected GSSCredential m_credential;
     protected String m_serverUrl;
+    protected static boolean twoPhaseUsed = false;
     private static final String IP_ADDRESS = "IPAddress";
     
     public Class[] getSupportedSecurityAdaptorClasses() {
