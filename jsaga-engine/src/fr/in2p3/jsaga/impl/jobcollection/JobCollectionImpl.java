@@ -1,9 +1,10 @@
 package fr.in2p3.jsaga.impl.jobcollection;
 
+import fr.in2p3.jsaga.adaptor.evaluator.Evaluator;
 import fr.in2p3.jsaga.engine.jobcollection.preprocess.JobPreprocessor;
+import fr.in2p3.jsaga.engine.jobcollection.preprocess.ParametricJobSplitter;
 import fr.in2p3.jsaga.engine.schema.jsdl.extension.Resource;
 import fr.in2p3.jsaga.engine.schema.jsdl.extension.ResourceSelection;
-import fr.in2p3.jsaga.impl.job.description.JSDLJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.job.instance.LateBindedJobImpl;
 import fr.in2p3.jsaga.impl.task.TaskContainerImpl;
 import fr.in2p3.jsaga.jobcollection.JobCollection;
@@ -36,17 +37,16 @@ public class JobCollectionImpl extends TaskContainerImpl implements JobCollectio
     private LinkedList<LateBindedJobImpl> m_unallocatedJobs;
 
     /** constructor */
-    public JobCollectionImpl(Session session, JobCollectionDescription collectionDesc) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+    public JobCollectionImpl(Session session, JobCollectionDescription jcDesc, Evaluator evaluator) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
         super(session);
 
+        // preprocess
+        JobPreprocessor preprocessor = new JobPreprocessor(jcDesc.getAsDocument());
+        byte[] processedJcDesc = preprocessor.preprocess();
+
         // split parametric job
-        org.ggf.schemas.jsdl.JobDescription[] jobDescArray;
-        try {
-            JobPreprocessor splitter = new JobPreprocessor(collectionDesc.getJSDL());
-            jobDescArray = splitter.split();
-        } catch (Exception e) {
-            throw new NoSuccess(e);
-        }
+        ParametricJobSplitter splitter = new ParametricJobSplitter(processedJcDesc, evaluator);
+        JobDescription[] jobDescArray = splitter.getIndividualJobArray();
 
         // create late binded job service
         JobService service;
@@ -57,9 +57,9 @@ public class JobCollectionImpl extends TaskContainerImpl implements JobCollectio
         }
 
         // create late binded jobs
-        for (int i=0; jobDescArray!=null && i<jobDescArray.length; i++) {
-            JobDescription jobDesc = new JSDLJobDescriptionImpl(jobDescArray[i]);
-            LateBindedJobImpl job = (LateBindedJobImpl) service.createJob(jobDesc);
+        m_unallocatedJobs = new LinkedList<LateBindedJobImpl>();
+        for (int i=0; i<jobDescArray.length; i++) {
+            LateBindedJobImpl job = (LateBindedJobImpl) service.createJob(jobDescArray[i]);
             m_unallocatedJobs.add(job);
             super.add(job);
         }
@@ -88,6 +88,7 @@ public class JobCollectionImpl extends TaskContainerImpl implements JobCollectio
         for (int i=0; i<resourceIds.length; i++) {
             Resource resource = new Resource();
             resource.setId(resourceIds[i]);
+            resource.setNbslots(1);
             resources.addResource(resource);
         }
         this.allocateResources(resources);

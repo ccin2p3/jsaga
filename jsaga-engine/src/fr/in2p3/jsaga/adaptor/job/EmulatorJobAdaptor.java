@@ -7,7 +7,6 @@ import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.*;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import org.ogf.saga.error.*;
-import org.ogf.saga.task.State;
 
 import java.util.*;
 
@@ -35,7 +34,7 @@ public class EmulatorJobAdaptor implements JobControlAdaptor, CleanableJobAdapto
     public Class[] getSupportedSecurityAdaptorClasses() {return null;}
     public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {}
     public int getDefaultPort() {return 5678;}
-    public String[] getSupportedSandboxProtocols() {return null; /*todo: add "file://"*/}
+    public String[] getSupportedSandboxProtocols() {return null;}
     public String getTranslator() {return null;}
     public Map getTranslatorParameters() {return null;}
     public JobMonitorAdaptor getDefaultJobMonitor() {return this;}
@@ -68,7 +67,7 @@ public class EmulatorJobAdaptor implements JobControlAdaptor, CleanableJobAdapto
 
     public JobStatus getStatus(String nativeJobId) throws Timeout, NoSuccess {
         EmulatorJobStatus currentStatus = s_status.get(nativeJobId);
-        if (currentStatus.getSagaState()==State.NEW && currentStatus.getElapsedTime()>1000) {
+        if (currentStatus.getSubState().getValue()==SubState.SUBMITTED.getValue() && currentStatus.getElapsedTime()>1000) {
             s_status.put(nativeJobId, new EmulatorJobStatus(nativeJobId, SubState.DONE));
         }
         return s_status.get(nativeJobId);

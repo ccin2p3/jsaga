@@ -66,7 +66,7 @@ public class JobCollectionRun extends AbstractCommand {
             JobCollectionDescription desc = JobCollectionFactory.createJobCollectionDescription(language, jobCollectionFile);
 
             if (line.hasOption(OPT_TRANSLATE)) {
-                XMLFileParser.dump(desc.getJSDL(), System.out);
+                XMLFileParser.dump(desc.getAsDocument(), System.out);
             } else {
                 // create job collection
                 Session session = SessionFactory.createSession(true);

@@ -22,17 +22,34 @@ import java.util.*;
  *
  */
 public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskContainer {
+    // metrics
+//    private MetricImpl<State> m_metric_TaskState;
+    // internal
     private Map<Integer,Task> m_tasks;
 
     /** constructor */
-    public TaskContainerImpl(Session session) {
+    public TaskContainerImpl(Session session) throws NoSuccess {
         super(session);
+
+        // set metrics
+/*
+        m_metric_TaskState = this._addMetric(new MetricImpl<State>(
+                TaskContainer.TASKCONTAINER_STATE,
+                "fires on state changes of any task in the container, and has the value of that task's handle",
+                MetricMode.ReadOnly,
+                "1",
+                MetricType.Enum,
+                null));
+*/
+
+        // internal
         m_tasks = new HashMap<Integer,Task>();
     }
 
     /** clone */
     public SagaObject clone() throws CloneNotSupportedException {
         TaskContainerImpl clone = (TaskContainerImpl) super.clone();
+//        clone.m_metric_TaskState = m_metric_TaskState;
         clone.m_tasks = clone(m_tasks);
         return clone;
     }
@@ -66,6 +83,7 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
     }
 
     public Task waitFor(float timeoutInSeconds, WaitMode mode) throws NotImplemented, IncorrectState, DoesNotExist, NoSuccess {
+        this.startListening();
         Task task = null;
         try {
             boolean forever;
@@ -84,6 +102,7 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
                 Thread.currentThread().sleep(100);
             }
         } catch(InterruptedException e) {/*ignore*/}
+        this.stopListening();
         return task;
     }
 
@@ -130,6 +149,27 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
             states.add(task.getState());
         }
         return states.toArray(new State[states.size()]);
+    }
+
+    private boolean startListening() throws NotImplemented, IncorrectState, NoSuccess {
+        boolean isListening = true;
+        try {
+            for (Task task : m_tasks.values()) {
+                isListening &= ((AbstractTaskImpl)task).startListening(null);
+            }
+        } catch(Timeout e) {
+            throw new NoSuccess(e);
+        }
+        return isListening;
+    }
+    private void stopListening() throws NotImplemented, NoSuccess {
+        try {
+            for (Task task : m_tasks.values()) {
+                ((AbstractTaskImpl)task).stopListening(null);
+            }
+        } catch(Timeout e) {
+            throw new NoSuccess(e);
+        }
     }
 
     private Task getFinished(WaitMode mode) throws NotImplemented {

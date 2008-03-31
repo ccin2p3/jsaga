@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl.jobcollection;
 
+import fr.in2p3.jsaga.adaptor.evaluator.Evaluator;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import fr.in2p3.jsaga.jobcollection.*;
 import org.ogf.saga.ObjectType;
@@ -22,14 +23,18 @@ import java.util.List;
  *
  */
 public class JobCollectionManagerImpl extends AbstractSagaObjectImpl implements JobCollectionManager {
+    private Evaluator m_evaluator;
+
     /** constructor */
-    public JobCollectionManagerImpl(Session session) {
+    public JobCollectionManagerImpl(Session session, Evaluator evaluator) {
         super(session);
+        m_evaluator = evaluator;
     }
 
     /** clone */
     public SagaObject clone() throws CloneNotSupportedException {
         JobCollectionManagerImpl clone = (JobCollectionManagerImpl) super.clone();
+        clone.m_evaluator = m_evaluator;
         return clone;
     }
 
@@ -38,7 +43,7 @@ public class JobCollectionManagerImpl extends AbstractSagaObjectImpl implements 
     }
 
     public JobCollection createJobCollection(JobCollectionDescription description) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
-        return new JobCollectionImpl(m_session, description);
+        return new JobCollectionImpl(m_session, description, m_evaluator);
     }
 
     public List<String> list() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {

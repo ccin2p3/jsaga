@@ -66,12 +66,12 @@ public class GenericThreadedTask extends AbstractTaskImpl implements Task {
         }
     }
 
-    protected void refreshState() {
-        // do nothing
+    protected State queryState() {
+        return null;    // GenericThreadedTask does not support queryState
     }
 
-    public void startListening(Metric metric) {
-        // do nothing
+    public boolean startListening(Metric metric) {
+        return true;    // GenericThreadedTask is always listening anyway...
     }
 
     public void stopListening(Metric metric) {

@@ -162,8 +162,7 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
                 throw new NoSuccess("INTERNAL ERROR: unexpected exception");
         }
         if (m_callbacks.size() > 0) {
-            m_isListening = true;
-            m_task.startListening(this);
+            m_isListening = m_task.startListening(this);
         }
         return cookie;
     }

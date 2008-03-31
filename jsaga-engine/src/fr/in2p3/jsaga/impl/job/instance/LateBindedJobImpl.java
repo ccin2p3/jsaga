@@ -5,6 +5,7 @@ import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
 import org.ogf.saga.monitoring.Metric;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.task.State;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -66,20 +67,21 @@ public class LateBindedJobImpl extends AbstractAsyncJobImpl implements Job {
         }
     }
 
-    protected void refreshState() throws NotImplemented, Timeout, NoSuccess {
+    protected State queryState() throws NotImplemented, Timeout, NoSuccess {
         if (m_job != null) {
-            m_job.refreshState();
+            return m_job.queryState();
         } else {
-            // do nothing
+            return State.NEW;
         }
     }
 
     private Metric m_listenedMetric;
-    public void startListening(Metric metric) throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public boolean startListening(Metric metric) throws NotImplemented, IncorrectState, Timeout, NoSuccess {
         if (m_job != null) {
-            m_job.startListening(metric);
+            return m_job.startListening(metric);
         } else {
             m_listenedMetric = metric;
+            return true;    // a job task is always listening (either with notification, or with polling)
         }
     }
 

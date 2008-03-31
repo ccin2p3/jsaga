@@ -5,8 +5,7 @@ import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
 import fr.in2p3.jsaga.helpers.XMLFileParser;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformer;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformerFactory;
-import fr.in2p3.jsaga.impl.job.description.JSDLJobDescriptionImpl;
-import fr.in2p3.jsaga.impl.job.description.SAGAJobDescriptionImpl;
+import fr.in2p3.jsaga.impl.job.description.AbstractJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.job.instance.JobImpl;
 import org.ogf.saga.*;
 import org.ogf.saga.error.*;
@@ -58,10 +57,8 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
 
     public Job createJob(JobDescription jobDesc) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
         Element jsdlDOM;
-        if (jobDesc instanceof SAGAJobDescriptionImpl) {
-            jsdlDOM = ((SAGAJobDescriptionImpl) jobDesc).getJSDL();
-        } else if (jobDesc instanceof JSDLJobDescriptionImpl) {
-            throw new NotImplemented("Not implemented yet..."); //todo
+        if (jobDesc instanceof AbstractJobDescriptionImpl) {
+            jsdlDOM = ((AbstractJobDescriptionImpl) jobDesc).getJSDL();
         } else {
             throw new NotImplemented("Unsupported JobDescription implementation: "+jobDesc.getClass().getName());
         }

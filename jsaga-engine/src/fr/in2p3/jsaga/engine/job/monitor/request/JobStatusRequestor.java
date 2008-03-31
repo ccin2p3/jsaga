@@ -31,8 +31,8 @@ public class JobStatusRequestor {
                 JobStatus[] statusArray = ((QueryListJob) m_adaptor).getStatusList(new String[]{nativeJobId});
                 return findJobStatus(statusArray, nativeJobId);
             } else if (m_adaptor instanceof QueryFilteredJob) {
-                //todo: get filter string (e.g. jobCollectionName) ?
-                JobStatus[] statusArray = ((QueryFilteredJob) m_adaptor).getFilteredStatus(null);
+                //todo: set filter string (e.g. userID, jcName, startDate) ?
+                JobStatus[] statusArray = ((QueryFilteredJob) m_adaptor).getFilteredStatus(null, null, null);
                 return findJobStatus(statusArray, nativeJobId);
             } else {
                 throw new NotImplemented("Querying job status not implemented for adaptor: "+ m_adaptor.getClass().getName());

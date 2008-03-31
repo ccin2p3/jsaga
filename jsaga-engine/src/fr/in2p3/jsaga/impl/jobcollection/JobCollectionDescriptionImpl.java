@@ -20,18 +20,18 @@ import org.w3c.dom.Document;
  *
  */
 public class JobCollectionDescriptionImpl extends AbstractSagaObjectImpl implements JobCollectionDescription {
-    private Document m_jsdl;
+    private Document m_document;
 
     /** constructor */
-    public JobCollectionDescriptionImpl(Document jsdl) throws NoSuccess {
+    public JobCollectionDescriptionImpl(Document jcDesc) throws NoSuccess {
         super();
-        m_jsdl = jsdl;
+        m_document = jcDesc;
     }
 
     /** clone */
     public SagaObject clone() throws CloneNotSupportedException {
         JobCollectionDescriptionImpl clone = (JobCollectionDescriptionImpl) super.clone();
-        clone.m_jsdl = m_jsdl;
+        clone.m_document = m_document;
         return clone;
     }
 
@@ -39,7 +39,7 @@ public class JobCollectionDescriptionImpl extends AbstractSagaObjectImpl impleme
         return ObjectType.UNKNOWN;
     }
 
-    public Document getJSDL() {
-        return m_jsdl;
+    public Document getAsDocument() {
+        return m_document;
     }
 }

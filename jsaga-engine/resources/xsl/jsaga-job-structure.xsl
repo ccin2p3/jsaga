@@ -6,15 +6,19 @@
             xmlns:ext="http://www.in2p3.fr/jsdl-extension"
             exclude-result-prefixes="xsd">
     <xsl:output method="xml" indent="yes"/>
-    <xsl:variable name="root" select="document('schema/jsdl-extended.xsd.xml')/xsd:schema"/>
+    <xsl:variable name="root" select="document('schema/job-collection.xsd')/xsd:schema"/>
+    <xsl:variable name="xjsdl" select="document('schema/jsdl-extended.xsd.xml')/xsd:schema"/>
     <xsl:variable name="jsdl" select="document('schema/jsdl.xsd')/xsd:schema"/>
     <xsl:variable name="ext" select="document('schema/jsdl-extension.xsd')/xsd:schema"/>
 
     <!-- entry point -->
     <xsl:template match="/">
-        <xsl:apply-templates select="$root/xsd:element[@name='JobDefinitionExtended']"/>
+        <xsl:apply-templates select="$root/xsd:element[@name='JobCollection']"/>
     </xsl:template>
 
+    <xsl:template match="xsd:element[@name='JobDefinition']">
+        <xsl:apply-templates select="$xjsdl/xsd:element[@name='JobDefinitionExtended']"/>
+    </xsl:template>
     <xsl:template match="xsd:element[@name='JobDefinitionExtended']">
         <jsdl:JobDefinition>
             <xsl:apply-templates select="xsd:complexType"/>

@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.impl.jobcollection;
 
 import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.language.LanguageAdaptor;
+import fr.in2p3.jsaga.engine.factories.EvaluatorAdaptorFactory;
 import fr.in2p3.jsaga.engine.factories.LanguageAdaptorFactory;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformer;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformerFactory;
@@ -31,14 +32,16 @@ import java.lang.Exception;
  *
  */
 public class JobCollectionFactoryImpl extends JobCollectionFactory {
-    private LanguageAdaptorFactory m_adaptorFactory;
+    private LanguageAdaptorFactory m_languageFactory;
+    private EvaluatorAdaptorFactory m_evaluatorFactory;
 
-    public JobCollectionFactoryImpl(LanguageAdaptorFactory adaptorFactory) {
-        m_adaptorFactory = adaptorFactory;
+    public JobCollectionFactoryImpl(LanguageAdaptorFactory languageFactory, EvaluatorAdaptorFactory evaluatorFactory) {
+        m_languageFactory = languageFactory;
+        m_evaluatorFactory = evaluatorFactory;
     }
 
     protected JobCollectionDescription doCreateJobCollectionDescription(String language, InputStream jobDescStream) throws NotImplemented, BadParameter, NoSuccess {
-        LanguageAdaptor parser = m_adaptorFactory.getLanguageAdaptor(language);
+        LanguageAdaptor parser = m_languageFactory.getLanguageAdaptor(language);
 
         // parse
         Document jobDescDOM = parser.parseJobDescription(jobDescStream);
@@ -54,21 +57,20 @@ public class JobCollectionFactoryImpl extends JobCollectionFactory {
 
         // translate to JSDL
         String stylesheet = parser.getTranslator();
-        Document jsdlDOM;
-        if (stylesheet != null) {
-            try {
-                XSLTransformer transformer = XSLTransformerFactory.getInstance().getCached(stylesheet);
-                jsdlDOM = transformer.transformToDOM(jobDescDOM);
-            } catch (Exception e) {
-                throw new NoSuccess(e);
-            }
-        } else {
-            jsdlDOM = jobDescDOM;
+        if (stylesheet == null) {
+            throw new NotImplemented("[ADAPTOR ERROR] Method getTranslator() must not return 'null'");
         }
-        return new JobCollectionDescriptionImpl(jsdlDOM);
+        Document jcDesc;
+        try {
+            XSLTransformer transformer = XSLTransformerFactory.getInstance().getCached(stylesheet);
+            jcDesc = transformer.transformToDOM(jobDescDOM);
+        } catch (Exception e) {
+            throw new NoSuccess(e);
+        }
+        return new JobCollectionDescriptionImpl(jcDesc);
     }
 
     protected JobCollectionManager doCreateJobCollectionManager(Session session) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
-        return new JobCollectionManagerImpl(session);
+        return new JobCollectionManagerImpl(session, m_evaluatorFactory.getEvaluatorAdaptor());
     }
 }

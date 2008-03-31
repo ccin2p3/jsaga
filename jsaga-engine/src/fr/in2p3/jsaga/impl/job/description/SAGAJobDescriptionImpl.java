@@ -29,22 +29,22 @@ public class SAGAJobDescriptionImpl extends AbstractJobDescriptionImpl implement
         s_adaptor.initParser();
     }
 
-    private Document m_jobDescDOM;
+    private Document m_document;
     private Element m_root;
 
     /** constructor */
     public SAGAJobDescriptionImpl() throws Exception {
         super();
-        m_jobDescDOM = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-        m_root = m_jobDescDOM.createElement("attributes");
-        m_jobDescDOM.appendChild(m_root);
+        m_document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        m_root = m_document.createElement("attributes");
+        m_document.appendChild(m_root);
     }
 
     /** clone */
     public SagaObject clone() throws CloneNotSupportedException {
         SAGAJobDescriptionImpl clone = (SAGAJobDescriptionImpl) super.clone();
-        clone.m_jobDescDOM = (Document) m_jobDescDOM.cloneNode(true);
-        clone.m_root = (Element) clone.m_jobDescDOM.getFirstChild();
+        clone.m_document = (Document) m_document.cloneNode(true);
+        clone.m_root = (Element) clone.m_document.getFirstChild();
         return clone;
     }
 
@@ -66,8 +66,8 @@ public class SAGAJobDescriptionImpl extends AbstractJobDescriptionImpl implement
         if (s_adaptor.isVectoryProperty(key)) {
             Element vectorAttribute = this.createAttribute(key);
             for (int i=0; i<values.length; i++) {
-                Element item = m_jobDescDOM.createElement("value");
-                item.appendChild(m_jobDescDOM.createTextNode(values[i]));
+                Element item = m_document.createElement("value");
+                item.appendChild(m_document.createTextNode(values[i]));
                 vectorAttribute.appendChild(item);
             }
             super.setVectorAttribute(key, values);
@@ -78,26 +78,16 @@ public class SAGAJobDescriptionImpl extends AbstractJobDescriptionImpl implement
         }
     }
 
-    public Element getJSDL() throws NoSuccess {
+    public Document getAsDocument() throws NoSuccess {
         String stylesheet = s_adaptor.getTranslator();
         if (stylesheet == null) {
             throw new NoSuccess("[INTERNAL ERROR] Stylesheet is null");
         }
-        Document jobCollectionDesc;
         try {
             XSLTransformer t = XSLTransformerFactory.getInstance().getCached(stylesheet);
-            jobCollectionDesc = t.transformToDOM(m_jobDescDOM);
+            return t.transformToDOM(m_document);
         } catch (Exception e) {
             throw new NoSuccess(e);
-        }
-        NodeList list = jobCollectionDesc.getElementsByTagNameNS("http://schemas.ggf.org/jsdl/2005/11/jsdl", "JobDefinition");
-        switch(list.getLength()) {
-            case 0:
-                throw new NoSuccess("[INTERNAL ERROR] Job description contains no JSDL element");
-            case 1:
-                return (Element) list.item(0);
-            default:
-                throw new NoSuccess("[INTERNAL ERROR] Job description contains several JSDL elements");
         }
     }
 
@@ -106,11 +96,11 @@ public class SAGAJobDescriptionImpl extends AbstractJobDescriptionImpl implement
         NodeList list = m_root.getElementsByTagName(key);
         switch(list.getLength()) {
             case 0:
-                attribute = m_jobDescDOM.createElement(key);
+                attribute = m_document.createElement(key);
                 m_root.appendChild(attribute);
                 return attribute;
             case 1:
-                attribute = m_jobDescDOM.createElement(key);
+                attribute = m_document.createElement(key);
                 m_root.replaceChild(attribute, list.item(0));
                 return attribute;
             default:

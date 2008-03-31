@@ -2,30 +2,74 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
-                xmlns:posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
-                xmlns:spmd="http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd"
                 xmlns:ext="http://www.in2p3.fr/jsdl-extension">
     <xsl:output method="xml" indent="yes"/>
-    <xsl:variable name="id">
-        <xsl:choose>
-            <xsl:when test="/jsdl:JobDefinition/jsdl:JobDescription/jsdl:JobIdentification/jsdl:JobName/text()">
-                <xsl:value-of select="/jsdl:JobDefinition/jsdl:JobDescription/jsdl:JobIdentification/jsdl:JobName/text()"/>
-            </xsl:when>
-            <xsl:otherwise><xsl:value-of select="generate-id(/jsdl:JobDefinition)"/></xsl:otherwise>
-        </xsl:choose>
-    </xsl:variable>
 
     <xsl:template match="/">
+        <xsl:apply-templates/>
+    </xsl:template>
+
+    <xsl:template match="jsdl:JobDefinition">
         <ext:JobCollection>
-            <ext:JobCollectionDescription>
-                <ext:JobCollectionIdentification>
-                    <ext:JobCollectionName><xsl:value-of select="$id"/></ext:JobCollectionName>
-                </ext:JobCollectionIdentification>
-                <ext:Parametric start="1" step="1" count="1"/>
-            </ext:JobCollectionDescription>
+            <xsl:call-template name="DEFAULT_JobCollectionDescription"/>
             <ext:Job>
-                <xsl:copy-of select="jsdl:JobDefinition"/>
+                <xsl:copy-of select="."/>
             </ext:Job>
         </ext:JobCollection>
+    </xsl:template>
+
+    <xsl:template match="ext:Job">
+        <ext:JobCollection>
+            <xsl:call-template name="DEFAULT_JobCollectionDescription"/>
+            <xsl:copy-of select="."/>
+        </ext:JobCollection>
+    </xsl:template>
+
+    <xsl:template match="ext:JobCollection">
+        <ext:JobCollection>
+            <xsl:choose>
+                <xsl:when test="ext:JobCollectionDescription"><xsl:apply-templates select="ext:JobCollectionDescription"/></xsl:when>
+                <xsl:otherwise><xsl:call-template name="DEFAULT_JobCollectionDescription"/></xsl:otherwise>
+            </xsl:choose>
+            <xsl:copy-of select="ext:Job"/>
+        </ext:JobCollection>
+    </xsl:template>
+    <xsl:template match="ext:JobCollectionDescription">
+        <ext:JobCollectionDescription>
+            <xsl:choose>
+                <xsl:when test="ext:JobCollectionIdentification"><xsl:copy-of select="ext:JobCollectionIdentification"/></xsl:when>
+                <xsl:otherwise><xsl:call-template name="DEFAULT_JobCollectionIdentification"/></xsl:otherwise>
+            </xsl:choose>
+            <xsl:choose>
+                <xsl:when test="ext:Parametric"><xsl:copy-of select="ext:Parametric"/></xsl:when>
+                <xsl:otherwise><xsl:call-template name="DEFAULT_Parametric"/></xsl:otherwise>
+            </xsl:choose>
+            <xsl:apply-templates select="ext:Termination"/>
+        </ext:JobCollectionDescription>
+    </xsl:template>
+
+    <xsl:template name="DEFAULT_JobCollectionDescription">
+        <ext:JobCollectionDescription>
+            <xsl:call-template name="DEFAULT_JobCollectionIdentification"/>
+            <xsl:call-template name="DEFAULT_Parametric"/>
+        </ext:JobCollectionDescription>
+    </xsl:template>
+    <xsl:template name="DEFAULT_JobCollectionIdentification">
+        <ext:JobCollectionIdentification>
+            <ext:JobCollectionName>
+                <xsl:choose>
+                    <xsl:when test="/ext:JobCollection/ext:JobCollectionDescription/ext:JobCollectionIdentification/ext:JobCollectionName/text()">
+                        <xsl:value-of select="/ext:JobCollection/ext:JobCollectionDescription/ext:JobCollectionIdentification/ext:JobCollectionName/text()"/>
+                    </xsl:when>
+                    <xsl:when test="//jsdl:JobDefinition/jsdl:JobDescription/jsdl:JobIdentification/jsdl:JobName/text()">
+                        <xsl:value-of select="//jsdl:JobDefinition/jsdl:JobDescription/jsdl:JobIdentification/jsdl:JobName/text()"/>
+                    </xsl:when>
+                    <xsl:otherwise><xsl:value-of select="generate-id(.)"/></xsl:otherwise>
+                </xsl:choose>
+            </ext:JobCollectionName>
+        </ext:JobCollectionIdentification>
+    </xsl:template>
+    <xsl:template name="DEFAULT_Parametric">
+        <ext:Parametric start="1" step="1" count="1"/>
     </xsl:template>
 </xsl:stylesheet>

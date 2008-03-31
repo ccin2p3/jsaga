@@ -42,17 +42,22 @@ import org.ogf.saga.task.TaskFactory;
  *
  */
 public class SagaFactoryImpl implements SagaFactory {
+    // data
     private DataAdaptorFactory m_dataAdaptorFactory;
-    private LanguageAdaptorFactory m_languageAdaptorFactory;
+    // job
     private JobAdaptorFactory m_jobAdaptorFactory;
     private JobMonitorAdaptorFactory m_jobMonitorAdaptorFactory;
+    // job collection
+    private LanguageAdaptorFactory m_languageAdaptorFactory;
+    private EvaluatorAdaptorFactory m_evaluatorAdaptorFactory;
 
     public SagaFactoryImpl() throws ConfigurationException {
         Configuration config = Configuration.getInstance();
         m_dataAdaptorFactory = new DataAdaptorFactory(config);
-        m_languageAdaptorFactory = new LanguageAdaptorFactory(config);
         m_jobAdaptorFactory = new JobAdaptorFactory(config);
         m_jobMonitorAdaptorFactory = new JobMonitorAdaptorFactory(config);
+        m_languageAdaptorFactory = new LanguageAdaptorFactory(config);
+        m_evaluatorAdaptorFactory = new EvaluatorAdaptorFactory(config);
     }
 
     public BufferFactory createBufferFactory() throws NotImplemented {
@@ -100,6 +105,6 @@ public class SagaFactoryImpl implements SagaFactory {
     }
 
     public JobCollectionFactory createJobCollectionFactory() throws NotImplemented {
-        return new JobCollectionFactoryImpl(m_languageAdaptorFactory);
+        return new JobCollectionFactoryImpl(m_languageAdaptorFactory, m_evaluatorAdaptorFactory);
     }
 }

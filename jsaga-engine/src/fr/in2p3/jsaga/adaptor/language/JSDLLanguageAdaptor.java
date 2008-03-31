@@ -21,6 +21,7 @@ public class JSDLLanguageAdaptor extends AbstractLanguageAdaptorXML implements L
 
     public void initParser() throws Exception {
         super._initParser(new String[]{
+                "schema/job-collection.xsd",
                 "schema/jsdl-extended.xsd.xml",
                 "schema/jsdl-extension.xsd",
                 "schema/jsdl-posix.xsd",

@@ -71,20 +71,22 @@
                             <posix:Environment name="{substring-before(.,'=')}"><xsl:value-of select="substring-after(.,'=')"/></posix:Environment>
                         </xsl:for-each>
                     </posix:POSIXApplication>
-                    <spmd:SPMDApplication>
-                        <xsl:for-each select="NumberOfProcesses/@value">
-                            <spmd:NumberOfProcesses><xsl:value-of select="."/></spmd:NumberOfProcesses>
-                        </xsl:for-each>
-                        <xsl:for-each select="ProcessesPerHost/@value">
-                            <spmd:ProcessesPerHost><xsl:value-of select="."/></spmd:ProcessesPerHost>
-                        </xsl:for-each>
-                        <xsl:for-each select="ThreadsPerProcess/@value">
-                            <spmd:ThreadsPerProcess><xsl:value-of select="."/></spmd:ThreadsPerProcess>
-                        </xsl:for-each>
-                        <xsl:for-each select="SPMDVariation/@value">
-                            <spmd:SPMDVariation><xsl:value-of select="."/></spmd:SPMDVariation>
-                        </xsl:for-each>
-                    </spmd:SPMDApplication>
+                    <xsl:if test="NumberOfProcesses | ProcessesPerHost | ThreadsPerProcess | SPMDVariation">
+                        <spmd:SPMDApplication>
+                            <xsl:for-each select="NumberOfProcesses/@value">
+                                <spmd:NumberOfProcesses><xsl:value-of select="."/></spmd:NumberOfProcesses>
+                            </xsl:for-each>
+                            <xsl:for-each select="ProcessesPerHost/@value">
+                                <spmd:ProcessesPerHost><xsl:value-of select="."/></spmd:ProcessesPerHost>
+                            </xsl:for-each>
+                            <xsl:for-each select="ThreadsPerProcess/@value">
+                                <spmd:ThreadsPerProcess><xsl:value-of select="."/></spmd:ThreadsPerProcess>
+                            </xsl:for-each>
+                            <xsl:for-each select="SPMDVariation/@value">
+                                <spmd:SPMDVariation><xsl:value-of select="."/></spmd:SPMDVariation>
+                            </xsl:for-each>
+                        </spmd:SPMDApplication>
+                    </xsl:if>
                 </jsdl:Application>
                 <jsdl:Resources>
                     <xsl:for-each select="WorkingDirectory/@value">
@@ -132,44 +134,54 @@
                     <jsdl:DataStaging>
                         <xsl:choose>
                             <xsl:when test="contains(.,'>>')">
+                                <jsdl:FileName><xsl:value-of select="substring-after(.,'>>')"/></jsdl:FileName>
+                                <jsdl:FilesystemName>WorkingDirectory</jsdl:FilesystemName>
+                                <jsdl:CreationFlag>Append</jsdl:CreationFlag>
+                                <xsl:call-template name="CLEANUP"/>
                                 <jsdl:Source>
                                     <jsdl:URI><xsl:value-of select="substring-before(.,'>>')"/></jsdl:URI>
                                 </jsdl:Source>
-                                <jsdl:FileName><xsl:value-of select="substring-after(.,'>>')"/></jsdl:FileName>
-                                <jsdl:CreationFlag>Append</jsdl:CreationFlag>
                             </xsl:when>
                             <xsl:when test="contains(.,'>')">
+                                <jsdl:FileName><xsl:value-of select="substring-after(.,'>')"/></jsdl:FileName>
+                                <jsdl:FilesystemName>WorkingDirectory</jsdl:FilesystemName>
+                                <jsdl:CreationFlag>Overwrite</jsdl:CreationFlag>
+                                <xsl:call-template name="CLEANUP"/>
                                 <jsdl:Source>
                                     <jsdl:URI><xsl:value-of select="substring-before(.,'>')"/></jsdl:URI>
                                 </jsdl:Source>
-                                <jsdl:FileName><xsl:value-of select="substring-after(.,'>')"/></jsdl:FileName>
-                                <jsdl:CreationFlag>Overwrite</jsdl:CreationFlag>
                             </xsl:when>
                             <xsl:when test="contains(.,'&lt;&lt;')">
+                                <jsdl:FileName><xsl:value-of select="substring-after(.,'&lt;&lt;')"/></jsdl:FileName>
+                                <jsdl:FilesystemName>WorkingDirectory</jsdl:FilesystemName>
+                                <jsdl:CreationFlag>Append</jsdl:CreationFlag>
+                                <xsl:call-template name="CLEANUP"/>
                                 <jsdl:Target>
                                     <jsdl:URI><xsl:value-of select="substring-before(.,'&lt;&lt;')"/></jsdl:URI>
                                 </jsdl:Target>
-                                <jsdl:FileName><xsl:value-of select="substring-after(.,'&lt;&lt;')"/></jsdl:FileName>
-                                <jsdl:CreationFlag>Append</jsdl:CreationFlag>
                             </xsl:when>
                             <xsl:when test="contains(.,'&lt;')">
+                                <jsdl:FileName><xsl:value-of select="substring-after(.,'&lt;')"/></jsdl:FileName>
+                                <jsdl:FilesystemName>WorkingDirectory</jsdl:FilesystemName>
+                                <jsdl:CreationFlag>Overwrite</jsdl:CreationFlag>
+                                <xsl:call-template name="CLEANUP"/>
                                 <jsdl:Target>
                                     <jsdl:URI><xsl:value-of select="substring-before(.,'&lt;')"/></jsdl:URI>
                                 </jsdl:Target>
-                                <jsdl:FileName><xsl:value-of select="substring-after(.,'&lt;')"/></jsdl:FileName>
-                                <jsdl:CreationFlag>Overwrite</jsdl:CreationFlag>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:message terminate="yes">BadParameter: syntax error for attribute FileTransfer: <xsl:value-of select="."/></xsl:message>
                             </xsl:otherwise>
                         </xsl:choose>
-                        <jsdl:FilesystemName>WorkingDirectory</jsdl:FilesystemName>
-                        <xsl:for-each select="/attributes/Cleanup/@value">
-                            <jsdl:DeleteOnTermination><xsl:value-of select="."/></jsdl:DeleteOnTermination>
-                        </xsl:for-each>
                     </jsdl:DataStaging>
                 </xsl:for-each>
             </jsdl:JobDescription>
         </jsdl:JobDefinition>
+    </xsl:template>
+
+    <xsl:template name="CLEANUP">
+        <xsl:for-each select="/attributes/Cleanup/@value">
+            <jsdl:DeleteOnTermination><xsl:value-of select="."/></jsdl:DeleteOnTermination>
+        </xsl:for-each>        
     </xsl:template>
 </xsl:stylesheet>

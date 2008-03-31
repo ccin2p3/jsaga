@@ -109,17 +109,18 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
         }
     }
 
-    //todo: do not change state if it is not conform to the states graph (because notified state may be more recent)
-    protected void refreshState() throws NotImplemented, Timeout, NoSuccess {
+    protected State queryState() throws NotImplemented, Timeout, NoSuccess {
         JobStatus status = m_monitorService.getState(m_nativeJobId);
-        this.setState(status.getSagaState(), status.getStateDetail(), status.getSubState());
+        this.setJobState(status.getSagaState(), status.getStateDetail(), status.getSubState());
+        return status.getSagaState();
     }
 
-    public void startListening(Metric metric) throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public boolean startListening(Metric metric) throws NotImplemented, IncorrectState, Timeout, NoSuccess {
         if (m_nativeJobId == null) {
             throw new IncorrectState("Can not listen to job in 'New' state", this);
         }
         m_monitorService.startListening(m_nativeJobId, this);
+        return true;    // a job task is always listening (either with notification, or with polling)
     }
 
     public void stopListening(Metric metric) throws NotImplemented, Timeout, NoSuccess {
@@ -230,7 +231,11 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     ////////////////////////////////////// implementation of JobMonitorCallback //////////////////////////////////////
 
     public void setState(State state, String stateDetail, SubState subState) {
+        this.setJobState(state, stateDetail, subState);
         super.setState(state);
+    }
+
+    private void setJobState(State state, String stateDetail, SubState subState) {
         switch(m_metrics.m_State.getValue(State.RUNNING)) {
             case DONE:
             case CANCELED:

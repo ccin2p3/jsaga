@@ -79,15 +79,17 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
     protected abstract boolean doCancel();
 
     /**
-     * refresh the task state
+     * query the task state
+     * return the new state if it has been queried, else null
      */
-    protected abstract void refreshState() throws NotImplemented, Timeout, NoSuccess;
+    protected abstract State queryState() throws NotImplemented, Timeout, NoSuccess;
 
     /**
      * start listening to value changes of the metric <code>metric</code>
      * @param metric the metric to monitor
+     * @return true if the task is listening, else false
      */
-    public abstract void startListening(Metric metric) throws NotImplemented, IncorrectState, Timeout, NoSuccess;
+    public abstract boolean startListening(Metric metric) throws NotImplemented, IncorrectState, Timeout, NoSuccess;
 
     /**
      * stop listening to value changes of the metric <code>metric</code>
@@ -122,6 +124,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
                 forever = false;
                 endTime = System.currentTimeMillis() + (long) timeoutInSeconds*1000;
             }
+            // read notified status, else query status
             while(!this.isDone() && (forever || System.currentTimeMillis()<endTime)) {
                 Thread.currentThread().sleep(100);
             }
@@ -166,7 +169,10 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
                 return m_metric_TaskState.getValue();
             default:
                 if (!m_metric_TaskState.isListening()) {
-                    this.refreshState();
+                    State state = this.queryState();
+                    if (state != null) {
+                        m_metric_TaskState.setValue(state, this);
+                    }
                 }
                 return m_metric_TaskState.getValue();
         }
@@ -278,15 +284,13 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
      * @return true if this task completed.
      */
     public boolean isDone() {
-        if (m_metric_TaskState.getValue() == null) {
-            // try to refresh state
-            try {
-                this.refreshState();
-            } catch (Exception e) {
-                return false;
-            }
+        State state;
+        try {
+            state = this.getState();
+        } catch (Exception e) {
+            return false;
         }
-        switch(m_metric_TaskState.getValue()) {
+        switch(state) {
             case DONE:
             case CANCELED:
             case FAILED:

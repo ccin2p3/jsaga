@@ -18,6 +18,6 @@ import org.ogf.saga.task.TaskFactory;
  */
 public class TaskFactoryImpl extends TaskFactory {
     protected TaskContainer doCreateTaskContainer() throws NotImplemented, Timeout, NoSuccess {
-        throw new NotImplemented("not implemented yet..."); //todo: implement method doCreateTaskContainer()
+        return new TaskContainerImpl(null);
     }
 }
