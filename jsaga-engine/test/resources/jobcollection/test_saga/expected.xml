@@ -20,6 +20,22 @@
                     </p:POSIXApplication>
                 </Application>
                 <Resources/>
+                <DataStaging>
+                    <FileName>input</FileName>
+                    <FilesystemName>WorkingDirectory</FilesystemName>
+                    <CreationFlag>Overwrite</CreationFlag>
+                    <Source>
+                        <URI>file:///input.txt</URI>
+                    </Source>
+                </DataStaging>
+                <DataStaging>
+                    <FileName>output</FileName>
+                    <FilesystemName>WorkingDirectory</FilesystemName>
+                    <CreationFlag>Append</CreationFlag>
+                    <Target>
+                        <URI>file:///output.txt</URI>
+                    </Target>
+                </DataStaging>
             </JobDescription>
         </JobDefinition>
     </ext:Job>

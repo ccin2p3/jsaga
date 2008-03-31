@@ -17,9 +17,22 @@ public class JobCollectionTest extends AbstractJobCollectionTest {
         super();
     }
 
-    public void test_saga() throws Exception {super.launchTest("SAGA", "job.properties");}
-    public void test_jsdl() throws Exception {super.launchTest("JSDL", "job.jsdl");}
-    public void test_ref() throws Exception {super.launchTest();}
-    public void test_sandbox() throws Exception {super.launchTest();}
-    public void test_staging() throws Exception {super.launchTest();}
+    public void test_language() throws Exception {
+        super.checkLanguage("JSDL", "JobCollection.xml");
+        super.checkLanguage("JSDL", "Job.xml");
+        super.checkLanguage("JSDL", "JobDefinition.jsdl");
+    }
+    public void test_saga() throws Exception {
+        super.checkLanguage("SAGA", "job.properties");
+    }
+
+    public void test_submit() throws Exception {
+        super.checkSubmit("job.xml");
+//        super.checkSubmit("job-sandbox.xml");
+//        super.checkSubmit("job-staging.xml");
+    }
+
+//    public void test_ref() throws Exception {super.checkPreprocess();}
+    public void test_sandbox() throws Exception {super.checkPreprocess();}
+//    public void test_staging() throws Exception {super.checkPreprocess();}
 }

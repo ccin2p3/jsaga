@@ -2,7 +2,7 @@
 <ext:JobCollection xmlns:ext="http://www.in2p3.fr/jsdl-extension">
     <ext:JobCollectionDescription>
         <ext:JobCollectionIdentification>
-            <ext:JobCollectionName>sandbox</ext:JobCollectionName>
+            <ext:JobCollectionName>test_sandbox</ext:JobCollectionName>
         </ext:JobCollectionIdentification>
         <ext:Parametric count="6" start="1" step="1"/>
     </ext:JobCollectionDescription>
@@ -10,7 +10,7 @@
         <JobDefinition xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl">
             <JobDescription>
                 <JobIdentification>
-                    <JobName>MYJOB_@{INDICE}</JobName>
+                    <JobName>MYJOB_@{INDEX}</JobName>
                 </JobIdentification>
                 <Application>
                     <ext:ScriptApplication shell="/bin/sh"><![CDATA[$E $C0 $C1 $C2 <$D >$R 2>$STDERR]]></ext:ScriptApplication>
@@ -52,7 +52,6 @@
                     <FilesystemName>HelloWorldDirectory</FilesystemName>
                     <CreationFlag>dontOverwrite</CreationFlag>
                     <Source/>
-                    <ext:Sandbox>true</ext:Sandbox>
                 </DataStaging>
                 <DataStaging name="E">
                     <FileName>executable-src/bin/executable.exe</FileName>
@@ -67,19 +66,19 @@
                 <DataStaging name="D">
                     <FileName>data.dat</FileName>
                     <CreationFlag>overwrite</CreationFlag>
-                    <Source><URI>gsiftp://host4:2811/data/data_@{INDICE}.dat#OpenPlast_proxy</URI></Source>
+                    <Source><URI>gsiftp://host4:2811/data/data_@{INDEX}.dat#OpenPlast_proxy</URI></Source>
                     <ext:Sandbox>true</ext:Sandbox>
                 </DataStaging>
                 <DataStaging name="R">
                     <FileName>result.dat</FileName>
                     <CreationFlag>overwrite</CreationFlag>
-                    <Target><URI>mail://sreynaud@in2p3.fr/result_@{INDICE}.dat?host1</URI></Target>
+                    <Target><URI>mail://sreynaud@in2p3.fr/result_@{INDEX}.dat?host1</URI></Target>
                     <ext:Sandbox>true</ext:Sandbox>
                 </DataStaging>
                 <DataStaging name="STDERR">
                     <FileName>stderr.txt</FileName>
                     <CreationFlag>overwrite</CreationFlag>
-                    <Target><URI>file:///tmp/stderr_@{INDICE}.txt</URI></Target>
+                    <Target><URI>file:///tmp/stderr_@{INDEX}.txt</URI></Target>
                     <ext:Sandbox>true</ext:Sandbox>
                 </DataStaging>
             </JobDescription>

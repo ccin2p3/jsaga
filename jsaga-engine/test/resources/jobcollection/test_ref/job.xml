@@ -2,7 +2,7 @@
 <ext:JobCollection xmlns:ext="http://www.in2p3.fr/jsdl-extension">
     <ext:JobCollectionDescription>
         <ext:JobCollectionIdentification>
-            <ext:JobCollectionName>ref</ext:JobCollectionName>
+            <ext:JobCollectionName>test_ref</ext:JobCollectionName>
         </ext:JobCollectionIdentification>
         <ext:Parametric count="10" start="1" step="1"/>
     </ext:JobCollectionDescription>
@@ -10,7 +10,7 @@
         <JobDefinition xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl">
             <JobDescription>
                 <JobIdentification>
-                    <JobName>MYJOB_@{INDICE}</JobName>
+                    <JobName>MYJOB_@{INDEX}</JobName>
                 </JobIdentification>
 
                 <Application>
@@ -71,7 +71,7 @@
                 </DataStaging>
 
                 <DataStaging name="INPUT">
-                    <FileName>data_@{INDICE}.dat</FileName>
+                    <FileName>data_@{INDEX}.dat</FileName>
                     <FilesystemName>DataBaseDirectory</FilesystemName>
                     <CreationFlag>dontOverwrite</CreationFlag>
                     <Source/>
@@ -83,7 +83,7 @@
                     <FilesystemName>WorkingDirectory</FilesystemName>
                     <CreationFlag>overwrite</CreationFlag>
                     <Target>
-                        <URI>file://./MYJOB_@{INDICE}.out</URI>
+                        <URI>file://./MYJOB_@{INDEX}.out</URI>
                     </Target>
                 </DataStaging>
             </JobDescription>
