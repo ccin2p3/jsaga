@@ -15,6 +15,6 @@ import org.ogf.saga.error.BadParameter;
  *
  */
 public interface Evaluator {
-    public void init(int indice);
+    public void init(int index);
     public String evaluate(String expression) throws BadParameter;
 }

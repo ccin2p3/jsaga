@@ -15,15 +15,15 @@ import org.ogf.saga.error.BadParameter;
  *
  */
 public class BasicEvaluator implements Evaluator {
-    private int m_indice;
+    private int m_index;
 
-    public void init(int indice) {
-        m_indice = indice;
+    public void init(int index) {
+        m_index = index;
     }
     
     public String evaluate(String expression) throws BadParameter {
-        if (expression.equals("INDICE")) {
-            return ""+ m_indice;
+        if (expression.equals("INDEX")) {
+            return ""+ m_index;
         } else {
             throw new BadParameter("Expression is not supported: "+expression);
         }

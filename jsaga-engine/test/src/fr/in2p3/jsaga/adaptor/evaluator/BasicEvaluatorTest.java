@@ -33,6 +33,6 @@ public class BasicEvaluatorTest extends TestCase {
     public void test_basic() throws BadParameter {
         assertEquals(
                 "3",
-                m_evaluator.evaluate("INDICE"));
+                m_evaluator.evaluate("INDEX"));
     }
 }
