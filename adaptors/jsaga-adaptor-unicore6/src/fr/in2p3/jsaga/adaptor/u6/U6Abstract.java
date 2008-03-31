@@ -106,8 +106,7 @@ public class U6Abstract {
 	        }
 	        
         } catch (NullPointerException e)  {
-        	e.printStackTrace();
-    		throw new NoSuccess("Unable to find regitry in "+m_serverUrl);        	
+    		throw new NoSuccess("Unable to find regitry in "+m_serverUrl, e);        	
         }
         
         // no target system factory available that supports requested application.
