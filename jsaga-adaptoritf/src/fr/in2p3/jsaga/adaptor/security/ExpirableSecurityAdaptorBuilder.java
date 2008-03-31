@@ -18,7 +18,7 @@ public interface ExpirableSecurityAdaptorBuilder extends SecurityAdaptorBuilder 
     /**
      * Destroy persisted state of security context
      * @param attributes the provided attributes.
-     * @param contextId can be either a context name or a pair (context type + indice)
+     * @param contextId the identifier of the security context
      */
     public void destroySecurityAdaptor(Map attributes, String contextId) throws Exception;
 }
