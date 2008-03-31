@@ -7,7 +7,12 @@
                 xmlns:ext="http://www.in2p3.fr/jsdl-extension">
     <xsl:output method="text"/>
     <xsl:param name="ShellPath"/>
-    <xsl:template match="/jsdl:JobDefinition/jsdl:JobDescription">
+    
+    <xsl:template match="/">
+        <xsl:apply-templates select="ext:Job/jsdl:JobDefinition/jsdl:JobDescription"/>
+    </xsl:template>
+
+    <xsl:template match="jsdl:JobDescription">
         <!-- executable and arguments -->
         <xsl:choose>
             <xsl:when test="$ShellPath">
