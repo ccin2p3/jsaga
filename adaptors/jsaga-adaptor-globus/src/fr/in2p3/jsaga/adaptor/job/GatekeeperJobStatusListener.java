@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.adaptor.job;
 
 import fr.in2p3.jsaga.adaptor.job.monitor.*;
 
+import org.apache.log4j.Logger;
 import org.globus.gram.GramException;
 import org.globus.gram.GramJob;
 import org.globus.gram.GramJobListener;
@@ -21,21 +22,24 @@ import org.ietf.jgss.GSSException;
  *
  */
 public class GatekeeperJobStatusListener extends JobStatusListener implements GramJobListener {
-    public GatekeeperJobStatusListener(JobStatusNotifier notifier) {
+	private Logger logger = Logger.getLogger(GatekeeperJobStatusListener.class.getName());
+	
+	public GatekeeperJobStatusListener(JobStatusNotifier notifier) {
         super(notifier);
     }
 
     public void statusChanged(GramJob job) {
-    	// TODO : move to cleanup
-    	if(job.getStatus() == GRAMConstants.STATUS_DONE ||
-    			job.getStatus() == GRAMConstants.STATUS_FAILED ) {
+    	// TODO : move to cleanup    	
+    	if(GatekeeperJobAdaptorAbstract.twoPhaseUsed && 
+    			(job.getStatus() == GRAMConstants.STATUS_DONE ||
+    			job.getStatus() == GRAMConstants.STATUS_FAILED )) {
     		try {
     			// Send signal to clean jobmanager
     			job.signal(GRAMConstants.SIGNAL_COMMIT_END);
 			} catch (GramException e) {
-				e.printStackTrace();
+				logger.warn("Unable to send commit end signal", e);
 			} catch (GSSException e) {
-				e.printStackTrace();
+				logger.warn("Unable to send commit end signal", e);
 			}
     	}
         JobStatus status = new GatekeeperJobStatus(job.getIDAsString(), new Integer(job.getStatus()), job.getStatusAsString());

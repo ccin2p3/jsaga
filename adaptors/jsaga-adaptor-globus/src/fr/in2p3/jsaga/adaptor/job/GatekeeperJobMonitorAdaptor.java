@@ -46,8 +46,9 @@ public class GatekeeperJobMonitorAdaptor extends GatekeeperJobAdaptorAbstract im
         try {
         	Gram.jobStatus(job);
         	// TODO : move to cleanup
-        	if(job.getStatus() == GRAMConstants.STATUS_DONE ||
-        			job.getStatus() == GRAMConstants.STATUS_FAILED) {
+        	if(GatekeeperJobAdaptorAbstract.twoPhaseUsed && 
+        			(job.getStatus() == GRAMConstants.STATUS_DONE ||
+        			job.getStatus() == GRAMConstants.STATUS_FAILED)) {
         		try {
         			// Send signal to clean jobmanager
     				job.signal(GRAMConstants.SIGNAL_COMMIT_END);
