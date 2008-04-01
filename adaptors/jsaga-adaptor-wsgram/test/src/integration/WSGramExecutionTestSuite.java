@@ -21,13 +21,13 @@ public class WSGramExecutionTestSuite extends TestSuite {
     // test cases
     public static class WSGramJobDescriptionTest extends JobDescriptionTest {
         public WSGramJobDescriptionTest() throws Exception {super("wsgram");}
-        public void test_totalCPUCount() { super.ignore("RSL v1.0 does not support this"); }
-        public void test_threadsPerProcess() { super.ignore("RSL v1.0 does not support this"); }
-        public void test_fileTransfer() { super.ignore("RSL v1.0 does not support this"); }
-        public void test_cleanup() { super.ignore("RSL v1.0 does not support this"); }
-        public void test_cpuArchitecture() { super.ignore("RSL v1.0 does not support this"); }
-        public void test_operatingSystemType() { super.ignore("RSL v1.0 does not support this"); }
-        public void test_candidateHosts() { super.ignore("RSL v1.0 does not support this"); }
+        public void test_totalCPUCount() { super.ignore("RSL v2.0 does not support this"); }
+        public void test_threadsPerProcess() { super.ignore("RSL v2.0 does not support this"); }
+        public void test_fileTransfer() { super.ignore("RSL v2.0 does not support this"); }
+        public void test_cleanup() { super.ignore("RSL v2.0 does not support this"); }
+        public void test_cpuArchitecture() { super.ignore("RSL v2.0 does not support this"); }
+        public void test_operatingSystemType() { super.ignore("RSL v2.0 does not support this"); }
+        public void test_candidateHosts() { super.ignore("RSL v2.0 does not support this"); }
     }
 
     // test cases
