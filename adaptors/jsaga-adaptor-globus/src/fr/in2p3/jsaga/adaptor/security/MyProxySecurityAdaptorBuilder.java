@@ -82,7 +82,8 @@ public class MyProxySecurityAdaptorBuilder implements ExpirableSecurityAdaptorBu
 
                         // local proxy
                         new UProxyObject(USAGE_LOCAL_MEMORY, GlobusContext.USERPROXYOBJECT, MIN_LIFETIME_FOR_USING),
-                        new UProxyFile(USAGE_LOCAL_LOAD, Context.USERPROXY, MIN_LIFETIME_FOR_USING),
+                        // Commented to avoid conflict with usage of Globus context type
+                        // new UProxyFile(USAGE_LOCAL_LOAD, Context.USERPROXY, MIN_LIFETIME_FOR_USING),
 
                         // get proxy from server with passphrase
                         new UAnd(USAGE_RENEW_MEMORY_WITH_PASSPHRASE, new Usage[]{
