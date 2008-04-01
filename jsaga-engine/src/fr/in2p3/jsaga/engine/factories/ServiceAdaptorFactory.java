@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.engine.factories;
 import fr.in2p3.jsaga.engine.config.AmbiguityException;
 import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.config.bean.ContextEngineConfiguration;
+import fr.in2p3.jsaga.helpers.StringArray;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.NoSuccess;
@@ -76,7 +77,15 @@ public class ServiceAdaptorFactory {
             case 1:
                 return contextCandidates.get(0);
             default:
-                throw new AmbiguityException("Found several valid security contexts");
+                String[] candidateRefs = new String[contextCandidates.size()];
+                for (int i=0; i<candidateRefs.length; i++) {
+                    try {
+                        candidateRefs[i] = contextCandidates.get(i).getAttribute(Context.TYPE);
+                    } catch (Exception e) {
+                        throw new AmbiguityException("Found several valid security contexts");
+                    }
+                }
+                throw new AmbiguityException("Found several valid security contexts: "+StringArray.arrayToString(candidateRefs,", "));
         }
     }
 
