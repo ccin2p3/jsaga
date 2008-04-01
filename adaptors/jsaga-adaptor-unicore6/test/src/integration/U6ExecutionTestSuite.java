@@ -36,11 +36,11 @@ public class U6ExecutionTestSuite extends TestSuite {
     // test cases
     public static class U6JobRunOptionalTest extends JobRunOptionalTest {
         public U6JobRunOptionalTest() throws Exception {super("unicore6");}
-        public void test_resume_done() { System.out.println("the test_resume_done ignored : the adaptor does not support this"); };
-        public void test_resume_running() { System.out.println("the test_resume_running ignored : the adaptor does not support this"); };
-        public void test_suspend_done() { System.out.println("the test_suspend_done ignored : the adaptor does not support this"); };
-        public void test_suspend_running() { System.out.println("the test_resume_running ignored : the adaptor does not support this"); };
-        public void test_listJob() { System.out.println("the test_listJob ignored : the adaptor does not support this but MUST BE REACTIVATED when the jsaga-engine will support this"); };
+        public void test_resume_done() { super.ignore("not supported"); };
+        public void test_resume_running() { super.ignore("not supported"); };
+        public void test_suspend_done() { super.ignore("not supported"); };
+        public void test_suspend_running() { super.ignore("not supported"); };
+        public void test_listJob() { super.ignore("not supported but MUST BE REACTIVATED when the jsaga-engine will support this"); };
     }
     
  	// test cases

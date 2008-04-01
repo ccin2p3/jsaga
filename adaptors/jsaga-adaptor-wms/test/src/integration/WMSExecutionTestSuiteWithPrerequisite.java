@@ -21,7 +21,7 @@ public class WMSExecutionTestSuiteWithPrerequisite extends TestSuite {
     // test cases
     public static class WMSJobRunWithPrequisiteTest extends JobRunWithPrequisiteTest {
         public WMSJobRunWithPrequisiteTest() throws Exception {super("wms");}
-        public void test_run_MPI() { System.out.println("the test_run_MPI ignored : jsaga-engine must support input sandbox"); };        
+        public void test_run_MPI() { super.ignore("jsaga-engine must support input sandbox"); };        
     }
 
     public WMSExecutionTestSuiteWithPrerequisite() throws Exception {

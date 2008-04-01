@@ -21,13 +21,13 @@ public class GlobusExecutionTestSuite extends TestSuite {
     // test cases
     public static class GlobusJobDescriptionTest extends JobDescriptionTest {
         public GlobusJobDescriptionTest() throws Exception {super("gatekeeper");}
-        public void test_totalCPUCount() { System.out.println("the test_totalCPUCount ignored : RSL v1.0 does not support this"); }
-        public void test_threadsPerProcess() { System.out.println("the test_threadsPerProcess ignored : RSL v1.0 does not support this"); }
-        public void test_fileTransfer() { System.out.println("the test_fileTransfer ignored : RSL v1.0 does not support this"); }
-        public void test_cleanup() { System.out.println("the test_cleanup ignored : RSL v1.0 does not support this"); }
-        public void test_cpuArchitecture() { System.out.println("the test_cpuArchitecture ignored : RSL v1.0 does not support this"); }
-        public void test_operatingSystemType() { System.out.println("the test_operatingSystemType ignored : RSL v1.0 does not support this"); }
-        public void test_candidateHosts() { System.out.println("the test_candidateHosts ignored : RSL v1.0 does not support this"); }
+        public void test_totalCPUCount() { super.ignore("RSL v1.0 does not support this"); }
+        public void test_threadsPerProcess() { super.ignore("RSL v1.0 does not support this"); }
+        public void test_fileTransfer() { super.ignore("RSL v1.0 does not support this"); }
+        public void test_cleanup() { super.ignore("RSL v1.0 does not support this"); }
+        public void test_cpuArchitecture() { super.ignore("RSL v1.0 does not support this"); }
+        public void test_operatingSystemType() { super.ignore("RSL v1.0 does not support this"); }
+        public void test_candidateHosts() { super.ignore("RSL v1.0 does not support this"); }
     }
 
     // test cases
@@ -43,11 +43,11 @@ public class GlobusExecutionTestSuite extends TestSuite {
     // test cases
     public static class GlobusJobRunOptionalTest extends JobRunOptionalTest {
         public GlobusJobRunOptionalTest() throws Exception {super("gatekeeper");}
-        public void test_resume_done() { System.out.println("the test_resume_done ignored : personal gatekeeper does not support this"); };
-        public void test_resume_running() { System.out.println("the test_resume_running ignored : personal gatekeeper does not support this"); };
-        public void test_suspend_done() { System.out.println("the test_suspend_done ignored : personal gatekeeper does not support this"); };
-        public void test_suspend_running() { System.out.println("the test_resume_running ignored : personal gatekeeper does not support this"); };
-        public void test_listJob() { System.out.println("the test_listJob ignored : personal gatekeeper does not support this but MUST BE REACTIVATED when the jsaga-engine will support this"); };
+        public void test_resume_done() { super.ignore("not supported"); }
+        public void test_resume_running() { super.ignore("not supported"); }
+        public void test_suspend_done() { super.ignore("not supported"); }
+        public void test_suspend_running() { super.ignore("not supported"); }
+        public void test_listJob() { super.ignore("not supported by adaptor but MUST BE REACTIVATED when supported by the engine"); }
     }
     
  	// test cases

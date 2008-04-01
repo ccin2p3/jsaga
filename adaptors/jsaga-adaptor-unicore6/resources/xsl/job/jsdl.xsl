@@ -8,8 +8,9 @@
     <xsl:output method="text"/>
     <xsl:param name="ShellPath"/>
     
-    <xsl:template match="/">
-        <xsl:apply-templates select="ext:Job/jsdl:JobDefinition/jsdl:JobDescription"/>
+    <!-- entry point (MUST BE RELATIVE) -->
+    <xsl:template match="jsdl:JobDefinition">
+        <xsl:apply-templates select="jsdl:JobDescription"/>
     </xsl:template>
 
     <xsl:template match="jsdl:JobDescription">

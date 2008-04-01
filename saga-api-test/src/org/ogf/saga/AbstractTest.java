@@ -1,8 +1,8 @@
 package org.ogf.saga;
 
 import junit.framework.TestCase;
-
 import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 import org.ogf.saga.error.*;
 
 import java.io.InputStream;
@@ -51,7 +51,7 @@ public abstract class AbstractTest extends TestCase {
     /** Implicitly invoked before executing each test method */
     protected void setUp() throws Exception {
     	if(logger.isInfoEnabled())
-    		logger.info(this.getName());
+    		logger.info(this.getName()+" running...");
     	startTime = new Date().getTime();
     	super.setUp();
     }
@@ -61,6 +61,11 @@ public abstract class AbstractTest extends TestCase {
         super.tearDown();
         if(logger.isDebugEnabled())
         	logger.debug(this.getName()+" - Duration: "+ (new Date().getTime() - startTime)+" ms");
+    }
+
+    protected void ignore(String message) {
+        if(logger.isEnabledFor(Priority.WARN))
+            logger.warn(this.getName()+" ignored"+ (message!=null ? " ("+message+")" : ""));
     }
     
     protected String getOptionalProperty(String protocol, String name) {
@@ -87,7 +92,4 @@ public abstract class AbstractTest extends TestCase {
         url.setPath(path);
         return url;
     }
-    
-
-
 }

@@ -19,6 +19,7 @@ import org.ogf.saga.namespace.NSEntryTest;
 public class MyProtocolIntegrationTestSuite extends TestSuite {
     public static class MyProtocolNSEntryTest extends NSEntryTest {
         public MyProtocolNSEntryTest() throws Exception {super("myprotocol");}
+        public void test_unexisting() { super.ignore("not yet implemented"); }
     }
 
     public MyProtocolIntegrationTestSuite() throws Exception {

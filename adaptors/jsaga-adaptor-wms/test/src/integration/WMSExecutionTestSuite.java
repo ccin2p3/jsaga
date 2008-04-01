@@ -21,10 +21,10 @@ public class WMSExecutionTestSuite extends TestSuite {
     // test cases
     public static class WMSJobDescriptionTest extends JobDescriptionTest {
         public WMSJobDescriptionTest() throws Exception {super("wms");}
-        public void test_totalCPUCount() { System.out.println("the test_totalCPUCount ignored : JDL does not support this"); }
-        public void test_fileTransfer() { System.out.println("the test_fileTransfer ignored : JDL does not support this"); }
-        public void test_cleanup() { System.out.println("the test_cleanup ignored : JDL does not support this"); }
-        public void test_workingDirectory() { System.out.println("the test_cleanup ignored : JDL does not support this"); }
+        public void test_totalCPUCount() { super.ignore("JDL does not support this"); }
+        public void test_fileTransfer() { super.ignore("not yet implemented but MUST BE REACTIVATED when implemented"); }
+        public void test_cleanup() { super.ignore("JDL does not support this"); }
+        public void test_workingDirectory() { super.ignore("JDL does not support this"); }
     }
     // test cases
     public static class WMSJobRunMinimalTest extends JobRunMinimalTest {
@@ -39,17 +39,17 @@ public class WMSExecutionTestSuite extends TestSuite {
     // test cases
     public static class WMSJobRunOptionalTest extends JobRunOptionalTest {
         public WMSJobRunOptionalTest() throws Exception {super("wms");}
-        public void test_resume_done() { System.out.println("the test_resume_done ignored : personal gatekeeper does not support this"); };
-        public void test_resume_running() { System.out.println("the test_resume_running ignored : personal gatekeeper does not support this"); };
-        public void test_suspend_done() { System.out.println("the test_suspend_done ignored : personal gatekeeper does not support this"); };
-        public void test_suspend_running() { System.out.println("the test_resume_running ignored : personal gatekeeper does not support this"); };
-        public void test_listJob() { System.out.println("the test_listJob ignored : personal gatekeeper does not support this but MUST BE REACTIVATED when the jsaga-engine will support this"); };
+        public void test_resume_done() { super.ignore("not supported"); }
+        public void test_resume_running() { super.ignore("not supported"); }
+        public void test_suspend_done() { super.ignore("not supported"); }
+        public void test_suspend_running() { super.ignore("not supported"); }
+        public void test_listJob() { super.ignore("not supported by adaptor but MUST BE REACTIVATED when supported by the engine"); }
     }
     
  	// test cases
     public static class WMSJobRunDescriptionTest extends JobRunDescriptionTest {
         public WMSJobRunDescriptionTest() throws Exception {super("wms");}
-        //public void test_run_inWorkingDirectory() { System.out.println("the test_run_inWorkingDirectory ignored : wms does not support this"); };        
+//        public void test_run_inWorkingDirectory() { super.ignore("not supported"); }
     }
 
     public WMSExecutionTestSuite() throws Exception {
