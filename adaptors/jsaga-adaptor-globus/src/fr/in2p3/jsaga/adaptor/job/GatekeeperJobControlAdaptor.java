@@ -48,7 +48,7 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
     }
 
     public String getTranslator() {
-        return "xsl/job/rsl.xsl";
+        return "xsl/job/rsl-1.0.xsl";
     }
 
     public Map getTranslatorParameters() {
