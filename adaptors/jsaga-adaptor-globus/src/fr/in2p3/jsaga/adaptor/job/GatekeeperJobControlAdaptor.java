@@ -84,8 +84,8 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
         	}
         	catch (WaitingForCommitException e) {
         		// send signal to start job
-        		twoPhaseUsed = true;
         		job.signal(GRAMConstants.SIGNAL_COMMIT_REQUEST);
+        		twoPhaseUsed = true;        		
         	}
         } catch (GramException e) {
             this.rethrowException(e);
