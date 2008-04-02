@@ -119,9 +119,6 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	        LoggingAndBookkeepingLocator loc = new LoggingAndBookkeepingLocatorClient(provider, m_credential);
 	        LoggingAndBookkeepingPortType stub = loc.getLoggingAndBookkeeping(lbURL);
 	        
-	        // get LB Version
-	        //System.out.println("LB Version :"+stub.getVersion(null));
-	        
 	        // get job Status
 	        JobFlagsValue[] jobFlagsValue = new JobFlagsValue[1];
 	        jobFlagsValue[0] = JobFlagsValue.CLASSADS;
@@ -130,7 +127,6 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	        if(jobState == null) {
 	            throw new NoSuccess("Unable to get status for job:"+nativeJobId);
 	        }
-	        System.out.println("Status:"+jobState.getState().getValue());
 	        
 	        // TODO : move to cleanup step
 	        if(jobState.getState().getValue().equals(StatName._DONE) || 
