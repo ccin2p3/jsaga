@@ -327,7 +327,7 @@ public class URL {
 
     private URI getSchemeSpecificPart() throws NotImplemented {
         try {
-            return new URI(u.getSchemeSpecificPart());
+            return new URI(u.getRawSchemeSpecificPart());
         } catch (URISyntaxException e) {
             throw new NotImplemented(e);
         }
