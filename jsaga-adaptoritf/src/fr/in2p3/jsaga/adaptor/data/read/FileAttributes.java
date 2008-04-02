@@ -37,6 +37,10 @@ public abstract class FileAttributes {
         }
     }
 
+    public String getNameOnly() {
+        return m_name;
+    }
+
     public int getType() {
         return m_type;
     }
