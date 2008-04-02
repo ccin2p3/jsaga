@@ -136,7 +136,7 @@ public class URL {
             if (path.startsWith("./")) {
                 //sreynaud: set relative path
                 u = new URI(u.getScheme(), u.getAuthority(),
-                        path.substring(1), u.getQuery(), u.getFragment());
+                        path.substring(2), u.getQuery(), u.getFragment());
             } else {
                 //sreynaud: fix absolute path
                 int i;for(i=0; i<path.length() && path.charAt(i)=='/'; i++);

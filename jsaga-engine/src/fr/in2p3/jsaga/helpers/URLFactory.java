@@ -112,6 +112,9 @@ public class URLFactory {
         String relativePath = JSagaURL.encodePath(name)
                 + (baseUri.getQuery()!=null ? "?"+baseUri.getQuery() : "")
                 + (baseUri.getFragment()!=null ? "#"+baseUri.getFragment() : "");
+        //bugfix: Windows drive letter is considered as hostname if URL is "file://C:/"
+        int i;for(i=0; i<relativePath.length() && relativePath.charAt(i)=='/'; i++);
+        if(i>1)relativePath="/"+relativePath.substring(i);
         java.net.URI uri = baseUri.resolve(relativePath);
         return uri.toString();
     }
