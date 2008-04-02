@@ -57,6 +57,7 @@ import java.util.Map;
 /**
  * TODO : Update JDL with CPUARCHITECTURE, OPERATINGSYSTEMTYPE; TotalCPUTime
  * TODO : Verify test_run_cpuTimeRequirement and test_run_processRequirement : Done in spite of Failed
+ * TODO : Test MPI jobs
  */
 public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobControlAdaptor {
     
@@ -175,6 +176,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
 			throw new AuthenticationFailed(e);
 		} 
 		
+		// TODO : use CheckAvailability parameter
         // ping service
         if(false) {
             try {
@@ -205,19 +207,19 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
     			jobDesc += "LBAddress=\""+m_lbServerUrl+"\";";	
     		}
     		
-    		// parse    		
-    		if(true) {
-	    		try {
-					AdParser.parseJdl(jobDesc);
-				} catch (JobAdException e) {
-					throw new NoSuccess(e);
-				}
-    		}
-    		// verify that at least one CE is matching
-    		if(true) {
+			// parse JDL
+			try {
+				AdParser.parseJdl(jobDesc);
+			} catch (JobAdException e) {
+				throw new NoSuccess("The job description is not valid", e);
+			}
+    		
+    		// TODO : use CheckMatch parameter
+    		if(true) {				
+				// get available CE
             	StringAndLongList result = m_client.jobListMatch(jobDesc, m_delegationId);            
             	if ( result != null ) {
-    				// list of CE's+their ranks
+    				// list of CE
     				StringAndLongType[] list = (StringAndLongType[]) result.getFile ();
     				if (list == null)
                         throw new NoSuccess("No Computing Element matching your job requirements has been found!");
@@ -225,9 +227,9 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
             	else 
             		throw new NoSuccess("No Computing Element matching your job requirements has been found!");
     		}
+    		
     		// submit
 	    	String jobId = m_client.jobSubmit(jobDesc, m_delegationId).getId();
-	    	System.out.println("WMS ID:"+jobId);
 	    	return jobId;
     	} catch (ServiceException e) {
     		throw new NoSuccess(e);
