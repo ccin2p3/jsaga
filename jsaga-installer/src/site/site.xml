@@ -29,13 +29,13 @@
             <item name="SAGA Java Binding" href="saga-api/index.html"/>
             <item name="Deviations from SAGA" href="SAGA-delta.html"/>
             <item name="JSDL Specification" href="http://www.ogf.org/documents/GFD.56.pdf"/>
-            <item name="Tips" href="tips.html"/>
+            <item name="FAQ" href="faq.html"/>
         </menu>
         <menu name="Developer Documentation">
             <item name="JSAGA Adaptors API" href="jsaga-adaptoritf/index.html"/>
             <item name="JSAGA Engine" href="jsaga-engine/index.html"/>
             <item name="Build Tools" href="../build-tools/index.html"/>
-            <item name="FAQ" href="faq.html"/>
+            <item name="How To" href="howto.html"/>
         </menu>
         <menu name="Project Documentation" ref="reports"/>
         <menu name="Adaptor Modules">
