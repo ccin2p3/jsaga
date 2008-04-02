@@ -39,7 +39,7 @@ public class HttpDataAdaptorSocketBased extends HttpDataAdaptorAbstract implemen
 
     public long getSize(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         HttpRequest request = this.getRequest(absolutePath, additionalArgs, HttpRequest.TYPE_HEAD);
-        return request.getContentLength() - 1;
+        return request.getContentLength();
     }
 
     public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {

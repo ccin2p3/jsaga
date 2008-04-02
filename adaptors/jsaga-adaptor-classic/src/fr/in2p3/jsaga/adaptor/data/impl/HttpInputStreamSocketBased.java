@@ -60,7 +60,6 @@ public class HttpInputStreamSocketBased extends InputStream {
         } else {
             int readlen = m_response.read(b, off, len);
             if (readlen > -1) {
-                if(readlen<len) readlen--; // HTTP server sends an additional '\n' at the end of stream
                 m_nbBytesTransfered += readlen;
             }
             return readlen;
