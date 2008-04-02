@@ -51,7 +51,7 @@ public class EmulatorJobAdaptor implements JobControlAdaptor, CleanableJobAdapto
         // => JobMonitorAdaptor: do nothing
     }
 
-    public String submit(String jobDesc) throws PermissionDenied, Timeout, NoSuccess {
+    public String submit(String jobDesc, boolean checkMatch) throws PermissionDenied, Timeout, NoSuccess {
         String nativeJobId = UUID.randomUUID().toString();
         s_status.put(nativeJobId, new EmulatorJobStatus(nativeJobId, SubState.SUBMITTED));
         return nativeJobId;

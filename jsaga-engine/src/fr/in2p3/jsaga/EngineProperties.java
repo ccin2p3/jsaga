@@ -24,6 +24,7 @@ public class EngineProperties {
     public static final String IGNORE_MISSING_ADAPTOR = "ignore.missing.adaptor";
     public static final String JOB_DESCRIPTION_DEFAULT = "job.description.default";
     public static final String JOB_MONITOR_ERROR_THRESHOLD = "job.monitor.error.threshold";
+    public static final String JOB_CONTROL_CHECK_MATCH = "job.control.check.match";
 
     private static Logger s_logger = Logger.getLogger(EngineProperties.class);
     private static Properties s_prop;
@@ -37,6 +38,7 @@ public class EngineProperties {
             s_prop.setProperty(IGNORE_MISSING_ADAPTOR, "true");
             s_prop.setProperty(JOB_DESCRIPTION_DEFAULT, "etc/jsaga-default.jsdl");
             s_prop.setProperty(JOB_MONITOR_ERROR_THRESHOLD, "3");
+            s_prop.setProperty(JOB_CONTROL_CHECK_MATCH, "true");
 
             // load properties
             File file = new File(Base.JSAGA_HOME, "etc/jsaga-engine.properties");
@@ -75,5 +77,9 @@ public class EngineProperties {
 
     public static int getInteger(String name) throws NumberFormatException {
         return Integer.parseInt(getProperty(name));
+    }
+
+    public static boolean getBoolean(String name) {
+        return "true".equalsIgnoreCase(getProperty(name));
     }
 }

@@ -19,9 +19,10 @@ public interface JobControlAdaptor extends JobAdaptor {
     /**
      * submit a job
      * @param jobDesc the job description in the language supported by the targeted grid
+     * @param checkMatch if true then check if job description matches job service before submitting job
      * @return the identifier of the job in the grid
      */
-    public String submit(String jobDesc) throws PermissionDenied, Timeout, NoSuccess;
+    public String submit(String jobDesc, boolean checkMatch) throws PermissionDenied, Timeout, NoSuccess;
 
     /**
      * cancel a job

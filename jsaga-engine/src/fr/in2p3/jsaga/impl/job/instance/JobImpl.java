@@ -6,6 +6,7 @@ import fr.in2p3.jsaga.adaptor.job.control.advanced.*;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorCallback;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
+import fr.in2p3.jsaga.EngineProperties;
 import org.ogf.saga.ObjectType;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
@@ -85,10 +86,11 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
 
     ////////////////////////////////////// implementation of AbstractTaskImpl //////////////////////////////////////
 
+    private static boolean s_checkMatch = EngineProperties.getBoolean(EngineProperties.JOB_CONTROL_CHECK_MATCH);
     protected void doSubmit() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
         try {
             String nativeJobDesc = m_attributes.m_NativeJobDescription.getObject();
-            m_nativeJobId = m_controlAdaptor.submit(nativeJobDesc);
+            m_nativeJobId = m_controlAdaptor.submit(nativeJobDesc, s_checkMatch);
             String monitorUrl = m_monitorService.getURL().toString().replaceAll("%20", " ");
             String sagaJobId = "["+monitorUrl+"]-["+m_nativeJobId+"]";
             m_attributes.m_JobId.setObject(sagaJobId);
