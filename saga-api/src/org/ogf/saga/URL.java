@@ -1,11 +1,9 @@
 package org.ogf.saga;
 
-import java.net.URISyntaxException;
-import java.net.URI;
+import org.ogf.saga.error.*;
 
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * URL class as specified by SAGA. The java.net.URL class is not usable
@@ -24,6 +22,7 @@ public class URL {
     public URL(String url) throws NotImplemented, BadParameter, NoSuccess {
         try {
             u = new URI(url);
+            this.fixFileURI();  //sreynaud
         } catch(URISyntaxException e) {
             throw new BadParameter("syntax error in url", e);
         }
@@ -42,8 +41,16 @@ public class URL {
     public void setURL(String url) throws NotImplemented, BadParameter {
         try {
             u = new URI(url);
+            this.fixFileURI();  //sreynaud
         } catch(URISyntaxException e) {
             throw new BadParameter("syntax error in url", e);
+        }
+    }
+
+    private void fixFileURI() throws URISyntaxException {
+        if ("file".equals(u.getScheme()) && u.getAuthority()!=null) {
+            u = new URI(u.getScheme(), u.getUserInfo(), null, -1,
+                    "/"+u.getAuthority()+u.getPath(), u.getQuery(), u.getFragment());
         }
     }
 
@@ -84,6 +91,9 @@ public class URL {
      * @return the host.
      */
     public String getHost() throws NotImplemented {
+        if (u.getHost() == null) {
+            return this.getSchemeSpecificPart().getHost();   //sreynaud
+        }
         return u.getHost();
     }
 
@@ -107,12 +117,12 @@ public class URL {
      * @return the path.
      */
     public String getPath() throws NotImplemented {
-        if (".".equals(u.getAuthority())) {
-            return "."+u.getPath();
-        } else {
-            return u.getPath();
+        if (u.getPath() == null) {
+            return this.getSchemeSpecificPart().getPath();  //sreynaud
+        } else if (".".equals(u.getAuthority())) {
+            return "."+u.getPath();                         //sreynaud
         }
-        //sreynaud: returns a relative path if URL is <scheme>://./<path>
+        return u.getPath();
     }
 
     /**
@@ -124,15 +134,18 @@ public class URL {
     public void setPath(String path) throws NotImplemented, BadParameter {
         try {
             if (path.startsWith("./")) {
+                //sreynaud: set relative path
                 u = new URI(u.getScheme(), u.getAuthority(),
                         path.substring(1), u.getQuery(), u.getFragment());
             } else {
+                //sreynaud: fix absolute path
+                int i;for(i=0; i<path.length() && path.charAt(i)=='/'; i++);
+                if(i>1)path="/"+path.substring(i);
                 u = new URI(u.getScheme(), u.getUserInfo(), u.getHost(),
                         u.getPort(), path, u.getQuery(), u.getFragment());
             }
-            //sreynaud: accepts relative path
         } catch(URISyntaxException e) {
-            throw new BadParameter("syntax error in host", e);
+            throw new BadParameter("syntax error in path", e);
         }
     }
 
@@ -141,6 +154,9 @@ public class URL {
      * @return the port number.
      */
     public int getPort() throws NotImplemented {
+        if (u.getPort() == -1) {
+            return this.getSchemeSpecificPart().getPort();  //sreynaud
+        }
         return u.getPort();
     }
 
@@ -164,6 +180,9 @@ public class URL {
      * @return the query.
      */
     public String getQuery() throws NotImplemented {
+        if (u.getQuery() == null) {
+            return this.getSchemeSpecificPart().getQuery(); //sreynaud
+        }
         return u.getQuery();
     }
 
@@ -210,6 +229,9 @@ public class URL {
      * @return the userinfo.
      */
     public String getUserInfo() throws NotImplemented {
+        if (u.getUserInfo() == null) {
+            return this.getSchemeSpecificPart().getUserInfo();  //sreynaud
+        }
         return u.getUserInfo();
     }
 
@@ -301,5 +323,13 @@ public class URL {
             return this;
         }
         return new URL(uri);
+    }
+
+    private URI getSchemeSpecificPart() throws NotImplemented {
+        try {
+            return new URI(u.getSchemeSpecificPart());
+        } catch (URISyntaxException e) {
+            throw new NotImplemented(e);
+        }
     }
 }
