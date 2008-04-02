@@ -72,7 +72,7 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
         return new U6JobMonitorAdaptor();
     }
 
-    public String submit(String jobDesc) throws PermissionDenied, Timeout, NoSuccess {
+    public String submit(String jobDesc, boolean checkMatch) throws PermissionDenied, Timeout, NoSuccess {
     	try {                         
             // create job script with selected values
     		File scriptFile = File.createTempFile("script", ".sh");    		

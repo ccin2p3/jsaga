@@ -199,7 +199,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
         m_client = null;
     }
     
-    public String submit(String jobDesc) throws PermissionDenied, Timeout, NoSuccess {
+    public String submit(String jobDesc, boolean checkMatch) throws PermissionDenied, Timeout, NoSuccess {
     	try {
     		
     		//if LB Address is specified, add tag in JDL
