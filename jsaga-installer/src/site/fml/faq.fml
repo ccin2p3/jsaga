@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faqs title="Frequently Asked Questions">
+    <part id="engine">
+        <title>General FAQ</title>
+        <faq id="resolve-ambiguity">
+            <question>An AmbiguityException is thrown, how can I resolve this ambiguity ?</question>
+            <answer>
+                <ul>
+                    <li>fill in the JSAGA configuration file to help the engine choosing the appropriate security context,
+                        according to the protocol, the hostname, the domain, the activated security context types...</li>
+                    <li>uninstall (remove from lib-adaptors directory) or deactivate (add attribute deactivated="true")
+                        unused adaptor modules</li>
+                    <li>add, at the end of the URL, the caracter '#' followed by the identifier of the security context to use.
+                        This identifier can be the context name or the context type (e.g. gsiftp://cclcgseli01.in2p3.fr/tmp/#VOMS).</li>
+                </ul>
+                <p>Use the jsaga-help command to display the list of possible ambiguities.</p>
+            </answer>
+        </faq>
+        <faq id="optimize-for-known-version">
+            <question>How can I help JSAGA to improve its efficiency ?</question>
+            <answer>
+                <ul>
+                    <li>use version-specific plugins rather than generic plugins when the selected grid is homogeneous</li>
+                    <li>TBD...</li>
+                </ul>
+            </answer>
+        </faq>
+        <faq id="attribute-values">
+            <question>Where should I set attribute values ?</question>
+            <answer>
+                <ul>
+                    <li>for a one shot usage, set the attribute in the command line arguments</li>
+                    <li>for a user, set the attribute in the user properties file: ~/.globus/jsaga-user.properties</li>
+                    <li>for all users, set the attribute in the JSAGA configuration file: $JSAGA_HOME/etc/jsaga-config.xml</li>
+                    <li>if attribute is not set, then JSAGA may set it according to the adaptor default values</li>
+                    <li>if a required attribute is not set and has no default value, then JSAGA will prompt the user for entering the value (unless the system property "interactive" is not defined)</li>
+                </ul>
+                <p>Use the jsaga-help command with mode "default" to display the effective attribute values used by JSAGA.</p>
+            </answer>
+        </faq>
+    </part>
+    <part id="adaptors">
+        <title>Adaptor-specific FAQ</title>
+        <faq id="srm-transfer-protocols">
+            <question>How do I configure the SRM adaptor to support new transfer protocols ?</question>
+            <answer>
+                <ul>
+                    <li>set the list of transfer protocols in attribute: TransferProtocols</li>
+                    <li>install the adaptors implementing these protocols</li>
+                </ul>
+            </answer>
+        </faq>
+    </part>
+</faqs>
