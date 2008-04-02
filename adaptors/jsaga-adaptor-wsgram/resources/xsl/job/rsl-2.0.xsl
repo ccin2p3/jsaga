@@ -6,7 +6,6 @@
                 xmlns:spmd="http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd"
                 xmlns:ext="http://www.in2p3.fr/jsdl-extension">
     <xsl:output method="xml"/>
-    <xsl:param name="ShellPath"/>
 
     <!-- entry point (MUST BE RELATIVE) -->
     <xsl:template match="jsdl:JobDefinition">
@@ -14,28 +13,14 @@
     </xsl:template>
 
     <xsl:template match="jsdl:JobDescription">
-		<job><xsl:text/>
+<job><xsl:text/>
         <!-- executable and arguments -->
-        <xsl:choose>
-            <xsl:when test="$ShellPath">
-<executable><xsl:value-of select="$ShellPath"/></executable>
-<argument>-c </argument>
-<argument><xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Executable/text()"/></argument>
-                <xsl:if test="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
-                    <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
-                        <argument><xsl:value-of select="."/></argument>
-                    </xsl:for-each>
-                </xsl:if>
-            </xsl:when>
-            <xsl:otherwise>
 <executable><xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Executable/text()"/></executable><xsl:text/>
-                <xsl:if test="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
+            <xsl:if test="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
 				<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
-                    <argument><xsl:value-of select="."/></argument>
-                </xsl:for-each>
-                </xsl:if>
-            </xsl:otherwise>
-        </xsl:choose>
+<argument><xsl:value-of select="."/></argument>
+    	        </xsl:for-each>
+            </xsl:if>
 
         <!-- other -->
         <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Output/text()">
