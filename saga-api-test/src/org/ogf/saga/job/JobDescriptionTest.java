@@ -32,8 +32,7 @@ public class JobDescriptionTest extends AbstractJobTest {
         this.change(JobDescription.ARGUMENTS, new String[]{"arg", "arg2"});
     }
     public void test_spmdVariation() throws Exception {
-    	// TODO : get first value
-        this.change(JobDescription.SPMDVARIATION, "MPICH2");
+        this.change(JobDescription.SPMDVARIATION, "MPI");
     }
     public void test_totalCPUCount() throws Exception {
         this.change(JobDescription.TOTALCPUCOUNT, "2");
@@ -66,7 +65,7 @@ public class JobDescriptionTest extends AbstractJobTest {
         this.change(JobDescription.FILETRANSFER, new String[]{"myfile>myf", "file2<f2"});
     }
     public void test_cleanup() throws Exception {
-        this.change(JobDescription.CLEANUP, JobDescription.FALSE);
+    	this.change(JobDescription.CLEANUP, JobDescription.TRUE);
     }
     public void test_totalCPUTime() throws Exception {
         this.change(JobDescription.TOTALCPUTIME, "120");
