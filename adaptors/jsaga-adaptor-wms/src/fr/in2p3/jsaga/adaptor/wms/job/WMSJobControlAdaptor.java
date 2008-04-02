@@ -63,7 +63,6 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
     
 	public static final String LBSERVER = "LBServer";
 
-    private Map m_parameters;
     private WMProxyAPI m_client;
     private String m_delegationId = "myId";
     protected String m_lbServerUrl;
@@ -101,7 +100,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
     }
 
     public Map getTranslatorParameters() {
-        return m_parameters;
+        return null;
     }
 
     public JobMonitorAdaptor getDefaultJobMonitor() {
@@ -114,9 +113,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
     	if(attributes.containsKey(LBSERVER))
     		m_lbServerUrl = (String) attributes.get(LBSERVER);
     	
-    	m_parameters = attributes;
-        
-        // get certificate directory
+    	// get certificate directory
     	// This solution is temporary
     	String caLoc = (String)attributes.get(Context.CERTREPOSITORY);
     	
@@ -193,7 +190,6 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
     }
 
     public void disconnect() throws NoSuccess {
-        m_parameters = null;
         m_wmsServerUrl = null;
         m_credential = null;
         m_client = null;
@@ -214,8 +210,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
 				throw new NoSuccess("The job description is not valid", e);
 			}
     		
-    		// TODO : use CheckMatch parameter
-    		if(true) {				
+    		if(checkMatch) {				
 				// get available CE
             	StringAndLongList result = m_client.jobListMatch(jobDesc, m_delegationId);            
             	if ( result != null ) {

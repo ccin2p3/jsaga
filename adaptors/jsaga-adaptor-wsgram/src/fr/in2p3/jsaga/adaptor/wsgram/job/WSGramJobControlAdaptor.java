@@ -7,6 +7,7 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.message.addressing.EndpointReferenceType;
+import org.apache.log4j.Logger;
 import org.globus.exec.client.GramJob;
 import org.globus.exec.utils.client.ManagedJobFactoryClientHelper;
 import org.globus.exec.utils.rsl.RSLHelper;
@@ -40,8 +41,9 @@ import java.util.Map;
  * TODO : during cleanup, remove proxy saved in server in $HOME/.globus/gram_proxy...
  */
 public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements JobControlAdaptor {
-    private Map m_parameters;
 
+	private Logger logger = Logger.getLogger(WSGramJobControlAdaptor.class);
+	
     public String getType() {
         return "wsgram";
     }
@@ -63,7 +65,7 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
     }
 
     public Map getTranslatorParameters() {
-        return m_parameters;
+        return null;
     }
 
     public JobMonitorAdaptor getDefaultJobMonitor() {
@@ -72,27 +74,26 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
         super.connect(userInfo, host, port, basePath, attributes);
-        m_parameters = attributes;
     }
 
     public void disconnect() throws NoSuccess {
         super.disconnect();
-        m_parameters = null;
     }
 
     public String submit(String jobDesc, boolean checkMatch) throws PermissionDenied, Timeout, NoSuccess {
     	try {
     		// parse and create
-    		if(true) {
-    			try {
-    				//System.out.println("Job desc:"+jobDesc);
-    				RSLHelper.readRSL(jobDesc);
-    			}
-    			catch (RSLParseException e) {
-    				throw new NoSuccess(e);    				
-    			}
-    		}
+			try {
+				RSLHelper.readRSL(jobDesc);
+			}
+			catch (RSLParseException e) {
+				throw new NoSuccess(e);    				
+			}
     		
+			if(checkMatch) {
+				logger.debug("CheckMatch not supported");
+			}
+			
     		// create job with the rsl XML jobDesc    		
     		GramJob gramJob = new GramJob(jobDesc);
     		
@@ -107,7 +108,7 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
     		gramJob.setAuthorization(authorization);
     		
         	// get factory
-    		//must be true, else if false, start job status listening and gt4/etc files are neeeded in $HOME
+    		//must be true, else if false, start job status listening and gt4/etc files are needed in $HOME
     		boolean isNotInteractiveJob = true; 
     		
             java.net.URL factoryURL = ManagedJobFactoryClientHelper.getServiceURL(m_serverUrl).getURL();
@@ -117,8 +118,7 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
             gramJob.submit(factoryEndpoint, isNotInteractiveJob, true, "uuid:" + UUIDGenFactory.getUUIDGen().nextUUID());
         	return gramJob.getHandle();
         } catch (GramException e) {
-            //this.rethrowException(e);
-            throw new NoSuccess(e);
+            return this.rethrowException(e);
         } catch (GSSException e) {
             throw new NoSuccess(e);
         } catch (Exception e) {
@@ -135,11 +135,11 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
         } catch (GSSException e) {
             throw new NoSuccess(e);
         } catch (Exception e) {
-       	 throw new NoSuccess(e);
+       	 	throw new NoSuccess(e);
 		}
     }
     
-    private void rethrowException(GramException e) throws PermissionDenied, Timeout, NoSuccess {
+    private String rethrowException(GramException e) throws PermissionDenied, Timeout, NoSuccess {
         switch(e.getErrorCode()) {
             case GRAMProtocolErrorConstants.ERROR_AUTHORIZATION:
                 throw new PermissionDenied(e);

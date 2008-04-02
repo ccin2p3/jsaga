@@ -5,6 +5,8 @@ import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
+
+import org.apache.log4j.Logger;
 import org.globus.gram.*;
 import org.globus.gram.internal.GRAMConstants;
 import org.globus.gram.internal.GRAMProtocolErrorConstants;
@@ -29,6 +31,7 @@ import java.util.Map;
  */
 public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract implements JobControlAdaptor {
     private static final String SHELLPATH = "ShellPath";
+    private Logger logger = Logger.getLogger(GatekeeperJobControlAdaptor.class);
     private Map m_parameters;
 
     public String getType() {
@@ -76,6 +79,11 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
         } catch (ParseException e) {
             throw new NoSuccess(e);
         }
+        
+        if(checkMatch) {
+			logger.debug("CheckMatch not supported");
+		}
+        
         GramJob job = new GramJob(m_credential, rslTree.toRSL(true));
         try {
         	try {
