@@ -126,7 +126,7 @@ public class ZipDataAdaptor implements FileReaderStreamFactory{//, FileWriterPut
                         found = true;
                     } else {
                         FileAttributes attr = new ZipFileAttributes(entry, path);
-                        if (attr.getName().indexOf('/') == -1) {
+                        if (attr.getNameOnly().indexOf('/') == -1) {
                             list.add(attr);
                         }
                     }

@@ -21,7 +21,7 @@ public class ZipFileAttributes extends FileAttributes {
     public ZipFileAttributes(ZipEntry entry, String basePath) {
         String name = entry.getName().substring(basePath.length());
         m_name = entry.isDirectory()
-                ? name.substring(name.length()-1)
+                ? name.substring(0, name.length()-1)
                 : name;
 
         m_type = entry.isDirectory()
