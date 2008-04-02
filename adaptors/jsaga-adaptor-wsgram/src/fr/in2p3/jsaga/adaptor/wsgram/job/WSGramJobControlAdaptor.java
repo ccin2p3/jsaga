@@ -7,7 +7,6 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.message.addressing.EndpointReferenceType;
-import org.apache.log4j.Logger;
 import org.globus.exec.client.GramJob;
 import org.globus.exec.utils.client.ManagedJobFactoryClientHelper;
 import org.globus.exec.utils.rsl.RSLHelper;
@@ -42,8 +41,6 @@ import java.util.Map;
  */
 public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements JobControlAdaptor {
 
-	private Logger logger = Logger.getLogger(WSGramJobControlAdaptor.class);
-	
     public String getType() {
         return "wsgram";
     }
@@ -91,7 +88,8 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
 			}
     		
 			if(checkMatch) {
-				logger.debug("CheckMatch not supported");
+                //TODO: remove boolean checkMatch or add dependency on Log4j
+//				logger.debug("CheckMatch not supported");
 			}
 			
     		// create job with the rsl XML jobDesc    		
