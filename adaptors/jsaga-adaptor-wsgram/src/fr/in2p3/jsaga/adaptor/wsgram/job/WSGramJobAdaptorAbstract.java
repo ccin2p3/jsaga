@@ -131,6 +131,8 @@ public abstract class WSGramJobAdaptorAbstract implements SagaSecureAdaptor {
 			}
     	}    	
     	AxisProperties.setProperty(EngineConfigurationFactoryDefault.OPTION_CLIENT_CONFIG_FILE, clientConfigFile);
+        
+    	// TODO : use CheckAvailability parameter
     	// Ping service
     	if(false) {
 	    	try {
