@@ -46,6 +46,7 @@ public class GatekeeperJobMonitorAdaptor extends GatekeeperJobAdaptorAbstract im
         try {
         	Gram.jobStatus(job);
         	// TODO : move to cleanup
+            // TODO : test if twoPhaseUsed is needed when moved in cleanup
         	if(GatekeeperJobAdaptorAbstract.twoPhaseUsed && 
         			(job.getStatus() == GRAMConstants.STATUS_DONE ||
         			job.getStatus() == GRAMConstants.STATUS_FAILED)) {

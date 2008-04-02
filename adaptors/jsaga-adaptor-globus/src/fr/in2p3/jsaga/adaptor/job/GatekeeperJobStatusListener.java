@@ -29,7 +29,10 @@ public class GatekeeperJobStatusListener extends JobStatusListener implements Gr
     }
 
     public void statusChanged(GramJob job) {
-    	// TODO : move to cleanup    	
+        JobStatus status = new GatekeeperJobStatus(job.getIDAsString(), new Integer(job.getStatus()), job.getStatusAsString());
+        m_notifier.notifyChange(status);
+    	// TODO : move to cleanup
+        // TODO : test if twoPhaseUsed is needed when moved in cleanup
     	if(GatekeeperJobAdaptorAbstract.twoPhaseUsed && 
     			(job.getStatus() == GRAMConstants.STATUS_DONE ||
     			job.getStatus() == GRAMConstants.STATUS_FAILED )) {
@@ -42,7 +45,5 @@ public class GatekeeperJobStatusListener extends JobStatusListener implements Gr
 				logger.warn("Unable to send commit end signal", e);
 			}
     	}
-        JobStatus status = new GatekeeperJobStatus(job.getIDAsString(), new Integer(job.getStatus()), job.getStatusAsString());
-        m_notifier.notifyChange(status);
     }
 }
