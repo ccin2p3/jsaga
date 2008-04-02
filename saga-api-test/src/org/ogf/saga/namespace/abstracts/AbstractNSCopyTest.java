@@ -29,7 +29,7 @@ public abstract class AbstractNSCopyTest extends AbstractNSDirectoryTest {
     // test data
     protected static final String DEFAULT_DIRNAME_2 = "dir2/";
     protected static final String DEFAULT_FILENAME_2 = "file2.txt";
-    protected static final String DEFAULT_CONTENT_2 = "Content of file 2 on base2.url...";
+    protected static final String DEFAULT_CONTENT_2 = "Content of file 2 on base2.url...\n";
 
     // configuration
     protected URL m_dirUrl2;
