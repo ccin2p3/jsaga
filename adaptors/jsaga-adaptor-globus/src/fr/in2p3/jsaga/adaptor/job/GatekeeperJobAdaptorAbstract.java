@@ -73,23 +73,27 @@ public abstract class GatekeeperJobAdaptorAbstract implements SagaSecureAdaptor 
     		loadedCogProperties.setIPAddress(value);
     		CoGProperties.setDefault(loadedCogProperties);
     	}
-        try {
-            Gram.ping(m_credential, m_serverUrl);
-        } catch (GramException e) {
-            switch(e.getErrorCode()) {
-                case GRAMProtocolErrorConstants.ERROR_PROTOCOL_FAILED:
-                    throw new AuthenticationFailed("Proxy may be expired", e);
-                case GRAMProtocolErrorConstants.ERROR_AUTHORIZATION:
-                    throw new AuthorizationFailed(e);
-                case GRAMProtocolErrorConstants.INVALID_JOB_CONTACT:
-                case GRAMProtocolErrorConstants.ERROR_CONNECTION_FAILED:
-                    throw new Timeout(e);
-                default:
-                    throw new NoSuccess(e);
-            }
-        } catch (GSSException e) {
-            throw new AuthenticationFailed(e);
-        }
+    	
+    	// TODO : user CheckAvailability parameter
+    	if(true) {
+	        try {
+	            Gram.ping(m_credential, m_serverUrl);
+	        } catch (GramException e) {
+	            switch(e.getErrorCode()) {
+	                case GRAMProtocolErrorConstants.ERROR_PROTOCOL_FAILED:
+	                    throw new AuthenticationFailed("Proxy may be expired", e);
+	                case GRAMProtocolErrorConstants.ERROR_AUTHORIZATION:
+	                    throw new AuthorizationFailed(e);
+	                case GRAMProtocolErrorConstants.INVALID_JOB_CONTACT:
+	                case GRAMProtocolErrorConstants.ERROR_CONNECTION_FAILED:
+	                    throw new Timeout(e);
+	                default:
+	                    throw new NoSuccess(e);
+	            }
+	        } catch (GSSException e) {
+	            throw new AuthenticationFailed(e);
+	        }
+    	}
     }
 
     public void disconnect() throws NoSuccess {
