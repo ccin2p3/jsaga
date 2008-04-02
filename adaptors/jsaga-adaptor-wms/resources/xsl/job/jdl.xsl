@@ -131,7 +131,7 @@ Requirements = true;<xsl:text/>
         <!-- TODO : To test when input sandbox will work -->
         <xsl:for-each select="jsdl:Application/spmd:SPMDApplication/spmd:SPMDVariation/text()[not(. = 'None')]">        
             <xsl:choose>
-	            <xsl:when test=". = 'MPI'">
+	            <xsl:when test=". = 'MPI' or . = 'MPICH1' or . = 'MPICH2'">
 JobType = "MPICH";<xsl:text/>
 		        <xsl:for-each select="../../spmd:NumberOfProcesses/text()">
 NodeNumber = <xsl:value-of select="."/>;<xsl:text/>
