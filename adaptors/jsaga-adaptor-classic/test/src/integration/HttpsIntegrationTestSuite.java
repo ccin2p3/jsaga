@@ -20,27 +20,21 @@ import org.ogf.saga.file.*;
 public class HttpsIntegrationTestSuite extends TestSuite {
     public static class HttpsNSEntryTest extends NSEntryTest {
         public HttpsNSEntryTest() throws Exception {super("https");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class HttpsDirectoryListTest extends DirectoryListTest {
         public HttpsDirectoryListTest() throws Exception {super("https");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class HttpsDirectoryTest extends DirectoryTest {
         public HttpsDirectoryTest() throws Exception {super("https");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class HttpsFileReadTest extends FileReadTest {
         public HttpsFileReadTest() throws Exception {super("https");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class Https_to_EmulatorNSCopyTest extends NSCopyTest {
         public Https_to_EmulatorNSCopyTest() throws Exception {super("https", "test");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
     public static class Https_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
         public Https_to_EmulatorNSCopyRecursiveTest() throws Exception {super("https", "test");}
-        public void setUp() throws Exception {System.out.println(this.getClass()); super.setUp();}
     }
 
     public HttpsIntegrationTestSuite() throws Exception {
