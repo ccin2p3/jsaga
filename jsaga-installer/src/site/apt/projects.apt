@@ -1,0 +1,17 @@
+Related Projects
+
+    * {{{http://elara.c-s.fr/elisaportal}Enterprise grid with Local Infrastructure and Services for @pplications}}
+
+[images/elisa.jpg] Elis@
+
+      A portal to industrial and research grid infrastructures, by British Telecom
+
+    * {{{http://cc.in2p3.fr/docenligne/269}Java Jobs Submission}} 
+
+[images/jjs.jpg] JJS
+
+      A tool to efficiently submit collections of short-life jobs to EGEE, by CC-IN2P3
+
+    * {{{#}Java Universal eXplorer}} JUX (in development...)
+
+      A multi-protocol file browser, by CC-IN2P3
