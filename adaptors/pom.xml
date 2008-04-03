@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.in2p3.jsaga.aggregator</groupId>
   <artifactId>adaptors</artifactId>
-  <version>0.9.1</version>
+  <version>0.9.2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>JSAGA Adaptors</name>
   <description>These are the adaptors for the JSAGA engine.</description>
@@ -25,8 +25,4 @@
     <module>jsaga-adaptor-wms</module>
 	<module>jsaga-adaptor-unicore6</module>
   </modules>
-
-  <scm>
-    <tag>jsaga-0_9_1</tag>
-  </scm>
 </project>
