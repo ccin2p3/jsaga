@@ -74,10 +74,10 @@ public class JobDescriptionTest extends AbstractJobTest {
         this.change(JobDescription.TOTALPHYSICALMEMORY, "2048");
     }
     public void test_cpuArchitecture() throws Exception {
-        this.change(JobDescription.CPUARCHITECTURE, new String[]{"x86", "x86_64"});
+        this.change(JobDescription.CPUARCHITECTURE, "ia64");
     }
     public void test_operatingSystemType() throws Exception {
-        this.change(JobDescription.OPERATINGSYSTEMTYPE, new String[]{"LINUX", "WIN98"});
+        this.change(JobDescription.OPERATINGSYSTEMTYPE, "WINNT");
     }
     public void test_candidateHosts() throws Exception {
         this.change(JobDescription.CANDIDATEHOSTS, new String[]{"myhost", "host2"});
@@ -110,8 +110,8 @@ public class JobDescriptionTest extends AbstractJobTest {
         // JobDescription.JOBSTARTTIME is not supported by JSAGA
         m_jobDescription.setAttribute(JobDescription.TOTALCPUTIME, "60");
         m_jobDescription.setAttribute(JobDescription.TOTALPHYSICALMEMORY, "1024");
-        m_jobDescription.setVectorAttribute(JobDescription.CPUARCHITECTURE, new String[]{"x86", "x86_32"});
-        m_jobDescription.setVectorAttribute(JobDescription.OPERATINGSYSTEMTYPE, new String[]{"LINUX", "WIN95"});
+        m_jobDescription.setAttribute(JobDescription.CPUARCHITECTURE, "x86");
+        m_jobDescription.setAttribute(JobDescription.OPERATINGSYSTEMTYPE, "LINUX");
         m_jobDescription.setVectorAttribute(JobDescription.CANDIDATEHOSTS, new String[]{"myhost", "host1"});
         m_jobDescription.setAttribute(JobDescription.QUEUE, "queue1");
         // JobDescription.JOBCONTACT is not supported by JSAGA

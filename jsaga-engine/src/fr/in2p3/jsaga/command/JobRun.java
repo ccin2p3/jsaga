@@ -114,8 +114,8 @@ public class JobRun extends AbstractCommand {
         opt.addOption(o("time at which a job should be scheduled").hasArg().create(JobDescription.JOBSTARTTIME));
         opt.addOption(o("estimated total number of CPU seconds which the job will require").hasArg().create(JobDescription.TOTALCPUTIME));
         opt.addOption(o("estimated amount of memory the job requires").hasArg().create(JobDescription.TOTALPHYSICALMEMORY));
-        opt.addOption(o("compatible processor for job submission").hasArgs().create(JobDescription.CPUARCHITECTURE));
-        opt.addOption(o("compatible operating system for job submission").hasArgs().create(JobDescription.OPERATINGSYSTEMTYPE));
+        opt.addOption(o("compatible processor for job submission").hasArg().create(JobDescription.CPUARCHITECTURE));
+        opt.addOption(o("compatible operating system for job submission").hasArg().create(JobDescription.OPERATINGSYSTEMTYPE));
         opt.addOption(o("list of host names which are to be considered by the resource manager as candidate targets").hasArgs().create(JobDescription.CANDIDATEHOSTS));
         opt.addOption(o("name of a queue to place the job into").hasArg().create(JobDescription.QUEUE));
         opt.addOption(o("set of endpoints describing where to report").hasArgs().create(JobDescription.JOBCONTACT));
@@ -148,8 +148,8 @@ public class JobRun extends AbstractCommand {
         setOptional(desc, line, JobDescription.JOBSTARTTIME);
         setOptional(desc, line, JobDescription.TOTALCPUTIME);
         setOptional(desc, line, JobDescription.TOTALPHYSICALMEMORY);
-        setOptMulti(desc, line, JobDescription.CPUARCHITECTURE);
-        setOptMulti(desc, line, JobDescription.OPERATINGSYSTEMTYPE);
+        setOptional(desc, line, JobDescription.CPUARCHITECTURE);
+        setOptional(desc, line, JobDescription.OPERATINGSYSTEMTYPE);
         setOptMulti(desc, line, JobDescription.CANDIDATEHOSTS);
         setOptional(desc, line, JobDescription.QUEUE);
         setOptMulti(desc, line, JobDescription.JOBCONTACT);

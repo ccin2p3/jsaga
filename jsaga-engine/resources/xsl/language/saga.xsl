@@ -110,12 +110,12 @@
                             <jsdl:UpperBoundedRange exclusiveBound="false"><xsl:value-of select="."/></jsdl:UpperBoundedRange>
                         </jsdl:TotalPhysicalMemory>
                     </xsl:for-each>
-                    <xsl:for-each select="CPUArchitecture/value/text()">
+                    <xsl:for-each select="CPUArchitecture/@value"><!-- deviation from SAGA specification (for consistency with JSDL) -->
                         <jsdl:CPUArchitecture>
                             <jsdl:CPUArchitectureName><xsl:value-of select="."/></jsdl:CPUArchitectureName>
                         </jsdl:CPUArchitecture>
                     </xsl:for-each>
-                    <xsl:for-each select="OperatingSystemType/value/text()">
+                    <xsl:for-each select="OperatingSystemType/@value"><!-- deviation from SAGA specification (for consistency with JSDL) -->
                         <jsdl:OperatingSystem>
                             <jsdl:OperatingSystemType>
                                 <jsdl:OperatingSystemName><xsl:value-of select="."/></jsdl:OperatingSystemName>

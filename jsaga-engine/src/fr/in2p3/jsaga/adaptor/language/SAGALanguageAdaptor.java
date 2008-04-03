@@ -34,14 +34,14 @@ public class SAGALanguageAdaptor extends AbstractLanguageAdaptorProperties imple
             JobDescription.JOBSTARTTIME,
             JobDescription.TOTALCPUTIME,
             JobDescription.TOTALPHYSICALMEMORY,
+            JobDescription.CPUARCHITECTURE,     // deviation from SAGA specification (for consistency with JSDL)
+            JobDescription.OPERATINGSYSTEMTYPE, // deviation from SAGA specification (for consistency with JSDL)
             JobDescription.QUEUE};
     private static final String[] REQUIRED_VECTOR_PROPERTY_NAMES = new String[] {};
     private static final String[] OPTIONAL_VECTOR_PROPERTY_NAMES = new String[] {
             JobDescription.ARGUMENTS,
             JobDescription.ENVIRONMENT,
             JobDescription.FILETRANSFER,
-            JobDescription.CPUARCHITECTURE,
-            JobDescription.OPERATINGSYSTEMTYPE,
             JobDescription.CANDIDATEHOSTS,
             JobDescription.JOBCONTACT};
 
