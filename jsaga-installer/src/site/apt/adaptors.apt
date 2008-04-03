@@ -8,6 +8,9 @@ Adaptors
 | UserPass         | Core |
 | InMemoryProxy    |
 *------------------+--+
+| X09              | jsaga-adaptor-classic |
+| JKS              |
+*------------------+--+
 | Globus           | jsaga-adaptor-globus |
 | GlobusLegacy     |
 | GlobusRFC820     |
@@ -25,19 +28,29 @@ Adaptors
 *--------------+--+--+
 | file         |                             | jsaga-adaptor-classic |
 *--------------+--+--+
-| gsiftp       | Globus, GlobusLegacy, GlobusRFC820 | jsaga-adaptor-globus |
-| gsiftp-new   | MyProxy, InMemoryProxy      |
-| gsiftp-old   | VOMS                        |
+| http         | UserPass                    | jsaga-adaptor-classic |
 *--------------+--+--+
-| gsiftp-win   | Globus, GlobusLegacy, GlobusRFC820 | jsaga-adaptor-globus |
-|              | MyProxy, InMemoryProxy      |
+| https        | X509, JKS                   | jsaga-adaptor-classic |
+*--------------+--+--+
+| zip          |                             | jsaga-adaptor-classic |
+| (read-only...) |
+*--------------+--+--+
+| cache        |                             | jsaga-adaptor-classic |
+| (in construction...) |
+*--------------+--+--+
+| gsiftp       | Globus, GlobusLegacy, GlobusRFC820 | jsaga-adaptor-globus |
+| gsiftp-v1    | MyProxy, InMemoryProxy      |
+| gsiftp-v2    | VOMS                        |
+| gsiftp-win   |                             |
+*--------------+--+--+
+| rbyteio      | JKS                         | jsaga-adaptor-unicore6 |
 *--------------+--+--+
 | srm          | Globus, GlobusLegacy, GlobusRFC820 | jsaga-adaptor-srm |
 | srm22        | MyProxy, InMemoryProxy      |
-| (en cours...)| VOMS                        |
+| (in construction...) | VOMS
 *--------------+--+--+
 | lfc          | "/tmp/x509u_up$UID"         | jsaga-adaptor-lfc |
-| (en cours...)|
+| (in construction...) |
 *--------------+--+--+
 
 * Execution Management Adaptors
@@ -53,8 +66,7 @@ Adaptors
 *-----------------+--+
 | gLite-WMS       | jsaga-adaptor-wms |
 *-----------------+--+
-| Unicore 6       | jsaga-adaptor-? |
-| (en cours...)   |
+| Unicore 6       | jsaga-adaptor-unicore6 |
 *-----------------+--+
 
 ** Langage Adaptors
@@ -62,11 +74,14 @@ Adaptors
 *-------------------+--+
 | <<Job Language>>  | <<Module>> |
 *-------------------+--+
-| JSDL + extensions | Core |
+| ext:JobCollection | Core |
+| ext:Job           |
+| JSDL + extensions |
 *-------------------+--+
 | SAGA              | Core |
 *-------------------+--+
 | JDL               | jsaga-adaptor-jdl |
+| (in construction...) |
 *-------------------+--+
 
 ** Other Adaptors (expression evaluation & file staging)

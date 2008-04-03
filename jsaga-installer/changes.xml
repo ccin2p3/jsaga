@@ -1,39 +1,15 @@
 <document>
     <properties>
-        <title>JSAGA changes</title>
+        <title>JSAGA Release Notes</title>
     </properties>
     <body>
-        <release version="0.9.1-SNAPSHOT" date="2007-09-20">
-            <action dev="sreynaud" type="update">
-                Move to JDK 1.5 and to the offical Java-binding of the SAGA interfaces.
-            </action>
-        </release>
-        <release version="0.9.0-alpha-4" date="2007-08-17">
-            <action dev="sreynaud" type="update">
-                Updated data adaptors interface.
-            </action>
-        </release>
-        <release version="0.9.0-alpha-3" date="2007-08-16">
-            <action dev="sreynaud" type="fix">
-                Added a root directory in generated packages.
-            </action>
-        </release>
-        <release version="0.9.0-alpha-2" date="2007-08-16">
+        <release version="0.9.1" date="2008-04-03" description="First release">
             <action dev="sreynaud" type="add">
-                Added security context plugins: Globus, MyProxy, VOMS.
+                Engine made compliant to 'snapshot-1' of SAGA Java Binding.
+                Management of Job Collections is still under development...
             </action>
-        </release>
-        <release version="0.9.0-alpha-1" date="2007-07-30">
-            <action dev="sreynaud" type="update">
-                Renamed module sagaitf-jdk14 to saga-interfaces.
-            </action>
-            <action dev="sreynaud" type="fix">
-                Fixed a bug in the SAGA test-suite.
-            </action>
-        </release>
-        <release version="0.9.0-alpha-0" date="2007-07-23">
-            <action dev="sreynaud" type="add">
-                Initial release.
+            <action dev="ndemesy" type="add">
+                Added adaptors for gLite WMS, Globus WS-GRAM and Unicore 6.
             </action>
         </release>
     </body>

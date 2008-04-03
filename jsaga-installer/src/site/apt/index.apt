@@ -4,23 +4,21 @@ JSAGA
  ({{{http://forge.ogf.org/sf/go/doc13771?nav=1}SAGA}}) specification from
  the Open Grid Forum ({{{http://forge.ogf.org/}OGF}}).
 
- Extensible via plugins and customizable via configuration files, this
- implementation enables a uniform access to the resources of several
- grids supporting heterogeneous security, data management and execution
+ It hides heterogeneity between grid middleware by providing a uniform
+ interface to the different security, data management and execution
  management technologies.
 
- JSAGA does not only enable submitting jobs on various grid middleware
- components, it also enables a transparent usage of grid deployments, by
- selecting the appropriate security context to connect to the resource
- and by conveying the input/output files of the jobs to/from the worker
- nodes. The selection of the transfer path depends on many parameters,
- including the characteristics of the selected grid and site, the
- characteristics of the file transfer protocol, the availability of the
- security contexts needed to access the data management resources, the
- characteristics of the file itself.
+ But JSAGA does not only hide heterogeneity between middleware, it also
+ hides heterogeneity between grid infrastructures. Indeed, heterogeneity
+ between infrastructures leads to additional issues, including selection
+ of the security context, setup of the job’s environment, or efficient
+ transport of input/output files to/from worker nodes. Transfer strategy
+ depends on file size, on the possibility of sharing a given file among
+ several jobs, on required data protection level, on protocol access
+ modes and third-party transfer capability, on security context
+ delegation capability, on characteristics of the execution site
+ (supported protocols, network filtering policy, shared file system and
+ preinstalled files availability). 
 
- JSAGA hides all this complexity and enables submitting jobs to several
- grids, by using a single job description written in Job Submission
- Description Language ({{{http://www.ogf.org/documents/GFD.56.pdf}JSDL}})
-
-            "DESCRIBE YOUR JOB ONCE, SUBMIT IT EVERY WHERE !"
+ JSAGA addresses these issues to enable efficient jobs submission to
+ several grid infrastructures with a single job description.
