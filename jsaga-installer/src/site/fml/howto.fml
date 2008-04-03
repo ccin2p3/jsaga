@@ -105,16 +105,16 @@ mv $LOCAL_BASE/application/ $LOCAL_BASE/build-tools/
 cd ../jsaga ; mvn -f pom-unreleased.xml deploy clean
 mvn validate release:prepare
 mvn validate release:perform
-mv $LOCAL_BASE/application/ $LOCAL_BASE/jsaga/</pre>
-                    </li>
-                    <li>Copy the installer into the archives directory
-                        <pre>/afs/in2p3.fr/home/throng/ccin2p3/grid/www/grid/archives/jsaga/
-# echo "Options +Indexes" > /afs/in2p3.fr/home/throng/ccin2p3/grid/www/grid/archives/.htaccess</pre>
+mv $LOCAL_BASE/application/ $LOCAL_BASE/jsaga/
+
+echo "Options +Indexes" > $LOCAL_BASE/maven2/.htaccess</pre>
                     </li>
                     <li>Synchronize directories
                         <pre>REMOTE_BASE=ccali:/afs/in2p3.fr/home/throng/ccin2p3/grid/www/grid
 cd $LOCAL_BASE
+rsync --progress -azC --force -e ssh maven2/fr/in2p3/jsaga/jsaga-installer/ $REMOTE_BASE/jsaga/
 rsync --progress -azC --force -e ssh --delete maven2/ $REMOTE_BASE/maven2/
+rsync --progress -azC --force -e ssh --delete build-tools/ $REMOTE_BASE/build-tools/
 rsync --progress -azC --force -e ssh --delete jsaga/ $REMOTE_BASE/jsaga/</pre>
                     </li>
                 </ul>
@@ -155,7 +155,7 @@ rsync --progress -azC --force -e ssh jsaga-dev/ $REMOTE_BASE/jsaga-dev/</pre>
             <question>How to re-build an old release of JSAGA ?</question>
             <answer>
                 <pre>TAG=&lt;release_tag&gt;
-mvn validate scm:bootstrap -DscmVersionType=tag -DscmVersion=$TAG -Dgoals=deploy</pre>
+mvn validate scm:bootstrap -DscmVersionType=tag -DscmVersion=$TAG -Dgoals=deploy,site-deploy</pre>
             </answer>
         </faq>
         <faq id="work-offline">
