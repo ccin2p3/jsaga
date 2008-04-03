@@ -50,7 +50,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependserializer-plugin</artifactId>
-                <version>1.0-SNAPSHOT</version>
                 <executions>
                     <execution>
                         <id>serialize-dependencies</id>
@@ -103,7 +102,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-izpack-plugin</artifactId>
-                <version>1.0-SNAPSHOT</version>
                 <configuration>
                     <descriptor>${project.build.directory}/izpack.xml</descriptor>
                     <basedir>${project.build.directory}/${project.artifactId}-${project.version}-bin.dir/jsaga-${project.version}/</basedir>
