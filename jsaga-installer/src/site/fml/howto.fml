@@ -92,8 +92,9 @@ cd ../jsaga ; mvn clean -Dall</pre>
                     <li>Cleanup maven local repository (for detecting dependencies on old releases)
                         <pre>cd jsaga-adaptorpom ; mvn uninstall:all</pre>
                     </li>
-                    <li>Start an SSH agent (required for release:*)
-                        <br/>
+                    <li>Start an SSH agent (required for "mvn validate release:*")
+                        <pre>eval `ssh-agent`
+ssh-add &lt;path_to_cvs_key&gt;</pre>
                     </li>
                     <li>Commit every changes to CVS repository
                         <br/>
