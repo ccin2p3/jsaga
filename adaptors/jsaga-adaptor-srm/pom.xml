@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
     <artifactId>jsaga-adaptor-srm</artifactId>
-    <version>0.9.1-SNAPSHOT</version>
+    <version>0.9.1</version>
     <name>Adaptor for SRM implementations</name>
     <build>
         <plugins>
@@ -38,26 +38,26 @@
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-adaptoritf</artifactId>
-            <version>0.9.1-SNAPSHOT</version>
+            <version>0.9.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api</artifactId>
-            <version>0.9.1-SNAPSHOT</version>
+            <version>0.9.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api</artifactId>
-            <version>0.9.1-SNAPSHOT</version>
+            <version>0.9.1</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
-            <version>0.9.1-SNAPSHOT</version>
+            <version>0.9.1</version>
             <scope>test</scope>
         </dependency>
         <!-- adaptor specific -->
@@ -87,4 +87,8 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+  <scm>
+    <tag>jsaga-0_9_1</tag>
+  </scm>
 </project>
