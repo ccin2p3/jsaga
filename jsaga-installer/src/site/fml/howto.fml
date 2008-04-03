@@ -85,12 +85,10 @@ and JNI header files for linux)
                     <li>Update the release notes
                         <br/>
                     </li>
-                    <li>Cleanup build directories
-                        <pre>cd build-tools ; mvn clean
-cd ../jsaga ; mvn clean -Dall</pre>
-                    </li>
-                    <li>Cleanup maven local repository (for detecting dependencies on old releases)
-                        <pre>cd jsaga-adaptorpom ; mvn uninstall:all</pre>
+                    <li>Cleanup
+                        <pre>cd ../build-tools ; mvn clean
+cd ../jsaga ; mvn clean -Dall
+cd jsaga-adaptorpom ; mvn uninstall:all</pre>
                     </li>
                     <li>Start an SSH agent (required for "mvn validate release:*")
                         <pre>eval `ssh-agent`
@@ -101,11 +99,10 @@ ssh-add &lt;path_to_cvs_key&gt;</pre>
                     </li>
                     <li>Make the release
                         <pre>LOCAL_BASE=c:/grid.in2p3.fr
-cd build-tools ; mvn deploy site-deploy
+cd ../build-tools ; mvn deploy site-deploy
 mv $LOCAL_BASE/application/ $LOCAL_BASE/build-tools/
 
 cd ../jsaga ; mvn -f pom-unreleased.xml deploy clean
-mvn install     # workaround to a bug with jsaga-adaptor-srm
 mvn validate release:prepare
 mvn validate release:perform
 mv $LOCAL_BASE/application/ $LOCAL_BASE/jsaga/</pre>
@@ -127,10 +124,13 @@ rsync --progress -azC --force -e ssh --delete jsaga/ $REMOTE_BASE/jsaga/</pre>
             <question>How to deploy a snapshot of JSAGA ?</question>
             <answer>
                 <ul>
-                    <li>Make the snapshot
+                    <li>Make a full snapshot
                         <pre>LOCAL_BASE=c:/grid.in2p3.fr
-cd jsaga/
-mvn install     # workaround to a bug with jsaga-adaptor-srm
+mvn deploy ; mvn site-deploy
+mv $LOCAL_BASE/application/ $LOCAL_BASE/jsaga-dev/</pre>
+                        Or make a quick snapshot (jsaga-installer only)
+                        <pre>LOCAL_BASE=c:/grid.in2p3.fr
+mvn install             # update maven local repository for building jsaga-installer
 cd jsaga-installer/
 mvn deploy site-deploy
 mv $LOCAL_BASE/application/ $LOCAL_BASE/jsaga-dev/</pre>
