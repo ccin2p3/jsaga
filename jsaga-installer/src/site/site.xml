@@ -23,7 +23,6 @@
             <item name="Download" href="download.html"/>
             <item name="Presentations" href="presentations.html"/>
             <item name="Related Projects" href="projects.html"/>
-            <item name="Unstable Release" href="../jsaga-dev/index.html"/>
         </menu>
         <menu name="User Documentation">
             <item name="SAGA Specification" href="http://www.ogf.org/documents/GFD.90.pdf"/>
@@ -37,6 +36,7 @@
             <item name="JSAGA Engine" href="jsaga-engine/index.html"/>
             <item name="Build Tools" href="../build-tools/index.html"/>
             <item name="How To" href="howto.html"/>
+            <item name="Development Release" href="../jsaga-dev/index.html"/>
         </menu>
         <menu name="Project Documentation" ref="reports"/>
         <menu name="Adaptor Modules">

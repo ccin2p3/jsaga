@@ -112,7 +112,8 @@ echo "Options +Indexes" > $LOCAL_BASE/maven2/.htaccess</pre>
                     <li>Synchronize directories
                         <pre>REMOTE_BASE=ccali:/afs/in2p3.fr/home/throng/ccin2p3/grid/www/grid
 cd $LOCAL_BASE
-rsync --progress -azC --force -e ssh maven2/fr/in2p3/jsaga/jsaga-installer/ $REMOTE_BASE/archives/jsaga/
+rsync --progress -azC --force -e ssh maven2/fr/in2p3/jsaga/jsaga-installer/ \
+      $REMOTE_BASE/archives/jsaga/
 rsync --progress -azC --force -e ssh --delete maven2/ $REMOTE_BASE/maven2/
 rsync --progress -azC --force -e ssh --delete build-tools/ $REMOTE_BASE/build-tools/
 rsync --progress -azC --force -e ssh --delete jsaga/ $REMOTE_BASE/jsaga/</pre>
@@ -130,16 +131,16 @@ mvn deploy ; mvn site-deploy
 mv $LOCAL_BASE/application/ $LOCAL_BASE/jsaga-dev/</pre>
                         Or make a quick snapshot (jsaga-installer only)
                         <pre>LOCAL_BASE=c:/grid.in2p3.fr
-mvn install             # update maven local repository for building jsaga-installer
+mvn install     # update maven local repository for building jsaga-installer
 cd jsaga-installer/
 mvn deploy site-deploy
 mv $LOCAL_BASE/application/ $LOCAL_BASE/jsaga-dev/</pre>
                     </li>
-                    <li>Edit the download page to fix the links to distribution files
-                        <pre>cd $LOCAL_BASE
-VERSION=`ls maven2/fr/in2p3/jsaga/jsaga-installer/*/jsaga-installer*.jar \
+                    <li>Correct the web pages for development release
+                        <pre>mv $LOCAL_BASE/jsaga-dev/images/logo-jsaga-dev.png $LOCAL_BASE/jsaga-dev/images/logo-jsaga.png
+VERSION=`ls $LOCAL_BASE/maven2/fr/in2p3/jsaga/jsaga-installer/*/jsaga-installer*.jar \
        | sed -e "s|.*/jsaga-installer-[^-]*-\(.*\)\.jar.\?|\1|"`
-sed -i jsaga-dev/download.html -e "s/SNAPSHOT\([^\/]\)/$VERSION\1/g"
+sed -i $LOCAL_BASE/jsaga-dev/download.html -e "s/SNAPSHOT\([^\/]\)/$VERSION\1/g"
 echo $VERSION</pre>
                     </li>
                     <li>Synchronize directories
