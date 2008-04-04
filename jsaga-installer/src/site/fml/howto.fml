@@ -112,7 +112,7 @@ echo "Options +Indexes" > $LOCAL_BASE/maven2/.htaccess</pre>
                     <li>Synchronize directories
                         <pre>REMOTE_BASE=ccali:/afs/in2p3.fr/home/throng/ccin2p3/grid/www/grid
 cd $LOCAL_BASE
-rsync --progress -azC --force -e ssh maven2/fr/in2p3/jsaga/jsaga-installer/ $REMOTE_BASE/jsaga/
+rsync --progress -azC --force -e ssh maven2/fr/in2p3/jsaga/jsaga-installer/ $REMOTE_BASE/archives/jsaga/
 rsync --progress -azC --force -e ssh --delete maven2/ $REMOTE_BASE/maven2/
 rsync --progress -azC --force -e ssh --delete build-tools/ $REMOTE_BASE/build-tools/
 rsync --progress -azC --force -e ssh --delete jsaga/ $REMOTE_BASE/jsaga/</pre>
