@@ -16,6 +16,8 @@ Queue=<xsl:value-of select="text()"/></xsl:template>
 
     <xsl:template match="posix:Executable">
 Executable=<xsl:value-of select="text()"/></xsl:template>
+    <xsl:template match="posix:WorkingDirectory">
+WorkingDirectory=<xsl:value-of select="text()"/></xsl:template>
     <xsl:template match="posix:Input">
 Input=<xsl:value-of select="text()"/></xsl:template>
     <xsl:template match="posix:Output">

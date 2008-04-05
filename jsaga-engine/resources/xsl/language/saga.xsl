@@ -55,6 +55,9 @@
                         <xsl:for-each select="Executable/@value">
                             <posix:Executable filesystemName="WorkingDirectory"><xsl:value-of select="."/></posix:Executable>
                         </xsl:for-each>
+                        <xsl:for-each select="WorkingDirectory/@value">
+                            <posix:WorkingDirectory filesystemName="WorkingDirectory"><xsl:value-of select="."/></posix:WorkingDirectory>
+                        </xsl:for-each>
                         <xsl:for-each select="Input/@value">
                             <posix:Input filesystemName="WorkingDirectory"><xsl:value-of select="."/></posix:Input>
                         </xsl:for-each>
@@ -89,12 +92,10 @@
                     </xsl:if>
                 </jsdl:Application>
                 <jsdl:Resources>
-                    <xsl:for-each select="WorkingDirectory/@value">
-                        <jsdl:FileSystem name="WorkingDirectory">
-                            <jsdl:FileSystemType>temporary</jsdl:FileSystemType>
-                            <jsdl:MountPoint><xsl:value-of select="."/></jsdl:MountPoint>
-                        </jsdl:FileSystem>
-                    </xsl:for-each>
+                    <jsdl:FileSystem name="WorkingDirectory">
+                        <jsdl:FileSystemType>temporary</jsdl:FileSystemType>
+                        <jsdl:MountPoint><xsl:value-of select="."/></jsdl:MountPoint>
+                    </jsdl:FileSystem>
                     <xsl:for-each select="TotalCPUCount/@value">
                         <jsdl:TotalCPUCount>
                             <jsdl:Exact><xsl:value-of select="."/></jsdl:Exact>
