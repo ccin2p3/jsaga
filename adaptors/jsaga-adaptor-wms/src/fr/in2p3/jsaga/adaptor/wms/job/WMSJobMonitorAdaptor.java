@@ -13,6 +13,7 @@ import org.apache.axis.SimpleTargetedChain;
 import org.apache.axis.configuration.EngineConfigurationFactoryDefault;
 import org.apache.axis.configuration.SimpleProvider;
 import org.apache.axis.transport.http.HTTPSender;
+import org.apache.log4j.Logger;
 import org.glite.lb.LoggingAndBookkeepingLocatorClient;
 import org.glite.wms.wmproxy.AuthenticationFaultException;
 import org.glite.wms.wmproxy.AuthorizationFaultException;
@@ -69,6 +70,7 @@ import javax.xml.rpc.ServiceException;
 public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements QueryIndividualJob {
 		
 	public static final String DEFAULT_PORT = "DefaultPort";
+	private Logger logger = Logger.getLogger(WMSJobMonitorAdaptor.class.getName());	
 	protected int m_lbPort;
 
 	// Should never be invoked 
@@ -129,16 +131,17 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	        }
 	        
 	        // TODO : move to cleanup step
-	        if(jobState.getState().getValue().equals(StatName._DONE) || 
-	        		jobState.getState().getValue().equals(StatName._ABORTED)) {
+	        if(!jobIsDestroy && 
+	        		(jobState.getState().getValue().equals(StatName._DONE) || 
+	        		jobState.getState().getValue().equals(StatName._ABORTED))) {
 	        	try {
 	        		
-	        		//get Stdout/stderr and purge	        		
+	        		//get Stdout/stderr and purge
+			        jobIsDestroy = true;
 					cleanUpJob(nativeJobId);
 					
 					// must return cleanUp state
 			        jobState = stub.jobStatus(nativeJobId,jobFlags );
-			        System.out.println("Status after clean:"+jobState.getState().getValue());
 			        
 			        // clean proxy
 			        if(m_tmpProxyFile != null &&
@@ -146,11 +149,12 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 			        	m_tmpProxyFile.delete();
 			        }
 				} catch (AuthenticationFailed e) {
-					System.err.println("Unable to clean job :"+e.getMessage());
-					e.printStackTrace();
+					logger.debug("Unable to clean job '"+nativeJobId+"'.", e);
 				} catch (NoSuccess e) {
-					System.err.println("Unable to clean job :"+e.getMessage());
-					e.printStackTrace();
+					logger.debug("Unable to clean job '"+nativeJobId+"'.", e);
+				}
+				finally {
+			        logger.debug("Job '"+nativeJobId+"'has been destroyed: "+jobState.getState().getValue());
 				}
 	        }
 	        
@@ -206,7 +210,6 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	        // create WMP Client
         	AxisProperties.setProperty(EngineConfigurationFactoryDefault.OPTION_CLIENT_CONFIG_FILE,
         			clientConfigFile);
-        	System.out.println("WMS : "+m_wmsServerUrl);
         	WMProxyAPI m_clientClean = new WMProxyAPI (m_wmsServerUrl, m_tmpProxyFile.getAbsolutePath(), caLoc);
 	    	
 	    	// put proxy
@@ -263,7 +266,7 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	                            uCopy.copy();
 	                                                    
 	                        } catch (Exception e) {
-	                        	 System.err.println("Unable to get file "+filename + ":"+ e.getMessage());
+	                        	logger.debug("Unable to get file '"+filename+"' for job '"+jobId+"'has been destroyed: ", e);
 	                        }                     
 	                    }
 	                }
