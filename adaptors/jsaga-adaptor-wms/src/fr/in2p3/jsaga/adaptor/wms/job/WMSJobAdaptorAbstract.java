@@ -34,6 +34,7 @@ public abstract class WMSJobAdaptorAbstract implements SagaSecureAdaptor {
     
     // TODO move when cleanup will be move to Control
     protected String m_wmsServerUrl;
+    protected boolean jobIsDestroy = false;
     protected String rootLogDir = System.getProperty("user.home") + File.separator;    
     
     public Class[] getSupportedSecurityAdaptorClasses() {
