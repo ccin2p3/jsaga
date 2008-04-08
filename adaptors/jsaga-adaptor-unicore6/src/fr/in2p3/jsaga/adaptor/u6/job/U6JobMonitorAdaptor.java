@@ -40,7 +40,8 @@ public class U6JobMonitorAdaptor extends U6JobAdaptorAbstract implements QueryIn
     		Status jobStatus = jobClient.getStatus();
 			
     		// TODO : move to cleanup step
-			if(jobStatus.isFailed() || jobStatus.isSuccessful()) {
+			if(isDestroy && (jobStatus.isFailed() || jobStatus.isSuccessful())) {
+				
 				//try to get stdout & stderr						
 				try {
 					getOutputs(jobClient, securityManager);
@@ -58,6 +59,7 @@ public class U6JobMonitorAdaptor extends U6JobAdaptorAbstract implements QueryIn
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
+				isDestroy = true;
 			}
 			return new U6JobStatus(nativeJobId, jobStatus, jobStatus.toString());			
     	} catch (Exception e) {

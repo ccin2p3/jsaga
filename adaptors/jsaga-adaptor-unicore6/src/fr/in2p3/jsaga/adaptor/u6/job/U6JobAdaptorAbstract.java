@@ -59,6 +59,7 @@ public abstract class U6JobAdaptorAbstract extends U6Abstract implements SagaSec
 	
 	protected JKSSecurityAdaptor m_credential;
     protected String rootLogDir = System.getProperty("user.home") + File.separator;    
+    protected boolean isDestroy = false;
     
     public Class[] getSupportedSecurityAdaptorClasses() {
         return new Class[]{JKSSecurityAdaptor.class};
