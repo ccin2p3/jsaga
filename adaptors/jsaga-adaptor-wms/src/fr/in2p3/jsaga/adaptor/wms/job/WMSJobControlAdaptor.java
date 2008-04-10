@@ -12,6 +12,7 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
 import org.apache.axis.AxisProperties;
 import org.apache.axis.configuration.EngineConfigurationFactoryDefault;
+import org.apache.log4j.Logger;
 import org.glite.jdl.AdParser;
 import org.glite.jdl.JobAdException;
 import org.glite.wms.wmproxy.AuthenticationFaultException;
@@ -62,7 +63,8 @@ import java.util.Map;
 public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobControlAdaptor {
     
 	public static final String LBSERVER = "LBServer";
-
+	private Logger logger = Logger.getLogger(WMSJobMonitorAdaptor.class.getName());
+	
     private WMProxyAPI m_client;
     private String m_delegationId = "myId";
     protected String m_lbServerUrl;
@@ -224,7 +226,8 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
     		}
     		
     		// submit
-	    	String jobId = m_client.jobSubmit(jobDesc, m_delegationId).getId();
+    		String jobId = m_client.jobSubmit(jobDesc, m_delegationId).getId();
+	    	logger.debug("Job id:"+jobId);
 	    	return jobId;
     	} catch (ServiceException e) {
     		throw new NoSuccess(e);
