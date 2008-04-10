@@ -73,13 +73,13 @@ OutputSandbox = {"<xsl:text/>
 		
 <!--  Requirements -->
 		<xsl:choose>
-			<xsl:when test="count(jsdl:Resources//text()) = 0 and 
+			<xsl:when test="count(jsdl:Resources/*[not( name() = 'jsdl:FileSystem')]) = 0 and 
 			count(jsdl:Application/spmd:SPMDApplication/spmd:ProcessesPerHost) > 0"> 
 Requirements = (other.GlueCEInfoTotalCPUs >= <xsl:value-of select="jsdl:Application/spmd:SPMDApplication/spmd:ProcessesPerHost"/>);<xsl:text/>
 			</xsl:when>
-			<xsl:when test="count(jsdl:Resources//text()) > 0">
+			<xsl:when test="count(jsdl:Resources/*[not( name() = 'jsdl:FileSystem')]) > 0">
 Requirements = <xsl:text/>
-				<xsl:for-each select="jsdl:Resources/*">					  
+				<xsl:for-each select="jsdl:Resources/*[not( name() = 'jsdl:FileSystem')]">					  
 					<xsl:choose>
 						<!-- TODO -->
                			<xsl:when test="name()= 'jsdl:TotalCPUTime'">
