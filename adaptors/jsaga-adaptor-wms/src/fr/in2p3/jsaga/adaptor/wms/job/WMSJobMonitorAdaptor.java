@@ -6,7 +6,9 @@ import fr.in2p3.jsaga.adaptor.base.usage.U;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
+import fr.in2p3.jsaga.adaptor.job.monitor.QueryFilteredJob;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
+import holders.StringArrayHolder;
 
 import org.apache.axis.AxisProperties;
 import org.apache.axis.SimpleTargetedChain;
@@ -27,7 +29,13 @@ import org.glite.wsdl.services.lb.LoggingAndBookkeepingPortType;
 import org.glite.wsdl.types.lb.GenericFault;
 import org.glite.wsdl.types.lb.JobFlags;
 import org.glite.wsdl.types.lb.JobFlagsValue;
+import org.glite.wsdl.types.lb.QueryAttr;
+import org.glite.wsdl.types.lb.QueryConditions;
+import org.glite.wsdl.types.lb.QueryOp;
+import org.glite.wsdl.types.lb.QueryRecValue;
+import org.glite.wsdl.types.lb.QueryRecord;
 import org.glite.wsdl.types.lb.StatName;
+import org.glite.wsdl.types.lb.holders.JobStatusArrayHolder;
 import org.globus.axis.transport.HTTPSSender;
 import org.globus.axis.util.Util;
 import org.globus.common.CoGProperties;
@@ -51,6 +59,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
+import java.util.Date;
 import java.util.Map;
 
 import javax.xml.rpc.ServiceException;
@@ -64,11 +73,9 @@ import javax.xml.rpc.ServiceException;
 * Date:   18 fev. 2008
 * ***************************************************
 * Description:                                      */
-/**
- * TODO : try to get status with stub.queryJobs(); 
- */
 public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements QueryIndividualJob {
-		
+	// TODO : add QueryFilteredJob when cleanup will be supported
+	
 	public static final String DEFAULT_PORT = "DefaultPort";
 	private Logger logger = Logger.getLogger(WMSJobMonitorAdaptor.class.getName());	
 	protected int m_lbPort;
@@ -295,6 +302,69 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 				m_tmpProxyFile.delete();
 			}
 		}
+	}
+
+	// TODO : get LB Server URl
+	/*
+	 * Get all jobs for authenticated user 
+	 */
+	public JobStatus[] getFilteredStatus(String userID, String jcName,
+			Date startDate) throws Timeout, NoSuccess {
+		try {
+			
+			//String nativeJobId = "https://rb02.pic.es:9000/";
+			//String nativeJobId = "https://lxb2176.cern.ch:9000/";
+			String nativeJobId = "https://cg08.ific.uv.es/";
+			
+    		URL jobUrl = new URL(nativeJobId);
+	        URL lbURL = new URL(jobUrl.getProtocol(), jobUrl.getHost(), m_lbPort , "");  
+    		
+	        // Set provider
+	        SimpleProvider provider = new SimpleProvider();
+	        SimpleTargetedChain c = null;
+	        c = new SimpleTargetedChain(new HTTPSSender());
+	        provider.deployTransport("https",c);
+	        c = new SimpleTargetedChain(new HTTPSender());
+	        provider.deployTransport("http",c);
+	        Util.registerTransport();
+	        
+	        // get LB Stub
+	        LoggingAndBookkeepingLocator loc = new LoggingAndBookkeepingLocatorClient(provider, m_credential);
+	        LoggingAndBookkeepingPortType stub = loc.getLoggingAndBookkeeping(lbURL);
+	        
+	        // get Jobs Status
+            JobFlagsValue[] jobFlagsValue = new JobFlagsValue[1];
+            jobFlagsValue[0] = JobFlagsValue.CLASSADS;
+            JobFlags jobFlags = new JobFlags(jobFlagsValue);
+	        
+            JobStatusArrayHolder jobStatusResult = new JobStatusArrayHolder();
+	        StringArrayHolder jobNativeIdResult = new StringArrayHolder();
+	       
+	        QueryConditions[] queryConditions = new  QueryConditions[1];
+	        queryConditions[0] = new QueryConditions();
+	        queryConditions[0].setAttr(QueryAttr.JOBID);
+	        
+	        QueryRecord[] qR = new QueryRecord[1];
+	        QueryRecValue value1 = new QueryRecValue();
+	        value1.setC(nativeJobId);
+	        qR[0] = new QueryRecord(QueryOp.UNEQUAL, value1, null );	        
+	        queryConditions[0].setRecord(qR);	        
+	        // Cannot use stub.userJobs() because not yet implemented (version > 1.8 needed) 
+	        stub.queryJobs(queryConditions, jobFlags, jobNativeIdResult, jobStatusResult);
+	        
+	        if(jobNativeIdResult != null && jobNativeIdResult.value != null) {
+	        	WMSJobStatus[] filterJobs = new WMSJobStatus[jobNativeIdResult.value.length];	
+	        	for (int i = 0; i < filterJobs.length; i++) {
+	        		System.out.println("Status for job '"+jobNativeIdResult.value[i]+"' :"+jobStatusResult.value[i].getState().getValue());
+	        		filterJobs[i] = new WMSJobStatus(jobNativeIdResult.value[i], jobStatusResult.value[i].getState(), jobStatusResult.value[i].getState().getValue());
+				}
+		        return filterJobs;
+	        }
+	        // TODO : exception or null ?
+	        return null;
+    	} catch (Exception e) {
+    		throw new NoSuccess(e);
+    	}
 	}
 
 }
