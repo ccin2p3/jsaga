@@ -51,8 +51,7 @@
                 select="jsdl:Application/posix:POSIXApplication/posix:Environment">(<xsl:value-of
                 select="@name"/><xsl:text> </xsl:text><xsl:value-of select="text()"/>)</xsl:for-each>)<xsl:text/>
         </xsl:if>
-        <!-- TODO : depends on configuration -->
-        <xsl:for-each select="jsdl:Resources/jsdl:FileSystem[@name='WorkingDirectory']/jsdl:MountPoint/text()">
+        <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:WorkingDirectory/text()">
 (directory = <xsl:value-of select="."/>)<xsl:text/>
         </xsl:for-each>
        <xsl:for-each select="jsdl:Resources/jsdl:TotalPhysicalMemory/jsdl:UpperBoundedRange/text()">

@@ -41,8 +41,7 @@
                 </environment>
             </xsl:for-each><xsl:text/>
         </xsl:if>
-        <!-- TODO : depends on configuration -->
-        <xsl:for-each select="jsdl:Resources/jsdl:FileSystem[@name='WorkingDirectory']/jsdl:MountPoint/text()">
+		<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:WorkingDirectory/text()">
 <directory><xsl:value-of select="."/></directory><xsl:text/>
         </xsl:for-each>
         <!--  Memory in Mb (must be an integer) -->
