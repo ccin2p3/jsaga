@@ -32,7 +32,6 @@ public class JobRunWithPrequisiteTest extends AbstractJobTest {
         
     	// prepare a job start a mpi binary
     	Attribute[] attributes = new Attribute[3];
-    	// TODO : get first suuported attribute SPMDVariation
     	attributes[0] = new Attribute(JobDescription.SPMDVARIATION, "MPI");
     	attributes[1] = new Attribute(JobDescription.NUMBEROFPROCESSES, "2");
     	attributes[2] = new Attribute(JobDescription.PROCESSESPERHOST, "2");
