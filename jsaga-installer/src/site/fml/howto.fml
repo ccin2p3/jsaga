@@ -26,7 +26,7 @@
 -DartifactId=jsaga-adaptor-_name_</pre>
                     </li>
                     <li>Change directory to your project, and set the version of the JSAGA engine
-                        <pre>VERSION=0.9.1-SNAPSHOT
+                        <pre>VERSION=&lt;current_version&gt;
 sed -i pom.xml -e "s/CHANGEME/$VERSION/g"</pre>
                     </li>
                     <li>Install all the dependencies
