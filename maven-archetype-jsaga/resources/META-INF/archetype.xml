@@ -16,5 +16,6 @@
         <resource>test/src/integration/MyProtocolIntegrationTestSuite.java</resource>
         <resource>test/assembly.xml</resource>
         <resource>test/config/jsaga-config.xml</resource>
+        <resource>test/config/log4j.properties</resource>
     </testResources>
 </archetype>
