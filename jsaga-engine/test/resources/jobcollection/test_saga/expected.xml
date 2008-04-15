@@ -19,7 +19,12 @@
                         <p:Error filesystemName="WorkingDirectory">stderr.txt</p:Error>
                     </p:POSIXApplication>
                 </Application>
-                <Resources/>
+                <Resources>
+                    <FileSystem name="WorkingDirectory">
+                        <FileSystemType>temporary</FileSystemType>
+                        <MountPoint>.</MountPoint>
+                    </FileSystem>
+                </Resources>
                 <DataStaging>
                     <FileName>input</FileName>
                     <FilesystemName>WorkingDirectory</FilesystemName>

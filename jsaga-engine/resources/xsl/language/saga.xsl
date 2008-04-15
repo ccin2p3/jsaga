@@ -94,7 +94,7 @@
                 <jsdl:Resources>
                     <jsdl:FileSystem name="WorkingDirectory">
                         <jsdl:FileSystemType>temporary</jsdl:FileSystemType>
-                        <jsdl:MountPoint><xsl:value-of select="."/></jsdl:MountPoint>
+                        <jsdl:MountPoint>.</jsdl:MountPoint>
                     </jsdl:FileSystem>
                     <xsl:for-each select="TotalCPUCount/@value">
                         <jsdl:TotalCPUCount>
