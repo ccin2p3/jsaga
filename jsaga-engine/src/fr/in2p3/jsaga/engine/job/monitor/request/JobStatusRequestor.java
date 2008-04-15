@@ -4,6 +4,8 @@ import fr.in2p3.jsaga.adaptor.job.SubState;
 import fr.in2p3.jsaga.adaptor.job.monitor.*;
 import org.ogf.saga.error.*;
 
+import java.util.Calendar;
+
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -31,8 +33,13 @@ public class JobStatusRequestor {
                 JobStatus[] statusArray = ((QueryListJob) m_adaptor).getStatusList(new String[]{nativeJobId});
                 return findJobStatus(statusArray, nativeJobId);
             } else if (m_adaptor instanceof QueryFilteredJob) {
-                //todo: set filter string (e.g. userID, jcName, startDate) ?
-                JobStatus[] statusArray = ((QueryFilteredJob) m_adaptor).getFilteredStatus(null, null, null);
+                Object[] filters = new Object[3];
+                filters[QueryFilteredJob.USER_ID] = null;           //todo: set filter value
+                filters[QueryFilteredJob.COLLECTION_NAME] = null;   //todo: set filter value
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.DAY_OF_YEAR, -1);
+                filters[QueryFilteredJob.START_DATE] = cal.getTime();
+                JobStatus[] statusArray = ((QueryFilteredJob) m_adaptor).getFilteredStatus(filters);
                 return findJobStatus(statusArray, nativeJobId);
             } else {
                 throw new NotImplemented("Querying job status not implemented for adaptor: "+ m_adaptor.getClass().getName());
