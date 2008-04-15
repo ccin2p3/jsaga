@@ -1,12 +1,13 @@
 package fr.in2p3.jsaga.impl.job.instance;
 
+import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.adaptor.job.SubState;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.*;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorCallback;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
-import fr.in2p3.jsaga.EngineProperties;
+import org.apache.log4j.Logger;
 import org.ogf.saga.ObjectType;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
@@ -18,6 +19,7 @@ import org.ogf.saga.task.State;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.Exception;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -36,6 +38,8 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     public static final String NATIVEJOBDESCRIPTION = "NativeJobDescription";
     /** Job metric (deviation from SAGA specification) */
     public static final String JOB_SUBSTATE = "job.sub_state";
+    /** logger */
+    private static Logger s_logger = Logger.getLogger(JobImpl.class);
 
     private JobControlAdaptor m_controlAdaptor;
     private JobMonitorService m_monitorService;
@@ -237,16 +241,33 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
         super.setState(state);
     }
 
-    private void setJobState(State state, String stateDetail, SubState subState) {
-        switch(m_metrics.m_State.getValue(State.RUNNING)) {
+    private synchronized void setJobState(State state, String stateDetail, SubState subState) {
+        // if not already in a final state
+        if (!isFinal(m_metrics.m_State.getValue(State.RUNNING))) {
+            // update metrics
+            m_metrics.m_State.setValue(state, this);
+            m_metrics.m_StateDetail.setValue(stateDetail, this);
+            m_metrics.m_SubState.setValue(subState.toString(), this);
+
+            // cleanup job
+            if (isFinal(state) && m_controlAdaptor instanceof CleanableJobAdaptor) {
+                try {
+                    ((CleanableJobAdaptor)m_controlAdaptor).clean(m_nativeJobId);
+                } catch (Exception e) {
+                    s_logger.warn("Failed to cleanup job: "+m_nativeJobId, e);
+                }
+            }
+        }
+    }
+
+    private static boolean isFinal(State state) {
+        switch(state) {
             case DONE:
             case CANCELED:
             case FAILED:
-                return;
+                return true;
             default:
-                m_metrics.m_State.setValue(state, this);
-                m_metrics.m_StateDetail.setValue(stateDetail, this);
-                m_metrics.m_SubState.setValue(subState.toString(), this);
+                return false;
         }
     }
 }
