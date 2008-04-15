@@ -59,7 +59,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
-import java.util.Date;
 import java.util.Map;
 
 import javax.xml.rpc.ServiceException;
@@ -308,8 +307,7 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	/*
 	 * Get all jobs for authenticated user 
 	 */
-	public JobStatus[] getFilteredStatus(String userID, String jcName,
-			Date startDate) throws Timeout, NoSuccess {
+	public JobStatus[] getFilteredStatus(Object[] filters) throws Timeout, NoSuccess {
 		try {
 			
 			//String nativeJobId = "https://rb02.pic.es:9000/";

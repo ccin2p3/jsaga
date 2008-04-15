@@ -10,7 +10,12 @@ import org.ogf.saga.error.Timeout;
 import com.intel.gpe.client2.security.GPESecurityManager;
 import com.intel.gpe.clients.api.JobClient;
 import com.intel.gpe.clients.api.Status;
+import com.intel.gpe.clients.api.exceptions.*;
+import fr.in2p3.jsaga.adaptor.u6.TargetSystemInfo;
 
+import java.lang.Exception;
+import java.util.Iterator;
+import java.util.List;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -68,10 +73,11 @@ public class U6JobMonitorAdaptor extends U6JobAdaptorAbstract implements QueryIn
     }        
 
     // TODO : uncomment when clean up OK
-	/*public JobStatus[] getFilteredStatus(String filter) throws Timeout, NoSuccess {
+    public JobStatus[] getFilteredStatus(Object[] filters) throws Timeout, NoSuccess {
 		try {
 			
     		// list jobs
+            TargetSystemInfo targetSystemInfo = findTargetSystem();
             List<JobClient> jobList = targetSystemInfo.getTargetSystem().getJobs();
             U6JobStatus[] jobListStatus = new U6JobStatus[jobList.size()];            
             for (Iterator iterator = jobList.iterator(); iterator.hasNext();) {
@@ -95,6 +101,6 @@ public class U6JobMonitorAdaptor extends U6JobAdaptorAbstract implements QueryIn
 		} catch (Exception e) {
 			throw new NoSuccess(e);
 		}
-	}*/
+	}
 
 }

@@ -3,8 +3,6 @@ package fr.in2p3.jsaga.adaptor.job.monitor;
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.Timeout;
 
-import java.util.Date;
-
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -18,12 +16,17 @@ import java.util.Date;
  *
  */
 public interface QueryFilteredJob extends QueryJob {
+    /** Item at position USER_ID is the identifier of the user (String) */
+    public static final int USER_ID = 0;
+    /** Item at position COLLECTION_NAME is the name of the job collection (String) */
+    public static final int COLLECTION_NAME = 1;
+    /** Item at position START_DATE is the beginning of the period (Date) */
+    public static final int START_DATE = 2;
+
     /**
      * Get status of jobs matching filter.
-     * @param userID the identifier of the user.
-     * @param jcName the name of the job collection.
-     * @param startDate the beginning of the period.
+     * @param filters the filter values.
      * @return the status of jobs matching filter.
      */
-    public JobStatus[] getFilteredStatus(String userID, String jcName, Date startDate) throws Timeout, NoSuccess;
+    public JobStatus[] getFilteredStatus(Object[] filters) throws Timeout, NoSuccess;
 }
