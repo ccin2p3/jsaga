@@ -37,8 +37,9 @@
     <element name="job"><complexType><complexContent><extension base="tns:ObjectType">
         <sequence>
             <element name="schemeAlias" minOccurs="0" maxOccurs="unbounded" type="string"/>
-            <element name="monitor" minOccurs="0" maxOccurs="1"><complexType><complexContent><extension base="tns:ObjectType">
-                <attribute name="impl" type="string" use="required"/>
+            <element name="monitorService" minOccurs="0" maxOccurs="1"><complexType><complexContent><extension base="tns:ObjectType">
+                <attribute name="impl" type="string" use="optional"/>
+                <attribute name="url" type="anyURI" use="optional"/>
             </extension></complexContent></complexType></element>
         </sequence>
         <attribute name="type" type="string" use="required"/>

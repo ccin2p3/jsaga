@@ -136,7 +136,7 @@
     <!-- execution -->
     <execution scheme="gatekeeper" bulk="false">
         <jobService name="default" type="gatekeeper" impl="fr.in2p3.jsaga.adaptor.job.GatekeeperJobControlAdaptor">
-            <monitor impl="fr.in2p3.jsaga.adaptor.job.GatekeeperJobMonitorAdaptor"/>
+            <monitorService impl="fr.in2p3.jsaga.adaptor.job.GatekeeperJobMonitorAdaptor"/>
             <supportedContextType>Globus</supportedContextType>
             <supportedContextType>MyProxy</supportedContextType>
             <supportedContextType>VOMS</supportedContextType>
@@ -145,7 +145,7 @@
     </execution>
     <execution scheme="jjs" bulk="false">
         <jobService name="default" type="jjs" impl="fr.in2p3.jsaga.adaptor.job.JJSJobControlAdaptor">
-            <monitor impl="fr.in2p3.jsaga.adaptor.job.JJSJobMonitorAdaptor"/>
+            <monitorService impl="fr.in2p3.jsaga.adaptor.job.JJSJobMonitorAdaptor"/>
             <supportedContextType>Globus</supportedContextType>
             <supportedContextType>VOMS</supportedContextType>
             <fileStaging/>
@@ -153,7 +153,7 @@
     </execution>
     <execution scheme="wms" bulk="true">
         <jobService name="default" type="wms" impl="fr.in2p3.jsaga.adaptor.job.WMSJobControlAdaptor">
-            <monitor impl="fr.in2p3.jsaga.adaptor.job.LBJobMonitorAdaptor"/>
+            <monitorService impl="fr.in2p3.jsaga.adaptor.job.LBJobMonitorAdaptor"/>
             <supportedContextType>Globus</supportedContextType>
             <supportedContextType>MyProxy</supportedContextType>
             <supportedContextType>VOMS</supportedContextType>
@@ -167,7 +167,7 @@
     </execution>
     <execution scheme="ssh" bulk="false">
         <jobService name="default" type="ssh" impl="fr.in2p3.jsaga.adaptor.job.SSHJobControlAdaptor">
-            <monitor impl="fr.in2p3.jsaga.adaptor.job.SSHJobMonitorAdaptor"/>
+            <monitorService impl="fr.in2p3.jsaga.adaptor.job.SSHJobMonitorAdaptor"/>
             <supportedContextType>SSH</supportedContextType>
             <fileStaging/>
         </jobService>

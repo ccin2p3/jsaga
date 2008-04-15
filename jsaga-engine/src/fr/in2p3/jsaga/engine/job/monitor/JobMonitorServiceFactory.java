@@ -31,10 +31,7 @@ public class JobMonitorServiceFactory {
     }
 
     public JobMonitorService getJobMonitorService(URL controlURL, Session session) throws Timeout, PermissionDenied, NoSuccess, BadParameter, IncorrectURL, AuthorizationFailed, NotImplemented, AuthenticationFailed {
-        URL monitorURL = null;  //todo: get monitorURL from controlURL
-        if (monitorURL == null) {
-            monitorURL = controlURL;
-        }
+        URL monitorURL = m_adaptorFactory.getJobMonitorURL(controlURL);
         JobMonitorService service = m_services.get(monitorURL);
         if (service == null) {
             JobMonitorAdaptor adaptor = m_adaptorFactory.getJobMonitorAdaptor(monitorURL, session);

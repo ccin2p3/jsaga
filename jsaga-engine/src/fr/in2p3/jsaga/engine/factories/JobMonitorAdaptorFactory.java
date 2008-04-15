@@ -7,7 +7,7 @@ import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.config.adaptor.SecurityAdaptorDescriptor;
 import fr.in2p3.jsaga.engine.config.bean.JobserviceEngineConfiguration;
 import fr.in2p3.jsaga.engine.schema.config.JobService;
-import fr.in2p3.jsaga.engine.schema.config.Monitor;
+import fr.in2p3.jsaga.engine.schema.config.MonitorService;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
@@ -37,9 +37,25 @@ public class JobMonitorAdaptorFactory extends ServiceAdaptorFactory {
         m_configuration = configuration.getConfigurations().getJobserviceCfg();
     }
 
+    public URL getJobMonitorURL(URL controlURL) throws NotImplemented, IncorrectURL, BadParameter, NoSuccess {
+        if (controlURL==null || controlURL.getScheme()==null) {
+            throw new IncorrectURL("Invalid entry name: "+controlURL);
+        }
+
+        // get config
+        JobService jobServiceConfig = m_configuration.findJobService(controlURL);
+        MonitorService config = jobServiceConfig.getMonitorService();
+
+        // get monitorURL
+        if (config.getUrl() != null) {
+            return new URL(config.getUrl());
+        } else {
+            return controlURL;
+        }
+    }
+
     /**
      * Create a new instance of job monitor adaptor for URL <code>url</code> and connect to service.
-     * todo: cache job monitor adaptor instances with "scheme://userInfo@host:port"
      * @param url the URL of the service
      * @param session the security session
      * @return the job monitor adaptor instance
@@ -51,10 +67,7 @@ public class JobMonitorAdaptorFactory extends ServiceAdaptorFactory {
 
         // get config
         JobService jobServiceConfig = m_configuration.findJobService(url);
-        Monitor config = jobServiceConfig.getMonitor();
-        if (config == null) {
-            return null;
-        }
+        MonitorService config = jobServiceConfig.getMonitorService();
 
         // create instance
         JobMonitorAdaptor monitorAdaptor;

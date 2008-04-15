@@ -111,7 +111,9 @@
                 <xsl:copy-of select="$desc/@*[not(name()=name($conf/@*))] | $conf/@*[not(name()='contextType')]"/>
                 <xsl:apply-templates select="$conf/cfg:domain"/>
                 <xsl:apply-templates select="$desc/cfg:attribute[not(@name=$conf/cfg:attribute/@name)] | $conf/cfg:attribute"/>
-                <xsl:apply-templates select="$desc/cfg:monitor[not($conf/cfg:monitor)] | $conf/cfg:monitor"/>
+                <xsl:apply-templates select="$desc/cfg:monitorService">
+                    <xsl:with-param name="conf" select="$conf/cfg:monitorService"/>
+                </xsl:apply-templates>
                 <xsl:apply-templates select="$desc/cfg:supportedContextType"/>
                 <xsl:for-each select="$conf/cfg:fileStaging">
                     <fileStaging>
@@ -124,6 +126,14 @@
                 </xsl:for-each>
             </jobService>
         </xsl:if>
+    </xsl:template>
+    <xsl:template match="cfg:monitorService">
+        <xsl:param name="conf"/>
+        <xsl:variable name="desc" select="."/>
+        <monitorService>
+            <xsl:copy-of select="$desc/@*[not(name()=name($conf/@*))] | $conf/@*"/>
+            <xsl:apply-templates select="$desc/cfg:attribute[not(@name=$conf/cfg:attribute/@name)] | $conf/cfg:attribute"/>
+        </monitorService>
     </xsl:template>
 
     <xsl:template match="cfg:attribute">

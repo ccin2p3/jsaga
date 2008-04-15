@@ -79,10 +79,10 @@ public class JobAdaptorDescriptor {
         service.setFileStaging(staging);
         JobMonitorAdaptor monitorAdaptor = adaptor.getDefaultJobMonitor();
         if (monitorAdaptor != null) {
-            Monitor monitor = new Monitor();
+            MonitorService monitor = new MonitorService();
             monitor.setImpl(monitorAdaptor.getClass().getName());
             AdaptorDescriptors.setDefaults(monitor, monitorAdaptor);
-            service.setMonitor(monitor);
+            service.setMonitorService(monitor);
         }
         if (adaptor.getUsage() != null) {
             service.setUsage(adaptor.getUsage().toString());

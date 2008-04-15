@@ -92,8 +92,9 @@
             <element ref="tns:mapping" minOccurs="1" maxOccurs="1"/>
             <element name="jobService" minOccurs="1" maxOccurs="unbounded"><complexType><complexContent><extension base="tns:ObjectType">
                 <sequence>
-                    <element name="monitor" minOccurs="0" maxOccurs="1"><complexType><complexContent><extension base="tns:ObjectType">
+                    <element name="monitorService" minOccurs="1" maxOccurs="1"><complexType><complexContent><extension base="tns:ObjectType">
                         <attribute name="impl" type="string" use="required"/><!-- from adaptor descriptor -->
+                        <attribute name="url" type="anyURI" use="optional"/>
                     </extension></complexContent></complexType></element>
                     <element name="supportedContextType" minOccurs="0" maxOccurs="unbounded" type="string"/><!-- from adaptor descriptor -->
                     <element name="fileStaging"><complexType>
