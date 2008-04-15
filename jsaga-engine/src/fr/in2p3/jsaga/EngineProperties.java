@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga;
 
-import org.apache.log4j.Logger;
 import org.ogf.saga.error.SagaError;
 
 import java.io.*;
@@ -26,7 +25,7 @@ public class EngineProperties {
     public static final String JOB_MONITOR_ERROR_THRESHOLD = "job.monitor.error.threshold";
     public static final String JOB_CONTROL_CHECK_MATCH = "job.control.check.match";
 
-    private static Logger s_logger = Logger.getLogger(EngineProperties.class);
+    private static Exception s_exception;
     private static Properties s_prop;
 
     public static Properties getProperties() {
@@ -47,10 +46,14 @@ public class EngineProperties {
                 s_prop.load(in);
                 in.close();
             } catch (IOException e) {
-                s_logger.warn("Failed to load properties: "+file.getAbsolutePath(), e);
+                s_exception = e;
             }
         }
         return s_prop;
+    }
+
+    public static Exception getException() {
+        return s_exception;
     }
 
     public static String getProperty(String name) {

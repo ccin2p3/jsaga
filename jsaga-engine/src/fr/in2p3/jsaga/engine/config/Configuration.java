@@ -9,6 +9,7 @@ import fr.in2p3.jsaga.engine.schema.config.EffectiveConfig;
 import fr.in2p3.jsaga.helpers.MD5Digester;
 import fr.in2p3.jsaga.helpers.XMLFileParser;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformerFactory;
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.Marshaller;
@@ -73,6 +74,9 @@ public class Configuration {
         File log4jConfig = EngineProperties.getFile(EngineProperties.LOG4J_CONFIGURATION);
         if (log4jConfig.exists()) {
             PropertyConfigurator.configure(log4jConfig.getAbsolutePath());
+        }
+        if (EngineProperties.getException() != null) {
+            Logger.getLogger(Configuration.class).warn("Failed to load engine properties, using defaults ["+EngineProperties.getException().getMessage()+"]");
         }
 
         // load adaptors
