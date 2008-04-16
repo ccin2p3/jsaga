@@ -43,9 +43,9 @@ public class TaskForTesting extends AbstractTaskImplWithAsyncAttributes<String> 
         m_submitTime = System.currentTimeMillis();
     }
 
-    protected boolean doCancel() {
+    protected void doCancel() {
         m_isCancelled = true;
-        return true;
+        this.setState(State.CANCELED);
     }
 
     protected State queryState() throws NotImplemented, Timeout, NoSuccess {
