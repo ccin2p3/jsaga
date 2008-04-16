@@ -48,6 +48,7 @@ public class SftpException extends Exception{
   public Throwable getCause(){
     return this.cause;
   }
+  // Added by Nicolas DEMESY
   public int getid() {
 	  return this.id;
   }
