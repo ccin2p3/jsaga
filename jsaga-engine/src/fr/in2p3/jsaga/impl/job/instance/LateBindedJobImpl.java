@@ -58,12 +58,12 @@ public class LateBindedJobImpl extends AbstractAsyncJobImpl implements Job {
     }
 
     private boolean m_isCancelled = false;
-    protected boolean doCancel() {
+    protected void doCancel() {
         if (m_job != null) {
-            return m_job.doCancel();
+            m_job.doCancel();
         } else {
             m_isCancelled = true;
-            return m_isCancelled;
+            this.setState(State.CANCELED);
         }
     }
 

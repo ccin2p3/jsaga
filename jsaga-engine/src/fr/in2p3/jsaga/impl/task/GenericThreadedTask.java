@@ -57,12 +57,12 @@ public class GenericThreadedTask extends AbstractTaskImpl implements Task {
         m_thread.start();
     }
 
-    protected boolean doCancel() {
+    protected void doCancel() {
         try {
             Thread.currentThread().interrupt();
-            return true;
+            this.setState(State.CANCELED);
         } catch(SecurityException e) {
-            return false;
+            // do nothing (failed to cancel task)
         }
     }
 

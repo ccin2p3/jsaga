@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.impl.task;
 
 import fr.in2p3.jsaga.impl.monitoring.*;
+import org.apache.log4j.Logger;
 import org.ogf.saga.ObjectType;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
@@ -31,6 +32,8 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
     private Object m_object;
     private E m_result;
     private org.ogf.saga.error.Exception m_exception;
+    /** logger */
+    private static Logger s_logger = Logger.getLogger(AbstractTaskImpl.class);
 
     /** constructor */
     public AbstractTaskImpl(Session session, Object object, boolean create) throws NotImplemented, BadParameter, Timeout, NoSuccess {
@@ -73,10 +76,9 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
     protected abstract void doSubmit() throws NotImplemented, IncorrectState, Timeout, NoSuccess;
 
     /**
-     * cancel the task
-     * @return true if the task has been synchronously cancelled, else false
+     * cancel the task (and update its state)
      */
-    protected abstract boolean doCancel();
+    protected abstract void doCancel();
 
     /**
      * query the task state
@@ -144,15 +146,37 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
                 // just ignore
                 break;
             case RUNNING:
-                new Thread(new Runnable() {
-                    public void run() {
-                        if (AbstractTaskImpl.this.doCancel()) {
-                            m_metric_TaskState.setValue(State.CANCELED, AbstractTaskImpl.this);
+                // try to cancel synchronously
+                this.doCancel();
+                if (!this.isDone_LocalCheckOnly()) {
+                    // try to cancel asynchronously (every minutes)
+                    s_logger.warn("Failed to cancel synchronously, trying asynchronously...");
+                    new Thread(new Runnable() {
+                        public void run() {
+                            try {
+                                while(!AbstractTaskImpl.this.isDone_LocalCheckOnly()) {
+                                    Thread.currentThread().sleep(60000);
+                                    AbstractTaskImpl.this.doCancel();
+                                }
+                            } catch (InterruptedException e) {/*ignore*/}
+                            if (AbstractTaskImpl.this.isCancelled()) {
+                                s_logger.info("Asynchronous cancel successfull !");
+                            }
                         }
-                    }
-                }).start();
+                    }).start();
+                }
                 break;
         }        
+    }
+    private boolean isDone_LocalCheckOnly() {
+        switch(m_metric_TaskState.getValue()) {
+            case DONE:
+            case CANCELED:
+            case FAILED:
+                return true;
+            default:
+                return false;
+        }
     }
 
     // wait for task to be cancelled (or done, or failed)
@@ -262,9 +286,9 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
             case FAILED:
                 return false;
             case RUNNING:
-                if (mayInterruptIfRunning && this.doCancel()) {
-                    m_metric_TaskState.setValue(State.CANCELED, this);
-                    return true;
+                if (mayInterruptIfRunning) {
+                    this.doCancel();
+                    return m_metric_TaskState.getValue() == State.CANCELED;
                 }
         }
         return false;

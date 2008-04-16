@@ -103,15 +103,15 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
         }
     }
 
-    protected boolean doCancel() {
+    protected void doCancel() {
         if (m_nativeJobId == null) {
             throw new RuntimeException("INTERNAL ERROR: JobID not initialized");
         }
         try {
             m_controlAdaptor.cancel(m_nativeJobId);
-            return true;
+            this.setState(State.CANCELED, "Canceled by user", SubState.CANCELED);
         } catch (org.ogf.saga.error.Exception e) {
-            return false;
+            // do nothing (failed to cancel task)
         }
     }
 
