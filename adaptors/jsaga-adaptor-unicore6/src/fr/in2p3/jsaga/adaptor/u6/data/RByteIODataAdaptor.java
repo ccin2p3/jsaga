@@ -56,11 +56,7 @@ import java.util.Vector;
 /**
  *
  */
-public class RByteIODataAdaptor extends U6Abstract 
-		implements
-		 FileWriterPutter, FileReaderGetter
-		// FileReaderStreamFactory, FileWriterStreamFactory
-	{
+public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, FileReaderGetter {
 	protected JKSSecurityAdaptor m_credential;
     protected String m_serverFileSeparator ;
     protected StorageClient m_client;
