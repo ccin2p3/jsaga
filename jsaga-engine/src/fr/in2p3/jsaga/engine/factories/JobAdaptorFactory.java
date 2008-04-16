@@ -10,7 +10,6 @@ import fr.in2p3.jsaga.engine.config.bean.JobserviceEngineConfiguration;
 import fr.in2p3.jsaga.engine.schema.config.JobService;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.ogf.saga.URL;
-import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 
@@ -107,6 +106,10 @@ public class JobAdaptorFactory extends ServiceAdaptorFactory {
         Map attributes = new HashMap();
         for (int i=0; i<config.getAttributeCount(); i++) {
             attributes.put(config.getAttribute(i).getName(), config.getAttribute(i).getValue());
+        }
+        if (config.getMonitorService()!=null && config.getMonitorService().getUrl()!=null) {
+            URL monitorURL = new URL(config.getMonitorService().getUrl());
+            attributes.put(JobControlAdaptor.MONITOR_SERVICE_URL, monitorURL);
         }
 
         // connect
