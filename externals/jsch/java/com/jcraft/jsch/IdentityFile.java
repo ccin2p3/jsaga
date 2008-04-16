@@ -31,7 +31,8 @@ package com.jcraft.jsch;
 
 import java.io.*;
 
-class IdentityFile implements Identity{
+//Patch Nicolas DEMESY : set to public
+public class IdentityFile implements Identity{
   String identity;
   byte[] key;
   byte[] iv;
@@ -130,7 +131,8 @@ class IdentityFile implements Identity{
     return newInstance(prvfile, prvkey, pubkey, jsch);
   }
 
-  static IdentityFile newInstance(String name, byte[] prvkey, byte[] pubkey, JSch jsch) throws JSchException{
+  //Patch Nicolas DEMESY : set to public
+  public static IdentityFile newInstance(String name, byte[] prvkey, byte[] pubkey, JSch jsch) throws JSchException{
     try{
       return new IdentityFile(name, prvkey, pubkey, jsch);
     }
