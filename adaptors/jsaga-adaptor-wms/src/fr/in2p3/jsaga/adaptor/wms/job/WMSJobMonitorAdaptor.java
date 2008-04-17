@@ -155,7 +155,6 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	        // TODO : exception or null ?
 	        return null;
     	} catch (Exception e) {
-    		e.printStackTrace();
     		throw new NoSuccess(e);
     	}
 	}
