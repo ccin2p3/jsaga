@@ -8,12 +8,12 @@
     </documentation></annotation>
 
     <!-- /JobDefinition/JobDescription/Application -->
-    <element name="ScriptApplication"><complexType><simpleContent><extension base="string">
-        <annotation><documentation>
-             Dump content to script file and create elements: POSIXApplication + DataStaging
-        </documentation></annotation>
-        <attribute name="shell" type="string" use="required"/>
-    </extension></simpleContent></complexType></element>
+    <element name="ScriptApplication"><complexType>
+        <sequence>
+            <element name="Script" type="string" minOccurs="1" maxOccurs="1"/>
+            <any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType></element>
 
     <!-- JobDefinition/JobDescription/Resources/FileSystem -->
     <element name="ParentFilesystemName"><complexType><simpleContent><!-- complexType needed to generate it as an object -->

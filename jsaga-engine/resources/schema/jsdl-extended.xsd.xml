@@ -2,12 +2,14 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
         xmlns:ext="http://www.in2p3.fr/jsdl-extension"
         xmlns:jsdl-posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
+        xmlns:jsdl-spmd="http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd"
         xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
         targetNamespace="http://schemas.ggf.org/jsdl/2005/11/jsdl"
         elementFormDefault="qualified">
 
     <include schemaLocation="jsdl.xsd"/>
     <import schemaLocation="jsdl-posix.xsd" namespace="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"/>
+    <import schemaLocation="jsdl-spmd.xsd" namespace="http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd"/>
     <import schemaLocation="jsdl-extension.xsd" namespace="http://www.in2p3.fr/jsdl-extension"/>
 
     <element name="JobDefinitionExtended"><complexType><complexContent><extension base="jsdl:JobDefinition_Type">
@@ -16,8 +18,9 @@
                 <sequence>
                     <element name="Application" minOccurs="0" maxOccurs="1"><complexType><complexContent><extension base="jsdl:Application_Type">
                         <sequence>
-                            <element ref="ext:ScriptApplication" minOccurs="0" maxOccurs="1"/>
                             <element ref="jsdl-posix:POSIXApplication" minOccurs="0" maxOccurs="1"/>
+                            <element ref="jsdl-spmd:SPMDApplication" minOccurs="0" maxOccurs="1"/>
+                            <element ref="ext:ScriptApplication" minOccurs="0" maxOccurs="1"/>
                         </sequence>
                     </extension></complexContent></complexType></element>
                     <element name="Resources" minOccurs="0" maxOccurs="1"><complexType><complexContent><extension base="jsdl:Resources_Type">

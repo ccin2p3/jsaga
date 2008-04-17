@@ -11,7 +11,15 @@
                 <JobName>MYJOB_3</JobName>
             </JobIdentification>
             <Application>
-                <ext:ScriptApplication shell="/bin/sh">$E $C0 $C1 $C2 &lt;$D &gt;$R 2&gt;$STDERR</ext:ScriptApplication>
+                <posix:POSIXApplication xmlns:posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix">
+                    <posix:Executable>$E</posix:Executable>
+                    <posix:Argument>-c0 $C0</posix:Argument>
+                    <posix:Argument>-c1 $C1</posix:Argument>
+                    <posix:Argument>-c2 $C2</posix:Argument>
+                    <posix:Input>$D</posix:Input>
+                    <posix:Output>$R</posix:Output>
+                    <posix:Error>$STDERR</posix:Error>
+                </posix:POSIXApplication>
             </Application>
             <Resources>
                 <FileSystem name="HelloWorldDirectory">

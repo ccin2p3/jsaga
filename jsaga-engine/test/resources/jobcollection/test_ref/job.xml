@@ -18,10 +18,10 @@
                     <ApplicationName>HelloWorld</ApplicationName>
                     <ApplicationVersion>1.0</ApplicationVersion>
                     <!-- Application definition -->
-                    <ext:ScriptApplication shell="/bin/sh"><![CDATA[$EXEC $INPUT > $STDOUT]]></ext:ScriptApplication>
-                    <p:POSIXApplication xmlns:p="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix">
+                    <ext:ScriptApplication xmlns:p="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix">
+                        <ext:Script><![CDATA[$EXEC $INPUT -o $STDOUT]]></ext:Script>
                         <p:Error>stderr.txt</p:Error>
-                    </p:POSIXApplication>
+                    </ext:ScriptApplication>
                 </Application>
 
                 <Resources>
