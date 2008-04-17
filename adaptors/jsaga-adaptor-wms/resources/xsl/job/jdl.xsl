@@ -39,15 +39,6 @@ Arguments = "	<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posi
         </xsl:choose>
 
         <!-- other -->
-        <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Output/text()">
-StdOutput = "<xsl:text/><xsl:value-of select="."/>";<xsl:text/>
-        </xsl:for-each>
-        <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Error/text()">
-StdError = "<xsl:value-of select="."/>";<xsl:text/>
-        </xsl:for-each>
-        <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Input/text()">
-StdInput = "<xsl:value-of select="."/>";<xsl:text/>
-        </xsl:for-each>
         <xsl:if test="count(jsdl:Application/posix:POSIXApplication/posix:Environment) > 0">
 Environment = {<xsl:text/>
       		<xsl:for-each
@@ -61,16 +52,7 @@ Environment = {<xsl:text/>
             </xsl:for-each>
            };<xsl:text/>
           </xsl:if> 
-          
-<!--  For TEST, get stdout and stderr -->
-        <xsl:if test="count(jsdl:Application/posix:POSIXApplication/posix:Output) = 1
-        	and count(jsdl:Application/posix:POSIXApplication/posix:Error) = 1">
-OutputSandbox = {"<xsl:text/>
-			<xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Output/text()"/><xsl:text/>
-			<xsl:text/>","<xsl:text/>
-			<xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Error/text()"/>"};<xsl:text/>
-		</xsl:if>
-		
+          		
 <!--  Requirements -->
 		<xsl:choose>
 			<xsl:when test="count(jsdl:Resources/*[not( name() = 'jsdl:FileSystem')]) = 0 and 
