@@ -121,6 +121,8 @@ public class URL {
             return this.getSchemeSpecificPart().getPath();  //sreynaud
         } else if (".".equals(u.getAuthority())) {
             return "."+u.getPath();                         //sreynaud
+        } else if (u.getPath().startsWith("/./")) {
+            return u.getPath().substring(1);                //sreynaud
         }
         return u.getPath();
     }
