@@ -3,16 +3,16 @@ package fr.in2p3.jsaga.adaptor.wms.job;
 import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
+import fr.in2p3.jsaga.adaptor.base.usage.U;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UFile;
-import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
 import org.apache.axis.AxisProperties;
 import org.apache.axis.configuration.EngineConfigurationFactoryDefault;
-import org.apache.log4j.Logger;
 import org.glite.jdl.AdParser;
 import org.glite.jdl.JobAdException;
 import org.glite.wms.wmproxy.AuthenticationFaultException;
@@ -60,14 +60,15 @@ import java.util.Map;
  * TODO : Verify test_run_cpuTimeRequirement and test_run_processRequirement : Done in spite of Failed
  * TODO : Test MPI jobs
  */
-public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobControlAdaptor {
+public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobControlAdaptor, CleanableJobAdaptor{
     
-	public static final String LBSERVER = "LBServer";
-	private Logger logger = Logger.getLogger(WMSJobMonitorAdaptor.class.getName());
-	
-    private WMProxyAPI m_client;
+	private String clientConfigFile = Base.JSAGA_VAR+ File.separator+ "client-config-wms.wsdd";
+	private File m_tmpProxyFile;
+	private WMProxyAPI m_client;
     private String m_delegationId = "myId";
-    protected String m_lbServerUrl;
+    private String m_wmsServerUrl;
+    private String m_lbServerHost;
+    private int m_lbPort;
     
     public String getType() {
         return "wms";
@@ -79,13 +80,14 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
     
     public Usage getUsage() {
         return new UAnd(new Usage[]{
-        		new UOptional(LBSERVER),
-        		new UFile(Context.CERTREPOSITORY)}); 
+        		new UFile(Context.CERTREPOSITORY),
+        		new U(MONITOR_PORT)}); 
     }
     
     public Default[] getDefaults(Map attributes) throws IncorrectState {
     	EnvironmentVariables env = EnvironmentVariables.getInstance();
         return new Default[]{
+        		new Default(MONITOR_PORT, "9000"),
                 new Default(Context.CERTREPOSITORY, new File[]{
                         new File(env.getProperty("X509_CERT_DIR")+""),
                         new File(System.getProperty("user.home")+"/.globus/certificates/"),
@@ -110,17 +112,27 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+
+    	m_wmsServerUrl = "https://"+host+":"+port+basePath;
+    	if(attributes.containsKey(MONITOR_SERVICE_URL)) {
+    		// LB server name get in config
+    		m_lbServerHost = ((org.ogf.saga.URL) attributes.get(MONITOR_SERVICE_URL)).getHost();
+    		// TODO : remove    		
+    		throw new NoSuccess("Not supported yet");
+    	}
+    	else {
+    		// LB And WMS on the same server
+    		m_lbServerHost = host;
+    	}
     	
-    	super.connect(userInfo, host, port, basePath, attributes);    	
-    	if(attributes.containsKey(LBSERVER))
-    		m_lbServerUrl = (String) attributes.get(LBSERVER);
+    	// get port
+    	m_lbPort = Integer.parseInt((String) attributes.get(MONITOR_PORT));
     	
-    	// get certificate directory
-    	// This solution is temporary
+    	// get certificate directory : This solution is temporary
     	String caLoc = (String)attributes.get(Context.CERTREPOSITORY);
     	
         // save proxy file
-        try {
+    	try {
             // save GSSCredential to tmpFile
             m_tmpProxyFile = File.createTempFile("proxy",".proxy");
             FileOutputStream out = new FileOutputStream(m_tmpProxyFile.getAbsolutePath());
@@ -132,9 +144,9 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
         	throw new AuthenticationFailed(e);        	
         }
         
-    	// save client-config.wsdd on JSAGA_VAR from jar 
         try  {
-        	String clientConfigFile = Base.JSAGA_VAR+ File.separator+ "client-config-wms.wsdd";
+        	
+        	// save client-config.wsdd on JSAGA_VAR from jar 
         	if(!new File(clientConfigFile).exists()) {
         		try {
         			InputStream is = this.getClass().getResourceAsStream("/"+new File(clientConfigFile).getName());
@@ -150,11 +162,10 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
     				throw new NoSuccess(e);
     			}
         	} 
+        	AxisProperties.setProperty(EngineConfigurationFactoryDefault.OPTION_CLIENT_CONFIG_FILE,clientConfigFile);
+
 	        // create WMP Client
-        	AxisProperties.setProperty(EngineConfigurationFactoryDefault.OPTION_CLIENT_CONFIG_FILE,clientConfigFile);			
 	    	m_client = new WMProxyAPI (m_wmsServerUrl, m_tmpProxyFile.getAbsolutePath(), caLoc);
-	    	
-	    	// put proxy
 	    	String proxy = m_client.getProxyReq (m_delegationId);
             m_client.grstPutProxy(m_delegationId, proxy);
 	    	
@@ -189,9 +200,13 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
 			}
         }
 
-    }
+    }	
 
-    public void disconnect() throws NoSuccess {
+	public void disconnect() throws NoSuccess {
+		if(m_tmpProxyFile != null &&
+				m_tmpProxyFile.exists()) {
+			m_tmpProxyFile.delete();
+		}
         m_wmsServerUrl = null;
         m_credential = null;
         m_client = null;
@@ -200,11 +215,9 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
     public String submit(String jobDesc, boolean checkMatch) throws PermissionDenied, Timeout, NoSuccess {
     	try {
     		
-    		//if LB Address is specified, add tag in JDL
-    		if(m_lbServerUrl != null && !m_lbServerUrl.equals("")) {
-    			jobDesc += "LBAddress=\""+m_lbServerUrl+"\";";	
-    		}
-    		
+    		//Add LB Address in JDL
+			jobDesc += "LBAddress=\""+m_lbServerHost+":"+m_lbPort+"\";";
+			
 			// parse JDL
 			try {
 				AdParser.parseJdl(jobDesc);
@@ -227,10 +240,9 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
     		
     		// submit
     		String jobId = m_client.jobSubmit(jobDesc, m_delegationId).getId();
-	    	logger.debug("Job id:"+jobId);
 	    	return jobId;
     	} catch (ServiceException e) {
-    		throw new NoSuccess(e);
+			throw new NoSuccess(e);
 		} catch (AuthorizationFaultException e) {
 			throw new PermissionDenied(e);
 		} catch (AuthenticationFaultException e) {
@@ -260,4 +272,24 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
 			throw new NoSuccess(e);
 		}
     }
+
+	public void clean(String nativeJobId) throws PermissionDenied, Timeout,
+			NoSuccess {
+        try  {
+	    	// purge        
+	    	m_client.jobPurge(nativeJobId);
+        } catch (AuthenticationFaultException e) {
+			throw new PermissionDenied(e);
+		} catch (AuthorizationFaultException e) {
+			throw new PermissionDenied(e);
+		} catch (org.glite.wms.wmproxy.ServiceException e) {
+			throw new NoSuccess(e);
+		} catch (OperationNotAllowedFaultException e) {
+			throw new PermissionDenied(e);
+		} catch (InvalidArgumentFaultException e) {
+			throw new NoSuccess(e);
+		} catch (JobUnknownFaultException e) {
+			throw new NoSuccess(e);
+		}
+	}
 }
