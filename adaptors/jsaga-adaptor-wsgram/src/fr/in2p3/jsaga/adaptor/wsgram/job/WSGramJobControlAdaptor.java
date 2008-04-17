@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.adaptor.wsgram.job;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
 import org.apache.axis.components.uuid.UUIDGenFactory;
@@ -39,7 +40,7 @@ import java.util.Map;
  * TODO : setProtection
  * TODO : during cleanup, remove proxy saved in server in $HOME/.globus/gram_proxy...
  */
-public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements JobControlAdaptor {
+public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements JobControlAdaptor, CleanableJobAdaptor {
 
     public String getType() {
         return "wsgram";
@@ -114,6 +115,7 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
 
             // submit job
             gramJob.submit(factoryEndpoint, isNotInteractiveJob, true, "uuid:" + UUIDGenFactory.getUUIDGen().nextUUID());
+            Thread.sleep(300000);
         	return gramJob.getHandle();
         } catch (GramException e) {
             return this.rethrowException(e);
@@ -148,4 +150,18 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
                 throw new NoSuccess(e);
         }
     }
+
+	public void clean(String nativeJobId) throws PermissionDenied, Timeout,
+			NoSuccess {
+		GramJob job = super.getGramJobById(nativeJobId);        
+    	try {
+            job.destroy();
+        } catch (GramException e) {
+            this.rethrowException(e);
+        } catch (GSSException e) {
+            throw new NoSuccess(e);
+        } catch (Exception e) {
+       	 	throw new NoSuccess(e);
+		}
+	}
 }
