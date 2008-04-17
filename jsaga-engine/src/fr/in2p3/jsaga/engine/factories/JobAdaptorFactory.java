@@ -109,6 +109,9 @@ public class JobAdaptorFactory extends ServiceAdaptorFactory {
         }
         if (config.getMonitorService()!=null && config.getMonitorService().getUrl()!=null) {
             URL monitorURL = new URL(config.getMonitorService().getUrl());
+            if (monitorURL == null) {
+                monitorURL = url;
+            }
             attributes.put(JobControlAdaptor.MONITOR_SERVICE_URL, monitorURL);
         }
 
