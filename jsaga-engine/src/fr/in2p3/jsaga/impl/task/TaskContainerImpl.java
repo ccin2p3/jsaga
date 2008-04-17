@@ -25,7 +25,7 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
     // metrics
 //    private MetricImpl<State> m_metric_TaskState;
     // internal
-    private Map<Integer,Task> m_tasks;
+    private final Map<Integer,Task> m_tasks;
 
     /** constructor */
     public TaskContainerImpl(Session session) throws NoSuccess {
@@ -43,14 +43,14 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
 */
 
         // internal
-        m_tasks = new HashMap<Integer,Task>();
+        m_tasks = Collections.synchronizedMap(new HashMap<Integer,Task>());
     }
 
     /** clone */
     public SagaObject clone() throws CloneNotSupportedException {
         TaskContainerImpl clone = (TaskContainerImpl) super.clone();
 //        clone.m_metric_TaskState = m_metric_TaskState;
-        clone.m_tasks = clone(m_tasks);
+        clone.m_tasks.putAll(m_tasks);
         return clone;
     }
 
@@ -73,8 +73,10 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
     }
 
     public void run() throws NotImplemented, IncorrectState, DoesNotExist, Timeout, NoSuccess {
-        for (Task task : m_tasks.values()) {
-            task.run();
+        synchronized(m_tasks) {
+            for (Task task : m_tasks.values()) {
+                task.run();
+            }
         }
     }
 
@@ -84,7 +86,7 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
 
     public Task waitFor(float timeoutInSeconds, WaitMode mode) throws NotImplemented, IncorrectState, DoesNotExist, NoSuccess {
         this.startListening();
-        Task task = null;
+        Integer cookie = null;
         try {
             boolean forever;
             long endTime;
@@ -98,23 +100,27 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
                 forever = false;
                 endTime = System.currentTimeMillis() + (long) timeoutInSeconds;
             }
-            while((task=this.getFinished(mode))==null && (forever || System.currentTimeMillis()<endTime)) {
+            while((cookie=this.getFinished(mode))==null && (forever || System.currentTimeMillis()<endTime)) {
                 Thread.currentThread().sleep(100);
             }
         } catch(InterruptedException e) {/*ignore*/}
         this.stopListening();
-        return task;
+        return m_tasks.remove(cookie);
     }
 
     public void cancel() throws NotImplemented, IncorrectState, DoesNotExist, Timeout, NoSuccess {
-        for (Task task : m_tasks.values()) {
-            task.cancel();
+        synchronized(m_tasks) {
+            for (Task task : m_tasks.values()) {
+                task.cancel();
+            }
         }
     }
 
     public void cancel(float timeoutInSeconds) throws NotImplemented, IncorrectState, DoesNotExist, Timeout, NoSuccess {
-        for (Task task : m_tasks.values()) {
-            task.cancel(timeoutInSeconds);
+        synchronized(m_tasks) {
+            for (Task task : m_tasks.values()) {
+                task.cancel(timeoutInSeconds);
+            }
         }
     }
 
@@ -123,12 +129,15 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
     }
 
     public int[] listTasks() throws NotImplemented, Timeout, NoSuccess {
-        Integer[] keys = m_tasks.keySet().toArray(new Integer[m_tasks.size()]);
-        int[] cookies = new int[keys.length];
-        for (int i=0; i<keys.length; i++) {
-            cookies[i] = keys[i];
+        int i=0;
+        synchronized(m_tasks) {
+            Set<Integer> keys = m_tasks.keySet();
+            int[] cookies = new int[keys.size()];
+            for (Integer key : keys) {
+                cookies[i++] = key;
+            }
+            return cookies;
         }
-        return cookies;
     }
 
     public <T> Task<T> getTask(int cookie) throws NotImplemented, DoesNotExist, Timeout, NoSuccess {
@@ -140,22 +149,29 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
     }
 
     public Task[] getTasks() throws NotImplemented, Timeout, NoSuccess {
-        return m_tasks.values().toArray(new Task[m_tasks.size()]);
+        synchronized(m_tasks) {
+            return m_tasks.values().toArray(new Task[m_tasks.size()]);
+        }
     }
 
     public State[] getStates() throws NotImplemented, Timeout, NoSuccess {
-        List<State> states = new ArrayList<State>();
-        for (Task task : m_tasks.values()) {
-            states.add(task.getState());
+        int i=0;
+        synchronized(m_tasks) {
+            State[] states = new State[m_tasks.size()];
+            for (Task task : m_tasks.values()) {
+                states[i++] = task.getState();
+            }
+            return states;
         }
-        return states.toArray(new State[states.size()]);
     }
 
     private boolean startListening() throws NotImplemented, IncorrectState, NoSuccess {
         boolean isListening = true;
         try {
-            for (Task task : m_tasks.values()) {
-                isListening &= ((AbstractTaskImpl)task).startListening(null);
+            synchronized(m_tasks) {
+                for (Task task : m_tasks.values()) {
+                    isListening &= ((AbstractTaskImpl)task).startListening(null);
+                }
             }
         } catch(Timeout e) {
             throw new NoSuccess(e);
@@ -164,15 +180,17 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
     }
     private void stopListening() throws NotImplemented, NoSuccess {
         try {
-            for (Task task : m_tasks.values()) {
-                ((AbstractTaskImpl)task).stopListening(null);
+            synchronized(m_tasks) {
+                for (Task task : m_tasks.values()) {
+                    ((AbstractTaskImpl)task).stopListening(null);
+                }
             }
         } catch(Timeout e) {
             throw new NoSuccess(e);
         }
     }
 
-    private Task getFinished(WaitMode mode) throws NotImplemented {
+    private Integer getFinished(WaitMode mode) throws NotImplemented {
         switch(mode) {
             case ALL:
                 return getFinishedAll();
@@ -182,26 +200,27 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
                 throw new NotImplemented("INTERNAL ERROR: unexpected exception");
         }
     }
-    private Task getFinishedAll() {
+    private Integer getFinishedAll() {
         Integer cookie = null;
-        for (Map.Entry<Integer,Task> entry : m_tasks.entrySet()) {
-            cookie = entry.getKey();
-            Task task = entry.getValue();
-            if (!task.isDone()) {
-                return null;
+        synchronized(m_tasks) {
+            for (Map.Entry<Integer,Task> entry : m_tasks.entrySet()) {
+                cookie = entry.getKey();
+                Task task = entry.getValue();
+                if (!task.isDone()) {
+                    return null;
+                }
             }
         }
-        if (cookie != null) {
-            return m_tasks.remove(cookie);
-        }
-        return null;
+        return cookie;
     }
-    private Task getFinishedAny() {
-        for (Map.Entry<Integer,Task> entry : m_tasks.entrySet()) {
-            Integer cookie = entry.getKey();
-            Task task = entry.getValue();
-            if (task.isDone()) {
-                return m_tasks.remove(cookie);
+    private Integer getFinishedAny() {
+        synchronized(m_tasks) {
+            for (Map.Entry<Integer,Task> entry : m_tasks.entrySet()) {
+                Integer cookie = entry.getKey();
+                Task task = entry.getValue();
+                if (task.isDone()) {
+                    return cookie;
+                }
             }
         }
         return null;
