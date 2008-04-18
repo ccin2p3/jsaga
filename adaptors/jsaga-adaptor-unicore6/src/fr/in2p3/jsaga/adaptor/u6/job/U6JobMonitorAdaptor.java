@@ -1,21 +1,27 @@
 package fr.in2p3.jsaga.adaptor.u6.job;
 
+import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.U;
+import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
-import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
+import fr.in2p3.jsaga.adaptor.job.monitor.QueryFilteredJob;
 
-import org.ogf.saga.error.AuthenticationFailed;
+import org.ogf.saga.error.IncorrectState;
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.Timeout;
 
-import com.intel.gpe.client2.security.GPESecurityManager;
 import com.intel.gpe.clients.api.JobClient;
 import com.intel.gpe.clients.api.Status;
 import com.intel.gpe.clients.api.exceptions.*;
+import com.intel.gpe.clients.impl.jms.AtomicJobClientImpl;
+
 import fr.in2p3.jsaga.adaptor.u6.TargetSystemInfo;
 
 import java.lang.Exception;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -24,72 +30,35 @@ import java.util.List;
 * File:   U6JobMonitorAdaptor
 * Author: Nicolas DEMESY (nicolas.demesy@bt.com)
 * Date:   18 fev. 2008
-* ***************************************************
-* Description:                                      */
-/**
- * TODO QueryFilteredJob when cleanup defined
- */
-public class U6JobMonitorAdaptor extends U6JobAdaptorAbstract implements QueryIndividualJob {
+* ***************************************************/
 
-    public String getType() {
-        return "unicore6";
+public class U6JobMonitorAdaptor extends U6JobAdaptorAbstract implements QueryFilteredJob {
+        
+    public Usage getUsage() {
+    	return new UAnd(new Usage[]{new U(APPLICATION_NAME)});
+    }
+
+    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    	return new Default[]{
+    			new Default(APPLICATION_NAME, "Bash shell")};
     }
     
-    public JobStatus getStatus(String nativeJobId) throws Timeout, NoSuccess {
-
-    	try {
-    		
-    		// set security
-    		GPESecurityManager securityManager = this.setSecurity(m_credential);    		
-	        JobClient jobClient = getJobById(nativeJobId, securityManager);
-    		Status jobStatus = jobClient.getStatus();
-			
-    		// TODO : move to cleanup step
-			if(isDestroy && (jobStatus.isFailed() || jobStatus.isSuccessful())) {
-				
-				//try to get stdout & stderr						
-				try {
-					getOutputs(jobClient, securityManager);
-				}
-				catch(NoSuccess e) {
-					e.printStackTrace();
-				}
-				catch(AuthenticationFailed e) {
-					e.printStackTrace();
-				}
-
-		        // destroy
-				try {
-					jobClient.destroy();
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-				isDestroy = true;
-			}
-			return new U6JobStatus(nativeJobId, jobStatus, jobStatus.toString());			
-    	} catch (Exception e) {
-    		throw new NoSuccess(e);
-		}
-    }        
-
-    // TODO : uncomment when clean up OK
     public JobStatus[] getFilteredStatus(Object[] filters) throws Timeout, NoSuccess {
 		try {
-			
-    		// list jobs
-            TargetSystemInfo targetSystemInfo = findTargetSystem();
+			// list jobs
+			TargetSystemInfo targetSystemInfo = findTargetSystem();
             List<JobClient> jobList = targetSystemInfo.getTargetSystem().getJobs();
-            U6JobStatus[] jobListStatus = new U6JobStatus[jobList.size()];            
-            for (Iterator iterator = jobList.iterator(); iterator.hasNext();) {
-				JobClient jobClient = (JobClient) iterator.next();
-				//cancel
+            U6JobStatus[] jobListStatus = new U6JobStatus[jobList.size()];
+            int index = 0;
+            for (Iterator<JobClient> iterator = jobList.iterator(); iterator.hasNext();) {
+				JobClient jobClient = iterator.next();
 				Status jobStatus = jobClient.getStatus();
-				jobListStatus[0] = new U6JobStatus("??", jobStatus, jobStatus.toString());
+				jobListStatus[index] = new U6JobStatus(((AtomicJobClientImpl) jobClient).getId().toString(), jobStatus, jobStatus.toString());
+				index ++;
 			}
-
             return jobListStatus;
     	} catch (GPEInvalidResourcePropertyQNameException e) {
-			throw new NoSuccess(e);
+    		throw new NoSuccess(e);
 		} catch (GPEResourceUnknownException e) {
 			throw new NoSuccess(e);
 		} catch (GPEUnmarshallingException e) {
