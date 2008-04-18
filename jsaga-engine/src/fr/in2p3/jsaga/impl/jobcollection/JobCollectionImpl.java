@@ -83,11 +83,12 @@ public class JobCollectionImpl extends TaskContainerImpl implements JobCollectio
         this.allocateResources(resources);
     }
 
-    public void allocateResources(String[] resourceIds) throws Exception {
+    public void allocateResources(URL[] resourceUrls) throws Exception {
         ResourceSelection resources = new ResourceSelection();
-        for (int i=0; i<resourceIds.length; i++) {
+        for (int i=0; i<resourceUrls.length; i++) {
             Resource resource = new Resource();
-            resource.setId(resourceIds[i]);
+            resource.setId(resourceUrls[i].toString());
+            resource.setGrid(resourceUrls[i].getFragment());
             resource.setNbslots(1);
             resources.addResource(resource);
         }

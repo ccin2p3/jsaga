@@ -17,7 +17,8 @@
                     <element name="StandaloneWorker" minOccurs="0" maxOccurs="1" type="boolean" default="false"/>
                     <element name="Tag" minOccurs="0" maxOccurs="unbounded" type="string"/>
                 </sequence>
-                <attribute name="id" type="string" use="required"/>
+                <attribute name="id" type="anyURI" use="required"/>
+                <attribute name="grid" type="string" use="optional"/>
                 <attribute name="nbslots" type="nonNegativeInteger" use="optional"/>
             </complexType></element>
         </sequence>
