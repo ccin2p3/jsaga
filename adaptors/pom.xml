@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <!-- declaration -->
   <parent>
@@ -23,6 +24,7 @@
     <module>jsaga-adaptor-jdl</module>
     <module>jsaga-adaptor-wsgram</module>
     <module>jsaga-adaptor-wms</module>
-	<module>jsaga-adaptor-unicore6</module>
+    <module>jsaga-adaptor-unicore6</module>
+    <module>jsaga-adaptor-ssh</module>
   </modules>
 </project>
