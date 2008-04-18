@@ -63,7 +63,7 @@ function _FAIL_() {
 function run() {
     FUNCTION=$1
     STATUS=$2
-    log DEBUG "Entering function $FUNCTION"
+    log DEBUG "Entering function: $FUNCTION"
     if test -x /usr/bin/time ; then
         /usr/bin/time -f "real=%e user=%U sys=%S mem=%K" -o $0.time $FUNCTION
         RETURN_CODE=$?
@@ -79,7 +79,7 @@ function run() {
         change_state $STATUS
         accounting $FUNCTION $TIME
     else
-        _FAIL_ "Failed to execute $FUNCTION"
+        _FAIL_ "Failed to execute function: $FUNCTION"
     fi
 }
 
@@ -88,9 +88,9 @@ function cleanup() {
         cat $0.newfile | while read line ; do
             rm -rf $line
             if test $? -eq 0 ; then
-                log DEBUG "File $line has been deleted"
+                log DEBUG "File has been deleted: $line"
             else
-                log WARN "Failed to delete file $line"
+                log WARN "Failed to delete file: $line"
             fi
         done
         rm -f $0.newfile
@@ -100,9 +100,9 @@ function cleanup() {
         cat $0.newdir | while read line ; do
             rm -rf $line
             if test $? -eq 0 ; then
-                log DEBUG "Directory $line has been deleted"
+                log DEBUG "Directory has been deleted: $line"
             else
-                log WARN "Failed to delete directory $line"
+                log WARN "Failed to delete directory: $line"
             fi
         done
         rm -f $0.newdir
@@ -123,7 +123,7 @@ function INPUT_STAGING() {
                         <xsl:value-of select="jsdl:FilesystemName/text()"/>
                         <xsl:text>/</xsl:text>
                         <xsl:call-template name="FILENAME">
-                            <xsl:with-param name="path" select="jsdl:FileName/text()"/>
+                            <xsl:with-param name="path" select="jsdl:Source/jsdl:URI/text()"/>
                         </xsl:call-template>
                     </xsl:when>
                     <xsl:otherwise>
@@ -135,16 +135,23 @@ function INPUT_STAGING() {
     if test -z "$IS_FOUND_<xsl:value-of select="@name"/>" ; then
             <xsl:choose>
                 <xsl:when test="jsdl:Source/jsdl:URI">
-        # Download remote file
+        # Create directory if needed
+        <xsl:value-of select="@name"/>=<xsl:value-of select="jsdl:FileName/text()"/>
+        if test ! -d ${<xsl:value-of select="@name"/>%/*} ; then
+            echo ${<xsl:value-of select="@name"/>%/*} &gt;&gt; $0.newdir
+            mkdir -p ${<xsl:value-of select="@name"/>%/*}
+        fi
+
+        # Download <xsl:value-of select="$LOCAL"/> from <xsl:value-of select="jsdl:Source/jsdl:URI/text()"/>
+                    <xsl:if test="jsdl:CreationFlag/text()='overwrite'"> (overwrite)</xsl:if>
         <xsl:apply-templates select="jsdl:Source/jsdl:URI">
             <xsl:with-param name="local" select="$LOCAL"/>
         </xsl:apply-templates>
         if test -f <xsl:value-of select="$LOCAL"/> ; then
             echo <xsl:value-of select="$LOCAL"/> &gt;&gt; $0.newfile
-            <xsl:value-of select="@name"/>=<xsl:value-of select="jsdl:FileName/text()"/>
             IS_FOUND_<xsl:value-of select="@name"/>=<xsl:value-of select="position()"/>
         else
-            log WARN "Failed to download file <xsl:value-of select="jsdl:Source/jsdl:URI/text()"/>"
+            log WARN "Failed to download file: <xsl:value-of select="jsdl:Source/jsdl:URI/text()"/>"
         fi
                 </xsl:when>
                 <xsl:otherwise>
@@ -153,17 +160,18 @@ function INPUT_STAGING() {
             <xsl:value-of select="@name"/>=<xsl:value-of select="jsdl:FileName/text()"/>
             IS_FOUND_<xsl:value-of select="@name"/>=<xsl:value-of select="position()"/>
         else
-            log INFO "Failed to find local file <xsl:value-of select="$LOCAL"/>"
+            log INFO "Local file not found: <xsl:value-of select="$LOCAL"/>"
         fi
                 </xsl:otherwise>
             </xsl:choose>
-            <xsl:for-each select="jsdl:Source/ext:Process/text()">
+            <xsl:if test="jsdl:Source/ext:Process/text()">
         # Preprocess
         if test -n "$IS_FOUND_<xsl:value-of select="@name"/>" ; then
-            SOURCE=<xsl:value-of select="$LOCAL"/>
-            <xsl:value-of select="."/>
+            echo <xsl:value-of select="jsdl:FileName/text()"/> &gt;&gt; $0.newfile
+            SOURCE=<xsl:value-of select="$LOCAL"/><xsl:text>
+            </xsl:text><xsl:value-of select="jsdl:Source/ext:Process/text()"/>
         fi
-            </xsl:for-each>
+            </xsl:if>
     fi
             <xsl:variable name="current" select="@name"/>
             <xsl:if test="not(following-sibling::jsdl:DataStaging[@name=$current])">
@@ -171,7 +179,7 @@ function INPUT_STAGING() {
         log DEBUG "\$<xsl:value-of select="@name"/>=$<xsl:value-of select="@name"/>"
         log DEBUG "\$IS_FOUND_<xsl:value-of select="@name"/>=$IS_FOUND_<xsl:value-of select="@name"/>"
     else
-        _FAIL_ "Found no file for input <xsl:value-of select="@name"/>"
+        _FAIL_ "Found no file for input: <xsl:value-of select="@name"/>"
     fi
             </xsl:if>
         </xsl:for-each>
@@ -182,14 +190,20 @@ function INPUT_STAGING() {
             <xsl:if test="not(jsdl:CreationFlag/text()='overwrite')">
         # Check output file existence
         if test -f <xsl:value-of select="jsdl:FileName/text()"/> ; then
-            _FAIL_ "Output file already exists <xsl:value-of select="jsdl:FileName/text()"/>
+            _FAIL_ "Output file already exists: <xsl:value-of select="jsdl:FileName/text()"/>
         fi
             </xsl:if>
             <xsl:choose>
                 <xsl:when test="jsdl:Target/jsdl:URI">
-        # Upload remote file
-        echo <xsl:value-of select="jsdl:FileName/text()"/> &gt;&gt; $0.newfile<xsl:text/>
+        # Create directory if needed
         <xsl:value-of select="@name"/>=<xsl:value-of select="jsdl:FileName/text()"/>
+        if test ! -d ${<xsl:value-of select="@name"/>%/*} ; then
+            echo ${<xsl:value-of select="@name"/>%/*} &gt;&gt; $0.newdir
+            mkdir -p ${<xsl:value-of select="@name"/>%/*}
+        fi
+
+        # Set file to upload
+        echo <xsl:value-of select="jsdl:FileName/text()"/> &gt;&gt; $0.newfile
         IS_FOUND_<xsl:value-of select="@name"/>=<xsl:value-of select="position()"/>
                 </xsl:when>
                 <xsl:otherwise>
@@ -199,7 +213,7 @@ function INPUT_STAGING() {
             <xsl:value-of select="@name"/>=<xsl:value-of select="jsdl:FileName/text()"/>
             IS_FOUND_<xsl:value-of select="@name"/>=<xsl:value-of select="position()"/>
         else
-            _FAIL_ "Can not create file <xsl:value-of select="jsdl:FileName/text()"/>"
+            log INFO "Can not create file: <xsl:value-of select="jsdl:FileName/text()"/>"
         fi
                 </xsl:otherwise>
             </xsl:choose>
@@ -210,7 +224,7 @@ function INPUT_STAGING() {
         log DEBUG "\$<xsl:value-of select="@name"/>=$<xsl:value-of select="@name"/>"
         log DEBUG "\$IS_FOUND_<xsl:value-of select="@name"/>=$IS_FOUND_<xsl:value-of select="@name"/>"
     else
-        _FAIL_ "No file can be created for output <xsl:value-of select="@name"/>"
+        _FAIL_ "No file can be created for output: <xsl:value-of select="@name"/>"
     fi
             </xsl:if>
         </xsl:for-each>
@@ -249,7 +263,7 @@ function OUTPUT_STAGING() {
                         <xsl:value-of select="jsdl:FilesystemName/text()"/>
                         <xsl:text>/</xsl:text>
                         <xsl:call-template name="FILENAME">
-                            <xsl:with-param name="path" select="jsdl:FileName/text()"/>
+                            <xsl:with-param name="path" select="jsdl:Target/jsdl:URI/text()"/>
                         </xsl:call-template>
                     </xsl:when>
                     <xsl:otherwise>
@@ -259,14 +273,17 @@ function OUTPUT_STAGING() {
             </xsl:variable>
     # OUTPUT [<xsl:value-of select="@name"/>]
     if test "$IS_FOUND_<xsl:value-of select="@name"/>" = "<xsl:value-of select="position()"/>" ; then
-            <xsl:for-each select="jsdl:Target/ext:Process/text()">
+            <xsl:if test="jsdl:Target/ext:Process/text()">
         # Postprocess
+        echo <xsl:value-of select="$LOCAL"/> &gt;&gt; $0.newfile
         TARGET=<xsl:value-of select="$LOCAL"/><xsl:text>
-        </xsl:text><xsl:value-of select="."/>
-            </xsl:for-each>
+        </xsl:text><xsl:value-of select="jsdl:Target/ext:Process/text()"/><xsl:text>
+        </xsl:text>
+            </xsl:if>
             <xsl:choose>
                 <xsl:when test="jsdl:Target/jsdl:URI">
-        # Upload remote file
+        # Upload <xsl:value-of select="$LOCAL"/> to <xsl:value-of select="jsdl:Target/jsdl:URI/text()"/>
+                    <xsl:if test="jsdl:CreationFlag/text()='overwrite'"> (overwrite)</xsl:if>
         <xsl:apply-templates select="jsdl:Target/jsdl:URI">
             <xsl:with-param name="local" select="$LOCAL"/>
         </xsl:apply-templates>
@@ -661,13 +678,13 @@ run COMPLETE        COMPLETED
 
     <xsl:template name="REMOVE_LOCAL">
         <xsl:param name="local"/>
-        if test -e <xsl:value-of select="$local"/> ; then
+        if test -e <xsl:value-of select="$local"/> ; then<xsl:text/>
             <xsl:choose>
                 <xsl:when test="../../jsdl:CreationFlag/text()='overwrite'">
             rm -f <xsl:value-of select="$local"/>
                 </xsl:when>
                 <xsl:otherwise>
-            _FAIL_ "File already exists: <xsl:value-of select="$local"/>, please set CreationFlag to overwrite"
+            _FAIL_ "File already exists: <xsl:value-of select="$local"/>, please set CreationFlag to overwrite"<xsl:text/>
                 </xsl:otherwise>
             </xsl:choose>
         fi
