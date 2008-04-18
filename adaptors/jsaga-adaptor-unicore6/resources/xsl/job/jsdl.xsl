@@ -8,7 +8,7 @@
     <xsl:output method="xml"/>
     
     <!-- entry point (MUST BE RELATIVE) -->
-	<xsl:template match="*">
+	<xsl:template match="jsdl:JobDescription">
 		<xsl:copy-of select="."/>
 	</xsl:template>
 </xsl:stylesheet>
