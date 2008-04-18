@@ -769,7 +769,7 @@ PATH=<xsl:call-template name="PATH"/>
             <xsl:when test="contains($suffix,':') and not(starts-with($url,'file://'))">
                 <xsl:value-of select="substring-before($suffix,':')"/>
             </xsl:when>
-            <xsl:when test="contains($suffix,'/') and not(starts-with($suffix,'.'))">
+            <xsl:when test="contains($suffix,'/') and not(starts-with($suffix,'.')) and not(starts-with($suffix,'$'))">
                 <xsl:value-of select="substring-before($suffix,'/')"/>
             </xsl:when>
             <xsl:otherwise>

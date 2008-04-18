@@ -48,9 +48,12 @@ public class URL {
     }
 
     private void fixFileURI() throws URISyntaxException {
-        if ("file".equals(u.getScheme()) && u.getAuthority()!=null && !u.getAuthority().equals(".")) {
-            u = new URI(u.getScheme(), u.getUserInfo(), null, -1,
-                    "/"+u.getAuthority()+u.getPath(), u.getQuery(), u.getFragment());
+        if (u.getHost()==null && u.getAuthority()!=null && !u.getAuthority().equals(".")) {
+            u = new URI(u.getScheme(), u.getUserInfo(),
+                    "",                                 // fix number of '/' after scheme
+                    u.getPort(),
+                    "/"+u.getAuthority()+u.getPath(),   // fix path
+                    u.getQuery(), u.getFragment());
         }
     }
 
