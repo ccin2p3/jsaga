@@ -821,7 +821,7 @@ PATH=<xsl:call-template name="PATH"/>
             </xsl:choose>
         </xsl:variable>
         <xsl:choose>
-            <xsl:when test="starts-with($suffix,'/') or starts-with($suffix,'.')">
+            <xsl:when test="starts-with($suffix,'/') or starts-with($suffix,'.') or starts-with($suffix,'$')">
                 <xsl:value-of select="$suffix"/>
             </xsl:when>
             <xsl:when test="contains($suffix,'/')">
