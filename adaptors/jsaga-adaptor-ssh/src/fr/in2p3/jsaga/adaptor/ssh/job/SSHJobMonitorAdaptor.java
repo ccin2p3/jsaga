@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.adaptor.ssh.job;
 
-import java.io.FileOutputStream;
 import java.util.Map;
 
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
@@ -39,17 +38,7 @@ public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryInd
     public JobStatus getStatus(String nativeJobId) throws Timeout, NoSuccess {
 
     	try {    		
-    		ChannelExec channel = (ChannelExec) SSHAdaptorAbstract.sessionMap.get(nativeJobId+"-id");
-
-    		// TODO move to cleanup
-    		if(channel.isClosed()) {
-    			channel.disconnect();
-    			FileOutputStream stdout = (FileOutputStream) SSHAdaptorAbstract.sessionMap.get(nativeJobId+"-stdout");
-    			stdout.close();
-    			FileOutputStream stderr = (FileOutputStream) SSHAdaptorAbstract.sessionMap.get(nativeJobId+"-stderr");
-    			stderr.close();
-    		}
-
+    		ChannelExec channel = (ChannelExec) SSHAdaptorAbstract.sessionMap.get(nativeJobId);
     		return new SSHJobStatus(nativeJobId, channel.getExitStatus());
 						
     	} catch (Exception e) {
