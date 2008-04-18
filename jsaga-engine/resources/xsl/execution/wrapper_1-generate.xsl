@@ -236,10 +236,9 @@ function USER_PROCESSING() {
             <xsl:choose>
                 <xsl:when test="local-name()='POSIXApplication' or local-name()='SPMDApplication'">
                     <xsl:for-each select="posix:Environment">
-                        <xsl:value-of select="@name"/>=<xsl:value-of select="text()"/><xsl:text>
-</xsl:text>
-                    </xsl:for-each>
-                    <xsl:value-of select="posix:Executable/text()"/>
+    export <xsl:value-of select="@name"/>=<xsl:value-of select="text()"/>
+                    </xsl:for-each><xsl:text>
+    </xsl:text><xsl:value-of select="posix:Executable/text()"/>
                     <xsl:for-each select="posix:Argument">
                         <xsl:text> </xsl:text><xsl:value-of select="text()"/>
                     </xsl:for-each>
