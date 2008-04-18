@@ -7,8 +7,6 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.read.*;
 import fr.in2p3.jsaga.adaptor.data.write.*;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.u6.TargetSystemInfo;
 import fr.in2p3.jsaga.adaptor.u6.U6Abstract;
 
@@ -57,14 +55,13 @@ import java.util.Vector;
  *
  */
 public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, FileReaderGetter {
-	protected JKSSecurityAdaptor m_credential;
-    protected String m_serverFileSeparator ;
-    protected StorageClient m_client;
-    private String rootDirectory = ".";
 	
-    public RByteIODataAdaptor() {
-    }
-
+	protected static final String SERVICE_NAME = "ServiceName";	
+	private TargetSystemInfo targetSystemInfo ;
+	private String m_serverFileSeparator ;
+	private StorageClient m_client;
+    private String rootDirectory = ".";
+    
     public String getType() {
         return "rbyteio";
     }
@@ -80,47 +77,28 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
     			new Default(APPLICATION_NAME, "Bash shell")};
     }
 
-    public Class[] getSupportedSecurityAdaptorClasses() {
-    	return new Class[]{JKSSecurityAdaptor.class};
-    }
-
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
-    	 m_credential = (JKSSecurityAdaptor) securityAdaptor;
-    }
-
-    public int getDefaultPort() {
-        return 8080;
-    }
-
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    	super.connect(userInfo, host, port, basePath, attributes);
+    	
     	// get SERVICE_NAME
     	if(attributes.containsKey(SERVICE_NAME))
     		m_serviceName = (String) attributes.get(SERVICE_NAME);
-    	
-    	// get APPLICATION_NAME
-    	if(attributes.containsKey(APPLICATION_NAME))
-    		m_applicationName = (String) attributes.get(APPLICATION_NAME);
-    	
+    	    	
     	// get registry
     	if(basePath.indexOf(m_serviceName) == -1 ) {
     		throw new BadParameter("Invalid base path:"+basePath);
     	}
     	String registryPath = basePath.substring(0,basePath.indexOf(m_serviceName)+m_serviceName.length());
-
+    	m_serverUrl = "https://"+host+":"+port+registryPath;
+    	
     	// get storage name
     	String storageName =  basePath.substring(basePath.indexOf(m_serviceName)+m_serviceName.length()+1,basePath.length());
     	storageName = storageName.substring(0,storageName.indexOf("/"));
-
-    	// connect
-    	m_serverUrl = "https://"+host+":"+port+registryPath;    
-
-    	// set security
-    	m_securityManager = setSecurity(m_credential);
     	
 		// get client that talks to registry
         try {
         	  // find target system that supports the specific application
-        	TargetSystemInfo targetSystemInfo = findTargetSystem();
+        	targetSystemInfo = findTargetSystem();
         	m_client = targetSystemInfo.getTargetSystem().getStorage(storageName);
         	if(m_client == null)
         		throw new NoSuccess("Unable to get storage:"+storageName);
@@ -132,8 +110,10 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
 		}
     }
 
-    public void disconnect() throws NoSuccess {
-        //
+    public void disconnect() throws NoSuccess {    	
+    	targetSystemInfo = null;
+    	m_client = null;
+    	super.disconnect();
     }
     
     public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
@@ -415,7 +395,7 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
         	int i;
 			for (i = 0; i < putters.size(); i++) {
 			    try {
-			         putters.get(i).putFile(m_securityManager, stream, inputFile.getM2());
+			         putters.get(i).putFile(targetSystemInfo.getSecurityManager(), stream, inputFile.getM2());
 			     }
 			     catch (GPEFileTransferProtocolNotSupportedException e) {
 			         continue;
@@ -446,7 +426,7 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
             int i;
             for (i = 0; i < getters.size(); i++) {
                 try {
-                    getters.get(i).getFile(m_securityManager, outputFile.getM2(), stream, null);
+                    getters.get(i).getFile(targetSystemInfo.getSecurityManager(), outputFile.getM2(), stream, null);
                 }
                 catch (GPEFileTransferProtocolNotSupportedException e) {
                     continue;

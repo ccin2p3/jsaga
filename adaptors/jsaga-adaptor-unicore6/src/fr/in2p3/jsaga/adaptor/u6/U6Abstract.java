@@ -3,19 +3,24 @@ package fr.in2p3.jsaga.adaptor.u6;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.ogf.saga.error.AuthenticationFailed;
+import org.ogf.saga.error.AuthorizationFailed;
+import org.ogf.saga.error.BadParameter;
 import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NotImplemented;
+import org.ogf.saga.error.Timeout;
 
-import com.intel.gpe.client2.security.GPESecurityManager;
 import com.intel.gpe.clients.api.RegistryClient;
 import com.intel.gpe.clients.api.TargetSystemClient;
 import com.intel.gpe.clients.api.TargetSystemFactoryClient;
 import com.intel.gpe.clients.impl.tss.ApplicationImpl;
 
+import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityAdaptor;
 
 /* ***************************************************
@@ -30,41 +35,39 @@ import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityAdaptor;
 
 public class U6Abstract {
 
-	protected static final String SERVICE_NAME = "ServiceName";
 	protected static final String APPLICATION_NAME = "ApplicationName";
 	protected String m_serviceName;
 	protected String m_applicationName;
 	protected String m_serverUrl ;
-	protected GPESecurityManager m_securityManager;
+	protected JKSSecurityAdaptor m_credential;
+	protected U6SecurityManagerImpl m_securityManager = null;
     
-	public GPESecurityManager setSecurity(JKSSecurityAdaptor jksSecurityAdaptor) throws AuthenticationFailed {
-    	   
-        // set security
-        try {
-            
-            // disable logs to console for KeyStoreManager
-            Logger logger = Logger.getLogger("com.intel.gpe");
-            logger.setLevel(Level.OFF);
+    public Class[] getSupportedSecurityAdaptorClasses() {
+    	return new Class[]{JKSSecurityAdaptor.class};
+    }
 
-            // now initialize security manager        
-            U6SecurityManagerImpl securityManager = new U6SecurityManagerImpl();
-            X509Certificate[] certs = jksSecurityAdaptor.getCaCertificates();
-            Vector<X509Certificate> caCertificateVector = new Vector<X509Certificate>();
-            for (int i = 0; i < certs.length; i++) {
-            	caCertificateVector.add(certs[i]);
-			}
-            securityManager.init(caCertificateVector, jksSecurityAdaptor.getCertificate(), jksSecurityAdaptor.getPrivateKey());
-            
-	    	if(securityManager == null) {
-                throw new AuthenticationFailed("Unable to initialize security manager");
-            }
-        	return securityManager;
-        	
-		} catch (Exception e) {
-			throw new AuthenticationFailed(e);
-		}
-	}
-    
+    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
+    	 m_credential = (JKSSecurityAdaptor) securityAdaptor;
+    }
+
+    public int getDefaultPort() {
+        return 8080;
+    }
+
+	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    	m_serverUrl = "https://"+host+":"+port+basePath;
+        
+    	// get APPLICATION_NAME
+    	m_applicationName = (String) attributes.get(APPLICATION_NAME);
+    }
+
+	public void disconnect() throws NoSuccess {
+        m_serverUrl = null;
+        m_credential = null;
+        m_applicationName = null;
+        m_securityManager = null;
+    }    
+	
     /**
      * Loop over all target systems and return one that supports the application
      * that should be executed
@@ -72,39 +75,58 @@ public class U6Abstract {
      * @throws Exception 
      */
     public TargetSystemInfo findTargetSystem() throws Exception {
+    	try { 
+    		// set security
+        	try {            
+                // disable logs to console for KeyStoreManager
+                Logger logger = Logger.getLogger("com.intel.gpe");
+                logger.setLevel(Level.OFF);
 
-       RegistryClient registry = m_securityManager.getRegistryClient(m_serverUrl);    	
-        try { 
-        
-	        List<TargetSystemFactoryClient> targetSystemFactories = registry.getTargetSystemFactories();
-	
-	        // Loop through all the available target system factories and
-	        // ask for available target system resources
+                // now initialize security manager        
+                U6SecurityManagerImpl securityManager = new U6SecurityManagerImpl();
+                X509Certificate[] certs = m_credential.getCaCertificates();
+                Vector<X509Certificate> caCertificateVector = new Vector<X509Certificate>();
+                for (int i = 0; i < certs.length; i++) {
+                	caCertificateVector.add(certs[i]);
+    			}
+                securityManager.init(caCertificateVector, m_credential.getCertificate(), m_credential.getPrivateKey());
+                
+    	    	if(securityManager == null) {
+                    throw new AuthenticationFailed("Unable to initialize security manager");
+                }
+    	    	m_securityManager = securityManager;
+    	        
+    		} catch (Exception e) {
+    			throw new AuthenticationFailed(e);
+    		}
+    		
+    		RegistryClient registry = m_securityManager.getRegistryClient(m_serverUrl);
+			List<TargetSystemFactoryClient> targetSystemFactories = registry.getTargetSystemFactories();
+	        
+        	// Loop through all the available target system factories and
 	        for (TargetSystemFactoryClient targetSystemFactory : targetSystemFactories) {
-	            List<TargetSystemClient> targetSystems = targetSystemFactory.getTargetSystems();
-	            for(TargetSystemClient targetSystem : targetSystems) {
+	        	 // ask for available target system resources	 	       
+	        	List<TargetSystemClient> targetSystems = targetSystemFactory.getTargetSystems();
+	        	for(TargetSystemClient targetSystem : targetSystems) {
 	                // If the target system resource supports the requested application
 	            	// get application (the first version is used)
                     List<ApplicationImpl> listApplication = targetSystem.getApplications(m_applicationName);
                     for (ApplicationImpl applicationImpl : listApplication) {
-                        return new TargetSystemInfo(m_applicationName, applicationImpl.getApplicationVersion(), targetSystem);
+                    	return new TargetSystemInfo(m_applicationName, applicationImpl.getApplicationVersion(), targetSystem, m_securityManager);
                     } 
 	            }
-	        }
-	        // no target system found, try to create a new one...
-	        // first find a target system factory with the requested application 
-	        for (TargetSystemFactoryClient targetSystemFactory : targetSystemFactories) {
-	        	 List<ApplicationImpl> listApplication = targetSystemFactory.getApplications(m_applicationName);
-	             for (ApplicationImpl applicationImpl : listApplication) {
+	            // no target system found, try to create a new one...
+		        // first find a target system factory with the requested application 
+	            List<ApplicationImpl> listApplication = targetSystemFactory.getApplications(m_applicationName);
+	            for (ApplicationImpl applicationImpl : listApplication) {
 	                 // create a target system resource with lifetime 1 day
-                     Calendar cal = Calendar.getInstance();
-                     cal.add(Calendar.DAY_OF_MONTH, 1);
-                     TargetSystemClient newTargetSystem = targetSystemFactory.createTargetSystem(cal);
-                     // if new target system has been successfully created, return it.
-                     return new TargetSystemInfo(m_applicationName, applicationImpl.getApplicationVersion(), newTargetSystem);
+                    Calendar cal = Calendar.getInstance();
+                    cal.add(Calendar.DAY_OF_MONTH, 1);
+                    TargetSystemClient newTargetSystem = targetSystemFactory.createTargetSystem(cal);
+                    // if new target system has been successfully created, return it.
+                    return new TargetSystemInfo(m_applicationName, applicationImpl.getApplicationVersion(), newTargetSystem, m_securityManager);
 	             }
 	        }
-	        
         } catch (NullPointerException e)  {
     		throw new NoSuccess("Unable to find regitry in "+m_serverUrl, e);        	
         }
