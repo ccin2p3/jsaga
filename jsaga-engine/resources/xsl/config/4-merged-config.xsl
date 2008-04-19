@@ -120,8 +120,7 @@
                         <xsl:copy-of select="@*"/>
                         <xsl:apply-templates select="$desc/cfg:fileStaging/cfg:supportedProtocolScheme"/>
                         <!-- filter unsupported schemes -->
-                        <xsl:apply-templates select="cfg:workerIn[not(@scheme=$desc/cfg:fileStaging/cfg:supportedProtocolScheme)]"/>
-                        <xsl:apply-templates select="cfg:workerOut[not(@scheme=$desc/cfg:fileStaging/cfg:supportedProtocolScheme)]"/>
+                        <xsl:apply-templates select="cfg:workerProtocolScheme[not(text()=$desc/cfg:fileStaging/cfg:supportedProtocolScheme/text())]"/>
                     </fileStaging>
                 </xsl:for-each>
             </jobService>
@@ -134,6 +133,30 @@
             <xsl:copy-of select="$desc/@*[not(name()=name($conf/@*))] | $conf/@*"/>
             <xsl:apply-templates select="$desc/cfg:attribute[not(@name=$conf/cfg:attribute/@name)] | $conf/cfg:attribute"/>
         </monitorService>
+    </xsl:template>
+    <xsl:template match="cfg:workerProtocolScheme">
+        <xsl:variable name="conf" select="."/>
+        <xsl:variable name="desc" select="$descriptors/cfg:protocol[cfg:dataService/@type=$conf/text()]"/>
+        <workerProtocolScheme>
+            <xsl:attribute name="read">
+                <xsl:choose>
+                    <xsl:when test="@read"><xsl:value-of select="@read"/></xsl:when>
+                    <xsl:when test="@write">false</xsl:when>
+                    <xsl:when test="$desc/@read"><xsl:value-of select="$desc/@read"/></xsl:when>
+                    <xsl:otherwise>true</xsl:otherwise>
+                </xsl:choose>
+            </xsl:attribute>
+            <xsl:attribute name="write">
+                <xsl:choose>
+                    <xsl:when test="@write"><xsl:value-of select="@write"/></xsl:when>
+                    <xsl:when test="@read">false</xsl:when>
+                    <xsl:when test="$desc/@write"><xsl:value-of select="$desc/@write"/></xsl:when>
+                    <xsl:otherwise>true</xsl:otherwise>
+                </xsl:choose>
+            </xsl:attribute>
+            <xsl:copy-of select="@recursive | @protection"/>
+            <xsl:value-of select="text()"/>
+        </workerProtocolScheme>
     </xsl:template>
 
     <xsl:template match="cfg:attribute">

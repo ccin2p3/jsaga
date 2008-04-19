@@ -102,8 +102,12 @@
                             <element name="supportedProtocolScheme" minOccurs="0" maxOccurs="unbounded" type="string"><!-- from adaptor descriptor -->
                                 <annotation><documentation>If exist, then file staging can be delegated to job service for this protocol</documentation></annotation>
                             </element>
-                            <element name="workerIn" minOccurs="0" maxOccurs="unbounded" type="tns:FileManagementWorkerType"/>
-                            <element name="workerOut" minOccurs="0" maxOccurs="unbounded" type="tns:FileManagementWorkerType"/>
+                            <element name="workerProtocolScheme" minOccurs="0" maxOccurs="unbounded"><complexType><simpleContent><extension base="string">
+                                <attribute name="read" type="boolean" use="required"/>
+                                <attribute name="write" type="boolean" use="required"/>
+                                <attribute name="recursive" type="boolean" use="optional"/>
+                                <attribute name="protection" type="tns:ProtectionLevelType" use="optional"/>
+                            </extension></simpleContent></complexType></element>
                         </sequence>
                         <attribute name="defaultIntermediary" type="anyURI" use="optional"/>
                     </complexType></element>
@@ -118,13 +122,6 @@
         <attribute name="scheme" type="string" use="required"/><!-- from adaptor descriptor -->
         <attribute name="bulk" type="boolean" use="required"/><!-- from adaptor descriptor -->
     </complexType></element>
-    <complexType name="FileManagementWorkerType"><simpleContent><extension base="string"><!-- should be CDATA -->
-        <attribute name="scheme" type="string" use="required"/>
-        <attribute name="source" type="string" use="optional"/>
-        <attribute name="target" type="string" use="optional"/>
-        <attribute name="recursive" type="boolean" use="optional"/>
-        <attribute name="protection" type="tns:ProtectionLevelType" use="optional"/>
-    </extension></simpleContent></complexType>
 
     <!-- root type -->
     <element name="effective-config"><complexType>

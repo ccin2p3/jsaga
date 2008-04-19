@@ -7,11 +7,4 @@
     <GRID contextType="MyProxy" deactivated="true">
         <attribute name="Server" value="cclcgproxli01.in2p3.fr:7512"/>
     </GRID>
-    <GRID name="test" contextType="UserPass">
-        <job type="test" defaultIntermediary="test://emulator/"/>
-        <data type="test">
-            <workerIn source="test://(.*)"><![CDATA[testcp $1 $2]]></workerIn>
-            <workerOut target="test://(.*)"><![CDATA[testcp $1 $2]]></workerOut>
-        </data>
-    </GRID>
 </UNIVERSE>

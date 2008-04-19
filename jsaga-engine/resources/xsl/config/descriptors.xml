@@ -79,6 +79,9 @@
     <protocol scheme="tar" read="true" write="true" thirdparty="false" logical="false">
         <dataService name="default" type="tar" impl="fr.in2p3.jsaga.adaptor.data.TarDataAdaptor"/>
     </protocol>
+    <protocol scheme="tgz" read="true" write="true" thirdparty="false" logical="false">
+        <dataService name="default" type="tgz" impl="fr.in2p3.jsaga.adaptor.data.TarGZipDataAdaptor"/>
+    </protocol>
     <protocol scheme="enc" read="true" write="true" thirdparty="false" logical="false">
         <dataService name="default" type="enc" impl="fr.in2p3.jsaga.adaptor.data.EncryptDataAdaptor"/>
     </protocol>
@@ -95,14 +98,14 @@
             <supportedContextType>VOMS</supportedContextType>
         </dataService>
     </protocol>
-    <protocol scheme="gsiftp-new" read="true" write="true" thirdparty="true" logical="false">
+    <protocol scheme="gsiftp-v2" read="true" write="true" thirdparty="true" logical="false">
         <dataService name="default" type="gsiftp-new" impl="fr.in2p3.jsaga.adaptor.data.GSIFTPDataAdaptor_new">
             <supportedContextType>Globus</supportedContextType>
             <supportedContextType>MyProxy</supportedContextType>
             <supportedContextType>VOMS</supportedContextType>
         </dataService>
     </protocol>
-    <protocol scheme="gsiftp-old" read="true" write="true" thirdparty="true" logical="false">
+    <protocol scheme="gsiftp-v1" read="true" write="true" thirdparty="true" logical="false">
         <dataService name="default" type="gsiftp-old" impl="fr.in2p3.jsaga.adaptor.data.GSIFTPDataAdaptor_old">
             <supportedContextType>Globus</supportedContextType>
             <supportedContextType>MyProxy</supportedContextType>
@@ -126,6 +129,14 @@
     </protocol>
     <protocol scheme="srb" read="true" write="true" thirdparty="false" logical="true">
         <dataService name="default" type="srb" impl="fr.in2p3.jsaga.adaptor.data.SRBDataAdaptor">
+            <supportedContextType>UserPass</supportedContextType>
+            <supportedContextType>Globus</supportedContextType>
+            <supportedContextType>MyProxy</supportedContextType>
+            <supportedContextType>VOMS</supportedContextType>
+        </dataService>
+    </protocol>
+    <protocol scheme="irods" read="true" write="true" thirdparty="false" logical="true">
+        <dataService name="default" type="irods" impl="fr.in2p3.jsaga.adaptor.data.IrodsDataAdaptor">
             <supportedContextType>UserPass</supportedContextType>
             <supportedContextType>Globus</supportedContextType>
             <supportedContextType>MyProxy</supportedContextType>

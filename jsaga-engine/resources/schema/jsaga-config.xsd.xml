@@ -50,19 +50,15 @@
     <element name="data"><complexType><complexContent><extension base="tns:ObjectType">
         <sequence>
             <element name="schemeAlias" minOccurs="0" maxOccurs="unbounded" type="string"/>
-            <element name="workerIn" minOccurs="0" maxOccurs="unbounded" type="tns:FileManagementWorkerType"/>
-            <element name="workerOut" minOccurs="0" maxOccurs="unbounded" type="tns:FileManagementWorkerType"/>
         </sequence>
         <attribute name="type" type="string" use="required"/>
         <attribute name="scheme" type='string' use="optional"/>
         <attribute name="deactivated" type="boolean" use="optional"/>
-    </extension></complexContent></complexType></element>
-    <complexType name="FileManagementWorkerType"><simpleContent><extension base="string"><!-- should be CDATA -->
-        <attribute name="source" type="string" use="optional"/>
-        <attribute name="target" type="string" use="optional"/>
-        <attribute name="recursive" type="boolean" use="optional"/>
+        <attribute name="read" type="boolean" use="optional"/><!-- default is same as plugin, unless 'write' is set -->
+        <attribute name="write" type="boolean" use="optional"/><!-- default is same as plugin, unless 'read' is set -->
+        <attribute name="recursive" type="boolean" use="optional"/><!-- default is false -->
         <attribute name="protection" type="tns:ProtectionLevelType" use="optional"/>
-    </extension></simpleContent></complexType>
+    </extension></complexContent></complexType></element>
 
     <element name="SITE">
         <complexType>

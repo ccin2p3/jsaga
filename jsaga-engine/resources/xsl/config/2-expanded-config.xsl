@@ -33,7 +33,7 @@
     <xsl:template match="cfg:data">
         <data>
             <xsl:copy-of select="@*"/>
-            <xsl:apply-templates select="*[local-name()!='workerIn' and local-name()!='workerOut']"/>
+            <xsl:apply-templates/>
         </data>
     </xsl:template>
 
@@ -44,16 +44,14 @@
             <xsl:apply-templates/>
             <fileStaging>
                 <xsl:copy-of select="@defaultIntermediary"/>
-                <xsl:apply-templates select="ancestor::cfg:*/cfg:data[not(@scheme=$this/cfg:data/@scheme)]/cfg:workerIn"/>
-                <xsl:apply-templates select="ancestor::cfg:*/cfg:data[not(@scheme=$this/cfg:data/@scheme)]/cfg:workerOut"/>
+                <xsl:for-each select="ancestor::cfg:*/cfg:data[not(@scheme=$this/cfg:data/@scheme)]">
+                    <workerProtocolScheme>
+                        <xsl:copy-of select="@read | @write | @recursive | @protection"/>
+                        <xsl:value-of select="@scheme"/>
+                    </workerProtocolScheme>
+                </xsl:for-each>
             </fileStaging>
         </job>
-    </xsl:template>
-    <xsl:template match="cfg:workerIn | cfg:workerOut">
-        <xsl:element name="{name()}">
-            <xsl:attribute name="scheme"><xsl:value-of select="parent::cfg:data/@scheme"/></xsl:attribute>
-            <xsl:copy-of select="@* | text()"/>
-        </xsl:element>
     </xsl:template>
 
     <xsl:template match="*">
