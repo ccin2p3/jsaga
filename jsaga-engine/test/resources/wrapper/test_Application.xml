@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ext:Job xmlns:ext="http://www.in2p3.fr/jsdl-extension">
+    <JobDefinition xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl">
+        <JobDescription>
+            <JobIdentification>
+                <JobName>test_Application</JobName>
+            </JobIdentification>
+
+            <Application>
+                <posix:POSIXApplication xmlns:posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix">
+                    <posix:Executable>/usr/local/bin/myprog.exe</posix:Executable>
+                    <posix:Argument>-c</posix:Argument>
+                    <posix:Argument>23</posix:Argument>
+                    <posix:Environment name="MYVAR">value</posix:Environment>
+                    <posix:Output>stdout.txt</posix:Output>
+                    <posix:Error>stderr.txt</posix:Error>
+                    <posix:Input>stdin.txt</posix:Input>
+                </posix:POSIXApplication>
+            </Application>
+        </JobDescription>
+    </JobDefinition>
+</ext:Job>
