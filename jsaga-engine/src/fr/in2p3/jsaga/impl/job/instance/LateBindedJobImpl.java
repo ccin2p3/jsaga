@@ -1,11 +1,15 @@
 package fr.in2p3.jsaga.impl.job.instance;
 
+import fr.in2p3.jsaga.engine.jobcollection.transform.IndividualJobPreprocessor;
+import fr.in2p3.jsaga.impl.job.description.AbstractJobDescriptionImpl;
+import fr.in2p3.jsaga.impl.job.description.XJSDLJobDescriptionImpl;
 import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
 import org.ogf.saga.monitoring.Metric;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
+import org.w3c.dom.Document;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,11 +27,11 @@ import java.io.OutputStream;
  *
  */
 public class LateBindedJobImpl extends AbstractAsyncJobImpl implements Job {
-    private JobDescription m_jobDesc;
+    private AbstractJobDescriptionImpl m_jobDesc;
     private JobImpl m_job;
 
     /** constructor for submission */
-    public LateBindedJobImpl(Session session, JobDescription jobDesc) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public LateBindedJobImpl(Session session, AbstractJobDescriptionImpl jobDesc) throws NotImplemented, BadParameter, Timeout, NoSuccess {
         super(session, true);
         m_jobDesc = jobDesc;
         m_job = null;
@@ -41,7 +45,13 @@ public class LateBindedJobImpl extends AbstractAsyncJobImpl implements Job {
     }
 
     public void allocate(URL rm) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        m_job = (JobImpl) JobFactory.createJobService(m_session, rm).createJob(m_jobDesc);
+        // transform job description
+        Document effectiveJobDescDOM = IndividualJobPreprocessor.preprocess(m_jobDesc.getAsDocument());
+        JobDescription effectiveJobDesc = new XJSDLJobDescriptionImpl(effectiveJobDescDOM);
+
+        // submit job
+        JobService jobService = JobFactory.createJobService(m_session, rm);
+        m_job = (JobImpl) jobService.createJob(effectiveJobDesc);
         if (m_isSubmitted && !m_isCancelled) {
             m_job.run();
         }

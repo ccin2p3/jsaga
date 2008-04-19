@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl.job.service;
 
+import fr.in2p3.jsaga.impl.job.description.AbstractJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.job.instance.LateBindedJobImpl;
 import org.ogf.saga.ObjectType;
 import org.ogf.saga.error.*;
@@ -31,7 +32,7 @@ public class LateBindedJobServiceImpl extends AbstractAsyncJobServiceImpl implem
     }
 
     public Job createJob(JobDescription jd) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
-        return new LateBindedJobImpl(m_session, jd);
+        return new LateBindedJobImpl(m_session, (AbstractJobDescriptionImpl) jd);
     }
 
     public List<String> list() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
