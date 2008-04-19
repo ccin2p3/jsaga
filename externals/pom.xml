@@ -35,7 +35,8 @@
 	<module>wss4j</module>
 	<module>xmlsec</module>
 	<module>jsr173</module>
-	<module>jsch</module>
+    <module>jargon</module>
+    <module>jsch</module>
 	<module>jzlib</module>
   </modules>
 </project>
