@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.impl.jobcollection;
 
 import fr.in2p3.jsaga.adaptor.evaluator.Evaluator;
-import fr.in2p3.jsaga.engine.jobcollection.preprocess.JobPreprocessor;
-import fr.in2p3.jsaga.engine.jobcollection.preprocess.ParametricJobSplitter;
+import fr.in2p3.jsaga.engine.jobcollection.transform.JobCollectionPreprocessor;
+import fr.in2p3.jsaga.engine.jobcollection.transform.JobCollectionSplitter;
 import fr.in2p3.jsaga.engine.schema.jsdl.extension.Resource;
 import fr.in2p3.jsaga.engine.schema.jsdl.extension.ResourceSelection;
 import fr.in2p3.jsaga.impl.job.instance.LateBindedJobImpl;
@@ -41,11 +41,11 @@ public class JobCollectionImpl extends TaskContainerImpl implements JobCollectio
         super(session);
 
         // preprocess
-        JobPreprocessor preprocessor = new JobPreprocessor(jcDesc.getAsDocument());
+        JobCollectionPreprocessor preprocessor = new JobCollectionPreprocessor(jcDesc.getAsDocument());
         byte[] processedJcDesc = preprocessor.preprocess();
 
         // split parametric job
-        ParametricJobSplitter splitter = new ParametricJobSplitter(processedJcDesc, evaluator);
+        JobCollectionSplitter splitter = new JobCollectionSplitter(processedJcDesc, evaluator);
         JobDescription[] jobDescArray = splitter.getIndividualJobArray();
 
         // create late binded job service
