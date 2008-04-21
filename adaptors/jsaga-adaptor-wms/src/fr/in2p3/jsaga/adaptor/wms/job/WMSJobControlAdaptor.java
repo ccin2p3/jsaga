@@ -7,6 +7,7 @@ import fr.in2p3.jsaga.adaptor.base.usage.U;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UFile;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
@@ -117,8 +118,6 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
     	if(attributes.containsKey(MONITOR_SERVICE_URL)) {
     		// LB server name get in config
     		m_lbServerHost = ((org.ogf.saga.URL) attributes.get(MONITOR_SERVICE_URL)).getHost();
-    		// TODO : remove    		
-    		throw new NoSuccess("Not supported yet");
     	}
     	else {
     		// LB And WMS on the same server
@@ -212,7 +211,8 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
         m_client = null;
     }
     
-    public String submit(String jobDesc, boolean checkMatch) throws PermissionDenied, Timeout, NoSuccess {
+    public String submit(String jobDesc, boolean checkMatch) 
+    	throws PermissionDenied, Timeout, NoSuccess, BadResource {
     	try {
     		
     		//Add LB Address in JDL
@@ -232,10 +232,10 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
     				// list of CE
     				StringAndLongType[] list = (StringAndLongType[]) result.getFile ();
     				if (list == null)
-                        throw new NoSuccess("No Computing Element matching your job requirements has been found!");
+                        throw new BadResource("No Computing Element matching your job requirements has been found!");
     			}
             	else 
-            		throw new NoSuccess("No Computing Element matching your job requirements has been found!");
+            		throw new BadResource("No Computing Element matching your job requirements has been found!");
     		}
     		
     		// submit
