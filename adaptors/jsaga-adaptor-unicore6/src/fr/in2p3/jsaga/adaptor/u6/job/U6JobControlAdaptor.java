@@ -4,6 +4,7 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.U;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
@@ -106,7 +107,8 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
 		}
     }
     
-    public String submit(String jobDesc, boolean checkMatch) throws PermissionDenied, Timeout, NoSuccess {
+    public String submit(String jobDesc, boolean checkMatch) 
+    	throws PermissionDenied, Timeout, NoSuccess, BadResource {
     	try {
     		
     		// parse JSDL to create jobDefinition 
@@ -174,14 +176,13 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
 	        		jobJsdl.getValue().getJobDescription().getResources().getTotalCPUTime() != null || 
 	        		jobJsdl.getValue().getJobDescription().getResources().getTotalCPUCount() != null )) {
 
-	        	System.out.println("Resolve pre-requisite");
 		        TargetSystemPropertiesDocument tSP = 
 		        	TargetSystemPropertiesDocument.Factory.parse((Element)targetSystemInfo.getTargetSystem().getResourcePropertyDocument());
 	    		
 	    		// verify CPU CPUArchitecture
 		        if(jobJsdl.getValue().getJobDescription().getResources().getCPUArchitecture() != null) {
 	    			if(!jobJsdl.getValue().getJobDescription().getResources().getCPUArchitecture().getCPUArchitectureName().toString().equals(tSP.getTargetSystemProperties().getProcessor().getCPUArchitecture().getCPUArchitectureName().toString()))
-	    				throw new NoSuccess("CPU Architecture requirement is not supported.");
+	    				throw new BadResource("CPU Architecture requirement is not supported.");
 	    		}
 
 	    		// verify Memory
@@ -196,7 +197,7 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
 	    					memoryRequested.getExactArray()[0].getDoubleValue() > 0) {
 	    				double exact = memoryRequested.getExactArray()[0].getDoubleValue()*1024*1024;
 		    			if(exact > upperLimit  || exact < lowerLimit ) {
-		    				throw new NoSuccess("Memory requirement is not valid: "+ exact/1024/1024 + " is not in the range " +
+		    				throw new BadResource("Memory requirement is not valid: "+ exact/1024/1024 + " is not in the range " +
 		    						"between "+lowerLimit/1024/1024 + " and "+upperLimit/1024/1024+".");
 	
 		    			}
@@ -207,7 +208,7 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
 		    			double lower = memoryRequested.getLowerBoundedRange().getDoubleValue()*1024*1024;
 		    			if(lower > 0 ) {
 		    				if(lower < lowerLimit) {
-			    				throw new NoSuccess("Memory requirement is not valid: "+ lower/1024/1024 + " is not in the range " +
+			    				throw new BadResource("Memory requirement is not valid: "+ lower/1024/1024 + " is not in the range " +
 			    						"between "+lowerLimit/1024/1024 + " and "+upperLimit/1024/1024+".");
 		
 			    			}    				
@@ -219,7 +220,7 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
 		    			double upper = memoryRequested.getUpperBoundedRange().getDoubleValue()*1024*1024;
 		    			if(upper > 0) {
 		    				if(upper > upperLimit) {
-			    				throw new NoSuccess("Memory requirement is not valid: "+ upper/1024/1024 + " is not in the range " +
+			    				throw new BadResource("Memory requirement is not valid: "+ upper/1024/1024 + " is not in the range " +
 			    						"between "+lowerLimit/1024/1024 + " and "+upperLimit/1024/1024+".");
 		
 			    			}
@@ -240,7 +241,7 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
 	    					cpuTimeRequested.getExactArray()[0].getDoubleValue() > 0) {
 	    				double requestCpuTimeInSeconds = cpuTimeRequested.getExactArray()[0].getDoubleValue();
 		    			if(requestCpuTimeInSeconds > upperLimit || requestCpuTimeInSeconds < lowerLimit) {
-		    				throw new NoSuccess("CPU Time requirement is not valid: "+requestCpuTimeInSeconds+ " is not in the range " +
+		    				throw new BadResource("CPU Time requirement is not valid: "+requestCpuTimeInSeconds+ " is not in the range " +
 		    						"between "+lowerLimit + " and "+upperLimit+".");
 		    			}
 		    			terminationTimeIsSet = true;
@@ -251,7 +252,7 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
 	    			if(cpuTimeRequested.getLowerBoundedRange()!= null &&
 	    					cpuTimeRequested.getLowerBoundedRange().getDoubleValue() > 0 ) {
 	    				if(cpuTimeRequested.getLowerBoundedRange().getDoubleValue() < lowerLimit) {
-		    				throw new NoSuccess("CPU Time requirement is not valid: "+cpuTimeRequested.getLowerBoundedRange().getDoubleValue() + " is not in the range " +
+		    				throw new BadResource("CPU Time requirement is not valid: "+cpuTimeRequested.getLowerBoundedRange().getDoubleValue() + " is not in the range " +
 		    						"between "+lowerLimit + " and "+upperLimit+".");
 		    			}
 	    			}
@@ -260,7 +261,7 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
 	    			if(cpuTimeRequested.getUpperBoundedRange()!= null &&
 	    					cpuTimeRequested.getUpperBoundedRange().getDoubleValue() > 0 ) {
 	    				if(cpuTimeRequested.getUpperBoundedRange().getDoubleValue() > upperLimit) {
-		    				throw new NoSuccess("CPU Time requirement is not valid: "+cpuTimeRequested.getUpperBoundedRange().getDoubleValue() + " is not in the range " +
+		    				throw new BadResource("CPU Time requirement is not valid: "+cpuTimeRequested.getUpperBoundedRange().getDoubleValue() + " is not in the range " +
 		    						"between "+lowerLimit + " and "+upperLimit+".");
 		    			}
 	    				terminationTimeIsSet = true;
@@ -281,7 +282,7 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
 	    					cpuCountRequested.getExactArray()[0].getDoubleValue() > 0) {
 	    				double requestCpuCount = cpuCountRequested.getExactArray()[0].getDoubleValue();
 		    			if(requestCpuCount > upperLimit || requestCpuCount < lowerLimit) {
-		    				throw new NoSuccess("CPU Count requirement is not valid: "+requestCpuCount+ " is not in the range " +
+		    				throw new BadResource("CPU Count requirement is not valid: "+requestCpuCount+ " is not in the range " +
 		    						"between "+lowerLimit + " and "+upperLimit+".");
 		    			}
 	    			}
@@ -290,7 +291,7 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
 	    			if(cpuCountRequested.getLowerBoundedRange()!= null &&
 	    					cpuCountRequested.getLowerBoundedRange().getDoubleValue() > 0 ) {
 	    				if(cpuCountRequested.getLowerBoundedRange().getDoubleValue() < lowerLimit) {
-		    				throw new NoSuccess("CPU Count requirement is not valid: "+cpuCountRequested.getLowerBoundedRange().getDoubleValue() + " is not in the range " +
+		    				throw new BadResource("CPU Count requirement is not valid: "+cpuCountRequested.getLowerBoundedRange().getDoubleValue() + " is not in the range " +
 		    						"between "+lowerLimit + " and "+upperLimit+".");
 		    			}
 	    			}
@@ -299,7 +300,7 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
 	    			if(cpuCountRequested.getUpperBoundedRange()!= null &&
 	    					cpuCountRequested.getUpperBoundedRange().getDoubleValue() > 0 ) {
 	    				if(cpuCountRequested.getUpperBoundedRange().getDoubleValue() > upperLimit) {
-		    				throw new NoSuccess("CPU Count requirement is not valid: "+cpuCountRequested.getUpperBoundedRange().getDoubleValue() + " is not in the range " +
+		    				throw new BadResource("CPU Count requirement is not valid: "+cpuCountRequested.getUpperBoundedRange().getDoubleValue() + " is not in the range " +
 		    						"between "+lowerLimit + " and "+upperLimit+".");
 		    			}
 	    			}
@@ -339,6 +340,9 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
     	} catch (GPEWrongJobTypeException e) {
 			throw new NoSuccess(e);
 		} catch (Exception e) {
+			if(e instanceof BadResource) {
+				throw new BadResource(e);
+			}
 			throw new NoSuccess(e);
 		} catch (Throwable e) {
 			throw new NoSuccess(e);
