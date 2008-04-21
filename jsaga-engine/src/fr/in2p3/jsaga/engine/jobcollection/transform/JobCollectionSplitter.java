@@ -38,9 +38,17 @@ public class JobCollectionSplitter {
             // set m_jobCollectionBean
             m_jobCollectionBean = jcBean.getJobCollectionDescription();
 
+            // set collectionName
+            String collectionName = m_jobCollectionBean.getJobCollectionIdentification().getJobCollectionName();
+
+            // set jobNameTemplate
+            String jobNameTemplate = jcBean.getJob(0).getJobDefinition().getJobDescription().getJobIdentification().getJobName();
+
             // set jobTemplate
-            if (jcBean.getJobCount() != 1) {
+            if (jcBean.getJobCount() == 0) {
                 throw new NoSuccess("Found no <Job> in description");
+            } else if (jcBean.getJobCount() > 1) {
+                throw new NoSuccess("Several <Job> in description is not supported");
             }
             Job jobBean = jcBean.getJob(0);
             ByteArrayOutputStream jobBytes = new ByteArrayOutputStream();
@@ -63,10 +71,11 @@ public class JobCollectionSplitter {
 
                 // evaluate expressions
                 evaluator.init(index);
+                String jobName = evaluate(jobNameTemplate, evaluator);
                 evaluate(clone.getDocumentElement(), evaluator);
 
                 // add to array
-                m_individualJobArray[i] = new XJSDLJobDescriptionImpl(clone);
+                m_individualJobArray[i] = new XJSDLJobDescriptionImpl(collectionName, jobName, clone);
             }
         } catch (Exception e) {
             throw new NoSuccess(e);

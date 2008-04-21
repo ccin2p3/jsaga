@@ -21,20 +21,6 @@
                     <posix:Error>$STDERR</posix:Error>
                 </posix:POSIXApplication>
             </Application>
-            <Resources>
-                <FileSystem name="HelloWorldDirectory">
-                    <FileSystemType>normal</FileSystemType>
-                    <MountPoint>HelloWorld/1.1</MountPoint>
-                    <ext:ParentFilesystemName>ApplicationsDirectory</ext:ParentFilesystemName>
-                    <ext:Tag>HELLOWORLD_1.1</ext:Tag>
-                </FileSystem>
-                <FileSystem name="HelloWorldDirectory">
-                    <FileSystemType>normal</FileSystemType>
-                    <MountPoint>HelloWorld/1.2</MountPoint>
-                    <ext:ParentFilesystemName>ApplicationsDirectory</ext:ParentFilesystemName>
-                    <ext:Tag>HELLOWORLD_1.2</ext:Tag>
-                </FileSystem>
-            </Resources>
             <DataStaging name="INPUT_SANDBOX">
                 <FileName>input-sandbox.tar</FileName>
                 <CreationFlag>overwrite</CreationFlag>
@@ -83,8 +69,8 @@
                 <ext:CopyLocally>false</ext:CopyLocally>
             </DataStaging>
             <DataStaging name="E">
-                <FileName>bin/executable.exe</FileName>
-                <FilesystemName>HelloWorldDirectory</FilesystemName>
+                <FileName>HelloWorld/1.1/bin/executable.exe</FileName>
+                <FilesystemName>ApplicationsDirectory</FilesystemName>
                 <CreationFlag>dontOverwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source/>

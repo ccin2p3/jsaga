@@ -9,7 +9,7 @@ import org.w3c.dom.Document;
 
 import javax.xml.xpath.XPathExpressionException;
 import java.io.File;
-import java.util.UUID;
+import java.util.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -24,65 +24,67 @@ import java.util.UUID;
  *
  */
 public class JobCollectionPreprocessor {
-    private static final String XML_JOBS_DESCRIPTION = "index.xml";
+    private static final String XML_JOB_TEMPLATE = "job-template.xml";
     private static final String XML_PRESTAGE_GRAPH = "prestage-graph.xml";
-    private static final String XML_STAGE_GRAPH = "stage-graph.xml";
 
     private static final String XSL_1_ADD_DEFAULTS = "xsl/execution/collec_1-add-defaults.xsl";
     private static final String XSL_2_GENERATE_PRESTAGE = "xsl/execution/collec_2-generate-prestage.xsl";
-    private static final String XSL_3_SPLIT_PARAMETRIC = "xsl/execution/collec_3-split-parametric.xsl";
     private static final String XSL_UPDATE_GRAPH = "xsl/execution/graph_1-update.xsl";
 
-    private Document m_jsdl;
-    private XSLTransformerFactory m_t;
+    private byte[] m_effectiveJobCollection;
+    private byte[] m_prestageGraph;
 
-    private XMLDocument m_jobsDescription;
-    private XMLDocument m_prestageGraph;
-    private XMLDocument m_stageGraph;
-
-    public JobCollectionPreprocessor(Document jobsDescription) throws NoSuccess {
-        // Job description DOM tree
-        m_jsdl = jobsDescription;
-
+    public JobCollectionPreprocessor(Document jobCollecDesc) throws NoSuccess {
         // Get job collection identifier
-        String id;
+        String collectionName;
         try {
-            id = XPathSelector.select(m_jsdl, "/ext:JobCollection/ext:JobCollectionDescription/ext:JobCollectionIdentification/ext:JobCollectionName/text()");
-            if (id == null) {
-                id = XPathSelector.select(m_jsdl, "/ext:JobCollection/ext:Job/jsdl:JobDefinition/jsdl:JobDescription/jsdl:JobIdentification/jsdl:JobName/text()");
-                if (id == null) {
-                    id = UUID.randomUUID().toString();
+            collectionName = XPathSelector.select(jobCollecDesc, "/ext:JobCollection/ext:JobCollectionDescription/ext:JobCollectionIdentification/ext:JobCollectionName/text()");
+            if (collectionName == null) {
+                collectionName = XPathSelector.select(jobCollecDesc, "/ext:JobCollection/ext:Job/jsdl:JobDefinition/jsdl:JobDescription/jsdl:JobIdentification/jsdl:JobName/text()");
+                if (collectionName == null) {
+                    collectionName = UUID.randomUUID().toString();
                 }
             }
         } catch (XPathExpressionException e) {
             throw new NoSuccess(e);
         }
+        Map parameters = new HashMap();
+        parameters.put("collectionName", collectionName);
+
+        // Set base directory
         File baseDir = new File(Base.JSAGA_VAR, "jobs");
         if(!baseDir.exists()) baseDir.mkdir();
-        baseDir = new File(baseDir, id);
-        if(!baseDir.exists()) baseDir.mkdir();
+        baseDir = new File(baseDir, collectionName);
+        if(baseDir.exists()) {
+            throw new NoSuccess("Collection already exists: "+collectionName+", please clean it up first.");
+        } else {
+            baseDir.mkdir();
+        }
 
-        // Transformer factory
-        m_t = XSLTransformerFactory.getInstance();
-        
-        // XML files
-        m_jobsDescription = new XMLDocument(new File(baseDir, XML_JOBS_DESCRIPTION));
-        m_prestageGraph = new XMLDocument(new File(baseDir, XML_PRESTAGE_GRAPH));
-        m_stageGraph = new XMLDocument(new File(baseDir, XML_STAGE_GRAPH));
-    }
-
-    public byte[] preprocess() throws NoSuccess {
+        // Transform
+        XSLTransformerFactory t = XSLTransformerFactory.getInstance();
+        XMLDocument collectionContainer = new XMLDocument(new File(baseDir, XML_JOB_TEMPLATE));
+        XMLDocument prestageContainer = new XMLDocument(new File(baseDir, XML_PRESTAGE_GRAPH));
         try {
-            m_jobsDescription.set(m_t.getCached(XSL_1_ADD_DEFAULTS).transform(m_jsdl.getDocumentElement()));
-            m_jobsDescription.set(m_t.getCached(XSL_2_GENERATE_PRESTAGE).transform(m_jobsDescription.get()));
-            m_jobsDescription.save();
-            return m_jobsDescription.get();
+            collectionContainer.set(t.getCached(XSL_1_ADD_DEFAULTS).transform(jobCollecDesc.getDocumentElement()));
+            collectionContainer.set(t.getCached(XSL_2_GENERATE_PRESTAGE, parameters).transform(collectionContainer.get()));
+            collectionContainer.save();
+
+            prestageContainer.set(t.getCached(XSL_UPDATE_GRAPH).transform(collectionContainer.get()));
+            prestageContainer.save();
+
+            m_effectiveJobCollection = collectionContainer.get();
+            m_prestageGraph = prestageContainer.get();
         } catch (Exception e) {
             throw new NoSuccess(e);
         }
     }
 
-    public void allocate(byte[] resources) throws Exception {
-        m_prestageGraph.set(m_t.getCached(XSL_UPDATE_GRAPH).transform(m_jobsDescription.get()));
+    public byte[] getEffectiveJobCollection() {
+        return m_effectiveJobCollection;
+    }
+
+    public byte[] getPrestageGraph() {
+        return m_prestageGraph;
     }
 }

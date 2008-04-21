@@ -1,7 +1,8 @@
 package fr.in2p3.jsaga.impl.job.instance;
 
+import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.jobcollection.transform.IndividualJobPreprocessor;
-import fr.in2p3.jsaga.impl.job.description.AbstractJobDescriptionImpl;
+import fr.in2p3.jsaga.engine.schema.jsdl.extension.Resource;
 import fr.in2p3.jsaga.impl.job.description.XJSDLJobDescriptionImpl;
 import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
@@ -13,6 +14,7 @@ import org.w3c.dom.Document;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.Exception;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -27,11 +29,11 @@ import java.io.OutputStream;
  *
  */
 public class LateBindedJobImpl extends AbstractAsyncJobImpl implements Job {
-    private AbstractJobDescriptionImpl m_jobDesc;
+    private XJSDLJobDescriptionImpl m_jobDesc;
     private JobImpl m_job;
 
     /** constructor for submission */
-    public LateBindedJobImpl(Session session, AbstractJobDescriptionImpl jobDesc) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public LateBindedJobImpl(Session session, XJSDLJobDescriptionImpl jobDesc) throws NotImplemented, BadParameter, Timeout, NoSuccess {
         super(session, true);
         m_jobDesc = jobDesc;
         m_job = null;
@@ -44,27 +46,52 @@ public class LateBindedJobImpl extends AbstractAsyncJobImpl implements Job {
         m_job = (JobImpl) JobFactory.createJobService(m_session, rm).getJob(nativeJobId);
     }
 
-    public void allocate(URL rm) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        // transform job description
-        Document effectiveJobDescDOM = IndividualJobPreprocessor.preprocess(m_jobDesc.getAsDocument());
-        JobDescription effectiveJobDesc = new XJSDLJobDescriptionImpl(effectiveJobDescDOM);
-
-        // submit job
-        JobService jobService = JobFactory.createJobService(m_session, rm);
-        m_job = (JobImpl) jobService.createJob(effectiveJobDesc);
-        if (m_isSubmitted && !m_isCancelled) {
-            m_job.run();
+    private URL m_resourceManager = null;
+    public void allocate(Resource rm) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+        // find grid name and allocate resource
+        m_resourceManager = new URL(rm.getId());
+        if (rm.getGrid() == null) {
+            rm.setGrid(Configuration.getInstance().getConfigurations().getJobserviceCfg().findJobService(m_resourceManager).getName());
         }
-        if (m_listenedMetric != null) {
-            m_job.startListening(m_listenedMetric);
+        m_resourceManager.setFragment(rm.getGrid());
+
+        // transform job description
+        IndividualJobPreprocessor preprocessor = new IndividualJobPreprocessor(m_jobDesc, rm);
+        Document effectiveJobDescDOM = preprocessor.getEffectiveJobDescription();
+        m_jobDesc = new XJSDLJobDescriptionImpl(m_jobDesc.getCollectionName(), m_jobDesc.getJobName(), effectiveJobDescDOM);
+
+        // submit job (if running flag is set)
+        if (m_isRunning && !m_isCancelled) {
+            this._doSubmit();
         }
     }
 
     ////////////////////////////////////// implementation of AbstractTaskImpl //////////////////////////////////////    
 
-    private boolean m_isSubmitted = false;
+    private boolean m_isRunning = false;
     protected void doSubmit() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
-        m_isSubmitted = true;
+        // set running flag
+        m_isRunning = true;
+
+        // submit job (if allocated)
+        if (m_resourceManager!=null && !m_isCancelled) {
+            try {
+                this._doSubmit();
+            }
+            catch (NotImplemented e) {throw e;}
+            catch (IncorrectState e) {throw e;}
+            catch (Timeout e) {throw e;}
+            catch (NoSuccess e) {throw e;}
+            catch (Exception e) {throw new NoSuccess(e);}
+        }
+    }
+    private void _doSubmit() throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+        JobService jobService = JobFactory.createJobService(m_session, m_resourceManager);
+        m_job = (JobImpl) jobService.createJob(m_jobDesc);
+        m_job.run();
+        if (m_listenedMetric != null) {
+            m_job.startListening(m_listenedMetric);
+        }
     }
 
     private boolean m_isCancelled = false;

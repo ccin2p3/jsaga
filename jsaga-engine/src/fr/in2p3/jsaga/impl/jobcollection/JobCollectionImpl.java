@@ -42,7 +42,7 @@ public class JobCollectionImpl extends TaskContainerImpl implements JobCollectio
 
         // preprocess
         JobCollectionPreprocessor preprocessor = new JobCollectionPreprocessor(jcDesc.getAsDocument());
-        byte[] processedJcDesc = preprocessor.preprocess();
+        byte[] processedJcDesc = preprocessor.getEffectiveJobCollection();
 
         // split parametric job
         JobCollectionSplitter splitter = new JobCollectionSplitter(processedJcDesc, evaluator);
@@ -87,8 +87,11 @@ public class JobCollectionImpl extends TaskContainerImpl implements JobCollectio
         ResourceSelection resources = new ResourceSelection();
         for (int i=0; i<resourceUrls.length; i++) {
             Resource resource = new Resource();
+            if (resourceUrls[i].getFragment() != null) {
+                resource.setGrid(resourceUrls[i].getFragment());
+                resourceUrls[i].setFragment(null);
+            }
             resource.setId(resourceUrls[i].toString());
-            resource.setGrid(resourceUrls[i].getFragment());
             resource.setNbslots(1);
             resources.addResource(resource);
         }
@@ -98,10 +101,9 @@ public class JobCollectionImpl extends TaskContainerImpl implements JobCollectio
     public void allocateResources(ResourceSelection resources) throws Exception {
         for (int i=0; resources!=null && i<resources.getResourceCount(); i++) {
             Resource rm = resources.getResource(i);
-            URL rmId = new URL(rm.getId());
             for (int slot=0; slot<rm.getNbslots(); slot++) {
                 LateBindedJobImpl job = m_unallocatedJobs.removeFirst();
-                job.allocate(rmId);
+                job.allocate(rm);
             }
         }
     }

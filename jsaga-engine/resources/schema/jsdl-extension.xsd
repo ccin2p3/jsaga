@@ -17,10 +17,10 @@
 
     <!-- JobDefinition/JobDescription/Resources/FileSystem -->
     <element name="ParentFilesystemName"><complexType><simpleContent><!-- complexType needed to generate it as an object -->
-        <extension base="string"/>
+        <extension base="string"/><!-- todo: not supported yet -->
     </simpleContent></complexType></element>
     <element name="Tag"><complexType><simpleContent>
-        <extension base="string"/>
+        <extension base="string"/><!-- todo: not supported yet -->
     </simpleContent></complexType></element>
 
     <!-- /JobDefinition/JobDescription/DataStaging/Source & Target -->

@@ -13,21 +13,36 @@
 
     <xsl:template match="cfg:UNIVERSE">
         <UNIVERSE>
-            <xsl:copy-of select="@*"/>
-            <xsl:apply-templates select="*[local-name()!='domain' and local-name()!='data'] | text() | comment()"/>
+            <xsl:copy-of select="@*[local-name()!='wrapperMonitoring']"/>
+            <xsl:apply-templates select="cfg:UNIVERSE | cfg:GRID | text() | comment()"/>
         </UNIVERSE>
     </xsl:template>
 
     <xsl:template match="cfg:GRID">
         <xsl:variable name="this" select="."/>
         <GRID>
-            <xsl:copy-of select="@*"/>
+            <xsl:copy-of select="@*[local-name()!='wrapperMonitoring']"/>
             <xsl:apply-templates select="cfg:attribute | cfg:SITE | text() | comment()"/>
             <SITE name="{@name}">
-                <xsl:apply-templates select="*[local-name()!='attribute' and local-name()!='SITE']"/>
-                <xsl:apply-templates select="ancestor::cfg:*/cfg:data[not(@scheme=$this/cfg:data/@scheme)]"/>
+                <!-- do not copy GRID attributes -->
+                <xsl:apply-templates select="cfg:domain"/>
+                <xsl:apply-templates select="ancestor-or-self::cfg:*/cfg:fileSystem"/>
+                <xsl:apply-templates select="cfg:job[not(@deactivated='true')]"/>
+                <xsl:apply-templates select="ancestor-or-self::cfg:*/cfg:data[not(@deactivated='true')]"/>
             </SITE>
         </GRID>
+    </xsl:template>
+
+    <xsl:template match="cfg:SITE">
+        <xsl:variable name="this" select="."/>
+        <SITE>
+            <xsl:copy-of select="@*[local-name()!='wrapperMonitoring']"/>
+            <xsl:apply-templates select="cfg:attributes"/>
+            <xsl:apply-templates select="cfg:domain"/>
+            <xsl:apply-templates select="ancestor-or-self::cfg:*/cfg:fileSystem"/>
+            <xsl:apply-templates select="parent::cfg:*/cfg:job[not(@deactivated='true')] | cfg:job[not(@deactivated='true')]"/>
+            <xsl:apply-templates select="ancestor-or-self::cfg:*/cfg:data[not(@deactivated='true')]"/>
+        </SITE>
     </xsl:template>
 
     <xsl:template match="cfg:data">
@@ -40,11 +55,12 @@
     <xsl:template match="cfg:job">
         <xsl:variable name="this" select="."/>
         <job>
-            <xsl:copy-of select="@*[local-name()!='defaultIntermediary']"/>
+            <xsl:copy-of select="@*[local-name()!='wrapperMonitoring' and local-name()!='defaultIntermediary']"/>
+            <xsl:copy-of select="ancestor-or-self::cfg:*/@wrapperMonitoring"/>
             <xsl:apply-templates/>
             <fileStaging>
                 <xsl:copy-of select="@defaultIntermediary"/>
-                <xsl:for-each select="ancestor::cfg:*/cfg:data[not(@scheme=$this/cfg:data/@scheme)]">
+                <xsl:for-each select="ancestor::cfg:*/cfg:data">
                     <workerProtocolScheme>
                         <xsl:copy-of select="@read | @write | @recursive | @protection"/>
                         <xsl:value-of select="@scheme"/>

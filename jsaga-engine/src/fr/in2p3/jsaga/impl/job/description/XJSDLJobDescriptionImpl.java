@@ -25,11 +25,19 @@ import java.util.*;
  */
 public class XJSDLJobDescriptionImpl extends AbstractJobDescriptionImpl implements JobDescription {
     private static final String SAGA_JOB_DESCRIPTION = "xsl/saga-job-description.xsl";
+    private String m_collectionName;
+    private String m_jobName;
     private Document m_document;
 
     /** constructor */
-    public XJSDLJobDescriptionImpl(Document document) throws NoSuccess {
+    public XJSDLJobDescriptionImpl(String collectionName, String jobName, Document document) throws NoSuccess {
         super();
+
+        // set job collection name
+        m_collectionName = collectionName;
+
+        // set job name
+        m_jobName = jobName;
 
         // set job description document
         m_document = document;
@@ -63,7 +71,15 @@ public class XJSDLJobDescriptionImpl extends AbstractJobDescriptionImpl implemen
         return ObjectType.JOBDESCRIPTION;
     }
 
-    public Document getAsDocument() throws NoSuccess {
+    public String getCollectionName() {
+        return m_collectionName;
+    }
+
+    public String getJobName() {
+        return m_jobName;
+    }
+
+    public Document getAsDocument() {
         return m_document;
     }
 }

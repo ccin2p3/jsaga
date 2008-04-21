@@ -3,7 +3,9 @@ package fr.in2p3.jsaga.engine.config.bean;
 import fr.in2p3.jsaga.engine.schema.config.EffectiveConfig;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.*;
+import org.w3c.dom.Document;
 
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 
 /* ***************************************************
@@ -41,6 +43,20 @@ public class EngineConfiguration {
 
     public JobserviceEngineConfiguration getJobserviceCfg() {
         return m_jobserviceCfg;
+    }
+
+    private Document m_xmlAsDocument;
+    public Document getAsDocument() throws Exception {
+        if (m_xmlAsDocument == null) {
+            ByteArrayOutputStream xmlAsBytes = new ByteArrayOutputStream();
+            Marshaller m = new Marshaller(new OutputStreamWriter(xmlAsBytes));
+            m.setNamespaceMapping("cfg", "http://www.in2p3.fr/jsaga");
+            m.marshal(m_xml);
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            m_xmlAsDocument = factory.newDocumentBuilder().parse(new ByteArrayInputStream(xmlAsBytes.toByteArray()));
+        }
+        return m_xmlAsDocument;
     }
 
     public void dump(OutputStream out) throws ValidationException, MarshalException {

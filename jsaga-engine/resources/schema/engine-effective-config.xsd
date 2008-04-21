@@ -92,10 +92,30 @@
             <element ref="tns:mapping" minOccurs="1" maxOccurs="1"/>
             <element name="jobService" minOccurs="1" maxOccurs="unbounded"><complexType><complexContent><extension base="tns:ObjectType">
                 <sequence>
+                    <element name="fileSystem" minOccurs="0" maxOccurs="unbounded"><complexType>
+                        <attribute name="name" type="string" use="required"/>
+                        <attribute name="mountPoint" type="string" use="required"/>
+                        <attribute name="type" use="required"><simpleType><restriction base="string">
+                            <enumeration value="swap"/>
+                            <enumeration value="temporary"/>
+                            <enumeration value="spool"/>
+                            <enumeration value="normal"/>
+                        </restriction></simpleType></attribute>
+                    </complexType></element>
                     <element name="monitorService" minOccurs="1" maxOccurs="1"><complexType><complexContent><extension base="tns:ObjectType">
                         <attribute name="impl" type="string" use="required"/><!-- from adaptor descriptor -->
                         <attribute name="url" type="anyURI" use="optional"/>
                     </extension></complexContent></complexType></element>
+                    <element name="logging" minOccurs="0" maxOccurs="1"><complexType><simpleContent><extension base="string">
+                        <attribute name="impl" type="string" use="required"/>
+                    </extension></simpleContent></complexType></element>
+                    <element name="monitoring" minOccurs="0" maxOccurs="1"><complexType><simpleContent><extension base="string">
+                        <attribute name="impl" type="string" use="required"/>
+                        <attribute name="mixed" type="boolean" use="optional"/>
+                    </extension></simpleContent></complexType></element>
+                    <element name="accounting" minOccurs="0" maxOccurs="1"><complexType><simpleContent><extension base="string">
+                        <attribute name="impl" type="string" use="required"/>
+                    </extension></simpleContent></complexType></element>
                     <element name="supportedContextType" minOccurs="0" maxOccurs="unbounded" type="string"/><!-- from adaptor descriptor -->
                     <element name="fileStaging"><complexType>
                         <sequence>

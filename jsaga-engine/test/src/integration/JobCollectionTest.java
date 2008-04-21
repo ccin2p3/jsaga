@@ -17,6 +17,7 @@ public class JobCollectionTest extends AbstractJobCollectionTest {
         super();
     }
 
+    // check language translation
     public void test_language() throws Exception {
         super.checkLanguage("JSDL", "JobCollection.xml");
         super.checkLanguage("JSDL", "Job.xml");
@@ -26,13 +27,15 @@ public class JobCollectionTest extends AbstractJobCollectionTest {
         super.checkLanguage("SAGA", "job.properties");
     }
 
+    // check job submission
     public void test_submit() throws Exception {
         super.checkSubmit("job.xml");
 //        super.checkSubmit("job-sandbox.xml");
 //        super.checkSubmit("job-staging.xml");
     }
 
+    // check job transformation
 //    public void test_ref() throws Exception {super.checkPreprocess();}
     public void test_sandbox() throws Exception {super.checkPreprocess();}
-//    public void test_staging() throws Exception {super.checkPreprocess();}
+    public void test_staging() throws Exception {super.checkPreprocess();}
 }

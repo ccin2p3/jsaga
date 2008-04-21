@@ -1,8 +1,10 @@
 package fr.in2p3.jsaga.helpers.xslt;
 
 import fr.in2p3.jsaga.Base;
+import fr.in2p3.jsaga.engine.config.Configuration;
 
 import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import java.io.File;
 
@@ -20,6 +22,14 @@ import java.io.File;
  */
 public class TransformerURIResolver implements URIResolver {
     public Source resolve(String href, String base) throws TransformerException {
-        return new StreamSource(new File(Base.JSAGA_HOME, href));
+        if ("var/jsaga-merged-config.xml".equals(href)) {
+            try {
+                return new DOMSource(Configuration.getInstance().getConfigurations().getAsDocument());
+            } catch (Exception e) {
+                throw new TransformerException(e);
+            }
+        } else {
+            return new StreamSource(new File(Base.JSAGA_HOME, href));
+        }
     }
 }

@@ -111,9 +111,11 @@
                 <xsl:copy-of select="$desc/@*[not(name()=name($conf/@*))] | $conf/@*[not(name()='contextType')]"/>
                 <xsl:apply-templates select="$conf/cfg:domain"/>
                 <xsl:apply-templates select="$desc/cfg:attribute[not(@name=$conf/cfg:attribute/@name)] | $conf/cfg:attribute"/>
+                <xsl:apply-templates select="$conf/cfg:fileSystem"/>
                 <xsl:apply-templates select="$desc/cfg:monitorService">
                     <xsl:with-param name="conf" select="$conf/cfg:monitorService"/>
                 </xsl:apply-templates>
+                <xsl:apply-templates select="$conf/cfg:logging | $conf/cfg:monitoring | $conf/cfg:accounting"/>
                 <xsl:apply-templates select="$desc/cfg:supportedContextType"/>
                 <xsl:for-each select="$conf/cfg:fileStaging">
                     <fileStaging>
@@ -133,6 +135,19 @@
             <xsl:copy-of select="$desc/@*[not(name()=name($conf/@*))] | $conf/@*"/>
             <xsl:apply-templates select="$desc/cfg:attribute[not(@name=$conf/cfg:attribute/@name)] | $conf/cfg:attribute"/>
         </monitorService>
+    </xsl:template>
+    <xsl:template match="cfg:fileSystem">
+        <fileSystem>
+            <xsl:copy-of select="@name | @mountPoint"/>
+            <xsl:attribute name="type">
+                <xsl:choose>
+                    <xsl:when test="@type"><xsl:value-of select="@type"/></xsl:when>
+                    <xsl:when test="@name='WorkingDirectory'">temporary</xsl:when>
+                    <xsl:when test="@name='IntermediaryDirectory'">spool</xsl:when>
+                    <xsl:otherwise>normal</xsl:otherwise>
+                </xsl:choose>
+            </xsl:attribute>
+        </fileSystem>
     </xsl:template>
     <xsl:template match="cfg:workerProtocolScheme">
         <xsl:variable name="conf" select="."/>

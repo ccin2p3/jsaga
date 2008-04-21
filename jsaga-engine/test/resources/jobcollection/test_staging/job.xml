@@ -23,20 +23,6 @@
                         <posix:Error>$STDERR</posix:Error>
                     </posix:POSIXApplication>
                 </Application>
-                <Resources>
-                    <FileSystem name="HelloWorldDirectory">
-                        <FileSystemType>normal</FileSystemType>
-                        <MountPoint>HelloWorld/1.1</MountPoint>
-                        <ext:ParentFilesystemName>ApplicationsDirectory</ext:ParentFilesystemName>
-                        <ext:Tag>HELLOWORLD_1.1</ext:Tag>
-                    </FileSystem>
-                    <FileSystem name="HelloWorldDirectory">
-                        <FileSystemType>normal</FileSystemType>
-                        <MountPoint>HelloWorld/1.2</MountPoint>
-                        <ext:ParentFilesystemName>ApplicationsDirectory</ext:ParentFilesystemName>
-                        <ext:Tag>HELLOWORLD_1.2</ext:Tag>
-                    </FileSystem>
-                </Resources>
                 <DataStaging name="C0">
                     <FileName>config0.cfg</FileName>
                     <CreationFlag>overwrite</CreationFlag>
@@ -53,8 +39,8 @@
                     <Source><URI>http://host5:8080/public/configuration/config2.cfg</URI></Source>
                 </DataStaging>
                 <DataStaging name="E">
-                    <FileName>bin/executable.exe</FileName>
-                    <FilesystemName>HelloWorldDirectory</FilesystemName>
+                    <FileName>HelloWorld/1.1/bin/executable.exe</FileName>
+                    <FilesystemName>ApplicationsDirectory</FilesystemName>
                     <CreationFlag>dontOverwrite</CreationFlag>
                     <Source/>
                 </DataStaging>

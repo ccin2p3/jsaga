@@ -112,6 +112,13 @@
                 <Source><URI>gzip:///tmp/input.txt.gz</URI></Source>
                 <Target><URI>gzip:///tmp/output.txt.gz</URI></Target>
             </DataStaging>
+            <DataStaging name="TAR_IN_VARIABLE">
+                <FileName>$PWD/myjob/file.txt</FileName>
+                <FilesystemName>$PWD</FilesystemName>
+                <CreationFlag>dontOverwrite</CreationFlag>
+                <Source><URI>tar://$TARBALL/tmp/input.txt</URI></Source>
+                <Target><URI>tar://$TARBALL/tmp/output.txt</URI></Target>
+            </DataStaging>
             <DataStaging name="TAR">
                 <FileName>$PWD/myjob/file.txt</FileName>
                 <FilesystemName>$PWD</FilesystemName>
@@ -126,19 +133,33 @@
                 <Source><URI>tar://$PWD/tarball.tar/tmp/input.txt</URI></Source>
                 <Target><URI>tar://$PWD/tarball.tar/tmp/output.txt</URI></Target>
             </DataStaging>
-            <DataStaging name="TGZ">
+            <DataStaging name="TAR_GZ">
                 <FileName>$PWD/myjob/file.txt</FileName>
                 <FilesystemName>$PWD</FilesystemName>
                 <CreationFlag>dontOverwrite</CreationFlag>
                 <Source><URI>tgz://$PWD/tarball.tar.gz/tmp/input.txt</URI></Source>
                 <Target><URI>tgz://$PWD/tarball.tar.gz/tmp/output.txt</URI></Target>
             </DataStaging>
-            <DataStaging name="TGZ_OVERWRITTEN">
+            <DataStaging name="TAR_GZ_OVERWRITTEN">
                 <FileName>$PWD/myjob/file.txt</FileName>
                 <FilesystemName>$PWD</FilesystemName>
                 <CreationFlag>overwrite</CreationFlag>
                 <Source><URI>tgz://$PWD/tarball.tar.gz/tmp/input.txt</URI></Source>
                 <Target><URI>tgz://$PWD/tarball.tar.gz/tmp/output.txt</URI></Target>
+            </DataStaging>
+            <DataStaging name="TGZ">
+                <FileName>$PWD/myjob/file.txt</FileName>
+                <FilesystemName>$PWD</FilesystemName>
+                <CreationFlag>dontOverwrite</CreationFlag>
+                <Source><URI>tgz://$PWD/tarball.tgz/tmp/input.txt</URI></Source>
+                <Target><URI>tgz://$PWD/tarball.tgz/tmp/output.txt</URI></Target>
+            </DataStaging>
+            <DataStaging name="TGZ_OVERWRITTEN">
+                <FileName>$PWD/myjob/file.txt</FileName>
+                <FilesystemName>$PWD</FilesystemName>
+                <CreationFlag>overwrite</CreationFlag>
+                <Source><URI>tgz://$PWD/tarball.tgz/tmp/input.txt</URI></Source>
+                <Target><URI>tgz://$PWD/tarball.tgz/tmp/output.txt</URI></Target>
             </DataStaging>
             <DataStaging name="GSIFTP">
                 <FileName>$PWD/myjob/file.txt</FileName>

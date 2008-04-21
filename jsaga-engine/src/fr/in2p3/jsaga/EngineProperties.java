@@ -56,6 +56,10 @@ public class EngineProperties {
         return s_exception;
     }
 
+    public static void setProperty(String name, String value) {
+        getProperties().setProperty(name, value);
+    }
+
     public static String getProperty(String name) {
         String value = getProperties().getProperty(name);
         if (value != null) {
