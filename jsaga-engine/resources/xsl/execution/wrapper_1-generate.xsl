@@ -442,14 +442,11 @@ run COMPLETE        COMPLETED
         fi
     </xsl:template>
     <xsl:template name="INIT_SRB">
-        mdasCollectionName="/home/USERNAME.DOMAIN"
         srbHost="<xsl:call-template name="HOST"/>"
         srbPort="<xsl:call-template name="PORT"/>"
         srbUser="<xsl:call-template name="USER"/>"
-        mdasDomainName="sdsc"
-        defaultResource="du-unix"
+        mdasDomainName="<xsl:call-template name="QUERY"/>"
         AUTH_SCHEME="GSI_AUTH"
-        Sinit
     </xsl:template>
 
     <!-- ************************* irods ************************* -->
@@ -477,7 +474,6 @@ run COMPLETE        COMPLETED
     </xsl:template>
     <xsl:template name="INIT_IRODS">
         <!-- todo -->
-        iinit
     </xsl:template>
 
     <!-- ************************* http ************************* -->
@@ -765,6 +761,8 @@ USER=<xsl:call-template name="USER"/>
 HOST=<xsl:call-template name="HOST"/>
 PORT=<xsl:call-template name="PORT"/>
 PATH=<xsl:call-template name="PATH"/>
+QUERY=<xsl:call-template name="QUERY"/>
+FRAGMENT=<xsl:call-template name="FRAGMENT"/>
     </xsl:template>
 
     <!-- ###########################################################################
@@ -792,26 +790,17 @@ PATH=<xsl:call-template name="PATH"/>
                 <xsl:value-of select="substring-before($url,'://')"/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:message terminate="yes">URL contains no scheme: <xsl:value-of select="$url"/></xsl:message>
+                <xsl:message terminate="no">URL contains no scheme: <xsl:value-of select="$url"/></xsl:message>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
     <xsl:template name="USER">
         <xsl:param name="url" select="text()"/>
-        <xsl:variable name="suffix">
-            <xsl:choose>
-                <xsl:when test="contains($url,'://')">
-                    <xsl:value-of select="substring-after($url,'://')"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:message terminate="yes">URL contains no scheme: <xsl:value-of select="$url"/></xsl:message>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
+        <xsl:variable name="authority"><xsl:call-template name="AUTHORITY"/></xsl:variable>
         <xsl:choose>
-            <xsl:when test="contains($suffix,'@')">
-                <xsl:value-of select="substring-before($suffix,'@')"/>
+            <xsl:when test="contains($authority,'@')">
+                <xsl:value-of select="substring-before($authority,'@')"/>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:message terminate="no">URL contains no userInfo: <xsl:value-of select="$url"/></xsl:message>
@@ -821,55 +810,29 @@ PATH=<xsl:call-template name="PATH"/>
 
     <xsl:template name="HOST">
         <xsl:param name="url" select="text()"/>
-        <xsl:variable name="suffix">
-            <xsl:choose>
-                <xsl:when test="contains($url,'@')">
-                    <xsl:value-of select="substring-after($url,'@')"/>
-                </xsl:when>
-                <xsl:when test="contains($url,'://')">
-                    <xsl:value-of select="substring-after($url,'://')"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:message terminate="yes">URL contains no scheme: <xsl:value-of select="$url"/></xsl:message>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
+        <xsl:variable name="authority"><xsl:call-template name="AUTHORITY"/></xsl:variable>
         <xsl:choose>
-            <xsl:when test="contains($suffix,':') and not(starts-with($url,'file://'))">
-                <xsl:value-of select="substring-before($suffix,':')"/>
+            <xsl:when test="contains($authority,'@') and contains($authority,':')">
+                <xsl:value-of select="substring-before(substring-after($authority,'@'),':')"/>
             </xsl:when>
-            <xsl:when test="contains($suffix,'/') and not(starts-with($suffix,'.')) and not(starts-with($suffix,'$'))">
-                <xsl:value-of select="substring-before($suffix,'/')"/>
+            <xsl:when test="contains($authority,'@')">
+                <xsl:value-of select="substring-after($authority,'@')"/>
+            </xsl:when>
+            <xsl:when test="contains($authority,':')">
+                <xsl:value-of select="substring-before($authority,':')"/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:message terminate="no">URL contains no host: <xsl:value-of select="$url"/></xsl:message>
+                <xsl:value-of select="$authority"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
     <xsl:template name="PORT">
         <xsl:param name="url" select="text()"/>
-        <xsl:variable name="suffix">
-            <xsl:choose>
-                <xsl:when test="contains($url,'://')">
-                    <xsl:value-of select="substring-after($url,'://')"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:message terminate="yes">URL contains no scheme: <xsl:value-of select="$url"/></xsl:message>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
+        <xsl:variable name="authority"><xsl:call-template name="AUTHORITY"/></xsl:variable>
         <xsl:choose>
-            <xsl:when test="contains($suffix,':')">
-                <xsl:variable name="suffix2" select="substring-after($suffix,':')"/>
-                <xsl:choose>
-                    <xsl:when test="contains($suffix2,'/')">
-                        <xsl:value-of select="substring-before($suffix2,'/')"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:value-of select="$suffix2"/>
-                    </xsl:otherwise>
-                </xsl:choose>
+            <xsl:when test="contains($authority,':')">
+                <xsl:value-of select="substring-after($authority,':')"/>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:message terminate="no">URL contains no port: <xsl:value-of select="$url"/></xsl:message>
@@ -877,31 +840,93 @@ PATH=<xsl:call-template name="PATH"/>
         </xsl:choose>
     </xsl:template>
 
+    <!-- [[user-info@]host[:port]] -->
+    <xsl:template name="AUTHORITY">
+        <xsl:param name="url" select="text()"/>
+        <xsl:variable name="middle"><xsl:call-template name="MIDDLE"/></xsl:variable>
+        <xsl:choose>
+            <xsl:when test="starts-with($middle,'/') or starts-with($middle,'.') or starts-with($middle,'$') or starts-with($url,'file://')">
+                <xsl:message terminate="no">URL contains no authority: <xsl:value-of select="$url"/></xsl:message>
+            </xsl:when>
+            <xsl:when test="contains($middle,'/')">
+                <xsl:value-of select="substring-before($middle,'/')"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$middle"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
     <xsl:template name="PATH">
         <xsl:param name="url" select="text()"/>
-        <xsl:variable name="suffix">
+        <xsl:variable name="middle"><xsl:call-template name="MIDDLE"/></xsl:variable>
+        <xsl:choose>
+            <xsl:when test="starts-with($middle,'/') or starts-with($middle,'.') or starts-with($middle,'$') or starts-with($url,'file://')">
+                <xsl:value-of select="$middle"/>
+            </xsl:when>
+            <xsl:when test="contains($middle,'/')">
+                <xsl:variable name="path" select="substring-after($middle,'/')"/>
+                <xsl:if test="not(starts-with($path,'./') or starts-with($path,'../'))">
+                    <xsl:text>/</xsl:text>
+                </xsl:if>
+                <xsl:value-of select="$path"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:message terminate="no">URL contains no path: <xsl:value-of select="$url"/></xsl:message>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="QUERY">
+        <xsl:param name="url" select="text()"/>
+        <xsl:choose>
+            <xsl:when test="contains($url,'?') and contains($url,'#')">
+                <xsl:value-of select="substring-before(substring-after($url,'?'),'#')"/>
+            </xsl:when>
+            <xsl:when test="contains($url,'?')">
+                <xsl:value-of select="substring-after($url,'?')"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:message terminate="no">URL contains no query: <xsl:value-of select="$url"/></xsl:message>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="FRAGMENT">
+        <xsl:param name="url" select="text()"/>
+        <xsl:choose>
+            <xsl:when test="contains($url,'#')">
+                <xsl:value-of select="substring-after($url,'#')"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:message terminate="no">URL contains no fragment: <xsl:value-of select="$url"/></xsl:message>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <!-- [[user-info@]host[:port]][/path] -->
+    <xsl:template name="MIDDLE">
+        <xsl:param name="url" select="text()"/>
+        <xsl:variable name="noscheme">
             <xsl:choose>
                 <xsl:when test="contains($url,'://')">
                     <xsl:value-of select="substring-after($url,'://')"/>
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:message terminate="yes">URL contains no scheme: <xsl:value-of select="$url"/></xsl:message>
+                    <xsl:value-of select="$url"/>
+                    <xsl:message terminate="no">URL contains no scheme: <xsl:value-of select="$url"/></xsl:message>
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
         <xsl:choose>
-            <xsl:when test="starts-with($suffix,'/') or starts-with($suffix,'.') or starts-with($suffix,'$')">
-                <xsl:value-of select="$suffix"/>
+            <xsl:when test="contains($noscheme,'?')">
+                <xsl:value-of select="substring-before($noscheme,'?')"/>
             </xsl:when>
-            <xsl:when test="contains($suffix,'/')">
-                <xsl:variable name="suffix2" select="substring-after($suffix,'/')"/>
-                <xsl:if test="not(starts-with($suffix2,'./') or starts-with($suffix2,'../'))">
-                    <xsl:text>/</xsl:text>
-                </xsl:if>
-                <xsl:value-of select="substring-after($suffix,'/')"/>
+            <xsl:when test="contains($noscheme,'#')">
+                <xsl:value-of select="substring-before($noscheme,'#')"/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:message terminate="no">URL contains no path: <xsl:value-of select="$url"/></xsl:message>
+                <xsl:value-of select="$noscheme"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>

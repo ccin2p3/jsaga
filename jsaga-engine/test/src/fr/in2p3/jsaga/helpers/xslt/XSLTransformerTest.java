@@ -21,6 +21,10 @@ import java.util.Properties;
 public class XSLTransformerTest extends TestCase {
     public void test_wrapper_1_generate_URL() throws Exception {
         final URL[] urls = new URL[] {
+                new URL("gsiftp://host:2811/absolute/path/to/file.txt?query#grid"),
+                new URL("gsiftp://host:2811/absolute/path/to/file.txt#grid"),
+                new URL("gsiftp://host:2811?query#grid"),
+                new URL("gsiftp://host:2811#grid"),
                 new URL("gsiftp://host:2811"),
                 new URL("gsiftp://host:2811/absolute/path/to/file.txt"),
                 new URL("gsiftp://host:2811/./relative/path/to/file.txt"),
@@ -56,6 +60,14 @@ public class XSLTransformerTest extends TestCase {
                     "Bad path for URL: "+prop.getProperty("URL"),
                     urls[i].getPath()!=null ? urls[i].getPath() : "",
                     prop.getProperty("PATH"));
+            assertEquals(
+                    "bad query for URL: "+prop.getProperty("URL"),
+                    urls[i].getQuery()!=null ? urls[i].getQuery() : "",
+                    prop.getProperty("QUERY"));
+            assertEquals(
+                    "bad fragment for URL: "+prop.getProperty("URL"),
+                    urls[i].getFragment()!=null ? urls[i].getFragment() : "",
+                    prop.getProperty("FRAGMENT"));
         }
     }
 }
