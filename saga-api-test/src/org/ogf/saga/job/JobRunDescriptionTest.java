@@ -47,7 +47,10 @@ public class JobRunDescriptionTest extends AbstractJobTest {
 	                job.getState());
         }
         catch (NoSuccess noSuccess) {
-        	// test may be successful
+        	// test is successful is exception instance of BadResource
+            if (!noSuccess.getClass().getName().equals("BadResource")) {
+                throw noSuccess;
+            }
         }
         finally {
         	if(job != null) {
