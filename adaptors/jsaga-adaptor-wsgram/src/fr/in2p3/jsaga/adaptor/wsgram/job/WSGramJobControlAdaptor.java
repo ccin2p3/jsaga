@@ -1,7 +1,5 @@
 package fr.in2p3.jsaga.adaptor.wsgram.job;
 
-import fr.in2p3.jsaga.adaptor.base.defaults.Default;
-import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
@@ -16,12 +14,7 @@ import org.globus.gram.GramException;
 import org.globus.gram.internal.GRAMProtocolErrorConstants;
 import org.globus.wsrf.impl.security.authorization.Authorization;
 import org.ietf.jgss.GSSException;
-import org.ogf.saga.error.AuthenticationFailed;
-import org.ogf.saga.error.AuthorizationFailed;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.IncorrectState;
 import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.error.PermissionDenied;
 import org.ogf.saga.error.Timeout;
 
@@ -42,17 +35,6 @@ import java.util.Map;
  */
 public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements JobControlAdaptor, CleanableJobAdaptor {
 
-    public String getType() {
-        return "wsgram";
-    }
-
-    public Usage getUsage() {
-        return null;
-    }
-
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
-        return null;    // no default
-    }
 
     public String[] getSupportedSandboxProtocols() {
         return null;    // no sandbox management
@@ -68,14 +50,6 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
 
     public JobMonitorAdaptor getDefaultJobMonitor() {
         return new WSGramJobMonitorAdaptor();
-    }
-
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
-        super.connect(userInfo, host, port, basePath, attributes);
-    }
-
-    public void disconnect() throws NoSuccess {
-        super.disconnect();
     }
 
     public String submit(String jobDesc, boolean checkMatch) throws PermissionDenied, Timeout, NoSuccess {
@@ -115,7 +89,6 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
 
             // submit job
             gramJob.submit(factoryEndpoint, isNotInteractiveJob, true, "uuid:" + UUIDGenFactory.getUUIDGen().nextUUID());
-            Thread.sleep(300000);
         	return gramJob.getHandle();
         } catch (GramException e) {
             return this.rethrowException(e);

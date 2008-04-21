@@ -61,8 +61,12 @@ import javax.xml.rpc.ServiceException;
 public abstract class WSGramJobAdaptorAbstract implements SagaSecureAdaptor {
 	
     protected GSSCredential m_credential;
-    protected String m_serverUrl, m_serverBatch;
+    protected String m_serverUrl, m_serverBatch = "Fork";
     private static final String IP_ADDRESS = "IPAddress";
+    
+    public String getType() {
+        return "wsgram";
+    }
     
     public Class[] getSupportedSecurityAdaptorClasses() {
         return new Class[]{GSSCredentialSecurityAdaptor.class};
@@ -91,7 +95,14 @@ public abstract class WSGramJobAdaptorAbstract implements SagaSecureAdaptor {
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
     	m_serverUrl = "https://"+host+":"+port;
-    	m_serverBatch = basePath.replaceAll("/", "");
+    	if(basePath != null &&
+    			!basePath.equals("") && 
+    			!basePath.equals("/")) { 
+    			if(basePath.indexOf("/") > -1)
+    				m_serverBatch = basePath.replaceAll("/", "");
+    			else
+    				m_serverBatch = basePath;
+    	}
     	// Overload cog properties
     	if (attributes!=null && attributes.containsKey(IP_ADDRESS)) {
             String value = ((String) attributes.get(IP_ADDRESS));
@@ -109,8 +120,7 @@ public abstract class WSGramJobAdaptorAbstract implements SagaSecureAdaptor {
 			ContainerConfig.getConfig().setOption(ContainerConfig.LOGICAL_HOST,
 				CoGProperties.getDefault().getIPAddress());
 			CoGProperties.getDefault().setHostName(CoGProperties.getDefault().getIPAddress());
-		}
-		
+		}		
     	
     	String clientConfigFile = Base.JSAGA_VAR+ File.separator+ "client-config-wsgram.wsdd";
     	// save client-config.wsdd on JSAGA_VAR from jar 
@@ -166,9 +176,9 @@ public abstract class WSGramJobAdaptorAbstract implements SagaSecureAdaptor {
     public void disconnect() throws NoSuccess {
         m_serverUrl = null;
         m_serverBatch = null;
+        m_credential = null;
     }
     
-
     protected GramJob getGramJobById(String nativeJobId) throws NoSuccess {
     	GramJob job = new GramJob();
         try {
