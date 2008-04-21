@@ -46,6 +46,8 @@ public class U6ExecutionTestSuite extends TestSuite {
  	// test cases
     public static class U6JobRunDescriptionTest extends JobRunDescriptionTest {
         public U6JobRunDescriptionTest() throws Exception {super("unicore6");}
+        public void test_run_queueRequirement() { super.ignore("not supported"); }
+        public void test_run_processRequirement() { super.ignore("not supported"); }
     }
 
     public U6ExecutionTestSuite() throws Exception {
