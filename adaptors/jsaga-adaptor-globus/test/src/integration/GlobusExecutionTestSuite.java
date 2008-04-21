@@ -53,6 +53,7 @@ public class GlobusExecutionTestSuite extends TestSuite {
  	// test cases
     public static class GlobusJobRunDescriptionTest extends JobRunDescriptionTest {
         public GlobusJobRunDescriptionTest() throws Exception {super("gatekeeper");}
+        public void test_run_inWorkingDirectory() { super.ignore("Unexpected error: The job manager failed to open stdout"); } 
     }
 
     public GlobusExecutionTestSuite() throws Exception {
