@@ -17,13 +17,14 @@
         <!-- executable and arguments -->
         <xsl:choose>
             <xsl:when test="$ShellPath">
-(executable = <xsl:value-of select="$ShellPath"/>)
-(arguments = -c "<xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Executable/text()"/>
+(executable = <xsl:value-of select="$ShellPath"/>)<!-- NOTE: '"..."' enables late evaluation of env variables -->
+(arguments = -c '"<xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Executable/text()"/>
                 <xsl:if test="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
+                    <!-- NOTE: use \"$MYVAR\" if $MYVAR contains space characters -->
                     <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
                         <xsl:text> </xsl:text><xsl:value-of select="."/>
                     </xsl:for-each>
-                </xsl:if>")<xsl:text/>
+                </xsl:if>"')<xsl:text/>
             </xsl:when>
             <xsl:otherwise>
 (executable = <xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Executable/text()"/>)<xsl:text/>
