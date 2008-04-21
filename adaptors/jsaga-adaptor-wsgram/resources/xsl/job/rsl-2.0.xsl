@@ -23,12 +23,24 @@
             </xsl:if>
 
         <!-- other -->
-        <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Output/text()">
-<stdout><xsl:text/><xsl:value-of select="."/></stdout><xsl:text/>
-        </xsl:for-each>
-        <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Error/text()">
-<stderr><xsl:value-of select="."/></stderr><xsl:text/>
-        </xsl:for-each>
+   		<xsl:choose>
+            <xsl:when test="jsdl:Application/posix:POSIXApplication/posix:Output/text()">
+<stdout><xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Output/text()"/></stdout><xsl:text/>
+            </xsl:when>
+            <xsl:otherwise>
+            <!--  just for debug -->
+<stdout>stdout.txt</stdout><xsl:text/>        
+            </xsl:otherwise>
+        </xsl:choose>
+        <xsl:choose>
+            <xsl:when test="jsdl:Application/posix:POSIXApplication/posix:Error/text()">
+<stderr><xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Error/text()"/></stderr><xsl:text/>
+            </xsl:when>
+            <xsl:otherwise>
+            <!--  just for debug -->
+<stderr>stderr.txt</stderr><xsl:text/>           
+            </xsl:otherwise>
+        </xsl:choose>
         <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Input/text()">
 <stdin><xsl:value-of select="."/></stdin><xsl:text/>
         </xsl:for-each>

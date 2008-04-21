@@ -36,13 +36,24 @@
         </xsl:choose>
 <!--  two_phase=time out : timeout indicates the timeout to send COMMIT and END signal  -->
 (two_phase=300)<xsl:text/>
-<!--  Provisoire : just for debug -->
-        <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Output/text()">
-(stdout = <xsl:value-of select="."/>)<xsl:text/>
-        </xsl:for-each>
-        <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Error/text()">
-(stderr = <xsl:value-of select="."/>)<xsl:text/>
-        </xsl:for-each>
+		<xsl:choose>
+            <xsl:when test="jsdl:Application/posix:POSIXApplication/posix:Output/text()">
+(stdout = <xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Output/text()"/>)<xsl:text/>
+            </xsl:when>
+            <xsl:otherwise>
+            <!--  just for debug -->
+(stdout = stdout.txt)<xsl:text/>         
+            </xsl:otherwise>
+        </xsl:choose>
+        <xsl:choose>
+            <xsl:when test="jsdl:Application/posix:POSIXApplication/posix:Error/text()">
+(stderr = <xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Error/text()"/>)<xsl:text/>
+            </xsl:when>
+            <xsl:otherwise>
+            <!--  just for debug  -->
+(stderr = stderr.txt)<xsl:text/>            
+            </xsl:otherwise>
+        </xsl:choose>
         <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Input/text()">
 (stdin = <xsl:value-of select="."/>)<xsl:text/>
         </xsl:for-each>
