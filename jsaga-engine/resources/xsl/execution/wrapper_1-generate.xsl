@@ -142,7 +142,7 @@ function INPUT_STAGING() {
             mkdir -p ${<xsl:value-of select="@name"/>%/*}
         fi
 
-        # Download <xsl:value-of select="$LOCAL"/> from <xsl:value-of select="jsdl:Source/jsdl:URI/text()"/>
+        # Get <xsl:value-of select="$LOCAL"/> from <xsl:value-of select="jsdl:Source/jsdl:URI/text()"/>
                     <xsl:if test="jsdl:CreationFlag/text()='overwrite'"> (overwrite)</xsl:if>
         <xsl:apply-templates select="jsdl:Source/jsdl:URI">
             <xsl:with-param name="local" select="$LOCAL"/>
@@ -151,7 +151,7 @@ function INPUT_STAGING() {
             echo <xsl:value-of select="$LOCAL"/> &gt;&gt; $0.newfile
             IS_FOUND_<xsl:value-of select="@name"/>=<xsl:value-of select="position()"/>
         else
-            log WARN "Failed to download file: <xsl:value-of select="jsdl:Source/jsdl:URI/text()"/>"
+            log WARN "Failed to get file: <xsl:value-of select="jsdl:Source/jsdl:URI/text()"/>"
         fi
                 </xsl:when>
                 <xsl:otherwise>
@@ -202,7 +202,7 @@ function INPUT_STAGING() {
             mkdir -p ${<xsl:value-of select="@name"/>%/*}
         fi
 
-        # Set file to upload
+        # Set file to put
         echo <xsl:value-of select="jsdl:FileName/text()"/> &gt;&gt; $0.newfile
         IS_FOUND_<xsl:value-of select="@name"/>=<xsl:value-of select="position()"/>
                 </xsl:when>
@@ -281,12 +281,12 @@ function OUTPUT_STAGING() {
             </xsl:if>
             <xsl:choose>
                 <xsl:when test="jsdl:Target/jsdl:URI">
-        # Upload <xsl:value-of select="$LOCAL"/> to <xsl:value-of select="jsdl:Target/jsdl:URI/text()"/>
+        # Put <xsl:value-of select="$LOCAL"/> to <xsl:value-of select="jsdl:Target/jsdl:URI/text()"/>
                     <xsl:if test="jsdl:CreationFlag/text()='overwrite'"> (overwrite)</xsl:if>
         <xsl:apply-templates select="jsdl:Target/jsdl:URI">
             <xsl:with-param name="local" select="$LOCAL"/>
         </xsl:apply-templates>
-        log DEBUG "Output uploaded: <xsl:value-of select="jsdl:Target/jsdl:URI/text()"/>"
+        log DEBUG "Output put: <xsl:value-of select="jsdl:Target/jsdl:URI/text()"/>"
                 </xsl:when>
                 <xsl:otherwise>
         # Use local file
@@ -533,8 +533,8 @@ run COMPLETE        COMPLETED
     <xsl:template match="jsdl:Source/jsdl:URI[starts-with(text(),'tar://')]">
         <xsl:param name="local"/>
         <xsl:call-template name="REMOVE_LOCAL"><xsl:with-param name="local" select="$local"/></xsl:call-template>
-        <xsl:variable name="tarball" select="concat(substring-after(substring-before(text(),'.tar/'),'://'),'.tar')"/>
-        <xsl:variable name="file" select="substring-after(text(),'.tar/')"/>
+        <xsl:variable name="tarball"><xsl:call-template name="TARBALL"/></xsl:variable>
+        <xsl:variable name="file"><xsl:call-template name="FILE_IN_TARBALL"/></xsl:variable>
         tar x<xsl:text/>
             <xsl:text> </xsl:text><xsl:value-of select="$file"/>
             <xsl:text> </xsl:text>-f <xsl:value-of select="$tarball"/>
@@ -542,8 +542,8 @@ run COMPLETE        COMPLETED
     </xsl:template>
     <xsl:template match="jsdl:Target/jsdl:URI[starts-with(text(),'tar://')]">
         <xsl:param name="local"/>
-        <xsl:variable name="tarball" select="concat(substring-after(substring-before(text(),'.tar/'),'://'),'.tar')"/>
-        <xsl:variable name="file" select="substring-after(text(),'.tar/')"/>
+        <xsl:variable name="tarball"><xsl:call-template name="TARBALL"/></xsl:variable>
+        <xsl:variable name="file"><xsl:call-template name="FILE_IN_TARBALL"/></xsl:variable>
         <xsl:if test="not(../../jsdl:CreationFlag/text()='overwrite')">
         tar tf <xsl:value-of select="$tarball"/> | grep "^<xsl:value-of select="$file"/>$"
         if test $? -eq 0 ; then
@@ -559,8 +559,8 @@ run COMPLETE        COMPLETED
     <xsl:template match="jsdl:Source/jsdl:URI[starts-with(text(),'tgz://')]">
         <xsl:param name="local"/>
         <xsl:call-template name="REMOVE_LOCAL"><xsl:with-param name="local" select="$local"/></xsl:call-template>
-        <xsl:variable name="tarball" select="concat(substring-after(substring-before(text(),'.tar.gz/'),'://'),'.tar')"/>
-        <xsl:variable name="file" select="substring-after(text(),'.tar.gz/')"/>
+        <xsl:variable name="tarball"><xsl:call-template name="TARBALL"/></xsl:variable>
+        <xsl:variable name="file"><xsl:call-template name="FILE_IN_TARBALL"/></xsl:variable>
         tar xz<xsl:text/>
             <xsl:text> </xsl:text><xsl:value-of select="$file"/>
             <xsl:text> </xsl:text>-f <xsl:value-of select="$tarball"/>
@@ -568,8 +568,8 @@ run COMPLETE        COMPLETED
     </xsl:template>
     <xsl:template match="jsdl:Target/jsdl:URI[starts-with(text(),'tgz://')]">
         <xsl:param name="local"/>
-        <xsl:variable name="tarball" select="concat(substring-after(substring-before(text(),'.tar.gz/'),'://'),'.tar')"/>
-        <xsl:variable name="file" select="substring-after(text(),'.tar.gz/')"/>
+        <xsl:variable name="tarball"><xsl:call-template name="TARBALL"/></xsl:variable>
+        <xsl:variable name="file"><xsl:call-template name="FILE_IN_TARBALL"/></xsl:variable>
         <xsl:if test="not(../../jsdl:CreationFlag/text()='overwrite')">
         tar tfz <xsl:value-of select="$tarball"/> | grep "^<xsl:value-of select="$file"/>$"
         if test $? -eq 0 ; then
@@ -579,6 +579,59 @@ run COMPLETE        COMPLETED
         mv <xsl:value-of select="$local"/> <xsl:value-of select="$file"/>
         tar rz <xsl:value-of select="$file"/> -f <xsl:value-of select="$tarball"/>
         mv <xsl:value-of select="$file"/> <xsl:value-of select="$local"/>
+    </xsl:template>
+    <xsl:template name="TARBALL">
+        <xsl:call-template name="DECOMPOSE_TAR_URL"><xsl:with-param name="file">tarball</xsl:with-param></xsl:call-template>
+    </xsl:template>
+    <xsl:template name="FILE_IN_TARBALL">
+        <xsl:call-template name="DECOMPOSE_TAR_URL"><xsl:with-param name="file">file_in_tarball</xsl:with-param></xsl:call-template>
+    </xsl:template>
+    <xsl:template name="DECOMPOSE_TAR_URL">
+        <xsl:param name="file"/>
+        <xsl:variable name="scheme" select="substring-before(text(), '://')"/>
+        <xsl:choose>
+            <xsl:when test="$scheme='tar' and contains(text(),'.tar/')">
+                <xsl:call-template name="DO_DECOMPOSE_TAR_URL">
+                    <xsl:with-param name="file" select="$file"/>
+                    <xsl:with-param name="extension" select="'tar'"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="$scheme='tgz' and contains(text(),'.tar.gz/')">
+                <xsl:call-template name="DO_DECOMPOSE_TAR_URL">
+                    <xsl:with-param name="file" select="$file"/>
+                    <xsl:with-param name="extension" select="'tar.gz'"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="$scheme='tgz' and contains(text(),'.tgz/')">
+                <xsl:call-template name="DO_DECOMPOSE_TAR_URL">
+                    <xsl:with-param name="file" select="$file"/>
+                    <xsl:with-param name="extension" select="'tgz'"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="contains(text(),'://$')">
+                <xsl:variable name="path" select="substring-after(text(), '://')"/>
+                <xsl:choose>
+                    <xsl:when test="$file='tarball'"><xsl:value-of select="substring-before($path,'/')"/></xsl:when>
+                    <xsl:when test="$file='file_in_tarball'"><xsl:value-of select="substring-after($path,'/')"/></xsl:when>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:message terminate="yes">Bad URL: <xsl:value-of select="text()"/></xsl:message>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    <xsl:template name="DO_DECOMPOSE_TAR_URL">
+        <xsl:param name="file"/>
+        <xsl:param name="extension"/>
+        <xsl:variable name="path" select="substring-after(text(), '://')"/>
+        <xsl:choose>
+            <xsl:when test="$file='tarball'">
+                <xsl:value-of select="substring-before($path, concat('.',$extension,'/'))"/>.<xsl:value-of select="$extension"/>
+            </xsl:when>
+            <xsl:when test="$file='file_in_tarball'">
+                <xsl:value-of select="substring-after($path, concat('.',$extension,'/'))"/>
+            </xsl:when>
+        </xsl:choose>
     </xsl:template>
 
     <!-- ************************* gsiftp ************************* -->
@@ -670,7 +723,7 @@ run COMPLETE        COMPLETED
     <xsl:template name="GET_ERROR">
         <xsl:param name="local"/>
         <xsl:choose>
-            <xsl:when test="../../jsdl:CreationFlag/text()='overwrite'">"Failed to upload file: <xsl:value-of select="$local"/>"</xsl:when>
+            <xsl:when test="../../jsdl:CreationFlag/text()='overwrite'">"Failed to put file: <xsl:value-of select="$local"/>"</xsl:when>
             <xsl:otherwise>"File already exists: <xsl:value-of select="$local"/>, please set CreationFlag to overwrite"</xsl:otherwise>
         </xsl:choose>
     </xsl:template>

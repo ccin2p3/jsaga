@@ -12,18 +12,22 @@
     <xsl:output method="xml" indent="yes"/>
     <xsl:strip-space elements="*"/>
     <xsl:param name="localIntermediary" select="'/tmp'"/>
-    <xsl:variable name="id">
+    <xsl:param name="collectionName">
+        <!-- default collection name (when parameter collectionName not given) -->
         <xsl:choose>
             <xsl:when test="/ext:JobCollection/ext:JobCollectionDescription/ext:JobCollectionIdentification/ext:JobCollectionName/text()">
                 <xsl:value-of select="/ext:JobCollection/ext:JobCollectionDescription/ext:JobCollectionIdentification/ext:JobCollectionName/text()"/>
             </xsl:when>
-            <xsl:otherwise>
+            <xsl:when test="/ext:JobCollection/ext:Job/jsdl:JobDefinition/jsdl:JobDescription/jsdl:JobIdentification/jsdl:JobName/text()">
                 <xsl:value-of select="/ext:JobCollection/ext:Job/jsdl:JobDefinition/jsdl:JobDescription/jsdl:JobIdentification/jsdl:JobName/text()"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="generate-id(/ext:JobCollection)"/>
             </xsl:otherwise>
         </xsl:choose>
-    </xsl:variable>
-    <xsl:variable name="insbx" select="concat($localIntermediary,'/',$id,'/input-sandbox.tar')"/>
-    <xsl:variable name="outsbx" select="concat($localIntermediary,'/',$id,'/output-sandbox-@{INDEX}.tar')"/>
+    </xsl:param>
+    <xsl:variable name="insbx" select="concat($localIntermediary,'/',$collectionName,'/input-sandbox.tar')"/>
+    <xsl:variable name="outsbx" select="concat($localIntermediary,'/',$collectionName,'/output-sandbox-@{INDEX}.tar')"/>
 
     <!-- entry point -->
     <xsl:template match="/">
@@ -71,7 +75,7 @@
                     <ext:Shared>false</ext:Shared><!-- never shared -->
                 </DataStaging>
             </xsl:if>
-            <xsl:apply-templates select="*[not(local-name()='DataStaging' or local-name()='JobIdentification' or local-name()='Application' or local-name()='Resources')]"/>
+            <xsl:apply-templates select="*[namespace-uri()!='http://schemas.ggf.org/jsdl/2005/11/jsdl']"/>
         </JobDescription>
     </xsl:template>
 
@@ -101,8 +105,7 @@
                     </ext:Step>
                 </ext:Step>
             </xsl:for-each>
-            <xsl:apply-templates select="*[not(local-name()='Source' or local-name()='Target' or local-name()='Sandbox'
-                or local-name()='FileName' or local-name()='FilesystemName' or local-name()='CreationFlag' or local-name()='DeleteOnTermination')]"/>
+            <xsl:apply-templates select="*[namespace-uri()!='http://schemas.ggf.org/jsdl/2005/11/jsdl' and local-name()!='Sandbox']"/>
         </DataStaging>
     </xsl:template>
 

@@ -12,16 +12,6 @@
     -->
     <xsl:output method="xml" indent="yes"/>
     <xsl:strip-space elements="*"/>
-    <xsl:variable name="id">
-        <xsl:choose>
-            <xsl:when test="/ext:JobCollection/ext:JobCollectionDescription/ext:JobCollectionIdentification/ext:JobCollectionName/text()">
-                <xsl:value-of select="/ext:JobCollection/ext:JobCollectionDescription/ext:JobCollectionIdentification/ext:JobCollectionName/text()"/>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="/ext:JobCollection/ext:Job/jsdl:JobDefinition/jsdl:JobDescription/jsdl:JobIdentification/jsdl:JobName/text()"/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:variable>
 
     <!-- entry point -->
     <xsl:template match="/">
