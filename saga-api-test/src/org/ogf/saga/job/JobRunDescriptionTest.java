@@ -3,7 +3,6 @@ package org.ogf.saga.job;
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.job.abstracts.AbstractJobTest;
 import org.ogf.saga.job.abstracts.Attribute;
-import org.ogf.saga.job.abstracts.AttributeVector;
 import org.ogf.saga.task.State;
 
 /* **************************************************
@@ -48,7 +47,7 @@ public class JobRunDescriptionTest extends AbstractJobTest {
         }
         catch (NoSuccess noSuccess) {
         	// test is successful is exception instance of BadResource
-            if (!noSuccess.getClass().getName().equals("BadResource")) {
+            if (!noSuccess.getClass().getName().endsWith("BadResource")) {
                 throw noSuccess;
             }
         }
@@ -102,30 +101,43 @@ public class JobRunDescriptionTest extends AbstractJobTest {
     	// and inform the scheduler to the estimate time is 14 days
     	desc.setAttribute(JobDescription.TOTALCPUTIME, String.valueOf(60*60*24*14));
     	
-    	// submit
-        Job job = runJob(desc);
-        
-        // wait the end
-        job.waitFor();  
-        
-        // check job status
-        assertEquals(
-                State.FAILED,
-                job.getState());       
+    	Job job = null;
+    	try {
+    		// submit
+	        job = runJob(desc);
+	        
+	        // wait the end
+	        job.waitFor();  
+	        
+	        // check job status
+	        assertEquals(
+	                State.FAILED,
+	                job.getState());
+    	}
+    	catch (NoSuccess noSuccess) {
+        	// test is successful is exception instance of BadResource
+            if (!noSuccess.getClass().getName().endsWith("BadResource")) {
+                throw noSuccess;
+            }
+        }
+    	finally {
+        	if(job != null) {
+        		job.waitFor(Float.valueOf(FINALY_TIMEOUT));
+        	}
+        }
+	        
     }
     
     /**
-     * Runs simple job, requests 1 Go of memory and expects DONE status (it is just an information)
+     * Runs simple job, requests 256 Mo of memory and expects DONE status (it is just an information)
      */
     public void test_run_memoryRequirement() throws Exception {
         
-    	// prepare a job witch requires 1 Gb of RAM
+    	// prepare a job witch requires 256 Mo of RAM
     	Attribute[] attributes = new Attribute[1];
-    	attributes[0] = new Attribute(JobDescription.TOTALPHYSICALMEMORY, "1024");
-    	AttributeVector[] attributesV = new AttributeVector[1];
-    	attributesV[0] = new AttributeVector(JobDescription.ARGUMENTS, new String[]{"30"});    
-    	JobDescription desc =  createJob(LONG_JOB_BINARY, attributes, attributesV);
-    	    	
+    	attributes[0] = new Attribute(JobDescription.TOTALPHYSICALMEMORY, "256");
+    	JobDescription desc =  createJob(SIMPLE_JOB_BINARY, attributes, null);
+    	
     	// submit
         Job job = runJob(desc);
         
@@ -149,16 +161,30 @@ public class JobRunDescriptionTest extends AbstractJobTest {
     	attributes[1] = new Attribute(JobDescription.PROCESSESPERHOST, "1");
     	JobDescription desc =  createJob(SIMPLE_JOB_BINARY, attributes, null);
     	
-    	// submit
-        Job job = runJob(desc);
-        
-        // wait for the end
-        job.waitFor();  
-        
-        // check job status
-        assertEquals(
-                State.FAILED,
-                job.getState());
+    	Job job = null;
+    	try {
+    		// submit
+	        job = runJob(desc);
+	        
+	        // wait the end
+	        job.waitFor();  
+	        
+	        // check job status
+	        assertEquals(
+	                State.FAILED,
+	                job.getState());
+    	}
+    	catch (NoSuccess noSuccess) {
+        	// test is successful is exception instance of BadResource
+            if (!noSuccess.getClass().getName().endsWith("BadResource")) {
+                throw noSuccess;
+            }
+        }
+    	finally {
+        	if(job != null) {
+        		job.waitFor(Float.valueOf(FINALY_TIMEOUT));
+        	}
+        }
     }
 
 }
