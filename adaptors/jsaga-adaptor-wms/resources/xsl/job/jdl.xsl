@@ -6,7 +6,6 @@
                 xmlns:spmd="http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd"
                 xmlns:ext="http://www.in2p3.fr/jsdl-extension">
     <xsl:output method="text"/>
-    <xsl:param name="ShellPath"/>
     
     <!-- entry point (MUST BE RELATIVE) -->
     <xsl:template match="jsdl:JobDefinition">
@@ -18,25 +17,12 @@ Type = "Job";<xsl:text/>
 <!-- Rank = other.GlueCEStateFreeCPUs;<xsl:text/>  -->
 Rank = -other.GlueCEStateEstimatedResponseTime ;<xsl:text/>
         <!-- executable and arguments -->
-        <xsl:choose>
-            <xsl:when test="$ShellPath">
-Executable = "<xsl:value-of select="$ShellPath"/>";<xsl:text/>
-Arguments = "-c <xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Executable/text()"/>
-                <xsl:if test="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
-                    <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
-                        <xsl:text> </xsl:text><xsl:value-of select="."/>
-                    </xsl:for-each>
-                </xsl:if>";<xsl:text/>
-            </xsl:when>
-            <xsl:otherwise>
 Executable = "<xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Executable/text()"/>";<xsl:text/>
-                <xsl:if test="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
-Arguments = "	<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
+        <xsl:if test="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
+Arguments = " <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
                     <xsl:text> </xsl:text><xsl:value-of select="."/>
                 </xsl:for-each>";<xsl:text/>
-                </xsl:if>
-            </xsl:otherwise>
-        </xsl:choose>
+		</xsl:if>
 
         <!-- other -->
         <xsl:if test="count(jsdl:Application/posix:POSIXApplication/posix:Environment) > 0">
@@ -66,6 +52,10 @@ Requirements = <xsl:text/>
 						<!-- TODO -->
                			<xsl:when test="name()= 'jsdl:TotalCPUTime'">
 <!-- other.MaxCPUTime > <xsl:value-of select="jsdl:UpperBoundedRange/text()"/><xsl:text/>  -->
+true
+               			</xsl:when>
+               			<xsl:when test="name()= 'jsdl:TotalCPUCount'">
+<!-- other.? > <xsl:value-of select="jsdl:UpperBoundedRange/text()"/><xsl:text/>  -->
 true
  						</xsl:when>
  						<!-- OK -->        
