@@ -95,6 +95,7 @@ public class XSLTransformerFactory {
         // set transformer
         transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
         transformer.setURIResolver(uriResolver);
+        transformer.setErrorListener(new XSLLogger());
         for (Iterator it=EngineProperties.getProperties().entrySet().iterator(); it.hasNext(); ) {
             Map.Entry entry = (Map.Entry) it.next();
             transformer.setParameter((String) entry.getKey(), entry.getValue());
