@@ -94,7 +94,6 @@ public class GatekeeperJobMonitorAdaptor extends GatekeeperJobAdaptorAbstract im
         	if (e.getErrorCode() == GramException.CONNECTION_FAILED ||
             		e.getErrorCode() == GramException.JOB_QUERY_DENIAL ||
             		e.getErrorCode() == GramException.HTTP_UNFRAME_FAILED) {
-        		logger.warn("Globus job manager may be stopped: status DONE returned in unsubscribeJob() for job "+nativeJobId);
                 // ignore (Globus does not distinguish job DONE and job manager stopped)
             } else {
                 this.rethrowException(e);
