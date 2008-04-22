@@ -18,6 +18,9 @@ import org.ogf.saga.error.NoSuccess;
 public class ServiceEngineConfigurationAbstract {
     public ServiceRef[] listServiceRefByHostname(Mapping mapping, String hostname) throws NoSuccess {
         if (mapping != null) {
+            if (hostname==null && mapping.getDomainCount()>0) {
+                throw new NoSuccess("Host name is required for this protocol");
+            }
             for (int d=0; d<mapping.getDomainCount(); d++) {
                 Domain domain = mapping.getDomain(d);
                 if ((domain.getName()!=null && hostname.endsWith("."+domain.getName())) ||
