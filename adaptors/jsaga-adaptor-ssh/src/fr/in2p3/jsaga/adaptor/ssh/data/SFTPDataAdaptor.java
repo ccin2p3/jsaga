@@ -1,7 +1,5 @@
 package fr.in2p3.jsaga.adaptor.ssh.data;
 
-import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
-import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
 import fr.in2p3.jsaga.adaptor.data.read.*;
@@ -38,25 +36,12 @@ import java.util.Vector;
  * Date:   11 avril 2008
  * ***************************************************/
 
-/**
- * TODO : Test of compression
- */
-
 public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 		FileReaderGetter, FileWriterPutter, DataRename {
 	private ChannelSftp channelSftp;
-	private int compression_level = 0;
-	private static final String COMPRESSION_LEVEL = "CompressionLevel";
-
-	public SFTPDataAdaptor() {
-	}
-
+	
 	public String getType() {
 		return "sftp";
-	}
-
-	public Usage getUsage() {
-		return new UOptional(COMPRESSION_LEVEL);
 	}
 
 	public void connect(String userInfo, String host, int port,
@@ -65,26 +50,8 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 			NoSuccess {
 		super.connect(userInfo, host, port, basePath, attributes);
 		
-		if (attributes!=null && attributes.containsKey(COMPRESSION_LEVEL)) {
-			try {
-				compression_level = Integer.valueOf(((String) attributes.get(COMPRESSION_LEVEL)));
-				if(compression_level > 9 || compression_level < 0 )
-					throw new BadParameter("Invalid value for CompressionLevel attribute: "+ compression_level+ " must be in the 0-9 range.");
-			}
-			catch (NumberFormatException e) {
-				throw new BadParameter("Unable to parse CompressionLevel attribute.",e);
-			}
-		}
-		
+		// start sftp channel
 		try {
-			if (compression_level == 0) {
-				session.setConfig("compression.s2c", "none");
-				session.setConfig("compression.c2s", "none");
-			} else {
-				session.setConfig("compression_level", String.valueOf(compression_level));
-				session.setConfig("compression.s2c","zlib@openssh.com,zlib,none");
-				session.setConfig("compression.c2s","zlib@openssh.com,zlib,none");
-			}
 			Channel channel = session.openChannel("sftp");
 			channel.connect();
 			channelSftp = (ChannelSftp) channel;
