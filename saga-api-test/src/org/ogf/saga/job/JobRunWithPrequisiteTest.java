@@ -2,7 +2,6 @@ package org.ogf.saga.job;
 
 import org.ogf.saga.job.abstracts.AbstractJobTest;
 import org.ogf.saga.job.abstracts.Attribute;
-import org.ogf.saga.job.abstracts.AttributeVector;
 import org.ogf.saga.task.State;
 
 /* ***************************************************
@@ -70,30 +69,4 @@ public class JobRunWithPrequisiteTest extends AbstractJobTest {
     
     >> compile : mpicc hello.c -o helloMpi
     */
-    
-
-    /**
-     * Post-Requisite : check the environment in job stdout 
-     * Runs job with requested environment variable
-     */
-    public void test_run_environnement() throws Exception {
-        
-    	// prepare
-    	String key1 = "MYVAR1", value1="Testing1";
-    	String key2 = "MYVAR2", value2="Testing2";
-    	AttributeVector[] attributesV = new AttributeVector[1];
-    	attributesV[0] = new AttributeVector(JobDescription.ENVIRONMENT, new String[]{key1+"="+value1, key2+"="+value2 });
-    	JobDescription desc =  createJob("/bin/env", null, attributesV);
-    	
-    	// submit
-        Job job = runJob(desc);
-        
-        // wait for the end
-        job.waitFor();       
-
-        // check job for DONE status
-        assertEquals(
-    		job.getState(),
-    		State.DONE);
-    }
 }
