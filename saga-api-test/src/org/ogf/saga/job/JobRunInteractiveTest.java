@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 
 import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.job.abstracts.AbstractJobTest;
+import org.ogf.saga.job.abstracts.AttributeVector;
 import org.ogf.saga.task.State;
 
 /* ***************************************************
@@ -107,4 +108,43 @@ public class JobRunInteractiveTest extends AbstractJobTest {
         	System.err.println("WARNING : "+this.getName()+" not implemented in plugin");
         }
     }
+	
+	
+	/**
+	 * check the environment in job stdout 
+	 * Runs job with requested environment variable
+	 */
+	public void test_run_environnement() throws Exception {
+	    
+		// prepare
+		String env1 = "MYVAR1=Testing 1";
+		String env2 = "MYVAR2=Testing two";
+		AttributeVector[] attributesV = new AttributeVector[1];
+		attributesV[0] = new AttributeVector(JobDescription.ENVIRONMENT, new String[]{env1, env2});
+		JobDescription desc =  createJob("/bin/env", null, attributesV);
+		
+		// submit
+	    Job job = runJob(desc);
+	    
+	    // wait for the end
+	    job.waitFor();  
+	    
+	    // check stdout
+	    boolean containsEnv1 = false, containsEnv2 = false;
+    	BufferedReader jobStdoutReader = new BufferedReader( new InputStreamReader(job.getStdout()));       
+	    String input;
+	    while ((input = jobStdoutReader.readLine()) !=null ){
+        	System.out.println(input);
+        	if(input.indexOf(env1) > -1) {
+        		containsEnv1 = true;
+        	}
+        	if(input.indexOf(env2) > -1) {
+        		containsEnv2 = true;
+        	}
+        }
+    	// check
+        assertEquals(
+        		containsEnv1 && containsEnv2,
+                true);
+	}
 }
