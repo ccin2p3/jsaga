@@ -9,12 +9,14 @@ import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
 import org.globus.common.CoGProperties;
 import org.globus.gram.Gram;
 import org.globus.gram.GramException;
+import org.globus.gram.GramJob;
 import org.globus.gram.internal.GRAMProtocolErrorConstants;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.error.*;
 
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.util.Map;
 
@@ -27,14 +29,15 @@ import java.util.Map;
 * Date:   16 nov. 2007
 * ***************************************************
 * Description:                                      */
-/**
- *
- */
+
 public abstract class GatekeeperJobAdaptorAbstract implements SagaSecureAdaptor {
     protected GSSCredential m_credential;
     protected String m_serverUrl;
-    protected static boolean twoPhaseUsed = false;
-    private static final String IP_ADDRESS = "IPAddress";
+    protected static final String IP_ADDRESS = "IPAddress";
+
+    public String getType() {
+        return "gatekeeper";
+    }
     
     public Class[] getSupportedSecurityAdaptorClasses() {
         return new Class[]{GSSCredentialSecurityAdaptor.class};
@@ -47,20 +50,7 @@ public abstract class GatekeeperJobAdaptorAbstract implements SagaSecureAdaptor 
     public int getDefaultPort() {
         return 2119;
     }
-    
-    public Usage getUsage() {
-        return new UOptional(IP_ADDRESS);
-    }
-
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
-    	try {
-			String defaultIp = InetAddress.getLocalHost().getHostAddress();
-	    	return new Default[]{new Default(IP_ADDRESS, defaultIp)};
-		} catch (UnknownHostException e) {
-			return null;
-		}
-    }
-
+   
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
     	if(basePath.indexOf("=") > -1)
     		m_serverUrl = host+":"+port+":"+basePath;
@@ -98,5 +88,16 @@ public abstract class GatekeeperJobAdaptorAbstract implements SagaSecureAdaptor 
 
     public void disconnect() throws NoSuccess {
         m_serverUrl = null;
+    }
+    
+
+    protected GramJob getGramJobById(String nativeJobId) throws NoSuccess {
+        GramJob job = new GramJob(m_credential, null);
+        try {
+            job.setID(nativeJobId);
+        } catch (MalformedURLException e) {
+            throw new NoSuccess(e);
+        }
+        return job;
     }
 }

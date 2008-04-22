@@ -1,6 +1,11 @@
 package fr.in2p3.jsaga.adaptor.job;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Map;
+
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.monitor.*;
 
@@ -10,9 +15,6 @@ import org.globus.gram.internal.GRAMConstants;
 import org.globus.gram.internal.GRAMProtocolErrorConstants;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.error.*;
-
-import java.net.MalformedURLException;
-import java.util.Map;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -26,43 +28,30 @@ import java.util.Map;
 /**
  *
  */
-public class GatekeeperJobMonitorAdaptor extends GatekeeperJobAdaptorAbstract implements QueryIndividualJob, ListenIndividualJob {
-	private Logger logger = Logger.getLogger(GatekeeperJobMonitorAdaptor.class.getName());
-	
-    public String getType() {
-        return "gatekeeper";
-    }
+public class GatekeeperJobMonitorAdaptor extends GatekeeperJobAdaptorAbstract implements QueryIndividualJob , ListenIndividualJob  {
+	private Logger logger = Logger.getLogger(GatekeeperJobMonitorAdaptor.class.getName());	
 
     public Usage getUsage() {
-        return null;    // no usage
+        return new UOptional(IP_ADDRESS);
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectState {
-        return null;    // no default
+    	try {
+			String defaultIp = InetAddress.getLocalHost().getHostAddress();
+	    	return new Default[]{new Default(IP_ADDRESS, defaultIp)};
+		} catch (UnknownHostException e) {
+			return null;
+		}
     }
-
+    
     public JobStatus getStatus(String nativeJobId) throws Timeout, NoSuccess {    	
-        GramJob job = this.getGramJobById(nativeJobId);
+        GramJob job = getGramJobById(nativeJobId);
         try {
         	Gram.jobStatus(job);
-        	// TODO : move to cleanup
-            // TODO : test if twoPhaseUsed is needed when moved in cleanup
-        	if(GatekeeperJobAdaptorAbstract.twoPhaseUsed && 
-        			(job.getStatus() == GRAMConstants.STATUS_DONE ||
-        			job.getStatus() == GRAMConstants.STATUS_FAILED)) {
-        		try {
-        			// Send signal to clean jobmanager
-    				job.signal(GRAMConstants.SIGNAL_COMMIT_END);
-    			} catch (GramException e) {
-    				logger.warn("Unable to send commit end signal", e);
-    			} catch (GSSException e) {
-    				logger.warn("Unable to send commit end signal", e);
-    			}
-        	}
         } catch (GramException e) {
             if (e.getErrorCode() == GramException.ERROR_CONTACTING_JOB_MANAGER) {
                 //WARNING: Globus does not distinguish job DONE and job manager stopped
-            	logger.warn("Globus job manager may be stopped: status DONE returned in getStatus()");
+            	logger.warn("Globus job manager may be stopped: status DONE returned in getStatus() for job "+nativeJobId);
                 return new GatekeeperJobStatus(nativeJobId, new Integer(GRAMConstants.STATUS_DONE), "DONE");
             } else {
                 this.rethrowException(e);
@@ -74,7 +63,7 @@ public class GatekeeperJobMonitorAdaptor extends GatekeeperJobAdaptorAbstract im
     }
 
     public void subscribeJob(String nativeJobId, JobStatusNotifier notifier) throws Timeout, NoSuccess {
-        GramJob job = this.getGramJobById(nativeJobId);
+        GramJob job = getGramJobById(nativeJobId);
         GramJobListener listener = new GatekeeperJobStatusListener(notifier);
         job.addListener(listener);
         try {
@@ -85,7 +74,7 @@ public class GatekeeperJobMonitorAdaptor extends GatekeeperJobAdaptorAbstract im
             		e.getErrorCode() == GramException.JOB_QUERY_DENIAL ||
             		e.getErrorCode() == GramException.HTTP_UNFRAME_FAILED) {
                 //WARNING: Globus does not distinguish job DONE and job manager stopped
-            	logger.warn("Globus job manager may be stopped: status DONE returned in subscribeJob()");
+            	logger.warn("Globus job manager may be stopped: status DONE returned in subscribeJob() for job "+nativeJobId);
                 GatekeeperJobStatus status = new GatekeeperJobStatus(nativeJobId, new Integer(GRAMConstants.STATUS_DONE), "DONE");
                 notifier.notifyChange(status);
             } else {
@@ -98,14 +87,14 @@ public class GatekeeperJobMonitorAdaptor extends GatekeeperJobAdaptorAbstract im
     }
 
     public void unsubscribeJob(String nativeJobId) throws Timeout, NoSuccess {
-        GramJob job = this.getGramJobById(nativeJobId);
+        GramJob job = getGramJobById(nativeJobId);
         try {
             job.unbind();
         } catch (GramException e) {
         	if (e.getErrorCode() == GramException.CONNECTION_FAILED ||
             		e.getErrorCode() == GramException.JOB_QUERY_DENIAL ||
             		e.getErrorCode() == GramException.HTTP_UNFRAME_FAILED) {
-        		logger.warn("Globus job manager may be stopped: status DONE returned in unsubscribeJob()");
+        		logger.warn("Globus job manager may be stopped: status DONE returned in unsubscribeJob() for job "+nativeJobId);
                 // ignore (Globus does not distinguish job DONE and job manager stopped)
             } else {
                 this.rethrowException(e);
@@ -114,16 +103,6 @@ public class GatekeeperJobMonitorAdaptor extends GatekeeperJobAdaptorAbstract im
             throw new NoSuccess(e);
         }
         //NOTICE: no need to remove GramJobListener since job is unregistered from CallbackHandler
-    }
-
-    private GramJob getGramJobById(String nativeJobId) throws NoSuccess {
-        GramJob job = new GramJob(m_credential, null);
-        try {
-            job.setID(nativeJobId);
-        } catch (MalformedURLException e) {
-            throw new NoSuccess(e);
-        }
-        return job;
     }
 
     private void rethrowException(GramException e) throws Timeout, NoSuccess {
