@@ -1,9 +1,11 @@
 package fr.in2p3.jsaga.adaptor.job;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
 import org.apache.log4j.Logger;
@@ -14,7 +16,8 @@ import org.globus.rsl.*;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.error.*;
 
-import java.net.MalformedURLException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Map;
 
 /* ***************************************************
@@ -26,24 +29,27 @@ import java.util.Map;
 * Date:   9 nov. 2007
 * ***************************************************
 * Description:                                      */
-/**
- *
- */
-public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract implements JobControlAdaptor {
-    private static final String SHELLPATH = "ShellPath";
+
+public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract implements JobControlAdaptor, CleanableJobAdaptor {
+    
+	private static final String SHELLPATH = "ShellPath";
     private Logger logger = Logger.getLogger(GatekeeperJobControlAdaptor.class);
     private Map m_parameters;
-
-    public String getType() {
-        return "gatekeeper";
-    }
-
+    private boolean twoPhaseUsed = false;    
+    
     public Usage getUsage() {
-        return new UOptional(SHELLPATH);
+        return new UAnd(new Usage[] {
+        		new UOptional(SHELLPATH),
+        		new UOptional(IP_ADDRESS)});
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectState {
-        return null;    // no default
+    	try {
+			String defaultIp = InetAddress.getLocalHost().getHostAddress();
+	    	return new Default[]{new Default(IP_ADDRESS, defaultIp)};
+		} catch (UnknownHostException e) {
+			return null;
+		}
     }
 
     public String[] getSupportedSandboxProtocols() {
@@ -72,8 +78,10 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
         m_parameters = null;
     }
 
-    public String submit(String jobDesc, boolean checkMatch) throws PermissionDenied, Timeout, NoSuccess {
-        RslNode rslTree;
+    public String submit(String jobDesc, boolean checkMatch) 
+    	throws PermissionDenied, Timeout, NoSuccess, BadResource {
+    	
+    	RslNode rslTree;
         try {
         	rslTree = RSLParser.parse(jobDesc);
         } catch (ParseException e) {
@@ -83,15 +91,21 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
         if(checkMatch) {
 			logger.debug("CheckMatch not supported");
 		}
-        
-        GramJob job = new GramJob(m_credential, rslTree.toRSL(true));
+        GramJob job = new GramJob(m_credential,rslTree.toRSL(true));
         try {
         	try {
         		// boolean set if the job is not interactive
             	Gram.request(m_serverUrl, job, false);
+            	logger.warn("'two_phase' attribute was ignored.");
         	}
         	catch (WaitingForCommitException e) {
         		// send signal to start job
+        		try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
         		job.signal(GRAMConstants.SIGNAL_COMMIT_REQUEST);
         		twoPhaseUsed = true;        		
         	}
@@ -104,12 +118,7 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
     }
 
     public void cancel(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess {
-        GramJob job = new GramJob(m_credential, null);
-        try {
-            job.setID(nativeJobId);
-        } catch (MalformedURLException e) {
-            throw new NoSuccess(e);
-        }
+        GramJob job = getGramJobById(nativeJobId);
         try {
             job.cancel();
         } catch (GramException e) {
@@ -145,8 +154,10 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
         return errorCode==0;
     }*/
 
-    private void rethrowException(GramException e) throws PermissionDenied, Timeout, NoSuccess {
-        switch(e.getErrorCode()) {
+    private void rethrowException(GramException e) throws PermissionDenied, Timeout, NoSuccess , BadResource{
+    	switch(e.getErrorCode()) {
+    		case GRAMProtocolErrorConstants.BAD_DIRECTORY:
+    			throw new BadResource(e);
             case GRAMProtocolErrorConstants.ERROR_AUTHORIZATION:
                 throw new PermissionDenied(e);
             case GRAMProtocolErrorConstants.INVALID_JOB_CONTACT:
@@ -156,4 +167,19 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
                 throw new NoSuccess(e);
         }
     }
+
+	public void clean(String nativeJobId) throws PermissionDenied, Timeout,
+			NoSuccess {
+		try {
+			if(twoPhaseUsed ) {
+				GramJob job = getGramJobById(nativeJobId);			
+				// Send signal to clean jobmanager
+				job.signal(GRAMConstants.SIGNAL_COMMIT_END);
+			}
+		} catch (GramException e) {
+			throw new NoSuccess("Unable to send commit end signal", e);
+		} catch (GSSException e) {
+			throw new NoSuccess("Unable to send commit end signal", e);
+		}
+	}
 }
