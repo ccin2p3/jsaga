@@ -36,13 +36,20 @@ import java.util.Map;
 * Author: Nicolas DEMESY (nicolas.demesy@bt.com)
 * Date:   11 avril 2008
 * ***************************************************/
+
+/**
+ * TODO : Test of compression
+ */
+
 public abstract class SSHAdaptorAbstract implements SagaSecureAdaptor {
 	
-	public static final String KNOWN_HOSTS = "KnownHosts";
+	protected static final String COMPRESSION_LEVEL = "CompressionLevel";
+	protected static final String KNOWN_HOSTS = "KnownHosts";
 	protected Session session;
 	protected static Map sessionMap = new HashMap();
 	private SecurityAdaptor securityAdaptor;
-	
+	private int compression_level = 0;
+
     public Class[] getSupportedSecurityAdaptorClasses() {
         return new Class[]{UserPassSecurityAdaptor.class, SSHSecurityAdaptor.class};
     }
@@ -58,7 +65,8 @@ public abstract class SSHAdaptorAbstract implements SagaSecureAdaptor {
     public Usage getUsage() {
     	return new UAnd(
       			 new Usage[]{
-      					 new UOptional(KNOWN_HOSTS)});
+      					 new UOptional(KNOWN_HOSTS),
+      					 new UOptional(COMPRESSION_LEVEL)});
     }
 
     public Default[] getDefaults(Map map) throws IncorrectState {
@@ -109,7 +117,28 @@ public abstract class SSHAdaptorAbstract implements SagaSecureAdaptor {
     		if (!attributes.containsKey(KNOWN_HOSTS)) {
     			session.setConfig("StrictHostKeyChecking", "no");
     		}
-			session.connect();
+    		
+    		// checking compression level
+    		if (attributes!=null && attributes.containsKey(COMPRESSION_LEVEL)) {
+    			try {
+    				compression_level = Integer.valueOf(((String) attributes.get(COMPRESSION_LEVEL)));
+    				if(compression_level > 9 || compression_level < 0 )
+    					throw new BadParameter("Invalid value for CompressionLevel attribute: "+ compression_level+ " must be in the 0-9 range.");
+    			}
+    			catch (NumberFormatException e) {
+    				throw new BadParameter("Unable to parse CompressionLevel attribute.",e);
+    			}
+    		}
+			if (compression_level == 0) {
+				session.setConfig("compression.s2c", "none");
+				session.setConfig("compression.c2s", "none");
+			} else {
+				session.setConfig("compression_level", String.valueOf(compression_level));
+				session.setConfig("compression.s2c","zlib@openssh.com,zlib,none");
+				session.setConfig("compression.c2s","zlib@openssh.com,zlib,none");
+			}
+			// oonnect
+    		session.connect();
     	} catch (JSchException e) {
     		if(e.getMessage().equals("Auth fail"))
     			throw new AuthenticationFailed(e);
