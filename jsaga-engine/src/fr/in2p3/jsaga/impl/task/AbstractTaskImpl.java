@@ -112,7 +112,39 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
     }
 
     public boolean waitFor(float timeoutInSeconds) throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+        // returns immediatly if already finished
+        if (this.isDone_LocalCheckOnly()) {
+            return true;
+        }
+
+        // start listening
         this.startListening(m_metric_TaskState); //WARN: do not breakpoint here (because this may change behavior)
+        // fixme: the code below avoids querying the status of finished tasks, but it makes test_simultaneousShortJob hanging with personal-gatekeeper...  :-(
+        /*int cookie;
+        try {
+            cookie = m_metric_TaskState.addCallback(new Callback(){
+                public boolean cb(Monitorable mt, Metric metric, Context ctx) throws NotImplemented, AuthorizationFailed {
+                    boolean stayRegistered;
+                    MetricImpl<State> m = (MetricImpl<State>) metric;
+                    switch(m.getValue()) {
+                        case DONE:
+                        case CANCELED:
+                        case FAILED:
+                            stayRegistered = false;
+                            break;
+                        default:
+                            stayRegistered = true;
+                            break;
+                    }
+                    return stayRegistered;
+                }
+            });
+        }
+        catch (AuthenticationFailed e) {throw new NoSuccess(e);}
+        catch (AuthorizationFailed e) {throw new NoSuccess(e);}
+        catch (PermissionDenied e) {throw new NoSuccess(e);}*/
+
+        // loop until task is finished (done, canceled or failed)
         try {
             boolean forever;
             long endTime;
@@ -131,8 +163,22 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
                 Thread.currentThread().sleep(100);
             }
         } catch (InterruptedException e) {/*ignore*/}
+
+        // stop listening
         this.stopListening(m_metric_TaskState);
-        return this.isDone();
+        /*{
+            // callback may have not been removed
+            try {
+                m_metric_TaskState.removeCallback(cookie);
+            }
+            catch (BadParameter e2) {throw new NoSuccess(e);}
+            catch (AuthenticationFailed e2) {throw new NoSuccess(e);}
+            catch (AuthorizationFailed e2) {throw new NoSuccess(e);}
+            catch (PermissionDenied e2) {throw new NoSuccess(e);}
+        }*/
+
+        // returns
+        return this.isDone_LocalCheckOnly();
     }
 
     // exit immediatly
@@ -167,16 +213,6 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
                 }
                 break;
         }        
-    }
-    private boolean isDone_LocalCheckOnly() {
-        switch(m_metric_TaskState.getValue()) {
-            case DONE:
-            case CANCELED:
-            case FAILED:
-                return true;
-            default:
-                return false;
-        }
     }
 
     // wait for task to be cancelled (or done, or failed)
@@ -382,5 +418,16 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
     public MetricImpl _addMetric(MetricImpl metric) throws NoSuccess {
         metric.setTask(this);
         return super._addMetric(metric);
+    }
+
+    private boolean isDone_LocalCheckOnly() {
+        switch(m_metric_TaskState.getValue()) {
+            case DONE:
+            case CANCELED:
+            case FAILED:
+                return true;
+            default:
+                return false;
+        }
     }
 }
