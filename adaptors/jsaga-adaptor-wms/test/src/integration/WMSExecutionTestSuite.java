@@ -22,9 +22,15 @@ public class WMSExecutionTestSuite extends TestSuite {
     public static class WMSJobDescriptionTest extends JobDescriptionTest {
         public WMSJobDescriptionTest() throws Exception {super("wms");}
         public void test_totalCPUCount() { super.ignore("JDL does not support this"); }
+        public void test_totalCPUTime() { super.ignore("JDL does not support this"); }
         public void test_fileTransfer() { super.ignore("not yet implemented but MUST BE REACTIVATED when implemented"); }
         public void test_cleanup() { super.ignore("JDL does not support this"); }
-        public void test_workingDirectory() { super.ignore("JDL does not support this"); }
+        public void test_workingDirectory() { super.ignore("JDL does not support this"); }        
+        public void test_threadsPerProcess() { super.ignore("JDL does not support this"); }
+        public void test_numberOfProcesses() { super.ignore("NumberOfProcesses only set with MPI"); }
+        public void test_input() { super.ignore("not supported"); }
+        public void test_output() { super.ignore("not supported"); }
+        public void test_error() { super.ignore("not supported"); }
     }
     // test cases
     public static class WMSJobRunMinimalTest extends JobRunMinimalTest {
@@ -49,7 +55,9 @@ public class WMSExecutionTestSuite extends TestSuite {
  	// test cases
     public static class WMSJobRunDescriptionTest extends JobRunDescriptionTest {
         public WMSJobRunDescriptionTest() throws Exception {super("wms");}
-//        public void test_run_inWorkingDirectory() { super.ignore("not supported"); }
+        public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
+        public void test_run_inWorkingDirectory() { super.ignore("not supported"); }
+        public void test_run_processRequirement() { super.ignore("not supported"); }
     }
 
     public WMSExecutionTestSuite() throws Exception {
