@@ -18,6 +18,22 @@ public class SSHExecutionTestSuite extends TestSuite {
     // test cases
     public static class SSHJobDescriptionTest extends JobDescriptionTest {
         public SSHJobDescriptionTest() throws Exception {super("ssh");}
+        public void test_spmdVariation() { super.ignore("not supported"); }
+        public void test_totalCPUCount() { super.ignore("not supported"); }
+        public void test_numberOfProcesses() { super.ignore("not supported"); }
+        public void test_processesPerHost() { super.ignore("not supported"); }
+        public void test_threadsPerProcess() { super.ignore("not supported"); }
+        public void test_input() { super.ignore("not supported"); }
+        public void test_output() { super.ignore("not supported"); }
+        public void test_error() { super.ignore("not supported"); }
+        public void test_fileTransfer() { super.ignore("not supported"); }
+        public void test_cleanup() { super.ignore("not supported"); }
+        public void test_totalCPUTime() { super.ignore("not supported"); }
+        public void test_totalPhysicalMemory() { super.ignore("not supported"); }
+        public void test_cpuArchitecture() { super.ignore("not supported"); }
+        public void test_operatingSystemType() { super.ignore("not supported"); }
+        public void test_candidateHosts() { super.ignore("not supported"); }
+        public void test_queue() { super.ignore("not supported"); }
      }
     
     // test cases
