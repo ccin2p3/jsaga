@@ -1,9 +1,7 @@
 package fr.in2p3.jsaga.adaptor.ssh.job;
 
-import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
-import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
-import fr.in2p3.jsaga.adaptor.ssh.SSHAdaptorAbstract;
+import java.util.Map;
+import java.util.UUID;
 
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.PermissionDenied;
@@ -11,8 +9,10 @@ import org.ogf.saga.error.Timeout;
 
 import com.jcraft.jsch.ChannelExec;
 
-import java.util.Date;
-import java.util.Map;
+import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
+import fr.in2p3.jsaga.adaptor.ssh.SSHAdaptorAbstract;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -54,16 +54,25 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 		try {
 
 			ChannelExec channel = (ChannelExec) session.openChannel("exec");
-			channel.setCommand(commandLine);
+
+			String jobId = UUID.randomUUID().toString();
+			String cde = "eval '"+commandLine+" &' ; " +
+					"MYPID=$! ; " +
+					"echo $MYPID > ."+jobId+" ;" +
+					"wait $MYPID;" +
+					"ENDCODE=$?;" +
+					"rm -f ."+ jobId + ";"  +
+					"exit $ENDCODE;";
 			
+			//commandLine
+			channel.setCommand(cde);
 			// start job
-			channel.connect();
+			channel.connect();	
 			
 			// add channel in sessionMap
-			String jobId = String.valueOf(new Date().getTime());
 			SSHAdaptorAbstract.sessionMap.put(jobId, channel);
-			
 			return jobId;
+			
 		} catch (Exception e) {
 			throw new NoSuccess(e);
 		}
@@ -72,19 +81,28 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 	public void cancel(String nativeJobId) throws PermissionDenied, Timeout,
 			NoSuccess {
 		try {
-
+			
+			ChannelExec channelCancel = (ChannelExec) session.openChannel("exec");
+			channelCancel.setCommand("MYPID=`cat ."+nativeJobId+"`; kill $MYPID ;");
+			// start cancel
+			channelCancel.connect();
+			while(!channelCancel.isClosed()) {
+				Thread.sleep(100);
+			}
+			channelCancel.disconnect();
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new NoSuccess(e);
 		}
 	}
 
 	public void clean(String nativeJobId) throws PermissionDenied, Timeout,
 			NoSuccess {
-		
 		ChannelExec channel = (ChannelExec) SSHAdaptorAbstract.sessionMap.get(nativeJobId);
 		if(channel.isClosed()) {
 			channel.disconnect();
 		}
+		SSHAdaptorAbstract.sessionMap.remove(channel);
 	}
 
 }
