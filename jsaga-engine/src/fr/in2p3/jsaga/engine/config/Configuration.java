@@ -70,6 +70,10 @@ public class Configuration {
         File baseDir = new File(Base.JSAGA_VAR, "jsaga-config");
         if(!baseDir.exists()) baseDir.mkdir();
 
+        // force using the JDK 1.5 implementation of Transformer
+        System.setProperty("javax.xml.transform.TransformerFactory",
+                "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl");
+
         // configure log4j
         File log4jConfig = EngineProperties.getFile(EngineProperties.LOG4J_CONFIGURATION);
         if (log4jConfig.exists()) {
