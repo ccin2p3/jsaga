@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 public class NamespaceList extends AbstractCommand {
     private static final String OPT_HELP = "h", LONGOPT_HELP = "help";
     private static final String OPT_LONG = "l", LONGOPT_LONG = "long";
+    private static final String OPT_NOWILDCARD = "n", LONGOPT_NOWILDCARD = "no-wildcard";
 
     public NamespaceList() {
         super("jsaga-ls", new String[]{"URL"}, new String[]{OPT_HELP, LONGOPT_HELP});
@@ -47,7 +48,7 @@ public class NamespaceList extends AbstractCommand {
             String arg = command.m_nonOptionValues[0];
             URL url;
             String pattern;
-            if (SAGAPattern.hasWildcard(arg)) {
+            if (SAGAPattern.hasWildcard(arg) && !line.hasOption(OPT_NOWILDCARD)) {
                 Matcher matcher = Pattern.compile("((.*)/)*(.*/)/*").matcher(arg);
                 if (matcher.matches() && matcher.groupCount()>1) {
                     url = URLFactory.create(matcher.group(1));
@@ -94,6 +95,10 @@ public class NamespaceList extends AbstractCommand {
                 .isRequired(false)
                 .withLongOpt(LONGOPT_LONG)
                 .create(OPT_LONG));
+        opt.addOption(OptionBuilder.withDescription("Disable interpretation of wildcards")
+                .isRequired(false)
+                .withLongOpt(LONGOPT_NOWILDCARD)
+                .create(OPT_NOWILDCARD));
         return opt;
     }
 }

@@ -18,6 +18,13 @@ import org.ogf.saga.error.*;
  */
 public class URLFactory {
     public static URL create(String url) throws NotImplemented, BadParameter, NoSuccess {
-        return new URL(JSagaURL.encodePath(url));
+        if (url.startsWith("file://")) {
+            return new URL(JSagaURL.encodePath(url));
+        } else if (url.startsWith("srb://") || url.startsWith("irods://")) {
+            return new URL(JSagaURL.encodeUrl(url));
+        } else {
+            // default choice
+            return new URL(JSagaURL.encodeUrl(url));
+        }
     }
 }
