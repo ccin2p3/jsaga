@@ -46,6 +46,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.logging.Level;
 
 
 /* ***************************************************
@@ -57,8 +58,7 @@ import java.util.Map;
 * Date:   18 fev. 2008
 * ***************************************************/
 /**
- * TODO : Update JDL with CPUARCHITECTURE, OPERATINGSYSTEMTYPE; TotalCPUTime
- * TODO : Verify test_run_cpuTimeRequirement and test_run_processRequirement : Done in spite of Failed
+ * TODO : Support of jsdl:TotalCPUTime, jsdl:OperatingSystemType, jsdl:TotalCPUCount
  * TODO : Test MPI jobs
  */
 public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobControlAdaptor, CleanableJobAdaptor{
