@@ -19,7 +19,7 @@ Rank = -other.GlueCEStateEstimatedResponseTime ;<xsl:text/>
         <!-- executable and arguments -->
 Executable = "<xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Executable/text()"/>";<xsl:text/>
         <xsl:if test="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
-Arguments = " <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
+Arguments = "<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
                     <xsl:text> </xsl:text><xsl:value-of select="."/>
                 </xsl:for-each>";<xsl:text/>
 		</xsl:if>
@@ -30,76 +30,31 @@ Environment = {<xsl:text/>
       		<xsl:for-each
                select="jsdl:Application/posix:POSIXApplication/posix:Environment">
                	<xsl:if test="position() = 1">
-               		"<xsl:text/><xsl:value-of select="@name"/>=<xsl:value-of select="text()"/>"<xsl:text/>
+"<xsl:text/><xsl:value-of select="@name"/>=<xsl:value-of select="text()"/>"<xsl:text/>
                	</xsl:if>
                 <xsl:if test="position() > 1">
-                		, "<xsl:text/><xsl:value-of select="@name"/>=<xsl:value-of select="text()"/>"<xsl:text/>
+, "<xsl:value-of select="@name"/>=<xsl:value-of select="text()"/>"<xsl:text/>
                 </xsl:if> 
             </xsl:for-each>
-           };<xsl:text/>
+};<xsl:text/>
           </xsl:if> 
           		
 <!--  Requirements -->
-		<xsl:choose>
-			<xsl:when test="count(jsdl:Resources/*[not( name() = 'jsdl:FileSystem')]) = 0 and 
-			count(jsdl:Application/spmd:SPMDApplication/spmd:ProcessesPerHost) > 0"> 
-Requirements = (other.GlueCEInfoTotalCPUs >= <xsl:value-of select="jsdl:Application/spmd:SPMDApplication/spmd:ProcessesPerHost"/>);<xsl:text/>
-			</xsl:when>
-			<xsl:when test="count(jsdl:Resources/*[not( name() = 'jsdl:FileSystem')]) > 0">
-Requirements = <xsl:text/>
-				<xsl:for-each select="jsdl:Resources/*[not( name() = 'jsdl:FileSystem')]">					  
-					<xsl:choose>
-						<!-- TODO -->
-               			<xsl:when test="name()= 'jsdl:TotalCPUTime'">
-<!-- other.MaxCPUTime > <xsl:value-of select="jsdl:UpperBoundedRange/text()"/><xsl:text/>  -->
-true
-               			</xsl:when>
-               			<xsl:when test="name()= 'jsdl:TotalCPUCount'">
-<!-- other.? > <xsl:value-of select="jsdl:UpperBoundedRange/text()"/><xsl:text/>  -->
-true
- 						</xsl:when>
- 						<!-- OK -->        
-                		<xsl:when test="name()= 'jsdl:TotalPhysicalMemory'">
-other.GlueHostMainMemoryRAMSize >= <xsl:value-of select="jsdl:UpperBoundedRange/text()"/><xsl:text/>
-           				</xsl:when>
-           				<!-- TODO -->
- 						<xsl:when test="name()= 'jsdl:CPUArchitecture'">
-other.GlueSubClusterPlatformType == "<xsl:value-of select="jsdl:CPUArchitectureName"/>"<xsl:text/>
- 						</xsl:when>
- 						<!-- TODO -->
-						<xsl:when test="name()= 'jsdl:OperatingSystem'">
-other.OperatingSystemName == "<xsl:value-of select="jsdl:OperatingSystemType/jsdl:OperatingSystemName/text()"/>"<xsl:text/>
- 						</xsl:when>  
- 						<!-- OK -->
- 						<xsl:when test="name()= 'jsdl:CandidateHosts'">
- 							<xsl:for-each select="jsdl:HostName">
-other.GlueCEInfoHostName == "<xsl:value-of select="text()"/>"<xsl:text/>
-								<xsl:if test="position() != last()">
-	                				<xsl:text/> &amp;&amp; <xsl:text/>
-	                			</xsl:if>
-							</xsl:for-each>
-						</xsl:when>
-						<xsl:otherwise>
-	    	        		<xsl:message terminate="yes">Inconsistent resource  : <xsl:value-of select="name()"/></xsl:message>
-            			</xsl:otherwise>
-	    			</xsl:choose>  		
-					<xsl:if test="position() != last()">
-                		<xsl:text/> &amp;&amp; <xsl:text/>
-                	</xsl:if>
-				</xsl:for-each>
-				<xsl:for-each select="jsdl:Application/spmd:SPMDApplication/spmd:ProcessesPerHost">
-&amp;&amp; other.GlueCEInfoTotalCPUs >= <xsl:value-of select="."/><xsl:text/>
-				</xsl:for-each>
-				<!-- OK -->
-				<xsl:for-each select="jsdl:JobIdentification/jsdl:JobAnnotation/text()">
-&amp;&amp; other.GlueCEUniqueID == "<xsl:value-of select="."/>"<xsl:text/>
-				</xsl:for-each>
-				<xsl:text/>;
-			</xsl:when>
-		    <xsl:otherwise>
-Requirements = true;<xsl:text/>
-		    </xsl:otherwise>
-	    </xsl:choose>
+Requirements = true <xsl:text/>
+		<xsl:for-each select="jsdl:Resources/jsdl:TotalPhysicalMemory/jsdl:UpperBoundedRange/text()">
+&amp;&amp; other.GlueHostMainMemoryRAMSize >= <xsl:value-of select="."/> <xsl:text/>
+		</xsl:for-each>
+ 		<xsl:for-each select="jsdl:Resources/jsdl:CandidateHosts/jsdl:HostName/text()">
+&amp;&amp; other.GlueCEInfoHostName == "<xsl:value-of select="."/>" <xsl:text/>
+		</xsl:for-each>
+		<xsl:for-each select="jsdl:Application/spmd:SPMDApplication/spmd:ProcessesPerHost/text()">
+&amp;&amp; other.GlueCEInfoTotalCPUs >= <xsl:value-of select="."/> <xsl:text/>
+		</xsl:for-each>
+		<xsl:for-each select="jsdl:JobIdentification/jsdl:JobAnnotation/text()">
+&amp;&amp; other.GlueCEUniqueID == "<xsl:value-of select="."/>" <xsl:text/>
+		</xsl:for-each>
+<xsl:text/>;
+
         <!-- TODO : To test when input sandbox will work -->
         <xsl:for-each select="jsdl:Application/spmd:SPMDApplication/spmd:SPMDVariation/text()[not(. = 'None')]">        
             <xsl:choose>
