@@ -151,7 +151,7 @@
             <element ref="tns:protocol" minOccurs="0" maxOccurs="unbounded"/>
             <element ref="tns:execution" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
-        <attribute name="localIntermediary" type="anyURI" use="required"/>
+        <attribute name="localIntermediary" type="string" use="required"/>
         <attribute name="evaluatorImpl" type="string" use="required"/>
     </complexType></element>
 </schema>
