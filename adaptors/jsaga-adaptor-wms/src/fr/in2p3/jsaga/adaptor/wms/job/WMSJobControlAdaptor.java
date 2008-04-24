@@ -57,7 +57,7 @@ import java.util.Map;
 * Date:   18 fev. 2008
 * ***************************************************/
 /**
- * TODO : Support of jsdl:TotalCPUTime, jsdl:OperatingSystemType, jsdl:TotalCPUCount
+ * TODO : Support of jsdl:TotalCPUTime, jsdl:OperatingSystemType, jsdl:TotalCPUCount, jsdl:CPUArchitecture
  * TODO : Test MPI jobs
  */
 public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobControlAdaptor, CleanableJobAdaptor{
@@ -223,16 +223,16 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract implements JobCo
 			} catch (JobAdException e) {
 				throw new NoSuccess("The job description is not valid", e);
 			}
-    		
-    		if(checkMatch) {				
+
+			if(checkMatch) {				
 				// get available CE
             	StringAndLongList result = m_client.jobListMatch(jobDesc, m_delegationId);            
             	if ( result != null ) {
     				// list of CE
     				StringAndLongType[] list = (StringAndLongType[]) result.getFile ();
-    				if (list == null)
-                        throw new BadResource("No Computing Element matching your job requirements has been found!");
-    			}
+    				if (list == null) 
+    					throw new BadResource("No Computing Element matching your job requirements has been found!");
+      			}
             	else 
             		throw new BadResource("No Computing Element matching your job requirements has been found!");
     		}
