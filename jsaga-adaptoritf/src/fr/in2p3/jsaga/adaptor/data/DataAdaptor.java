@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.data;
 
 import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
+import org.ogf.saga.error.IncorrectURL;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -15,4 +16,8 @@ import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
  *
  */
 public interface DataAdaptor extends SagaSecureAdaptor {
+    /**
+     * @return the base URL
+     */
+    public BaseURL getBaseURL() throws IncorrectURL;
 }

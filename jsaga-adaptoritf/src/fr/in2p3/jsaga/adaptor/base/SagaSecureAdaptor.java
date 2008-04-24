@@ -30,11 +30,6 @@ public interface SagaSecureAdaptor extends SagaBaseAdaptor {
     public void setSecurityAdaptor(SecurityAdaptor securityAdaptor);
 
     /**
-     * @return the default server port.
-     */
-    public int getDefaultPort();
-
-    /**
      * Connect to the server and initialize the connection with the provided <code>attributes</code>.
      * @param userInfo the user login
      * @param host the server

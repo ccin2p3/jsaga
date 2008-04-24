@@ -50,8 +50,8 @@ public class ZipDataAdaptor implements FileReaderStreamFactory{//, FileWriterPut
         // do nothing
     }
 
-    public int getDefaultPort() {
-        return 0;
+    public BaseURL getBaseURL() throws IncorrectURL {
+        return null;
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {

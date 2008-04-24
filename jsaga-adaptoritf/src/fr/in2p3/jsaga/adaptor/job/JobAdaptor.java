@@ -34,6 +34,11 @@ public interface JobAdaptor extends SagaSecureAdaptor {
     public Map getTranslatorParameters();
 
     /**
+     * @return the default server port.
+     */
+    public int getDefaultPort();
+
+    /**
      * @return the class of the job monitor implementation
      */
     public JobMonitorAdaptor getDefaultJobMonitor();

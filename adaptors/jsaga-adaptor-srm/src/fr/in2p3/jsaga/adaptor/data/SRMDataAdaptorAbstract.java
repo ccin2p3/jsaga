@@ -75,7 +75,7 @@ public abstract class SRMDataAdaptorAbstract implements DataAdaptor {
         m_credential = ((GSSCredentialSecurityAdaptor) securityAdaptor).getGSSCredential();
     }
 
-    public int getDefaultPort() {
-        return 8443;
+    public BaseURL getBaseURL() throws IncorrectURL {
+        return new BaseURL(8443);
     }
 }

@@ -5,6 +5,7 @@ import fr.in2p3.jsaga.adaptor.base.usage.U;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
+import fr.in2p3.jsaga.adaptor.data.BaseURL;
 import fr.in2p3.jsaga.adaptor.data.read.*;
 import fr.in2p3.jsaga.adaptor.data.write.*;
 import fr.in2p3.jsaga.adaptor.u6.TargetSystemInfo;
@@ -16,6 +17,7 @@ import org.ogf.saga.error.AuthorizationFailed;
 import org.ogf.saga.error.BadParameter;
 import org.ogf.saga.error.DoesNotExist;
 import org.ogf.saga.error.IncorrectState;
+import org.ogf.saga.error.IncorrectURL;
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.error.PermissionDenied;
@@ -64,6 +66,10 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
     
     public String getType() {
         return "rbyteio";
+    }
+
+    public BaseURL getBaseURL() throws IncorrectURL {
+        return new BaseURL(8080);
     }
 
     public Usage getUsage() {

@@ -15,4 +15,9 @@ import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
  *
  */
 public interface JobMonitorAdaptor extends SagaSecureAdaptor {
+    /**
+     * @return the default server port.
+     */
+    public int getDefaultPort();
+
 }

@@ -51,8 +51,8 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
         m_credential = ((GSSCredentialSecurityAdaptor) securityAdaptor).getGSSCredential();
     }
 
-    public int getDefaultPort() {
-        return 2811;
+    public BaseURL getBaseURL() throws IncorrectURL {
+        return new BaseURL(2811);
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {

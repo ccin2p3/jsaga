@@ -1,8 +1,7 @@
 package fr.in2p3.jsaga.impl.file;
 
 import fr.in2p3.jsaga.JSagaURL;
-import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
-import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
+import fr.in2p3.jsaga.adaptor.data.*;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyDelegated;
 import fr.in2p3.jsaga.adaptor.data.read.*;
@@ -158,10 +157,13 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
             }
         } else if (m_adaptor instanceof DataCopy && m_url.getScheme().equals(effectiveTarget.getScheme())) {
             try {
-                int targetPort = (effectiveTarget.getPort()>0 ? effectiveTarget.getPort() : m_adaptor.getDefaultPort());
+                BaseURL base = m_adaptor.getBaseURL();
+                if (base == null) {
+                    base = new BaseURL();
+                }
                 ((DataCopy)m_adaptor).copy(
                         m_url.getPath(),
-                        effectiveTarget.getHost(), targetPort, effectiveTarget.getPath(),
+                        effectiveTarget.getHost(), base.getPort(effectiveTarget), effectiveTarget.getPath(),
                         overwrite, m_url.getQuery());
             } catch (ParentDoesNotExist parentDoesNotExist) {
                 throw new DoesNotExist("Target parent directory does not exist: "+effectiveTarget.resolve(new URL(".")), parentDoesNotExist);
@@ -221,9 +223,13 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
                 throw new IncorrectState("Target entry already exists: "+ m_url, alreadyExists);
             }
         } else if (m_adaptor instanceof DataCopy && m_url.getScheme().equals(effectiveSource.getScheme())) {
+            BaseURL base = m_adaptor.getBaseURL();
+            if (base == null) {
+                base = new BaseURL();
+            }
             try {
                 ((DataCopy)m_adaptor).copyFrom(
-                        effectiveSource.getHost(), effectiveSource.getPort(), effectiveSource.getPath(),
+                        effectiveSource.getHost(), base.getPort(effectiveSource), effectiveSource.getPath(),
                         m_url.getPath(),
                         overwrite, m_url.getQuery());
             } catch (DoesNotExist doesNotExist) {

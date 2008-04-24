@@ -49,8 +49,8 @@ public abstract class HttpDataAdaptorAbstract extends HtmlDataAdaptorAbstract im
         }
     }
 
-    public int getDefaultPort() {
-        return 80;
+    public BaseURL getBaseURL() throws IncorrectURL {
+        return new BaseURL(80);
     }
 
     public abstract boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess;

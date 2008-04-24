@@ -50,8 +50,8 @@ public class FileDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         // do nothing
     }
 
-    public int getDefaultPort() {
-        return 0;
+    public BaseURL getBaseURL() throws IncorrectURL {
+        return null;
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {

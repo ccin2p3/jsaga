@@ -65,8 +65,8 @@ public class HttpsDataAdaptorSocketBased extends HttpDataAdaptorSocketBased impl
         m_keyManager = adaptor.getKeyManager();
     }
 
-    public int getDefaultPort() {
-        return 443;
+    public BaseURL getBaseURL() throws IncorrectURL {
+        return new BaseURL(443);
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {

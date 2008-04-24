@@ -48,7 +48,7 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
     public Default[] getDefaults(Map attributes) throws IncorrectState {return null;}
     public Class[] getSupportedSecurityAdaptorClasses() {return new Class[]{InMemoryProxySecurityAdaptor.class};}
     public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {}
-    public int getDefaultPort() {return 0;}
+    public BaseURL getBaseURL() throws IncorrectURL {return null;}
 
     public SagaDataAdaptor(URI url, GSSCredential cred) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         try {

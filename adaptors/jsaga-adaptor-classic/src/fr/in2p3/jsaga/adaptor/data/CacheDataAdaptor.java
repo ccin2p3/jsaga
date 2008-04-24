@@ -57,7 +57,7 @@ public class CacheDataAdaptor implements FileReaderStreamFactory, FileWriter {
 
     public Class[] getSupportedSecurityAdaptorClasses() {return null;}
     public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {}
-    public int getDefaultPort() {return 0;}
+    public BaseURL getBaseURL() throws IncorrectURL {return null;}
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
         m_baseURL = new URL((String) attributes.get(BASE_URL));

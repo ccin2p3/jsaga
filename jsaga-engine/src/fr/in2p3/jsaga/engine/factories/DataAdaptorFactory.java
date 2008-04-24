@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.engine.factories;
 
+import fr.in2p3.jsaga.adaptor.data.BaseURL;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.engine.config.Configuration;
@@ -107,10 +108,14 @@ public class DataAdaptorFactory extends ServiceAdaptorFactory {
         for (int i=0; i<config.getAttributeCount(); i++) {
             attributes.put(config.getAttribute(i).getName(), config.getAttribute(i).getValue());
         }
+        BaseURL base = dataAdaptor.getBaseURL();
+        if (base == null) {
+            base = new BaseURL();
+        }
+        base.setAttributes(attributes);
 
         // connect
-        int port = (url.getPort()>0 ? url.getPort() : dataAdaptor.getDefaultPort());
-        dataAdaptor.connect(url.getUserInfo(), url.getHost(), port, url.getPath(), attributes);
+        dataAdaptor.connect(base.getUserInfo(url), base.getHost(url), base.getPort(url), base.getPath(url), attributes);
         return dataAdaptor;
     }
 }

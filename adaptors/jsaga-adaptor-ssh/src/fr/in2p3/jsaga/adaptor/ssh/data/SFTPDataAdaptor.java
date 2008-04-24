@@ -1,20 +1,13 @@
 package fr.in2p3.jsaga.adaptor.ssh.data;
 
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
+import fr.in2p3.jsaga.adaptor.data.BaseURL;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
 import fr.in2p3.jsaga.adaptor.data.read.*;
 import fr.in2p3.jsaga.adaptor.data.write.*;
 import fr.in2p3.jsaga.adaptor.ssh.SSHAdaptorAbstract;
 
-import org.ogf.saga.error.AlreadyExists;
-import org.ogf.saga.error.AuthenticationFailed;
-import org.ogf.saga.error.AuthorizationFailed;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.DoesNotExist;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
-import org.ogf.saga.error.PermissionDenied;
-import org.ogf.saga.error.Timeout;
+import org.ogf.saga.error.*;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
@@ -43,6 +36,10 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 	public String getType() {
 		return "sftp";
 	}
+
+    public BaseURL getBaseURL() throws IncorrectURL {
+        return new BaseURL(22);
+    }
 
 	public void connect(String userInfo, String host, int port,
 			String basePath, Map attributes) throws NotImplemented,
