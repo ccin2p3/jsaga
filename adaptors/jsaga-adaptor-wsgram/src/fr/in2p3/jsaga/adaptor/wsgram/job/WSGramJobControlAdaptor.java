@@ -4,7 +4,6 @@ import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
-import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.axis.message.addressing.EndpointReferenceType;
 import org.globus.exec.client.GramJob;
 import org.globus.exec.utils.client.ManagedJobFactoryClientHelper;
@@ -88,7 +87,7 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
             EndpointReferenceType factoryEndpoint = ManagedJobFactoryClientHelper.getFactoryEndpoint(factoryURL, m_serverBatch);
 
             // submit job
-            gramJob.submit(factoryEndpoint, isNotInteractiveJob, true, "uuid:" + UUIDGenFactory.getUUIDGen().nextUUID());
+            gramJob.submit(factoryEndpoint, isNotInteractiveJob);
         	return gramJob.getHandle();
         } catch (GramException e) {
             return this.rethrowException(e);
