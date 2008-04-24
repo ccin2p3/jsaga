@@ -62,8 +62,7 @@
                     <CreationFlag>overwrite</CreationFlag>
                     <Source>
                         <URI>gsiftp://host/repository/helloworld.c#EGEE_proxy</URI>
-                        <!-- target is ${WorkingDirectory}/${URI%/*} instead of <FilesystemName>/<FileName> -->
-                        <ext:Process>gcc -o $EXEC $@</ext:Process><!-- $@ is reserved for ${WorkingDirectory}/${URI%/*} -->
+                        <ext:Process>gcc -o $EXEC $SOURCE</ext:Process>
                     </Source>
                     <Target>
                         <ext:Process><![CDATA[# delete the files missed by the job-wrapper]]></ext:Process>

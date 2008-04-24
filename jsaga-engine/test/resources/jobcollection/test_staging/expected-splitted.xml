@@ -21,6 +21,12 @@
                     <posix:Error>$STDERR</posix:Error>
                 </posix:POSIXApplication>
             </Application>
+            <Resources>
+                <FileSystem name="HELLOWORLD_1.1">
+                    <MountPoint>HelloWorld/1.1</MountPoint>
+                    <ext:ParentFilesystemName>ApplicationsDirectory</ext:ParentFilesystemName>
+                </FileSystem>
+            </Resources>
             <DataStaging name="C0">
                 <FileName>config0.cfg</FileName>
                 <FilesystemName>WorkingDirectory</FilesystemName>
@@ -55,8 +61,8 @@
                 <ext:Shared>true</ext:Shared>
             </DataStaging>
             <DataStaging name="E">
-                <FileName>HelloWorld/1.1/bin/executable.exe</FileName>
-                <FilesystemName>ApplicationsDirectory</FilesystemName>
+                <FileName>bin/executable.exe</FileName>
+                <FilesystemName>HELLOWORLD_1.1</FilesystemName>
                 <CreationFlag>dontOverwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source/>
@@ -69,8 +75,8 @@
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source>
-                    <URI>gsiftp://host3:2811/repository/src/executable-src.tar.gz#EGEE_proxy</URI>
-                    <ext:Process>tar xzvf $@ ; cd executable-src ; make</ext:Process>
+                    <URI>gsiftp://host3:2811/repository/src/executable-src.tar.gz#EGEE</URI>
+                    <ext:Process>tar xzvf $SOURCE ; cd executable-src ; make</ext:Process>
                 </Source>
                 <ext:CopyLocally>false</ext:CopyLocally>
                 <ext:Shared>true</ext:Shared>
@@ -81,7 +87,7 @@
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source>
-                    <URI>gsiftp://host4:2811/data/data_3.dat#OpenPlast_proxy</URI>
+                    <URI>gsiftp://host4:2811/data/data_3.dat#OpenPlast</URI>
                 </Source>
                 <ext:CopyLocally>false</ext:CopyLocally>
                 <ext:Shared>false</ext:Shared>

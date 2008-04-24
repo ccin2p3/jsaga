@@ -4,7 +4,7 @@
         <ext:JobCollectionIdentification>
             <ext:JobCollectionName>test_staging</ext:JobCollectionName>
         </ext:JobCollectionIdentification>
-        <ext:Parametric count="6" start="1" step="1"/>
+        <ext:Parametric count="3" start="1" step="1"/>
     </ext:JobCollectionDescription>
     <ext:Job>
         <JobDefinition xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl">
@@ -23,6 +23,12 @@
                         <posix:Error>$STDERR</posix:Error>
                     </posix:POSIXApplication>
                 </Application>
+                <Resources>
+                    <FileSystem name="HELLOWORLD_1.1">
+                        <MountPoint>HelloWorld/1.1</MountPoint>
+                        <ext:ParentFilesystemName>ApplicationsDirectory</ext:ParentFilesystemName>
+                    </FileSystem>                    
+                </Resources>
                 <DataStaging name="C0">
                     <FileName>config0.cfg</FileName>
                     <CreationFlag>overwrite</CreationFlag>
@@ -39,8 +45,8 @@
                     <Source><URI>http://host5:8080/public/configuration/config2.cfg</URI></Source>
                 </DataStaging>
                 <DataStaging name="E">
-                    <FileName>HelloWorld/1.1/bin/executable.exe</FileName>
-                    <FilesystemName>ApplicationsDirectory</FilesystemName>
+                    <FileName>bin/executable.exe</FileName>
+                    <FilesystemName>HELLOWORLD_1.1</FilesystemName>
                     <CreationFlag>dontOverwrite</CreationFlag>
                     <Source/>
                 </DataStaging>
@@ -48,14 +54,14 @@
                     <FileName>executable-src/bin/executable.exe</FileName>
                     <CreationFlag>overwrite</CreationFlag>
                     <Source>
-                        <URI>gsiftp://host3:2811/repository/src/executable-src.tar.gz#EGEE_proxy</URI>
-                        <ext:Process>tar xzvf $@ ; cd executable-src ; make</ext:Process>
+                        <URI>gsiftp://host3:2811/repository/src/executable-src.tar.gz#EGEE</URI>
+                        <ext:Process>tar xzvf $SOURCE ; cd executable-src ; make</ext:Process>
                     </Source>
                 </DataStaging>
                 <DataStaging name="D">
                     <FileName>data.dat</FileName>
                     <CreationFlag>overwrite</CreationFlag>
-                    <Source><URI>gsiftp://host4:2811/data/data_@{INDEX}.dat#OpenPlast_proxy</URI></Source>
+                    <Source><URI>gsiftp://host4:2811/data/data_@{INDEX}.dat#OpenPlast</URI></Source>
                 </DataStaging>
                 <DataStaging name="R">
                     <FileName>result.dat</FileName>

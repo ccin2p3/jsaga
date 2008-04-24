@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ext:Job xmlns:ext="http://www.in2p3.fr/jsdl-extension">
+    <ext:JobLifetimeManagement>
+        <ext:Retry count="3" maxTime="PT80S" status="queued"/>
+        <ext:Retry count="2" maxTime="PT6M" status="running"/>
+        <ext:Retry count="1" status="failed"/>
+    </ext:JobLifetimeManagement>
+    <JobDefinition xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl">
+        <JobDescription>
+            <JobIdentification>
+                <JobName>MYJOB_1</JobName>
+            </JobIdentification>
+            <Application>
+                <posix:POSIXApplication xmlns:posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix">
+                    <posix:Executable>$E</posix:Executable>
+                    <posix:Argument>-c0 $C0</posix:Argument>
+                    <posix:Argument>-c1 $C1</posix:Argument>
+                    <posix:Argument>-c2 $C2</posix:Argument>
+                    <posix:Input>$D</posix:Input>
+                    <posix:Output>$R</posix:Output>
+                    <posix:Error>$STDERR</posix:Error>
+                </posix:POSIXApplication>
+            </Application>
+            <Resources>
+                <FileSystem name="IntermediaryDirectory">
+                    <FileSystemType>spool</FileSystemType>
+                    <MountPoint>$INTERMERIADY_DIR</MountPoint>
+                </FileSystem>
+                <FileSystem name="ApplicationsDirectory">
+                    <FileSystemType>normal</FileSystemType>
+                    <MountPoint>$APPLICATIONS_DIR</MountPoint>
+                </FileSystem>
+                <FileSystem name="WorkingDirectory">
+                    <FileSystemType>temporary</FileSystemType>
+                    <MountPoint>$PWD</MountPoint>
+                </FileSystem>
+                <FileSystem name="HELLOWORLD_1.1">
+                    <FileSystemType>normal</FileSystemType>
+                    <MountPoint>$APPLICATIONS_DIR/HelloWorld/1.1</MountPoint>
+                </FileSystem>
+            </Resources>
+            <DataStaging name="C0">
+                <FileName>$PWD/config0.cfg</FileName>
+                <FilesystemName>$PWD</FilesystemName>
+                <CreationFlag>overwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Source>
+                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/config0.cfg#OpenPlast</URI>
+                </Source>
+                <ext:Step uri="file:///tmp/config0.cfg">
+                    <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/config0.cfg#OpenPlast"/>
+                </ext:Step>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>true</ext:Shared>
+            </DataStaging>
+            <DataStaging name="C1">
+                <FileName>$PWD/config1.cfg</FileName>
+                <FilesystemName>$PWD</FilesystemName>
+                <CreationFlag>overwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Source>
+                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/config1.cfg#OpenPlast</URI>
+                </Source>
+                <ext:Step uri="https://host2:8443/private/configuration/config1.cfg#TEST_X509">
+                    <ext:Step uri="file:///tmp/test_staging.in/config1.cfg">
+                        <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/config1.cfg#OpenPlast"/>
+                    </ext:Step>
+                </ext:Step>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>true</ext:Shared>
+            </DataStaging>
+            <DataStaging name="C2">
+                <FileName>$PWD/config2.cfg</FileName>
+                <FilesystemName>$PWD</FilesystemName>
+                <CreationFlag>overwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Source>
+                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/config2.cfg#OpenPlast</URI>
+                </Source>
+                <ext:Step uri="http://host5:8080/public/configuration/config2.cfg">
+                    <ext:Step uri="file:///tmp/test_staging.in/config2.cfg">
+                        <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/config2.cfg#OpenPlast"/>
+                    </ext:Step>
+                </ext:Step>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>true</ext:Shared>
+            </DataStaging>
+            <DataStaging name="E">
+                <FileName>$APPLICATIONS_DIR/HelloWorld/1.1/bin/executable.exe</FileName>
+                <FilesystemName>$APPLICATIONS_DIR/HelloWorld/1.1</FilesystemName>
+                <CreationFlag>dontOverwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Source/>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>true</ext:Shared>
+            </DataStaging>
+            <DataStaging name="E">
+                <FileName>$PWD/executable-src/bin/executable.exe</FileName>
+                <FilesystemName>$PWD</FilesystemName>
+                <CreationFlag>overwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Source>
+                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/executable-src.tar.gz#OpenPlast</URI>
+                    <ext:Process>tar xzvf $SOURCE ; cd executable-src ; make</ext:Process>
+                </Source>
+                <ext:Step uri="gsiftp://host3:2811/repository/src/executable-src.tar.gz#EGEE">
+                    <ext:Step uri="file:///tmp/test_staging.in/executable-src.tar.gz">
+                        <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/executable-src.tar.gz#OpenPlast"/>
+                    </ext:Step>
+                </ext:Step>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>true</ext:Shared>
+            </DataStaging>
+            <DataStaging name="D">
+                <FileName>$PWD/data.dat</FileName>
+                <FilesystemName>$PWD</FilesystemName>
+                <CreationFlag>overwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Source>
+                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/data_1.dat#OpenPlast</URI>
+                </Source>
+                <ext:Step uri="gsiftp://host4:2811/data/data_1.dat#OpenPlast">
+                    <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/data_1.dat#OpenPlast"/>
+                </ext:Step>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>false</ext:Shared>
+            </DataStaging>
+            <DataStaging name="R">
+                <FileName>$PWD/result.dat</FileName>
+                <FilesystemName>$PWD</FilesystemName>
+                <CreationFlag>overwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Target>
+                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.out/MYJOB_1/result_1.dat#OpenPlast</URI>
+                </Target>
+                <ext:Step uri="mail://sreynaud@in2p3.fr/result_1.dat">
+                    <ext:Step uri="file:///tmp/test_staging.out/MYJOB_1/result_1.dat">
+                        <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.out/MYJOB_1/result_1.dat#OpenPlast"/>
+                    </ext:Step>
+                </ext:Step>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>false</ext:Shared>
+            </DataStaging>
+            <DataStaging name="STDERR">
+                <FileName>$PWD/stderr.txt</FileName>
+                <FilesystemName>$PWD</FilesystemName>
+                <CreationFlag>overwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Target>
+                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.out/MYJOB_1/stderr_1.txt#OpenPlast</URI>
+                </Target>
+                <ext:Step uri="file:///tmp/stderr_1.txt">
+                    <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.out/MYJOB_1/stderr_1.txt#OpenPlast"/>
+                </ext:Step>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>false</ext:Shared>
+            </DataStaging>
+        </JobDescription>
+    </JobDefinition>
+</ext:Job>
