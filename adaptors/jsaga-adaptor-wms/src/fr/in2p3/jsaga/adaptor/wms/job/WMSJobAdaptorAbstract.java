@@ -1,7 +1,5 @@
 package fr.in2p3.jsaga.adaptor.wms.job;
 
-import java.io.File;
-
 import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
