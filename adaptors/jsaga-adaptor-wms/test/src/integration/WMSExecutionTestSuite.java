@@ -27,6 +27,8 @@ public class WMSExecutionTestSuite extends TestSuite {
         public void test_cleanup() { super.ignore("JDL does not support this"); }
         public void test_workingDirectory() { super.ignore("JDL does not support this"); }        
         public void test_threadsPerProcess() { super.ignore("JDL does not support this"); }
+        public void test_operatingSystemType() { super.ignore("JDL does not support this"); }
+        public void test_cpuArchitecture() { super.ignore("JDL does not support this"); }
         public void test_numberOfProcesses() { super.ignore("NumberOfProcesses only set with MPI"); }
         public void test_input() { super.ignore("not supported"); }
         public void test_output() { super.ignore("not supported"); }
