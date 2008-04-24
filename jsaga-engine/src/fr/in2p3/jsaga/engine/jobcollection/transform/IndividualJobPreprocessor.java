@@ -31,8 +31,9 @@ public class IndividualJobPreprocessor {
     private static final String XML_STAGE_GRAPH = "stage-graph.xml";
 
     private static final String XSL_1_ADD_FILESYSTEMS = "xsl/execution/job_1-add-filesystems.xsl";
-    private static final String XSL_2_SIMPLIFY = "xsl/execution/job_2-simplify.xsl";
+    private static final String XSL_2_RESOLVE_PARENT_FS = "xsl/execution/job_2-resolve-parent-fs.xsl";
     private static final String XSL_3_GENERATE_STAGE = "xsl/execution/job_3-generate-stage.xsl";
+    private static final String XSL_4_RESOLVE_FS = "xsl/execution/job_4-resolve-fs.xsl";
     private static final String XSL_UPDATE_GRAPH = "xsl/execution/graph_1-update.xsl";
 
     private Document m_effectiveJob;
@@ -60,8 +61,9 @@ public class IndividualJobPreprocessor {
         XMLDocument stageContainer = new XMLDocument(new File(baseDir, XML_STAGE_GRAPH));
         try {
             jobContainer.set(t.getCached(XSL_1_ADD_FILESYSTEMS, parameters).transform(jobDesc.getAsDocument().getDocumentElement()));
-            jobContainer.set(t.getCached(XSL_2_SIMPLIFY).transform(jobContainer.get()));
-            jobContainer.set(t.getCached(XSL_3_GENERATE_STAGE).transform(jobContainer.get()));
+            jobContainer.set(t.getCached(XSL_2_RESOLVE_PARENT_FS, parameters).transform(jobContainer.get()));
+            jobContainer.set(t.getCached(XSL_3_GENERATE_STAGE, parameters).transform(jobContainer.get()));
+            jobContainer.set(t.getCached(XSL_4_RESOLVE_FS, parameters).transform(jobContainer.get()));
             jobContainer.save();
 
             stageContainer.set(t.getCached(XSL_UPDATE_GRAPH).transform(jobContainer.get()));
