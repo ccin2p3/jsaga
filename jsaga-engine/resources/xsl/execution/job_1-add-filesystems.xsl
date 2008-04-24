@@ -18,10 +18,16 @@
 
     <!-- configuration -->
     <xsl:variable name="resourceScheme" select="substring-before($resourceId, '://')"/>
-    <xsl:variable name="config" select="document('var/jsaga-merged-config.xml')/cfg:effective-config/cfg:execution[@scheme=$resourceScheme]/cfg:jobService[@name=$gridName]"/>
+    <xsl:variable name="jobService" select="document('var/jsaga-merged-config.xml')/cfg:effective-config/cfg:execution[@scheme=$resourceScheme]/cfg:jobService[@name=$gridName]"/>
 
     <!-- entry point -->
     <xsl:template match="/">
+        <!-- check required parameters -->
+        <xsl:if test="not($resourceId)"><xsl:message terminate="yes">Missing required parameter: resourceId</xsl:message></xsl:if>
+        <xsl:if test="not($gridName)"><xsl:message terminate="yes">Missing required parameter: gridName</xsl:message></xsl:if>
+        <!-- check required elements -->
+        <xsl:if test="not($jobService)"><xsl:message terminate="yes">Missing required element: jobService[<xsl:value-of select="$gridName"/>]</xsl:message></xsl:if>
+        <!-- process -->
         <xsl:apply-templates select="ext:Job"/>
     </xsl:template>
     <xsl:template match="ext:Job">
@@ -41,7 +47,7 @@
             <xsl:apply-templates select="jsdl:JobIdentification | jsdl:Application | jsdl:Resources"/>
             <xsl:if test="not(jsdl:Resources)">
                 <Resources>
-                    <xsl:apply-templates select="$config/cfg:fileSystem"/>
+                    <xsl:apply-templates select="$jobService/cfg:fileSystem"/>
                 </Resources>
             </xsl:if>
             <xsl:apply-templates select="jsdl:DataStaging | *[namespace-uri()!='http://schemas.ggf.org/jsdl/2005/11/jsdl']"/>            
@@ -52,9 +58,13 @@
         <xsl:variable name="this" select="."/>
         <Resources>
             <xsl:copy-of select="jsdl:CandidateHosts"/>
-            <xsl:apply-templates select="$config/cfg:fileSystem[not(@name=$this/jsdl:FileSystem/@name)]"/>
+            <xsl:apply-templates select="$jobService/cfg:fileSystem[not(@name=$this/jsdl:FileSystem/@name)]"/>
             <xsl:copy-of select="*[not(local-name()='CandidateHosts')]"/>
         </Resources>
+    </xsl:template>
+
+    <xsl:template match="ext:Step">
+        <!-- remove pre/post-staging step -->
     </xsl:template>
 
     <xsl:template match="cfg:fileSystem">
