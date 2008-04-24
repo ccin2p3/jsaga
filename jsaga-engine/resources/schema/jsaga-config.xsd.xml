@@ -91,6 +91,7 @@
             </sequence>
             <attribute name="name" type="string" use="required"/>
             <attribute name="wrapperMonitoring" type="boolean" use="optional"/>
+            <attribute name="defaultIntermediary" type="anyURI" use="optional"/>
         </complexType>
     </element>
 
@@ -106,6 +107,7 @@
         <attribute name="name" type="string" use="optional"/>
         <attribute name="deactivated" type="boolean" use="optional"/>
         <attribute name="wrapperMonitoring" type="boolean" use="optional"/>
+        <attribute name="defaultIntermediary" type="anyURI" use="optional"/>
     </extension></complexContent></complexType></element>
 
     <!-- root types -->
@@ -121,7 +123,8 @@
             </sequence>
             <attribute name="name" type="string" use="required"/>
             <attribute name="wrapperMonitoring" type="boolean" use="optional"/>
-            <attribute name="localIntermediary" type="anyURI" use="optional"/><!-- root element only -->
+            <attribute name="defaultIntermediary" type="anyURI" use="optional"/>
+            <attribute name="localIntermediary" type="string" use="optional"/><!-- root element only -->
             <anyAttribute namespace="##other" processContents="lax"/>
         </complexType>
         <!-- 1 occurence of UNIVERSE/@name per configuration -->
