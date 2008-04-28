@@ -36,7 +36,10 @@
                 <panel classname="FinishPanel"/>
             </panels>
             <packs>
-                <xsl:apply-templates select="artifact"/>
+                <xsl:for-each select="artifact">
+                    <xsl:sort order="descending"/>
+                    <xsl:apply-templates select="."/>
+                </xsl:for-each>
             </packs>
         </installation>
     </xsl:template>

@@ -130,38 +130,10 @@
         </plugins>
     </reporting>
     <dependencies>
-        <!-- engine -->
-        <dependency>
-            <groupId>fr.in2p3.jsaga</groupId>
-            <artifactId>jsaga-engine</artifactId>
-            <version>0.9.2-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.in2p3.jsaga</groupId>
-            <artifactId>jsaga-engine</artifactId>
-            <version>0.9.2-SNAPSHOT</version>
-            <classifier>config</classifier>
-            <type>zip</type>
-        </dependency>
         <!-- adaptors -->
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-default</artifactId>
-            <version>0.9.2-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.in2p3.jsaga.adaptor</groupId>
-            <artifactId>jsaga-adaptor-classic</artifactId>
-            <version>0.9.2-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.in2p3.jsaga.adaptor</groupId>
-            <artifactId>jsaga-adaptor-globus</artifactId>
-            <version>0.9.2-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.in2p3.jsaga.adaptor</groupId>
-            <artifactId>jsaga-adaptor-voms</artifactId>
             <version>0.9.2-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -187,6 +159,41 @@
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-unicore6</artifactId>
+            <version>0.9.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-ssh</artifactId>
+            <version>0.9.2-SNAPSHOT</version>            
+        </dependency>
+        <!-- adaptors which are used as dependencies of other adaptors must be declared at the end -->
+        <dependency>
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-classic</artifactId>
+            <version>0.9.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-voms</artifactId>
+            <version>0.9.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-globus</artifactId>
+            <version>0.9.2-SNAPSHOT</version>
+        </dependency>
+
+        <!-- engine -->
+        <dependency>
+            <groupId>fr.in2p3.jsaga</groupId>
+            <artifactId>jsaga-engine</artifactId>
+            <version>0.9.2-SNAPSHOT</version>
+            <classifier>config</classifier>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>fr.in2p3.jsaga</groupId>
+            <artifactId>jsaga-engine</artifactId>
             <version>0.9.2-SNAPSHOT</version>
         </dependency>
     </dependencies>
