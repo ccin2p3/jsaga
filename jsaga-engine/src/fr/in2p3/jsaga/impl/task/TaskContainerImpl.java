@@ -58,7 +58,7 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
         return ObjectType.TASKCONTAINER;
     }
 
-    public int add(Task task) {
+    public int add(Task task) throws NotImplemented, Timeout, NoSuccess {
         int cookie = task.hashCode();
         m_tasks.put(cookie, task);
         return cookie;
