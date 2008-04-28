@@ -49,6 +49,7 @@
             <item name="SRM" href="adaptors/jsaga-adaptor-srm/index.html"/>
             <item name="VOMS" href="adaptors/jsaga-adaptor-voms/index.html"/>
             <item name="Unicore 6" href="adaptors/jsaga-adaptor-unicore6/index.html"/>
+            <item name="SSH" href="adaptors/jsaga-adaptor-ssh/index.html"/>
         </menu>
         <menu name="Adaptors provided by..."/>
     </body>
