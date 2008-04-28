@@ -11,6 +11,8 @@ Adaptors
 | X09              | jsaga-adaptor-classic |
 | JKS              |
 *------------------+--+
+| SSH              | jsaga-adaptor-ssh |
+*------------------+--+
 | Globus           | jsaga-adaptor-globus |
 | GlobusLegacy     |
 | GlobusRFC820     |
@@ -38,6 +40,8 @@ Adaptors
 | cache        |                             | jsaga-adaptor-classic |
 | (in construction...) |
 *--------------+--+--+
+| SFTP         | SSH                         | jsaga-adaptor-ssh |
+*--------------+--+--+
 | gsiftp       | Globus, GlobusLegacy, GlobusRFC820 | jsaga-adaptor-globus |
 | gsiftp-v1    | MyProxy, InMemoryProxy      |
 | gsiftp-v2    | VOMS                        |
@@ -52,22 +56,30 @@ Adaptors
 | lfc          | "/tmp/x509u_up$UID"         | jsaga-adaptor-lfc |
 | (in construction...) |
 *--------------+--+--+
+| srb, irods   | "~/.srb/.MdasEnv"           | jsaga-adaptor-irods |
+| (in construction...) |
+*--------------+--+--+
 
 * Execution Management Adaptors
 
 ** Job Submission Adaptors
 
-*-----------------+--+
-| <<Job Service>> | <<Module>> |
-*-----------------+--+
-| Gatekeeper      | jsaga-adaptor-globus |
-*-----------------+--+
-| WS-GRAM         | jsaga-adaptor-wsgram |
-*-----------------+--+
-| gLite-WMS       | jsaga-adaptor-wms |
-*-----------------+--+
-| Unicore 6       | jsaga-adaptor-unicore6 |
-*-----------------+--+
+*-----------------+--+--+
+| <<Job Service>> | <<Supported Context Types>> | <<Module>> |
+*-----------------+--+--+
+| SSH             | SSH                         | jsaga-adaptor-ssh |
+*-----------------+--+--+
+| Gatekeeper      | Globus, GlobusLegacy, GlobusRFC820 | jsaga-adaptor-globus |
+|                 | MyProxy, InMemoryProxy, VOMS
+*-----------------+--+--+
+| WS-GRAM         | Globus, GlobusLegacy, GlobusRFC820 | jsaga-adaptor-wsgram |
+|                 | MyProxy, InMemoryProxy, VOMS
+*-----------------+--+--+
+| gLite-WMS       | GlobusLegacy, MyProxy, VOMS | jsaga-adaptor-wms |
+|                 | InMemoryProxy
+*-----------------+--+--+
+| Unicore 6       | JKS                         | jsaga-adaptor-unicore6 |
+*-----------------+--+--+
 
 ** Langage Adaptors
 
