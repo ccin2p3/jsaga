@@ -8,6 +8,7 @@ import fr.in2p3.jsaga.adaptor.job.control.interactive.*;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorCallback;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
+import fr.in2p3.jsaga.impl.job.instance.stream.*;
 import org.apache.log4j.Logger;
 import org.ogf.saga.ObjectType;
 import org.ogf.saga.SagaObject;
@@ -173,7 +174,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
             if (m_IOHandler instanceof JobIOGetter) {
                 return ((JobIOGetter)m_IOHandler).getStdin();
             } else if (m_IOHandler instanceof JobIOSetter) {
-                throw new NotImplemented("Not implemented yet...");
+                return new PipedStdin((JobIOSetter) m_IOHandler);
             } else {
                 throw new NoSuccess("ADAPTOR ERROR: JobIOHandler must be either JobIOGetter or JobIOSetter", this);
             }
@@ -187,7 +188,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
             if (m_IOHandler instanceof JobIOGetter) {
                 return ((JobIOGetter)m_IOHandler).getStdout();
             } else if (m_IOHandler instanceof JobIOSetter) {
-                throw new NotImplemented("Not implemented yet...");
+                return new PipedStdout((JobIOSetter) m_IOHandler);
             } else {
                 throw new NoSuccess("ADAPTOR ERROR: JobIOHandler must be either JobIOGetter or JobIOSetter", this);
             }
@@ -201,7 +202,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
             if (m_IOHandler instanceof JobIOGetter) {
                 return ((JobIOGetter)m_IOHandler).getStderr();
             } else if (m_IOHandler instanceof JobIOSetter) {
-                throw new NotImplemented("Not implemented yet...");
+                return new PipedStderr((JobIOSetter) m_IOHandler);
             } else {
                 throw new NoSuccess("ADAPTOR ERROR: JobIOHandler must be either JobIOGetter or JobIOSetter", this);
             }
