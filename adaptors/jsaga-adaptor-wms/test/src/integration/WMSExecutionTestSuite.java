@@ -59,7 +59,6 @@ public class WMSExecutionTestSuite extends TestSuite {
         public WMSJobRunDescriptionTest() throws Exception {super("wms");}
         public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
         public void test_run_inWorkingDirectory() { super.ignore("not supported"); }
-        public void test_run_processRequirement() { super.ignore("not supported"); }
     }
 
     public WMSExecutionTestSuite() throws Exception {
