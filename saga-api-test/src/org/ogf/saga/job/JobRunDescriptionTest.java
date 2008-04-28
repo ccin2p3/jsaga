@@ -153,7 +153,7 @@ public class JobRunDescriptionTest extends AbstractJobTest {
     /**
      * Runs simple job and expects FAILED status
      */
-    public void test_run_processRequirement() throws Exception {
+   /* public void test_run_processRequirement() throws Exception {
         
     	// prepare a job witch requires 1 million of nodes
     	Attribute[] attributes = new Attribute[2];
@@ -185,6 +185,6 @@ public class JobRunDescriptionTest extends AbstractJobTest {
         		job.waitFor(Float.valueOf(FINALY_TIMEOUT));
         	}
         }
-    }
+    }*/
 
 }
