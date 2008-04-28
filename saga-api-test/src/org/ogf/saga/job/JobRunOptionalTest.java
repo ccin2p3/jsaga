@@ -7,6 +7,9 @@ import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.job.abstracts.AbstractJobTest;
 import org.ogf.saga.task.State;
+import org.ogf.saga.task.TaskContainer;
+import org.ogf.saga.task.TaskFactory;
+import org.ogf.saga.task.WaitMode;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -200,7 +203,7 @@ public class JobRunOptionalTest extends AbstractJobTest {
     }
     
 	/**
-     * Runs long jobs on the same time with the one job service
+     * Runs long jobs on the same time with one job service
      */
     public void test_simultaneousLongJob() throws Exception {
         
@@ -220,21 +223,22 @@ public class JobRunOptionalTest extends AbstractJobTest {
     		newJob[i].join();
 		}
     	
-    	boolean allJobsAreDone = true;
-    	for (int i = 0; i < numberOfJobs; i++) {
+    	// get job exception
+		int numberOfFailed = 0;
+		for (int i = 0; i < numberOfJobs; i++) {
     		if(newJob[i].getException() != null) {
-    			allJobsAreDone = false;
-    			throw new NoSuccess("The job number "+i+" is failed:"+newJob[i].getException().getMessage());
-    		}
+    			numberOfFailed ++;
+			}
 		}
-    	
-    	 assertEquals(
-	                true,
-	                allJobsAreDone);
+		if(numberOfFailed > 1) 
+			throw new NoSuccess(numberOfFailed + "jobs of "+numberOfJobs+" are failed.");
+		if(numberOfFailed > 0) 
+			throw new NoSuccess(numberOfFailed + "job of "+numberOfJobs+" is failed.");
+
     }
 
 	/**
-     * Runs short jobs on the same time with the one job service
+     * Runs short jobs on the same time with one job service
      */
     public void test_simultaneousShortJob() throws Exception {
         
@@ -254,16 +258,67 @@ public class JobRunOptionalTest extends AbstractJobTest {
     		newJob[i].join();
 		}
     	
-    	boolean allJobsAreDone = true;
-    	for (int i = 0; i < numberOfJobs; i++) {
+    	// get job exception
+		int numberOfFailed = 0;
+		for (int i = 0; i < numberOfJobs; i++) {
     		if(newJob[i].getException() != null) {
-    			allJobsAreDone = false;
-    			throw new NoSuccess("The job number "+i+" is failed:"+newJob[i].getException().getMessage());
-    		}
+    			numberOfFailed ++;
+			}
 		}
+		if(numberOfFailed > 1) 
+			throw new NoSuccess(numberOfFailed + "jobs of "+numberOfJobs+" are failed.");
+		if(numberOfFailed > 0) 
+			throw new NoSuccess(numberOfFailed + "job of "+numberOfJobs+" is failed.");
+		
+    	assertEquals(
+	                0,
+	                numberOfFailed);
+    }
+    
+    /**
+     * Runs short jobs on the same time with one task container
+     */
+    public void test_TaskContainer_ShortJob() throws Exception {
+        
+    	int numberOfJobs = Integer.parseInt(SIMULTANEOUS_JOB_NUMBER);
+
+    	TaskContainer taskContainer = TaskFactory.createTaskContainer();
+    	    	
+    	// create and start jobs
+    	JobService m_service = JobFactory.createJobService(m_session, m_jobservice); 
+		for (int index = 0; index < numberOfJobs; index++) {
+			// create description
+	    	JobDescription desc = JobFactory.createJobDescription();
+    		desc.setAttribute(JobDescription.EXECUTABLE, "/bin/date");
+	        desc.setAttribute(JobDescription.OUTPUT, index+"-stdout.txt");
+	        desc.setAttribute(JobDescription.ERROR, index+"-stderr.txt");
+	        // add job to task			
+			taskContainer.add(m_service.createJob(desc));
+		}
+    
+		// run
+		taskContainer.run();
+		
+		// wait the end 
+		taskContainer.waitFor(WaitMode.ALL);
     	
+		// get failed jobs
+		int numberOfFailed = 0;
+		State[] states = taskContainer.getStates();
+		for (int j = 0; j < states.length; j++) {
+			State state = states[j];
+			if(state.getValue() == State.FAILED.getValue()) {
+				numberOfFailed ++;
+			}
+		}
+		
+		if(numberOfFailed > 1) 
+			throw new NoSuccess(numberOfFailed + "jobs of "+numberOfJobs+" are failed.");
+		if(numberOfFailed > 0) 
+			throw new NoSuccess(numberOfFailed + "job of "+numberOfJobs+" is failed.");
+		
     	 assertEquals(
-	                true,
-	                allJobsAreDone);
+	                0,
+	                numberOfFailed);
     }
 }
