@@ -64,6 +64,11 @@ public class SSHExecutionTestSuite extends TestSuite {
         public void test_run_memoryRequirement() { super.ignore("not supported"); }
         public void test_run_processRequirement() { super.ignore("not supported"); }
     }
+    
+    // test cases
+    public static class SSHJobRunInteractiveTest extends JobRunInteractiveTest {
+        public SSHJobRunInteractiveTest() throws Exception {super("ssh");}
+    }
 
     public SSHExecutionTestSuite() throws Exception {
         super();
@@ -73,6 +78,7 @@ public class SSHExecutionTestSuite extends TestSuite {
         this.addTestSuite(SSHJobRunRequiredTest.class);
         this.addTestSuite(SSHJobRunOptionalTest.class);
         this.addTestSuite(SSHJobRunDescriptionTest.class);
+        this.addTestSuite(SSHJobRunInteractiveTest.class);
     }
 
     public static Test suite() throws Exception {
