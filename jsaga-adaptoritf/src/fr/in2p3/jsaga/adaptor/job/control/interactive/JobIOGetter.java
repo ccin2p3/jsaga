@@ -2,7 +2,6 @@ package fr.in2p3.jsaga.adaptor.job.control.interactive;
 
 import org.ogf.saga.error.*;
 
-import java.io.InputStream;
 import java.io.OutputStream;
 
 /* ***************************************************
@@ -17,10 +16,6 @@ import java.io.OutputStream;
 /**
  *
  */
-public interface JobIOGetter extends JobIOHandler {
+public interface JobIOGetter extends JobIOGetterPseudo {
     public OutputStream getStdin() throws PermissionDenied, Timeout, NoSuccess;
-
-    public InputStream getStdout() throws PermissionDenied, Timeout, NoSuccess;
-
-    public InputStream getStderr() throws PermissionDenied, Timeout, NoSuccess;
 }

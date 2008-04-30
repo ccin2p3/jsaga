@@ -13,4 +13,8 @@ package fr.in2p3.jsaga.adaptor.job.control.interactive;
  *
  */
 public interface JobIOHandler {
+    /**
+     * @return the identifier of the job in the grid
+     */
+    public String getJobId();
 }

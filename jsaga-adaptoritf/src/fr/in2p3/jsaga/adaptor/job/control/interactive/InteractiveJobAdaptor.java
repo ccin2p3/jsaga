@@ -3,6 +3,8 @@ package fr.in2p3.jsaga.adaptor.job.control.interactive;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import org.ogf.saga.error.*;
 
+import java.io.InputStream;
+
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -17,18 +19,11 @@ import org.ogf.saga.error.*;
  */
 public interface InteractiveJobAdaptor extends JobControlAdaptor {
     /**
-     * create a job input/output handler
-     * @return the created handler
-     */
-    public JobIOHandler createJobIOHandler();
-
-    /**
      * submit an interactive job
      * @param jobDesc the job description in the language supported by the targeted grid
      * @param checkMatch if true then check if job description matches job service before submitting job
-     * @param ioHandler the job input/output handler
-     * @param hasStdin true if getStdin() has been invoked by user application
-     * @return the identifier of the job in the grid
+     * @param stdin the job standard input stream
+     * @return the job input/output streams handler
      */
-    public String submitInteractive(String jobDesc, boolean checkMatch, JobIOHandler ioHandler, boolean hasStdin) throws PermissionDenied, Timeout, NoSuccess;
+    public JobIOHandler submitInteractive(String jobDesc, boolean checkMatch, InputStream stdin) throws PermissionDenied, Timeout, NoSuccess;
 }
