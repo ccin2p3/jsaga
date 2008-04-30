@@ -23,8 +23,9 @@ public class JobStderrInputStream extends InputStream {
     private Job m_job;
     private JobIOHandler m_ioHandler;
 
-    public JobStderrInputStream(Job job) throws NotImplemented, DoesNotExist, Timeout, NoSuccess {
+    public JobStderrInputStream(Job job, JobIOHandler ioHandler) throws NotImplemented, DoesNotExist, Timeout, NoSuccess {
         m_job = job;
+        m_ioHandler = ioHandler;
         switch(m_job.getState()) {
             case DONE:
             case CANCELED:
@@ -37,9 +38,7 @@ public class JobStderrInputStream extends InputStream {
         }
     }
 
-    public void closeJobIOHandler(JobIOHandler ioHandler) throws PermissionDenied, Timeout, NoSuccess {
-        m_ioHandler = ioHandler;
-
+    public void closeJobIOHandler() throws PermissionDenied, Timeout, NoSuccess {
         // get stream
         if (m_stream == null) {
             if (m_ioHandler instanceof JobIOGetter) {

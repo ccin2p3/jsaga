@@ -212,7 +212,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     public InputStream getStdout() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, IncorrectState, NoSuccess {
         if (this.isInteractive()) {
             if (m_stdout == null) {
-                m_stdout = new JobStdoutInputStream(this);
+                m_stdout = new JobStdoutInputStream(this, m_IOHandler);
             }
             return m_stdout;
         } else {
@@ -223,7 +223,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     public InputStream getStderr() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, IncorrectState, NoSuccess {
         if (this.isInteractive()) {
             if (m_stderr == null) {
-                m_stderr = new JobStderrInputStream(this);
+                m_stderr = new JobStderrInputStream(this, m_IOHandler);
             }
             return m_stderr;
         } else {
@@ -316,13 +316,13 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
         if (m_IOHandler != null) {  //if (isInteractive()) {
             if (m_controlAdaptor instanceof InteractiveJobAdaptor || m_controlAdaptor instanceof PseudoInteractiveJobAdaptor) {
                 if (m_stdout == null) {
-                    m_stdout = new JobStdoutInputStream(this);
+                    m_stdout = new JobStdoutInputStream(this, m_IOHandler);
                 }
-                m_stdout.closeJobIOHandler(m_IOHandler);
+                m_stdout.closeJobIOHandler();
                 if (m_stderr == null) {
-                    m_stderr = new JobStderrInputStream(this);
+                    m_stderr = new JobStderrInputStream(this, m_IOHandler);
                 }
-                m_stderr.closeJobIOHandler(m_IOHandler);
+                m_stderr.closeJobIOHandler();
             }
         }
         // cleanup job

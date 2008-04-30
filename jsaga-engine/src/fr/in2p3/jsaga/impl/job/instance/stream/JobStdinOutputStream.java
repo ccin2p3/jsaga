@@ -61,6 +61,7 @@ public class JobStdinOutputStream extends OutputStream {
         if (m_buffer!=null && m_buffer.size()>0) {
             try {
                 m_stream.write(m_buffer.toByteArray());
+                m_stream.close();
             } catch (IOException e) {
                 throw new NoSuccess(e);
             }
