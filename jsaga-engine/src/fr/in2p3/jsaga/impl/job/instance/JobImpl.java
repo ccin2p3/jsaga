@@ -19,8 +19,7 @@ import org.ogf.saga.monitoring.Metric;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.lang.Exception;
 
 /* ***************************************************
@@ -50,14 +49,39 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     private JobDescription m_jobDescription;
     private String m_nativeJobId;
     private JobIOHandler m_IOHandler;
+    private OutputStream m_stdin;
+    private InputStream m_stdout;
+    private InputStream m_stderr;
 
     /** constructor for submission */
-    public JobImpl(Session session, JobDescription jobDesc, String nativeJobDesc, JobControlAdaptor controlAdaptor, JobMonitorService monitorService) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public JobImpl(Session session, JobDescription jobDesc, String nativeJobDesc, JobControlAdaptor controlAdaptor, JobMonitorService monitorService) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
         this(session, controlAdaptor, monitorService, true);
         m_attributes.m_NativeJobDescription.setObject(nativeJobDesc);
         m_jobDescription = jobDesc;
         m_nativeJobId = null;
-        m_IOHandler = null;
+        boolean isInteractive;
+        try {
+            isInteractive = "true".equalsIgnoreCase(m_jobDescription.getAttribute(JobDescription.INTERACTIVE));
+        } catch (DoesNotExist e) {
+            isInteractive = false;
+        } catch (IncorrectState e) {
+            throw new NoSuccess(e);
+        }
+        if (isInteractive) {
+            if (m_controlAdaptor instanceof InteractiveJobAdaptor) {
+                m_IOHandler = ((InteractiveJobAdaptor)m_controlAdaptor).createJobIOHandler();
+            } else {
+                throw new NotImplemented("Interactive jobs are not supported by this adaptor: "+m_controlAdaptor.getClass().getName());
+            }
+            if (m_IOHandler == null) {
+                throw new NotImplemented("ADAPTOR ERROR: Method createJobIOHandler() must not return null: "+m_controlAdaptor.getClass().getName());
+            }
+        } else {
+            m_IOHandler = null;
+        }
+        m_stdin = null;
+        m_stdout = null;
+        m_stderr = null;
     }
 
     /** constructor for control and monitoring only */
@@ -66,6 +90,9 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
         m_jobDescription = null;
         m_nativeJobId = nativeJobId;
         m_IOHandler = null;
+        m_stdin = null;
+        m_stdout = null;
+        m_stderr = null;
     }
 
     /** common to all contructors */
@@ -87,6 +114,9 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
         clone.m_jobDescription = m_jobDescription;
         clone.m_nativeJobId = m_nativeJobId;
         clone.m_IOHandler = m_IOHandler;
+        clone.m_stdin = m_stdin;
+        clone.m_stdout = m_stdout;
+        clone.m_stderr = m_stderr;
         return clone;
     }
 
@@ -100,13 +130,24 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     protected void doSubmit() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
         try {
             String nativeJobDesc = m_attributes.m_NativeJobDescription.getObject();
-            if (isInteractive()) {
-                if (m_controlAdaptor instanceof InteractiveJobAdaptor) {
-                    m_IOHandler = ((InteractiveJobAdaptor)m_controlAdaptor).submitInteractive(nativeJobDesc, s_checkMatch);
-                    m_nativeJobId = m_IOHandler.getJobId();
-                } else {
-                    throw new NotImplemented("Interactive jobs are not supported by this adaptor: "+m_controlAdaptor.getClass().getName());
+            if (m_IOHandler!=null && m_controlAdaptor instanceof InteractiveJobAdaptor) {
+                if (m_stdin!=null && m_stdin instanceof ByteArrayOutputStream) {
+                    try{
+                        m_stdin.close();
+                        byte[] bytes = ((ByteArrayOutputStream)m_stdin).toByteArray();
+                        if (m_IOHandler instanceof JobIOSetterPseudo) {
+                            ((JobIOSetterPseudo)m_IOHandler).setStdin(new ByteArrayInputStream(bytes));
+                        } else if (m_IOHandler instanceof JobIOGetterPseudo) {
+                            OutputStream out = ((JobIOGetterPseudo)m_IOHandler).getStdin();
+                            out.write(bytes);
+                            out.close();
+                        }
+                    } catch (IOException e){
+                        throw new NoSuccess(e);
+                    }
                 }
+                boolean hasStdin = (m_stdin!=null);
+                m_nativeJobId = ((InteractiveJobAdaptor)m_controlAdaptor).submitInteractive(nativeJobDesc, s_checkMatch, m_IOHandler, hasStdin);
             } else {
                 m_nativeJobId = m_controlAdaptor.submit(nativeJobDesc, s_checkMatch);
             }
@@ -115,18 +156,6 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
             m_attributes.m_JobId.setObject(sagaJobId);
         } catch (PermissionDenied e) {
             throw new NoSuccess(e);
-        }
-    }
-    private boolean isInteractive() throws NotImplemented, PermissionDenied, IncorrectState, Timeout, NoSuccess {
-        try {
-            String interactive = m_jobDescription.getAttribute(JobDescription.INTERACTIVE);
-            return "true".equalsIgnoreCase(interactive);
-        } catch (DoesNotExist e) {
-            return false;
-        } catch (AuthenticationFailed e) {
-            throw new PermissionDenied(e);
-        } catch (AuthorizationFailed e) {
-            throw new PermissionDenied(e);
         }
     }
 
@@ -171,13 +200,18 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
 
     public OutputStream getStdin() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, IncorrectState, NoSuccess {
         if (m_IOHandler != null) {
-            if (m_IOHandler instanceof JobIOGetter) {
-                return ((JobIOGetter)m_IOHandler).getStdin();
+            if (m_stdin != null) {
+                // do nothing
+            } else if (m_IOHandler instanceof JobIOGetterPseudo || m_IOHandler instanceof JobIOSetterPseudo) {
+                m_stdin = new ByteArrayOutputStream();
+            } else if (m_IOHandler instanceof JobIOGetter) {
+                m_stdin = ((JobIOGetter)m_IOHandler).getStdin();
             } else if (m_IOHandler instanceof JobIOSetter) {
-                return new PipedStdin((JobIOSetter) m_IOHandler);
+                m_stdin = new PipedStdin((JobIOSetter) m_IOHandler);
             } else {
                 throw new NoSuccess("ADAPTOR ERROR: JobIOHandler must be either JobIOGetter or JobIOSetter", this);
             }
+            return m_stdin;
         } else {
             throw new IncorrectState("Method getStdin() is allowed on interactive jobs only", this);
         }
@@ -185,13 +219,18 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
 
     public InputStream getStdout() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, IncorrectState, NoSuccess {
         if (m_IOHandler != null) {
-            if (m_IOHandler instanceof JobIOGetter) {
-                return ((JobIOGetter)m_IOHandler).getStdout();
+            if (m_stdout != null) {
+                // do nothing
+            } else if (m_IOHandler instanceof JobIOGetterPseudo || m_IOHandler instanceof JobIOSetterPseudo) {
+                // do nothing (already set by cleanup)
+            } else if (m_IOHandler instanceof JobIOGetter) {
+                m_stdout = ((JobIOGetter)m_IOHandler).getStdout();
             } else if (m_IOHandler instanceof JobIOSetter) {
-                return new PipedStdout((JobIOSetter) m_IOHandler);
+                m_stdout = new PipedStdout((JobIOSetter) m_IOHandler);
             } else {
                 throw new NoSuccess("ADAPTOR ERROR: JobIOHandler must be either JobIOGetter or JobIOSetter", this);
             }
+            return m_stdout;
         } else {
             throw new IncorrectState("Method getStdout() is allowed on interactive jobs only", this);
         }
@@ -199,13 +238,18 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
 
     public InputStream getStderr() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, IncorrectState, NoSuccess {
         if (m_IOHandler != null) {
-            if (m_IOHandler instanceof JobIOGetter) {
-                return ((JobIOGetter)m_IOHandler).getStderr();
+            if (m_stderr != null) {
+                // do nothing
+            } else if (m_IOHandler instanceof JobIOGetterPseudo || m_IOHandler instanceof JobIOSetterPseudo) {
+                // do nothing (already set by cleanup)
+            } else if (m_IOHandler instanceof JobIOGetter) {
+                m_stderr = ((JobIOGetter)m_IOHandler).getStderr();
             } else if (m_IOHandler instanceof JobIOSetter) {
-                return new PipedStderr((JobIOSetter) m_IOHandler);
+                m_stderr = new PipedStderr((JobIOSetter) m_IOHandler);
             } else {
                 throw new NoSuccess("ADAPTOR ERROR: JobIOHandler must be either JobIOGetter or JobIOSetter", this);
             }
+            return m_stderr;
         } else {
             throw new IncorrectState("Method getStderr() is allowed on interactive jobs only", this);
         }
@@ -291,6 +335,29 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
         }
     }
 
+    private void cleanup() throws PermissionDenied, Timeout, NoSuccess {
+        // get job output and error streams
+        if (m_IOHandler!=null && m_controlAdaptor instanceof InteractiveJobAdaptor) {
+            if (m_IOHandler instanceof JobIOSetterPseudo || m_IOHandler instanceof JobIOGetterPseudo) {
+                if (m_IOHandler instanceof JobIOSetterPseudo) {
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    ((JobIOSetterPseudo)m_IOHandler).setStdout(out);
+                    m_stdout = new ByteArrayInputStream(out.toByteArray());
+                    ByteArrayOutputStream err = new ByteArrayOutputStream();
+                    ((JobIOSetterPseudo)m_IOHandler).setStderr(err);
+                    m_stderr = new ByteArrayInputStream(err.toByteArray());
+                } else if (m_IOHandler instanceof JobIOGetterPseudo) {
+                    m_stdout = ((JobIOGetterPseudo)m_IOHandler).getStdout();
+                    m_stderr = ((JobIOGetterPseudo)m_IOHandler).getStderr();
+                }
+            }
+        }
+        // cleanup job
+        if (m_controlAdaptor instanceof CleanableJobAdaptor) {
+            ((CleanableJobAdaptor)m_controlAdaptor).clean(m_nativeJobId);
+        }
+    }
+
     ////////////////////////////////////// implementation of JobMonitorCallback //////////////////////////////////////
 
     public void setState(State state, String stateDetail, SubState subState) {
@@ -307,9 +374,9 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
             m_metrics.m_SubState.setValue(subState.toString(), this);
 
             // cleanup job
-            if (isFinal(state) && m_controlAdaptor instanceof CleanableJobAdaptor) {
+            if (isFinal(state)) {
                 try {
-                    ((CleanableJobAdaptor)m_controlAdaptor).clean(m_nativeJobId);
+                    this.cleanup();
                 } catch (Exception e) {
                     s_logger.warn("Failed to cleanup job: "+m_nativeJobId, e);
                 }
