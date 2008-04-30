@@ -27,11 +27,13 @@ public class JobStdoutInputStream extends InputStream {
         m_job = job;
         switch(m_job.getState()) {
             case DONE:
+            case CANCELED:
+            case FAILED:
             case RUNNING:
                 // OK
                 break;
             default:
-                throw new DoesNotExist("Stdout is not available because job is neither done nor running");
+                throw new DoesNotExist("Stdout is not available because job is neither finished nor running");
         }
     }
 
@@ -77,6 +79,8 @@ public class JobStdoutInputStream extends InputStream {
         try {
             switch(m_job.getState()) {
                 case DONE:
+                case CANCELED:
+                case FAILED:
                     if (m_buffer == null) {
                         throw new NoSuccess("INTERNAL ERROR: JobIOHandler has not been closed");
                     }
@@ -93,7 +97,7 @@ public class JobStdoutInputStream extends InputStream {
                     }
                     return m_stream;
                 default:
-                    throw new DoesNotExist("Stdout is not available because job is neither done nor running");
+                    throw new DoesNotExist("Stdout is not available because job is neither finished nor running");
             }
         } catch (Exception e) {
             throw new IOException(e.getMessage());

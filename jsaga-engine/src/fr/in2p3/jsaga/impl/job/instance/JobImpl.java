@@ -120,6 +120,9 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
                     }
 
                     // set stdin
+                    if (m_stdin == null) {
+                        m_stdin = new JobStdinOutputStream(this);
+                    }
                     m_stdin.openJobIOHandler(m_IOHandler);
                 } else if (m_controlAdaptor instanceof PseudoInteractiveJobAdaptor) {
                     // set stdin
@@ -150,6 +153,8 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
         } catch (AuthenticationFailed e) {
             throw new NoSuccess(e);
         } catch (PermissionDenied e) {
+            throw new NoSuccess(e);
+        } catch (DoesNotExist e) {
             throw new NoSuccess(e);
         }
     }
@@ -306,11 +311,19 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
         }
     }
 
-    private void cleanup() throws PermissionDenied, Timeout, NoSuccess {
+    private void cleanup() throws NotImplemented, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         // close job output and error streams
-        if (m_IOHandler!=null && m_controlAdaptor instanceof InteractiveJobAdaptor) {
-            m_stdout.closeJobIOHandler(m_IOHandler);
-            m_stderr.closeJobIOHandler(m_IOHandler);
+        if (m_IOHandler != null) {  //if (isInteractive()) {
+            if (m_controlAdaptor instanceof InteractiveJobAdaptor || m_controlAdaptor instanceof PseudoInteractiveJobAdaptor) {
+                if (m_stdout == null) {
+                    m_stdout = new JobStdoutInputStream(this);
+                }
+                m_stdout.closeJobIOHandler(m_IOHandler);
+                if (m_stderr == null) {
+                    m_stderr = new JobStderrInputStream(this);
+                }
+                m_stderr.closeJobIOHandler(m_IOHandler);
+            }
         }
         // cleanup job
         if (m_controlAdaptor instanceof CleanableJobAdaptor) {
