@@ -6,24 +6,14 @@
                 xmlns:spmd="http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd"
                 xmlns:ext="http://www.in2p3.fr/jsdl-extension">
     <xsl:output method="text"/>
-    <xsl:param name="ShellPath"/>
-    
+
     <!-- entry point (MUST BE RELATIVE) -->
 	 <xsl:template match="jsdl:JobDefinition">
         <xsl:apply-templates select="jsdl:JobDescription"/>
     </xsl:template>
     
     <xsl:template match="jsdl:JobDescription">
-    
-    	<xsl:choose>
-    		<xsl:when test="$ShellPath">
-<xsl:value-of select="$ShellPath"/>
-			</xsl:when>
-				<xsl:otherwise>
-<xsl:text>/bin/sh </xsl:text>
-			</xsl:otherwise>
-		</xsl:choose>    
-<xsl:text>-c \"</xsl:text>
+<xsl:text>/bin/sh -c \"</xsl:text>
     	<xsl:if test="jsdl:Application/posix:POSIXApplication/posix:Environment">
 	    	<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Environment">
 <xsl:text>export </xsl:text><xsl:value-of select="@name"/>=\"<xsl:value-of select="text()"/><xsl:text>\";</xsl:text>
