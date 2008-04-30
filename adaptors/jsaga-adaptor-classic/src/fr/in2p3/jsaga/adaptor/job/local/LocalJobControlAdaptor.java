@@ -6,11 +6,11 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.InteractiveJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.ogf.saga.error.*;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.Exception;
 import java.util.Map;
 import java.util.UUID;
@@ -28,8 +28,7 @@ import java.util.UUID;
  * TODO : Support of pre-requisite
  */
 public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
-		JobControlAdaptor, CleanableJobAdaptor {
-	//, InteractiveJobAdaptor, JobIOGetter
+        JobControlAdaptor, CleanableJobAdaptor, InteractiveJobAdaptor {
 
 	private static final String SHELLPATH = "ShellPath";
     private String m_shellPath;
@@ -88,12 +87,7 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 		
 			String jobId = UUID.randomUUID().toString();
 			String cde = prepareCde(commandLine, jobId);
-			
 			Process p = Runtime.getRuntime().exec(m_shellPath+" -c \""+cde+"\"");
-			// TODO
-			OutputStream stdin = p.getOutputStream();
-			stdin.write("Test".getBytes());
-			stdin.close();
 			// add process in sessionMap
 			LocalAdaptorAbstract.sessionMap.put(jobId, p);
 			return new LocalJobIOHandler(p, jobId);

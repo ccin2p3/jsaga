@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.job.local;
 
-import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOGetterPseudo;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOGetter;
 
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.PermissionDenied;
@@ -18,7 +18,7 @@ import java.io.OutputStream;
 * Author: Nicolas DEMESY (nicolas.demesy@bt.com)
 * Date:   29 avril 2008
 * ***************************************************/
-public class LocalJobIOHandler implements JobIOGetterPseudo {
+public class LocalJobIOHandler implements JobIOGetter {
 
 	private Process p;
 	private String jobId;
@@ -37,9 +37,7 @@ public class LocalJobIOHandler implements JobIOGetterPseudo {
 	}
 
 	public OutputStream getStdin() throws PermissionDenied, Timeout, NoSuccess {
-		// TODO Auto-generated method stub
-		//return p.getInputStream();
-		return null;
+		return p.getOutputStream();
 	}
 
 	public InputStream getStdout() throws PermissionDenied, Timeout, NoSuccess {
