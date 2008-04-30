@@ -7,6 +7,9 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.InteractiveJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOSetterPseudo;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.adaptor.u6.TargetSystemInfo;
 
@@ -25,12 +28,19 @@ import org.ogf.saga.error.Timeout;
 import org.unigrids.x2006.x04.services.tss.TargetSystemPropertiesDocument;
 import org.w3c.dom.Element;
 
+import com.intel.gpe.client2.common.i18n.Messages;
+import com.intel.gpe.client2.common.i18n.MessagesKeys;
 import com.intel.gpe.client2.common.requests.PutFilesRequest;
+import com.intel.gpe.client2.common.transfers.byteio.RandomByteIOFileExportImpl;
 import com.intel.gpe.client2.common.transfers.byteio.RandomByteIOFileImportImpl;
 import com.intel.gpe.client2.providers.FileProvider;
+import com.intel.gpe.client2.transfers.FileExport;
+import com.intel.gpe.client2.transfers.FileImport;
+import com.intel.gpe.client2.transfers.TransferFailedException;
 import com.intel.gpe.clients.api.JobClient;
 import com.intel.gpe.clients.api.JobType;
 import com.intel.gpe.clients.api.StorageClient;
+import com.intel.gpe.clients.api.exceptions.GPEFileTransferProtocolNotSupportedException;
 import com.intel.gpe.clients.api.exceptions.GPEJobNotAbortedException;
 import com.intel.gpe.clients.api.exceptions.GPEMiddlewareRemoteException;
 import com.intel.gpe.clients.api.exceptions.GPEMiddlewareServiceException;
@@ -46,6 +56,8 @@ import com.intel.gpe.util.sets.Pair;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Calendar;
 import java.util.Date;
@@ -62,7 +74,8 @@ import java.util.Vector;
 * Author: Nicolas DEMESY (nicolas.demesy@bt.com)
 * Date:   18 fev. 2008
 * ***************************************************/
-public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobControlAdaptor, CleanableJobAdaptor {
+public class U6JobControlAdaptor extends U6JobAdaptorAbstract 
+		implements JobControlAdaptor, CleanableJobAdaptor, InteractiveJobAdaptor {
 
 	protected static final String DEFAULT_CPU_TIME = "DefaultCpuTime";
 	private int cpuTime;
@@ -107,55 +120,17 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
 		}
     }
     
-    public String submit(String jobDesc, boolean checkMatch) 
+    public JobClient createJob(GPEJobImpl jobJsdl , boolean checkMatch, String scriptFilename, TargetSystemInfo targetSystemInfo) 
     	throws PermissionDenied, Timeout, NoSuccess, BadResource {
     	try {
     		
-    		// parse JSDL to create jobDefinition 
-    		GPEJobImpl jobJsdl = new GPEJobImpl();
-    		jobJsdl.setValue(JobDefinitionType.Factory.parse(jobDesc));
-    		
-	        // Create job command line
-    		String commandLine = "";
-    		// add working directory if specified
-    		if(jobJsdl.getPOSIXApplication().getWorkingDirectory() != null && 
-    				jobJsdl.getPOSIXApplication().getWorkingDirectory().getStringValue() != null && 
-    				!jobJsdl.getPOSIXApplication().getWorkingDirectory().getStringValue().equals("") ) {
-    				commandLine = "if [[ !( -d " + jobJsdl.getPOSIXApplication().getWorkingDirectory().getStringValue()+") ]] ;" +
-    						" then exit 1; fi;" +
-    						" cd "+jobJsdl.getPOSIXApplication().getWorkingDirectory().getStringValue()+";";    			
-    		}
-    		// add executable
-    		commandLine += jobJsdl.getPOSIXApplication().getExecutable().getStringValue(); 
-    		// add arguments
-    		if(jobJsdl.getPOSIXApplication().getArgumentArray() != null) {
-    			ArgumentType[] args = jobJsdl.getPOSIXApplication().getArgumentArray();
-        		for (int i = 0; i < args.length; i++) {
-        			commandLine += " " + args[i].getStringValue();
-				}
-    		}
-    		commandLine += ";";
-
-    		// create job script with command line
-    		File scriptFile = File.createTempFile("script", ".sh");
-    		scriptFile.deleteOnExit();
-    		PrintWriter fich = new PrintWriter(new FileWriter(scriptFile.getAbsolutePath()));
-			fich.print(commandLine);
-			fich.close();
-			
-    		// register job script as input file
-			GPEFile gpeFile = new LocalGPEFile(scriptFile.getAbsolutePath());
-			List<Pair<GPEFile, String>> inputFiles = new Vector<Pair<GPEFile, String>>();
-	        inputFiles.add(new Pair<GPEFile, String>(gpeFile, scriptFile.getName()));     		
-	        
 	        // get target and create new job
-    		TargetSystemInfo targetSystemInfo = findTargetSystem();
 	        JobType jobType = targetSystemInfo.getTargetSystem().getJobType(JobType.JobDefinitions.GPEJSDL);
 	        GPEJob jobToSubmit = targetSystemInfo.getTargetSystem().newJob(jobType);	       
 	        jobToSubmit.setApplicationName(targetSystemInfo.getApplicationName());
 	        jobToSubmit.setApplicationVersion(targetSystemInfo.getApplicationVersion());
 	        jobToSubmit.setId(String.valueOf(new Date().getTime()));
-	        jobToSubmit.addField("SOURCE", scriptFile.getName());
+	        jobToSubmit.addField("SOURCE", scriptFilename);
 	        
 	        // get env
 	        if(jobJsdl.getPOSIXApplication().getEnvironmentArray() != null) {
@@ -306,7 +281,6 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
 	    			}
 	    		}
 	        }
-    		
     		// set default
     		if(!terminationTimeIsSet)
     			terminationTime.add(Calendar.HOUR, cpuTime);    		
@@ -323,20 +297,8 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
 	        if (jobClient.getStatus().isFailed()) {
 	            throw new NoSuccess("Unable to submit job: job already failed !");
 	        }
-            
-	        // upload script file
-	        StorageClient storage = jobClient.getWorkingDirectory();            
-	        FileProvider fileProvider = new FileProvider();
-	        fileProvider.addFilePutter("RBYTEIO", RandomByteIOFileImportImpl.class);
-	        PutFilesRequest request = new PutFilesRequest(fileProvider, storage, inputFiles, targetSystemInfo.getSecurityManager());
-	        request.perform();
 	        
-	        // clean script file
-            scriptFile.delete();
-	        
-	        // start job
-	        jobClient.start();
-	        return ((AtomicJobClientImpl) jobClient).getId().toString();            
+	        return jobClient;            
     	} catch (GPEWrongJobTypeException e) {
 			throw new NoSuccess(e);
 		} catch (Exception e) {
@@ -348,7 +310,150 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
 			throw new NoSuccess(e);
 		}
     }
+    
+    public JobIOHandler submitInteractive(String jobDesc, boolean checkMatch, InputStream inputStream) 
+    		throws PermissionDenied, Timeout, NoSuccess {	
+		try {
+			// create target
+			TargetSystemInfo targetSystemInfo = findTargetSystem();
+			JobClient jobClient;
+			if(inputStream != null) {
+				// parse JSDL to get execution file 
+				GPEJobImpl jobJsdl = new GPEJobImpl();
+				jobJsdl.setValue(JobDefinitionType.Factory.parse(jobDesc));				
+				String exec = jobJsdl.getPOSIXApplication().getExecutable().getStringValue();
 
+				String jobScriptFilename = "script.sh";
+				
+				// For Optimization : run the input script directly
+				if((exec.equals("/bin/sh") || exec.equals("sh") ||
+						exec.equals("/bin/bash") || exec.equals("bash")) && 
+						( jobJsdl.getPOSIXApplication().getArgumentArray() == null || 
+								jobJsdl.getPOSIXApplication().getArgumentArray().length == 0 ) &&
+						(jobJsdl.getPOSIXApplication().getWorkingDirectory() == null ||
+								jobJsdl.getPOSIXApplication().getWorkingDirectory().equals("$PWD"))) {
+					jobClient = createJob(jobJsdl, checkMatch, jobScriptFilename, targetSystemInfo);			    	
+				}
+				else {
+					// run the "command < stdin" into a script
+					jobClient = createJob(jobDesc, jobScriptFilename,targetSystemInfo, checkMatch);
+				}
+				// upload inputStream
+				FileProvider fileProvider = new FileProvider();
+		        fileProvider.addFilePutter("RBYTEIO", RandomByteIOFileImportImpl.class);	        
+	    		List<FileImport> putters = fileProvider.preparePutters(jobClient.getWorkingDirectory());
+	        	int i;
+				for (i = 0; i < putters.size(); i++) {
+				    try {
+				    	putters.get(i).putFile(targetSystemInfo.getSecurityManager(), inputStream, jobScriptFilename);
+				     }
+				     catch (GPEFileTransferProtocolNotSupportedException e) {
+				         continue;
+				     }
+				     break;
+				}
+				if (i == putters.size()) {
+				     throw new Exception(
+				             Messages.getString(MessagesKeys.common_requests_PutFilesRequest_Cannot_put_file_to_remote_location__no_suitable_protocol_found));
+				}
+			}
+			else {
+				jobClient = createJob(jobDesc, null, targetSystemInfo, checkMatch);
+			}
+			jobClient.start();
+			String jobId = ((AtomicJobClientImpl) jobClient).getId().toString();
+			return new U6JobIOHandler(targetSystemInfo, jobClient,jobId);
+		} catch (Exception e) {
+			if(e instanceof BadResource) {
+				throw new BadResource(e);
+			}
+			throw new NoSuccess(e);
+		}
+	}
+
+    public String submit(String jobDesc, boolean checkMatch)  
+    		throws PermissionDenied, Timeout, NoSuccess, BadResource {
+    	try {
+        	TargetSystemInfo targetSystemInfo = findTargetSystem();        
+        	JobClient jobClient = createJob(jobDesc, null, targetSystemInfo, checkMatch);
+    		//start job
+			jobClient.start();
+	    	return ((AtomicJobClientImpl) jobClient).getId().toString();
+		} catch (Exception e) {
+			if(e instanceof BadResource) {
+				throw new BadResource(e);
+			}
+			throw new NoSuccess(e);
+		}
+    }
+    
+    public JobClient createJob(String jobDesc, String stdinScript, TargetSystemInfo targetSystemInfo, boolean checkMatch) 
+    		throws PermissionDenied, Timeout, NoSuccess , BadResource {
+
+    	try {
+			// parse JSDL to create jobDefinition 
+			GPEJobImpl jobJsdl = new GPEJobImpl();
+			jobJsdl.setValue(JobDefinitionType.Factory.parse(jobDesc));
+	
+	    	// create input script file
+			String commandLine = "JOBDIR=$PWD; ";
+			// add working directory if specified
+			if(jobJsdl.getPOSIXApplication().getWorkingDirectory() != null && 
+					jobJsdl.getPOSIXApplication().getWorkingDirectory().getStringValue() != null && 
+					!jobJsdl.getPOSIXApplication().getWorkingDirectory().getStringValue().equals("") ) {
+					commandLine = "if [[ !( -d " + jobJsdl.getPOSIXApplication().getWorkingDirectory().getStringValue()+") ]] ;" +
+							" then exit 1; fi;" +
+							" cd "+jobJsdl.getPOSIXApplication().getWorkingDirectory().getStringValue()+";";    			
+			}
+			// add executable
+			commandLine += jobJsdl.getPOSIXApplication().getExecutable().getStringValue(); 
+			// add arguments
+			if(jobJsdl.getPOSIXApplication().getArgumentArray() != null) {
+				ArgumentType[] args = jobJsdl.getPOSIXApplication().getArgumentArray();
+	    		for (int i = 0; i < args.length; i++) {
+	    			commandLine += " " + args[i].getStringValue();
+				}
+			}
+			if(stdinScript != null)
+				commandLine += " < $JOBDIR/"+ stdinScript;
+			commandLine += ";";
+	
+			// create job script with command line
+			File scriptFile = File.createTempFile("script", ".sh");
+			scriptFile.deleteOnExit();
+			PrintWriter fich = new PrintWriter(new FileWriter(scriptFile.getAbsolutePath()));
+			fich.print(commandLine);
+			fich.close();
+			
+			// register job script as input file
+			GPEFile gpeFile = new LocalGPEFile(scriptFile.getAbsolutePath());
+			List<Pair<GPEFile, String>> inputFiles = new Vector<Pair<GPEFile, String>>();
+			inputFiles.add(new Pair<GPEFile, String>(gpeFile, scriptFile.getName()));     		
+	    	
+	    	// create job
+			JobClient jobClient = createJob(jobJsdl, checkMatch, scriptFile.getName(), targetSystemInfo);
+	        
+	        // upload script file
+	        StorageClient storage = jobClient.getWorkingDirectory();            
+	        FileProvider fileProvider = new FileProvider();
+	        fileProvider.addFilePutter("RBYTEIO", RandomByteIOFileImportImpl.class);
+	        PutFilesRequest request = new PutFilesRequest(fileProvider, storage, inputFiles, targetSystemInfo.getSecurityManager());
+	        request.perform();
+	        
+	        // clean script file
+	        scriptFile.delete();
+	        
+	    	return jobClient;
+    	} catch (GPESecurityException e) {
+			throw new PermissionDenied(e);
+		} catch (Throwable e) {
+			if(e instanceof BadResource) {
+				throw new BadResource(e);
+			}
+			throw new NoSuccess(e);
+		}
+	}
+    
     public void cancel(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess {    	
     	try {
     		// abort
@@ -374,8 +479,8 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract implements JobCont
 			// destroy
 	        getJobById(nativeJobId).destroy();
 		} catch (Exception e1) {
-			e1.printStackTrace();
+			throw new NoSuccess(e1);
 		}
-	}   
-    
+	}
+	
 }
