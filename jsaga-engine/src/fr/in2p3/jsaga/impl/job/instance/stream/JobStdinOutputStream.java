@@ -43,12 +43,14 @@ public class JobStdinOutputStream extends OutputStream {
         }
     }
     
-    public void openJobIOHandler(JobIOHandler ioHandler) throws PermissionDenied, Timeout, NoSuccess {
+    public void openJobIOHandler(JobIOHandler ioHandler) throws NotImplemented, PermissionDenied, Timeout, NoSuccess {
         m_ioHandler = ioHandler;
 
         // get stream
         if (m_stream == null) {
-            if (m_ioHandler instanceof JobIOGetter) {
+            if (m_ioHandler instanceof JobIOGetterPseudo || m_ioHandler instanceof JobIOSetterPseudo) {
+                throw new NotImplemented("ADAPTOR ERROR: Inconsistent implementation (InteractiveJobAdaptor with JobIOHandlerPseudo)");
+            } else if (m_ioHandler instanceof JobIOGetter) {
                 m_stream = ((JobIOGetter)m_ioHandler).getStdin();
             } else if (m_ioHandler instanceof JobIOSetter) {
                 m_stream = new PipedStdin((JobIOSetter) m_ioHandler);

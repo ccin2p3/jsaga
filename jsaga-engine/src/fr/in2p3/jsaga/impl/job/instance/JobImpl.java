@@ -4,8 +4,7 @@ import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.adaptor.job.SubState;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.*;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.InteractiveJobAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.*;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorCallback;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
@@ -114,20 +113,31 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
             String nativeJobDesc = m_attributes.m_NativeJobDescription.getObject();
             if (this.isInteractive()) {
                 if (m_controlAdaptor instanceof InteractiveJobAdaptor) {
+                    // submit
+                    m_IOHandler = ((InteractiveJobAdaptor)m_controlAdaptor).submitInteractive(nativeJobDesc, s_checkMatch);
+                    if (m_IOHandler == null) {
+                        throw new NotImplemented("ADAPTOR ERROR: Method submitInteractive() must not return null: "+m_controlAdaptor.getClass().getName());
+                    }
+
+                    // set stdin
+                    m_stdin.openJobIOHandler(m_IOHandler);
+                } else if (m_controlAdaptor instanceof PseudoInteractiveJobAdaptor) {
+                    // set stdin
                     InputStream stdin;
                     if (m_stdin!=null && m_stdin.getBuffer().length>0) {
                         stdin = new ByteArrayInputStream(m_stdin.getBuffer());
                     } else {
                         stdin = null;
                     }
-                    m_IOHandler = ((InteractiveJobAdaptor)m_controlAdaptor).submitInteractive(nativeJobDesc, s_checkMatch, stdin);
+
+                    // submit
+                    m_IOHandler = ((PseudoInteractiveJobAdaptor)m_controlAdaptor).submitInteractive(nativeJobDesc, s_checkMatch, stdin);
+                    if (m_IOHandler == null) {
+                        throw new NotImplemented("ADAPTOR ERROR: Method submitInteractive() must not return null: "+m_controlAdaptor.getClass().getName());
+                    }
                 } else {
                     throw new NotImplemented("Interactive jobs are not supported by this adaptor: "+m_controlAdaptor.getClass().getName());
                 }
-                if (m_IOHandler == null) {
-                    throw new NotImplemented("ADAPTOR ERROR: Method createJobIOHandler() must not return null: "+m_controlAdaptor.getClass().getName());
-                }
-                m_stdin.openJobIOHandler(m_IOHandler);
                 m_nativeJobId = m_IOHandler.getJobId();
             } else {
                 m_nativeJobId = m_controlAdaptor.submit(nativeJobDesc, s_checkMatch);
