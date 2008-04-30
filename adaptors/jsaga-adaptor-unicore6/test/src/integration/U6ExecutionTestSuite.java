@@ -47,9 +47,13 @@ public class U6ExecutionTestSuite extends TestSuite {
     public static class U6JobRunDescriptionTest extends JobRunDescriptionTest {
         public U6JobRunDescriptionTest() throws Exception {super("unicore6");}
         public void test_run_queueRequirement() { super.ignore("not supported"); }
-        public void test_run_processRequirement() { super.ignore("not supported"); }
     }
 
+    // test cases
+    public static class U6JobRunInteractiveTest extends JobRunInteractiveTest {
+        public U6JobRunInteractiveTest() throws Exception {super("unicore6");}
+    }
+    
     public U6ExecutionTestSuite() throws Exception {
         super();
         // test cases
@@ -58,6 +62,7 @@ public class U6ExecutionTestSuite extends TestSuite {
         this.addTestSuite(U6JobRunRequiredTest.class);
         this.addTestSuite(U6JobRunOptionalTest.class);
         this.addTestSuite(U6JobRunDescriptionTest.class);
+        this.addTestSuite(U6JobRunInteractiveTest.class);
     }
 
     public static Test suite() throws Exception {
