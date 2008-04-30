@@ -285,15 +285,17 @@ public class JobRunOptionalTest extends AbstractJobTest {
     	TaskContainer taskContainer = TaskFactory.createTaskContainer();
     	    	
     	// create and start jobs
-    	JobService m_service = JobFactory.createJobService(m_session, m_jobservice); 
+    	JobService m_service = JobFactory.createJobService(m_session, m_jobservice);
+    	Job[] jobs = new Job[numberOfJobs];		
 		for (int index = 0; index < numberOfJobs; index++) {
 			// create description
 	    	JobDescription desc = JobFactory.createJobDescription();
     		desc.setAttribute(JobDescription.EXECUTABLE, "/bin/date");
 	        desc.setAttribute(JobDescription.OUTPUT, index+"-stdout.txt");
 	        desc.setAttribute(JobDescription.ERROR, index+"-stderr.txt");
-	        // add job to task			
-			taskContainer.add(m_service.createJob(desc));
+	        // add job to task
+	        jobs[index] = m_service.createJob(desc);
+			taskContainer.add(jobs[index]);
 		}
     
 		// run
@@ -304,10 +306,8 @@ public class JobRunOptionalTest extends AbstractJobTest {
     	
 		// get failed jobs
 		int numberOfFailed = 0;
-		State[] states = taskContainer.getStates();
-		for (int j = 0; j < states.length; j++) {
-			State state = states[j];
-			if(state.getValue() == State.FAILED.getValue()) {
+		for (int index = 0; index < numberOfJobs; index++) {
+			if(jobs[index].getState().getValue() == State.FAILED.getValue()) {
 				numberOfFailed ++;
 			}
 		}
@@ -317,7 +317,7 @@ public class JobRunOptionalTest extends AbstractJobTest {
 		if(numberOfFailed > 0) 
 			throw new NoSuccess(numberOfFailed + "job of "+numberOfJobs+" is failed.");
 		
-    	 assertEquals(
+    	assertEquals(
 	                0,
 	                numberOfFailed);
     }
