@@ -62,7 +62,6 @@ public class SSHExecutionTestSuite extends TestSuite {
         public void test_run_queueRequirement() { super.ignore("not supported"); }
         public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
         public void test_run_memoryRequirement() { super.ignore("not supported"); }
-        public void test_run_processRequirement() { super.ignore("not supported"); }
     }
     
     // test cases
