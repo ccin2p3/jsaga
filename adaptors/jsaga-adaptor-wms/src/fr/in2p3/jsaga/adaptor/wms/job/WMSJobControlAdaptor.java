@@ -314,7 +314,8 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 		return this;
 	}*/
 
-	public InputStream getStderr() throws PermissionDenied, Timeout, NoSuccess {
+    //TODO: move all the code below to a new JobIOHandler class
+    public InputStream getStderr() throws PermissionDenied, Timeout, NoSuccess {
 		try {
 			return new FileInputStream(getSandboxFile("stderr.txt"));
 		} catch (FileNotFoundException e) {
