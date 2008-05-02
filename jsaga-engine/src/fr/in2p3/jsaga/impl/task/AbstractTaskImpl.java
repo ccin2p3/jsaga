@@ -420,6 +420,10 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
         return super._addMetric(metric);
     }
 
+    protected State getState_LocalCheckOnly() {
+        return m_metric_TaskState.getValue();
+    }
+
     private boolean isDone_LocalCheckOnly() {
         switch(m_metric_TaskState.getValue()) {
             case DONE:

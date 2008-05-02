@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.impl;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.factories.*;
+import fr.in2p3.jsaga.engine.workflow.WorkflowFactoryImpl;
 import fr.in2p3.jsaga.impl.buffer.BufferFactoryImpl;
 import fr.in2p3.jsaga.impl.context.ContextFactoryImpl;
 import fr.in2p3.jsaga.impl.file.FileFactoryImpl;
@@ -15,6 +16,7 @@ import fr.in2p3.jsaga.impl.session.SessionFactoryImpl;
 import fr.in2p3.jsaga.impl.task.TaskFactoryImpl;
 import fr.in2p3.jsaga.impl.unimplemented.RPCFactoryImpl;
 import fr.in2p3.jsaga.jobcollection.JobCollectionFactory;
+import fr.in2p3.jsaga.workflow.WorkflowFactory;
 import org.ogf.saga.bootstrap.SagaFactory;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.context.ContextFactory;
@@ -102,6 +104,10 @@ public class SagaFactoryImpl implements SagaFactory {
 
     public TaskFactory createTaskFactory() throws NotImplemented {
         return new TaskFactoryImpl();
+    }
+
+    public WorkflowFactory createWorkflowFactory() throws NotImplemented {
+        return new WorkflowFactoryImpl();
     }
 
     public JobCollectionFactory createJobCollectionFactory() throws NotImplemented {
