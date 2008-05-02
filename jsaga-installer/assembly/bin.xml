@@ -14,6 +14,7 @@
             <unpack>true</unpack>
             <includes>
                 <include>fr.in2p3.jsaga:jsaga-engine:zip:config</include>
+                <include>org.graphviz:graphviz:zip:bin</include>
             </includes>
         </dependencySet>
         <dependencySet>

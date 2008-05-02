@@ -130,6 +130,15 @@
         </plugins>
     </reporting>
     <dependencies>
+        <!-- optional -->
+        <dependency>
+            <groupId>org.graphviz</groupId>
+            <artifactId>graphviz</artifactId>
+            <version>1.0.2</version>
+            <classifier>bin</classifier>
+            <type>zip</type>
+        </dependency>
+
         <!-- adaptors -->
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>

@@ -13,6 +13,7 @@
                 <url>http://grid.in2p3.fr/jsaga/</url>
                 <authors>
                     <author name="Sylvain Reynaud" email="sreynaud@in2p3.fr"/>
+                    <author name="Nicolas Demesy" email="nicolas.demesy@bt.com"/>
                 </authors>
             </info>
             <guiprefs width="640" height="480" resizable="yes"/>
@@ -55,11 +56,6 @@
                 <file src="{@file}" targetdir="$INSTALL_PATH/lib"/>
             </xsl:for-each>
 
-            <!-- WORKAROUND: artifact commons-logging.jar is provided by module jsaga-adaptor-srm instead of jsaga-engine -->
-            <xsl:for-each select="/project/artifact[@id='jsaga-adaptor-srm']/artifact/artifact[@id='commons-logging']">
-                <file src="{@file}" targetdir="$INSTALL_PATH/lib"/>
-            </xsl:for-each>
-
             <!-- unix -->
             <fileset os="unix" dir="bin/" includes="*.sh" targetdir="$INSTALL_PATH/bin/"/>
             <xsl:for-each select="$scripts/script/text()">
@@ -77,9 +73,21 @@
         </pack>
     </xsl:template>
 
-    <xsl:template match="/project/artifact[@id!='jsaga-engine' and @scope!='test']">
+    <xsl:template match="/project/artifact[@id='graphviz']">
+        <pack name="Graph Visualizer" required="no">
+            <description>For visualizing data staging graphs of job collections</description>
+            <file src="shared/" targetdir="$INSTALL_PATH"/>
+            <!-- unix -->
+            <fileset os="unix" dir="bin/" includes="*.sh" targetdir="$INSTALL_PATH/bin/"/>
+            <!-- windows -->
+            <fileset os="windows" dir="bin/" includes="*.bat" targetdir="$INSTALL_PATH/bin/"/>
+        </pack>
+    </xsl:template>
+
+    <xsl:template match="/project/artifact[starts-with(@id,'jsaga-adaptor-') and @scope!='test']">
         <pack name="{@id}" required="no">
-            <description>An adaptor</description>
+            <description>Adaptor for <xsl:value-of
+                    select="translate(substring-after(@id,'jsaga-adaptor-'),'abcdefghijklmnopqrstuvwxyz)','ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/></description>
             <xsl:for-each select="descendant-or-self::artifact">
                 <file src="{@file}" targetdir="$INSTALL_PATH/lib-adaptors"/>
             </xsl:for-each>
