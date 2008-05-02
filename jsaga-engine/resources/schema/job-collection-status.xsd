@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:tns="http://www.in2p3.fr/jsaga/status"
+        targetNamespace="http://www.in2p3.fr/jsaga/status"
+        elementFormDefault="qualified">
+
+    <element name="workflow"><complexType>
+        <sequence>
+            <element name="task" minOccurs="0" maxOccurs="unbounded"><complexType>
+                <sequence>
+                    <element name="successor" type="string" minOccurs="0" maxOccurs="unbounded"/>
+                    <element name="accounting" minOccurs="0" maxOccurs="unbounded"><complexType>
+                        <attribute name="step" use="required"><simpleType><restriction base="string">
+                            <enumeration value="INITIALIZE"/>
+                            <enumeration value="INPUT_STAGING"/>
+                            <enumeration value="USER_PROCESSING"/>
+                            <enumeration value="OUTPUT_STAGING"/>
+                            <enumeration value="COMPLETE"/>
+                        </restriction></simpleType></attribute>
+                        <attribute name="real" type="float" use="required"/>
+                        <attribute name="user" type="float" use="required"/>
+                        <attribute name="sys" type="float" use="required"/>
+                        <attribute name="mem" type="float" use="optional"/>
+                    </complexType></element>
+                </sequence>
+                <attribute name="name" type="string" use="required"/>
+                <attribute name="type" use="required"><simpleType><restriction base="string">
+                    <enumeration value="start"/>
+                    <enumeration value="transfer"/>
+                    <enumeration value="job"/>                    
+                </restriction></simpleType></attribute>
+                <attribute name="state" use="required"><simpleType><restriction base="string">
+                    <enumeration value="NEW"/>
+                    <enumeration value="RUNNING"/>
+                    <enumeration value="DONE"/>
+                    <enumeration value="CANCELED"/>
+                    <enumeration value="FAILED"/>
+                    <enumeration value="SUSPENDED"/>                    
+                </restriction></simpleType></attribute>
+            </complexType></element>
+        </sequence>
+        <attribute name="name" type="string" use="required"/>
+    </complexType></element>
+</schema>
