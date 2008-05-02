@@ -34,7 +34,6 @@ public class IndividualJobPreprocessor {
     private static final String XSL_2_RESOLVE_PARENT_FS = "xsl/execution/job_2-resolve-parent-fs.xsl";
     private static final String XSL_3_GENERATE_STAGE = "xsl/execution/job_3-generate-stage.xsl";
     private static final String XSL_4_RESOLVE_FS = "xsl/execution/job_4-resolve-fs.xsl";
-    private static final String XSL_UPDATE_GRAPH = "xsl/execution/graph_1-update.xsl";
 
     private Document m_effectiveJob;
     private byte[] m_stageGraph;
@@ -65,9 +64,6 @@ public class IndividualJobPreprocessor {
             jobContainer.set(t.getCached(XSL_3_GENERATE_STAGE, parameters).transform(jobContainer.get()));
             jobContainer.set(t.getCached(XSL_4_RESOLVE_FS, parameters).transform(jobContainer.get()));
             jobContainer.save();
-
-            stageContainer.set(t.getCached(XSL_UPDATE_GRAPH).transform(jobContainer.get()));
-            stageContainer.save();
 
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);

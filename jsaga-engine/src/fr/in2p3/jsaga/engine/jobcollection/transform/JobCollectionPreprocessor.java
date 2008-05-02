@@ -29,7 +29,6 @@ public class JobCollectionPreprocessor {
 
     private static final String XSL_1_ADD_DEFAULTS = "xsl/execution/collec_1-add-defaults.xsl";
     private static final String XSL_2_GENERATE_PRESTAGE = "xsl/execution/collec_2-generate-prestage.xsl";
-    private static final String XSL_UPDATE_GRAPH = "xsl/execution/graph_1-update.xsl";
 
     private byte[] m_effectiveJobCollection;
     private byte[] m_prestageGraph;
@@ -69,9 +68,6 @@ public class JobCollectionPreprocessor {
             collectionContainer.set(t.getCached(XSL_1_ADD_DEFAULTS).transform(jobCollecDesc.getDocumentElement()));
             collectionContainer.set(t.getCached(XSL_2_GENERATE_PRESTAGE, parameters).transform(collectionContainer.get()));
             collectionContainer.save();
-
-            prestageContainer.set(t.getCached(XSL_UPDATE_GRAPH).transform(collectionContainer.get()));
-            prestageContainer.save();
 
             m_effectiveJobCollection = collectionContainer.get();
             m_prestageGraph = prestageContainer.get();
