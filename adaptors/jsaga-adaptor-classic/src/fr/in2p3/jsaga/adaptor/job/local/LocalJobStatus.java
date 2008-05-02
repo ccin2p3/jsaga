@@ -14,7 +14,7 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 
 public class LocalJobStatus extends JobStatus {
     public LocalJobStatus(String jobId, int status) {
-        super(jobId, status, "unknown");
+        super(jobId, Integer.valueOf(status), "unknown");
     }
 
 	public String getModel() {
@@ -23,11 +23,13 @@ public class LocalJobStatus extends JobStatus {
 
     public SubState getSubState() {
     	// select status with exitCode
-    	if((Integer) m_nativeStateCode == 0)
-    		return SubState.DONE;
-    	else if((Integer) m_nativeStateCode == -1)
-    		return SubState.RUNNING_ACTIVE;
-    	else
-    		return SubState.FAILED_ERROR;
+        switch(((Integer)m_nativeStateCode).intValue()) {
+            case 0:
+                return SubState.DONE;
+            case -1:
+                return SubState.RUNNING_ACTIVE;
+            default:
+                return SubState.FAILED_ERROR;
+        }
     }
 }
