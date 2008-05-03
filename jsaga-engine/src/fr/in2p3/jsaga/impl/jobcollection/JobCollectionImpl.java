@@ -1,8 +1,7 @@
 package fr.in2p3.jsaga.impl.jobcollection;
 
 import fr.in2p3.jsaga.adaptor.evaluator.Evaluator;
-import fr.in2p3.jsaga.engine.jobcollection.transform.JobCollectionPreprocessor;
-import fr.in2p3.jsaga.engine.jobcollection.transform.JobCollectionSplitter;
+import fr.in2p3.jsaga.engine.jobcollection.transform.*;
 import fr.in2p3.jsaga.engine.schema.jsdl.extension.Resource;
 import fr.in2p3.jsaga.engine.schema.jsdl.extension.ResourceSelection;
 import fr.in2p3.jsaga.impl.job.instance.LateBindedJobImpl;
@@ -15,6 +14,7 @@ import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
+import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
 import java.io.*;
@@ -40,8 +40,13 @@ public class JobCollectionImpl extends TaskContainerImpl implements JobCollectio
     public JobCollectionImpl(Session session, JobCollectionDescription jcDesc, Evaluator evaluator) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
         super(session);
 
+        // fill
+        JobCollectionFiller filler = new JobCollectionFiller(jcDesc.getAsDocument());
+        String collectionName = filler.getCollectionName();
+        Document filledJcDesc = filler.getEfectiveJobCollection();
+        
         // preprocess
-        JobCollectionPreprocessor preprocessor = new JobCollectionPreprocessor(jcDesc.getAsDocument());
+        JobCollectionPreprocessor preprocessor = new JobCollectionPreprocessor(filledJcDesc, collectionName);
         byte[] processedJcDesc = preprocessor.getEffectiveJobCollection();
 
         // split parametric job
