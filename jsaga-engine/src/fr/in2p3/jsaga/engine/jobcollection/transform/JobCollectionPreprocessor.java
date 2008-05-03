@@ -2,14 +2,13 @@ package fr.in2p3.jsaga.engine.jobcollection.transform;
 
 import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.engine.jobcollection.preprocess.XMLDocument;
-import fr.in2p3.jsaga.engine.jobcollection.preprocess.XPathSelector;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformerFactory;
 import org.ogf.saga.error.NoSuccess;
 import org.w3c.dom.Document;
 
-import javax.xml.xpath.XPathExpressionException;
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -33,20 +32,8 @@ public class JobCollectionPreprocessor {
     private byte[] m_effectiveJobCollection;
     private byte[] m_prestageGraph;
 
-    public JobCollectionPreprocessor(Document jobCollecDesc) throws NoSuccess {
-        // Get job collection identifier
-        String collectionName;
-        try {
-            collectionName = XPathSelector.select(jobCollecDesc, "/ext:JobCollection/ext:JobCollectionDescription/ext:JobCollectionIdentification/ext:JobCollectionName/text()");
-            if (collectionName == null) {
-                collectionName = XPathSelector.select(jobCollecDesc, "/ext:JobCollection/ext:Job/jsdl:JobDefinition/jsdl:JobDescription/jsdl:JobIdentification/jsdl:JobName/text()");
-                if (collectionName == null) {
-                    collectionName = UUID.randomUUID().toString();
-                }
-            }
-        } catch (XPathExpressionException e) {
-            throw new NoSuccess(e);
-        }
+    public JobCollectionPreprocessor(Document jobCollecDesc, String collectionName) throws NoSuccess {
+        // Set stylesheet parameters
         Map parameters = new HashMap();
         parameters.put("collectionName", collectionName);
 
