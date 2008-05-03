@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.engine.factories;
 
-import fr.in2p3.jsaga.adaptor.data.BaseURL;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.engine.config.Configuration;
@@ -8,6 +7,7 @@ import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.config.adaptor.DataAdaptorDescriptor;
 import fr.in2p3.jsaga.engine.config.adaptor.SecurityAdaptorDescriptor;
 import fr.in2p3.jsaga.engine.config.bean.ProtocolEngineConfiguration;
+import fr.in2p3.jsaga.engine.data.FilledURL;
 import fr.in2p3.jsaga.engine.schema.config.DataService;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.ogf.saga.URL;
@@ -103,19 +103,18 @@ public class DataAdaptorFactory extends ServiceAdaptorFactory {
             }
         }
 
+        // set filled URL
+        FilledURL filledUrl = new FilledURL(url, config);
+        
         // get attributes from config
         Map attributes = new HashMap();
         for (int i=0; i<config.getAttributeCount(); i++) {
             attributes.put(config.getAttribute(i).getName(), config.getAttribute(i).getValue());
         }
-        BaseURL base = dataAdaptor.getBaseURL();
-        if (base == null) {
-            base = new BaseURL();
-        }
-        base.setAttributes(attributes);
+        filledUrl.setAttributes(attributes);
 
         // connect
-        dataAdaptor.connect(base.getUserInfo(url), base.getHost(url), base.getPort(url), base.getPath(url), attributes);
+        dataAdaptor.connect(filledUrl.getUserInfo(), filledUrl.getHost(), filledUrl.getPort(), filledUrl.getPath(), attributes);
         return dataAdaptor;
     }
 }
