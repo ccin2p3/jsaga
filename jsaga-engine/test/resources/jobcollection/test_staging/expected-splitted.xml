@@ -44,7 +44,7 @@
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source>
-                    <URI>https://host2:8443/private/configuration/config1.cfg#TEST_X509</URI>
+                    <URI>srb://sreynaud@host2:5544/grid/config1.cfg?mydomain#OpenPlast-CCIN2P3</URI>
                 </Source>
                 <ext:CopyLocally>false</ext:CopyLocally>
                 <ext:Shared>true</ext:Shared>

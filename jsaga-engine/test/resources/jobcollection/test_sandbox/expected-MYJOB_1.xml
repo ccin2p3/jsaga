@@ -67,7 +67,7 @@
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source>
-                    <URI>tar://$INPUT_SANDBOX/https.,,host2.8443,private,configuration,config1.cfg</URI>
+                    <URI>tar://$INPUT_SANDBOX/srb.,,sreynaud@host2.5544,grid,config1.cfg</URI>
                 </Source>
                 <ext:CopyLocally>false</ext:CopyLocally>
             </DataStaging>

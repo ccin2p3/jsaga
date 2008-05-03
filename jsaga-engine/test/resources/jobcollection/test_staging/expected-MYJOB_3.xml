@@ -61,7 +61,7 @@
                 <Source>
                     <URI>gsiftp://defaultSE.openplast.fr/tmp/test_staging.in/config1.cfg#OpenPlast</URI>
                 </Source>
-                <ext:Step uri="https://host2:8443/private/configuration/config1.cfg#TEST_X509">
+                <ext:Step uri="srb://sreynaud@host2:5544/grid/config1.cfg?mydomain#OpenPlast-CCIN2P3">
                     <ext:Step uri="file:///tmp/test_staging.in/config1.cfg">
                         <ext:Step uri="gsiftp://defaultSE.openplast.fr/tmp/test_staging.in/config1.cfg#OpenPlast"/>
                     </ext:Step>

@@ -44,10 +44,10 @@
                 <FilesystemName>$PWD</FilesystemName>
                 <CreationFlag>overwrite</CreationFlag>
                 <Source>
-                    <URI>gsiftp://defaultSE.openplast.fr/tmp/test_sandbox.in/input-sandbox.tar#OpenPlast</URI>
+                    <URI>gsiftp://defaultSE.openplast.fr/tmp/test_sandbox.in/input-sandbox.tar#OpenPlast-CCIN2P3</URI>
                 </Source>
                 <ext:Step uri="file:///tmp/test_sandbox/input-sandbox.tar">
-                    <ext:Step uri="gsiftp://defaultSE.openplast.fr/tmp/test_sandbox.in/input-sandbox.tar#OpenPlast"/>
+                    <ext:Step uri="gsiftp://defaultSE.openplast.fr/tmp/test_sandbox.in/input-sandbox.tar#OpenPlast-CCIN2P3"/>
                 </ext:Step>
                 <ext:Shared>true</ext:Shared>
             </DataStaging>
@@ -67,7 +67,7 @@
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source>
-                    <URI>tar://$INPUT_SANDBOX/https.,,host2.8443,private,configuration,config1.cfg</URI>
+                    <URI>tar://$INPUT_SANDBOX/srb.,,sreynaud@host2.5544,grid,config1.cfg</URI>
                 </Source>
                 <ext:CopyLocally>false</ext:CopyLocally>
             </DataStaging>
@@ -126,11 +126,10 @@
                 <FilesystemName>$PWD</FilesystemName>
                 <CreationFlag>overwrite</CreationFlag>
                 <Target>
-                    <URI>gsiftp://defaultSE.openplast.fr/tmp/test_sandbox.out/MYJOB_2/output-sandbox-2.tar#OpenPlast</URI>
+                    <URI>gsiftp://defaultSE.openplast.fr/tmp/test_sandbox.out/MYJOB_2/output-sandbox-2.tar#OpenPlast-CCIN2P3</URI>
                 </Target>
                 <ext:Step uri="file:///tmp/test_sandbox/output-sandbox-2.tar">
-                    <ext:Step uri="gsiftp://defaultSE.openplast.fr/tmp/test_sandbox.out/MYJOB_2/output-sandbox-2.tar#OpenPlast"/>
-                </ext:Step>
+                    <ext:Step uri="gsiftp://defaultSE.openplast.fr/tmp/test_sandbox.out/MYJOB_2/output-sandbox-2.tar#OpenPlast-CCIN2P3"/>                </ext:Step>
                 <ext:Shared>false</ext:Shared>
             </DataStaging>
         </JobDescription>

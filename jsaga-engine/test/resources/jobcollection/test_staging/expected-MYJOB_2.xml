@@ -45,10 +45,10 @@
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source>
-                    <URI>gsiftp://defaultSE.openplast.fr/tmp/test_staging.in/config0.cfg#OpenPlast</URI>
+                    <URI>gsiftp://defaultSE.openplast.fr/tmp/test_staging.in/config0.cfg#OpenPlast-CCIN2P3</URI>
                 </Source>
                 <ext:Step uri="file:///tmp/config0.cfg">
-                    <ext:Step uri="gsiftp://defaultSE.openplast.fr/tmp/test_staging.in/config0.cfg#OpenPlast"/>
+                    <ext:Step uri="gsiftp://defaultSE.openplast.fr/tmp/test_staging.in/config0.cfg#OpenPlast-CCIN2P3"/>
                 </ext:Step>
                 <ext:CopyLocally>false</ext:CopyLocally>
                 <ext:Shared>true</ext:Shared>
@@ -59,13 +59,8 @@
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source>
-                    <URI>gsiftp://defaultSE.openplast.fr/tmp/test_staging.in/config1.cfg#OpenPlast</URI>
+                    <URI>srb://sreynaud@host2:5544/grid/config1.cfg?mydomain#OpenPlast-CCIN2P3</URI>
                 </Source>
-                <ext:Step uri="https://host2:8443/private/configuration/config1.cfg#TEST_X509">
-                    <ext:Step uri="file:///tmp/test_staging.in/config1.cfg">
-                        <ext:Step uri="gsiftp://defaultSE.openplast.fr/tmp/test_staging.in/config1.cfg#OpenPlast"/>
-                    </ext:Step>
-                </ext:Step>
                 <ext:CopyLocally>false</ext:CopyLocally>
                 <ext:Shared>true</ext:Shared>
             </DataStaging>
@@ -75,11 +70,11 @@
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source>
-                    <URI>gsiftp://defaultSE.openplast.fr/tmp/test_staging.in/config2.cfg#OpenPlast</URI>
+                    <URI>gsiftp://defaultSE.openplast.fr/tmp/test_staging.in/config2.cfg#OpenPlast-CCIN2P3</URI>
                 </Source>
                 <ext:Step uri="http://host5:8080/public/configuration/config2.cfg">
                     <ext:Step uri="file:///tmp/test_staging.in/config2.cfg">
-                        <ext:Step uri="gsiftp://defaultSE.openplast.fr/tmp/test_staging.in/config2.cfg#OpenPlast"/>
+                        <ext:Step uri="gsiftp://defaultSE.openplast.fr/tmp/test_staging.in/config2.cfg#OpenPlast-CCIN2P3"/>
                     </ext:Step>
                 </ext:Step>
                 <ext:CopyLocally>false</ext:CopyLocally>
@@ -112,11 +107,11 @@
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Target>
-                    <URI>gsiftp://defaultSE.openplast.fr/tmp/test_staging.out/MYJOB_2/result_2.dat#OpenPlast</URI>
+                    <URI>gsiftp://defaultSE.openplast.fr/tmp/test_staging.out/MYJOB_2/result_2.dat#OpenPlast-CCIN2P3</URI>
                 </Target>
                 <ext:Step uri="mail://sreynaud@in2p3.fr/result_2.dat">
                     <ext:Step uri="file:///tmp/test_staging.out/MYJOB_2/result_2.dat">
-                        <ext:Step uri="gsiftp://defaultSE.openplast.fr/tmp/test_staging.out/MYJOB_2/result_2.dat#OpenPlast"/>
+                        <ext:Step uri="gsiftp://defaultSE.openplast.fr/tmp/test_staging.out/MYJOB_2/result_2.dat#OpenPlast-CCIN2P3"/>
                     </ext:Step>
                 </ext:Step>
                 <ext:CopyLocally>false</ext:CopyLocally>
@@ -128,10 +123,10 @@
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Target>
-                    <URI>gsiftp://defaultSE.openplast.fr/tmp/test_staging.out/MYJOB_2/stderr_2.txt#OpenPlast</URI>
+                    <URI>gsiftp://defaultSE.openplast.fr/tmp/test_staging.out/MYJOB_2/stderr_2.txt#OpenPlast-CCIN2P3</URI>
                 </Target>
                 <ext:Step uri="file:///tmp/stderr_2.txt">
-                    <ext:Step uri="gsiftp://defaultSE.openplast.fr/tmp/test_staging.out/MYJOB_2/stderr_2.txt#OpenPlast"/>
+                    <ext:Step uri="gsiftp://defaultSE.openplast.fr/tmp/test_staging.out/MYJOB_2/stderr_2.txt#OpenPlast-CCIN2P3"/>
                 </ext:Step>
                 <ext:CopyLocally>false</ext:CopyLocally>
                 <ext:Shared>false</ext:Shared>

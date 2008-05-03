@@ -54,10 +54,10 @@
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source>
-                    <URI>tar://$INPUT_SANDBOX/https.,,host2.8443,private,configuration,config1.cfg</URI>
+                    <URI>tar://$INPUT_SANDBOX/srb.,,sreynaud@host2.5544,grid,config1.cfg</URI>
                 </Source>
-                <ext:Step uri="https://host2:8443/private/configuration/config1.cfg#TEST_X509">
-                    <ext:Step uri="tar:///tmp/test_sandbox/input-sandbox.tar/https.,,host2.8443,private,configuration,config1.cfg"/>
+                <ext:Step uri="srb://sreynaud@host2:5544/grid/config1.cfg?mydomain#OpenPlast-CCIN2P3">
+                    <ext:Step uri="tar:///tmp/test_sandbox/input-sandbox.tar/srb.,,sreynaud@host2.5544,grid,config1.cfg"/>
                 </ext:Step>
                 <ext:CopyLocally>false</ext:CopyLocally>
             </DataStaging>

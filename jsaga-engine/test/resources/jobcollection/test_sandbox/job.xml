@@ -38,7 +38,7 @@
                 <DataStaging name="C1">
                     <FileName>config1.cfg</FileName>
                     <CreationFlag>overwrite</CreationFlag>
-                    <Source><URI>https://host2:8443/private/configuration/config1.cfg#TEST_X509</URI></Source>
+                    <Source><URI>srb:///grid/config1.cfg#OpenPlast-CCIN2P3</URI></Source>
                     <ext:Sandbox>true</ext:Sandbox>
                 </DataStaging>
                 <DataStaging name="C2">
