@@ -10,6 +10,7 @@ import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
 import fr.in2p3.jsaga.engine.schema.config.DataService;
 import fr.in2p3.jsaga.engine.schema.config.Protocol;
+import org.ogf.saga.error.IncorrectURL;
 import org.ogf.saga.error.NoSuccess;
 
 import java.util.HashMap;
@@ -32,7 +33,7 @@ public class DataAdaptorDescriptor {
     private Map m_usages;
     protected Protocol[] m_xml;
 
-    public DataAdaptorDescriptor(Class[] adaptorClasses, SecurityAdaptorDescriptor securityDesc) throws IllegalAccessException, InstantiationException {
+    public DataAdaptorDescriptor(Class[] adaptorClasses, SecurityAdaptorDescriptor securityDesc) throws IllegalAccessException, InstantiationException, IncorrectURL {
         m_classes = new HashMap();
         m_usages = new HashMap();
         m_xml = new Protocol[adaptorClasses.length];
@@ -65,7 +66,7 @@ public class DataAdaptorDescriptor {
         return (Usage) m_usages.get(scheme);
     }
 
-    private static Protocol toXML(DataAdaptor adaptor, SecurityAdaptorDescriptor securityDesc) {
+    private static Protocol toXML(DataAdaptor adaptor, SecurityAdaptorDescriptor securityDesc) throws IncorrectURL {
         Protocol protocol = new Protocol();
         protocol.setScheme(adaptor.getType());
         protocol.setRead(adaptor instanceof DataReaderAdaptor);
@@ -78,6 +79,9 @@ public class DataAdaptorDescriptor {
         service.setName("default");
         service.setType(adaptor.getType());
         service.setImpl(adaptor.getClass().getName());
+        if (adaptor.getBaseURL() != null) {
+            service.setBase(adaptor.getBaseURL().toString());
+        }
         if (adaptor.getSupportedSecurityAdaptorClasses() != null) {
             String[] supportedContextTypes = securityDesc.getSupportedContextTypes(adaptor.getSupportedSecurityAdaptorClasses());
             service.setSupportedContextType(supportedContextTypes);
