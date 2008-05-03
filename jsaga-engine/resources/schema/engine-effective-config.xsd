@@ -75,6 +75,7 @@
                 <attribute name="name" type="string" use="required"/><!-- from adaptor descriptor -->
                 <attribute name="type" type="string" use="required"/><!-- from adaptor descriptor -->
                 <attribute name="impl" type="string" use="required"/><!-- from adaptor descriptor -->
+                <attribute name="base" type="anyURI" use="optional"/><!-- from adaptor descriptor -->
                 <attribute name="usage" type="string" use="optional"/><!-- from adaptor descriptor -->
                 <attribute name="contextRef" type="string" use="optional"/>
             </extension></complexContent></complexType></element>

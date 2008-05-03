@@ -75,6 +75,7 @@
         <attribute name="type" type="string" use="required"/>
         <attribute name="scheme" type='string' use="optional"/>
         <attribute name="deactivated" type="boolean" use="optional"/>
+        <attribute name="base" type="anyURI" use="optional"/>
         <attribute name="read" type="boolean" use="optional"/><!-- default is same as plugin, unless 'write' is set -->
         <attribute name="write" type="boolean" use="optional"/><!-- default is same as plugin, unless 'read' is set -->
         <attribute name="recursive" type="boolean" use="optional"/><!-- default is false -->
