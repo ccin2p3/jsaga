@@ -4,7 +4,7 @@
         <Intermediary>gsiftp://firewallSE.openplast.fr:2811/intermediary</Intermediary>
         <StandaloneWorker>true</StandaloneWorker>
     </Resource>
-    <Resource id="gatekeeper://simple.openplast.fr/jobmanager-pbs" nbslots="1">
+    <Resource id="gatekeeper://ccgridvmli08.in2p3.fr/jobmanager-pbs" nbslots="1">
         <StandaloneWorker>false</StandaloneWorker>
         <Tag>HELLOWORLD_1.1</Tag>
     </Resource>

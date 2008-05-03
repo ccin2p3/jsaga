@@ -4,6 +4,8 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 
+import java.net.URI;
+
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -94,6 +96,37 @@ public class JSagaURL extends URL {
 
     // [scheme://][[user-info@]host[:port]][path][?query][#fragment]
     public static String decode(URL url) throws NotImplemented {
+        StringBuffer buffer = new StringBuffer();
+        if (url.getScheme() != null) {
+            buffer.append(url.getScheme());
+            buffer.append("://");
+        }
+        if (url.getHost() != null) {
+            if (url.getUserInfo() != null) {
+                buffer.append(url.getUserInfo());
+                buffer.append('@');
+            }
+            buffer.append(url.getHost());
+            if (url.getPort() != -1) {
+                buffer.append(':');
+                buffer.append(url.getPort());
+            }
+        }
+        if (url.getPath() != null) {
+            buffer.append(url.getPath());
+        }
+        if (url.getQuery() != null) {
+            buffer.append('?');
+            buffer.append(url.getQuery());
+        }
+        if (url.getFragment() != null) {
+            buffer.append('#');
+            buffer.append(url.getFragment());
+        }
+        return buffer.toString();
+    }
+
+    public static String decode(URI url) throws NotImplemented {
         StringBuffer buffer = new StringBuffer();
         if (url.getScheme() != null) {
             buffer.append(url.getScheme());
