@@ -35,8 +35,8 @@
 
     <xsl:template match="cfg:SITE">
         <xsl:variable name="this" select="."/>
-        <SITE>
-            <xsl:copy-of select="@*[local-name()!='wrapperMonitoring' and local-name()!='defaultIntermediary']"/>
+        <SITE name="{concat(parent::cfg:GRID/@name,'-',@name)}">
+            <xsl:copy-of select="@*[local-name()!='wrapperMonitoring' and local-name()!='defaultIntermediary' and local-name()!='name']"/>
             <xsl:apply-templates select="cfg:attributes"/>
             <xsl:apply-templates select="cfg:domain"/>
             <xsl:apply-templates select="ancestor-or-self::cfg:*/cfg:fileSystem"/>
@@ -57,16 +57,8 @@
         <job>
             <xsl:copy-of select="@*[local-name()!='wrapperMonitoring' and local-name()!='defaultIntermediary']"/>
             <xsl:copy-of select="ancestor-or-self::cfg:*/@wrapperMonitoring"/>
+            <xsl:copy-of select="ancestor-or-self::cfg:*/@defaultIntermediary"/>
             <xsl:apply-templates/>
-            <fileStaging>
-                <xsl:copy-of select="ancestor-or-self::cfg:*/@defaultIntermediary"/>
-                <xsl:for-each select="ancestor::cfg:*/cfg:data">
-                    <workerProtocolScheme>
-                        <xsl:copy-of select="@read | @write | @recursive | @protection"/>
-                        <xsl:value-of select="@scheme"/>
-                    </workerProtocolScheme>
-                </xsl:for-each>
-            </fileStaging>
         </job>
     </xsl:template>
 

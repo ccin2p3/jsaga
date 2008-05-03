@@ -12,7 +12,8 @@
     <xsl:template match="/">
         <xsl:variable name="cfg" select="/*"/>
         <effective-config>
-            <xsl:copy-of select="$descriptors/@*[not(name()=name($cfg/@*))] | $cfg/@*"/>
+            <xsl:copy-of select="$descriptors/@*"/>
+            <xsl:copy-of select="$cfg/@*"/>
             <xsl:comment> languages </xsl:comment>
             <xsl:apply-templates select="$descriptors/cfg:language"/>
             <xsl:comment> security </xsl:comment>
@@ -39,7 +40,8 @@
             </xsl:when>
             <xsl:otherwise>
                 <context>
-                    <xsl:copy-of select="$desc/@*[not(name()=name($conf/@*))] | $conf/@*"/>
+                    <xsl:copy-of select="$desc/@*"/>
+                    <xsl:copy-of select="$conf/@*"/>
                     <xsl:apply-templates select="$desc/cfg:attribute[not(@name=$conf/cfg:attribute/@name)] | $conf/cfg:attribute"/>
                 </context>
             </xsl:otherwise>
@@ -58,7 +60,8 @@
             </xsl:when>
             <xsl:otherwise>
                 <protocol>
-                    <xsl:copy-of select="$desc/@*[not(name()=name($conf/@*))] | $conf/@*"/>
+                    <xsl:copy-of select="$desc/@*"/>
+                    <xsl:copy-of select="$conf/@*"/>
                     <xsl:apply-templates select="$conf/cfg:schemeAlias"/>
                     <xsl:apply-templates select="$conf/cfg:dataService[@type=$descriptors/cfg:protocol/cfg:dataService/@type]"/>
                     <!-- add default if all context types are filtered -->
@@ -73,7 +76,8 @@
         <!-- filter unsupported context types -->
         <xsl:if test="$conf/@contextType = $desc/cfg:supportedContextType">
             <dataService>
-                <xsl:copy-of select="$desc/@*[not(name()=name($conf/@*))] | $conf/@*[not(name()='contextType')]"/>
+                <xsl:copy-of select="$desc/@*"/>
+                <xsl:copy-of select="$conf/@*[not(name()='contextType')]"/>
                 <xsl:apply-templates select="$conf/cfg:domain"/>
                 <xsl:apply-templates select="$desc/cfg:attribute[not(@name=$conf/cfg:attribute/@name)] | $conf/cfg:attribute"/>
                 <xsl:apply-templates select="$desc/cfg:supportedContextType"/>
@@ -93,7 +97,8 @@
             </xsl:when>
             <xsl:otherwise>
                 <execution>
-                    <xsl:copy-of select="$desc/@*[not(name()=name($conf/@*))] | $conf/@*"/>
+                    <xsl:copy-of select="$desc/@*"/>
+                    <xsl:copy-of select="$conf/@*"/>
                     <xsl:apply-templates select="$conf/cfg:schemeAlias"/>
                     <xsl:apply-templates select="$conf/cfg:jobService[@type=$descriptors/cfg:execution/cfg:jobService/@type]"/>
                     <!-- add default if all context types are filtered -->
@@ -108,7 +113,8 @@
         <!-- filter unsupported context types -->
         <xsl:if test="$conf/@contextType = $desc/cfg:supportedContextType">
             <jobService>
-                <xsl:copy-of select="$desc/@*[not(name()=name($conf/@*))] | $conf/@*[not(name()='contextType')]"/>
+                <xsl:copy-of select="$desc/@*"/>
+                <xsl:copy-of select="$conf/@*[not(name()='contextType')]"/>
                 <xsl:apply-templates select="$conf/cfg:domain"/>
                 <xsl:apply-templates select="$desc/cfg:attribute[not(@name=$conf/cfg:attribute/@name)] | $conf/cfg:attribute"/>
                 <xsl:apply-templates select="$conf/cfg:fileSystem"/>
@@ -132,7 +138,8 @@
         <xsl:param name="conf"/>
         <xsl:variable name="desc" select="."/>
         <monitorService>
-            <xsl:copy-of select="$desc/@*[not(name()=name($conf/@*))] | $conf/@*"/>
+            <xsl:copy-of select="$desc/@*"/>
+            <xsl:copy-of select="$conf/@*"/>
             <xsl:apply-templates select="$desc/cfg:attribute[not(@name=$conf/cfg:attribute/@name)] | $conf/cfg:attribute"/>
         </monitorService>
     </xsl:template>

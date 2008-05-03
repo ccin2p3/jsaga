@@ -82,6 +82,8 @@
 
     <xsl:template match="jsdl:Source[jsdl:URI] | jsdl:Target[jsdl:URI]">
         <xsl:variable name="scheme" select="substring-before(jsdl:URI/text(), '://')"/>
+        <xsl:variable name="fragment" select="substring-after(jsdl:URI/text(), '#')"/>
+        <xsl:variable name="type" select="local-name()"/>
         <xsl:choose>
             <xsl:when test="
             $scheme='tar' or $scheme='tgz' or $scheme='zip' or $scheme='gzip'
@@ -90,10 +92,19 @@
                 (
                     $jobService/cfg:fileStaging/cfg:supportedProtocolScheme[text()=$scheme]
                     or
-                    $jobService/cfg:fileStaging/cfg:workerProtocolScheme[text()=$scheme and @read='true']
+                    $jobService/cfg:fileStaging/cfg:workerProtocolScheme
+                        [
+                            text()=$scheme
+                            and
+                            (($type='Source' and @read='true') or ($type='Target' and @write='true'))
+                        ]
                 )
                 and
-                substring-after(jsdl:URI/text(),'#')=$gridName
+                (
+                    $gridName = $fragment
+                    or
+                    starts-with($gridName, concat($fragment,'-'))
+                )
                 and
                 (
                     not($StandaloneWorker='true')
@@ -157,7 +168,11 @@
                         and
                         substring-before($selectedIntermediary,'://')=$scheme
                         and
-                        substring-after(jsdl:URI/text(),'#')=$gridName
+                        (
+                            $gridName = $fragment
+                            or
+                            starts-with($gridName, concat($fragment,'-'))
+                        )
                     )">
                         <!-- file can be transfered directly to server intermediary node -->
                         <xsl:element name="{local-name()}">

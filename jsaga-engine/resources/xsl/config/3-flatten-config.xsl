@@ -38,6 +38,7 @@
             <xsl:for-each select="//cfg:data[@scheme=$scheme and not(@scheme=preceding-sibling::cfg:data/@scheme)]">
                 <dataService name="{parent::cfg:SITE/@name}" type="{@type}"
                              contextRef="{ancestor::cfg:GRID/@name}" contextType="{ancestor::cfg:GRID/@contextType}">
+                    <xsl:copy-of select="@base"/>
                     <xsl:apply-templates select="parent::cfg:SITE/cfg:domain"/>
                     <xsl:apply-templates select="*[not(local-name()='schemeAlias')] | text() | comment()"/>
                 </dataService>
@@ -55,10 +56,12 @@
                             contextRef="{ancestor::cfg:GRID/@name}" contextType="{ancestor::cfg:GRID/@contextType}">
                     <xsl:apply-templates select="cfg:attribute"/>
                     <xsl:apply-templates select="parent::cfg:SITE/cfg:domain"/>
+
                     <xsl:apply-templates select="parent::cfg:SITE/cfg:fileSystem"/>
                     <xsl:if test="not(parent::cfg:SITE/cfg:fileSystem[@name='WorkingDirectory'])">
                         <fileSystem name="WorkingDirectory" mountPoint="$PWD"/>
                     </xsl:if>
+
                     <xsl:apply-templates select="cfg:monitorService"/>
                     <xsl:apply-templates select="cfg:logging"/>
                     <xsl:if test="not(cfg:logging) and @wrapperMonitoring='true'">
@@ -75,7 +78,16 @@
                         <accounting impl="fr.in2p3.jsaga.engine.jobcollection.DefaultAccountingImpl"
                                 >echo "T1M: [$TIME] $FUNCTION"</accounting>
                     </xsl:if>
-                    <xsl:apply-templates select="cfg:fileStaging"/>
+
+                    <fileStaging>
+                        <xsl:copy-of select="@defaultIntermediary"/>
+                        <xsl:for-each select="ancestor::cfg:*/cfg:data">
+                            <workerProtocolScheme>
+                                <xsl:copy-of select="@read | @write | @recursive | @protection"/>
+                                <xsl:value-of select="@scheme"/>
+                            </workerProtocolScheme>
+                        </xsl:for-each>
+                    </fileStaging>
                 </jobService>
             </xsl:for-each>
         </execution>
