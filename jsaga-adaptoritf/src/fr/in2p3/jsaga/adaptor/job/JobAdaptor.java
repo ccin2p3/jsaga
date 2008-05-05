@@ -18,6 +18,8 @@ import java.util.Map;
  *
  */
 public interface JobAdaptor extends SagaSecureAdaptor {
+    public static final String CHECK_AVAILABILITY = "CheckAvailability";
+
     /**
      * @return the protocol schemes supported by sandbox management, or null if no sandbox management.
      */

@@ -1,10 +1,12 @@
 package fr.in2p3.jsaga.engine.config.adaptor;
 
+import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.BulkJobSubmit;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.engine.schema.config.*;
+import fr.in2p3.jsaga.engine.schema.config.types.AttributeSourceType;
 import org.ogf.saga.error.NoSuccess;
 
 import java.util.HashMap;
@@ -88,6 +90,14 @@ public class JobAdaptorDescriptor {
             service.setUsage(adaptor.getUsage().toString());
         }
         AdaptorDescriptors.setDefaults(service, adaptor);
+        String checkAvailability  = EngineProperties.getProperty(EngineProperties.JOB_CONTROL_CHECK_AVAILABILITY);
+        if (checkAvailability != null) {
+            Attribute attr = new Attribute();
+            attr.setName(JobAdaptor.CHECK_AVAILABILITY);
+            attr.setValue(checkAvailability);
+            attr.setSource(AttributeSourceType.ENGINECONFIGURATION);
+            service.addAttribute(attr);
+        }
         execution.addJobService(service);
         return execution;
     }

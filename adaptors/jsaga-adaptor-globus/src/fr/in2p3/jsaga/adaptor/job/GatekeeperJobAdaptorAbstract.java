@@ -58,9 +58,8 @@ public abstract class GatekeeperJobAdaptorAbstract implements SagaSecureAdaptor 
     		loadedCogProperties.setIPAddress(value);
     		CoGProperties.setDefault(loadedCogProperties);
     	}
-    	
-    	// TODO : user CheckAvailability parameter
-    	if(true) {
+
+        if("true".equalsIgnoreCase((String) attributes.get(JobAdaptor.CHECK_AVAILABILITY))) {
 	        try {
 	            Gram.ping(m_credential, m_serverUrl);
 	        } catch (GramException e) {

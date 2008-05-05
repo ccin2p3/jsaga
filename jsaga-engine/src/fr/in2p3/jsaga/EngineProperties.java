@@ -23,6 +23,7 @@ public class EngineProperties {
     public static final String IGNORE_MISSING_ADAPTOR = "ignore.missing.adaptor";
     public static final String JOB_DESCRIPTION_DEFAULT = "job.description.default";
     public static final String JOB_MONITOR_ERROR_THRESHOLD = "job.monitor.error.threshold";
+    public static final String JOB_CONTROL_CHECK_AVAILABILITY = "job.control.check.availability";
     public static final String JOB_CONTROL_CHECK_MATCH = "job.control.check.match";
 
     private static Exception s_exception;
@@ -37,6 +38,7 @@ public class EngineProperties {
             s_prop.setProperty(IGNORE_MISSING_ADAPTOR, "true");
             s_prop.setProperty(JOB_DESCRIPTION_DEFAULT, "etc/jsaga-default.jsdl");
             s_prop.setProperty(JOB_MONITOR_ERROR_THRESHOLD, "3");
+            s_prop.setProperty(JOB_CONTROL_CHECK_AVAILABILITY, "true");
             s_prop.setProperty(JOB_CONTROL_CHECK_MATCH, "true");
 
             // load properties
