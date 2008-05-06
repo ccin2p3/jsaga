@@ -5,8 +5,8 @@ import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.apache.commons.cli.*;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.context.ContextFactory;
-import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.error.BadParameter;
+import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 

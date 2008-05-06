@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.jobcollection;
 
 import fr.in2p3.jsaga.engine.schema.jsdl.extension.ResourceSelection;
-import org.ogf.saga.task.TaskContainer;
 import org.ogf.saga.URL;
+import org.ogf.saga.task.TaskContainer;
 
 import java.io.File;
 import java.io.InputStream;
