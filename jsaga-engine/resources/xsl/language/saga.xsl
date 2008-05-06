@@ -31,9 +31,6 @@
 
     <xsl:template match="attributes">
         <!-- check unsupported attributes -->
-        <xsl:if test="Interactive/@value='true'">
-            <xsl:message terminate="yes">Interactive jobs are currently not supported by JSAGA</xsl:message>
-        </xsl:if>
         <xsl:if test="JobStartTime/@value">
             <xsl:message terminate="yes">Unsupported attribute key: JobStartTime</xsl:message>
         </xsl:if>
@@ -58,15 +55,30 @@
                         <xsl:for-each select="WorkingDirectory/@value">
                             <posix:WorkingDirectory filesystemName="WorkingDirectory"><xsl:value-of select="."/></posix:WorkingDirectory>
                         </xsl:for-each>
-                        <xsl:for-each select="Input/@value">
-                            <posix:Input filesystemName="WorkingDirectory"><xsl:value-of select="."/></posix:Input>
-                        </xsl:for-each>
-                        <xsl:for-each select="Output/@value">
-                            <posix:Output filesystemName="WorkingDirectory"><xsl:value-of select="."/></posix:Output>
-                        </xsl:for-each>
-                        <xsl:for-each select="Error/@value">
-                            <posix:Error filesystemName="WorkingDirectory"><xsl:value-of select="."/></posix:Error>
-                        </xsl:for-each>
+                        <xsl:choose>
+                            <xsl:when test="translate(Interactive/@value,'TRUE','true') = 'true'">
+                                <xsl:if test="Input/@value">
+                                    <xsl:message terminate="no">Ignoring attribute 'Input' because job is interactive</xsl:message>
+                                </xsl:if>
+                                <xsl:if test="Output/@value">
+                                    <xsl:message terminate="no">Ignoring attribute 'Output' because job is interactive</xsl:message>
+                                </xsl:if>
+                                <xsl:if test="Error/@value">
+                                    <xsl:message terminate="no">Ignoring attribute 'Error' because job is interactive</xsl:message>
+                                </xsl:if>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:for-each select="Input/@value">
+                                    <posix:Input filesystemName="WorkingDirectory"><xsl:value-of select="."/></posix:Input>
+                                </xsl:for-each>
+                                <xsl:for-each select="Output/@value">
+                                    <posix:Output filesystemName="WorkingDirectory"><xsl:value-of select="."/></posix:Output>
+                                </xsl:for-each>
+                                <xsl:for-each select="Error/@value">
+                                    <posix:Error filesystemName="WorkingDirectory"><xsl:value-of select="."/></posix:Error>
+                                </xsl:for-each>
+                            </xsl:otherwise>
+                        </xsl:choose>
                         <xsl:for-each select="Arguments/value/text()">
                             <posix:Argument><xsl:value-of select="."/></posix:Argument>
                         </xsl:for-each>
