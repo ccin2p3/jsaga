@@ -37,7 +37,7 @@ public class JobRunInteractiveTest extends AbstractJobTest {
         
     	// prepare interactive job
     	String stringToTestInStdout = "     1\tTest 1";
-    	JobDescription desc = createJob("cat", null, null);
+    	JobDescription desc = createJob("/bin/cat", null, null);
     	desc.setAttribute(JobDescription.INTERACTIVE, JobDescription.TRUE);
     	desc.setVectorAttribute(JobDescription.ARGUMENTS, new String[]{"-n"});
     	
