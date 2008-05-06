@@ -25,6 +25,10 @@
                 <include>fr.in2p3.jsaga:jsaga-engine:jar</include>
                 <include>fr.in2p3.jsaga:jsaga-adaptoritf:jar</include>
                 <include>org.ogf.saga:saga-api:jar</include>
+                <!-- workaround: transitive filtering does not work here -->
+                <include>commons-cli:commons-cli:jar</include>
+                <include>log4j:log4j:jar</include>
+                <include>castor:castor:jar:xml</include>
             </includes>
         </dependencySet>
         <dependencySet>
