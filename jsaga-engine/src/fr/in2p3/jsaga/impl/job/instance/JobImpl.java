@@ -15,7 +15,6 @@ import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.Job;
 import org.ogf.saga.job.JobDescription;
-import org.ogf.saga.monitoring.Metric;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
 
@@ -177,7 +176,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
         return status.getSagaState();
     }
 
-    public boolean startListening(Metric metric) throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public boolean startListening() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
         if (m_nativeJobId == null) {
             throw new IncorrectState("Can not listen to job in 'New' state", this);
         }
@@ -185,7 +184,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
         return true;    // a job task is always listening (either with notification, or with polling)
     }
 
-    public void stopListening(Metric metric) throws NotImplemented, Timeout, NoSuccess {
+    public void stopListening() throws NotImplemented, Timeout, NoSuccess {
         if (m_nativeJobId == null) {
             throw new RuntimeException("INTERNAL ERROR: JobID not initialized");
         }
@@ -327,6 +326,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
         }
         // cleanup job
         if (m_controlAdaptor instanceof CleanableJobAdaptor) {
+            m_monitorService.stopListening(m_nativeJobId);
             ((CleanableJobAdaptor)m_controlAdaptor).clean(m_nativeJobId);
         }
     }
@@ -342,9 +342,9 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
         // if not already in a final state
         if (!isFinal(m_metrics.m_State.getValue(State.RUNNING))) {
             // update metrics
-            m_metrics.m_State.setValue(state, this);
-            m_metrics.m_StateDetail.setValue(stateDetail, this);
-            m_metrics.m_SubState.setValue(subState.toString(), this);
+            m_metrics.m_State.setValue(state);
+            m_metrics.m_StateDetail.setValue(stateDetail);
+            m_metrics.m_SubState.setValue(subState.toString());
 
             // cleanup job
             if (isFinal(state)) {

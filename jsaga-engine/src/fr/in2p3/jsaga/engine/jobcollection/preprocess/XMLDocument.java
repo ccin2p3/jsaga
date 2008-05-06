@@ -1,5 +1,10 @@
 package fr.in2p3.jsaga.engine.jobcollection.preprocess;
 
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 
 /* ***************************************************
@@ -28,6 +33,12 @@ public class XMLDocument {
     }
     public byte[] get() {
         return m_content;
+    }
+
+    public Document getAsDocument() throws ParserConfigurationException, IOException, SAXException {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        return factory.newDocumentBuilder().parse(new ByteArrayInputStream(m_content));        
     }
 
     public void save() throws IOException {

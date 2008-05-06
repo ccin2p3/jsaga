@@ -2,7 +2,6 @@ package fr.in2p3.jsaga.engine.workflow;
 
 import fr.in2p3.jsaga.engine.workflow.task.DummyTask;
 import org.ogf.saga.error.*;
-import org.ogf.saga.session.Session;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -20,8 +19,8 @@ public class StartTask extends DummyTask {
     public static final String NAME = "start";
 
     /** constructor */
-    StartTask(Session session) throws NotImplemented, BadParameter, Timeout, NoSuccess {
-        super(session, NAME);
+    StartTask() throws NotImplemented, BadParameter, Timeout, NoSuccess {
+        super(NAME);
     }
 
     /** override super.run() */

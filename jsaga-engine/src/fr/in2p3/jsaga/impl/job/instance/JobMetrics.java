@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.impl.job.instance;
 
 import fr.in2p3.jsaga.adaptor.job.SubState;
 import fr.in2p3.jsaga.impl.monitoring.*;
+import fr.in2p3.jsaga.impl.task.TaskStateMetricImpl;
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.job.Job;
 import org.ogf.saga.task.State;
@@ -19,14 +20,15 @@ import org.ogf.saga.task.State;
  *
  */
 public class JobMetrics {
-    MetricImpl<State> m_State;
+    TaskStateMetricImpl m_State;
     MetricImpl<String> m_StateDetail;
     /** deviation from SAGA specification */
     MetricImpl<String> m_SubState;
 
     /** constructor */
     JobMetrics(JobImpl job) throws NoSuccess {
-        m_State = job._addMetric(new MetricImpl<State>(
+        m_State = (TaskStateMetricImpl) job._addMetric(new TaskStateMetricImpl(
+                job,
                 Job.JOB_STATE,
                 "fires on state changes of the job, and has the literal value of the job state enum.",
                 MetricMode.ReadOnly,
@@ -34,6 +36,7 @@ public class JobMetrics {
                 MetricType.Enum,
                 State.NEW));
         m_StateDetail = job._addMetric(new MetricImpl<String>(
+                job,
                 Job.JOB_STATEDETAIL,
                 "fires as a job changes its state detail",
                 MetricMode.ReadOnly,
@@ -41,6 +44,7 @@ public class JobMetrics {
                 MetricType.String,
                 "Unknown:Unknown"));
         m_SubState = job._addMetric(new MetricImpl<String>(
+                job,
                 JobImpl.JOB_SUBSTATE,
                 "fires on sub-state changes of the job (deviation from SAGA specification)",
                 MetricMode.ReadOnly,

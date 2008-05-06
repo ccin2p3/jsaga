@@ -1,18 +1,22 @@
 package fr.in2p3.jsaga.impl.jobcollection;
 
 import fr.in2p3.jsaga.adaptor.evaluator.Evaluator;
+import fr.in2p3.jsaga.engine.jobcollection.DataStagingTaskGenerator;
 import fr.in2p3.jsaga.engine.jobcollection.transform.*;
 import fr.in2p3.jsaga.engine.schema.jsdl.extension.Resource;
 import fr.in2p3.jsaga.engine.schema.jsdl.extension.ResourceSelection;
+import fr.in2p3.jsaga.engine.workflow.WorkflowImpl;
+import fr.in2p3.jsaga.engine.workflow.task.DummyTask;
+import fr.in2p3.jsaga.engine.workflow.task.JobRunTask;
+import fr.in2p3.jsaga.impl.job.description.XJSDLJobDescriptionImpl;
+import fr.in2p3.jsaga.impl.job.instance.JobHandle;
 import fr.in2p3.jsaga.impl.job.instance.LateBindedJobImpl;
-import fr.in2p3.jsaga.impl.task.TaskContainerImpl;
 import fr.in2p3.jsaga.jobcollection.JobCollection;
 import fr.in2p3.jsaga.jobcollection.JobCollectionDescription;
 import org.exolab.castor.xml.Unmarshaller;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
-import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -33,7 +37,7 @@ import java.util.LinkedList;
 /**
  *
  */
-public class JobCollectionImpl extends TaskContainerImpl implements JobCollection {
+public class JobCollectionImpl extends WorkflowImpl implements JobCollection {
     private LinkedList<LateBindedJobImpl> m_unallocatedJobs;
 
     /** constructor */
@@ -47,27 +51,37 @@ public class JobCollectionImpl extends TaskContainerImpl implements JobCollectio
         
         // preprocess
         JobCollectionPreprocessor preprocessor = new JobCollectionPreprocessor(filledJcDesc, collectionName);
-        byte[] processedJcDesc = preprocessor.getEffectiveJobCollection();
+        Document processedJcDesc = preprocessor.getEffectiveJobCollection();
 
         // split parametric job
         JobCollectionSplitter splitter = new JobCollectionSplitter(processedJcDesc, evaluator);
-        JobDescription[] jobDescArray = splitter.getIndividualJobArray();
+        XJSDLJobDescriptionImpl[] jobDescArray = splitter.getIndividualJobArray();
 
-        // create late binded job service
-        JobService service;
-        try {
-            service = JobFactory.createJobService(session, null);
-        } catch (IncorrectURL e) {
-            throw new NoSuccess(e);
-        }
-
-        // create late binded jobs
+        // update workflow
         m_unallocatedJobs = new LinkedList<LateBindedJobImpl>();
         for (int i=0; i<jobDescArray.length; i++) {
-            LateBindedJobImpl job = (LateBindedJobImpl) service.createJob(jobDescArray[i]);
+            // get job name
+            String jobName = jobDescArray[i].getJobName();
+
+            // create job handle
+            JobHandle jobHandle = new JobHandle(session);
+            // create workflow jobRun task
+            JobRunTask jobRun = new JobRunTask("run_"+jobName, jobHandle);
+            // create workflow jobEnd task
+            DummyTask jobEnd = new DummyTask("end_"+jobName);
+            // create container task
+            JobWithStagingImpl job = new JobWithStagingImpl(session, jobDescArray[i], jobHandle, this, jobEnd);
+
+            // update unallocated job list
             m_unallocatedJobs.add(job);
+            // update task container
             super.add(job);
+            // update workflow
+            this.add(jobEnd, null, null);
+            this.add(jobRun, "start", jobEnd.getName());
         }
+        DataStagingTaskGenerator prePostStaging = new DataStagingTaskGenerator(processedJcDesc);
+        prePostStaging.updateWorkflow(this);
     }
 
     /** clone */

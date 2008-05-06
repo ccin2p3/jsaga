@@ -1,10 +1,8 @@
 package fr.in2p3.jsaga.engine.workflow.task;
 
 import fr.in2p3.jsaga.engine.workflow.AbstractWorkflowTaskImpl;
-import org.ogf.saga.session.Session;
 import org.ogf.saga.error.*;
 import org.ogf.saga.task.State;
-import org.ogf.saga.monitoring.Metric;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -20,8 +18,8 @@ import org.ogf.saga.monitoring.Metric;
  */
 public class DummyTask extends AbstractWorkflowTaskImpl {
     /** constructor */
-    public DummyTask(Session session, String name) throws NotImplemented, BadParameter, Timeout, NoSuccess {
-        super(session, name);
+    public DummyTask(String name) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+        super(null, name);
     }
 
     //////////////////////////////////////////// abstract methods ////////////////////////////////////////////
@@ -38,11 +36,11 @@ public class DummyTask extends AbstractWorkflowTaskImpl {
         return super.getState_LocalCheckOnly();
     }
 
-    public boolean startListening(Metric metric) throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public boolean startListening() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
         return true;    // do nothing
     }
 
-    public void stopListening(Metric metric) throws NotImplemented, Timeout, NoSuccess {
+    public void stopListening() throws NotImplemented, Timeout, NoSuccess {
         // do nothing
     }
 }

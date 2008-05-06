@@ -24,13 +24,10 @@ import java.util.Map;
  */
 public class JobCollectionPreprocessor {
     private static final String XML_JOB_TEMPLATE = "job-template.xml";
-    private static final String XML_PRESTAGE_GRAPH = "prestage-graph.xml";
-
     private static final String XSL_1_ADD_DEFAULTS = "xsl/execution/collec_1-add-defaults.xsl";
     private static final String XSL_2_GENERATE_PRESTAGE = "xsl/execution/collec_2-generate-prestage.xsl";
 
-    private byte[] m_effectiveJobCollection;
-    private byte[] m_prestageGraph;
+    private Document m_effectiveJobCollection;
 
     public JobCollectionPreprocessor(Document jobCollecDesc, String collectionName) throws NoSuccess {
         // Set stylesheet parameters
@@ -50,24 +47,17 @@ public class JobCollectionPreprocessor {
         // Transform
         XSLTransformerFactory t = XSLTransformerFactory.getInstance();
         XMLDocument collectionContainer = new XMLDocument(new File(baseDir, XML_JOB_TEMPLATE));
-        XMLDocument prestageContainer = new XMLDocument(new File(baseDir, XML_PRESTAGE_GRAPH));
         try {
             collectionContainer.set(t.getCached(XSL_1_ADD_DEFAULTS).transform(jobCollecDesc.getDocumentElement()));
             collectionContainer.set(t.getCached(XSL_2_GENERATE_PRESTAGE, parameters).transform(collectionContainer.get()));
             collectionContainer.save();
-
-            m_effectiveJobCollection = collectionContainer.get();
-            m_prestageGraph = prestageContainer.get();
+            m_effectiveJobCollection = collectionContainer.getAsDocument();
         } catch (Exception e) {
             throw new NoSuccess(e);
         }
     }
 
-    public byte[] getEffectiveJobCollection() {
+    public Document getEffectiveJobCollection() {
         return m_effectiveJobCollection;
-    }
-
-    public byte[] getPrestageGraph() {
-        return m_prestageGraph;
     }
 }

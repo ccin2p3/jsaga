@@ -2,7 +2,6 @@ package fr.in2p3.jsaga.impl.monitoring;
 
 import fr.in2p3.jsaga.helpers.AttributeSerializer;
 import fr.in2p3.jsaga.impl.attributes.AbstractAttributesImpl;
-import fr.in2p3.jsaga.impl.task.AbstractTaskImpl;
 import org.apache.log4j.Logger;
 import org.ogf.saga.ObjectType;
 import org.ogf.saga.error.*;
@@ -27,15 +26,14 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
     // attributes
     protected E m_value;
     // internal
-    private AbstractTaskImpl m_task;
+    private Monitorable m_monitorable;
     private MetricMode m_mode;
     private MetricType m_type;
     private Map<Integer,Callback> m_callbacks;
     private int m_cookieGenerator;
-    private boolean m_isListening;
 
     /** constructor */
-    public MetricImpl(String name, String desc, MetricMode mode, String unit, MetricType type, E initialValue) {
+    public MetricImpl(Monitorable mt, String name, String desc, MetricMode mode, String unit, MetricType type, E initialValue) {
         super(null, true);   //not attached to a session, isExtensible=true
         // set attributes
         super._addReadOnlyAttribute(Metric.NAME, name);
@@ -45,11 +43,11 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
         super._addReadOnlyAttribute(Metric.TYPE, type.name());
         m_value = initialValue; //do not notify
         // internal
+        m_monitorable = mt;
         m_mode = mode;
         m_type = type;
         m_callbacks = new HashMap<Integer,Callback>();
         m_cookieGenerator = 1;
-        m_isListening = false;
     }
 
     /** clone */
@@ -58,12 +56,11 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
         MetricImpl<E> clone = (MetricImpl<E>) super.clone();
         clone.m_value = m_value;
         // internal
-        clone.m_task = m_task;
+        clone.m_monitorable = m_monitorable;
         clone.m_mode = m_mode;
         clone.m_type = m_type;
         clone.m_callbacks = clone(m_callbacks);
         clone.m_cookieGenerator = m_cookieGenerator;
-        clone.m_isListening = m_isListening;
         return clone;
     }
 
@@ -71,25 +68,16 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
         return ObjectType.METRIC;
     }
 
-    public void setTask(AbstractTaskImpl task) {
-        m_task = task;
-    }
-
-    public boolean isListening() {
-        return m_isListening;
-    }
-
     /**
      * If new value if different from old value, then set it and invoke callbacks.
      * The SAGA engine implementation SHOULD use this method instead of method setAttribute.
      * @param value the new value
-     * @param mt the object that is setting this new value
      */
-    public void setValue(E value, Monitorable mt) {
+    public void setValue(E value) {
         boolean isModified = (m_value==null && value!=null) || (m_value!=null && !m_value.equals(value));
         if (isModified) {
             m_value = value;
-            this.invokeCallbacks(mt);
+            this.invokeCallbacks();
         }
     }
 
@@ -149,29 +137,20 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
     //////////////////////////////////////////// interface Metric ////////////////////////////////////////////
 
     public int addCallback(Callback cb) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
-        int cookie;
         switch (m_mode) {
             case ReadWrite:
             case ReadOnly:
                 m_callbacks.put(m_cookieGenerator, cb);
-                cookie = m_cookieGenerator++;
-                break;
+                return ++m_cookieGenerator;
             case Final:
                 throw new IncorrectState("Can not add callback to a metric with mode: "+m_mode.name(), this);
             default:
                 throw new NoSuccess("INTERNAL ERROR: unexpected exception");
         }
-        if (m_callbacks.size() > 0) {
-            m_isListening = m_task.startListening(this);
-        }
-        return cookie;
     }
 
-    public void removeCallback(int cookie) throws NotImplemented, BadParameter, AuthenticationFailed, AuthorizationFailed,PermissionDenied, Timeout, NoSuccess {
-        if (m_callbacks.remove(cookie)!=null && m_callbacks.size()==0) {
-            m_task.stopListening(this);
-            m_isListening = false;
-        }
+    public void removeCallback(int cookie) throws NotImplemented, BadParameter, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
+        m_callbacks.remove(cookie);
     }
 
     public void fire() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
@@ -193,7 +172,7 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
         if (Metric.VALUE.equals(key)) {
             switch(m_mode) {
                 case ReadWrite:
-                    this.setValue(this.getValuefromString(value), null);
+                    this.setValue(this.getValuefromString(value));
                     break;
                 case ReadOnly:
                 case Final:
@@ -220,7 +199,7 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
         if (Metric.VALUE.equals(key)) {
             switch(m_mode) {
                 case ReadWrite:
-                    this.setValue(this.getValuefromStringArray(values), null);
+                    this.setValue(this.getValuefromStringArray(values));
                 case ReadOnly:
                 case Final:
                     throw new IncorrectState("Can not set attributes of a metric with mode: "+m_mode.name(), this);
@@ -243,13 +222,17 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
 
     //////////////////////////////////////////// private methods ////////////////////////////////////////////
 
-    private void invokeCallbacks(Monitorable mt) {
-        for (Iterator<Map.Entry<Integer,Callback>> it=m_callbacks.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry<Integer,Callback> entry = it.next();
+    protected int getNumberOfCallbacks() {
+        return m_callbacks.size();
+    }
+
+    protected void invokeCallbacks() {
+        Collection<Map.Entry<Integer,Callback>> callbacks = new HashSet<Map.Entry<Integer,Callback>>(m_callbacks.entrySet());
+        for (Map.Entry<Integer,Callback> entry : callbacks) {
             Integer cookie = entry.getKey();
             Callback callback = entry.getValue();
             try {
-                boolean stayRegistered = callback.cb(mt, this, null);
+                boolean stayRegistered = callback.cb(m_monitorable, this, null);
                 if (!stayRegistered) {
                     this.removeCallback(cookie);
                 }

@@ -1,7 +1,6 @@
 package fr.in2p3.jsaga.impl.task;
 
 import org.ogf.saga.error.*;
-import org.ogf.saga.monitoring.Metric;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
 import org.ogf.saga.task.Task;
@@ -70,11 +69,11 @@ public class GenericThreadedTask extends AbstractTaskImpl implements Task {
         return null;    // GenericThreadedTask does not support queryState
     }
 
-    public boolean startListening(Metric metric) {
+    public boolean startListening() {
         return true;    // GenericThreadedTask is always listening anyway...
     }
 
-    public void stopListening(Metric metric) {
+    public void stopListening() {
         // do nothing
     }
 }

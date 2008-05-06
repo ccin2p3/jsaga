@@ -8,7 +8,6 @@ import org.exolab.castor.xml.Unmarshaller;
 import org.ogf.saga.error.BadParameter;
 import org.ogf.saga.error.NoSuccess;
 import org.w3c.dom.*;
-import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
@@ -29,11 +28,10 @@ public class JobCollectionSplitter {
     private JobCollectionDescription m_jobCollectionBean;
     private XJSDLJobDescriptionImpl[] m_individualJobArray;
 
-    public JobCollectionSplitter(byte[] jcBytes, Evaluator evaluator) throws NoSuccess {
+    public JobCollectionSplitter(Document jobCollection, Evaluator evaluator) throws NoSuccess {
         try {
             // marshall <JobCollection>
-            InputSource jcSource = new InputSource(new ByteArrayInputStream(jcBytes));
-            JobCollection jcBean = (JobCollection) Unmarshaller.unmarshal(JobCollection.class, jcSource);
+            JobCollection jcBean = (JobCollection) Unmarshaller.unmarshal(JobCollection.class, jobCollection);
 
             // set m_jobCollectionBean
             m_jobCollectionBean = jcBean.getJobCollectionDescription();

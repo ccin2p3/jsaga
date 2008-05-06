@@ -2,7 +2,6 @@ package fr.in2p3.jsaga.impl.task;
 
 import org.ogf.saga.ObjectType;
 import org.ogf.saga.error.*;
-import org.ogf.saga.monitoring.Metric;
 import org.ogf.saga.task.State;
 
 import java.util.Timer;
@@ -63,7 +62,7 @@ public class TaskForTesting extends AbstractTaskImplWithAsyncAttributes<String> 
         }
     }
 
-    public boolean startListening(Metric metric) throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public boolean startListening() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
         if (m_notified) {
             final TaskForTesting current = this;
             m_timer = new Timer();
@@ -77,7 +76,7 @@ public class TaskForTesting extends AbstractTaskImplWithAsyncAttributes<String> 
         return m_notified;
     }
 
-    public void stopListening(Metric metric) throws NotImplemented, Timeout, NoSuccess {
+    public void stopListening() throws NotImplemented, Timeout, NoSuccess {
         if (m_notified) {
             m_timer.cancel();
         }

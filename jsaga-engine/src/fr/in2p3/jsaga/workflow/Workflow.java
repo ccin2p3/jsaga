@@ -1,7 +1,6 @@
 package fr.in2p3.jsaga.workflow;
 
 import org.ogf.saga.error.*;
-import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskContainer;
 import org.w3c.dom.Document;
 
@@ -35,19 +34,6 @@ public interface Workflow extends TaskContainer {
             throws NotImplemented, Timeout, NoSuccess;
 
     ////////////////////////////////// interface TaskContainer /////////////////////////////////
-
-    /**
-     * TO BE OVERRIDED FOR IMPLEMENTING WORKFLOW BEHAVIOR.
-     * @throws NoSuccess IF WORKFLOW ALREADY CONTAINS <code>task</code>.
-     */
-    public int add(Task task)
-            throws NotImplemented, Timeout, NoSuccess;
-
-    /**
-     * TO BE OVERRIDED FOR IMPLEMENTING WORKFLOW BEHAVIOR.
-     */
-    public <T> Task<T> remove(int cookie)
-            throws NotImplemented, DoesNotExist, Timeout, NoSuccess;
 
     /**
      * TO BE OVERRIDED FOR IMPLEMENTING WORKFLOW BEHAVIOR.

@@ -85,6 +85,9 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
     }
 
     public Task waitFor(float timeoutInSeconds, WaitMode mode) throws NotImplemented, IncorrectState, DoesNotExist, NoSuccess {
+        if (m_tasks.isEmpty()) {
+            throw new IncorrectState("Task container is empty", this);
+        }
         this.startListening();
         Integer cookie = null;
         try {
@@ -170,7 +173,7 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
         try {
             synchronized(m_tasks) {
                 for (Task task : m_tasks.values()) {
-                    isListening &= ((AbstractTaskImpl)task).startListening(null);
+                    isListening &= ((AbstractTaskImpl)task).startListening();
                 }
             }
         } catch(Timeout e) {
@@ -182,7 +185,7 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
         try {
             synchronized(m_tasks) {
                 for (Task task : m_tasks.values()) {
-                    ((AbstractTaskImpl)task).stopListening(null);
+                    ((AbstractTaskImpl)task).stopListening();
                 }
             }
         } catch(Timeout e) {

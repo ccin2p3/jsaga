@@ -7,7 +7,6 @@ import org.exolab.castor.xml.Marshaller;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
-import org.ogf.saga.task.Task;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -32,7 +31,7 @@ public class WorkflowImpl extends TaskContainerImpl implements Workflow {
     /** constructor */
     public WorkflowImpl(Session session) throws NotImplemented, BadParameter, Timeout, NoSuccess {
         super(session);
-        WorkflowTask startTask = new StartTask(session);
+        WorkflowTask startTask = new StartTask();
         m_workflowTasks = Collections.synchronizedMap(new HashMap<String,WorkflowTask>());
         m_workflowTasks.put(startTask.getName(), startTask);
     }
@@ -76,25 +75,6 @@ public class WorkflowImpl extends TaskContainerImpl implements Workflow {
                 throw new NoSuccess(e);
             }
         }
-    }
-
-    /** override super.add() */
-    public synchronized int add(Task task) throws NotImplemented, Timeout, NoSuccess {
-        if (task instanceof WorkflowTask) {
-            WorkflowTask workflowTask = (WorkflowTask) task;
-            this.add(workflowTask, null, null);
-        }
-        return super.add(task);
-    }
-
-    /** override super.remove() */
-    public <T> Task<T> remove(int cookie) throws NotImplemented, DoesNotExist, Timeout, NoSuccess {
-        Task<T> task = super.remove(cookie);
-        if (task instanceof WorkflowTask) {
-            WorkflowTask workflowTask = (WorkflowTask) task;
-            m_workflowTasks.remove(workflowTask.getName());
-        }
-        return task;
     }
 
     /** Override super.run() */

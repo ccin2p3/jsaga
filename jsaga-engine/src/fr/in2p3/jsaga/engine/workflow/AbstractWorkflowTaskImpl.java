@@ -8,7 +8,6 @@ import fr.in2p3.jsaga.workflow.WorkflowTask;
 import org.apache.log4j.Logger;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
-import org.ogf.saga.monitoring.Metric;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
 
@@ -45,14 +44,6 @@ public abstract class AbstractWorkflowTaskImpl extends AbstractTaskImpl implemen
     public SagaObject clone() throws CloneNotSupportedException {
         throw new CloneNotSupportedException("Cloning workflow tasks is not supported yet");
     }
-
-    //////////////////////////////////////////// abstract methods ////////////////////////////////////////////
-
-    protected abstract void doSubmit() throws NotImplemented, IncorrectState, Timeout, NoSuccess;
-    protected abstract void doCancel();
-    protected abstract State queryState() throws NotImplemented, Timeout, NoSuccess;
-    public abstract boolean startListening(Metric metric) throws NotImplemented, IncorrectState, Timeout, NoSuccess;
-    public abstract void stopListening(Metric metric) throws NotImplemented, Timeout, NoSuccess;
 
     //////////////////////////////////////////////// interface Task ////////////////////////////////////////////////
 

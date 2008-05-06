@@ -21,17 +21,18 @@ import org.ogf.saga.task.WaitMode;
 public class WorkflowImplTest extends TestCase {
     public void test_workflow() throws Exception {
         Workflow workflow = WorkflowFactory.createWorkflow();
-        WorkflowTask endTask = new DummyTask(null,"endTask");       workflow.add(endTask);
-        WorkflowTask task1 = new DummyTask(null,"task1");           workflow.add(task1, null, endTask.getName());
-        WorkflowTask task2 = new DummyTask(null,"task2");           workflow.add(task2, null, endTask.getName());
-        WorkflowTask startTask1 = new DummyTask(null,"startTask1"); workflow.add(startTask1, "start", task1.getName());
+        WorkflowTask endTask = new DummyTask("endTask");        workflow.add(endTask, null, null);
+        WorkflowTask task1 = new DummyTask("task1");            workflow.add(task1, null, endTask.getName());
+        WorkflowTask task2 = new DummyTask("task2");            workflow.add(task2, null, endTask.getName());
+        WorkflowTask startTask1 = new DummyTask("startTask1");  workflow.add(startTask1, "start", task1.getName());
         workflow.run();
         Thread.sleep(100);
         assertEquals(State.DONE, task1.getState());
         assertEquals(State.NEW, task2.getState());
         assertEquals(State.NEW, endTask.getState());
 
-        WorkflowTask startTask2 = new DummyTask(null,"startTask2"); workflow.add(startTask2, "start", task2.getName());
+        WorkflowTask startTask2 = new DummyTask("startTask2");  workflow.add(startTask2, "start", task2.getName());
+        workflow.add(endTask);  // waitFor() requires to add the final tasks to the task container
         workflow.waitFor(WaitMode.ALL);
         assertEquals(State.DONE, task2.getState());
         assertEquals(State.DONE, endTask.getState());

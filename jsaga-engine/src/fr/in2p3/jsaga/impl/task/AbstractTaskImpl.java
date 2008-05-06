@@ -5,7 +5,6 @@ import org.apache.log4j.Logger;
 import org.ogf.saga.ObjectType;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
-import org.ogf.saga.monitoring.Metric;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
 import org.ogf.saga.task.Task;
@@ -27,7 +26,7 @@ import java.util.concurrent.*;
  */
 public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implements Task<E>, TaskCallback<E> {
     // metrics
-    private MetricImpl<State> m_metric_TaskState;
+    private TaskStateMetricImpl m_metric_TaskState;
     // internal
     private Object m_object;
     private E m_result;
@@ -40,7 +39,8 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
         super(session);
 
         // set metrics
-        m_metric_TaskState = this._addMetric(new MetricImpl<State>(
+        m_metric_TaskState = (TaskStateMetricImpl) this._addMetric(new TaskStateMetricImpl(
+                this,
                 Task.TASK_STATE,
                 "fires on task state change, and has the literal value of the task enum.",
                 MetricMode.ReadOnly,
@@ -87,17 +87,15 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
     protected abstract State queryState() throws NotImplemented, Timeout, NoSuccess;
 
     /**
-     * start listening to value changes of the metric <code>metric</code>
-     * @param metric the metric to monitor
+     * start listening to changes of task state
      * @return true if the task is listening, else false
      */
-    public abstract boolean startListening(Metric metric) throws NotImplemented, IncorrectState, Timeout, NoSuccess;
+    public abstract boolean startListening() throws NotImplemented, IncorrectState, Timeout, NoSuccess;
 
     /**
-     * stop listening to value changes of the metric <code>metric</code>
-     * @param metric the monitored metric
+     * stop listening to changes of task state
      */
-    public abstract void stopListening(Metric metric) throws NotImplemented, Timeout, NoSuccess;
+    public abstract void stopListening() throws NotImplemented, Timeout, NoSuccess;
 
     //////////////////////////////////////////// interface Task ////////////////////////////////////////////
 
@@ -118,7 +116,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
         }
 
         // start listening
-        this.startListening(m_metric_TaskState); //WARN: do not breakpoint here (because this may change behavior)
+        this.startListening(); //WARN: do not breakpoint here (because this may change behavior)
         // fixme: the code below avoids querying the status of finished tasks, but it makes test_simultaneousShortJob hanging with personal-gatekeeper...  :-(
         /*int cookie;
         try {
@@ -165,7 +163,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
         } catch (InterruptedException e) {/*ignore*/}
 
         // stop listening
-        this.stopListening(m_metric_TaskState);
+        this.stopListening();
         /*{
             // callback may have not been removed
             try {
@@ -231,7 +229,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
                 if (!m_metric_TaskState.isListening()) {
                     State state = this.queryState();
                     if (state != null) {
-                        m_metric_TaskState.setValue(state, this);
+                        m_metric_TaskState.setValue(state);
                     }
                 }
                 return m_metric_TaskState.getValue();
@@ -288,7 +286,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
             case FAILED:
                 return;
             default:
-                m_metric_TaskState.setValue(state, this);
+                m_metric_TaskState.setValue(state);
         }
     }
 
@@ -315,7 +313,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
     public boolean cancel(boolean mayInterruptIfRunning) {
         switch(m_metric_TaskState.getValue(State.RUNNING)) {
             case NEW:
-                m_metric_TaskState.setValue(State.CANCELED, this);   //as specified in java.util.concurrent
+                m_metric_TaskState.setValue(State.CANCELED);   //as specified in java.util.concurrent
                 return true;
             case DONE:
             case CANCELED:
@@ -413,12 +411,6 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
     }
 
     //////////////////////////////////////////// internal methods ////////////////////////////////////////////
-
-    /** override AbstractMonitorableImpl._addMetric() */
-    public MetricImpl _addMetric(MetricImpl metric) throws NoSuccess {
-        metric.setTask(this);
-        return super._addMetric(metric);
-    }
 
     protected State getState_LocalCheckOnly() {
         return m_metric_TaskState.getValue();
