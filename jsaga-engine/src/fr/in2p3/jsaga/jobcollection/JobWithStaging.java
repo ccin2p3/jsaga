@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.jobcollection;
 
+import org.ogf.saga.error.*;
 import org.ogf.saga.job.Job;
 
 /* ***************************************************
@@ -15,4 +16,11 @@ import org.ogf.saga.job.Job;
  *
  */
 public interface JobWithStaging extends Job {
+    /**
+     * Get the job wrapper script embedding the user job.
+     * @return the job wrapper script
+     */
+    public String getWrapper()
+        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
+            PermissionDenied, DoesNotExist, Timeout, NoSuccess;
 }
