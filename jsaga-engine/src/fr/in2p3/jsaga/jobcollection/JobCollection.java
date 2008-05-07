@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.jobcollection;
 
 import fr.in2p3.jsaga.engine.schema.jsdl.extension.ResourceSelection;
+import fr.in2p3.jsaga.workflow.Workflow;
 import org.ogf.saga.URL;
-import org.ogf.saga.task.TaskContainer;
 
 import java.io.File;
 import java.io.InputStream;
@@ -19,7 +19,7 @@ import java.io.InputStream;
 /**
  *
  */
-public interface JobCollection extends TaskContainer {
+public interface JobCollection extends Workflow {
     public void allocateResources(File resourcesFile) throws Exception;
     public void allocateResources(InputStream resourcesStream) throws Exception;
     public void allocateResources(URL[] resourceUrls) throws Exception;
