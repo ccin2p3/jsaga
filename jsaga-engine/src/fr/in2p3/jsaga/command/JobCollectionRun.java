@@ -3,7 +3,7 @@ package fr.in2p3.jsaga.command;
 import fr.in2p3.jsaga.helpers.XMLFileParser;
 import fr.in2p3.jsaga.jobcollection.*;
 import org.apache.commons.cli.*;
-import org.ogf.saga.error.BadParameter;
+import org.ogf.saga.error.DoesNotExist;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.task.Task;
@@ -30,8 +30,9 @@ public class JobCollectionRun extends AbstractCommand {
     private static final String OPT_LANGUAGE = "l", LONGOPT_LANGUAGE = "language";
     private static final String OPT_RESOURCES = "r", LONGOPT_RESOURCES = "resources";
     // options group
-    private static final String OPT_TRANSLATE = "t", LONGOPT_TRANSLATE = "translate";
-    private static final String OPT_PREPROCESS = "p", LONGOPT_PREPROCESS = "preprocess";
+    private static final String OPT_DUMP_JSDL = "j", LONGOPT_DUMP_JSDL = "dump-jsdl";
+    private static final String OPT_DUMP_STAGING = "s", LONGOPT_DUMP_STAGING = "dump-staging";
+    private static final String OPT_DUMP_WRAPPER = "w", LONGOPT_DUMP_WRAPPER = "dump-wrapper";
 
     protected JobCollectionRun() {
         super("jsaga-jobcollection-run", new String[]{"jobCollection"}, new String[]{OPT_HELP, LONGOPT_HELP});
@@ -65,26 +66,26 @@ public class JobCollectionRun extends AbstractCommand {
             // create job collection description
             JobCollectionDescription desc = JobCollectionFactory.createJobCollectionDescription(language, jobCollectionFile);
 
-            if (line.hasOption(OPT_TRANSLATE)) {
+            if (line.hasOption(OPT_DUMP_JSDL)) {
                 XMLFileParser.dump(desc.getAsDocument(), System.out);
             } else {
                 // create job collection
                 Session session = SessionFactory.createSession(true);
                 JobCollectionManager manager = JobCollectionFactory.createJobCollectionManager(session);
                 JobCollection jobCollection = manager.createJobCollection(desc);
+                if (resourcesFile != null) {
+                    jobCollection.allocateResources(resourcesFile);
+                }
 
-                if (line.hasOption(OPT_PREPROCESS)) {
-                    if (resourcesFile != null) {
-                        jobCollection.allocateResources(resourcesFile);
-                    } else {
-                        throw new BadParameter("Option --"+LONGOPT_PREPROCESS+" requires option --"+LONGOPT_RESOURCES);
-                    }
+                if (line.hasOption(OPT_DUMP_STAGING)) {
+                    XMLFileParser.dump(jobCollection.getStatesAsXML(), System.out);
+                } else if (line.hasOption(OPT_DUMP_WRAPPER)) {
+                    String jobName = line.getOptionValue(OPT_DUMP_WRAPPER);
+                    JobWithStaging job = findJob(jobCollection, jobName);
+                    System.out.println(job.getWrapper());
                 } else {
                     // submit job collection
                     jobCollection.run();
-                    if (resourcesFile != null) {
-                        jobCollection.allocateResources(resourcesFile);
-                    }
 
                     // wait
                     while (jobCollection.size() > 0) {
@@ -94,6 +95,16 @@ public class JobCollectionRun extends AbstractCommand {
                 }
             }
         }
+    }
+    private static JobWithStaging findJob(JobCollection jobCollection, String jobName) throws Exception {
+        Task[] array = jobCollection.getTasks();
+        for (int i=0; i<array.length; i++) {
+            JobWithStaging job = (JobWithStaging) array[i];
+            if (jobName.equals(job.getJobDescription().getAttribute("JobName"))) {
+                return job;
+            }
+        }
+        throw new DoesNotExist("Job not found in collection: "+jobName);
     }
 
     protected Options createOptions() {
@@ -120,12 +131,17 @@ public class JobCollectionRun extends AbstractCommand {
         OptionGroup group = new OptionGroup();
         group.setRequired(false);
         {
-            group.addOption(OptionBuilder.withDescription("Translate job collection to JSDL and exit")
-                    .withLongOpt(LONGOPT_TRANSLATE)
-                    .create(OPT_TRANSLATE));
-            group.addOption(OptionBuilder.withDescription("Preprocess job collection and exit")
-                    .withLongOpt(LONGOPT_PREPROCESS)
-                    .create(OPT_PREPROCESS));
+            group.addOption(OptionBuilder.withDescription("Dump generated JSDL document and exit")
+                    .withLongOpt(LONGOPT_DUMP_JSDL)
+                    .create(OPT_DUMP_JSDL));
+            group.addOption(OptionBuilder.withDescription("Dump generated staging graph and exit")
+                    .withLongOpt(LONGOPT_DUMP_STAGING)
+                    .create(OPT_DUMP_STAGING));
+            group.addOption(OptionBuilder.withDescription("Dump generated wrapper script and exit")
+                    .hasArg()
+                    .withArgName("JobName")
+                    .withLongOpt(LONGOPT_DUMP_WRAPPER)
+                    .create(OPT_DUMP_WRAPPER));
         }
         opt.addOptionGroup(group);
         
