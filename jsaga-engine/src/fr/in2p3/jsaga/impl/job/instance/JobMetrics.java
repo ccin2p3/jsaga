@@ -20,14 +20,14 @@ import org.ogf.saga.task.State;
  *
  */
 public class JobMetrics {
-    TaskStateMetricImpl m_State;
+    MetricImpl<State> m_State;
     MetricImpl<String> m_StateDetail;
     /** deviation from SAGA specification */
     MetricImpl<String> m_SubState;
 
     /** constructor */
     JobMetrics(JobImpl job) throws NoSuccess {
-        m_State = (TaskStateMetricImpl) job._addMetric(new TaskStateMetricImpl(
+        m_State = job._addMetric(new TaskStateMetricImpl<State>(
                 job,
                 Job.JOB_STATE,
                 "fires on state changes of the job, and has the literal value of the job state enum.",
@@ -35,7 +35,7 @@ public class JobMetrics {
                 "1",
                 MetricType.Enum,
                 State.NEW));
-        m_StateDetail = job._addMetric(new MetricImpl<String>(
+        m_StateDetail = job._addMetric(new TaskStateMetricImpl<String>(
                 job,
                 Job.JOB_STATEDETAIL,
                 "fires as a job changes its state detail",
@@ -43,7 +43,7 @@ public class JobMetrics {
                 "1",
                 MetricType.String,
                 "Unknown:Unknown"));
-        m_SubState = job._addMetric(new MetricImpl<String>(
+        m_SubState = job._addMetric(new TaskStateMetricImpl<String>(
                 job,
                 JobImpl.JOB_SUBSTATE,
                 "fires on sub-state changes of the job (deviation from SAGA specification)",
