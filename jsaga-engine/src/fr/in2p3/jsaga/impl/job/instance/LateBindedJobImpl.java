@@ -1,7 +1,6 @@
 package fr.in2p3.jsaga.impl.job.instance;
 
 import fr.in2p3.jsaga.engine.config.Configuration;
-import fr.in2p3.jsaga.engine.jobcollection.transform.IndividualJobPreprocessor;
 import fr.in2p3.jsaga.engine.schema.jsdl.extension.Resource;
 import fr.in2p3.jsaga.impl.job.description.XJSDLJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.monitoring.MetricImpl;
@@ -13,7 +12,6 @@ import org.ogf.saga.monitoring.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
 import org.ogf.saga.task.Task;
-import org.w3c.dom.Document;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,8 +30,8 @@ import java.io.OutputStream;
  */
 public class LateBindedJobImpl extends AbstractAsyncJobImpl implements Job {
     protected JobHandle m_jobHandle;
-    protected XJSDLJobDescriptionImpl m_jobDesc;
-    protected URL m_resourceManager;
+    private XJSDLJobDescriptionImpl m_jobDesc;
+    private URL m_resourceManager;
 
     /** constructor for JobWithStagingImpl */
     protected LateBindedJobImpl(Session session, XJSDLJobDescriptionImpl jobDesc, JobHandle jobHandle) throws NotImplemented, BadParameter, Timeout, NoSuccess {
@@ -68,17 +66,21 @@ public class LateBindedJobImpl extends AbstractAsyncJobImpl implements Job {
         m_resourceManager.setFragment(rm.getGrid());
 
         // transform job description
-        IndividualJobPreprocessor preprocessor = new IndividualJobPreprocessor(m_jobDesc, rm);
-        Document effectiveJobDescDOM = preprocessor.getEffectiveJobDescription();
-        m_jobDesc = new XJSDLJobDescriptionImpl(m_jobDesc.getCollectionName(), m_jobDesc.getJobName(), effectiveJobDescDOM);
+        this.transformJobDescription(m_jobDesc, rm);
 
         // create job
         JobService jobService = JobFactory.createJobService(m_session, m_resourceManager);
         JobImpl job = (JobImpl) jobService.createJob(m_jobDesc);
         m_jobHandle.setJob(job);
     }
+    protected boolean isAllocated() {
+        return (m_resourceManager != null);
+    }
+    protected XJSDLJobDescriptionImpl transformJobDescription(XJSDLJobDescriptionImpl jobDesc, Resource rm) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+        return jobDesc;     // default implementation does nothing
+    }
 
-    ////////////////////////////////////// implementation of AbstractTaskImpl //////////////////////////////////////    
+    ////////////////////////////////////// implementation of AbstractTaskImpl //////////////////////////////////////
 
     protected void doSubmit() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
         m_jobHandle.doSubmit();
