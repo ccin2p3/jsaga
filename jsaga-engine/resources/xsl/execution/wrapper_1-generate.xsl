@@ -15,6 +15,7 @@
     <xsl:param name="logger"/>
     <xsl:param name="monitor"/>
     <xsl:param name="accounting"/>
+    <xsl:param name="prologue"/>
     <xsl:param name="protection" select="'integrity'"/>
 
     <!-- entry point -->
@@ -111,7 +112,10 @@ function cleanup() {
 
 ############### INITIALIZE ###############
 function INITIALIZE() {
-    . /etc/profile
+    if test -f /etc/profile ; then
+        . /etc/profile
+    fi
+    <xsl:if test="$prologue"><xsl:value-of select="$prologue"/></xsl:if>
 }
 
 ############### INPUT_STAGING ###############

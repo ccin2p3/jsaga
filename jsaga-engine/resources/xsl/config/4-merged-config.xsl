@@ -122,6 +122,7 @@
                     <xsl:with-param name="conf" select="$conf/cfg:monitorService"/>
                 </xsl:apply-templates>
                 <xsl:apply-templates select="$conf/cfg:logging | $conf/cfg:monitoring | $conf/cfg:accounting"/>
+                <xsl:apply-templates select="$conf/cfg:prologue"/>
                 <xsl:apply-templates select="$desc/cfg:supportedContextType"/>
                 <xsl:for-each select="$conf/cfg:fileStaging">
                     <fileStaging>

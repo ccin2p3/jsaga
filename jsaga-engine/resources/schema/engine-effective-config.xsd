@@ -117,6 +117,7 @@
                     <element name="accounting" minOccurs="0" maxOccurs="1"><complexType><simpleContent><extension base="string">
                         <attribute name="impl" type="string" use="required"/>
                     </extension></simpleContent></complexType></element>
+                    <element name="prologue" minOccurs="0" maxOccurs="1" type="string"/>                    
                     <element name="supportedContextType" minOccurs="0" maxOccurs="unbounded" type="string"/><!-- from adaptor descriptor -->
                     <element name="fileStaging"><complexType>
                         <sequence>

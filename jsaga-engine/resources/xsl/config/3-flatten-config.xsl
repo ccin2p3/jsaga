@@ -78,6 +78,7 @@
                         <accounting impl="fr.in2p3.jsaga.engine.jobcollection.DefaultAccountingImpl"
                                 >echo "T1M: [$TIME] $FUNCTION"</accounting>
                     </xsl:if>
+                    <xsl:apply-templates select="cfg:prologue"/>
 
                     <fileStaging>
                         <xsl:copy-of select="@defaultIntermediary"/>
