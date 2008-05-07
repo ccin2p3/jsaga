@@ -3,7 +3,8 @@
                 xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
                 xmlns:posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
                 xmlns:spmd="http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd"
-                xmlns:ext="http://www.in2p3.fr/jsdl-extension">
+                xmlns:ext="http://www.in2p3.fr/jsdl-extension"
+                xmlns:cfg="http://www.in2p3.fr/jsaga">
     <!-- ###########################################################################
          # Generate job wrapper script
          ###########################################################################
@@ -11,12 +12,15 @@
     <xsl:output method="text" indent="yes" encoding="latin1"/>
     <xsl:strip-space elements="*"/>
 
-    <!-- configuration attributes -->
-    <xsl:param name="logger"/>
-    <xsl:param name="monitor"/>
-    <xsl:param name="accounting"/>
-    <xsl:param name="prologue"/>
-    <xsl:param name="protection" select="'integrity'"/>
+    <!-- resource -->
+    <xsl:param name="resourceId"/><!-- required -->
+    <xsl:param name="gridName"/><!-- required -->
+    <xsl:param name="protection" select="'integrity'"/><!-- optional -->
+
+    <!-- configuration -->
+    <xsl:variable name="config" select="document('var/jsaga-merged-config.xml')/cfg:effective-config"/>
+    <xsl:variable name="resourceScheme" select="substring-before($resourceId, '://')"/>
+    <xsl:variable name="jobService" select="$config/cfg:execution[@scheme=$resourceScheme]/cfg:jobService[@name=$gridName]"/>
 
     <!-- entry point -->
     <xsl:template match="/">
@@ -32,7 +36,7 @@ function log() {
     LEVEL=$1
     MESSAGE=$2
     echo "$LEVEL: ["`date "+%d/%m/%Y %T,%2N"`"] - $MESSAGE"
-    <xsl:if test="$logger"><xsl:value-of select="$logger"/></xsl:if>
+    <xsl:for-each select="$jobService/cfg:logging/text()"><xsl:value-of select="."/></xsl:for-each>
 }
 
 function change_state() {
@@ -43,14 +47,14 @@ function change_state() {
     else
         log INFO "new status: $STATUS"
     fi
-    <xsl:if test="$monitor"><xsl:value-of select="$monitor"/></xsl:if>
+    <xsl:for-each select="$jobService/cfg:monitoring/text()"><xsl:value-of select="."/></xsl:for-each>
 }
 
 function accounting() {
     FUNCTION=$1
     TIME=$2
     log INFO "accounting for $FUNCTION: $TIME"
-    <xsl:if test="$accounting"><xsl:value-of select="$accounting"/></xsl:if>
+    <xsl:for-each select="$jobService/cfg:accounting/text()"><xsl:value-of select="."/></xsl:for-each>
 }
 
 function _FAIL_() {
@@ -115,7 +119,7 @@ function INITIALIZE() {
     if test -f /etc/profile ; then
         . /etc/profile
     fi
-    <xsl:if test="$prologue"><xsl:value-of select="$prologue"/></xsl:if>
+    <xsl:for-each select="$jobService/cfg:prologue/text()"><xsl:value-of select="."/></xsl:for-each>
 }
 
 ############### INPUT_STAGING ###############
