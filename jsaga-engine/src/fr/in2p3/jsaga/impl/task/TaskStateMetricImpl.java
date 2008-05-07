@@ -3,7 +3,6 @@ package fr.in2p3.jsaga.impl.task;
 import fr.in2p3.jsaga.impl.monitoring.*;
 import org.ogf.saga.error.*;
 import org.ogf.saga.monitoring.Callback;
-import org.ogf.saga.task.State;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -17,21 +16,21 @@ import org.ogf.saga.task.State;
 /**
  *
  */
-public class TaskStateMetricImpl extends MetricImpl<State> {
+public class TaskStateMetricImpl<E> extends MetricImpl<E> {
     private AbstractTaskImpl m_task;
     private boolean m_isListening;
 
     /** constructor */
-    public TaskStateMetricImpl(AbstractTaskImpl task, String name, String desc, MetricMode mode, String unit, MetricType type, State initialValue) {
+    public TaskStateMetricImpl(AbstractTaskImpl task, String name, String desc, MetricMode mode, String unit, MetricType type, E initialValue) {
         super(task, name, desc, mode, unit, type, initialValue);
         m_task = task;
         m_isListening = false;
     }
 
     /** clone */
-    public TaskStateMetricImpl clone() throws CloneNotSupportedException {
+    public TaskStateMetricImpl<E> clone() throws CloneNotSupportedException {
         // clone attributes
-        TaskStateMetricImpl clone = (TaskStateMetricImpl) super.clone();
+        TaskStateMetricImpl<E> clone = (TaskStateMetricImpl<E>) super.clone();
         clone.m_task = m_task;
         clone.m_isListening = m_isListening;
         return clone;
