@@ -33,7 +33,7 @@ import java.io.OutputStream;
 public class LateBindedJobImpl extends AbstractAsyncJobImpl implements Job {
     protected JobHandle m_jobHandle;
     protected XJSDLJobDescriptionImpl m_jobDesc;
-    private URL m_resourceManager;
+    protected URL m_resourceManager;
 
     /** constructor for JobWithStagingImpl */
     protected LateBindedJobImpl(Session session, XJSDLJobDescriptionImpl jobDesc, JobHandle jobHandle) throws NotImplemented, BadParameter, Timeout, NoSuccess {

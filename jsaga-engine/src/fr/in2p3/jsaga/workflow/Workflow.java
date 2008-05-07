@@ -18,19 +18,27 @@ import org.w3c.dom.Document;
  */
 public interface Workflow extends TaskContainer {
     /**
-     * Gets the states of all tasks in the workflow.
-     * @return the states in a XML document.
-     */
-    public Document getStatesAsXML()
-            throws NotImplemented, Timeout, NoSuccess;
-
-    /**
      * Adds a task to the workflow.
      * @param task the task to add.
      * @param predecessorName name of a predecessor task.
      * @param successorName name of a successor task.
      */
     public void add(WorkflowTask task, String predecessorName, String successorName)
+            throws NotImplemented, Timeout, NoSuccess;
+
+    /**
+     * Gets a single task from the task container.
+     * @param name the name identifying the task.
+     * @return the task.
+     */
+    public WorkflowTask getTask(String name)
+        throws NotImplemented, DoesNotExist, Timeout, NoSuccess;
+
+    /**
+     * Gets the states of all tasks in the workflow.
+     * @return the states in a XML document.
+     */
+    public Document getStatesAsXML()
             throws NotImplemented, Timeout, NoSuccess;
 
     ////////////////////////////////// interface TaskContainer /////////////////////////////////

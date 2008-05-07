@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.impl.jobcollection;
 
 import fr.in2p3.jsaga.engine.jobcollection.DataStagingTaskGenerator;
 import fr.in2p3.jsaga.engine.schema.jsdl.extension.Resource;
+import fr.in2p3.jsaga.engine.workflow.StartTask;
 import fr.in2p3.jsaga.engine.workflow.task.DummyTask;
 import fr.in2p3.jsaga.impl.job.description.XJSDLJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.job.instance.JobHandle;
@@ -26,12 +27,18 @@ import org.ogf.saga.task.State;
 public class JobWithStagingImpl extends LateBindedJobImpl {
     private Workflow m_workflow;
     private DummyTask m_jobEnd;
+    private DummyTask m_startTask;
 
     /** constructor for submission */
     public JobWithStagingImpl(Session session, XJSDLJobDescriptionImpl jobDesc, JobHandle jobHandle, Workflow workflow, DummyTask jobEnd) throws NotImplemented, BadParameter, Timeout, NoSuccess {
         super(session, jobDesc, jobHandle);
         m_workflow = workflow;
         m_jobEnd = jobEnd;
+        try {
+            m_startTask = (DummyTask) m_workflow.getTask(StartTask.NAME);
+        } catch (DoesNotExist e) {
+            throw new NoSuccess(e);
+        }
     }
 
     /** override super.allocate() */
@@ -58,9 +65,20 @@ public class JobWithStagingImpl extends LateBindedJobImpl {
         state = m_jobHandle.getState();
         switch(state) {
             case DONE:
+            case RUNNING:
                 return State.RUNNING;
-            default:
+            case CANCELED:
+            case FAILED:
+            case SUSPENDED:
                 return state;
-        }        
+        }
+        state = m_startTask.getState();
+        switch(state) {
+            case DONE:
+                if (m_resourceManager != null) {
+                    return State.RUNNING;
+                }
+        }
+        return State.NEW;
     }    
 }

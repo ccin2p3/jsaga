@@ -43,6 +43,12 @@ public class WorkflowImpl extends TaskContainerImpl implements Workflow {
         return clone;
     }
 
+    /** Override super.run() */
+    public void run() throws NotImplemented, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+        WorkflowTask startTask = m_workflowTasks.get(StartTask.NAME);
+        startTask.run();
+    }
+
     public void add(WorkflowTask task, String predecessorName, String successorName) throws NotImplemented, Timeout, NoSuccess {
         // link to predecessor
         if (predecessorName != null) {
@@ -77,10 +83,13 @@ public class WorkflowImpl extends TaskContainerImpl implements Workflow {
         }
     }
 
-    /** Override super.run() */
-    public void run() throws NotImplemented, IncorrectState, DoesNotExist, Timeout, NoSuccess {
-        WorkflowTask startTask = m_workflowTasks.get(StartTask.NAME);
-        startTask.run();
+    public WorkflowTask getTask(String name) throws NotImplemented, DoesNotExist, Timeout, NoSuccess {
+        WorkflowTask task = m_workflowTasks.get(name);
+        if (task != null) {
+            return task;
+        } else {
+            throw new DoesNotExist("Task not in workflow: "+name, this);
+        }
     }
 
     public synchronized Document getStatesAsXML() throws NotImplemented, Timeout, NoSuccess {
