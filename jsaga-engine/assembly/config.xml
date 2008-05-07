@@ -5,8 +5,8 @@
         <format>zip</format>
     </formats>
     <fileSets>
+        <!-- copy directories -->
         <fileSet>
-            <!-- copy directories -->
             <outputDirectory/>
             <directory>config</directory>
             <excludes>
@@ -16,7 +16,11 @@
             </excludes>
         </fileSet>
         <fileSet>
-            <!-- generate launcher scripts -->
+            <outputDirectory>doc/examples</outputDirectory>
+            <directory>test/resources/jobcollection</directory>
+        </fileSet>
+        <!-- generate launcher scripts -->
+        <fileSet>
             <outputDirectory>bin</outputDirectory>
             <directory>build/bin</directory>
             <lineEnding>unix</lineEnding><!-- fixme: does not work when build is launched by parent project -->
