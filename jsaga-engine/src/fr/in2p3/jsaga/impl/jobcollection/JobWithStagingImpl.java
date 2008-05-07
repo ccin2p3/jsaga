@@ -1,16 +1,19 @@
 package fr.in2p3.jsaga.impl.jobcollection;
 
 import fr.in2p3.jsaga.engine.jobcollection.DataStagingTaskGenerator;
+import fr.in2p3.jsaga.engine.jobcollection.transform.IndividualJobPreprocessor;
 import fr.in2p3.jsaga.engine.schema.jsdl.extension.Resource;
 import fr.in2p3.jsaga.engine.workflow.StartTask;
 import fr.in2p3.jsaga.engine.workflow.task.DummyTask;
 import fr.in2p3.jsaga.impl.job.description.XJSDLJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.job.instance.JobHandle;
 import fr.in2p3.jsaga.impl.job.instance.LateBindedJobImpl;
+import fr.in2p3.jsaga.jobcollection.JobWithStaging;
 import fr.in2p3.jsaga.workflow.Workflow;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
+import org.w3c.dom.Document;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -24,10 +27,11 @@ import org.ogf.saga.task.State;
 /**
  *
  */
-public class JobWithStagingImpl extends LateBindedJobImpl {
+public class JobWithStagingImpl extends LateBindedJobImpl implements JobWithStaging {
     private Workflow m_workflow;
     private DummyTask m_jobEnd;
     private DummyTask m_startTask;
+    private String m_wrapper;
 
     /** constructor for submission */
     public JobWithStagingImpl(Session session, XJSDLJobDescriptionImpl jobDesc, JobHandle jobHandle, Workflow workflow, DummyTask jobEnd) throws NotImplemented, BadParameter, Timeout, NoSuccess {
@@ -41,14 +45,29 @@ public class JobWithStagingImpl extends LateBindedJobImpl {
         }
     }
 
-    /** override super.allocate() */
-    public void allocate(Resource rm) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        // transform job description and create job
-        super.allocate(rm);
+    //////////////////////////////////////// implementation of JobWithStaging //////////////////////////////////////
+
+    public String getWrapper() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        return m_wrapper;
+    }    
+
+    ////////////////////////////////////// implementation of LateBindedJobImpl /////////////////////////////////////
+
+    /** override super.transformJobDescription() */
+    protected XJSDLJobDescriptionImpl transformJobDescription(XJSDLJobDescriptionImpl jobDesc, Resource rm) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+        // transform job description
+        IndividualJobPreprocessor preprocessor = new IndividualJobPreprocessor(jobDesc, rm);
+        Document effectiveJobDescDOM = preprocessor.getEffectiveJobDescription();
+        jobDesc = new XJSDLJobDescriptionImpl(jobDesc.getCollectionName(), jobDesc.getJobName(), effectiveJobDescDOM);
+
+        // set wrapper script
+        m_wrapper = preprocessor.getWrapper();
 
         // update workflow
-        DataStagingTaskGenerator staging = new DataStagingTaskGenerator(m_jobDesc.getAsDocument());
+        DataStagingTaskGenerator staging = new DataStagingTaskGenerator(jobDesc.getAsDocument());
         staging.updateWorkflow(m_workflow);
+
+        return jobDesc;
     }
 
     ////////////////////////////////////// implementation of AbstractTaskImpl //////////////////////////////////////
@@ -75,10 +94,10 @@ public class JobWithStagingImpl extends LateBindedJobImpl {
         state = m_startTask.getState();
         switch(state) {
             case DONE:
-                if (m_resourceManager != null) {
+                if (super.isAllocated()) {
                     return State.RUNNING;
                 }
         }
         return State.NEW;
-    }    
+    }
 }

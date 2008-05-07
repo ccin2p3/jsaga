@@ -30,8 +30,10 @@ public class IndividualJobPreprocessor {
     private static final String XSL_2_RESOLVE_PARENT_FS = "xsl/execution/job_2-resolve-parent-fs.xsl";
     private static final String XSL_3_GENERATE_STAGE = "xsl/execution/job_3-generate-stage.xsl";
     private static final String XSL_4_RESOLVE_FS = "xsl/execution/job_4-resolve-fs.xsl";
+    private static final String XSL_WRAPPER_GENERATE = "xsl/execution/wrapper_1-generate.xsl";
 
     private Document m_effectiveJob;
+    private String m_wrapper;
 
     public IndividualJobPreprocessor(XJSDLJobDescriptionImpl jobDesc, Resource rm) throws NotImplemented, NoSuccess {
         // Set stylesheet parameters
@@ -52,6 +54,7 @@ public class IndividualJobPreprocessor {
         // Transform
         XSLTransformerFactory t = XSLTransformerFactory.getInstance();
         XMLDocument jobContainer = new XMLDocument(new File(baseDir, jobDesc.getJobName()+".xml"));
+        XMLDocument jobWrapper = new XMLDocument(new File(baseDir, jobDesc.getJobName()+".sh"));
         try {
             jobContainer.set(t.getCached(XSL_1_ADD_FILESYSTEMS, parameters).transform(jobDesc.getAsDocument().getDocumentElement()));
             jobContainer.set(t.getCached(XSL_2_RESOLVE_PARENT_FS, parameters).transform(jobContainer.get()));
@@ -59,6 +62,10 @@ public class IndividualJobPreprocessor {
             jobContainer.set(t.getCached(XSL_4_RESOLVE_FS, parameters).transform(jobContainer.get()));
             jobContainer.save();
             m_effectiveJob = jobContainer.getAsDocument();
+
+            jobWrapper.set(t.getCached(XSL_WRAPPER_GENERATE, parameters).transform(m_effectiveJob.getDocumentElement()));
+            jobWrapper.save();
+            m_wrapper = new String(jobWrapper.get());
         } catch (Exception e) {
             throw new NoSuccess(e);
         }
@@ -66,5 +73,9 @@ public class IndividualJobPreprocessor {
 
     public Document getEffectiveJobDescription() {
         return m_effectiveJob;
+    }
+
+    public String getWrapper() {
+        return m_wrapper;
     }
 }
