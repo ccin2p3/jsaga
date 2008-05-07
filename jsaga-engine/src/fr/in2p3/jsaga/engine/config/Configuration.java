@@ -38,7 +38,6 @@ import java.io.*;
 public class Configuration {
     public static final String XSD_CONFIG = "schema/jsaga-config.xsd.xml";
     public static final File XML_MERGED_CONFIG = new File(Base.JSAGA_VAR, "jsaga-merged-config.xml");
-    private static boolean ALWAYS_RELOAD_CONFIG = false;    //false is twice faster than true
 
     private static final String ADAPTOR_DESCRIPTORS = "adaptor-descriptors";
     private static final String XI_RAW_CONFIG = "raw-config.xi";
@@ -98,7 +97,8 @@ public class Configuration {
         Unmarshaller unmarshaller = new Unmarshaller(EffectiveConfig.class);
         unmarshaller.setIgnoreExtraAttributes(false);
         unmarshaller.setValidation(true);
-        if (sameDescMD5 && sameConfigMD5 && XML_MERGED_CONFIG.exists() && !ALWAYS_RELOAD_CONFIG) {
+        boolean enableCache = EngineProperties.getBoolean(EngineProperties.JSAGA_CONFIGURATION_ENABLE_CACHE);
+        if (sameDescMD5 && sameConfigMD5 && XML_MERGED_CONFIG.exists() && enableCache) {
             // *** load merged config from file ***
             Reader reader = new InputStreamReader(new FileInputStream(XML_MERGED_CONFIG));
             mergedConfig = (EffectiveConfig) unmarshaller.unmarshal(reader);

@@ -19,8 +19,9 @@ import java.util.Properties;
  */
 public class EngineProperties {
     public static final String JSAGA_CONFIGURATION = "jsaga.configuration";
+    public static final String JSAGA_CONFIGURATION_ENABLE_CACHE = "jsaga.configuration.enable.cache";
+    public static final String JSAGA_CONFIGURATION_IGNORE_MISSING_ADAPTOR = "jsaga.configuration.ignore.missing.adaptor";
     public static final String LOG4J_CONFIGURATION = "log4j.configuration";
-    public static final String IGNORE_MISSING_ADAPTOR = "ignore.missing.adaptor";
     public static final String JOB_DESCRIPTION_DEFAULT = "job.description.default";
     public static final String JOB_MONITOR_POLL_PERIOD = "job.monitor.poll.period";
     public static final String JOB_MONITOR_ERROR_THRESHOLD = "job.monitor.error.threshold";
@@ -35,8 +36,9 @@ public class EngineProperties {
             // set default properties
             s_prop = new Properties();
             s_prop.setProperty(JSAGA_CONFIGURATION, "etc/jsaga-config.xml");
+            s_prop.setProperty(JSAGA_CONFIGURATION_ENABLE_CACHE, "true");
+            s_prop.setProperty(JSAGA_CONFIGURATION_IGNORE_MISSING_ADAPTOR, "true");
             s_prop.setProperty(LOG4J_CONFIGURATION, "etc/log4j.properties");
-            s_prop.setProperty(IGNORE_MISSING_ADAPTOR, "true");
             s_prop.setProperty(JOB_DESCRIPTION_DEFAULT, "etc/jsaga-default.jsdl");
             s_prop.setProperty(JOB_MONITOR_POLL_PERIOD, "1000");
             s_prop.setProperty(JOB_MONITOR_ERROR_THRESHOLD, "3");
