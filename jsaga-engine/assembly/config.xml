@@ -19,6 +19,10 @@
             <outputDirectory>doc/examples</outputDirectory>
             <directory>test/resources/jobcollection</directory>
         </fileSet>
+        <fileSet>
+            <outputDirectory>doc/examples/test_config</outputDirectory>
+            <directory>test/resources/config</directory>
+        </fileSet>
         <!-- generate launcher scripts -->
         <fileSet>
             <outputDirectory>bin</outputDirectory>
