@@ -26,7 +26,7 @@ import java.util.concurrent.*;
  */
 public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implements Task<E>, TaskCallback<E> {
     // metrics
-    private TaskStateMetricImpl m_metric_TaskState;
+    private TaskStateMetricImpl<State> m_metric_TaskState;
     // internal
     private Object m_object;
     private E m_result;
@@ -39,7 +39,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
         super(session);
 
         // set metrics
-        m_metric_TaskState = (TaskStateMetricImpl) this._addMetric(new TaskStateMetricImpl(
+        m_metric_TaskState = (TaskStateMetricImpl<State>) this._addMetric(new TaskStateMetricImpl<State>(
                 this,
                 Task.TASK_STATE,
                 "fires on task state change, and has the literal value of the task enum.",
