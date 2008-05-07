@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.engine.job.monitor;
 
+import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.adaptor.job.monitor.*;
 import fr.in2p3.jsaga.engine.job.monitor.listen.FilteredJobStatusListener;
 import fr.in2p3.jsaga.engine.job.monitor.listen.IndividualJobStatusListener;
@@ -53,8 +54,9 @@ public class JobMonitorService {
                 throw new NotImplemented("Querying job status not implemented for adaptor: "+adaptor.getClass().getName());
             }
             m_registry = poller;
+            int pollPeriod = EngineProperties.getInteger(EngineProperties.JOB_MONITOR_POLL_PERIOD);
             m_timer = new Timer();
-            m_timer.schedule(poller, 0, 1000);
+            m_timer.schedule(poller, 0, pollPeriod);
         } else {
             throw new NotImplemented("Adaptor does not implement any monitoring interface: "+adaptor.getClass().getName());
         }
