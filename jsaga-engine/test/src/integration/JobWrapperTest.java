@@ -1,5 +1,6 @@
 package integration;
 
+import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformerFactory;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformerTest;
 import junit.framework.TestCase;
@@ -21,6 +22,15 @@ import javax.xml.transform.stream.StreamSource;
  *
  */
 public class JobWrapperTest extends TestCase {
+    private String m_workDir;
+    protected void setUp() {
+        m_workDir = System.getProperty("user.dir");
+        System.setProperty("user.dir", Base.JSAGA_HOME.getAbsolutePath());
+    }
+    protected void tearDown() {
+        System.setProperty("user.dir", m_workDir);
+    }
+
     public void test_wrapper_1_generate_Application() throws Exception {
         Source stylesheet = new StreamSource(XSLTransformerFactory.class.getClassLoader().getResourceAsStream("xsl/execution/wrapper_1-generate.xsl"));
         Source xml = new StreamSource(XSLTransformerTest.class.getClassLoader().getResourceAsStream("wrapper/test_Application.xml"));
