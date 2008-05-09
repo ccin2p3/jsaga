@@ -2,7 +2,6 @@ package fr.in2p3.jsaga.engine.workflow;
 
 import fr.in2p3.jsaga.engine.schema.status.Task;
 import fr.in2p3.jsaga.engine.schema.status.types.TaskStateType;
-import fr.in2p3.jsaga.engine.schema.status.types.TaskTypeType;
 import fr.in2p3.jsaga.impl.task.AbstractTaskImpl;
 import fr.in2p3.jsaga.workflow.WorkflowTask;
 import org.apache.log4j.Logger;
@@ -31,6 +30,7 @@ public abstract class AbstractWorkflowTaskImpl extends AbstractTaskImpl implemen
     private String m_name;
     private final Map<String,WorkflowTask> m_predecessors;
     private final Map<String,WorkflowTask> m_successors;
+    private Task m_xmlStatus;
 
     /** constructor */
     public AbstractWorkflowTaskImpl(Session session, String name) throws NotImplemented, BadParameter, Timeout, NoSuccess {
@@ -38,6 +38,10 @@ public abstract class AbstractWorkflowTaskImpl extends AbstractTaskImpl implemen
         m_name = name;
         m_predecessors = new HashMap<String,WorkflowTask>();
         m_successors = new HashMap<String,WorkflowTask>();
+        // set XML status
+        m_xmlStatus = new Task();
+        m_xmlStatus.setName(m_name);
+        m_xmlStatus.setState(TaskStateType.NEW);
     }
 
     /** clone */
@@ -64,6 +68,9 @@ public abstract class AbstractWorkflowTaskImpl extends AbstractTaskImpl implemen
     public synchronized void setState(State state) {
         // update state
         super.setState(state);
+
+        // update XML status
+        m_xmlStatus.setState(toTaskStateType(state));
 
         // run successors if state of current task is DONE
         if (State.DONE.equals(state)) {
@@ -93,20 +100,17 @@ public abstract class AbstractWorkflowTaskImpl extends AbstractTaskImpl implemen
     public synchronized void addSuccessor(WorkflowTask successor) {
         if (! m_successors.containsKey(successor.getName())) {
             m_successors.put(successor.getName(), successor);
+            // update XML status
+            m_xmlStatus.addSuccessor(successor.getName());
         }
     }
 
     public Task getStateAsXML() throws NotImplemented, Timeout, NoSuccess {
-        Task task = new Task();
-        task.setName(task.getName());
-        task.setState(this._getStateAsXML());
-        if (this instanceof StartTask) {
-            task.setType(TaskTypeType.START);
-        }
-        return task;
+        return m_xmlStatus;
     }
-    private TaskStateType _getStateAsXML() throws NotImplemented, Timeout, NoSuccess {
-        switch(this.getState()) {
+
+    private static TaskStateType toTaskStateType(State state) {
+        switch(state) {
             case NEW:
                 return TaskStateType.NEW;
             case RUNNING:

@@ -29,6 +29,7 @@ public class JobCollectionRun extends AbstractCommand {
     // optional
     private static final String OPT_LANGUAGE = "l", LONGOPT_LANGUAGE = "language";
     private static final String OPT_RESOURCES = "r", LONGOPT_RESOURCES = "resources";
+    private static final String OPT_BATCH = "b", LONGOPT_BATCH = "batch";
     // options group
     private static final String OPT_DUMP_JSDL = "j", LONGOPT_DUMP_JSDL = "dump-jsdl";
     private static final String OPT_DUMP_STAGING = "s", LONGOPT_DUMP_STAGING = "dump-staging";
@@ -87,10 +88,14 @@ public class JobCollectionRun extends AbstractCommand {
                     // submit job collection
                     jobCollection.run();
 
-                    // wait
-                    while (jobCollection.size() > 0) {
-                        Task finishedTask = jobCollection.waitFor(WaitMode.ANY);
-                        System.out.println("Job finished with state: "+finishedTask.getState().name());
+                    if (line.hasOption(OPT_BATCH)) {
+                        System.out.println(jobCollection.getJobCollectionName());
+                    } else {
+                        // wait
+                        while (jobCollection.size() > 0) {
+                            Task finishedTask = jobCollection.waitFor(WaitMode.ANY);
+                            System.out.println("Job finished with state: "+finishedTask.getState().name());
+                        }
                     }
                 }
             }
@@ -126,6 +131,10 @@ public class JobCollectionRun extends AbstractCommand {
                 .withArgName("file")
                 .withLongOpt(LONGOPT_RESOURCES)
                 .create(OPT_RESOURCES));
+        opt.addOption(OptionBuilder.withDescription("Exit immediatly after having submitted the job collection, " +
+                "and print the collection name on the standard output.")
+                .withLongOpt(LONGOPT_BATCH)
+                .create(OPT_BATCH));
 
         // options group
         OptionGroup group = new OptionGroup();

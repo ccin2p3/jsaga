@@ -27,6 +27,7 @@ import java.util.*;
  */
 public class WorkflowImpl extends TaskContainerImpl implements Workflow {
     private final Map<String,WorkflowTask> m_workflowTasks;
+    private fr.in2p3.jsaga.engine.schema.status.Workflow m_xmlStatus;
 
     /** constructor */
     public WorkflowImpl(Session session) throws NotImplemented, BadParameter, Timeout, NoSuccess {
@@ -34,12 +35,16 @@ public class WorkflowImpl extends TaskContainerImpl implements Workflow {
         WorkflowTask startTask = new StartTask();
         m_workflowTasks = Collections.synchronizedMap(new HashMap<String,WorkflowTask>());
         m_workflowTasks.put(startTask.getName(), startTask);
+        // set XML status
+        m_xmlStatus = new fr.in2p3.jsaga.engine.schema.status.Workflow();
+        m_xmlStatus.setName("todo");
     }
 
     /** clone */
     public SagaObject clone() throws CloneNotSupportedException {
         WorkflowImpl clone = (WorkflowImpl) super.clone();
         clone.m_workflowTasks.putAll(m_workflowTasks);
+        clone.m_xmlStatus = m_xmlStatus;
         return clone;
     }
 
@@ -71,8 +76,10 @@ public class WorkflowImpl extends TaskContainerImpl implements Workflow {
         }
 
         if (! m_workflowTasks.containsKey(task.getName())) {
-            // add
+            // add to workflow
             m_workflowTasks.put(task.getName(), task);
+            // add to XML status
+            m_xmlStatus.addTask(task.getStateAsXML());
 
             // may run task
             try {
@@ -93,18 +100,11 @@ public class WorkflowImpl extends TaskContainerImpl implements Workflow {
     }
 
     public synchronized Document getStatesAsXML() throws NotImplemented, Timeout, NoSuccess {
-        // create status bean
-        fr.in2p3.jsaga.engine.schema.status.Workflow workflow = new fr.in2p3.jsaga.engine.schema.status.Workflow();
-        workflow.setName("todo");
-        for (Iterator<WorkflowTask> it = m_workflowTasks.values().iterator(); it.hasNext();) {
-            workflow.addTask(it.next().getStateAsXML());
-        }
-
-        // serialize it
+        // serialize XML status
         Document doc;
         try {
             doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-            Marshaller.marshal(workflow, doc);
+            Marshaller.marshal(m_xmlStatus, doc);
         } catch (Exception e) {
             throw new NoSuccess(e);
         }

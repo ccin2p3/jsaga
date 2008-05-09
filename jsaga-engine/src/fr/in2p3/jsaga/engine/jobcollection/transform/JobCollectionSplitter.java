@@ -25,30 +25,27 @@ import java.io.*;
  *
  */
 public class JobCollectionSplitter {
-    private JobCollectionDescription m_jobCollectionBean;
+    private JobCollection m_jcBean;
     private XJSDLJobDescriptionImpl[] m_individualJobArray;
 
     public JobCollectionSplitter(Document jobCollection, Evaluator evaluator) throws NoSuccess {
         try {
             // marshall <JobCollection>
-            JobCollection jcBean = (JobCollection) Unmarshaller.unmarshal(JobCollection.class, jobCollection);
-
-            // set m_jobCollectionBean
-            m_jobCollectionBean = jcBean.getJobCollectionDescription();
+            m_jcBean = (JobCollection) Unmarshaller.unmarshal(JobCollection.class, jobCollection);
 
             // set collectionName
-            String collectionName = m_jobCollectionBean.getJobCollectionIdentification().getJobCollectionName();
+            String collectionName = m_jcBean.getJobCollectionDescription().getJobCollectionIdentification().getJobCollectionName();
 
             // set jobNameTemplate
-            String jobNameTemplate = jcBean.getJob(0).getJobDefinition().getJobDescription().getJobIdentification().getJobName();
+            String jobNameTemplate = m_jcBean.getJob(0).getJobDefinition().getJobDescription().getJobIdentification().getJobName();
 
             // set jobTemplate
-            if (jcBean.getJobCount() == 0) {
+            if (m_jcBean.getJobCount() == 0) {
                 throw new NoSuccess("Found no <Job> in description");
-            } else if (jcBean.getJobCount() > 1) {
+            } else if (m_jcBean.getJobCount() > 1) {
                 throw new NoSuccess("Several <Job> in description is not supported");
             }
-            Job jobBean = jcBean.getJob(0);
+            Job jobBean = m_jcBean.getJob(0);
             ByteArrayOutputStream jobBytes = new ByteArrayOutputStream();
             Marshaller m = new Marshaller(new OutputStreamWriter(jobBytes));
             m.setNamespaceMapping("ext", "http://www.in2p3.fr/jsdl-extension");
@@ -59,7 +56,7 @@ public class JobCollectionSplitter {
             Document jobTemplate = factory.newDocumentBuilder().parse(new ByteArrayInputStream(jobBytes.toByteArray()));
 
             // split parametric job
-            Parametric p = m_jobCollectionBean.getParametric();
+            Parametric p = m_jcBean.getJobCollectionDescription().getParametric();
             m_individualJobArray = new XJSDLJobDescriptionImpl[p.getCount()];
             for (int i=0; i<p.getCount(); i++) {
                 int index = p.getStart() + i*p.getStep();
@@ -80,8 +77,8 @@ public class JobCollectionSplitter {
         }
     }
 
-    public JobCollectionDescription getJobCollectionBean() {
-        return m_jobCollectionBean;
+    public JobCollection getJobCollectionBean() {
+        return m_jcBean;
     }
 
     public XJSDLJobDescriptionImpl[] getIndividualJobArray() {

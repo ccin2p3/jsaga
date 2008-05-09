@@ -20,7 +20,7 @@ public class StartTask extends DummyTask {
 
     /** constructor */
     StartTask() throws NotImplemented, BadParameter, Timeout, NoSuccess {
-        super(NAME);
+        super(name());
     }
 
     /** override super.run() */
@@ -29,5 +29,9 @@ public class StartTask extends DummyTask {
         if (!this.isCancelled()) {
             this.doSubmit();
         }
+    }
+
+    public static String name() {
+        return NAME;
     }
 }

@@ -4,6 +4,7 @@ import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.schema.jsdl.extension.Resource;
 import fr.in2p3.jsaga.impl.job.description.XJSDLJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.monitoring.MetricImpl;
+import fr.in2p3.jsaga.jobcollection.LateBindedJob;
 import org.ogf.saga.URL;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
@@ -28,7 +29,7 @@ import java.io.OutputStream;
 /**
  *
  */
-public class LateBindedJobImpl extends AbstractAsyncJobImpl implements Job {
+public class LateBindedJobImpl extends AbstractAsyncJobImpl implements LateBindedJob {
     protected JobHandle m_jobHandle;
     private XJSDLJobDescriptionImpl m_jobDesc;
     private URL m_resourceManager;
@@ -57,6 +58,8 @@ public class LateBindedJobImpl extends AbstractAsyncJobImpl implements Job {
         m_resourceManager = rm;
     }
 
+    /////////////////////////////////////// implementation of LateBindedJob ////////////////////////////////////////
+
     public void allocate(Resource rm) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         // find grid name and allocate resource
         m_resourceManager = new URL(rm.getId());
@@ -66,7 +69,7 @@ public class LateBindedJobImpl extends AbstractAsyncJobImpl implements Job {
         m_resourceManager.setFragment(rm.getGrid());
 
         // transform job description
-        this.transformJobDescription(m_jobDesc, rm);
+        m_jobDesc = this.transformJobDescription(m_jobDesc, rm);
 
         // create job
         JobService jobService = JobFactory.createJobService(m_session, m_resourceManager);

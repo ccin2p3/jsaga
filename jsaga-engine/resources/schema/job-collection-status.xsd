@@ -24,10 +24,14 @@
                     </complexType></element>
                 </sequence>
                 <attribute name="name" type="string" use="required"/>
+                <attribute name="label" type="string" use="required"/>
+                <attribute name="group" type="string" use="optional"/>
+                <attribute name="context" type="string" use="optional"/>
+                <attribute name="input" type="boolean" use="optional"/>
                 <attribute name="type" use="required"><simpleType><restriction base="string">
-                    <enumeration value="start"/>
+                    <enumeration value="dummy"/>
                     <enumeration value="transfer"/>
-                    <enumeration value="job"/>                    
+                    <enumeration value="job"/>
                 </restriction></simpleType></attribute>
                 <attribute name="state" use="required"><simpleType><restriction base="string">
                     <enumeration value="NEW"/>

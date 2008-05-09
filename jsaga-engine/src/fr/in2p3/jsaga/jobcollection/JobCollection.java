@@ -20,6 +20,7 @@ import java.io.InputStream;
  *
  */
 public interface JobCollection extends Workflow {
+    public String getJobCollectionName();
     public void allocateResources(File resourcesFile) throws Exception;
     public void allocateResources(InputStream resourcesStream) throws Exception;
     public void allocateResources(URL[] resourceUrls) throws Exception;

@@ -1,7 +1,6 @@
 package fr.in2p3.jsaga.jobcollection;
 
 import org.ogf.saga.error.*;
-import org.ogf.saga.job.Job;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -15,7 +14,7 @@ import org.ogf.saga.job.Job;
 /**
  *
  */
-public interface JobWithStaging extends Job {
+public interface JobWithStaging extends LateBindedJob {
     /**
      * Get the job wrapper script embedding the user job.
      * @return the job wrapper script

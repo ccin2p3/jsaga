@@ -76,11 +76,10 @@
     <xsl:template match="/project/artifact[@id='graphviz']">
         <pack name="Graph Visualizer" required="no">
             <description>For visualizing data staging graphs of job collections</description>
-            <file src="shared/" targetdir="$INSTALL_PATH"/>
             <!-- unix -->
-            <fileset os="unix" dir="bin/" includes="*.sh" targetdir="$INSTALL_PATH/bin/"/>
+            <file os="unix" src="lib/linux/" targetdir="$INSTALL_PATH/lib/"/>
             <!-- windows -->
-            <fileset os="windows" dir="bin/" includes="*.bat" targetdir="$INSTALL_PATH/bin/"/>
+            <file os="windows" src="lib/win32/" targetdir="$INSTALL_PATH/lib/"/>
         </pack>
     </xsl:template>
 

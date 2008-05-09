@@ -64,7 +64,7 @@ public class JobWithStagingImpl extends LateBindedJobImpl implements JobWithStag
         m_wrapper = preprocessor.getWrapper();
 
         // update workflow
-        DataStagingTaskGenerator staging = new DataStagingTaskGenerator(jobDesc.getAsDocument());
+        DataStagingTaskGenerator staging = new DataStagingTaskGenerator(jobDesc.getAsDocument(), jobDesc.getJobName());
         staging.updateWorkflow(m_workflow);
 
         return jobDesc;

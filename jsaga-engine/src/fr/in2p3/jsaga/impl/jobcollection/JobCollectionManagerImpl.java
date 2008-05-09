@@ -51,6 +51,6 @@ public class JobCollectionManagerImpl extends AbstractSagaObjectImpl implements 
     }
 
     public JobCollection getJobCollection(String jobCollectionId) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-        return null;  //todo
+        return new JobCollectionReadOnlyImpl(jobCollectionId);
     }
 }

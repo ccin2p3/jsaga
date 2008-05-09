@@ -1,5 +1,7 @@
 package fr.in2p3.jsaga.engine.workflow.task;
 
+import fr.in2p3.jsaga.engine.schema.status.Task;
+import fr.in2p3.jsaga.engine.schema.status.types.TaskTypeType;
 import fr.in2p3.jsaga.engine.workflow.AbstractWorkflowTaskImpl;
 import fr.in2p3.jsaga.impl.job.instance.JobHandle;
 import org.ogf.saga.error.*;
@@ -23,9 +25,14 @@ public class JobRunTask extends AbstractWorkflowTaskImpl {
     private JobHandle m_jobHandle;
 
     /** constructor */
-    public JobRunTask(String name, JobHandle jobHandle) throws NotImplemented, BadParameter, Timeout, NoSuccess {
-        super(null, name);
+    public JobRunTask(String jobName, JobHandle jobHandle) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+        super(null, name(jobName));
         m_jobHandle = jobHandle;
+        // update XML status
+        Task xmlStatus = super.getStateAsXML();
+        xmlStatus.setType(TaskTypeType.JOB);
+        xmlStatus.setLabel(name(jobName));
+        xmlStatus.setGroup(name(jobName));
     }
 
     //////////////////////////////////////////// abstract methods ////////////////////////////////////////////
@@ -52,5 +59,9 @@ public class JobRunTask extends AbstractWorkflowTaskImpl {
 
     public void stopListening() throws NotImplemented, Timeout, NoSuccess {
         throw new NotImplemented("Not supported");
+    }
+
+    public static String name(String jobName) {
+        return "run_"+jobName;
     }
 }
