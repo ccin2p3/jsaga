@@ -5,7 +5,12 @@
     <script>jsaga-context-init</script>
     <script>jsaga-context-destroy</script>
 
+    <script>jsaga-job-cancel</script>
     <script>jsaga-job-run</script>
+    <script>jsaga-job-status</script>
+
+    <script>jsaga-jobcollection-run</script>
+    <script>jsaga-jobcollection-status</script>
 
     <script>jsaga-cat</script>
     <script>jsaga-cp</script>

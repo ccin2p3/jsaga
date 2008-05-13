@@ -45,10 +45,10 @@
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source>
-                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/config0.cfg#OpenPlast</URI>
+                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/config0.cfg#OpenPlast-default</URI>
                 </Source>
                 <ext:Step uri="file:///tmp/config0.cfg">
-                    <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/config0.cfg#OpenPlast"/>
+                    <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/config0.cfg#OpenPlast-default"/>
                 </ext:Step>
                 <ext:CopyLocally>false</ext:CopyLocally>
                 <ext:Shared>true</ext:Shared>
@@ -59,11 +59,11 @@
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source>
-                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/config1.cfg#OpenPlast</URI>
+                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/config1.cfg#OpenPlast-default</URI>
                 </Source>
                 <ext:Step uri="srb://sreynaud@host2:5544/grid/config1.cfg?mydomain#OpenPlast-CCIN2P3">
                     <ext:Step uri="file:///tmp/test_staging.in/config1.cfg">
-                        <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/config1.cfg#OpenPlast"/>
+                        <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/config1.cfg#OpenPlast-default"/>
                     </ext:Step>
                 </ext:Step>
                 <ext:CopyLocally>false</ext:CopyLocally>
@@ -75,11 +75,11 @@
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source>
-                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/config2.cfg#OpenPlast</URI>
+                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/config2.cfg#OpenPlast-default</URI>
                 </Source>
                 <ext:Step uri="http://host5:8080/public/configuration/config2.cfg">
                     <ext:Step uri="file:///tmp/test_staging.in/config2.cfg">
-                        <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/config2.cfg#OpenPlast"/>
+                        <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/config2.cfg#OpenPlast-default"/>
                     </ext:Step>
                 </ext:Step>
                 <ext:CopyLocally>false</ext:CopyLocally>
@@ -100,12 +100,12 @@
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source>
-                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/executable-src.tar.gz#OpenPlast</URI>
+                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/executable-src.tar.gz#OpenPlast-default</URI>
                     <ext:Process>tar xzvf $SOURCE ; cd executable-src ; make</ext:Process>
                 </Source>
                 <ext:Step uri="gsiftp://host3:2811/repository/src/executable-src.tar.gz#EGEE">
                     <ext:Step uri="file:///tmp/test_staging.in/executable-src.tar.gz">
-                        <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/executable-src.tar.gz#OpenPlast"/>
+                        <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/executable-src.tar.gz#OpenPlast-default"/>
                     </ext:Step>
                 </ext:Step>
                 <ext:CopyLocally>false</ext:CopyLocally>
@@ -117,10 +117,10 @@
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source>
-                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/data_1.dat#OpenPlast</URI>
+                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/data_1.dat#OpenPlast-default</URI>
                 </Source>
                 <ext:Step uri="gsiftp://host4:2811/data/data_1.dat#OpenPlast">
-                    <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/data_1.dat#OpenPlast"/>
+                    <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/data_1.dat#OpenPlast-default"/>
                 </ext:Step>
                 <ext:CopyLocally>false</ext:CopyLocally>
                 <ext:Shared>false</ext:Shared>
@@ -131,11 +131,11 @@
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Target>
-                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.out/MYJOB_1/result_1.dat#OpenPlast</URI>
+                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.out/MYJOB_1/result_1.dat#OpenPlast-default</URI>
                 </Target>
                 <ext:Step uri="mail://sreynaud@in2p3.fr/result_1.dat">
                     <ext:Step uri="file:///tmp/test_staging.out/MYJOB_1/result_1.dat">
-                        <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.out/MYJOB_1/result_1.dat#OpenPlast"/>
+                        <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.out/MYJOB_1/result_1.dat#OpenPlast-default"/>
                     </ext:Step>
                 </ext:Step>
                 <ext:CopyLocally>false</ext:CopyLocally>
@@ -147,10 +147,10 @@
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Target>
-                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.out/MYJOB_1/stderr_1.txt#OpenPlast</URI>
+                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.out/MYJOB_1/stderr_1.txt#OpenPlast-default</URI>
                 </Target>
                 <ext:Step uri="file:///tmp/stderr_1.txt">
-                    <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.out/MYJOB_1/stderr_1.txt#OpenPlast"/>
+                    <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.out/MYJOB_1/stderr_1.txt#OpenPlast-default"/>
                 </ext:Step>
                 <ext:CopyLocally>false</ext:CopyLocally>
                 <ext:Shared>false</ext:Shared>

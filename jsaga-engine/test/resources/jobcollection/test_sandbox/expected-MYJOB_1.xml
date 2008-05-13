@@ -44,10 +44,10 @@
                 <FilesystemName>$PWD</FilesystemName>
                 <CreationFlag>overwrite</CreationFlag>
                 <Source>
-                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sandbox.in/input-sandbox.tar#OpenPlast</URI>
+                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sandbox.in/input-sandbox.tar#OpenPlast-default</URI>
                 </Source>
                 <ext:Step uri="file:///tmp/test_sandbox/input-sandbox.tar">
-                    <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sandbox.in/input-sandbox.tar#OpenPlast"/>
+                    <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sandbox.in/input-sandbox.tar#OpenPlast-default"/>
                 </ext:Step>
                 <ext:Shared>true</ext:Shared>
             </DataStaging>
@@ -60,6 +60,7 @@
                     <URI>tar://$INPUT_SANDBOX/file.,,,tmp,config0.cfg</URI>
                 </Source>
                 <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Sandbox>true</ext:Sandbox>
             </DataStaging>
             <DataStaging name="C1">
                 <FileName>$PWD/config1.cfg</FileName>
@@ -70,6 +71,7 @@
                     <URI>tar://$INPUT_SANDBOX/srb.,,sreynaud@host2.5544,grid,config1.cfg</URI>
                 </Source>
                 <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Sandbox>true</ext:Sandbox>
             </DataStaging>
             <DataStaging name="C2">
                 <FileName>$PWD/config2.cfg</FileName>
@@ -80,6 +82,7 @@
                     <URI>tar://$INPUT_SANDBOX/http.,,host5.8080,public,configuration,config2.cfg</URI>
                 </Source>
                 <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Sandbox>true</ext:Sandbox>
             </DataStaging>
             <DataStaging name="E">
                 <FileName>$APPLICATIONS_DIR/HelloWorld/1.1/bin/executable.exe</FileName>
@@ -100,6 +103,7 @@
                     <ext:Process>tar xzvf $SOURCE ; cd executable-src ; make</ext:Process>
                 </Source>
                 <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Sandbox>true</ext:Sandbox>
             </DataStaging>
             <DataStaging name="D">
                 <FileName>$PWD/data.dat</FileName>
@@ -110,6 +114,7 @@
                     <URI>tar://$INPUT_SANDBOX/gsiftp.,,host4.2811,data,data_1.dat</URI>
                 </Source>
                 <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Sandbox>true</ext:Sandbox>
             </DataStaging>
             <DataStaging name="R">
                 <FileName>$PWD/result.dat</FileName>
@@ -120,6 +125,7 @@
                     <URI>tar://$OUTPUT_SANDBOX/mail.,,sreynaud@in2p3.fr,result_1.dat</URI>
                 </Target>
                 <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Sandbox>true</ext:Sandbox>
             </DataStaging>
             <DataStaging name="STDERR">
                 <FileName>$PWD/stderr.txt</FileName>
@@ -130,16 +136,17 @@
                     <URI>tar://$OUTPUT_SANDBOX/file.,,,tmp,stderr_1.txt</URI>
                 </Target>
                 <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Sandbox>true</ext:Sandbox>
             </DataStaging>
             <DataStaging name="OUTPUT_SANDBOX">
                 <FileName>output-sandbox.tar</FileName>
                 <FilesystemName>$PWD</FilesystemName>
                 <CreationFlag>overwrite</CreationFlag>
                 <Target>
-                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sandbox.out/MYJOB_1/output-sandbox-1.tar#OpenPlast</URI>
+                    <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sandbox.out/MYJOB_1/output-sandbox-1.tar#OpenPlast-default</URI>
                 </Target>
                 <ext:Step uri="file:///tmp/test_sandbox/output-sandbox-1.tar">
-                    <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sandbox.out/MYJOB_1/output-sandbox-1.tar#OpenPlast"/>
+                    <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sandbox.out/MYJOB_1/output-sandbox-1.tar#OpenPlast-default"/>
                 </ext:Step>
                 <ext:Shared>false</ext:Shared>
             </DataStaging>

@@ -52,6 +52,7 @@
             <file src="Readme.txt" targetdir="$INSTALL_PATH"/>
             <parsable targetfile="$INSTALL_PATH/Readme.txt" type="plain"/>
             <file src="etc/" targetdir="$INSTALL_PATH"/>
+            <file src="doc/" targetdir="$INSTALL_PATH"/>
             <xsl:for-each select="descendant-or-self::artifact">
                 <file src="{@file}" targetdir="$INSTALL_PATH/lib"/>
             </xsl:for-each>

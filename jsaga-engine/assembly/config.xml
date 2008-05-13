@@ -18,6 +18,9 @@
         <fileSet>
             <outputDirectory>doc/examples</outputDirectory>
             <directory>test/resources/jobcollection</directory>
+            <excludes>
+                <exclude>*/expected-*.xml</exclude>
+            </excludes>
         </fileSet>
         <fileSet>
             <outputDirectory>doc/examples/test_config</outputDirectory>

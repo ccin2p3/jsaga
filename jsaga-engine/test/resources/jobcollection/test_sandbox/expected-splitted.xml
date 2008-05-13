@@ -47,6 +47,7 @@
                     <ext:Step uri="tar:///tmp/test_sandbox/input-sandbox.tar/file.,,,tmp,config0.cfg"/>
                 </ext:Step>
                 <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Sandbox>true</ext:Sandbox>
             </DataStaging>
             <DataStaging name="C1">
                 <FileName>config1.cfg</FileName>
@@ -60,6 +61,7 @@
                     <ext:Step uri="tar:///tmp/test_sandbox/input-sandbox.tar/srb.,,sreynaud@host2.5544,grid,config1.cfg"/>
                 </ext:Step>
                 <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Sandbox>true</ext:Sandbox>
             </DataStaging>
             <DataStaging name="C2">
                 <FileName>config2.cfg</FileName>
@@ -73,6 +75,7 @@
                     <ext:Step uri="tar:///tmp/test_sandbox/input-sandbox.tar/http.,,host5.8080,public,configuration,config2.cfg"/>
                 </ext:Step>
                 <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Sandbox>true</ext:Sandbox>
             </DataStaging>
             <DataStaging name="E">
                 <FileName>bin/executable.exe</FileName>
@@ -96,6 +99,7 @@
                     <ext:Step uri="tar:///tmp/test_sandbox/input-sandbox.tar/gsiftp.,,host3.2811,repository,src,executable-src.tar.gz"/>
                 </ext:Step>
                 <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Sandbox>true</ext:Sandbox>
             </DataStaging>
             <DataStaging name="D">
                 <FileName>data.dat</FileName>
@@ -109,6 +113,7 @@
                     <ext:Step uri="tar:///tmp/test_sandbox/input-sandbox.tar/gsiftp.,,host4.2811,data,data_3.dat"/>
                 </ext:Step>
                 <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Sandbox>true</ext:Sandbox>
             </DataStaging>
             <DataStaging name="R">
                 <FileName>result.dat</FileName>
@@ -122,6 +127,7 @@
                     <ext:Step uri="tar:///tmp/test_sandbox/output-sandbox-3.tar/mail.,,sreynaud@in2p3.fr,result_3.dat"/>
                 </ext:Step>
                 <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Sandbox>true</ext:Sandbox>
             </DataStaging>
             <DataStaging name="STDERR">
                 <FileName>stderr.txt</FileName>
@@ -135,6 +141,7 @@
                     <ext:Step uri="tar:///tmp/test_sandbox/output-sandbox-3.tar/file.,,,tmp,stderr_3.txt"/>
                 </ext:Step>
                 <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Sandbox>true</ext:Sandbox>
             </DataStaging>
             <DataStaging name="OUTPUT_SANDBOX">
                 <FileName>output-sandbox.tar</FileName>
