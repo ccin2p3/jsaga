@@ -1,7 +1,5 @@
 package fr.in2p3.jsaga.engine.workflow.task;
 
-import fr.in2p3.jsaga.engine.schema.status.Task;
-import fr.in2p3.jsaga.engine.schema.status.types.TaskTypeType;
 import fr.in2p3.jsaga.engine.workflow.AbstractWorkflowTaskImpl;
 import org.ogf.saga.error.*;
 import org.ogf.saga.task.State;
@@ -18,14 +16,10 @@ import org.ogf.saga.task.State;
 /**
  *
  */
-public class DummyTask extends AbstractWorkflowTaskImpl {
+public abstract class DummyTask extends AbstractWorkflowTaskImpl {
     /** constructor */
     public DummyTask(String name) throws NotImplemented, BadParameter, Timeout, NoSuccess {
         super(null, name);
-        // update XML status
-        Task xmlStatus = super.getStateAsXML();
-        xmlStatus.setLabel(name);
-        xmlStatus.setType(TaskTypeType.DUMMY);
     }
 
     //////////////////////////////////////////// abstract methods ////////////////////////////////////////////

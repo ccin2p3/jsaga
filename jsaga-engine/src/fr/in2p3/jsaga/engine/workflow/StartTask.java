@@ -1,5 +1,7 @@
 package fr.in2p3.jsaga.engine.workflow;
 
+import fr.in2p3.jsaga.engine.schema.status.Task;
+import fr.in2p3.jsaga.engine.schema.status.types.TaskTypeType;
 import fr.in2p3.jsaga.engine.workflow.task.DummyTask;
 import org.ogf.saga.error.*;
 
@@ -20,7 +22,11 @@ public class StartTask extends DummyTask {
 
     /** constructor */
     StartTask() throws NotImplemented, BadParameter, Timeout, NoSuccess {
-        super(name());
+        super(NAME);
+        // update XML status
+        Task xmlStatus = super.getStateAsXML();
+        xmlStatus.setType(TaskTypeType.START);
+        xmlStatus.setLabel(NAME);
     }
 
     /** override super.run() */

@@ -27,7 +27,14 @@ public interface Workflow extends TaskContainer {
             throws NotImplemented, Timeout, NoSuccess;
 
     /**
-     * Gets a single task from the task container.
+     * Removes a single task from the workflow.
+     * @param name the name identifying the task.
+     */
+    public void remove(String name)
+            throws NotImplemented, Timeout, NoSuccess;
+
+    /**
+     * Gets a single task from the workflow.
      * @param name the name identifying the task.
      * @return the task.
      */

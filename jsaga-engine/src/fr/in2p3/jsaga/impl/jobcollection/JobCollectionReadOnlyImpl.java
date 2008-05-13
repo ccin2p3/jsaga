@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl.jobcollection;
 
+import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.engine.schema.jsdl.extension.ResourceSelection;
 import fr.in2p3.jsaga.engine.workflow.WorkflowImpl;
 import fr.in2p3.jsaga.jobcollection.JobCollection;
@@ -29,7 +30,7 @@ public class JobCollectionReadOnlyImpl extends WorkflowImpl implements JobCollec
 
     /** constructor */
     public JobCollectionReadOnlyImpl(String collectionName) throws NotImplemented, BadParameter, Timeout, NoSuccess {
-        super(null);
+        super(null, collectionName);
         m_jobCollectionName = collectionName;
     }
 
@@ -51,6 +52,17 @@ public class JobCollectionReadOnlyImpl extends WorkflowImpl implements JobCollec
 
     public void allocateResources(ResourceSelection resources) throws Exception {
         throw new NotImplemented("Not implemented yet...");
+    }
+
+    public void cleanup() {
+        File baseDir = new File(new File(Base.JSAGA_VAR, "jobs"), m_jobCollectionName);
+        if(baseDir.exists()) {
+            File[] files = baseDir.listFiles();
+            for (int i=0; i<files.length; i++) {
+                files[i].delete();
+            }
+            baseDir.delete();
+        }
     }
 
     /** override super.getStatesAsXML() */

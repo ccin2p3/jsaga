@@ -23,7 +23,7 @@ import java.util.Map;
  *
  */
 public class JobCollectionPreprocessor {
-    private static final String XML_JOB_TEMPLATE = "job-template.xml";
+    private static final String XML_JOB_TEMPLATE = "_job-template.xml";
     private static final String XSL_1_ADD_DEFAULTS = "xsl/execution/collec_1-add-defaults.xsl";
     private static final String XSL_2_GENERATE_PRESTAGE = "xsl/execution/collec_2-generate-prestage.xsl";
 

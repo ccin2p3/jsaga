@@ -1,14 +1,10 @@
 package fr.in2p3.jsaga.engine.workflow.task;
 
-import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.engine.schema.status.Task;
 import fr.in2p3.jsaga.engine.schema.status.types.TaskTypeType;
 import fr.in2p3.jsaga.engine.workflow.AbstractWorkflowTaskImpl;
 import org.ogf.saga.error.*;
 import org.ogf.saga.task.State;
-
-import java.net.URI;
-import java.net.URISyntaxException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -24,23 +20,16 @@ import java.net.URISyntaxException;
  */
 public class TransferTask extends AbstractWorkflowTaskImpl {
     /** constructor */
-    public TransferTask(String name, boolean input) throws NotImplemented, BadParameter, Timeout, NoSuccess {
-        super(null, name);
+    public TransferTask(String url, boolean input) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+        super(null, url);
         // update XML status
+        URLDecomposer u = new URLDecomposer(url);
         Task xmlStatus = super.getStateAsXML();
         xmlStatus.setType(TaskTypeType.TRANSFER);
+        xmlStatus.setGroup(u.getGroup());
+        xmlStatus.setLabel(u.getLabel());
+        xmlStatus.setContext(u.getContext());
         xmlStatus.setInput(input);
-        try {
-            String urlString = xmlStatus.getName();
-            URI uri = new URI(urlString.contains("@{")
-                    ? JSagaURL.encodeUrl(urlString)
-                    : urlString);
-            xmlStatus.setLabel(uri.getPath().substring(uri.getPath().lastIndexOf('/')+1));
-            xmlStatus.setGroup(uri.getScheme()+"://"+(uri.getHost()!=null ? uri.getHost() : ""));
-            xmlStatus.setContext(uri.getFragment());
-        } catch (URISyntaxException e) {
-            throw new NoSuccess(e);
-        }
     }
 
     //////////////////////////////////////////// abstract methods ////////////////////////////////////////////

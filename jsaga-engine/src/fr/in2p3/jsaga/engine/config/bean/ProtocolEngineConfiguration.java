@@ -35,13 +35,19 @@ public class ProtocolEngineConfiguration extends ServiceEngineConfigurationAbstr
             Protocol protocol = findProtocol(url.getScheme());
             if (url.getFragment() != null) {
                 String serviceRef = url.getFragment();
-                DataService service = this.findDataService(protocol, serviceRef);
+                DataService service = this.findDataServiceByServiceRef(protocol, serviceRef);
                 if (service != null) {
                     return service;
                 } else if (protocol.getDataService(0).getContextRef() == null) {
                     return protocol.getDataService(0);
                 } else {
-                    throw new NoSuccess("Data service not found: "+serviceRef);
+                    String contextRef = url.getFragment();
+                    service = this.findDataServiceByContextRef(protocol, contextRef);
+                    if (service != null) {
+                        return service;
+                    } else {
+                        throw new NoSuccess("No data service matches fragment: "+url.getFragment());
+                    }
                 }
             } else {
                 ServiceRef[] arrayRef = super.listServiceRefByHostname(protocol.getMapping(), url.getHost());
@@ -50,7 +56,7 @@ public class ProtocolEngineConfiguration extends ServiceEngineConfigurationAbstr
                         throw new NoSuccess("No data service matches hostname: "+url.getHost());
                     case 1:
                         String serviceRef = arrayRef[0].getName();
-                        DataService service = this.findDataService(protocol, serviceRef);
+                        DataService service = this.findDataServiceByServiceRef(protocol, serviceRef);
                         if (service != null) {
                             return service;
                         } else {
@@ -75,10 +81,20 @@ public class ProtocolEngineConfiguration extends ServiceEngineConfigurationAbstr
         throw new NoSuccess("Protocol not found: "+scheme);
     }
 
-    private DataService findDataService(Protocol protocol, String serviceRef) {
+    private DataService findDataServiceByServiceRef(Protocol protocol, String serviceRef) {
         for (int s=0; s<protocol.getDataServiceCount(); s++) {
             DataService service = protocol.getDataService(s);
             if (service.getName().equals(serviceRef)) {
+                return service;
+            }
+        }
+        return null;
+    }
+
+    private DataService findDataServiceByContextRef(Protocol protocol, String contextRef) {
+        for (int s=0; s<protocol.getDataServiceCount(); s++) {
+            DataService service = protocol.getDataService(s);
+            if (service.getContextRef().equals(contextRef)) {
                 return service;
             }
         }

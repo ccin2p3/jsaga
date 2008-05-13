@@ -4,6 +4,8 @@ import fr.in2p3.jsaga.workflow.Workflow;
 import fr.in2p3.jsaga.workflow.WorkflowFactory;
 import org.ogf.saga.error.*;
 
+import java.util.UUID;
+
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -18,6 +20,6 @@ import org.ogf.saga.error.*;
  */
 public class WorkflowFactoryImpl extends WorkflowFactory {
     protected Workflow doCreateWorkflow() throws NotImplemented, BadParameter, Timeout, NoSuccess {
-        return new WorkflowImpl(null);
+        return new WorkflowImpl(null, UUID.randomUUID().toString());
     }
 }

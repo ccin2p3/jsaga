@@ -27,6 +27,7 @@ import java.io.FileNotFoundException;
 public class JobCollectionRun extends AbstractCommand {
     private static final String OPT_HELP = "h", LONGOPT_HELP = "help";
     // optional
+    private static final String OPT_NAME = "n", LONGOPT_NAME = "name";
     private static final String OPT_LANGUAGE = "l", LONGOPT_LANGUAGE = "language";
     private static final String OPT_RESOURCES = "r", LONGOPT_RESOURCES = "resources";
     private static final String OPT_BATCH = "b", LONGOPT_BATCH = "batch";
@@ -34,6 +35,7 @@ public class JobCollectionRun extends AbstractCommand {
     private static final String OPT_DUMP_JSDL = "j", LONGOPT_DUMP_JSDL = "dump-jsdl";
     private static final String OPT_DUMP_STAGING = "s", LONGOPT_DUMP_STAGING = "dump-staging";
     private static final String OPT_DUMP_WRAPPER = "w", LONGOPT_DUMP_WRAPPER = "dump-wrapper";
+    private static final String OPT_GRAPHVIZ = "g", LONGOPT_GRAPHVIZ = "graph";
 
     protected JobCollectionRun() {
         super("jsaga-jobcollection-run", new String[]{"jobCollection"}, new String[]{OPT_HELP, LONGOPT_HELP});
@@ -65,7 +67,12 @@ public class JobCollectionRun extends AbstractCommand {
             }
 
             // create job collection description
-            JobCollectionDescription desc = JobCollectionFactory.createJobCollectionDescription(language, jobCollectionFile);
+            JobCollectionDescription desc;
+            if (line.hasOption(OPT_NAME)) {
+                desc = JobCollectionFactory.createJobCollectionDescription(language, jobCollectionFile, line.getOptionValue(OPT_NAME));
+            } else {
+                desc = JobCollectionFactory.createJobCollectionDescription(language, jobCollectionFile);
+            }
 
             if (line.hasOption(OPT_DUMP_JSDL)) {
                 XMLFileParser.dump(desc.getAsDocument(), System.out);
@@ -84,6 +91,13 @@ public class JobCollectionRun extends AbstractCommand {
                     String jobName = line.getOptionValue(OPT_DUMP_WRAPPER);
                     JobWithStaging job = findJob(jobCollection, jobName);
                     System.out.println(job.getWrapper());
+                } else if (line.hasOption(OPT_GRAPHVIZ)) {
+                    GraphGenerator generator = new GraphGenerator(jobCollection.getJobCollectionName(), jobCollection.getStatesAsXML());
+                    File statusGraph = generator.generateStatusGraph();
+                    File stagingGraph = generator.generateStagingGraph();
+                    System.out.println("Graphs successfully generated:");
+                    System.out.println("  "+statusGraph.getAbsolutePath());
+                    System.out.println("  "+stagingGraph.getAbsolutePath());
                 } else {
                     // submit job collection
                     jobCollection.run();
@@ -98,6 +112,9 @@ public class JobCollectionRun extends AbstractCommand {
                         }
                     }
                 }
+
+                // cleanup job collection
+                jobCollection.cleanup();
             }
         }
     }
@@ -121,6 +138,11 @@ public class JobCollectionRun extends AbstractCommand {
                 .create(OPT_HELP));
 
         // optional
+        opt.addOption(OptionBuilder.withDescription("The name of the job collection (override name in job description)")
+                .hasArg()
+                .withArgName("name")
+                .withLongOpt(LONGOPT_NAME)
+                .create(OPT_NAME));
         opt.addOption(OptionBuilder.withDescription("The language used for job description (default=JSDL)")
                 .hasArg()
                 .withArgName("id")
@@ -151,6 +173,9 @@ public class JobCollectionRun extends AbstractCommand {
                     .withArgName("JobName")
                     .withLongOpt(LONGOPT_DUMP_WRAPPER)
                     .create(OPT_DUMP_WRAPPER));
+            group.addOption(OptionBuilder.withDescription("Generate status and staging graphs")
+                    .withLongOpt(LONGOPT_GRAPHVIZ)
+                    .create(OPT_GRAPHVIZ));
         }
         opt.addOptionGroup(group);
         

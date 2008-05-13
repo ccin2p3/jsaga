@@ -34,13 +34,19 @@ public class JobserviceEngineConfiguration extends ServiceEngineConfigurationAbs
             Execution execution = findExecution(url.getScheme());
             if (url.getFragment() != null) {
                 String serviceRef = url.getFragment();
-                JobService service = this.findJobService(execution, serviceRef);
+                JobService service = this.findJobServiceByServiceRef(execution, serviceRef);
                 if (service != null) {
                     return service;
                 } else if (execution.getJobService(0).getContextRef() == null) {
                     return execution.getJobService(0);
                 } else {
-                    throw new NoSuccess("Job service not found: "+serviceRef);
+                    String contextRef = url.getFragment();
+                    service = this.findJobServiceByContextRef(execution, contextRef);
+                    if (service != null) {
+                        return service;
+                    } else {
+                        throw new NoSuccess("No job service matches fragment: "+url.getFragment());
+                    }
                 }
             } else {
                 ServiceRef[] arrayRef = super.listServiceRefByHostname(execution.getMapping(), url.getHost());
@@ -49,7 +55,7 @@ public class JobserviceEngineConfiguration extends ServiceEngineConfigurationAbs
                         throw new NoSuccess("No job service matches hostname: "+url.getHost());
                     case 1:
                         String serviceRef = arrayRef[0].getName();
-                        JobService service = this.findJobService(execution, serviceRef);
+                        JobService service = this.findJobServiceByServiceRef(execution, serviceRef);
                         if (service != null) {
                             return service;
                         } else {
@@ -74,10 +80,20 @@ public class JobserviceEngineConfiguration extends ServiceEngineConfigurationAbs
         throw new NoSuccess("No execution manager matches scheme: "+ scheme);
     }
 
-    private JobService findJobService(Execution execution, String serviceRef) throws NoSuccess {
+    private JobService findJobServiceByServiceRef(Execution execution, String serviceRef) throws NoSuccess {
         for (int s=0; s<execution.getJobServiceCount(); s++) {
             JobService service = execution.getJobService(s);
             if (service.getName().equals(serviceRef)) {
+                return service;
+            }
+        }
+        return null;
+    }
+
+    private JobService findJobServiceByContextRef(Execution execution, String contextRef) throws NoSuccess {
+        for (int s=0; s<execution.getJobServiceCount(); s++) {
+            JobService service = execution.getJobService(s);
+            if (service.getContextRef().equals(contextRef)) {
                 return service;
             }
         }

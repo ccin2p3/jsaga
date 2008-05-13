@@ -41,6 +41,10 @@ public class JobCollectionFactoryImpl extends JobCollectionFactory {
     }
 
     protected JobCollectionDescription doCreateJobCollectionDescription(String language, InputStream jobDescStream) throws NotImplemented, BadParameter, NoSuccess {
+        return this.doCreateJobCollectionDescription(language, jobDescStream, null);
+    }
+
+    protected JobCollectionDescription doCreateJobCollectionDescription(String language, InputStream jobDescStream, String collectionName) throws NotImplemented, BadParameter, NoSuccess {
         LanguageAdaptor parser = m_languageFactory.getLanguageAdaptor(language);
 
         // parse
@@ -67,7 +71,7 @@ public class JobCollectionFactoryImpl extends JobCollectionFactory {
         } catch (Exception e) {
             throw new NoSuccess(e);
         }
-        return new JobCollectionDescriptionImpl(jcDesc);
+        return new JobCollectionDescriptionImpl(jcDesc, collectionName);
     }
 
     protected JobCollectionManager doCreateJobCollectionManager(Session session) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {

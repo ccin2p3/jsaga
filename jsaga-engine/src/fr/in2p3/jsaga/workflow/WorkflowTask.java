@@ -31,10 +31,27 @@ public interface WorkflowTask<E> extends Task<E>, TaskCallback<E> {
     public void addPredecessor(WorkflowTask predecessor);
 
     /**
+     * Removes a predecessor from the task.
+     * @param predecessorName the name of the predecessor to remove.
+     */
+    public void removePredecessor(String predecessorName);
+
+    /**
      * Adds a successor to the task.
      * @param successor the successor to add.
      */
     public void addSuccessor(WorkflowTask successor);
+
+    /**
+     * Removes a successor from the task.
+     * @param successorName the name of the successor to remove.
+     */
+    public void removeSuccessor(String successorName);
+
+    /**
+     * Unlink this task from its predecessors and successors.
+     */
+    public void unlink();
 
     /**
      * Gets the state of the task.

@@ -123,42 +123,30 @@
             </xsl:when>
             <xsl:otherwise>
                 <!-- file is not accessible from worker: copy it to an intermediary node -->
-                <xsl:variable name="selectedIntermediary">
+                <xsl:variable name="intermediaryFile">
                     <xsl:choose>
                         <xsl:when test="$StandaloneWorker='true'">
-                            <xsl:if test="$Intermediary"><xsl:value-of select="$Intermediary"/></xsl:if>
+                            <xsl:if test="$Intermediary"><xsl:call-template name="CLOSE_INTERMEDIARY_FILE"/></xsl:if>
                         </xsl:when>
                         <xsl:when test="../ext:Shared='true'">
                             <xsl:choose>
-                                <xsl:when test="$jobService/cfg:fileStaging/@defaultIntermediary"><xsl:value-of select="$jobService/cfg:fileStaging/@defaultIntermediary"/></xsl:when>
-                                <xsl:when test="$Intermediary"><xsl:value-of select="$Intermediary"/></xsl:when>
+                                <xsl:when test="$jobService/cfg:fileStaging/@defaultIntermediary"><xsl:call-template name="DEFAULT_INTERMEDIARY_FILE"/></xsl:when>
+                                <xsl:when test="$Intermediary"><xsl:call-template name="CLOSE_INTERMEDIARY_FILE"/></xsl:when>
                             </xsl:choose>
                         </xsl:when>
                         <xsl:otherwise>
                             <xsl:choose>
-                                <xsl:when test="$Intermediary"><xsl:value-of select="$Intermediary"/></xsl:when>
-                                <xsl:when test="$jobService/cfg:fileStaging/@defaultIntermediary"><xsl:value-of select="$jobService/cfg:fileStaging/@defaultIntermediary"/></xsl:when>
+                                <xsl:when test="$Intermediary"><xsl:call-template name="CLOSE_INTERMEDIARY_FILE"/></xsl:when>
+                                <xsl:when test="$jobService/cfg:fileStaging/@defaultIntermediary"><xsl:call-template name="DEFAULT_INTERMEDIARY_FILE"/></xsl:when>
                             </xsl:choose>
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
-                <xsl:if test="$selectedIntermediary=''">
+                <xsl:if test="$intermediaryFile=''">
                     <xsl:message terminate="yes">
                         <xsl:value-of select="$jobName"/>: no intermediary node to transport file <xsl:value-of select="jsdl:URI/text()"/>
                     </xsl:message>
                 </xsl:if>
-                <xsl:variable name="intermediaryFile">
-                    <xsl:choose>
-                        <xsl:when test="contains($selectedIntermediary,'?')"><xsl:value-of select="substring-before($selectedIntermediary,'?')"/></xsl:when>
-                        <xsl:otherwise><xsl:value-of select="$selectedIntermediary"/></xsl:otherwise>
-                    </xsl:choose>
-                    <xsl:text>/</xsl:text>
-                    <xsl:call-template name="INTERMEDIARY_DIR"/>
-                    <xsl:text>/</xsl:text>
-                    <xsl:call-template name="FILENAME"/>
-                    <xsl:if test="contains($selectedIntermediary,'?')">?<xsl:value-of select="substring-after($selectedIntermediary,'?')"/></xsl:if>
-                    <xsl:if test="$gridName">#<xsl:value-of select="$gridName"/></xsl:if>
-                </xsl:variable>
                 <xsl:choose>
                     <xsl:when test="
                     substring-before(jsdl:URI/text(),'://')='file'
@@ -166,7 +154,7 @@
                     (
                         $config/cfg:protocol[@scheme=$scheme]/@thirdparty='true'
                         and
-                        substring-before($selectedIntermediary,'://')=$scheme
+                        substring-before($intermediaryFile,'://')=$scheme
                         and
                         (
                             $gridName = $fragment
@@ -206,6 +194,31 @@
                 </xsl:choose>
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="CLOSE_INTERMEDIARY_FILE">
+        <xsl:call-template name="INTERMEDIARY_FILE">
+            <xsl:with-param name="selectedIntermediary" select="$Intermediary"/>
+        </xsl:call-template>
+        <xsl:if test="$gridName">#<xsl:value-of select="$gridName"/></xsl:if>
+    </xsl:template>
+    <xsl:template name="DEFAULT_INTERMEDIARY_FILE">
+        <xsl:call-template name="INTERMEDIARY_FILE">
+            <xsl:with-param name="selectedIntermediary" select="$jobService/cfg:fileStaging/@defaultIntermediary"/>
+        </xsl:call-template>
+        <xsl:if test="$jobService/@contextRef">#<xsl:value-of select="$jobService/@contextRef"/></xsl:if>
+    </xsl:template>
+    <xsl:template name="INTERMEDIARY_FILE">
+        <xsl:param name="selectedIntermediary"/>
+        <xsl:choose>
+            <xsl:when test="contains($selectedIntermediary,'?')"><xsl:value-of select="substring-before($selectedIntermediary,'?')"/></xsl:when>
+            <xsl:otherwise><xsl:value-of select="$selectedIntermediary"/></xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>/</xsl:text>
+        <xsl:call-template name="INTERMEDIARY_DIR"/>
+        <xsl:text>/</xsl:text>
+        <xsl:call-template name="FILENAME"/>
+        <xsl:if test="contains($selectedIntermediary,'?')">?<xsl:value-of select="substring-after($selectedIntermediary,'?')"/></xsl:if>
     </xsl:template>
 
     <xsl:template name="INTERMEDIARY_DIR">

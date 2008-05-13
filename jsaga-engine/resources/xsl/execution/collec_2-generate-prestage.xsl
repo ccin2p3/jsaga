@@ -105,7 +105,7 @@
                     </ext:Step>
                 </ext:Step>
             </xsl:for-each>
-            <xsl:apply-templates select="*[namespace-uri()!='http://schemas.ggf.org/jsdl/2005/11/jsdl' and local-name()!='Sandbox']"/>
+            <xsl:apply-templates select="*[namespace-uri()!='http://schemas.ggf.org/jsdl/2005/11/jsdl']"/>
         </DataStaging>
     </xsl:template>
 

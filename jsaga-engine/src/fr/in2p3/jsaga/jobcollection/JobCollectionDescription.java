@@ -16,5 +16,6 @@ import org.w3c.dom.Document;
  *
  */
 public interface JobCollectionDescription extends SagaObject {
+    public String getCollectionName();
     public Document getAsDocument();
 }

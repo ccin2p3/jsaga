@@ -25,4 +25,5 @@ public interface JobCollection extends Workflow {
     public void allocateResources(InputStream resourcesStream) throws Exception;
     public void allocateResources(URL[] resourceUrls) throws Exception;
     public void allocateResources(ResourceSelection resources) throws Exception;
+    public void cleanup();
 }

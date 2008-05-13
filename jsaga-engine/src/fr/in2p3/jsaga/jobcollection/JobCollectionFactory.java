@@ -39,6 +39,16 @@ public abstract class JobCollectionFactory {
         throws NotImplemented, BadParameter, NoSuccess;
 
     /**
+     * Creates a job collection description. To be provided by the implementation.
+     * @param language the job description language.
+     * @param jobDescStream the job collection description stream.
+     * @param collectionName the name of the job collection.
+     * @return the job collection description.
+     */
+    protected abstract JobCollectionDescription doCreateJobCollectionDescription(String language, InputStream jobDescStream, String collectionName)
+        throws NotImplemented, BadParameter, NoSuccess;
+
+    /**
      * Creates a job collection manager. To be provided by the implementation.
      * @param session the session handle.
      * @return the job collection manager.
@@ -70,6 +80,26 @@ public abstract class JobCollectionFactory {
     /**
      * Creates a job collection description.
      * @param language the job description language.
+     * @param jobDescFile the job collection description file.
+     * @param collectionName the name of the job collection.
+     * @return the job collection description.
+     */
+    public static JobCollectionDescription createJobCollectionDescription(String language, File jobDescFile, String collectionName)
+        throws NotImplemented, BadParameter, NoSuccess {
+        initializeFactory();
+        try {
+            InputStream jobDescStream = new FileInputStream(jobDescFile);
+            JobCollectionDescription jobDesc = factory.doCreateJobCollectionDescription(language, jobDescStream, collectionName);
+            jobDescStream.close();
+            return jobDesc;
+        } catch (IOException e) {
+            throw new NoSuccess("Failed to load job collection description: "+jobDescFile.getPath(), e);
+        }
+    }
+
+    /**
+     * Creates a job collection description.
+     * @param language the job description language.
      * @param jobDescStream the job collection description stream.
      * @return the job collection description.
      */
@@ -77,6 +107,19 @@ public abstract class JobCollectionFactory {
         throws NotImplemented, BadParameter, NoSuccess {
         initializeFactory();
         return factory.doCreateJobCollectionDescription(language, jobDescStream);
+    }
+
+    /**
+     * Creates a job collection description.
+     * @param language the job description language.
+     * @param jobDescStream the job collection description stream.
+     * @param collectionName the name of the job collection.
+     * @return the job collection description.
+     */
+    public static JobCollectionDescription createJobCollectionDescription(String language, InputStream jobDescStream, String collectionName)
+        throws NotImplemented, BadParameter, NoSuccess {
+        initializeFactory();
+        return factory.doCreateJobCollectionDescription(language, jobDescStream, collectionName);
     }
 
     /**

@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.engine.workflow.task;
 
 import fr.in2p3.jsaga.engine.schema.status.Task;
+import fr.in2p3.jsaga.engine.schema.status.types.TaskTypeType;
 import org.ogf.saga.error.*;
 
 /* ***************************************************
@@ -21,7 +22,9 @@ public class JobEndTask extends DummyTask {
         super(name(jobName));
         // update XML status
         Task xmlStatus = super.getStateAsXML();
+        xmlStatus.setType(TaskTypeType.END);
         xmlStatus.setGroup(name(jobName));
+        xmlStatus.setLabel(jobName);
     }
 
     public static String name(String jobName) {

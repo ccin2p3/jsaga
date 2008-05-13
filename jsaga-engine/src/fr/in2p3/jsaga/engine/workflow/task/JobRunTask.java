@@ -31,8 +31,8 @@ public class JobRunTask extends AbstractWorkflowTaskImpl {
         // update XML status
         Task xmlStatus = super.getStateAsXML();
         xmlStatus.setType(TaskTypeType.JOB);
-        xmlStatus.setLabel(name(jobName));
         xmlStatus.setGroup(name(jobName));
+        xmlStatus.setLabel(jobName);
     }
 
     //////////////////////////////////////////// abstract methods ////////////////////////////////////////////

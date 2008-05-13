@@ -2,43 +2,53 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:stg="http://www.in2p3.fr/jsaga/status">
     <xsl:output method="text"/>
 
-    <xsl:template match="/stg:workflow">
+    <xsl:template match="/">
+        <xsl:if test="not(stg:workflow)">
+            <xsl:message terminate="yes">Workflow status XML document is not namespace aware</xsl:message>
+        </xsl:if>
+        <xsl:apply-templates/>
+    </xsl:template>
+
+    <xsl:template match="stg:workflow">
 digraph G {
-    graph [rankdir=LR, ratio=1];
-    graph [color=black, fontname="Times-Bold"];
+    label="<xsl:value-of select="@name"/>"; labelloc=t; labeljust=l; fontname="Times-Bold"; fontsize=36.0;
+    graph [rankdir=LR];
+    graph [style=dashed, color=black];
     node [shape=plaintext, height=0.2];
 
         <!-- nodes -->
-        <xsl:for-each select="stg:task[@type='dummy' and @name='start']">
+        <xsl:for-each select="stg:task[@type='start']">
     "start" [shape=ellipse, style=filled, color=<xsl:call-template name="STATUS"/>];<xsl:text/>
         </xsl:for-each>
-        <xsl:for-each select="stg:task[@type='job' and not(@name=preceding-sibling::stg:task/@name)]">
-    subgraph "cluster_<xsl:value-of select="@name"/>" {
-        label = "<xsl:value-of select="@name"/>";
-        style = dashed;
-        "<xsl:value-of select="@name"/>" [label="run_job", shape=ellipse, style=filled, color=<xsl:call-template
-                    name="STATUS"/>];<xsl:text/>
-            <xsl:variable name="inPrefix">in_<xsl:value-of select="substring-after(@name,'run_')"/>_</xsl:variable>
-            <xsl:for-each select="/stg:workflow/stg:task[@type='dummy' and starts-with(@name,$inPrefix)]">
-        "<xsl:value-of select="@name"/>" [label="<xsl:value-of select="substring-after(@name,$inPrefix)"/>"];<xsl:text/>
+        <xsl:for-each select="stg:task[@type='job']">
+            <xsl:variable name="jobName" select="@label"/>
+            <xsl:variable name="runGroup">run_<xsl:value-of select="@label"/></xsl:variable>
+            <xsl:variable name="endGroup">end_<xsl:value-of select="@label"/></xsl:variable>
+    subgraph "cluster_<xsl:value-of select="$runGroup"/>" {
+        label = "<xsl:value-of select="$runGroup"/>"; labelloc=t; labeljust=c; fontname="Times-Bold"; fontsize=14.0;
+            <xsl:for-each select="/stg:workflow/stg:task[@type='staged' and @group=$runGroup]">
+        "<xsl:value-of select="@name"/>" [label="<xsl:value-of select="@label"/>"];<xsl:text/>
+            </xsl:for-each>
+            <xsl:for-each select="/stg:workflow/stg:task[@type='job' and @group=$runGroup]">
+        "<xsl:value-of select="@name"/>" [label="run_job", shape=ellipse, style=filled, color=<xsl:call-template name="STATUS"/>];<xsl:text/>
+            </xsl:for-each>
+    }
+    subgraph "cluster_<xsl:value-of select="$endGroup"/>" {
+        label = "<xsl:value-of select="$endGroup"/>"; labelloc=t; labeljust=c; fontname="Times-Bold"; fontsize=14.0;
+            <xsl:for-each select="/stg:workflow/stg:task[@type='staged' and @group=$endGroup and not(@name=$endGroup)]">
+        "<xsl:value-of select="@name"/>" [label="<xsl:value-of select="@label"/>"];<xsl:text/>
+            </xsl:for-each>
+            <xsl:for-each select="/stg:workflow/stg:task[@type='end' and @group=$endGroup and @name=$endGroup]">
+        "<xsl:value-of select="@name"/>" [label="end_job", shape=ellipse, style=filled, color=<xsl:call-template name="STATUS"/>];<xsl:text/>
             </xsl:for-each>
     }
         </xsl:for-each>
-        <xsl:for-each select="stg:task[@type='dummy' and not(@name=preceding-sibling::stg:task/@name) and starts-with(@name,'end_')]">
-    subgraph "cluster_<xsl:value-of select="@name"/>" {
-        label = "<xsl:value-of select="@name"/>";
-        style = dashed;
-        "<xsl:value-of select="@name"/>" [label="end_job", shape=ellipse, style=filled, color=<xsl:call-template
-                name="STATUS"/>];<xsl:text/>
-            <xsl:variable name="outPrefix">out_<xsl:value-of select="substring-after(@name,'end_')"/>_</xsl:variable>
-            <xsl:for-each select="/stg:workflow/stg:task[@type='dummy' and starts-with(@name,$outPrefix)]">
-        "<xsl:value-of select="@name"/>" [label="<xsl:value-of select="substring-after(@name,$outPrefix)"/>"];<xsl:text/>
-            </xsl:for-each>
-    }
+        <xsl:for-each select="stg:task[@type='source']">
+    "<xsl:value-of select="@name"/>" [label="<xsl:value-of select="@group"/>\n<xsl:value-of select="@label"/>"];<xsl:text/>
         </xsl:for-each>
         <xsl:for-each select="stg:task[@type='transfer']">
-    "<xsl:value-of select="@name"/>" [label="<xsl:value-of select="@label"/>", shape=ellipse, style=filled, color=<xsl:call-template
-                name="STATUS"/>];<xsl:text/>
+    "<xsl:value-of select="@name"/>" [label="<xsl:value-of select="@group"/>\n<xsl:value-of select="@label"/>", <xsl:text/>
+            <xsl:text/>shape=ellipse, style=filled, color=<xsl:call-template name="STATUS"/>];<xsl:text/>
         </xsl:for-each>
 
         <!-- edges -->

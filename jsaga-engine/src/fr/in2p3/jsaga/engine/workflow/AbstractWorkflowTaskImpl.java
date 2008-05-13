@@ -97,11 +97,32 @@ public abstract class AbstractWorkflowTaskImpl extends AbstractTaskImpl implemen
         }
     }
 
+    public synchronized void removePredecessor(String predecessorName) {
+        m_predecessors.remove(predecessorName);
+    }
+
     public synchronized void addSuccessor(WorkflowTask successor) {
         if (! m_successors.containsKey(successor.getName())) {
             m_successors.put(successor.getName(), successor);
             // update XML status
             m_xmlStatus.addSuccessor(successor.getName());
+        }
+    }
+
+    public synchronized void removeSuccessor(String successorName) {
+        m_successors.remove(successorName);
+        // update XML status
+        m_xmlStatus.removeSuccessor(successorName);
+    }
+
+    public synchronized void unlink() {
+        for (Iterator<WorkflowTask> it=m_predecessors.values().iterator(); it.hasNext(); ) {
+            WorkflowTask predecessor =  it.next();
+            predecessor.removeSuccessor(m_name);
+        }
+        for (Iterator<WorkflowTask> it=m_successors.values().iterator(); it.hasNext(); ) {
+            WorkflowTask successor = it.next();
+            successor.removePredecessor(m_name);
         }
     }
 

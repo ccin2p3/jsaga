@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.engine.workflow.task;
 
 import fr.in2p3.jsaga.engine.schema.status.Task;
+import fr.in2p3.jsaga.engine.schema.status.types.TaskTypeType;
 import org.ogf.saga.error.*;
 
 /* ***************************************************
@@ -21,7 +22,9 @@ public class StagedTask extends DummyTask {
         super(name(jobName, dataStagingName, input));
         // update XML status
         Task xmlStatus = super.getStateAsXML();
+        xmlStatus.setType(TaskTypeType.STAGED);
         xmlStatus.setGroup((input?"run":"end")+"_"+jobName);
+        xmlStatus.setLabel(dataStagingName);
         xmlStatus.setInput(input);
     }
 

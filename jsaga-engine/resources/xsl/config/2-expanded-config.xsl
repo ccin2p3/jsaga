@@ -23,7 +23,7 @@
         <GRID>
             <xsl:copy-of select="@*[local-name()!='wrapperMonitoring' and local-name()!='defaultIntermediary']"/>
             <xsl:apply-templates select="cfg:attribute | cfg:SITE | text() | comment()"/>
-            <SITE name="{@name}">
+            <SITE name="{@name}-default">
                 <!-- do not copy GRID attributes -->
                 <xsl:apply-templates select="cfg:domain"/>
                 <xsl:apply-templates select="ancestor-or-self::cfg:*/cfg:fileSystem"/>
@@ -35,7 +35,7 @@
 
     <xsl:template match="cfg:SITE">
         <xsl:variable name="this" select="."/>
-        <SITE name="{concat(parent::cfg:GRID/@name,'-',@name)}">
+        <SITE name="{parent::cfg:GRID/@name}-{@name}">
             <xsl:copy-of select="@*[local-name()!='wrapperMonitoring' and local-name()!='defaultIntermediary' and local-name()!='name']"/>
             <xsl:apply-templates select="cfg:attributes"/>
             <xsl:apply-templates select="cfg:domain"/>

@@ -10,6 +10,7 @@ import org.ogf.saga.session.Session;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.*;
 import java.lang.Exception;
 import java.util.*;
 
@@ -30,14 +31,16 @@ public class WorkflowImpl extends TaskContainerImpl implements Workflow {
     private fr.in2p3.jsaga.engine.schema.status.Workflow m_xmlStatus;
 
     /** constructor */
-    public WorkflowImpl(Session session) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public WorkflowImpl(Session session, String workflowName) throws NotImplemented, BadParameter, Timeout, NoSuccess {
         super(session);
-        WorkflowTask startTask = new StartTask();
         m_workflowTasks = Collections.synchronizedMap(new HashMap<String,WorkflowTask>());
-        m_workflowTasks.put(startTask.getName(), startTask);
         // set XML status
         m_xmlStatus = new fr.in2p3.jsaga.engine.schema.status.Workflow();
-        m_xmlStatus.setName("todo");
+        m_xmlStatus.setName(workflowName);
+        // add start task
+        WorkflowTask startTask = new StartTask();
+        m_workflowTasks.put(startTask.getName(), startTask);
+        m_xmlStatus.addTask(startTask.getStateAsXML());
     }
 
     /** clone */
@@ -54,39 +57,54 @@ public class WorkflowImpl extends TaskContainerImpl implements Workflow {
         startTask.run();
     }
 
-    public void add(WorkflowTask task, String predecessorName, String successorName) throws NotImplemented, Timeout, NoSuccess {
+    public void add(WorkflowTask newTask, String predecessorName, String successorName) throws NotImplemented, Timeout, NoSuccess {
+        String[] predecessorNamesArray = (predecessorName!=null ? new String[]{predecessorName} : null);
+        String[] successorNamesArray = (successorName!=null ? new String[]{successorName} : null);
+        this.add(newTask, predecessorNamesArray, successorNamesArray);
+    }
+
+    private void add(WorkflowTask newTask, String[] predecessorNames, String[] successorNames) throws NotImplemented, Timeout, NoSuccess {
+        // add task to workflow or retrieve task from workflow
+        WorkflowTask task = m_workflowTasks.get(newTask.getName());
+        if (task == null) {
+            m_workflowTasks.put(newTask.getName(), newTask);
+            m_xmlStatus.addTask(newTask.getStateAsXML());
+            task = newTask;
+        }
+        
         // link to predecessor
-        if (predecessorName != null) {
-            WorkflowTask predecessor = m_workflowTasks.get(predecessorName);
+        for (int i=0; predecessorNames!=null && i<predecessorNames.length; i++) {
+            WorkflowTask predecessor = m_workflowTasks.get(predecessorNames[i]);
             if (predecessor == null) {
-                throw new NoSuccess("Predecessor not found in workflow: "+predecessorName);
+                throw new NoSuccess("Predecessor not found in workflow: "+predecessorNames[i]);
             }
             predecessor.addSuccessor(task);
             task.addPredecessor(predecessor);
         }
 
         // link to successor
-        if (successorName != null) {
-            WorkflowTask successor = m_workflowTasks.get(successorName);
+        for (int i=0; successorNames!=null && i<successorNames.length; i++) {
+            WorkflowTask successor = m_workflowTasks.get(successorNames[i]);
             if (successor == null) {
-                throw new NoSuccess("Successor not found in workflow: "+successorName);
+                throw new NoSuccess("Successor not found in workflow: "+successorNames[i]);
             }
             task.addSuccessor(successor);
             successor.addPredecessor(task);
         }
 
-        if (! m_workflowTasks.containsKey(task.getName())) {
-            // add to workflow
-            m_workflowTasks.put(task.getName(), task);
-            // add to XML status
-            m_xmlStatus.addTask(task.getStateAsXML());
+        // may run task
+        try {
+            task.run();
+        } catch (IncorrectState e) {
+            throw new NoSuccess(e);
+        }
+    }
 
-            // may run task
-            try {
-                task.run();
-            } catch (IncorrectState e) {
-                throw new NoSuccess(e);
-            }
+    public void remove(String name) throws NotImplemented, Timeout, NoSuccess {
+        WorkflowTask task = m_workflowTasks.remove(name);
+        if (task != null) {
+            m_xmlStatus.removeTask(task.getStateAsXML());
+            task.unlink();
         }
     }
 
@@ -100,14 +118,19 @@ public class WorkflowImpl extends TaskContainerImpl implements Workflow {
     }
 
     public synchronized Document getStatesAsXML() throws NotImplemented, Timeout, NoSuccess {
-        // serialize XML status
-        Document doc;
+        // workaround: if marshalling directly to DOM then namespaces are ignored
         try {
-            doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-            Marshaller.marshal(m_xmlStatus, doc);
+            // first marshall to byte array
+            ByteArrayOutputStream xml = new ByteArrayOutputStream();
+            Marshaller m = new Marshaller(new OutputStreamWriter(xml));
+            m.setNamespaceMapping("", "http://www.in2p3.fr/jsaga/status");
+            m.marshal(m_xmlStatus);
+            // then parse the marshalled document
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            return factory.newDocumentBuilder().parse(new ByteArrayInputStream(xml.toByteArray()));
         } catch (Exception e) {
             throw new NoSuccess(e);
         }
-        return doc;
     }
 }

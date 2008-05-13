@@ -19,7 +19,6 @@ import org.ogf.saga.session.Session;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -45,11 +44,11 @@ public class JobCollectionImpl extends WorkflowImpl implements JobCollection {
 
     /** constructor */
     public JobCollectionImpl(Session session, JobCollectionDescription jcDesc, Evaluator evaluator) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
-        super(session);
+        super(session, jcDesc.getCollectionName());
+        m_jobCollectionName = jcDesc.getCollectionName();
 
         // fill
         JobCollectionFiller filler = new JobCollectionFiller(jcDesc.getAsDocument());
-        m_jobCollectionName = filler.getCollectionName();
         Document filledJcDesc = filler.getEfectiveJobCollection();
         
         // preprocess
@@ -77,6 +76,10 @@ public class JobCollectionImpl extends WorkflowImpl implements JobCollection {
             JobEndTaskGenerator jobEnd = new JobEndTaskGenerator(jobName, jobTemplate);
             jobEnd.updateWorkflow(this);
 
+            // update workflow (pre/post staging)
+            DataPrePostStagingTaskGenerator prePostStaging = new DataPrePostStagingTaskGenerator(jobName, jobDescArray[i].getAsDocument());
+            prePostStaging.updateWorkflow(this);
+
             // update task container
             JobWithStaging job = new JobWithStagingImpl(session, jobDescArray[i], jobHandle, this, jobEnd.getTask());
             super.add(job);
@@ -84,9 +87,6 @@ public class JobCollectionImpl extends WorkflowImpl implements JobCollection {
             // update list of unallocated jobs
             m_unallocatedJobs.add(job);
         }
-        // update workflow (pre/post staging)
-        DataStagingTaskGenerator prePostStaging = new DataStagingTaskGenerator(processedJcDesc, null);
-        prePostStaging.updateWorkflow(this);
     }
 
     /** clone */
@@ -136,14 +136,27 @@ public class JobCollectionImpl extends WorkflowImpl implements JobCollection {
         }
     }
 
+    public void cleanup() {
+        File baseDir = new File(new File(Base.JSAGA_VAR, "jobs"), m_jobCollectionName);
+        if(baseDir.exists()) {
+            File[] files = baseDir.listFiles();
+            for (int i=0; i<files.length; i++) {
+                files[i].delete();
+            }
+            baseDir.delete();
+        }        
+    }
+
     /** override super.getStatesAsXML() */
     public synchronized Document getStatesAsXML() throws NotImplemented, Timeout, NoSuccess {
         Document status = super.getStatesAsXML();
         try {
+            OutputStream out = new FileOutputStream(statusFile(m_jobCollectionName));
             TransformerFactory.newInstance().newTransformer().transform(
                     new DOMSource(status),
-                    new StreamResult(statusFile(m_jobCollectionName)));
-        } catch (TransformerException e) {
+                    new StreamResult(out));
+            out.close();
+        } catch (Exception e) {
             throw new NoSuccess(e);
         }
         return status;
