@@ -18,6 +18,6 @@ public class SrbDataAdaptorTest extends TestCase {
     public void test_getScheme() {
         assertEquals(
                 "srb",
-                new IrodsDataAdaptor().getType());
+                new SrbDataAdaptor().getType());
     }
 }
