@@ -21,15 +21,13 @@ import org.ogf.saga.task.State;
  */
 public class JobRun extends AbstractCommand {
     private static final String OPT_HELP = "h", LONGOPT_HELP = "help";
-    // required arguments
-    private static final String OPT_JOB_SERVICE = "s", LONGOPT_JOB_SERVICE = "service";
     // optional arguments
     private static final String OPT_BATCH = "b", LONGOPT_BATCH = "batch";
     // attribute names missing in interface JobDescription
     private static final String JOBNAME = "JobName";
 
     protected JobRun() {
-        super("jsaga-job-run", null, null, new GnuParser());
+        super("jsaga-job-run", new String[]{"resource"}, new String[]{OPT_HELP, LONGOPT_HELP}, new GnuParser());
     }
 
     public static void main(String[] args) throws Exception {
@@ -44,7 +42,7 @@ public class JobRun extends AbstractCommand {
         else
         {
             // get arguments
-            URL serviceURL = URLFactory.create(line.getOptionValue(OPT_JOB_SERVICE));
+            URL serviceURL = URLFactory.create(command.m_nonOptionValues[0]);
             JobDescription desc = createJobDescription(line);
 
             // submit
@@ -79,14 +77,6 @@ public class JobRun extends AbstractCommand {
         opt.addOption(OptionBuilder.withDescription("Display this help and exit")
                 .withLongOpt(LONGOPT_HELP)
                 .create(OPT_HELP));
-
-        // required arguments
-        opt.addOption(OptionBuilder.withDescription("the URL of the job service")
-                .isRequired(true)
-                .hasArg()
-                .withArgName("URL")
-                .withLongOpt(LONGOPT_JOB_SERVICE)
-                .create(OPT_JOB_SERVICE));
 
         // optional arguments
         opt.addOption(OptionBuilder.withDescription("exit immediatly after having submitted the job, " +
