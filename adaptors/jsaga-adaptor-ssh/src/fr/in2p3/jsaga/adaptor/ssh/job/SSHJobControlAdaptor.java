@@ -1,11 +1,5 @@
 package fr.in2p3.jsaga.adaptor.ssh.job;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Map;
 import java.util.UUID;
 
@@ -17,6 +11,7 @@ import com.jcraft.jsch.ChannelExec;
 
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.InteractiveJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.adaptor.ssh.SSHAdaptorAbstract;
 
@@ -33,11 +28,8 @@ import fr.in2p3.jsaga.adaptor.ssh.SSHAdaptorAbstract;
  * TODO : Support of pre-requisite
  */
 public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
-		JobControlAdaptor, CleanableJobAdaptor{
-//, InteractiveJobAdaptor, JobIOGetter 
-	private String jobId;
-	private File stdoutFile, stderrFile, stdinFile;
-	
+		JobControlAdaptor, CleanableJobAdaptor, InteractiveJobAdaptor {
+
 	public String getType() {
 		return "ssh";
 	}
@@ -64,11 +56,11 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 
 			ChannelExec channel = (ChannelExec) session.openChannel("exec");
 
-			jobId = UUID.randomUUID().toString();
-			String cde = prepareCde(commandLine);
+			String jobId = UUID.randomUUID().toString();
 			
 			//commandLine
-			channel.setCommand(cde);
+			channel.setCommand(prepareCde(commandLine, jobId));
+			
 			// start job
 			channel.connect();	
 			
@@ -80,51 +72,30 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 			throw new NoSuccess(e);
 		}
 	}
-	/*
-	public JobIOHandler submitInteractive(String commandLine,
+	
+	public SSHJobIOHandler submitInteractive(String commandLine,
 			boolean checkMatch) throws PermissionDenied, Timeout, NoSuccess {
 		
 		try {
-			//ChannelShell channel = (ChannelShell) session.openChannel("shell");
 			ChannelExec channel = (ChannelExec) session.openChannel("exec");
 
-			jobId = UUID.randomUUID().toString();
-			
-			// set stdout
-			stdoutFile = File.createTempFile(jobId, ".stdout");
-			stdoutFile.deleteOnExit();
-			//OutputStream outputStream = new FileOutputStream(stdoutFile);
-			channel.setOutputStream(System.out);
-			
-			// set stderr
-			stderrFile = File.createTempFile(jobId, ".stderr");
-			stderrFile.deleteOnExit();
-			OutputStream errorStream = new FileOutputStream(stderrFile);
-			channel.setErrStream(System.err);		
-	
-			// set stdin
-			//stdinFile = File.createTempFile(jobId, ".stdin");
-			//stdinFile.deleteOnExit();
-			stdinFile = new File("d://test.sh");
-			InputStream inputStream = new FileInputStream(stdinFile);
-			channel.setInputStream(inputStream);	
+			String jobId = UUID.randomUUID().toString();
 			
 			//commandLine
-			channel.setCommand("sh");
+			channel.setCommand(prepareCde(commandLine, jobId));
 			
 			// start job
 			channel.connect();
-			inputStream.close();
 			
 			// add channel in sessionMap
 			SSHAdaptorAbstract.sessionMap.put(jobId, channel);
-			return this;
+			return new SSHJobIOHandler(channel, jobId);
 		} catch (Exception e) {
 			throw new NoSuccess(e);
 		}
-	}*/
+	}
 
-	private String prepareCde(String commandLine) {
+	private String prepareCde(String commandLine, String jobId) {
 		return 	"eval '"+commandLine+" &' ; " +
 			"MYPID=$! ; " +
 			"echo $MYPID > ."+jobId+" ;" +
@@ -156,39 +127,5 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 		ChannelExec channel = (ChannelExec) SSHAdaptorAbstract.sessionMap.get(nativeJobId);
 		channel.disconnect();
 		SSHAdaptorAbstract.sessionMap.remove(channel);
-	}
-
-	public String getJobId() {
-		return jobId;
-	}
-
-	public InputStream getStderr() throws PermissionDenied, Timeout, NoSuccess {
-		InputStream iS;
-		try {
-			iS = new FileInputStream(stderrFile);
-		} catch (FileNotFoundException e) {
-			throw new NoSuccess(e);
-		}
-		return iS;
-	}
-
-	public OutputStream getStdin() throws PermissionDenied, Timeout, NoSuccess {
-		OutputStream oS;
-		try {
-			oS = new FileOutputStream(stdinFile);
-		} catch (FileNotFoundException e) {
-			throw new NoSuccess(e);
-		}
-		return oS;
-	}
-
-	public InputStream getStdout() throws PermissionDenied, Timeout, NoSuccess {
-		InputStream iS;
-		try {
-			iS = new FileInputStream(stdoutFile);
-		} catch (FileNotFoundException e) {
-			throw new NoSuccess(e);
-		}
-		return iS;
 	}
 }
