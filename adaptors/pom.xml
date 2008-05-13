@@ -26,5 +26,7 @@
     <module>jsaga-adaptor-wms</module>
     <module>jsaga-adaptor-unicore6</module>
     <module>jsaga-adaptor-ssh</module>
+    <module>jsaga-adaptor-irods</module>
+    <module>jsaga-adaptor-mail</module>
   </modules>
 </project>
