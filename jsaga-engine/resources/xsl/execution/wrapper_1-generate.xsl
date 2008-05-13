@@ -713,6 +713,22 @@ run COMPLETE        COMPLETED
             <xsl:text> </xsl:text>"<xsl:call-template name="FIXED_URL"/>"<xsl:text/>
     </xsl:template>
     
+    <!-- ************************* file ************************* -->
+    <xsl:template match="jsdl:Source/jsdl:URI[starts-with(text(),'file://')]">
+        <xsl:param name="local"/>
+        <xsl:call-template name="REMOVE_LOCAL"><xsl:with-param name="local" select="$local"/></xsl:call-template>
+        cp<xsl:text/>
+            <xsl:text> </xsl:text><xsl:call-template name="PATH"/>
+            <xsl:text> </xsl:text><xsl:value-of select="$local"/>
+    </xsl:template>
+    <xsl:template match="jsdl:Target/jsdl:URI[starts-with(text(),'file://')]">
+        <xsl:param name="local"/>
+        <xsl:call-template name="REMOVE_LOCAL"><xsl:with-param name="local"><xsl:call-template name="PATH"/></xsl:with-param></xsl:call-template>
+        cp<xsl:text/>
+            <xsl:text> </xsl:text><xsl:value-of select="$local"/>
+            <xsl:text> </xsl:text><xsl:call-template name="PATH"/>
+    </xsl:template>
+
     <!-- ************************* other... ************************* -->
     <xsl:template match="jsdl:URI">
         <xsl:message terminate="yes">Protocol not supported: <xsl:value-of select="substring-before(text(),':')"/></xsl:message>

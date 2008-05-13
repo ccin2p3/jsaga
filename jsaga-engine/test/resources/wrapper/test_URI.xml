@@ -187,6 +187,20 @@
                 <Source><URI>gsiftp-v1://host:1234/tmp/input.txt</URI></Source>
                 <Target><URI>gsiftp-v1://host:1234/tmp/output.txt</URI></Target>
             </DataStaging>
+            <DataStaging name="FILE">
+                <FileName>$PWD/myjob/file.txt</FileName>
+                <FilesystemName>$PWD</FilesystemName>
+                <CreationFlag>dontOverwrite</CreationFlag>
+                <Source><URI>file:///tmp/input.txt</URI></Source>
+                <Target><URI>file:///tmp/output.txt</URI></Target>
+            </DataStaging>
+            <DataStaging name="FILE_OVERWRITTEN">
+                <FileName>$PWD/myjob/file.txt</FileName>
+                <FilesystemName>$PWD</FilesystemName>
+                <CreationFlag>overwrite</CreationFlag>
+                <Source><URI>file:///tmp/input.txt</URI></Source>
+                <Target><URI>file:///tmp/output.txt</URI></Target>
+            </DataStaging>
         </JobDescription>
     </JobDefinition>
 </ext:Job>
