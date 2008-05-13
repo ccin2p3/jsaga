@@ -35,6 +35,7 @@ public class JobCollectionTest extends AbstractJobCollectionTest {
     }
 
     // check job transformation
+    public void test_demo2() throws Exception {super.checkPreprocess();}
 //    public void test_ref() throws Exception {super.checkPreprocess();}
     public void test_sandbox() throws Exception {super.checkPreprocess();}
     public void test_sbxstg() throws Exception {super.checkPreprocess();}
