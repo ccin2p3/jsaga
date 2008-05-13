@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ext:Job xmlns:ext="http://www.in2p3.fr/jsdl-extension">
+    <ext:JobLifetimeManagement>
+        <ext:Retry count="3" maxTime="PT80S" status="queued"/>
+        <ext:Retry count="2" maxTime="PT6M" status="running"/>
+        <ext:Retry count="1" status="failed"/>
+    </ext:JobLifetimeManagement>
+    <JobDefinition xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl">
+        <JobDescription>
+            <JobIdentification>
+                <JobName>MYJOB_3</JobName>
+            </JobIdentification>
+            <Application>
+                <posix:POSIXApplication xmlns:posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix">
+                    <posix:Executable>$E</posix:Executable>
+                    <posix:Argument>-c0 $C0</posix:Argument>
+                    <posix:Argument>-c1 $C1</posix:Argument>
+                    <posix:Argument>-c2 $C2</posix:Argument>
+                    <posix:Input>$D</posix:Input>
+                    <posix:Output>$R</posix:Output>
+                    <posix:Error>$STDERR</posix:Error>
+                </posix:POSIXApplication>
+            </Application>
+            <Resources>
+                <FileSystem name="ApplicationsDirectory">
+                    <FileSystemType>normal</FileSystemType>
+                    <MountPoint>$VO_BIOMED_SW_DIR</MountPoint>
+                </FileSystem>
+                <FileSystem name="WorkingDirectory">
+                    <FileSystemType>temporary</FileSystemType>
+                    <MountPoint>$PWD</MountPoint>
+                </FileSystem>
+                <FileSystem name="HELLOWORLD_1.1">
+                    <FileSystemType>normal</FileSystemType>
+                    <MountPoint>$VO_BIOMED_SW_DIR/HelloWorld/1.1</MountPoint>
+                </FileSystem>
+            </Resources>
+            <DataStaging name="C0">
+                <FileName>$PWD/config0.cfg</FileName>
+                <FilesystemName>$PWD</FilesystemName>
+                <CreationFlag>overwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Source>
+                    <URI>gsiftp://defaultSE.egee.org/tmp/test_staging_egee.in/config0.cfg#EGEE</URI>
+                </Source>
+                <ext:Step uri="file:///tmp/config0.cfg">
+                    <ext:Step uri="gsiftp://defaultSE.egee.org/tmp/test_staging_egee.in/config0.cfg#EGEE"/>
+                </ext:Step>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>true</ext:Shared>
+            </DataStaging>
+            <DataStaging name="C1">
+                <FileName>$PWD/config1.cfg</FileName>
+                <FilesystemName>$PWD</FilesystemName>
+                <CreationFlag>overwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Source>
+                    <URI>gsiftp://defaultSE.egee.org/tmp/test_staging_egee.in/config1.cfg#EGEE</URI>
+                </Source>
+                <ext:Step uri="srb://sreynaud@host2:5544/grid/config1.cfg?mydomain#OpenPlast-CCIN2P3">
+                    <ext:Step uri="file:///tmp/test_staging_egee.in/config1.cfg">
+                        <ext:Step uri="gsiftp://defaultSE.egee.org/tmp/test_staging_egee.in/config1.cfg#EGEE"/>
+                    </ext:Step>
+                </ext:Step>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>true</ext:Shared>
+            </DataStaging>
+            <DataStaging name="C2">
+                <FileName>$PWD/config2.cfg</FileName>
+                <FilesystemName>$PWD</FilesystemName>
+                <CreationFlag>overwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Source>
+                    <URI>gsiftp://defaultSE.egee.org/tmp/test_staging_egee.in/config2.cfg#EGEE</URI>
+                </Source>
+                <ext:Step uri="http://host5:8080/public/configuration/config2.cfg">
+                    <ext:Step uri="file:///tmp/test_staging_egee.in/config2.cfg">
+                        <ext:Step uri="gsiftp://defaultSE.egee.org/tmp/test_staging_egee.in/config2.cfg#EGEE"/>
+                    </ext:Step>
+                </ext:Step>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>true</ext:Shared>
+            </DataStaging>
+            <DataStaging name="E">
+                <FileName>$VO_BIOMED_SW_DIR/HelloWorld/1.1/bin/executable.exe</FileName>
+                <FilesystemName>$VO_BIOMED_SW_DIR/HelloWorld/1.1</FilesystemName>
+                <CreationFlag>dontOverwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Source/>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>true</ext:Shared>
+            </DataStaging>
+            <DataStaging name="E">
+                <FileName>$PWD/executable-src/bin/executable.exe</FileName>
+                <FilesystemName>$PWD</FilesystemName>
+                <CreationFlag>overwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Source>
+                    <URI>gsiftp://host3:2811/repository/src/executable-src.tar.gz#EGEE</URI>
+                    <ext:Process>tar xzvf $SOURCE ; cd executable-src ; make</ext:Process>
+                </Source>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>true</ext:Shared>
+            </DataStaging>
+            <DataStaging name="D">
+                <FileName>$PWD/data.dat</FileName>
+                <FilesystemName>$PWD</FilesystemName>
+                <CreationFlag>overwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Source>
+                    <URI>gsiftp://closeSE.egee.org:2811/intermediary/test_staging_egee.in/data_3.dat#EGEE-default</URI>
+                </Source>
+                <ext:Step uri="gsiftp://host4:2811/data/data_3.dat#OpenPlast">
+                    <ext:Step uri="file:///tmp/test_staging_egee.in/data_3.dat">
+                        <ext:Step uri="gsiftp://closeSE.egee.org:2811/intermediary/test_staging_egee.in/data_3.dat#EGEE-default"/>
+                    </ext:Step>
+                </ext:Step>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>false</ext:Shared>
+            </DataStaging>
+            <DataStaging name="R">
+                <FileName>$PWD/result.dat</FileName>
+                <FilesystemName>$PWD</FilesystemName>
+                <CreationFlag>overwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Target>
+                    <URI>gsiftp://closeSE.egee.org:2811/intermediary/test_staging_egee.out/MYJOB_3/result_3.dat#EGEE-default</URI>
+                </Target>
+                <ext:Step uri="mail://sreynaud@in2p3.fr/result_3.dat">
+                    <ext:Step uri="file:///tmp/test_staging_egee.out/MYJOB_3/result_3.dat">
+                        <ext:Step uri="gsiftp://closeSE.egee.org:2811/intermediary/test_staging_egee.out/MYJOB_3/result_3.dat#EGEE-default"/>
+                    </ext:Step>
+                </ext:Step>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>false</ext:Shared>
+            </DataStaging>
+            <DataStaging name="STDERR">
+                <FileName>$PWD/stderr.txt</FileName>
+                <FilesystemName>$PWD</FilesystemName>
+                <CreationFlag>overwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Target>
+                    <URI>gsiftp://closeSE.egee.org:2811/intermediary/test_staging_egee.out/MYJOB_3/stderr_3.txt#EGEE-default</URI>
+                </Target>
+                <ext:Step uri="file:///tmp/stderr_3.txt">
+                    <ext:Step uri="gsiftp://closeSE.egee.org:2811/intermediary/test_staging_egee.out/MYJOB_3/stderr_3.txt#EGEE-default"/>
+                </ext:Step>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>false</ext:Shared>
+            </DataStaging>
+        </JobDescription>
+    </JobDefinition>
+</ext:Job>

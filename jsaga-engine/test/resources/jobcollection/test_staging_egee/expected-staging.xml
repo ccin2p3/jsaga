@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow xmlns="http://www.in2p3.fr/jsaga/status" name="test_staging_egee">
+    <task label="start" name="start" state="NEW" type="start">
+        <successor>file:///tmp/config0.cfg</successor>
+        <successor>srb://sreynaud@host2:5544/grid/config1.cfg?mydomain#OpenPlast-CCIN2P3</successor>
+        <successor>http://host5:8080/public/configuration/config2.cfg</successor>
+        <successor>gsiftp://host3:2811/repository/src/executable-src.tar.gz#EGEE</successor>
+        <successor>gsiftp://host4:2811/data/data_1.dat#OpenPlast</successor>
+        <successor>gsiftp://host4:2811/data/data_2.dat#OpenPlast</successor>
+        <successor>gsiftp://host4:2811/data/data_3.dat#OpenPlast</successor>
+    </task>
+    <task group="run_MYJOB_1" label="MYJOB_1" name="run_MYJOB_1" state="NEW" type="job">
+        <successor>gsiftp://firewallSE.egee.org:2811/intermediary/test_staging_egee.out/MYJOB_1/result_1.dat#EGEE-default</successor>
+        <successor>gsiftp://firewallSE.egee.org:2811/intermediary/test_staging_egee.out/MYJOB_1/stderr_1.txt#EGEE-default</successor>
+    </task>
+    <task group="run_MYJOB_1" input="true" label="C0" name="in_MYJOB_1_C0" state="NEW" type="staged">
+        <successor>run_MYJOB_1</successor>
+    </task>
+    <task group="run_MYJOB_1" input="true" label="C1" name="in_MYJOB_1_C1" state="NEW" type="staged">
+        <successor>run_MYJOB_1</successor>
+    </task>
+    <task group="run_MYJOB_1" input="true" label="C2" name="in_MYJOB_1_C2" state="NEW" type="staged">
+        <successor>run_MYJOB_1</successor>
+    </task>
+    <task group="run_MYJOB_1" input="true" label="E" name="in_MYJOB_1_E" state="NEW" type="staged">
+        <successor>run_MYJOB_1</successor>
+    </task>
+    <task group="run_MYJOB_1" input="true" label="D" name="in_MYJOB_1_D" state="NEW" type="staged">
+        <successor>run_MYJOB_1</successor>
+    </task>
+    <task group="end_MYJOB_1" label="MYJOB_1" name="end_MYJOB_1" state="NEW" type="end"/>
+    <task group="end_MYJOB_1" input="false" label="R" name="out_MYJOB_1_R" state="NEW" type="staged">
+        <successor>end_MYJOB_1</successor>
+    </task>
+    <task group="end_MYJOB_1" input="false" label="STDERR" name="out_MYJOB_1_STDERR" state="NEW" type="staged">
+        <successor>end_MYJOB_1</successor>
+    </task>
+    <task group="run_MYJOB_2" label="MYJOB_2" name="run_MYJOB_2" state="NEW" type="job">
+        <successor>gsiftp://defaultSE.egee.org/tmp/test_staging_egee.out/MYJOB_2/result_2.dat#EGEE</successor>
+        <successor>gsiftp://defaultSE.egee.org/tmp/test_staging_egee.out/MYJOB_2/stderr_2.txt#EGEE</successor>
+    </task>
+    <task group="run_MYJOB_2" input="true" label="C0" name="in_MYJOB_2_C0" state="NEW" type="staged">
+        <successor>run_MYJOB_2</successor>
+    </task>
+    <task group="run_MYJOB_2" input="true" label="C1" name="in_MYJOB_2_C1" state="NEW" type="staged">
+        <successor>run_MYJOB_2</successor>
+    </task>
+    <task group="run_MYJOB_2" input="true" label="C2" name="in_MYJOB_2_C2" state="NEW" type="staged">
+        <successor>run_MYJOB_2</successor>
+    </task>
+    <task group="run_MYJOB_2" input="true" label="D" name="in_MYJOB_2_D" state="NEW" type="staged">
+        <successor>run_MYJOB_2</successor>
+    </task>
+    <task group="end_MYJOB_2" label="MYJOB_2" name="end_MYJOB_2" state="NEW" type="end"/>
+    <task group="end_MYJOB_2" input="false" label="R" name="out_MYJOB_2_R" state="NEW" type="staged">
+        <successor>end_MYJOB_2</successor>
+    </task>
+    <task group="end_MYJOB_2" input="false" label="STDERR" name="out_MYJOB_2_STDERR" state="NEW" type="staged">
+        <successor>end_MYJOB_2</successor>
+    </task>
+    <task group="run_MYJOB_3" label="MYJOB_3" name="run_MYJOB_3" state="NEW" type="job">
+        <successor>gsiftp://closeSE.egee.org:2811/intermediary/test_staging_egee.out/MYJOB_3/result_3.dat#EGEE-default</successor>
+        <successor>gsiftp://closeSE.egee.org:2811/intermediary/test_staging_egee.out/MYJOB_3/stderr_3.txt#EGEE-default</successor>
+    </task>
+    <task group="run_MYJOB_3" input="true" label="C0" name="in_MYJOB_3_C0" state="NEW" type="staged">
+        <successor>run_MYJOB_3</successor>
+    </task>
+    <task group="run_MYJOB_3" input="true" label="C1" name="in_MYJOB_3_C1" state="NEW" type="staged">
+        <successor>run_MYJOB_3</successor>
+    </task>
+    <task group="run_MYJOB_3" input="true" label="C2" name="in_MYJOB_3_C2" state="NEW" type="staged">
+        <successor>run_MYJOB_3</successor>
+    </task>
+    <task group="run_MYJOB_3" input="true" label="E" name="in_MYJOB_3_E" state="NEW" type="staged">
+        <successor>run_MYJOB_3</successor>
+    </task>
+    <task group="run_MYJOB_3" input="true" label="D" name="in_MYJOB_3_D" state="NEW" type="staged">
+        <successor>run_MYJOB_3</successor>
+    </task>
+    <task group="end_MYJOB_3" label="MYJOB_3" name="end_MYJOB_3" state="NEW" type="end"/>
+    <task group="end_MYJOB_3" input="false" label="R" name="out_MYJOB_3_R" state="NEW" type="staged">
+        <successor>end_MYJOB_3</successor>
+    </task>
+    <task group="end_MYJOB_3" input="false" label="STDERR" name="out_MYJOB_3_STDERR" state="NEW" type="staged">
+        <successor>end_MYJOB_3</successor>
+    </task>
+    <task group="file://" input="true" label="config0.cfg" name="file:///tmp/config0.cfg" state="NEW" type="source">
+        <successor>gsiftp://firewallSE.egee.org:2811/intermediary/test_staging_egee.in/config0.cfg#EGEE-default</successor>
+        <successor>gsiftp://defaultSE.egee.org/tmp/test_staging_egee.in/config0.cfg#EGEE</successor>
+    </task>
+    <task context="EGEE-default" group="gsiftp://firewallSE.egee.org" input="true" label="config0.cfg" name="gsiftp://firewallSE.egee.org:2811/intermediary/test_staging_egee.in/config0.cfg#EGEE-default" state="NEW" type="transfer">
+        <successor>in_MYJOB_1_C0</successor>
+    </task>
+    <task context="OpenPlast-CCIN2P3" group="srb://host2" input="true" label="config1.cfg" name="srb://sreynaud@host2:5544/grid/config1.cfg?mydomain#OpenPlast-CCIN2P3" state="NEW" type="source">
+        <successor>file:///tmp/test_staging_egee.in/config1.cfg</successor>
+    </task>
+    <task group="file://" input="true" label="config1.cfg" name="file:///tmp/test_staging_egee.in/config1.cfg" state="NEW" type="transfer">
+        <successor>gsiftp://firewallSE.egee.org:2811/intermediary/test_staging_egee.in/config1.cfg#EGEE-default</successor>
+        <successor>gsiftp://defaultSE.egee.org/tmp/test_staging_egee.in/config1.cfg#EGEE</successor>
+    </task>
+    <task context="EGEE-default" group="gsiftp://firewallSE.egee.org" input="true" label="config1.cfg" name="gsiftp://firewallSE.egee.org:2811/intermediary/test_staging_egee.in/config1.cfg#EGEE-default" state="NEW" type="transfer">
+        <successor>in_MYJOB_1_C1</successor>
+    </task>
+    <task group="http://host5" input="true" label="config2.cfg" name="http://host5:8080/public/configuration/config2.cfg" state="NEW" type="source">
+        <successor>file:///tmp/test_staging_egee.in/config2.cfg</successor>
+    </task>
+    <task group="file://" input="true" label="config2.cfg" name="file:///tmp/test_staging_egee.in/config2.cfg" state="NEW" type="transfer">
+        <successor>gsiftp://firewallSE.egee.org:2811/intermediary/test_staging_egee.in/config2.cfg#EGEE-default</successor>
+        <successor>gsiftp://defaultSE.egee.org/tmp/test_staging_egee.in/config2.cfg#EGEE</successor>
+    </task>
+    <task context="EGEE-default" group="gsiftp://firewallSE.egee.org" input="true" label="config2.cfg" name="gsiftp://firewallSE.egee.org:2811/intermediary/test_staging_egee.in/config2.cfg#EGEE-default" state="NEW" type="transfer">
+        <successor>in_MYJOB_1_C2</successor>
+    </task>
+    <task context="EGEE" group="gsiftp://host3" input="true" label="executable-src.tar.gz" name="gsiftp://host3:2811/repository/src/executable-src.tar.gz#EGEE" state="NEW" type="source">
+        <successor>gsiftp://firewallSE.egee.org:2811/intermediary/test_staging_egee.in/executable-src.tar.gz#EGEE-default</successor>
+        <successor>in_MYJOB_3_E</successor>
+    </task>
+    <task context="EGEE-default" group="gsiftp://firewallSE.egee.org" input="true" label="executable-src.tar.gz" name="gsiftp://firewallSE.egee.org:2811/intermediary/test_staging_egee.in/executable-src.tar.gz#EGEE-default" state="NEW" type="transfer">
+        <successor>in_MYJOB_1_E</successor>
+    </task>
+    <task context="OpenPlast" group="gsiftp://host4" input="true" label="data_1.dat" name="gsiftp://host4:2811/data/data_1.dat#OpenPlast" state="NEW" type="source">
+        <successor>file:///tmp/test_staging_egee.in/data_1.dat</successor>
+    </task>
+    <task group="file://" input="true" label="data_1.dat" name="file:///tmp/test_staging_egee.in/data_1.dat" state="NEW" type="transfer">
+        <successor>gsiftp://firewallSE.egee.org:2811/intermediary/test_staging_egee.in/data_1.dat#EGEE-default</successor>
+    </task>
+    <task context="EGEE-default" group="gsiftp://firewallSE.egee.org" input="true" label="data_1.dat" name="gsiftp://firewallSE.egee.org:2811/intermediary/test_staging_egee.in/data_1.dat#EGEE-default" state="NEW" type="transfer">
+        <successor>in_MYJOB_1_D</successor>
+    </task>
+    <task context="EGEE-default" group="gsiftp://firewallSE.egee.org" input="false" label="result_1.dat" name="gsiftp://firewallSE.egee.org:2811/intermediary/test_staging_egee.out/MYJOB_1/result_1.dat#EGEE-default" state="NEW" type="source">
+        <successor>file:///tmp/test_staging_egee.out/MYJOB_1/result_1.dat</successor>
+    </task>
+    <task group="file://" input="false" label="result_1.dat" name="file:///tmp/test_staging_egee.out/MYJOB_1/result_1.dat" state="NEW" type="transfer">
+        <successor>mail://sreynaud@in2p3.fr/result_1.dat</successor>
+    </task>
+    <task group="mail://in2p3.fr" input="false" label="result_1.dat" name="mail://sreynaud@in2p3.fr/result_1.dat" state="NEW" type="transfer">
+        <successor>out_MYJOB_1_R</successor>
+    </task>
+    <task context="EGEE-default" group="gsiftp://firewallSE.egee.org" input="false" label="stderr_1.txt" name="gsiftp://firewallSE.egee.org:2811/intermediary/test_staging_egee.out/MYJOB_1/stderr_1.txt#EGEE-default" state="NEW" type="source">
+        <successor>file:///tmp/stderr_1.txt</successor>
+    </task>
+    <task group="file://" input="false" label="stderr_1.txt" name="file:///tmp/stderr_1.txt" state="NEW" type="transfer">
+        <successor>out_MYJOB_1_STDERR</successor>
+    </task>
+    <task context="EGEE" group="gsiftp://defaultSE.egee.org" input="true" label="config0.cfg" name="gsiftp://defaultSE.egee.org/tmp/test_staging_egee.in/config0.cfg#EGEE" state="NEW" type="transfer">
+        <successor>in_MYJOB_2_C0</successor>
+        <successor>in_MYJOB_3_C0</successor>
+    </task>
+    <task context="EGEE" group="gsiftp://defaultSE.egee.org" input="true" label="config1.cfg" name="gsiftp://defaultSE.egee.org/tmp/test_staging_egee.in/config1.cfg#EGEE" state="NEW" type="transfer">
+        <successor>in_MYJOB_2_C1</successor>
+        <successor>in_MYJOB_3_C1</successor>
+    </task>
+    <task context="EGEE" group="gsiftp://defaultSE.egee.org" input="true" label="config2.cfg" name="gsiftp://defaultSE.egee.org/tmp/test_staging_egee.in/config2.cfg#EGEE" state="NEW" type="transfer">
+        <successor>in_MYJOB_2_C2</successor>
+        <successor>in_MYJOB_3_C2</successor>
+    </task>
+    <task context="OpenPlast" group="gsiftp://host4" input="true" label="data_2.dat" name="gsiftp://host4:2811/data/data_2.dat#OpenPlast" state="NEW" type="source">
+        <successor>file:///tmp/test_staging_egee.in/data_2.dat</successor>
+    </task>
+    <task group="file://" input="true" label="data_2.dat" name="file:///tmp/test_staging_egee.in/data_2.dat" state="NEW" type="transfer">
+        <successor>gsiftp://defaultSE.egee.org/tmp/test_staging_egee.in/data_2.dat#EGEE</successor>
+    </task>
+    <task context="EGEE" group="gsiftp://defaultSE.egee.org" input="true" label="data_2.dat" name="gsiftp://defaultSE.egee.org/tmp/test_staging_egee.in/data_2.dat#EGEE" state="NEW" type="transfer">
+        <successor>in_MYJOB_2_D</successor>
+    </task>
+    <task context="EGEE" group="gsiftp://defaultSE.egee.org" input="false" label="result_2.dat" name="gsiftp://defaultSE.egee.org/tmp/test_staging_egee.out/MYJOB_2/result_2.dat#EGEE" state="NEW" type="source">
+        <successor>file:///tmp/test_staging_egee.out/MYJOB_2/result_2.dat</successor>
+    </task>
+    <task group="file://" input="false" label="result_2.dat" name="file:///tmp/test_staging_egee.out/MYJOB_2/result_2.dat" state="NEW" type="transfer">
+        <successor>mail://sreynaud@in2p3.fr/result_2.dat</successor>
+    </task>
+    <task group="mail://in2p3.fr" input="false" label="result_2.dat" name="mail://sreynaud@in2p3.fr/result_2.dat" state="NEW" type="transfer">
+        <successor>out_MYJOB_2_R</successor>
+    </task>
+    <task context="EGEE" group="gsiftp://defaultSE.egee.org" input="false" label="stderr_2.txt" name="gsiftp://defaultSE.egee.org/tmp/test_staging_egee.out/MYJOB_2/stderr_2.txt#EGEE" state="NEW" type="source">
+        <successor>file:///tmp/stderr_2.txt</successor>
+    </task>
+    <task group="file://" input="false" label="stderr_2.txt" name="file:///tmp/stderr_2.txt" state="NEW" type="transfer">
+        <successor>out_MYJOB_2_STDERR</successor>
+    </task>
+    <task context="OpenPlast" group="gsiftp://host4" input="true" label="data_3.dat" name="gsiftp://host4:2811/data/data_3.dat#OpenPlast" state="NEW" type="source">
+        <successor>file:///tmp/test_staging_egee.in/data_3.dat</successor>
+    </task>
+    <task group="file://" input="true" label="data_3.dat" name="file:///tmp/test_staging_egee.in/data_3.dat" state="NEW" type="transfer">
+        <successor>gsiftp://closeSE.egee.org:2811/intermediary/test_staging_egee.in/data_3.dat#EGEE-default</successor>
+    </task>
+    <task context="EGEE-default" group="gsiftp://closeSE.egee.org" input="true" label="data_3.dat" name="gsiftp://closeSE.egee.org:2811/intermediary/test_staging_egee.in/data_3.dat#EGEE-default" state="NEW" type="transfer">
+        <successor>in_MYJOB_3_D</successor>
+    </task>
+    <task context="EGEE-default" group="gsiftp://closeSE.egee.org" input="false" label="result_3.dat" name="gsiftp://closeSE.egee.org:2811/intermediary/test_staging_egee.out/MYJOB_3/result_3.dat#EGEE-default" state="NEW" type="source">
+        <successor>file:///tmp/test_staging_egee.out/MYJOB_3/result_3.dat</successor>
+    </task>
+    <task group="file://" input="false" label="result_3.dat" name="file:///tmp/test_staging_egee.out/MYJOB_3/result_3.dat" state="NEW" type="transfer">
+        <successor>mail://sreynaud@in2p3.fr/result_3.dat</successor>
+    </task>
+    <task group="mail://in2p3.fr" input="false" label="result_3.dat" name="mail://sreynaud@in2p3.fr/result_3.dat" state="NEW" type="transfer">
+        <successor>out_MYJOB_3_R</successor>
+    </task>
+    <task context="EGEE-default" group="gsiftp://closeSE.egee.org" input="false" label="stderr_3.txt" name="gsiftp://closeSE.egee.org:2811/intermediary/test_staging_egee.out/MYJOB_3/stderr_3.txt#EGEE-default" state="NEW" type="source">
+        <successor>file:///tmp/stderr_3.txt</successor>
+    </task>
+    <task group="file://" input="false" label="stderr_3.txt" name="file:///tmp/stderr_3.txt" state="NEW" type="transfer">
+        <successor>out_MYJOB_3_STDERR</successor>
+    </task>
+</workflow>

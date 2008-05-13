@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ext:Job xmlns:ext="http://www.in2p3.fr/jsdl-extension">
+    <ext:JobLifetimeManagement>
+        <ext:Retry count="3" maxTime="PT80S" status="queued"/>
+        <ext:Retry count="2" maxTime="PT6M" status="running"/>
+        <ext:Retry count="1" status="failed"/>
+    </ext:JobLifetimeManagement>
+    <JobDefinition xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl">
+        <JobDescription>
+            <JobIdentification>
+                <JobName>MYJOB_3</JobName>
+            </JobIdentification>
+            <Application>
+                <posix:POSIXApplication xmlns:posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix">
+                    <posix:Executable>$E</posix:Executable>
+                    <posix:Argument>-c0 $C0</posix:Argument>
+                    <posix:Argument>-c1 $C1</posix:Argument>
+                    <posix:Argument>-c2 $C2</posix:Argument>
+                    <posix:Input>$D</posix:Input>
+                    <posix:Output>$R</posix:Output>
+                    <posix:Error>$STDERR</posix:Error>
+                </posix:POSIXApplication>
+            </Application>
+            <Resources>
+                <FileSystem name="HELLOWORLD_1.1">
+                    <MountPoint>HelloWorld/1.1</MountPoint>
+                    <ext:ParentFilesystemName>ApplicationsDirectory</ext:ParentFilesystemName>
+                </FileSystem>
+            </Resources>
+            <DataStaging name="C0">
+                <FileName>config0.cfg</FileName>
+                <FilesystemName>WorkingDirectory</FilesystemName>
+                <CreationFlag>overwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Source>
+                    <URI>file:///tmp/config0.cfg</URI>
+                </Source>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>true</ext:Shared>
+            </DataStaging>
+            <DataStaging name="C1">
+                <FileName>config1.cfg</FileName>
+                <FilesystemName>WorkingDirectory</FilesystemName>
+                <CreationFlag>overwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Source>
+                    <URI>srb://sreynaud@host2:5544/grid/config1.cfg?mydomain#OpenPlast-CCIN2P3</URI>
+                </Source>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>true</ext:Shared>
+            </DataStaging>
+            <DataStaging name="C2">
+                <FileName>config2.cfg</FileName>
+                <FilesystemName>WorkingDirectory</FilesystemName>
+                <CreationFlag>overwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Source>
+                    <URI>http://host5:8080/public/configuration/config2.cfg</URI>
+                </Source>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>true</ext:Shared>
+            </DataStaging>
+            <DataStaging name="E">
+                <FileName>bin/executable.exe</FileName>
+                <FilesystemName>HELLOWORLD_1.1</FilesystemName>
+                <CreationFlag>dontOverwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Source/>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>true</ext:Shared>
+            </DataStaging>
+            <DataStaging name="E">
+                <FileName>executable-src/bin/executable.exe</FileName>
+                <FilesystemName>WorkingDirectory</FilesystemName>
+                <CreationFlag>overwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Source>
+                    <URI>gsiftp://host3:2811/repository/src/executable-src.tar.gz#EGEE</URI>
+                    <ext:Process>tar xzvf $SOURCE ; cd executable-src ; make</ext:Process>
+                </Source>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>true</ext:Shared>
+            </DataStaging>
+            <DataStaging name="D">
+                <FileName>data.dat</FileName>
+                <FilesystemName>WorkingDirectory</FilesystemName>
+                <CreationFlag>overwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Source>
+                    <URI>gsiftp://host4:2811/data/data_3.dat#OpenPlast</URI>
+                </Source>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>false</ext:Shared>
+            </DataStaging>
+            <DataStaging name="R">
+                <FileName>result.dat</FileName>
+                <FilesystemName>WorkingDirectory</FilesystemName>
+                <CreationFlag>overwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Target>
+                    <URI>mail://sreynaud@in2p3.fr/result_3.dat</URI>
+                </Target>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>false</ext:Shared>
+            </DataStaging>
+            <DataStaging name="STDERR">
+                <FileName>stderr.txt</FileName>
+                <FilesystemName>WorkingDirectory</FilesystemName>
+                <CreationFlag>overwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Target>
+                    <URI>file:///tmp/stderr_3.txt</URI>
+                </Target>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>false</ext:Shared>
+            </DataStaging>
+        </JobDescription>
+    </JobDefinition>
+</ext:Job>
