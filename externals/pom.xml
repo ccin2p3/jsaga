@@ -16,27 +16,28 @@
 
   <!-- aggregation -->
   <modules>
-    <module>classad</module>
-    <module>cog-jglobus</module>
-    <module>cog-axis</module>
-    <module>cog-url</module>
-    <module>jce-jdk13</module>
-    <module>puretls</module>
-    <module>cryptix32</module>
-    <module>cryptix-asn1</module>
-    <module>vomsjapi</module>    
     <module>addressing-1.0</module>
+    <module>classad</module>
+    <module>cog-axis</module>
+    <module>cog-jglobus</module>
+    <module>cog-url</module>
     <module>commonj</module>
     <module>concurrent</module>
-	<module>opensaml</module>
-	<module>wsgram-api</module>
+    <module>cryptix-asn1</module>
+    <module>cryptix32</module>
+    <module>graphviz</module>
+    <module>jargon</module>
+    <module>jce-jdk13</module>
+    <module>jsch</module>
+    <module>jsr173</module>
+    <module>jzlib</module>
+    <module>opensaml</module>
+    <module>puretls</module>
+    <module>unicore6-api</module>
+    <module>vomsjapi</module>
 	<module>wms-api</module>
-	<module>unicore6-api</module>
+    <module>wsgram-api</module>
 	<module>wss4j</module>
 	<module>xmlsec</module>
-	<module>jsr173</module>
-    <module>jargon</module>
-    <module>jsch</module>
-	<module>jzlib</module>
   </modules>
 </project>
