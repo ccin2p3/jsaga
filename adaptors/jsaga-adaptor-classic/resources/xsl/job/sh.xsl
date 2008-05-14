@@ -13,7 +13,6 @@
     </xsl:template>
     
     <xsl:template match="jsdl:JobDescription">
-<xsl:text>/bin/sh -c \"</xsl:text>
     	<xsl:if test="jsdl:Application/posix:POSIXApplication/posix:Environment">
 	    	<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Environment">
 <xsl:text>export </xsl:text><xsl:value-of select="@name"/>=\"<xsl:value-of select="text()"/><xsl:text>\";</xsl:text>
@@ -28,7 +27,5 @@
 				 <xsl:text> </xsl:text><xsl:value-of select="."/><xsl:text/>
             </xsl:for-each>
 		</xsl:if>
-<xsl:text>\"</xsl:text>
-
 	</xsl:template>
 </xsl:stylesheet>
