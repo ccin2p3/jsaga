@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.impl.job.instance.stream;
 
-import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOSetter;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOSetterPseudo;
 import org.ogf.saga.error.NoSuccess;
 
 import java.io.IOException;
@@ -18,7 +18,7 @@ import java.io.IOException;
  *
  */
 public class PipedStderr extends PipedStdout {
-    public PipedStderr(JobIOSetter ioHandler) throws NoSuccess {
+    public PipedStderr(JobIOSetterPseudo ioHandler) throws NoSuccess {
         super(ioHandler);
     }
 

@@ -123,6 +123,15 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
                         m_stdin = new JobStdinOutputStream(this);
                     }
                     m_stdin.openJobIOHandler(m_IOHandler);
+                    m_nativeJobId = m_IOHandler.getJobId();
+                } else if (m_controlAdaptor instanceof InteractiveJobStreamSet) {
+                    if (m_stdout == null) {
+                        m_stdout = new PreconnectedStdoutInputStream(this);
+                    }
+                    OutputStream stdout = ((PreconnectedStdoutInputStream)m_stdout).getOutputStreamContainer();
+                    m_nativeJobId = ((InteractiveJobStreamSet)m_controlAdaptor).submitInteractive(
+                            nativeJobDesc, s_checkMatch,
+                            null, stdout, null);
                 } else if (m_controlAdaptor instanceof PseudoInteractiveJobAdaptor) {
                     // set stdin
                     InputStream stdin;
@@ -137,10 +146,10 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
                     if (m_IOHandler == null) {
                         throw new NotImplemented("ADAPTOR ERROR: Method submitInteractive() must not return null: "+m_controlAdaptor.getClass().getName());
                     }
+                    m_nativeJobId = m_IOHandler.getJobId();
                 } else {
                     throw new NotImplemented("Interactive jobs are not supported by this adaptor: "+m_controlAdaptor.getClass().getName());
                 }
-                m_nativeJobId = m_IOHandler.getJobId();
             } else {
                 m_nativeJobId = m_controlAdaptor.submit(nativeJobDesc, s_checkMatch);
             }

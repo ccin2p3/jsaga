@@ -20,7 +20,7 @@ import java.lang.Exception;
  *
  */
 public class JobStdoutInputStream extends InputStream {
-    private Job m_job;
+    protected Job m_job;
     private JobIOHandler m_ioHandler;
 
     public JobStdoutInputStream(Job job, JobIOHandler ioHandler) throws NotImplemented, DoesNotExist, Timeout, NoSuccess {
@@ -38,13 +38,18 @@ public class JobStdoutInputStream extends InputStream {
         }
     }
 
+    /** constructor for InteractiveJobStreamSet */
+    protected JobStdoutInputStream(Job job) {
+        m_job = job;
+    }
+
     public void closeJobIOHandler() throws PermissionDenied, Timeout, NoSuccess {
         // get stream
         if (m_stream == null) {
-            if (m_ioHandler instanceof JobIOGetter) {
-                m_stream = ((JobIOGetter)m_ioHandler).getStdout();
-            } else if (m_ioHandler instanceof JobIOSetter) {
-                m_stream = new PipedStdout((JobIOSetter) m_ioHandler);
+            if (m_ioHandler instanceof JobIOGetterPseudo) {
+                m_stream = ((JobIOGetterPseudo)m_ioHandler).getStdout();
+            } else if (m_ioHandler instanceof JobIOSetterPseudo) {
+                m_stream = new PipedStdout((JobIOSetterPseudo) m_ioHandler);
             }
         }
 
@@ -86,10 +91,10 @@ public class JobStdoutInputStream extends InputStream {
                     return m_buffer;
                 case RUNNING:
                     if (m_stream == null) {
-                        if (m_ioHandler instanceof JobIOGetter) {
-                            m_stream = ((JobIOGetter)m_ioHandler).getStdout();
-                        } else if (m_ioHandler instanceof JobIOSetter) {
-                            m_stream = new PipedStdout((JobIOSetter) m_ioHandler);
+                        if (m_ioHandler instanceof JobIOGetterPseudo) {
+                            m_stream = ((JobIOGetterPseudo)m_ioHandler).getStdout();
+                        } else if (m_ioHandler instanceof JobIOSetterPseudo) {
+                            m_stream = new PipedStdout((JobIOSetterPseudo) m_ioHandler);
                         } else {
                             throw new NoSuccess("Can not read from stdout because job is running and adaptor does not support job interactivity");
                         }
