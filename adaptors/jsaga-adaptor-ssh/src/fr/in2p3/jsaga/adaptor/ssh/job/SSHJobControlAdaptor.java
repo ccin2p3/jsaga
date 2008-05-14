@@ -2,6 +2,8 @@ package fr.in2p3.jsaga.adaptor.ssh.job;
 
 import java.util.Map;
 import java.util.UUID;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.PermissionDenied;
@@ -11,7 +13,7 @@ import com.jcraft.jsch.ChannelExec;
 
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.InteractiveJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.InteractiveJobStreamSet;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.adaptor.ssh.SSHAdaptorAbstract;
 
@@ -28,7 +30,7 @@ import fr.in2p3.jsaga.adaptor.ssh.SSHAdaptorAbstract;
  * TODO : Support of pre-requisite
  */
 public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
-		JobControlAdaptor, CleanableJobAdaptor, InteractiveJobAdaptor {
+		JobControlAdaptor, CleanableJobAdaptor, InteractiveJobStreamSet {
 
 	public String getType() {
 		return "ssh";
@@ -72,10 +74,8 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 			throw new NoSuccess(e);
 		}
 	}
-	
-	public SSHJobIOHandler submitInteractive(String commandLine,
-			boolean checkMatch) throws PermissionDenied, Timeout, NoSuccess {
-		
+
+    public String submitInteractive(String commandLine, boolean checkMatch, InputStream stdin, OutputStream stdout, OutputStream stderr) throws PermissionDenied, Timeout, NoSuccess {
 		try {
 			ChannelExec channel = (ChannelExec) session.openChannel("exec");
 
@@ -83,13 +83,20 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 			
 			//commandLine
 			channel.setCommand(prepareCde(commandLine, jobId));
-			
-			// start job
+
+            // set streams
+            if (stdin != null) {
+                channel.setInputStream(stdin);
+            }
+            channel.setOutputStream(stdout);
+            channel.setErrStream(stderr);
+
+            // start job
 			channel.connect();
 			
 			// add channel in sessionMap
 			SSHAdaptorAbstract.sessionMap.put(jobId, channel);
-			return new SSHJobIOHandler(channel, jobId);
+			return jobId;
 		} catch (Exception e) {
 			throw new NoSuccess(e);
 		}
