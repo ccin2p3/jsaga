@@ -59,6 +59,11 @@ public class GlobusExecutionTestSuiteForWindows extends TestSuite {
         public void test_run_processRequirement() { super.ignore("personal gatekeeper return always DONE"); }
     }
 
+    // test cases
+    public static class GlobusJobRunInteractiveTest extends JobRunInteractiveTest {
+        public GlobusJobRunInteractiveTest() throws Exception {super("gatekeeper-windows");}
+    }
+
     public GlobusExecutionTestSuiteForWindows() throws Exception {
         super();
         // test cases
@@ -67,6 +72,7 @@ public class GlobusExecutionTestSuiteForWindows extends TestSuite {
         this.addTestSuite(GlobusJobRunRequiredTest.class);
         this.addTestSuite(GlobusJobRunOptionalTest.class);
         this.addTestSuite(GlobusJobRunDescriptionTest.class);
+        this.addTestSuite(GlobusJobRunInteractiveTest.class);
     }
 
     public static Test suite() throws Exception {

@@ -1,24 +1,26 @@
 package fr.in2p3.jsaga.adaptor.job;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
-import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
-import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
-import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.InteractiveJobStreamSet;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
-
 import org.apache.log4j.Logger;
 import org.globus.gram.*;
 import org.globus.gram.internal.GRAMConstants;
 import org.globus.gram.internal.GRAMProtocolErrorConstants;
+import org.globus.io.gass.server.*;
 import org.globus.rsl.*;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.error.*;
 
+import java.lang.Exception;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -30,8 +32,7 @@ import java.util.Map;
 * ***************************************************
 * Description:                                      */
 
-public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract implements JobControlAdaptor, CleanableJobAdaptor {
-    
+public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract implements JobControlAdaptor, CleanableJobAdaptor, InteractiveJobStreamSet {
 	private static final String SHELLPATH = "ShellPath";
     private Logger logger = Logger.getLogger(GatekeeperJobControlAdaptor.class);
     private Map m_parameters;
@@ -78,24 +79,44 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
         m_parameters = null;
     }
 
-    public String submit(String jobDesc, boolean checkMatch) 
-    	throws PermissionDenied, Timeout, NoSuccess, BadResource {
-    	
+    public String submit(String jobDesc, boolean checkMatch)  throws PermissionDenied, Timeout, NoSuccess, BadResource {
     	RslNode rslTree;
         try {
         	rslTree = RSLParser.parse(jobDesc);
         } catch (ParseException e) {
             throw new NoSuccess(e);
         }
-        
+        return submit(rslTree, checkMatch, false);
+    }
+
+    public String submitInteractive(String jobDesc, boolean checkMatch, InputStream stdin, OutputStream stdout, OutputStream stderr) throws PermissionDenied, Timeout, NoSuccess {
+        GatekeeperJobOutputListener listener = new GatekeeperJobOutputListener(stdout);
+        RslNode rslTree;
+        String gassURL;
+        try {
+            rslTree = RSLParser.parse(jobDesc);
+            gassURL = startGassServer(listener);
+        } catch (Exception e) {
+            throw new NoSuccess(e);
+        }
+        // update RSL
+        Bindings subst = new Bindings("rsl_substitution");
+        subst.add(new Binding("GLOBUSRUN_GASS_URL", gassURL));
+        rslTree.add(subst);
+        NameOpValue line = new NameOpValue("stdout", NameOpValue.EQ,
+                new VarRef("GLOBUSRUN_GASS_URL", null, new Value("/dev/stdout-rgs")));
+        rslTree.add(line);
+        return this.submit(rslTree, checkMatch, true);
+    }
+    
+    private String submit(RslNode rslTree, boolean checkMatch, boolean isInteractive) throws PermissionDenied, Timeout, NoSuccess, BadResource {
         if(checkMatch) {
 			logger.debug("CheckMatch not supported");
 		}
         GramJob job = new GramJob(m_credential,rslTree.toRSL(true));
         try {
         	try {
-        		// boolean set if the job is not interactive
-            	Gram.request(m_serverUrl, job, false);
+            	Gram.request(m_serverUrl, job, isInteractive);
             	logger.warn("'two_phase' attribute was ignored.");
         	}
         	catch (WaitingForCommitException e) {
@@ -182,4 +203,26 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
 			throw new NoSuccess("Unable to send commit end signal", e);
 		}
 	}
+
+    private String startGassServer(JobOutputListener listener) throws Exception {
+        GassServer gassServer = null;
+        JobOutputStream stdoutStream;
+        JobOutputStream stderrStream;
+        String gassURL = null;
+        try {
+            gassServer = GassServerFactory.getGassServer(m_credential);
+            gassServer.registerDefaultDeactivator();
+        } catch (Exception e) {
+            throw new Exception("Problems while creating a Gass Server", e);
+        }
+
+        gassURL = gassServer.getURL();
+        stdoutStream = new JobOutputStream(listener);
+        stderrStream = new JobOutputStream(listener);
+
+        gassServer.registerJobOutputStream("err-rgs", stderrStream);
+        gassServer.registerJobOutputStream("out-rgs", stdoutStream);
+        logger.debug("Started the GASS server");
+        return gassURL;
+    }
 }
