@@ -2,3 +2,4 @@ local:/
 ssh://localhost
 gatekeeper://localhost:2119/C=FR/ST=France/L=Villeurbanne/O=CNRS/OU=IN2P3/CN=Sylvain Reynaud/E=sreynaud@in2p3.fr
 unicore6://localhost:8080/DEMO-SITE/services/Registry
+unicore6://ccgridvmli08.in2p3.fr:30180/CC-SITE/services/Registry
