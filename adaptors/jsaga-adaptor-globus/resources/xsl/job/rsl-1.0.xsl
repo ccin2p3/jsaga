@@ -62,7 +62,7 @@
         <xsl:if test="jsdl:Application/posix:POSIXApplication/posix:Environment">
 (environment = <xsl:for-each
                 select="jsdl:Application/posix:POSIXApplication/posix:Environment">(<xsl:value-of
-                select="@name"/><xsl:text> </xsl:text><xsl:value-of select="text()"/>)</xsl:for-each>)<xsl:text/>
+                select="@name"/><xsl:text> </xsl:text>"<xsl:value-of select="text()"/>")</xsl:for-each>)<xsl:text/>
         </xsl:if>
         <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:WorkingDirectory/text()">
 (directory = <xsl:value-of select="."/>)<xsl:text/>
