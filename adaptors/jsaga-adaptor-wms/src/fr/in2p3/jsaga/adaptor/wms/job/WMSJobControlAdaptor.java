@@ -8,16 +8,15 @@ import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UFile;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
+import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.InteractiveJobAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOGetter;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.PseudoInteractiveJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
 import org.apache.axis.AxisProperties;
 import org.apache.axis.configuration.EngineConfigurationFactoryDefault;
-import org.apache.log4j.Logger;
 import org.glite.jdl.AdParser;
 import org.glite.jdl.JobAdException;
 import org.glite.wms.wmproxy.AuthenticationFaultException;
@@ -34,9 +33,6 @@ import org.glite.wms.wmproxy.StringAndLongType;
 import org.glite.wms.wmproxy.WMProxyAPI;
 import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
-import org.globus.io.urlcopy.UrlCopy;
-import org.globus.io.urlcopy.UrlCopyException;
-import org.globus.util.GlobusURL;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.AuthenticationFailed;
 import org.ogf.saga.error.AuthorizationFailed;
@@ -48,13 +44,10 @@ import org.ogf.saga.error.PermissionDenied;
 import org.ogf.saga.error.Timeout;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.util.Map;
 
 
@@ -71,8 +64,8 @@ import java.util.Map;
  * TODO : Test MPI jobs
  */
 public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract 
-		implements JobControlAdaptor, CleanableJobAdaptor{
-    //, InteractiveJobAdaptor, JobIOGetter 
+		implements JobControlAdaptor, CleanableJobAdaptor, PseudoInteractiveJobAdaptor {
+
 	private String clientConfigFile = Base.JSAGA_VAR+ File.separator+ "client-config-wms.wsdd";
 	private File m_tmpProxyFile;
 	private WMProxyAPI m_client;
@@ -80,7 +73,6 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     private String m_wmsServerUrl;
     private String m_lbServerHost;
     private int m_lbPort;
-    private String jobId;
     
     public String getType() {
         return "wms";
@@ -145,6 +137,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     	try {
             // save GSSCredential to tmpFile
             m_tmpProxyFile = File.createTempFile("proxy",".proxy");
+            m_tmpProxyFile.deleteOnExit();
             FileOutputStream out = new FileOutputStream(m_tmpProxyFile.getAbsolutePath());
             GlobusCredential globusCred = ((GlobusGSSCredentialImpl)m_credential).getGlobusCredential();        
             globusCred.save(out);
@@ -196,9 +189,8 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 			throw new AuthenticationFailed(e);
 		} 
 		
-		// TODO : use CheckAvailability parameter
         // ping service
-        if(false) {
+		if("true".equalsIgnoreCase((String) attributes.get(JobAdaptor.CHECK_AVAILABILITY))) {
             try {
             	m_client.getVersion();
 			} catch (AuthenticationFaultException e) {
@@ -250,7 +242,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     		}
 			
     		// submit
-    		jobId = m_client.jobSubmit(jobDesc, m_delegationId).getId();
+    		String jobId = m_client.jobSubmit(jobDesc, m_delegationId).getId();
 	    	return jobId;
     	} catch (ServiceException e) {
 			throw new NoSuccess(e);
@@ -264,6 +256,40 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 			throw new NoSuccess(e);
 		}
     }
+    
+
+
+	public JobIOHandler submitInteractive(String jobDesc, boolean checkMatch,
+			InputStream stdin) throws PermissionDenied, Timeout, NoSuccess {
+		
+		try {
+			// add stdout/stderr
+			String stdoutFileName = "stdout.txt", stderrFileName = "stderr.txt";
+			jobDesc += "StdOutput=\""+stdoutFileName+"\";";
+			jobDesc += "StdError=\""+stderrFileName+"\";";
+			jobDesc += "OutputSandbox={\""+stdoutFileName+"\",\""+stderrFileName+"\"};";
+			
+			if(stdin != null ) {
+				// create and add stdin
+				File stdinFile = File.createTempFile("stdin", ".in");
+				//stdinFile.deleteOnExit();
+				FileOutputStream fos = new FileOutputStream(stdinFile);
+				byte buf[]=new byte[1024];
+			    int len;
+			    while((len=stdin.read(buf))>0)
+			    	fos.write(buf,0,len);
+			    fos.close();
+				jobDesc += "StdInput=\""+stdinFile.getName()+"\";";
+				jobDesc += "InputSandbox={\""+stdinFile.getAbsolutePath()+"\"};";
+			}
+			System.out.println("JDL:"+jobDesc);
+			String jobId = submit(jobDesc,checkMatch);
+			return new WMSJobIOHandler(jobId, m_client, m_credential, stdoutFileName, stderrFileName);
+		}
+		catch(IOException e) {
+			throw new NoSuccess(e);
+		}
+	}
 
     public void cancel(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess {
     	try {
@@ -303,105 +329,4 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 			throw new NoSuccess(e);
 		}
 	}
-
-	/*public JobIOHandler submitInteractive(String jobDesc, boolean checkMatch)
-			throws PermissionDenied, Timeout, NoSuccess {
-		// Add Stdout/Stderr/OutputSandbox attributes to JDL
-		jobDesc += "StdOutput=\"stdout.txt\";";
-		jobDesc += "StdError=\"stderr.txt\";";
-		jobDesc += "OutputSandbox={\"stdout.txt\",\"stderr.txt\"};";		
-		jobId = submit(jobDesc,checkMatch);
-		return this;
-	}*/
-
-    //TODO: move all the code below to a new JobIOHandler class
-    public InputStream getStderr() throws PermissionDenied, Timeout, NoSuccess {
-		try {
-			return new FileInputStream(getSandboxFile("stderr.txt"));
-		} catch (FileNotFoundException e) {
-			throw new NoSuccess(e);
-		}
-	}
-
-	public OutputStream getStdin() throws PermissionDenied, Timeout, NoSuccess {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public InputStream getStdout() throws PermissionDenied, Timeout, NoSuccess {
-		try {
-			return new FileInputStream(getSandboxFile("stdout.txt"));
-		} catch (FileNotFoundException e) {
-			throw new NoSuccess(e);
-		}
-	}
-
-	public String getJobId() {
-		return jobId;
-	}
-	
-	private File getSandboxFile(String filename) throws NoSuccess, PermissionDenied {
-		
-		try {
-			// create tmp file
-			File resultFile = File.createTempFile("sandbox",".txt");
-			resultFile.deleteOnExit();
-			
-			//Use the "gsiftp" transfer protocols to retrieve the list of files produced by the jobs.
-	        StringAndLongList result = m_client.getOutputFileList(jobId, "gsiftp");
-	        if ( result != null ) 
-	        {
-	            // list of files+their size
-	            StringAndLongType[] list = (StringAndLongType[]) result.getFile();            
-	            if (list != null) {
-	                for (int i=0; i<list.length ; i++){
-	                	//TODO
-	                	System.out.println("Get file:"+list[i].getName());
-	                    if(filename.equals(list[i].getName())) {
-		                    // Creation of the "fromURL" link from where download the file(s).
-		                    String port = list[i].getName().substring(list[i].getName().lastIndexOf(":")+1,list[i].getName().length());
-		                    port = port.substring(0, port.indexOf("/"));                        
-		                    int pos = (list[i].getName()).indexOf(port);
-		                    int length = (list[i].getName()).length();                      
-		                    String front = (list[i].getName()).substring(0 , pos);
-		                    String rear = (list[i].getName()).substring(pos + 4 , length);                      
-		                    String fromURL = front + port + "/" + rear;
-		                    
-		                    String toURL = "file:///" + resultFile.getAbsolutePath();	                        
-	                        //Retrieve the file(s) from the WMProxy Server.
-	                        GlobusURL from = new GlobusURL(fromURL);
-	                        GlobusURL to = new GlobusURL(toURL);
-	                        
-	                        UrlCopy uCopy = new UrlCopy();
-	                        uCopy.setDestinationCredentials(m_credential);
-	                        uCopy.setSourceCredentials(m_credential);
-	                        uCopy.setDestinationUrl(to);
-	                        uCopy.setSourceUrl(from);
-	                        uCopy.setUseThirdPartyCopy(true);
-	                        uCopy.copy();
-	                    }
-	                }
-	            }
-	        }
-	        return resultFile;
-		} catch( UrlCopyException e) {
-			throw new NoSuccess(e);
-		} catch (MalformedURLException e) {
-			throw new NoSuccess(e);
-		} catch (AuthorizationFaultException e) {
-			throw new PermissionDenied(e);
-		} catch (AuthenticationFaultException e) {
-			throw new PermissionDenied(e);
-		} catch (OperationNotAllowedFaultException e) {
-			throw new PermissionDenied(e);
-		} catch (InvalidArgumentFaultException e) {
-			throw new NoSuccess(e);
-		} catch (JobUnknownFaultException e) {
-			throw new NoSuccess(e);
-		} catch (ServiceException e) {
-			throw new NoSuccess(e);
-		} catch (IOException e) {
-			throw new NoSuccess(e);
-		}
-	}	
 }
