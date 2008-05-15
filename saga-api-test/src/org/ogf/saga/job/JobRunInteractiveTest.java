@@ -17,11 +17,11 @@ import org.ogf.saga.task.WaitMode;
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
 * File:   JobRunOptionalTest
-* Author: Nicolas Demesy (nicolas.demesy@bt.com)
+* Author: Nicolas DEMESY (nicolas.demesy@bt.com)
 * Date:   30 janv. 2008
 * ***************************************************
 * Description: 
-* This test suite is made to be test "pseudo" 
+* This test suite is made to be test  
 * interactive jobs									 */
 
 public class JobRunInteractiveTest extends AbstractJobTest {
@@ -152,7 +152,7 @@ public class JobRunInteractiveTest extends AbstractJobTest {
 	public void test_run_environnement() throws Exception {
 	    
 		// prepare
-		String env0 = "MYVAR3=Testing";
+		String env0 = "MYVAR0=Testing0";
 		String env1 = "MYVAR1=Testing 1";
 		String env2 = "MYVAR2=Testing two";
 		AttributeVector[] attributesV = new AttributeVector[1];
@@ -165,6 +165,8 @@ public class JobRunInteractiveTest extends AbstractJobTest {
 	    
 	    // wait for the end
 	    job.waitFor();  
+	    
+	    checkStatus(job.getState(), State.DONE);
 	    
 	    // check stdout
 	    boolean containsEnv0 = false, containsEnv1 = false, containsEnv2 = false;
@@ -203,7 +205,7 @@ public class JobRunInteractiveTest extends AbstractJobTest {
 		for (int index = 0; index < numberOfJobs; index++) {
 			// create description
 	    	JobDescription desc = JobFactory.createJobDescription();
-    		desc.setAttribute(JobDescription.EXECUTABLE, "/bin/echo");
+    		desc.setAttribute(JobDescription.EXECUTABLE, "/bin/cat");
 	        desc.setAttribute(JobDescription.INTERACTIVE, JobDescription.TRUE);
 	    	
 	        jobs[index] = m_service.createJob(desc);
