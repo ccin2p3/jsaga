@@ -7,6 +7,8 @@ import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.task.State;
 
+import java.io.*;
+
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -44,6 +46,9 @@ public class JobRun extends AbstractCommand {
             // get arguments
             URL serviceURL = URLFactory.create(command.m_nonOptionValues[0]);
             JobDescription desc = createJobDescription(line);
+            if (!line.hasOption(OPT_BATCH)) {
+                desc.setAttribute(JobDescription.INTERACTIVE, "true");
+            }
 
             // submit
             Session session = SessionFactory.createSession(true);
@@ -61,7 +66,7 @@ public class JobRun extends AbstractCommand {
                 // display final state
                 State state = job.getState();
                 if (State.DONE.compareTo(state) == 0) {
-                    System.out.println("Job completed successfully.");
+                    copyStream(job.getStdout(), System.out);
                 } else {
                     System.err.println("Job did not complete successfully, final state is: "+state);
                 }
@@ -159,6 +164,13 @@ public class JobRun extends AbstractCommand {
     private static void setOptMulti(JobDescription desc, CommandLine line, String name) throws Exception {
         if (line.hasOption(name)) {
             desc.setVectorAttribute(name, line.getOptionValues(name));
+        }
+    }
+
+    private static void copyStream(InputStream in, OutputStream out) throws IOException {
+        byte[] buffer = new byte[1024];
+        for (int len; (len=in.read(buffer))>0; ) {
+            out.write(buffer, 0, len);
         }
     }
 }
