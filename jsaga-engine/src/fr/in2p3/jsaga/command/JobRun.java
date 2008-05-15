@@ -179,8 +179,9 @@ public class JobRun extends AbstractCommand {
 
     private static void copyStream(InputStream in, OutputStream out) throws IOException {
         byte[] buffer = new byte[1024];
-        for (int len; (len=in.read(buffer))>0; ) {
+        int len=in.read(buffer);
+//        for (int len; (len=in.read(buffer))>0; ) {
             out.write(buffer, 0, len);
-        }
+//        }
     }
 }
