@@ -5,6 +5,7 @@ import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
 
@@ -142,9 +143,8 @@ public abstract class WSGramJobAdaptorAbstract implements SagaSecureAdaptor {
     	}    	
     	AxisProperties.setProperty(EngineConfigurationFactoryDefault.OPTION_CLIENT_CONFIG_FILE, clientConfigFile);
         
-    	// TODO : use CheckAvailability parameter
     	// Ping service
-    	if(false) {
+    	if("true".equalsIgnoreCase((String) attributes.get(JobAdaptor.CHECK_AVAILABILITY))) {
 	    	try {
 	    		URL pingHandle = ServiceURL.getURL(host+":"+port, "ContainerRegistryService");
 	
