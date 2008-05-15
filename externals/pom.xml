@@ -25,7 +25,7 @@
     <module>concurrent</module>
     <module>cryptix-asn1</module>
     <module>cryptix32</module>
-    <module>graphviz</module>
+    <!--<module>graphviz</module>--><!-- must be deployed manually -->
     <module>jargon</module>
     <module>jce-jdk13</module>
     <module>jsch</module>
