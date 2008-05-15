@@ -7,4 +7,7 @@
     <GRID contextType="MyProxy" deactivated="true">
         <attribute name="Server" value="cclcgproxli01.in2p3.fr:7512"/>
     </GRID>
+    <GRID contextType="JKS">
+        <attribute name="KeystorePass" value="demouser"/>
+    </GRID>
 </UNIVERSE>
