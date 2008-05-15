@@ -231,9 +231,9 @@ public class JobRunOptionalTest extends AbstractJobTest {
 			}
 		}
 		if(numberOfFailed > 1) 
-			throw new NoSuccess(numberOfFailed + "jobs of "+numberOfJobs+" are failed.");
+			throw new NoSuccess(numberOfFailed + " jobs of "+numberOfJobs+" are failed.");
 		if(numberOfFailed > 0) 
-			throw new NoSuccess(numberOfFailed + "job of "+numberOfJobs+" is failed.");
+			throw new NoSuccess(numberOfFailed + " job of "+numberOfJobs+" is failed.");
 
     }
 
@@ -266,9 +266,9 @@ public class JobRunOptionalTest extends AbstractJobTest {
 			}
 		}
 		if(numberOfFailed > 1) 
-			throw new NoSuccess(numberOfFailed + "jobs of "+numberOfJobs+" are failed.");
+			throw new NoSuccess(numberOfFailed + " jobs of "+numberOfJobs+" are failed.");
 		if(numberOfFailed > 0) 
-			throw new NoSuccess(numberOfFailed + "job of "+numberOfJobs+" is failed.");
+			throw new NoSuccess(numberOfFailed + " job of "+numberOfJobs+" is failed.");
 		
     	assertEquals(
 	                0,
@@ -313,9 +313,9 @@ public class JobRunOptionalTest extends AbstractJobTest {
 		}
 		
 		if(numberOfFailed > 1) 
-			throw new NoSuccess(numberOfFailed + "jobs of "+numberOfJobs+" are failed.");
+			throw new NoSuccess(numberOfFailed + " jobs of "+numberOfJobs+" are failed.");
 		if(numberOfFailed > 0) 
-			throw new NoSuccess(numberOfFailed + "job of "+numberOfJobs+" is failed.");
+			throw new NoSuccess(numberOfFailed + " job of "+numberOfJobs+" is failed.");
 		
     	assertEquals(
 	                0,
