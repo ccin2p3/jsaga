@@ -53,18 +53,9 @@ public class U6JobIOHandler implements JobIOSetterPseudo {
 		return jobId;
 	}
 
-	public JobIOHandler createJobIOHandler() {
-		return this;
-	}
-
 	public void setStderr(OutputStream err) throws PermissionDenied, Timeout,
 			NoSuccess {
 		getStream(err, "stderr");
-	}
-
-	public void setStdin(InputStream in) throws PermissionDenied, Timeout,
-			NoSuccess {
-		// not use here but in submit
 	}
 
 	public void setStdout(OutputStream out) throws PermissionDenied, Timeout,
