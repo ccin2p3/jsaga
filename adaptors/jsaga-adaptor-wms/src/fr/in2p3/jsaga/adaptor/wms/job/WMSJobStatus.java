@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.adaptor.wms.job;
 import fr.in2p3.jsaga.adaptor.job.SubState;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 
+import org.apache.log4j.Logger;
 import org.glite.wsdl.types.lb.StatName;
 
 /* ***************************************************
@@ -18,12 +19,13 @@ import org.glite.wsdl.types.lb.StatName;
  *
  */
 public class WMSJobStatus extends JobStatus {
+	
+	private Logger logger = Logger.getLogger(WMSJobStatus.class);
+	
     public WMSJobStatus(String jobId, StatName state, String stateString) {
         super(jobId, state, stateString);
-    }
-
-    public WMSJobStatus(String jobId, StatName state, String stateString, String cause) {
-        super(jobId, state, stateString, cause);
+        if(logger.isDebugEnabled())
+        	logger.debug("Status for job '"+jobId+"':"+stateString);
     }
     
     public String getModel() {
