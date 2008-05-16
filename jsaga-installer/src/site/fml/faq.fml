@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <faqs title="Frequently Asked Questions">
-    <part id="engine">
+    <part id="general">
         <title>General FAQ</title>
         <faq id="resolve-ambiguity">
             <question>An AmbiguityException is thrown, how can I resolve this ambiguity ?</question>
@@ -10,8 +10,8 @@
                         according to the protocol, the hostname, the domain, the activated security context types...</li>
                     <li>uninstall (remove from lib-adaptors directory) or deactivate (add attribute deactivated="true")
                         unused adaptor modules</li>
-                    <li>add, at the end of the URL, the caracter '#' followed by the identifier of the security context to use.
-                        This identifier can be the context name or the context type (e.g. gsiftp://cclcgseli01.in2p3.fr/tmp/#VOMS).</li>
+                    <li>at the end of the URL, add the caracter '#' followed by the identifier of the grid or by the
+                        security context type to use (e.g. gsiftp://cclcgseli01.in2p3.fr/tmp/#VOMS).</li>
                 </ul>
                 <p>Use the jsaga-help command to display the list of possible ambiguities.</p>
             </answer>
@@ -39,9 +39,9 @@
             </answer>
         </faq>
     </part>
-    <part id="adaptors">
-        <title>Adaptor-specific FAQ</title>
-        <faq id="srm-transfer-protocols">
+    <part id="data">
+        <title>Data adaptors FAQ</title>
+        <faq id="srm">
             <question>How do I configure the SRM adaptor to support new transfer protocols ?</question>
             <answer>
                 <ul>
