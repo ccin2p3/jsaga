@@ -75,6 +75,9 @@ and JNI header files for linux)
                     <li>Download <a href="files/bootstrap/pom.xml">bootstrap POM file</a></li>
                     <li>Build from latest source code
                         <pre>mvn scm:bootstrap [-Dmaven.scm.cvs.java.cvs_rsh=_path/to/ssh_]</pre>
+                        Or build an old release
+                        <pre>TAG=&lt;release_tag&gt;
+mvn validate scm:bootstrap -DscmVersionType=tag -DscmVersion=$TAG -Dgoals=deploy,site-deploy</pre>
                     </li>
                 </ul>
             </answer>
@@ -151,13 +154,6 @@ rsync --progress -azC --force -e ssh maven2/ $REMOTE_BASE/maven2/
 rsync --progress -azC --force -e ssh jsaga-dev/ $REMOTE_BASE/jsaga-dev/</pre>
                     </li>
                 </ul>
-            </answer>
-        </faq>
-        <faq id="build-old-release">
-            <question>How to re-build an old release of JSAGA ?</question>
-            <answer>
-                <pre>TAG=&lt;release_tag&gt;
-mvn validate scm:bootstrap -DscmVersionType=tag -DscmVersion=$TAG -Dgoals=deploy,site-deploy</pre>
             </answer>
         </faq>
         <faq id="work-offline">
