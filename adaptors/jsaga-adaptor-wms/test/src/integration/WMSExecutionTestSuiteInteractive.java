@@ -21,8 +21,8 @@ public class WMSExecutionTestSuiteInteractive extends TestSuite {
     // test cases
     public static class WMSJobRunInteractiveTest extends JobRunInteractiveTest {
         public WMSJobRunInteractiveTest() throws Exception {super("wms");}
-        public void test_getStderr() { super.ignore("JDL does not support this"); }
-        public void test_run_environnement() { super.ignore("JDL does not support this"); }
+        public void test_getStderr() { super.ignore("WMS does not support this: the job is failed but the stderr is empty"); }
+        public void test_run_environnement() { super.ignore("JDL does not support space in environment value"); }
     }
     
     public WMSExecutionTestSuiteInteractive() throws Exception {
