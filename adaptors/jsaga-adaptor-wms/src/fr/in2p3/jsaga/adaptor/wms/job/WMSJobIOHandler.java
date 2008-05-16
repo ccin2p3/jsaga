@@ -22,7 +22,6 @@ import org.ogf.saga.error.Timeout;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 
@@ -38,20 +37,21 @@ import java.net.MalformedURLException;
 
 public class WMSJobIOHandler implements JobIOGetterPseudo {
 
-	private String jobId, stdoutFileName, stderrFileName;
+	private String jobId ;
 	private WMProxyAPI m_client;
-	protected GSSCredential m_credential;
+	private GSSCredential m_credential;
+	private String stdoutFile, stderrFile;
 
 	public WMSJobIOHandler(String jobId, 
 			WMProxyAPI m_client,
 			GSSCredential m_credential,
-			String stdoutFileName,
-			String stderrFileName) {
+			String stdoutFile,
+			String stderrFile) {
 		this.jobId = jobId;
 		this.m_client = m_client;
 		this.m_credential = m_credential;
-		this.stdoutFileName = stdoutFileName;
-		this.stderrFileName = stderrFileName; 
+		this.stdoutFile = stdoutFile;
+		this.stderrFile = stderrFile;
 	}
 
 	public String getJobId() {
@@ -60,7 +60,8 @@ public class WMSJobIOHandler implements JobIOGetterPseudo {
 
 	public InputStream getStderr() throws PermissionDenied, Timeout, NoSuccess {
 		try {
-			return new FileInputStream(getSandboxFile(stderrFileName));
+			getSandboxFile(stderrFile);
+			return new FileInputStream(stderrFile);
 		} catch (FileNotFoundException e) {
 			throw new NoSuccess(e);
 		}
@@ -68,19 +69,16 @@ public class WMSJobIOHandler implements JobIOGetterPseudo {
 
 	public InputStream getStdout() throws PermissionDenied, Timeout, NoSuccess {
 		try {
-			return new FileInputStream(getSandboxFile(stdoutFileName));
+			getSandboxFile(stdoutFile);
+			return new FileInputStream(stdoutFile);
 		} catch (FileNotFoundException e) {
 			throw new NoSuccess(e);
 		}
 	}
 	
-	private File getSandboxFile(String filename) throws NoSuccess, PermissionDenied {
+	private void getSandboxFile(String file) throws NoSuccess, PermissionDenied {
 		
 		try {
-			// create tmp file
-			File resultFile = File.createTempFile("sandbox",".txt");
-			resultFile.deleteOnExit();
-			
 			//Use the "gsiftp" transfer protocols to retrieve the list of files produced by the jobs.
 	        StringAndLongList result = m_client.getOutputFileList(jobId, "gsiftp");
 	        if ( result != null ) 
@@ -89,7 +87,8 @@ public class WMSJobIOHandler implements JobIOGetterPseudo {
 	            StringAndLongType[] list = (StringAndLongType[]) result.getFile();            
 	            if (list != null) {
 	                for (int i=0; i<list.length ; i++){
-	                	if(list[i].getName().endsWith(filename)) {
+	                	System.out.println("get:"+list[i].getName()+" > "+new File(file).getName());
+	                	if(list[i].getName().endsWith(new File(file).getName())) {
 		                    // Creation of the "fromURL" link from where download the file(s).
 		                    String port = list[i].getName().substring(list[i].getName().lastIndexOf(":")+1,list[i].getName().length());
 		                    port = port.substring(0, port.indexOf("/"));                        
@@ -99,7 +98,7 @@ public class WMSJobIOHandler implements JobIOGetterPseudo {
 		                    String rear = (list[i].getName()).substring(pos + 4 , length);                      
 		                    String fromURL = front + port + "/" + rear;
 		                    
-		                    String toURL = "file:///" + resultFile.getAbsolutePath();	                        
+		                    String toURL = "file:///" + file;	                        
 	                        //Retrieve the file(s) from the WMProxy Server.
 	                        GlobusURL from = new GlobusURL(fromURL);
 	                        GlobusURL to = new GlobusURL(toURL);
@@ -115,7 +114,6 @@ public class WMSJobIOHandler implements JobIOGetterPseudo {
 	                }
 	            }
 	        }
-	        return resultFile;
 		} catch( UrlCopyException e) {
 			throw new NoSuccess(e);
 		} catch (MalformedURLException e) {
@@ -131,8 +129,6 @@ public class WMSJobIOHandler implements JobIOGetterPseudo {
 		} catch (JobUnknownFaultException e) {
 			throw new NoSuccess(e);
 		} catch (ServiceException e) {
-			throw new NoSuccess(e);
-		} catch (IOException e) {
 			throw new NoSuccess(e);
 		}
 	}
