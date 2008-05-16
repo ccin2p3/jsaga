@@ -67,7 +67,8 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 		implements JobControlAdaptor, CleanableJobAdaptor, PseudoInteractiveJobAdaptor {
 
 	private String clientConfigFile = Base.JSAGA_VAR+ File.separator+ "client-config-wms.wsdd";
-	private File m_tmpProxyFile;
+	private File m_tmpProxyFile,  stdoutFile, stderrFile;
+	
 	private WMProxyAPI m_client;
     private String m_delegationId = "myId";
     private String m_wmsServerUrl;
@@ -205,10 +206,6 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     }	
 
 	public void disconnect() throws NoSuccess {
-		if(m_tmpProxyFile != null &&
-				m_tmpProxyFile.exists()) {
-			m_tmpProxyFile.delete();
-		}
         m_wmsServerUrl = null;
         m_credential = null;
         m_client = null;
@@ -264,11 +261,12 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 		
 		try {
 			// add stdout/stderr
-			String stdoutFileName = "stdout.txt", stderrFileName = "stderr.txt";
-			jobDesc += "StdOutput=\""+stdoutFileName+"\";";
-			jobDesc += "StdError=\""+stderrFileName+"\";";
-			jobDesc += "OutputSandbox={\""+stdoutFileName+"\",\""+stderrFileName+"\"};";
-			
+			stdoutFile = File.createTempFile("stdout", ".txt");
+			stderrFile = File.createTempFile("stderr", ".txt");			
+			jobDesc += "StdOutput=\""+stdoutFile.getName()+"\";";
+			jobDesc += "StdError=\""+stderrFile.getName()+"\";";
+			jobDesc += "OutputSandbox={\""+stdoutFile.getName()+"\",\""+stderrFile.getName()+"\"};";
+			/*
 			if(stdin != null ) {
 				// create and add stdin
 				File stdinFile = File.createTempFile("stdin", ".in");
@@ -281,12 +279,12 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 			    fos.close();
 				jobDesc += "StdInput=\""+stdinFile.getName()+"\";";
 				jobDesc += "InputSandbox={\""+stdinFile.getAbsolutePath()+"\"};";
-			}
+			}*/
 			System.out.println("JDL:"+jobDesc);
 			String jobId = submit(jobDesc,checkMatch);
-			return new WMSJobIOHandler(jobId, m_client, m_credential, stdoutFileName, stderrFileName);
+			return new WMSJobIOHandler(jobId, m_client, m_credential, stdoutFile.getAbsolutePath(), stderrFile.getAbsolutePath());
 		}
-		catch(IOException e) {
+		catch(Exception e) {
 			throw new NoSuccess(e);
 		}
 	}
@@ -313,19 +311,28 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 	public void clean(String nativeJobId) throws PermissionDenied, Timeout,
 			NoSuccess {
         try  {
-	    	// purge        
-	    	m_client.jobPurge(nativeJobId);
-        } catch (AuthenticationFaultException e) {
-			throw new PermissionDenied(e);
-		} catch (AuthorizationFaultException e) {
-			throw new PermissionDenied(e);
-		} catch (org.glite.wms.wmproxy.ServiceException e) {
-			throw new NoSuccess(e);
-		} catch (OperationNotAllowedFaultException e) {
-			throw new PermissionDenied(e);
-		} catch (InvalidArgumentFaultException e) {
-			throw new NoSuccess(e);
-		} catch (JobUnknownFaultException e) {
+	    	// purge
+        	try {
+        		m_client.jobPurge(nativeJobId);
+        	}
+        	catch(Exception  e) {
+        	}
+	    	if(stdoutFile != null &&
+	    			stdoutFile.exists()) {
+	    		stdoutFile.delete();
+				// fixme: file not deleted!
+	    	}
+	    	if(stderrFile != null &&
+	    			stderrFile.exists()) {
+	    		stderrFile.delete();
+				// fixme: file not deleted!
+			}
+			if(m_tmpProxyFile != null &&
+					m_tmpProxyFile.exists()) {
+				m_tmpProxyFile.delete();
+				// fixme: file not deleted!
+			}
+        } catch (Exception e) {
 			throw new NoSuccess(e);
 		}
 	}
