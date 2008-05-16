@@ -89,7 +89,7 @@ public class WMSJobIOHandler implements JobIOGetterPseudo {
 	            StringAndLongType[] list = (StringAndLongType[]) result.getFile();            
 	            if (list != null) {
 	                for (int i=0; i<list.length ; i++){
-	                	if(filename.equals(list[i].getName())) {
+	                	if(list[i].getName().endsWith(filename)) {
 		                    // Creation of the "fromURL" link from where download the file(s).
 		                    String port = list[i].getName().substring(list[i].getName().lastIndexOf(":")+1,list[i].getName().length());
 		                    port = port.substring(0, port.indexOf("/"));                        
