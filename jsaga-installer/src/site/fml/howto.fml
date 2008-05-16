@@ -77,7 +77,8 @@ and JNI header files for linux)
                         <pre>mvn scm:bootstrap [-Dmaven.scm.cvs.java.cvs_rsh=_path/to/ssh_]</pre>
                         Or build an old release
                         <pre>TAG=&lt;release_tag&gt;
-mvn validate scm:bootstrap -DscmVersionType=tag -DscmVersion=$TAG -Dgoals=deploy,site-deploy</pre>
+mvn scm:bootstrap -DscmVersionType=tag -DscmVersion=$TAG -Dgoals=deploy,site-deploy \
+                 [-Dmaven.scm.cvs.java.cvs_rsh=_path/to/ssh_]</pre>
                     </li>
                 </ul>
             </answer>
