@@ -29,10 +29,13 @@ public class OutputStreamContainer extends OutputStream {
         while(!m_isClosed) {
             Thread.currentThread().sleep(100);
         }
-        if (m_buffer == null) {
-            m_buffer = new ByteArrayOutputStream();
+        if (m_buffer != null) {
+            byte[] buffer = m_buffer.toByteArray();
+            m_buffer.reset();
+            return new ByteArrayInputStream(buffer);
+        } else {
+            return new ByteArrayInputStream(new byte[]{});
         }
-        return new ByteArrayInputStream(m_buffer.toByteArray());
     }
 
     /////////////////////////////////// interface OutputStream ///////////////////////////////////
