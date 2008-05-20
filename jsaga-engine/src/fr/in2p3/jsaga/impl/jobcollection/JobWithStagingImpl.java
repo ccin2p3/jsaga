@@ -81,7 +81,7 @@ public class JobWithStagingImpl extends LateBindedJobImpl implements JobWithStag
             case FAILED:
                 return state;
         }
-        state = m_jobHandle.getState();
+        state = super.queryState();
         switch(state) {
             case DONE:
             case RUNNING:

@@ -30,7 +30,7 @@ import java.io.OutputStream;
  *
  */
 public class LateBindedJobImpl extends AbstractAsyncJobImpl implements LateBindedJob {
-    protected JobHandle m_jobHandle;
+    private JobHandle m_jobHandle;
     private XJSDLJobDescriptionImpl m_jobDesc;
     private URL m_resourceManager;
 
