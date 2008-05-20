@@ -67,6 +67,9 @@ public class JobCollectionSplitter {
                 // evaluate expressions
                 evaluator.init(index);
                 String jobName = evaluate(jobNameTemplate, evaluator);
+                if (jobName == null) {
+                    jobName = jobNameTemplate;
+                }
                 evaluate(clone.getDocumentElement(), evaluator);
 
                 // add to array
