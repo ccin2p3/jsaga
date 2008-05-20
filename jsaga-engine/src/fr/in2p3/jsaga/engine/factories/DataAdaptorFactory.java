@@ -98,6 +98,8 @@ public class DataAdaptorFactory extends ServiceAdaptorFactory {
             }
             if (SecurityAdaptorDescriptor.isSupported(securityAdaptor.getClass(), dataAdaptor.getSupportedSecurityAdaptorClasses())) {
                 dataAdaptor.setSecurityAdaptor(securityAdaptor);
+            } else if (SecurityAdaptorDescriptor.isSupportedNoContext(dataAdaptor.getSupportedSecurityAdaptorClasses())) {
+                dataAdaptor.setSecurityAdaptor(null);
             } else {
                 throw new AuthenticationFailed("Security context class '"+ securityAdaptor.getClass().getName() +"' not supported for protocol: "+url.getScheme());
             }

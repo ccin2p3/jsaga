@@ -112,6 +112,8 @@ public class JobMonitorAdaptorFactory extends ServiceAdaptorFactory {
             }
             if (SecurityAdaptorDescriptor.isSupported(securityAdaptor.getClass(), monitorAdaptor.getSupportedSecurityAdaptorClasses())) {
                 monitorAdaptor.setSecurityAdaptor(securityAdaptor);
+            } else if (SecurityAdaptorDescriptor.isSupportedNoContext(monitorAdaptor.getSupportedSecurityAdaptorClasses())) {
+                monitorAdaptor.setSecurityAdaptor(null);
             } else {
                 throw new AuthenticationFailed("Security context class '"+ securityAdaptor.getClass().getName() +"' not supported for protocol: "+url.getScheme());
             }
