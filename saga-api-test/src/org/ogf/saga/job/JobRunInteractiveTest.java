@@ -112,7 +112,7 @@ public class JobRunInteractiveTest extends AbstractJobTest {
     }
     
     /**
-     * Runs a job, waits for done and check stderr
+     * Runs a job, waits for failed and check stderr
      */
     public void test_getStderr() throws Exception {
         
