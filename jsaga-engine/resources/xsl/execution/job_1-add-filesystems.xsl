@@ -17,7 +17,7 @@
     <xsl:param name="gridName"/><!-- required -->
 
     <!-- configuration -->
-    <xsl:variable name="resourceScheme" select="substring-before($resourceId, '://')"/>
+    <xsl:variable name="resourceScheme" select="substring-before($resourceId, ':/')"/>
     <xsl:variable name="jobService" select="document('var/jsaga-merged-config.xml')/cfg:effective-config/cfg:execution[@scheme=$resourceScheme]/cfg:jobService[@name=$gridName]"/>
 
     <!-- entry point -->
@@ -26,7 +26,8 @@
         <xsl:if test="not($resourceId)"><xsl:message terminate="yes">Missing required parameter: resourceId</xsl:message></xsl:if>
         <xsl:if test="not($gridName)"><xsl:message terminate="yes">Missing required parameter: gridName</xsl:message></xsl:if>
         <!-- check required elements -->
-        <xsl:if test="not($jobService)"><xsl:message terminate="yes">Missing required element: jobService[<xsl:value-of select="$gridName"/>]</xsl:message></xsl:if>
+        <xsl:if test="not($jobService)"><xsl:message terminate="yes">Missing required element: jobService for (scheme=<xsl:value-of
+                select="$resourceScheme"/> and grid=<xsl:value-of select="$gridName"/>)</xsl:message></xsl:if>
         <!-- process -->
         <xsl:apply-templates select="ext:Job"/>
     </xsl:template>

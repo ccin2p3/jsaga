@@ -112,8 +112,10 @@ public class FilledURL {
     public URI getURI() {
         try {
             String host = this.getHost();
+            String path = this.getPath();
             return new URI(this.getScheme(), this.getUserInfo(), (host!=null ? host : ""),
-                    this.getPort(), this.getPath(), this.getQuery(), this.getFragment());
+                    this.getPort(), (path.startsWith("./") ? "/"+path : path),
+                    this.getQuery(), this.getFragment());
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         } catch (NotImplemented e) {
