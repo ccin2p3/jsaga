@@ -3,8 +3,8 @@ package fr.in2p3.jsaga.engine.config.bean;
 import fr.in2p3.jsaga.engine.schema.config.*;
 import org.ogf.saga.error.NoSuccess;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
