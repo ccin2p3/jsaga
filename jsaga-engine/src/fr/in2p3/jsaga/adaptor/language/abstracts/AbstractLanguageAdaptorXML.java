@@ -30,7 +30,7 @@ public abstract class AbstractLanguageAdaptorXML implements LanguageAdaptor {
 
     public Document parseJobDescription(InputStream jobDescStream) throws BadParameter {
         try {
-            File debugFile = new File(Base.JSAGA_VAR, "_parsed-job-description.xml");
+            File debugFile = new File(new File(Base.JSAGA_VAR, "debug"), "parsed-job-description.xml");
             return m_parser.parse(jobDescStream, debugFile);
         } catch (Exception e) {
             throw new BadParameter(e);
