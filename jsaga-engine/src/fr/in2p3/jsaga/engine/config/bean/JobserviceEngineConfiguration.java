@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.engine.config.bean;
 
-import fr.in2p3.jsaga.engine.config.ConfigurationException;
+import fr.in2p3.jsaga.engine.config.*;
 import fr.in2p3.jsaga.engine.schema.config.*;
 import org.ogf.saga.URL;
 import org.ogf.saga.error.NoSuccess;
@@ -45,14 +45,14 @@ public class JobserviceEngineConfiguration extends ServiceEngineConfigurationAbs
                     if (service != null) {
                         return service;
                     } else {
-                        throw new NoSuccess("No job service matches fragment: "+url.getFragment());
+                        throw new NoMatchException(execution.getScheme(), "no job service matches fragment "+url.getFragment());
                     }
                 }
             } else {
-                ServiceRef[] arrayRef = super.listServiceRefByHostname(execution.getMapping(), url.getHost());
+                ServiceRef[] arrayRef = super.listServiceRefByHostname(execution.getScheme(), execution.getMapping(), url.getHost());
                 switch(arrayRef.length) {
                     case 0:
-                        throw new NoSuccess("No job service matches hostname: "+url.getHost());
+                        throw new NoMatchException(execution.getScheme(), "no job service matches hostname "+url.getHost());
                     case 1:
                         String serviceRef = arrayRef[0].getName();
                         JobService service = this.findJobServiceByServiceRef(execution, serviceRef);
@@ -62,7 +62,7 @@ public class JobserviceEngineConfiguration extends ServiceEngineConfigurationAbs
                             throw new ConfigurationException("INTERNAL ERROR: effective-config may be inconsistent");
                         }
                     default:
-                        throw new NoSuccess("Ambiguity: several job services match hostname: "+url.getHost());
+                        throw new AmbiguityException(execution.getScheme(), "several job services match hostname "+url.getHost());
                 }
             }
         } else {

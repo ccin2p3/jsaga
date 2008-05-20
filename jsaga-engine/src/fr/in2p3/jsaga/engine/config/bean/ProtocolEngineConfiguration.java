@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.engine.config.bean;
 
-import fr.in2p3.jsaga.engine.config.ConfigurationException;
+import fr.in2p3.jsaga.engine.config.*;
 import fr.in2p3.jsaga.engine.schema.config.*;
 import fr.in2p3.jsaga.helpers.StringArray;
 import org.ogf.saga.URL;
@@ -46,14 +46,14 @@ public class ProtocolEngineConfiguration extends ServiceEngineConfigurationAbstr
                     if (service != null) {
                         return service;
                     } else {
-                        throw new NoSuccess("No data service matches fragment: "+url.getFragment());
+                        throw new NoMatchException(protocol.getScheme(), "no data service matches fragment "+url.getFragment());
                     }
                 }
             } else {
-                ServiceRef[] arrayRef = super.listServiceRefByHostname(protocol.getMapping(), url.getHost());
+                ServiceRef[] arrayRef = super.listServiceRefByHostname(protocol.getScheme(), protocol.getMapping(), url.getHost());
                 switch(arrayRef.length) {
                     case 0:
-                        throw new NoSuccess("No data service matches hostname: "+url.getHost());
+                        throw new NoMatchException(protocol.getScheme(), "no data service matches hostname "+url.getHost());
                     case 1:
                         String serviceRef = arrayRef[0].getName();
                         DataService service = this.findDataServiceByServiceRef(protocol, serviceRef);
@@ -63,7 +63,7 @@ public class ProtocolEngineConfiguration extends ServiceEngineConfigurationAbstr
                             throw new ConfigurationException("INTERNAL ERROR: effective-config may be inconsistent");
                         }
                     default:
-                        throw new NoSuccess("Ambiguity: several data services match hostname: "+url.getHost());
+                        throw new AmbiguityException(protocol.getScheme(), "several data services match hostname "+url.getHost());
                 }
             }
         } else {

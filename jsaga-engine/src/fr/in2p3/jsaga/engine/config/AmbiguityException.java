@@ -15,6 +15,10 @@ import org.ogf.saga.error.NoSuccess;
  *
  */
 public class AmbiguityException extends NoSuccess {
+    public AmbiguityException(String id, String message) {
+        super("["+id+"] "+message);
+    }
+
     public AmbiguityException(String message) {
         super(message);
     }

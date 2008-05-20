@@ -1,5 +1,7 @@
 package fr.in2p3.jsaga.engine.config.bean;
 
+import fr.in2p3.jsaga.engine.config.AmbiguityException;
+import fr.in2p3.jsaga.engine.config.NoMatchException;
 import fr.in2p3.jsaga.engine.schema.config.Context;
 import org.ogf.saga.error.NoSuccess;
 
@@ -34,11 +36,11 @@ public class ContextEngineConfiguration {
             Context[] ctxArray = this.listContextsArray(id);
             switch(ctxArray.length) {
                 case 0:
-                    throw new NoSuccess("No context instance matches: "+id);
+                    throw new NoMatchException(id, "no context instance matches");
                 case 1:
                     return ctxArray[0];
                 default:
-                    throw new NoSuccess("Ambiguity, please use context name instead of type: "+id);
+                    throw new AmbiguityException(id, "several context instances match, please specify grid name instead of context type");
             }
         } else {
             throw new NoSuccess("Null context identifier");
