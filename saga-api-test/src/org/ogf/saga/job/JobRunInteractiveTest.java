@@ -101,7 +101,6 @@ public class JobRunInteractiveTest extends AbstractJobTest {
 	        while ((input = jobStdoutReader.readLine()) !=null ){
 	        	if(input.indexOf(stringToTestInStdout) > -1) {
 	        		stdout = input;
-	        		break;
 	        	}
 	        }
         }
