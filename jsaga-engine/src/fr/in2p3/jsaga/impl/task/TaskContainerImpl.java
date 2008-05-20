@@ -86,7 +86,7 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
 
     public Task waitFor(float timeoutInSeconds, WaitMode mode) throws NotImplemented, IncorrectState, DoesNotExist, NoSuccess {
         if (m_tasks.isEmpty()) {
-            throw new IncorrectState("Task container is empty", this);
+            throw new DoesNotExist("Task container is empty", this);
         }
         this.startListening();
         Integer cookie = null;
