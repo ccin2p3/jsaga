@@ -29,6 +29,9 @@ Arguments = "<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix
 Environment = {<xsl:text/>
       		<xsl:for-each
                select="jsdl:Application/posix:POSIXApplication/posix:Environment">
+               	<xsl:if test="contains(text(),' ')">
+               		<xsl:message terminate="yes">Unsupported space in environment value : <xsl:value-of select="text()"/></xsl:message>
+               	</xsl:if>
                	<xsl:if test="position() = 1">
 "<xsl:text/><xsl:value-of select="@name"/>=<xsl:value-of select="text()"/>"<xsl:text/>
                	</xsl:if>
