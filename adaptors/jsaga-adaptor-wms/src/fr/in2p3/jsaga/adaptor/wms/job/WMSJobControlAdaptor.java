@@ -17,6 +17,7 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
 import org.apache.axis.AxisProperties;
 import org.apache.axis.configuration.EngineConfigurationFactoryDefault;
+import org.apache.log4j.Logger;
 import org.glite.jdl.AdParser;
 import org.glite.jdl.JobAdException;
 import org.glite.wms.wmproxy.AuthenticationFaultException;
@@ -30,9 +31,12 @@ import org.glite.wms.wmproxy.ServiceException;
 import org.glite.wms.wmproxy.ServiceURLException;
 import org.glite.wms.wmproxy.StringAndLongList;
 import org.glite.wms.wmproxy.StringAndLongType;
+import org.glite.wms.wmproxy.StringList;
 import org.glite.wms.wmproxy.WMProxyAPI;
+import org.globus.ftp.GridFTPClient;
 import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
+import org.globus.util.GlobusURL;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.AuthenticationFailed;
 import org.ogf.saga.error.AuthorizationFailed;
@@ -61,11 +65,14 @@ import java.util.Map;
 * ***************************************************/
 /**
  * TODO : Support of jsdl:TotalCPUTime, jsdl:OperatingSystemType, jsdl:TotalCPUCount, jsdl:CPUArchitecture
+ * TODO : Support of space in environment value
  * TODO : Test MPI jobs
  */
 public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract 
 		implements JobControlAdaptor, CleanableJobAdaptor, PseudoInteractiveJobAdaptor {
 
+	private Logger logger = Logger.getLogger(WMSJobControlAdaptor.class);
+	
 	private String clientConfigFile = Base.JSAGA_VAR+ File.separator+ "client-config-wms.wsdd";
 	private File m_tmpProxyFile,  stdoutFile, stderrFile;
 	
@@ -218,28 +225,13 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     		//Add LB Address in JDL
 			jobDesc += "LBAddress=\""+m_lbServerHost+":"+m_lbPort+"\";";
 			
-			// parse JDL
-			try {
-				AdParser.parseJdl(jobDesc);
-			} catch (JobAdException e) {
-				throw new NoSuccess("The job description is not valid", e);
-			}
-
-			if(checkMatch) {				
-				// get available CE
-            	StringAndLongList result = m_client.jobListMatch(jobDesc, m_delegationId);            
-            	if ( result != null ) {
-    				// list of CE
-    				StringAndLongType[] list = (StringAndLongType[]) result.getFile ();
-    				if (list == null) 
-    					throw new BadResource("No Computing Element matching your job requirements has been found!");
-      			}
-            	else 
-            		throw new BadResource("No Computing Element matching your job requirements has been found!");
-    		}
+			// parse JDL and Check Matching
+			checkJDLAndMAtch(jobDesc, checkMatch, m_client);
 			
     		// submit
     		String jobId = m_client.jobSubmit(jobDesc, m_delegationId).getId();
+            if(logger.isDebugEnabled())
+            	logger.debug("Id for job:"+jobId);
 	    	return jobId;
     	} catch (ServiceException e) {
 			throw new NoSuccess(e);
@@ -260,36 +252,108 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 			InputStream stdin) throws PermissionDenied, Timeout, NoSuccess {
 		
 		try {
+			
+			jobDesc += "LBAddress=\""+m_lbServerHost+":"+m_lbPort+"\";";
+						
 			// add stdout/stderr
 			stdoutFile = File.createTempFile("stdout", ".txt");
-			stderrFile = File.createTempFile("stderr", ".txt");			
+			stderrFile = File.createTempFile("stderr", ".txt");
+			
 			jobDesc += "StdOutput=\""+stdoutFile.getName()+"\";";
 			jobDesc += "StdError=\""+stderrFile.getName()+"\";";
 			jobDesc += "OutputSandbox={\""+stdoutFile.getName()+"\",\""+stderrFile.getName()+"\"};";
-			/*
+
+			String jobId = null;
+			
 			if(stdin != null ) {
-				// create and add stdin
+				// add stdin
 				File stdinFile = File.createTempFile("stdin", ".in");
-				//stdinFile.deleteOnExit();
+				jobDesc += "InputSandbox={\""+stdinFile.getName()+"\"};";
+				jobDesc += "StdInput=\""+stdinFile.getName()+"\";";			
+			
+				// parse JDL and Check Matching
+				checkJDLAndMAtch(jobDesc, checkMatch, m_client);
+
+				// register job
+				jobId = m_client.jobRegister(jobDesc, m_delegationId).getId();
+
+				// create stdin tmp file
 				FileOutputStream fos = new FileOutputStream(stdinFile);
 				byte buf[]=new byte[1024];
 			    int len;
 			    while((len=stdin.read(buf))>0)
 			    	fos.write(buf,0,len);
 			    fos.close();
-				jobDesc += "StdInput=\""+stdinFile.getName()+"\";";
-				jobDesc += "InputSandbox={\""+stdinFile.getAbsolutePath()+"\"};";
-			}*/
-			System.out.println("JDL:"+jobDesc);
-			String jobId = submit(jobDesc,checkMatch);
+			    
+			    // upload input file to the sandbox associated to the registered job 
+				StringList list = m_client.getSandboxDestURI(jobId, "gsiftp");
+				if(list == null  || list.getItem() == null || list.getItem().length < 1) {
+					throw new NoSuccess("Unable to find a input sandbox uri to put stdin file");
+				}				
+				
+				try {
+					String[] uriList = list.getItem();
+					GlobusURL to = new GlobusURL(uriList[0]+"/"+stdinFile.getName());
+		            GridFTPClient test = new GridFTPClient(to.getHost(), to.getPort());
+		            test.authenticate(m_credential);
+		            test.put(stdinFile, "/"+to.getPath(), true);
+				}
+				catch(Exception e) {
+					throw new NoSuccess("Unable to upload stdin file to input sandbox",e);
+				}
+				finally {
+					// clean stdin tmp file
+					stdinFile.delete();
+				}
+
+			}
+			else {
+				// parse JDL and Check Matching
+				checkJDLAndMAtch(jobDesc, checkMatch, m_client);
+
+				// register job
+				jobId = m_client.jobRegister(jobDesc, m_delegationId).getId();
+			}
+			
+			// start job
+            m_client.jobStart(jobId);
+            if(logger.isDebugEnabled())
+            	logger.debug("Id for job:"+jobId);
 			return new WMSJobIOHandler(jobId, m_client, m_credential, stdoutFile.getAbsolutePath(), stderrFile.getAbsolutePath());
-		}
-		catch(Exception e) {
+		} catch (AuthorizationFaultException e) {
+			throw new PermissionDenied(e);
+		} catch (AuthenticationFaultException e) {
+			throw new PermissionDenied(e);
+		} catch(Exception e) {
 			throw new NoSuccess(e);
 		}
 	}
 
-    public void cancel(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess {
+    private void checkJDLAndMAtch(String jobDesc, boolean checkMatch,
+			WMProxyAPI m_client2) throws NoSuccess, AuthorizationFaultException, AuthenticationFaultException, InvalidArgumentFaultException, NoSuitableResourcesFaultException, ServiceException {
+		// parse JDL
+		try {
+			AdParser.parseJdl(jobDesc);
+		} catch (JobAdException e) {
+			throw new NoSuccess("The job description is not valid", e);
+		}
+
+		if(checkMatch) {				
+			// get available CE
+        	StringAndLongList result = m_client.jobListMatch(jobDesc, m_delegationId);            
+        	if ( result != null ) {
+				// list of CE
+				StringAndLongType[] list = (StringAndLongType[]) result.getFile ();
+				if (list == null) 
+					throw new BadResource("No Computing Element matching your job requirements has been found!");
+  			}
+        	else 
+        		throw new BadResource("No Computing Element matching your job requirements has been found!");
+		}
+
+	}
+
+	public void cancel(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess {
     	try {
 	    	// cancel
 	    	m_client.jobCancel(nativeJobId);
