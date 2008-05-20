@@ -65,7 +65,7 @@
                     <xsl:apply-templates select="$conf/cfg:schemeAlias"/>
                     <xsl:apply-templates select="$conf/cfg:dataService[@type=$descriptors/cfg:protocol/cfg:dataService/@type]"/>
                     <!-- add default if all context types are filtered -->
-                    <xsl:copy-of select="$desc/cfg:dataService[not(cfg:supportedContextType=$conf/cfg:dataService/@contextType)]"/>
+                    <xsl:copy-of select="$desc/cfg:dataService[not(cfg:supportedContextType=$conf/cfg:dataService/@contextType or count(cfg:supportedContextType)=0)]"/>
                 </protocol>
             </xsl:otherwise>
         </xsl:choose>
@@ -74,7 +74,7 @@
         <xsl:variable name="conf" select="."/>
         <xsl:variable name="desc" select="$descriptors/cfg:protocol/cfg:dataService[@type=$conf/@type]"/>
         <!-- filter unsupported context types -->
-        <xsl:if test="$conf/@contextType = $desc/cfg:supportedContextType">
+        <xsl:if test="$conf/@contextType=$desc/cfg:supportedContextType or count($desc/cfg:supportedContextType)=0">
             <dataService>
                 <xsl:copy-of select="$desc/@*"/>
                 <xsl:copy-of select="$conf/@*[not(name()='contextType')]"/>
@@ -102,7 +102,7 @@
                     <xsl:apply-templates select="$conf/cfg:schemeAlias"/>
                     <xsl:apply-templates select="$conf/cfg:jobService[@type=$descriptors/cfg:execution/cfg:jobService/@type]"/>
                     <!-- add default if all context types are filtered -->
-                    <xsl:copy-of select="$desc/cfg:jobService[not(cfg:supportedContextType=$conf/cfg:jobService/@contextType)]"/>
+                    <xsl:copy-of select="$desc/cfg:jobService[not(cfg:supportedContextType=$conf/cfg:jobService/@contextType or count(cfg:supportedContextType)=0)]"/>
                 </execution>                
             </xsl:otherwise>
         </xsl:choose>
@@ -111,7 +111,7 @@
         <xsl:variable name="conf" select="."/>
         <xsl:variable name="desc" select="$descriptors/cfg:execution/cfg:jobService[@type=$conf/@type]"/>
         <!-- filter unsupported context types -->
-        <xsl:if test="$conf/@contextType = $desc/cfg:supportedContextType">
+        <xsl:if test="$conf/@contextType=$desc/cfg:supportedContextType or count($desc/cfg:supportedContextType)=0">
             <jobService>
                 <xsl:copy-of select="$desc/@*"/>
                 <xsl:copy-of select="$conf/@*[not(name()='contextType')]"/>
