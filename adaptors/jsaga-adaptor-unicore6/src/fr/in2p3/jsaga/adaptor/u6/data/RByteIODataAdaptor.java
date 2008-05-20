@@ -98,7 +98,13 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
     	m_serverUrl = "https://"+host+":"+port+registryPath;
     	
     	// get storage name
+    	if(basePath.indexOf(m_serviceName)+m_serviceName.length() >= basePath.length()) {
+    		throw new BadParameter("Invalid storage name: the name cannot be empty '"+basePath+"'");
+    	}
     	String storageName =  basePath.substring(basePath.indexOf(m_serviceName)+m_serviceName.length()+1,basePath.length());
+    	if(storageName.indexOf("/") < 1) {
+    		throw new BadParameter("invalid storage name, must contain '/': '"+storageName+"'.");
+		}
     	storageName = storageName.substring(0,storageName.indexOf("/"));
     	
 		// get client that talks to registry
