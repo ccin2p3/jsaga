@@ -50,7 +50,7 @@ public class ProtocolEngineConfiguration extends ServiceEngineConfigurationAbstr
                     }
                 }
             } else {
-                ServiceRef[] arrayRef = super.listServiceRefByHostname(protocol.getScheme(), protocol.getMapping(), url.getHost());
+                ServiceRef[] arrayRef = super.listServiceRefByHostname(protocol.getMapping(), url.getHost());
                 switch(arrayRef.length) {
                     case 0:
                         throw new NoMatchException(protocol.getScheme(), "no data service matches hostname "+url.getHost());

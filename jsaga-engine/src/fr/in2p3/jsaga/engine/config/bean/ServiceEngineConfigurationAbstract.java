@@ -1,8 +1,10 @@
 package fr.in2p3.jsaga.engine.config.bean;
 
-import fr.in2p3.jsaga.engine.config.AmbiguityException;
 import fr.in2p3.jsaga.engine.schema.config.*;
 import org.ogf.saga.error.NoSuccess;
+
+import java.util.Map;
+import java.util.HashMap;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -17,7 +19,7 @@ import org.ogf.saga.error.NoSuccess;
  *
  */
 public class ServiceEngineConfigurationAbstract {
-    public ServiceRef[] listServiceRefByHostname(String scheme, Mapping mapping, String hostname) throws NoSuccess {
+    public ServiceRef[] listServiceRefByHostname(Mapping mapping, String hostname) throws NoSuccess {
         if (mapping != null) {
             if (hostname != null) {
                 for (int d=0; d<mapping.getDomainCount(); d++) {
@@ -37,10 +39,22 @@ public class ServiceEngineConfigurationAbstract {
                 return mapping.getServiceRef();
             } else {
                 // if no hostname
-                if (mapping.getDomainCount() > 1) {
-                    throw new AmbiguityException(scheme, "several services match and no hostname is provided");
-                } else {
+                if (mapping.getServiceRefCount() > 0) {
                     return mapping.getServiceRef();
+                } else if (mapping.getDomainCount() > 0) {
+                    Map<String,ServiceRef> map = new HashMap<String,ServiceRef>();
+                    for (int d=0; d<mapping.getDomainCount(); d++) {
+                        Domain domain = mapping.getDomain(d);
+                        for (int h=0; h<domain.getHostCount(); h++) {
+                            Host host = domain.getHost(h);
+                            addAll(map, host.getServiceRef());
+                        }
+                        addAll(map, domain.getServiceRef());
+                    }
+                    //addAll(map, mapping.getServiceRef());
+                    return map.values().toArray(new ServiceRef[map.size()]);
+                } else {
+                    return new ServiceRef[0];
                 }
             }
         } else {
@@ -50,5 +64,10 @@ public class ServiceEngineConfigurationAbstract {
     }
     private static String getDomain(String domainName) {
         return (domainName!=null ? "."+domainName : "");
+    }
+    private static void addAll(Map<String,ServiceRef> map, ServiceRef[] array) {
+        for (ServiceRef serviceRef : array) {
+            map.put(serviceRef.getName(), serviceRef);
+        }
     }
 }

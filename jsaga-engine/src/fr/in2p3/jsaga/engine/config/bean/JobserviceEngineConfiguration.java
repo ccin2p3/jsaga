@@ -49,7 +49,7 @@ public class JobserviceEngineConfiguration extends ServiceEngineConfigurationAbs
                     }
                 }
             } else {
-                ServiceRef[] arrayRef = super.listServiceRefByHostname(execution.getScheme(), execution.getMapping(), url.getHost());
+                ServiceRef[] arrayRef = super.listServiceRefByHostname(execution.getMapping(), url.getHost());
                 switch(arrayRef.length) {
                     case 0:
                         throw new NoMatchException(execution.getScheme(), "no job service matches hostname "+url.getHost());
