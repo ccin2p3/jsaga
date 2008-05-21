@@ -30,6 +30,32 @@ public class JobRunInteractiveTest extends AbstractJobTest {
         super(jobprotocol);
     }
 
+    /**
+     * This enables testing stdin without stdout/stderr
+     */
+    public void test_setStdin_error() throws Exception {
+        // prepare interactive job
+        JobDescription desc = createJob("/bin/sh", null, null);
+        desc.setAttribute(JobDescription.INTERACTIVE, JobDescription.TRUE);
+
+        // create
+        Job job = createJob(desc);
+
+        // get stdin
+        OutputStream stdin = job.getStdin();
+        stdin.write("/bin/command-error".getBytes());
+        stdin.close();
+
+        // run
+        job.run();
+
+        // wait for the end
+        job.waitFor();
+
+        // check job for DONE status
+        checkStatus(job.getState(), State.FAILED);
+    }
+
 	/**
      * Runs a job,write in stdin, wait for done and check stdout
      */
