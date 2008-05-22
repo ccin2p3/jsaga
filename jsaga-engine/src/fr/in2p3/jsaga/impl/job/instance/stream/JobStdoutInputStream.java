@@ -34,7 +34,7 @@ public class JobStdoutInputStream extends InputStream {
                 // OK
                 break;
             default:
-                throw new DoesNotExist("Stdout is not available because job is neither finished nor running");
+                throw new DoesNotExist("Stdout is not available because job is neither finished nor running: "+m_job.getState());
         }
     }
 
