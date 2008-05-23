@@ -346,6 +346,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
         try {
             state = this.getState();
         } catch (Exception e) {
+            s_logger.warn("Failed to get state", e);
             return false;
         }
         switch(state) {
