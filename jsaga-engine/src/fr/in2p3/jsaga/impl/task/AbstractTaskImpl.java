@@ -417,7 +417,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
         return m_metric_TaskState.getValue();
     }
 
-    private boolean isDone_LocalCheckOnly() {
+    protected boolean isDone_LocalCheckOnly() {
         switch(m_metric_TaskState.getValue()) {
             case DONE:
             case CANCELED:

@@ -25,7 +25,7 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
     // metrics
 //    private MetricImpl<State> m_metric_TaskState;
     // internal
-    private final Map<Integer,Task> m_tasks;
+    private final Map<Integer,AbstractTaskImpl> m_tasks;
 
     /** constructor */
     public TaskContainerImpl(Session session) throws NoSuccess {
@@ -43,7 +43,7 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
 */
 
         // internal
-        m_tasks = Collections.synchronizedMap(new HashMap<Integer,Task>());
+        m_tasks = Collections.synchronizedMap(new HashMap<Integer,AbstractTaskImpl>());
     }
 
     /** clone */
@@ -60,7 +60,7 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
 
     public int add(Task task) throws NotImplemented, Timeout, NoSuccess {
         int cookie = task.hashCode();
-        m_tasks.put(cookie, task);
+        m_tasks.put(cookie, (AbstractTaskImpl) task);
         return cookie;
     }
 
@@ -206,10 +206,10 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
     private Integer getFinishedAll() {
         Integer cookie = null;
         synchronized(m_tasks) {
-            for (Map.Entry<Integer,Task> entry : m_tasks.entrySet()) {
+            for (Map.Entry<Integer,AbstractTaskImpl> entry : m_tasks.entrySet()) {
                 cookie = entry.getKey();
-                Task task = entry.getValue();
-                if (!task.isDone()) {
+                AbstractTaskImpl task = entry.getValue();
+                if (!task.isDone_LocalCheckOnly()) {
                     return null;
                 }
             }
@@ -218,10 +218,10 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
     }
     private Integer getFinishedAny() {
         synchronized(m_tasks) {
-            for (Map.Entry<Integer,Task> entry : m_tasks.entrySet()) {
+            for (Map.Entry<Integer,AbstractTaskImpl> entry : m_tasks.entrySet()) {
                 Integer cookie = entry.getKey();
-                Task task = entry.getValue();
-                if (task.isDone()) {
+                AbstractTaskImpl task = entry.getValue();
+                if (task.isDone_LocalCheckOnly()) {
                     return cookie;
                 }
             }
