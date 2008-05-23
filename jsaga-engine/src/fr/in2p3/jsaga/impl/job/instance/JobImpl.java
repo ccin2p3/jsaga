@@ -181,7 +181,9 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
 
     protected State queryState() throws NotImplemented, Timeout, NoSuccess {
         JobStatus status = m_monitorService.getState(m_nativeJobId);
-        this.setState(status.getSagaState(), status.getStateDetail(), status.getSubState());
+        // set job state (may cleanup job)
+        this.setJobState(status.getSagaState(), status.getStateDetail(), status.getSubState());
+        // return task state (may trigger finish task)
         return status.getSagaState();
     }
 
@@ -343,9 +345,10 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     ////////////////////////////////////// implementation of JobMonitorCallback //////////////////////////////////////
 
     public void setState(State state, String stateDetail, SubState subState) {
-        // task state must be set before cleanup
-        super.setState(state);
+        // set job state (may cleanup job)
         this.setJobState(state, stateDetail, subState);
+        // set task state (may finish task)
+        super.setState(state);
     }
 
     private synchronized void setJobState(State state, String stateDetail, SubState subState) {
