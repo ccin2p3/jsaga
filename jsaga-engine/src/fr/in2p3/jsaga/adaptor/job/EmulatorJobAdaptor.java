@@ -4,10 +4,13 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.*;
 import fr.in2p3.jsaga.adaptor.job.monitor.*;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import org.ogf.saga.error.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.*;
 
 /* ***************************************************
@@ -22,7 +25,7 @@ import java.util.*;
 /**
  *
  */
-public class EmulatorJobAdaptor implements JobControlAdaptor, CleanableJobAdaptor, QueryIndividualJob {
+public class EmulatorJobAdaptor implements JobControlAdaptor, CleanableJobAdaptor, QueryIndividualJob, PseudoInteractiveJobAdaptor {
     private static Map<String,EmulatorJobStatus> s_status = new HashMap<String,EmulatorJobStatus>();
 
     public String getType() {
@@ -55,6 +58,18 @@ public class EmulatorJobAdaptor implements JobControlAdaptor, CleanableJobAdapto
         String nativeJobId = UUID.randomUUID().toString();
         s_status.put(nativeJobId, new EmulatorJobStatus(nativeJobId, SubState.SUBMITTED));
         return nativeJobId;
+    }
+
+    public JobIOHandler submitInteractive(String jobDesc, boolean checkMatch, InputStream stdin) throws PermissionDenied, Timeout, NoSuccess {
+        final String nativeJobId = this.submit(jobDesc, checkMatch);
+        return new JobIOGetterPseudo() {
+            private String m_nativeJobId = nativeJobId;
+            private InputStream m_stdout = new ByteArrayInputStream("output".getBytes());
+            private InputStream m_stderr = new ByteArrayInputStream("error".getBytes());
+            public String getJobId() {return m_nativeJobId;}
+            public InputStream getStdout() throws PermissionDenied, Timeout, NoSuccess {return m_stdout;}
+            public InputStream getStderr() throws PermissionDenied, Timeout, NoSuccess {return m_stderr;}
+        };
     }
 
     public void cancel(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess {
