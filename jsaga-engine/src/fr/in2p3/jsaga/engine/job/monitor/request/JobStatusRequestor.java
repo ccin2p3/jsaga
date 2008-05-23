@@ -27,22 +27,26 @@ public class JobStatusRequestor {
 
     public JobStatus getJobStatus(String nativeJobId) throws NotImplemented, Timeout, NoSuccess {
         if (nativeJobId != null) {
-            if (m_adaptor instanceof QueryIndividualJob) {
-                return ((QueryIndividualJob) m_adaptor).getStatus(nativeJobId);
-            } else if (m_adaptor instanceof QueryListJob) {
-                JobStatus[] statusArray = ((QueryListJob) m_adaptor).getStatusList(new String[]{nativeJobId});
-                return findJobStatus(statusArray, nativeJobId);
-            } else if (m_adaptor instanceof QueryFilteredJob) {
-                Object[] filters = new Object[3];
-                filters[QueryFilteredJob.USER_ID] = null;           //todo: set filter value
-                filters[QueryFilteredJob.COLLECTION_NAME] = null;   //todo: set filter value
-                Calendar cal = Calendar.getInstance();
-                cal.add(Calendar.DAY_OF_YEAR, -1);
-                filters[QueryFilteredJob.START_DATE] = cal.getTime();
-                JobStatus[] statusArray = ((QueryFilteredJob) m_adaptor).getFilteredStatus(filters);
-                return findJobStatus(statusArray, nativeJobId);
-            } else {
-                throw new NotImplemented("Querying job status not implemented for adaptor: "+ m_adaptor.getClass().getName());
+            try {
+                if (m_adaptor instanceof QueryIndividualJob) {
+                    return ((QueryIndividualJob) m_adaptor).getStatus(nativeJobId);
+                } else if (m_adaptor instanceof QueryListJob) {
+                    JobStatus[] statusArray = ((QueryListJob) m_adaptor).getStatusList(new String[]{nativeJobId});
+                    return findJobStatus(statusArray, nativeJobId);
+                } else if (m_adaptor instanceof QueryFilteredJob) {
+                    Object[] filters = new Object[3];
+                    filters[QueryFilteredJob.USER_ID] = null;           //todo: set filter value
+                    filters[QueryFilteredJob.COLLECTION_NAME] = null;   //todo: set filter value
+                    Calendar cal = Calendar.getInstance();
+                    cal.add(Calendar.DAY_OF_YEAR, -1);
+                    filters[QueryFilteredJob.START_DATE] = cal.getTime();
+                    JobStatus[] statusArray = ((QueryFilteredJob) m_adaptor).getFilteredStatus(filters);
+                    return findJobStatus(statusArray, nativeJobId);
+                } else {
+                    throw new NotImplemented("Querying job status not implemented for adaptor: "+ m_adaptor.getClass().getName());
+                }
+            } catch(RuntimeException e) {
+                throw new NoSuccess("Failed to get status for job: "+nativeJobId, e);
             }
         } else {
             return new JobStatus(nativeJobId, new Integer(0), "Unknown"){
