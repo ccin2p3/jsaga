@@ -47,6 +47,16 @@ public class JobCollectionImpl extends WorkflowImpl implements JobCollection {
         super(session, jcDesc.getCollectionName());
         m_jobCollectionName = jcDesc.getCollectionName();
 
+        // Set base directory
+        File baseDir = new File(Base.JSAGA_VAR, "jobs");
+        if(!baseDir.exists()) baseDir.mkdir();
+        baseDir = new File(baseDir, m_jobCollectionName);
+        if(baseDir.exists()) {
+            throw new NoSuccess("Collection already exists: "+m_jobCollectionName+", please clean it up first.");
+        } else {
+            baseDir.mkdir();
+        }
+
         // fill
         JobCollectionFiller filler = new JobCollectionFiller(jcDesc.getAsDocument());
         Document filledJcDesc = filler.getEfectiveJobCollection();
