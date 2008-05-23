@@ -69,7 +69,7 @@ public class LateBindedJobImpl extends AbstractAsyncJobImpl implements LateBinde
         m_resourceManager.setFragment(rm.getGrid());
 
         // transform job description
-        m_jobDesc = this.transformJobDescription(m_jobDesc, rm);
+        m_jobDesc = this.transformJobDescription(m_jobHandle, m_jobDesc, rm);
 
         // create job
         JobService jobService = JobFactory.createJobService(m_session, m_resourceManager);
@@ -79,7 +79,7 @@ public class LateBindedJobImpl extends AbstractAsyncJobImpl implements LateBinde
     protected boolean isAllocated() {
         return (m_resourceManager != null);
     }
-    protected XJSDLJobDescriptionImpl transformJobDescription(XJSDLJobDescriptionImpl jobDesc, Resource rm) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    protected XJSDLJobDescriptionImpl transformJobDescription(JobHandle jobHandle, XJSDLJobDescriptionImpl jobDesc, Resource rm) throws NotImplemented, BadParameter, Timeout, NoSuccess {
         return jobDesc;     // default implementation does nothing
     }
 

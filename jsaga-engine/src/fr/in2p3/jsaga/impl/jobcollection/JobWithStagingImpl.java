@@ -54,7 +54,7 @@ public class JobWithStagingImpl extends LateBindedJobImpl implements JobWithStag
     ////////////////////////////////////// implementation of LateBindedJobImpl /////////////////////////////////////
 
     /** override super.transformJobDescription() */
-    protected XJSDLJobDescriptionImpl transformJobDescription(XJSDLJobDescriptionImpl jobDesc, Resource rm) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    protected XJSDLJobDescriptionImpl transformJobDescription(JobHandle jobHandle, XJSDLJobDescriptionImpl jobDesc, Resource rm) throws NotImplemented, BadParameter, Timeout, NoSuccess {
         // transform job description
         IndividualJobPreprocessor preprocessor = new IndividualJobPreprocessor(jobDesc, rm);
         Document effectiveJobDescDOM = preprocessor.getEffectiveJobDescription();
@@ -62,6 +62,7 @@ public class JobWithStagingImpl extends LateBindedJobImpl implements JobWithStag
 
         // set wrapper script
         m_wrapper = preprocessor.getWrapper();
+        jobHandle.setInputFile(preprocessor.getWrapperFile());
 
         // update workflow
         DataStagingTaskGenerator staging = new DataStagingTaskGenerator(jobDesc.getJobName(), jobDesc.getAsDocument());

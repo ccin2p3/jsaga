@@ -10,8 +10,8 @@ import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
 import org.ogf.saga.task.Task;
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.lang.Exception;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -27,17 +27,20 @@ import java.io.OutputStream;
  */
 public class JobHandle extends AbstractAsyncJobImpl implements Job {
     private JobImpl m_job;
+    private File m_inputFile;
 
     /** constructor for submission */
     public JobHandle(Session session) throws NotImplemented, BadParameter, Timeout, NoSuccess {
         super(session, true);
         m_job = null;
+        m_inputFile = null;
     }
 
     /** constructor for control and monitoring only */
     public JobHandle(Session session, URL rm, String nativeJobId) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         super(session, false);
         m_job = (JobImpl) JobFactory.createJobService(m_session, rm).getJob(nativeJobId);
+        m_inputFile = null;
     }
 
     ////////////////////////////////////////// JobHandler specific method //////////////////////////////////////////
@@ -49,16 +52,46 @@ public class JobHandle extends AbstractAsyncJobImpl implements Job {
         }
     }
 
+    public void setInputFile(File inputFile) throws NoSuccess {
+        if (m_job==null || !m_isRunning) {
+            m_inputFile = inputFile;
+        } else {
+            throw new NoSuccess("Can not set stdin on a running job");
+        }
+    }
+
     ////////////////////////////////////// implementation of AbstractTaskImpl //////////////////////////////////////
 
     private boolean m_isRunning = false;
     protected void doSubmit() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
         if (m_job != null) {
+            // send input stream to job
+            if (m_inputFile != null) {
+                try {
+                    m_job.getJobDescription().setAttribute(JobDescription.INTERACTIVE, "true");
+                    FileInputStream in = new FileInputStream(m_inputFile);
+                    OutputStream out = m_job.getStdin();
+                    int len;
+                    byte[] buffer = new byte[1024];
+                    while ( (len=in.read(buffer)) > -1 ) {
+                        out.write(buffer, 0, len);
+                    }
+                    out.close();
+                    in.close();
+                } catch (Exception e) {
+                    throw new NoSuccess(e);
+                }
+            }
+
+            // submit
             m_job.doSubmit();
+
+            // start listening
             if (m_isListening) {
                 m_job.startListening();
             }            
         } else {
+            // set as running
             m_isRunning = true;
         }
     }
