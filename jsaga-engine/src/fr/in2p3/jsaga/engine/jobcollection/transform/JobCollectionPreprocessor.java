@@ -35,14 +35,7 @@ public class JobCollectionPreprocessor {
         parameters.put("collectionName", collectionName);
 
         // Set base directory
-        File baseDir = new File(Base.JSAGA_VAR, "jobs");
-        if(!baseDir.exists()) baseDir.mkdir();
-        baseDir = new File(baseDir, collectionName);
-        if(baseDir.exists()) {
-            throw new NoSuccess("Collection already exists: "+collectionName+", please clean it up first.");
-        } else {
-            baseDir.mkdir();
-        }
+        File baseDir = new File(new File(Base.JSAGA_VAR, "jobs"), collectionName);
 
         // Transform
         XSLTransformerFactory t = XSLTransformerFactory.getInstance();
