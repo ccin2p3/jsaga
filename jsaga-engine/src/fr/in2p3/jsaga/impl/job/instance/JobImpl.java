@@ -342,6 +342,12 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
         }
     }
 
+    /////////////////////////////////////////// implementation of JobImpl ////////////////////////////////////////////
+
+    public State getJobState() {
+        return m_metrics.m_State.getValue();
+    }
+
     ////////////////////////////////////// implementation of JobMonitorCallback //////////////////////////////////////
 
     public void setState(State state, String stateDetail, SubState subState) {

@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.impl.job.instance.stream;
 
+import fr.in2p3.jsaga.impl.job.instance.JobImpl;
 import org.ogf.saga.error.DoesNotExist;
 import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.job.Job;
 
 import java.io.*;
 
@@ -22,7 +22,7 @@ public class PreconnectedStdoutInputStream extends JobStdoutInputStream {
     private OutputStreamContainer m_out;
 
     /** constructor for InteractiveJobStreamSet */
-    public PreconnectedStdoutInputStream(Job job) {
+    public PreconnectedStdoutInputStream(JobImpl job) {
         super(job);
         m_out = new OutputStreamContainer();
     }

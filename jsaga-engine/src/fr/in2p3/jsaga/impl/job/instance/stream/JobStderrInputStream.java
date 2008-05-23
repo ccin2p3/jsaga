@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.impl.job.instance.stream;
 
 import fr.in2p3.jsaga.adaptor.job.control.interactive.*;
+import fr.in2p3.jsaga.impl.job.instance.JobImpl;
 import org.ogf.saga.error.*;
-import org.ogf.saga.job.Job;
 
 import java.io.*;
 import java.lang.Exception;
@@ -20,13 +20,13 @@ import java.lang.Exception;
  *
  */
 public class JobStderrInputStream extends InputStream {
-    protected Job m_job;
+    protected JobImpl m_job;
     private JobIOHandler m_ioHandler;
 
-    public JobStderrInputStream(Job job, JobIOHandler ioHandler) throws NotImplemented, DoesNotExist, Timeout, NoSuccess {
+    public JobStderrInputStream(JobImpl job, JobIOHandler ioHandler) throws NotImplemented, DoesNotExist, Timeout, NoSuccess {
         m_job = job;
         m_ioHandler = ioHandler;
-        switch(m_job.getState()) {
+        switch(m_job.getJobState()) {
             case DONE:
             case CANCELED:
             case FAILED:
@@ -39,7 +39,7 @@ public class JobStderrInputStream extends InputStream {
     }
 
     /** constructor for InteractiveJobStreamSet */
-    protected JobStderrInputStream(Job job) {
+    protected JobStderrInputStream(JobImpl job) {
         m_job = job;
     }
 
