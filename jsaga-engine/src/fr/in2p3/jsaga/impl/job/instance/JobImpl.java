@@ -129,9 +129,13 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
                         m_stdout = new PreconnectedStdoutInputStream(this);
                     }
                     OutputStream stdout = ((PreconnectedStdoutInputStream)m_stdout).getOutputStreamContainer();
+                    if (m_stderr == null) {
+                        m_stderr = new PreconnectedStderrInputStream(this);
+                    }
+                    OutputStream stderr = ((PreconnectedStderrInputStream)m_stderr).getOutputStreamContainer();
                     m_nativeJobId = ((InteractiveJobStreamSet)m_controlAdaptor).submitInteractive(
                             nativeJobDesc, s_checkMatch,
-                            null, stdout, null);
+                            null, stdout, stderr);
                 } else if (m_controlAdaptor instanceof PseudoInteractiveJobAdaptor) {
                     // set stdin
                     InputStream stdin;

@@ -34,7 +34,7 @@ public class JobStderrInputStream extends InputStream {
                 // OK
                 break;
             default:
-                throw new DoesNotExist("Stderr is not available because job is neither finished nor running");
+                throw new DoesNotExist("Stderr is not available because job is neither finished nor running: "+m_job.getState());
         }
     }
 
