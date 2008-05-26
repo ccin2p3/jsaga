@@ -62,7 +62,7 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 			
 			//commandLine
 			channel.setCommand(prepareCde(commandLine, jobId));
-			
+			System.out.println("commandLine:"+commandLine);
 			// start job
 			channel.connect();	
 			
@@ -81,9 +81,10 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 
 			String jobId = UUID.randomUUID().toString();
 			
-			//commandLine
-			channel.setCommand(prepareCde(commandLine, jobId));
-
+			// TODO: must use prepareCde, else no cancel possible
+			//channel.setCommand(prepareCde(commandLine, jobId));
+			channel.setCommand(commandLine);
+			
             // set streams
             if (stdin != null) {
                 channel.setInputStream(stdin);
