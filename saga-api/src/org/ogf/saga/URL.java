@@ -48,7 +48,9 @@ public class URL {
     }
 
     private void fixFileURI() throws URISyntaxException {
-        if (u.getHost()==null && u.getAuthority()!=null && !u.getAuthority().equals(".")) {
+        boolean isRelative = (u.getHost()==null && u.getAuthority()!=null && !u.getAuthority().equals("."));
+        boolean isWindows = (u.getHost()!=null && u.getHost().length()==1 && u.getAuthority()!=null && u.getAuthority().endsWith(":"));
+        if (isRelative || isWindows) {
             u = new URI(u.getScheme(), u.getUserInfo(),
                     "",                                 // fix number of '/' after scheme
                     u.getPort(),
