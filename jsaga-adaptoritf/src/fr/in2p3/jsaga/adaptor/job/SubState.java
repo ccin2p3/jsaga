@@ -45,6 +45,10 @@ public class SubState {
         return label;
     }
 
+    public boolean equals(Object subState) {
+        return this.toString().equals(subState.toString());
+    }
+
     public State toSagaState() {
         switch(value) {
             case SUBMIT:
