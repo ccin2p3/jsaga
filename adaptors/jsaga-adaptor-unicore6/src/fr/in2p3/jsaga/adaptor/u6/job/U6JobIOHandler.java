@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.adaptor.u6.job;
 
-import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOSetterPseudo;
 import fr.in2p3.jsaga.adaptor.u6.TargetSystemInfo;
 
@@ -23,7 +22,6 @@ import com.intel.gpe.clients.api.exceptions.GPEResourceUnknownException;
 import com.intel.gpe.gridbeans.GPEFile;
 import com.intel.gpe.util.sets.Pair;
 
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
