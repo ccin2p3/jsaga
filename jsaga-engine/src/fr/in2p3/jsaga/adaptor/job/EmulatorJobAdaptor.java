@@ -64,8 +64,8 @@ public class EmulatorJobAdaptor implements JobControlAdaptor, CleanableJobAdapto
         final String nativeJobId = this.submit(jobDesc, checkMatch);
         return new JobIOGetterPseudo() {
             private String m_nativeJobId = nativeJobId;
-            private InputStream m_stdout = new ByteArrayInputStream("output".getBytes());
-            private InputStream m_stderr = new ByteArrayInputStream("error".getBytes());
+            private InputStream m_stdout = new ByteArrayInputStream("output\n".getBytes());
+            private InputStream m_stderr = new ByteArrayInputStream("error\n".getBytes());
             public String getJobId() {return m_nativeJobId;}
             public InputStream getStdout() throws PermissionDenied, Timeout, NoSuccess {return m_stdout;}
             public InputStream getStderr() throws PermissionDenied, Timeout, NoSuccess {return m_stderr;}

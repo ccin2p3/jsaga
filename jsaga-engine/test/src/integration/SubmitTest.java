@@ -1,16 +1,6 @@
 package integration;
 
-import fr.in2p3.jsaga.Base;
-import fr.in2p3.jsaga.EngineProperties;
-import fr.in2p3.jsaga.jobcollection.*;
-import junit.framework.TestCase;
 import org.ogf.saga.URL;
-import org.ogf.saga.session.Session;
-import org.ogf.saga.session.SessionFactory;
-import org.ogf.saga.task.*;
-
-import java.io.File;
-import java.io.InputStream;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -37,7 +27,11 @@ public class SubmitTest extends AbstractSubmitTest {
         super.checkSubmit(new URL[]{new URL("test://emulator"), new URL("test://emulator"), new URL("test://emulator")});
     }
 
-    public void test_fullprocess() throws Exception {
+    public void test_staging() throws Exception {
+        super.checkSubmit(new URL[]{new URL("local:/")});
+    }
+
+    public void test_sandbox() throws Exception {
         super.checkSubmit(new URL[]{new URL("local:/")});
     }
 }

@@ -64,6 +64,7 @@ public class IndividualJobPreprocessor {
             jobContainer.set(t.getCached(XSL_4_RESOLVE_FS, parameters).transform(jobContainer.get()));
 
             jobWrapper.set(t.getCached(XSL_1_WRAPPER_GENERATE, parameters).transform(jobContainer.get()));
+            jobWrapper.set(new String(jobWrapper.get()).replaceAll("\\r\\n", "\n").getBytes());
             jobWrapper.save();
             m_wrapper = new String(jobWrapper.get());
 

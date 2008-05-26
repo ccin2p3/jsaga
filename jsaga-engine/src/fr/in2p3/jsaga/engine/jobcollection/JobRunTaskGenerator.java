@@ -40,6 +40,10 @@ public class JobRunTaskGenerator {
                     StagedTask inputTask = new StagedTask(m_jobName, dataStaging.getName(), true);
                     workflow.add(inputTask, null, m_jobRunTask.getName());
                 }
+                if (dataStaging.getTarget()!=null && dataStaging.getTarget().getURI()!=null) {
+                    StagedTask outputTask = new StagedTask(m_jobName, dataStaging.getName(), true);
+                    workflow.add(outputTask, null, m_jobRunTask.getName());
+                }
             }
         } else {
             workflow.add(m_jobRunTask, StartTask.name(), null);

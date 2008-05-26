@@ -31,6 +31,7 @@
                 <attribute name="type" use="required"><simpleType><restriction base="string">
                     <enumeration value="start"/>
                     <enumeration value="source"/>
+                    <enumeration value="mkdir"/>
                     <enumeration value="transfer"/>
                     <enumeration value="staged"/>
                     <enumeration value="job"/>

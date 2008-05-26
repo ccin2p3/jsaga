@@ -3,8 +3,14 @@ package fr.in2p3.jsaga.engine.workflow.task;
 import fr.in2p3.jsaga.engine.schema.status.Task;
 import fr.in2p3.jsaga.engine.schema.status.types.TaskTypeType;
 import fr.in2p3.jsaga.engine.workflow.AbstractWorkflowTaskImpl;
+import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
+import org.ogf.saga.namespace.Flags;
+import org.ogf.saga.namespace.NSFactory;
+import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
+
+import java.lang.Exception;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -19,11 +25,19 @@ import org.ogf.saga.task.State;
  *
  */
 public class TransferTask extends AbstractWorkflowTaskImpl {
+    private Session m_session;
+    private URL m_source;
+    private URL m_destination;
+
     /** constructor */
-    public TransferTask(String url, boolean input) throws NotImplemented, BadParameter, Timeout, NoSuccess {
-        super(null, url);
+    public TransferTask(Session session, String source, String destination, boolean input) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+        super(null, destination);
+        // set URL
+        m_session = session;
+        m_source = new URL(source);
+        m_destination = new URL(destination);
         // update XML status
-        URLDecomposer u = new URLDecomposer(url);
+        URLDecomposer u = new URLDecomposer(destination);
         Task xmlStatus = super.getStateAsXML();
         xmlStatus.setType(TaskTypeType.TRANSFER);
         xmlStatus.setGroup(u.getGroup());
@@ -35,6 +49,11 @@ public class TransferTask extends AbstractWorkflowTaskImpl {
     //////////////////////////////////////////// abstract methods ////////////////////////////////////////////
 
     protected void doSubmit() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+        try {
+            NSFactory.createNSEntry(m_session, m_source).copy(m_destination, Flags.CREATEPARENTS.getValue());
+        } catch (Exception e) {
+            throw new NoSuccess(e);
+        }
         super.setState(State.DONE);
     }
 

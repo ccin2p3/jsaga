@@ -6,6 +6,7 @@ import fr.in2p3.jsaga.helpers.xpath.XJSDLXPathSelector;
 import fr.in2p3.jsaga.workflow.Workflow;
 import fr.in2p3.jsaga.workflow.WorkflowTask;
 import org.ogf.saga.error.*;
+import org.ogf.saga.session.Session;
 import org.w3c.dom.*;
 
 /* ***************************************************
@@ -29,7 +30,7 @@ public class DataPrePostStagingTaskGenerator {
         m_selector = new XJSDLXPathSelector(jobDesc);
     }
 
-    public void updateWorkflow(Workflow workflow) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public void updateWorkflow(Session session, Workflow workflow) throws NotImplemented, BadParameter, Timeout, NoSuccess {
         // input pre-staging
         String inSbxUri = m_selector.getString("/ext:Job/jsdl:JobDefinition/jsdl:JobDescription/jsdl:DataStaging[@name='INPUT_SANDBOX']/jsdl:Source/jsdl:URI/text()");
         if (inSbxUri != null) {
@@ -52,7 +53,7 @@ public class DataPrePostStagingTaskGenerator {
                         previousTaskName = currentTask.getName();
                         // create transfer task
                         step = (Element) stepList.item(j);
-                        currentTask = new TransferTask(step.getAttribute("uri"), input);
+                        currentTask = new TransferTask(session, previousTaskName, step.getAttribute("uri"), input);
                     }
                     // add last task
                     workflow.add(currentTask, previousTaskName, inSbxUri);
@@ -71,7 +72,7 @@ public class DataPrePostStagingTaskGenerator {
             String outputSandboxTaskName = StagedTask.name(m_jobName, "OUTPUT_SANDBOX", notInput);
             workflow.remove(outputSandboxTaskName);
             // add first task
-            WorkflowTask currentTask = new TransferTask(outSbxUri, notInput);
+            WorkflowTask currentTask = new TransferTask(session, "FIXME://FIXME", outSbxUri, notInput);  //FIXME
             workflow.add(currentTask, null, null);
             NodeList stagingList = m_selector.getNodes("/ext:Job/jsdl:JobDefinition/jsdl:JobDescription/jsdl:DataStaging[@name!='OUTPUT_SANDBOX' and jsdl:Target/jsdl:URI/text()]");
             for (int i=0; i<stagingList.getLength(); i++) {
@@ -89,7 +90,7 @@ public class DataPrePostStagingTaskGenerator {
                         previousTaskName = currentTask.getName();
                         // create transfer task
                         step = (Element) stepList.item(j);
-                        currentTask = new TransferTask(step.getAttribute("uri"), notInput);
+                        currentTask = new TransferTask(session, previousTaskName, step.getAttribute("uri"), notInput);
                     }
                     // add last task
                     String nextTaskName = StagedTask.name(m_jobName, dataStagingName, notInput);

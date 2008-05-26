@@ -27,13 +27,6 @@ public class JobCollectionTest extends AbstractJobCollectionTest {
         super.checkLanguage("SAGA", "job.properties");
     }
 
-    // check job submission
-    public void test_submit() throws Exception {
-        super.checkSubmit("job.xml");
-//        super.checkSubmit("job-sandbox.xml");
-//        super.checkSubmit("job-staging.xml");
-    }
-
     // check job transformation
     public void test_demo2() throws Exception {super.checkPreprocess();}
 //    public void test_ref() throws Exception {super.checkPreprocess();}

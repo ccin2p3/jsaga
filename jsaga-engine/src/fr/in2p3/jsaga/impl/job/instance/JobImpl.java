@@ -48,9 +48,9 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     private JobDescription m_jobDescription;
     private String m_nativeJobId;
     private JobIOHandler m_IOHandler;
-    private JobStdinOutputStream m_stdin;
-    private JobStdoutInputStream m_stdout;
-    private JobStderrInputStream m_stderr;
+    private Stdin m_stdin;
+    private Stdout m_stdout;
+    private Stdout m_stderr;
 
     /** constructor for submission */
     public JobImpl(Session session, JobDescription jobDesc, String nativeJobDesc, JobControlAdaptor controlAdaptor, JobMonitorService monitorService) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
@@ -123,8 +123,24 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
                         m_stdin = new JobStdinOutputStream(this);
                     }
                     m_stdin.openJobIOHandler(m_IOHandler);
+
+                    // set stdout and stderr
+                    if (m_stdout == null) {
+                        m_stdout = new GetterInputStream(((JobIOGetter)m_IOHandler).getStdout());
+                    }
+                    if (m_stderr == null) {
+                        m_stderr = new GetterInputStream(((JobIOGetter)m_IOHandler).getStderr());
+                    }
+
                     m_nativeJobId = m_IOHandler.getJobId();
                 } else if (m_controlAdaptor instanceof InteractiveJobStreamSet) {
+                    // set stdin
+                    InputStream stdin = null;
+                    if (m_stdin != null) {
+                        stdin = ((PostconnectedStdinOutputStream)m_stdin).getInputStreamContainer();
+                    }
+
+                    // set stdout and stderr
                     if (m_stdout == null) {
                         m_stdout = new PreconnectedStdoutInputStream(this);
                     }
@@ -133,9 +149,11 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
                         m_stderr = new PreconnectedStderrInputStream(this);
                     }
                     OutputStream stderr = ((PreconnectedStderrInputStream)m_stderr).getOutputStreamContainer();
+
+                    // submit
                     m_nativeJobId = ((InteractiveJobStreamSet)m_controlAdaptor).submitInteractive(
                             nativeJobDesc, s_checkMatch,
-                            null, stdout, stderr);
+                            stdin, stdout, stderr);
                 } else if (m_controlAdaptor instanceof PseudoInteractiveJobAdaptor) {
                     // set stdin
                     InputStream stdin;
@@ -215,7 +233,11 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     public OutputStream getStdin() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, IncorrectState, NoSuccess {
         if (this.isInteractive()) {
             if (m_stdin == null) {
-                m_stdin = new JobStdinOutputStream(this);
+                if (m_controlAdaptor instanceof InteractiveJobStreamSet) {
+                    m_stdin = new PostconnectedStdinOutputStream(this);
+                } else {
+                    m_stdin = new JobStdinOutputStream(this);
+                }
             }
             return m_stdin;
         } else {

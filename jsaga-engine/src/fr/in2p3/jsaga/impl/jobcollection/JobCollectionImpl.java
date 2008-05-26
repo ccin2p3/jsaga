@@ -88,7 +88,7 @@ public class JobCollectionImpl extends WorkflowImpl implements JobCollection {
 
             // update workflow (pre/post staging)
             DataPrePostStagingTaskGenerator prePostStaging = new DataPrePostStagingTaskGenerator(jobName, jobDescArray[i].getAsDocument());
-            prePostStaging.updateWorkflow(this);
+            prePostStaging.updateWorkflow(m_session, this);
 
             // update task container
             JobWithStaging job = new JobWithStagingImpl(session, jobDescArray[i], jobHandle, this, jobEnd.getTask());
@@ -97,6 +97,8 @@ public class JobCollectionImpl extends WorkflowImpl implements JobCollection {
             // update list of unallocated jobs
             m_unallocatedJobs.add(job);
         }
+        // save initial workflow to file
+        this.saveStatesAsXML();
     }
 
     /** clone */
@@ -161,6 +163,7 @@ public class JobCollectionImpl extends WorkflowImpl implements JobCollection {
     public synchronized Document getStatesAsXML() throws NotImplemented, Timeout, NoSuccess {
         Document status = super.getStatesAsXML();
         try {
+            // save states to file
             OutputStream out = new FileOutputStream(statusFile(m_jobCollectionName));
             TransformerFactory.newInstance().newTransformer().transform(
                     new DOMSource(status),
@@ -170,6 +173,17 @@ public class JobCollectionImpl extends WorkflowImpl implements JobCollection {
             throw new NoSuccess(e);
         }
         return status;
+    }
+
+    public synchronized void saveStatesAsXML() throws NotImplemented, Timeout, NoSuccess {
+        try {
+            // save states to file
+            OutputStream out = new FileOutputStream(statusFile(m_jobCollectionName));
+            super.dumpStatesToWriter(new OutputStreamWriter(out));
+            out.close();
+        } catch (Exception e) {
+            throw new NoSuccess(e);
+        }
     }
 
     protected static File statusFile(String collectionName) {

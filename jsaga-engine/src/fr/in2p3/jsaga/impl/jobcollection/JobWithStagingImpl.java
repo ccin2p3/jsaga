@@ -9,7 +9,6 @@ import fr.in2p3.jsaga.impl.job.description.XJSDLJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.job.instance.JobHandle;
 import fr.in2p3.jsaga.impl.job.instance.LateBindedJobImpl;
 import fr.in2p3.jsaga.jobcollection.JobWithStaging;
-import fr.in2p3.jsaga.workflow.Workflow;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
@@ -28,13 +27,13 @@ import org.w3c.dom.Document;
  *
  */
 public class JobWithStagingImpl extends LateBindedJobImpl implements JobWithStaging {
-    private Workflow m_workflow;
+    private JobCollectionImpl m_workflow;
     private DummyTask m_jobEnd;
     private DummyTask m_startTask;
     private String m_wrapper;
 
     /** constructor for submission */
-    public JobWithStagingImpl(Session session, XJSDLJobDescriptionImpl jobDesc, JobHandle jobHandle, Workflow workflow, DummyTask jobEnd) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public JobWithStagingImpl(Session session, XJSDLJobDescriptionImpl jobDesc, JobHandle jobHandle, JobCollectionImpl workflow, DummyTask jobEnd) throws NotImplemented, BadParameter, Timeout, NoSuccess {
         super(session, jobDesc, jobHandle);
         m_workflow = workflow;
         m_jobEnd = jobEnd;
@@ -66,7 +65,8 @@ public class JobWithStagingImpl extends LateBindedJobImpl implements JobWithStag
 
         // update workflow
         DataStagingTaskGenerator staging = new DataStagingTaskGenerator(jobDesc.getJobName(), jobDesc.getAsDocument());
-        staging.updateWorkflow(m_workflow);
+        staging.updateWorkflow(m_session, m_workflow);
+        m_workflow.saveStatesAsXML();
 
         return jobDesc;
     }

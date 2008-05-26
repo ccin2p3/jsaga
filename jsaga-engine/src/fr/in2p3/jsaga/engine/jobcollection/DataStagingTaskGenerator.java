@@ -6,6 +6,7 @@ import fr.in2p3.jsaga.helpers.xpath.XJSDLXPathSelector;
 import fr.in2p3.jsaga.workflow.Workflow;
 import fr.in2p3.jsaga.workflow.WorkflowTask;
 import org.ogf.saga.error.*;
+import org.ogf.saga.session.Session;
 import org.w3c.dom.*;
 
 /* ***************************************************
@@ -29,7 +30,7 @@ public class DataStagingTaskGenerator {
         m_selector = new XJSDLXPathSelector(jobDesc);
     }
     
-    public void updateWorkflow(Workflow workflow) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public void updateWorkflow(Session session, Workflow workflow) throws NotImplemented, BadParameter, Timeout, NoSuccess {
         NodeList stagingList = m_selector.getNodes("/ext:Job/jsdl:JobDefinition/jsdl:JobDescription/jsdl:DataStaging[not(translate(ext:Sandbox/text(),'TRUE','true')='true')]");
         for (int i=0; i<stagingList.getLength(); i++) {
             Element dataStaging = (Element) stagingList.item(i);
@@ -54,7 +55,7 @@ public class DataStagingTaskGenerator {
                         previousTaskName = currentTask.getName();
                         // create transfer task
                         step = (Element) stepList.item(j);
-                        currentTask = new TransferTask(step.getAttribute("uri"), input);
+                        currentTask = new TransferTask(session, previousTaskName, step.getAttribute("uri"), input);
                     }
                 } else {
                     currentTask = new SourceTask(sourceUri, input);
@@ -64,8 +65,32 @@ public class DataStagingTaskGenerator {
                 workflow.add(currentTask, previousTaskName, nextTaskName);
             }
 
-            // output staging
+            // output directories
             String targetUri = m_selector.getString(dataStaging, "jsdl:Target/jsdl:URI/text()");
+            if (targetUri != null) {
+                boolean input = true;
+                WorkflowTask currentTask;
+                String previousTaskName = StartTask.name();
+                NodeList stepList = dataStaging.getElementsByTagNameNS("http://www.in2p3.fr/jsdl-extension", "Step");
+                if (stepList.getLength() > 0) {
+                    // create mkdir task
+                    Element step = (Element) stepList.item(stepList.getLength()-1);
+                    currentTask = new MkdirTask(session, dir(step.getAttribute("uri")));
+                    for (int j=stepList.getLength()-2; j>=1; j--) {
+                        // add task
+                        workflow.add(currentTask, previousTaskName, null);
+                        previousTaskName = currentTask.getName();
+                        // create mkdir task
+                        step = (Element) stepList.item(j);
+                        currentTask = new MkdirTask(session, dir(step.getAttribute("uri")));
+                    }
+                    // add last task
+                    String nextTaskName = StagedTask.name(m_jobName, dataStagingName, input);
+                    workflow.add(currentTask, previousTaskName, nextTaskName);
+                }
+            }
+
+            // output staging
             if (targetUri != null) {
                 boolean notInput = false;
                 WorkflowTask currentTask;
@@ -81,7 +106,7 @@ public class DataStagingTaskGenerator {
                         previousTaskName = currentTask.getName();
                         // create transfer task
                         step = (Element) stepList.item(j);
-                        currentTask = new TransferTask(step.getAttribute("uri"), notInput);
+                        currentTask = new TransferTask(session, previousTaskName, step.getAttribute("uri"), notInput);
                     }
                 } else {
                     currentTask = new SourceTask(targetUri, notInput);
@@ -104,5 +129,9 @@ public class DataStagingTaskGenerator {
                 workflow.remove(outputTaskName);
             }
         }
+    }
+
+    private static String dir(String uri) {
+        return uri.substring(0, uri.lastIndexOf('/')+1);
     }
 }

@@ -168,24 +168,24 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
         }
     }
 
-    private boolean startListening() throws NotImplemented, IncorrectState, NoSuccess {
-        boolean isListening = true;
+    private void startListening() throws NotImplemented, IncorrectState, NoSuccess {
         try {
             synchronized(m_tasks) {
-                for (Task task : m_tasks.values()) {
-                    isListening &= ((AbstractTaskImpl)task).startListening();
+                for (AbstractTaskImpl task : m_tasks.values()) {
+                    boolean isListening = task.startListening();
+                    task.setWaitingFor(isListening);
                 }
             }
         } catch(Timeout e) {
             throw new NoSuccess(e);
         }
-        return isListening;
     }
     private void stopListening() throws NotImplemented, NoSuccess {
         try {
             synchronized(m_tasks) {
-                for (Task task : m_tasks.values()) {
-                    ((AbstractTaskImpl)task).stopListening();
+                for (AbstractTaskImpl task : m_tasks.values()) {
+                    task.stopListening();
+                    task.setWaitingFor(false);
                 }
             }
         } catch(Timeout e) {
@@ -209,7 +209,7 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
             for (Map.Entry<Integer,AbstractTaskImpl> entry : m_tasks.entrySet()) {
                 cookie = entry.getKey();
                 AbstractTaskImpl task = entry.getValue();
-                if (!task.isDone_LocalCheckOnly()) {
+                if (!task.isDone()) {
                     return null;
                 }
             }
@@ -221,7 +221,7 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
             for (Map.Entry<Integer,AbstractTaskImpl> entry : m_tasks.entrySet()) {
                 Integer cookie = entry.getKey();
                 AbstractTaskImpl task = entry.getValue();
-                if (task.isDone_LocalCheckOnly()) {
+                if (task.isDone()) {
                     return cookie;
                 }
             }

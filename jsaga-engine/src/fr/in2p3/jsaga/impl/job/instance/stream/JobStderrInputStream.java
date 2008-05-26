@@ -19,7 +19,7 @@ import java.lang.Exception;
 /**
  *
  */
-public class JobStderrInputStream extends InputStream {
+public class JobStderrInputStream extends Stdout {
     protected JobImpl m_job;
     private JobIOHandler m_ioHandler;
 

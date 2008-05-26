@@ -19,8 +19,8 @@ import java.lang.Exception;
 /**
  *
  */
-public class JobStdinOutputStream extends OutputStream {
-    private Job m_job;
+public class JobStdinOutputStream extends Stdin {
+    protected Job m_job;
     private JobIOHandler m_ioHandler;
 
     public JobStdinOutputStream(Job job) throws NotImplemented, DoesNotExist, Timeout, NoSuccess {
@@ -31,7 +31,7 @@ public class JobStdinOutputStream extends OutputStream {
                 // OK
                 break;
             default:
-                throw new DoesNotExist("Stdin is not available because job neither unsubmitted nor running");
+                throw new DoesNotExist("Stdin is not available because job is ended or suspended");
         }
     }
 

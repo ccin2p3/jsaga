@@ -30,8 +30,6 @@
 
     <!-- script -->
     <xsl:template match="jsdl:JobDescription">#!/bin/sh
-JOBNAME=<xsl:value-of select="jsdl:JobIdentification/jsdl:JobName/text()"/>
-
 function log() {
     LEVEL=$1
     MESSAGE=$2
@@ -52,7 +50,7 @@ function change_state() {
 
 function accounting() {
     FUNCTION=$1
-    TIME=$2
+    TIME="$2 $3 $4 $5"
     log INFO "accounting for $FUNCTION: $TIME"
     <xsl:for-each select="$jobService/cfg:accounting/text()"><xsl:value-of select="."/></xsl:for-each>
 }
@@ -60,31 +58,57 @@ function accounting() {
 function _FAIL_() {
     CAUSE=$1
     change_state FAILED "$CAUSE"
-    cleanup
-    sleep 1     # prevent LRMS from returning before stdout and stderr are flushed
-    exit 1      # exit with failure
+    return 1    # return with failure
+}
+
+function run_time() {
+    FUNCTION=$1
+    if test -x /usr/bin/time ; then
+        /usr/bin/time -f "real=%e user=%U sys=%S mem=%K" -o $0.time $FUNCTION
+        RETURN_CODE=$?
+    else
+        eval "time -p $FUNCTION &gt;stdout 2&gt;stderr" 2&gt;$0.time
+        RETURN_CODE=$?
+        cat $0.time | tr " " "=" | tr "\n" " " &gt; $0.time
+        cat stdout
+        cat stderr 1&gt;&amp;2
+        rm -f stdout stderr
+    fi
+    return $RETURN_CODE
 }
 
 function run() {
     FUNCTION=$1
     STATUS=$2
     log DEBUG "Entering function: $FUNCTION"
-    if test -x /usr/bin/time ; then
-        /usr/bin/time -f "real=%e user=%U sys=%S mem=%K" -o $0.time $FUNCTION
-        RETURN_CODE=$?
+    if test "$FUNCTION" = "USER_PROCESSING" ; then
+        <xsl:for-each select="jsdl:Application/*">
+        run_time $FUNCTION<xsl:text/>
+            <xsl:for-each select="posix:Input">
+                <xsl:text> &lt;</xsl:text><xsl:value-of select="text()"/>
+            </xsl:for-each>
+            <xsl:for-each select="posix:Output">
+                <xsl:text> &gt;</xsl:text><xsl:value-of select="text()"/>
+            </xsl:for-each>
+            <xsl:for-each select="posix:Error">
+                <xsl:text> 2&gt;</xsl:text><xsl:value-of select="text()"/>
+            </xsl:for-each>
+        </xsl:for-each><xsl:text>
+</xsl:text>
     else
-        eval "time -p $FUNCTION &gt;stdout 2&gt;stderr" 2&gt;&amp;1 | tr " " "=" | tr "\n" " " &gt; $0.time
-        RETURN_CODE=$?
-        cat stdout
-        cat stderr 1&gt;&amp;2
+        run_time $FUNCTION
     fi
+    RETURN_CODE=$?
     TIME=`cat $0.time`
     rm -f $0.time
     if test $RETURN_CODE -eq 0 ; then
         change_state $STATUS
         accounting $FUNCTION $TIME
     else
-        _FAIL_ "Failed to execute function: $FUNCTION"
+        log FATAL "Failed to execute function: $FUNCTION"
+        cleanup
+        sleep 1     # prevent LRMS from returning before stdout and stderr are flushed
+        exit 1      # exit with failure
     fi
 }
 
@@ -116,14 +140,17 @@ function cleanup() {
 
 ############### INITIALIZE ###############
 function INITIALIZE() {
-    if test -f /etc/profile ; then
-        . /etc/profile
-    fi
+        <xsl:if test="not($jobService/cfg:proloque/text())">
+    log DEBUG "no prologue for job: $JOBNAME"
+        </xsl:if>
     <xsl:for-each select="$jobService/cfg:prologue/text()"><xsl:value-of select="."/></xsl:for-each>
 }
 
 ############### INPUT_STAGING ###############
 function INPUT_STAGING() {
+        <xsl:if test="not(jsdl:DataStaging[jsdl:Source])">
+    log INFO "no input staging for job: $JOBNAME"
+        </xsl:if>
         <xsl:for-each select="jsdl:DataStaging[jsdl:Source]">
             <xsl:variable name="LOCAL">
                 <xsl:choose>
@@ -188,6 +215,7 @@ function INPUT_STAGING() {
         log DEBUG "\$IS_FOUND_<xsl:value-of select="@name"/>=$IS_FOUND_<xsl:value-of select="@name"/>"
     else
         _FAIL_ "Found no file for input: <xsl:value-of select="@name"/>"
+        return $?
     fi
             </xsl:if>
         </xsl:for-each>
@@ -199,6 +227,7 @@ function INPUT_STAGING() {
         # Check output file existence
         if test -f <xsl:value-of select="jsdl:FileName/text()"/> ; then
             _FAIL_ "Output file already exists: <xsl:value-of select="jsdl:FileName/text()"/>
+            return $?
         fi
             </xsl:if>
             <xsl:choose>
@@ -233,6 +262,7 @@ function INPUT_STAGING() {
         log DEBUG "\$IS_FOUND_<xsl:value-of select="@name"/>=$IS_FOUND_<xsl:value-of select="@name"/>"
     else
         _FAIL_ "No file can be created for output: <xsl:value-of select="@name"/>"
+        return $?
     fi
             </xsl:if>
         </xsl:for-each>
@@ -263,6 +293,9 @@ function USER_PROCESSING() {
 
 ############### OUTPUT_STAGING ###############
 function OUTPUT_STAGING() {
+        <xsl:if test="not(jsdl:DataStaging[jsdl:Target])">
+    log INFO "no output staging for job: $JOBNAME"
+        </xsl:if>
         <xsl:for-each select="jsdl:DataStaging[jsdl:Target]">
             <xsl:variable name="LOCAL">
                 <xsl:choose>
@@ -308,29 +341,26 @@ function OUTPUT_STAGING() {
 ############### COMPLETE ###############
 function COMPLETE() {
     cleanup
-    sleep 1     # prevent LRMS from returning before stdout and stderr are flushed
-    exit 0      # exit with success
 }
 
 ############### MAIN ###############
+if test -f /etc/profile ; then
+    OLD_PWD=$PWD
+    . /etc/profile
+    cd $OLD_PWD
+    log INFO "sourced file: /etc/profile"
+fi
+JOBNAME=<xsl:value-of select="jsdl:JobIdentification/jsdl:JobName/text()"/>
+log INFO "JOBNAME=$JOBNAME"
+log INFO "PWD=$PWD"
 change_state STARTED
 run INITIALIZE      INITIALIZED
 run INPUT_STAGING   INPUT_STAGED
-        <xsl:for-each select="jsdl:Application/*">
-run USER_PROCESSING USER_PROCESSED<xsl:text/>
-            <xsl:for-each select="posix:Input">
-                <xsl:text> &lt;</xsl:text><xsl:value-of select="text()"/>
-            </xsl:for-each>
-            <xsl:for-each select="posix:Output">
-                <xsl:text> &gt;</xsl:text><xsl:value-of select="text()"/>
-            </xsl:for-each>
-            <xsl:for-each select="posix:Error">
-                <xsl:text> 2&gt;</xsl:text><xsl:value-of select="text()"/>
-            </xsl:for-each>
-        </xsl:for-each><xsl:text>
-</xsl:text>
+run USER_PROCESSING USER_PROCESSED
 run OUTPUT_STAGING  OUTPUT_STAGED
 run COMPLETE        COMPLETED
+sleep 1     # prevent LRMS from returning before stdout and stderr are flushed
+exit 0      # exit with success
     </xsl:template>
 
     <!-- ###########################################################################
@@ -373,6 +403,7 @@ run COMPLETE        COMPLETED
             SRMDEL="$GLITE_LOCATION/../d-cache/srm/bin/srm-advisory-delete"
         else
             _FAIL_ "Command not found: srmcp"
+            return $?
         fi
     </xsl:template>
 
@@ -412,6 +443,7 @@ run COMPLETE        COMPLETED
             LCG_CP="$LCG_LOCATION/bin/lcg-cp"
         else
             _FAIL_ "Command not found: lcg-cp"
+            return $?
         fi
     </xsl:template>
     <xsl:template name="INIT_LFN_UPLOAD">
@@ -423,6 +455,7 @@ run COMPLETE        COMPLETED
             LCG_CR="$LCG_LOCATION/bin/lcg-cr"
         else
             _FAIL_ "Command not found: lcg-cr"
+            return $?
         fi
     </xsl:template>
 
@@ -436,6 +469,7 @@ run COMPLETE        COMPLETED
             <xsl:text> </xsl:text><xsl:value-of select="$local"/>
         if test $? -ne 0 ; then
             _FAIL_ <xsl:call-template name="GET_ERROR"><xsl:with-param name="local" select="$local"/></xsl:call-template>
+            return $?
         fi
     </xsl:template>
     <xsl:template match="jsdl:Target/jsdl:URI[starts-with(text(),'srb://')]">
@@ -467,6 +501,7 @@ run COMPLETE        COMPLETED
             <xsl:text> </xsl:text><xsl:value-of select="$local"/>
         if test $? -ne 0 ; then
             _FAIL_ <xsl:call-template name="GET_ERROR"><xsl:with-param name="local" select="$local"/></xsl:call-template>
+            return $?
         fi
     </xsl:template>
     <xsl:template match="jsdl:Target/jsdl:URI[starts-with(text(),'irods://')]">
@@ -690,6 +725,7 @@ run COMPLETE        COMPLETED
             GLOBUS_URL_COPY="$GLOBUS_LOCATION/bin/globus-url-copy.bat"
         else
             _FAIL_ "Command not found: globus-url-copy"
+            return $?
         fi
     </xsl:template>
 
@@ -757,6 +793,7 @@ run COMPLETE        COMPLETED
                 </xsl:when>
                 <xsl:otherwise>
             _FAIL_ "File already exists: <xsl:value-of select="$local"/>, please set CreationFlag to overwrite"<xsl:text/>
+            return $?
                 </xsl:otherwise>
             </xsl:choose>
         fi

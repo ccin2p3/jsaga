@@ -31,6 +31,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
     private Object m_object;
     private E m_result;
     private org.ogf.saga.error.Exception m_exception;
+    private boolean m_isWaitingFor;
     /** logger */
     private static Logger s_logger = Logger.getLogger(AbstractTaskImpl.class);
 
@@ -52,6 +53,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
         m_object = (object!=null ? object : this);
         m_result = null;
         m_exception = null;
+        m_isWaitingFor = false;
     }
 
     /** clone */
@@ -61,6 +63,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
         clone.m_object = m_object;
         clone.m_result = m_result;
         clone.m_exception = m_exception;
+        clone.m_isWaitingFor = m_isWaitingFor;
         return clone;
     }
 
@@ -97,6 +100,10 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
      */
     public abstract void stopListening() throws NotImplemented, Timeout, NoSuccess;
 
+    public void setWaitingFor(boolean isWaitingFor) {
+        m_isWaitingFor = isWaitingFor;
+    }
+
     //////////////////////////////////////////// interface Task ////////////////////////////////////////////
 
     public void run() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
@@ -116,7 +123,8 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
         }
 
         // start listening
-        this.startListening(); //WARN: do not breakpoint here (because this may change behavior)
+        boolean isListening = this.startListening(); //WARN: do not breakpoint here (because this may change behavior)
+        this.setWaitingFor(isListening);
         // fixme: the code below avoids querying the status of finished tasks, but it makes test_simultaneousShortJob hanging with personal-gatekeeper...  :-(
         /*int cookie;
         try {
@@ -164,6 +172,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
 
         // stop listening
         this.stopListening();
+        this.setWaitingFor(false);
         /*{
             // callback may have not been removed
             try {
@@ -226,7 +235,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
             case FAILED:
                 return m_metric_TaskState.getValue();
             default:
-                if (!m_metric_TaskState.isListening()) {
+                if (!m_isWaitingFor && !m_metric_TaskState.isListening()) {
                     State state = this.queryState();
                     if (state != null) {
                         m_metric_TaskState.setValue(state);
@@ -417,7 +426,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
         return m_metric_TaskState.getValue();
     }
 
-    protected boolean isDone_LocalCheckOnly() {
+    private boolean isDone_LocalCheckOnly() {
         switch(m_metric_TaskState.getValue()) {
             case DONE:
             case CANCELED:

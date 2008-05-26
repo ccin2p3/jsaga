@@ -122,9 +122,7 @@ public class WorkflowImpl extends TaskContainerImpl implements Workflow {
         try {
             // first marshall to byte array
             ByteArrayOutputStream xml = new ByteArrayOutputStream();
-            Marshaller m = new Marshaller(new OutputStreamWriter(xml));
-            m.setNamespaceMapping("", "http://www.in2p3.fr/jsaga/status");
-            m.marshal(m_xmlStatus);
+            this.dumpStatesToWriter(new OutputStreamWriter(xml));
             // then parse the marshalled document
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
@@ -132,5 +130,11 @@ public class WorkflowImpl extends TaskContainerImpl implements Workflow {
         } catch (Exception e) {
             throw new NoSuccess(e);
         }
+    }
+
+    protected synchronized void dumpStatesToWriter(Writer writer) throws Exception {
+        Marshaller m = new Marshaller(writer);
+        m.setNamespaceMapping("", "http://www.in2p3.fr/jsaga/status");
+        m.marshal(m_xmlStatus);
     }
 }
