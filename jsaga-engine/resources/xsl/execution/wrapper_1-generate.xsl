@@ -63,17 +63,18 @@ function _FAIL_() {
 
 function run_time() {
     FUNCTION=$1
-    if test -x /usr/bin/time ; then
-        /usr/bin/time -f "real=%e user=%U sys=%S mem=%K" -o $0.time $FUNCTION
-        RETURN_CODE=$?
-    else
+    <!-- fixme: /usr/bin/time does not support invoking shell function -->
+#    if test -x /usr/bin/time ; then
+#        /usr/bin/time -f "real=%e user=%U sys=%S mem=%K" -o $0.time $FUNCTION
+#        RETURN_CODE=$?
+#    else
         eval "time -p $FUNCTION &gt;stdout 2&gt;stderr" 2&gt;$0.time
         RETURN_CODE=$?
         cat $0.time | tr " " "=" | tr "\n" " " &gt; $0.time
         cat stdout
         cat stderr 1&gt;&amp;2
         rm -f stdout stderr
-    fi
+#    fi
     return $RETURN_CODE
 }
 
