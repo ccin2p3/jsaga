@@ -23,7 +23,7 @@ import java.util.*;
  */
 public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskContainer {
     // metrics
-//    private MetricImpl<State> m_metric_TaskState;
+//    private MetricImpl<Task> m_metric_TaskContainerState;
     // internal
     private final Map<Integer,AbstractTaskImpl> m_tasks;
 
@@ -33,7 +33,8 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
 
         // set metrics
 /*
-        m_metric_TaskState = this._addMetric(new MetricImpl<State>(
+        m_metric_TaskContainerState = this._addMetric(new MetricImpl<Task>(
+                this,
                 TaskContainer.TASKCONTAINER_STATE,
                 "fires on state changes of any task in the container, and has the value of that task's handle",
                 MetricMode.ReadOnly,
@@ -49,7 +50,7 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
     /** clone */
     public SagaObject clone() throws CloneNotSupportedException {
         TaskContainerImpl clone = (TaskContainerImpl) super.clone();
-//        clone.m_metric_TaskState = m_metric_TaskState;
+//        clone.m_metric_TaskContainerState = m_metric_TaskContainerState;
         clone.m_tasks.putAll(m_tasks);
         return clone;
     }
@@ -80,15 +81,29 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
         }
     }
 
-    public Task waitFor(WaitMode mode) throws NotImplemented, IncorrectState, DoesNotExist, NoSuccess {
+    public Task waitFor(WaitMode mode) throws NotImplemented, IncorrectState, DoesNotExist, Timeout, NoSuccess {
         return this.waitFor(WAIT_FOREVER, mode);
     }
 
-    public Task waitFor(float timeoutInSeconds, WaitMode mode) throws NotImplemented, IncorrectState, DoesNotExist, NoSuccess {
+    public Task waitFor(float timeoutInSeconds, WaitMode mode) throws NotImplemented, IncorrectState, DoesNotExist, Timeout, NoSuccess {
         if (m_tasks.isEmpty()) {
             throw new DoesNotExist("Task container is empty", this);
         }
+
         this.startListening();
+        // todo: use addCallback instead of startListening
+        /*int tcCookie;
+        try {
+            tcCookie = m_metric_TaskContainerState.addCallback(new Callback(){
+                public boolean cb(Monitorable mt, Metric metric, Context ctx) throws NotImplemented, AuthorizationFailed {
+                    return !m_tasks.isEmpty();
+                }
+            });
+        }
+        catch (AuthenticationFailed e) {throw new NoSuccess(e);}
+        catch (AuthorizationFailed e) {throw new NoSuccess(e);}
+        catch (PermissionDenied e) {throw new NoSuccess(e);}*/
+
         Integer cookie = null;
         try {
             boolean forever;
@@ -107,7 +122,19 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
                 Thread.currentThread().sleep(100);
             }
         } catch(InterruptedException e) {/*ignore*/}
+
         this.stopListening();
+        /*{
+            // callback may have not been removed
+            try {
+                m_metric_TaskContainerState.removeCallback(tcCookie);
+            }
+            catch (BadParameter e2) {throw new NoSuccess(e);}
+            catch (AuthenticationFailed e2) {throw new NoSuccess(e);}
+            catch (AuthorizationFailed e2) {throw new NoSuccess(e);}
+            catch (PermissionDenied e2) {throw new NoSuccess(e);}
+        }*/
+
         return m_tasks.remove(cookie);
     }
 
@@ -167,6 +194,12 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
             return states;
         }
     }
+
+/*
+    protected void notifyStateChange(Task task) {
+        m_metric_TaskContainerState.setValue(task);
+    }
+*/
 
     private void startListening() throws NotImplemented, IncorrectState, NoSuccess {
         try {
