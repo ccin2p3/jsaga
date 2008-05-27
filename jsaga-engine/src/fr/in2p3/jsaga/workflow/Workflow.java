@@ -24,7 +24,7 @@ public interface Workflow extends TaskContainer {
      * @param successorName name of a successor task.
      */
     public void add(WorkflowTask task, String predecessorName, String successorName)
-            throws NotImplemented, Timeout, NoSuccess;
+            throws NotImplemented, BadParameter, Timeout, NoSuccess;
 
     /**
      * Removes a single task from the workflow.

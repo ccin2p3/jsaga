@@ -53,7 +53,7 @@ public class DataPrePostStagingTaskGenerator {
                         previousTaskName = currentTask.getName();
                         // create transfer task
                         step = (Element) stepList.item(j);
-                        currentTask = new TransferTask(session, previousTaskName, step.getAttribute("uri"), input);
+                        currentTask = new TransferTask(session, step.getAttribute("uri"), input);
                     }
                     // add last task
                     workflow.add(currentTask, previousTaskName, inSbxUri);
@@ -72,7 +72,7 @@ public class DataPrePostStagingTaskGenerator {
             String outputSandboxTaskName = StagedTask.name(m_jobName, "OUTPUT_SANDBOX", notInput);
             workflow.remove(outputSandboxTaskName);
             // add first task
-            WorkflowTask currentTask = new TransferTask(session, "FIXME://FIXME", outSbxUri, notInput);  //FIXME
+            WorkflowTask currentTask = new TransferTask(session, outSbxUri, notInput);
             workflow.add(currentTask, null, null);
             NodeList stagingList = m_selector.getNodes("/ext:Job/jsdl:JobDefinition/jsdl:JobDescription/jsdl:DataStaging[@name!='OUTPUT_SANDBOX' and jsdl:Target/jsdl:URI/text()]");
             for (int i=0; i<stagingList.getLength(); i++) {
@@ -90,7 +90,7 @@ public class DataPrePostStagingTaskGenerator {
                         previousTaskName = currentTask.getName();
                         // create transfer task
                         step = (Element) stepList.item(j);
-                        currentTask = new TransferTask(session, previousTaskName, step.getAttribute("uri"), notInput);
+                        currentTask = new TransferTask(session, step.getAttribute("uri"), notInput);
                     }
                     // add last task
                     String nextTaskName = StagedTask.name(m_jobName, dataStagingName, notInput);

@@ -8,6 +8,9 @@
         <successor>srb://sreynaud@host2:5544/grid/config1.cfg?mydomain#OpenPlast-CCIN2P3</successor>
         <successor>http://host5:8080/public/configuration/config2.cfg</successor>
         <successor>gsiftp://host3:2811/repository/src/executable-src.tar.gz#EGEE</successor>
+        <successor>mkdir_gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sbxstg.out/MYJOB_1/</successor>
+        <successor>mkdir_gsiftp://defaultSE.openplast.fr/tmp/test_sbxstg.out/MYJOB_2/</successor>
+        <successor>mkdir_gsiftp://closeSE.openplast.fr:2811/intermediary/test_sbxstg.out/MYJOB_3/</successor>
     </task>
     <task group="run_MYJOB_1" label="MYJOB_1" name="run_MYJOB_1" state="NEW" type="job">
         <successor>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sbxstg.out/MYJOB_1/result_1.dat#OpenPlast-default</successor>
@@ -23,6 +26,12 @@
         <successor>run_MYJOB_1</successor>
     </task>
     <task group="run_MYJOB_1" input="true" label="E" name="in_MYJOB_1_E" state="NEW" type="staged">
+        <successor>run_MYJOB_1</successor>
+    </task>
+    <task group="run_MYJOB_1" input="true" label="R" name="in_MYJOB_1_R" state="NEW" type="staged">
+        <successor>run_MYJOB_1</successor>
+    </task>
+    <task group="run_MYJOB_1" input="true" label="STDERR" name="in_MYJOB_1_STDERR" state="NEW" type="staged">
         <successor>run_MYJOB_1</successor>
     </task>
     <task group="end_MYJOB_1" label="MYJOB_1" name="end_MYJOB_1" state="NEW" type="end"/>
@@ -61,6 +70,12 @@
     <task group="run_MYJOB_2" input="true" label="C2" name="in_MYJOB_2_C2" state="NEW" type="staged">
         <successor>run_MYJOB_2</successor>
     </task>
+    <task group="run_MYJOB_2" input="true" label="R" name="in_MYJOB_2_R" state="NEW" type="staged">
+        <successor>run_MYJOB_2</successor>
+    </task>
+    <task group="run_MYJOB_2" input="true" label="STDERR" name="in_MYJOB_2_STDERR" state="NEW" type="staged">
+        <successor>run_MYJOB_2</successor>
+    </task>
     <task group="end_MYJOB_2" label="MYJOB_2" name="end_MYJOB_2" state="NEW" type="end"/>
     <task group="end_MYJOB_2" input="false" label="R" name="out_MYJOB_2_R" state="NEW" type="staged">
         <successor>end_MYJOB_2</successor>
@@ -88,6 +103,12 @@
         <successor>run_MYJOB_3</successor>
     </task>
     <task group="run_MYJOB_3" input="true" label="E" name="in_MYJOB_3_E" state="NEW" type="staged">
+        <successor>run_MYJOB_3</successor>
+    </task>
+    <task group="run_MYJOB_3" input="true" label="R" name="in_MYJOB_3_R" state="NEW" type="staged">
+        <successor>run_MYJOB_3</successor>
+    </task>
+    <task group="run_MYJOB_3" input="true" label="STDERR" name="in_MYJOB_3_STDERR" state="NEW" type="staged">
         <successor>run_MYJOB_3</successor>
     </task>
     <task group="end_MYJOB_3" label="MYJOB_3" name="end_MYJOB_3" state="NEW" type="end"/>
@@ -137,6 +158,13 @@
     <task context="OpenPlast-default" group="gsiftp://firewallSE.openplast.fr" input="true" label="executable-src.tar.gz" name="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sbxstg.in/executable-src.tar.gz#OpenPlast-default" state="NEW" type="transfer">
         <successor>in_MYJOB_1_E</successor>
     </task>
+    <task group="gsiftp://firewallSE.openplast.fr" label="" name="mkdir_gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sbxstg.out/MYJOB_1/" state="NEW" type="mkdir">
+        <successor>mkdir_file:///tmp/test_sbxstg.out/MYJOB_1/</successor>
+        <successor>in_MYJOB_1_STDERR</successor>
+    </task>
+    <task group="file://" label="" name="mkdir_file:///tmp/test_sbxstg.out/MYJOB_1/" state="NEW" type="mkdir">
+        <successor>in_MYJOB_1_R</successor>
+    </task>
     <task context="OpenPlast-default" group="gsiftp://firewallSE.openplast.fr" input="false" label="result_1.dat" name="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sbxstg.out/MYJOB_1/result_1.dat#OpenPlast-default" state="NEW" type="source">
         <successor>file:///tmp/test_sbxstg.out/MYJOB_1/result_1.dat</successor>
     </task>
@@ -160,6 +188,13 @@
         <successor>in_MYJOB_2_C2</successor>
         <successor>in_MYJOB_3_C2</successor>
     </task>
+    <task group="gsiftp://defaultSE.openplast.fr" label="" name="mkdir_gsiftp://defaultSE.openplast.fr/tmp/test_sbxstg.out/MYJOB_2/" state="NEW" type="mkdir">
+        <successor>mkdir_file:///tmp/test_sbxstg.out/MYJOB_2/</successor>
+        <successor>in_MYJOB_2_STDERR</successor>
+    </task>
+    <task group="file://" label="" name="mkdir_file:///tmp/test_sbxstg.out/MYJOB_2/" state="NEW" type="mkdir">
+        <successor>in_MYJOB_2_R</successor>
+    </task>
     <task context="OpenPlast" group="gsiftp://defaultSE.openplast.fr" input="false" label="result_2.dat" name="gsiftp://defaultSE.openplast.fr/tmp/test_sbxstg.out/MYJOB_2/result_2.dat#OpenPlast" state="NEW" type="source">
         <successor>file:///tmp/test_sbxstg.out/MYJOB_2/result_2.dat</successor>
     </task>
@@ -180,6 +215,13 @@
     </task>
     <task context="OpenPlast" group="gsiftp://defaultSE.openplast.fr" input="true" label="executable-src.tar.gz" name="gsiftp://defaultSE.openplast.fr/tmp/test_sbxstg.in/executable-src.tar.gz#OpenPlast" state="NEW" type="transfer">
         <successor>in_MYJOB_3_E</successor>
+    </task>
+    <task group="gsiftp://closeSE.openplast.fr" label="" name="mkdir_gsiftp://closeSE.openplast.fr:2811/intermediary/test_sbxstg.out/MYJOB_3/" state="NEW" type="mkdir">
+        <successor>mkdir_file:///tmp/test_sbxstg.out/MYJOB_3/</successor>
+        <successor>in_MYJOB_3_STDERR</successor>
+    </task>
+    <task group="file://" label="" name="mkdir_file:///tmp/test_sbxstg.out/MYJOB_3/" state="NEW" type="mkdir">
+        <successor>in_MYJOB_3_R</successor>
     </task>
     <task context="OpenPlast-default" group="gsiftp://closeSE.openplast.fr" input="false" label="result_3.dat" name="gsiftp://closeSE.openplast.fr:2811/intermediary/test_sbxstg.out/MYJOB_3/result_3.dat#OpenPlast-default" state="NEW" type="source">
         <successor>file:///tmp/test_sbxstg.out/MYJOB_3/result_3.dat</successor>

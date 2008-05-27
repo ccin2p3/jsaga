@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.engine.workflow;
 
+import fr.in2p3.jsaga.engine.workflow.task.TransferTask;
 import fr.in2p3.jsaga.impl.task.TaskContainerImpl;
 import fr.in2p3.jsaga.workflow.Workflow;
 import fr.in2p3.jsaga.workflow.WorkflowTask;
@@ -57,13 +58,13 @@ public class WorkflowImpl extends TaskContainerImpl implements Workflow {
         startTask.run();
     }
 
-    public void add(WorkflowTask newTask, String predecessorName, String successorName) throws NotImplemented, Timeout, NoSuccess {
+    public void add(WorkflowTask newTask, String predecessorName, String successorName) throws NotImplemented, BadParameter, Timeout, NoSuccess {
         String[] predecessorNamesArray = (predecessorName!=null ? new String[]{predecessorName} : null);
         String[] successorNamesArray = (successorName!=null ? new String[]{successorName} : null);
         this.add(newTask, predecessorNamesArray, successorNamesArray);
     }
 
-    private void add(WorkflowTask newTask, String[] predecessorNames, String[] successorNames) throws NotImplemented, Timeout, NoSuccess {
+    private void add(WorkflowTask newTask, String[] predecessorNames, String[] successorNames) throws NotImplemented, BadParameter, Timeout, NoSuccess {
         // add task to workflow or retrieve task from workflow
         WorkflowTask task = m_workflowTasks.get(newTask.getName());
         if (task == null) {
@@ -80,6 +81,10 @@ public class WorkflowImpl extends TaskContainerImpl implements Workflow {
             }
             predecessor.addSuccessor(task);
             task.addPredecessor(predecessor);
+            // set source URL of transfer task
+            if (task instanceof TransferTask) {
+                ((TransferTask)task).setSource(predecessorNames[i]);
+            }
         }
 
         // link to successor

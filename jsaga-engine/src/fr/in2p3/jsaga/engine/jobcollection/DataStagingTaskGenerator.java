@@ -55,7 +55,7 @@ public class DataStagingTaskGenerator {
                         previousTaskName = currentTask.getName();
                         // create transfer task
                         step = (Element) stepList.item(j);
-                        currentTask = new TransferTask(session, previousTaskName, step.getAttribute("uri"), input);
+                        currentTask = new TransferTask(session, step.getAttribute("uri"), input);
                     }
                 } else {
                     currentTask = new SourceTask(sourceUri, input);
@@ -106,7 +106,7 @@ public class DataStagingTaskGenerator {
                         previousTaskName = currentTask.getName();
                         // create transfer task
                         step = (Element) stepList.item(j);
-                        currentTask = new TransferTask(session, previousTaskName, step.getAttribute("uri"), notInput);
+                        currentTask = new TransferTask(session, step.getAttribute("uri"), notInput);
                     }
                 } else {
                     currentTask = new SourceTask(targetUri, notInput);
@@ -127,6 +127,20 @@ public class DataStagingTaskGenerator {
                 boolean notInput = false;
                 String outputTaskName = StagedTask.name(m_jobName, dataStagingName, notInput);
                 workflow.remove(outputTaskName);
+            }
+        }
+
+        NodeList sandboxList = m_selector.getNodes("/ext:Job/jsdl:JobDefinition/jsdl:JobDescription/jsdl:DataStaging[translate(ext:Sandbox/text(),'TRUE','true')='true']");
+        for (int i=0; i<sandboxList.getLength(); i++) {
+            Element dataStaging = (Element) sandboxList.item(i);
+            String dataStagingName = m_selector.getString(dataStaging, "@name");
+            // output directories
+            String targetUri = m_selector.getString(dataStaging, "jsdl:Target/jsdl:URI/text()");
+            if (targetUri != null) {
+                // try to remove directory
+                boolean input = true;
+                String inputTaskName = StagedTask.name(m_jobName, dataStagingName, input);
+                workflow.remove(inputTaskName);
             }
         }
     }

@@ -30,11 +30,11 @@ public class TransferTask extends AbstractWorkflowTaskImpl {
     private URL m_destination;
 
     /** constructor */
-    public TransferTask(Session session, String source, String destination, boolean input) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public TransferTask(Session session, String destination, boolean input) throws NotImplemented, BadParameter, Timeout, NoSuccess {
         super(null, destination);
         // set URL
         m_session = session;
-        m_source = new URL(source);
+        m_source = null;
         m_destination = new URL(destination);
         // update XML status
         URLDecomposer u = new URLDecomposer(destination);
@@ -44,6 +44,10 @@ public class TransferTask extends AbstractWorkflowTaskImpl {
         xmlStatus.setLabel(u.getLabel());
         xmlStatus.setContext(u.getContext());
         xmlStatus.setInput(input);
+    }
+
+    public void setSource(String source) throws NotImplemented, BadParameter, NoSuccess {
+        m_source = new URL(source);
     }
 
     //////////////////////////////////////////// abstract methods ////////////////////////////////////////////

@@ -50,6 +50,10 @@ digraph G {
     "<xsl:value-of select="@name"/>" [label="<xsl:value-of select="@group"/>\n<xsl:value-of select="@label"/>", <xsl:text/>
             <xsl:text/>shape=ellipse, style=filled, color=<xsl:call-template name="STATUS"/>];<xsl:text/>
         </xsl:for-each>
+        <xsl:for-each select="stg:task[@type='mkdir']">
+    "<xsl:value-of select="@name"/>" [label="<xsl:value-of select="@group"/>\n<xsl:value-of select="@label"/>", <xsl:text/>
+            <xsl:text/>shape=box, style=filled, color=<xsl:call-template name="STATUS"/>];<xsl:text/>
+        </xsl:for-each>
 
         <!-- edges -->
     edge [arrowhead=normal, arrowtail=none, style=bold, color=black];

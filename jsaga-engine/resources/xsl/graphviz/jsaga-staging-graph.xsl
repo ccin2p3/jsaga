@@ -17,7 +17,8 @@ digraph G {
     node [shape=plaintext, height=0.2];
 
         <!-- nodes -->
-        <xsl:for-each select="stg:task[(@type='transfer' or @type='source') and not(@group=preceding-sibling::stg:task/@group)]">
+        <xsl:for-each select="stg:task[(@type='transfer' or @type='source')
+                and not(@group=preceding-sibling::stg:task[@type='transfer' or @type='source']/@group)]">
             <xsl:variable name="group" select="@group"/>
     subgraph "cluster_<xsl:value-of select="@group"/>" {
         label = "<xsl:value-of select="@group"/><xsl:if test="@context">\n(<xsl:value-of select="@context"/>)</xsl:if>";<xsl:text/>
