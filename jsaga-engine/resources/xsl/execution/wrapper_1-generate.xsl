@@ -57,7 +57,10 @@ function accounting() {
 
 function _FAIL_() {
     CAUSE=$1
-    change_state FAILED "$CAUSE"
+    if test "$_FAILED_" != "true" ; then
+        change_state FAILED "$CAUSE"
+        _FAILED_=true
+    fi
     return 1    # return with failure
 }
 
@@ -106,7 +109,7 @@ function run() {
         change_state $STATUS
         accounting $FUNCTION $TIME
     else
-        log FATAL "Failed to execute function: $FUNCTION"
+        _FAIL_ "Failed to execute function: $FUNCTION"
         cleanup
         sleep 1     # prevent LRMS from returning before stdout and stderr are flushed
         exit 1      # exit with failure
