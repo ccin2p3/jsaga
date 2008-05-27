@@ -64,20 +64,27 @@ function _FAIL_() {
     return 1    # return with failure
 }
 
+if test -x /usr/bin/time ; then
+    declare -fx log
+    declare -fx change_state
+    declare -fx accounting
+    declare -fx _FAIL_
+fi
 function run_time() {
     FUNCTION=$1
-    <!-- fixme: /usr/bin/time does not support invoking shell function -->
-#    if test -x /usr/bin/time ; then
-#        /usr/bin/time -f "real=%e user=%U sys=%S mem=%K" -o $0.time $FUNCTION
-#        RETURN_CODE=$?
-#    else
+    if test -x /usr/bin/time ; then
+        declare -fx $FUNCTION
+        /usr/bin/time -f "real=%e user=%U sys=%S mem=%K" -o $0.time bash -c $FUNCTION
+        RETURN_CODE=$?
+        unset $FUNCTION
+    else
         eval "time -p $FUNCTION &gt;stdout 2&gt;stderr" 2&gt;$0.time
         RETURN_CODE=$?
         cat $0.time | tr " " "=" | tr "\n" " " &gt; $0.time
         cat stdout
         cat stderr 1&gt;&amp;2
         rm -f stdout stderr
-#    fi
+    fi
     return $RETURN_CODE
 }
 
@@ -140,6 +147,7 @@ function cleanup() {
         done
         rm -f $0.newdir
     fi
+    log INFO "Worker has been cleaned up"
 }
 
 ############### INITIALIZE ###############
@@ -342,11 +350,6 @@ function OUTPUT_STAGING() {
         </xsl:for-each>
 }
 
-############### COMPLETE ###############
-function COMPLETE() {
-    cleanup
-}
-
 ############### MAIN ###############
 if test -f /etc/profile ; then
     OLD_PWD=$PWD
@@ -362,7 +365,8 @@ run INITIALIZE      INITIALIZED
 run INPUT_STAGING   INPUT_STAGED
 run USER_PROCESSING USER_PROCESSED
 run OUTPUT_STAGING  OUTPUT_STAGED
-run COMPLETE        COMPLETED
+change_state COMPLETED
+cleanup
 sleep 1     # prevent LRMS from returning before stdout and stderr are flushed
 exit 0      # exit with success
     </xsl:template>
