@@ -74,13 +74,13 @@ function run_time() {
     FUNCTION=$1
     if test -x /usr/bin/time ; then
         declare -fx $FUNCTION
-        /usr/bin/time -f "real=%e user=%U sys=%S mem=%K" -o $0.time bash -c $FUNCTION
+        /usr/bin/time -f "real=%e user=%U sys=%S mem=%K" -o $TMPFILE.time bash -c $FUNCTION
         RETURN_CODE=$?
         unset $FUNCTION
     else
-        eval "time -p $FUNCTION &gt;stdout 2&gt;stderr" 2&gt;$0.time
+        eval "time -p $FUNCTION &gt;stdout 2&gt;stderr" 2&gt;$TMPFILE.time
         RETURN_CODE=$?
-        cat $0.time | tr " " "=" | tr "\n" " " &gt; $0.time
+        cat $TMPFILE.time | tr " " "=" | tr "\n" " " &gt; $TMPFILE.time
         cat stdout
         cat stderr 1&gt;&amp;2
         rm -f stdout stderr
@@ -110,8 +110,8 @@ function run() {
         run_time $FUNCTION
     fi
     RETURN_CODE=$?
-    TIME=`cat $0.time`
-    rm -f $0.time
+    TIME=`cat $TMPFILE.time`
+    rm -f $TMPFILE.time
     if test $RETURN_CODE -eq 0 ; then
         change_state $STATUS
         accounting $FUNCTION $TIME
@@ -124,8 +124,8 @@ function run() {
 }
 
 function cleanup() {
-    if test -f $0.newfile ; then
-        cat $0.newfile | while read line ; do
+    if test -f $TMPFILE.newfile ; then
+        cat $TMPFILE.newfile | while read line ; do
             rm -rf $line
             if test $? -eq 0 ; then
                 log DEBUG "File has been deleted: $line"
@@ -133,11 +133,11 @@ function cleanup() {
                 log WARN "Failed to delete file: $line"
             fi
         done
-        rm -f $0.newfile
+        rm -f $TMPFILE.newfile
     fi
 
-    if test -f $0.newdir ; then
-        cat $0.newdir | while read line ; do
+    if test -f $TMPFILE.newdir ; then
+        cat $TMPFILE.newdir | while read line ; do
             rm -rf $line
             if test $? -eq 0 ; then
                 log DEBUG "Directory has been deleted: $line"
@@ -145,7 +145,7 @@ function cleanup() {
                 log WARN "Failed to delete directory: $line"
             fi
         done
-        rm -f $0.newdir
+        rm -f $TMPFILE.newdir
     fi
     log INFO "Worker has been cleaned up"
 }
@@ -185,7 +185,7 @@ function INPUT_STAGING() {
         # Create directory if needed
         <xsl:value-of select="@name"/>=<xsl:value-of select="jsdl:FileName/text()"/>
         if test ! -d ${<xsl:value-of select="@name"/>%/*} ; then
-            echo ${<xsl:value-of select="@name"/>%/*} &gt;&gt; $0.newdir
+            echo ${<xsl:value-of select="@name"/>%/*} &gt;&gt; $TMPFILE.newdir
             mkdir -p ${<xsl:value-of select="@name"/>%/*}
         fi
 
@@ -195,7 +195,7 @@ function INPUT_STAGING() {
             <xsl:with-param name="local" select="$LOCAL"/>
         </xsl:apply-templates>
         if test -f <xsl:value-of select="$LOCAL"/> ; then
-            echo <xsl:value-of select="$LOCAL"/> &gt;&gt; $0.newfile
+            echo <xsl:value-of select="$LOCAL"/> &gt;&gt; $TMPFILE.newfile
             IS_FOUND_<xsl:value-of select="@name"/>=<xsl:value-of select="position()"/>
         else
             log WARN "Failed to get file: <xsl:value-of select="jsdl:Source/jsdl:URI/text()"/>"
@@ -214,7 +214,7 @@ function INPUT_STAGING() {
             <xsl:if test="jsdl:Source/ext:Process/text()">
         # Preprocess
         if test -n "$IS_FOUND_<xsl:value-of select="@name"/>" ; then
-            echo <xsl:value-of select="jsdl:FileName/text()"/> &gt;&gt; $0.newfile
+            echo <xsl:value-of select="jsdl:FileName/text()"/> &gt;&gt; $TMPFILE.newfile
             SOURCE=<xsl:value-of select="$LOCAL"/><xsl:text>
             </xsl:text><xsl:value-of select="jsdl:Source/ext:Process/text()"/>
         fi
@@ -247,12 +247,12 @@ function INPUT_STAGING() {
         # Create directory if needed
         <xsl:value-of select="@name"/>=<xsl:value-of select="jsdl:FileName/text()"/>
         if test ! -d ${<xsl:value-of select="@name"/>%/*} ; then
-            echo ${<xsl:value-of select="@name"/>%/*} &gt;&gt; $0.newdir
+            echo ${<xsl:value-of select="@name"/>%/*} &gt;&gt; $TMPFILE.newdir
             mkdir -p ${<xsl:value-of select="@name"/>%/*}
         fi
 
         # Set file to put
-        echo <xsl:value-of select="jsdl:FileName/text()"/> &gt;&gt; $0.newfile
+        echo <xsl:value-of select="jsdl:FileName/text()"/> &gt;&gt; $TMPFILE.newfile
         IS_FOUND_<xsl:value-of select="@name"/>=<xsl:value-of select="position()"/>
                 </xsl:when>
                 <xsl:otherwise>
@@ -327,7 +327,7 @@ function OUTPUT_STAGING() {
     if test "$IS_FOUND_<xsl:value-of select="@name"/>" = "<xsl:value-of select="position()"/>" ; then
             <xsl:if test="jsdl:Target/ext:Process/text()">
         # Postprocess
-        echo <xsl:value-of select="$LOCAL"/> &gt;&gt; $0.newfile
+        echo <xsl:value-of select="$LOCAL"/> &gt;&gt; $TMPFILE.newfile
         TARGET=<xsl:value-of select="$LOCAL"/><xsl:text>
         </xsl:text><xsl:value-of select="jsdl:Target/ext:Process/text()"/><xsl:text>
         </xsl:text>
@@ -357,15 +357,18 @@ if test -f /etc/profile ; then
     cd $OLD_PWD
     log INFO "sourced file: /etc/profile"
 fi
-JOBNAME=<xsl:value-of select="jsdl:JobIdentification/jsdl:JobName/text()"/>
+export JOBNAME=<xsl:value-of select="jsdl:JobIdentification/jsdl:JobName/text()"/>
 log INFO "JOBNAME=$JOBNAME"
-log INFO "PWD=$PWD"
+export TMPFILE=$PWD/$JOBNAME-$$
+log INFO "TMPFILE=$TMPFILE"
+
 change_state STARTED
 run INITIALIZE      INITIALIZED
 run INPUT_STAGING   INPUT_STAGED
 run USER_PROCESSING USER_PROCESSED
 run OUTPUT_STAGING  OUTPUT_STAGED
 change_state COMPLETED
+
 cleanup
 sleep 1     # prevent LRMS from returning before stdout and stderr are flushed
 exit 0      # exit with success
