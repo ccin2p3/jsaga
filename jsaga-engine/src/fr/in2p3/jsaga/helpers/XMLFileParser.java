@@ -81,7 +81,9 @@ public class XMLFileParser {
                     filename = new File(e.getSystemId()).getName();
                 } else {
                     filename = dumpMergedFile.getName();
-                    dump(doc, new FileOutputStream(dumpMergedFile));
+                    if (dumpMergedFile.getParentFile().mkdirs()) {
+                        dump(doc, new FileOutputStream(dumpMergedFile));
+                    }
                 }
                 throw new SAXException("["+filename+": "+e.getLineNumber()+"] "+e.getMessage());
             }
