@@ -21,7 +21,7 @@ import java.lang.Exception;
  */
 public class JobStdinOutputStream extends Stdin {
     protected Job m_job;
-    private JobIOHandler m_ioHandler;
+    private JobIOGetterInteractive m_ioHandler;
 
     public JobStdinOutputStream(Job job) throws NotImplemented, DoesNotExist, Timeout, NoSuccess {
         m_job = job;
@@ -43,18 +43,12 @@ public class JobStdinOutputStream extends Stdin {
         }
     }
     
-    public void openJobIOHandler(JobIOHandler ioHandler) throws NotImplemented, PermissionDenied, Timeout, NoSuccess {
+    public void openJobIOHandler(JobIOGetterInteractive ioHandler) throws NotImplemented, PermissionDenied, Timeout, NoSuccess {
         m_ioHandler = ioHandler;
 
         // get stream
         if (m_stream == null) {
-            if (m_ioHandler instanceof JobIOGetter) {
-                m_stream = ((JobIOGetter)m_ioHandler).getStdin();
-            } else if (m_ioHandler instanceof JobIOSetter) {
-                m_stream = new PipedStdin((JobIOSetter) m_ioHandler);
-            } else if (m_ioHandler instanceof JobIOGetterPseudo || m_ioHandler instanceof JobIOSetterPseudo) {
-                throw new NotImplemented("ADAPTOR ERROR: Inconsistent implementation (InteractiveJobAdaptor with JobIOHandlerPseudo)");
-            }
+            m_stream = m_ioHandler.getStdin();
         }
 
         // dump buffer to stream
@@ -90,11 +84,9 @@ public class JobStdinOutputStream extends Stdin {
                     return m_buffer;
                 case RUNNING:
                     if (m_stream == null) {
-                        if (m_ioHandler instanceof JobIOGetter) {
-                            m_stream = ((JobIOGetter)m_ioHandler).getStdin();
-                        } else if (m_ioHandler instanceof JobIOSetter) {
-                            m_stream = new PipedStdin((JobIOSetter) m_ioHandler);
-                        } else if (m_ioHandler instanceof JobIOGetterPseudo || m_ioHandler instanceof JobIOSetterPseudo) {
+                        if (m_ioHandler instanceof JobIOGetterInteractive) {
+                            m_stream = ((JobIOGetterInteractive)m_ioHandler).getStdin();
+                        } else if (m_ioHandler instanceof JobIOGetter || m_ioHandler instanceof JobIOSetter) {
                             throw new NotImplemented("Can not write to stdin because job is running and adaptor does not support job interactivity");
                         }
                     }

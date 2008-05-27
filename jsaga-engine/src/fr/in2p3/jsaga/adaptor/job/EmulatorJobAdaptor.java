@@ -25,7 +25,7 @@ import java.util.*;
 /**
  *
  */
-public class EmulatorJobAdaptor implements JobControlAdaptor, CleanableJobAdaptor, QueryIndividualJob, PseudoInteractiveJobAdaptor {
+public class EmulatorJobAdaptor implements JobControlAdaptor, CleanableJobAdaptor, QueryIndividualJob, StreamableJobBatch {
     private static Map<String,EmulatorJobStatus> s_status = new HashMap<String,EmulatorJobStatus>();
 
     public String getType() {
@@ -60,9 +60,9 @@ public class EmulatorJobAdaptor implements JobControlAdaptor, CleanableJobAdapto
         return nativeJobId;
     }
 
-    public JobIOHandler submitInteractive(String jobDesc, boolean checkMatch, InputStream stdin) throws PermissionDenied, Timeout, NoSuccess {
+    public JobIOHandler submit(String jobDesc, boolean checkMatch, InputStream stdin) throws PermissionDenied, Timeout, NoSuccess {
         final String nativeJobId = this.submit(jobDesc, checkMatch);
-        return new JobIOGetterPseudo() {
+        return new JobIOGetter() {
             private String m_nativeJobId = nativeJobId;
             private InputStream m_stdout = new ByteArrayInputStream("output\n".getBytes());
             private InputStream m_stderr = new ByteArrayInputStream("error\n".getBytes());

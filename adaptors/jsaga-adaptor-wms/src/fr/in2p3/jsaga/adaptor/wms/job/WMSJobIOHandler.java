@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.wms.job;
 
-import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOGetterPseudo;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOGetter;
 
 import org.glite.wms.wmproxy.AuthenticationFaultException;
 import org.glite.wms.wmproxy.AuthorizationFaultException;
@@ -35,7 +35,7 @@ import java.net.MalformedURLException;
 * Date:   13 mai 2008
 * ***************************************************/
 
-public class WMSJobIOHandler implements JobIOGetterPseudo {
+public class WMSJobIOHandler implements JobIOGetter {
 
 	private String jobId ;
 	private WMProxyAPI m_client;

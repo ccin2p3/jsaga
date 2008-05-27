@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.impl.job.instance.stream;
 
-import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOSetter;
 import org.ogf.saga.error.NoSuccess;
 
 import java.io.*;
@@ -15,16 +14,14 @@ import java.io.*;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * TODO: remove this class (not used) ???
  */
 public class PipedStdin extends PipedOutputStream implements Runnable {
-    protected JobIOSetter m_ioHandler;
     protected IOException m_exception;
     protected boolean m_closed;
     protected InputStream m_in;
 
-    public PipedStdin(JobIOSetter ioHandler) throws NoSuccess {
-        m_ioHandler = ioHandler;
+    public PipedStdin() throws NoSuccess {
         m_exception = null;
         m_closed = false;
         try {
@@ -69,7 +66,7 @@ public class PipedStdin extends PipedOutputStream implements Runnable {
 
     public void run() {
         try {
-            m_ioHandler.setStdin(m_in);
+//            m_ioHandler.setStdin(m_in);
         } catch (Exception e) {
             m_exception = new IOException(e.getClass()+": "+e.getMessage());
         } finally {

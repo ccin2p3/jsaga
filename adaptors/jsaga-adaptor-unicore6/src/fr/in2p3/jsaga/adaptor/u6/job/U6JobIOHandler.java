@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.u6.job;
 
-import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOSetterPseudo;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOSetter;
 import fr.in2p3.jsaga.adaptor.u6.TargetSystemInfo;
 
 import org.ogf.saga.error.NoSuccess;
@@ -34,7 +34,7 @@ import java.util.List;
 * Author: Nicolas DEMESY (nicolas.demesy@bt.com)
 * Date:   29 avril 2008
 * ***************************************************/
-public class U6JobIOHandler implements JobIOSetterPseudo {
+public class U6JobIOHandler implements JobIOSetter {
 
 	private TargetSystemInfo targetSystemInfo;
 	private JobClient jobClient;

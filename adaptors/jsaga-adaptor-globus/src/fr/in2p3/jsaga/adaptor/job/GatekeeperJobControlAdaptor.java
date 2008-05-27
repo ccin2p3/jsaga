@@ -4,7 +4,7 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.InteractiveJobStreamSet;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobInteractiveSet;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.apache.log4j.Logger;
 import org.globus.gram.*;
@@ -34,7 +34,7 @@ import java.util.Map;
 /**
  * TODO: remove stdin file and stop gass server when cleanup
  */
-public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract implements JobControlAdaptor, CleanableJobAdaptor, InteractiveJobStreamSet {
+public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract implements JobControlAdaptor, CleanableJobAdaptor, StreamableJobInteractiveSet {
 	private static final String SHELLPATH = "ShellPath";
     private Logger logger = Logger.getLogger(GatekeeperJobControlAdaptor.class);
     private Map m_parameters;

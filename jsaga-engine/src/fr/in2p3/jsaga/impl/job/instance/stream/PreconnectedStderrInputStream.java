@@ -21,7 +21,7 @@ import java.io.*;
 public class PreconnectedStderrInputStream extends JobStderrInputStream {
     private OutputStreamContainer m_out;
 
-    /** constructor for InteractiveJobStreamSet */
+    /** constructor for StreamableJobInteractiveSet */
     public PreconnectedStderrInputStream(JobImpl job) {
         super(job);
         m_out = new OutputStreamContainer();

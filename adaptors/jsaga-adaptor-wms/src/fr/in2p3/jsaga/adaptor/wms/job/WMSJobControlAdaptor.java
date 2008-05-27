@@ -12,7 +12,7 @@ import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.PseudoInteractiveJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
 import org.apache.axis.AxisProperties;
@@ -69,7 +69,7 @@ import java.util.Map;
  * TODO : Test MPI jobs
  */
 public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract 
-		implements JobControlAdaptor, CleanableJobAdaptor, PseudoInteractiveJobAdaptor {
+		implements JobControlAdaptor, CleanableJobAdaptor, StreamableJobBatch {
 
 	private Logger logger = Logger.getLogger(WMSJobControlAdaptor.class);
 	
@@ -248,7 +248,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     
 
 
-	public JobIOHandler submitInteractive(String jobDesc, boolean checkMatch,
+	public JobIOHandler submit(String jobDesc, boolean checkMatch,
 			InputStream stdin) throws PermissionDenied, Timeout, NoSuccess {
 		
 		try {

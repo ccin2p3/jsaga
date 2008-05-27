@@ -19,7 +19,7 @@ import org.ogf.saga.error.*;
  */
 public class StreamFactory {
     public static Stdin createStdin(JobImpl job, JobControlAdaptor adaptor) throws NotImplemented, DoesNotExist, Timeout, NoSuccess {
-        if (adaptor instanceof InteractiveJobStreamSet) {
+        if (adaptor instanceof StreamableJobInteractiveSet) {
             return new PostconnectedStdinOutputStream(job);
         } else {
             return new JobStdinOutputStream(job);
@@ -27,11 +27,11 @@ public class StreamFactory {
     }
 
     public static Stdout createStdout(JobImpl job, JobControlAdaptor adaptor, JobIOHandler ioHandler) throws NotImplemented, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        if (adaptor instanceof InteractiveJobAdaptor) {
-            return new GetterInputStream(((JobIOGetter)ioHandler).getStdout());
-        } else if (adaptor instanceof InteractiveJobStreamSet) {
+        if (adaptor instanceof StreamableJobInteractiveGet) {
+            return new GetterInputStream(((JobIOGetterInteractive)ioHandler).getStdout());
+        } else if (adaptor instanceof StreamableJobInteractiveSet) {
             return new PreconnectedStdoutInputStream(job);
-        } else if (adaptor instanceof PseudoInteractiveJobAdaptor) {
+        } else if (adaptor instanceof StreamableJobBatch) {
             return new JobStdoutInputStream(job, ioHandler);
         } else {
             throw new NotImplemented("Unsupported streamable interface: "+adaptor.getClass().getName());
@@ -39,11 +39,11 @@ public class StreamFactory {
     }
 
     public static Stdout createStderr(JobImpl job, JobControlAdaptor adaptor, JobIOHandler ioHandler) throws NotImplemented, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        if (adaptor instanceof InteractiveJobAdaptor) {
-            return new GetterInputStream(((JobIOGetter)ioHandler).getStderr());
-        } else if (adaptor instanceof InteractiveJobStreamSet) {
+        if (adaptor instanceof StreamableJobInteractiveGet) {
+            return new GetterInputStream(((JobIOGetterInteractive)ioHandler).getStderr());
+        } else if (adaptor instanceof StreamableJobInteractiveSet) {
             return new PreconnectedStderrInputStream(job);
-        } else if (adaptor instanceof PseudoInteractiveJobAdaptor) {
+        } else if (adaptor instanceof StreamableJobBatch) {
             return new JobStderrInputStream(job, ioHandler);
         } else {
             throw new NotImplemented("Unsupported streamable interface: "+adaptor.getClass().getName());

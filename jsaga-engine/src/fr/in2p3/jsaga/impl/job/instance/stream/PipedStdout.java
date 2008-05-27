@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.impl.job.instance.stream;
 
-import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOSetterPseudo;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOSetter;
 import org.ogf.saga.error.NoSuccess;
 
 import java.io.*;
@@ -18,12 +18,12 @@ import java.io.*;
  *
  */
 public class PipedStdout extends PipedInputStream implements Runnable {
-    protected JobIOSetterPseudo m_ioHandler;
+    protected JobIOSetter m_ioHandler;
     protected IOException m_exception;
     protected boolean m_closed;
     protected OutputStream m_out;
 
-    public PipedStdout(JobIOSetterPseudo ioHandler) throws NoSuccess {
+    public PipedStdout(JobIOSetter ioHandler) throws NoSuccess {
         m_ioHandler = ioHandler;
         m_exception = null;
         m_closed = false;

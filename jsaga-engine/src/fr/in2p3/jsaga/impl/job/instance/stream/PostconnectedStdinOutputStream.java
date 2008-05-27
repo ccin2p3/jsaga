@@ -21,7 +21,7 @@ import java.lang.Exception;
 public class PostconnectedStdinOutputStream extends JobStdinOutputStream {
     private InputStreamContainer m_in;
 
-    /** constructor for InteractiveJobStreamSet */
+    /** constructor for StreamableJobInteractiveSet */
     public PostconnectedStdinOutputStream(JobImpl job) throws Timeout, DoesNotExist, NoSuccess, NotImplemented {
         super(job);
         m_in = new InputStreamContainer();

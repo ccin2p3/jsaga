@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.adaptor.job.control.interactive;
 
 import org.ogf.saga.error.*;
 
-import java.io.OutputStream;
+import java.io.InputStream;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -10,12 +10,14 @@ import java.io.OutputStream;
 * ***************************************************
 * File:   JobIOGetter
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   18 avr. 2008
+* Date:   29 avr. 2008
 * ***************************************************
 * Description:                                      */
 /**
  *
  */
-public interface JobIOGetter extends JobIOGetterPseudo {
-    public OutputStream getStdin() throws PermissionDenied, Timeout, NoSuccess;
+public interface JobIOGetter extends JobIOHandler {
+    public InputStream getStdout() throws PermissionDenied, Timeout, NoSuccess;
+
+    public InputStream getStderr() throws PermissionDenied, Timeout, NoSuccess;
 }

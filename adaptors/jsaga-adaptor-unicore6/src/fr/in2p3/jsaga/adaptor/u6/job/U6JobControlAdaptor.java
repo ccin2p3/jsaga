@@ -7,7 +7,7 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.PseudoInteractiveJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.adaptor.u6.TargetSystemInfo;
@@ -70,7 +70,7 @@ import java.util.Vector;
 * Date:   18 fev. 2008
 * ***************************************************/
 public class U6JobControlAdaptor extends U6JobAdaptorAbstract 
-		implements JobControlAdaptor, CleanableJobAdaptor, PseudoInteractiveJobAdaptor {
+		implements JobControlAdaptor, CleanableJobAdaptor, StreamableJobBatch {
 
 	protected static final String DEFAULT_CPU_TIME = "DefaultCpuTime";
 	private int cpuTime;
@@ -306,7 +306,7 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract
 		}
     }
     
-    public JobIOHandler submitInteractive(String jobDesc, boolean checkMatch, InputStream inputStream) 
+    public JobIOHandler submit(String jobDesc, boolean checkMatch, InputStream inputStream)
     		throws PermissionDenied, Timeout, NoSuccess {	
 		try {
 			// create target

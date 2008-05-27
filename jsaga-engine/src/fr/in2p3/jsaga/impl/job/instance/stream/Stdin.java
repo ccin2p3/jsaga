@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.impl.job.instance.stream;
 
-import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOGetterInteractive;
 import org.ogf.saga.error.*;
 
 import java.io.OutputStream;
@@ -18,6 +18,6 @@ import java.io.OutputStream;
  *
  */
 public abstract class Stdin extends OutputStream {
-    public abstract void openJobIOHandler(JobIOHandler ioHandler) throws NotImplemented, PermissionDenied, Timeout, NoSuccess;
+    public abstract void openJobIOHandler(JobIOGetterInteractive ioHandler) throws NotImplemented, PermissionDenied, Timeout, NoSuccess;
     public abstract byte[] getBuffer();
 }

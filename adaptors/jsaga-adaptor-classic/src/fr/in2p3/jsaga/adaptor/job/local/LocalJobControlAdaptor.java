@@ -5,8 +5,8 @@ import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.InteractiveJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOGetterInteractive;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobInteractiveGet;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.ogf.saga.error.*;
 
@@ -28,7 +28,7 @@ import java.util.UUID;
  * TODO : Support of pre-requisite
  */
 public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
-        JobControlAdaptor, CleanableJobAdaptor, InteractiveJobAdaptor {
+        JobControlAdaptor, CleanableJobAdaptor, StreamableJobInteractiveGet {
 
 	private static final String SHELLPATH = "ShellPath";
     private String m_shellPath;
@@ -80,7 +80,7 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 		}
 	}
 	
-	public JobIOHandler submitInteractive(String commandLine,
+	public JobIOGetterInteractive submitInteractive(String commandLine,
 			boolean checkMatch) throws PermissionDenied, Timeout, NoSuccess {
 		
 		try {

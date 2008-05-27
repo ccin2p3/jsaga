@@ -38,7 +38,7 @@ public class JobStdoutInputStream extends Stdout {
         }
     }
 
-    /** constructor for InteractiveJobStreamSet */
+    /** constructor for StreamableJobInteractiveSet */
     protected JobStdoutInputStream(JobImpl job) {
         m_job = job;
     }
@@ -46,10 +46,10 @@ public class JobStdoutInputStream extends Stdout {
     public void closeJobIOHandler() throws PermissionDenied, Timeout, NoSuccess {
         // get stream
         if (m_stream == null) {
-            if (m_ioHandler instanceof JobIOGetterPseudo) {
-                m_stream = ((JobIOGetterPseudo)m_ioHandler).getStdout();
-            } else if (m_ioHandler instanceof JobIOSetterPseudo) {
-                m_stream = new PipedStdout((JobIOSetterPseudo) m_ioHandler);
+            if (m_ioHandler instanceof JobIOGetter) {
+                m_stream = ((JobIOGetter)m_ioHandler).getStdout();
+            } else if (m_ioHandler instanceof JobIOSetter) {
+                m_stream = new PipedStdout((JobIOSetter) m_ioHandler);
             }
         }
 
@@ -91,10 +91,10 @@ public class JobStdoutInputStream extends Stdout {
                     return m_buffer;
                 case RUNNING:
                     if (m_stream == null) {
-                        if (m_ioHandler instanceof JobIOGetterPseudo) {
-                            m_stream = ((JobIOGetterPseudo)m_ioHandler).getStdout();
-                        } else if (m_ioHandler instanceof JobIOSetterPseudo) {
-                            m_stream = new PipedStdout((JobIOSetterPseudo) m_ioHandler);
+                        if (m_ioHandler instanceof JobIOGetter) {
+                            m_stream = ((JobIOGetter)m_ioHandler).getStdout();
+                        } else if (m_ioHandler instanceof JobIOSetter) {
+                            m_stream = new PipedStdout((JobIOSetter) m_ioHandler);
                         } else {
                             throw new NoSuccess("Can not read from stdout because job is running and adaptor does not support job interactivity");
                         }
