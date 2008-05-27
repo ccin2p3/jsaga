@@ -13,7 +13,7 @@ import com.jcraft.jsch.ChannelExec;
 
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.InteractiveJobStreamSet;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobInteractiveSet;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.adaptor.ssh.SSHAdaptorAbstract;
 
@@ -30,7 +30,7 @@ import fr.in2p3.jsaga.adaptor.ssh.SSHAdaptorAbstract;
  * TODO : Support of pre-requisite
  */
 public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
-		JobControlAdaptor, CleanableJobAdaptor, InteractiveJobStreamSet {
+		JobControlAdaptor, CleanableJobAdaptor, StreamableJobInteractiveSet {
 
 	public String getType() {
 		return "ssh";
