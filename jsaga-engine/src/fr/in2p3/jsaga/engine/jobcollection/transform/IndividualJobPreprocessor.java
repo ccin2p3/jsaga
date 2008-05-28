@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.engine.jobcollection.transform;
 
 import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.engine.jobcollection.preprocess.XMLDocument;
+import fr.in2p3.jsaga.engine.schema.jsdl.extension.Intermediary;
 import fr.in2p3.jsaga.engine.schema.jsdl.extension.Resource;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformerFactory;
 import fr.in2p3.jsaga.impl.job.description.XJSDLJobDescriptionImpl;
@@ -43,7 +44,11 @@ public class IndividualJobPreprocessor {
         Map<String,String> parameters = new HashMap<String,String>();
         parameters.put("resourceId", rm.getId());
         parameters.put("gridName", rm.getGrid());
-        if(rm.getIntermediary()!=null) parameters.put("Intermediary", rm.getIntermediary());
+        if(rm.getIntermediary()!=null) {
+            Intermediary i = rm.getIntermediary();
+            parameters.put("Intermediary", i.getContent());
+            if(i.getWorkerMountPoint()!=null) parameters.put("workerMountPoint", i.getWorkerMountPoint());
+        }
         if(rm.hasStandaloneWorker()) parameters.put("StandaloneWorker", ""+rm.getStandaloneWorker());
         if(rm.getTagCount()>0) parameters.put("Tag", rm.getTag(0));
         parameters.put("collectionName", jobDesc.getCollectionName());
