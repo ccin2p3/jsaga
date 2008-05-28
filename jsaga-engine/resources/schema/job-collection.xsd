@@ -13,7 +13,11 @@
         <sequence>
             <element name="Resource" minOccurs="0" maxOccurs="unbounded"><complexType>
                 <sequence>
-                    <element name="Intermediary" minOccurs="0" maxOccurs="1" type="anyURI"/>
+                    <element name="Intermediary" minOccurs="0" maxOccurs="1"><complexType><simpleContent>
+                        <extension base="anyURI">
+                            <attribute name="workerFileSystem" use="optional" type="boolean" default="false"/>
+                        </extension>
+                    </simpleContent></complexType></element>
                     <element name="StandaloneWorker" minOccurs="0" maxOccurs="1" type="boolean" default="false"/>
                     <element name="Tag" minOccurs="0" maxOccurs="unbounded" type="string"/>
                 </sequence>
