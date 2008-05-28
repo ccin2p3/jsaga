@@ -16,6 +16,8 @@ import org.ogf.saga.SagaObject;
 import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.task.Task;
+import org.ogf.saga.task.WaitMode;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
@@ -157,6 +159,14 @@ public class JobCollectionImpl extends WorkflowImpl implements JobCollection {
             }
             baseDir.delete();
         }        
+    }
+
+    public Task waitFor(float timeoutInSeconds, WaitMode mode) throws NotImplemented, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+        Task task = super.waitFor(timeoutInSeconds, mode);
+        if (super.size() == 0) {
+            this.saveStatesAsXML();
+        }
+        return task;
     }
 
     /** override super.getStatesAsXML() */
