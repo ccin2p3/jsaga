@@ -238,7 +238,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
                 if (!m_isWaitingFor && !m_metric_TaskState.isListening()) {
                     State state = this.queryState();
                     if (state != null) {
-                        m_metric_TaskState.setValue(state);
+                        this.setState(state);
                     }
                 }
                 return m_metric_TaskState.getValue();
@@ -322,7 +322,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
     public boolean cancel(boolean mayInterruptIfRunning) {
         switch(m_metric_TaskState.getValue(State.RUNNING)) {
             case NEW:
-                m_metric_TaskState.setValue(State.CANCELED);   //as specified in java.util.concurrent
+                this.setState(State.CANCELED);   //as specified in java.util.concurrent
                 return true;
             case DONE:
             case CANCELED:
