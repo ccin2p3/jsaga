@@ -118,6 +118,6 @@ public class AdaptorDescriptors {
         String tmpPath = (System.getProperty("file.separator").equals("\\")
                 ? "/"+System.getProperty("java.io.tmpdir").replaceAll("\\\\", "/")
                 : System.getProperty("java.io.tmpdir"));
-        xml.setLocalIntermediary("file://"+tmpPath);
+        xml.setLocalIntermediary(tmpPath);
     }
 }
