@@ -42,7 +42,7 @@
         <attribute name="uri" type="anyURI" use="required"/>
     </complexType></element>
     <element name="CopyLocally"><complexType><simpleContent>
-        <extension base="string"/>
+        <extension base="boolean"/>
     </simpleContent></complexType></element>
     <element name="Sandbox"><complexType><simpleContent>
         <extension base="boolean"/>
