@@ -107,6 +107,8 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
         if (stdin != null) {
             File stdinFile;
             try{stdinFile=File.createTempFile("stdin-",".txt",new File("./"));} catch(IOException e){throw new NoSuccess(e);}
+            //todo: remove stdinFile on cleanup() instead of on exit
+            stdinFile.deleteOnExit();
             save(stdin, stdinFile);
             NameOpValue stdinUrl = new NameOpValue("stdin", NameOpValue.EQ,
                     new VarRef("GLOBUSRUN_GASS_URL", null, new Value("/"+stdinFile.getName())));
