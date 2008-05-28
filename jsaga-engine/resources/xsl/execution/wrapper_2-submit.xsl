@@ -29,10 +29,12 @@
         </JobDefinition>
     </xsl:template>
 
-    <xsl:template match="posix:POSIXApplication | spmd:SPMDApplication">
-        <posix:POSIXApplication>
-            <posix:Executable>/bin/sh</posix:Executable>
-        </posix:POSIXApplication>
+    <xsl:template match="jsdl:Application">
+        <Application>
+            <posix:POSIXApplication>
+                <posix:Executable>/bin/sh</posix:Executable>
+            </posix:POSIXApplication>
+        </Application>
     </xsl:template>
 
     <!-- default template rules -->
