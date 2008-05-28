@@ -15,7 +15,7 @@
                 <sequence>
                     <element name="Intermediary" minOccurs="0" maxOccurs="1"><complexType><simpleContent>
                         <extension base="anyURI">
-                            <attribute name="workerFileSystem" use="optional" type="boolean" default="false"/>
+                            <attribute name="workerMountPoint" use="optional" type="string"/>
                         </extension>
                     </simpleContent></complexType></element>
                     <element name="StandaloneWorker" minOccurs="0" maxOccurs="1" type="boolean" default="false"/>
