@@ -113,9 +113,39 @@ public class FilledURL {
         try {
             String host = this.getHost();
             String path = this.getPath();
-            return new URI(this.getScheme(), this.getUserInfo(), (host!=null ? host : ""),
-                    this.getPort(), (path.startsWith("./") ? "/"+path : path),
-                    this.getQuery(), this.getFragment());
+            if (path.startsWith("./")) {
+                // can not create relative URI with multi-arguments constructors
+                StringBuffer buf = new StringBuffer();
+                if (this.getScheme() != null) {
+                    buf.append(this.getScheme());
+                    buf.append("://");
+                }
+                if (this.getHost() != null) {
+                    if (this.getUserInfo() != null) {
+                        buf.append(this.getUserInfo());
+                        buf.append("@");
+                    }
+                    buf.append(this.getHost());
+                    if (this.getPort() > -1) {
+                        buf.append(':');
+                        buf.append(this.getPort());
+                    }
+                }
+                buf.append(path);
+                if (this.getQuery() != null) {
+                    buf.append('?');
+                    buf.append(this.getQuery());
+                }
+                if (this.getFragment() != null) {
+                    buf.append('#');
+                    buf.append(this.getFragment());
+                }
+                return new URI(buf.toString());
+            } else {
+                return new URI(this.getScheme(), this.getUserInfo(), (host!=null ? host : ""),
+                        this.getPort(), path,
+                        this.getQuery(), this.getFragment());
+            }
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         } catch (NotImplemented e) {
