@@ -15,6 +15,8 @@
     <!-- resource -->
     <xsl:param name="resourceId"/><!-- required -->
     <xsl:param name="gridName"/><!-- required -->
+    <xsl:param name="Intermediary"/><!-- optional -->
+    <xsl:param name="workerMountPoint"/><!-- optional -->
     <xsl:param name="protection" select="'integrity'"/><!-- optional -->
 
     <!-- configuration -->
@@ -178,9 +180,31 @@ function INPUT_STAGING() {
                     </xsl:otherwise>
                 </xsl:choose>                
             </xsl:variable>
+            <xsl:variable name="INTERMEDIARY">
+                <xsl:if test="jsdl:Source/jsdl:URI and $Intermediary and $workerMountPoint">
+                    <xsl:variable name="baseUri">
+                        <xsl:call-template name="BASEURL"><xsl:with-param name="url" select="jsdl:Source/jsdl:URI/text()"/></xsl:call-template>
+                    </xsl:variable>
+                    <xsl:variable name="baseIntermediary">
+                        <xsl:call-template name="BASEURL"><xsl:with-param name="url" select="$Intermediary"/></xsl:call-template>
+                    </xsl:variable>
+                    <xsl:value-of select="$workerMountPoint"/>
+                    <xsl:value-of select="substring-after($baseUri, $baseIntermediary)"/>
+                </xsl:if>
+            </xsl:variable>
     # INPUT [<xsl:value-of select="@name"/>]
     if test -z "$IS_FOUND_<xsl:value-of select="@name"/>" ; then
             <xsl:choose>
+                <xsl:when test="jsdl:Source/jsdl:URI and $workerMountPoint and not(ext:CopyLocally='true')">
+        # Access intermediary file directly
+        if test -e <xsl:value-of select="$INTERMEDIARY"/> ; then
+            log DEBUG "Accessing intermediary file directly via shared file system"
+            <xsl:value-of select="@name"/>=<xsl:value-of select="$INTERMEDIARY"/>
+            IS_FOUND_<xsl:value-of select="@name"/>=<xsl:value-of select="position()"/>
+        else
+            log INFO "Intermediary file not found: <xsl:value-of select="$INTERMEDIARY"/>"
+        fi
+                </xsl:when>
                 <xsl:when test="jsdl:Source/jsdl:URI">
         # Create directory if needed
         <xsl:value-of select="@name"/>=<xsl:value-of select="jsdl:FileName/text()"/>
@@ -189,11 +213,25 @@ function INPUT_STAGING() {
             mkdir -p ${<xsl:value-of select="@name"/>%/*}
         fi
 
+                    <xsl:choose>
+                        <xsl:when test="$workerMountPoint">
+        # Copy <xsl:value-of select="$LOCAL"/> from <xsl:value-of select="$INTERMEDIARY"/>
+                    <xsl:if test="jsdl:CreationFlag/text()='overwrite'"> (overwrite)</xsl:if>
+        log DEBUG "Copying intermediary file via shared file system"
+        <xsl:for-each select="jsdl:Source/jsdl:URI"><xsl:call-template name="COPY">
+            <xsl:with-param name="source" select="$INTERMEDIARY"/>
+            <xsl:with-param name="target" select="$LOCAL"/>
+        </xsl:call-template></xsl:for-each>
+                        </xsl:when>
+                        <xsl:otherwise>
         # Get <xsl:value-of select="$LOCAL"/> from <xsl:value-of select="jsdl:Source/jsdl:URI/text()"/>
                     <xsl:if test="jsdl:CreationFlag/text()='overwrite'"> (overwrite)</xsl:if>
+        log DEBUG "Getting file from remote server"
         <xsl:apply-templates select="jsdl:Source/jsdl:URI">
             <xsl:with-param name="local" select="$LOCAL"/>
         </xsl:apply-templates>
+                        </xsl:otherwise>
+                    </xsl:choose>
         if test -f <xsl:value-of select="$LOCAL"/> ; then
             echo <xsl:value-of select="$LOCAL"/> &gt;&gt; $TMPFILE.newfile
             IS_FOUND_<xsl:value-of select="@name"/>=<xsl:value-of select="position()"/>
@@ -201,19 +239,24 @@ function INPUT_STAGING() {
             log WARN "Failed to get file: <xsl:value-of select="jsdl:Source/jsdl:URI/text()"/>"
         fi
                 </xsl:when>
-                <xsl:otherwise>
-        # Use local file
+                <xsl:when test="not(jsdl:Source/jsdl:URI)">
+        # Access local file directly
         if test -e <xsl:value-of select="$LOCAL"/> ; then
+            log DEBUG "Accessing local file directly"
             <xsl:value-of select="@name"/>=<xsl:value-of select="jsdl:FileName/text()"/>
             IS_FOUND_<xsl:value-of select="@name"/>=<xsl:value-of select="position()"/>
         else
             log INFO "Local file not found: <xsl:value-of select="$LOCAL"/>"
         fi
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:message terminate="yes">Inconsistent data staging description</xsl:message>
                 </xsl:otherwise>
             </xsl:choose>
             <xsl:if test="jsdl:Source/ext:Process/text()">
         # Preprocess
         if test -n "$IS_FOUND_<xsl:value-of select="@name"/>" ; then
+            log DEBUG "Preprocessing <xsl:value-of select="$LOCAL"/>"
             echo <xsl:value-of select="jsdl:FileName/text()"/> &gt;&gt; $TMPFILE.newfile
             SOURCE=<xsl:value-of select="$LOCAL"/><xsl:text>
             </xsl:text><xsl:value-of select="jsdl:Source/ext:Process/text()"/>
@@ -233,39 +276,62 @@ function INPUT_STAGING() {
         </xsl:for-each>
 
         <xsl:for-each select="jsdl:DataStaging[jsdl:Target]">
+            <xsl:variable name="INTERMEDIARY">
+                <xsl:if test="jsdl:Target/jsdl:URI and $Intermediary and $workerMountPoint">
+                    <xsl:variable name="baseUri">
+                        <xsl:call-template name="BASEURL"><xsl:with-param name="url" select="jsdl:Target/jsdl:URI/text()"/></xsl:call-template>
+                    </xsl:variable>
+                    <xsl:variable name="baseIntermediary">
+                        <xsl:call-template name="BASEURL"><xsl:with-param name="url" select="$Intermediary"/></xsl:call-template>
+                    </xsl:variable>
+                    <xsl:value-of select="$workerMountPoint"/>
+                    <xsl:value-of select="substring-after($baseUri, $baseIntermediary)"/>
+                </xsl:if>
+            </xsl:variable>
     # OUTPUT [<xsl:value-of select="@name"/>]
     if test -z "$IS_FOUND_<xsl:value-of select="@name"/>" ; then
-            <xsl:if test="not(jsdl:CreationFlag/text()='overwrite')">
-        # Check output file existence
-        if test -f <xsl:value-of select="jsdl:FileName/text()"/> ; then
-            _FAIL_ "Output file already exists: <xsl:value-of select="jsdl:FileName/text()"/>
-            return $?
-        fi
-            </xsl:if>
             <xsl:choose>
+                <xsl:when test="jsdl:Target/jsdl:URI and $workerMountPoint and not(ext:CopyLocally='true')">
+        # Access intermediary file directly
+        log DEBUG "Accessing intermediary file directly via shared file system"
+        <xsl:value-of select="@name"/>=<xsl:value-of select="$INTERMEDIARY"/>
+                </xsl:when>
                 <xsl:when test="jsdl:Target/jsdl:URI">
-        # Create directory if needed
+        # Set file to put
+        log DEBUG "Setting file to put on remote server"
         <xsl:value-of select="@name"/>=<xsl:value-of select="jsdl:FileName/text()"/>
+        echo <xsl:value-of select="jsdl:FileName/text()"/> &gt;&gt; $TMPFILE.newfile
+
+        # Create directory if needed
         if test ! -d ${<xsl:value-of select="@name"/>%/*} ; then
             echo ${<xsl:value-of select="@name"/>%/*} &gt;&gt; $TMPFILE.newdir
             mkdir -p ${<xsl:value-of select="@name"/>%/*}
         fi
-
-        # Set file to put
-        echo <xsl:value-of select="jsdl:FileName/text()"/> &gt;&gt; $TMPFILE.newfile
-        IS_FOUND_<xsl:value-of select="@name"/>=<xsl:value-of select="position()"/>
+                </xsl:when>
+                <xsl:when test="not(jsdl:Target/jsdl:URI)">
+        # Access local file directly
+        log DEBUG "Accessing local file directly"
+        <xsl:value-of select="@name"/>=<xsl:value-of select="jsdl:FileName/text()"/>
                 </xsl:when>
                 <xsl:otherwise>
-        # Use local file
-        touch <xsl:value-of select="jsdl:FileName/text()"/>
-        if test -f <xsl:value-of select="jsdl:FileName/text()"/> ; then
-            <xsl:value-of select="@name"/>=<xsl:value-of select="jsdl:FileName/text()"/>
-            IS_FOUND_<xsl:value-of select="@name"/>=<xsl:value-of select="position()"/>
-        else
-            log INFO "Can not create file: <xsl:value-of select="jsdl:FileName/text()"/>"
-        fi
+                    <xsl:message terminate="yes">Inconsistent data staging description</xsl:message>
                 </xsl:otherwise>
             </xsl:choose>
+            <xsl:if test="not(jsdl:CreationFlag/text()='overwrite')">
+
+        # Check output file does not exist
+        if test -f $<xsl:value-of select="@name"/> ; then
+            _FAIL_ "Output file already exists: $<xsl:value-of select="@name"/>"
+            return $?
+        fi
+            </xsl:if>
+
+        # Check output file can be created
+        if test -d ${<xsl:value-of select="@name"/>%/*} -a -w ${<xsl:value-of select="@name"/>%/*} ; then
+            IS_FOUND_<xsl:value-of select="@name"/>=<xsl:value-of select="position()"/>
+        else
+            log INFO "Can not create file: $<xsl:value-of select="@name"/>"
+        fi
     fi
             <xsl:variable name="current" select="@name"/>
             <xsl:if test="not(following-sibling::jsdl:DataStaging[@name=$current])">
@@ -323,27 +389,66 @@ function OUTPUT_STAGING() {
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:variable>
+            <xsl:variable name="INTERMEDIARY">
+                <xsl:if test="jsdl:Target/jsdl:URI and $Intermediary and $workerMountPoint">
+                    <xsl:variable name="baseUri">
+                        <xsl:call-template name="BASEURL"><xsl:with-param name="url" select="jsdl:Target/jsdl:URI/text()"/></xsl:call-template>
+                    </xsl:variable>
+                    <xsl:variable name="baseIntermediary">
+                        <xsl:call-template name="BASEURL"><xsl:with-param name="url" select="$Intermediary"/></xsl:call-template>
+                    </xsl:variable>
+                    <xsl:value-of select="$workerMountPoint"/>
+                    <xsl:value-of select="substring-after($baseUri, $baseIntermediary)"/>
+                </xsl:if>
+            </xsl:variable>
     # OUTPUT [<xsl:value-of select="@name"/>]
     if test "$IS_FOUND_<xsl:value-of select="@name"/>" = "<xsl:value-of select="position()"/>" ; then
+        # Check output file exists
+        if test ! -e $<xsl:value-of select="@name"/> ; then
+            _FAIL_ "Output file has not been created: $<xsl:value-of select="@name"/>"
+            return $?
+        fi
             <xsl:if test="jsdl:Target/ext:Process/text()">
         # Postprocess
+        log DEBUG "Postprocessing <xsl:value-of select="$LOCAL"/>"
         echo <xsl:value-of select="$LOCAL"/> &gt;&gt; $TMPFILE.newfile
         TARGET=<xsl:value-of select="$LOCAL"/><xsl:text>
         </xsl:text><xsl:value-of select="jsdl:Target/ext:Process/text()"/><xsl:text>
         </xsl:text>
             </xsl:if>
             <xsl:choose>
+                <xsl:when test="jsdl:Target/jsdl:URI and $workerMountPoint and not(ext:CopyLocally='true')">
+        # Access intermediary file directly
+        log DEBUG "Intermediary file is available: <xsl:value-of select="$INTERMEDIARY"/>"
+                </xsl:when>
                 <xsl:when test="jsdl:Target/jsdl:URI">
+                    <xsl:choose>
+                        <xsl:when test="$workerMountPoint">
+        # Copy <xsl:value-of select="$LOCAL"/> to <xsl:value-of select="$INTERMEDIARY"/>
+                    <xsl:if test="jsdl:CreationFlag/text()='overwrite'"> (overwrite)</xsl:if>
+        log DEBUG "Copying intermediary file via shared file system"
+        <xsl:for-each select="jsdl:Target/jsdl:URI"><xsl:call-template name="COPY">
+            <xsl:with-param name="source" select="$LOCAL"/>
+            <xsl:with-param name="target" select="$INTERMEDIARY"/>
+        </xsl:call-template></xsl:for-each>
+                        </xsl:when>
+                        <xsl:otherwise>
         # Put <xsl:value-of select="$LOCAL"/> to <xsl:value-of select="jsdl:Target/jsdl:URI/text()"/>
                     <xsl:if test="jsdl:CreationFlag/text()='overwrite'"> (overwrite)</xsl:if>
+        log DEBUG "Putting file to remote server"
         <xsl:apply-templates select="jsdl:Target/jsdl:URI">
             <xsl:with-param name="local" select="$LOCAL"/>
         </xsl:apply-templates>
-        log DEBUG "Output put: <xsl:value-of select="jsdl:Target/jsdl:URI/text()"/>"
+                        </xsl:otherwise>
+                    </xsl:choose>
+        log DEBUG "Remote file is available: <xsl:value-of select="jsdl:Target/jsdl:URI/text()"/>"
+                </xsl:when>
+                <xsl:when test="not(jsdl:Target/jsdl:URI)">
+        # Access local file directly
+        log DEBUG "Local file is available: <xsl:value-of select="$LOCAL"/>"
                 </xsl:when>
                 <xsl:otherwise>
-        # Use local file
-        log DEBUG "Output ready: <xsl:value-of select="$LOCAL"/>"
+                    <xsl:message terminate="yes">Inconsistent data staging description</xsl:message>
                 </xsl:otherwise>
             </xsl:choose>
     fi
@@ -781,6 +886,16 @@ exit 0      # exit with success
         <xsl:message terminate="yes">Protocol not supported: <xsl:value-of select="substring-before(text(),':')"/></xsl:message>
     </xsl:template>
 
+    <!-- ******************* explicit local copy ******************** -->
+    <xsl:template name="COPY">
+        <xsl:param name="source"/>
+        <xsl:param name="target"/>
+        <xsl:call-template name="REMOVE_LOCAL"><xsl:with-param name="local" select="$target"/></xsl:call-template>
+        cp<xsl:text/>
+            <xsl:text> </xsl:text><xsl:value-of select="$source"/>
+            <xsl:text> </xsl:text><xsl:value-of select="$target"/>
+    </xsl:template>
+
     <xsl:template name="SET_OVERWRITE">
         <xsl:param name="option"/>
         <xsl:if test="../../jsdl:CreationFlag/text()='overwrite'">
@@ -999,6 +1114,21 @@ FRAGMENT=<xsl:call-template name="FRAGMENT"/>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="$noscheme"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="BASEURL">
+        <xsl:param name="url"/>
+        <xsl:choose>
+            <xsl:when test="contains($url,'?')">
+                <xsl:value-of select="substring-before($url,'?')"/>
+            </xsl:when>
+            <xsl:when test="contains($url,'#')">
+                <xsl:value-of select="substring-before($url,'#')"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$url"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
