@@ -1,6 +1,8 @@
 package integration;
 
 import org.ogf.saga.URL;
+import org.ogf.saga.file.File;
+import org.ogf.saga.file.FileFactory;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -29,9 +31,17 @@ public class SubmitTest extends AbstractSubmitTest {
 
     public void test_staging() throws Exception {
         super.checkSubmit(new URL[]{new URL("local:/")});
+        URL expected = new URL("file://./jsaga-engine/config/var/"+this.getName()+".txt");
+        File file = FileFactory.createFile(expected);
+        assertTrue(file.isEntry());
+        assertTrue(file.getSize() > 0);
     }
 
     public void test_sandbox() throws Exception {
         super.checkSubmit(new URL[]{new URL("local:/")});
+        URL expected = new URL("file://./jsaga-engine/config/var/"+this.getName()+".txt");
+        File file = FileFactory.createFile(expected);
+        assertTrue(file.isEntry());
+        assertTrue(file.getSize() > 0);
     }
 }
