@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.impl.job.instance;
 
 import fr.in2p3.jsaga.impl.monitoring.MetricImpl;
+import fr.in2p3.jsaga.impl.task.TaskCallback;
 import org.ogf.saga.URL;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
@@ -28,12 +29,14 @@ import java.lang.Exception;
 public class JobHandle extends AbstractAsyncJobImpl implements Job {
     private JobImpl m_job;
     private File m_inputFile;
+    private TaskCallback m_jobRunTask;
 
     /** constructor for submission */
     public JobHandle(Session session) throws NotImplemented, BadParameter, Timeout, NoSuccess {
         super(session, true);
         m_job = null;
         m_inputFile = null;
+        m_jobRunTask = null;
     }
 
     /** constructor for control and monitoring only */
@@ -41,6 +44,7 @@ public class JobHandle extends AbstractAsyncJobImpl implements Job {
         super(session, false);
         m_job = (JobImpl) JobFactory.createJobService(m_session, rm).getJob(nativeJobId);
         m_inputFile = null;
+        m_jobRunTask = null;
     }
 
     ////////////////////////////////////////// JobHandler specific method //////////////////////////////////////////
@@ -58,6 +62,10 @@ public class JobHandle extends AbstractAsyncJobImpl implements Job {
         } else {
             throw new NoSuccess("Can not set stdin on a running job");
         }
+    }
+
+    public void setJobRunTask(TaskCallback jobRunTask) {
+        m_jobRunTask = jobRunTask;
     }
 
     ////////////////////////////////////// implementation of AbstractTaskImpl //////////////////////////////////////
@@ -87,9 +95,7 @@ public class JobHandle extends AbstractAsyncJobImpl implements Job {
             m_job.doSubmit();
 
             // start listening
-            if (m_isListening) {
-                m_job.startListening();
-            }            
+            m_job.startListening();
         } else {
             // set as running
             m_isRunning = true;
@@ -112,13 +118,13 @@ public class JobHandle extends AbstractAsyncJobImpl implements Job {
     }
 
     private int m_cookie;
-    private boolean m_isListening = false;
     public boolean startListening() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
         if (m_job != null) {
             try {
                 m_cookie = m_job.addCallback(Task.TASK_STATE, new Callback(){
                     public boolean cb(Monitorable mt, Metric metric, Context ctx) throws NotImplemented, AuthorizationFailed {
                         State state = ((MetricImpl<State>) metric).getValue();
+                        m_jobRunTask.setState(state);
                         JobHandle.this.setState(state);
                         switch(state) {
                             case DONE:
@@ -137,7 +143,6 @@ public class JobHandle extends AbstractAsyncJobImpl implements Job {
             catch (DoesNotExist e) {throw new NoSuccess(e);}
             return m_job.startListening();
         } else {
-            m_isListening = true;
             return true;    // a job task is always listening (either with notification, or with polling)
         }
     }
@@ -153,8 +158,6 @@ public class JobHandle extends AbstractAsyncJobImpl implements Job {
             catch (AuthorizationFailed e) {throw new NoSuccess(e);}
             catch (PermissionDenied e) {throw new NoSuccess(e);}
             m_job.stopListening();
-        } else {
-            m_isListening = false;
         }
     }
 

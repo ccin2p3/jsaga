@@ -4,7 +4,6 @@ import fr.in2p3.jsaga.engine.schema.status.Task;
 import fr.in2p3.jsaga.engine.schema.status.types.TaskStateType;
 import fr.in2p3.jsaga.impl.task.AbstractTaskImpl;
 import fr.in2p3.jsaga.workflow.WorkflowTask;
-import org.apache.log4j.Logger;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
@@ -26,7 +25,6 @@ import java.util.*;
  *
  */
 public abstract class AbstractWorkflowTaskImpl extends AbstractTaskImpl implements WorkflowTask {
-    private static Logger s_logger = Logger.getLogger(AbstractWorkflowTaskImpl.class);
     private String m_name;
     private final Map<String,WorkflowTask> m_predecessors;
     private final Map<String,WorkflowTask> m_successors;
@@ -73,15 +71,26 @@ public abstract class AbstractWorkflowTaskImpl extends AbstractTaskImpl implemen
         m_xmlStatus.setState(toTaskStateType(state));
 
         // run successors if state of current task is DONE
-        if (State.DONE.equals(state)) {
-            for (Iterator<WorkflowTask> it=m_successors.values().iterator(); it.hasNext(); ) {
-                WorkflowTask successor = it.next();
-                try {
-                    successor.run();
-                } catch (Exception e) {
-                    s_logger.warn("Failed to run task: "+successor.getName(), e);
+        switch(state) {
+            case DONE:
+                for (Iterator<WorkflowTask> it=m_successors.values().iterator(); it.hasNext(); ) {
+                    WorkflowTask successor = it.next();
+                    try {
+                        successor.run();
+                    } catch (Exception e) {
+                        successor.setException(new NoSuccess(e));
+                        successor.setState(State.FAILED);
+                    }
                 }
-            }
+                break;
+            case FAILED:
+            case CANCELED:
+                for (Iterator<WorkflowTask> it=m_successors.values().iterator(); it.hasNext(); ) {
+                    WorkflowTask successor = it.next();
+                    successor.setException(super.m_exception);
+                    successor.setState(state);
+                }
+                break;
         }
     }
     

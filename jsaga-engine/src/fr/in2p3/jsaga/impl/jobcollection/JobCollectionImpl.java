@@ -96,6 +96,9 @@ public class JobCollectionImpl extends WorkflowImpl implements JobCollection {
             JobWithStaging job = new JobWithStagingImpl(session, jobDescArray[i], jobHandle, this, jobEnd.getTask());
             super.add(job);
 
+            // set job handle
+            jobHandle.setJobRunTask(jobRun.getTask());
+
             // update list of unallocated jobs
             m_unallocatedJobs.add(job);
         }

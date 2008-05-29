@@ -30,7 +30,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
     // internal
     private Object m_object;
     private E m_result;
-    private org.ogf.saga.error.Exception m_exception;
+    protected org.ogf.saga.error.Exception m_exception;
     private boolean m_isWaitingFor;
     /** logger */
     private static Logger s_logger = Logger.getLogger(AbstractTaskImpl.class);

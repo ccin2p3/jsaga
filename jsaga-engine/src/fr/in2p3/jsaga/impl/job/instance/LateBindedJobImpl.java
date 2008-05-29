@@ -118,7 +118,7 @@ public class LateBindedJobImpl extends AbstractAsyncJobImpl implements LateBinde
         catch (AuthorizationFailed e) {throw new NoSuccess(e);}
         catch (PermissionDenied e) {throw new NoSuccess(e);}
         catch (DoesNotExist e) {throw new NoSuccess(e);}
-        return m_jobHandle.startListening();
+        return true;
     }
 
     public void stopListening() throws NotImplemented, Timeout, NoSuccess {
@@ -130,7 +130,6 @@ public class LateBindedJobImpl extends AbstractAsyncJobImpl implements LateBinde
         catch (AuthenticationFailed e) {throw new NoSuccess(e);}
         catch (AuthorizationFailed e) {throw new NoSuccess(e);}
         catch (PermissionDenied e) {throw new NoSuccess(e);}
-        m_jobHandle.stopListening();
     }
 
     ////////////////////////////////////// implementation of Job //////////////////////////////////////

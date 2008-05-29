@@ -14,6 +14,8 @@ import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
 import org.w3c.dom.Document;
 
+import java.lang.Exception;
+
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -69,6 +71,45 @@ public class JobWithStagingImpl extends LateBindedJobImpl implements JobWithStag
         m_workflow.saveStatesAsXML();
 
         return jobDesc;
+    }
+
+    //////////////////////////////////////////// interface TaskCallback ////////////////////////////////////////////
+
+    public synchronized void setState(State state) {
+        State jobEndState;
+        try {
+            jobEndState = m_jobEnd.getState();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+        switch(jobEndState) {
+            case DONE:
+                super.setState(jobEndState);
+                break;
+            case CANCELED:
+            case FAILED:
+                try {
+                    m_jobEnd.rethrow();
+                } catch (org.ogf.saga.error.Exception e) {
+                    super.setException(e);
+                }
+                super.setState(jobEndState);
+                break;
+            default:
+                switch(state) {
+                    case DONE:
+                    case RUNNING:
+                        super.setState(State.RUNNING);
+                        break;
+                    case CANCELED:
+                    case FAILED:
+                    case SUSPENDED:
+                        super.setState(state);
+                        break;
+                }
+                break;
+        }
     }
 
     ////////////////////////////////////// implementation of AbstractTaskImpl //////////////////////////////////////
