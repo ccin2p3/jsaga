@@ -24,7 +24,7 @@ public class GatekeeperJobStatusListener extends JobStatusListener implements Gr
     }
 
     public void statusChanged(GramJob job) {
-        JobStatus status = new GatekeeperJobStatus(job.getIDAsString(), new Integer(job.getStatus()), job.getStatusAsString());
+        JobStatus status = new GatekeeperJobStatus(job.getIDAsString(), new Integer(job.getStatus()), job.getStatusAsString(), job.getError());
         m_notifier.notifyChange(status);
     }
 }

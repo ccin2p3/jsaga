@@ -59,7 +59,7 @@ public class GatekeeperJobMonitorAdaptor extends GatekeeperJobAdaptorAbstract im
         } catch (GSSException e) {
             throw new NoSuccess(e);
         }
-        return new GatekeeperJobStatus(nativeJobId, new Integer(job.getStatus()), job.getStatusAsString());
+        return new GatekeeperJobStatus(nativeJobId, new Integer(job.getStatus()), job.getStatusAsString(), job.getError());
     }
 
     public void subscribeJob(String nativeJobId, JobStatusNotifier notifier) throws Timeout, NoSuccess {

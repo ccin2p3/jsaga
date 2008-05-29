@@ -16,12 +16,21 @@ import org.globus.gram.internal.GRAMConstants;
  *
  */
 public class GatekeeperJobStatus extends JobStatus {
+    private int m_errorCode;
+
     public GatekeeperJobStatus(String jobId, Object stateCode, String stateString) {
         super(jobId, stateCode, stateString);
+        m_errorCode = 0;
     }
 
-    public GatekeeperJobStatus(String jobId, Object stateCode, String stateString, String cause) {
+    public GatekeeperJobStatus(String jobId, Object stateCode, String stateString, int errorCode) {
+        super(jobId, stateCode, stateString);
+        m_errorCode = errorCode;
+    }
+
+    public GatekeeperJobStatus(String jobId, Object stateCode, String stateString, int errorCode, String cause) {
         super(jobId, stateCode, stateString, cause);
+        m_errorCode = errorCode;
     }
 
     public String getModel() {
@@ -29,6 +38,10 @@ public class GatekeeperJobStatus extends JobStatus {
     }
 
     public SubState getSubState() {
+        if (m_errorCode != 0) {
+            return SubState.FAILED_ERROR;
+        }
+        
         switch(((Integer)m_nativeStateCode).intValue()) {
             case GRAMConstants.STATUS_UNSUBMITTED:
                 return SubState.SUBMITTED;
