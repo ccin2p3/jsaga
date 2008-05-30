@@ -35,6 +35,8 @@ public class DataStagingTaskGenerator {
         for (int i=0; i<stagingList.getLength(); i++) {
             Element dataStaging = (Element) stagingList.item(i);
             String dataStagingName = m_selector.getString(dataStaging, "@name");
+            String overwriteStr = m_selector.getString(dataStaging, "jsdl:CreationFlag/text()");
+            boolean overwrite = (overwriteStr!=null && overwriteStr.equalsIgnoreCase("overwrite"));
 
             // input staging
             String sourceUri = m_selector.getString(dataStaging, "jsdl:Source/jsdl:URI/text()");
@@ -55,7 +57,7 @@ public class DataStagingTaskGenerator {
                         previousTaskName = currentTask.getName();
                         // create transfer task
                         step = (Element) stepList.item(j);
-                        currentTask = new TransferTask(session, step.getAttribute("uri"), input);
+                        currentTask = new TransferTask(session, step.getAttribute("uri"), input, overwrite);
                     }
                 } else {
                     currentTask = new SourceTask(sourceUri, input);
@@ -106,7 +108,7 @@ public class DataStagingTaskGenerator {
                         previousTaskName = currentTask.getName();
                         // create transfer task
                         step = (Element) stepList.item(j);
-                        currentTask = new TransferTask(session, step.getAttribute("uri"), notInput);
+                        currentTask = new TransferTask(session, step.getAttribute("uri"), notInput, overwrite);
                     }
                 } else {
                     currentTask = new SourceTask(targetUri, notInput);

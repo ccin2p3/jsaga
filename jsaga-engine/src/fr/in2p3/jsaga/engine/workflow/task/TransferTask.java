@@ -28,14 +28,16 @@ public class TransferTask extends AbstractWorkflowTaskImpl {
     private Session m_session;
     private URL m_source;
     private URL m_destination;
+    private boolean m_overwrite;
 
     /** constructor */
-    public TransferTask(Session session, String destination, boolean input) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public TransferTask(Session session, String destination, boolean input, boolean overwrite) throws NotImplemented, BadParameter, Timeout, NoSuccess {
         super(null, destination);
         // set URL
         m_session = session;
         m_source = null;
         m_destination = new URL(destination);
+        m_overwrite = overwrite;
         // update XML status
         URLDecomposer u = new URLDecomposer(destination);
         Task xmlStatus = super.getStateAsXML();
@@ -54,7 +56,10 @@ public class TransferTask extends AbstractWorkflowTaskImpl {
 
     protected void doSubmit() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
         try {
-            NSFactory.createNSEntry(m_session, m_source).copy(m_destination, Flags.CREATEPARENTS.getValue());
+            int flags = (m_overwrite
+                    ? Flags.CREATEPARENTS.or(Flags.OVERWRITE)
+                    : Flags.CREATEPARENTS.getValue());
+            NSFactory.createNSEntry(m_session, m_source).copy(m_destination, flags);
         } catch (Exception e) {
             throw new NoSuccess(e);
         }

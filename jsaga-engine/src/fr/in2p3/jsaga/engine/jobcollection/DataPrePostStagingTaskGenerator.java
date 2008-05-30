@@ -41,6 +41,9 @@ public class DataPrePostStagingTaskGenerator {
             for (int i=0; i<stagingList.getLength(); i++) {
                 Element dataStaging = (Element) stagingList.item(i);
                 String dataStagingName = m_selector.getString(dataStaging, "@name");
+                String overwriteStr = m_selector.getString(dataStaging, "jsdl:CreationFlag/text()");
+                boolean overwrite = (overwriteStr!=null && overwriteStr.equalsIgnoreCase("overwrite"));
+
                 String previousTaskName = StartTask.name();
                 NodeList stepList = dataStaging.getElementsByTagNameNS("http://www.in2p3.fr/jsdl-extension", "Step");
                 if (stepList.getLength() > 0) {
@@ -53,7 +56,7 @@ public class DataPrePostStagingTaskGenerator {
                         previousTaskName = currentTask.getName();
                         // create transfer task
                         step = (Element) stepList.item(j);
-                        currentTask = new TransferTask(session, step.getAttribute("uri"), input);
+                        currentTask = new TransferTask(session, step.getAttribute("uri"), input, overwrite);
                     }
                     // add last task
                     workflow.add(currentTask, previousTaskName, inSbxUri);
@@ -72,12 +75,15 @@ public class DataPrePostStagingTaskGenerator {
             String outputSandboxTaskName = StagedTask.name(m_jobName, "OUTPUT_SANDBOX", notInput);
             workflow.remove(outputSandboxTaskName);
             // add first task
-            WorkflowTask currentTask = new TransferTask(session, outSbxUri, notInput);
+            WorkflowTask currentTask = new TransferTask(session, outSbxUri, notInput, true); //always overwrite
             workflow.add(currentTask, null, null);
             NodeList stagingList = m_selector.getNodes("/ext:Job/jsdl:JobDefinition/jsdl:JobDescription/jsdl:DataStaging[@name!='OUTPUT_SANDBOX' and jsdl:Target/jsdl:URI/text()]");
             for (int i=0; i<stagingList.getLength(); i++) {
                 Element dataStaging = (Element) stagingList.item(i);
                 String dataStagingName = m_selector.getString(dataStaging, "@name");
+                String overwriteStr = m_selector.getString(dataStaging, "jsdl:CreationFlag/text()");
+                boolean overwrite = (overwriteStr!=null && overwriteStr.equalsIgnoreCase("overwrite"));
+
                 String previousTaskName = outSbxUri;
                 NodeList stepList = dataStaging.getElementsByTagNameNS("http://www.in2p3.fr/jsdl-extension", "Step");
                 if (stepList.getLength() > 0) {
@@ -90,7 +96,7 @@ public class DataPrePostStagingTaskGenerator {
                         previousTaskName = currentTask.getName();
                         // create transfer task
                         step = (Element) stepList.item(j);
-                        currentTask = new TransferTask(session, step.getAttribute("uri"), notInput);
+                        currentTask = new TransferTask(session, step.getAttribute("uri"), notInput, overwrite);
                     }
                     // add last task
                     String nextTaskName = StagedTask.name(m_jobName, dataStagingName, notInput);
