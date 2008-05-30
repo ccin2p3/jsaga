@@ -312,6 +312,11 @@ function INPUT_STAGING() {
         # Access local file directly
         log DEBUG "Accessing local file directly"
         <xsl:value-of select="@name"/>=<xsl:value-of select="jsdl:FileName/text()"/>
+
+        # Create directory if needed (will not be removed)
+        if test ! -d ${<xsl:value-of select="@name"/>%/*} ; then
+            mkdir -p ${<xsl:value-of select="@name"/>%/*}
+        fi
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:message terminate="yes">Inconsistent data staging description</xsl:message>
