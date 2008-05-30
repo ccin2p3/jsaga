@@ -43,7 +43,7 @@ public class JobRunInteractiveTest extends AbstractJobTest {
 
         // get stdin
         OutputStream stdin = job.getStdin();
-        stdin.write("/bin/command-error".getBytes());
+        stdin.write("/bin/cat -true".getBytes());
         stdin.close();
 
         // run
@@ -143,7 +143,9 @@ public class JobRunInteractiveTest extends AbstractJobTest {
     public void test_getStderr() throws Exception {
         
     	// prepare interactive job
-    	JobDescription desc = createErrorJob();
+    	AttributeVector[] attributesV = new AttributeVector[1];
+    	attributesV[0] = new AttributeVector(JobDescription.ARGUMENTS,new String[]{"-true"});    	
+    	JobDescription desc = createJob("/bin/cat", null, attributesV);
     	desc.setAttribute(JobDescription.INTERACTIVE, JobDescription.TRUE);
     	
         // submit
