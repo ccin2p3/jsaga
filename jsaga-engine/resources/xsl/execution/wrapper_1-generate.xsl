@@ -96,6 +96,9 @@ function run() {
     STATUS=$2
     log DEBUG "Entering function: $FUNCTION"
     if test "$FUNCTION" = "USER_PROCESSING" ; then
+        <xsl:if test="not(jsdl:Application/*)">
+        log DEBUG "no application element for job: $JOBNAME"
+        </xsl:if>
         <xsl:for-each select="jsdl:Application/*">
         run_time $FUNCTION<xsl:text/>
             <xsl:for-each select="posix:Input">
@@ -354,6 +357,9 @@ function INPUT_STAGING() {
 
 ############### USER_PROCESSING ###############
 function USER_PROCESSING() {
+        <xsl:if test="not(jsdl:Application/*)">
+    log DEBUG "no application element for job: $JOBNAME"
+        </xsl:if>
         <xsl:for-each select="jsdl:Application/*">
             <xsl:choose>
                 <xsl:when test="local-name()='POSIXApplication' or local-name()='SPMDApplication'">
@@ -376,9 +382,6 @@ function USER_PROCESSING() {
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:for-each>
-        <xsl:if test="not(jsdl:Application/*)">
-            <xsl:message terminate="yes">Job has no application element</xsl:message>
-        </xsl:if>
 }
 
 ############### OUTPUT_STAGING ###############
