@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+s<?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="JSAGA">
     <skin>
         <groupId>fr.in2p3.maven</groupId>
@@ -34,11 +34,14 @@
         <menu name="Developer Documentation">
             <item name="JSAGA Adaptors API" href="jsaga-adaptoritf/index.html"/>
             <item name="JSAGA Engine" href="jsaga-engine/index.html"/>
-            <item name="Build Tools" href="../build-tools/index.html"/>
             <item name="How To" href="howto.html"/>
-            <item name="Development Release" href="../jsaga-dev/index.html"/>
         </menu>
         <menu name="Project Documentation" ref="reports"/>
+        <menu name="Links">
+            <item name="Development Release" href="../jsaga-dev/index.html"/>
+            <item name="Build Tools" href="../build-tools/index.html"/>
+            <item name="Common Tools" href="../in2p3-commons/index.html"/>
+        </menu>
         <menu name="Adaptor Modules">
             <item name="Default" href="adaptors/jsaga-adaptor-default/index.html"/>
             <item name="Classic" href="adaptors/jsaga-adaptor-classic/index.html"/>
