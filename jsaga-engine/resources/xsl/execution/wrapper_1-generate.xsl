@@ -66,27 +66,28 @@ function _FAIL_() {
     return 1    # return with failure
 }
 
-if test -x /usr/bin/time ; then
-    declare -fx log
-    declare -fx change_state
-    declare -fx accounting
-    declare -fx _FAIL_
-fi
+#if test -x /usr/bin/time ; then
+#    declare -fx log
+#    declare -fx change_state
+#    declare -fx accounting
+#    declare -fx _FAIL_
+#fi
 function run_time() {
     FUNCTION=$1
-    if test -x /usr/bin/time ; then
-        declare -fx $FUNCTION
-        /usr/bin/time -f "real=%e user=%U sys=%S mem=%K" -o $TMPFILE.time bash -c $FUNCTION
-        RETURN_CODE=$?
-        unset $FUNCTION
-    else
+    <!-- todo: save all variables in a file and source it -->
+#    if test -x /usr/bin/time ; then
+#        declare -fx $FUNCTION
+#        /usr/bin/time -f "real=%e user=%U sys=%S mem=%K" -o $TMPFILE.time bash -c $FUNCTION
+#        RETURN_CODE=$?
+#        unset $FUNCTION
+#    else
         eval "time -p $FUNCTION &gt;stdout 2&gt;stderr" 2&gt;$TMPFILE.time
         RETURN_CODE=$?
         cat $TMPFILE.time | tr " " "=" | tr "\n" " " &gt; $TMPFILE.time
         cat stdout
         cat stderr 1&gt;&amp;2
         rm -f stdout stderr
-    fi
+#    fi
     return $RETURN_CODE
 }
 
