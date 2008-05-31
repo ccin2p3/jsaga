@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.in2p3.jsaga.aggregator</groupId>
   <artifactId>adaptors</artifactId>
-  <version>0.9.3</version>
+  <version>0.9.4-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>JSAGA Adaptors</name>
   <description>These are the adaptors for the JSAGA engine.</description>
@@ -28,8 +28,4 @@
     <module>jsaga-adaptor-irods</module>
     <module>jsaga-adaptor-mail</module>
   </modules>
-
-  <scm>
-    <tag>jsaga-0_9_3</tag>
-  </scm>
 </project>

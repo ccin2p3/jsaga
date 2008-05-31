@@ -7,33 +7,33 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
     <artifactId>jsaga-adaptor-voms</artifactId>
-    <version>0.9.3</version>
+    <version>0.9.4-SNAPSHOT</version>
     <name>Adaptor for VOMS</name>
     <dependencies>
         <!-- common -->
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-adaptoritf</artifactId>
-            <version>0.9.3</version>
+            <version>0.9.4-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api</artifactId>
-            <version>0.9.3</version>
+            <version>0.9.4-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api</artifactId>
-            <version>0.9.3</version>
+            <version>0.9.4-SNAPSHOT</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
-            <version>0.9.3</version>
+            <version>0.9.4-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <!-- adaptor specific -->
@@ -43,8 +43,4 @@
             <version>1.7.22</version>
         </dependency>
     </dependencies>
-
-  <scm>
-    <tag>jsaga-0_9_3</tag>
-  </scm>
 </project>

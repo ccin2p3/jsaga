@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.in2p3.jsaga.aggregator</groupId>
   <artifactId>jsaga</artifactId>
-  <version>0.9.3</version>
+  <version>0.9.4-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>JSAGA Project</name>
   <description>JSAGA is a Java implementation of the SAGA interface.</description>
@@ -18,7 +18,6 @@
     <connection>scm:cvs|ext|anoncvs@anoncvs.in2p3.fr|/cvs/gridpub|jsaga</connection>
     <developerConnection>scm:cvs|ext|sreynaud@cvs.in2p3.fr|/cvs/gridpub|jsaga</developerConnection>
     <url>https://cvs.in2p3.fr/gridpub/jsaga</url>
-    <tag>jsaga-0_9_3</tag>
   </scm>
 
   <!-- aggregation -->
