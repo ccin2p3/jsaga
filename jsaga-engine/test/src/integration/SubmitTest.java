@@ -30,6 +30,8 @@ public class SubmitTest extends AbstractSubmitTest {
     }
 
     public void test_staging() throws Exception {
+//        super.checkSubmit(new URL[]{new URL("gatekeeper://localhost:2119/C=FR/ST=France/L=Villeurbanne/O=CNRS/OU=IN2P3/CN=Sylvain%20Reynaud/E=sreynaud@in2p3.fr")});
+//        super.checkSubmit(new URL[]{new URL("ssh://localhost:22")});
         super.checkSubmit(new URL[]{new URL("local:/")});
         URL expected = new URL("file://./jsaga-engine/config/var/"+this.getName()+".txt");
         File file = FileFactory.createFile(expected);
