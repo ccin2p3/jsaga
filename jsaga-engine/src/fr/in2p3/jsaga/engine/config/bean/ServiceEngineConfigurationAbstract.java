@@ -40,7 +40,8 @@ public class ServiceEngineConfigurationAbstract {
             } else {
                 // if no hostname
                 if (mapping.getServiceRefCount() > 0) {
-                    return mapping.getServiceRef();
+                    // todo: find a way to solve ambiguity
+                    return new ServiceRef[]{mapping.getServiceRef(0)};
                 } else if (mapping.getDomainCount() > 0) {
                     Map<String,ServiceRef> map = new HashMap<String,ServiceRef>();
                     for (int d=0; d<mapping.getDomainCount(); d++) {
