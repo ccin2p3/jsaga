@@ -20,7 +20,3 @@ JSAGA
 
  JSAGA addresses these issues to enable efficient jobs submission to
  several grid infrastructures with a single job description.
-
-
- (PLEASE NOTE THAT THE JOB COLLECTION MANAGEMENT PART IS STILL UNDER
- DEVELOPMENT AND NOT YET AVAILABLE IN THE CURRENT RELEASE.)
