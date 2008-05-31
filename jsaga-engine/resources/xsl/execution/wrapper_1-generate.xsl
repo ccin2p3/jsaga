@@ -77,13 +77,13 @@ function run_time() {
     <!-- todo: save all variables in a file and source it -->
 #    if test -x /usr/bin/time ; then
 #        declare -fx $FUNCTION
-#        /usr/bin/time -f "real=%e user=%U sys=%S mem=%K" -o $TMPFILE.time bash -c $FUNCTION
+#        /usr/bin/time -f "real=%e user=%U sys=%S mem=%K" -o "$TMPFILE.time" bash -c $FUNCTION
 #        RETURN_CODE=$?
 #        unset $FUNCTION
 #    else
-        eval "time -p $FUNCTION &gt;stdout 2&gt;stderr" 2&gt;$TMPFILE.time
+        eval "time -p $FUNCTION &gt;stdout 2&gt;stderr" 2&gt;"$TMPFILE.time"
         RETURN_CODE=$?
-        cat $TMPFILE.time | tr " " "=" | tr "\n" " " &gt; $TMPFILE.time
+        cat "$TMPFILE.time" | tr " " "=" | tr "\n" " " &gt; "$TMPFILE.time"
         cat stdout
         cat stderr 1&gt;&amp;2
         rm -f stdout stderr
@@ -113,8 +113,8 @@ function run() {
         run_time $FUNCTION
     fi
     RETURN_CODE=$?
-    TIME=`cat $TMPFILE.time`
-    rm -f $TMPFILE.time
+    TIME=`cat "$TMPFILE.time"`
+    rm -f "$TMPFILE.time"
     if test $RETURN_CODE -eq 0 ; then
         change_state $STATUS
         accounting $FUNCTION $TIME
@@ -127,28 +127,28 @@ function run() {
 }
 
 function cleanup() {
-    if test -f $TMPFILE.newfile ; then
-        cat $TMPFILE.newfile | while read line ; do
-            rm -rf $line
+    if test -f "$TMPFILE.newfile" ; then
+        cat "$TMPFILE.newfile" | while read line ; do
+            rm -rf "$line"
             if test $? -eq 0 ; then
                 log DEBUG "File has been deleted: $line"
             else
                 log WARN "Failed to delete file: $line"
             fi
         done
-        rm -f $TMPFILE.newfile
+        rm -f "$TMPFILE.newfile"
     fi
 
-    if test -f $TMPFILE.newdir ; then
-        cat $TMPFILE.newdir | while read line ; do
-            rm -rf $line
+    if test -f "$TMPFILE.newdir" ; then
+        cat "$TMPFILE.newdir" | while read line ; do
+            rm -rf "$line"
             if test $? -eq 0 ; then
                 log DEBUG "Directory has been deleted: $line"
             else
                 log WARN "Failed to delete directory: $line"
             fi
         done
-        rm -f $TMPFILE.newdir
+        rm -f "$TMPFILE.newdir"
     fi
     log INFO "Worker has been cleaned up"
 }
@@ -198,7 +198,7 @@ function INPUT_STAGING() {
             <xsl:choose>
                 <xsl:when test="jsdl:Source/jsdl:URI and $workerMountPoint and not(ext:CopyLocally='true')">
         # Access intermediary file directly
-        if test -e <xsl:value-of select="$INTERMEDIARY"/> ; then
+        if test -e "<xsl:value-of select="$INTERMEDIARY"/>" ; then
             log DEBUG "Accessing intermediary file directly via shared file system"
             <xsl:value-of select="@name"/>=<xsl:value-of select="$INTERMEDIARY"/>
             IS_FOUND_<xsl:value-of select="@name"/>=<xsl:value-of select="position()"/>
@@ -209,9 +209,9 @@ function INPUT_STAGING() {
                 <xsl:when test="jsdl:Source/jsdl:URI">
         # Create directory if needed
         <xsl:value-of select="@name"/>=<xsl:value-of select="jsdl:FileName/text()"/>
-        if test ! -d ${<xsl:value-of select="@name"/>%/*} ; then
-            echo ${<xsl:value-of select="@name"/>%/*} &gt;&gt; $TMPFILE.newdir
-            mkdir -p ${<xsl:value-of select="@name"/>%/*}
+        if test ! -d "${<xsl:value-of select="@name"/>%/*}" ; then
+            echo "${<xsl:value-of select="@name"/>%/*}" &gt;&gt; "$TMPFILE.newdir"
+            mkdir -p "${<xsl:value-of select="@name"/>%/*}"
         fi
 
                     <xsl:choose>
@@ -233,8 +233,8 @@ function INPUT_STAGING() {
         </xsl:apply-templates>
                         </xsl:otherwise>
                     </xsl:choose>
-        if test -f <xsl:value-of select="$LOCAL"/> ; then
-            echo <xsl:value-of select="$LOCAL"/> &gt;&gt; $TMPFILE.newfile
+        if test -f "<xsl:value-of select="$LOCAL"/>" ; then
+            echo "<xsl:value-of select="$LOCAL"/>" &gt;&gt; "$TMPFILE.newfile"
             IS_FOUND_<xsl:value-of select="@name"/>=<xsl:value-of select="position()"/>
         else
             log WARN "Failed to get file: <xsl:value-of select="jsdl:Source/jsdl:URI/text()"/>"
@@ -242,7 +242,7 @@ function INPUT_STAGING() {
                 </xsl:when>
                 <xsl:when test="not(jsdl:Source/jsdl:URI)">
         # Access local file directly
-        if test -e <xsl:value-of select="$LOCAL"/> ; then
+        if test -e "<xsl:value-of select="$LOCAL"/>" ; then
             log DEBUG "Accessing local file directly"
             <xsl:value-of select="@name"/>=<xsl:value-of select="jsdl:FileName/text()"/>
             IS_FOUND_<xsl:value-of select="@name"/>=<xsl:value-of select="position()"/>
@@ -258,7 +258,7 @@ function INPUT_STAGING() {
         # Preprocess
         if test -n "$IS_FOUND_<xsl:value-of select="@name"/>" ; then
             log DEBUG "Preprocessing <xsl:value-of select="$LOCAL"/>"
-            echo <xsl:value-of select="jsdl:FileName/text()"/> &gt;&gt; $TMPFILE.newfile
+            echo "<xsl:value-of select="jsdl:FileName/text()"/>" &gt;&gt; "$TMPFILE.newfile"
             SOURCE=<xsl:value-of select="$LOCAL"/><xsl:text>
             </xsl:text><xsl:value-of select="jsdl:Source/ext:Process/text()"/>
         fi
@@ -301,12 +301,12 @@ function INPUT_STAGING() {
         # Set file to put
         log DEBUG "Setting file to put on remote server"
         <xsl:value-of select="@name"/>=<xsl:value-of select="jsdl:FileName/text()"/>
-        echo <xsl:value-of select="jsdl:FileName/text()"/> &gt;&gt; $TMPFILE.newfile
+        echo "<xsl:value-of select="jsdl:FileName/text()"/>" &gt;&gt; "$TMPFILE.newfile"
 
         # Create directory if needed
-        if test ! -d ${<xsl:value-of select="@name"/>%/*} ; then
-            echo ${<xsl:value-of select="@name"/>%/*} &gt;&gt; $TMPFILE.newdir
-            mkdir -p ${<xsl:value-of select="@name"/>%/*}
+        if test ! -d "${<xsl:value-of select="@name"/>%/*}" ; then
+            echo "${<xsl:value-of select="@name"/>%/*}" &gt;&gt; "$TMPFILE.newdir"
+            mkdir -p "${<xsl:value-of select="@name"/>%/*}"
         fi
                 </xsl:when>
                 <xsl:when test="not(jsdl:Target/jsdl:URI)">
@@ -315,8 +315,8 @@ function INPUT_STAGING() {
         <xsl:value-of select="@name"/>=<xsl:value-of select="jsdl:FileName/text()"/>
 
         # Create directory if needed (will not be removed)
-        if test ! -d ${<xsl:value-of select="@name"/>%/*} ; then
-            mkdir -p ${<xsl:value-of select="@name"/>%/*}
+        if test ! -d "${<xsl:value-of select="@name"/>%/*}" ; then
+            mkdir -p "${<xsl:value-of select="@name"/>%/*}"
         fi
                 </xsl:when>
                 <xsl:otherwise>
@@ -326,14 +326,14 @@ function INPUT_STAGING() {
             <xsl:if test="not(jsdl:CreationFlag/text()='overwrite')">
 
         # Check output file does not exist
-        if test -f $<xsl:value-of select="@name"/> ; then
+        if test -f "$<xsl:value-of select="@name"/>" ; then
             _FAIL_ "Output file already exists: $<xsl:value-of select="@name"/>"
             return $?
         fi
             </xsl:if>
 
         # Check output file can be created
-        if test -d ${<xsl:value-of select="@name"/>%/*} -a -w ${<xsl:value-of select="@name"/>%/*} ; then
+        if test -d "${<xsl:value-of select="@name"/>%/*}" -a -w "${<xsl:value-of select="@name"/>%/*}" ; then
             IS_FOUND_<xsl:value-of select="@name"/>=<xsl:value-of select="position()"/>
         else
             log INFO "Can not create file: $<xsl:value-of select="@name"/>"
@@ -416,14 +416,14 @@ function OUTPUT_STAGING() {
     # OUTPUT [<xsl:value-of select="@name"/>]
     if test "$IS_FOUND_<xsl:value-of select="@name"/>" = "<xsl:value-of select="position()"/>" ; then
         # Check output file exists
-        if test ! -e $<xsl:value-of select="@name"/> ; then
+        if test ! -e "$<xsl:value-of select="@name"/>" ; then
             _FAIL_ "Output file has not been created: $<xsl:value-of select="@name"/>"
             return $?
         fi
             <xsl:if test="jsdl:Target/ext:Process/text()">
         # Postprocess
         log DEBUG "Postprocessing <xsl:value-of select="$LOCAL"/>"
-        echo <xsl:value-of select="$LOCAL"/> &gt;&gt; $TMPFILE.newfile
+        echo "<xsl:value-of select="$LOCAL"/>" &gt;&gt; "$TMPFILE.newfile"
         TARGET=<xsl:value-of select="$LOCAL"/><xsl:text>
         </xsl:text><xsl:value-of select="jsdl:Target/ext:Process/text()"/><xsl:text>
         </xsl:text>
@@ -471,7 +471,7 @@ function OUTPUT_STAGING() {
 if test -f /etc/profile ; then
     OLD_PWD=$PWD
     . /etc/profile
-    cd $OLD_PWD
+    cd "$OLD_PWD"
     log INFO "sourced file: /etc/profile"
 fi
 export JOBNAME=<xsl:value-of select="jsdl:JobIdentification/jsdl:JobName/text()"/>
@@ -882,15 +882,15 @@ exit 0      # exit with success
         <xsl:param name="local"/>
         <xsl:call-template name="REMOVE_LOCAL"><xsl:with-param name="local" select="$local"/></xsl:call-template>
         cp<xsl:text/>
-            <xsl:text> </xsl:text><xsl:call-template name="PATH"/>
-            <xsl:text> </xsl:text><xsl:value-of select="$local"/>
+            <xsl:text> </xsl:text>"<xsl:call-template name="PATH"/>"<xsl:text/>
+            <xsl:text> </xsl:text>"<xsl:value-of select="$local"/>"<xsl:text/>
     </xsl:template>
     <xsl:template match="jsdl:Target/jsdl:URI[starts-with(text(),'file://')]">
         <xsl:param name="local"/>
         <xsl:call-template name="REMOVE_LOCAL"><xsl:with-param name="local"><xsl:call-template name="PATH"/></xsl:with-param></xsl:call-template>
         cp<xsl:text/>
-            <xsl:text> </xsl:text><xsl:value-of select="$local"/>
-            <xsl:text> </xsl:text><xsl:call-template name="PATH"/>
+            <xsl:text> </xsl:text>"<xsl:value-of select="$local"/>"<xsl:text/>
+            <xsl:text> </xsl:text>"<xsl:call-template name="PATH"/>"<xsl:text/>
     </xsl:template>
 
     <!-- ************************* other... ************************* -->
@@ -904,8 +904,8 @@ exit 0      # exit with success
         <xsl:param name="target"/>
         <xsl:call-template name="REMOVE_LOCAL"><xsl:with-param name="local" select="$target"/></xsl:call-template>
         cp<xsl:text/>
-            <xsl:text> </xsl:text><xsl:value-of select="$source"/>
-            <xsl:text> </xsl:text><xsl:value-of select="$target"/>
+            <xsl:text> </xsl:text>"<xsl:value-of select="$source"/>"<xsl:text/>
+            <xsl:text> </xsl:text>"<xsl:value-of select="$target"/>"<xsl:text/>
     </xsl:template>
 
     <xsl:template name="SET_OVERWRITE">
@@ -924,10 +924,10 @@ exit 0      # exit with success
 
     <xsl:template name="REMOVE_LOCAL">
         <xsl:param name="local"/>
-        if test -e <xsl:value-of select="$local"/> ; then<xsl:text/>
+        if test -e "<xsl:value-of select="$local"/>" ; then<xsl:text/>
             <xsl:choose>
                 <xsl:when test="../../jsdl:CreationFlag/text()='overwrite'">
-            rm -f <xsl:value-of select="$local"/>
+            rm -f "<xsl:value-of select="$local"/>"
                 </xsl:when>
                 <xsl:otherwise>
             _FAIL_ "File already exists: <xsl:value-of select="$local"/>, please set CreationFlag to overwrite"<xsl:text/>
