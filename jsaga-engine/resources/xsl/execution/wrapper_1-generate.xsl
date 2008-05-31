@@ -367,12 +367,18 @@ function USER_PROCESSING() {
                 </xsl:when>
                 <xsl:when test="local-name()='ScriptApplication'">
                     <xsl:value-of select="ext:Script/text()"/>
+                    <xsl:if test="not(ext:Script/text())">
+                        <xsl:message terminate="yes">ScriptApplication requires element Script</xsl:message>
+                    </xsl:if>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:message terminate="yes">Unsupported application type: <xsl:value-of select="local-name()"/></xsl:message>
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:for-each>
+        <xsl:if test="not(jsdl:Application/*)">
+            <xsl:message terminate="yes">Job has no application element</xsl:message>
+        </xsl:if>
 }
 
 ############### OUTPUT_STAGING ###############
