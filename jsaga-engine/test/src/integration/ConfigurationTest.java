@@ -26,4 +26,14 @@ public class ConfigurationTest extends TestCase {
         // dump effective config
         Configuration.getInstance().getConfigurations().dump(System.out);
     }
+
+    public void test_config_jobcollection() throws Exception {
+        // configure JSAGA engine
+        System.setProperty("debug", "true");
+        EngineProperties.setProperty(EngineProperties.JSAGA_CONFIGURATION, "../test/resources/jobcollection/jsaga-config.xml");
+        EngineProperties.setProperty(EngineProperties.JSAGA_CONFIGURATION_ENABLE_CACHE, "false");
+
+        // dump effective config
+        Configuration.getInstance().getConfigurations().dump(System.out);
+    }
 }
