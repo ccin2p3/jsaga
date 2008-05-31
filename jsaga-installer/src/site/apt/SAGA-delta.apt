@@ -2,48 +2,65 @@ Deviations from SAGA specifications
 
 * Security management
 
-    * Context.TYPE: may refer to one of the configured security contexts
-      (JSAGA supports several configuration of the same context type).
+    * Methods
 
-    * Override method toString(): this dump a description of the security context instance.
+        * toString(): overrided to dump a description of the security context instance.
 
 * Data management
 
     * URL
 
-        * Query (?...) at the end of URL refers to adaptor-specific parameters
+        * Query (?...) at the end of URL refers to adaptor-specific parameters.
 
-        * Fragment (#...) at the end of URL refers to a specific configuration of the protocol
+        * Fragment (#...) at the end of URL refers to a specific configuration of the protocol.
 
-        * Class URL is modified to support relative paths (<scheme>://./<path>) and to be extendable
+        * Modified class URL to support windows paths, relative paths (<scheme>://./<path>) and special characters (e.g. % \ #).
           <(NOTE: this is the only modification made on the SAGA Java Binding, and it will disappear when a URL factory will be provided)>
 
-    * Add flag (FLAGS_BYPASSEXIST=4096) to disable existence check when creating NSEntry instances
-      (then an IncorrectState exception embedding a DoesNotExist exception may be thrown on subsequent method invocations).
+    * Constructor flags
 
-    * Add some methods to enable reducing the number of messages with the server. These methods are accessible
-      by casting NSEntry instances to AbstractNSEntryImpl and NSDirectory instances to AbstractNSDirectoryImpl.
+        * FLAGS_BYPASSEXIST=4096: added to disable existence check when creating NSEntry instances.
+          <(NOTE: an IncorrectState exception embedding a DoesNotExist exception may be thrown on subsequent method invocations)>
 
-        * exist(): Check if current entry exist (use this if created with flag FLAGS_BYPASSEXIST).
+    * Methods
+      <(NOTE: These methods are accessible by casting NSEntry instances to AbstractNSEntryImpl and NSDirectory instances to AbstractNSDirectoryImpl)>
 
-        * copyFrom(): Copy remote source entry to current entry.
+        * copyFrom(): added to copy remote source entry to current entry (for optimization purposes).
         
-        * getLastModified(): Return the date of last modification.
+        * getLastModified(): added to get the date of last modification (for implementation of "ls -l").
 
-    * Few differences in implementation of behavior with some flags (see comments in source code)
-
-        * NSEntry.remove() allow no RECURSIVE flag for directory in order to enable "rmdir-like" behavior.
+        * NSEntry.remove(): allow no RECURSIVE flag for directory (for enabling "rmdir-like" behavior).
 
 * Job management
 
-    * Some job description attributes are not supported by JSAGA.
-      Attributes marked as ’not supported by JSDL’ might disappear in future versions of the SAGA API.
+    * Job description attributes
 
-        * Interactive (will be supported in the future)
+        * JobName: added
 
-        * JobStartTime (not supported by JSDL)
+        * JobStartTime: not supported
+          <(NOTE: this attribute is ’not supported by JSDL and might disappear in future versions of the SAGA API)>
 
-        * JobContact (not supported by JSDL)
+        * JobContact: not supported
+          <(NOTE: this attribute is ’not supported by JSDL and might disappear in future versions of the SAGA API)>
+
+        * CPUArchitecture: defined as scalar attribute
+          <(NOTE: for compliance with JSDL)>
+
+        * OperatingSystemType: defined as scalar attribute
+          <(NOTE: for compliance with JSDL)>
+
+    * Attributes
+
+        * NativeJobDescription: added
+
+    * Metrics
+
+        * job.sub_state: added
+
+    * Methods
+
+        * allocateResource: added
+          <(NOTE: to be renamed to bindResourceManager)>
 
 * Streams, Remote Procedure Call
 
