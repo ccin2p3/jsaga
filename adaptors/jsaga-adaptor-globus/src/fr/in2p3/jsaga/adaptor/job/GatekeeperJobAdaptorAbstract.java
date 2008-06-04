@@ -29,6 +29,7 @@ public abstract class GatekeeperJobAdaptorAbstract implements SagaSecureAdaptor 
     protected GSSCredential m_credential;
     protected String m_serverUrl;
     protected static final String IP_ADDRESS = "IPAddress";
+    protected static final String TCP_PORT_RANGE = "TcpPortRange";
 
     public String getType() {
         return "gatekeeper";
@@ -58,7 +59,13 @@ public abstract class GatekeeperJobAdaptorAbstract implements SagaSecureAdaptor 
     		loadedCogProperties.setIPAddress(value);
     		CoGProperties.setDefault(loadedCogProperties);
     	}
-
+    	// Overload cog properties
+    	if (attributes!=null && attributes.containsKey(TCP_PORT_RANGE)) {
+            String value = ((String) attributes.get(TCP_PORT_RANGE));
+        	CoGProperties loadedCogProperties= CoGProperties.getDefault();
+    		loadedCogProperties.setProperty("tcp.port.range", value);
+    		CoGProperties.setDefault(loadedCogProperties);
+    	}
         if("true".equalsIgnoreCase((String) attributes.get(JobAdaptor.CHECK_AVAILABILITY))) {
 	        try {
 	            Gram.ping(m_credential, m_serverUrl);

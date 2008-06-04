@@ -5,6 +5,7 @@ import java.net.UnknownHostException;
 import java.util.Map;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.monitor.*;
@@ -32,13 +33,16 @@ public class GatekeeperJobMonitorAdaptor extends GatekeeperJobAdaptorAbstract im
 	private Logger logger = Logger.getLogger(GatekeeperJobMonitorAdaptor.class.getName());	
 
     public Usage getUsage() {
-        return new UOptional(IP_ADDRESS);
+    	return new UAnd(new Usage[] {
+        		new UOptional(IP_ADDRESS),
+        		new UOptional(TCP_PORT_RANGE)});
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectState {
     	try {
 			String defaultIp = InetAddress.getLocalHost().getHostAddress();
-	    	return new Default[]{new Default(IP_ADDRESS, defaultIp)};
+			String defaultTcpPortRange="40000,45000";
+			return new Default[]{new Default(IP_ADDRESS, defaultIp),new Default(TCP_PORT_RANGE, defaultTcpPortRange)};
 		} catch (UnknownHostException e) {
 			return null;
 		}

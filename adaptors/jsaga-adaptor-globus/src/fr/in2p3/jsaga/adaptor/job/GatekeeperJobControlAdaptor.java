@@ -43,13 +43,15 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
     public Usage getUsage() {
         return new UAnd(new Usage[] {
         		new UOptional(SHELLPATH),
-        		new UOptional(IP_ADDRESS)});
+        		new UOptional(IP_ADDRESS),
+        		new UOptional(TCP_PORT_RANGE)});
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectState {
     	try {
 			String defaultIp = InetAddress.getLocalHost().getHostAddress();
-	    	return new Default[]{new Default(IP_ADDRESS, defaultIp)};
+			String defaultTcpPortRange="40000,45000";
+	    	return new Default[]{new Default(IP_ADDRESS, defaultIp),new Default(TCP_PORT_RANGE, defaultTcpPortRange)};
 		} catch (UnknownHostException e) {
 			return null;
 		}
