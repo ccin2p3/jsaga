@@ -42,7 +42,7 @@ public class EnvironmentVariables {
                 p = r.exec("cmd.exe /c set");
             }
         } else {
-            p = r.exec("env");
+            p = r.exec("/bin/env");
         }
         String line;
         BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
