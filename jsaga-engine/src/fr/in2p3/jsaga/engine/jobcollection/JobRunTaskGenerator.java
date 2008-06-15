@@ -32,20 +32,23 @@ public class JobRunTaskGenerator {
     }
 
     public void updateWorkflow(Workflow workflow) throws NotImplemented, BadParameter, Timeout, NoSuccess {
-        if (m_jobDesc.getDataStagingCount() > 0) {
-            workflow.add(m_jobRunTask, null, null);
-            for (int i=0; i<m_jobDesc.getDataStagingCount(); i++) {
-                DataStaging dataStaging = m_jobDesc.getDataStaging(i);
-                if (dataStaging.getSource()!=null && dataStaging.getSource().getURI()!=null) {
-                    StagedTask inputTask = new StagedTask(m_jobName, dataStaging.getName(), true);
-                    workflow.add(inputTask, null, m_jobRunTask.getName());
-                }
-                if (dataStaging.getTarget()!=null && dataStaging.getTarget().getURI()!=null) {
-                    StagedTask outputTask = new StagedTask(m_jobName, dataStaging.getName(), true);
-                    workflow.add(outputTask, null, m_jobRunTask.getName());
-                }
+        boolean hasStagedTask = false;
+        workflow.add(m_jobRunTask, null, null);
+        for (int i=0; i<m_jobDesc.getDataStagingCount(); i++) {
+            DataStaging dataStaging = m_jobDesc.getDataStaging(i);
+            if (dataStaging.getSource()!=null && dataStaging.getSource().getURI()!=null) {
+                StagedTask inputTask = new StagedTask(m_jobName, dataStaging.getName(), true);
+                workflow.add(inputTask, null, m_jobRunTask.getName());
+                hasStagedTask = true;
             }
-        } else {
+            if (dataStaging.getTarget()!=null && dataStaging.getTarget().getURI()!=null) {
+                StagedTask outputTask = new StagedTask(m_jobName, dataStaging.getName(), true);
+                workflow.add(outputTask, null, m_jobRunTask.getName());
+                hasStagedTask = true;
+            }
+        }
+        if (! hasStagedTask) {
+            // connect jobRunTask to startTask
             workflow.add(m_jobRunTask, StartTask.name(), null);
         }
     }

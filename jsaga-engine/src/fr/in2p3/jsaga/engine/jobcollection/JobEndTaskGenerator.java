@@ -29,16 +29,18 @@ public class JobEndTaskGenerator {
     }
 
     public void updateWorkflow(Workflow workflow) throws NotImplemented, BadParameter, Timeout, NoSuccess {
-        if (m_jobDesc.getDataStagingCount() > 0) {
-            workflow.add(m_jobEndTask, null, null);
-            for (int i=0; i<m_jobDesc.getDataStagingCount(); i++) {
-                DataStaging dataStaging = m_jobDesc.getDataStaging(i);
-                if (dataStaging.getTarget()!=null && dataStaging.getTarget().getURI()!=null) {
-                    StagedTask outputTask = new StagedTask(m_jobName, dataStaging.getName(), false);
-                    workflow.add(outputTask, null, m_jobEndTask.getName());
-                }
+        boolean hasStagedTask = false;
+        workflow.add(m_jobEndTask, null, null);
+        for (int i=0; i<m_jobDesc.getDataStagingCount(); i++) {
+            DataStaging dataStaging = m_jobDesc.getDataStaging(i);
+            if (dataStaging.getTarget()!=null && dataStaging.getTarget().getURI()!=null) {
+                StagedTask outputTask = new StagedTask(m_jobName, dataStaging.getName(), false);
+                workflow.add(outputTask, null, m_jobEndTask.getName());
+                hasStagedTask = true;
             }
-        } else {
+        }
+        if (! hasStagedTask) {
+            // connect jobEndTask to jobRunTask
             workflow.add(m_jobEndTask, JobRunTask.name(m_jobName), null);
         }
     }
