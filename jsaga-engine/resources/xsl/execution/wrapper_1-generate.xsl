@@ -124,8 +124,9 @@ function run() {
     else
         _FAIL_ "Failed to execute function: $FUNCTION"
         cleanup
-        sleep 1     # prevent LRMS from returning before stdout and stderr are flushed
-        exit 1      # exit with failure
+        log WARN "Exiting with error code: $RETURN_CODE"
+        sleep 1             # prevent LRMS from returning before stdout and stderr are flushed
+        exit $RETURN_CODE   # exit with failure
     fi
 }
 
@@ -490,6 +491,7 @@ run OUTPUT_STAGING  OUTPUT_STAGED
 change_state COMPLETED
 
 cleanup
+log INFO "Exiting normally"
 sleep 1     # prevent LRMS from returning before stdout and stderr are flushed
 exit 0      # exit with success
     </xsl:template>
