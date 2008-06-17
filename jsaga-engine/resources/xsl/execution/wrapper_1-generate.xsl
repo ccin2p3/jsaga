@@ -81,12 +81,14 @@ function run_time() {
 #        RETURN_CODE=$?
 #        unset $FUNCTION
 #    else
-        eval "time -p $FUNCTION &gt;stdout 2&gt;stderr" 2&gt;"$TMPFILE.time"
+        _STDOUT_=`mktemp /tmp/stdout.XXXX`
+        _STDERR_=`mktemp /tmp/stderr.XXXX`
+        eval "time -p $FUNCTION &gt;$_STDOUT_ 2&gt;$_STDERR_" 2&gt;"$TMPFILE.time"
         RETURN_CODE=$?
         cat "$TMPFILE.time" | tr " " "=" | tr "\n" " " &gt; "$TMPFILE.time"
-        cat stdout
-        cat stderr 1&gt;&amp;2
-        rm -f stdout stderr
+        cat $_STDOUT_
+        cat $_STDERR_ 1&gt;&amp;2
+        rm -f $_SDTOUT_ $_STDERR_
 #    fi
     return $RETURN_CODE
 }
