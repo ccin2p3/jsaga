@@ -65,7 +65,7 @@
                         <xsl:value-of select="jsdl:FileName/text()"/>
                     </FileName>
                     <FilesystemName>
-                        <xsl:text>$PWD</xsl:text>
+                        <xsl:text>$HOME</xsl:text>
                     </FilesystemName>
                 </xsl:otherwise>
             </xsl:choose>

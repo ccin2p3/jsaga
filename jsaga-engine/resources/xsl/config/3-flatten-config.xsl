@@ -59,7 +59,7 @@
 
                     <xsl:apply-templates select="parent::cfg:SITE/cfg:fileSystem"/>
                     <xsl:if test="not(parent::cfg:SITE/cfg:fileSystem[@name='WorkingDirectory'])">
-                        <fileSystem name="WorkingDirectory" mountPoint="$PWD"/>
+                        <fileSystem name="WorkingDirectory" mountPoint="$HOME"/>
                     </xsl:if>
 
                     <xsl:apply-templates select="cfg:monitorService"/>
