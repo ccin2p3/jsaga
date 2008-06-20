@@ -47,14 +47,21 @@
         <DataStaging>
             <xsl:copy-of select="@*"/>
             <xsl:choose>
-                <xsl:when test="jsdl:FilesystemName/text() and not(starts-with(jsdl:FileName/text(), '/'))">
+                <xsl:when test="jsdl:FilesystemName/text()">
                     <xsl:variable name="fsName" select="jsdl:FilesystemName/text()"/>
                     <xsl:variable name="mntPoint" select="//jsdl:FileSystem[@name=$fsName]/jsdl:MountPoint/text()"/>
                     <xsl:if test="not($mntPoint)">
                         <xsl:message terminate="yes">File system not defined: <xsl:value-of select="$fsName"/></xsl:message>
                     </xsl:if>
                     <FileName>
-                        <xsl:value-of select="$mntPoint"/>/<xsl:value-of select="jsdl:FileName/text()"/>
+                        <xsl:choose>
+                            <xsl:when test="not(starts-with(jsdl:FileName/text(),'/') or starts-with(jsdl:FileName/text(),'$'))">
+                                <xsl:value-of select="$mntPoint"/>/<xsl:value-of select="jsdl:FileName/text()"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="jsdl:FileName/text()"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </FileName>
                     <FilesystemName>
                         <xsl:value-of select="$mntPoint"/>
