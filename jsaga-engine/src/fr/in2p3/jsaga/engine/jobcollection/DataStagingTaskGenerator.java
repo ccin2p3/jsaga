@@ -31,6 +31,9 @@ public class DataStagingTaskGenerator {
     }
     
     public void updateWorkflow(Session session, Workflow workflow) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+        final boolean keep = true;
+        final boolean notKeep = false;
+
         NodeList stagingList = m_selector.getNodes("/ext:Job/jsdl:JobDefinition/jsdl:JobDescription/jsdl:DataStaging[not(translate(ext:Sandbox/text(),'TRUE','true')='true')]");
         for (int i=0; i<stagingList.getLength(); i++) {
             Element dataStaging = (Element) stagingList.item(i);
@@ -50,17 +53,17 @@ public class DataStagingTaskGenerator {
                 if (stepList.getLength() > 0) {
                     // create dummy task
                     Element step = (Element) stepList.item(0);
-                    currentTask = new SourceTask(step.getAttribute("uri"), input);
+                    currentTask = new SourceTask(step.getAttribute("uri"), input, keep);
                     for (int j=1; j<stepList.getLength(); j++) {
                         // add task
                         workflow.add(currentTask, previousTaskName, null);
                         previousTaskName = currentTask.getName();
                         // create transfer task
                         step = (Element) stepList.item(j);
-                        currentTask = new TransferTask(session, step.getAttribute("uri"), input, overwrite);
+                        currentTask = new TransferTask(session, step.getAttribute("uri"), input, overwrite, notKeep);
                     }
                 } else {
-                    currentTask = new SourceTask(sourceUri, input);
+                    currentTask = new SourceTask(sourceUri, input, keep);
                 }
                 // add last task
                 String nextTaskName = StagedTask.name(m_jobName, dataStagingName, input);
@@ -77,14 +80,14 @@ public class DataStagingTaskGenerator {
                 if (stepList.getLength() > 0) {
                     // create mkdir task
                     Element step = (Element) stepList.item(stepList.getLength()-1);
-                    currentTask = new MkdirTask(session, dir(step.getAttribute("uri")));
+                    currentTask = new MkdirTask(session, dir(step.getAttribute("uri")), notKeep);
                     for (int j=stepList.getLength()-2; j>=1; j--) {
                         // add task
                         workflow.add(currentTask, previousTaskName, null);
                         previousTaskName = currentTask.getName();
                         // create mkdir task
                         step = (Element) stepList.item(j);
-                        currentTask = new MkdirTask(session, dir(step.getAttribute("uri")));
+                        currentTask = new MkdirTask(session, dir(step.getAttribute("uri")), notKeep);
                     }
                     // add last task
                     String nextTaskName = StagedTask.name(m_jobName, dataStagingName, input);
@@ -101,17 +104,18 @@ public class DataStagingTaskGenerator {
                 if (stepList.getLength() > 0) {
                     // create dummy task
                     Element step = (Element) stepList.item(stepList.getLength()-1);
-                    currentTask = new SourceTask(step.getAttribute("uri"), notInput);
+                    currentTask = new SourceTask(step.getAttribute("uri"), notInput, notKeep);
                     for (int j=stepList.getLength()-2; j>=0; j--) {
                         // add task
                         workflow.add(currentTask, previousTaskName, null);
                         previousTaskName = currentTask.getName();
                         // create transfer task
                         step = (Element) stepList.item(j);
-                        currentTask = new TransferTask(session, step.getAttribute("uri"), notInput, overwrite);
+                        boolean keepLastOnly = (j==0);
+                        currentTask = new TransferTask(session, step.getAttribute("uri"), notInput, overwrite, keepLastOnly);
                     }
                 } else {
-                    currentTask = new SourceTask(targetUri, notInput);
+                    currentTask = new SourceTask(targetUri, notInput, keep);
                 }
                 String nextTaskName = ("OUTPUT_SANDBOX".equals(dataStagingName)
                         ? null

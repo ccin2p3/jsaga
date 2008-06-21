@@ -31,6 +31,7 @@ public class JobCollectionRun extends AbstractCommand {
     private static final String OPT_LANGUAGE = "l", LONGOPT_LANGUAGE = "language";
     private static final String OPT_RESOURCES = "r", LONGOPT_RESOURCES = "resources";
     private static final String OPT_BATCH = "b", LONGOPT_BATCH = "batch";
+    private static final String OPT_CLEANUP = "c", LONGOPT_CLEANUP = "cleanup";
     // options group
     private static final String OPT_DUMP_JSDL = "j", LONGOPT_DUMP_JSDL = "dump-jsdl";
     private static final String OPT_DUMP_STAGING = "s", LONGOPT_DUMP_STAGING = "dump-staging";
@@ -80,7 +81,8 @@ public class JobCollectionRun extends AbstractCommand {
                 // create job collection
                 Session session = SessionFactory.createSession(true);
                 JobCollectionManager manager = JobCollectionFactory.createJobCollectionManager(session);
-                JobCollection jobCollection = manager.createJobCollection(desc);
+                boolean force = line.hasOption(OPT_CLEANUP);
+                JobCollection jobCollection = manager.createJobCollection(desc, force);
                 if (resourcesFile != null) {
                     jobCollection.allocateResources(resourcesFile);
                 }
@@ -157,6 +159,9 @@ public class JobCollectionRun extends AbstractCommand {
                 "and print the collection name on the standard output.")
                 .withLongOpt(LONGOPT_BATCH)
                 .create(OPT_BATCH));
+        opt.addOption(OptionBuilder.withDescription("Cleanup previous execution of job collection")
+                .withLongOpt(LONGOPT_CLEANUP)
+                .create(OPT_CLEANUP));
 
         // options group
         OptionGroup group = new OptionGroup();

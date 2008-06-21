@@ -31,7 +31,7 @@ public class TransferTask extends AbstractWorkflowTaskImpl {
     private boolean m_overwrite;
 
     /** constructor */
-    public TransferTask(Session session, String destination, boolean input, boolean overwrite) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public TransferTask(Session session, String destination, boolean input, boolean overwrite, boolean keep) throws NotImplemented, BadParameter, Timeout, NoSuccess {
         super(null, destination);
         // set URL
         m_session = session;
@@ -46,6 +46,7 @@ public class TransferTask extends AbstractWorkflowTaskImpl {
         xmlStatus.setLabel(u.getLabel());
         xmlStatus.setContext(u.getContext());
         xmlStatus.setInput(input);
+        xmlStatus.setKeep(keep);
     }
 
     public void setSource(String source) throws NotImplemented, BadParameter, NoSuccess {

@@ -29,7 +29,7 @@ public class MkdirTask extends AbstractWorkflowTaskImpl {
     private URL m_dir;
 
     /** constructor */
-    public MkdirTask(Session session, String dir) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public MkdirTask(Session session, String dir, boolean keep) throws NotImplemented, BadParameter, Timeout, NoSuccess {
         super(null, "mkdir_"+dir);
         // set URL
         m_session = session;
@@ -41,6 +41,7 @@ public class MkdirTask extends AbstractWorkflowTaskImpl {
         xmlStatus.setGroup(u.getGroup());
         xmlStatus.setLabel(u.getLabel());
         xmlStatus.setContext(u.getContext());
+        xmlStatus.setKeep(keep);
     }
 
     //////////////////////////////////////////// abstract methods ////////////////////////////////////////////

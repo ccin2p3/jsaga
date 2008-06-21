@@ -51,7 +51,7 @@ public class XSLTransformer {
         return transformToDOM(new StreamSource(new ByteArrayInputStream(xmlInput)));
     }
 
-    private byte[] transform(Source source) throws TransformerException, IOException {
+    public byte[] transform(Source source) throws TransformerException, IOException {
         // transform
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Result result = new StreamResult(out);

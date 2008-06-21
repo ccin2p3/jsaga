@@ -18,7 +18,7 @@ import org.ogf.saga.error.*;
  */
 public class SourceTask extends DummyTask {
     /** constructor */
-    public SourceTask(String url, boolean input) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public SourceTask(String url, boolean input, boolean keep) throws NotImplemented, BadParameter, Timeout, NoSuccess {
         super(url);
         // update XML status
         URLDecomposer u = new URLDecomposer(url);
@@ -28,5 +28,6 @@ public class SourceTask extends DummyTask {
         xmlStatus.setLabel(u.getLabel());
         xmlStatus.setContext(u.getContext());
         xmlStatus.setInput(input);
+        xmlStatus.setKeep(keep);
     }
 }

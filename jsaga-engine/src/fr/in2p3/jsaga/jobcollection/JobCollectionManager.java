@@ -28,6 +28,16 @@ public interface JobCollectionManager extends SagaObject {
            BadParameter, Timeout, NoSuccess;
 
     /**
+     * Creates a job collection instance as specified by the job collection description provided.
+     * @param jd the job collection description.
+     * @param force cleanup previous execution of job collection if needed
+     * @return the job collection.
+     */
+    public JobCollection createJobCollection(JobCollectionDescription jd, boolean force) throws NotImplemented,
+           AuthenticationFailed, AuthorizationFailed, PermissionDenied,
+           BadParameter, Timeout, NoSuccess;
+
+    /**
      * Obtains the list of job collections that are currently known to this
      * job collection manager.
      * @return a list of job collection ids.
