@@ -54,14 +54,12 @@ public class JobCollectionReadOnlyImpl extends WorkflowImpl implements JobCollec
         throw new NotImplemented("Not implemented yet...");
     }
 
-    public void cleanup() {
-        File baseDir = new File(new File(Base.JSAGA_VAR, "jobs"), m_jobCollectionName);
-        if(baseDir.exists()) {
-            File[] files = baseDir.listFiles();
-            for (int i=0; i<files.length; i++) {
-                files[i].delete();
-            }
-            baseDir.delete();
+    public void cleanup() throws NoSuccess {
+        try {
+            JobCollectionCleaner cleaner = new JobCollectionCleaner(m_session, m_jobCollectionName);
+            cleaner.cleanup();
+        } catch(Exception e) {
+            throw new NoSuccess("Failed to cleanup job collection: "+m_jobCollectionName, e);
         }
     }
 
