@@ -50,5 +50,15 @@
                 </ul>
             </answer>
         </faq>
+        <faq id="mail">
+            <question>I have the following exception
+                <pre>java.lang.UnsupportedOperationException: Method not yet implemented
+at javax.mail.internet.MimeMessage.&lt;init&gt;(MimeMessage.java:89)</pre>
+            </question>
+            <answer>Remove geronimo-spec-javamail-1.3.1-rc1.jar from lib-adaptor
+                <pre>dependency of directory-naming:naming-factory:jar:0.8:compile, which is
+dependency of org.globus:wsgram-api:4.0.0</pre>
+            </answer>
+        </faq>
     </part>
 </faqs>
