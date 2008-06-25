@@ -41,6 +41,10 @@
                 select="$resourceScheme"/> and grid=<xsl:value-of select="$gridName"/>)</xsl:message></xsl:if>
         <!-- check required attributes -->
         <xsl:if test="not($config/@localIntermediary)"><xsl:message terminate="yes">Missing required attribute: localIntermediary</xsl:message></xsl:if>
+        <!-- check consistency -->
+        <xsl:if test="$jobService/cfg:fileStaging/@defaultIntermediary = concat('file://',$config/@localIntermediary)">
+            <xsl:message terminate="yes">Local and remote intermediary URL must not have the same value</xsl:message>
+        </xsl:if>
         <!-- process -->
         <xsl:apply-templates select="ext:Job"/>
     </xsl:template>
