@@ -193,7 +193,7 @@ public class FileDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
             } else if (absolutePath.matches("/+")) {
                 return null;
             } else {
-                throw new NoSuccess("Absolute path in Windows must start with drive letter");
+                throw new NoSuccess("Absolute path in Windows must start with drive letter: "+absolutePath);
             }
         } else {
             return new File(absolutePath);
