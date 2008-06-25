@@ -28,54 +28,54 @@
     <task group="end_MYJOB_1" input="false" label="STDERR" name="out_MYJOB_1_STDERR" state="NEW" type="staged">
         <successor>end_MYJOB_1</successor>
     </task>
-    <task group="file://" input="true" label="input-sandbox.tar" name="file:///tmp/test_sandbox/input-sandbox.tar" state="NEW" type="source">
+    <task group="file://" input="true" keep="false" label="input-sandbox.tar" name="file:///tmp/test_sandbox/input-sandbox.tar" state="NEW" type="source">
         <successor>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sandbox.in/input-sandbox.tar#OpenPlast-default</successor>
         <successor>gsiftp://defaultSE.openplast.fr/tmp/test_sandbox.in/input-sandbox.tar#OpenPlast</successor>
     </task>
-    <task group="file://" input="true" label="config0.cfg" name="file:///tmp/config0.cfg" state="NEW" type="source">
+    <task group="file://" input="true" keep="true" label="config0.cfg" name="file:///tmp/config0.cfg" state="NEW" type="source">
         <successor>tar:///tmp/test_sandbox/input-sandbox.tar/file.,,,tmp,config0.cfg</successor>
     </task>
-    <task group="tar:///tmp/test_sandbox/input-sandbox" input="true" label="config0.cfg" name="tar:///tmp/test_sandbox/input-sandbox.tar/file.,,,tmp,config0.cfg" state="NEW" type="transfer">
+    <task group="tar:///tmp/test_sandbox/input-sandbox" input="true" keep="false" label="config0.cfg" name="tar:///tmp/test_sandbox/input-sandbox.tar/file.,,,tmp,config0.cfg" state="NEW" type="transfer">
         <successor>file:///tmp/test_sandbox/input-sandbox.tar</successor>
     </task>
-    <task context="OpenPlast-CCIN2P3" group="srb://host2" input="true" label="config1.cfg" name="srb://sreynaud@host2:5544/grid/config1.cfg?mydomain#OpenPlast-CCIN2P3" state="NEW" type="source">
+    <task context="OpenPlast-CCIN2P3" group="srb://host2" input="true" keep="true" label="config1.cfg" name="srb://sreynaud@host2:5544/grid/config1.cfg?mydomain#OpenPlast-CCIN2P3" state="NEW" type="source">
         <successor>tar:///tmp/test_sandbox/input-sandbox.tar/srb.,,sreynaud@host2.5544,grid,config1.cfg</successor>
     </task>
-    <task group="tar:///tmp/test_sandbox/input-sandbox" input="true" label="config1.cfg" name="tar:///tmp/test_sandbox/input-sandbox.tar/srb.,,sreynaud@host2.5544,grid,config1.cfg" state="NEW" type="transfer">
+    <task group="tar:///tmp/test_sandbox/input-sandbox" input="true" keep="false" label="config1.cfg" name="tar:///tmp/test_sandbox/input-sandbox.tar/srb.,,sreynaud@host2.5544,grid,config1.cfg" state="NEW" type="transfer">
         <successor>file:///tmp/test_sandbox/input-sandbox.tar</successor>
     </task>
-    <task group="http://host5" input="true" label="config2.cfg" name="http://host5:8080/public/configuration/config2.cfg" state="NEW" type="source">
+    <task group="http://host5" input="true" keep="true" label="config2.cfg" name="http://host5:8080/public/configuration/config2.cfg" state="NEW" type="source">
         <successor>tar:///tmp/test_sandbox/input-sandbox.tar/http.,,host5.8080,public,configuration,config2.cfg</successor>
     </task>
-    <task group="tar:///tmp/test_sandbox/input-sandbox" input="true" label="config2.cfg" name="tar:///tmp/test_sandbox/input-sandbox.tar/http.,,host5.8080,public,configuration,config2.cfg" state="NEW" type="transfer">
+    <task group="tar:///tmp/test_sandbox/input-sandbox" input="true" keep="false" label="config2.cfg" name="tar:///tmp/test_sandbox/input-sandbox.tar/http.,,host5.8080,public,configuration,config2.cfg" state="NEW" type="transfer">
         <successor>file:///tmp/test_sandbox/input-sandbox.tar</successor>
     </task>
-    <task context="EGEE" group="gsiftp://host3" input="true" label="executable-src.tar.gz" name="gsiftp://host3:2811/repository/src/executable-src.tar.gz#EGEE" state="NEW" type="source">
+    <task context="EGEE" group="gsiftp://host3" input="true" keep="true" label="executable-src.tar.gz" name="gsiftp://host3:2811/repository/src/executable-src.tar.gz#EGEE" state="NEW" type="source">
         <successor>tar:///tmp/test_sandbox/input-sandbox.tar/gsiftp.,,host3.2811,repository,src,executable-src.tar.gz</successor>
     </task>
-    <task group="tar:///tmp/test_sandbox/input-sandbox" input="true" label="executable-src.tar.gz" name="tar:///tmp/test_sandbox/input-sandbox.tar/gsiftp.,,host3.2811,repository,src,executable-src.tar.gz" state="NEW" type="transfer">
+    <task group="tar:///tmp/test_sandbox/input-sandbox" input="true" keep="false" label="executable-src.tar.gz" name="tar:///tmp/test_sandbox/input-sandbox.tar/gsiftp.,,host3.2811,repository,src,executable-src.tar.gz" state="NEW" type="transfer">
         <successor>file:///tmp/test_sandbox/input-sandbox.tar</successor>
     </task>
-    <task context="OpenPlast" group="gsiftp://host4" input="true" label="data_1.dat" name="gsiftp://host4:2811/data/data_1.dat#OpenPlast" state="NEW" type="source">
+    <task context="OpenPlast" group="gsiftp://host4" input="true" keep="true" label="data_1.dat" name="gsiftp://host4:2811/data/data_1.dat#OpenPlast" state="NEW" type="source">
         <successor>tar:///tmp/test_sandbox/input-sandbox.tar/gsiftp.,,host4.2811,data,data_1.dat</successor>
     </task>
-    <task group="tar:///tmp/test_sandbox/input-sandbox" input="true" label="data_1.dat" name="tar:///tmp/test_sandbox/input-sandbox.tar/gsiftp.,,host4.2811,data,data_1.dat" state="NEW" type="transfer">
+    <task group="tar:///tmp/test_sandbox/input-sandbox" input="true" keep="false" label="data_1.dat" name="tar:///tmp/test_sandbox/input-sandbox.tar/gsiftp.,,host4.2811,data,data_1.dat" state="NEW" type="transfer">
         <successor>file:///tmp/test_sandbox/input-sandbox.tar</successor>
     </task>
-    <task group="file://" input="false" label="output-sandbox-1.tar" name="file:///tmp/test_sandbox/output-sandbox-1.tar" state="NEW" type="transfer">
+    <task group="file://" input="false" keep="false" label="output-sandbox-1.tar" name="file:///tmp/test_sandbox/output-sandbox-1.tar" state="NEW" type="transfer">
         <successor>tar:///tmp/test_sandbox/output-sandbox-1.tar/mail.,,sreynaud@in2p3.fr,result_1.dat</successor>
         <successor>tar:///tmp/test_sandbox/output-sandbox-1.tar/file.,,,tmp,stderr_1.txt</successor>
     </task>
-    <task group="tar:///tmp/test_sandbox/output-sandbox-1" input="false" label="result_1.dat" name="tar:///tmp/test_sandbox/output-sandbox-1.tar/mail.,,sreynaud@in2p3.fr,result_1.dat" state="NEW" type="source">
+    <task group="tar:///tmp/test_sandbox/output-sandbox-1" input="false" keep="false" label="result_1.dat" name="tar:///tmp/test_sandbox/output-sandbox-1.tar/mail.,,sreynaud@in2p3.fr,result_1.dat" state="NEW" type="source">
         <successor>mail://sreynaud@in2p3.fr/result_1.dat</successor>
     </task>
-    <task group="mail://in2p3.fr" input="false" label="result_1.dat" name="mail://sreynaud@in2p3.fr/result_1.dat" state="NEW" type="transfer">
+    <task group="mail://in2p3.fr" input="false" keep="true" label="result_1.dat" name="mail://sreynaud@in2p3.fr/result_1.dat" state="NEW" type="transfer">
         <successor>out_MYJOB_1_R</successor>
     </task>
-    <task group="tar:///tmp/test_sandbox/output-sandbox-1" input="false" label="stderr_1.txt" name="tar:///tmp/test_sandbox/output-sandbox-1.tar/file.,,,tmp,stderr_1.txt" state="NEW" type="source">
+    <task group="tar:///tmp/test_sandbox/output-sandbox-1" input="false" keep="false" label="stderr_1.txt" name="tar:///tmp/test_sandbox/output-sandbox-1.tar/file.,,,tmp,stderr_1.txt" state="NEW" type="source">
         <successor>file:///tmp/stderr_1.txt</successor>
     </task>
-    <task group="file://" input="false" label="stderr_1.txt" name="file:///tmp/stderr_1.txt" state="NEW" type="transfer">
+    <task group="file://" input="false" keep="true" label="stderr_1.txt" name="file:///tmp/stderr_1.txt" state="NEW" type="transfer">
         <successor>out_MYJOB_1_STDERR</successor>
     </task>
     <task group="run_MYJOB_2" label="MYJOB_2" name="run_MYJOB_2" state="NEW" type="job">
@@ -94,26 +94,26 @@
     <task group="end_MYJOB_2" input="false" label="STDERR" name="out_MYJOB_2_STDERR" state="NEW" type="staged">
         <successor>end_MYJOB_2</successor>
     </task>
-    <task context="OpenPlast" group="gsiftp://host4" input="true" label="data_2.dat" name="gsiftp://host4:2811/data/data_2.dat#OpenPlast" state="NEW" type="source">
+    <task context="OpenPlast" group="gsiftp://host4" input="true" keep="true" label="data_2.dat" name="gsiftp://host4:2811/data/data_2.dat#OpenPlast" state="NEW" type="source">
         <successor>tar:///tmp/test_sandbox/input-sandbox.tar/gsiftp.,,host4.2811,data,data_2.dat</successor>
     </task>
-    <task group="tar:///tmp/test_sandbox/input-sandbox" input="true" label="data_2.dat" name="tar:///tmp/test_sandbox/input-sandbox.tar/gsiftp.,,host4.2811,data,data_2.dat" state="NEW" type="transfer">
+    <task group="tar:///tmp/test_sandbox/input-sandbox" input="true" keep="false" label="data_2.dat" name="tar:///tmp/test_sandbox/input-sandbox.tar/gsiftp.,,host4.2811,data,data_2.dat" state="NEW" type="transfer">
         <successor>file:///tmp/test_sandbox/input-sandbox.tar</successor>
     </task>
-    <task group="file://" input="false" label="output-sandbox-2.tar" name="file:///tmp/test_sandbox/output-sandbox-2.tar" state="NEW" type="transfer">
+    <task group="file://" input="false" keep="false" label="output-sandbox-2.tar" name="file:///tmp/test_sandbox/output-sandbox-2.tar" state="NEW" type="transfer">
         <successor>tar:///tmp/test_sandbox/output-sandbox-2.tar/mail.,,sreynaud@in2p3.fr,result_2.dat</successor>
         <successor>tar:///tmp/test_sandbox/output-sandbox-2.tar/file.,,,tmp,stderr_2.txt</successor>
     </task>
-    <task group="tar:///tmp/test_sandbox/output-sandbox-2" input="false" label="result_2.dat" name="tar:///tmp/test_sandbox/output-sandbox-2.tar/mail.,,sreynaud@in2p3.fr,result_2.dat" state="NEW" type="source">
+    <task group="tar:///tmp/test_sandbox/output-sandbox-2" input="false" keep="false" label="result_2.dat" name="tar:///tmp/test_sandbox/output-sandbox-2.tar/mail.,,sreynaud@in2p3.fr,result_2.dat" state="NEW" type="source">
         <successor>mail://sreynaud@in2p3.fr/result_2.dat</successor>
     </task>
-    <task group="mail://in2p3.fr" input="false" label="result_2.dat" name="mail://sreynaud@in2p3.fr/result_2.dat" state="NEW" type="transfer">
+    <task group="mail://in2p3.fr" input="false" keep="true" label="result_2.dat" name="mail://sreynaud@in2p3.fr/result_2.dat" state="NEW" type="transfer">
         <successor>out_MYJOB_2_R</successor>
     </task>
-    <task group="tar:///tmp/test_sandbox/output-sandbox-2" input="false" label="stderr_2.txt" name="tar:///tmp/test_sandbox/output-sandbox-2.tar/file.,,,tmp,stderr_2.txt" state="NEW" type="source">
+    <task group="tar:///tmp/test_sandbox/output-sandbox-2" input="false" keep="false" label="stderr_2.txt" name="tar:///tmp/test_sandbox/output-sandbox-2.tar/file.,,,tmp,stderr_2.txt" state="NEW" type="source">
         <successor>file:///tmp/stderr_2.txt</successor>
     </task>
-    <task group="file://" input="false" label="stderr_2.txt" name="file:///tmp/stderr_2.txt" state="NEW" type="transfer">
+    <task group="file://" input="false" keep="true" label="stderr_2.txt" name="file:///tmp/stderr_2.txt" state="NEW" type="transfer">
         <successor>out_MYJOB_2_STDERR</successor>
     </task>
     <task group="run_MYJOB_3" label="MYJOB_3" name="run_MYJOB_3" state="NEW" type="job">
@@ -132,51 +132,51 @@
     <task group="end_MYJOB_3" input="false" label="STDERR" name="out_MYJOB_3_STDERR" state="NEW" type="staged">
         <successor>end_MYJOB_3</successor>
     </task>
-    <task context="OpenPlast" group="gsiftp://host4" input="true" label="data_3.dat" name="gsiftp://host4:2811/data/data_3.dat#OpenPlast" state="NEW" type="source">
+    <task context="OpenPlast" group="gsiftp://host4" input="true" keep="true" label="data_3.dat" name="gsiftp://host4:2811/data/data_3.dat#OpenPlast" state="NEW" type="source">
         <successor>tar:///tmp/test_sandbox/input-sandbox.tar/gsiftp.,,host4.2811,data,data_3.dat</successor>
     </task>
-    <task group="tar:///tmp/test_sandbox/input-sandbox" input="true" label="data_3.dat" name="tar:///tmp/test_sandbox/input-sandbox.tar/gsiftp.,,host4.2811,data,data_3.dat" state="NEW" type="transfer">
+    <task group="tar:///tmp/test_sandbox/input-sandbox" input="true" keep="false" label="data_3.dat" name="tar:///tmp/test_sandbox/input-sandbox.tar/gsiftp.,,host4.2811,data,data_3.dat" state="NEW" type="transfer">
         <successor>file:///tmp/test_sandbox/input-sandbox.tar</successor>
     </task>
-    <task group="file://" input="false" label="output-sandbox-3.tar" name="file:///tmp/test_sandbox/output-sandbox-3.tar" state="NEW" type="transfer">
+    <task group="file://" input="false" keep="false" label="output-sandbox-3.tar" name="file:///tmp/test_sandbox/output-sandbox-3.tar" state="NEW" type="transfer">
         <successor>tar:///tmp/test_sandbox/output-sandbox-3.tar/mail.,,sreynaud@in2p3.fr,result_3.dat</successor>
         <successor>tar:///tmp/test_sandbox/output-sandbox-3.tar/file.,,,tmp,stderr_3.txt</successor>
     </task>
-    <task group="tar:///tmp/test_sandbox/output-sandbox-3" input="false" label="result_3.dat" name="tar:///tmp/test_sandbox/output-sandbox-3.tar/mail.,,sreynaud@in2p3.fr,result_3.dat" state="NEW" type="source">
+    <task group="tar:///tmp/test_sandbox/output-sandbox-3" input="false" keep="false" label="result_3.dat" name="tar:///tmp/test_sandbox/output-sandbox-3.tar/mail.,,sreynaud@in2p3.fr,result_3.dat" state="NEW" type="source">
         <successor>mail://sreynaud@in2p3.fr/result_3.dat</successor>
     </task>
-    <task group="mail://in2p3.fr" input="false" label="result_3.dat" name="mail://sreynaud@in2p3.fr/result_3.dat" state="NEW" type="transfer">
+    <task group="mail://in2p3.fr" input="false" keep="true" label="result_3.dat" name="mail://sreynaud@in2p3.fr/result_3.dat" state="NEW" type="transfer">
         <successor>out_MYJOB_3_R</successor>
     </task>
-    <task group="tar:///tmp/test_sandbox/output-sandbox-3" input="false" label="stderr_3.txt" name="tar:///tmp/test_sandbox/output-sandbox-3.tar/file.,,,tmp,stderr_3.txt" state="NEW" type="source">
+    <task group="tar:///tmp/test_sandbox/output-sandbox-3" input="false" keep="false" label="stderr_3.txt" name="tar:///tmp/test_sandbox/output-sandbox-3.tar/file.,,,tmp,stderr_3.txt" state="NEW" type="source">
         <successor>file:///tmp/stderr_3.txt</successor>
     </task>
-    <task group="file://" input="false" label="stderr_3.txt" name="file:///tmp/stderr_3.txt" state="NEW" type="transfer">
+    <task group="file://" input="false" keep="true" label="stderr_3.txt" name="file:///tmp/stderr_3.txt" state="NEW" type="transfer">
         <successor>out_MYJOB_3_STDERR</successor>
     </task>
-    <task context="OpenPlast-default" group="gsiftp://firewallSE.openplast.fr" input="true" label="input-sandbox.tar" name="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sandbox.in/input-sandbox.tar#OpenPlast-default" state="NEW" type="transfer">
+    <task context="OpenPlast-default" group="gsiftp://firewallSE.openplast.fr" input="true" keep="false" label="input-sandbox.tar" name="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sandbox.in/input-sandbox.tar#OpenPlast-default" state="NEW" type="transfer">
         <successor>in_MYJOB_1_INPUT_SANDBOX</successor>
     </task>
-    <task group="gsiftp://firewallSE.openplast.fr" label="" name="mkdir_gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sandbox.out/MYJOB_1/" state="NEW" type="mkdir">
+    <task group="gsiftp://firewallSE.openplast.fr" keep="false" label="" name="mkdir_gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sandbox.out/MYJOB_1/" state="NEW" type="mkdir">
         <successor>in_MYJOB_1_OUTPUT_SANDBOX</successor>
     </task>
-    <task context="OpenPlast-default" group="gsiftp://firewallSE.openplast.fr" input="false" label="output-sandbox-1.tar" name="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sandbox.out/MYJOB_1/output-sandbox-1.tar#OpenPlast-default" state="NEW" type="source">
+    <task context="OpenPlast-default" group="gsiftp://firewallSE.openplast.fr" input="false" keep="false" label="output-sandbox-1.tar" name="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sandbox.out/MYJOB_1/output-sandbox-1.tar#OpenPlast-default" state="NEW" type="source">
         <successor>file:///tmp/test_sandbox/output-sandbox-1.tar</successor>
     </task>
-    <task context="OpenPlast" group="gsiftp://defaultSE.openplast.fr" input="true" label="input-sandbox.tar" name="gsiftp://defaultSE.openplast.fr/tmp/test_sandbox.in/input-sandbox.tar#OpenPlast" state="NEW" type="transfer">
+    <task context="OpenPlast" group="gsiftp://defaultSE.openplast.fr" input="true" keep="false" label="input-sandbox.tar" name="gsiftp://defaultSE.openplast.fr/tmp/test_sandbox.in/input-sandbox.tar#OpenPlast" state="NEW" type="transfer">
         <successor>in_MYJOB_2_INPUT_SANDBOX</successor>
         <successor>in_MYJOB_3_INPUT_SANDBOX</successor>
     </task>
-    <task group="gsiftp://defaultSE.openplast.fr" label="" name="mkdir_gsiftp://defaultSE.openplast.fr/tmp/test_sandbox.out/MYJOB_2/" state="NEW" type="mkdir">
+    <task group="gsiftp://defaultSE.openplast.fr" keep="false" label="" name="mkdir_gsiftp://defaultSE.openplast.fr/tmp/test_sandbox.out/MYJOB_2/" state="NEW" type="mkdir">
         <successor>in_MYJOB_2_OUTPUT_SANDBOX</successor>
     </task>
-    <task context="OpenPlast" group="gsiftp://defaultSE.openplast.fr" input="false" label="output-sandbox-2.tar" name="gsiftp://defaultSE.openplast.fr/tmp/test_sandbox.out/MYJOB_2/output-sandbox-2.tar#OpenPlast" state="NEW" type="source">
+    <task context="OpenPlast" group="gsiftp://defaultSE.openplast.fr" input="false" keep="false" label="output-sandbox-2.tar" name="gsiftp://defaultSE.openplast.fr/tmp/test_sandbox.out/MYJOB_2/output-sandbox-2.tar#OpenPlast" state="NEW" type="source">
         <successor>file:///tmp/test_sandbox/output-sandbox-2.tar</successor>
     </task>
-    <task group="gsiftp://closeSE.openplast.fr" label="" name="mkdir_gsiftp://closeSE.openplast.fr:2811/intermediary/test_sandbox.out/MYJOB_3/" state="NEW" type="mkdir">
+    <task group="gsiftp://closeSE.openplast.fr" keep="false" label="" name="mkdir_gsiftp://closeSE.openplast.fr:2811/intermediary/test_sandbox.out/MYJOB_3/" state="NEW" type="mkdir">
         <successor>in_MYJOB_3_OUTPUT_SANDBOX</successor>
     </task>
-    <task context="OpenPlast-default" group="gsiftp://closeSE.openplast.fr" input="false" label="output-sandbox-3.tar" name="gsiftp://closeSE.openplast.fr:2811/intermediary/test_sandbox.out/MYJOB_3/output-sandbox-3.tar#OpenPlast-default" state="NEW" type="source">
+    <task context="OpenPlast-default" group="gsiftp://closeSE.openplast.fr" input="false" keep="false" label="output-sandbox-3.tar" name="gsiftp://closeSE.openplast.fr:2811/intermediary/test_sandbox.out/MYJOB_3/output-sandbox-3.tar#OpenPlast-default" state="NEW" type="source">
         <successor>file:///tmp/test_sandbox/output-sandbox-3.tar</successor>
     </task>
 </workflow>

@@ -26,7 +26,7 @@
                 </FileSystem>
                 <FileSystem name="WorkingDirectory">
                     <FileSystemType>temporary</FileSystemType>
-                    <MountPoint>$PWD</MountPoint>
+                    <MountPoint>$HOME</MountPoint>
                 </FileSystem>
                 <FileSystem name="HELLOWORLD_1.1">
                     <FileSystemType>normal</FileSystemType>
@@ -35,7 +35,7 @@
             </Resources>
             <DataStaging name="INPUT_SANDBOX">
                 <FileName>input-sandbox.tar</FileName>
-                <FilesystemName>$PWD</FilesystemName>
+                <FilesystemName>$HOME</FilesystemName>
                 <CreationFlag>overwrite</CreationFlag>
                 <Source>
                     <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sandbox.in/input-sandbox.tar#OpenPlast-default</URI>
@@ -46,8 +46,8 @@
                 <ext:Shared>true</ext:Shared>
             </DataStaging>
             <DataStaging name="C0">
-                <FileName>$PWD/config0.cfg</FileName>
-                <FilesystemName>$PWD</FilesystemName>
+                <FileName>$HOME/config0.cfg</FileName>
+                <FilesystemName>$HOME</FilesystemName>
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source>
@@ -57,8 +57,8 @@
                 <ext:Sandbox>true</ext:Sandbox>
             </DataStaging>
             <DataStaging name="C1">
-                <FileName>$PWD/config1.cfg</FileName>
-                <FilesystemName>$PWD</FilesystemName>
+                <FileName>$HOME/config1.cfg</FileName>
+                <FilesystemName>$HOME</FilesystemName>
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source>
@@ -68,8 +68,8 @@
                 <ext:Sandbox>true</ext:Sandbox>
             </DataStaging>
             <DataStaging name="C2">
-                <FileName>$PWD/config2.cfg</FileName>
-                <FilesystemName>$PWD</FilesystemName>
+                <FileName>$HOME/config2.cfg</FileName>
+                <FilesystemName>$HOME</FilesystemName>
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source>
@@ -88,8 +88,8 @@
                 <ext:Shared>true</ext:Shared>
             </DataStaging>
             <DataStaging name="E">
-                <FileName>$PWD/executable-src/bin/executable.exe</FileName>
-                <FilesystemName>$PWD</FilesystemName>
+                <FileName>$HOME/executable-src/bin/executable.exe</FileName>
+                <FilesystemName>$HOME</FilesystemName>
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source>
@@ -100,8 +100,8 @@
                 <ext:Sandbox>true</ext:Sandbox>
             </DataStaging>
             <DataStaging name="D">
-                <FileName>$PWD/data.dat</FileName>
-                <FilesystemName>$PWD</FilesystemName>
+                <FileName>$HOME/data.dat</FileName>
+                <FilesystemName>$HOME</FilesystemName>
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source>
@@ -111,8 +111,8 @@
                 <ext:Sandbox>true</ext:Sandbox>
             </DataStaging>
             <DataStaging name="R">
-                <FileName>$PWD/result.dat</FileName>
-                <FilesystemName>$PWD</FilesystemName>
+                <FileName>$HOME/result.dat</FileName>
+                <FilesystemName>$HOME</FilesystemName>
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Target>
@@ -122,8 +122,8 @@
                 <ext:Sandbox>true</ext:Sandbox>
             </DataStaging>
             <DataStaging name="STDERR">
-                <FileName>$PWD/stderr.txt</FileName>
-                <FilesystemName>$PWD</FilesystemName>
+                <FileName>$HOME/stderr.txt</FileName>
+                <FilesystemName>$HOME</FilesystemName>
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Target>
@@ -134,7 +134,7 @@
             </DataStaging>
             <DataStaging name="OUTPUT_SANDBOX">
                 <FileName>output-sandbox.tar</FileName>
-                <FilesystemName>$PWD</FilesystemName>
+                <FilesystemName>$HOME</FilesystemName>
                 <CreationFlag>overwrite</CreationFlag>
                 <Target>
                     <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sandbox.out/MYJOB_1/output-sandbox-1.tar#OpenPlast-default</URI>

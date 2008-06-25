@@ -22,7 +22,7 @@
                 </FileSystem>
                 <FileSystem name="WorkingDirectory">
                     <FileSystemType>temporary</FileSystemType>
-                    <MountPoint>$PWD</MountPoint>
+                    <MountPoint>$HOME</MountPoint>
                 </FileSystem>
                 <FileSystem name="HELLOWORLD_1.1">
                     <FileSystemType>normal</FileSystemType>
@@ -30,8 +30,8 @@
                 </FileSystem>
             </Resources>
             <DataStaging name="C0">
-                <FileName>$PWD/config0.cfg</FileName>
-                <FilesystemName>$PWD</FilesystemName>
+                <FileName>$HOME/config0.cfg</FileName>
+                <FilesystemName>$HOME</FilesystemName>
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source>
@@ -44,8 +44,8 @@
                 <ext:Shared>true</ext:Shared>
             </DataStaging>
             <DataStaging name="C1">
-                <FileName>$PWD/config1.cfg</FileName>
-                <FilesystemName>$PWD</FilesystemName>
+                <FileName>$HOME/config1.cfg</FileName>
+                <FilesystemName>$HOME</FilesystemName>
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source>
@@ -60,8 +60,8 @@
                 <ext:Shared>true</ext:Shared>
             </DataStaging>
             <DataStaging name="C2">
-                <FileName>$PWD/config2.cfg</FileName>
-                <FilesystemName>$PWD</FilesystemName>
+                <FileName>$HOME/config2.cfg</FileName>
+                <FilesystemName>$HOME</FilesystemName>
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source>
@@ -85,8 +85,8 @@
                 <ext:Shared>true</ext:Shared>
             </DataStaging>
             <DataStaging name="E">
-                <FileName>$PWD/executable-src/bin/executable.exe</FileName>
-                <FilesystemName>$PWD</FilesystemName>
+                <FileName>$HOME/executable-src/bin/executable.exe</FileName>
+                <FilesystemName>$HOME</FilesystemName>
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source>
@@ -100,8 +100,8 @@
                 <ext:Shared>true</ext:Shared>
             </DataStaging>
             <DataStaging name="D">
-                <FileName>$PWD/data.dat</FileName>
-                <FilesystemName>$PWD</FilesystemName>
+                <FileName>$HOME/data.dat</FileName>
+                <FilesystemName>$HOME</FilesystemName>
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source>
@@ -116,8 +116,8 @@
                 <ext:Shared>false</ext:Shared>
             </DataStaging>
             <DataStaging name="R">
-                <FileName>$PWD/result.dat</FileName>
-                <FilesystemName>$PWD</FilesystemName>
+                <FileName>$HOME/result.dat</FileName>
+                <FilesystemName>$HOME</FilesystemName>
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Target>
@@ -132,8 +132,8 @@
                 <ext:Shared>false</ext:Shared>
             </DataStaging>
             <DataStaging name="STDERR">
-                <FileName>$PWD/stderr.txt</FileName>
-                <FilesystemName>$PWD</FilesystemName>
+                <FileName>$HOME/stderr.txt</FileName>
+                <FilesystemName>$HOME</FilesystemName>
                 <CreationFlag>overwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Target>
