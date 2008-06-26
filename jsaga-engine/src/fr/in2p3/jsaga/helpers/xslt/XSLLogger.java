@@ -28,10 +28,11 @@ public class XSLLogger implements ErrorListener {
 
     /** invoked when <xsl:message terminate="yes"/> */
     public void error(TransformerException exception) throws TransformerException {
-        s_logger.warn(exception.getMessageAndLocation());
+        s_logger.error(exception.getMessageAndLocation());
         throw exception;
     }
 
+    /** never invoked ? */
     public void fatalError(TransformerException exception) throws TransformerException {
         s_logger.error(exception.getMessageAndLocation());
         throw exception;
