@@ -8,7 +8,7 @@
   <groupId>fr.in2p3.jsaga.adaptor</groupId>
   <artifactId>jsaga-adaptor-unicore6</artifactId>
   <name>Adaptor for Unicore 6</name>
-  <version>0.9.4</version>
+  <version>0.9.5-SNAPSHOT</version>
   <build>
     <plugins>
       <plugin>
@@ -25,33 +25,33 @@
     <dependency>
       <groupId>fr.in2p3.jsaga</groupId>
       <artifactId>jsaga-adaptoritf</artifactId>
-      <version>0.9.4</version>
+      <version>0.9.5-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.ogf.saga</groupId>
       <artifactId>saga-api</artifactId>
-      <version>0.9.4</version>
+      <version>0.9.5-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.ogf.saga</groupId>
       <artifactId>saga-api</artifactId>
-      <version>0.9.4</version>
+      <version>0.9.5-SNAPSHOT</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>fr.in2p3.jsaga</groupId>
       <artifactId>jsaga-engine</artifactId>
-      <version>0.9.4</version>
+      <version>0.9.5-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
   <!-- adaptor specific -->
 		<dependency>
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-classic</artifactId>
-			<version>0.9.4</version>
+			<version>0.9.5-SNAPSHOT</version>
 			<scope>runtime</scope>
 		</dependency>
   		<dependency>
@@ -97,8 +97,4 @@
             <scope>runtime</scope>
         </dependency>
   </dependencies>
-
-  <scm>
-    <tag>jsaga-0_9_4</tag>
-  </scm>
 </project>
