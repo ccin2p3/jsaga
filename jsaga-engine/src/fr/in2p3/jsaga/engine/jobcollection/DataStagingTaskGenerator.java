@@ -136,18 +136,33 @@ public class DataStagingTaskGenerator {
             }
         }
 
+        // remove staged tasks for sandbox files (e.g. tar://$OUTPUT_SANDBOX/protocol.,,host,path,to,file)
         NodeList sandboxList = m_selector.getNodes("/ext:Job/jsdl:JobDefinition/jsdl:JobDescription/jsdl:DataStaging[translate(ext:Sandbox/text(),'TRUE','true')='true']");
         for (int i=0; i<sandboxList.getLength(); i++) {
             Element dataStaging = (Element) sandboxList.item(i);
             String dataStagingName = m_selector.getString(dataStaging, "@name");
-            // output directories
             String targetUri = m_selector.getString(dataStaging, "jsdl:Target/jsdl:URI/text()");
             if (targetUri != null) {
-                // try to remove directory
                 boolean input = true;
                 String inputTaskName = StagedTask.name(m_jobName, dataStagingName, input);
                 workflow.remove(inputTaskName);
             }
+        }
+
+        // connect nodes if needed (e.g. if there is no more staged task after Tag processing)
+        String jobTaskName = JobRunTask.name(m_jobName);
+        try {
+            WorkflowTask jobTask = workflow.getTask(jobTaskName);
+            if (! jobTask.hasPredecessors()) {
+                String startTaskName = StartTask.name();
+                workflow.add(jobTask, startTaskName, null);
+            }
+            if (! jobTask.hasSuccessors()) {
+                String endTaskName = JobEndTask.name(m_jobName);
+                workflow.add(jobTask, null, endTaskName);
+            }
+        } catch (DoesNotExist e) {
+            throw new NoSuccess("INTERNAL ERROR: unexpected exception", e);
         }
     }
 
