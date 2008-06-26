@@ -8,31 +8,31 @@
   <groupId>fr.in2p3.jsaga.adaptor</groupId>
   <artifactId>jsaga-adaptor-wms</artifactId>
   <name>Adaptor for Glite WMS</name>
-  <version>0.9.4-SNAPSHOT</version>
+  <version>0.9.4</version>
   <dependencies>
 		<dependency>
 		  <groupId>fr.in2p3.jsaga</groupId>
 		  <artifactId>jsaga-adaptoritf</artifactId>
-		  <version>0.9.4-SNAPSHOT</version>
+		  <version>0.9.4</version>
 		  <scope>provided</scope>
 		</dependency>
 		<dependency>
 		  <groupId>org.ogf.saga</groupId>
 		  <artifactId>saga-api</artifactId>
-		  <version>0.9.4-SNAPSHOT</version>
+		  <version>0.9.4</version>
 		  <scope>provided</scope>
 		</dependency>
 		<dependency>
 		  <groupId>org.ogf.saga</groupId>
 		  <artifactId>saga-api</artifactId>
-		  <version>0.9.4-SNAPSHOT</version>
+		  <version>0.9.4</version>
 		  <type>test-jar</type>
 		  <scope>test</scope>
 		</dependency>
 		<dependency>
 		  <groupId>fr.in2p3.jsaga</groupId>
 		  <artifactId>jsaga-engine</artifactId>
-		  <version>0.9.4-SNAPSHOT</version>
+		  <version>0.9.4</version>
 		  <scope>test</scope>
 		</dependency>
         <!-- adaptor specific -->
@@ -52,7 +52,11 @@
 		<dependency>
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 		    <artifactId>jsaga-adaptor-voms</artifactId>
-		    <version>0.9.4-SNAPSHOT</version>
+		    <version>0.9.4</version>
 		</dependency>
   </dependencies>
+
+  <scm>
+    <tag>jsaga-0_9_4</tag>
+  </scm>
 </project>
