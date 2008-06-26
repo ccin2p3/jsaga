@@ -76,7 +76,7 @@
                     <URI>gsiftp://defaultSE.openplast.fr/tmp/test_sbxstg.in/config2.cfg#OpenPlast</URI>
                 </Source>
                 <ext:Step uri="http://host5:8080/public/configuration/config2.cfg">
-                    <ext:Step uri="file:///tmp/test_sbxstg.in/config2.cfg">
+                    <ext:Step uri="file://c:/tmp/test_sbxstg.in/config2.cfg">
                         <ext:Step uri="gsiftp://defaultSE.openplast.fr/tmp/test_sbxstg.in/config2.cfg#OpenPlast"/>
                     </ext:Step>
                 </ext:Step>
@@ -113,7 +113,7 @@
                     <URI>gsiftp://defaultSE.openplast.fr/tmp/test_sbxstg.out/MYJOB_2/result_2.dat#OpenPlast</URI>
                 </Target>
                 <ext:Step uri="mail://sreynaud@in2p3.fr/result_2.dat">
-                    <ext:Step uri="file:///tmp/test_sbxstg.out/MYJOB_2/result_2.dat">
+                    <ext:Step uri="file://c:/tmp/test_sbxstg.out/MYJOB_2/result_2.dat">
                         <ext:Step uri="gsiftp://defaultSE.openplast.fr/tmp/test_sbxstg.out/MYJOB_2/result_2.dat#OpenPlast"/>
                     </ext:Step>
                 </ext:Step>

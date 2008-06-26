@@ -66,7 +66,7 @@
                     <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sbxstg.in/config1.cfg#OpenPlast-default</URI>
                 </Source>
                 <ext:Step uri="srb://sreynaud@host2:5544/grid/config1.cfg?mydomain#OpenPlast-CCIN2P3">
-                    <ext:Step uri="file:///tmp/test_sbxstg.in/config1.cfg">
+                    <ext:Step uri="file://c:/tmp/test_sbxstg.in/config1.cfg">
                         <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sbxstg.in/config1.cfg#OpenPlast-default"/>
                     </ext:Step>
                 </ext:Step>
@@ -82,7 +82,7 @@
                     <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sbxstg.in/config2.cfg#OpenPlast-default</URI>
                 </Source>
                 <ext:Step uri="http://host5:8080/public/configuration/config2.cfg">
-                    <ext:Step uri="file:///tmp/test_sbxstg.in/config2.cfg">
+                    <ext:Step uri="file://c:/tmp/test_sbxstg.in/config2.cfg">
                         <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sbxstg.in/config2.cfg#OpenPlast-default"/>
                     </ext:Step>
                 </ext:Step>
@@ -108,7 +108,7 @@
                     <ext:Process>tar xzvf $SOURCE ; cd executable-src ; make</ext:Process>
                 </Source>
                 <ext:Step uri="gsiftp://host3:2811/repository/src/executable-src.tar.gz#EGEE">
-                    <ext:Step uri="file:///tmp/test_sbxstg.in/executable-src.tar.gz">
+                    <ext:Step uri="file://c:/tmp/test_sbxstg.in/executable-src.tar.gz">
                         <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sbxstg.in/executable-src.tar.gz#OpenPlast-default"/>
                     </ext:Step>
                 </ext:Step>
@@ -135,7 +135,7 @@
                     <URI>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sbxstg.out/MYJOB_1/result_1.dat#OpenPlast-default</URI>
                 </Target>
                 <ext:Step uri="mail://sreynaud@in2p3.fr/result_1.dat">
-                    <ext:Step uri="file:///tmp/test_sbxstg.out/MYJOB_1/result_1.dat">
+                    <ext:Step uri="file://c:/tmp/test_sbxstg.out/MYJOB_1/result_1.dat">
                         <ext:Step uri="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_sbxstg.out/MYJOB_1/result_1.dat#OpenPlast-default"/>
                     </ext:Step>
                 </ext:Step>

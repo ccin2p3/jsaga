@@ -116,10 +116,10 @@
     </task>
     <task context="OpenPlast-CCIN2P3" group="srb://host2" input="true" keep="true" label="config1.cfg"
           name="srb://sreynaud@host2:5544/grid/config1.cfg?mydomain#OpenPlast-CCIN2P3" state="NEW" type="source">
-        <successor>file:///tmp/test_staging.in/config1.cfg</successor>
+        <successor>file://c:/tmp/test_staging.in/config1.cfg</successor>
         <successor>in_MYJOB_2_C1</successor>
     </task>
-    <task group="file://" input="true" keep="false" label="config1.cfg" name="file:///tmp/test_staging.in/config1.cfg" state="NEW"
+    <task group="file://c" input="true" keep="false" label="config1.cfg" name="file://c:/tmp/test_staging.in/config1.cfg" state="NEW"
           type="transfer">
         <successor>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/config1.cfg#OpenPlast-default</successor>
         <successor>gsiftp://defaultSE.openplast.fr/tmp/test_staging.in/config1.cfg#OpenPlast</successor>
@@ -131,9 +131,9 @@
     </task>
     <task group="http://host5" input="true" keep="true" label="config2.cfg"
           name="http://host5:8080/public/configuration/config2.cfg" state="NEW" type="source">
-        <successor>file:///tmp/test_staging.in/config2.cfg</successor>
+        <successor>file://c:/tmp/test_staging.in/config2.cfg</successor>
     </task>
-    <task group="file://" input="true" keep="false" label="config2.cfg" name="file:///tmp/test_staging.in/config2.cfg" state="NEW"
+    <task group="file://c" input="true" keep="false" label="config2.cfg" name="file://c:/tmp/test_staging.in/config2.cfg" state="NEW"
           type="transfer">
         <successor>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/config2.cfg#OpenPlast-default</successor>
         <successor>gsiftp://defaultSE.openplast.fr/tmp/test_staging.in/config2.cfg#OpenPlast</successor>
@@ -145,10 +145,10 @@
     </task>
     <task context="EGEE" group="gsiftp://host3" input="true" keep="true" label="executable-src.tar.gz"
           name="gsiftp://host3:2811/repository/src/executable-src.tar.gz#EGEE" state="NEW" type="source">
-        <successor>file:///tmp/test_staging.in/executable-src.tar.gz</successor>
+        <successor>file://c:/tmp/test_staging.in/executable-src.tar.gz</successor>
     </task>
-    <task group="file://" input="true" keep="false" label="executable-src.tar.gz"
-          name="file:///tmp/test_staging.in/executable-src.tar.gz" state="NEW" type="transfer">
+    <task group="file://c" input="true" keep="false" label="executable-src.tar.gz"
+          name="file://c:/tmp/test_staging.in/executable-src.tar.gz" state="NEW" type="transfer">
         <successor>gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.in/executable-src.tar.gz#OpenPlast-default</successor>
         <successor>gsiftp://defaultSE.openplast.fr/tmp/test_staging.in/executable-src.tar.gz#OpenPlast</successor>
     </task>
@@ -170,18 +170,18 @@
     <task group="gsiftp://firewallSE.openplast.fr" keep="false" label=""
           name="mkdir_gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.out/MYJOB_1/" state="NEW"
           type="mkdir">
-        <successor>mkdir_file:///tmp/test_staging.out/MYJOB_1/</successor>
+        <successor>mkdir_file://c:/tmp/test_staging.out/MYJOB_1/</successor>
         <successor>in_MYJOB_1_STDERR</successor>
     </task>
-    <task group="file://" keep="false" label="" name="mkdir_file:///tmp/test_staging.out/MYJOB_1/" state="NEW" type="mkdir">
+    <task group="file://c" keep="false" label="" name="mkdir_file://c:/tmp/test_staging.out/MYJOB_1/" state="NEW" type="mkdir">
         <successor>in_MYJOB_1_R</successor>
     </task>
     <task context="OpenPlast-default" group="gsiftp://firewallSE.openplast.fr" input="false" keep="false" label="result_1.dat"
           name="gsiftp://firewallSE.openplast.fr:2811/intermediary/test_staging.out/MYJOB_1/result_1.dat#OpenPlast-default"
           state="NEW" type="source">
-        <successor>file:///tmp/test_staging.out/MYJOB_1/result_1.dat</successor>
+        <successor>file://c:/tmp/test_staging.out/MYJOB_1/result_1.dat</successor>
     </task>
-    <task group="file://" input="false" keep="false" label="result_1.dat" name="file:///tmp/test_staging.out/MYJOB_1/result_1.dat"
+    <task group="file://c" input="false" keep="false" label="result_1.dat" name="file://c:/tmp/test_staging.out/MYJOB_1/result_1.dat"
           state="NEW" type="transfer">
         <successor>mail://sreynaud@in2p3.fr/result_1.dat</successor>
     </task>
@@ -214,18 +214,18 @@
     </task>
     <task group="gsiftp://defaultSE.openplast.fr" keep="false" label=""
           name="mkdir_gsiftp://defaultSE.openplast.fr/tmp/test_staging.out/MYJOB_2/" state="NEW" type="mkdir">
-        <successor>mkdir_file:///tmp/test_staging.out/MYJOB_2/</successor>
+        <successor>mkdir_file://c:/tmp/test_staging.out/MYJOB_2/</successor>
         <successor>in_MYJOB_2_STDERR</successor>
     </task>
-    <task group="file://" keep="false" label="" name="mkdir_file:///tmp/test_staging.out/MYJOB_2/" state="NEW" type="mkdir">
+    <task group="file://c" keep="false" label="" name="mkdir_file://c:/tmp/test_staging.out/MYJOB_2/" state="NEW" type="mkdir">
         <successor>in_MYJOB_2_R</successor>
     </task>
     <task context="OpenPlast" group="gsiftp://defaultSE.openplast.fr" input="false" keep="false" label="result_2.dat"
           name="gsiftp://defaultSE.openplast.fr/tmp/test_staging.out/MYJOB_2/result_2.dat#OpenPlast" state="NEW"
           type="source">
-        <successor>file:///tmp/test_staging.out/MYJOB_2/result_2.dat</successor>
+        <successor>file://c:/tmp/test_staging.out/MYJOB_2/result_2.dat</successor>
     </task>
-    <task group="file://" input="false" keep="false" label="result_2.dat" name="file:///tmp/test_staging.out/MYJOB_2/result_2.dat"
+    <task group="file://c" input="false" keep="false" label="result_2.dat" name="file://c:/tmp/test_staging.out/MYJOB_2/result_2.dat"
           state="NEW" type="transfer">
         <successor>mail://sreynaud@in2p3.fr/result_2.dat</successor>
     </task>
@@ -258,18 +258,18 @@
     <task group="gsiftp://closeSE.openplast.fr" keep="false" label=""
           name="mkdir_gsiftp://closeSE.openplast.fr:2811/intermediary/test_staging.out/MYJOB_3/" state="NEW"
           type="mkdir">
-        <successor>mkdir_file:///tmp/test_staging.out/MYJOB_3/</successor>
+        <successor>mkdir_file://c:/tmp/test_staging.out/MYJOB_3/</successor>
         <successor>in_MYJOB_3_STDERR</successor>
     </task>
-    <task group="file://" keep="false" label="" name="mkdir_file:///tmp/test_staging.out/MYJOB_3/" state="NEW" type="mkdir">
+    <task group="file://c" keep="false" label="" name="mkdir_file://c:/tmp/test_staging.out/MYJOB_3/" state="NEW" type="mkdir">
         <successor>in_MYJOB_3_R</successor>
     </task>
     <task context="OpenPlast-default" group="gsiftp://closeSE.openplast.fr" input="false" keep="false" label="result_3.dat"
           name="gsiftp://closeSE.openplast.fr:2811/intermediary/test_staging.out/MYJOB_3/result_3.dat#OpenPlast-default"
           state="NEW" type="source">
-        <successor>file:///tmp/test_staging.out/MYJOB_3/result_3.dat</successor>
+        <successor>file://c:/tmp/test_staging.out/MYJOB_3/result_3.dat</successor>
     </task>
-    <task group="file://" input="false" keep="false" label="result_3.dat" name="file:///tmp/test_staging.out/MYJOB_3/result_3.dat"
+    <task group="file://c" input="false" keep="false" label="result_3.dat" name="file://c:/tmp/test_staging.out/MYJOB_3/result_3.dat"
           state="NEW" type="transfer">
         <successor>mail://sreynaud@in2p3.fr/result_3.dat</successor>
     </task>

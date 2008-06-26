@@ -52,7 +52,7 @@
                     <URI>gsiftp://defaultSE.egee.org/tmp/test_staging_egee.in/config1.cfg#EGEE</URI>
                 </Source>
                 <ext:Step uri="srb://sreynaud@host2:5544/grid/config1.cfg?mydomain#OpenPlast-CCIN2P3">
-                    <ext:Step uri="file:///tmp/test_staging_egee.in/config1.cfg">
+                    <ext:Step uri="file://c:/tmp/test_staging_egee.in/config1.cfg">
                         <ext:Step uri="gsiftp://defaultSE.egee.org/tmp/test_staging_egee.in/config1.cfg#EGEE"/>
                     </ext:Step>
                 </ext:Step>
@@ -68,7 +68,7 @@
                     <URI>gsiftp://defaultSE.egee.org/tmp/test_staging_egee.in/config2.cfg#EGEE</URI>
                 </Source>
                 <ext:Step uri="http://host5:8080/public/configuration/config2.cfg">
-                    <ext:Step uri="file:///tmp/test_staging_egee.in/config2.cfg">
+                    <ext:Step uri="file://c:/tmp/test_staging_egee.in/config2.cfg">
                         <ext:Step uri="gsiftp://defaultSE.egee.org/tmp/test_staging_egee.in/config2.cfg#EGEE"/>
                     </ext:Step>
                 </ext:Step>
@@ -94,7 +94,7 @@
                     <URI>gsiftp://defaultSE.egee.org/tmp/test_staging_egee.in/data_2.dat#EGEE</URI>
                 </Source>
                 <ext:Step uri="gsiftp://host4:2811/data/data_2.dat#OpenPlast">
-                    <ext:Step uri="file:///tmp/test_staging_egee.in/data_2.dat">
+                    <ext:Step uri="file://c:/tmp/test_staging_egee.in/data_2.dat">
                         <ext:Step uri="gsiftp://defaultSE.egee.org/tmp/test_staging_egee.in/data_2.dat#EGEE"/>
                     </ext:Step>
                 </ext:Step>
@@ -110,7 +110,7 @@
                     <URI>gsiftp://defaultSE.egee.org/tmp/test_staging_egee.out/MYJOB_2/result_2.dat#EGEE</URI>
                 </Target>
                 <ext:Step uri="mail://sreynaud@in2p3.fr/result_2.dat">
-                    <ext:Step uri="file:///tmp/test_staging_egee.out/MYJOB_2/result_2.dat">
+                    <ext:Step uri="file://c:/tmp/test_staging_egee.out/MYJOB_2/result_2.dat">
                         <ext:Step uri="gsiftp://defaultSE.egee.org/tmp/test_staging_egee.out/MYJOB_2/result_2.dat#EGEE"/>
                     </ext:Step>
                 </ext:Step>

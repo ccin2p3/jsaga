@@ -56,7 +56,7 @@
                     <URI>gsiftp://defaultSE.openplast.fr/tmp/test_staging.in/config1.cfg#OpenPlast</URI>
                 </Source>
                 <ext:Step uri="srb://sreynaud@host2:5544/grid/config1.cfg?mydomain#OpenPlast-CCIN2P3">
-                    <ext:Step uri="file:///tmp/test_staging.in/config1.cfg">
+                    <ext:Step uri="file://c:/tmp/test_staging.in/config1.cfg">
                         <ext:Step uri="gsiftp://defaultSE.openplast.fr/tmp/test_staging.in/config1.cfg#OpenPlast"/>
                     </ext:Step>
                 </ext:Step>
@@ -72,7 +72,7 @@
                     <URI>gsiftp://defaultSE.openplast.fr/tmp/test_staging.in/config2.cfg#OpenPlast</URI>
                 </Source>
                 <ext:Step uri="http://host5:8080/public/configuration/config2.cfg">
-                    <ext:Step uri="file:///tmp/test_staging.in/config2.cfg">
+                    <ext:Step uri="file://c:/tmp/test_staging.in/config2.cfg">
                         <ext:Step uri="gsiftp://defaultSE.openplast.fr/tmp/test_staging.in/config2.cfg#OpenPlast"/>
                     </ext:Step>
                 </ext:Step>
@@ -98,7 +98,7 @@
                     <ext:Process>tar xzvf $SOURCE ; cd executable-src ; make</ext:Process>
                 </Source>
                 <ext:Step uri="gsiftp://host3:2811/repository/src/executable-src.tar.gz#EGEE">
-                    <ext:Step uri="file:///tmp/test_staging.in/executable-src.tar.gz">
+                    <ext:Step uri="file://c:/tmp/test_staging.in/executable-src.tar.gz">
                         <ext:Step uri="gsiftp://defaultSE.openplast.fr/tmp/test_staging.in/executable-src.tar.gz#OpenPlast"/>
                     </ext:Step>
                 </ext:Step>
@@ -125,7 +125,7 @@
                     <URI>gsiftp://closeSE.openplast.fr:2811/intermediary/test_staging.out/MYJOB_3/result_3.dat#OpenPlast-default</URI>
                 </Target>
                 <ext:Step uri="mail://sreynaud@in2p3.fr/result_3.dat">
-                    <ext:Step uri="file:///tmp/test_staging.out/MYJOB_3/result_3.dat">
+                    <ext:Step uri="file://c:/tmp/test_staging.out/MYJOB_3/result_3.dat">
                         <ext:Step uri="gsiftp://closeSE.openplast.fr:2811/intermediary/test_staging.out/MYJOB_3/result_3.dat#OpenPlast-default"/>
                     </ext:Step>
                 </ext:Step>
