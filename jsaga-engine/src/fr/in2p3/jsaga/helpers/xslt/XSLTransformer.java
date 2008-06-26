@@ -55,7 +55,12 @@ public class XSLTransformer {
         // transform
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Result result = new StreamResult(out);
-        m_transformer.transform(source, result);
+        try {
+            m_transformer.transform(source, result);
+        } catch(TransformerException e) {
+            // throw the cause of exception
+            m_transformer.getErrorListener().fatalError(e);
+        }
         byte[] outBytes = out.toByteArray();
 
         // debug
@@ -80,7 +85,12 @@ public class XSLTransformer {
             throw new TransformerException(e);
         }
         Result result = new DOMResult(doc);
-        m_transformer.transform(source, result);
+        try {
+            m_transformer.transform(source, result);
+        } catch(TransformerException e) {
+            // throw the cause of exception
+            m_transformer.getErrorListener().fatalError(e);
+        }
 
         // debug
         if (Base.DEBUG && m_debugFile!=null) {

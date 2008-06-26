@@ -19,9 +19,11 @@ import javax.xml.transform.TransformerException;
  */
 public class XSLLogger implements ErrorListener {
     private static Logger s_logger = Logger.getLogger(XSLLogger.class);
+    private TransformerException m_cause;
 
     /** invoked when <xsl:message terminate="no"/> */
     public void warning(TransformerException exception) throws TransformerException {
+        m_cause = exception;
         s_logger.info(exception.getMessageAndLocation());
         throw exception;
     }
@@ -32,9 +34,8 @@ public class XSLLogger implements ErrorListener {
         throw exception;
     }
 
-    /** never invoked ? */
+    /** explicitely invoked by XSLTransformer */
     public void fatalError(TransformerException exception) throws TransformerException {
-        s_logger.error(exception.getMessageAndLocation());
-        throw exception;
+        throw m_cause;
     }
 }
