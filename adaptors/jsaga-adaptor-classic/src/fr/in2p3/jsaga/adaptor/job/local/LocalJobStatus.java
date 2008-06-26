@@ -13,8 +13,8 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 * ***************************************************/
 
 public class LocalJobStatus extends JobStatus {
-    public LocalJobStatus(String jobId, int status) {
-        super(jobId, Integer.valueOf(status), "unknown");
+    public LocalJobStatus(String jobId, int returnCode) {
+        super(jobId, Integer.valueOf(returnCode), "unknown", returnCode);
     }
 
 	public String getModel() {
