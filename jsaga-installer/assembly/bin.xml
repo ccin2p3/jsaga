@@ -51,5 +51,11 @@
             <outputDirectory>/</outputDirectory>
             <source>assembly/Readme.txt</source>
         </file>
+        <file>
+            <outputDirectory>/</outputDirectory>
+            <source>assembly/post-install.sh</source>
+            <lineEnding>unix</lineEnding>
+            <fileMode>0755</fileMode>
+        </file>
     </files>
 </assembly>

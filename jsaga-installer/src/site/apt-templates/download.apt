@@ -37,6 +37,9 @@ Download JSAGA
     [[3]] Update the PATH environment variable (optional):
           <<<export PATH=$PATH:JSAGA_HOME/bin>>>
 
+    [[4]] Execute the post-install.sh script:
+          <<<./post-install.sh>>>
+
 * Current Release
 
     JSAGA is distributed in several formats for your convenience.
