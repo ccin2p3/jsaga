@@ -29,29 +29,33 @@
                         <HostName>myhost.in2p3.fr</HostName>
                         <HostName>otherhost.in2p3.fr</HostName>
                     </CandidateHosts>
-                    <FileSystem name="HelloWorldDirectory">
+                    <FileSystem name="HELLOWORLD_1.1">
                         <FileSystemType>normal</FileSystemType>
                         <MountPoint>HelloWorld/1.1</MountPoint>
                         <ext:ParentFilesystemName>ApplicationsDirectory</ext:ParentFilesystemName>
-                        <ext:Tag>HELLOWORLD_1.1</ext:Tag>
                     </FileSystem>
-                    <FileSystem name="HelloWorldDirectory">
+                    <FileSystem name="HELLOWORLD_1.2">
                         <FileSystemType>normal</FileSystemType>
                         <MountPoint>HelloWorld/1.2</MountPoint>
                         <ext:ParentFilesystemName>ApplicationsDirectory</ext:ParentFilesystemName>
-                        <ext:Tag>HELLOWORLD_1.2</ext:Tag>
                     </FileSystem>
-                    <FileSystem name="DataBaseDirectory">
+                    <FileSystem name="DATABASE_1.0">
                         <FileSystemType>normal</FileSystemType>
                         <MountPoint>database/1.0</MountPoint>
                         <ext:ParentFilesystemName>ApplicationsDirectory</ext:ParentFilesystemName>
-                        <ext:Tag>DATABASE_1.0</ext:Tag>
                     </FileSystem>
                 </Resources>
 
                 <DataStaging name="EXEC">
                     <FileName>bin/executable.exe</FileName>
-                    <FilesystemName>HelloWorldDirectory</FilesystemName>
+                    <FilesystemName>HELLOWORLD_1.1</FilesystemName>
+                    <CreationFlag>dontOverwrite</CreationFlag>
+                    <Source/>
+                </DataStaging>
+
+                <DataStaging name="EXEC">
+                    <FileName>bin/executable.exe</FileName>
+                    <FilesystemName>HELLOWORLD_1.2</FilesystemName>
                     <CreationFlag>dontOverwrite</CreationFlag>
                     <Source/>
                 </DataStaging>
@@ -71,7 +75,7 @@
 
                 <DataStaging name="INPUT">
                     <FileName>data_@{INDEX}.dat</FileName>
-                    <FilesystemName>DataBaseDirectory</FilesystemName>
+                    <FilesystemName>DATABASE_1.0</FilesystemName>
                     <CreationFlag>dontOverwrite</CreationFlag>
                     <Source/>
                     <ext:CopyLocally>true</ext:CopyLocally>

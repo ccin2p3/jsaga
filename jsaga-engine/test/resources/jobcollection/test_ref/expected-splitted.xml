@@ -44,23 +44,20 @@
                     <MountPoint>${ATLAS_APPLICATIONS}</MountPoint>
                 </FileSystem>
                 <!-- user-defined file systems -->
-                <FileSystem name="HelloWorldDirectory">
+                <FileSystem name="HELLOWORLD_1.1">
                     <FileSystemType>normal</FileSystemType>
                     <MountPoint>HelloWorld/1.1</MountPoint>
                     <ext:ParentFilesystemName>ApplicationsDirectory</ext:ParentFilesystemName>
-                    <ext:Tag>HELLOWORLD_1.1</ext:Tag>
                 </FileSystem>
-                <FileSystem name="HelloWorldDirectory">
+                <FileSystem name="HELLOWORLD_1.2">
                     <FileSystemType>normal</FileSystemType>
                     <MountPoint>HelloWorld/1.2</MountPoint>
                     <ext:ParentFilesystemName>ApplicationsDirectory</ext:ParentFilesystemName>
-                    <ext:Tag>HELLOWORLD_1.2</ext:Tag>
                 </FileSystem>
-                <FileSystem name="DataBaseDirectory">
+                <FileSystem name="DATABASE_1.0">
                     <FileSystemType>normal</FileSystemType>
                     <MountPoint>database/1.0</MountPoint>
                     <ext:ParentFilesystemName>ApplicationsDirectory</ext:ParentFilesystemName>
-                    <ext:Tag>DATABASE_1.0</ext:Tag>
                 </FileSystem>
                 <!-- automatically generated -->
                 <TotalResourceCount>
@@ -70,7 +67,16 @@
 
             <DataStaging name="EXEC">
                 <FileName>bin/executable.exe</FileName>
-                <FilesystemName>HelloWorldDirectory</FilesystemName>
+                <FilesystemName>HELLOWORLD_1.1</FilesystemName>
+                <CreationFlag>dontOverwrite</CreationFlag>
+                <DeleteOnTermination>true</DeleteOnTermination>
+                <Source/>
+                <ext:CopyLocally>false</ext:CopyLocally>
+                <ext:Shared>true</ext:Shared>
+            </DataStaging>
+            <DataStaging name="EXEC">
+                <FileName>bin/executable.exe</FileName>
+                <FilesystemName>HELLOWORLD_1.2</FilesystemName>
                 <CreationFlag>dontOverwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source/>
@@ -95,7 +101,7 @@
 
             <DataStaging name="INPUT">
                 <FileName>data_3.dat</FileName>
-                <FilesystemName>DataBaseDirectory</FilesystemName>
+                <FilesystemName>DATABASE_1.0</FilesystemName>
                 <CreationFlag>dontOverwrite</CreationFlag>
                 <DeleteOnTermination>true</DeleteOnTermination>
                 <Source/>
