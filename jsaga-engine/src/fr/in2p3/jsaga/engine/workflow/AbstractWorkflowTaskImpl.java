@@ -100,6 +100,10 @@ public abstract class AbstractWorkflowTaskImpl extends AbstractTaskImpl implemen
         return m_name;
     }
 
+    public synchronized boolean hasPredecessors() {
+        return (! m_predecessors.isEmpty());
+    }
+
     public synchronized void addPredecessor(WorkflowTask predecessor) {
         if (! m_predecessors.containsKey(predecessor.getName())) {
             m_predecessors.put(predecessor.getName(), predecessor);
@@ -108,6 +112,10 @@ public abstract class AbstractWorkflowTaskImpl extends AbstractTaskImpl implemen
 
     public synchronized void removePredecessor(String predecessorName) {
         m_predecessors.remove(predecessorName);
+    }
+
+    public synchronized boolean hasSuccessors() {
+        return (! m_successors.isEmpty());
     }
 
     public synchronized void addSuccessor(WorkflowTask successor) {

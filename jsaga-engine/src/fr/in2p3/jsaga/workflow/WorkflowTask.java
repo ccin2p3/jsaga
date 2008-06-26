@@ -25,6 +25,12 @@ public interface WorkflowTask<E> extends Task<E>, TaskCallback<E> {
     public String getName();
 
     /**
+     * Check if task has predecessors.
+     * @return true if the task has one or several predecessors.
+     */
+    public boolean hasPredecessors();
+
+    /**
      * Adds a predecessor to the task.
      * @param predecessor the predecessor to add.
      */
@@ -35,6 +41,12 @@ public interface WorkflowTask<E> extends Task<E>, TaskCallback<E> {
      * @param predecessorName the name of the predecessor to remove.
      */
     public void removePredecessor(String predecessorName);
+
+    /**
+     * Check if task has successors.
+     * @return true if the task has one or several successors.
+     */
+    public boolean hasSuccessors();
 
     /**
      * Adds a successor to the task.
