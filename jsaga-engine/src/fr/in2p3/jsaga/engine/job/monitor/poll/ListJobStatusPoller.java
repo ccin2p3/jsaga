@@ -40,7 +40,7 @@ public class ListJobStatusPoller extends AbstractJobStatusPoller {
                     callback = m_subscribedJobs.get(nativeJobId);
                 }
                 if (callback != null) {
-                    callback.setState(status.getSagaState(), status.getStateDetail(), status.getSubState());
+                    callback.setState(status.getSagaState(), status.getStateDetail(), status.getSubState(), status.getCause());
                 }
             }
         } catch (Exception e) {

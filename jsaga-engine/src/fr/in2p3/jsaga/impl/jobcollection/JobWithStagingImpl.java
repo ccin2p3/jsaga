@@ -90,6 +90,7 @@ public class JobWithStagingImpl extends LateBindedJobImpl implements JobWithStag
             case CANCELED:
             case FAILED:
                 try {
+                    m_jobHandle.rethrow();
                     m_jobEnd.rethrow();
                 } catch (org.ogf.saga.error.Exception e) {
                     super.setException(e);

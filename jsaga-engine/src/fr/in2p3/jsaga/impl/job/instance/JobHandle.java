@@ -68,6 +68,15 @@ public class JobHandle extends AbstractAsyncJobImpl implements Job {
         m_jobRunTask = jobRunTask;
     }
 
+    //////////////////////////////////////////// implementation of Task ////////////////////////////////////////////
+
+    /** override super.rethrow() */
+    public void rethrow() throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+        if (m_job != null) {
+            m_job.rethrow();
+        }
+    }
+
     ////////////////////////////////////// implementation of AbstractTaskImpl //////////////////////////////////////
 
     private boolean m_isRunning = false;

@@ -24,6 +24,6 @@ public class IndividualJobStatusNotifier implements JobStatusNotifier {
     }
 
     public void notifyChange(JobStatus status) {
-        m_callback.setState(status.getSagaState(), status.getStateDetail(), status.getSubState());
+        m_callback.setState(status.getSagaState(), status.getStateDetail(), status.getSubState(), status.getCause());
     }
 }

@@ -32,6 +32,15 @@
 
     <!-- script -->
     <xsl:template match="jsdl:JobDescription">#!/bin/sh
+_ERROR_INPUT_DOES_NOT_EXIST_=90
+_ERROR_INPUT_ALREADY_EXISTS_LOCALLY_=91
+_ERROR_INPUT_FAIL_TO_TRANSFER_=92
+_ERROR_OUTPUT_DOES_NOT_EXIST_=93
+_ERROR_OUTPUT_ALREADY_EXISTS_LOCALLY_=94
+_ERROR_OUTPUT_FAIL_TO_CREATE_=95
+_ERROR_COMMAND_NOT_FOUND_=96
+_ERROR_RESERVED_RETURN_CODE_=97
+
 function log() {
     LEVEL=$1
     MESSAGE=$2
@@ -114,10 +123,14 @@ function run() {
             </xsl:for-each>
         </xsl:for-each><xsl:text>
 </xsl:text>
+        RETURN_CODE=$?
+        if test $RETURN_CODE -ge $_ERROR_INPUT_DOES_NOT_EXIST_ -a $RETURN_CODE -le $_ERROR_RESERVED_RETURN_CODE_ ; then
+            RETURN_CODE=$_ERROR_RESERVED_RETURN_CODE_
+        fi
     else
         run_time $FUNCTION
+        RETURN_CODE=$?
     fi
-    RETURN_CODE=$?
     TIME=`cat "$TMPFILE.time"`
     rm -f "$TMPFILE.time"
     if test $RETURN_CODE -eq 0 ; then
@@ -225,10 +238,12 @@ function INPUT_STAGING() {
         # Copy <xsl:value-of select="$LOCAL"/> from <xsl:value-of select="$INTERMEDIARY"/>
                     <xsl:if test="jsdl:CreationFlag/text()='overwrite'"> (overwrite)</xsl:if>
         log DEBUG "Copying intermediary file via shared file system"
-        <xsl:for-each select="jsdl:Source/jsdl:URI"><xsl:call-template name="COPY">
-            <xsl:with-param name="source" select="$INTERMEDIARY"/>
-            <xsl:with-param name="target" select="$LOCAL"/>
-        </xsl:call-template></xsl:for-each>
+        <xsl:for-each select="jsdl:Source/jsdl:URI">
+        <xsl:call-template name="REMOVE_LOCAL_INPUT"><xsl:with-param name="local" select="$LOCAL"/></xsl:call-template>
+        cp<xsl:text/>
+            <xsl:text> </xsl:text>"<xsl:value-of select="$INTERMEDIARY"/>"<xsl:text/>
+            <xsl:text> </xsl:text>"<xsl:value-of select="$LOCAL"/>"<xsl:text/>
+        </xsl:for-each>
                         </xsl:when>
                         <xsl:otherwise>
         # Get <xsl:value-of select="$LOCAL"/> from <xsl:value-of select="jsdl:Source/jsdl:URI/text()"/>
@@ -277,7 +292,7 @@ function INPUT_STAGING() {
         log DEBUG "\$IS_FOUND_<xsl:value-of select="@name"/>=$IS_FOUND_<xsl:value-of select="@name"/>"
     else
         _FAIL_ "Found no file for input: <xsl:value-of select="@name"/>"
-        return $?
+        return $_ERROR_INPUT_DOES_NOT_EXIST_
     fi
             </xsl:if>
         </xsl:for-each>
@@ -334,7 +349,7 @@ function INPUT_STAGING() {
         # Check output file does not exist
         if test -f "$<xsl:value-of select="@name"/>" ; then
             _FAIL_ "Output file already exists: $<xsl:value-of select="@name"/>"
-            return $?
+            return $_ERROR_OUTPUT_ALREADY_EXISTS_LOCALLY_
         fi
             </xsl:if>
 
@@ -352,7 +367,7 @@ function INPUT_STAGING() {
         log DEBUG "\$IS_FOUND_<xsl:value-of select="@name"/>=$IS_FOUND_<xsl:value-of select="@name"/>"
     else
         _FAIL_ "No file can be created for output: <xsl:value-of select="@name"/>"
-        return $?
+        return $_ERROR_OUTPUT_FAIL_TO_CREATE_
     fi
             </xsl:if>
         </xsl:for-each>
@@ -424,7 +439,7 @@ function OUTPUT_STAGING() {
         # Check output file exists
         if test ! -e "$<xsl:value-of select="@name"/>" ; then
             _FAIL_ "Output file has not been created: $<xsl:value-of select="@name"/>"
-            return $?
+            return $_ERROR_OUTPUT_DOES_NOT_EXIST_
         fi
             <xsl:if test="jsdl:Target/ext:Process/text()">
         # Postprocess
@@ -445,10 +460,12 @@ function OUTPUT_STAGING() {
         # Copy <xsl:value-of select="$LOCAL"/> to <xsl:value-of select="$INTERMEDIARY"/>
                     <xsl:if test="jsdl:CreationFlag/text()='overwrite'"> (overwrite)</xsl:if>
         log DEBUG "Copying intermediary file via shared file system"
-        <xsl:for-each select="jsdl:Target/jsdl:URI"><xsl:call-template name="COPY">
-            <xsl:with-param name="source" select="$LOCAL"/>
-            <xsl:with-param name="target" select="$INTERMEDIARY"/>
-        </xsl:call-template></xsl:for-each>
+        <xsl:for-each select="jsdl:Target/jsdl:URI">
+        <xsl:call-template name="REMOVE_REMOTE_OUTPUT"><xsl:with-param name="remote" select="$INTERMEDIARY"/></xsl:call-template>
+        cp<xsl:text/>
+            <xsl:text> </xsl:text>"<xsl:value-of select="$LOCAL"/>"<xsl:text/>
+            <xsl:text> </xsl:text>"<xsl:value-of select="$INTERMEDIARY"/>"<xsl:text/>
+        </xsl:for-each>
                         </xsl:when>
                         <xsl:otherwise>
         # Put <xsl:value-of select="$LOCAL"/> to <xsl:value-of select="jsdl:Target/jsdl:URI/text()"/>
@@ -505,7 +522,7 @@ exit 0      # exit with success
     <!-- ************************* srm ************************* -->
     <xsl:template match="jsdl:Source/jsdl:URI[starts-with(text(),'srm://')]">
         <xsl:param name="local"/>
-        <xsl:call-template name="REMOVE_LOCAL"><xsl:with-param name="local" select="$local"/></xsl:call-template>
+        <xsl:call-template name="REMOVE_LOCAL_INPUT"><xsl:with-param name="local" select="$local"/></xsl:call-template>
         <xsl:call-template name="INIT_SRM"/>
         $SRMCP<xsl:text/>
             <xsl:text> </xsl:text><xsl:value-of select="text()"/>
@@ -518,7 +535,7 @@ exit 0      # exit with success
             <xsl:text> </xsl:text>file:///<xsl:value-of select="$local"/>
             <xsl:text> </xsl:text><xsl:value-of select="text()"/>
         if test $? -eq 2 ; then
-        <xsl:call-template name="OVERWRITE_REMOTE">
+        <xsl:call-template name="OVERWRITE_REMOTE_OUTPUT">
             <xsl:with-param name="command">
             $SRMDEL <xsl:value-of select="text()"/>
             $SRMCP<xsl:text/>
@@ -538,14 +555,14 @@ exit 0      # exit with success
             SRMDEL="$GLITE_LOCATION/../d-cache/srm/bin/srm-advisory-delete"
         else
             _FAIL_ "Command not found: srmcp"
-            return $?
+            return $_ERROR_COMMAND_NOT_FOUND_
         fi
     </xsl:template>
 
     <!-- ************************* lfn ************************* -->
     <xsl:template match="jsdl:Source/jsdl:URI[starts-with(text(),'lfn://')]">
         <xsl:param name="local"/>
-        <xsl:call-template name="REMOVE_LOCAL"><xsl:with-param name="local" select="$local"/></xsl:call-template>
+        <xsl:call-template name="REMOVE_LOCAL_INPUT"><xsl:with-param name="local" select="$local"/></xsl:call-template>
         <xsl:call-template name="INIT_LFN_DOWNLOAD"/>
         LFC_HOST=<xsl:call-template name="HOST"/>
         $LCG_CP<xsl:text/><!-- copy only -->
@@ -560,7 +577,7 @@ exit 0      # exit with success
             <xsl:text> </xsl:text>-l lfn:<xsl:call-template name="PATH"/>
             <xsl:text> </xsl:text>file:///<xsl:value-of select="$local"/>
         if test $? -eq 1 ; then
-        <xsl:call-template name="OVERWRITE_REMOTE">
+        <xsl:call-template name="OVERWRITE_REMOTE_OUTPUT">
             <xsl:with-param name="command">
             $LCG_DEL <xsl:value-of select="text()"/>
             $LCG_CR<xsl:text/><!-- copy and register (warning: reverse order of arguments) -->
@@ -578,7 +595,7 @@ exit 0      # exit with success
             LCG_CP="$LCG_LOCATION/bin/lcg-cp"
         else
             _FAIL_ "Command not found: lcg-cp"
-            return $?
+            return $_ERROR_COMMAND_NOT_FOUND_
         fi
     </xsl:template>
     <xsl:template name="INIT_LFN_UPLOAD">
@@ -590,7 +607,7 @@ exit 0      # exit with success
             LCG_CR="$LCG_LOCATION/bin/lcg-cr"
         else
             _FAIL_ "Command not found: lcg-cr"
-            return $?
+            return $_ERROR_COMMAND_NOT_FOUND_
         fi
     </xsl:template>
 
@@ -599,23 +616,38 @@ exit 0      # exit with success
         <xsl:param name="local"/>
         <xsl:call-template name="INIT_SRB"/>
         Sget<xsl:text/>
-            <xsl:text> </xsl:text><xsl:call-template name="SET_OVERWRITE"><xsl:with-param name="option">-f</xsl:with-param></xsl:call-template>
+            <xsl:text> </xsl:text><xsl:if test="../../jsdl:CreationFlag/text()='overwrite'">-f</xsl:if>
             <xsl:text> </xsl:text><xsl:call-template name="PATH"/>
             <xsl:text> </xsl:text><xsl:value-of select="$local"/>
         if test $? -ne 0 ; then
-            _FAIL_ <xsl:call-template name="GET_ERROR"><xsl:with-param name="local" select="$local"/></xsl:call-template>
-            return $?
+        <xsl:choose>
+            <xsl:when test="../../jsdl:CreationFlag/text()='overwrite'">
+            _FAIL_ "Failed to download input file: <xsl:value-of select="$local"/>"
+            return $_ERROR_INPUT_FAIL_TO_TRANSFER_
+            </xsl:when>
+            <xsl:otherwise>
+            _FAIL_ "Input file already exists locally: <xsl:value-of select="$local"/>, please set CreationFlag to overwrite"
+            return $_ERROR_INPUT_ALREADY_EXISTS_LOCALLY_
+            </xsl:otherwise>
+        </xsl:choose>
         fi
     </xsl:template>
     <xsl:template match="jsdl:Target/jsdl:URI[starts-with(text(),'srb://')]">
         <xsl:param name="local"/>
         <xsl:call-template name="INIT_SRB"/>
         Sput<xsl:text/>
-            <xsl:text> </xsl:text><xsl:call-template name="SET_OVERWRITE"><xsl:with-param name="option">-f</xsl:with-param></xsl:call-template>
+            <xsl:text> </xsl:text><xsl:if test="../../jsdl:CreationFlag/text()='overwrite'">-f</xsl:if>
             <xsl:text> </xsl:text><xsl:value-of select="$local"/>
             <xsl:text> </xsl:text><xsl:call-template name="PATH"/>
         if test $? -ne 0 ; then
-            log WARN <xsl:call-template name="GET_ERROR"><xsl:with-param name="local" select="$local"/></xsl:call-template>
+        <xsl:choose>
+            <xsl:when test="../../jsdl:CreationFlag/text()='overwrite'">
+            log WARN "Failed to upload output file: <xsl:value-of select="$local"/>"
+            </xsl:when>
+            <xsl:otherwise>
+            log WARN "Output file already exists remotely: <xsl:value-of select="text()"/>, please set CreationFlag to overwrite"
+            </xsl:otherwise>
+        </xsl:choose>
         fi
     </xsl:template>
     <xsl:template name="INIT_SRB">
@@ -631,23 +663,38 @@ exit 0      # exit with success
         <xsl:param name="local"/>
         <xsl:call-template name="INIT_IRODS"/>
         iget<xsl:text/>
-            <xsl:text> </xsl:text><xsl:call-template name="SET_OVERWRITE"><xsl:with-param name="option">-f</xsl:with-param></xsl:call-template>
+            <xsl:text> </xsl:text><xsl:if test="../../jsdl:CreationFlag/text()='overwrite'">-f</xsl:if>
             <xsl:text> </xsl:text><xsl:call-template name="PATH"/>
             <xsl:text> </xsl:text><xsl:value-of select="$local"/>
         if test $? -ne 0 ; then
-            _FAIL_ <xsl:call-template name="GET_ERROR"><xsl:with-param name="local" select="$local"/></xsl:call-template>
-            return $?
+        <xsl:choose>
+            <xsl:when test="../../jsdl:CreationFlag/text()='overwrite'">
+            _FAIL_ "Failed to download input file: <xsl:value-of select="$local"/>"
+            return $_ERROR_INPUT_FAIL_TO_TRANSFER_
+            </xsl:when>
+            <xsl:otherwise>
+            _FAIL_ "Input file already exists locally: <xsl:value-of select="$local"/>, please set CreationFlag to overwrite"
+            return $_ERROR_INPUT_ALREADY_EXISTS_LOCALLY_
+            </xsl:otherwise>
+        </xsl:choose>
         fi
     </xsl:template>
     <xsl:template match="jsdl:Target/jsdl:URI[starts-with(text(),'irods://')]">
         <xsl:param name="local"/>
         <xsl:call-template name="INIT_IRODS"/>
         iput<xsl:text/>
-            <xsl:text> </xsl:text><xsl:call-template name="SET_OVERWRITE"><xsl:with-param name="option">-f</xsl:with-param></xsl:call-template>
+            <xsl:text> </xsl:text><xsl:if test="../../jsdl:CreationFlag/text()='overwrite'">-f</xsl:if>
             <xsl:text> </xsl:text><xsl:value-of select="$local"/>
             <xsl:text> </xsl:text><xsl:call-template name="PATH"/>
         if test $? -ne 0 ; then
-            log WARN <xsl:call-template name="GET_ERROR"><xsl:with-param name="local" select="$local"/></xsl:call-template>
+        <xsl:choose>
+            <xsl:when test="../../jsdl:CreationFlag/text()='overwrite'">
+            log WARN "Failed to upload output file: <xsl:value-of select="$local"/>"
+            </xsl:when>
+            <xsl:otherwise>
+            log WARN "Output file already exists remotely: <xsl:value-of select="text()"/>, please set CreationFlag to overwrite"
+            </xsl:otherwise>
+        </xsl:choose>
         fi
     </xsl:template>
     <xsl:template name="INIT_IRODS">
@@ -657,7 +704,7 @@ exit 0      # exit with success
     <!-- ************************* http ************************* -->
     <xsl:template match="jsdl:Source/jsdl:URI[starts-with(text(),'http://')]">
         <xsl:param name="local"/>
-        <xsl:call-template name="REMOVE_LOCAL"><xsl:with-param name="local" select="$local"/></xsl:call-template>
+        <xsl:call-template name="REMOVE_LOCAL_INPUT"><xsl:with-param name="local" select="$local"/></xsl:call-template>
         wget<xsl:text/>
             <xsl:text> </xsl:text><xsl:value-of select="text()"/>
             <xsl:text> </xsl:text>--output-document=<xsl:value-of select="$local"/>
@@ -667,7 +714,7 @@ exit 0      # exit with success
     <!-- ************************* https ************************* -->
     <xsl:template match="jsdl:Source/jsdl:URI[starts-with(text(),'https://')]">
         <xsl:param name="local"/>
-        <xsl:call-template name="REMOVE_LOCAL"><xsl:with-param name="local" select="$local"/></xsl:call-template>
+        <xsl:call-template name="REMOVE_LOCAL_INPUT"><xsl:with-param name="local" select="$local"/></xsl:call-template>
         wget<xsl:text/>
             <xsl:text> </xsl:text><xsl:value-of select="text()"/>
             <xsl:text> </xsl:text>--output-document=<xsl:value-of select="$local"/>
@@ -678,7 +725,7 @@ exit 0      # exit with success
     <!-- ************************* ftp ************************* -->
     <xsl:template match="jsdl:Source/jsdl:URI[starts-with(text(),'ftp://')]">
         <xsl:param name="local"/>
-        <xsl:call-template name="REMOVE_LOCAL"><xsl:with-param name="local" select="$local"/></xsl:call-template>
+        <xsl:call-template name="REMOVE_LOCAL_INPUT"><xsl:with-param name="local" select="$local"/></xsl:call-template>
         wget<xsl:text/>
             <xsl:text> </xsl:text><xsl:value-of select="text()"/>
             <xsl:text> </xsl:text>--output-document=<xsl:value-of select="$local"/>
@@ -690,14 +737,14 @@ exit 0      # exit with success
     <!-- ************************* gzip ************************* -->
     <xsl:template match="jsdl:Source/jsdl:URI[starts-with(text(),'gzip://')]">
         <xsl:param name="local"/>
-        <xsl:call-template name="REMOVE_LOCAL"><xsl:with-param name="local" select="$local"/></xsl:call-template>
+        <xsl:call-template name="REMOVE_LOCAL_INPUT"><xsl:with-param name="local" select="$local"/></xsl:call-template>
         gzip --decompress<xsl:text/>
             <xsl:text> </xsl:text><xsl:call-template name="PATH"/>
             <xsl:text> </xsl:text>--stdout &gt; <xsl:value-of select="$local"/>
     </xsl:template>
     <xsl:template match="jsdl:Target/jsdl:URI[starts-with(text(),'gzip://')]">
         <xsl:param name="local"/>
-        <xsl:call-template name="REMOVE_LOCAL"><xsl:with-param name="local"><xsl:call-template name="PATH"/></xsl:with-param></xsl:call-template>
+        <xsl:call-template name="REMOVE_REMOTE_OUTPUT"><xsl:with-param name="remote"><xsl:call-template name="PATH"/></xsl:with-param></xsl:call-template>
         gzip<xsl:text/>
             <xsl:text> </xsl:text><xsl:value-of select="$local"/>
             <xsl:text> </xsl:text>--stdout &gt; <xsl:call-template name="PATH"/>
@@ -706,7 +753,7 @@ exit 0      # exit with success
     <!-- ************************* tar ************************* -->    
     <xsl:template match="jsdl:Source/jsdl:URI[starts-with(text(),'tar://')]">
         <xsl:param name="local"/>
-        <xsl:call-template name="REMOVE_LOCAL"><xsl:with-param name="local" select="$local"/></xsl:call-template>
+        <xsl:call-template name="REMOVE_LOCAL_INPUT"><xsl:with-param name="local" select="$local"/></xsl:call-template>
         <xsl:variable name="tarball"><xsl:call-template name="TARBALL"/></xsl:variable>
         <xsl:variable name="file"><xsl:call-template name="FILE_IN_TARBALL"/></xsl:variable>
         tar x<xsl:text/>
@@ -721,7 +768,7 @@ exit 0      # exit with success
         <xsl:if test="not(../../jsdl:CreationFlag/text()='overwrite')">
         tar tf <xsl:value-of select="$tarball"/> | grep "^<xsl:value-of select="$file"/>$"
         if test $? -eq 0 ; then
-            log WARN "File already exists: <xsl:value-of select="text()"/>, please set CreationFlag to overwrite"
+            log WARN "Output file already exists in tar: <xsl:value-of select="text()"/>, please set CreationFlag to overwrite"
         fi
         </xsl:if>
         mv <xsl:value-of select="$local"/> <xsl:value-of select="$file"/>
@@ -732,7 +779,7 @@ exit 0      # exit with success
     <!-- ************************* tgz ************************* -->    
     <xsl:template match="jsdl:Source/jsdl:URI[starts-with(text(),'tgz://')]">
         <xsl:param name="local"/>
-        <xsl:call-template name="REMOVE_LOCAL"><xsl:with-param name="local" select="$local"/></xsl:call-template>
+        <xsl:call-template name="REMOVE_LOCAL_INPUT"><xsl:with-param name="local" select="$local"/></xsl:call-template>
         <xsl:variable name="tarball"><xsl:call-template name="TARBALL"/></xsl:variable>
         <xsl:variable name="file"><xsl:call-template name="FILE_IN_TARBALL"/></xsl:variable>
         tar xz<xsl:text/>
@@ -747,7 +794,7 @@ exit 0      # exit with success
         <xsl:if test="not(../../jsdl:CreationFlag/text()='overwrite')">
         tar tfz <xsl:value-of select="$tarball"/> | grep "^<xsl:value-of select="$file"/>$"
         if test $? -eq 0 ; then
-            log WARN "File already exists: <xsl:value-of select="text()"/>, please set CreationFlag to overwrite"
+            log WARN "Output file already exists in tgz: <xsl:value-of select="text()"/>, please set CreationFlag to overwrite"
         fi
         </xsl:if>
         mv <xsl:value-of select="$local"/> <xsl:value-of select="$file"/>
@@ -811,7 +858,7 @@ exit 0      # exit with success
     <!-- ************************* gsiftp ************************* -->
     <xsl:template match="jsdl:Source/jsdl:URI[starts-with(text(),'gsiftp://')]">
         <xsl:param name="local"/>
-        <xsl:call-template name="REMOVE_LOCAL"><xsl:with-param name="local" select="$local"/></xsl:call-template>
+        <xsl:call-template name="REMOVE_LOCAL_INPUT"><xsl:with-param name="local" select="$local"/></xsl:call-template>
         <xsl:call-template name="INIT_GSIFTP"/>
         $GLOBUS_URL_COPY -notpt<xsl:text/>
             <xsl:text> </xsl:text><xsl:call-template name="SET_PROTECTION"/>
@@ -860,14 +907,14 @@ exit 0      # exit with success
             GLOBUS_URL_COPY="$GLOBUS_LOCATION/bin/globus-url-copy.bat"
         else
             _FAIL_ "Command not found: globus-url-copy"
-            return $?
+            return $_ERROR_COMMAND_NOT_FOUND_
         fi
     </xsl:template>
 
     <!-- ************************* gsiftp v1 ************************* -->
     <xsl:template match="jsdl:Source/jsdl:URI[starts-with(text(),'gsiftp-v1://')]">
         <xsl:param name="local"/>
-        <xsl:call-template name="REMOVE_LOCAL"><xsl:with-param name="local" select="$local"/></xsl:call-template>
+        <xsl:call-template name="REMOVE_LOCAL_INPUT"><xsl:with-param name="local" select="$local"/></xsl:call-template>
         <xsl:call-template name="INIT_GSIFTP"/>
         $GLOBUS_URL_COPY -notpt<xsl:text/>
             <xsl:text> </xsl:text>"<xsl:call-template name="FIXED_URL"/>"<xsl:text/>
@@ -887,14 +934,14 @@ exit 0      # exit with success
     <!-- ************************* file ************************* -->
     <xsl:template match="jsdl:Source/jsdl:URI[starts-with(text(),'file://')]">
         <xsl:param name="local"/>
-        <xsl:call-template name="REMOVE_LOCAL"><xsl:with-param name="local" select="$local"/></xsl:call-template>
+        <xsl:call-template name="REMOVE_LOCAL_INPUT"><xsl:with-param name="local" select="$local"/></xsl:call-template>
         cp<xsl:text/>
             <xsl:text> </xsl:text>"<xsl:call-template name="PATH"/>"<xsl:text/>
             <xsl:text> </xsl:text>"<xsl:value-of select="$local"/>"<xsl:text/>
     </xsl:template>
     <xsl:template match="jsdl:Target/jsdl:URI[starts-with(text(),'file://')]">
         <xsl:param name="local"/>
-        <xsl:call-template name="REMOVE_LOCAL"><xsl:with-param name="local"><xsl:call-template name="PATH"/></xsl:with-param></xsl:call-template>
+        <xsl:call-template name="REMOVE_REMOTE_OUTPUT"><xsl:with-param name="remote"><xsl:call-template name="PATH"/></xsl:with-param></xsl:call-template>
         cp<xsl:text/>
             <xsl:text> </xsl:text>"<xsl:value-of select="$local"/>"<xsl:text/>
             <xsl:text> </xsl:text>"<xsl:call-template name="PATH"/>"<xsl:text/>
@@ -906,30 +953,7 @@ exit 0      # exit with success
     </xsl:template>
 
     <!-- ******************* explicit local copy ******************** -->
-    <xsl:template name="COPY">
-        <xsl:param name="source"/>
-        <xsl:param name="target"/>
-        <xsl:call-template name="REMOVE_LOCAL"><xsl:with-param name="local" select="$target"/></xsl:call-template>
-        cp<xsl:text/>
-            <xsl:text> </xsl:text>"<xsl:value-of select="$source"/>"<xsl:text/>
-            <xsl:text> </xsl:text>"<xsl:value-of select="$target"/>"<xsl:text/>
-    </xsl:template>
-
-    <xsl:template name="SET_OVERWRITE">
-        <xsl:param name="option"/>
-        <xsl:if test="../../jsdl:CreationFlag/text()='overwrite'">
-            <xsl:value-of select="$option"/>
-        </xsl:if>
-    </xsl:template>
-    <xsl:template name="GET_ERROR">
-        <xsl:param name="local"/>
-        <xsl:choose>
-            <xsl:when test="../../jsdl:CreationFlag/text()='overwrite'">"Failed to put file: <xsl:value-of select="$local"/>"</xsl:when>
-            <xsl:otherwise>"File already exists: <xsl:value-of select="$local"/>, please set CreationFlag to overwrite"</xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-
-    <xsl:template name="REMOVE_LOCAL">
+    <xsl:template name="REMOVE_LOCAL_INPUT">
         <xsl:param name="local"/>
         if test -e "<xsl:value-of select="$local"/>" ; then<xsl:text/>
             <xsl:choose>
@@ -937,21 +961,35 @@ exit 0      # exit with success
             rm -f "<xsl:value-of select="$local"/>"
                 </xsl:when>
                 <xsl:otherwise>
-            _FAIL_ "File already exists: <xsl:value-of select="$local"/>, please set CreationFlag to overwrite"<xsl:text/>
-            return $?
+            _FAIL_ "Input file already exists locally: <xsl:value-of select="$local"/>, please set CreationFlag to overwrite"<xsl:text/>
+            return $_ERROR_INPUT_ALREADY_EXISTS_LOCALLY_
                 </xsl:otherwise>
             </xsl:choose>
         fi
     </xsl:template>
 
-    <xsl:template name="OVERWRITE_REMOTE">
+    <xsl:template name="REMOVE_REMOTE_OUTPUT">
+        <xsl:param name="remote"/>
+        if test -e "<xsl:value-of select="$remote"/>" ; then<xsl:text/>
+            <xsl:choose>
+                <xsl:when test="../../jsdl:CreationFlag/text()='overwrite'">
+            rm -f "<xsl:value-of select="$remote"/>"
+                </xsl:when>
+                <xsl:otherwise>
+            log WARN "Output file already exists remotely: <xsl:value-of select="$remote"/>, please set CreationFlag to overwrite"<xsl:text/>
+                </xsl:otherwise>
+            </xsl:choose>
+        fi
+    </xsl:template>
+
+    <xsl:template name="OVERWRITE_REMOTE_OUTPUT">
         <xsl:param name="command"/>
         <xsl:choose>
             <xsl:when test="../../jsdl:CreationFlag/text()='overwrite'">
                 <xsl:value-of select="$command"/>
             </xsl:when>
             <xsl:otherwise>
-            log WARN "File already exists: <xsl:value-of select="text()"/>, please set CreationFlag to overwrite"
+            log WARN "Output file already exists remotely: <xsl:value-of select="text()"/>, please set CreationFlag to overwrite"
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>

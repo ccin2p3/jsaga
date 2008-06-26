@@ -50,7 +50,7 @@ public class FilteredJobStatusListener extends AbstractJobStatusListener impleme
     public void notifyChange(JobStatus status) {
         JobMonitorCallback callback = (JobMonitorCallback) m_subscribedJobs.get(status.getNativeJobId());
         if (callback != null) {
-            callback.setState(status.getSagaState(), status.getStateDetail(), status.getSubState());
+            callback.setState(status.getSagaState(), status.getStateDetail(), status.getSubState(), status.getCause());
         }
     }
 }

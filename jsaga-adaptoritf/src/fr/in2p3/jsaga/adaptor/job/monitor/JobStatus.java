@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.job.monitor;
 
 import fr.in2p3.jsaga.adaptor.job.SubState;
+import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.task.State;
 
 /* ***************************************************
@@ -19,16 +20,25 @@ public abstract class JobStatus {
     private String m_nativeJobId;
     protected Object m_nativeStateCode;
     protected String m_nativeStateString;
-    protected String m_nativeCause;
+    protected org.ogf.saga.error.Exception m_nativeCause;
 
-    public JobStatus(String jobId, Object stateCode, String stateString) {
-        this(jobId, stateCode, stateString, null);
+    public JobStatus(String jobId, Object stateCode, String stateString, int returnCode) {
+        this(jobId, stateCode, stateString);
+        if (returnCode != 0) {
+            m_nativeCause = new JobWrapperException(jobId, returnCode);
+        }
     }
     public JobStatus(String jobId, Object stateCode, String stateString, String cause) {
+        this(jobId, stateCode, stateString);
+        if (cause != null) {
+            m_nativeCause = new NoSuccess("Job '"+jobId+"': "+cause);
+        }
+    }
+    public JobStatus(String jobId, Object stateCode, String stateString) {
         m_nativeJobId = jobId;
         m_nativeStateCode = stateCode;
         m_nativeStateString = stateString;
-        m_nativeCause = cause;
+        m_nativeCause = null;
     }
 
     public String getNativeJobId() {
@@ -41,6 +51,10 @@ public abstract class JobStatus {
 
     public String getStateDetail() {
         return this.getModel()+":"+m_nativeStateString;
+    }
+
+    public org.ogf.saga.error.Exception getCause() {
+        return m_nativeCause;
     }
 
     public abstract String getModel();

@@ -196,7 +196,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
         }
         try {
             m_controlAdaptor.cancel(m_nativeJobId);
-            this.setState(State.CANCELED, "Canceled by user", SubState.CANCELED);
+            this.setState(State.CANCELED, "Canceled by user", SubState.CANCELED, new IncorrectState("Canceled by user"));
         } catch (org.ogf.saga.error.Exception e) {
             // do nothing (failed to cancel task)
         }
@@ -377,7 +377,9 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
 
     ////////////////////////////////////// implementation of JobMonitorCallback //////////////////////////////////////
 
-    public void setState(State state, String stateDetail, SubState subState) {
+    public void setState(State state, String stateDetail, SubState subState, org.ogf.saga.error.Exception cause) {
+        // set cause of task state (do not trigger anything)
+        super.setException(cause);
         // set job state (may cleanup job)
         this.setJobState(state, stateDetail, subState);
         // set task state (may finish task)

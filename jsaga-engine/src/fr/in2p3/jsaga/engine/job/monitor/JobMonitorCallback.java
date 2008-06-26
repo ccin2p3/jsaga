@@ -16,5 +16,5 @@ import org.ogf.saga.task.State;
  *
  */
 public interface JobMonitorCallback {
-    public void setState(State state, String stateDetail, SubState subState);
+    public void setState(State state, String stateDetail, SubState subState, org.ogf.saga.error.Exception cause);
 }

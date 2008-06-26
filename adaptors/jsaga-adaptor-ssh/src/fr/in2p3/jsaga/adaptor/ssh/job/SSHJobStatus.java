@@ -13,8 +13,8 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 * ***************************************************/
 
 public class SSHJobStatus extends JobStatus {
-    public SSHJobStatus(String jobId, int status) {
-        super(jobId, status, "unknown");
+    public SSHJobStatus(String jobId, int returnCode) {
+        super(jobId, returnCode, "unknown", returnCode);
     }
 
 	public String getModel() {
