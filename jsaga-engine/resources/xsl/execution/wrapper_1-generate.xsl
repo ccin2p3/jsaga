@@ -1078,9 +1078,11 @@ FRAGMENT=<xsl:call-template name="FRAGMENT"/>
             <xsl:when test="contains($authority,':')">
                 <xsl:value-of select="substring-after($authority,':')"/>
             </xsl:when>
+<!--
             <xsl:otherwise>
                 <xsl:message terminate="no">URL contains no port: <xsl:value-of select="$url"/></xsl:message>
             </xsl:otherwise>
+-->
         </xsl:choose>
     </xsl:template>
 
