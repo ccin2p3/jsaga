@@ -133,7 +133,7 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
         try {
         	try {
             	Gram.request(m_serverUrl, job, isInteractive);
-            	logger.warn("'two_phase' attribute was ignored.");
+            	logger.debug("'two_phase' attribute was ignored.");
         	}
         	catch (WaitingForCommitException e) {
         		// send signal to start job
