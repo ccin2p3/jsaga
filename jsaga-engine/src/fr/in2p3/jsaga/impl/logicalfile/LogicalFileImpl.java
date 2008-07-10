@@ -2,19 +2,14 @@ package fr.in2p3.jsaga.impl.logicalfile;
 
 import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
-import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
-import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
-import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyDelegated;
 import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
-import fr.in2p3.jsaga.engine.config.Configuration;
-import fr.in2p3.jsaga.engine.data.copy.SourceLogicalFile;
-import fr.in2p3.jsaga.engine.data.copy.TargetLogicalFile;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytesLogical;
-import fr.in2p3.jsaga.engine.schema.config.Protocol;
 import fr.in2p3.jsaga.helpers.URLFactory;
+import fr.in2p3.jsaga.impl.logicalfile.copy.LogicalFileCopy;
+import fr.in2p3.jsaga.impl.logicalfile.copy.LogicalFileCopyFrom;
 import fr.in2p3.jsaga.impl.namespace.*;
 import org.ogf.saga.*;
 import org.ogf.saga.error.*;
@@ -99,43 +94,8 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
             return; //==========> EXIT
         }
         effectiveFlags.checkAllowed(Flags.DEREFERENCE.or(Flags.CREATEPARENTS.or(Flags.OVERWRITE)));
-        boolean overwrite = effectiveFlags.contains(Flags.OVERWRITE);
         URL effectiveTarget = this._getEffectiveURL(target);
-        if (m_adaptor instanceof DataCopyDelegated && m_url.getScheme().equals(effectiveTarget.getScheme())) {
-            try {
-                ((DataCopyDelegated)m_adaptor).requestTransfer(
-                        m_url,
-                        effectiveTarget,
-                        overwrite, m_url.getQuery());
-            } catch (DoesNotExist doesNotExist) {
-                throw new IncorrectState("Logical file does not exist: "+ m_url, doesNotExist);
-            } catch (AlreadyExists alreadyExists) {
-                throw new AlreadyExists("Target entry already exists: "+effectiveTarget, alreadyExists.getCause());
-            }
-        } else if (m_adaptor instanceof DataCopy && m_url.getScheme().equals(effectiveTarget.getScheme())) {
-            try {
-                ((DataCopy)m_adaptor).copy(
-                        m_url.getPath(),
-                        effectiveTarget.getHost(), effectiveTarget.getPort(), effectiveTarget.getPath(),
-                        overwrite, m_url.getQuery());
-            } catch (ParentDoesNotExist parentDoesNotExist) {
-                throw new DoesNotExist("Target parent directory does not exist: "+effectiveTarget.resolve(new URL(".")), parentDoesNotExist);
-            } catch (DoesNotExist doesNotExist) {
-                throw new IncorrectState("Logical file does not exist: "+ m_url, doesNotExist);
-            } catch (AlreadyExists alreadyExists) {
-                throw new AlreadyExists("Target entry already exists: "+effectiveTarget, alreadyExists.getCause());
-            }
-        } else if (m_adaptor instanceof LogicalReader) {
-            SourceLogicalFile source = new SourceLogicalFile(this);
-            Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(target.getScheme());
-            if (descriptor.hasLogical() && descriptor.getLogical()) {
-                source.putToLogicalFile(m_session, effectiveTarget, effectiveFlags);
-            } else {
-                source.putToPhysicalFile(m_session, effectiveTarget, effectiveFlags);
-            }
-        } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
-        }
+        new LogicalFileCopy(m_session, this, m_adaptor).copy(effectiveTarget, effectiveFlags);
     }
 
     public void copyFrom(URL source, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
@@ -145,41 +105,8 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
             return; //==========> EXIT
         }
         effectiveFlags.checkAllowed(Flags.DEREFERENCE.or(Flags.OVERWRITE));
-        boolean overwrite = effectiveFlags.contains(Flags.OVERWRITE);
         URL effectiveSource = this._getEffectiveURL(source);
-        if (m_adaptor instanceof DataCopyDelegated && m_url.getScheme().equals(effectiveSource.getScheme())) {
-            try {
-                ((DataCopyDelegated)m_adaptor).requestTransfer(
-                        effectiveSource,
-                        m_url,
-                        overwrite, m_url.getQuery());
-            } catch (DoesNotExist doesNotExist) {
-                throw new DoesNotExist("Logical file does not exist: "+effectiveSource, doesNotExist.getCause());
-            } catch (AlreadyExists alreadyExists) {
-                throw new IncorrectState("Target entry already exists: "+ m_url, alreadyExists);
-            }
-        } else if (m_adaptor instanceof DataCopy && m_url.getScheme().equals(effectiveSource.getScheme())) {
-            try {
-                ((DataCopy)m_adaptor).copyFrom(
-                        effectiveSource.getHost(), effectiveSource.getPort(), effectiveSource.getPath(),
-                        m_url.getPath(),
-                        overwrite, m_url.getQuery());
-            } catch (DoesNotExist doesNotExist) {
-                throw new DoesNotExist("Logical file does not exist: "+effectiveSource, doesNotExist.getCause());
-            } catch (AlreadyExists alreadyExists) {
-                throw new IncorrectState("Target entry already exists: "+ m_url, alreadyExists);
-            }
-        } else if (m_adaptor instanceof LogicalWriter) {
-            Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(source.getScheme());
-            if (descriptor.hasLogical() && descriptor.getLogical()) {
-                TargetLogicalFile target = new TargetLogicalFile(this);
-                target.getFromLogicalFile(m_session, effectiveSource, effectiveFlags);
-            } else {
-                throw new BadParameter("Maybe what you want to do is to register to logical file the following location: "+source);
-            }
-        } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
-        }
+        new LogicalFileCopyFrom(m_session, this, m_adaptor).copyFrom(effectiveSource, effectiveFlags);
     }
 
     /////////////////////////////// class AbstractNSEntryImpl ///////////////////////////////

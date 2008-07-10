@@ -1,19 +1,15 @@
 package fr.in2p3.jsaga.impl.file;
 
 import fr.in2p3.jsaga.JSagaURL;
-import fr.in2p3.jsaga.adaptor.data.*;
-import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
-import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyDelegated;
-import fr.in2p3.jsaga.adaptor.data.read.*;
+import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
+import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
+import fr.in2p3.jsaga.adaptor.data.read.FileReader;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
-import fr.in2p3.jsaga.adaptor.data.write.FileWriterPutter;
-import fr.in2p3.jsaga.engine.config.Configuration;
-import fr.in2p3.jsaga.engine.data.copy.SourcePhysicalFile;
-import fr.in2p3.jsaga.engine.data.copy.TargetPhysicalFile;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytesPhysical;
-import fr.in2p3.jsaga.engine.schema.config.Protocol;
 import fr.in2p3.jsaga.helpers.URLFactory;
+import fr.in2p3.jsaga.impl.file.copy.FileCopy;
+import fr.in2p3.jsaga.impl.file.copy.FileCopyFrom;
 import fr.in2p3.jsaga.impl.namespace.*;
 import org.ogf.saga.*;
 import org.ogf.saga.buffer.Buffer;
@@ -139,63 +135,11 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
             return; //==========> EXIT
         }
         effectiveFlags.checkAllowed(Flags.DEREFERENCE.or(Flags.CREATEPARENTS.or(Flags.OVERWRITE)));
-        boolean overwrite = effectiveFlags.contains(Flags.OVERWRITE);
         URL effectiveTarget = this._getEffectiveURL(target);
         if (m_outStream != null) {
             try {m_outStream.close();} catch (IOException e) {/*ignore*/}
         }
-        if (m_adaptor instanceof DataCopyDelegated && m_url.getScheme().equals(effectiveTarget.getScheme())) {
-            try {
-                ((DataCopyDelegated)m_adaptor).requestTransfer(
-                        m_url,
-                        effectiveTarget,
-                        overwrite, m_url.getQuery());
-            } catch (DoesNotExist doesNotExist) {
-                throw new IncorrectState("Source file does not exist: "+ m_url, doesNotExist);
-            } catch (AlreadyExists alreadyExists) {
-                throw new AlreadyExists("Target entry already exists: "+effectiveTarget, alreadyExists.getCause());
-            }
-        } else if (m_adaptor instanceof DataCopy && m_url.getScheme().equals(effectiveTarget.getScheme())) {
-            try {
-                BaseURL base = m_adaptor.getBaseURL();
-                if (base == null) {
-                    base = new BaseURL();
-                }
-                ((DataCopy)m_adaptor).copy(
-                        m_url.getPath(),
-                        effectiveTarget.getHost(), base.getPort(effectiveTarget), effectiveTarget.getPath(),
-                        overwrite, m_url.getQuery());
-            } catch (ParentDoesNotExist parentDoesNotExist) {
-                throw new DoesNotExist("Target parent directory does not exist: "+effectiveTarget.resolve(new URL(".")), parentDoesNotExist);
-            } catch (DoesNotExist doesNotExist) {
-                throw new IncorrectState("Source file does not exist: "+ m_url, doesNotExist);
-            } catch (AlreadyExists alreadyExists) {
-                throw new AlreadyExists("Target entry already exists: "+effectiveTarget, alreadyExists.getCause());
-            }
-        } else if (m_adaptor instanceof FileReaderGetter && !m_url.getScheme().equals(effectiveTarget.getScheme())) {
-            FileImpl targetFile = SourcePhysicalFile.createTargetFile(m_session, effectiveTarget, effectiveFlags);
-            try {
-                ((FileReaderGetter)m_adaptor).getToStream(
-                        m_url.getPath(),
-                        m_url.getQuery(),
-                        targetFile.getFileOutputStream());
-            } catch (DoesNotExist doesNotExist) {
-                targetFile.remove();
-                throw new IncorrectState("Source file does not exist: "+m_url, doesNotExist);
-            } finally {
-                targetFile.close();
-            }
-        } else if (m_adaptor instanceof FileReader) {
-            Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(target.getScheme());
-            if (descriptor.hasLogical() && descriptor.getLogical()) {
-                throw new BadParameter("Maybe what you want to do is to register to logical file the following location: "+ m_url.toString());
-            } else {
-                SourcePhysicalFile source = new SourcePhysicalFile(this);
-                source.putToPhysicalFile(m_session, effectiveTarget, effectiveFlags);
-            }
-        } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
-        }
+        new FileCopy(m_session, this, m_adaptor).copy(effectiveTarget, effectiveFlags);
     }
 
     /** implements super.copyFrom() */
@@ -206,63 +150,11 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
             return; //==========> EXIT
         }
         effectiveFlags.checkAllowed(Flags.DEREFERENCE.or(Flags.OVERWRITE));
-        boolean overwrite = effectiveFlags.contains(Flags.OVERWRITE);
         URL effectiveSource = this._getEffectiveURL(source);
         if (m_inStream != null) {
             try {m_inStream.close();} catch (IOException e) {/*ignore*/}
         }
-        if (m_adaptor instanceof DataCopyDelegated && m_url.getScheme().equals(effectiveSource.getScheme())) {
-            try {
-                ((DataCopyDelegated)m_adaptor).requestTransfer(
-                        effectiveSource,
-                        m_url,
-                        overwrite, m_url.getQuery());
-            } catch (DoesNotExist doesNotExist) {
-                throw new DoesNotExist("Source file does not exist: "+effectiveSource, doesNotExist.getCause());
-            } catch (AlreadyExists alreadyExists) {
-                throw new IncorrectState("Target entry already exists: "+ m_url, alreadyExists);
-            }
-        } else if (m_adaptor instanceof DataCopy && m_url.getScheme().equals(effectiveSource.getScheme())) {
-            BaseURL base = m_adaptor.getBaseURL();
-            if (base == null) {
-                base = new BaseURL();
-            }
-            try {
-                ((DataCopy)m_adaptor).copyFrom(
-                        effectiveSource.getHost(), base.getPort(effectiveSource), effectiveSource.getPath(),
-                        m_url.getPath(),
-                        overwrite, m_url.getQuery());
-            } catch (DoesNotExist doesNotExist) {
-                throw new DoesNotExist("Source file does not exist: "+effectiveSource, doesNotExist.getCause());
-            } catch (AlreadyExists alreadyExists) {
-                throw new IncorrectState("Target entry already exists: "+ m_url, alreadyExists);
-            }
-        } else if (m_adaptor instanceof FileWriterPutter && !m_url.getScheme().equals(effectiveSource.getScheme())) {
-            FileImpl sourceFile = TargetPhysicalFile.createSourceFile(m_session, effectiveSource);
-            try {
-                ((FileWriterPutter)m_adaptor).putFromStream(
-                        m_url.getPath(),
-                        false,
-                        m_url.getQuery(),
-                        sourceFile.getFileInputStream());
-            } catch (ParentDoesNotExist parentDoesNotExist) {
-                throw new DoesNotExist("Target parent directory does not exist: "+m_url, parentDoesNotExist);
-            } catch (AlreadyExists alreadyExists) {
-                throw new IncorrectState("Target entry already exists: "+m_url, alreadyExists);
-            } finally {
-                sourceFile.close();
-            }
-        } else if (m_adaptor instanceof FileWriter) {
-            TargetPhysicalFile target = new TargetPhysicalFile(this);
-            Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(source.getScheme());
-            if (descriptor.hasLogical() && descriptor.getLogical()) {
-                target.getFromLogicalFile(m_session, effectiveSource, effectiveFlags);
-            } else {
-                target.getFromPhysicalFile(m_session, effectiveSource, effectiveFlags);
-            }
-        } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
-        }
+        new FileCopyFrom(m_session, this, m_adaptor).copyFrom(effectiveSource, effectiveFlags);
     }
 
     ////////////////////////////// class AbstractNSEntryImpl //////////////////////////////
