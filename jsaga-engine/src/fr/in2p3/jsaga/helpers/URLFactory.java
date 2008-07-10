@@ -62,7 +62,7 @@ public class URLFactory {
             throw new BadParameter("INTERNAL ERROR: path must be relative to a directory: "+base.getURL());
         }
         // resolve
-        String absolutePath = resolve(base, relativePath.getPath());
+        String absolutePath = resolve(base, relativePath);
         if (relativePath instanceof JSagaURL) {
             return new JSagaURL(((JSagaURL)relativePath).getAttributes(), absolutePath);
         } else {
@@ -117,5 +117,40 @@ public class URLFactory {
         if(i>1)relativePath="/"+relativePath.substring(i);
         java.net.URI uri = baseUri.resolve(relativePath);
         return uri.toString();
+    }
+
+    private static String resolve(URL base, URL relativeUrl) throws NotImplemented, BadParameter, NoSuccess {
+        java.net.URI baseUri;
+        try {
+            baseUri = new java.net.URI(base.getURL());
+        } catch (URISyntaxException e) {
+            throw new BadParameter(e);
+        }
+        String relativePath = JSagaURL.encodePath(relativeUrl.getPath())
+                + getQuery(base, relativeUrl)
+                + getFragment(base, relativeUrl);
+        //bugfix: Windows drive letter is considered as hostname if URL is "file://C:/"
+        int i;for(i=0; i<relativePath.length() && relativePath.charAt(i)=='/'; i++);
+        if(i>1)relativePath="/"+relativePath.substring(i);
+        java.net.URI uri = baseUri.resolve(relativePath);
+        return uri.toString();
+    }
+    private static String getQuery(URL base, URL relative) throws NotImplemented {
+        if (relative.getQuery() != null) {
+            return "?"+relative.getQuery();
+        } else if (base.getQuery() != null) {
+            return "?"+base.getQuery();
+        } else {
+            return "";
+        }
+    }
+    private static String getFragment(URL base, URL relative) throws NotImplemented {
+        if (relative.getFragment() != null) {
+            return "#"+relative.getFragment();
+        } else if (base.getFragment() != null) {
+            return "#"+base.getFragment();
+        } else {
+            return "";
+        }
     }
 }
