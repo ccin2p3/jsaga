@@ -38,13 +38,16 @@ public class FileCopy {
     private DataAdaptor m_adaptor;
 
     /** constructor */
-    public FileCopy(Session session, FileImpl sourceFile, DataAdaptor adaptor) throws NotImplemented, BadParameter, IncorrectState, Timeout, NoSuccess {
+    public FileCopy(Session session, FileImpl sourceFile, DataAdaptor adaptor) throws NotImplemented {
         m_session = session;
         m_sourceFile = sourceFile;
         m_adaptor = adaptor;
     }
 
     public void copy(URL effectiveTarget, FlagsBytes effectiveFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
+        this.copy(effectiveTarget, effectiveFlags, null);
+    }
+    void copy(URL effectiveTarget, FlagsBytes effectiveFlags, FileCopyTask progressMonitor) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
         boolean overwrite = effectiveFlags.contains(Flags.OVERWRITE);
         URL source = m_sourceFile.getURL();
         if (m_adaptor instanceof DataCopyDelegated && source.getScheme().equals(effectiveTarget.getScheme())) {
@@ -93,14 +96,14 @@ public class FileCopy {
             if (descriptor.hasLogical() && descriptor.getLogical()) {
                 throw new BadParameter("Maybe what you want to do is to register to logical file the following location: "+source.toString());
             } else {
-                this.putToPhysicalFile(effectiveTarget, effectiveFlags);
+                this.putToPhysicalFile(effectiveTarget, effectiveFlags, progressMonitor);
             }
         } else {
             throw new NotImplemented("Not supported for this protocol: "+source.getScheme());
         }
     }
 
-    private void putToPhysicalFile(URL target, FlagsBytes targetFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
+    private void putToPhysicalFile(URL target, FlagsBytes targetFlags, FileCopyTask progressMonitor) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
         IOException closingException = null;
 
         // open source file if it exists
@@ -138,6 +141,10 @@ public class FileCopy {
                             out.write(dataBis, 0, writelen);
                         } else {
                             out.write(data, 0, readlen);
+                        }
+                        // update progress monitor
+                        if (progressMonitor != null) {
+                            progressMonitor.increment(writelen);
                         }
                     }
                     readlen = in.read(data,0, data.length);

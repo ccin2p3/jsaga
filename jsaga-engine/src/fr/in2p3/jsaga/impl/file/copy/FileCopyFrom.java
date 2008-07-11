@@ -40,13 +40,16 @@ public class FileCopyFrom {
     private DataAdaptor m_adaptor;
 
     /** constructor */
-    public FileCopyFrom(Session session, FileImpl targetFile, DataAdaptor adaptor) throws NotImplemented, BadParameter, IncorrectState, Timeout, NoSuccess {
+    public FileCopyFrom(Session session, FileImpl targetFile, DataAdaptor adaptor) throws NotImplemented {
         m_session = session;
         m_targetFile = targetFile;
         m_adaptor = adaptor;
     }
 
     public void copyFrom(URL effectiveSource, FlagsBytes effectiveFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
+        this.copyFrom(effectiveSource, effectiveFlags, null);
+    }
+    void copyFrom(URL effectiveSource, FlagsBytes effectiveFlags, FileCopyFromTask progressMonitor) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
         boolean overwrite = effectiveFlags.contains(Flags.OVERWRITE);
         URL target = m_targetFile.getURL();
         if (m_adaptor instanceof DataCopyDelegated && target.getScheme().equals(effectiveSource.getScheme())) {
@@ -95,14 +98,14 @@ public class FileCopyFrom {
             if (descriptor.hasLogical() && descriptor.getLogical()) {
                 this.getFromLogicalFile(effectiveSource, effectiveFlags);
             } else {
-                this.getFromPhysicalFile(effectiveSource, effectiveFlags);
+                this.getFromPhysicalFile(effectiveSource, effectiveFlags, progressMonitor);
             }
         } else {
             throw new NotImplemented("Not supported for this protocol: "+target.getScheme());
         }
     }
 
-    private void getFromPhysicalFile(URL source, FlagsBytes sourceFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
+    private void getFromPhysicalFile(URL source, FlagsBytes sourceFlags, FileCopyFromTask progressMonitor) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
         IOException closingException = null;
 
         // open source file if it exists
@@ -137,6 +140,10 @@ public class FileCopyFrom {
                             out.write(dataBis, 0, writelen);
                         } else {
                             out.write(data, 0, readlen);
+                        }
+                        // update progress monitor
+                        if (progressMonitor != null) {
+                            progressMonitor.increment(writelen);
                         }
                     }
                     readlen = in.read(data,0, data.length);

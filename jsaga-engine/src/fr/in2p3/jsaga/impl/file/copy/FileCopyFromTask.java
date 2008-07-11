@@ -3,9 +3,11 @@ package fr.in2p3.jsaga.impl.file.copy;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.impl.file.FileImpl;
+import fr.in2p3.jsaga.impl.monitoring.*;
 import fr.in2p3.jsaga.impl.task.AbstractTaskImplWithAsyncAttributes;
 import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
+import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
 import org.ogf.saga.task.Task;
@@ -25,16 +27,43 @@ import java.lang.Exception;
  *
  */
 public class FileCopyFromTask extends AbstractTaskImplWithAsyncAttributes implements Task {
+    // internal
     private FileCopyFrom m_copyFrom;
     private URL m_effectiveSource;
     private FlagsBytes m_effectiveFlags;
+    // metrics
+    private long m_totalWrittenBytes;
+    private MetricImpl<Long> m_metric_Progress;
 
     /** constructor */
-    public FileCopyFromTask(Session session, FileImpl targetFile, DataAdaptor adaptor, URL effectiveSource, FlagsBytes effectiveFlags) throws NotImplemented, BadParameter, IncorrectState, Timeout, NoSuccess {
+    public FileCopyFromTask(Session session, FileImpl targetFile, DataAdaptor adaptor, URL effectiveSource, FlagsBytes effectiveFlags) throws NotImplemented {
         super(session, null, true);
+        // check flags
+        try {
+            effectiveFlags.checkAllowed(Flags.DEREFERENCE.or(Flags.CREATEPARENTS.or(Flags.OVERWRITE)));
+        } catch (BadParameter e) {
+            FileCopyFromTask.super.setException(e);
+            FileCopyFromTask.super.setState(State.FAILED);
+        }
+        // internal
         m_copyFrom = new FileCopyFrom(session, targetFile, adaptor);
         m_effectiveSource = effectiveSource;
         m_effectiveFlags = effectiveFlags;
+        // metrics
+        m_totalWrittenBytes = 0;
+        m_metric_Progress = (MetricImpl<Long>) this._addMetric(new MetricImpl<Long>(
+                this,
+                FileCopyTask.FILE_COPY_PROGRESS,
+                "this metric gives the state of ongoing file transfer as number of bytes transfered.",
+                MetricMode.ReadOnly,
+                "bytes",
+                MetricType.Int,
+                new Long(0)));
+    }
+
+    void increment(long writtenBytes) {
+        m_totalWrittenBytes += writtenBytes;
+        m_metric_Progress.setValue(new Long(m_totalWrittenBytes));
     }
 
     ////////////////////////////////////// implementation of AbstractTaskImpl //////////////////////////////////////
@@ -45,7 +74,7 @@ public class FileCopyFromTask extends AbstractTaskImplWithAsyncAttributes implem
             public void run() {
                 FileCopyFromTask.super.setState(State.RUNNING);
                 try {
-                    m_copyFrom.copyFrom(m_effectiveSource, m_effectiveFlags);
+                    m_copyFrom.copyFrom(m_effectiveSource, m_effectiveFlags, FileCopyFromTask.this);
                     FileCopyFromTask.super.setState(State.DONE);
                 } catch (Exception e) {
                     FileCopyFromTask.super.setException(new NoSuccess(e));

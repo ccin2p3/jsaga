@@ -1,6 +1,10 @@
 package fr.in2p3.jsaga.impl.namespace;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
+import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
+import fr.in2p3.jsaga.impl.file.FileImpl;
+import fr.in2p3.jsaga.impl.file.copy.FileCopyFromTask;
+import fr.in2p3.jsaga.impl.file.copy.FileCopyTask;
 import fr.in2p3.jsaga.impl.permissions.AbstractDataPermissionsImpl;
 import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
 import org.ogf.saga.URL;
@@ -116,18 +120,43 @@ public abstract class AbstractAsyncNSEntryImpl extends AbstractDataPermissionsIm
     }
 
     public Task copy(TaskMode mode, URL target, int flags) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractNSEntryImpl.class.getMethod("copy", new Class[]{URL.class, int.class}),
-                    new Object[]{target, flags}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
+        if (this instanceof FileImpl) {
+            FlagsBytes effectiveFlags = new FlagsBytes(flags);
+            return new FileCopyTask(m_session, (FileImpl) this, m_adaptor, target, effectiveFlags);
+        } else {
+            try {
+                return prepareTask(mode, new GenericThreadedTask(
+                        m_session,
+                        this,
+                        AbstractNSEntryImpl.class.getMethod("copy", new Class[]{URL.class, int.class}),
+                        new Object[]{target, flags}));
+            } catch (Exception e) {
+                throw new NotImplemented(e);
+            }
         }
     }
     public Task copy(TaskMode mode, URL target) throws NotImplemented {
         return this.copy(mode, target, Flags.NONE.getValue());
+    }
+
+    public Task copyFrom(TaskMode mode, URL source, int flags) throws NotImplemented {
+        if (this instanceof FileImpl) {
+            FlagsBytes effectiveFlags = new FlagsBytes(flags);
+            return new FileCopyFromTask(m_session, (FileImpl) this, m_adaptor, source, effectiveFlags);
+        } else {
+            try {
+                return prepareTask(mode, new GenericThreadedTask(
+                        m_session,
+                        this,
+                        AbstractNSEntryImpl.class.getMethod("copyFrom", new Class[]{URL.class, int.class}),
+                        new Object[]{source, flags}));
+            } catch (Exception e) {
+                throw new NotImplemented(e);
+            }
+        }
+    }
+    public Task copyFrom(TaskMode mode, URL source) throws NotImplemented {
+        return this.copyFrom(mode, source, Flags.NONE.getValue());
     }
 
     public Task link(TaskMode mode, URL target, int flags) throws NotImplemented {
