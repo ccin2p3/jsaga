@@ -26,7 +26,7 @@ public abstract class AbstractTaskImplWithAsyncAttributes<E> extends AbstractTas
     private AbstractAsyncAttributesImpl m_attributes;
 
     /** constructor */
-    public AbstractTaskImplWithAsyncAttributes(Session session, SagaObject object, boolean create) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public AbstractTaskImplWithAsyncAttributes(Session session, SagaObject object, boolean create) throws NotImplemented {
         super(session, object, create);
         m_attributes = new AbstractAsyncAttributesImpl(m_session){
             public ObjectType getType() {

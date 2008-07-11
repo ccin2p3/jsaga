@@ -3,7 +3,7 @@ package fr.in2p3.jsaga.impl.job.instance;
 import fr.in2p3.jsaga.adaptor.job.SubState;
 import fr.in2p3.jsaga.impl.monitoring.*;
 import fr.in2p3.jsaga.impl.task.TaskStateMetricImpl;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.job.Job;
 import org.ogf.saga.task.State;
 
@@ -26,7 +26,7 @@ public class JobMetrics {
     MetricImpl<String> m_SubState;
 
     /** constructor */
-    JobMetrics(JobImpl job) throws NoSuccess {
+    JobMetrics(JobImpl job) throws NotImplemented {
         m_State = job._addMetric(new TaskStateMetricImpl<State>(
                 job,
                 Job.JOB_STATE,

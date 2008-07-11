@@ -36,7 +36,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
     private static Logger s_logger = Logger.getLogger(AbstractTaskImpl.class);
 
     /** constructor */
-    public AbstractTaskImpl(Session session, Object object, boolean create) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public AbstractTaskImpl(Session session, Object object, boolean create) throws NotImplemented {
         super(session);
 
         // set metrics

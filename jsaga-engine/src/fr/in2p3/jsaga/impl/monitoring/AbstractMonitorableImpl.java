@@ -71,12 +71,12 @@ public abstract class AbstractMonitorableImpl extends AbstractSagaObjectImpl imp
 
     //////////////////////////////////////////// internal methods ////////////////////////////////////////////
 
-    public MetricImpl _addMetric(MetricImpl metric) throws NoSuccess {
+    public MetricImpl _addMetric(MetricImpl metric) throws NotImplemented {
         try {
             String name = metric.getAttribute(Metric.NAME);
             m_metrics.put(name, metric);
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NotImplemented("INTERNAL ERROR", e);
         }
         return metric;
     }

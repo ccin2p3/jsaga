@@ -31,7 +31,7 @@ public abstract class AbstractWorkflowTaskImpl extends AbstractTaskImpl implemen
     private Task m_xmlStatus;
 
     /** constructor */
-    public AbstractWorkflowTaskImpl(Session session, String name) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public AbstractWorkflowTaskImpl(Session session, String name) throws NotImplemented {
         super(session, null, true);
         m_name = name;
         m_predecessors = new HashMap<String,WorkflowTask>();
