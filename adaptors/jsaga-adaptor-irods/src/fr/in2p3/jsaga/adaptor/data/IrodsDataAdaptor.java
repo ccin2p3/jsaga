@@ -1,7 +1,6 @@
 package fr.in2p3.jsaga.adaptor.data;
 
-import edu.sdsc.grid.io.FileFactory;
-import edu.sdsc.grid.io.GeneralFile;
+import edu.sdsc.grid.io.*;
 import edu.sdsc.grid.io.irods.*;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
@@ -62,7 +61,7 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
     }
 
     public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
-        //todo: save and use provided security adaptor        
+        //todo: save and use provided security adaptor
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
@@ -85,17 +84,69 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
     }
 	
 	public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+		/*
 		GeneralFile[] files = FileFactory.newFile(fileSystem, absolutePath).listFiles();
 		FileAttributes[] fileAttributes = new FileAttributes[files.length];
 		for (int i=0; i<files.length;i++) {
 			fileAttributes[i] = new IrodsFileAttributes(files[i]);
 		}
 		return fileAttributes;
-	}
-	
-	public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+*/
+
+		boolean listDir = true;
+		boolean listFile = true;
+		
+		if (additionalArgs != null && additionalArgs.equals(DIR)) { listFile=false;}
+		if (additionalArgs != null && additionalArgs.equals(FILE)) { listDir=false;}
+		
+		absolutePath = absolutePath.substring(0,absolutePath.length()-1);
 		try {
-			String[] split = absolutePath.split(separator);
+			// Select for directories
+			MetaDataRecordList[] rlDir = null;
+			if (listDir) {
+				MetaDataCondition conditionsDir[] = new MetaDataCondition[1];
+				MetaDataSelect selectsDir[] ={	MetaDataSet.newSelection(IRODSMetaDataSet.DIRECTORY_NAME) };
+				conditionsDir[0] = IRODSMetaDataSet.newCondition(IRODSMetaDataSet.PARENT_DIRECTORY_NAME,MetaDataCondition.EQUAL, absolutePath);
+				rlDir = fileSystem.query(conditionsDir, selectsDir);
+			}
+			
+			// Select for files
+			MetaDataRecordList[] rlFile = null;
+			if (listFile) {	
+				MetaDataCondition conditionsFile[] = new MetaDataCondition[1];
+				MetaDataSelect selectsFile[] ={MetaDataSet.newSelection(MetaDataSet.FILE_NAME),
+				MetaDataSet.newSelection(IRODSMetaDataSet.SIZE),
+				MetaDataSet.newSelection(IRODSMetaDataSet.MODIFICATION_DATE)};
+				
+				conditionsFile[0] = IRODSMetaDataSet.newCondition(
+				IRODSMetaDataSet.DIRECTORY_NAME,MetaDataCondition.EQUAL, absolutePath);
+				rlFile = fileSystem.query(conditionsFile, selectsFile);
+			}
+			
+			int file =0;
+			int dir = 0;
+			if (rlDir != null) {dir=rlDir.length;}
+			if (rlFile != null) {file=rlFile.length;}
+
+			int ind=0;
+			FileAttributes[] fileAttributes = new FileAttributes[dir+file];
+			for (int i = 0; i < dir; i++) {
+				fileAttributes[ind] = new SrbFileAttributes(rlDir[i],null);
+				ind++;
+			}
+			for (int i = 0; i < file; i++) {
+				fileAttributes[ind] = new SrbFileAttributes(null,rlFile[i]);
+				ind++;
+			}
+			return fileAttributes;
+		} catch (IOException e) {throw new NoSuccess(e);}
+
+		}
+	
+	public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess
+	{
+		try {
+			String[] split = absolutePath.split(SEPARATOR);
 			String fileName = split[split.length-1];
 			
 			String dir = absolutePath.substring(0,absolutePath.length()-fileName.length());
@@ -121,9 +172,15 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 	
 	public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
 		try {
+		/*
 			String[] split = parentAbsolutePath.split(separator);
 			String dir = parentAbsolutePath.substring(0,parentAbsolutePath.length()-fileName.length());
-			IRODSFile generalFile =  (IRODSFile)FileFactory.newFile((IRODSFileSystem)fileSystem, dir, fileName );
+			System.out.println("parentAbsolutePath:"+parentAbsolutePath);
+			System.out.println("fileSystem:"+fileSystem);
+			System.out.println("dir:"+dir);
+			System.out.println("fileName:"+fileName);
+			*/
+			IRODSFile generalFile =  (IRODSFile)FileFactory.newFile((IRODSFileSystem)fileSystem, parentAbsolutePath, fileName );
 			
 			return new BufferedOutputStream(new IRODSFileOutputStream(generalFile));
        	} catch (java.lang.Exception e) {
@@ -132,17 +189,17 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 	}
 	
 	public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
-		IRODSFile irodsFile = new IRODSFile((IRODSFileSystem)fileSystem, parentAbsolutePath +separator + directoryName);
+		IRODSFile irodsFile = new IRODSFile((IRODSFileSystem)fileSystem, parentAbsolutePath +SEPARATOR + directoryName);
 		irodsFile.mkdir();
 	}
 
 	public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-		IRODSFile irodsFile = new IRODSFile((IRODSFileSystem)fileSystem, parentAbsolutePath +separator + directoryName);
+		IRODSFile irodsFile = new IRODSFile((IRODSFileSystem)fileSystem, parentAbsolutePath +SEPARATOR + directoryName);
 		irodsFile.delete();
 	}
 
 	public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-		IRODSFile irodsFile = new IRODSFile((IRODSFileSystem)fileSystem, parentAbsolutePath +separator + fileName);
+		IRODSFile irodsFile = new IRODSFile((IRODSFileSystem)fileSystem, parentAbsolutePath +SEPARATOR + fileName);
 		irodsFile.delete();
 	}
 	

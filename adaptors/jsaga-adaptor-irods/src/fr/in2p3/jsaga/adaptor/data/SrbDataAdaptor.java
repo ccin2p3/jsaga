@@ -94,33 +94,43 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 		}
 		return fileAttributes;
 		*/
-		if (additionalArgs != null)
-		{
-			System.out.println("additionalArgs:"+additionalArgs);
-		}
+		boolean listDir = true;
+		boolean listFile = true;
+		
+		if (additionalArgs != null && additionalArgs.equals(DIR)) { listFile=false;}
+		if (additionalArgs != null && additionalArgs.equals(FILE)) { listDir=false;}
 		
 		absolutePath = absolutePath.substring(0,absolutePath.length()-1);
+		
 		try {
 			// Select for directories
-			MetaDataCondition conditionsDir[] = new MetaDataCondition[1];
-			MetaDataSelect selectsDir[] ={	MetaDataSet.newSelection(SRBMetaDataSet.DIRECTORY_NAME) };
-			conditionsDir[0] = SRBMetaDataSet.newCondition(SRBMetaDataSet.PARENT_DIRECTORY_NAME,MetaDataCondition.EQUAL, absolutePath);
-			MetaDataRecordList[] rlDir = fileSystem.query(conditionsDir, selectsDir);
+			MetaDataRecordList[] rlDir = null;
+			 
+			if (listDir) {
+				MetaDataCondition conditionsDir[] = new MetaDataCondition[1];
+				MetaDataSelect selectsDir[] ={	MetaDataSet.newSelection(SRBMetaDataSet.DIRECTORY_NAME) };
+				conditionsDir[0] = SRBMetaDataSet.newCondition(SRBMetaDataSet.PARENT_DIRECTORY_NAME,MetaDataCondition.EQUAL, absolutePath);
+				rlDir = fileSystem.query(conditionsDir, selectsDir);
+			}
 			
 			// Select for files
-			MetaDataCondition conditionsFile[] = new MetaDataCondition[1];
-			MetaDataSelect selectsFile[] ={MetaDataSet.newSelection(MetaDataSet.FILE_NAME),
-			MetaDataSet.newSelection(SRBMetaDataSet.SIZE),
-			MetaDataSet.newSelection(SRBMetaDataSet.FILE_LAST_ACCESS_TIMESTAMP)	};
+			MetaDataRecordList[] rlFile = null;
 			
-			System.out.println("absolutePath:"+absolutePath);
-			// MetaDataSet.newSelection(SRBMetaDataSet.ACCESS_CONSTRAINT),
-			// MetaDataSet.newSelection(SRBMetaDataSet.USER_TYPE_NAME),
-			//MetaDataSet.newSelection(SRBMetaDataSet.USER_NAME)
-			conditionsFile[0] = SRBMetaDataSet.newCondition(
-			SRBMetaDataSet.DIRECTORY_NAME,MetaDataCondition.EQUAL, absolutePath);
+			if (listFile) {
+				MetaDataCondition conditionsFile[] = new MetaDataCondition[1];
+				MetaDataSelect selectsFile[] ={MetaDataSet.newSelection(MetaDataSet.FILE_NAME),
+				MetaDataSet.newSelection(SRBMetaDataSet.SIZE),
+				MetaDataSet.newSelection(SRBMetaDataSet.FILE_LAST_ACCESS_TIMESTAMP)	};
+				
+				System.out.println("absolutePath:"+absolutePath);
+				// MetaDataSet.newSelection(SRBMetaDataSet.ACCESS_CONSTRAINT),
+				// MetaDataSet.newSelection(SRBMetaDataSet.USER_TYPE_NAME),
+				//MetaDataSet.newSelection(SRBMetaDataSet.USER_NAME)
+				conditionsFile[0] = SRBMetaDataSet.newCondition(
+				SRBMetaDataSet.DIRECTORY_NAME,MetaDataCondition.EQUAL, absolutePath);
 
-			MetaDataRecordList[] rlFile = fileSystem.query(conditionsFile, selectsFile);
+				rlFile = fileSystem.query(conditionsFile, selectsFile);
+			}
 			
 			int file =0;
 			int dir = 0;
@@ -143,7 +153,7 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 
 	public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
 		try {
-			String[] split = absolutePath.split(separator);
+			String[] split = absolutePath.split(SEPARATOR);
 			String fileName = split[split.length-1];
 			
 			String dir = absolutePath.substring(0,absolutePath.length()-fileName.length());
@@ -182,17 +192,17 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 	}
 	
 	public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
-		SRBFile srbFile = new SRBFile((SRBFileSystem)fileSystem, parentAbsolutePath +separator + directoryName);
+		SRBFile srbFile = new SRBFile((SRBFileSystem)fileSystem, parentAbsolutePath +SEPARATOR + directoryName);
 		srbFile.mkdir();
 	}
 
 	public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-		SRBFile srbFile = new SRBFile((SRBFileSystem)fileSystem, parentAbsolutePath +separator + directoryName);
+		SRBFile srbFile = new SRBFile((SRBFileSystem)fileSystem, parentAbsolutePath +SEPARATOR + directoryName);
 		srbFile.delete();
 	}
 
 	public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-		SRBFile srbFile = new SRBFile((SRBFileSystem)fileSystem, parentAbsolutePath +separator + fileName);
+		SRBFile srbFile = new SRBFile((SRBFileSystem)fileSystem, parentAbsolutePath +SEPARATOR + fileName);
 		srbFile.delete();
 	}
 }

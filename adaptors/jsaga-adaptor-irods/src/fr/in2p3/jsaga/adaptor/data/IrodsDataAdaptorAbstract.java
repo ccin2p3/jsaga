@@ -21,7 +21,9 @@ import org.ogf.saga.error.*;
  */
 public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor, FileReaderStreamFactory, FileWriterStreamFactory {
 	protected GeneralFileSystem fileSystem;
-	protected final static String separator = "/";
+	protected final static String SEPARATOR = "/";
+	protected final static String FILE = "file";
+	protected final static String DIR = "dir";
 
 	public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
 		return true;

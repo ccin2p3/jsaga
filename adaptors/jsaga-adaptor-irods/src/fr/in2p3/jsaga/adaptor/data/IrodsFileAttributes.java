@@ -1,9 +1,13 @@
 package fr.in2p3.jsaga.adaptor.data;
 
-import edu.sdsc.grid.io.GeneralFile;
+import edu.sdsc.grid.io.MetaDataRecordList;
+import edu.sdsc.grid.io.irods.IRODSMetaDataSet;
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import org.ogf.saga.error.DoesNotExist;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -19,39 +23,54 @@ import org.ogf.saga.error.DoesNotExist;
  */
 public class IrodsFileAttributes extends FileAttributes {
 
-    public IrodsFileAttributes(GeneralFile entry) throws DoesNotExist {
+    public IrodsFileAttributes(MetaDataRecordList collection, MetaDataRecordList file) throws DoesNotExist
+	{
         // set name
-        m_name = entry.getName();
-        if (m_name ==null || m_name.equals(".") || m_name.equals("..")) {
-            throw new DoesNotExist("Ignore this entry");
-        }
+		if (collection != null) {
+			m_name = (String) collection.getValue(collection.getFieldIndex(IRODSMetaDataSet.DIRECTORY_NAME));
+		} else {
+			m_name = (String) file.getValue(file.getFieldIndex(IRODSMetaDataSet.FILE_NAME));
+		}
+
+		if (m_name ==null || m_name.equals(".") || m_name.equals("..")) {
+			throw new DoesNotExist("Ignore this entry");
+		}
 
         // set type        
-		if (entry.isDirectory()) {
+		if (collection != null) {
 			m_type = FileAttributes.DIRECTORY_TYPE;
-		} else if (entry.isFile()) {
+		} else  {
 			m_type = FileAttributes.FILE_TYPE;
-		} else {
-			m_type = FileAttributes.UNKNOWN_TYPE;
-		}
+		} 
 	
         // set size
-        try {
-            m_size = entry.length();
-        } catch(NumberFormatException e) {
+        if (file != null)
+		{
+            m_size = Long.parseLong((String)file.getValue(file.getFieldIndex(IRODSMetaDataSet.SIZE)));
+        } else {
             m_size = -1;
         }
 
         // set permission
-		m_permission = PermissionBytes.NONE;
+        m_permission = PermissionBytes.READ;
+        /* This slow down execution
+        m_permission = PermissionBytes.NONE;
         if (entry.canRead()) {
 			m_permission = m_permission.or(PermissionBytes.READ);
         }
 		if (entry.canWrite()) {
 			m_permission = m_permission.or(PermissionBytes.WRITE);
 		}
+		*/
 
         // set last modified
-        m_lastModified = entry.lastModified();
-    }
+		if (file != null) {
+			try
+			{
+				SimpleDateFormat dateStandard = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss");
+				Date date = dateStandard.parse((String) file.getValue(file.getFieldIndex(IRODSMetaDataSet.MODIFICATION_DATE)));
+				m_lastModified = date.getTime();
+			} catch (Exception e){}
+		}
+	}
 }
