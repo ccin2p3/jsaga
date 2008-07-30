@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.sdsc.grid</groupId>
     <artifactId>jargon</artifactId>
-    <version>2.0.1-beta</version>
+    <version>2.0.1-beta-fixed</version>
     <name>Jargon library</name>
     <url>http://www.sdsc.edu/srb/jargon/</url>
 </project>
