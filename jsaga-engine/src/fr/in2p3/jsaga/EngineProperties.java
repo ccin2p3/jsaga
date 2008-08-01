@@ -22,6 +22,8 @@ public class EngineProperties {
     public static final String JSAGA_CONFIGURATION_ENABLE_CACHE = "jsaga.configuration.enable.cache";
     public static final String JSAGA_CONFIGURATION_IGNORE_MISSING_ADAPTOR = "jsaga.configuration.ignore.missing.adaptor";
     public static final String LOG4J_CONFIGURATION = "log4j.configuration";
+    public static final String DATA_COPY_BUFFER_SIZE = "data.copy.buffer.size";
+    public static final String DATA_COPY_KEEP_LAST_MODIFIED = "data.copy.keep.last.modified";
     public static final String JOB_DESCRIPTION_DEFAULT = "job.description.default";
     public static final String JOB_MONITOR_POLL_PERIOD = "job.monitor.poll.period";
     public static final String JOB_MONITOR_ERROR_THRESHOLD = "job.monitor.error.threshold";
@@ -39,6 +41,8 @@ public class EngineProperties {
             s_prop.setProperty(JSAGA_CONFIGURATION_ENABLE_CACHE, "true");
             s_prop.setProperty(JSAGA_CONFIGURATION_IGNORE_MISSING_ADAPTOR, "true");
             s_prop.setProperty(LOG4J_CONFIGURATION, "etc/log4j.properties");
+            s_prop.setProperty(DATA_COPY_BUFFER_SIZE, "16384");
+            s_prop.setProperty(DATA_COPY_KEEP_LAST_MODIFIED, "false");
             s_prop.setProperty(JOB_DESCRIPTION_DEFAULT, "etc/jsaga-default.jsdl");
             s_prop.setProperty(JOB_MONITOR_POLL_PERIOD, "1000");
             s_prop.setProperty(JOB_MONITOR_ERROR_THRESHOLD, "3");
