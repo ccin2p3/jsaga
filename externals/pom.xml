@@ -39,5 +39,6 @@
     <module>wsgram-api</module>
 	<module>wss4j</module>
 	<module>xmlsec</module>
+    <module>naregi-ss-api</module>
   </modules>
 </project>
