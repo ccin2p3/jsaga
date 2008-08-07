@@ -20,7 +20,7 @@ import java.util.List;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * TODO: remove this dead code
  */
 public class TargetLogicalFile {
     private LogicalFile m_targetFile;

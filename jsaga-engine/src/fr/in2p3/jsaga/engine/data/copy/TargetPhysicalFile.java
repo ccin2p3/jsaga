@@ -23,7 +23,7 @@ import java.util.List;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * TODO: remove this dead code
  */
 public class TargetPhysicalFile {
     private static final int DEFAULT_BUFFER_SIZE = 16384;

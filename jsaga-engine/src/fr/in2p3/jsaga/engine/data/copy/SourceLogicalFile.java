@@ -21,7 +21,7 @@ import java.util.List;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * TODO: remove this dead code
  */
 public class SourceLogicalFile {
     private LogicalFile m_sourceFile;

@@ -22,7 +22,7 @@ import java.lang.Exception;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * TODO: remove this dead code
  */
 public class SourcePhysicalFile {
     private static final int DEFAULT_BUFFER_SIZE = 16384;
