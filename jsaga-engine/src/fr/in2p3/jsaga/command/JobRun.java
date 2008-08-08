@@ -26,6 +26,7 @@ public class JobRun extends AbstractCommand {
     // required arguments
     private static final String OPT_RESOURCE = "r", LONGOPT_RESOURCE = "resource";
     // optional arguments
+    private static final String OPT_DESCRIPTION = "d", LONGOPT_DESCRIPTION = "description";
     private static final String OPT_BATCH = "b", LONGOPT_BATCH = "batch";
     // attribute names missing in interface JobDescription
     private static final String JOBNAME = "JobName";
@@ -52,25 +53,33 @@ public class JobRun extends AbstractCommand {
                 desc.setAttribute(JobDescription.INTERACTIVE, "true");
             }
 
-            // submit
+            // create the job
             Session session = SessionFactory.createSession(true);
             JobService service = JobFactory.createJobService(session, serviceURL);
             Job job = service.createJob(desc);
-            job.run();
 
-            if (line.hasOption(OPT_BATCH)) {
-                String jobId = job.getAttribute(Job.JOBID);
-                System.out.println(jobId);
+            if (line.hasOption(OPT_DESCRIPTION)) {
+                // dump job description
+                String nativeDesc = job.getAttribute("NativeJobDescription");
+                System.out.println(nativeDesc);
             } else {
-                // wait
-                job.waitFor();
+                // submit
+                job.run();
 
-                // display final state
-                State state = job.getState();
-                if (State.DONE.compareTo(state) == 0) {
-                    copyStream(job.getStdout(), System.out);
+                if (line.hasOption(OPT_BATCH)) {
+                    String jobId = job.getAttribute(Job.JOBID);
+                    System.out.println(jobId);
                 } else {
-                    System.err.println("Job did not complete successfully, final state is: "+state);
+                    // wait
+                    job.waitFor();
+
+                    // display final state
+                    State state = job.getState();
+                    if (State.DONE.compareTo(state) == 0) {
+                        copyStream(job.getStdout(), System.out);
+                    } else {
+                        System.err.println("Job did not complete successfully, final state is: "+state);
+                    }
                 }
             }
             System.exit(0);
@@ -94,6 +103,10 @@ public class JobRun extends AbstractCommand {
                 .create(OPT_RESOURCE));
 
         // optional arguments
+        opt.addOption(OptionBuilder.withDescription("generate the job description in the targeted grid language " +
+                "and exit (do not submit the job)")
+                .withLongOpt(LONGOPT_DESCRIPTION)
+                .create(OPT_DESCRIPTION));
         opt.addOption(OptionBuilder.withDescription("exit immediatly after having submitted the job, " +
                 "and print the job ID on the standard output.")
                 .withLongOpt(LONGOPT_BATCH)
