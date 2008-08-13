@@ -37,12 +37,12 @@ sed -i pom.xml -e "s/CHANGEME/$VERSION/g"</pre>
                 </ul>
             </answer>
         </faq>
-        <faq id="run-adaptor-integration-test-locally">
-            <question>How to run integration tests on local host ?</question>
+        <faq id="adaptor-integration-test-with-maven">
+            <question>How to run integration tests with maven ?</question>
             <answer><pre>mvn integration-test -Dintegration-test=&lt;MyProtocolIntegrationTestSuite&gt;</pre></answer>
         </faq>
-        <faq id="run-adaptor-integration-test-remotely">
-            <question>How to run integration tests on remote host ?</question>
+        <faq id="adaptor-integration-test-without-maven">
+            <question>How to run integration tests without maven ?</question>
             <answer>
                 <ul>
                     <li>Build tests package:
