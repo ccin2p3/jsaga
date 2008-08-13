@@ -9,9 +9,7 @@
     <artifactId>saga-api</artifactId>
     <version>0.9.5-SNAPSHOT</version>
     <name>The SAGA Interfaces</name>
-    <description>This is the Java binding of the SAGA interface.
-        This module also contains a generic test-suite for validating SAGA implementations.
-    </description>
+    <description>This is the reference Java binding of the SAGA specification</description>
     <distributionManagement>
         <site>
             <url>${site.upload.root}/${artifactId}</url>
@@ -27,32 +25,6 @@
                     <target>1.5</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
-    <dependencies>
-    	<dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.8</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
 </project>
