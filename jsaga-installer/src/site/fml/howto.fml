@@ -37,9 +37,24 @@ sed -i pom.xml -e "s/CHANGEME/$VERSION/g"</pre>
                 </ul>
             </answer>
         </faq>
-        <faq id="adaptor-integration-test">
-            <question>How to run integration tests ?</question>
+        <faq id="run-adaptor-integration-test-locally">
+            <question>How to run integration tests on local host ?</question>
             <answer><pre>mvn integration-test -Dintegration-test=&lt;MyProtocolIntegrationTestSuite&gt;</pre></answer>
+        </faq>
+        <faq id="run-adaptor-integration-test-remotely">
+            <question>How to run integration tests on remote host ?</question>
+            <answer>
+                <ul>
+                    <li>Build tests package:
+                        <pre>mvn test jar:test-jar -Dintegration-test</pre>
+                    </li>
+                    <li>Copy tests package (build/*-test.jar) to remote host (in directory $JSAGA_HOME/lib-test/)</li>
+                    <li>Copy tests configuration (build/jsaga_home.dir/etc/) to remote host (instead of $JSAGA_HOME/etc/)</li>
+                    <li>Run integration tests:
+                        <pre>junit-run-test integration.&lt;MyProtocolIntegrationTestSuite&gt;</pre>
+                    </li>
+                </ul>
+            </answer>
         </faq>
         <faq id="create-test-entries">
             <question>How to create files and directories for data test suite ?</question>
