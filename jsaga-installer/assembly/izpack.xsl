@@ -93,4 +93,13 @@
             </xsl:for-each>
         </pack>
     </xsl:template>
+
+    <xsl:template match="/project/artifact[@id='saga-api-test']">
+        <pack name="Integration tests" required="no">
+            <description>For running integration tests</description>
+            <xsl:for-each select="descendant-or-self::artifact">
+                <file src="{@file}" targetdir="$INSTALL_PATH/lib-test"/>
+            </xsl:for-each>
+        </pack>
+    </xsl:template>
 </xsl:stylesheet>
