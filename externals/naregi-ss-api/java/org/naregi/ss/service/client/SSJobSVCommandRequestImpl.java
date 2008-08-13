@@ -11,8 +11,8 @@
  *
  *
  * Revision history:
- *      $Revision: 1.1 $
- *      $Id: SSJobSVCommandRequestImpl.java,v 1.1 2008/08/07 15:24:32 sreynaud Exp $
+ *      Revision: 882
+ *      Id: SSJobSVCommandRequestImpl.java 882 2007-03-29 10:58:42Z kawamura 
  */
 package org.naregi.ss.service.client;
 
