@@ -21,15 +21,8 @@
         </dependency>
         <dependency>
             <groupId>org.ogf.saga</groupId>
-            <artifactId>saga-api</artifactId>
+            <artifactId>saga-api-test</artifactId>
             <version>CHANGEME</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.ogf.saga</groupId>
-            <artifactId>saga-api</artifactId>
-            <version>CHANGEME</version>
-            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>

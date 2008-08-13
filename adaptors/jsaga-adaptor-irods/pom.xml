@@ -19,15 +19,8 @@
         </dependency>
         <dependency>
             <groupId>org.ogf.saga</groupId>
-            <artifactId>saga-api</artifactId>
+            <artifactId>saga-api-test</artifactId>
             <version>0.9.5-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.ogf.saga</groupId>
-            <artifactId>saga-api</artifactId>
-            <version>0.9.5-SNAPSHOT</version>
-            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
