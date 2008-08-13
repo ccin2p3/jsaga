@@ -36,6 +36,9 @@ done
 for i in `ls $JSAGA_HOME/lib-adaptors/*.jar` ; do
   CLASSPATH="${CLASSPATH}${SEP}${i}"
 done
+for i in `ls $JSAGA_HOME/lib-test/*.jar` ; do
+  CLASSPATH="${CLASSPATH}${SEP}${i}"
+done
 
 # set java
 if test -z "$JAVA_HOME" ; then

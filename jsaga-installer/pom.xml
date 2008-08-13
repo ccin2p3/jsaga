@@ -203,7 +203,14 @@
             <version>0.9.5-SNAPSHOT</version>
         </dependency>
 
-        <!-- engine -->
+        <!-- test -->
+        <dependency>
+            <groupId>org.ogf.saga</groupId>
+            <artifactId>saga-api-test</artifactId>
+            <version>0.9.5-SNAPSHOT</version>
+        </dependency>
+
+        <!-- core -->
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>

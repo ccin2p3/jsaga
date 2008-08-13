@@ -36,6 +36,9 @@ for %%i in ("%JSAGA_HOME%\lib\*.jar") do (
 for %%i in ("%JSAGA_HOME%\lib-adaptors\*.jar") do (
   set CLASSPATH=!CLASSPATH!;%%i
 )
+for %%i in ("%JSAGA_HOME%\lib-test\*.jar") do (
+  set CLASSPATH=!CLASSPATH!;%%i
+)
 
 REM # set java
 if "%JAVA_HOME%_"=="_" (

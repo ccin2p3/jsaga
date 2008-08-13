@@ -41,6 +41,14 @@
                 <exclude>org.ogf.saga:saga-api:jar</exclude>
             </excludes>
         </dependencySet>
+        <dependencySet>
+            <outputDirectory>lib-test</outputDirectory>
+            <unpack>false</unpack>
+            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <includes>
+                <include>org.ogf.saga:saga-api-test:jar</include>
+            </includes>
+        </dependencySet>
     </dependencySets>
     <files>
         <file>
