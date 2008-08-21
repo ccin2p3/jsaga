@@ -114,6 +114,7 @@ public class VOMSSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuild
                         new File(System.getProperty("user.home")+"/.globus/userkey.pem")}),
                 new Default(Context.CERTREPOSITORY, new File[]{
                         new File(env.getProperty("CADIR")+""),
+                        new File(env.getProperty("X509_CERT_DIR")+""),
                         new File(System.getProperty("user.home")+"/.globus/certificates/"),
                         new File("/etc/grid-security/certificates/")}),
                 new Default(VOMSContext.VOMSDIR, new File[]{
