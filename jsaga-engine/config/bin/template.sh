@@ -30,13 +30,13 @@ PROPERTIES="${PROPERTIES} -DJSAGA_HOME=$JSAGA_HOME"
 
 # set classpath
 CLASSPATH=.
-for i in `ls $JSAGA_HOME/lib/*.jar` ; do
+for i in $JSAGA_HOME/lib/*.jar ; do
   CLASSPATH="${CLASSPATH}${SEP}${i}"
 done
-for i in `ls $JSAGA_HOME/lib-adaptors/*.jar` ; do
+for i in $JSAGA_HOME/lib-adaptors/*.jar ; do
   CLASSPATH="${CLASSPATH}${SEP}${i}"
 done
-for i in `ls $JSAGA_HOME/lib-test/*.jar` ; do
+for i in $JSAGA_HOME/lib-test/*.jar ; do
   CLASSPATH="${CLASSPATH}${SEP}${i}"
 done
 
