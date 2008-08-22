@@ -21,46 +21,6 @@
             <outputDirectory>lib</outputDirectory>
             <unpack>false</unpack>
             <useTransitiveFiltering>true</useTransitiveFiltering>
-            <includes>
-                <include>fr.in2p3.jsaga:jsaga-engine:jar</include>
-                <include>fr.in2p3.jsaga:jsaga-adaptoritf:jar</include>
-                <include>org.ogf.saga:saga-api:jar</include>
-                <!-- workaround: transitive filtering does not work here -->
-                <include>commons-cli:commons-cli:jar</include>
-                <include>log4j:log4j:jar</include>
-                <include>castor:castor:jar:xml</include>
-                <include>xerces:xercesImpl:jar</include>
-                <include>xml-apis:xml-apis:jar</include>
-                <include>commons-logging:commons-logging:jar</include>
-            </includes>
-        </dependencySet>
-        <dependencySet>
-            <outputDirectory>lib-adaptors</outputDirectory>
-            <unpack>false</unpack>
-            <useTransitiveFiltering>true</useTransitiveFiltering>
-            <excludes>
-                <exclude>fr.in2p3.jsaga:jsaga-engine</exclude>
-                <exclude>fr.in2p3.jsaga:jsaga-adaptoritf:jar</exclude>
-                <exclude>org.ogf.saga:saga-api:jar</exclude>
-                <exclude>org.ogf.saga:saga-api-test:jar</exclude>
-                <!-- workaround: remove dependencies common to engine and adaptors -->
-                <exclude>xerces:xercesImpl:jar</exclude>
-                <exclude>xml-apis:xml-apis:jar</exclude>
-                <exclude>commons-logging:commons-logging:jar</exclude>
-            </excludes>
-        </dependencySet>
-        <dependencySet>
-            <outputDirectory>lib-test</outputDirectory>
-            <unpack>false</unpack>
-            <useTransitiveFiltering>true</useTransitiveFiltering>
-            <includes>
-                <include>org.ogf.saga:saga-api-test:jar</include>
-            </includes>
-            <excludes>
-                <!-- workaround: remove dependencies common to engine and tests -->
-                <exclude>org.ogf.saga:saga-api:jar</exclude>
-                <exclude>log4j:log4j:jar</exclude>
-            </excludes>
         </dependencySet>
     </dependencySets>
     <files>
