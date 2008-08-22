@@ -100,6 +100,10 @@
             <xsl:for-each select="descendant-or-self::artifact">
                 <file src="{@file}" targetdir="$INSTALL_PATH/lib-test"/>
             </xsl:for-each>
+            <!-- workaround: junit is not seen as a dependency -->
+            <xsl:for-each select="/project/artifact[@id='junit']">
+                <file src="{@file}" targetdir="$INSTALL_PATH/lib-test"/>
+            </xsl:for-each>
         </pack>
     </xsl:template>
 </xsl:stylesheet>
