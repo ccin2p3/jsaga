@@ -135,7 +135,7 @@ public class ZipDataAdaptor implements FileReaderStreamFactory{//, FileWriterPut
         } catch (IOException e) {
             throw new NoSuccess(e);
         }
-        if (found) {
+        if (found || "".equals(path)) {
             return (FileAttributes[]) list.toArray(new FileAttributes[list.size()]);
         } else {
             throw new DoesNotExist("Entry not found");
@@ -220,6 +220,9 @@ public class ZipDataAdaptor implements FileReaderStreamFactory{//, FileWriterPut
 
     private ZipEntry getEntry(String absolutePath) throws DoesNotExist {
         String path = absolutePath.substring(m_zipPath.length()+1);
+        if ("".equals(path)) {
+            return new ZipEntry("/");
+        }
         if (m_zipReader != null) {
             ZipEntry entry = m_zipReader.getEntry(path);
             if (entry != null) {
