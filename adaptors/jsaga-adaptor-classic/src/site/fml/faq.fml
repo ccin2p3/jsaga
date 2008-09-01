@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faqs title="Frequently Asked Questions">
+    <part id="https">
+        <title>HTTPS</title>
+        <faq id="client-authentication">
+            <question>How to enable client authentication ?</question>
+            <answer>Configure the HTTPS plug-in to use a security context of one of the following types:
+                <ul>
+                    <li>X509: the certificate must be in a PKCS12 file</li>
+                    <li>JKS: the certificate must be in a Java Keystore</li>
+                </ul>
+            </answer>
+        </faq>
+        <faq id="mutual-authentication">
+            <question>How to enable mutual authentication ?</question>
+            <answer>Configure the HTTPS plug-in...
+                <ul>
+                    <li>with attribute "MutualAuthentication" set to value "true"</li>
+                    <li>use a security context of type "JKS" (mutual authentication
+                        with context type "X509" is not supported)</li>
+                </ul>
+            </answer>
+        </faq>
+        <faq id="jks">
+            <question>How to import certificates into the Java Keystore ?</question>
+            <answer>Use the "keytool" command line interface from Java distribution:
+                <ul>
+                    <li>import CA (use a different alias for each imported CA)
+                        <pre>openssl x509 -outform der -in myCA.crt -out myCA.der
+keytool -import -alias 1 -file myCA.der</pre></li>
+                    <li>import your certificate
+                        <pre>java -cp $JSAGA_HOME/lib-adaptors/jsaga-adaptor-classic-*.jar \
+        fr.in2p3.jsaga.adaptor.security.JKSImportCert mycert.p12 passphrase</pre></li>
+                </ul>
+            </answer>
+        </faq>
+        <faq id="pem_to_p12">
+            <question>How to convert certificate from PEM to PKCS12 ?</question>
+            <answer>Use the "openssl" command line interface from Linux/Cygwin distribution:
+                <pre>openssl pkcs12 -export -in usercert.pem -inkey userkey.pem -out mycert.p12</pre>
+            </answer>
+        </faq>
+        <faq id="crt_to_p12">
+            <question>How to convert certificate from CRT to PKCS12 ?</question>
+            <answer>Use the "openssl" command line interface from Linux/Cygwin distribution:
+                <pre>openssl pkcs12 -export -in mycert.crt -inkey mycert.key -out mycert.p12</pre>
+            </answer>
+        </faq>
+    </part>
+</faqs>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faqs title="Frequently Asked Questions">
+    <part id="gsi">
+        <title>Globus Security Infrastructure</title>
+        <faq id="p12_to_pem">
+            <question>How to convert certificate from PKCS12 to PEM ?</question>
+            <answer>Use the "openssl" command line interface from Linux/Cygwin distribution:
+                <pre>openssl pkcs12 -clcerts -nokeys -in mycert.p12 -out usercert.pem
+openssl pkcs12 -nocerts -in mycert.p12 -out userkey.pem</pre>
+            </answer>
+        </faq>
+    </part>
+</faqs>

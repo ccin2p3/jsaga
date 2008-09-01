@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faqs title="Frequently Asked Questions">
+    <part id="mytitle">
+        <title>My Title</title>
+        <faq id="myquestion">
+            <question>What's this ?</question>
+            <answer>This web page is a template for FAQ about this module.</answer>
+        </faq>
+    </part>
+</faqs>
