@@ -5,6 +5,7 @@ import sun.misc.BASE64Encoder;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.security.Key;
 
@@ -49,8 +50,9 @@ public class PasswordEncrypterSingleton extends PasswordAbstract {
         m_key = new SecretKeySpec(rawKey, ALGORITHM);
 
         // store it
+        File keystoreFile = PasswordAbstract.getFile();
         m_keystore.setKeyEntry(m_keyalias, m_key, m_keypass, null);
-        m_keystore.store(new FileOutputStream(FILE), m_storepass);
+        m_keystore.store(new FileOutputStream(keystoreFile), m_storepass);
     }
 
     public String encrypt(String uncrypted) throws Exception {

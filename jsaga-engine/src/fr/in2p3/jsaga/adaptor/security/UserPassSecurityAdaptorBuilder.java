@@ -8,8 +8,7 @@ import org.ogf.saga.context.Context;
 import org.ogf.saga.error.IncorrectState;
 import org.ogf.saga.error.NoSuccess;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.util.Map;
 import java.util.Properties;
 
@@ -75,11 +74,14 @@ public class UserPassSecurityAdaptorBuilder implements ExpirableSecurityAdaptorB
                     int expiryDate = PasswordEncrypterSingleton.getExpiryDate(lifetime);
 
                     // write to user properties file
+                    File propFile = FilePropertiesAttributesParser.getFile();
                     Properties prop = new Properties();
-                    prop.load(new FileInputStream(FilePropertiesAttributesParser.FILE));
+                    if (propFile.exists()) {
+                        prop.load(new FileInputStream(propFile));
+                    }
                     prop.setProperty(contextId+"."+Context.USERID, name);
                     prop.setProperty(contextId+"."+USERPASSCRYPTED, cryptedPassword);
-                    prop.store(new FileOutputStream(FilePropertiesAttributesParser.FILE), "JSAGA user attributes");
+                    prop.store(new FileOutputStream(propFile), "JSAGA user attributes");
                     return new UserPassExpirableSecurityAdaptor(name, password, expiryDate);
                 }
                 case USAGE_VOLATILE:
@@ -119,9 +121,10 @@ public class UserPassSecurityAdaptorBuilder implements ExpirableSecurityAdaptorB
     }
 
     public void destroySecurityAdaptor(Map attributes, String contextId) throws Exception {
+        File propFile = FilePropertiesAttributesParser.getFile();
         Properties prop = new Properties();
-        prop.load(new FileInputStream(FilePropertiesAttributesParser.FILE));
+        prop.load(new FileInputStream(propFile));
         prop.remove(contextId+"."+USERPASSCRYPTED);
-        prop.store(new FileOutputStream(FilePropertiesAttributesParser.FILE), "JSAGA user attributes");
+        prop.store(new FileOutputStream(propFile), "JSAGA user attributes");
     }
 }

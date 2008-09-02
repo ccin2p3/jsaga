@@ -19,18 +19,17 @@ import java.util.*;
  * Update attributes with user properties file
  */
 public class FilePropertiesAttributesParser extends AbstractAttributesParser implements AttributesParser {
-    public static final File FILE = new File(new File(System.getProperty("user.home")), "jsaga-user.properties");
-
     public FilePropertiesAttributesParser(EffectiveConfig config) {
         super(config);
     }
     
     public void updateAttributes() throws ConfigurationException {
-        if (FILE.exists()) {
+        File propFile = getFile();
+        if (propFile.exists()) {
             // load properties file
             Properties prop = new Properties();
             try {
-                prop.load(new FileInputStream(FILE));
+                prop.load(new FileInputStream(propFile));
             } catch (IOException e) {
                 throw new ConfigurationException(e);
             }
@@ -43,5 +42,20 @@ public class FilePropertiesAttributesParser extends AbstractAttributesParser imp
                 super.updateOrInsertAttribute(propertyName, propertyValue);
             }
         }
+    }
+
+    private static File s_file;
+    public static File getFile() throws ConfigurationException {
+        if (s_file == null) {
+            // set properties file
+            s_file = new File(new File(new File(System.getProperty("user.home")), ".jsaga"), "jsaga-user.properties");
+
+            // create parent directory if needed
+            File dir = s_file.getParentFile();
+            if (!dir.exists() && !dir.mkdir()) {
+                throw new ConfigurationException("Failed to create directory: "+dir);
+            }
+        }
+        return s_file;
     }
 }

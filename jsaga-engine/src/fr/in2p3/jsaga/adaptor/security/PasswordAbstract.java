@@ -1,5 +1,7 @@
 package fr.in2p3.jsaga.adaptor.security;
 
+import org.ogf.saga.error.NoSuccess;
+
 import java.io.*;
 import java.security.Key;
 import java.security.KeyStore;
@@ -17,7 +19,6 @@ import java.security.KeyStore;
  *
  */
 public abstract class PasswordAbstract {
-    protected static final File FILE = new File(new File(System.getProperty("user.home")), ".jce-keystore");
     protected static final String ALGORITHM = "AES";
     private static final String MODE = "ECB";
     private static final String PADDING = "PKCS5Padding";
@@ -33,11 +34,31 @@ public abstract class PasswordAbstract {
         m_storepass = System.getProperty("keystore.password", "changeit").toCharArray();
         m_keypass = System.getProperty("key.password", "changeit").toCharArray();
         m_keystore = KeyStore.getInstance("JCEKS");
-        try {
-            m_keystore.load(new FileInputStream(FILE), m_storepass);
-        } catch (FileNotFoundException e) {
-            m_keystore.load(null, null); // create an empty JKS keystore
+        File keystoreFile = getFile();
+        if (keystoreFile.exists()) {
+            // load keystore
+            InputStream in = new FileInputStream(keystoreFile);
+            m_keystore.load(in, m_storepass);
+            in.close();
+        } else {
+            // create an empty keystore
+            m_keystore.load(null, null);
         }
         m_keyalias = System.getProperty("user.name", "default");
+    }
+
+    private static File s_file;
+    protected static File getFile() throws NoSuccess {
+        if (s_file == null) {
+            // set keystore file
+            s_file = new File(new File(new File(System.getProperty("user.home")), ".jsaga"), "jce-keystore.dat");
+
+            // create parent directory if needed
+            File dir = s_file.getParentFile();
+            if (!dir.exists() && !dir.mkdir()) {
+                throw new NoSuccess("Failed to create directory: "+dir);
+            }
+        }
+        return s_file;
     }
 }
