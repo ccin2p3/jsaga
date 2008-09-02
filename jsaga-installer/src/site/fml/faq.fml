@@ -30,34 +30,12 @@
             <answer>
                 <ul>
                     <li>for a one shot usage, set the attribute in the command line arguments</li>
-                    <li>for a user, set the attribute in the user properties file: ~/.globus/jsaga-user.properties</li>
+                    <li>for a user, set the attribute in the user properties file: ~/.jsaga/jsaga-user.properties</li>
                     <li>for all users, set the attribute in the JSAGA configuration file: $JSAGA_HOME/etc/jsaga-config.xml</li>
                     <li>if attribute is not set, then JSAGA may set it according to the adaptor default values</li>
                     <li>if a required attribute is not set and has no default value, then JSAGA will prompt the user for entering the value (unless the system property "interactive" is not defined)</li>
                 </ul>
                 <p>Use the jsaga-help command with mode "default" to display the effective attribute values used by JSAGA.</p>
-            </answer>
-        </faq>
-    </part>
-    <part id="data">
-        <title>Data adaptors FAQ</title>
-        <faq id="srm">
-            <question>How do I configure the SRM adaptor to support new transfer protocols ?</question>
-            <answer>
-                <ul>
-                    <li>set the list of transfer protocols in attribute: TransferProtocols</li>
-                    <li>install the adaptors implementing these protocols</li>
-                </ul>
-            </answer>
-        </faq>
-        <faq id="mail">
-            <question>I have the following exception
-                <pre>java.lang.UnsupportedOperationException: Method not yet implemented
-at javax.mail.internet.MimeMessage.&lt;init&gt;(MimeMessage.java:89)</pre>
-            </question>
-            <answer>Remove geronimo-spec-javamail-1.3.1-rc1.jar from lib-adaptor
-                <pre>dependency of directory-naming:naming-factory:jar:0.8:compile, which is
-dependency of org.globus:wsgram-api:4.0.0</pre>
             </answer>
         </faq>
     </part>
