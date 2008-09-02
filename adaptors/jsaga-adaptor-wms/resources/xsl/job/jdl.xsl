@@ -10,6 +10,7 @@
     <!-- entry point (MUST BE RELATIVE) -->
     <xsl:template match="jsdl:JobDefinition">
         <xsl:apply-templates select="jsdl:JobDescription"/>
+        <xsl:apply-templates select="ext:Extension[@language='JDL']"/>
     </xsl:template>
 
     <xsl:template match="jsdl:JobDescription">
@@ -79,5 +80,9 @@ NodeNumber = <xsl:value-of select="."/>;<xsl:text/>
             	</xsl:otherwise>
         	</xsl:choose>
         </xsl:for-each>
+    </xsl:template>
+
+    <xsl:template match="ext:Extension"># Extension:
+<xsl:value-of select="text()"/>
     </xsl:template>
 </xsl:stylesheet>
