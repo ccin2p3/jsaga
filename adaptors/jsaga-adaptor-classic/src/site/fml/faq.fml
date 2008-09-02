@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <faqs title="Frequently Asked Questions">
+    <part id="module">
+        <title>Adaptor module</title>
+        <faq id="jsaga-help">
+            <question>How do I use this module ?</question>
+            <answer>The command "jsaga-help" provides some useful information about the usage
+                and the current configuration of the plug-ins.
+                <pre>jsaga-help -help</pre>
+                If this command does not provides the answer to your question, then
+                please contact us so that we can fill out this FAQ.
+            </answer>
+        </faq>
+    </part>
     <part id="https">
         <title>HTTPS</title>
         <faq id="client-authentication">

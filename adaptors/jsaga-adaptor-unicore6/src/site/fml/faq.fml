@@ -1,10 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <faqs title="Frequently Asked Questions">
-    <part id="mytitle">
-        <title>My Title</title>
-        <faq id="myquestion">
-            <question>What's this ?</question>
-            <answer>This web page is a template for FAQ about this module.</answer>
+    <part id="module">
+        <title>Adaptor module</title>
+        <faq id="jsaga-help">
+            <question>How do I use this module ?</question>
+            <answer>The command "jsaga-help" provides some useful information about the usage
+                and the current configuration of the plug-ins.
+                <pre>jsaga-help -help</pre>
+                If this command does not provides the answer to your question, then
+                please contact us so that we can fill out this FAQ.
+            </answer>
+        </faq>
+    </part>
+    <part id="execution">
+        <title>Execution management</title>
+        <faq id="windows">
+            <question>How to install Unicore 6.1.0 on Windows ?</question>
+            <answer>
+                <ul>
+                    <li>Install cygwin</li>
+                    <li>Install the core server bundle of Unicore 6.1.0</li>
+                    <li>Edit file "unicorex/conf/simpleidb" to set path to cygwin bash
+                        <pre><![CDATA[<!-- DO NOT REMOVE (workaround for fml) -->  &lt;!-- Bash shell --&gt;
+  &lt;idb:IDBApplication&gt;
+    &lt;idb:ApplicationName&gt;Bash shell&lt;/idb:ApplicationName&gt;
+    &lt;idb:ApplicationVersion&gt;3.1.16&lt;/idb:ApplicationVersion&gt;
+    &lt;jsdl:POSIXApplication xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"&gt;
+      &lt;!-- To comment : &lt;jsdl:Executable&gt;/bin/bash&lt;/jsdl:Executable&gt; --&gt;
+      &lt;!-- Set path to cygwin bash : --&gt;
+      &lt;jsdl:Executable&gt;C:\cygwin\bin\bash&lt;/jsdl:Executable&gt;
+      &lt;jsdl:Argument&gt;--debugger$DEBUG?&lt;/jsdl:Argument&gt;
+      &lt;jsdl:Argument&gt;-v$VERBOSE?&lt;/jsdl:Argument&gt;
+      &lt;jsdl:Argument&gt;$ARGUMENTS?&lt;/jsdl:Argument&gt;
+      &lt;jsdl:Argument&gt;$SOURCE?&lt;/jsdl:Argument&gt;
+    &lt;/jsdl:POSIXApplication&gt;
+  &lt;/idb:IDBApplication&gt;]]></pre>
+                    </li>
+                </ul>
+            </answer>
         </faq>
     </part>
 </faqs>

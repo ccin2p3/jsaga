@@ -1,10 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <faqs title="Frequently Asked Questions">
-    <part id="mytitle">
-        <title>My Title</title>
-        <faq id="myquestion">
-            <question>What's this ?</question>
-            <answer>This web page is a template for FAQ about this module.</answer>
+    <part id="module">
+        <title>Adaptor module</title>
+        <faq id="jsaga-help">
+            <question>How do I use this module ?</question>
+            <answer>The command "jsaga-help" provides some useful information about the usage
+                and the current configuration of the plug-ins.
+                <pre>jsaga-help -help</pre>
+                If this command does not provides the answer to your question, then
+                please contact us so that we can fill out this FAQ.
+            </answer>
+        </faq>
+    </part>
+    <part id="execution">
+        <title>Execution management</title>
+        <faq id="jdl">
+            <question>How can I pass JDL atttributes that are not supported by JSDL ?</question>
+            <answer>Put unsupported attributes into a &lt;Extension&gt; element.
+                <pre><![CDATA[<!-- DO NOT REMOVE (workaround for fml) -->&lt;JobDefinition xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl"&gt;
+    &lt;!-- Your job description here... --&gt;
+    &lt;ext:Extension language="JDL" xmlns:ext="http://www.in2p3.fr/jsdl-extension"&gt;
+MyProxyServer = "skurut.cesnet.cz";
+UserTags = [
+    color = "red";
+    position = "12";
+    prodId = "cms_1234";
+];
+    &lt;/ext:Extension&gt;
+&lt;/JobDefinition&gt;]]></pre>
+            </answer>
         </faq>
     </part>
 </faqs>
