@@ -41,11 +41,11 @@
             <version>2.2</version>
 			 <scope>compile</scope>
         </dependency>
-		<!-- TODO : remove because not required --> 
 		<dependency>
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
-		    <artifactId>jsaga-adaptor-voms</artifactId>
+		    <artifactId>jsaga-adaptor-globus</artifactId>
 		    <version>0.9.5-SNAPSHOT</version>
-		</dependency>
+            <scope>runtime</scope><!-- for security context -->
+        </dependency>
   </dependencies>
 </project>

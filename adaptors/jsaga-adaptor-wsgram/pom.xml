@@ -29,13 +29,13 @@
       <version>0.9.5-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
+    <!-- adaptor specific -->
     <dependency>
       <groupId>fr.in2p3.jsaga.adaptor</groupId>
       <artifactId>jsaga-adaptor-globus</artifactId>
       <version>0.9.5-SNAPSHOT</version>
-      <scope>compile</scope>
+      <scope>runtime</scope><!-- for security context -->
     </dependency>
-	<!-- adaptor specific -->
 	<dependency>
 		<groupId>org.globus</groupId>
 		<artifactId>wsgram-api</artifactId>
