@@ -11,6 +11,12 @@
     <name>Interfaces for adaptors</name>
     <description>This is the set of mandatory and optional interfaces that adaptors have to implement
         in order to be integrated into the SAGA implementation: JSAGA.</description>
+    <licenses>
+        <license>
+            <name>GNU Lesser General Public License</name>
+            <url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
+        </license>
+    </licenses>
     <distributionManagement>
         <site>
             <url>${site.upload.root}/${artifactId}</url>

@@ -10,6 +10,12 @@
     <version>0.9.5-SNAPSHOT</version>
     <name>JSAGA Engine</name>
     <description>This is an implementation of the SAGA interface.</description>
+    <licenses>
+        <license>
+            <name>GNU Lesser General Public License</name>
+            <url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
+        </license>
+    </licenses>
     <distributionManagement>
         <site>
             <url>${site.upload.root}/${artifactId}</url>
