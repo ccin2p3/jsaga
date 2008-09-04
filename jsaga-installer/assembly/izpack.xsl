@@ -48,7 +48,7 @@
 
     <xsl:template match="/project/artifact[@id='jsaga-engine' and not(@classifier)]">
         <pack name="Core" required="yes">
-            <description>The core engine (required)</description>
+            <description>The core engine (required).</description>
             <file src="Licence.txt" targetdir="$INSTALL_PATH"/>
             <file src="Readme.txt" targetdir="$INSTALL_PATH"/>
             <parsable targetfile="$INSTALL_PATH/Readme.txt" type="plain"/>
@@ -73,8 +73,8 @@
                 <parsable os="windows" targetfile="{$script}" type="plain"/>
             </xsl:for-each>
         </pack>
-        <pack name="Integration tests" required="no">
-            <description>Install libraries needed for running integration tests</description>
+        <pack name="Integration tests" required="no" preselected="no">
+            <description>Install libraries needed for running integration tests.</description>
             <xsl:for-each select="descendant::artifact[@scope='test']">
                 <file src="{@file}" targetdir="$INSTALL_PATH/lib-test"/>
             </xsl:for-each>
@@ -83,7 +83,7 @@
 
     <xsl:template match="/project/artifact[@id='graphviz']">
         <pack name="Graph Visualizer" required="no">
-            <description>Install libraries needed for visualizing data staging graphs (recommended)</description>
+            <description>Install libraries needed for visualizing data staging graphs (recommended).</description>
             <!-- unix -->
             <file os="unix" src="lib/linux/" targetdir="$INSTALL_PATH/lib/"/>
             <!-- windows -->
@@ -92,9 +92,19 @@
     </xsl:template>
 
     <xsl:template match="/project/artifact[starts-with(@id,'jsaga-adaptor-')]">
-        <pack name="{@id}" required="no">
-            <description>Adaptor for <xsl:value-of
-                    select="translate(substring-after(@id,'jsaga-adaptor-'),'abcdefghijklmnopqrstuvwxyz)','ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/></description>
+        <pack required="no">
+            <xsl:attribute name="name">
+                <xsl:choose>
+                    <xsl:when test="@name"><xsl:value-of select="@name"/></xsl:when>
+                    <xsl:otherwise><xsl:value-of select="@id"/></xsl:otherwise>
+                </xsl:choose>
+            </xsl:attribute>
+            <description>
+                <xsl:choose>
+                    <xsl:when test="@description and @description!=''"><xsl:value-of select="@description"/></xsl:when>
+                    <xsl:otherwise>No description available for this module.</xsl:otherwise>
+                </xsl:choose>
+            </description>
             <xsl:for-each select="descendant-or-self::artifact">
                 <file src="{@file}" targetdir="$INSTALL_PATH/lib-adaptors"/>
             </xsl:for-each>
