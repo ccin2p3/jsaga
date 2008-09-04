@@ -12,6 +12,12 @@
     <packaging>jar</packaging>
     <name>JSAGA Installer</name>
     <description>JSAGA is a Java implementation of the Simple API for Grid Applications (SAGA)</description>
+    <licenses>
+        <license>
+            <name>GNU Lesser General Public License</name>
+            <url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
+        </license>
+    </licenses>
 
     <!-- web site -->
     <developers>
@@ -70,12 +76,8 @@
                 <artifactId>xslt-maven-plugin</artifactId>
                 <version>1.0</version>
                 <configuration>
-                    <xslFile>assembly/izpack.xsl</xslFile>
                     <srcDir>${project.build.directory}</srcDir>
                     <srcIncludes>dependencies.xml</srcIncludes>
-                    <destDir>${project.build.directory}</destDir>
-                    <fileNameRegex>dependencies</fileNameRegex>
-                    <fileNameReplacement>izpack</fileNameReplacement>
                 </configuration>
                 <executions>
                     <execution>
@@ -84,6 +86,38 @@
                         <goals>
                             <goal>transform</goal>
                         </goals>
+                        <configuration>
+                            <xslFile>assembly/izpack.xsl</xslFile>
+                            <destDir>${project.build.directory}</destDir>
+                            <fileNameRegex>dependencies</fileNameRegex>
+                            <fileNameReplacement>izpack</fileNameReplacement>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-adaptors-web-page</id>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
+                        <configuration>
+                            <xslFile>src/site/xsl/adaptors.xsl</xslFile>
+                            <destDir>${project.build.directory}/site</destDir>
+                            <fileNameRegex>dependencies.xml</fileNameRegex>
+                            <fileNameReplacement>adaptors-bis.html</fileNameReplacement>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-licenses-web-page</id>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
+                        <configuration>
+                            <xslFile>src/site/xsl/licenses.xsl</xslFile>
+                            <destDir>${project.build.directory}/site</destDir>
+                            <fileNameRegex>dependencies.xml</fileNameRegex>
+                            <fileNameReplacement>licenses.html</fileNameReplacement>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -163,6 +197,11 @@
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-jdl</artifactId>
+            <version>0.9.5-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-naregi</artifactId>
             <version>0.9.5-SNAPSHOT</version>
         </dependency>
         <dependency>
