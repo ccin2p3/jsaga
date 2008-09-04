@@ -119,6 +119,19 @@
                             <fileNameReplacement>licenses.xml</fileNameReplacement>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>generate-dependencies-graph-web-page</id>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
+                        <configuration>
+                            <xslFile>src/site/xsl/dependencies-graph.xsl</xslFile>
+                            <destDir>${project.build.directory}/generated-site/xdoc</destDir>
+                            <fileNameRegex>dependencies.xml</fileNameRegex>
+                            <fileNameReplacement>dependencies-graph.xml</fileNameReplacement>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>

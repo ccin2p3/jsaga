@@ -35,6 +35,7 @@
         <menu name="Developer Documentation">
             <item name="JSAGA Adaptors API" href="jsaga-adaptoritf/index.html"/>
             <item name="JSAGA Engine" href="jsaga-engine/index.html"/>
+            <item name="Dependencies" href="dependencies-graph.html"/>
             <item name="How To" href="howto.html"/>
         </menu>
         <menu name="Project Documentation" ref="reports"/>
