@@ -42,18 +42,6 @@
             <item name="Build Tools" href="../build-tools/index.html"/>
             <item name="Common Tools" href="../in2p3-commons/index.html"/>
         </menu>
-        <menu name="Adaptors Documentation">
-            <item name="Default" href="adaptors/jsaga-adaptor-default/faq.html"/>
-            <item name="Classic" href="adaptors/jsaga-adaptor-classic/faq.html"/>
-            <item name="Globus 2.4" href="adaptors/jsaga-adaptor-globus/faq.html"/>
-            <item name="Globus WS-GRAM" href="adaptors/jsaga-adaptor-wsgram/faq.html"/>
-            <item name="gLite JDL" href="adaptors/jsaga-adaptor-jdl/faq.html"/>
-            <item name="gLite WMS" href="adaptors/jsaga-adaptor-wms/faq.html"/>
-            <item name="SRM" href="adaptors/jsaga-adaptor-srm/faq.html"/>
-            <item name="VOMS" href="adaptors/jsaga-adaptor-voms/faq.html"/>
-            <item name="Unicore 6" href="adaptors/jsaga-adaptor-unicore6/faq.html"/>
-            <item name="SSH" href="adaptors/jsaga-adaptor-ssh/faq.html"/>
-        </menu>
         <menu name="Adaptors provided by..."/>
     </body>
 </project>
