@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faqs title="Frequently Asked Questions">
+    <part id="naregi-ss">
+        <title>NAREGI Super Scheduler</title>
+        <faq id="security">
+            <question>Which security context types can be used to submit jobs to NAREGI ?</question>
+            <answer>Any GSI-based security context type can be used, including:
+                <ul>
+                    <li>Globus</li>
+                    <li>GlobusRFC820</li>
+                    <li>VOMS</li>
+                    <li>MyProxy</li>
+                </ul>
+                The UserPass security context type can also be used, by setting the UserID attribute
+                to the MyProxy account, and the UserPass attribute to the MyProxy passphrase.
+            </answer>
+        </faq>
+        <faq id="MyProxy">
+            <question>What is the difference between using MyProxy and UserPass context type ?</question>
+            <answer>
+                <p>With the context type "MyProxy", JSAGA will obtain the proxy, and then submit
+                    the job with the obtained proxy</p>
+                <p>With the context type "UserPass", JSAGA will submit the job with the account/passphrase
+                    information, and the Super Scheduler will obtain the proxy</p>
+            </answer>
+        </faq>
+        <faq id="WallTimeLimit">
+            <question>How can I change the default WallTimeLimit through the SAGA API ?</question>
+            <answer>
+                <p>You can change the default WallTimeLimit by setting the TotalCPUTime attribute.
+                    Its value must 10% lower than the value expected for WallTimeLimit.</p>
+                <p>If you are using the JobCollection API instead of SAGA, then you can directly set
+                    the WallTimeLimit in the JSDL job description.</p>
+            </answer>
+        </faq>
+    </part>
+</faqs>
