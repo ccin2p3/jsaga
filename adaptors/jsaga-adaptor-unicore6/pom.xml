@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.in2p3.jsaga.adaptor</groupId>
   <artifactId>jsaga-adaptor-unicore6</artifactId>
-  <version>0.9.5</version>
+  <version>0.9.6-SNAPSHOT</version>
   <name>Adaptors for Unicore 6</name>
   <description>This module provides support for Unicore 6 components:
 data management protocol (RByte-IO),
@@ -28,26 +28,26 @@ execution management technology (Unicore Gateway).</description>
     <dependency>
       <groupId>fr.in2p3.jsaga</groupId>
       <artifactId>jsaga-adaptoritf</artifactId>
-      <version>0.9.5</version>
+      <version>0.9.6-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.ogf.saga</groupId>
       <artifactId>saga-api-test</artifactId>
-      <version>0.9.5</version>
+      <version>0.9.6-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>fr.in2p3.jsaga</groupId>
       <artifactId>jsaga-engine</artifactId>
-      <version>0.9.5</version>
+      <version>0.9.6-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
   <!-- adaptor specific -->
 		<dependency>
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-classic</artifactId>
-			<version>0.9.5</version>
+			<version>0.9.6-SNAPSHOT</version>
 			<scope>runtime</scope><!-- for security context -->
 		</dependency>
   		<dependency>
@@ -93,8 +93,4 @@ execution management technology (Unicore Gateway).</description>
             <scope>runtime</scope>
         </dependency>
   </dependencies>
-
-  <scm>
-    <tag>jsaga-0_9_5</tag>
-  </scm>
 </project>

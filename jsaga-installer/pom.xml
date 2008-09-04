@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga</groupId>
     <artifactId>jsaga-installer</artifactId>
-    <version>0.9.5</version>
+    <version>0.9.6-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>JSAGA Installer</name>
     <description>JSAGA is a Java implementation of the Simple API for Grid Applications (SAGA)</description>
@@ -195,94 +195,90 @@
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-default</artifactId>
-            <version>0.9.5</version>
+            <version>0.9.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-irods</artifactId>
-            <version>0.9.5</version>            
+            <version>0.9.6-SNAPSHOT</version>            
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-mail</artifactId>
-            <version>0.9.5</version>            
+            <version>0.9.6-SNAPSHOT</version>            
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-jdl</artifactId>
-            <version>0.9.5</version>
+            <version>0.9.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-naregi</artifactId>
-            <version>0.9.5</version>
+            <version>0.9.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-wms</artifactId>
-            <version>0.9.5</version>
+            <version>0.9.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-wsgram</artifactId>
-            <version>0.9.5</version>
+            <version>0.9.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-unicore6</artifactId>
-            <version>0.9.5</version>
+            <version>0.9.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-ssh</artifactId>
-            <version>0.9.5</version>            
+            <version>0.9.6-SNAPSHOT</version>            
         </dependency>
         <!-- workaround to bad declaration of axis-jaxrpc and axis-saaj libraries in maven repository -->
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-srm</artifactId>
-            <version>0.9.5</version>
+            <version>0.9.6-SNAPSHOT</version>
         </dependency>
         <!-- adaptors which are used as dependencies of other adaptors must be declared at the end -->
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-classic</artifactId>
-            <version>0.9.5</version>
+            <version>0.9.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-voms</artifactId>
-            <version>0.9.5</version>
+            <version>0.9.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-globus</artifactId>
-            <version>0.9.5</version>
+            <version>0.9.6-SNAPSHOT</version>
         </dependency>
 
         <!-- test -->
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api-test</artifactId>
-            <version>0.9.5</version>
+            <version>0.9.6-SNAPSHOT</version>
         </dependency>
 
         <!-- core -->
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
-            <version>0.9.5</version>
+            <version>0.9.6-SNAPSHOT</version>
             <classifier>config</classifier>
             <type>zip</type>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
-            <version>0.9.5</version>
+            <version>0.9.6-SNAPSHOT</version>
         </dependency>
     </dependencies>
-
-  <scm>
-    <tag>jsaga-0_9_5</tag>
-  </scm>
 </project>
