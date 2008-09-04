@@ -21,4 +21,6 @@
     <script>jsaga-rm</script>
     <script>jsaga-rmdir</script>
     <script>jsaga-test</script>
+
+    <script>junit-run-test</script>
 </scripts>
