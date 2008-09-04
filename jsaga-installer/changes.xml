@@ -3,6 +3,11 @@
         <title>JSAGA Release Notes</title>
     </properties>
     <body>
+        <release version="0.9.5" date="2008-09-04">
+            <action dev="sreynaud" type="fix">
+                Fixed dependencies management in GUI installer.
+            </action>
+        </release>
         <release version="0.9.4" date="2008-06-26" description="Initial revision for Elis@"/>
         <release version="0.9.3" date="2008-05-31" description="Initial implementation of job collection management"/>
         <release version="0.9.2" date="2008-05-15">
