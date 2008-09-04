@@ -8,7 +8,8 @@
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
     <artifactId>jsaga-adaptor-irods</artifactId>
     <version>0.9.5-SNAPSHOT</version>
-    <name>Adaptor for iRods and SRB</name>
+    <name>Adaptors for iRODS/SRB</name>
+    <description>This module provides support for iRODS and SRB data management protocols.</description>
     <dependencies>
         <!-- common -->
         <dependency>

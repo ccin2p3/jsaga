@@ -8,7 +8,8 @@
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
     <artifactId>jsaga-adaptor-mail</artifactId>
     <version>0.9.5-SNAPSHOT</version>
-    <name>Currently just a placeholder for testing JSAGA engine...</name>
+    <name>Placeholder</name>
+    <description>This module does not do anything. It is just a placeholder needed for some tests...</description>
     <dependencies>
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>

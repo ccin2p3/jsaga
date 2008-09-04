@@ -8,7 +8,11 @@
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
     <artifactId>jsaga-adaptor-globus</artifactId>
     <version>0.9.5-SNAPSHOT</version>
-    <name>Adaptor for Globus Toolkit</name>
+    <name>Adaptors for Globus Toolkit v2</name>
+    <description>This module provides support for Globus Toolkit v2 components, for;
+security mechanisms (Globus, GlobusLegacy, GlobusRFC820, MyProxy),
+data management protocols (gsiftp v1, v2 and .NET implementation),
+execution management technologies (Gatekeeper).</description>
     <dependencies>
         <!-- common -->
         <dependency>

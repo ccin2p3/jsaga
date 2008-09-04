@@ -7,8 +7,9 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.in2p3.jsaga.adaptor</groupId>
   <artifactId>jsaga-adaptor-wms</artifactId>
-  <name>Adaptor for Glite WMS</name>
   <version>0.9.5-SNAPSHOT</version>
+  <name>Adaptors for gLite-WMS</name>
+  <description>This module provides support for WMS (Workload Management System) execution management technology.</description>
   <dependencies>
 		<dependency>
 		  <groupId>fr.in2p3.jsaga</groupId>

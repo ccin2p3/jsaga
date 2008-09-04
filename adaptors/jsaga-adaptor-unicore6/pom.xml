@@ -7,8 +7,11 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.in2p3.jsaga.adaptor</groupId>
   <artifactId>jsaga-adaptor-unicore6</artifactId>
-  <name>Adaptor for Unicore 6</name>
   <version>0.9.5-SNAPSHOT</version>
+  <name>Adaptors for Unicore 6</name>
+  <description>This module provides support for Unicore 6 components:
+data management protocol (RByte-IO),
+execution management technology (Unicore Gateway).</description>
   <build>
     <plugins>
       <plugin>

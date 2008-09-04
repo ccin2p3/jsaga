@@ -8,7 +8,8 @@
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
     <artifactId>jsaga-adaptor-srm</artifactId>
     <version>0.9.5-SNAPSHOT</version>
-    <name>Adaptor for SRM implementations</name>
+    <name>Adaptors for SRM</name>
+    <description>This module provides support for version 2.2 of the data management protocol SRM (Storage Resource Manager).</description>
     <build>
         <plugins>
             <plugin>

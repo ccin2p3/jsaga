@@ -8,7 +8,8 @@
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
     <artifactId>jsaga-adaptor-voms</artifactId>
     <version>0.9.5-SNAPSHOT</version>
-    <name>Adaptor for VOMS</name>
+    <name>Adaptors for VOMS</name>
+    <description>This module provides support for VOMS (Virtual Organization Membership Service) security mechanism.</description>
     <dependencies>
         <!-- common -->
         <dependency>

@@ -9,8 +9,12 @@
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
     <artifactId>jsaga-adaptor-ssh</artifactId>
     <version>0.9.5-SNAPSHOT</version>
-    <name>Adaptor for SSH</name>
-	<build>
+    <name>Adaptors for SSH</name>
+    <description>This module provides support for SSH components;
+security mecanism (SSH asymmetric keys),
+data management protocol (SFTP),
+execution management technology (SSH).</description>
+    <build>
 	  <plugins>
 	    <plugin>
 	        <groupId>org.apache.maven.plugins</groupId>
