@@ -2,7 +2,7 @@
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns="uri:izpack">
-    <xsl:output method="xml" indent="yes"/>
+    <xsl:output method="xml" indent="yes" xalan:indent-amount="2" xmlns:xalan="http://xml.apache.org/xslt"/>
     <xsl:variable name="scripts" select="document('scripts.xml')/*"/>
 
     <xsl:template match="/project">
@@ -37,23 +37,24 @@
                 <panel classname="FinishPanel"/>
             </panels>
             <packs>
-                <xsl:for-each select="artifact">
-                    <xsl:sort order="descending"/>
-                    <xsl:apply-templates select="."/>
-                </xsl:for-each>
+                <xsl:apply-templates select="artifact[@id='jsaga-engine']"/>
+                <xsl:apply-templates select="artifact[@id='graphviz']"/>
+                <xsl:apply-templates select="artifact[starts-with(@id,'jsaga-adaptor-')]">
+                    <xsl:sort select="@id" order="ascending"/>
+                </xsl:apply-templates>
             </packs>
         </installation>
     </xsl:template>
 
     <xsl:template match="/project/artifact[@id='jsaga-engine' and not(@classifier)]">
         <pack name="Core" required="yes">
-            <description>The core engine</description>
+            <description>The core engine (required)</description>
             <file src="Licence.txt" targetdir="$INSTALL_PATH"/>
             <file src="Readme.txt" targetdir="$INSTALL_PATH"/>
             <parsable targetfile="$INSTALL_PATH/Readme.txt" type="plain"/>
             <file src="etc/" targetdir="$INSTALL_PATH"/>
             <file src="doc/" targetdir="$INSTALL_PATH"/>
-            <xsl:for-each select="descendant-or-self::artifact">
+            <xsl:for-each select="descendant-or-self::artifact[not(@scope='test')]">
                 <file src="{@file}" targetdir="$INSTALL_PATH/lib"/>
             </xsl:for-each>
 
@@ -72,11 +73,17 @@
                 <parsable os="windows" targetfile="{$script}" type="plain"/>
             </xsl:for-each>
         </pack>
+        <pack name="Integration tests" required="no">
+            <description>Install libraries needed for running integration tests</description>
+            <xsl:for-each select="descendant::artifact[@scope='test']">
+                <file src="{@file}" targetdir="$INSTALL_PATH/lib-test"/>
+            </xsl:for-each>
+        </pack>
     </xsl:template>
 
     <xsl:template match="/project/artifact[@id='graphviz']">
         <pack name="Graph Visualizer" required="no">
-            <description>For visualizing data staging graphs of job collections</description>
+            <description>Install libraries needed for visualizing data staging graphs (recommended)</description>
             <!-- unix -->
             <file os="unix" src="lib/linux/" targetdir="$INSTALL_PATH/lib/"/>
             <!-- windows -->
@@ -84,25 +91,12 @@
         </pack>
     </xsl:template>
 
-    <xsl:template match="/project/artifact[starts-with(@id,'jsaga-adaptor-') and @scope!='test']">
+    <xsl:template match="/project/artifact[starts-with(@id,'jsaga-adaptor-')]">
         <pack name="{@id}" required="no">
             <description>Adaptor for <xsl:value-of
                     select="translate(substring-after(@id,'jsaga-adaptor-'),'abcdefghijklmnopqrstuvwxyz)','ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/></description>
             <xsl:for-each select="descendant-or-self::artifact">
                 <file src="{@file}" targetdir="$INSTALL_PATH/lib-adaptors"/>
-            </xsl:for-each>
-        </pack>
-    </xsl:template>
-
-    <xsl:template match="/project/artifact[@id='saga-api-test']">
-        <pack name="Integration tests" required="no">
-            <description>For running integration tests</description>
-            <xsl:for-each select="descendant-or-self::artifact">
-                <file src="{@file}" targetdir="$INSTALL_PATH/lib-test"/>
-            </xsl:for-each>
-            <!-- workaround: junit is not seen as a dependency -->
-            <xsl:for-each select="/project/artifact[@id='junit']">
-                <file src="{@file}" targetdir="$INSTALL_PATH/lib-test"/>
             </xsl:for-each>
         </pack>
     </xsl:template>
