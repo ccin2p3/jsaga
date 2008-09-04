@@ -50,6 +50,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependserializer-plugin</artifactId>
+                <configuration>
+                    <testableArtifacts>
+                        <testableArtifact>fr.in2p3.jsaga:jsaga-engine:jar</testableArtifact>
+                    </testableArtifacts>
+                </configuration>
                 <executions>
                     <execution>
                         <id>serialize-dependencies</id>
