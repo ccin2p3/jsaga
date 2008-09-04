@@ -89,8 +89,8 @@
                         <configuration>
                             <xslFile>assembly/izpack.xsl</xslFile>
                             <destDir>${project.build.directory}</destDir>
-                            <fileNameRegex>dependencies</fileNameRegex>
-                            <fileNameReplacement>izpack</fileNameReplacement>
+                            <fileNameRegex>dependencies.xml</fileNameRegex>
+                            <fileNameReplacement>izpack.xml</fileNameReplacement>
                         </configuration>
                     </execution>
                     <execution>
@@ -101,9 +101,9 @@
                         </goals>
                         <configuration>
                             <xslFile>src/site/xsl/adaptors.xsl</xslFile>
-                            <destDir>${project.build.directory}/site</destDir>
+                            <destDir>${project.build.directory}/generated-site/xdoc</destDir>
                             <fileNameRegex>dependencies.xml</fileNameRegex>
-                            <fileNameReplacement>adaptors-bis.html</fileNameReplacement>
+                            <fileNameReplacement>adaptors.xml</fileNameReplacement>
                         </configuration>
                     </execution>
                     <execution>
@@ -114,9 +114,9 @@
                         </goals>
                         <configuration>
                             <xslFile>src/site/xsl/licenses.xsl</xslFile>
-                            <destDir>${project.build.directory}/site</destDir>
+                            <destDir>${project.build.directory}/generated-site/xdoc</destDir>
                             <fileNameRegex>dependencies.xml</fileNameRegex>
-                            <fileNameReplacement>licenses.html</fileNameReplacement>
+                            <fileNameReplacement>licenses.xml</fileNameReplacement>
                         </configuration>
                     </execution>
                 </executions>
