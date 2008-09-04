@@ -11,7 +11,7 @@
     <version>current</version>
     <packaging>pom</packaging>
     <name>Parent POM for adaptors</name>
-    <description>This is the project definition common to all the JSAGA adaptors.</description>
+    <description/><!-- override parent description -->
     <!-- base url for inheriting projects -->
     <scm>
         <connection>${scm.root}/adaptors</connection>
