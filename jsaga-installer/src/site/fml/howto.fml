@@ -123,6 +123,7 @@ cd ../build-tools ; mvn deploy site-deploy
 mv $LOCAL_BASE/application/ $LOCAL_BASE/build-tools/
 
 cd ../jsaga ; mvn -f pom-unreleased.xml deploy clean
+mvn install
 mvn validate release:prepare
 mvn validate release:perform
 mv $LOCAL_BASE/application/ $LOCAL_BASE/jsaga/
