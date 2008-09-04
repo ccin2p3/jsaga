@@ -9,7 +9,8 @@
     <artifactId>jsaga-adaptor-srm</artifactId>
     <version>0.9.5-SNAPSHOT</version>
     <name>Adaptors for SRM</name>
-    <description>This module provides support for version 2.2 of the data management protocol SRM (Storage Resource Manager).</description>
+    <description>This module provides support for version 2.2 of the data management protocol SRM (Storage Resource Manager).
+UNDER DEVELOPMENT...</description>
     <build>
         <plugins>
             <plugin>
