@@ -9,10 +9,26 @@
     <groupId>org.globus</groupId>
     <artifactId>wsgram-api</artifactId>
     <version>4.0.0</version>
-	<name>WS GRAM external libraries</name>
-	<description>These are the external libraries for the WS GRAM adaptor.</description>
+	<name>WS-GRAM client API</name>
+	<description>Java API for managing jobs with WS-GRAM from Globus Toolkit 4.</description>
     <url>http://www.globus.org/</url>
-	<dependencies>
+    <organization>
+        <name>The Globus Alliance</name>
+        <url>http://www.globus.org/alliance/</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>Globus Toolkit Public License (GTPL) Version 3</name>
+            <url>http://www.globus.org/toolkit/legal/4.0/license-v3.html</url>
+        </license>
+        <!-- applicable for 4.0.1+
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+        -->
+    </licenses>
+    <dependencies>
 		<dependency>
 			<groupId>directory-naming</groupId>
 			<artifactId>naming-java</artifactId>

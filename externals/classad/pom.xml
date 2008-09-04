@@ -9,6 +9,17 @@
     <groupId>org.condor</groupId>
     <artifactId>classad</artifactId>
     <version>2.2</version>
-    <name>Condor Classified Advertiser</name>
-    <url>http://www.condor.edu/</url><!-- todo: verifier l'URL -->
+    <name>Condor Classified Advertisements</name>
+    <description>Classified Advertisements (classads) are the lingua franca of Condor. They are used for describing jobs, workstations, and other resources.</description>
+    <url>http://www.cs.wisc.edu/condor/classad/</url>
+    <organization>
+        <name>University of Wisconsin-Madison</name>
+        <url>http://www.cs.wisc.edu/</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
 </project>

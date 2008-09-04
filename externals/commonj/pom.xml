@@ -9,5 +9,7 @@
     <groupId>org.globus</groupId>
     <artifactId>commonj</artifactId>
     <version>4.0.0</version>
-    <name>Common java</name>
+    <name>Common Java API</name>
+    <description>Timer and Work Manager API</description>
+    <url>http://dev2dev.bea.com/wlplatform/commonj/twm.html</url>
 </project>

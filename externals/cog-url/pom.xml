@@ -10,8 +10,13 @@
     <artifactId>cog-url</artifactId>
     <version>1.4</version>
     <name>Java CoG Kit - URL</name>
-    <url>http://www-unix.globus.org/cog/</url>
     <description>Needed for registering httpg transport. When deployed within Tomcat,
-        put this jar file with server libraries rather than with web application libraries.
+put this jar file with server libraries rather than with web application libraries.
     </description>
+    <url>http://wiki.cogkit.org/index.php/Java_CoG_Kit</url>
+    <licenses>
+        <license>
+            <name>Apache License </name>
+        </license>
+    </licenses>
 </project>

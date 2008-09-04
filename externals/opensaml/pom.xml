@@ -10,4 +10,5 @@
     <artifactId>opensaml</artifactId>
     <version>4.0.0</version>
     <name>Open SAML</name>
+    <url>http://www.opensaml.org/</url>
 </project>

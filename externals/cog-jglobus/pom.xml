@@ -9,8 +9,14 @@
     <groupId>org.globus</groupId>
     <artifactId>cog-jglobus</artifactId>
     <version>1.4</version>
-    <name>Java CoG Kit</name>
-    <url>http://www-unix.globus.org/cog/</url>
+    <name>Java CoG Kit JGlobus module</name>
+    <description>The Java CoG Kit JGlobus module is a Globus project that produces core Java non-WS runtime and security technologies.</description>
+    <url>http://dev.globus.org/wiki/CoG_jglobus</url>
+    <licenses>
+        <license>
+            <name>Apache License </name>
+        </license>
+    </licenses>
     <dependencies>
         <dependency>
             <groupId>org.bouncycastle</groupId>

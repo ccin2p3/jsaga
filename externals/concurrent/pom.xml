@@ -9,5 +9,6 @@
     <groupId>org.globus</groupId>
     <artifactId>concurrent</artifactId>
     <version>4.0.0</version>
-    <name>Common java</name>
+    <name>util.concurrent library</name>
+    <url>http://gee.cs.oswego.edu/dl/classes/EDU/oswego/cs/dl/util/concurrent/intro.html</url>
 </project>

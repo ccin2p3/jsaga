@@ -9,6 +9,17 @@
     <groupId>edu.sdsc.grid</groupId>
     <artifactId>jargon</artifactId>
     <version>2.0.1-beta-fixed</version>
-    <name>Jargon library</name>
+    <name>Java Api for Rules, Grids, and Online Networks</name>
+    <description>JARGON is a Java API for accessing SRB and iRODS servers.</description>
     <url>http://www.sdsc.edu/srb/jargon/</url>
+    <organization>
+        <name>SDSC San Diego SuperComputer Center</name>
+        <url>http://www.sdsc.edu/</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>BSD License</name>
+            <url>http://www.sdsc.edu/srb/index.php/Client_License</url>
+        </license>
+    </licenses>
 </project>

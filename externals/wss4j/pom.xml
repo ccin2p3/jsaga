@@ -9,5 +9,17 @@
     <groupId>org.apache</groupId>
     <artifactId>wss4j</artifactId>
     <version>1.5.2</version>
-    <name>WSS For Java</name>
+    <name>WS-Security for Java</name>
+    <description>Apache WSS4J is an implementation of the OASIS Web Services Security (WS-Security) from OASIS Web Services Security TC.</description>
+    <url>http://ws.apache.org/wss4j/</url>
+    <organization>
+        <name>Apache Software Foundation</name>
+        <url>http://www.apache.org/</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
 </project>

@@ -9,5 +9,17 @@
     <groupId>org.apache</groupId>
     <artifactId>addressing-1.0</artifactId>
     <version>1.0</version>
-    <name>Apache Addressing</name>
+    <name>Apache WS-Addressing</name>
+    <description>Implementation of the Web Services Addressing (WS-Addressing) specification from W3C.</description>
+    <url>http://www.apache.org/addressing/</url>
+    <organization>
+        <name>Apache Software Foundation</name>
+        <url>http://www.apache.org/</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
 </project>

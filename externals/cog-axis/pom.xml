@@ -10,5 +10,11 @@
     <artifactId>cog-axis</artifactId>
     <version>gt4</version>
     <name>Java CoG Kit - AXIS</name>
-    <url>http://www-unix.globus.org/cog/</url>
+    <description>Utilities for Apache AXIS.</description>
+    <url>http://wiki.cogkit.org/index.php/Java_CoG_Kit</url>
+    <licenses>
+        <license>
+            <name>Apache License </name>
+        </license>
+    </licenses>
 </project>

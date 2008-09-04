@@ -9,5 +9,6 @@
     <groupId>xmlsec</groupId>
     <artifactId>xmlsec</artifactId>
     <version>1.4.1</version>
-    <name>Xml Security from Unicore</name>
+    <name>Apache XML Security</name>
+    <url>http://xml.apache.org/security/</url>
 </project>
