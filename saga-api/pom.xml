@@ -10,6 +10,17 @@
     <version>0.9.5-SNAPSHOT</version>
     <name>The SAGA Interfaces</name>
     <description>This is the reference Java binding of the SAGA specification</description>
+    <url>http://forge.ogf.org/sf/projects/saga-rg</url>
+    <organization>
+        <name>Open Grid Forum</name>
+        <url>http://www.ogf.org/</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>Vrije Universiteit License</name>
+            <url>http://grid.in2p3.fr/jsaga/saga-api/LICENSE.txt</url>
+        </license>
+    </licenses>
     <distributionManagement>
         <site>
             <url>${site.upload.root}/${artifactId}</url>
