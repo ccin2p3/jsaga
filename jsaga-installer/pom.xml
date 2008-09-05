@@ -107,16 +107,16 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>generate-licenses-web-page</id>
+                        <id>generate-dependencies-licenses-web-page</id>
                         <phase>pre-site</phase>
                         <goals>
                             <goal>transform</goal>
                         </goals>
                         <configuration>
-                            <xslFile>src/site/xsl/licenses.xsl</xslFile>
+                            <xslFile>src/site/xsl/dependencies-licenses.xsl</xslFile>
                             <destDir>${project.build.directory}/generated-site/xdoc</destDir>
                             <fileNameRegex>dependencies.xml</fileNameRegex>
-                            <fileNameReplacement>licenses.xml</fileNameReplacement>
+                            <fileNameReplacement>dependencies-licenses.xml</fileNameReplacement>
                         </configuration>
                     </execution>
                     <execution>

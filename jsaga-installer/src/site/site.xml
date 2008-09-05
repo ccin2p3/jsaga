@@ -22,7 +22,7 @@
             <item name="Adaptors" href="adaptors.html"/>
             <item name="Presentations" href="presentations.html"/>
             <item name="Download" href="download.html"/>
-            <item name="Licenses" href="licenses.html"/>
+            <item name="Dependencies" href="dependencies-licenses.html"/>
             <item name="Related Projects" href="projects.html"/>
         </menu>
         <menu name="User Documentation">
@@ -35,7 +35,7 @@
         <menu name="Developer Documentation">
             <item name="JSAGA Adaptors API" href="jsaga-adaptoritf/index.html"/>
             <item name="JSAGA Engine" href="jsaga-engine/index.html"/>
-            <item name="Dependencies" href="dependencies-graph.html"/>
+            <item name="Dependencies Tree" href="dependencies-graph.html"/>
             <item name="How To" href="howto.html"/>
         </menu>
         <menu name="Project Documentation" ref="reports"/>
