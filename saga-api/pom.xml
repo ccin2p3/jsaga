@@ -9,7 +9,7 @@
     <artifactId>saga-api</artifactId>
     <version>0.9.6-SNAPSHOT</version>
     <name>The SAGA Interfaces</name>
-    <description>This is the reference Java binding of the SAGA specification</description>
+    <description>The reference Java binding of the SAGA specification.</description>
     <url>http://forge.ogf.org/sf/projects/saga-rg</url>
     <organization>
         <name>Open Grid Forum</name>
