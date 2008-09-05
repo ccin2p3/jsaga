@@ -9,9 +9,17 @@
     <groupId>com.claymoresystems</groupId>
     <artifactId>puretls</artifactId>
     <version>0.9-beta-4</version>
-    <name>Claymore Systems SSL/TLS</name>
-    <description>PureTLS is a free Java-only implementation of the SSLv3 and TLSv1 (RFC2246) protocols.</description>
+    <name>Pure TLS</name>
+    <description>Free Java-only implementation of the SSLv3 and TLSv1 (RFC2246) protocols.</description>
     <url>http://www.rtfm.com/puretls/</url>
+    <organization>
+        <name>Claymore Systems, Inc.</name>
+    </organization>
+    <licenses>
+        <license>
+            <name>Berkeley-style license</name>
+        </license>
+    </licenses>
     <dependencies>
         <dependency>
             <groupId>org.cryptix</groupId>

@@ -10,5 +10,16 @@
     <artifactId>xmlsec</artifactId>
     <version>1.4.1</version>
     <name>Apache XML Security</name>
+    <description>Implementation of W3C security standards for XML; XML-Signature Syntax and Processing standard, and XML Encryption Syntax and Processing standard.</description>
     <url>http://xml.apache.org/security/</url>
+    <organization>
+        <name>Apache Software Foundation</name>
+        <url>http://www.apache.org/</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
 </project>

@@ -8,21 +8,20 @@
 	<groupId>javax.xml</groupId>
 	<artifactId>jsr173</artifactId>
 	<version>1.0</version>
-	<name>JSR 173 - Streaming API for XML</name>
-	<description>JSR 173 - Streaming API for XML</description>
+	<name>JSR 173</name>
+	<description>Implementation of the JSR 173 specification from JCP: Streaming API for XML.</description>
 	<url>http://dev2dev.bea.com/xml/stax.html</url>
-<!-- <distributionManagement>
-		<downloadUrl>http://ftpna2.bea.com/pub/downloads/jsr173.jar</downloadUrl>
-	</distributionManagement>
+    <organization>
+        <name>BEA</name>
+        <url>http://www.bea.com</url>
+    </organization>
 	<licenses>
 		<license>
-			<name>BEA JSR 173 Spec</name>
+			<name>BEA JSR 173 License</name>
 			<url>http://www.ibiblio.org/maven2/javax/xml/jsr173/1.0/jsr173-1.0-license.txt</url>
-			<distribution>manual</distribution>
 		</license>
 	</licenses>
-	<organization>
-		<name>BEA</name>
-		<url>http://www.bea.com</url>
-	</organization> -->
+    <distributionManagement>
+		<downloadUrl>http://ftpna2.bea.com/pub/downloads/jsr173.jar</downloadUrl>
+	</distributionManagement>
 </project>

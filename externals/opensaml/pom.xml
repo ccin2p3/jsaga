@@ -10,5 +10,12 @@
     <artifactId>opensaml</artifactId>
     <version>4.0.0</version>
     <name>Open SAML</name>
+    <description>Library meant to support developers working with the Security Assertion Markup Language (SAML).</description>
     <url>http://www.opensaml.org/</url>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
 </project>

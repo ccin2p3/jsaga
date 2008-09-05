@@ -10,7 +10,7 @@
     <artifactId>classad</artifactId>
     <version>2.2</version>
     <name>Condor Classified Advertisements</name>
-    <description>Classified Advertisements (classads) are the lingua franca of Condor. They are used for describing jobs, workstations, and other resources.</description>
+    <description>The lingua franca of Condor. It is used for describing jobs, workstations, and other resources.</description>
     <url>http://www.cs.wisc.edu/condor/classad/</url>
     <organization>
         <name>University of Wisconsin-Madison</name>

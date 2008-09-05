@@ -10,9 +10,19 @@
   <groupId>org.glite</groupId>
   <artifactId>wms-api</artifactId>
   <version>3.1</version>
-  <name>WMS external libraries</name>
-  <description>These are the external libraries for the WMS adaptors.</description>
+  <name>gLite-WMS API</name>
+  <description>Java API for the Workload Management System (WMS).</description>
   <url>https://grid.ct.infn.it/twiki/bin/view/GILDA/ApiJavaWMProxy</url>
+  <organization>
+      <name>INFN</name>
+      <url>http://www.infn.it/</url>
+  </organization>
+  <licenses>
+      <license>
+          <name>The Apache Software License, Version 2.0</name>
+          <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      </license>
+  </licenses>
   <dependencies>
         <dependency>
             <groupId>axis</groupId>

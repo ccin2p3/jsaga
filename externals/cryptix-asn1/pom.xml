@@ -9,6 +9,13 @@
     <groupId>org.cryptix</groupId>
     <artifactId>cryptix-asn1</artifactId>
     <version>3.2.0</version>
-    <name>Cryptix ASN1 implementation</name>
-    <url>http://www.cryptix.org/</url>
+    <name>Cryptix ASN1 Kit</name>
+    <description>This package aims at facilitating the task programmers face in coding, accessing and generating java-bound, both types and values, defined as ASN.1 constructs, or encoded as such.</description>
+    <url>http://sourceforge.net/projects/cryptix-asn1/</url>
+    <licenses>
+        <license>
+            <name>Cryptix General License</name>
+            <url>http://www.cryptix.org/LICENSE.TXT</url>
+        </license>
+    </licenses>
 </project>

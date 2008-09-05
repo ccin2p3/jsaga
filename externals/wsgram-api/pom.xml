@@ -9,7 +9,7 @@
     <groupId>org.globus</groupId>
     <artifactId>wsgram-api</artifactId>
     <version>4.0.0</version>
-	<name>WS-GRAM client API</name>
+	<name>WS-GRAM API</name>
 	<description>Java API for managing jobs with WS-GRAM from Globus Toolkit 4.</description>
     <url>http://www.globus.org/</url>
     <organization>

@@ -9,8 +9,19 @@
     <groupId>org.naregi.ss</groupId>
     <artifactId>naregi-ss-api</artifactId>
     <version>beta-2</version>
-    <name>NAREGI Super Scheduler Client API</name>
+    <name>NAREGI Super Scheduler API</name>
+    <description>Java API for the NAREGI Super Scheduler service.</description>
     <url>http://rpm1.naregi.org/index_beta2.html</url>
+    <organization>
+        <name>Center for GRID Research Development</name>
+        <url>http://www.naregi.org/index_e.html</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
     <dependencies>
         <dependency>
             <groupId>org.globus</groupId>

@@ -10,5 +10,11 @@
     <artifactId>concurrent</artifactId>
     <version>4.0.0</version>
     <name>util.concurrent library</name>
+    <description>This package provides standardized, efficient versions of utility classes commonly encountered in concurrent Java programming.</description>
     <url>http://gee.cs.oswego.edu/dl/classes/EDU/oswego/cs/dl/util/concurrent/intro.html</url>
+    <licenses>
+        <license>
+            <name>No license</name>
+        </license>
+    </licenses>
 </project>

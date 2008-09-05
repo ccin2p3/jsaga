@@ -9,8 +9,19 @@
     <groupId>com.jcraft.jsch</groupId>
     <artifactId>jsch</artifactId>
     <version>0.1.37</version>
-    <name>JSCH library</name>
+    <name>JSch</name>
+    <description>Pure Java implementation of SSH2.</description>
     <url>http://www.jcraft.com/jsch/</url>
+    <organization>
+        <name>JCraft</name>
+        <url>http://www.jcraft.com/</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>BSD-style license</name>
+            <url>http://www.jcraft.com/jsch/LICENSE.txt</url>
+        </license>
+    </licenses>
     <dependencies>
        <dependency>
             <groupId>com.jcraft.jzlib</groupId>

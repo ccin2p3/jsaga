@@ -9,6 +9,17 @@
     <groupId>com.jcraft.jzlib</groupId>
     <artifactId>jzlib</artifactId>
     <version>1.0.7</version>
-    <name>JZLIb library</name>
-    <url>http://www.jcraft.com/jsch/</url>
+    <name>JZLib</name>
+    <description>A re-implementation of zlib in pure Java.</description>
+    <url>http://www.jcraft.com/jzlib/</url>
+    <organization>
+        <name>JCraft</name>
+        <url>http://www.jcraft.com/</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>BSD-style license</name>
+            <url>http://www.jcraft.com/jzlib/LICENSE.txt</url>
+        </license>
+    </licenses>
 </project>

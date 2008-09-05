@@ -10,7 +10,7 @@
     <artifactId>cog-jglobus</artifactId>
     <version>1.4</version>
     <name>Java CoG Kit JGlobus module</name>
-    <description>The Java CoG Kit JGlobus module is a Globus project that produces core Java non-WS runtime and security technologies.</description>
+    <description>Java API for Globus non-WS runtime and security technologies.</description>
     <url>http://dev.globus.org/wiki/CoG_jglobus</url>
     <licenses>
         <license>

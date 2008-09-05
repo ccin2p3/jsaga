@@ -10,8 +10,15 @@
   <groupId>de.fzj.unicore</groupId>
   <artifactId>unicore6-api</artifactId>
   <version>6.1</version>
-  <name>U6 external libraries</name>
-  <description>These are the external libraries for the U6 adaptor.</description>
+  <name>Unicore 6 API</name>
+  <description>Java API for Unicore 6 services (Uniform Interface to Computing Resources).</description>
+  <url>http://www.unicore.eu/download/unicore6/</url>
+  <licenses>
+      <license>
+          <name>BSD License</name>
+          <url>http://www.opensource.org/licenses/bsd-license.php</url>
+      </license>
+  </licenses>
     <dependencies>
         <dependency>
             <groupId>javax.xml</groupId>

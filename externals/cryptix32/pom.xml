@@ -10,5 +10,12 @@
     <artifactId>cryptix32</artifactId>
     <version>3.2.0</version>
     <name>Cryptix library</name>
+    <description>A suite of cryptographic classes.</description>
     <url>http://www.cryptix.org/</url>
+    <licenses>
+        <license>
+            <name>Cryptix General License</name>
+            <url>http://www.cryptix.org/LICENSE.TXT</url>
+        </license>
+    </licenses>
 </project>
