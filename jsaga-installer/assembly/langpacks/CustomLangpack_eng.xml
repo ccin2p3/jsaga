@@ -1,0 +1,4 @@
+<langpack>
+    <str id="OptionalLicencePanel.rollback"
+         txt="... or else you can click on button 'Previous' and unselect the package(s) under this license."/>
+</langpack>
