@@ -22,7 +22,7 @@
                     <xsl:with-param name="licenseType">CDDL</xsl:with-param>
                 </xsl:call-template>
             </conditions>
-            <guiprefs width="700" height="480" resizable="yes"/>
+            <guiprefs width="700" height="520" resizable="yes"/>
             <locale>
                 <langpack iso3="eng"/>
                 <langpack iso3="fra"/>
@@ -129,12 +129,12 @@
 *****************************************************************************
 *** WARNING: If you check this package, you will have to accept the terms of the agreement
 ***    of the <xsl:value-of select="@license"/>.
-*****************************************************************************
-                    </description>
+*****************************************************************************</description>
                 </xsl:otherwise>
             </xsl:choose>
-            <xsl:for-each select="descendant-or-self::artifact">
-                <file src="{@file}" targetdir="$INSTALL_PATH/lib-adaptors"/>
+            <file src="{@file}" targetdir="$INSTALL_PATH/lib-adaptors"/>
+            <xsl:for-each select="artifact">
+                <xsl:call-template name="PACKAGE_DEPENDENCY"/>
             </xsl:for-each>
         </pack>
     </xsl:template>
@@ -163,6 +163,23 @@
                     </xsl:for-each>
                 </condition>
             </xsl:when>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="PACKAGE_DEPENDENCY">
+        <xsl:choose>
+            <xsl:when test="starts-with(@id, 'jsaga-adaptor-')">
+                <depends>
+                    <xsl:attribute name="packname"><xsl:call-template name="PACKAGE_NAME"/></xsl:attribute>
+                </depends>
+            </xsl:when>
+            <xsl:otherwise>
+                <file src="{@file}" targetdir="$INSTALL_PATH/lib-adaptors"/>
+                <!-- recurse -->
+                <xsl:for-each select="artifact">
+                    <xsl:call-template name="PACKAGE_DEPENDENCY"/>
+                </xsl:for-each>
+            </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
