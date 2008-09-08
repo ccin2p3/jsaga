@@ -8,8 +8,8 @@
   <groupId>fr.in2p3.jsaga.adaptor</groupId>
   <artifactId>jsaga-adaptor-wsgram</artifactId>
   <version>0.9.6-SNAPSHOT</version>
-  <name>Adaptors for WS-GRAM</name>
-  <description>This module provides support for WS-GRAM (Web Service - Grid Resource Allocation Management)
+  <name>Adaptors for Globus WS-GRAM</name>
+  <description>This module provides support for Globus WS-GRAM (Web Service - Grid Resource Allocation Management)
 execution management technology from Globus Toolkit 4.0.</description>
   <dependencies>
 	<!-- common -->
