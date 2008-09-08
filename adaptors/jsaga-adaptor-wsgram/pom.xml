@@ -32,11 +32,11 @@ execution management technology from Globus Toolkit 4.0.</description>
       <scope>test</scope>
     </dependency>
     <!-- adaptor specific -->
-    <dependency>
-      <groupId>fr.in2p3.jsaga.adaptor</groupId>
-      <artifactId>jsaga-adaptor-globus</artifactId>
-      <version>0.9.6-SNAPSHOT</version>
-      <scope>runtime</scope><!-- for security context -->
+    <dependency><!-- for security context (WARNING: order of dependencies matters) -->
+        <groupId>fr.in2p3.jsaga.adaptor</groupId>
+        <artifactId>jsaga-adaptor-globus</artifactId>
+        <version>0.9.6-SNAPSHOT</version>
+        <scope>runtime</scope>
     </dependency>
 	<dependency>
 		<groupId>org.globus</groupId>
