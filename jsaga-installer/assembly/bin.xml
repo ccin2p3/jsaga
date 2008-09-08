@@ -25,8 +25,17 @@
     </dependencySets>
     <files>
         <file>
+            <outputDirectory>/bin/panels</outputDirectory>
+            <destName>OptionalLicencePanel.jar</destName>
+            <source>${project.build.directory}/${project.build.finalName}.jar</source>
+        </file>
+        <file>
             <outputDirectory>/</outputDirectory>
-            <source>assembly/Licence.txt</source>
+            <source>assembly/licenses/License-LGPLv3.txt</source>
+        </file>
+        <file>
+            <outputDirectory>/</outputDirectory>
+            <source>assembly/licenses/License-CDDLv1.0.txt</source>
         </file>
         <file>
             <outputDirectory>/</outputDirectory>

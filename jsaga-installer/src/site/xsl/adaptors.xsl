@@ -6,10 +6,13 @@
     <xsl:template match="/project">
         <document><body>
             <section name="Adaptors">
+                <p>Because of their dependencies, some adaptors may have a license different from the
+                   core engine license. Please check which license(s) apply to the adaptor(s) you use.
+                </p>
                 <table border="1">
                     <xsl:call-template name="HEADERS"/>
                     <xsl:apply-templates select="artifact[starts-with(@id,'jsaga-adaptor-')]">
-                        <xsl:sort select="@id" order="ascending"/>
+                        <xsl:sort select="@name" order="ascending"/>
                     </xsl:apply-templates>
                     <xsl:apply-templates select="artifact[@id='jsaga-engine' and not(@classifier)]"/>
                 </table>

@@ -152,11 +152,12 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-izpack-plugin</artifactId>
+                <groupId>org.codehaus.izpack</groupId>
+                <artifactId>izpack-maven-plugin</artifactId>
                 <configuration>
                     <descriptor>${project.build.directory}/izpack.xml</descriptor>
-                    <basedir>${project.build.directory}/${project.artifactId}-${project.version}-bin.dir/jsaga-${project.version}/</basedir>
+                    <izpackBasedir>${project.build.directory}/${project.artifactId}-${project.version}-bin.dir/jsaga-${project.version}/</izpackBasedir>
+                    <installerFile>${project.build.directory}/${project.build.finalName}.jar</installerFile>
                 </configuration>
                 <executions>
                     <execution>
@@ -182,6 +183,13 @@
         </plugins>
     </reporting>
     <dependencies>
+        <!-- for installer itself (for compiling custom panels) -->
+        <dependency>
+            <groupId>org.codehaus.izpack</groupId>
+            <artifactId>izpack-standalone-compiler</artifactId>
+            <version>4.0.1</version>
+        </dependency>
+
         <!-- optional -->
         <dependency>
             <groupId>org.graphviz</groupId>
