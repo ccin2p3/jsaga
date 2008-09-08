@@ -10,7 +10,14 @@
     <version>0.9.6-SNAPSHOT</version>
     <name>Placeholder</name>
     <description>This module does not do anything. It is just a placeholder needed for some tests...</description>
+    <licenses>
+        <license>
+            <name>Common Development and Distribution License (CDDL) v1.0</name>
+            <url>https://glassfish.dev.java.net/public/CDDLv1.0.html</url>
+        </license>
+    </licenses>
     <dependencies>
+        <!-- common -->
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-adaptoritf</artifactId>
@@ -28,6 +35,12 @@
             <artifactId>jsaga-engine</artifactId>
             <version>0.9.6-SNAPSHOT</version>
             <scope>test</scope>
+        </dependency>
+        <!-- adaptor specific -->
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4</version>
         </dependency>
     </dependencies>
 </project>
