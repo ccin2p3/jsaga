@@ -67,7 +67,7 @@
         <pack name="Core" required="yes">
             <description>The core engine (required).</description>
             <file src="License-LGPLv3.txt" targetdir="$INSTALL_PATH"/>
-            <file src="License-CDDLv1.0.txt" targetdir="$INSTALL_PATH" condition="CDDL"/>
+            <file src="License-CDDLv1.0.txt" targetdir="$INSTALL_PATH" condition="show_CDDL"/>
             <file src="Readme.txt" targetdir="$INSTALL_PATH"/>
             <parsable targetfile="$INSTALL_PATH/Readme.txt" type="plain"/>
             <file src="etc/" targetdir="$INSTALL_PATH"/>
