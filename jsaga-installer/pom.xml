@@ -158,6 +158,7 @@
                     <descriptor>${project.build.directory}/izpack.xml</descriptor>
                     <izpackBasedir>${project.build.directory}/${project.artifactId}-${project.version}-bin.dir/jsaga-${project.version}/</izpackBasedir>
                     <installerFile>${project.build.directory}/${project.build.finalName}.jar</installerFile>
+                    <attach>false</attach>
                 </configuration>
                 <executions>
                     <execution>
