@@ -21,6 +21,9 @@
             <outputDirectory>lib</outputDirectory>
             <unpack>false</unpack>
             <useTransitiveFiltering>true</useTransitiveFiltering>
+            <excludes>
+                <exclude>org.codehaus.izpack:izpack-standalone-compiler:jar</exclude>
+            </excludes>
         </dependencySet>
     </dependencySets>
     <files>
