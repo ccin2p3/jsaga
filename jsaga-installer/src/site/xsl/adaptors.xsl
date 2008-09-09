@@ -44,7 +44,7 @@ job description languages (SAGA job description attributes, JSDL, JSAGA job coll
 
     <xsl:template match="artifact">
         <tr>
-            <td><a href="{@id}/faq.html"><xsl:value-of select="@name"/></a></td>
+            <td><a href="adaptors/{@id}/faq.html"><xsl:value-of select="@name"/></a></td>
             <td><xsl:value-of select="@description"/></td>
             <td><xsl:choose>
                 <xsl:when test="@licenseUrl"><a href="{@licenseUrl}"><xsl:value-of select="@license"/></a></xsl:when>
