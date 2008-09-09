@@ -1,0 +1,67 @@
+<licenses>
+    <!-- this file contains the information that is missing on maven repository POM files -->
+    <license name="?">
+        <organization name="SUN Microsystems" url="http://java.sun.com/">
+            <project id="servlet-api"/>
+        </organization>
+    </license>
+    <license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt">
+        <organization>
+            <project id="castor">
+                <name>Castor</name>
+                <description>Castor is an Open Source data binding framework for Java[tm]. It's the shortest path between Java objects, XML documents and relational tables. Castor provides Java-to-XML binding, Java-to-SQL persistence, and more.</description>
+                <url>http://www.castor.org/</url>
+            </project>
+        </organization>
+        <organization name="Apache Software Foundation" url="http://www.apache.org/">
+            <project id="axis-jaxrpc"/>
+            <project id="axis-saaj"/>
+            <project id="axis-wsdl4j"/>
+            <project id="commons-beanutils">
+                <name>Commons Java Bean Utilities</name>
+                <description>BeanUtils provides an easy-to-use but flexible wrapper around reflection and introspection.</description>
+                <url>http://commons.apache.org/beanutils/</url>
+            </project>
+            <project id="commons-collections">
+                <name>Commons Collections</name>
+                <description>Types that extend and augment the Java Collections Framework.</description>
+                <url>http://jakarta.apache.org/commons/collections/</url>
+            </project>
+            <project id="commons-digester">
+                <name>Commons Digester</name>
+                <description>The Digester package lets you configure an XML->Java object mapping module which triggers certain actions called rules whenever a particular pattern of nested XML elements is recognized.</description>
+                <url>http://jakarta.apache.org/commons/digester/</url>
+            </project>
+            <project id="commons-discovery">
+                <name>Commons Discovery</name>
+                <version>0.4</version>
+                <description>Commons Discovery</description>
+                <url>http://jakarta.apache.org/commons/dicovery/</url>
+            </project>
+            <project id="commons-logging">
+                <name>Commons Logging</name>
+                <description>Commons Logging is a thin adapter allowing configurable bridging to other, well known logging systems.</description>
+                <url>http://commons.apache.org/logging</url>
+            </project>
+            <project id="log4j">
+                <name>Apache Log4j</name>
+                <description>Apache Log4j 1.2</description>
+                <url>http://logging.apache.org:80/log4j/1.2/</url>
+            </project>
+            <project id="geronimo-spec-javamail"/>
+            <project id="naming-core"/>
+            <project id="naming-factory"/>
+            <project id="naming-java"/>
+            <project id="xalan">
+                <name>Xalan-Java</name>
+                <description>Xalan-Java is an XSLT processor for transforming XML documents into HTML, text, or other XML document types. It implements XSL Transformations (XSLT) Version 1.0 and XML Path Language (XPath).</description>
+                <url>http://xml.apache.org/xalan-j/</url>
+            </project>
+            <project id="xercesImpl">
+                <name>Xerces2 Java Parser</name>
+                <description>Xerces2 is the next generation of high performance, fully compliant XML parsers in the Apache Xerces family.</description>
+                <url>http://xerces.apache.org/xerces2-j/</url>
+            </project>
+        </organization>
+    </license>
+</licenses>
