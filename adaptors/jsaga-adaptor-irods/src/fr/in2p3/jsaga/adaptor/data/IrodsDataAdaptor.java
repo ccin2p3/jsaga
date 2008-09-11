@@ -44,7 +44,7 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
     }
 	
 	public long getSize(String absolute, String absolutePath) {
-		return 476160;
+		return -1;
 	}
 	
     public Default[] getDefaults(Map attributes) throws IncorrectState {
@@ -61,12 +61,30 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
     }
 
     public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
-        //todo: save and use provided security adaptor
+       this.securityAdaptor = securityAdaptor;
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
 		try {
-			IRODSAccount account = new IRODSAccount();
+			parseValue(attributes);
+			/*
+			//IRODSAccount account = new IRODSAccount();System.out.println("password"+passWord);
+			System.out.println("mdasDomainName"+mdasDomainName);
+			System.out.println("mcatZone"+mcatZone);
+			
+			System.out.println("userName"+userName);
+			System.out.println("host"+host);
+			System.out.println("port"+port);
+			System.out.println("basePath"+basePath);
+			System.out.println("attributes"+attributes);
+			System.out.println("defaultStorageResource"+defaultStorageResource);
+			*/
+			IRODSAccount account  =null;
+			if (host == null) {
+				account = new IRODSAccount();
+			} else {
+				account = new IRODSAccount(host, port, userName, passWord, basePath, mcatZone, defaultStorageResource);
+			}
 			fileSystem = FileFactory.newFileSystem(account);
 		} catch (IOException ioe) {
 			throw new AuthenticationFailed(ioe);
@@ -99,7 +117,10 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 		if (additionalArgs != null && additionalArgs.equals(DIR)) { listFile=false;}
 		if (additionalArgs != null && additionalArgs.equals(FILE)) { listDir=false;}
 		
-		absolutePath = absolutePath.substring(0,absolutePath.length()-1);
+		if (!absolutePath.equals("/")) {
+			absolutePath = absolutePath.substring(0,absolutePath.length()-1);
+		}
+
 		try {
 			// Select for directories
 			MetaDataRecordList[] rlDir = null;
@@ -127,15 +148,26 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 			int dir = 0;
 			if (rlDir != null) {dir=rlDir.length;}
 			if (rlFile != null) {file=rlFile.length;}
-
-			int ind=0;
-			FileAttributes[] fileAttributes = new FileAttributes[dir+file];
+			
+			// Supppres "/" when list /
+			int root =0;
 			for (int i = 0; i < dir; i++) {
-				fileAttributes[ind] = new SrbFileAttributes(rlDir[i],null);
-				ind++;
+				String m_name = (String) rlDir[i].getValue(rlDir[i].getFieldIndex(IRODSMetaDataSet.DIRECTORY_NAME));
+				if (m_name.equals(SEPARATOR)) {root++;}
 			}
+			
+			int ind=0;
+			FileAttributes[] fileAttributes = new FileAttributes[dir+file-root];
+			for (int i = 0; i < dir; i++) {
+				String m_name = (String) rlDir[i].getValue(rlDir[i].getFieldIndex(IRODSMetaDataSet.DIRECTORY_NAME));
+				if (!m_name.equals(SEPARATOR)) {
+					fileAttributes[ind] = new IrodsFileAttributes(rlDir[i],null);
+					ind++;
+				}
+			}
+			
 			for (int i = 0; i < file; i++) {
-				fileAttributes[ind] = new SrbFileAttributes(null,rlFile[i]);
+				fileAttributes[ind] = new IrodsFileAttributes(null,rlFile[i]);
 				ind++;
 			}
 			return fileAttributes;
@@ -172,13 +204,9 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 	
 	public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
 		try {
-		/*
+			/*
 			String[] split = parentAbsolutePath.split(separator);
 			String dir = parentAbsolutePath.substring(0,parentAbsolutePath.length()-fileName.length());
-			System.out.println("parentAbsolutePath:"+parentAbsolutePath);
-			System.out.println("fileSystem:"+fileSystem);
-			System.out.println("dir:"+dir);
-			System.out.println("fileName:"+fileName);
 			*/
 			IRODSFile generalFile =  (IRODSFile)FileFactory.newFile((IRODSFileSystem)fileSystem, parentAbsolutePath, fileName );
 			

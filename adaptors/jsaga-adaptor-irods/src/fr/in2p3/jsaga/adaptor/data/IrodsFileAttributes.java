@@ -6,9 +6,6 @@ import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import org.ogf.saga.error.DoesNotExist;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
@@ -67,9 +64,9 @@ public class IrodsFileAttributes extends FileAttributes {
 		if (file != null) {
 			try
 			{
-				SimpleDateFormat dateStandard = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss");
-				Date date = dateStandard.parse((String) file.getValue(file.getFieldIndex(IRODSMetaDataSet.MODIFICATION_DATE)));
-				m_lastModified = date.getTime();
+				String modificationDate = (String) file.getValue(file.getFieldIndex(IRODSMetaDataSet.MODIFICATION_DATE));
+				modificationDate = modificationDate+"000";
+				m_lastModified = Long.parseLong(modificationDate);
 			} catch (Exception e){}
 		}
 	}

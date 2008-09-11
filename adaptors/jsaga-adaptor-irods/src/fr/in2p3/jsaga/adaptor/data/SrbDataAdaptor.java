@@ -58,13 +58,27 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
     }
 
     public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
-        //todo: save and use provided security adaptor
+		this.securityAdaptor = securityAdaptor;	
     }
 
+	// syntax: srb:// [username.mdasdomain [.zone] [:password] @] [host] [:port] /path
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
-        // connect to server
 		try {
-			SRBAccount account = new SRBAccount();
+			parseValue(attributes);
+			// connect to server
+			//SRBAccount account = new SRBAccount();
+			SRBAccount account = null;
+			
+			if (securityAdaptor instanceof GSSCredentialSecurityAdaptor) { 
+				cert = ((GSSCredentialSecurityAdaptor)securityAdaptor).getGSSCredential();
+				account = new SRBAccount(host, port, cert);
+			} else {
+				if (host == null) {
+					account = new SRBAccount();
+				} else {
+					account = new SRBAccount(host, port, userName, passWord, basePath, mdasDomainName, defaultStorageResource, mcatZone);
+				}
+			}
 			fileSystem = FileFactory.newFileSystem(account);
 		} catch (IOException ioe) {
 			throw new AuthenticationFailed(ioe);
@@ -82,7 +96,7 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
     }
 
 	public long getSize(String absolute, String absolutePath) {
-		return 476160;
+		return -1;
 	}
 	
 	public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
@@ -122,7 +136,6 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 				MetaDataSet.newSelection(SRBMetaDataSet.SIZE),
 				MetaDataSet.newSelection(SRBMetaDataSet.FILE_LAST_ACCESS_TIMESTAMP)	};
 				
-				System.out.println("absolutePath:"+absolutePath);
 				// MetaDataSet.newSelection(SRBMetaDataSet.ACCESS_CONSTRAINT),
 				// MetaDataSet.newSelection(SRBMetaDataSet.USER_TYPE_NAME),
 				//MetaDataSet.newSelection(SRBMetaDataSet.USER_NAME)
@@ -136,12 +149,22 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 			int dir = 0;
 			if (rlDir != null) {dir=rlDir.length;}
 			if (rlFile != null) {file=rlFile.length;}
+			
+			// Supppres "/" when list /
+			int root =0;
+			for (int i = 0; i < dir; i++) {
+				String m_name = (String) rlDir[i].getValue(rlDir[i].getFieldIndex(SRBMetaDataSet.DIRECTORY_NAME));
+				if (m_name.equals(SEPARATOR)) {root++;}
+			}
 
 			int ind=0;
-			FileAttributes[] fileAttributes = new FileAttributes[dir+file];
+			FileAttributes[] fileAttributes = new FileAttributes[dir+file-root];
 			for (int i = 0; i < dir; i++) {
-				fileAttributes[ind] = new SrbFileAttributes(rlDir[i],null);
-				ind++;
+				String m_name = (String) rlDir[i].getValue(rlDir[i].getFieldIndex(SRBMetaDataSet.DIRECTORY_NAME));
+				if (!m_name.equals(SEPARATOR)) {
+					fileAttributes[ind] = new SrbFileAttributes(rlDir[i],null);
+					ind++;
+				}
 			}
 			for (int i = 0; i < file; i++) {
 				fileAttributes[ind] = new SrbFileAttributes(null,rlFile[i]);
@@ -181,8 +204,6 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 		try {
 			//String[] split = parentAbsolutePath.split(separator);
 			//String dir = parentAbsolutePath.substring(0,parentAbsolutePath.length()-fileName.length());
-			System.out.println("parentAbsolutePath:"+parentAbsolutePath);
-			System.out.println("fileName:"+fileName);
 			SRBFile generalFile =  (SRBFile)FileFactory.newFile((SRBFileSystem)fileSystem, parentAbsolutePath, fileName );
 			
 			return new BufferedOutputStream(new SRBFileOutputStream(generalFile));

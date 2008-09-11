@@ -4,8 +4,13 @@ import edu.sdsc.grid.io.GeneralFileSystem;
 import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
+import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
+import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.*;
 
+import java.util.*;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -24,6 +29,11 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor, Fil
 	protected final static String SEPARATOR = "/";
 	protected final static String FILE = "file";
 	protected final static String DIR = "dir";
+	protected final static String DOT =  "\\.";
+	protected final static String DEFAULTRESOURCE	= "defaultresource";
+	protected String userName, passWord, mdasDomainName, mcatZone="", defaultStorageResource="";
+	protected SecurityAdaptor securityAdaptor;
+	protected GSSCredential cert;
 
 	public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
 		return true;
@@ -36,4 +46,52 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor, Fil
 	public boolean isEntry(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
 		return true;
 	}
+	
+	void parseValue(Map attributes) throws java.lang.Exception {
+	
+		if (securityAdaptor instanceof UserPassSecurityAdaptor) {
+			userName = securityAdaptor.getUserID();
+			passWord = ((UserPassSecurityAdaptor)securityAdaptor).getUserPass();
+		} else if (securityAdaptor instanceof GSSCredentialSecurityAdaptor) {
+			userName = null;
+		}
+		
+		// Parsing de username to extract domain and zone
+		if (userName != null)  {
+			String[] userNameAttribute = userName.split(DOT);
+			if (this instanceof SrbDataAdaptor) {
+				for (int i=0;i<userNameAttribute.length;i++){
+					if (i==0) {
+						userName = userNameAttribute[i];
+					} else if (i==1) {
+						mdasDomainName = userNameAttribute[i];
+					} else if (i==2) {
+						mcatZone = userNameAttribute[i];
+					}
+				}
+			} else {
+				for (int i=0;i<userNameAttribute.length;i++){
+					if (i==0) {
+						userName = userNameAttribute[i];
+					} else if (i==1) {
+						mcatZone = userNameAttribute[i];
+					}
+				}
+			}
+		}
+
+		// Parsing for defaultResource
+		Set set = attributes.entrySet();
+		Iterator iterator = set.iterator();
+
+        while (iterator.hasNext()) {
+            Map.Entry me = (Map.Entry) iterator.next();
+
+            String key = ((String)me.getKey()).toLowerCase();
+            String value =(String)me.getValue();
+            if (key.equals(DEFAULTRESOURCE)) {
+                defaultStorageResource = (String)me.getValue();
+            }
+        }
+    }
 }
