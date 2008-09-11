@@ -9,7 +9,7 @@ JSAGA
  But JSAGA does not only hide heterogeneity between middleware, it also
  hides heterogeneity between grid infrastructures. Indeed, heterogeneity
  between infrastructures leads to additional issues, including selection
- of the security context, setup of the job’s environment, or efficient
+ of the security context, setup of the job's environment, or efficient
  transport of input/output files to/from worker nodes. Transfer strategy
  depends on file size, on the possibility of sharing a given file among
  several jobs, on required data protection level, on protocol access

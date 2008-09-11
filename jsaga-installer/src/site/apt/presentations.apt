@@ -14,7 +14,7 @@ Presentations
 
     * Seminar CC-IN2P3, Lyon, 16/05/2008 (restricted access)
 
-      {{{http://cc.in2p3.fr/IMG/JSAGA.pdf}Interopérabilité de grilles au CC-IN2P3 avec JSAGA}}
+      {{{http://cc.in2p3.fr/IMG/JSAGA.pdf}Interoperabilite de grilles au CC-IN2P3 avec JSAGA}}
 
     * Open Grid Forum 23, Barcelona, 03/06/2008
 
@@ -22,7 +22,7 @@ Presentations
 
     * Tutorial grilles et EGEE, Montpellier, 18/06/2008 (in french)
 
-      {{{http://indico.in2p3.fr/materialDisplay.py?sessionId=29&materialId=2&confId=907}Utilisation uniforme des grilles avec SAGA et JSAGA}}
+      {{{http://indico.in2p3.fr/materialDisplay.py?sessionId=29&amp;materialId=2&amp;confId=907}Utilisation uniforme des grilles avec SAGA et JSAGA}}
 
     * IGTMD project meeting, Lyon, 30/06/2008
 
@@ -32,4 +32,4 @@ Publications
 
     * La lettre IN2P3 Informatique, 05/09/2008 (in french)
 
-      {{{http://informatique.in2p3.fr/?q=node/206}JSAGA : pour un accès uniforme à des grilles hétérogènes}}
+      {{{http://informatique.in2p3.fr/?q=node/206}JSAGA : pour un acces uniforme a des grilles heterogenes}}
