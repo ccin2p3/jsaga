@@ -10,7 +10,7 @@ import org.globus.gsi.proxy.ext.ProxyPolicy;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.BadParameter;
+import org.ogf.saga.error.*;
 
 import java.text.ParseException;
 import java.util.Map;
@@ -84,7 +84,7 @@ public class GlobusProxyFactory extends GlobusProxyFactoryAbstract {
         }
     }
 
-    public GSSCredential createProxy() throws GSSException {
+    public GSSCredential createProxy() throws IncorrectState, NoSuccess {
         CertUtil.init();
 
         ProxyCertInfo proxyCertInfo = null;
@@ -113,9 +113,18 @@ public class GlobusProxyFactory extends GlobusProxyFactoryAbstract {
         try {
 			proxy.verify();
 		} catch (GlobusCredentialException e) {
-			throw new GSSException(e.getErrorCode());
+            switch(e.getErrorCode()) {
+                case GlobusCredentialException.EXPIRED:
+                    throw new IncorrectState("Your certificate is expired", e);
+                default:
+                    throw new NoSuccess("Proxy verification failed", e);
+            }
 		}
-        return new GlobusGSSCredentialImpl(proxy, GSSCredential.INITIATE_ONLY);
+        try {
+            return new GlobusGSSCredentialImpl(proxy, GSSCredential.INITIATE_ONLY);
+        } catch (GSSException e) {
+            throw new NoSuccess("Proxy convertion failed", e);
+        }
     }
     
     public String getVersion() {
