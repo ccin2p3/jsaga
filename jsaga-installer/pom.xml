@@ -132,6 +132,19 @@
                             <fileNameReplacement>dependencies-graph.xml</fileNameReplacement>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>export-web-pages</id>
+                        <phase>post-site</phase>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
+                        <configuration>
+                            <xslFile>src/site/xsl/export.xsl</xslFile>
+                            <srcDir>${project.build.directory}/site</srcDir>
+                            <srcIncludes>index.html, download.html, presentations.html</srcIncludes>
+                            <destDir>${project.build.directory}/site/export</destDir>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
