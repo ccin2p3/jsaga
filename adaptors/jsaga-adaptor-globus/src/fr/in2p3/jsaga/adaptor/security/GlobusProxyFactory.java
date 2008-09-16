@@ -35,8 +35,6 @@ public class GlobusProxyFactory extends GlobusProxyFactoryAbstract {
     private String m_certFile = "";
     private String m_proxyFile = "";
     private String m_keyFile = null;
-    private boolean m_verify = false;
-    private boolean m_globusStyle = false;
 
     public GlobusProxyFactory(Map attributes, int oid, int certificateFormat) throws BadParameter, ParseException {
         // required attributes
@@ -109,7 +107,13 @@ public class GlobusProxyFactory extends GlobusProxyFactoryAbstract {
         super.setDebug(false);
         super.setQuiet(false);
         super.setStdin(false);
-        super.createProxy(m_certFile, m_keyFile, m_verify, m_globusStyle, m_proxyFile);
+        try {
+            final boolean VERIFY = false;
+            final boolean GLOBUS_STYLE = false;
+            super.createProxy(m_certFile, m_keyFile, VERIFY, GLOBUS_STYLE, m_proxyFile);
+        } catch (NullPointerException e) {
+            throw new IncorrectState("Bad passphrase", e);
+        }
         try {
 			proxy.verify();
 		} catch (GlobusCredentialException e) {

@@ -124,22 +124,14 @@ public abstract class GlobusSecurityAdaptorBuilder implements ExpirableSecurityA
             switch(usage) {
                 case USAGE_INIT_PKCS12:
                 {
-                    GSSCredential cred;
-                    try {
-                        cred = new GlobusProxyFactory(attributes, this.getGlobusType(), GlobusProxyFactory.CERTIFICATE_PKCS12).createProxy();
-                    } catch (NullPointerException e) {
-                        throw new IncorrectState("Bad passphrase");
-                    }
+                    GlobusProxyFactory factory = new GlobusProxyFactory(attributes, this.getGlobusType(), GlobusProxyFactory.CERTIFICATE_PKCS12);
+                    GSSCredential cred = factory.createProxy();
                     return this.createSecurityAdaptor(cred);
                 }
                 case USAGE_INIT_PEM:
                 {
-                    GSSCredential cred;
-                    try {
-                        cred = new GlobusProxyFactory(attributes, this.getGlobusType(), GlobusProxyFactory.CERTIFICATE_PEM).createProxy();
-                    } catch (NullPointerException e) {
-                        throw new IncorrectState("Bad passphrase");
-                    }
+                    GlobusProxyFactory factory = new GlobusProxyFactory(attributes, this.getGlobusType(), GlobusProxyFactory.CERTIFICATE_PEM);
+                    GSSCredential cred = factory.createProxy();
                     return this.createSecurityAdaptor(cred);
                 }
                 case USAGE_MEMORY:

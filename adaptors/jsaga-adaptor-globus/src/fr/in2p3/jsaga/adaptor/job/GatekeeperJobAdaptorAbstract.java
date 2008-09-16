@@ -4,9 +4,7 @@ import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
 import org.globus.common.CoGProperties;
-import org.globus.gram.Gram;
-import org.globus.gram.GramException;
-import org.globus.gram.GramJob;
+import org.globus.gram.*;
 import org.globus.gram.internal.GRAMProtocolErrorConstants;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
@@ -72,8 +70,16 @@ public abstract class GatekeeperJobAdaptorAbstract implements SagaSecureAdaptor 
 	        } catch (GramException e) {
 	            switch(e.getErrorCode()) {
 	                case GRAMProtocolErrorConstants.ERROR_PROTOCOL_FAILED:
-	                    throw new AuthenticationFailed("Proxy may be expired", e);
-	                case GRAMProtocolErrorConstants.ERROR_AUTHORIZATION:
+                        String msg = e.getMessage();
+                        if (msg!=null && msg.contains("Caused by: ")) {
+                            msg = msg.substring(msg.lastIndexOf("Caused by: "));
+                            msg = msg.substring(0, msg.indexOf("]"));
+                            String dn=null; try{dn=m_credential.getName().toString();} catch(GSSException e1){}
+                            throw new AuthenticationFailed(msg+" ("+dn+")");
+                        } else {
+                            throw new AuthenticationFailed("Please check stack trace", e);
+                        }
+                    case GRAMProtocolErrorConstants.ERROR_AUTHORIZATION:
 	                    throw new AuthorizationFailed(e);
 	                case GRAMProtocolErrorConstants.INVALID_JOB_CONTACT:
 	                case GRAMProtocolErrorConstants.ERROR_CONNECTION_FAILED:
