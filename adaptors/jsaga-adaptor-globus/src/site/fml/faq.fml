@@ -21,5 +21,25 @@
 openssl pkcs12 -nocerts -in mycert.p12 -out userkey.pem</pre>
             </answer>
         </faq>
+        <faq id="ca">
+            <question>How to name the Certificate Authority (CA) ?</question>
+            <answer>Use the "openssl" command line interface from Linux/Cygwin distribution:
+                <pre>mv ca.crt `openssl x509 -hash -noout -in ca.crt`.0
+chmod 664 $HASH.0</pre>
+            </answer>
+        </faq>
+        <faq id="policy">
+            <question>How to generate the CA signing policy (on server side) ?</question>
+            <answer>Use the "openssl" command line interface from Linux/Cygwin distribution:
+                <pre>HASH=`ls *.0 | cut -c -8`
+DN=`openssl x509 -noout -subject -in $HASH.0 | cut -c 10-`
+cat &lt;&lt; EOF &gt; $HASH.signing_policy
+access_id_CA      X509          '$DN'
+pos_rights        globus        CA:sign
+cond_subjects     globus        '"/*"'
+EOF
+chmod 664 $HASH.signing_policy</pre>
+            </answer>
+        </faq>
     </part>
 </faqs>
