@@ -5,7 +5,7 @@ import fr.in2p3.jsaga.adaptor.security.SecurityAdaptorBuilder;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.config.bean.EngineConfiguration;
 import fr.in2p3.jsaga.engine.factories.SecurityAdaptorBuilderFactory;
-import fr.in2p3.jsaga.engine.schema.config.Context;
+import fr.in2p3.jsaga.engine.schema.config.*;
 import fr.in2p3.jsaga.helpers.ASCIITableFormatter;
 import fr.in2p3.jsaga.helpers.StringArray;
 import fr.in2p3.jsaga.introspector.Introspector;
@@ -39,6 +39,7 @@ public class Help extends AbstractCommand {
     private static final String OPT_JOB = "j", LONGOPT_JOB = "job",
             ARG_JOB_SERVICE = "service", ARG_JOB_CONTEXT = "context",
             USAGE_OPT_JOB = "<mode> = "+ARG_JOB_SERVICE+" | "+ARG_JOB_CONTEXT;
+    private static final String OPT_SECURITY_ATTRIBUTE = "a", LONGOPT_SECURITY_ATTRIBUTE = "attribute";
     private static final String LONGOPT_EFFECTIVE_CONFIG = "config";
 
     public Help() {
@@ -137,6 +138,18 @@ public class Help extends AbstractCommand {
                 command.printHelpAndExit("Missing required argument: "+USAGE_OPT_JOB);
             }
         }
+        else if (line.hasOption(OPT_SECURITY_ATTRIBUTE))
+        {
+            String arg = line.getOptionValue(OPT_SECURITY_ATTRIBUTE);
+            if (arg.contains(".")) {
+                String ctxId = arg.substring(0, arg.indexOf("."));
+                String attrName = arg.substring(arg.indexOf(".")+1);
+                String attrValue = getAttribute(config.getContextCfg().findContextByName(ctxId), attrName);
+                System.out.println(attrValue);
+            } else {
+                command.printHelpAndExit("Bad argument: "+arg);
+            }
+        }
         else if (line.hasOption(LONGOPT_EFFECTIVE_CONFIG))
         {
             config.dump(System.out);
@@ -173,6 +186,16 @@ public class Help extends AbstractCommand {
         formatter.dump(System.out);
     }
 
+    private static String getAttribute(ObjectType object, String name) throws Exception {
+        for (int a=0; object!=null && a<object.getAttributeCount(); a++) {
+            Attribute attribute = object.getAttribute(a);
+            if (attribute.getName().equals(name)) {
+                return attribute.getValue();
+            }
+        }
+        throw new Exception("Attribute not found: "+name);
+    }
+
     protected Options createOptions() {
         Options opt = new Options();
 
@@ -201,6 +224,11 @@ public class Help extends AbstractCommand {
                     .withArgName("mode")
                     .hasArg()
                     .create(OPT_JOB));
+            group.addOption(OptionBuilder.withDescription("Output the value of security context attribute")
+                    .withLongOpt(LONGOPT_SECURITY_ATTRIBUTE)
+                    .withArgName("ctxId>.<attr")
+                    .hasArg()
+                    .create(OPT_SECURITY_ATTRIBUTE));
             group.addOption(OptionBuilder.withDescription("Output the effective configuration")
                     .withLongOpt(LONGOPT_EFFECTIVE_CONFIG)
                     .create());
