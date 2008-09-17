@@ -18,10 +18,23 @@ import javax.swing.*;
  */
 public class ContextInitTest extends AbstractTest {
     private String m_contextId;
+    private boolean m_hasUserPass;
 
-    public ContextInitTest(String contextId) throws Exception {
+    protected ContextInitTest(String contextId) throws Exception {
+        this(contextId, true);
+    }
+
+    protected ContextInitTest(String contextId, boolean hasUserPass) throws Exception {
         super();
         m_contextId = contextId;
+        m_hasUserPass = hasUserPass;
+    }
+
+    /**
+     * Override this method to add context-specific attribtues at run-time.
+     */
+    protected void updateContextAttributes(Context context) throws Exception {
+        // do nothing
     }
 
     public void test_init() throws Exception {
@@ -29,18 +42,22 @@ public class ContextInitTest extends AbstractTest {
         Context context = ContextFactory.createContext();
         context.setAttribute(Context.TYPE, m_contextId);
 
-        // test-only passwords can be retrieved from test properties
-        String userpass = super.getOptionalProperty(m_contextId, Context.USERPASS);
-        if (userpass == null) {
-            // prompt for UserPass
-            userpass = JOptionPane.showInputDialog("Please enter UserPass (WARNING: clear text!)");
-            if (userpass==null || userpass.trim().length()==0) {
-                fail("Test aborted by tester");
+        // set attribute UserPass
+        if (m_hasUserPass) {
+            // test-only passwords can be retrieved from test properties
+            String userpass = super.getOptionalProperty(m_contextId, Context.USERPASS);
+            if (userpass == null) {
+                // prompt for UserPass
+                userpass = JOptionPane.showInputDialog("Please enter UserPass (WARNING: clear text!)");
+                if (userpass==null || userpass.trim().length()==0) {
+                    fail("Test aborted by tester");
+                }
             }
+            context.setAttribute(Context.USERPASS, userpass);
         }
 
-        // set attribute UserPass
-        context.setAttribute(Context.USERPASS, userpass);
+        // set context-specific attributes
+        this.updateContextAttributes(context);
 
         // initialize context
         context.setDefaults();
