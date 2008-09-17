@@ -16,5 +16,8 @@ public class GlobusContext {
     public static final String USERCERTKEY = "UserCertKey";
     public static final String USERPROXYOBJECT = "UserProxyObject";
     public static final String DELEGATION = "Delegation";
+
+    // MyProxy attributes
     public static final String MYPROXYPASS = "MyProxyPass";
+    public static final String DELEGATIONLIFETIME = "DelegationLifeTime";
 }

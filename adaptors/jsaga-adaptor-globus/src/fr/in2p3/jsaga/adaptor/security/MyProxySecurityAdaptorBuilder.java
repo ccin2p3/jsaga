@@ -60,36 +60,26 @@ public class MyProxySecurityAdaptorBuilder implements ExpirableSecurityAdaptorBu
     public Usage getUsage() {
         return new UAnd(new Usage[]{
                 new UOr(new Usage[]{
+                        // create and store proxy
                         new UAnd(USAGE_INIT_PEM, new Usage[]{
                                 new UFile(Context.USERCERT), new UFile(Context.USERKEY),
                                 new UFilePath(Context.USERPROXY), new UHidden(Context.USERPASS),
-                                new U(Context.SERVER),
-                                new U(Context.USERID),
-                                new UHidden(GlobusContext.MYPROXYPASS),
-/*
-                                new UOptional(Context.USERID),
-                                new UHidden(GlobusContext.MYPROXYPASS) {
-                                    public String toString() {return "[*"+m_name+"*]";}
-                                    protected void throwExceptionIfInvalid(Object value) throws Exception {}
-                                },
-*/
-                                new UDuration(Context.LIFETIME) {
-                                    protected Object throwExceptionIfInvalid(Object value) throws Exception {
-                                        return (value!=null ? super.throwExceptionIfInvalid(value) : null);
-                                    }
-                                },
+                                new UDuration(Context.LIFETIME),
+                        }),
+
+                        // get proxy from server with passphrase
+                        new UAnd(USAGE_RENEW_MEMORY_WITH_PASSPHRASE, new Usage[]{
+                                new UNoPrompt(GlobusContext.USERPROXYOBJECT),
+                                new UDuration(GlobusContext.DELEGATIONLIFETIME)
+                        }),
+                        new UAnd(USAGE_RENEW_LOAD_WITH_PASSPHRASE, new Usage[]{
+                                new U(Context.USERPROXY),
+                                new UDuration(GlobusContext.DELEGATIONLIFETIME)
                         }),
 
                         // local proxy
                         new UProxyObject(USAGE_LOCAL_MEMORY, GlobusContext.USERPROXYOBJECT, MIN_LIFETIME_FOR_USING),
-                        // Commented to avoid conflict with usage of Globus context type
-                        // new UProxyFile(USAGE_LOCAL_LOAD, Context.USERPROXY, MIN_LIFETIME_FOR_USING),
-
-                        // get proxy from server with passphrase
-                        new UAnd(USAGE_RENEW_MEMORY_WITH_PASSPHRASE, new Usage[]{
-                                new UNoPrompt(GlobusContext.USERPROXYOBJECT), new U(Context.USERID), new UHidden(GlobusContext.MYPROXYPASS)}),
-                        new UAnd(USAGE_RENEW_LOAD_WITH_PASSPHRASE, new Usage[]{
-                                new U(Context.USERPROXY), new U(Context.USERID), new UHidden(GlobusContext.MYPROXYPASS)})
+                        new UProxyFile(USAGE_LOCAL_LOAD, Context.USERPROXY, MIN_LIFETIME_FOR_USING),
 
                         // get proxy from server with old proxy
 /*
@@ -97,6 +87,9 @@ public class MyProxySecurityAdaptorBuilder implements ExpirableSecurityAdaptorBu
                         new UProxyFile(USAGE_RENEW_LOAD_WITH_PROXY, Context.USERPROXY, MIN_LIFETIME_FOR_RENEW)
 */
                 }),
+                new U(Context.SERVER),
+                new U(Context.USERID),
+                new UHidden(GlobusContext.MYPROXYPASS),
                 new UFile(Context.CERTREPOSITORY)
         });
     }
@@ -104,8 +97,9 @@ public class MyProxySecurityAdaptorBuilder implements ExpirableSecurityAdaptorBu
     public Default[] getDefaults(Map map) throws IncorrectState {
         EnvironmentVariables env = EnvironmentVariables.getInstance();
         return new Default[]{
+                // concat with ".myproxy" to avoid conflict with Globus context type
                 new Default(Context.USERPROXY, new String[]{
-                        env.getProperty("X509_USER_PROXY"),
+                        env.getProperty("X509_USER_PROXY")+".myproxy",
                         System.getProperty("java.io.tmpdir")+System.getProperty("file.separator")+"x509up_u"+
                                 (System.getProperty("os.name").toLowerCase().startsWith("windows")
                                         ? "_"+System.getProperty("user.name").toLowerCase()
@@ -113,7 +107,7 @@ public class MyProxySecurityAdaptorBuilder implements ExpirableSecurityAdaptorBu
                                                 ? env.getProperty("UID")
                                                 : GlobusSecurityAdaptorBuilder.getUnixUID()
                                           )
-                                )}),
+                                )+".myproxy"}),
                 new Default(Context.USERCERT, new File[]{
                         new File(env.getProperty("X509_USER_CERT")+""),
                         new File(System.getProperty("user.home")+"/.globus/usercert.pem")}),
@@ -134,15 +128,23 @@ public class MyProxySecurityAdaptorBuilder implements ExpirableSecurityAdaptorBu
             switch(usage) {
                 case USAGE_INIT_PEM:
                 {
-                    // create proxy
+                    // create local temporary proxy
+                    String tempFile = File.createTempFile("myproxy", "txt").getAbsolutePath();
+                    attributes.put(Context.USERPROXY, tempFile);
                     GSSCredential cred = new GlobusProxyFactory(attributes, GlobusProxyFactory.OID_OLD, GlobusProxyFactory.CERTIFICATE_PEM).createProxy();
+
                     // send it to MyProxy server
                     String userId = (String) attributes.get(Context.USERID);
                     String myProxyPass = (String) attributes.get(GlobusContext.MYPROXYPASS);
                     int storedLifetime = attributes.containsKey(Context.LIFETIME)
                             ? UDuration.toInt(attributes.get(Context.LIFETIME))
                             : DEFAULT_STORED_PROXY_LIFETIME;  // default lifetime for stored proxies
-                    createMyProxy(attributes).put(cred, userId, myProxyPass, storedLifetime);
+                    MyProxy server = getServer(attributes);
+                    server.put(cred, userId, myProxyPass, storedLifetime);
+
+                    // destroy local temporary proxy
+                    Util.destroy(tempFile);
+
                     // returns
                     return this.createSecurityAdaptor(cred, attributes);
                 }
@@ -194,14 +196,22 @@ public class MyProxySecurityAdaptorBuilder implements ExpirableSecurityAdaptorBu
         }
     }
     private SecurityAdaptor createSecurityAdaptor(GSSCredential cred, Map attributes) throws IncorrectState {
+        String server = (String) attributes.get(Context.SERVER);
         String userId = (String) attributes.get(Context.USERID);
         String myProxyPass = (String) attributes.get(GlobusContext.MYPROXYPASS);
-        return new MyProxySecurityAdaptor(cred, userId, myProxyPass);
+        return new MyProxySecurityAdaptor(cred, server, userId, myProxyPass);
     }
 
     public void destroySecurityAdaptor(Map attributes, String contextId) throws Exception {
-        String proxyFile = (String) attributes.get(Context.USERPROXY);
-        Util.destroy(proxyFile);
+        // get attributes
+        GSSCredential cred = load(new File((String) attributes.get(Context.USERPROXY)));
+        String userId = (String) attributes.get(Context.USERID);
+        String myProxyPass = (String) attributes.get(GlobusContext.MYPROXYPASS);
+        // destroy remote proxy
+        MyProxy server = getServer(attributes);
+        server.destroy(cred, userId, myProxyPass);
+        // destroy local proxy
+        Util.destroy((String) attributes.get(Context.USERPROXY));
     }
 
     private static GSSCredential renewCredential(GSSCredential oldCred, Map attributes) throws ParseException, URISyntaxException, MyProxyException {
@@ -210,13 +220,18 @@ public class MyProxySecurityAdaptorBuilder implements ExpirableSecurityAdaptorBu
         int delegatedLifetime = attributes.containsKey(Context.LIFETIME)
                 ? UDuration.toInt(attributes.get(Context.LIFETIME))
                 : DEFAULT_DELEGATED_PROXY_LIFETIME;  // effective lifetime for delegated proxy
-        return createMyProxy(attributes).get(oldCred, userId, myProxyPass, delegatedLifetime);
+        MyProxy server = getServer(attributes);
+        return server.get(oldCred, userId, myProxyPass, delegatedLifetime);
     }
 
-    protected static MyProxy createMyProxy(Map attributes) throws URISyntaxException {
-        String[] server = ((String) attributes.get(Context.SERVER)).split(":");
-        String host = server[0];
-        int port = (server.length>1 ? Integer.parseInt(server[1]) : MyProxy.DEFAULT_PORT);
+    private static MyProxy getServer(Map attributes) throws URISyntaxException {
+        String server = (String) attributes.get(Context.SERVER);
+        return getServer(server);
+    }
+    static MyProxy getServer(String server) {
+        String[] array = (server).split(":");
+        String host = array[0];
+        int port = (array.length>1 ? Integer.parseInt(array[1]) : MyProxy.DEFAULT_PORT);
         MyProxy myProxy = new MyProxy(host, port);
 /*
         String subjectDN = null;
@@ -238,7 +253,7 @@ public class MyProxySecurityAdaptorBuilder implements ExpirableSecurityAdaptorBu
                 ExtendedGSSCredential.IMPEXP_OPAQUE,
                 GSSCredential.DEFAULT_LIFETIME,
                 null, // use default mechanism: GSI
-                GSSCredential.ACCEPT_ONLY);
+                GSSCredential.INITIATE_AND_ACCEPT);
     }
 
     private static void save(File proxyFile, GSSCredential cred) throws GSSException, IOException {

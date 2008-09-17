@@ -21,39 +21,46 @@ import java.io.PrintStream;
  *
  */
 public class MyProxySecurityAdaptor extends GSSCredentialSecurityAdaptor implements SecurityAdaptor {
+    private String m_server;
     private String m_userId;
     private String m_myProxyPass;
 
-    public MyProxySecurityAdaptor(GSSCredential proxy, String userId, String myProxyPass) {
+    public MyProxySecurityAdaptor(GSSCredential proxy, String server, String userId, String myProxyPass) {
         super(proxy);
+        m_server = server;
         m_userId = userId;
         m_myProxyPass = myProxyPass;
     }
 
     /** override super.dump() */
     public void dump(PrintStream out) throws Exception {
-        CredentialInfo info = new MyProxy().info(m_proxy, m_userId, m_myProxyPass);
-        if (info.getName() != null) {
-            out.println("  "+info.getName()+":");
-        } else {
-            out.println("  default:");
-        }
-        out.println("  Start Time  : "+info.getStartTime());
-        out.println("  End Time    : "+info.getEndTime());
+        MyProxy server = MyProxySecurityAdaptorBuilder.getServer(m_server);
+
+        // server info
+        CredentialInfo info = server.info(m_proxy, m_userId, m_myProxyPass);
+        out.println("  Owner    : "+info.getOwner());
+        out.println("  StartTime: "+info.getStartTimeAsDate());
+        out.println("  EndTime  : "+info.getEndTimeAsDate());
         long now = System.currentTimeMillis();
         if (info.getEndTime() > now) {
-            out.println("  Time left   : "+Util.formatTimeSec((info.getEndTime() - now)/1000));
+            out.println("  LifeTime : "+Util.formatTimeSec((info.getEndTime() - now)/1000));
         } else {
-            out.println("  Time left   : expired");
+            out.println("  LifeTime : expired");
+        }
+        if (info.getName() != null) {
+            out.println("  Name     : "+info.getName());
         }
         if (info.getRetrievers() != null) {
-            out.println("  Retrievers  : "+info.getRetrievers());
+            out.println("  Retrievers : "+info.getRetrievers());
         }
         if (info.getRenewers() != null) {
-            out.println("  Renewers    : "+info.getRenewers());
+            out.println("  Renewers : "+info.getRenewers());
         }
         if (info.getDescription() != null) {
             out.println("  Description : "+info.getDescription());
         }
+
+        // local info
+        out.println("  Delegated LifeTime : "+format(m_proxy.getRemainingLifetime()));
     }
 }
