@@ -65,6 +65,25 @@
                     </testExcludes>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-escapexml-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>example</id>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>escapexml</goal>
+                        </goals>
+                        <configuration>
+                            <title>Configuration example</title>
+                            <description>Configuration used for integration tests of this module</description>
+                            <xmlFile>test/config/jsaga-config.xml</xmlFile>
+                            <xdocFileName>example.xml</xdocFileName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <profiles>
