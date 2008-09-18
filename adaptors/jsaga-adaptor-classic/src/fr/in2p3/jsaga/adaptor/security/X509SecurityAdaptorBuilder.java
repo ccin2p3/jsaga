@@ -7,6 +7,7 @@ import org.ogf.saga.context.Context;
 import org.ogf.saga.error.IncorrectState;
 import org.ogf.saga.error.NoSuccess;
 
+import javax.crypto.BadPaddingException;
 import java.io.*;
 import java.security.KeyStore;
 import java.util.Enumeration;
@@ -57,6 +58,8 @@ public class X509SecurityAdaptorBuilder implements SecurityAdaptorBuilder {
         } catch(IOException e) {
             if (e.getMessage()!=null && e.getMessage().endsWith("too big.")) {
                 throw new IncorrectState("Not a PKCS12 file", e);
+            } else if (e.getCause()!=null && e.getCause() instanceof BadPaddingException) {
+                throw new IncorrectState("Bad passphrase", e);
             } else {
                 throw new NoSuccess(e);
             }
