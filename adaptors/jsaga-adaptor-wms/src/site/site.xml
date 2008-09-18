@@ -26,6 +26,7 @@
         <menu name="User Documentation">
             <item name="Module Home" href="index.html"/>
             <item name="FAQ" href="faq.html"/>
+            <item name="Example" href="example.html"/>
         </menu>
 		<menu name="Module Documentation" ref="reports" />
 	</body>
