@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UNIVERSE name="World" xmlns="http://www.in2p3.fr/jsaga" xmlns:xi="http://www.w3.org/2003/XInclude"
+          wrapperMonitoring="true" localIntermediary="/tmp">
+    <UNIVERSE name="Grid">
+        <GRID name="EGEE" contextType="VOMS" defaultIntermediary="gsiftp://cclcgseli01.in2p3.fr/tmp/">
+            <attribute name="UserProxy" value="${java.io.tmpdir}/x509up_u${user.name}"/>
+            <attribute name="Server" value="voms://cert-voms-01.cnaf.infn.it:5003"/>
+            <SITE name="CCIN2P3">
+                <domain name="in2p3.fr">
+                    <host prefix="cclcgce"/>
+                </domain>
+                <fileSystem name="WorkingDirectory" mountPoint="$SCRATCH_DIR"/>
+                <job type="gatekeeper">
+                    <monitoring impl="fr.in2p3.jsaga.adaptor.job.LBMonitoring"
+>if test "$STATUS" = "STARTED" ; then
+    glite-lb-logevent --lbproxy --jobid $JOBID --event Running --node $HOSTNAME
+elif test "$STATUS" = "INITIALIZED" ; then
+    # ignore this step
+elif test "$STATUS" = "INPUT_STAGED" ; then
+    glite-lb-logevent --lbproxy --jobid $JOBID --event ReallyRunning
+elif test "$STATUS" = "USER_PROCESSED" ; then
+    glite-lb-logevent --lbproxy --jobid $JOBID --event Done --exit_code 0
+elif test "$STATUS" = "OUTPUT_STAGED" ; then
+    # ignore this step
+elif test "$STATUS" = "COMPLETED" ; then
+    glite-lb-logevent --lbproxy --jobid $JOBID --event Purge
+elif test "$STATUS" = "FAILED" ; then
+    glite-lb-logevent --lbproxy --jobid $JOBID --event Abort --reason $CAUSE
+fi</monitoring>
+                    <accounting impl="fr.in2p3.jsaga.adaptor.job.LBAccounting"
+>glite-lb-logevent --lbproxy --jobid $JOBID --event ResourceUsage --resource ? --quantity ? --unit ?</accounting>
+                </job>
+                <data type="srb" base="srb://host2:5544?mydomain"/>
+                <data type="irods"/>
+            </SITE>
+            <fileSystem name="ApplicationsDirectory" mountPoint="$VO_BIOMED_SW_DIR"/>
+            <job type="wms">
+                <monitorService url="https://lxb2176.cern.ch:9003"/>
+            </job>
+            <job type="cream"/>
+            <job scheme="jjs" type="gatekeeper" wrapperMonitoring="false">
+                <monitorService url="gsiftp://cclcgseli01.in2p3.fr/tmp/"
+                                impl="fr.in2p3.jsaga.adaptor.JJSJobMonitorAdaptor"/>
+            </job>
+            <data type="srm">
+                <attribute name="TransferProtocols" value="dcap,rfio,gsiftp"/>
+            </data>
+            <data type="lfn"/>
+        </GRID>
+        <GRID name="OpenPlast" contextType="Globus" defaultIntermediary="gsiftp://ccrugceli01.in2p3.fr/tmp/">
+            <attribute name="UserProxy" value="${java.io.tmpdir}/x509up_u${user.name}_openplast"/>
+            <SITE name="CS-SI">
+                <domain name="c-s.fr"/>
+                <fileSystem name="IntermediaryDirectory" mountPoint="$INTERMERIADY_DIR"/>
+            </SITE>
+            <domain name="in2p3.fr">
+                <host prefix="ccrug"/>
+            </domain>
+            <fileSystem name="ApplicationsDirectory" mountPoint="$APPLICATIONS_DIR"/>
+            <job type="gatekeeper"/>
+            <job type="wsgram"/>
+            <data type="gsiftp-v2" scheme="gsiftp"/>
+            <data type="gsiftp-v1"/>
+        </GRID>
+        <GRID name="NAREGI" contextType="Globus">
+            <attribute name="UserProxy" value="${java.io.tmpdir}/x509up_u${user.name}_naregi"/>
+            <domain name="jp"/>
+            <job type="gridvm"/>
+        </GRID>
+        <GRID contextType="UserPass">
+            <!-- anonymous FTP -->
+            <data type="ftp" read="true"/>
+        </GRID>
+        <!-- common to several GRIDs -->
+        <data type="gsiftp">
+            <schemeAlias>gridftp</schemeAlias>
+        </data>
+    </UNIVERSE>
+    <UNIVERSE name="Test">
+        <GRID contextType="Globus">
+            <attribute name="UserProxy" value="${java.io.tmpdir}/x509up_u${user.name}_test"/>
+            <domain>
+                <host prefix="localhost"/>
+            </domain>
+            <domain name="in2p3.fr">
+                <host prefix="ccgridvm"/>
+                <host prefix="ccsyre"/>
+            </domain>
+            <fileSystem name="WorkingDirectory" mountPoint="${java.io.tmpdir}/jsaga/work"/>
+            <fileSystem name="IntermediaryDirectory" mountPoint="${java.io.tmpdir}/jsaga/intermediary"/>
+            <job type="gatekeeper">
+                <attribute name="ShellPath" value="f:\cygwin\bin\sh.exe"/>
+            </job>
+            <!-- gsiftp with this security context is supported by client but not by worker -->
+            <data type="gsiftp"/>
+        </GRID>
+        <GRID contextType="X509">
+            <data type="https"/>
+        </GRID>
+        <domain name="vmnet.net"/>
+    </UNIVERSE>
+    <GRID contextType="UserPass">
+        <attribute name="UserID" value="${user.name}"/>
+        <!-- unset default UserPass to enable prompt for user input -->
+        <attribute name="UserPass"/>
+        <attribute name="LifeTime" value="PT12H"/>
+        <data type="ftp" read="true"/>
+    </GRID>
+    <data type="http"/>
+    <data type="gzip"/>
+    <data type="tar"/>
+    <data type="tgz"/>
+</UNIVERSE>

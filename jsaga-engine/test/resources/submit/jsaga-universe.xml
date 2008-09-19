@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UNIVERSE name="World" xmlns="http://www.in2p3.fr/jsaga" xmlns:xi="http://www.w3.org/2003/XInclude" localIntermediary="c:/tmp">
+    <UNIVERSE name="Laptop" defaultIntermediary="file://c:/grid.in2p3.fr">
+        <GRID contextType="JKS">
+            <attribute name="Keystore" value="${user.home}/.jsaga/contexts/unicore6/demouser.jks"/>
+            <attribute name="KeystorePass" value="demouser"/>
+            <job type="unicore6"/>
+        </GRID>
+        <GRID contextType="Globus">
+            <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/globus/certificates/"/>
+            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/globus_cred.txt"/>
+            <job type="gatekeeper"/>
+            <job type="local"/>
+        </GRID>
+        <GRID contextType="SSH">
+            <job type="ssh"/>
+        </GRID>
+        <domain>
+            <host prefix="localhost"/>
+        </domain>
+        <fileSystem name="IntermediaryDirectory" mountPoint="${java.io.tmpdir}"/>
+        <fileSystem name="ApplicationsDirectory" mountPoint="/usr/local"/>
+        <data type="file"/>
+    </UNIVERSE>
+    <GRID contextType="Globus" defaultIntermediary="gsiftp://ccgridvmli08.in2p3.fr/tmp">
+        <domain name="in2p3.fr">
+            <host prefix="ccgridvmli08"/>
+        </domain>
+        <job type="gatekeeper"/>
+        <data type="gsiftp"/>
+    </GRID>
+</UNIVERSE>
