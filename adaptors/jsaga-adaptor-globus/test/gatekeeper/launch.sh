@@ -14,8 +14,10 @@ else
 fi
 
 # set X509_* environment variables
-cd build/jsaga_home.dir/
-JSAGA_HELP="\"$JAVA\" -cp \"$CLASSPATH;../classes\" fr.in2p3.jsaga.command.Help"
+cd build/
+JSAGA_HELP="\"$JAVA\" -cp \"$CLASSPATH;classes\" \
+    -Djsaga.universe=file:../test/resources/etc/jsaga-universe.xml
+    fr.in2p3.jsaga.command.Help"
 X509_USER_PROXY=`eval $JSAGA_HELP -a Test_Globus.UserProxy | tr -d "\r\n"`
 X509_CERT_DIR=`eval $JSAGA_HELP -a Test_Globus.CertRepository | tr -d "\r\n"`
 cd -
@@ -24,7 +26,7 @@ echo "X509_CERT_DIR=$X509_CERT_DIR"
 
 # set system properties
 PROPERTIES=
-PROPERTIES="$PROPERTIES -DGLOBUS_LOCATION=build/jsaga_home.dir/"
+PROPERTIES="$PROPERTIES -DGLOBUS_LOCATION=build/"
 PROPERTIES="$PROPERTIES -DX509_USER_PROXY=\"$X509_USER_PROXY\""
 PROPERTIES="$PROPERTIES -DX509_CERT_DIR=\"$X509_CERT_DIR\""
 
