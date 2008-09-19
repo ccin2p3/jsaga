@@ -22,6 +22,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
+import java.util.Properties;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -36,7 +37,7 @@ import java.io.*;
  *
  */
 public class Configuration {
-    public static final String XSD_CONFIG = "schema/jsaga-config.xsd.xml";
+    public static final String XSD_UNIVERSE = "schema/jsaga-universe.xsd.xml";
     public static final File XML_MERGED_CONFIG = new File(Base.JSAGA_VAR, "jsaga-merged-config.xml");
 
     private static final String ADAPTOR_DESCRIPTORS = "adaptor-descriptors";
@@ -66,7 +67,7 @@ public class Configuration {
         if (!Base.JSAGA_HOME.exists()) {
             throw new FileNotFoundException("JSAGA_HOME does not exist: "+Base.JSAGA_HOME.getAbsolutePath());
         }
-        File baseDir = new File(Base.JSAGA_VAR, "jsaga-config");
+        File baseDir = new File(Base.JSAGA_VAR, "jsaga-universe");
         if(!baseDir.exists()) baseDir.mkdir();
 
         // force using the JDK 1.5 implementation of Transformer
@@ -74,9 +75,12 @@ public class Configuration {
                 "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl");
 
         // configure log4j
-        File log4jConfig = EngineProperties.getFile(EngineProperties.LOG4J_CONFIGURATION);
-        if (log4jConfig.exists()) {
-            PropertyConfigurator.configure(log4jConfig.getAbsolutePath());
+        InputStream log4jCfgStream = EngineProperties.getStream(EngineProperties.LOG4J_CONFIGURATION);
+        if (log4jCfgStream != null) {
+            Properties prop = new Properties();
+            prop.load(log4jCfgStream);
+            log4jCfgStream.close();
+            PropertyConfigurator.configure(prop);
         }
         if (EngineProperties.getException() != null) {
             Logger.getLogger(Configuration.class).warn("Failed to load engine properties, using defaults ["+EngineProperties.getException().getMessage()+"]");
@@ -88,8 +92,8 @@ public class Configuration {
         boolean sameDescMD5 = MD5Digester.isSame(new File(baseDir, ADAPTOR_DESCRIPTORS +".md5"), descBytes);
 
         // xinclude
-        File jsagaConfig = EngineProperties.getRequiredFile(EngineProperties.JSAGA_CONFIGURATION);
-        byte[] data = new XMLFileParser(null).xinclude(jsagaConfig);
+        InputStream jsagaCfgStream = EngineProperties.getRequiredStream(EngineProperties.JSAGA_UNIVERSE);
+        byte[] data = new XMLFileParser(null).xinclude(jsagaCfgStream);
         boolean sameConfigMD5 = MD5Digester.isSame(new File(baseDir, XI_RAW_CONFIG+".md5"), data);
 
         // load/generate merged config
@@ -97,7 +101,7 @@ public class Configuration {
         Unmarshaller unmarshaller = new Unmarshaller(EffectiveConfig.class);
         unmarshaller.setIgnoreExtraAttributes(false);
         unmarshaller.setValidation(true);
-        boolean enableCache = EngineProperties.getBoolean(EngineProperties.JSAGA_CONFIGURATION_ENABLE_CACHE);
+        boolean enableCache = EngineProperties.getBoolean(EngineProperties.JSAGA_UNIVERSE_ENABLE_CACHE);
         if (sameDescMD5 && sameConfigMD5 && XML_MERGED_CONFIG.exists() && enableCache) {
             // *** load merged config from file ***
             Reader reader = new InputStreamReader(new FileInputStream(XML_MERGED_CONFIG));
@@ -106,7 +110,7 @@ public class Configuration {
             // *** generate merged config ***
 
             // parse config
-            XMLFileParser parser = new XMLFileParser(new String[]{XSD_CONFIG});
+            XMLFileParser parser = new XMLFileParser(new String[]{XSD_UNIVERSE});
             Document rawConfig = parser.parse(new ByteArrayInputStream(data), new File(baseDir, XI_RAW_CONFIG));
 
             // parse adaptor descriptors document (Note: ignored by stylesheet if marshalled from EffectiveConfig)

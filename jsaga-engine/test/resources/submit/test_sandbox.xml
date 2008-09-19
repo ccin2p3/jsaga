@@ -14,7 +14,7 @@
         <DataStaging name="INPUT">
             <FileName>file1.txt</FileName>
             <CreationFlag>overwrite</CreationFlag>
-            <Source><URI>file://./jsaga-engine/config/etc/jsaga-config.xml</URI></Source>
+            <Source><URI>file://./jsaga-engine/config/etc/jsaga-universe.xml</URI></Source>
             <ext:Sandbox>true</ext:Sandbox>
         </DataStaging>
         <DataStaging name="OUTPUT">

@@ -20,8 +20,8 @@ public class ConfigurationTest extends TestCase {
     public void test_config() throws Exception {
         // configure JSAGA engine
         System.setProperty("debug", "true");
-        EngineProperties.setProperty(EngineProperties.JSAGA_CONFIGURATION, "../test/resources/config/jsaga-config.xml");
-        EngineProperties.setProperty(EngineProperties.JSAGA_CONFIGURATION_ENABLE_CACHE, "false");
+        EngineProperties.setProperty(EngineProperties.JSAGA_UNIVERSE, "../test/resources/config/jsaga-universe.xml");
+        EngineProperties.setProperty(EngineProperties.JSAGA_UNIVERSE_ENABLE_CACHE, "false");
 
         // dump effective config
         Configuration.getInstance().getConfigurations().dump(System.out);
@@ -30,8 +30,8 @@ public class ConfigurationTest extends TestCase {
     public void test_config_jobcollection() throws Exception {
         // configure JSAGA engine
         System.setProperty("debug", "true");
-        EngineProperties.setProperty(EngineProperties.JSAGA_CONFIGURATION, "../test/resources/jobcollection/jsaga-config.xml");
-        EngineProperties.setProperty(EngineProperties.JSAGA_CONFIGURATION_ENABLE_CACHE, "false");
+        EngineProperties.setProperty(EngineProperties.JSAGA_UNIVERSE, "../test/resources/jobcollection/jsaga-universe.xml");
+        EngineProperties.setProperty(EngineProperties.JSAGA_UNIVERSE_ENABLE_CACHE, "false");
 
         // dump effective config
         Configuration.getInstance().getConfigurations().dump(System.out);

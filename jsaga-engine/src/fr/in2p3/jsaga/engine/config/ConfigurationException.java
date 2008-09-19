@@ -22,4 +22,8 @@ public class ConfigurationException extends NoSuccess {
     public ConfigurationException(Throwable throwable) {
         super(throwable);
     }
+
+    public ConfigurationException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

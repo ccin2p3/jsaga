@@ -58,9 +58,9 @@ public class XMLFileParser {
     /**
      * Note: included files are relative to the parent directory of this file.
      */
-    public byte[] xinclude(File xmlFile) throws ParserConfigurationException, IOException, SAXException, TransformerException {
+    public byte[] xinclude(InputStream xmlStream) throws ParserConfigurationException, IOException, SAXException, TransformerException {
         ByteArrayOutputStream dump = new ByteArrayOutputStream();
-        dump(m_parser.newDocumentBuilder().parse(xmlFile), dump);
+        dump(m_parser.newDocumentBuilder().parse(xmlStream), dump);
         return dump.toByteArray();
     }
 

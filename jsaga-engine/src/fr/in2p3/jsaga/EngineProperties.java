@@ -1,8 +1,11 @@
 package fr.in2p3.jsaga;
 
+import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import org.ogf.saga.error.SagaError;
 
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Properties;
 
 /* ***************************************************
@@ -18,9 +21,9 @@ import java.util.Properties;
  *
  */
 public class EngineProperties {
-    public static final String JSAGA_CONFIGURATION = "jsaga.configuration";
-    public static final String JSAGA_CONFIGURATION_ENABLE_CACHE = "jsaga.configuration.enable.cache";
-    public static final String JSAGA_CONFIGURATION_IGNORE_MISSING_ADAPTOR = "jsaga.configuration.ignore.missing.adaptor";
+    public static final String JSAGA_UNIVERSE = "jsaga.universe";
+    public static final String JSAGA_UNIVERSE_ENABLE_CACHE = "jsaga.universe.enable.cache";
+    public static final String JSAGA_UNIVERSE_IGNORE_MISSING_ADAPTOR = "jsaga.universe.ignore.missing.adaptor";
     public static final String LOG4J_CONFIGURATION = "log4j.configuration";
     public static final String DATA_COPY_BUFFER_SIZE = "data.copy.buffer.size";
     public static final String DATA_COPY_KEEP_LAST_MODIFIED = "data.copy.keep.last.modified";
@@ -37,9 +40,9 @@ public class EngineProperties {
         if (s_prop == null) {
             // set default properties
             s_prop = new Properties();
-            s_prop.setProperty(JSAGA_CONFIGURATION, "etc/jsaga-config.xml");
-            s_prop.setProperty(JSAGA_CONFIGURATION_ENABLE_CACHE, "true");
-            s_prop.setProperty(JSAGA_CONFIGURATION_IGNORE_MISSING_ADAPTOR, "true");
+            s_prop.setProperty(JSAGA_UNIVERSE, "etc/jsaga-universe.xml");
+            s_prop.setProperty(JSAGA_UNIVERSE_ENABLE_CACHE, "true");
+            s_prop.setProperty(JSAGA_UNIVERSE_IGNORE_MISSING_ADAPTOR, "true");
             s_prop.setProperty(LOG4J_CONFIGURATION, "etc/log4j.properties");
             s_prop.setProperty(DATA_COPY_BUFFER_SIZE, "16384");
             s_prop.setProperty(DATA_COPY_KEEP_LAST_MODIFIED, "false");
@@ -79,16 +82,46 @@ public class EngineProperties {
         }
     }
 
-    public static File getFile(String name) {
-        return new File(Base.JSAGA_HOME, getProperty(name));
-    }
-
-    public static File getRequiredFile(String name) throws FileNotFoundException {
-        File file = getFile(name);
-        if (file.exists()) {
-            return file;
+    /**
+     * Get the stream corresponding to property <code>name</code>.
+     * The property value can be either an URL (System properties only)
+     * or a file path (Engine properties only).
+     * @param name the name of the property
+     * @return the input stream
+     */
+    public static InputStream getRequiredStream(String name) throws ConfigurationException {
+        InputStream stream;
+        String value = System.getProperty(name);
+        if (value != null) {
+            try {
+                URL url = new URL(value);
+                stream = url.openStream();
+            } catch (MalformedURLException e) {
+                throw new ConfigurationException("Malformed URL: "+value, e);
+            } catch (IOException e) {
+                throw new ConfigurationException("Failed to open stream: "+value, e);
+            }
         } else {
-            throw new FileNotFoundException("File not found: "+file.getAbsolutePath());
+            String path = getProperty(name);
+            File file;
+            if (new File(path).isAbsolute()) {
+                file = new File(path);
+            } else {
+                file = new File(Base.JSAGA_HOME, path);
+            }
+            try {
+                stream = new FileInputStream(file);
+            } catch (FileNotFoundException e) {
+                throw new ConfigurationException("File not found: "+file, e);
+            }
+        }
+        return stream;
+    }
+    public static InputStream getStream(String name) {
+        try {
+            return getRequiredStream(name);
+        } catch (ConfigurationException e) {
+            return null;
         }
     }
 
