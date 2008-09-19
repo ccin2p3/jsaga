@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UNIVERSE name="World" xmlns="http://www.in2p3.fr/jsaga">
+	<GRID contextType="VOMS">		
+		<SITE name="PPSCern">
+			<domain name="cern.ch">
+				<host prefix="pps-wms"/>
+				<host prefix="lxb2176"/>
+			</domain>
+			<job type="wms">
+					<monitorService url="wms://lxb2176.cern.ch"/>
+			</job>
+		</SITE>
+		<SITE name="PPSDefault">
+			<job type="wms"/>
+		</SITE>
+	</GRID>
+</UNIVERSE>

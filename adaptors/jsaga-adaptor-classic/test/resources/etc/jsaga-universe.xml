@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UNIVERSE name="World" xmlns="http://www.in2p3.fr/jsaga">
+    <GRID contextType="X509">
+        <attribute name="UserCert" value="${user.home}/.jsaga/contexts/https/mycert.p12"/>
+        <attribute name="UserPass" value="toto"/>
+        <data type="https"/>
+    </GRID>
+    <GRID contextType="JKS">
+        <attribute name="Keystore" value="${user.home}/.jsaga/contexts/https/mycert.jks"/>
+        <attribute name="KeystorePass" value="changeit"/>
+<!--
+        <data type="https">
+            <attribute name="MutualAuthentication" value="true"/>
+        </data>
+-->
+    </GRID>
+</UNIVERSE>
