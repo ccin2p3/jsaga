@@ -78,7 +78,7 @@
                         <configuration>
                             <title>Configuration example</title>
                             <description>Configuration used for integration tests of this module</description>
-                            <xmlFile>test/config/jsaga-config.xml</xmlFile>
+                            <xmlFile>test/resources/etc/jsaga-universe.xml</xmlFile>
                             <xdocFileName>example.xml</xdocFileName>
                         </configuration>
                     </execution>
@@ -107,26 +107,6 @@
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>pre-integration-test</phase>
-                                <goals>
-                                    <goal>directory-inline</goal>
-                                </goals>
-                                <configuration>
-                                    <descriptors>
-                                        <descriptor>test/assembly.xml</descriptor>
-                                    </descriptors>
-                                    <finalName>jsaga_home</finalName>
-                                    <appendAssemblyId>false</appendAssemblyId>
-                                    <archiveBaseDirectory>test/config</archiveBaseDirectory>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <executions>
                             <execution>
@@ -141,7 +121,7 @@
                                     <systemProperties>
                                         <property>
                                             <name>JSAGA_HOME</name>
-                                            <value>build/jsaga_home.dir</value>
+                                            <value>${project.build.directory}</value>
                                         </property>
                                     </systemProperties>
                                 </configuration>
