@@ -53,7 +53,7 @@ public class EngineProperties {
             s_prop.setProperty(JOB_CONTROL_CHECK_MATCH, "true");
 
             // load properties
-            File file = new File(Base.JSAGA_HOME, "etc/jsaga-engine.properties");
+            File file = new File(Base.JSAGA_HOME, "etc/jsaga-config.properties");
             try {
                 InputStream in = new FileInputStream(file);
                 s_prop.load(in);
