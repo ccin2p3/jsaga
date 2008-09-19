@@ -31,7 +31,7 @@
                 <ul>
                     <li>for a one shot usage, set the attribute in the command line arguments</li>
                     <li>for a user, set the attribute in the user properties file: ~/.jsaga/jsaga-user.properties</li>
-                    <li>for all users, set the attribute in the JSAGA configuration file: $JSAGA_HOME/etc/jsaga-config.xml</li>
+                    <li>for all users, set the attribute in the JSAGA configuration file: $JSAGA_HOME/etc/jsaga-universe.xml</li>
                     <li>if attribute is not set, then JSAGA may set it according to the adaptor default values</li>
                     <li>if a required attribute is not set and has no default value, then JSAGA will prompt the user for entering the value (unless the system property "interactive" is not defined)</li>
                 </ul>
