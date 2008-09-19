@@ -1,10 +1,8 @@
 package fr.in2p3.jsaga.adaptor.ssh.data;
 
+import com.jcraft.jsch.ChannelSftp.LsEntry;
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-
-import com.jcraft.jsch.ChannelSftp.LsEntry;
-
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -42,8 +40,10 @@ public class SFTPFileAttributes extends FileAttributes {
 		
 		m_group =  String.valueOf(entry.getAttrs().getGId());
 		m_owner =  String.valueOf(entry.getAttrs().getUId());
-		
-		int permissions = entry.getAttrs().getPermissions();
+
+        m_lastModified = ((long) entry.getAttrs().getMTime()) * 1000;
+
+        int permissions = entry.getAttrs().getPermissions();
 		if((permissions & S_IRUSR)!=0) 
 			m_permission = m_permission.or(PermissionBytes.READ);
 
