@@ -24,18 +24,12 @@ import java.security.Key;
 public class PasswordEncrypterSingleton extends PasswordAbstract {
     private static final int EXPIRY_DATE_POSITION = 12;
     private static final int KEY_SIZE = 128;
-    private static PasswordEncrypterSingleton _instance;
 
     /**
+     * @param keyalias the alias of the secret key
      * @param lifetime the validity duration of the key in seconds
      */
-    public synchronized static PasswordEncrypterSingleton getInstance(int lifetime) throws Exception {
-        if (_instance == null) {
-            _instance = new PasswordEncrypterSingleton(lifetime);
-        }
-        return _instance;
-    }
-    private PasswordEncrypterSingleton(int lifetime) throws Exception {
+    public PasswordEncrypterSingleton(String keyalias, int lifetime) throws Exception {
         super();
 
         // generate key
@@ -51,7 +45,7 @@ public class PasswordEncrypterSingleton extends PasswordAbstract {
 
         // store it
         File keystoreFile = PasswordAbstract.getFile();
-        m_keystore.setKeyEntry(m_keyalias, m_key, m_keypass, null);
+        m_keystore.setKeyEntry(keyalias, m_key, m_keypass, null);
         m_keystore.store(new FileOutputStream(keystoreFile), m_storepass);
     }
 

@@ -27,7 +27,6 @@ public abstract class PasswordAbstract {
     protected char[] m_storepass;
     protected char[] m_keypass;
     protected KeyStore m_keystore;
-    protected String m_keyalias;
     protected Key m_key;
 
     protected PasswordAbstract() throws Exception {
@@ -44,7 +43,6 @@ public abstract class PasswordAbstract {
             // create an empty keystore
             m_keystore.load(null, null);
         }
-        m_keyalias = System.getProperty("user.name", "default");
     }
 
     private static File s_file;

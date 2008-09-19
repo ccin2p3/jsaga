@@ -19,21 +19,17 @@ import javax.crypto.Cipher;
  */
 public class PasswordDecrypterSingleton extends PasswordAbstract {
     private static final int EXPIRY_DATE_POSITION = 12;
-    private static PasswordDecrypterSingleton _instance;
 
-    public synchronized static PasswordDecrypterSingleton getInstance() throws Exception {
-        if (_instance == null) {
-            _instance = new PasswordDecrypterSingleton();
-        }
-        return _instance;
-    }
-    private PasswordDecrypterSingleton() throws Exception {
+    /**
+     * @param keyalias the alias of the secret key
+     */
+    public PasswordDecrypterSingleton(String keyalias) throws Exception {
         super();
 
         // load key from keystore
-        m_key = m_keystore.getKey(m_keyalias, m_keypass);
+        m_key = m_keystore.getKey(keyalias, m_keypass);
         if (m_key == null) {
-            throw new BadParameter("Key not found in keystore: "+m_keyalias);
+            throw new BadParameter("Key not found in keystore: "+keyalias);
         }
     }
 

@@ -69,7 +69,7 @@ public class UserPassSecurityAdaptorBuilder implements ExpirableSecurityAdaptorB
                             : 12*3600);
 
                     // encrypt password
-                    PasswordEncrypterSingleton crypter = PasswordEncrypterSingleton.getInstance(lifetime);
+                    PasswordEncrypterSingleton crypter = new PasswordEncrypterSingleton(name, lifetime);
                     String cryptedPassword = crypter.encrypt(password);
                     int expiryDate = PasswordEncrypterSingleton.getExpiryDate(lifetime);
 
@@ -97,7 +97,7 @@ public class UserPassSecurityAdaptorBuilder implements ExpirableSecurityAdaptorB
                     String cryptedPassword = (String) attributes.get(USERPASSCRYPTED);
 
                     // decrypt password
-                    PasswordDecrypterSingleton decrypter = PasswordDecrypterSingleton.getInstance();
+                    PasswordDecrypterSingleton decrypter = new PasswordDecrypterSingleton(name);
                     int expiryDate = decrypter.getExpiryDate();
                     int currentDate = (int) (System.currentTimeMillis()/1000);
                     String password;
