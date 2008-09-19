@@ -49,7 +49,6 @@ sed -i pom.xml -e "s/CHANGEME/$VERSION/g"</pre>
                         <pre>mvn test jar:test-jar -Dintegration-test</pre>
                     </li>
                     <li>Copy tests package (build/*-test.jar) to remote host (in directory $JSAGA_HOME/lib-test/)</li>
-                    <li>Copy tests configuration (build/jsaga_home.dir/etc/) to remote host (instead of $JSAGA_HOME/etc/)</li>
                     <li>Run integration tests:
                         <pre>junit-run-test integration.&lt;MyProtocolIntegrationTestSuite&gt;</pre>
                     </li>
