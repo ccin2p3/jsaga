@@ -41,13 +41,17 @@ public abstract class AbstractTest extends TestCase {
         System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
 
         // set configuration files to use
-        java.net.URL universe = getClass().getClassLoader().getResource("etc/jsaga-universe.xml");
-        if (universe != null) {
-            System.setProperty("jsaga.universe", universe.toString());
+        if (System.getProperty("jsaga.universe") == null) {
+            java.net.URL universe = getClass().getClassLoader().getResource("etc/jsaga-universe.xml");
+            if (universe != null) {
+                System.setProperty("jsaga.universe", universe.toString());
+            }
         }
-        java.net.URL log4j = getClass().getClassLoader().getResource("etc/log4j.properties");
-        if (log4j != null) {
-            System.setProperty("log4j.configuration", log4j.toString());
+        if (System.getProperty("log4j.configuration") == null) {
+            java.net.URL log4j = getClass().getClassLoader().getResource("etc/log4j.properties");
+            if (log4j != null) {
+                System.setProperty("log4j.configuration", log4j.toString());
+            }
         }
 
         // load test config
