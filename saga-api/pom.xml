@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ogf.saga</groupId>
     <artifactId>saga-api</artifactId>
-    <version>0.9.6</version>
+    <version>0.9.7-SNAPSHOT</version>
     <name>The SAGA Interfaces</name>
     <description>The reference Java binding of the SAGA specification.</description>
     <url>http://forge.ogf.org/sf/projects/saga-rg</url>
@@ -38,8 +38,4 @@
             </plugin>
         </plugins>
     </build>
-
-  <scm>
-    <tag>jsaga-0_9_6</tag>
-  </scm>
 </project>
