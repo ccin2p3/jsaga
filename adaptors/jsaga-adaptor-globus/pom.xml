@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
     <artifactId>jsaga-adaptor-globus</artifactId>
-    <version>0.9.6-SNAPSHOT</version>
+    <version>0.9.6</version>
     <name>Adaptors for Globus Toolkit v2</name>
     <description>This module provides support for Globus Toolkit v2 components, for;
 security mechanisms (Globus, GlobusLegacy, GlobusRFC820, MyProxy),
@@ -18,19 +18,19 @@ execution management technologies (Gatekeeper).</description>
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-adaptoritf</artifactId>
-            <version>0.9.6-SNAPSHOT</version>
+            <version>0.9.6</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api-test</artifactId>
-            <version>0.9.6-SNAPSHOT</version>
+            <version>0.9.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
-            <version>0.9.6-SNAPSHOT</version>
+            <version>0.9.6</version>
             <scope>test</scope>
         </dependency>
         <!-- adaptor specific -->
@@ -46,4 +46,8 @@ execution management technologies (Gatekeeper).</description>
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
+  <scm>
+    <tag>jsaga-0_9_6</tag>
+  </scm>
 </project>
