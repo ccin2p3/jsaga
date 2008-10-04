@@ -36,9 +36,11 @@ done
 for i in $JSAGA_HOME/lib-adaptors/*.jar ; do
   CLASSPATH="${CLASSPATH}${SEP}${i}"
 done
-for i in $JSAGA_HOME/lib-test/*.jar ; do
-  CLASSPATH="${CLASSPATH}${SEP}${i}"
-done
+if test "${class.name}" = "junit.textui.TestRunner" ; then
+    for i in $JSAGA_HOME/lib-test/*.jar ; do
+      CLASSPATH="${CLASSPATH}${SEP}${i}"
+    done
+fi
 
 # set java
 if test -z "$JAVA_HOME" ; then

@@ -6,7 +6,7 @@
     <xsl:template match="/project">
         <document><body>
             <section name="Dependencies of fr.in2p3.jsaga:jsaga-installer:{@version}">
-                <xsl:apply-templates select="artifact"/>
+                <xsl:apply-templates select="artifact[not(@classifier='tests')]"/>
             </section>
         </body></document>
     </xsl:template>

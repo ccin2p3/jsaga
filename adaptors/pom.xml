@@ -16,8 +16,6 @@
   <!-- aggregation -->
   <modules>
     <module>jsaga-adaptor-default</module>
-    <module>jsaga-adaptor-classic</module>
-    <module>jsaga-adaptor-globus</module>
     <module>jsaga-adaptor-voms</module>
     <module>jsaga-adaptor-srm</module>
     <module>jsaga-adaptor-jdl</module>
@@ -28,5 +26,8 @@
     <module>jsaga-adaptor-ssh</module>
     <module>jsaga-adaptor-irods</module>
     <module>jsaga-adaptor-mail</module>
+    <!-- adaptors which are used as dependencies of other adaptors must be declared at the end -->
+    <module>jsaga-adaptor-classic</module>
+    <module>jsaga-adaptor-globus</module>
   </modules>
 </project>

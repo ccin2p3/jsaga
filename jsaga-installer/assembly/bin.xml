@@ -20,8 +20,11 @@
         <dependencySet>
             <outputDirectory>lib</outputDirectory>
             <unpack>false</unpack>
-            <useTransitiveFiltering>true</useTransitiveFiltering>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <scope>test</scope>
             <excludes>
+                <exclude>fr.in2p3.jsaga:jsaga-engine:zip:config</exclude>
+                <exclude>org.graphviz:graphviz:zip:bin</exclude>
                 <exclude>org.codehaus.izpack:izpack-standalone-compiler:jar</exclude>
             </excludes>
         </dependencySet>

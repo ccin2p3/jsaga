@@ -51,12 +51,12 @@
                 <panel classname="SimpleFinishPanel"/>
             </panels>
             <packs>
-                <xsl:apply-templates select="artifact[@id='jsaga-engine']"/>
+                <xsl:apply-templates select="artifact[@id='jsaga-engine' and not(@classifier)]"/>
                 <xsl:apply-templates select="artifact[@id='graphviz']"/>
                 <pack name="Adaptors" required="no">
                     <description>The adaptors provide the support for various technologies.</description>
                 </pack>
-                <xsl:apply-templates select="artifact[starts-with(@id,'jsaga-adaptor-')]">
+                <xsl:apply-templates select="artifact[starts-with(@id,'jsaga-adaptor-') and not(@classifier)]">
                     <xsl:sort select="@name" order="ascending"/>
                 </xsl:apply-templates>
             </packs>
@@ -92,8 +92,11 @@
             </xsl:for-each>
         </pack>
         <pack name="Integration tests" required="no" preselected="no">
-            <description>Install libraries needed for running integration tests.</description>
+            <description>Install integration test suites.</description>
             <xsl:for-each select="descendant::artifact[@scope='test']">
+                <file src="{@file}" targetdir="$INSTALL_PATH/lib-test"/>
+            </xsl:for-each>
+            <xsl:for-each select="/project/artifact[@scope='test']">
                 <file src="{@file}" targetdir="$INSTALL_PATH/lib-test"/>
             </xsl:for-each>
         </pack>
@@ -109,7 +112,7 @@
         </pack>
     </xsl:template>
 
-    <xsl:template match="/project/artifact[starts-with(@id,'jsaga-adaptor-')]">
+    <xsl:template match="/project/artifact[starts-with(@id,'jsaga-adaptor-') and not(@classifier)]">
         <xsl:variable name="description">
             <xsl:choose>
                 <xsl:when test="@description and @description!=''"><xsl:value-of select="@description"/></xsl:when>

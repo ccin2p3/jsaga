@@ -5,10 +5,10 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
 import org.ogf.saga.error.*;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.Exception;
-import java.util.Date;
-import java.util.Properties;
+import java.util.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -42,13 +42,13 @@ public abstract class AbstractTest extends TestCase {
 
         // set configuration files to use
         if (System.getProperty("jsaga.universe") == null) {
-            java.net.URL universe = getClass().getClassLoader().getResource("etc/jsaga-universe.xml");
+            java.net.URL universe = this.getResource("etc/jsaga-universe.xml");
             if (universe != null) {
                 System.setProperty("jsaga.universe", universe.toString());
             }
         }
         if (System.getProperty("log4j.configuration") == null) {
-            java.net.URL log4j = getClass().getClassLoader().getResource("etc/log4j.properties");
+            java.net.URL log4j = this.getResource("etc/log4j.properties");
             if (log4j != null) {
                 System.setProperty("log4j.configuration", log4j.toString());
             }
@@ -106,5 +106,31 @@ public abstract class AbstractTest extends TestCase {
         URL url = new URL(base.toString());
         url.setPath(path);
         return url;
+    }
+
+    private java.net.URL getResource(String path) throws IOException {
+        ClassLoader loader = this.getClass().getClassLoader();
+        // get class JAR
+        String classPath = this.getClass().getName().replaceAll("\\.", "/") + ".class";
+        java.net.URL classResource = loader.getResource(classPath);
+        String classJar = getJar(classResource, classPath);
+        for (Enumeration<java.net.URL> e=loader.getResources(path); e.hasMoreElements(); ) {
+            // get resource JAR
+            java.net.URL resource = e.nextElement();
+            String jar = getJar(resource, path);
+            // compare
+            if (classJar.equals(jar)) {
+                return resource;
+            }
+        }
+        return null;
+    }
+    private static String getJar(java.net.URL resource, String path) {
+        int index = resource.toString().indexOf(path);
+        if (index > -1) {
+            return resource.toString().substring(0, index);
+        } else {
+            return null;
+        }
     }
 }

@@ -11,7 +11,7 @@
                 </p>
                 <table border="1">
                     <xsl:call-template name="HEADERS"/>
-                    <xsl:apply-templates select="artifact[starts-with(@id,'jsaga-adaptor-')]">
+                    <xsl:apply-templates select="artifact[starts-with(@id,'jsaga-adaptor-') and not(@classifier)]">
                         <xsl:sort select="@name" order="ascending"/>
                     </xsl:apply-templates>
                     <xsl:apply-templates select="artifact[@id='jsaga-engine' and not(@classifier)]"/>

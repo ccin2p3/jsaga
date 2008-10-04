@@ -27,6 +27,7 @@
     <module>jsaga-adaptoritf</module>
     <module>jsaga-engine</module>
     <module>adaptors</module>
+    <module>jsaga-adaptors</module>
     <module>jsaga-installer</module>
   </modules>
     <profiles>

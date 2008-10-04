@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <!-- declaration -->
     <parent>
-        <groupId>fr.in2p3.parent</groupId>
-        <artifactId>in2p3-root-pom</artifactId>
-        <version>current</version>
+        <groupId>fr.in2p3.jsaga.aggregator</groupId>
+        <artifactId>jsaga-adaptors</artifactId>
+        <version>0.9.7-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga</groupId>
@@ -211,75 +211,6 @@
             <version>2.12</version>
             <classifier>bin</classifier>
             <type>zip</type>
-        </dependency>
-
-        <!-- adaptors -->
-        <dependency>
-            <groupId>fr.in2p3.jsaga.adaptor</groupId>
-            <artifactId>jsaga-adaptor-default</artifactId>
-            <version>0.9.7-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.in2p3.jsaga.adaptor</groupId>
-            <artifactId>jsaga-adaptor-irods</artifactId>
-            <version>0.9.7-SNAPSHOT</version>            
-        </dependency>
-        <dependency>
-            <groupId>fr.in2p3.jsaga.adaptor</groupId>
-            <artifactId>jsaga-adaptor-mail</artifactId>
-            <version>0.9.7-SNAPSHOT</version>            
-        </dependency>
-        <dependency>
-            <groupId>fr.in2p3.jsaga.adaptor</groupId>
-            <artifactId>jsaga-adaptor-jdl</artifactId>
-            <version>0.9.7-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.in2p3.jsaga.adaptor</groupId>
-            <artifactId>jsaga-adaptor-naregi</artifactId>
-            <version>0.9.7-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.in2p3.jsaga.adaptor</groupId>
-            <artifactId>jsaga-adaptor-wms</artifactId>
-            <version>0.9.7-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.in2p3.jsaga.adaptor</groupId>
-            <artifactId>jsaga-adaptor-wsgram</artifactId>
-            <version>0.9.7-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.in2p3.jsaga.adaptor</groupId>
-            <artifactId>jsaga-adaptor-unicore6</artifactId>
-            <version>0.9.7-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.in2p3.jsaga.adaptor</groupId>
-            <artifactId>jsaga-adaptor-ssh</artifactId>
-            <version>0.9.7-SNAPSHOT</version>            
-        </dependency>
-        <!-- workaround to bad declaration of axis-jaxrpc and axis-saaj libraries in maven repository -->
-        <dependency>
-            <groupId>fr.in2p3.jsaga.adaptor</groupId>
-            <artifactId>jsaga-adaptor-srm</artifactId>
-            <version>0.9.7-SNAPSHOT</version>
-        </dependency>
-        <!-- adaptors which are used as dependencies of other adaptors must be declared at the end -->
-        <dependency>
-            <groupId>fr.in2p3.jsaga.adaptor</groupId>
-            <artifactId>jsaga-adaptor-classic</artifactId>
-            <version>0.9.7-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.in2p3.jsaga.adaptor</groupId>
-            <artifactId>jsaga-adaptor-voms</artifactId>
-            <version>0.9.7-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.in2p3.jsaga.adaptor</groupId>
-            <artifactId>jsaga-adaptor-globus</artifactId>
-            <version>0.9.7-SNAPSHOT</version>
         </dependency>
 
         <!-- test -->

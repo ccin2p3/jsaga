@@ -37,19 +37,14 @@ sed -i pom.xml -e "s/CHANGEME/$VERSION/g"</pre>
                 </ul>
             </answer>
         </faq>
-        <faq id="adaptor-integration-test-with-maven">
-            <question>How to run integration tests with maven ?</question>
-            <answer><pre>mvn integration-test -Dintegration-test=&lt;MyProtocolIntegrationTestSuite&gt;</pre></answer>
-        </faq>
-        <faq id="adaptor-integration-test-without-maven">
-            <question>How to run integration tests without maven ?</question>
+        <faq id="adaptor-integration-test">
+            <question>How to run integration tests ?</question>
             <answer>
                 <ul>
-                    <li>Build tests package:
-                        <pre>mvn test jar:test-jar -Dintegration-test</pre>
+                    <li>From your build environment:
+                        <pre>mvn integration-test -Dintegration-test=&lt;MyProtocolIntegrationTestSuite&gt;</pre>
                     </li>
-                    <li>Copy tests package (build/*-test.jar) to remote host (in directory $JSAGA_HOME/lib-test/)</li>
-                    <li>Run integration tests:
+                    <li>From an installation of JSAGA:
                         <pre>junit-run-test integration.&lt;MyProtocolIntegrationTestSuite&gt;</pre>
                     </li>
                 </ul>
