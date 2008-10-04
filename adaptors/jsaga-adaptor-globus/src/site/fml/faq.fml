@@ -21,6 +21,13 @@
 openssl pkcs12 -nocerts -in mycert.p12 -out userkey.pem</pre>
             </answer>
         </faq>
+        <faq id="change_passphrase">
+            <question>How to change the passphrase of the private key ?</question>
+            <answer>Use the "openssl" command line interface from Linux/Cygwin distribution:
+                <pre>openssl rsa -des3 -in userkey.pem -out userkey.new
+if test $? -eq 0 ; then mv userkey.new userkey.pem ; fi</pre>
+            </answer>
+        </faq>
         <faq id="ca">
             <question>How to name the Certificate Authority (CA) ?</question>
             <answer>Use the "openssl" command line interface from Linux/Cygwin distribution:
