@@ -7,10 +7,6 @@
     </skin>
     <bannerLeft><src>images/logo-jsaga.png</src><alt>JSAGA</alt></bannerLeft>
     <bannerRight><src>images/logo-cc.png</src><alt>CC-IN2P3</alt></bannerRight>
-    <poweredBy>
-        <logo name="CC-IN2P3" href="http://cc.in2p3.fr/" img="http://cc.in2p3.fr/images/site/logoCC72.gif"/>
-        <logo name="British Telecom" href="http://www.bt.com/" img="http://www.bt.com/static/wa/homepage/images/logo_75x36.gif"/>
-    </poweredBy>    
     <body>
         <links>
             <item name="ANR" href="http://www.agence-nationale-recherche.fr"/>
@@ -44,6 +40,10 @@
             <item name="Build Tools" href="../build-tools/index.html"/>
             <item name="Common Tools" href="../in2p3-commons/index.html"/>
         </menu>
-        <menu name="Adaptors provided by..."/>
+        <menu name="Adaptors developed by..."/>
     </body>
+    <poweredBy>
+        <logo name="CC-IN2P3" href="http://cc.in2p3.fr/" img="http://cc.in2p3.fr/images/site/logoCC72.gif"/>
+        <logo name="British Telecom" href="http://www.bt.com/" img="http://www.bt.com/static/wa/homepage/images/logo_75x36.gif"/>
+    </poweredBy>
 </project>
