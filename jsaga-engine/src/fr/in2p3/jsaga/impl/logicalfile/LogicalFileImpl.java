@@ -96,6 +96,7 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
         effectiveFlags.checkAllowed(Flags.DEREFERENCE.or(Flags.CREATEPARENTS.or(Flags.OVERWRITE)));
         URL effectiveTarget = this._getEffectiveURL(target);
         new LogicalFileCopy(m_session, this, m_adaptor).copy(effectiveTarget, effectiveFlags);
+        super._preserveTimes(effectiveTarget);
     }
 
     public void copyFrom(URL source, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
@@ -107,6 +108,7 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
         effectiveFlags.checkAllowed(Flags.DEREFERENCE.or(Flags.OVERWRITE));
         URL effectiveSource = this._getEffectiveURL(source);
         new LogicalFileCopyFrom(m_session, this, m_adaptor).copyFrom(effectiveSource, effectiveFlags);
+        super._preserveTimesFrom(effectiveSource);
     }
 
     /////////////////////////////// class AbstractNSEntryImpl ///////////////////////////////

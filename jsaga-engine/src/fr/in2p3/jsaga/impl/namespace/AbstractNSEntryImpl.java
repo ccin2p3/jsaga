@@ -1,13 +1,14 @@
 package fr.in2p3.jsaga.impl.namespace;
 
+import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.link.LinkAdaptor;
 import fr.in2p3.jsaga.adaptor.data.link.NotLink;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
-import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
-import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
+import fr.in2p3.jsaga.adaptor.data.read.*;
 import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
+import fr.in2p3.jsaga.adaptor.data.write.FileWriterTimes;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.helpers.URLFactory;
 import org.ogf.saga.*;
@@ -382,14 +383,41 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
     }
 
     /** deviation from SAGA specification */
-    public Date getLastModified() throws NotImplemented {
+    public Date getLastModified() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
         if (m_url instanceof JSagaURL) {
             long lastModified = ((JSagaURL)m_url).getAttributes().getLastModified();
             if (lastModified > 0) {
                 return new Date(lastModified);
             }
         }
-        throw new NotImplemented("Not supported for this protocol: "+m_url.getScheme());
+        if (m_adaptor instanceof FileReaderTimes) {
+            try {
+                long lastModified = ((FileReaderTimes)m_adaptor).getLastModified(
+                        m_url.getPath(),
+                        m_url.getQuery());
+                return new Date(lastModified);
+            } catch (DoesNotExist doesNotExist) {
+                throw new IncorrectState("File does not exist: "+ m_url, doesNotExist);
+            }
+        } else {
+            throw new NotImplemented("Not supported for this protocol: "+m_url.getScheme());
+        }
+    }
+
+    /** deviation from SAGA specification */
+    public void setLastModified(Date lastModified) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+        if (m_adaptor instanceof FileWriterTimes) {
+            try {
+                ((FileWriterTimes)m_adaptor).setLastModified(
+                        m_url.getPath(),
+                        m_url.getQuery(),
+                        lastModified.getTime());
+            } catch (DoesNotExist doesNotExist) {
+                throw new IncorrectState("File does not exist: "+ m_url, doesNotExist);
+            }
+        } else {
+            throw new NotImplemented("Not supported for this protocol: "+m_url.getScheme());
+        }
     }
 
     ///////////////////////////////////////// protected methods /////////////////////////////////////////
@@ -442,6 +470,54 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             throw new NoSuccess(e);
         } catch (IncorrectState e) {
             throw new NoSuccess(e);
+        }
+    }
+
+    protected void _preserveTimes(URL target) throws IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
+        if (EngineProperties.getBoolean(EngineProperties.DATA_COPY_PRESERVE_TIMES)) {
+            Date lastModified;
+            try {
+                lastModified = this.getLastModified();
+            } catch(NotImplemented e) {
+                return; //======> EXIT
+            }
+            AbstractNSEntryImpl targetEntry;
+            try {
+                targetEntry = (AbstractNSEntryImpl) NSFactory.createNSEntry(m_session, target);
+            } catch (DoesNotExist e) {
+                throw new NoSuccess("Copy failed", e);
+            } catch (NotImplemented e) {
+                throw new NoSuccess("Unexpected exception", e);
+            }
+            try {
+                targetEntry.setLastModified(lastModified);
+            } catch(NotImplemented e) {
+                // ignore
+            }
+        }
+    }
+
+    protected void _preserveTimesFrom(URL source) throws IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+        if (EngineProperties.getBoolean(EngineProperties.DATA_COPY_PRESERVE_TIMES)) {
+            AbstractNSEntryImpl sourceEntry;
+            try {
+                sourceEntry = (AbstractNSEntryImpl) NSFactory.createNSEntry(m_session, source);
+            } catch(AlreadyExists e) {
+                throw new NoSuccess("Unexpected exception", e);
+            } catch (NotImplemented e) {
+                throw new NoSuccess("Unexpected exception", e);
+            }
+            Date lastModified;
+            try {
+                lastModified = sourceEntry.getLastModified();
+            } catch(NotImplemented e) {
+                return; //======> EXIT
+            }
+            try {
+                this.setLastModified(lastModified);
+            } catch(NotImplemented e) {
+                // ignore
+            }
         }
     }
 }

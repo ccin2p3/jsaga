@@ -140,6 +140,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
             try {m_outStream.close();} catch (IOException e) {/*ignore*/}
         }
         new FileCopy(m_session, this, m_adaptor).copy(effectiveTarget, effectiveFlags);
+        super._preserveTimes(effectiveTarget);
     }
 
     /** implements super.copyFrom() */
@@ -155,6 +156,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
             try {m_inStream.close();} catch (IOException e) {/*ignore*/}
         }
         new FileCopyFrom(m_session, this, m_adaptor).copyFrom(effectiveSource, effectiveFlags);
+        super._preserveTimesFrom(effectiveSource);
     }
 
     ////////////////////////////// class AbstractNSEntryImpl //////////////////////////////
