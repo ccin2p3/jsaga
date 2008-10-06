@@ -29,5 +29,9 @@
             <item name="Example" href="example.html"/>
         </menu>
 		<menu name="Module Documentation" ref="reports" />
-	</body>
+        <menu name="Module developed by..."/>
+    </body>
+    <poweredBy>
+        <logo name="British Telecom" href="http://www.bt.com/" img="http://www.bt.com/static/wa/homepage/images/logo_75x36.gif"/>
+    </poweredBy>
 </project>
