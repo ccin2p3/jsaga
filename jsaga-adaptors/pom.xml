@@ -10,6 +10,7 @@
   <artifactId>jsaga-adaptors</artifactId>
   <version>0.9.7-SNAPSHOT</version>
   <packaging>pom</packaging>
+  <name>List of adaptors</name>
   <dependencies>
     <dependency>
       <groupId>fr.in2p3.jsaga.adaptor</groupId>

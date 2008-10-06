@@ -98,7 +98,7 @@ public class EntryLongFormat {
         }
     }
 
-    public Date getLastModified(NSEntry entry) {
+    public Date getLastModified(NSEntry entry) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
         if (entry instanceof AbstractNSEntryImpl) {
             try {
                 return ((AbstractNSEntryImpl)entry).getLastModified();
