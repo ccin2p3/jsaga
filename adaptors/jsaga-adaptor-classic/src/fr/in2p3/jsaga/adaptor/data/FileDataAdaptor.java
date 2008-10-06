@@ -3,9 +3,9 @@ package fr.in2p3.jsaga.adaptor.data;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
-import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
+import fr.in2p3.jsaga.adaptor.data.read.*;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
+import fr.in2p3.jsaga.adaptor.data.write.FileWriterTimes;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import org.ogf.saga.error.*;
 
@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 /**
  *
  */
-public class FileDataAdaptor implements FileReaderStreamFactory, FileWriterStreamFactory, DataRename {
+public class FileDataAdaptor implements FileReaderStreamFactory, FileWriterStreamFactory, DataRename, FileReaderTimes, FileWriterTimes {
     private static final boolean s_isWindows = System.getProperty("os.name").startsWith("Windows");
     private String m_drive;
 
@@ -177,6 +177,16 @@ public class FileDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
             throw new AlreadyExists("Target entry already exists");
         }
         source.renameTo(target);
+    }
+
+    public long getLastModified(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        File entry = newEntry(absolutePath);
+        return entry.lastModified();
+    }
+
+    public void setLastModified(String absolutePath, String additionalArgs, long lastModified) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        File entry = newEntry(absolutePath);
+        entry.setLastModified(lastModified);
     }
 
     ////////////////////////////////////// private methods //////////////////////////////////////
