@@ -207,6 +207,8 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         if (m_adaptor instanceof DataReaderAdaptor) {
             try {
                 return ((DataReaderAdaptor)m_adaptor).listAttributes(absolutePath, m_url.getQuery());
+            } catch (BadParameter badParameter) {
+                throw new IncorrectState("Entry is not a directory: "+absolutePath, badParameter);
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("Directory does not exist: "+absolutePath, doesNotExist);
             }
