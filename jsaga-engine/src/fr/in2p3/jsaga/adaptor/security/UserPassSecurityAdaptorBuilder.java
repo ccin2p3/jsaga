@@ -79,7 +79,6 @@ public class UserPassSecurityAdaptorBuilder implements ExpirableSecurityAdaptorB
                     if (propFile.exists()) {
                         prop.load(new FileInputStream(propFile));
                     }
-                    prop.setProperty(contextId+"."+Context.USERID, name);
                     prop.setProperty(contextId+"."+USERPASSCRYPTED, cryptedPassword);
                     prop.store(new FileOutputStream(propFile), "JSAGA user attributes");
                     return new UserPassExpirableSecurityAdaptor(name, password, expiryDate);
@@ -102,6 +101,7 @@ public class UserPassSecurityAdaptorBuilder implements ExpirableSecurityAdaptorB
                     int currentDate = (int) (System.currentTimeMillis()/1000);
                     String password;
                     if (currentDate > expiryDate) {
+                        this.destroySecurityAdaptor(attributes, contextId);
                         password = null;
                     } else {
                         password = decrypter.decrypt(cryptedPassword);
