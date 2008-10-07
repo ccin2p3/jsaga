@@ -50,6 +50,9 @@ public class ServiceAdaptorFactory {
     protected ContextImpl findContext(Session session, String[] supportedContextTypeArray) throws NotImplemented, NoSuccess {
         Set<String> contextRefCandidates = new HashSet<String>();
         for (int i=0; supportedContextTypeArray!=null && i<supportedContextTypeArray.length; i++) {
+            if ("None".equals(supportedContextTypeArray[i])) {
+                return null;
+            }
             fr.in2p3.jsaga.engine.schema.config.Context[] configArray = m_config.listContextsArrayByType(supportedContextTypeArray[i]);
             for (int c=0; configArray!=null && c<configArray.length; c++) {
                 contextRefCandidates.add(configArray[c].getName());
