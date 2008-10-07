@@ -62,12 +62,11 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             FileAttributes[] sourceChilds = this._listAttributes(m_url.getPath());
             for (int i=0; i<sourceChilds.length; i++) {
                 NSEntry sourceChildEntry = this._openNS(sourceChilds[i]);
-                URL targetChild = URLFactory.createURL(effectiveTarget, sourceChilds[i].getName());
                 int targetFlags =
                         (sourceChildEntry instanceof NSDirectory
                                 ? flags
                                 : effectiveFlags.remove(Flags.RECURSIVE));
-                sourceChildEntry.copy(targetChild, targetFlags);
+                sourceChildEntry.copy(effectiveTarget, targetFlags);
             }
         } else {
             throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
@@ -83,29 +82,12 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         }
         effectiveFlags.checkAllowed(Flags.RECURSIVE.or(Flags.DEREFERENCE.or(Flags.OVERWRITE)));
         effectiveFlags.checkRequired(Flags.RECURSIVE.getValue());
-        URL effectiveSource = this._getEffectiveURL(source);
         if (m_adaptor instanceof DataWriterAdaptor) {
-            // copy source childs
-            AbstractNSDirectoryImpl sourceDir;
             try {
-                sourceDir = (AbstractNSDirectoryImpl) NSFactory.createNSDirectory(m_session, effectiveSource, Flags.NONE.getValue());
+                NSDirectory sourceDir = NSFactory.createNSDirectory(m_session, source);
+                sourceDir.copy(m_url, flags);
             } catch (AlreadyExists e) {
-                throw new NoSuccess("Unexpected exception: AlreadyExists", e);
-            }
-            // copy source childs
-            FileAttributes[] sourceChilds = sourceDir._listAttributes(m_url.getPath());
-            for (int i=0; i<sourceChilds.length; i++) {
-                NSEntry sourceChildEntry = sourceDir._openNS(sourceChilds[i]);
-                URL targetChild = URLFactory.createURL(m_url, sourceChilds[i].getName());
-                int targetFlags =
-                        (sourceChildEntry instanceof NSDirectory
-                                ? flags
-                                : effectiveFlags.remove(Flags.RECURSIVE));
-                try {
-                    sourceChildEntry.copy(targetChild, targetFlags);
-                } catch (AlreadyExists e) {
-                    throw new NoSuccess("Unexpected exception: AlreadyExists", e);
-                }
+                throw new IncorrectState("Unexpected exception", e);
             }
         } else {
             throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
