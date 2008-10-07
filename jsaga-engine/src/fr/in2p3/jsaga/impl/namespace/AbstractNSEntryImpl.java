@@ -6,9 +6,10 @@ import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.link.LinkAdaptor;
 import fr.in2p3.jsaga.adaptor.data.link.NotLink;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
-import fr.in2p3.jsaga.adaptor.data.read.*;
+import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
+import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
-import fr.in2p3.jsaga.adaptor.data.write.FileWriterTimes;
+import fr.in2p3.jsaga.adaptor.data.write.DataWriterTimes;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.helpers.URLFactory;
 import org.ogf.saga.*;
@@ -390,30 +391,33 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
                 return new Date(lastModified);
             }
         }
-        if (m_adaptor instanceof FileReaderTimes) {
+        //TODO: uncomment this when method getAttributes() will be available
+/*
+        if (m_adaptor instanceof DataReaderAdaptor) {
             try {
-                long lastModified = ((FileReaderTimes)m_adaptor).getLastModified(
+                FileAttributes attr = ((DataReaderAdaptor)m_adaptor).getAttributes(
                         m_url.getPath(),
                         m_url.getQuery());
-                return new Date(lastModified);
+                return new Date(attr.getLastModified());
             } catch (DoesNotExist doesNotExist) {
-                throw new IncorrectState("File does not exist: "+ m_url, doesNotExist);
+                throw new IncorrectState("Entry does not exist: "+m_url, doesNotExist);
             }
         } else {
+*/
             throw new NotImplemented("Not supported for this protocol: "+m_url.getScheme());
-        }
+//        }
     }
 
     /** deviation from SAGA specification */
     public void setLastModified(Date lastModified) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
-        if (m_adaptor instanceof FileWriterTimes) {
+        if (m_adaptor instanceof DataWriterTimes) {
             try {
-                ((FileWriterTimes)m_adaptor).setLastModified(
+                ((DataWriterTimes)m_adaptor).setLastModified(
                         m_url.getPath(),
                         m_url.getQuery(),
                         lastModified.getTime());
             } catch (DoesNotExist doesNotExist) {
-                throw new IncorrectState("File does not exist: "+ m_url, doesNotExist);
+                throw new IncorrectState("Entry does not exist: "+m_url, doesNotExist);
             }
         } else {
             throw new NotImplemented("Not supported for this protocol: "+m_url.getScheme());

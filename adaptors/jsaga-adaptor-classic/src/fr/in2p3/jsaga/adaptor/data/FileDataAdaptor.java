@@ -3,9 +3,10 @@ package fr.in2p3.jsaga.adaptor.data;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
-import fr.in2p3.jsaga.adaptor.data.read.*;
+import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
+import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
+import fr.in2p3.jsaga.adaptor.data.write.DataWriterTimes;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
-import fr.in2p3.jsaga.adaptor.data.write.FileWriterTimes;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import org.ogf.saga.error.*;
 
@@ -26,7 +27,7 @@ import java.util.regex.Pattern;
 /**
  *
  */
-public class FileDataAdaptor implements FileReaderStreamFactory, FileWriterStreamFactory, DataRename, FileReaderTimes, FileWriterTimes {
+public class FileDataAdaptor implements FileReaderStreamFactory, FileWriterStreamFactory, DataRename, DataWriterTimes {
     private static final boolean s_isWindows = System.getProperty("os.name").startsWith("Windows");
     private String m_drive;
 
@@ -125,13 +126,15 @@ public class FileDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         }
     }
 
-    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         File[] list;
         File entry = this.newPath(absolutePath);
         if (entry == null) {
             list = File.listRoots();
-        } else if (entry.exists()) {
+        } else if (entry.isDirectory()) {
             list = newEntry(absolutePath).listFiles();
+        } else if (entry.exists()) {
+            throw new BadParameter("Entry is not a directory");
         } else {
             throw new DoesNotExist("Entry does not exist");
         }
@@ -177,11 +180,6 @@ public class FileDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
             throw new AlreadyExists("Target entry already exists");
         }
         source.renameTo(target);
-    }
-
-    public long getLastModified(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        File entry = newEntry(absolutePath);
-        return entry.lastModified();
     }
 
     public void setLastModified(String absolutePath, String additionalArgs, long lastModified) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
