@@ -38,8 +38,8 @@ public class NSCopyRecursiveTest extends AbstractNSCopyTest {
     }
 
     public void test_copy_recurse() throws Exception {
-        URL target = createURL(m_subDirUrl2, DEFAULT_SUBDIRNAME +DEFAULT_FILENAME);
-        m_subDir.copy(m_subDirUrl2, Flags.RECURSIVE.getValue());
+        URL target = createURL(m_dirUrl2, DEFAULT_DIRNAME+DEFAULT_SUBDIRNAME+DEFAULT_FILENAME);
+        m_dir.copy(m_dirUrl2, Flags.RECURSIVE.getValue());
         checkCopied(target, DEFAULT_CONTENT);
     }
 
