@@ -55,7 +55,8 @@ public abstract class AbstractTest extends TestCase {
         }
 
         // load test config
-        InputStream stream = getClass().getClassLoader().getResourceAsStream("saga-test.properties");
+        java.net.URL test = this.getResource("saga-test.properties");
+        InputStream stream = test.openStream();
         if (stream == null) {
             throw new Exception("Resource not found: saga-test.properties");
         }
@@ -114,6 +115,7 @@ public abstract class AbstractTest extends TestCase {
         String classPath = this.getClass().getName().replaceAll("\\.", "/") + ".class";
         java.net.URL classResource = loader.getResource(classPath);
         String classJar = getJar(classResource, classPath);
+        // find resource matching class JAR
         for (Enumeration<java.net.URL> e=loader.getResources(path); e.hasMoreElements(); ) {
             // get resource JAR
             java.net.URL resource = e.nextElement();
