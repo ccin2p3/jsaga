@@ -3,6 +3,7 @@ package integration;
 import org.ogf.saga.URL;
 import org.ogf.saga.file.File;
 import org.ogf.saga.file.FileFactory;
+import integration.abstracts.AbstractSubmitTest;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***

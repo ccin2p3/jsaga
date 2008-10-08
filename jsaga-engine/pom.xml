@@ -30,7 +30,7 @@
                     <source>1.5</source>
                     <target>1.5</target>
                     <testExcludes>
-                        <testExclude>integration/*.java</testExclude>
+                        <testExclude>integration/**/*.java</testExclude>
                     </testExcludes>
                 </configuration>
             </plugin>

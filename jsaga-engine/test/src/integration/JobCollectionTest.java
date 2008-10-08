@@ -1,5 +1,7 @@
 package integration;
 
+import integration.abstracts.AbstractJobCollectionTest;
+
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
