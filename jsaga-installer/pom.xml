@@ -120,6 +120,19 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>generate-dependencies-tree-web-page</id>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
+                        <configuration>
+                            <xslFile>src/site/xsl/dependencies-tree.xsl</xslFile>
+                            <destDir>${project.build.directory}/generated-site/xdoc</destDir>
+                            <fileNameRegex>dependencies.xml</fileNameRegex>
+                            <fileNameReplacement>dependencies-tree.xml</fileNameReplacement>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>generate-dependencies-graph-web-page</id>
                         <phase>pre-site</phase>
                         <goals>
@@ -127,9 +140,9 @@
                         </goals>
                         <configuration>
                             <xslFile>src/site/xsl/dependencies-graph.xsl</xslFile>
-                            <destDir>${project.build.directory}/generated-site/xdoc</destDir>
+                            <destDir>${project.build.directory}</destDir>
                             <fileNameRegex>dependencies.xml</fileNameRegex>
-                            <fileNameReplacement>dependencies-graph.xml</fileNameReplacement>
+                            <fileNameReplacement>dependencies-graph</fileNameReplacement>
                         </configuration>
                     </execution>
                     <execution>
@@ -143,6 +156,21 @@
                             <srcDir>${project.build.directory}/site</srcDir>
                             <srcIncludes>index.html, download.html, presentations.html</srcIncludes>
                             <destDir>${project.build.directory}/site/export</destDir>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-graphviz-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>site</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <dotFile>${project.build.directory}/dependencies-graph</dotFile>
                         </configuration>
                     </execution>
                 </executions>
