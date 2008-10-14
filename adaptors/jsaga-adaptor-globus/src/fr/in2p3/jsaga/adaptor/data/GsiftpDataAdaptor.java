@@ -141,6 +141,10 @@ public class GsiftpDataAdaptor implements FileReaderGetter, FileWriterPutter, Da
         m_adaptor.removeFile(parentAbsolutePath, fileName, additionalArgs);
     }
 
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        return m_adaptor.getAttributes(absolutePath, additionalArgs);
+    }
+
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         return m_adaptor.listAttributes(absolutePath, additionalArgs);
     }

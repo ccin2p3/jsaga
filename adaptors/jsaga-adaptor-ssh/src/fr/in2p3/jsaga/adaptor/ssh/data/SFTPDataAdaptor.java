@@ -6,13 +6,11 @@ import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
 import fr.in2p3.jsaga.adaptor.data.read.*;
 import fr.in2p3.jsaga.adaptor.data.write.*;
 import fr.in2p3.jsaga.adaptor.ssh.SSHAdaptorAbstract;
+import fr.in2p3.jsaga.helpers.EntryPath;
 
 import org.ogf.saga.error.*;
 
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.SftpException;
+import com.jcraft.jsch.*;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 
 import java.io.InputStream;
@@ -158,7 +156,21 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 		return !isDirectory(absolutePath, additionalArgs);
 	}
 
-	public FileAttributes[] listAttributes(String absolutePath,
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        try {
+            String filename = new EntryPath(absolutePath).getEntryName();
+            SftpATTRS attrs = channelSftp.lstat(absolutePath);
+            return new SFTPFileAttributes(filename, attrs);
+        } catch (SftpException e) {
+            if (e.getid() == ChannelSftp.SSH_FX_NO_SUCH_FILE)
+                throw new DoesNotExist(e);
+            if (e.getid() == ChannelSftp.SSH_FX_PERMISSION_DENIED)
+                throw new PermissionDenied(e);
+            throw new NoSuccess(e);
+        }
+    }
+
+    public FileAttributes[] listAttributes(String absolutePath,
 			String additionalArgs) throws PermissionDenied, DoesNotExist,
 			Timeout, NoSuccess {
 		try {
@@ -169,7 +181,8 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 				for (int ii = 2; ii < vv.size(); ii++) {
 					Object obj = vv.elementAt(ii);
 					if (obj instanceof LsEntry) {
-						list[ii - 2] = new SFTPFileAttributes((LsEntry) obj);
+                        LsEntry entry = (LsEntry) obj;
+                        list[ii - 2] = new SFTPFileAttributes(entry.getFilename(), entry.getAttrs());
 					}
 				}
 				return list;

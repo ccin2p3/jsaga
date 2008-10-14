@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.ssh.data;
 
-import com.jcraft.jsch.ChannelSftp.LsEntry;
+import com.jcraft.jsch.SftpATTRS;
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 
@@ -28,22 +28,22 @@ public class SFTPFileAttributes extends FileAttributes {
 	private int S_IXOTH = 00001; // execute/search by others
 
 
-	public SFTPFileAttributes(LsEntry entry) {
-		m_name = entry.getFilename();
-		m_size = entry.getAttrs().getSize();
-		if(entry.getAttrs().isDir())
+	public SFTPFileAttributes(String filename, SftpATTRS attrs) {
+		m_name = filename;
+		m_size = attrs.getSize();
+		if(attrs.isDir())
 			m_type = FileAttributes.DIRECTORY_TYPE;
-		else if(entry.getAttrs().isLink())
+		else if(attrs.isLink())
 			m_type = FileAttributes.LINK_TYPE;
 		else 
 			m_type = FileAttributes.FILE_TYPE;
 		
-		m_group =  String.valueOf(entry.getAttrs().getGId());
-		m_owner =  String.valueOf(entry.getAttrs().getUId());
+		m_group =  String.valueOf(attrs.getGId());
+		m_owner =  String.valueOf(attrs.getUId());
 
-        m_lastModified = ((long) entry.getAttrs().getMTime()) * 1000;
+        m_lastModified = ((long) attrs.getMTime()) * 1000;
 
-        int permissions = entry.getAttrs().getPermissions();
+        int permissions = attrs.getPermissions();
 		if((permissions & S_IRUSR)!=0) 
 			m_permission = m_permission.or(PermissionBytes.READ);
 

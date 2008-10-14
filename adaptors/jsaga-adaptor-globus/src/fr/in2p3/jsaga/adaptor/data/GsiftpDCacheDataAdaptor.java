@@ -3,14 +3,17 @@ package fr.in2p3.jsaga.adaptor.data;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import org.globus.ftp.*;
-import org.globus.ftp.exception.UnexpectedReplyCodeException;
+import fr.in2p3.jsaga.helpers.EntryPath;
+import org.globus.ftp.FileInfo;
+import org.globus.ftp.GridFTPSession;
 import org.globus.ftp.exception.ServerException;
+import org.globus.ftp.exception.UnexpectedReplyCodeException;
 import org.ogf.saga.error.*;
 
-import java.lang.Exception;
-import java.util.*;
 import java.io.IOException;
+import java.lang.Exception;
+import java.util.Map;
+import java.util.Vector;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -75,6 +78,18 @@ public class GsiftpDCacheDataAdaptor extends GsiftpDataAdaptorAbstract {
             } catch(Exception e) {/*ignore*/}
         }
         return isDirectory;
+    }
+
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        EntryPath path = new EntryPath(absolutePath);
+        String entryName = path.getEntryName();
+        FileAttributes[] list = this.listAttributes(path.getBaseDir(), additionalArgs);
+        for (FileAttributes attrs : list) {
+            if (attrs.getNameOnly().equals(entryName)) {
+                return attrs;
+            }
+        }
+        throw new DoesNotExist("Entry does not exist: "+entryName);
     }
 
     //fixme: listAttributes does not work

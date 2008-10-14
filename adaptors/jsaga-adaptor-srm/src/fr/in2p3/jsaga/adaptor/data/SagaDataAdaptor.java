@@ -260,6 +260,10 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         }
     }
 
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        throw new NoSuccess("[INTERNAL ERROR] This method is not supposed to be used");
+    }
+
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         throw new NoSuccess("[INTERNAL ERROR] This method is not supposed to be used");
     }

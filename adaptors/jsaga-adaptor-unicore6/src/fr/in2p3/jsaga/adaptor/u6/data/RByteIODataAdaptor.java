@@ -278,6 +278,37 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
         }
     }
 
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        //prepare path and connection
+        absolutePath = getEntryPath(absolutePath);
+
+        // get parent
+        String parentDirectory = rootDirectory;
+        if(absolutePath.lastIndexOf(m_serverFileSeparator) > 0) {
+            parentDirectory = absolutePath.substring(0,absolutePath.lastIndexOf(m_serverFileSeparator));
+         }
+
+        try {
+            // check
+            List<com.intel.gpe.clients.api.GridFile> directoryList = m_client.listDirectory(parentDirectory);
+            for (com.intel.gpe.clients.api.GridFile file : directoryList) {
+                if(file.getPath().endsWith(absolutePath)) {
+                    return new RByteIOFileAttributes(file, m_serverFileSeparator);
+                }
+            }
+            // to be catch by Throwable
+            throw new DoesNotExist("The entry does not exist.");
+        } catch (GPESecurityException e) {
+            throw new PermissionDenied("Unable to get entry attributes",e);
+        } catch (Throwable e) {
+            // check
+            if(!exists(absolutePath, additionalArgs)) {
+                throw new DoesNotExist("The entry does not exist.");
+            }
+            throw new NoSuccess(e);
+        }
+    }
+
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {        
     	// prepare path
     	absolutePath = getEntryPath(absolutePath);

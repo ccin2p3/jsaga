@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.adaptor.data;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
+import fr.in2p3.jsaga.helpers.EntryPath;
 import org.globus.ftp.FileInfo;
 import org.globus.ftp.GridFTPSession;
 import org.globus.ftp.exception.UnexpectedReplyCodeException;
@@ -59,6 +60,19 @@ public class Gsiftp1DataAdaptor extends GsiftpDataAdaptorAbstract {
             } catch(Exception e) {/*ignore*/}
         }
         return isDirectory;
+    }
+
+    /** MLSD command is not supported */
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        EntryPath path = new EntryPath(absolutePath);
+        String entryName = path.getEntryName();
+        FileAttributes[] list = this.listAttributes(path.getBaseDir(), additionalArgs);
+        for (FileAttributes attrs : list) {
+            if (attrs.getNameOnly().equals(entryName)) {
+                return attrs;
+            }
+        }
+        throw new DoesNotExist("Entry does not exist: "+entryName);
     }
 
     /** MLSD command is not supported */

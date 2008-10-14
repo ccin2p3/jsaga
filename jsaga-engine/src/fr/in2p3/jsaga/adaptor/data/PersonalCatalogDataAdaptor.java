@@ -123,6 +123,11 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
         return file.getReplica();
     }
 
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        EntryType entry = m_catalog.getEntry(absolutePath);
+        return new CatalogFileAttributes(entry);
+    }
+
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         EntryType[] list = m_catalog.listEntries(absolutePath);
         FileAttributes[] ret = new FileAttributes[list.length];

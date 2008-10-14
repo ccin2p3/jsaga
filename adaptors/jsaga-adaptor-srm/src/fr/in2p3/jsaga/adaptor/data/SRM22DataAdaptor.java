@@ -336,6 +336,11 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         }
     }
 
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        TMetaDataPathDetail metadata = this.getMetaData(absolutePath);
+        return new SRM22FileAttributes(metadata);
+    }
+
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         TMetaDataPathDetail metadata = this.getMetaData(absolutePath);
         TMetaDataPathDetail[] list = metadata.getArrayOfSubPaths().getPathDetailArray();

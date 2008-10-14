@@ -127,6 +127,11 @@ public class EmulatorDataAdaptor implements FileReaderStreamFactory, FileWriterS
         if(Base.DEBUG) m_server.commit();
     }
 
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        EntryType entry = m_server.getEntry(absolutePath);
+        return new EmulatorFileAttributes(entry);
+    }
+
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         EntryType[] list = m_server.listEntries(absolutePath);
         FileAttributes[] ret = new FileAttributes[list.length];
