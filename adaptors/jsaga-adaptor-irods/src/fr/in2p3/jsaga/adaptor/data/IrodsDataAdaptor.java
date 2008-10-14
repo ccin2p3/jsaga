@@ -89,8 +89,12 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 			throw new NoSuccess(e);
         }
     }
-	
-	public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        throw new NoSuccess("Not implemented yet");
+    }
+
+    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
 		/*
 		GeneralFile[] files = FileFactory.newFile(fileSystem, absolutePath).listFiles();
 		FileAttributes[] fileAttributes = new FileAttributes[files.length];

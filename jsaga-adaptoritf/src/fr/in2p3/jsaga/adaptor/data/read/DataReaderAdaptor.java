@@ -48,6 +48,16 @@ public interface DataReaderAdaptor extends DataAdaptor {
         throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
 
     /**
+     * Get the file attributes of the entry <code>absolutePath</code>.
+     * @param absolutePath the absolute path of the entry.
+     * @param additionalArgs adaptor specific arguments.
+     * @return the file attributes.
+     * @throws DoesNotExist if <code>absolutePath</code> does not exist.
+     */
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs)
+        throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
+
+    /**
      * Lists all the entries in the directory <code>absolutePath</code>.
      * @param absolutePath the directory containing entries to list.
      * @param additionalArgs adaptor specific arguments.

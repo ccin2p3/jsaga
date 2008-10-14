@@ -91,8 +91,12 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 	public long getSize(String absolute, String absolutePath) {
 		return -1;
 	}
-	
-	public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        throw new NoSuccess("Not implemented yet");
+    }
+
+    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
 		/* methode offcielle
 		GeneralFile[] files = FileFactory.newFile(fileSystem, absolutePath).listFiles();
 		FileAttributes[] fileAttributes = new FileAttributes[files.length];
