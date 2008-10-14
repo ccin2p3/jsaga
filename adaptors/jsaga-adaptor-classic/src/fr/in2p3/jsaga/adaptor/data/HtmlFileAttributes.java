@@ -8,16 +8,16 @@ import org.w3c.dom.Node;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   HttpFileAttributes
+* File:   HtmlFileAttributes
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   25 mars 2008
+* Date:   14 oct. 2008
 * ***************************************************
 * Description:                                      */
 /**
  *
  */
-public class HttpFileAttributes extends FileAttributes {
-    public HttpFileAttributes(Element img) {
+public class HtmlFileAttributes extends FileAttributes {
+    public HtmlFileAttributes(Element img) {
         boolean isDir = img.getAttribute("alt").equals("[DIR]");
 
         Node n = img;

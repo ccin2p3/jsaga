@@ -1,10 +1,13 @@
-package fr.in2p3.jsaga.adaptor.data;
+package fr.in2p3.jsaga.adaptor.data.zip;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
+import fr.in2p3.jsaga.adaptor.data.BaseURL;
+import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import fr.in2p3.jsaga.helpers.EntryPath;
 import org.ogf.saga.error.*;
 
 import java.io.*;
@@ -110,6 +113,13 @@ public class ZipDataAdaptor implements FileReaderStreamFactory{//, FileWriterPut
         } catch (IOException e) {
             throw new NoSuccess(e);
         }
+    }
+
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        ZipEntry entry = this.getEntry(absolutePath);
+        String path = absolutePath.substring(m_zipPath.length()+1);
+        String baseDir = new EntryPath(path).getBaseDir();
+        return new ZipFileAttributes(entry, baseDir);
     }
 
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {

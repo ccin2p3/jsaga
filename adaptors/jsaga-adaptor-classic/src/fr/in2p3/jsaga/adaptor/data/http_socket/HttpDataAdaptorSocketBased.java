@@ -1,7 +1,7 @@
-package fr.in2p3.jsaga.adaptor.data;
+package fr.in2p3.jsaga.adaptor.data.http_socket;
 
-import fr.in2p3.jsaga.adaptor.data.impl.HttpInputStreamSocketBased;
-import fr.in2p3.jsaga.adaptor.data.impl.HttpRequest;
+import fr.in2p3.jsaga.adaptor.data.HttpDataAdaptorAbstract;
+import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import org.ogf.saga.error.*;
 
@@ -40,6 +40,11 @@ public class HttpDataAdaptorSocketBased extends HttpDataAdaptorAbstract implemen
     public long getSize(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         HttpRequest request = this.getRequest(absolutePath, additionalArgs, HttpRequest.TYPE_HEAD);
         return request.getContentLength();
+    }
+
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        HttpRequest request = this.getRequest(absolutePath, additionalArgs, HttpRequest.TYPE_HEAD);
+        return new HttpFileAttributesSockedBased(absolutePath, request);
     }
 
     public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {

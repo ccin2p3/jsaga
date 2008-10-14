@@ -1,11 +1,13 @@
-package fr.in2p3.jsaga.adaptor.data;
+package fr.in2p3.jsaga.adaptor.data.https;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.data.impl.HttpRequest;
-import fr.in2p3.jsaga.adaptor.data.impl.OneWayAuthenticationTrustManager;
+import fr.in2p3.jsaga.adaptor.data.http_socket.HttpRequest;
+import fr.in2p3.jsaga.adaptor.data.http_socket.HttpDataAdaptorSocketBased;
+import fr.in2p3.jsaga.adaptor.data.https.OneWayAuthenticationTrustManager;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
+import fr.in2p3.jsaga.adaptor.data.BaseURL;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.X509SecurityAdaptor;
 import org.ogf.saga.error.*;

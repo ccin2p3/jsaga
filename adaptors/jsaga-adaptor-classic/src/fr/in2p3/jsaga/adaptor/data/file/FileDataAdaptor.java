@@ -1,4 +1,4 @@
-package fr.in2p3.jsaga.adaptor.data;
+package fr.in2p3.jsaga.adaptor.data.file;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
@@ -7,6 +7,8 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.adaptor.data.write.DataWriterTimes;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
+import fr.in2p3.jsaga.adaptor.data.BaseURL;
+import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import org.ogf.saga.error.*;
 
@@ -124,6 +126,11 @@ public class FileDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         } else if (!file.delete()) {
             throw new NoSuccess("Failed to remove file: "+fileName);
         }
+    }
+
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        File entry = this.newEntry(absolutePath);
+        return new LocalFileAttributes(entry);
     }
 
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {

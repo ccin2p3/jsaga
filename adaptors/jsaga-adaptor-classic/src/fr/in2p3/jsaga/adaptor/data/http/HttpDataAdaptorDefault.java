@@ -1,5 +1,7 @@
-package fr.in2p3.jsaga.adaptor.data;
+package fr.in2p3.jsaga.adaptor.data.http;
 
+import fr.in2p3.jsaga.adaptor.data.HttpDataAdaptorAbstract;
+import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import org.ogf.saga.error.*;
 
@@ -36,6 +38,11 @@ public class HttpDataAdaptorDefault extends HttpDataAdaptorAbstract implements F
     public long getSize(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         URLConnection cnx = this.getConnection(absolutePath, additionalArgs);
         return cnx.getContentLength();
+    }
+
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        URLConnection cnx = this.getConnection(absolutePath, additionalArgs);
+        return new HttpFileAttributesDefault(cnx);
     }
 
     public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {

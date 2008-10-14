@@ -1,4 +1,4 @@
-package fr.in2p3.jsaga.adaptor.data;
+package fr.in2p3.jsaga.adaptor.data.zip;
 
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;

@@ -50,13 +50,13 @@
 
     <!-- protocols -->
     <protocol scheme="file" read="true" write="true" thirdparty="true" logical="true">
-        <dataService name="default" type="file" impl="fr.in2p3.jsaga.adaptor.data.FileDataAdaptor"/>
+        <dataService name="default" type="file" impl="fr.in2p3.jsaga.adaptor.data.file.FileDataAdaptor"/>
     </protocol>
     <protocol scheme="http" read="true" write="false" thirdparty="false" logical="false">
-        <dataService name="default" type="http" impl="fr.in2p3.jsaga.adaptor.data.HTTPDataAdaptor"/>
+        <dataService name="default" type="http" impl="fr.in2p3.jsaga.adaptor.data.http.HTTPDataAdaptorDefault"/>
     </protocol>
     <protocol scheme="https" read="true" write="false" thirdparty="false" logical="false">
-        <dataService name="default" type="https" impl="fr.in2p3.jsaga.adaptor.data.HTTPSDataAdaptor">
+        <dataService name="default" type="https" impl="fr.in2p3.jsaga.adaptor.data.https.HTTPSDataAdaptorDefault">
             <supportedContextType>X509</supportedContextType>
         </dataService>
     </protocol>

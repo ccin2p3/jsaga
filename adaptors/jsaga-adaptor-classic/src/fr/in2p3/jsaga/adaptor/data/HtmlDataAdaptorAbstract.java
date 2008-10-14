@@ -70,7 +70,7 @@ public abstract class HtmlDataAdaptorAbstract implements FileReaderStreamFactory
             FileAttributes[] list = new FileAttributes[nbEntries];
             for (int i=0; i<nbEntries; i++) {
                 Element img = (Element) images.item(i+2);
-                list[i] = new HttpFileAttributes(img);
+                list[i] = new HtmlFileAttributes(img);
             }
             return list;
         } catch (SAXParseException e) {

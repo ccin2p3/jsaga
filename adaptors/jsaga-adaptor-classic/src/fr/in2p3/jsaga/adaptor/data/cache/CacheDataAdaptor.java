@@ -1,10 +1,12 @@
-package fr.in2p3.jsaga.adaptor.data;
+package fr.in2p3.jsaga.adaptor.data.cache;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
+import fr.in2p3.jsaga.adaptor.data.BaseURL;
+import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
@@ -118,6 +120,19 @@ public class CacheDataAdaptor implements FileReaderStreamFactory, FileWriter {
         try {
             URL remoteURL = getURL(absolutePath, additionalArgs);
             return m_connection.open(remoteURL).isEntry();
+        }
+        catch (PermissionDenied e) {throw e;}
+        catch (DoesNotExist e) {throw e;}
+        catch (Timeout e) {throw e;}
+        catch (NoSuccess e) {throw e;}
+        catch (Exception e) {throw new NoSuccess(e);}
+    }
+
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+        try {
+            URL remoteURL = getURL(absolutePath, additionalArgs);
+            NSEntry entry = m_connection.open(remoteURL);
+            return new CacheFileAttributes(entry);
         }
         catch (PermissionDenied e) {throw e;}
         catch (DoesNotExist e) {throw e;}
