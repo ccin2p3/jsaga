@@ -385,27 +385,23 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
 
     /** deviation from SAGA specification */
     public Date getLastModified() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+        FileAttributes attrs = null;
         if (m_url instanceof JSagaURL) {
-            long lastModified = ((JSagaURL)m_url).getAttributes().getLastModified();
-            if (lastModified > 0) {
-                return new Date(lastModified);
-            }
-        }
-        //TODO: uncomment this when method getAttributes() will be available
-/*
-        if (m_adaptor instanceof DataReaderAdaptor) {
+            attrs = ((JSagaURL)m_url).getAttributes();
+        } else if (m_adaptor instanceof DataReaderAdaptor) {
             try {
-                FileAttributes attr = ((DataReaderAdaptor)m_adaptor).getAttributes(
+                attrs = ((DataReaderAdaptor)m_adaptor).getAttributes(
                         m_url.getPath(),
                         m_url.getQuery());
-                return new Date(attr.getLastModified());
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("Entry does not exist: "+m_url, doesNotExist);
             }
+        }
+        if (attrs!=null && attrs.getLastModified()>0) {
+            return new Date(attrs.getLastModified());
         } else {
-*/
             throw new NotImplemented("Not supported for this protocol: "+m_url.getScheme());
-//        }
+        }
     }
 
     /** deviation from SAGA specification */
