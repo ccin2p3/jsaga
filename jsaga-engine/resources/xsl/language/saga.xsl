@@ -50,10 +50,13 @@
                 <jsdl:Application>
                     <posix:POSIXApplication>
                         <xsl:for-each select="Executable/@value">
-                            <posix:Executable filesystemName="WorkingDirectory"><xsl:value-of select="."/></posix:Executable>
+                            <posix:Executable>
+                                <xsl:call-template name="FILESYSTEM_NAME"/>
+                                <xsl:value-of select="."/>
+                            </posix:Executable>
                         </xsl:for-each>
-                        <xsl:for-each select="WorkingDirectory/@value">
-                            <posix:WorkingDirectory filesystemName="WorkingDirectory"><xsl:value-of select="."/></posix:WorkingDirectory>
+                        <xsl:for-each select="Arguments/value/text()">
+                            <posix:Argument><xsl:value-of select="."/></posix:Argument>
                         </xsl:for-each>
                         <xsl:choose>
                             <xsl:when test="translate(Interactive/@value,'TRUE','true') = 'true'">
@@ -69,18 +72,30 @@
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:for-each select="Input/@value">
-                                    <posix:Input filesystemName="WorkingDirectory"><xsl:value-of select="."/></posix:Input>
+                                    <posix:Input>
+                                        <xsl:call-template name="FILESYSTEM_NAME"/>
+                                        <xsl:value-of select="."/>
+                                    </posix:Input>
                                 </xsl:for-each>
                                 <xsl:for-each select="Output/@value">
-                                    <posix:Output filesystemName="WorkingDirectory"><xsl:value-of select="."/></posix:Output>
+                                    <posix:Output>
+                                        <xsl:call-template name="FILESYSTEM_NAME"/>
+                                        <xsl:value-of select="."/>
+                                    </posix:Output>
                                 </xsl:for-each>
                                 <xsl:for-each select="Error/@value">
-                                    <posix:Error filesystemName="WorkingDirectory"><xsl:value-of select="."/></posix:Error>
+                                    <posix:Error>
+                                        <xsl:call-template name="FILESYSTEM_NAME"/>
+                                        <xsl:value-of select="."/>
+                                    </posix:Error>
                                 </xsl:for-each>
                             </xsl:otherwise>
                         </xsl:choose>
-                        <xsl:for-each select="Arguments/value/text()">
-                            <posix:Argument><xsl:value-of select="."/></posix:Argument>
+                        <xsl:for-each select="WorkingDirectory/@value">
+                            <posix:WorkingDirectory>
+                                <xsl:call-template name="FILESYSTEM_NAME"/>
+                                <xsl:value-of select="."/>
+                            </posix:WorkingDirectory>
                         </xsl:for-each>
                         <xsl:for-each select="Environment/value/text()">
                             <posix:Environment name="{substring-before(.,'=')}"><xsl:value-of select="substring-after(.,'=')"/></posix:Environment>
@@ -104,30 +119,17 @@
                     </xsl:if>
                 </jsdl:Application>
                 <jsdl:Resources>
+                    <xsl:for-each select="CandidateHosts">
+                        <jsdl:CandidateHosts>
+                            <xsl:for-each select="value/text()">
+                                <jsdl:HostName><xsl:value-of select="."/></jsdl:HostName>
+                            </xsl:for-each>
+                        </jsdl:CandidateHosts>
+                    </xsl:for-each>
                     <jsdl:FileSystem name="WorkingDirectory">
                         <jsdl:FileSystemType>temporary</jsdl:FileSystemType>
                         <jsdl:MountPoint>.</jsdl:MountPoint>
                     </jsdl:FileSystem>
-                    <xsl:for-each select="TotalCPUCount/@value">
-                        <jsdl:TotalCPUCount>
-                            <jsdl:Exact><xsl:value-of select="."/></jsdl:Exact>
-                        </jsdl:TotalCPUCount>
-                    </xsl:for-each>
-                    <xsl:for-each select="TotalCPUTime/@value">
-                        <jsdl:TotalCPUTime>
-                            <jsdl:UpperBoundedRange exclusiveBound="false"><xsl:value-of select="."/></jsdl:UpperBoundedRange>
-                        </jsdl:TotalCPUTime>
-                    </xsl:for-each>
-                    <xsl:for-each select="TotalPhysicalMemory/@value">
-                        <jsdl:TotalPhysicalMemory>
-                            <jsdl:UpperBoundedRange exclusiveBound="false"><xsl:value-of select="."/></jsdl:UpperBoundedRange>
-                        </jsdl:TotalPhysicalMemory>
-                    </xsl:for-each>
-                    <xsl:for-each select="CPUArchitecture/@value"><!-- deviation from SAGA specification (for consistency with JSDL) -->
-                        <jsdl:CPUArchitecture>
-                            <jsdl:CPUArchitectureName><xsl:value-of select="."/></jsdl:CPUArchitectureName>
-                        </jsdl:CPUArchitecture>
-                    </xsl:for-each>
                     <xsl:for-each select="OperatingSystemType/@value"><!-- deviation from SAGA specification (for consistency with JSDL) -->
                         <jsdl:OperatingSystem>
                             <jsdl:OperatingSystemType>
@@ -135,12 +137,25 @@
                             </jsdl:OperatingSystemType>
                         </jsdl:OperatingSystem>
                     </xsl:for-each>
-                    <xsl:for-each select="CandidateHosts">
-                        <jsdl:CandidateHosts>
-                            <xsl:for-each select="value/text()">
-                                <jsdl:HostName><xsl:value-of select="."/></jsdl:HostName>
-                            </xsl:for-each>
-                        </jsdl:CandidateHosts>
+                    <xsl:for-each select="CPUArchitecture/@value"><!-- deviation from SAGA specification (for consistency with JSDL) -->
+                        <jsdl:CPUArchitecture>
+                            <jsdl:CPUArchitectureName><xsl:value-of select="."/></jsdl:CPUArchitectureName>
+                        </jsdl:CPUArchitecture>
+                    </xsl:for-each>
+                    <xsl:for-each select="TotalCPUTime/@value">
+                        <jsdl:TotalCPUTime>
+                            <jsdl:UpperBoundedRange exclusiveBound="false"><xsl:value-of select="."/></jsdl:UpperBoundedRange>
+                        </jsdl:TotalCPUTime>
+                    </xsl:for-each>
+                    <xsl:for-each select="TotalCPUCount/@value">
+                        <jsdl:TotalCPUCount>
+                            <jsdl:Exact><xsl:value-of select="."/></jsdl:Exact>
+                        </jsdl:TotalCPUCount>
+                    </xsl:for-each>
+                    <xsl:for-each select="TotalPhysicalMemory/@value">
+                        <jsdl:TotalPhysicalMemory>
+                            <jsdl:UpperBoundedRange exclusiveBound="false"><xsl:value-of select="."/></jsdl:UpperBoundedRange>
+                        </jsdl:TotalPhysicalMemory>
                     </xsl:for-each>
                 </jsdl:Resources>
                 <xsl:for-each select="FileTransfer/value/text()">
@@ -190,6 +205,12 @@
                 </xsl:for-each>
             </jsdl:JobDescription>
         </jsdl:JobDefinition>
+    </xsl:template>
+
+    <xsl:template name="FILESYSTEM_NAME">
+        <xsl:if test="not(starts-with(.,'/') or starts-with(.,'$'))">
+            <xsl:attribute name="filesystemName">WorkingDirectory</xsl:attribute>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template name="CLEANUP">
