@@ -6,19 +6,18 @@ if test -z "$1" ; then
 fi
 NAREGI_HOME=$1
 
-echo "***************************************************************************"
-echo "*** When you will be prompted, answer 'y' for client and 'n' for server ***"
-echo "***************************************************************************"
-echo ""
+SOURCE=`mktemp -d`
 PWD_SAVED=$PWD
 
 # Install NAREGI-SS client
-SOURCE=`mktemp -d`
 cd $SOURCE
 wget http://rpm1.naregi.org/beta2/html/Packages/SS_r1349.tar.gz
 tar xzvf SS_r1349.tar.gz
 cd ./Progs/
-sh OPENDIST.sh $NAREGI_HOME
+sh OPENDIST.sh $NAREGI_HOME << EOF
+y
+n
+EOF
 
 # Install patch
 wget http://grid.in2p3.fr/maven2/org/naregi/ss/naregi-ss-api/beta-2/naregi-ss-api-beta-2-patch.tar.gz
