@@ -41,7 +41,8 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 
 	public BaseURL getBaseURL() throws IncorrectURL {
         //todo: parse MDASENV file
-        return null;
+		//return new BaseURL(String userInfo, String host, int port, "/", "domain=mydomain&zone=myzone&resource=myresource");
+		return null;
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectState {
@@ -53,20 +54,11 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 		};
     }
 
-    public Class[] getSupportedSecurityAdaptorClasses() {
-        return new Class[]{UserPassSecurityAdaptor.class, GSSCredentialSecurityAdaptor.class};
-    }
-
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
-		this.securityAdaptor = securityAdaptor;	
-    }
-
 	// syntax: srb:// [username.mdasdomain [.zone] [:password] @] [host] [:port] /path
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
 		try {
 			parseValue(attributes);
 			// connect to server
-			//SRBAccount account = new SRBAccount();
 			SRBAccount account = null;
 			
 			if (securityAdaptor instanceof GSSCredentialSecurityAdaptor) { 
@@ -79,6 +71,7 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 					account = new SRBAccount(host, port, userName, passWord, basePath, mdasDomainName, defaultStorageResource, mcatZone);
 				}
 			}
+
 			fileSystem = FileFactory.newFileSystem(account);
 		} catch (IOException ioe) {
 			throw new AuthenticationFailed(ioe);
@@ -184,12 +177,9 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 			
 			return new BufferedInputStream(new SRBFileInputStream(generalFile));
 			/*
-			System.out.println("generalFile:"+generalFile);
 			GeneralRandomAccessFile generalRandomAccessFile = FileFactory.newRandomAccessFile( generalFile, "r" );
 			int filesize = (int)generalFile.length();
-		
-			System.out.println("filesize:"+generalFile.length());
-			
+
 			byte[] buffer = new byte[filesize];
 			generalRandomAccessFile.readFully(buffer);
 			ByteArrayInputStream bais = new ByteArrayInputStream(buffer); 

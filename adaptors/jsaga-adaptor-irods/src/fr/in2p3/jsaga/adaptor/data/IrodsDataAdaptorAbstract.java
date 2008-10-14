@@ -30,11 +30,19 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor, Fil
 	protected final static String FILE = "file";
 	protected final static String DIR = "dir";
 	protected final static String DOT =  "\\.";
-	protected final static String DEFAULTRESOURCE	= "defaultresource";
+	protected final static String DEFAULTRESOURCE	= "defaultresource", DOMAIN="domain", ZONE="zone";
 	protected String userName, passWord, mdasDomainName, mcatZone="", defaultStorageResource="";
 	protected SecurityAdaptor securityAdaptor;
 	protected GSSCredential cert;
 
+	public Class[] getSupportedSecurityAdaptorClasses() {
+        return new Class[]{UserPassSecurityAdaptor.class, GSSCredentialSecurityAdaptor.class};
+    }
+
+    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
+		this.securityAdaptor = securityAdaptor;	
+    }
+	
 	public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
 		return true;
 	}
@@ -57,6 +65,7 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor, Fil
 		}
 		
 		// Parsing de username to extract domain and zone
+		/* WARNING: THIS DOES NOT WORK WITH DOMAINS WHICH CONTAINS DOTS
 		if (userName != null)  {
 			String[] userNameAttribute = userName.split(DOT);
 			if (this instanceof SrbDataAdaptor) {
@@ -79,6 +88,7 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor, Fil
 				}
 			}
 		}
+		*/
 
 		// Parsing for defaultResource
 		Set set = attributes.entrySet();
@@ -86,12 +96,17 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor, Fil
 
         while (iterator.hasNext()) {
             Map.Entry me = (Map.Entry) iterator.next();
-
             String key = ((String)me.getKey()).toLowerCase();
             String value =(String)me.getValue();
+			
             if (key.equals(DEFAULTRESOURCE)) {
                 defaultStorageResource = (String)me.getValue();
-            }
+            } else if (key.equals(DOMAIN)) {
+				mdasDomainName  = (String)me.getValue();
+			} else if (key.equals(ZONE)) {
+				mcatZone  = (String)me.getValue();
+			}
+			
         }
     }
 }

@@ -9,6 +9,7 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
 import org.ogf.saga.error.*;
 
 import java.io.*;
@@ -56,35 +57,23 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 		};
     }
 
-    public Class[] getSupportedSecurityAdaptorClasses() {
-        return new Class[]{UserPassSecurityAdaptor.class};
-    }
-
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
-       this.securityAdaptor = securityAdaptor;
-    }
-
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
 		try {
 			parseValue(attributes);
-			/*
-			//IRODSAccount account = new IRODSAccount();System.out.println("password"+passWord);
-			System.out.println("mdasDomainName"+mdasDomainName);
-			System.out.println("mcatZone"+mcatZone);
+			IRODSAccount account = null;
 			
-			System.out.println("userName"+userName);
-			System.out.println("host"+host);
-			System.out.println("port"+port);
-			System.out.println("basePath"+basePath);
-			System.out.println("attributes"+attributes);
-			System.out.println("defaultStorageResource"+defaultStorageResource);
-			*/
-			IRODSAccount account  =null;
-			if (host == null) {
-				account = new IRODSAccount();
-			} else {
+			if (securityAdaptor instanceof GSSCredentialSecurityAdaptor) { 
+				cert = ((GSSCredentialSecurityAdaptor)securityAdaptor).getGSSCredential();
 				account = new IRODSAccount(host, port, userName, passWord, basePath, mcatZone, defaultStorageResource);
+				account.setAuthenticationScheme("GSI");
+			} else {
+				if (host == null) {
+					account = new IRODSAccount();
+				} else {
+					account = new IRODSAccount(host, port, userName, passWord, basePath, mcatZone, defaultStorageResource);
+				}
 			}
+			
 			fileSystem = FileFactory.newFileSystem(account);
 		} catch (IOException ioe) {
 			throw new AuthenticationFailed(ioe);
@@ -186,12 +175,8 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 			
 			return new BufferedInputStream(new IRODSFileInputStream(generalFile));
 			/*
-			System.out.println("generalFile:"+generalFile);
 			GeneralRandomAccessFile generalRandomAccessFile = FileFactory.newRandomAccessFile( generalFile, "r" );
 			int filesize = (int)generalFile.length();
-		
-			System.out.println("filesize:"+generalFile.length());
-			
 			byte[] buffer = new byte[filesize];
 			generalRandomAccessFile.readFully(buffer);
 			ByteArrayInputStream bais = new ByteArrayInputStream(buffer); 
@@ -204,12 +189,7 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 	
 	public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
 		try {
-			/*
-			String[] split = parentAbsolutePath.split(separator);
-			String dir = parentAbsolutePath.substring(0,parentAbsolutePath.length()-fileName.length());
-			*/
 			IRODSFile generalFile =  (IRODSFile)FileFactory.newFile((IRODSFileSystem)fileSystem, parentAbsolutePath, fileName );
-			
 			return new BufferedOutputStream(new IRODSFileOutputStream(generalFile));
        	} catch (java.lang.Exception e) {
 			throw new NoSuccess(e);
