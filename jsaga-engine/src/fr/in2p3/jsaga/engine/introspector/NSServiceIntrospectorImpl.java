@@ -34,6 +34,16 @@ public class NSServiceIntrospectorImpl extends AbstractIntrospectorImpl implemen
         return Introspector.CONTEXT;
     }
 
+    /** override super.getAttribute() */
+    public String getAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+        for (int i=0; i<m_config.getAttributeCount(); i++) {
+            if (m_config.getAttribute(i).getName().equals(key)) {
+                return m_config.getAttribute(i).getValue();
+            }
+        }
+        throw new DoesNotExist("Attribute "+key+" does not exist", this);
+    }
+
     /** @return contexts */
     protected String[] getChildIntrospectorKeys() throws NoSuccess {
         Set<String> result = new HashSet<String>();

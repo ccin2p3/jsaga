@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.engine.introspector;
 
+import fr.in2p3.jsaga.engine.config.AmbiguityException;
 import fr.in2p3.jsaga.impl.attributes.AbstractAttributesImpl;
 import fr.in2p3.jsaga.introspector.Introspector;
 import org.ogf.saga.ObjectType;
@@ -29,6 +30,28 @@ public abstract class AbstractIntrospectorImpl extends AbstractAttributesImpl im
 
     public ObjectType getType() {
         return ObjectType.UNKNOWN;
+    }
+
+    /** override super.getAttribute() */
+    public String getAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+        try {
+            return super.getAttribute(key);
+        } catch(DoesNotExist e) {
+            // recursive
+            Set<String> result = new HashSet<String>();
+            for (String childKey : this.getChildIntrospectorKeys()) {
+                Introspector child = this.getChildIntrospector(childKey);
+                result.add(child.getAttribute(key));
+            }
+            switch(result.size()) {
+                case 0:
+                    throw e;
+                case 1:
+                    return result.toArray(new String[1])[0];
+                default:
+                    throw new AmbiguityException("Several values are configured: "+result.size());
+            }
+        }
     }
 
     /** override super.getVectorAttribute() */
