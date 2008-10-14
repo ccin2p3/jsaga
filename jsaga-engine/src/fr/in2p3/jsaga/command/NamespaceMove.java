@@ -30,17 +30,20 @@ public class NamespaceMove extends AbstractCommand {
     public static void main(String[] args) throws Exception {
         NamespaceMove command = new NamespaceMove();
         CommandLine line = command.parse(args);
+        command.execute(line);
+    }
 
+    public void execute(CommandLine line) throws Exception {
         System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
         if (line.hasOption(OPT_HELP))
         {
-            command.printHelpAndExit(null);
+            super.printHelpAndExit(null);
         }
         else
         {
             // get arguments
-            URL source = URLFactory.create(command.m_nonOptionValues[0]);
-            URL target = URLFactory.create(command.m_nonOptionValues[1]);
+            URL source = URLFactory.create(super.m_nonOptionValues[0]);
+            URL target = URLFactory.create(super.m_nonOptionValues[1]);
             int flags =(line.hasOption(OPT_NOT_OVERWRITE) ? Flags.NONE : Flags.OVERWRITE)
                     .or(line.hasOption(OPT_RECURSIVE) ? Flags.RECURSIVE : Flags.NONE);
 
@@ -52,9 +55,14 @@ public class NamespaceMove extends AbstractCommand {
             } else {
                 entry = NSFactory.createNSEntry(session, source, Flags.NONE.getValue());
             }
+            this.changeBehavior(session, target);
             entry.move(target, flags);
             entry.close();
         }
+    }
+
+    protected void changeBehavior(Session session, URL target) throws Exception {
+        // do nothing
     }
 
     protected Options createOptions() {
