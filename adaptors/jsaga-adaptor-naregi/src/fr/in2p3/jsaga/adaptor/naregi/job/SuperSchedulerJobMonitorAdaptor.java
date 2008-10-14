@@ -10,7 +10,6 @@ import org.w3c.dom.Document;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.*;
-import java.io.File;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -65,17 +64,20 @@ public class SuperSchedulerJobMonitorAdaptor extends SuperSchedulerJobAdaptorAbs
     }
 
     public JobStatus getStatus(String nativeJobId) throws Timeout, NoSuccess {
-        File epr = new File(nativeJobId);   //todo: remove this workaround
-        String id = getJobID(epr);
+        String epr = new JobEPR(nativeJobId).getEPR();
         Document detail;
         try {
             if (m_credential != null) {
-                detail = m_jss.queryJob(id, m_credential);
+                detail = m_jss.queryJob(epr, m_credential);
             } else {
-                detail = m_jss.queryJob(id, m_account, m_passPhrase);
+                detail = m_jss.queryJob(epr, m_account, m_passPhrase);
             }
         } catch (JobScheduleServiceException e) {
-            throw new NoSuccess(e);
+            if (e.getMessage().startsWith("Super Scheduler command error occurred.")) {
+                throw new NoSuccess("Failed to get status (job may have been cleaned up)");
+            } else {
+                throw new NoSuccess(e);
+            }
         }
 
 /*
@@ -99,6 +101,6 @@ public class SuperSchedulerJobMonitorAdaptor extends SuperSchedulerJobAdaptorAbs
             throw new NoSuccess(e);
         }
 
-        return new SuperSchedulerJobStatus(id, stateString);
+        return new SuperSchedulerJobStatus(epr, stateString);
     }
 }

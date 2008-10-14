@@ -13,7 +13,6 @@ import org.w3c.dom.Document;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.lang.Exception;
 import java.util.Map;
 
@@ -77,17 +76,16 @@ public class SuperSchedulerJobControlAdaptor extends SuperSchedulerJobAdaptorAbs
         } catch (JobScheduleServiceException e) {
             throw new NoSuccess(e);
         }
-        return epr;
+        return new JobEPR(new ByteArrayInputStream(epr.getBytes())).getJobId();
     }
 
     public void cancel(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess {
-        File epr = new File(nativeJobId);   //todo: remove this workaround
-        String id = getJobID(epr);
+        String epr = new JobEPR(nativeJobId).getEPR();
         try {
             if (m_credential != null) {
-                m_jss.cancelJob(id, m_credential);
+                m_jss.cancelJob(epr, m_credential);
             } else {
-                m_jss.cancelJob(id, m_account, m_passPhrase);
+                m_jss.cancelJob(epr, m_account, m_passPhrase);
             }
         } catch (JobScheduleServiceException e) {
             throw new NoSuccess(e);
@@ -95,13 +93,12 @@ public class SuperSchedulerJobControlAdaptor extends SuperSchedulerJobAdaptorAbs
     }
 
     public void clean(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess {
-        File epr = new File(nativeJobId);   //todo: remove this workaround
-        String id = getJobID(epr);
+        String epr = new JobEPR(nativeJobId).getEPR();
         try {
             if (m_credential != null) {
-                m_jss.deleteJob(id, m_credential);
+                m_jss.deleteJob(epr, m_credential);
             } else {
-                m_jss.deleteJob(id, m_account, m_passPhrase);
+                m_jss.deleteJob(epr, m_account, m_passPhrase);
             }
         } catch (JobScheduleServiceException e) {
             throw new NoSuccess(e);

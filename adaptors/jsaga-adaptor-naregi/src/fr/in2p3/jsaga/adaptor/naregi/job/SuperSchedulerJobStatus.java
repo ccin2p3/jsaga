@@ -18,6 +18,7 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 public class SuperSchedulerJobStatus extends JobStatus {
     private static final String RUNNING = "Running";
     private static final String DONE = "Done";
+    private static final String EXCEPTION = "Exception";
 
     public SuperSchedulerJobStatus(String jobId, String stateString) {
         super(jobId, stateString, stateString);
@@ -32,6 +33,8 @@ public class SuperSchedulerJobStatus extends JobStatus {
             return SubState.RUNNING_ACTIVE;
         } else if (DONE.equals(m_nativeStateString)) {
             return SubState.DONE;
+        } else if (EXCEPTION.equals(m_nativeStateString)) {
+            return SubState.FAILED_ERROR;
         } else {
 System.err.println("Unknown status: "+m_nativeStateString); //todo: remove this line
             return SubState.FAILED_ERROR;

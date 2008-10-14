@@ -5,12 +5,10 @@ import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
 import org.ietf.jgss.GSSCredential;
-import org.naregi.ss.service.client.JobScheduleService;
-import org.naregi.ss.service.client.JobScheduleServiceFactory;
+import org.naregi.ss.service.client.*;
 import org.ogf.saga.error.*;
 
-import java.io.*;
-import java.lang.Exception;
+import java.util.Iterator;
 import java.util.Map;
 
 /* ***************************************************
@@ -50,6 +48,28 @@ public abstract class SuperSchedulerJobAdaptorAbstract implements SagaSecureAdap
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+        // modify configuration of NAREGI API
+        try {
+            for (Iterator it=attributes.entrySet().iterator(); it.hasNext(); ) {
+                Map.Entry entry = (Map.Entry) it.next();
+                String key = (String) entry.getKey();
+                String value = (String) entry.getValue();
+                ConfigManager.setProperty(key, value);
+            }
+            String cmd = ConfigManager.getProperty("ss.command.location");
+            String svr = ConfigManager.getProperty("Server");
+            String env = ConfigManager.getProperty("ss.command.env");
+            if (env==null || env.trim().equals("")) {
+                throw new NoSuccess("Missing required property: ss.command.env");
+            }
+            env += ", LD_LIBRARY_PATH="+cmd+"/lib:"+cmd+"/libexec";
+            env += ", BSC_CLIENT_SERVICE_URL=http://"+svr+":8080/wsrf/services/BpelWFServiceContainer2";
+            ConfigManager.setProperty("ss.command.env", env);
+        } catch (JobScheduleServiceException e) {
+            throw new NoSuccess(e);
+        }
+
+        // create client
         m_jss = JobScheduleServiceFactory.create();
         if (host != null) {
             m_jss.setJmHost(host);
@@ -61,24 +81,5 @@ public abstract class SuperSchedulerJobAdaptorAbstract implements SagaSecureAdap
 
     public void disconnect() throws NoSuccess {
         m_jss = null;
-    }
-
-    protected static String getJobID(File eprFile) throws NoSuccess {
-        StringBuffer bfs = new StringBuffer();
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(eprFile)));
-            String line;
-            while ((line = br.readLine()) != null) {
-                bfs.append(line);
-            }
-        } catch (IOException e) {
-            throw new NoSuccess(e);
-        } finally {
-            if (null != br) {
-                try{br.close();} catch(Exception e){}
-            }
-        }
-        return new String(bfs);
     }
 }
