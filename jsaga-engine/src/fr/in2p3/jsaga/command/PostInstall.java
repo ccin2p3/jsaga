@@ -37,7 +37,7 @@ public class PostInstall {
 
     public static void main(String[] args) throws Exception {
         if (args.length > 1) {
-            System.err.println("usage: PostInstall [<plug-in>]");
+            System.err.println("usage: jsaga-post-install [<plug-in>]");
             System.exit(1);
         }
         Map<String,PostInstall> map = new HashMap<String,PostInstall>();
