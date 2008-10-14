@@ -4,7 +4,8 @@
                 xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl"
                 xmlns:posix="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"
                 xmlns:spmd="http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd"
-                xmlns:ext="http://www.in2p3.fr/jsdl-extension">
+                xmlns:ext="http://www.in2p3.fr/jsdl-extension"
+                exclude-result-prefixes="jsdl posix spmd ext">
     <xsl:output method="xml" indent="yes"/>
 
     <!-- entry point (MUST BE RELATIVE) -->
@@ -13,10 +14,10 @@
             <activityModel>
                 <activity name="hostname#1">
                     <jsdl>
-                        <JobDefinition xmlns="http://schemas.ggf.org/jsdl/2005/06/jsdl"
+                        <old_jsdl:JobDefinition xmlns:old_jsdl="http://schemas.ggf.org/jsdl/2005/06/jsdl"
                                        xmlns:naregi="http://www.naregi.org/ws/2005/08/jsdl-naregi-draft-02">
                             <xsl:apply-templates select="jsdl:JobDescription"/>
-                        </JobDefinition>
+                        </old_jsdl:JobDefinition>
                     </jsdl>
                 </activity>
             </activityModel>
@@ -33,9 +34,15 @@
             </compositionModel>
         </definitions>
     </xsl:template>
+    <xsl:template match="jsdl:*">
+        <xsl:copy-of select="@*"/>
+        <xsl:element name="old_jsdl:{local-name()}" namespace="http://schemas.ggf.org/jsdl/2005/06/jsdl">
+            <xsl:apply-templates/>
+        </xsl:element>
+    </xsl:template>
 
     <xsl:template match="posix:POSIXApplication">
-        <posix:POSIXApplication>
+        <old_posix:POSIXApplication xmlns:old_posix="http://schemas.ggf.org/jsdl/2005/06/jsdl-posix">
             <xsl:apply-templates/>
             <!-- Executable -->
             <xsl:if test="not(posix:Executable)">
@@ -55,15 +62,21 @@
                         </xsl:choose>
                     </xsl:variable>
                     <xsl:variable name="CPUTime" select="$TotalCPUTime div $TotalCPUCount"/>
-                    <posix:WallTimeLimit>
+                    <old_posix:WallTimeLimit>
                         <xsl:value-of select="$CPUTime + 0.1*$CPUTime"/>
-                    </posix:WallTimeLimit>
+                    </old_posix:WallTimeLimit>
                 </xsl:when>
                 <xsl:otherwise>
-                    <posix:WallTimeLimit>300</posix:WallTimeLimit>
+                    <old_posix:WallTimeLimit>300</old_posix:WallTimeLimit>
                 </xsl:otherwise>
             </xsl:choose>
-        </posix:POSIXApplication>
+        </old_posix:POSIXApplication>
+    </xsl:template>
+    <xsl:template match="posix:*">
+        <xsl:copy-of select="@*"/>
+        <xsl:element name="old_posix:{local-name()}" namespace="http://schemas.ggf.org/jsdl/2005/06/jsdl-posix">
+            <xsl:apply-templates/>
+        </xsl:element>
     </xsl:template>
 
     <xsl:template match="spmd:SPMDApplication">
