@@ -16,8 +16,7 @@
  */
 package org.naregi.ss.service.client;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.*;
 import java.util.Properties;
 
 /**
@@ -72,7 +71,32 @@ public class ConfigManager {
         } catch (Exception e) {
         	prop = null;
         }
-	}
+
+        //sreynaud: enable reading configuration from JAR file
+        try
+        {
+            if (prop == null) {
+                InputStream in = ConfigManager.class.getClassLoader().getResourceAsStream(PROPFILE);
+                if (in != null) {
+                    prop = new Properties();
+                    prop.load(in);
+                    in.close();
+                }
+            }
+        } catch (IOException e) {
+            prop = null;
+        }
+    }
+
+    //sreynaud: enable modifying configuration
+    public static void setProperty(String key, String value) throws JobScheduleServiceException {
+        if (prop != null) {
+            prop.setProperty(key, value);
+        } else {
+            String msg = "Unable to read config file.";
+            throw new JobScheduleServiceException(msg);
+        }
+    }
 
     /**
      * Get property from configuration parameter 
