@@ -14,6 +14,14 @@
     </part>
     <part id="security">
         <title>Security</title>
+        <faq id="ca">
+            <question>How to name the Certificate Authority (on client side) ?</question>
+            <answer>Use the "openssl" command line interface from Linux/Cygwin distribution:
+                <pre>HASH=`openssl x509 -hash -noout -in ca.crt`
+mv ca.crt $HASH.0
+chmod 664 $HASH.0</pre>
+            </answer>
+        </faq>
         <faq id="other">
             <question>Is there some other FAQ about this plug-in ?</question>
             <answer>Yes, VOMS is based on Globus Security Infrastructure, so please also check
