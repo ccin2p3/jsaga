@@ -1,0 +1,13 @@
+<assembly>
+    <id>patch</id>
+    <baseDirectory/>
+    <formats>
+        <format>tar.gz</format>
+    </formats>
+    <fileSets>
+        <fileSet>
+            <outputDirectory/>
+            <directory>config</directory>
+        </fileSet>
+    </fileSets>
+</assembly>
