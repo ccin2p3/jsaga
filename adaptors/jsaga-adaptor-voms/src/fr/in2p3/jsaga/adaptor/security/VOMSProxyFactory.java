@@ -130,7 +130,7 @@ public class VOMSProxyFactory {
 		        }
 	        }
 	        catch (IllegalArgumentException iAE) {
-	        	throw new BadParameter("The lifetime may be too long : "+iAE.getMessage());
+	        	throw new BadParameter("The lifetime may be too long", iAE);
 	        }
         }
         return new GlobusGSSCredentialImpl(globusProxy, GSSCredential.INITIATE_AND_ACCEPT);
