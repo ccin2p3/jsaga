@@ -82,7 +82,7 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
                     }
                 } catch(AlreadyExists e) {
                     if (effectiveFlags.contains(Flags.EXCL)) {
-                        throw new AlreadyExists("Directory already exists: "+ m_url, e.getCause());
+                        throw new AlreadyExists("Entry already exists: "+ m_url, e.getCause());
                     }
                 }
             } else {
