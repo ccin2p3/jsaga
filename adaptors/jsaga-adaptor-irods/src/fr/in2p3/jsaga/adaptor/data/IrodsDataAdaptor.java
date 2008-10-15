@@ -35,6 +35,11 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
         return "irods";
     }
 
+    /** TODO: remove this method when GSI will be supported */
+    public Class[] getSupportedSecurityAdaptorClasses() {
+        return new Class[]{UserPassSecurityAdaptor.class};
+    }
+
 	public Usage getUsage() {
         return new UFile(IRODSENV);
     }
