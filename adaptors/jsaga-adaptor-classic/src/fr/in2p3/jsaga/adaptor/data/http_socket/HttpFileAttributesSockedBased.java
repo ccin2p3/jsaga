@@ -5,6 +5,8 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.helpers.EntryPath;
 import org.ogf.saga.error.NoSuccess;
 
+import java.util.Date;
+
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -30,6 +32,9 @@ public class HttpFileAttributesSockedBased extends FileAttributes {
             m_permission = PermissionBytes.NONE;
         }
 
-        m_lastModified = request.getLastModified().getTime();
+        Date lastModified = request.getLastModified();
+        if (lastModified != null) {
+            m_lastModified = lastModified.getTime();
+        }
     }
 }

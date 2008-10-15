@@ -88,12 +88,11 @@ public class Gsiftp2DataAdaptor extends GsiftpDataAdaptorAbstract {
         }
     }
 
-    /** override super.getAttributes() to use mlsd command */
+    /** override super.getAttributes() to use mlst command */
     public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         MlsxEntry entry;
         try {
-            m_client.setMode(GridFTPSession.MODE_STREAM);
-            m_client.setPassiveMode(true);
+            m_client.setPassiveMode(false);
             entry = m_client.mlst(absolutePath);
         } catch (Exception e) {
             try {
