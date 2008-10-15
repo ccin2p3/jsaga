@@ -32,11 +32,6 @@ public class HttpDataAdaptorSocketBased extends HttpDataAdaptorAbstract implemen
         }
     }
 
-    public boolean isDirectory(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        HttpRequest request = this.getRequest(absolutePath, additionalArgs, HttpRequest.TYPE_HEAD);
-        return (request.getLastModified() == null);
-    }
-
     public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         HttpRequest request = this.getRequest(absolutePath, additionalArgs, HttpRequest.TYPE_HEAD);
         return new HttpFileAttributesSockedBased(absolutePath, request);

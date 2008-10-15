@@ -40,7 +40,6 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
     public abstract String getType();
     public abstract Usage getUsage();
     public abstract Default[] getDefaults(Map attributes) throws IncorrectState;
-    public abstract boolean isDirectory(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
     public abstract FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
     public abstract FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
 

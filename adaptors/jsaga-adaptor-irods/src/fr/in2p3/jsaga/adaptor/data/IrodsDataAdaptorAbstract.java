@@ -44,13 +44,10 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor, Fil
     }
 	
 	public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
-		return true;
+        // TODO: check existence as efficiently as possible, else re-use getAttributes()
+        return true;
 	}
 
-	public boolean isDirectory(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-		return true;
-	}
-	
 	void parseValue(Map attributes) throws java.lang.Exception {
 	
 		if (securityAdaptor instanceof UserPassSecurityAdaptor) {

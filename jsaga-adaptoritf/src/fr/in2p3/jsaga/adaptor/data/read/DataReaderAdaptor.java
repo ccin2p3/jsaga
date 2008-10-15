@@ -26,16 +26,6 @@ public interface DataReaderAdaptor extends DataAdaptor {
         throws PermissionDenied, Timeout, NoSuccess;
 
     /**
-     * Tests this entry for being a directory.
-     * @param absolutePath the absolute path of the entry.
-     * @param additionalArgs adaptor specific arguments.
-     * @return true if the entry is a directory.
-     * @throws DoesNotExist if <code>absolutePath</code> does not exist.
-     */
-    public boolean isDirectory(String absolutePath, String additionalArgs)
-        throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
-
-    /**
      * Get the file attributes of the entry <code>absolutePath</code>.
      * @param absolutePath the absolute path of the entry.
      * @param additionalArgs adaptor specific arguments.

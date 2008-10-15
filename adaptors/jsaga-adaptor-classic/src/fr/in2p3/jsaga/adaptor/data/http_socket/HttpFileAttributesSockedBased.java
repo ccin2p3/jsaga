@@ -22,7 +22,8 @@ import java.util.Date;
 public class HttpFileAttributesSockedBased extends FileAttributes {
     public HttpFileAttributesSockedBased(String path, HttpRequest request) throws NoSuccess {
         m_name = new EntryPath(path).getEntryName();
-        m_type = path.endsWith("/") ? DIRECTORY_TYPE : FILE_TYPE;
+        m_type = request.getLastModified()==null ? DIRECTORY_TYPE : FILE_TYPE;
+//        m_type = path.endsWith("/") ? DIRECTORY_TYPE : FILE_TYPE;
 
         m_size = request.getContentLength();
 

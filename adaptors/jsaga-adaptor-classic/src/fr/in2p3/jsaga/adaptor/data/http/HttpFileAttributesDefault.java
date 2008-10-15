@@ -24,7 +24,8 @@ public class HttpFileAttributesDefault extends FileAttributes {
     public HttpFileAttributesDefault(URLConnection cnx) throws NoSuccess {
         String path = cnx.getURL().getPath();
         m_name = new EntryPath(path).getEntryName();
-        m_type = path.endsWith("/") ? DIRECTORY_TYPE : FILE_TYPE;
+        m_type = cnx.getLastModified()==0 ? DIRECTORY_TYPE : FILE_TYPE;
+//        m_type = path.endsWith("/") ? DIRECTORY_TYPE : FILE_TYPE;
 
         m_size = cnx.getContentLength();
 

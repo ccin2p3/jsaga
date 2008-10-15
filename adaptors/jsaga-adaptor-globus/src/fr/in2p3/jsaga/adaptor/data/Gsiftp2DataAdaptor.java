@@ -73,21 +73,6 @@ public class Gsiftp2DataAdaptor extends GsiftpDataAdaptorAbstract {
         }
     }
 
-    /** override super.isDirectory() to use mlst command */
-    public boolean isDirectory(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        try {
-            m_client.setPassiveMode(false);
-            MlsxEntry entry = m_client.mlst(absolutePath);
-            return entry.get("type").endsWith("dir");
-        } catch (Exception e) {
-            try {
-                throw rethrowException(e);
-            } catch (BadParameter badParameter) {
-                throw new NoSuccess("Unexpected exception", e);
-            }
-        }
-    }
-
     /** override super.getAttributes() to use mlst command */
     public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         MlsxEntry entry;

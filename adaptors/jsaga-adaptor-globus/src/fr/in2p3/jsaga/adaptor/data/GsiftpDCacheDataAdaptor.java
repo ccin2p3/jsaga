@@ -58,28 +58,6 @@ public class GsiftpDCacheDataAdaptor extends GsiftpDataAdaptorAbstract {
         }
     }
 
-    /** MLST command is not supported */
-    public boolean isDirectory(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        boolean isDirectory;
-        String savDir;
-        try {
-            savDir = m_client.getCurrentDir();
-        } catch (Exception e) {
-            throw new NoSuccess(e);
-        }
-        try {
-            m_client.changeDir(absolutePath);
-            isDirectory = true;
-        } catch(Exception e) {
-            isDirectory = false;
-        } finally {
-            try {
-                m_client.changeDir(savDir);
-            } catch(Exception e) {/*ignore*/}
-        }
-        return isDirectory;
-    }
-
     public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         EntryPath path = new EntryPath(absolutePath);
         String entryName = path.getEntryName();

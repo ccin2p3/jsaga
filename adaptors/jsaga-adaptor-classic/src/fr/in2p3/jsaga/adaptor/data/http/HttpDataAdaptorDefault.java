@@ -30,11 +30,6 @@ public class HttpDataAdaptorDefault extends HttpDataAdaptorAbstract implements F
         }
     }
 
-    public boolean isDirectory(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        URLConnection cnx = this.getConnection(absolutePath, additionalArgs);
-        return (cnx.getLastModified() == 0);
-    }
-
     public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         URLConnection cnx = this.getConnection(absolutePath, additionalArgs);
         return new HttpFileAttributesDefault(cnx);

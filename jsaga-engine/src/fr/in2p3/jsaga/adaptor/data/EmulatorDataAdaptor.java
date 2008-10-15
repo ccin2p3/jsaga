@@ -77,11 +77,6 @@ public class EmulatorDataAdaptor implements FileReaderStreamFactory, FileWriterS
         }
     }
 
-    public boolean isDirectory(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        EntryType entry = m_server.getEntry(absolutePath);
-        return entry instanceof DirectoryType;
-    }
-
     public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         File file = m_server.getFile(absolutePath);
         String content = file.getContent()!=null ? file.getContent() : "";

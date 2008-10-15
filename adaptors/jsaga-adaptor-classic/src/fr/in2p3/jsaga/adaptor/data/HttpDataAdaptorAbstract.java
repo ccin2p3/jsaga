@@ -2,9 +2,9 @@ package fr.in2p3.jsaga.adaptor.data;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import org.ogf.saga.error.*;
 
 import java.io.InputStream;
@@ -55,7 +55,6 @@ public abstract class HttpDataAdaptorAbstract extends HtmlDataAdaptorAbstract im
     }
 
     public abstract boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess;
-    public abstract boolean isDirectory(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
     public abstract FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
     public abstract InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess;
 }
