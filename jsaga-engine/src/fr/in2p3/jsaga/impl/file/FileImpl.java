@@ -2,8 +2,7 @@ package fr.in2p3.jsaga.impl.file;
 
 import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
-import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
-import fr.in2p3.jsaga.adaptor.data.read.FileReader;
+import fr.in2p3.jsaga.adaptor.data.read.*;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytesPhysical;
@@ -176,28 +175,21 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
     /////////////////////////////////// interface File ///////////////////////////////////
 
     public long getSize() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
-        if (m_url instanceof JSagaURL) {
-            long size = ((JSagaURL)m_url).getAttributes().getSize();
-            if (size > -1) {
-                return size;
-            }
-        }
         if (m_adaptor instanceof FileReader) {
             if (m_outStream != null) {
                 try {m_outStream.close();} catch (IOException e) {/*ignore*/}
             }
-            try {
-                return ((FileReader)m_adaptor).getSize(
-                        m_url.getPath(),
-                        m_url.getQuery());
-            } catch (DoesNotExist doesNotExist) {
-                throw new IncorrectState("File does not exist: "+ m_url, doesNotExist);
-            } catch (BadParameter badParameter) {
-                throw new IncorrectState("Entry is not a file: "+ m_url, badParameter);
-            }
-        } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
+        try {
+            FileAttributes attrs = this._getFileAttributes();
+            long size = attrs.getSize();
+            if (size > -1) {
+                return size;
+            }
+        } catch (BadParameter e) {
+            throw new NoSuccess(e);
+        }
+        throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
     }
 
     public int read(Buffer buffer, int len) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IOException {

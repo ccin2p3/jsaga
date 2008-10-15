@@ -4,6 +4,8 @@ import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionAdaptor;
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
+import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
+import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
 import org.ogf.saga.SagaObject;
@@ -81,57 +83,52 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
         }
     }
 
-    public boolean permissionsCheck(String id, int permissions) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
-        if (m_url instanceof JSagaURL) {
-            PermissionBytes perm = ((JSagaURL)m_url).getAttributes().getPermission();
+    public boolean permissionsCheck(String id, int permissions) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+        try {
+            FileAttributes attrs = this._getFileAttributes();
+            PermissionBytes perm = attrs.getPermission();
             if (perm != null) {
-                String owner = ((JSagaURL)m_url).getAttributes().getOwner();
+                String owner = attrs.getOwner();
                 boolean checkOwnerPerm = (owner!=null && owner.equals(id));
                 boolean checkAllPerm = (owner==null && (id==null || id.equals("*")));
                 if (checkOwnerPerm || checkAllPerm) {
                     return perm.containsAll(permissions);
                 }
             }
+        } catch (IncorrectState e) {
+            throw new NoSuccess(e);
         }
-        if (m_adaptor instanceof PermissionAdaptor) {
-            PermissionBytes effectivePermissions = new PermissionBytes(permissions);
-            return ((PermissionAdaptor)m_adaptor).permissionsCheck(
-                    m_url.getPath(),
-                    id,
-                    effectivePermissions);
-        } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
-        }
+        throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
     }
 
     public String getOwner() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
-        if (m_url instanceof JSagaURL) {
-            String owner = ((JSagaURL)m_url).getAttributes().getOwner();
+        try {
+            FileAttributes attrs = this._getFileAttributes();
+            String owner = attrs.getOwner();
             if (owner != null) {
                 return owner;
             }
+        } catch (IncorrectState e) {
+            throw new NoSuccess(e);
+        } catch (BadParameter e) {
+            throw new NoSuccess(e);
         }
-        if (m_adaptor instanceof PermissionAdaptor) {
-            return ((PermissionAdaptor)m_adaptor).getOwner(
-                    m_url.getPath());
-        } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
-        }
+        throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
     }
 
     public String getGroup() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
-        if (m_url instanceof JSagaURL) {
-            String group = ((JSagaURL)m_url).getAttributes().getGroup();
+        try {
+            FileAttributes attrs = this._getFileAttributes();
+            String group = attrs.getGroup();
             if (group != null) {
                 return group;
             }
+        } catch (IncorrectState e) {
+            throw new NoSuccess(e);
+        } catch (BadParameter e) {
+            throw new NoSuccess(e);
         }
-        if (m_adaptor instanceof PermissionAdaptor) {
-            return ((PermissionAdaptor)m_adaptor).getGroup(
-                    m_url.getPath());
-        } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
-        }
+        throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
     }
 
     //////////////////////////////////////////// Asynchronous ////////////////////////////////////////////
@@ -194,5 +191,27 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
         } catch (Exception e) {
             throw new NotImplemented(e);
         }
+    }
+
+    protected FileAttributes _getFileAttributes() throws NotImplemented, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+        FileAttributes attrs;
+        if (m_url instanceof JSagaURL) {
+            // get file attributes from cache
+            attrs = ((JSagaURL)m_url).getAttributes();
+        } else if (m_adaptor instanceof DataReaderAdaptor) {
+            // query file attributes
+            try {
+                attrs = ((DataReaderAdaptor)m_adaptor).getAttributes(
+                        m_url.getPath(),
+                        m_url.getQuery());
+            } catch (DoesNotExist doesNotExist) {
+                throw new IncorrectState("Entry does not exist: "+m_url, doesNotExist);
+            }
+            // set file attributes to cache
+            m_url = new JSagaURL(attrs, m_url.getPath());
+        } else {
+            throw new NotImplemented("Not supported for this protocol: "+m_url.getScheme(), this);
+        }
+        return attrs;
     }
 }

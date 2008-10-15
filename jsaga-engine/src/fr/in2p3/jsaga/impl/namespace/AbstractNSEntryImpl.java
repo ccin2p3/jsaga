@@ -135,41 +135,17 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
     }
 
     public boolean isDir() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        if (m_url instanceof JSagaURL) {
-            return ((JSagaURL)m_url).getAttributes().getType() == FileAttributes.DIRECTORY_TYPE;
-        } else if (m_adaptor instanceof DataReaderAdaptor) {
-            try {
-                return ((DataReaderAdaptor)m_adaptor).isDirectory(
-                        m_url.getPath(),
-                        m_url.getQuery());
-            } catch (DoesNotExist doesNotExist) {
-                throw new IncorrectState("Entry does not exist: "+ m_url, doesNotExist);
-            }
-        } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
-        }
+        FileAttributes attrs = this._getFileAttributes();
+        return (attrs.getType() == FileAttributes.DIRECTORY_TYPE);
     }
 
     public boolean isEntry() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        if (m_url instanceof JSagaURL) {
-            return ((JSagaURL)m_url).getAttributes().getType() == FileAttributes.FILE_TYPE;
-        } else if (m_adaptor instanceof DataReaderAdaptor) {
-            try {
-                return ((DataReaderAdaptor)m_adaptor).isEntry(
-                        m_url.getPath(),
-                        m_url.getQuery());
-            } catch (DoesNotExist doesNotExist) {
-                throw new IncorrectState("Entry does not exist: "+ m_url, doesNotExist);
-            }
-        } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
-        }
+        FileAttributes attrs = this._getFileAttributes();
+        return (attrs.getType() == FileAttributes.FILE_TYPE);
     }
 
     public boolean isLink() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        if (m_url instanceof JSagaURL) {
-            return ((JSagaURL)m_url).getAttributes().getType() == FileAttributes.LINK_TYPE;
-        } else if (m_adaptor instanceof LinkAdaptor) {
+        if (m_adaptor instanceof LinkAdaptor) {
             try {
                 return ((LinkAdaptor)m_adaptor).isLink(
                         m_url.getPath());
@@ -177,7 +153,8 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
                 throw new IncorrectState("Link does not exist: "+ m_url, doesNotExist);
             }
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
+            FileAttributes attrs = this._getFileAttributes();
+            return (attrs.getType() == FileAttributes.LINK_TYPE);
         }
     }
 
@@ -385,23 +362,15 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
 
     /** deviation from SAGA specification */
     public Date getLastModified() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
-        FileAttributes attrs = null;
-        if (m_url instanceof JSagaURL) {
-            attrs = ((JSagaURL)m_url).getAttributes();
-        } else if (m_adaptor instanceof DataReaderAdaptor) {
-            try {
-                attrs = ((DataReaderAdaptor)m_adaptor).getAttributes(
-                        m_url.getPath(),
-                        m_url.getQuery());
-            } catch (DoesNotExist doesNotExist) {
-                throw new IncorrectState("Entry does not exist: "+m_url, doesNotExist);
+        try {
+            FileAttributes attrs = this._getFileAttributes();
+            if (attrs!=null && attrs.getLastModified()>0) {
+                return new Date(attrs.getLastModified());
             }
+        } catch (BadParameter e) {
+            throw new NoSuccess(e);
         }
-        if (attrs!=null && attrs.getLastModified()>0) {
-            return new Date(attrs.getLastModified());
-        } else {
-            throw new NotImplemented("Not supported for this protocol: "+m_url.getScheme());
-        }
+        throw new NotImplemented("Not supported for this protocol: "+m_url.getScheme(), this);
     }
 
     /** deviation from SAGA specification */
@@ -416,7 +385,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
                 throw new IncorrectState("Entry does not exist: "+m_url, doesNotExist);
             }
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+m_url.getScheme());
+            throw new NotImplemented("Not supported for this protocol: "+m_url.getScheme(), this);
         }
     }
 
