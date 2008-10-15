@@ -56,7 +56,6 @@ public abstract class HttpDataAdaptorAbstract extends HtmlDataAdaptorAbstract im
 
     public abstract boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess;
     public abstract boolean isDirectory(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
-    public abstract long getSize(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess;
     public abstract FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
     public abstract InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess;
 }

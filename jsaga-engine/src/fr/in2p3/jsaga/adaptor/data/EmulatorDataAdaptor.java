@@ -87,11 +87,6 @@ public class EmulatorDataAdaptor implements FileReaderStreamFactory, FileWriterS
         return entry instanceof FileType;
     }
 
-    public long getSize(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-        File file = m_server.getFile(absolutePath);
-        return file.getContent().length();
-    }
-
     public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         File file = m_server.getFile(absolutePath);
         String content = file.getContent()!=null ? file.getContent() : "";

@@ -103,10 +103,6 @@ public class ZipDataAdaptor implements FileReaderStreamFactory{//, FileWriterPut
         return !this.isDirectory(absolutePath, additionalArgs);
     }
 
-    public long getSize(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-        return this.getEntry(absolutePath).getSize();
-    }
-
     public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         try {
             return m_zipReader.getInputStream(this.getEntry(absolutePath));

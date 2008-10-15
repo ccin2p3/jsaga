@@ -35,11 +35,6 @@ public class HttpDataAdaptorDefault extends HttpDataAdaptorAbstract implements F
         return (cnx.getLastModified() == 0);
     }
 
-    public long getSize(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-        URLConnection cnx = this.getConnection(absolutePath, additionalArgs);
-        return cnx.getContentLength();
-    }
-
     public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         URLConnection cnx = this.getConnection(absolutePath, additionalArgs);
         return new HttpFileAttributesDefault(cnx);

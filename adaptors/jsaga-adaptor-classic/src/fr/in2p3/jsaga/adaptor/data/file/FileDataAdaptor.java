@@ -80,10 +80,6 @@ public class FileDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         return newEntry(absolutePath).isFile();
     }
 
-    public long getSize(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-        return newFile(absolutePath).length();
-    }
-
     public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         try {
             File file = newFile(absolutePath);

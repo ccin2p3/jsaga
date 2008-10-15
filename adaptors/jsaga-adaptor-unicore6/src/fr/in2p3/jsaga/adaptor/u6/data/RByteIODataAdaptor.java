@@ -208,44 +208,6 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
         return !isDirectory(absolutePath, additionalArgs);
     }
     
-    public long getSize(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-    	
-    	//prepare path and connection
-		absolutePath = getEntryPath(absolutePath);
-		
-		// get parent
-		String parentDirectory = rootDirectory;               
-		if(absolutePath.lastIndexOf(m_serverFileSeparator) > 0) {
-		    parentDirectory = absolutePath.substring(0,absolutePath.lastIndexOf(m_serverFileSeparator));
-		 }
-		
-		try {		
-	        // check
-	        List<com.intel.gpe.clients.api.GridFile> directoryList = m_client.listDirectory(parentDirectory);
-	        for (com.intel.gpe.clients.api.GridFile file : directoryList) {
-	            if(file.getPath().endsWith(absolutePath)) {
-	            	return file.getSize();
-	            }
-	        }
-	        // to be catch by Throwable
-	        throw new Exception("To be catched");
-		} catch (GPESecurityException e) {
-			throw new PermissionDenied("Unable to get size",e);
-        } catch (Throwable e) {
-        	// check source
-    		if(!exists(absolutePath, additionalArgs)) {
-    			throw new DoesNotExist("The file does not exist.");
-    		}
-    		
-    		// check source
-    		if(!isEntry(absolutePath, additionalArgs)) {
-    			throw new BadParameter("The entry is not a file.");
-    		}
-    	
-    		throw new NoSuccess("Unable to get size",e);
-        }
-    }
-
     public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
     	//prepare path
 		String absolutePath = getEntryPath(parentAbsolutePath + fileName);    	

@@ -120,14 +120,6 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
         return !isDirectory(absolutePath, additionalArgs);
     }
 
-    public long getSize(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-        try {
-            return m_client.getSize(absolutePath);
-        } catch (Exception e) {
-            throw rethrowException(e);
-        }
-    }
-
     public void getToStream(String absolutePath, String additionalArgs, OutputStream stream) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         final boolean autoFlush = false;
         final boolean ignoreOffset = true;

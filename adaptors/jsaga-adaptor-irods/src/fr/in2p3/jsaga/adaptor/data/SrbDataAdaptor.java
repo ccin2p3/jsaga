@@ -88,10 +88,6 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
         }
     }
 
-	public long getSize(String absolute, String absolutePath) {
-		return -1;
-	}
-
     public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         throw new NoSuccess("Not implemented yet");
     }

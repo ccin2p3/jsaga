@@ -75,38 +75,6 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 		}
 	}
 
-	public long getSize(String absolutePath, String additionalArgs)
-			throws PermissionDenied, BadParameter, DoesNotExist, Timeout,
-			NoSuccess {
-		try {
-			Vector<LsEntry> vv = channelSftp.ls(absolutePath);
-			if (vv != null) {
-				for (int ii = 0; ii < vv.size(); ii++) {
-					Object obj = vv.elementAt(ii);
-					if (obj instanceof com.jcraft.jsch.ChannelSftp.LsEntry) {
-						if (absolutePath
-								.endsWith(((LsEntry) obj).getFilename())) {
-							return ((LsEntry) obj).getAttrs().getSize();
-						}
-					}
-				}
-			}
-			return -1;
-		} catch (SftpException e) {
-			if (e.getid() == ChannelSftp.SSH_FX_NO_SUCH_FILE)
-				throw new DoesNotExist(e);
-			if (e.getid() == ChannelSftp.SSH_FX_PERMISSION_DENIED)
-				throw new PermissionDenied(e);
-
-			// check source
-			if (!isEntry(absolutePath, additionalArgs)) {
-				throw new BadParameter("The entry is not a file.");
-			}
-
-			throw new NoSuccess(e);
-		}
-	}
-
 	public boolean exists(String absolutePath, String additionalArgs)
 			throws PermissionDenied, Timeout, NoSuccess {
 		try {

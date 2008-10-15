@@ -160,19 +160,6 @@ public class CacheDataAdaptor implements FileReaderStreamFactory, FileWriter {
         catch (Exception e) {throw new NoSuccess(e);}
     }
 
-    public long getSize(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-        URL remoteURL = getURL(absolutePath, additionalArgs);
-        try {
-            return m_connection.openFile(remoteURL).getSize();
-        }
-        catch (PermissionDenied e) {throw e;}
-        catch (BadParameter e) {throw e;}
-        catch (DoesNotExist e) {throw e;}
-        catch (Timeout e) {throw e;}
-        catch (NoSuccess e) {throw e;}
-        catch (Exception e) {throw new NoSuccess(e);}
-    }
-
     public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         URL remoteURL = getURL(absolutePath, additionalArgs);
         URL cacheURL = this.getCacheURL(absolutePath, additionalArgs);

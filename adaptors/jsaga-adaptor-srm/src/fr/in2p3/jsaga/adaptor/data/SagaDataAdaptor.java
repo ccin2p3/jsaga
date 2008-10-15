@@ -138,25 +138,6 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         }
     }
 
-    public long getSize(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-        NSEntry entry = this.getEntry(absolutePath);
-        if (entry instanceof File) {
-            try {
-                return ((File) entry).getSize();
-            } catch (NotImplemented e) {
-                throw new NoSuccess(e);
-            } catch (AuthenticationFailed e) {
-                throw new NoSuccess(e);
-            } catch (AuthorizationFailed e) {
-                throw new NoSuccess(e);
-            } catch (IncorrectState e) {
-                throw new NoSuccess(e);
-            }
-        } else {
-            throw new NoSuccess("Tranfer URL is not a file");
-        }
-    }
-
     public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         NSEntry entry = this.getEntry(absolutePath);
         if (entry instanceof File) {

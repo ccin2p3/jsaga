@@ -44,10 +44,6 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
         return null;
     }
 	
-	public long getSize(String absolute, String absolutePath) {
-		return -1;
-	}
-	
     public Default[] getDefaults(Map attributes) throws IncorrectState {
 		EnvironmentVariables env = EnvironmentVariables.getInstance();
         return new Default[]{
