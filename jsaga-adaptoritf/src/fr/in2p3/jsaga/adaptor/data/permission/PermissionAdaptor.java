@@ -37,34 +37,4 @@ public interface PermissionAdaptor extends DataAdaptor {
      */
     public void permissionsDeny(String absolutePath, String id, PermissionBytes permissions)
             throws PermissionDenied, Timeout, NoSuccess;
-
-    /**
-     * Determines if the specified permissions are enabled for the
-     * specified id.
-     * An id of "*" queries the permissions for all.
-     * Unsupported permission types are considered as always enabled.
-     * @param absolutePath the absolute path of the entry.
-     * @param id the id.
-     * @param permissions the permissions to query.
-     * @return <code>true</code> if the specified permissions are enabled
-     *     for the specified id.
-     */
-    public boolean permissionsCheck(String absolutePath, String id, PermissionBytes permissions)
-            throws PermissionDenied, Timeout, NoSuccess;
-
-    /**
-     * Gets the owner id of the entity.
-     * @param absolutePath the absolute path of the entry.
-     * @return the id of the owner.
-     */
-    public String getOwner(String absolutePath)
-            throws PermissionDenied, Timeout, NoSuccess;
-
-    /**
-     * Gets the group id of the entity.
-     * @param absolutePath the absolute path of the entry.
-     * @return the id of the group.
-     */
-    public String getGroup(String absolutePath)
-            throws PermissionDenied, Timeout, NoSuccess;
 }
