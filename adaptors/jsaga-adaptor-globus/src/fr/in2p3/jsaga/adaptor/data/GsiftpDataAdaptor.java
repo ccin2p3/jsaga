@@ -109,10 +109,6 @@ public class GsiftpDataAdaptor implements FileReaderGetter, FileWriterPutter, Da
         return m_adaptor.isDirectory(absolutePath, additionalArgs);
     }
 
-    public boolean isEntry(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        return m_adaptor.isEntry(absolutePath, additionalArgs);
-    }
-
     public void getToStream(String absolutePath, String additionalArgs, OutputStream stream) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         m_adaptor.getToStream(absolutePath, additionalArgs, stream);
     }

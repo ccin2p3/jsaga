@@ -42,10 +42,6 @@ public abstract class HtmlDataAdaptorAbstract implements FileReaderStreamFactory
         m_baseUrl = null;
     }
 
-    public boolean isEntry(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        return !this.isDirectory(absolutePath, additionalArgs);
-    }
-
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         try {
             // get web page

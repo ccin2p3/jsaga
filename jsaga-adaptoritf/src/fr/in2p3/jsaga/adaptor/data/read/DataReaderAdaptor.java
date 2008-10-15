@@ -36,18 +36,6 @@ public interface DataReaderAdaptor extends DataAdaptor {
         throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
 
     /**
-     * Tests this entry for being a namespace entry. If this entry represents
-     * a link or a directory, this method returns <code>false</code>, although
-     * strictly speaking, directories and links are namespace entries as well.
-     * @param absolutePath the absolute path of the entry.
-     * @param additionalArgs adaptor specific arguments.
-     * @return true if the entry is a namespace entry.
-     * @throws DoesNotExist if <code>absolutePath</code> does not exist.
-     */
-    public boolean isEntry(String absolutePath, String additionalArgs)
-        throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
-
-    /**
      * Get the file attributes of the entry <code>absolutePath</code>.
      * @param absolutePath the absolute path of the entry.
      * @param additionalArgs adaptor specific arguments.

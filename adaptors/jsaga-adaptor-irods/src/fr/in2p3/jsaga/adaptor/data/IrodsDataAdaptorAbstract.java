@@ -51,10 +51,6 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor, Fil
 		return true;
 	}
 	
-	public boolean isEntry(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-		return true;
-	}
-	
 	void parseValue(Map attributes) throws java.lang.Exception {
 	
 		if (securityAdaptor instanceof UserPassSecurityAdaptor) {

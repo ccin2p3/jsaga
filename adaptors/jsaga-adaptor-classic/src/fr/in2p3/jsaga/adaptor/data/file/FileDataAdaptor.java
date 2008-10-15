@@ -76,10 +76,6 @@ public class FileDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         return newEntry(absolutePath).isDirectory();
     }
 
-    public boolean isEntry(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        return newEntry(absolutePath).isFile();
-    }
-
     public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         try {
             File file = newFile(absolutePath);

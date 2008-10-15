@@ -119,11 +119,6 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 
 	}
 
-	public boolean isEntry(String absolutePath, String additionalArgs)
-			throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-		return !isDirectory(absolutePath, additionalArgs);
-	}
-
     public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         try {
             String filename = new EntryPath(absolutePath).getEntryName();

@@ -116,10 +116,6 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
         }
     }
 
-    public boolean isEntry(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        return !isDirectory(absolutePath, additionalArgs);
-    }
-
     public void getToStream(String absolutePath, String additionalArgs, OutputStream stream) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         final boolean autoFlush = false;
         final boolean ignoreOffset = true;

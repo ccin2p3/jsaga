@@ -110,11 +110,6 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         return metadata.getType().equals(TFileType.DIRECTORY);
     }
 
-    public boolean isEntry(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        TMetaDataPathDetail metadata = this.getMetaData(absolutePath);
-        return metadata.getType().equals(TFileType.FILE);
-    }
-
     public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
         org.apache.axis.types.URI logicalUri = this.toSrmURI(absolutePath);
         SrmPrepareToGetRequest request = new SrmPrepareToGetRequest();

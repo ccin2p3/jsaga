@@ -78,11 +78,6 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
         return entry instanceof DirectoryType;
     }
 
-    public boolean isEntry(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        EntryType entry = m_catalog.getEntry(absolutePath);
-        return entry instanceof FileType;
-    }
-
     public void addLocation(String logicalEntry, URL replicaEntry, String additionalArgs) throws PermissionDenied, IncorrectState, Timeout, NoSuccess {
         // get or create logical entry
         File file;

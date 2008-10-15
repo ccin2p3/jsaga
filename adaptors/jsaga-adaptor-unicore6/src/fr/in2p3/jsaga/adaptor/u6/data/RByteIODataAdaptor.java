@@ -204,10 +204,6 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
 		}
     }
 
-    public boolean isEntry(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        return !isDirectory(absolutePath, additionalArgs);
-    }
-    
     public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
     	//prepare path
 		String absolutePath = getEntryPath(parentAbsolutePath + fileName);    	
