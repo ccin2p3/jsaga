@@ -28,7 +28,10 @@ public class NamespaceCopy extends AbstractCommand {
     private static final String OPT_HELP = "h", LONGOPT_HELP = "help";
     private static final String OPT_NOT_OVERWRITE = "i", LONGOPT_NOT_OVERWRITE = "interactive";
     private static final String OPT_RECURSIVE = "r", LONGOPT_RECURSIVE = "recursive";
+    private static final String OPT_PRESERVE_TIMES = "p", LONGOPT_PRESERVE_TIMES = "preserve";
     private static final String OPT_MONITOR = "m", LONGOPT_MONITOR = "monitor";
+
+    private static final int FLAGS_PRESERVETIMES = 8192;
 
     public NamespaceCopy() {
         super("jsaga-cp", new String[]{"Source URL", "Target URL"}, new String[]{OPT_HELP, LONGOPT_HELP});
@@ -48,8 +51,9 @@ public class NamespaceCopy extends AbstractCommand {
             // get arguments
             URL source = URLFactory.create(command.m_nonOptionValues[0]);
             URL target = URLFactory.create(command.m_nonOptionValues[1]);
-            int flags =(line.hasOption(OPT_NOT_OVERWRITE) ? Flags.NONE : Flags.OVERWRITE)
-                    .or(line.hasOption(OPT_RECURSIVE) ? Flags.RECURSIVE : Flags.NONE);
+            int flags = (line.hasOption(OPT_NOT_OVERWRITE) ? Flags.NONE : Flags.OVERWRITE)
+                    .or((line.hasOption(OPT_RECURSIVE) ? Flags.RECURSIVE : Flags.NONE)
+                    .or((line.hasOption(OPT_PRESERVE_TIMES) ? FLAGS_PRESERVETIMES : Flags.NONE.getValue())));
 
             // execute command
             Session session = SessionFactory.createSession(true);
@@ -112,6 +116,10 @@ public class NamespaceCopy extends AbstractCommand {
                 .isRequired(false)
                 .withLongOpt(LONGOPT_RECURSIVE)
                 .create(OPT_RECURSIVE));
+        opt.addOption(OptionBuilder.withDescription("Preserve times")
+                .isRequired(false)
+                .withLongOpt(LONGOPT_PRESERVE_TIMES)
+                .create(OPT_PRESERVE_TIMES));
         opt.addOption(OptionBuilder.withDescription("Monitor transfer")
                 .isRequired(false)
                 .withLongOpt(LONGOPT_MONITOR)

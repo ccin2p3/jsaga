@@ -17,8 +17,7 @@ import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -95,8 +94,20 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
         }
         effectiveFlags.checkAllowed(Flags.DEREFERENCE.or(Flags.CREATEPARENTS.or(Flags.OVERWRITE)));
         URL effectiveTarget = this._getEffectiveURL(target);
-        new LogicalFileCopy(m_session, this, m_adaptor).copy(effectiveTarget, effectiveFlags);
-        super._preserveTimes(effectiveTarget);
+        if (JSAGAFlags.PRESERVETIMES.isSet(flags)) {
+            // throw NotImplemented if can not preserve times
+            Date sourceTimes = this.getLastModified();
+            AbstractNSEntryImpl targetEntry = super._getTargetEntry_checkPreserveTimes(effectiveTarget);
+
+            // copy
+            new LogicalFileCopy(m_session, this, m_adaptor).copy(effectiveTarget, effectiveFlags);
+
+            // preserve times
+            targetEntry.setLastModified(sourceTimes);
+        } else {
+            // copy only
+            new LogicalFileCopy(m_session, this, m_adaptor).copy(effectiveTarget, effectiveFlags);
+        }
     }
 
     public void copyFrom(URL source, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
@@ -107,8 +118,19 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
         }
         effectiveFlags.checkAllowed(Flags.DEREFERENCE.or(Flags.OVERWRITE));
         URL effectiveSource = this._getEffectiveURL(source);
-        new LogicalFileCopyFrom(m_session, this, m_adaptor).copyFrom(effectiveSource, effectiveFlags);
-        super._preserveTimesFrom(effectiveSource);
+        if (JSAGAFlags.PRESERVETIMES.isSet(flags)) {
+            // throw NotImplemented if can not preserve times
+            Date sourceTimes = super._getSourceTimes_checkPreserveTimes(effectiveSource);
+
+            // copy
+            new LogicalFileCopyFrom(m_session, this, m_adaptor).copyFrom(effectiveSource, effectiveFlags);
+
+            // preserve times
+            this.setLastModified(sourceTimes);
+        } else {
+            // copy only
+            new LogicalFileCopyFrom(m_session, this, m_adaptor).copyFrom(effectiveSource, effectiveFlags);
+        }
     }
 
     /////////////////////////////// class AbstractNSEntryImpl ///////////////////////////////

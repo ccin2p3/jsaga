@@ -18,6 +18,7 @@ import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 /* ***************************************************
@@ -138,8 +139,20 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         if (m_outStream != null) {
             try {m_outStream.close();} catch (IOException e) {/*ignore*/}
         }
-        new FileCopy(m_session, this, m_adaptor).copy(effectiveTarget, effectiveFlags);
-        super._preserveTimes(effectiveTarget);
+        if (JSAGAFlags.PRESERVETIMES.isSet(flags)) {
+            // throw NotImplemented if can not preserve times
+            Date sourceTimes = this.getLastModified();
+            AbstractNSEntryImpl targetEntry = super._getTargetEntry_checkPreserveTimes(effectiveTarget);
+
+            // copy
+            new FileCopy(m_session, this, m_adaptor).copy(effectiveTarget, effectiveFlags);
+
+            // preserve times
+            targetEntry.setLastModified(sourceTimes);
+        } else {
+            // copy only
+            new FileCopy(m_session, this, m_adaptor).copy(effectiveTarget, effectiveFlags);
+        }
     }
 
     /** implements super.copyFrom() */
@@ -154,8 +167,19 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         if (m_inStream != null) {
             try {m_inStream.close();} catch (IOException e) {/*ignore*/}
         }
-        new FileCopyFrom(m_session, this, m_adaptor).copyFrom(effectiveSource, effectiveFlags);
-        super._preserveTimesFrom(effectiveSource);
+        if (JSAGAFlags.PRESERVETIMES.isSet(flags)) {
+            // throw NotImplemented if can not preserve times
+            Date sourceTimes = super._getSourceTimes_checkPreserveTimes(effectiveSource);
+
+            // copy
+            new FileCopyFrom(m_session, this, m_adaptor).copyFrom(effectiveSource, effectiveFlags);
+
+            // preserve times
+            this.setLastModified(sourceTimes);
+        } else {
+            // copy only
+            new FileCopyFrom(m_session, this, m_adaptor).copyFrom(effectiveSource, effectiveFlags);
+        }
     }
 
     ////////////////////////////// class AbstractNSEntryImpl //////////////////////////////

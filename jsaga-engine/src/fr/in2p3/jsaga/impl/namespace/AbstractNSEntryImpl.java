@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.impl.namespace;
 
-import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.link.LinkAdaptor;
@@ -442,51 +441,29 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
         }
     }
 
-    protected void _preserveTimes(URL target) throws IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
-        if (EngineProperties.getBoolean(EngineProperties.DATA_COPY_PRESERVE_TIMES)) {
-            Date lastModified;
-            try {
-                lastModified = this.getLastModified();
-            } catch(NotImplemented e) {
-                return; //======> EXIT
-            }
-            AbstractNSEntryImpl targetEntry;
-            try {
-                targetEntry = (AbstractNSEntryImpl) NSFactory.createNSEntry(m_session, target);
-            } catch (DoesNotExist e) {
-                throw new NoSuccess("Copy failed", e);
-            } catch (NotImplemented e) {
-                throw new NoSuccess("Unexpected exception", e);
-            }
-            try {
-                targetEntry.setLastModified(lastModified);
-            } catch(NotImplemented e) {
-                // ignore
-            }
+    protected AbstractNSEntryImpl _getTargetEntry_checkPreserveTimes(URL target) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
+        AbstractNSEntryImpl targetEntry;
+        try {
+            targetEntry = (AbstractNSEntryImpl) NSFactory.createNSEntry(m_session, target, JSAGAFlags.BYPASSEXIST.getValue());
+        } catch (DoesNotExist e) {
+            throw new NoSuccess("Unexpected exception", e);
         }
+        if (! (targetEntry.m_adaptor instanceof DataWriterTimes) ) {
+            throw new NotImplemented("Flag PRESERVETIMES ("+JSAGAFlags.PRESERVETIMES+") not supported for protocol: "+target.getScheme());
+        }
+        return targetEntry;
     }
 
-    protected void _preserveTimesFrom(URL source) throws IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
-        if (EngineProperties.getBoolean(EngineProperties.DATA_COPY_PRESERVE_TIMES)) {
-            AbstractNSEntryImpl sourceEntry;
-            try {
-                sourceEntry = (AbstractNSEntryImpl) NSFactory.createNSEntry(m_session, source);
-            } catch(AlreadyExists e) {
-                throw new NoSuccess("Unexpected exception", e);
-            } catch (NotImplemented e) {
-                throw new NoSuccess("Unexpected exception", e);
-            }
-            Date lastModified;
-            try {
-                lastModified = sourceEntry.getLastModified();
-            } catch(NotImplemented e) {
-                return; //======> EXIT
-            }
-            try {
-                this.setLastModified(lastModified);
-            } catch(NotImplemented e) {
-                // ignore
-            }
+    protected Date _getSourceTimes_checkPreserveTimes(URL source) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+        if (! (m_adaptor instanceof DataWriterTimes) ) {
+            throw new NotImplemented("Flag PRESERVETIMES ("+JSAGAFlags.PRESERVETIMES+") not supported for protocol: "+m_url.getScheme());
         }
+        AbstractNSEntryImpl sourceEntry;
+        try {
+            sourceEntry = (AbstractNSEntryImpl) NSFactory.createNSEntry(m_session, source);
+        } catch(AlreadyExists e) {
+            throw new NoSuccess("Unexpected exception", e);
+        }
+        return sourceEntry.getLastModified();
     }
 }

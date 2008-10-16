@@ -13,7 +13,8 @@ package fr.in2p3.jsaga.impl.namespace;
  *
  */
 public enum JSAGAFlags {
-    BYPASSEXIST(4096);
+    BYPASSEXIST(4096),
+    PRESERVETIMES(8192);
 
     private int value;
 
