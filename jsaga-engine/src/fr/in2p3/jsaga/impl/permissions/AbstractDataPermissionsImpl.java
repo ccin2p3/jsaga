@@ -208,7 +208,7 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
                 throw new IncorrectState("Entry does not exist: "+m_url, doesNotExist);
             }
             // set file attributes to cache
-            m_url = new JSagaURL(attrs, m_url.getPath());
+            m_url = new JSagaURL(attrs, m_url.toString());
         } else {
             throw new NotImplemented("Not supported for this protocol: "+m_url.getScheme(), this);
         }
