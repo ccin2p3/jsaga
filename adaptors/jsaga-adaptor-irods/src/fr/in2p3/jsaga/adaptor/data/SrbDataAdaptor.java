@@ -4,12 +4,9 @@ import edu.sdsc.grid.io.*;
 import edu.sdsc.grid.io.srb.*;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
-import fr.in2p3.jsaga.adaptor.base.usage.UFile;
-import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
 import org.ogf.saga.error.*;
 
 import java.io.*;
@@ -29,14 +26,20 @@ import java.util.Map;
  *
  */
 public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
-	private static final String MDASENV ="MdasEnv";
+    private static final String MDASENV ="MdasEnv";
+    private static final String USE_TRASH = "UseTrash";
+
+    private boolean m_useTrash;
 
     public String getType() {
         return "srb";
     }
 
     public Usage getUsage() {
-         return new UFile(MDASENV);
+        return new UAnd(new Usage[]{
+                new UFile(MDASENV),
+                new UOptional(USE_TRASH)
+        });
     }
 
 	public BaseURL getBaseURL() throws IncorrectURL {
@@ -48,23 +51,32 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
     public Default[] getDefaults(Map attributes) throws IncorrectState {
         EnvironmentVariables env = EnvironmentVariables.getInstance();
 		return new Default[]{
-			new Default(MDASENV, new File[]{
-			new File(env.getProperty("srbEnvFile")+""),
-			new File(System.getProperty("user.home")+"/.srb/.MdasEnv")}),
-		};
+                new Default(MDASENV, new File[]{
+                        new File(env.getProperty("srbEnvFile")+""),
+                        new File(System.getProperty("user.home")+"/.srb/.MdasEnv")}),
+                new Default(USE_TRASH, "false")
+        };
     }
 
 	// syntax: srb:// [username.mdasdomain [.zone] [:password] @] [host] [:port] /path
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
-		try {
-			parseValue(attributes);
+        // configuration attributes
+        m_useTrash = "true".equalsIgnoreCase((String) attributes.get(USE_TRASH));
+
+        // URL attributes
+        parseValue(attributes);
+        if (defaultStorageResource == null) {
+            throw new BadParameter("The default storage resource cannot be null");
+        }
+
+        try {
 			// connect to server
 			SRBAccount account = null;
 			
 			if (securityAdaptor instanceof GSSCredentialSecurityAdaptor) { 
 				cert = ((GSSCredentialSecurityAdaptor)securityAdaptor).getGSSCredential();
-				account = new SRBAccount(host, port, cert);
-			} else {
+				account = new SRBAccount(host, port, cert, basePath, defaultStorageResource, SRBAccount.GSI_AUTH);
+            } else {
 				if (host == null) {
 					account = new SRBAccount();
 				} else {
@@ -75,8 +87,6 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 			fileSystem = FileFactory.newFileSystem(account);
 		} catch (IOException ioe) {
 			throw new AuthenticationFailed(ioe);
-		} catch (java.lang.Exception e) {
-			throw new NoSuccess(e);
         }
     }
 
@@ -209,11 +219,11 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 
 	public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
 		SRBFile srbFile = new SRBFile((SRBFileSystem)fileSystem, parentAbsolutePath +SEPARATOR + directoryName);
-		srbFile.delete();
+		srbFile.delete(! m_useTrash);
 	}
 
 	public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
 		SRBFile srbFile = new SRBFile((SRBFileSystem)fileSystem, parentAbsolutePath +SEPARATOR + fileName);
-		srbFile.delete();
+		srbFile.delete(! m_useTrash);
 	}
 }

@@ -7,7 +7,6 @@ import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
 import fr.in2p3.jsaga.adaptor.base.usage.UFile;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
 import org.ogf.saga.error.*;
@@ -59,8 +58,13 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+        // URL attributes
+        parseValue(attributes);
+        if (defaultStorageResource == null) {
+            throw new BadParameter("The default storage resource cannot be null");
+        }
+
 		try {
-			parseValue(attributes);
 			IRODSAccount account = null;
 			
 			if (securityAdaptor instanceof GSSCredentialSecurityAdaptor) { 
@@ -78,9 +82,7 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 			fileSystem = FileFactory.newFileSystem(account);
 		} catch (IOException ioe) {
 			throw new AuthenticationFailed(ioe);
-		} catch (java.lang.Exception e) {
-			throw new NoSuccess(e);
-        }    
+        }
 	}
 
     public void disconnect() throws NoSuccess {

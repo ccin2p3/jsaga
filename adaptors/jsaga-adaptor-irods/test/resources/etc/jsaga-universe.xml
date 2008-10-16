@@ -2,6 +2,8 @@
 <UNIVERSE name="World" xmlns="http://www.in2p3.fr/jsaga">
     <GRID name="IRODS_SRB" contextType="Globus">
         <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/irods_srb_cred.txt"/>
-        <data type="srb" base="srb://ccsrb02.in2p3.fr:5591/?defaultResource=MammoDisk&amp;domain=ccin2p3"/>
+        <data type="srb" base="srb://ccsrb02.in2p3.fr:5591/?defaultResource=MammoDisk&amp;domain=ccin2p3">
+            <attribute name="UseTrash" value="false"/>
+        </data>
     </GRID>
 </UNIVERSE>

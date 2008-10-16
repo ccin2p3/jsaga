@@ -11,6 +11,7 @@ import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.*;
 
 import java.util.*;
+import java.lang.Exception;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -31,7 +32,7 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor, Fil
 	protected final static String DIR = "dir";
 	protected final static String DOT =  "\\.";
 	protected final static String DEFAULTRESOURCE	= "defaultresource", DOMAIN="domain", ZONE="zone";
-	protected String userName, passWord, mdasDomainName, mcatZone="", defaultStorageResource="";
+	protected String userName, passWord, mdasDomainName, mcatZone, defaultStorageResource;
 	protected SecurityAdaptor securityAdaptor;
 	protected GSSCredential cert;
 
@@ -48,41 +49,20 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor, Fil
         return true;
 	}
 
-	void parseValue(Map attributes) throws java.lang.Exception {
+	void parseValue(Map attributes) throws NoSuccess {
 	
 		if (securityAdaptor instanceof UserPassSecurityAdaptor) {
-			userName = securityAdaptor.getUserID();
-			passWord = ((UserPassSecurityAdaptor)securityAdaptor).getUserPass();
+            try {
+                userName = securityAdaptor.getUserID();
+            } catch (Exception e) {
+                throw new NoSuccess(e);
+            }
+            passWord = ((UserPassSecurityAdaptor)securityAdaptor).getUserPass();
 		} else if (securityAdaptor instanceof GSSCredentialSecurityAdaptor) {
 			userName = null;
-		}
+            passWord = null;
+        }
 		
-		// Parsing de username to extract domain and zone
-		/* WARNING: THIS DOES NOT WORK WITH DOMAINS WHICH CONTAINS DOTS
-		if (userName != null)  {
-			String[] userNameAttribute = userName.split(DOT);
-			if (this instanceof SrbDataAdaptor) {
-				for (int i=0;i<userNameAttribute.length;i++){
-					if (i==0) {
-						userName = userNameAttribute[i];
-					} else if (i==1) {
-						mdasDomainName = userNameAttribute[i];
-					} else if (i==2) {
-						mcatZone = userNameAttribute[i];
-					}
-				}
-			} else {
-				for (int i=0;i<userNameAttribute.length;i++){
-					if (i==0) {
-						userName = userNameAttribute[i];
-					} else if (i==1) {
-						mcatZone = userNameAttribute[i];
-					}
-				}
-			}
-		}
-		*/
-
 		// Parsing for defaultResource
 		Set set = attributes.entrySet();
 		Iterator iterator = set.iterator();
@@ -93,11 +73,11 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor, Fil
             String value =(String)me.getValue();
 			
             if (key.equals(DEFAULTRESOURCE)) {
-                defaultStorageResource = (String)me.getValue();
+                defaultStorageResource = value;
             } else if (key.equals(DOMAIN)) {
-				mdasDomainName  = (String)me.getValue();
+				mdasDomainName  = value;
 			} else if (key.equals(ZONE)) {
-				mcatZone  = (String)me.getValue();
+				mcatZone  = value;
 			}
 			
         }
