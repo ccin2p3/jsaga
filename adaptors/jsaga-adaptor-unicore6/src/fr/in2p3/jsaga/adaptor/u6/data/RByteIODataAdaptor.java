@@ -1,28 +1,5 @@
 package fr.in2p3.jsaga.adaptor.u6.data;
 
-import fr.in2p3.jsaga.adaptor.base.defaults.Default;
-import fr.in2p3.jsaga.adaptor.base.usage.U;
-import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
-import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
-import fr.in2p3.jsaga.adaptor.data.BaseURL;
-import fr.in2p3.jsaga.adaptor.data.read.*;
-import fr.in2p3.jsaga.adaptor.data.write.*;
-import fr.in2p3.jsaga.adaptor.u6.TargetSystemInfo;
-import fr.in2p3.jsaga.adaptor.u6.U6Abstract;
-
-import org.ogf.saga.error.AlreadyExists;
-import org.ogf.saga.error.AuthenticationFailed;
-import org.ogf.saga.error.AuthorizationFailed;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.DoesNotExist;
-import org.ogf.saga.error.IncorrectState;
-import org.ogf.saga.error.IncorrectURL;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
-import org.ogf.saga.error.PermissionDenied;
-import org.ogf.saga.error.Timeout;
-
 import com.intel.gpe.client2.common.i18n.Messages;
 import com.intel.gpe.client2.common.i18n.MessagesKeys;
 import com.intel.gpe.client2.common.requests.CreateDirectoryRequest;
@@ -30,20 +7,27 @@ import com.intel.gpe.client2.common.requests.DeleteFileRequest;
 import com.intel.gpe.client2.common.transfers.byteio.RandomByteIOFileExportImpl;
 import com.intel.gpe.client2.common.transfers.byteio.RandomByteIOFileImportImpl;
 import com.intel.gpe.client2.providers.FileProvider;
-import com.intel.gpe.client2.transfers.FileExport;
-import com.intel.gpe.client2.transfers.FileImport;
-import com.intel.gpe.client2.transfers.TransferFailedException;
+import com.intel.gpe.client2.transfers.*;
 import com.intel.gpe.clients.api.StorageClient;
-import com.intel.gpe.clients.api.exceptions.GPEFileTransferProtocolNotSupportedException;
-import com.intel.gpe.clients.api.exceptions.GPESecurityException;
+import com.intel.gpe.clients.api.exceptions.*;
 import com.intel.gpe.gridbeans.GPEFile;
 import com.intel.gpe.util.sets.Pair;
+import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.*;
+import fr.in2p3.jsaga.adaptor.data.BaseURL;
+import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
+import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
+import fr.in2p3.jsaga.adaptor.data.read.FileReaderGetter;
+import fr.in2p3.jsaga.adaptor.data.write.FileWriterPutter;
+import fr.in2p3.jsaga.adaptor.u6.TargetSystemInfo;
+import fr.in2p3.jsaga.adaptor.u6.U6Abstract;
+import org.apache.log4j.Logger;
+import org.ogf.saga.error.*;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.lang.Exception;
+import java.util.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -57,12 +41,13 @@ import java.util.Vector;
  *
  */
 public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, FileReaderGetter {
-	
-	protected static final String SERVICE_NAME = "ServiceName";	
-	private TargetSystemInfo targetSystemInfo ;
+	protected static final String SERVICE_NAME = "ServiceName";
+    private static Logger s_logger = Logger.getLogger(RByteIODataAdaptor.class);
+    private TargetSystemInfo targetSystemInfo ;
 	private String m_serverFileSeparator ;
 	private StorageClient m_client;
     private String rootDirectory = ".";
+    private boolean m_isRetrying = false;
     
     public String getType() {
         return "rbyteio";
@@ -115,9 +100,19 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
         	if(m_client == null)
         		throw new NoSuccess("Unable to get storage:"+storageName);
         	m_serverFileSeparator = m_client.getFileSeparator();
-		} catch (NoSuccess e) {
-			throw new NoSuccess(e);
-		} catch (Exception e) {
+        } catch (GPEMiddlewareRemoteException e) {
+            if ("Client exception".equals(e.getMessage())) {
+                if (!m_isRetrying) {
+                    s_logger.warn("Retrying method connect()");
+                    m_isRetrying = true;
+                    this.connect(userInfo, host, port, basePath, attributes);
+                    m_isRetrying = false;
+                    return; //====================> EXIT OK
+                }
+                throw new NoSuccess("Retry failed", e);
+            }
+            throw new NoSuccess(e);
+        } catch (Exception e) {
 			throw new NoSuccess(e);
 		}
     }
@@ -131,138 +126,64 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
     public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
     	// prepare path
 		absolutePath = getEntryPath(absolutePath);
-    	
-		// get parent
-		String parentDirectory = rootDirectory;            
-		if(absolutePath.lastIndexOf(m_serverFileSeparator) > 0) {
-		    parentDirectory = absolutePath.substring(0,absolutePath.lastIndexOf(m_serverFileSeparator));
-		 }
-		
 		// if absolutePath is the root
 		if(absolutePath.equals(rootDirectory)) {
 			return true;
 		}
-		
-		try {			
+		try {
 	        // check
-			List<com.intel.gpe.clients.api.GridFile> directoryList = m_client.listDirectory(parentDirectory);
-	        for (com.intel.gpe.clients.api.GridFile file : directoryList) {
-	            if(file.getPath().endsWith(absolutePath)) {
-	            	return true;
-	            }
-	        }
-	        return false;
+            com.intel.gpe.clients.api.GridFile entry = m_client.listProperties(absolutePath);
+            return (entry.getPath() != null);
 		} catch (GPESecurityException e) {
 			throw new PermissionDenied("Unable to check entry",e);
-		} catch (Throwable e) {
-			if(!exists(parentDirectory, additionalArgs)) {
-				return false;
-			}
-			else {
-				throw new NoSuccess(e);
-			}
-		}
-    }
-
-    public boolean isDirectory(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-    	// prepare path and connection
-		absolutePath = getEntryPath(absolutePath);
-		
-		// is root path
-		if(absolutePath.equals(rootDirectory)) {
-			return true;
-		}				
-		
-		// get parent
-    	String parentDirectory = rootDirectory;            
-        if(absolutePath.lastIndexOf(m_serverFileSeparator) > 0) {
-            parentDirectory = absolutePath.substring(0,absolutePath.lastIndexOf(m_serverFileSeparator));
-        }
-    	try {
-	        // check
-	        List<com.intel.gpe.clients.api.GridFile> directoryList = m_client.listDirectory(parentDirectory);
-	        for (com.intel.gpe.clients.api.GridFile file : directoryList) {
-	        	if(file.getPath().endsWith(absolutePath)) {
-	            	if(file.isDirectory()) {
-	            		return true;
-	            	}
-	            	else {
-	            		return false;
-	            	}
-	            }
-	        }
-	        // to be catch by Throwable
-	        throw new DoesNotExist("The directory does not exist.");
-        } catch (GPESecurityException e) {
-        	throw new PermissionDenied("Unable to check directory",e);
-		} catch (Throwable e) {
-			// check
-			if(!exists(absolutePath, additionalArgs)) {
-				throw new DoesNotExist("The directory does not exist.");
-			}
-			throw new NoSuccess(e);			
-		}
-    }
-
-    public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-    	//prepare path
-		String absolutePath = getEntryPath(parentAbsolutePath + fileName);    	
-
-		try {
-        	// remove
-	        List<com.intel.gpe.clients.api.GridFile> directoryList = m_client.listDirectory(getEntryPath(parentAbsolutePath));
-	        for (com.intel.gpe.clients.api.GridFile gridFile : directoryList) {
-	            if(gridFile.getPath().endsWith(fileName)) {
-	                DeleteFileRequest requestRmFile = new DeleteFileRequest(m_client, gridFile);
-	                requestRmFile.perform();
-	                return;
-	            }
-	        }
-	        // 
-	        throw new Exception("To be catched");
-    	} catch (GPESecurityException e) {
-			throw new PermissionDenied("Failed to remove file ["+fileName+"]", e);
+        } catch (GPEMiddlewareRemoteException e) {
+            if ("Unknown exception".equals(e.getMessage())) {
+                // occurs when parent entry is not a directory
+                return false;
+            } else if ("Client exception".equals(e.getMessage())) {
+                if (!m_isRetrying) {
+                    s_logger.warn("Retrying method exists()");
+                    m_isRetrying = true;
+                    boolean ret = this.exists(absolutePath, additionalArgs);
+                    m_isRetrying = false;
+                    return ret; //====================> EXIT OK
+                }
+                throw new NoSuccess("Retry failed", e);
+            }
+            throw new NoSuccess(e);
         } catch (Throwable e) {
-    		// check file
-    		if(!exists(absolutePath, additionalArgs)) {
-    			throw new DoesNotExist("The file ["+absolutePath+"] does not exist.");
-    		}
-    		
-    		// check file
-    		if(isDirectory(absolutePath, additionalArgs)) {
-    			throw new BadParameter("The entry ["+absolutePath+"] is a directory.");
-    		}
-            throw new NoSuccess("Failed to remove file ["+fileName+"]", e);
-        }
+            throw new NoSuccess(e);
+		}
     }
 
     public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
         //prepare path and connection
         absolutePath = getEntryPath(absolutePath);
-
-        // get parent
-        String parentDirectory = rootDirectory;
-        if(absolutePath.lastIndexOf(m_serverFileSeparator) > 0) {
-            parentDirectory = absolutePath.substring(0,absolutePath.lastIndexOf(m_serverFileSeparator));
-         }
-
         try {
             // check
-            List<com.intel.gpe.clients.api.GridFile> directoryList = m_client.listDirectory(parentDirectory);
-            for (com.intel.gpe.clients.api.GridFile file : directoryList) {
-                if(file.getPath().endsWith(absolutePath)) {
-                    return new RByteIOFileAttributes(file, m_serverFileSeparator);
-                }
+            com.intel.gpe.clients.api.GridFile entry = m_client.listProperties(absolutePath);
+            if (entry.getPath() != null) {
+                return new RByteIOFileAttributes(entry, m_serverFileSeparator);
+            } else {
+                throw new DoesNotExist("Entry does not exist: "+absolutePath);
             }
-            // to be catch by Throwable
-            throw new DoesNotExist("The entry does not exist.");
+        } catch (DoesNotExist e) {
+            throw e;
         } catch (GPESecurityException e) {
             throw new PermissionDenied("Unable to get entry attributes",e);
-        } catch (Throwable e) {
-            // check
-            if(!exists(absolutePath, additionalArgs)) {
-                throw new DoesNotExist("The entry does not exist.");
+        } catch (GPEMiddlewareRemoteException e) {
+            if ("Client exception".equals(e.getMessage())) {
+                if (!m_isRetrying) {
+                    s_logger.warn("Retrying method getAttributes()");
+                    m_isRetrying = true;
+                    FileAttributes ret = this.getAttributes(absolutePath, additionalArgs);
+                    m_isRetrying = false;
+                    return ret; //====================> EXIT OK
+                }
+                throw new NoSuccess("Retry failed", e);
             }
+            throw new NoSuccess(e);
+        } catch (Throwable e) {
             throw new NoSuccess(e);
         }
     }
@@ -270,7 +191,7 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {        
     	// prepare path
     	absolutePath = getEntryPath(absolutePath);
-    	
+
 		try {
 	        List<com.intel.gpe.clients.api.GridFile> directoryList = m_client.listDirectory(absolutePath);
 	        Vector<RByteIOFileAttributes> entries = new Vector<RByteIOFileAttributes>();
@@ -284,12 +205,24 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
 	        return list;
 		} catch (GPESecurityException e) {
 			throw new NoSuccess(e);
+        } catch (GPEMiddlewareRemoteException e) {
+            if ("Unknown exception".equals(e.getMessage())) {
+                if(!exists(absolutePath, additionalArgs)) {
+                    throw new DoesNotExist("The entry ["+absolutePath+"] does not exist.");
+                }
+            } else if ("Client exception".equals(e.getMessage())) {
+                if (!m_isRetrying) {
+                    s_logger.warn("Retrying method listAttributes()");
+                    m_isRetrying = true;
+                    FileAttributes[] ret = this.listAttributes(absolutePath, additionalArgs);
+                    m_isRetrying = false;
+                    return ret; //====================> EXIT OK
+                }
+                throw new NoSuccess("Retry failed", e);
+            }
+            throw new NoSuccess(e);
 		} catch (Throwable e) {
-			// check parent
-			if(!exists(absolutePath, additionalArgs)) {
-				throw new DoesNotExist("The entry ["+absolutePath+"] does not exist.");
-			}
-			throw new NoSuccess("Failed to list attributes", e);
+			throw new NoSuccess(e);
 		}
     }
 
@@ -298,85 +231,122 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
     	try {
     		// check parent here, else no exception returned during creation
     		if(!exists(parentAbsolutePath, additionalArgs)) {
-    			throw new ParentDoesNotExist("The parent directory ["+parentAbsolutePath+"] of ["+directoryName+"] does not exist.");
+                throw new ParentDoesNotExist("Parent directory does not exist: "+parentAbsolutePath);
     		}
-    		
+
         	// make
     		CreateDirectoryRequest request = new CreateDirectoryRequest(m_client, absolutePath);
 			request.perform();
+        } catch (ParentDoesNotExist e) {
+            throw e;
         } catch (GPESecurityException e) {
-			throw new PermissionDenied("Failed to make directory ["+directoryName+"]", e);
-		} catch (Throwable e) {
-
-			// get NoSuccess exception
-			if(e.getClass() == ParentDoesNotExist.class) {
-				throw new ParentDoesNotExist(e);
-			}
-			
-			// check already exist
-			try {			
-				if(isDirectory(absolutePath, additionalArgs))
-					throw new AlreadyExists ("The directory ["+absolutePath+"] already exists.");
-			}
-			catch(DoesNotExist e1) {
-				// means that the directory does not exist
-			}
-			
-			// check parent
-			try {
-				if(!isDirectory(parentAbsolutePath, additionalArgs))
-					throw new BadParameter("The parent directory is not a directory.");
-			}
-			catch(DoesNotExist e1) {
-				throw new BadParameter("The parent directory is not a directory.",e1);
-			}
-			throw new NoSuccess("Failed to make directory ["+directoryName+"]", e);
+			throw new PermissionDenied(e);
+        } catch (GPEMiddlewareRemoteException e) {
+            if ("Unknown exception".equals(e.getMessage())) {
+                if (exists(absolutePath, additionalArgs)) {
+                    throw new AlreadyExists("Entry already exists: "+absolutePath);
+                } else {
+                    throw new BadParameter("Parent entry is not a directory: "+parentAbsolutePath, e);
+                }
+            } else if ("Client exception".equals(e.getMessage())) {
+                if (!m_isRetrying) {
+                    s_logger.warn("Retrying method makeDir()");
+                    m_isRetrying = true;
+                    this.makeDir(parentAbsolutePath, directoryName, additionalArgs);
+                    m_isRetrying = false;
+                    return; //====================> EXIT OK
+                }
+                throw new NoSuccess("Retry failed", e);
+            }
+            throw new NoSuccess(e);
+        } catch (Throwable e) {
+			throw new NoSuccess(e);
 		}
     }
 
     public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
     	// prepare path
 		String absolutePath = getEntryPath(parentAbsolutePath + directoryName) ;
-		try {  
+		try {
+            // get directory
+            com.intel.gpe.clients.api.GridFile directory = m_client.listProperties(absolutePath);
+            if (!directory.isDirectory()) {
+                throw new BadParameter("Entry is not a directory: "+absolutePath);
+            }
+
 			// check children here, else no exception returned during deletion !			
 			List<com.intel.gpe.clients.api.GridFile> directoryList = m_client.listDirectory(absolutePath);
 	        if(directoryList.size() > 0) {
-	        	throw new NoSuccess("The entry ["+absolutePath+"] is not a empty directory.");
+	        	throw new NoSuccess("Directory is not empty: "+absolutePath);
 	        }
-	        
-    		// remove
-        	List<com.intel.gpe.clients.api.GridFile> parentDirectoryList = m_client.listDirectory(getEntryPath(parentAbsolutePath));       
-	        for (com.intel.gpe.clients.api.GridFile file : parentDirectoryList) {
-	            if(file.getPath().endsWith(directoryName)) {
-	                DeleteFileRequest requestRmFile = new DeleteFileRequest(m_client, file);
-	                requestRmFile.perform();
-	                return ;
-	            }
-	        }
-	        // to be catch by Throwable
-	        throw new Exception("To be catched");
+
+            // remove
+            DeleteFileRequest requestRmFile = new DeleteFileRequest(m_client, directory);
+            requestRmFile.perform();
+        } catch (BadParameter e) {
+            throw e;
+        } catch (NoSuccess e) {
+            throw e;
         } catch (GPESecurityException e) {
-			throw new PermissionDenied("Failed to remove directory ["+directoryName+"]", e);
-		} catch (Throwable e) {
-			
-			// get NoSuccess exception
-			if(e.getClass() == NoSuccess.class) {
-				throw new NoSuccess(e);
-			}
-			
-			// check directory
-			if(!exists(absolutePath, additionalArgs)) {
-				throw new DoesNotExist("The directory ["+absolutePath+"] does not exist.");
-			}
-			
-			// check directory
-			if(!isDirectory(absolutePath, additionalArgs)) {
-				throw new BadParameter("The entry ["+absolutePath+"] is not a directory.");
-			}
-				        
-			throw new NoSuccess("Failed to remove directory ["+directoryName+"]", e);
+			throw new PermissionDenied(e);
+        } catch (GPEMiddlewareRemoteException e) {
+            if ("Unknown exception".equals(e.getMessage())) {
+                if (!exists(absolutePath, additionalArgs)) {
+                    throw new DoesNotExist("Entry does not exist: "+absolutePath);
+                }
+            } else if ("Client exception".equals(e.getMessage())) {
+                if (!m_isRetrying) {
+                    s_logger.warn("Retrying method removeDir()");
+                    m_isRetrying = true;
+                    this.removeDir(parentAbsolutePath, directoryName, additionalArgs);
+                    m_isRetrying = false;
+                    return; //====================> EXIT OK
+                }
+                throw new NoSuccess("Retry failed", e);
+            }
+            throw new NoSuccess(e);
+        } catch (Throwable e) {
+			throw new NoSuccess(e);
 		}
-    }    
+    }
+
+    public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    	//prepare path
+		String absolutePath = getEntryPath(parentAbsolutePath + fileName);
+		try {
+            // get file
+            com.intel.gpe.clients.api.GridFile file = m_client.listProperties(absolutePath);
+            if (file.isDirectory()) {
+                throw new BadParameter("Entry is a directory: "+absolutePath);
+            }
+
+            // remove
+            DeleteFileRequest requestRmFile = new DeleteFileRequest(m_client, file);
+            requestRmFile.perform();
+        } catch (BadParameter e) {
+            throw e;
+        } catch (GPESecurityException e) {
+			throw new PermissionDenied(e);
+        } catch (GPEMiddlewareRemoteException e) {
+            if ("Unknown exception".equals(e.getMessage())) {
+                if (!exists(absolutePath, additionalArgs)) {
+                    throw new DoesNotExist("Entry does not exist: "+absolutePath);
+                }
+            } else if ("Client exception".equals(e.getMessage())) {
+                if (!m_isRetrying) {
+                    s_logger.warn("Retrying method removeFile()");
+                    m_isRetrying = true;
+                    this.removeFile(parentAbsolutePath, fileName, additionalArgs);
+                    m_isRetrying = false;
+                    return; //====================> EXIT OK
+                }
+                throw new NoSuccess("Retry failed", e);
+            }
+            throw new NoSuccess(e);
+        } catch (Throwable e) {
+            throw new NoSuccess(e);
+        }
+    }
 
 	public void putFromStream(String absolutePath, boolean append, String additionalArgs,
 			InputStream stream) throws PermissionDenied,
