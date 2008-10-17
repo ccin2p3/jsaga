@@ -50,7 +50,19 @@ execution management technology (Unicore Gateway).</description>
 			<version>0.9.7-SNAPSHOT</version>
 			<scope>runtime</scope>
 		</dependency>
-  		<dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.8</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.fzj.unicore</groupId>
+            <artifactId>unicore6-api</artifactId>
+            <version>6.1</version>
+        </dependency>
+      <!-- unicore-api dependencies -->
+          <dependency>
 			<groupId>xalan</groupId>
 			<artifactId>xalan</artifactId>
             <version>2.6.0</version>
@@ -70,11 +82,6 @@ execution management technology (Unicore Gateway).</description>
 			<groupId>xmlsec</groupId>
 			<artifactId>xmlsec</artifactId>
 			<version>1.4.1</version>
-		</dependency>
-		<dependency>
-			<groupId>de.fzj.unicore</groupId>
-			<artifactId>unicore6-api</artifactId>
-			<version>6.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache</groupId>
