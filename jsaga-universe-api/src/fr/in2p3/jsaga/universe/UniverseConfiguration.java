@@ -27,7 +27,7 @@ public class UniverseConfiguration {
         this._load();
     }
 
-    public UNIVERSE getConfig() {
+    public UNIVERSE getUNIVERSE() {
         return m_config;
     }
 
@@ -54,6 +54,8 @@ public class UniverseConfiguration {
     }
 
     public static void main(String[] args) throws Exception {
-        new UniverseConfiguration(new File("etc/jsaga-universe.xml")).dump();
+        UniverseConfiguration config = new UniverseConfiguration(new File("etc/jsaga-universe.xml"));
+        config.getUNIVERSE().getGRID(0).setName("Test");
+        config.dump();
     }
 }
