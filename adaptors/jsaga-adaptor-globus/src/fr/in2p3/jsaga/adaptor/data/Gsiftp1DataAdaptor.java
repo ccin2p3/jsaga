@@ -45,9 +45,9 @@ public class Gsiftp1DataAdaptor extends GsiftpDataAdaptorAbstract {
         EntryPath path = new EntryPath(absolutePath);
         String entryName = path.getEntryName();
         FileAttributes[] list = this.listAttributes(path.getBaseDir(), additionalArgs);
-        for (FileAttributes attrs : list) {
-            if (attrs.getNameOnly().equals(entryName)) {
-                return attrs;
+        for (int i=0; i<list.length; i++) {
+            if (list[i].getNameOnly().equals(entryName)) {
+                return list[i];
             }
         }
         throw new DoesNotExist("Entry does not exist: "+entryName);
