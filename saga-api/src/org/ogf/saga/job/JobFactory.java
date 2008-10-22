@@ -1,6 +1,7 @@
 package org.ogf.saga.job;
 
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 import org.ogf.saga.bootstrap.ImplementationBootstrapLoader;
 import org.ogf.saga.error.AuthenticationFailed;
 import org.ogf.saga.error.AuthorizationFailed;
@@ -113,7 +114,7 @@ public abstract class JobFactory {
             Timeout, NoSuccess {
         URL url;
         try {
-            url = new URL("");
+            url = URLFactory.createURL("");
         } catch(Throwable e) {
             throw new SagaError("Should not happen", e);
         }
@@ -133,7 +134,7 @@ public abstract class JobFactory {
             TaskMode mode, Session session) throws NotImplemented {
         URL url;
         try {
-            url = new URL("");
+            url = URLFactory.createURL("");
         } catch(Throwable e) {
             throw new SagaError("Should not happen", e);
         }
@@ -183,7 +184,7 @@ public abstract class JobFactory {
             Timeout, NoSuccess {
         URL url;
         try {
-            url = new URL("");
+            url = URLFactory.createURL("");
         } catch(Throwable e) {
             throw new SagaError("Should not happen", e);
         }
@@ -206,7 +207,7 @@ public abstract class JobFactory {
             TaskMode mode) throws NotImplemented, NoSuccess {
         URL url;
         try {
-            url = new URL("");
+            url = URLFactory.createURL("");
         } catch(Throwable e) {
             throw new SagaError("Should not happen", e);
         }

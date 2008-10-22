@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.impl.permissions;
 
-import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionAdaptor;
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
@@ -8,13 +7,14 @@ import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
+import fr.in2p3.jsaga.impl.url.URLImpl;
 import org.ogf.saga.SagaObject;
-import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.permissions.Permissions;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
+import org.ogf.saga.url.URL;
 
 import java.lang.Exception;
 
@@ -195,9 +195,9 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
 
     protected FileAttributes _getFileAttributes() throws NotImplemented, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         FileAttributes attrs;
-        if (m_url instanceof JSagaURL) {
+        if ( ((URLImpl)m_url).hasCache() ) {
             // get file attributes from cache
-            attrs = ((JSagaURL)m_url).getAttributes();
+            attrs = ((URLImpl)m_url).getCache();
         } else if (m_adaptor instanceof DataReaderAdaptor) {
             // query file attributes
             try {
@@ -207,8 +207,9 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("Entry does not exist: "+m_url, doesNotExist);
             }
+
             // set file attributes to cache
-            m_url = new JSagaURL(attrs, m_url.toString());
+            ((URLImpl)m_url).setCache(attrs);
         } else {
             throw new NotImplemented("Not supported for this protocol: "+m_url.getScheme(), this);
         }

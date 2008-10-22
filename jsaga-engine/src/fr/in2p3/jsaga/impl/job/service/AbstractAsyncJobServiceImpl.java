@@ -2,7 +2,8 @@ package fr.in2p3.jsaga.impl.job.service;
 
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
@@ -41,7 +42,7 @@ public abstract class AbstractAsyncJobServiceImpl extends AbstractSagaObjectImpl
 
             // set job service
             Session session = SessionFactory.createSession(true);
-            URL serviceURL = new URL(host!=null ? host.replaceAll(" ", "%20") : "");
+            URL serviceURL = URLFactory.createURL(host);
             JobService service = JobFactory.createJobService(session, serviceURL);
 
             // submit job

@@ -10,7 +10,7 @@ import fr.in2p3.jsaga.impl.job.description.SAGAJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.job.service.JobServiceImpl;
 import fr.in2p3.jsaga.impl.job.service.LateBindedJobServiceImpl;
 import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;

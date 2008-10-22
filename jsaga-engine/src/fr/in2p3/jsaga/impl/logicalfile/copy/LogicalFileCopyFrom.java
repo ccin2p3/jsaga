@@ -8,7 +8,7 @@ import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.engine.schema.config.Protocol;
 import fr.in2p3.jsaga.impl.logicalfile.LogicalFileImpl;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.logicalfile.LogicalFileFactory;

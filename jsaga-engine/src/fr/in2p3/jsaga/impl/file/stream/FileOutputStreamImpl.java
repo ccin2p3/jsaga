@@ -3,9 +3,9 @@ package fr.in2p3.jsaga.impl.file.stream;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
-import fr.in2p3.jsaga.helpers.URLFactory;
+import fr.in2p3.jsaga.impl.url.URLHelper;
 import org.ogf.saga.SagaObject;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 
@@ -36,9 +36,9 @@ public class FileOutputStreamImpl extends AbstractAsyncFileOutputStreamImpl {
         m_connection = (disconnectable ? adaptor : null);
 
         // open stream
-        URL fileUrl = URLFactory.toFileURL(url);
-        URL parent = URLFactory.getParentURL(fileUrl);
-        String fileName = URLFactory.getName(fileUrl);
+        URL fileUrl = URLHelper.toFileURL(url);
+        URL parent = URLHelper.getParentURL(fileUrl);
+        String fileName = URLHelper.getName(fileUrl);
         if (exclusive && append) {
             throw new BadParameter("Incompatible flags: EXCL and APPEND");
         }

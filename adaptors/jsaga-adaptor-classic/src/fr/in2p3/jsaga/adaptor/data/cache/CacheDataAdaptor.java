@@ -8,11 +8,12 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.file.Directory;
 import org.ogf.saga.file.FileFactory;
 import org.ogf.saga.namespace.NSEntry;
+import org.ogf.saga.url.URLFactory;
 
 import java.io.InputStream;
 import java.lang.Exception;
@@ -62,11 +63,11 @@ public class CacheDataAdaptor implements FileReaderStreamFactory, FileWriter {
     public BaseURL getBaseURL() throws IncorrectURL {return null;}
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
-        m_baseURL = new URL((String) attributes.get(BASE_URL));
+        m_baseURL = URLFactory.createURL((String) attributes.get(BASE_URL));
         URL remoteUrl;
         try {
             String protocol = "http";   //todo: read protocol from attributes
-            remoteUrl = new URL(new URI(protocol, userInfo, host, port, basePath, null, null).toString());
+            remoteUrl = URLFactory.createURL(new URI(protocol, userInfo, host, port, basePath, null, null).toString());
         }
         catch (URISyntaxException e) {throw new BadParameter(e);}
         try {
@@ -200,7 +201,9 @@ public class CacheDataAdaptor implements FileReaderStreamFactory, FileWriter {
 
     private static URL getURL(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, Timeout, NoSuccess {
         try {
-            return (additionalArgs!=null ? new URL(absolutePath+"?"+additionalArgs) : new URL(absolutePath));
+            return URLFactory.createURL(additionalArgs!=null
+                    ? absolutePath+"?"+additionalArgs
+                    : absolutePath);
         } catch (NotImplemented e) {
             throw new NoSuccess(e);
         }

@@ -3,7 +3,7 @@ package org.ogf.saga.stream;
 import java.io.IOException;
 
 import org.ogf.saga.SagaObject;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.attributes.AsyncAttributes;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.context.Context;

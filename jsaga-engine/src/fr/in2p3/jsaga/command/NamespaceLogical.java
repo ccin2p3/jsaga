@@ -1,12 +1,13 @@
 package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.*;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
+import org.ogf.saga.url.URLFactory;
 
 import java.lang.Exception;
 
@@ -44,13 +45,13 @@ public class NamespaceLogical extends AbstractCommand {
         else if (line.hasOption(OPT_REGISTER))
         {
             LogicalFile file = command.getLogicalFile();
-            file.addLocation(new URL(line.getOptionValue(OPT_REGISTER)));
+            file.addLocation(URLFactory.createURL(line.getOptionValue(OPT_REGISTER)));
             file.close();
         }
         else if (line.hasOption(OPT_UNREGISTER))
         {
             LogicalFile file = command.getLogicalFile();
-            file.removeLocation(new URL(line.getOptionValue(OPT_REGISTER)));
+            file.removeLocation(URLFactory.createURL(line.getOptionValue(OPT_REGISTER)));
             file.close();
         }
         else if (line.hasOption(OPT_LIST))
@@ -64,7 +65,7 @@ public class NamespaceLogical extends AbstractCommand {
     }
 
     private LogicalFile getLogicalFile() throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess, IncorrectState, AlreadyExists {
-        URL logicalUrl = URLFactory.create(m_nonOptionValues[0]);
+        URL logicalUrl = URLFactory.createURL(m_nonOptionValues[0]);
         Session session = SessionFactory.createSession(true);
         NSEntry entry = NSFactory.createNSEntry(session, logicalUrl, Flags.NONE.getValue());
         if (entry instanceof LogicalFile) {

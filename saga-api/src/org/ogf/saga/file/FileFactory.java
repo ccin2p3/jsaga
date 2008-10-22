@@ -1,6 +1,6 @@
 package org.ogf.saga.file;
 
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.bootstrap.ImplementationBootstrapLoader;
 import org.ogf.saga.error.AlreadyExists;
 import org.ogf.saga.error.AuthenticationFailed;

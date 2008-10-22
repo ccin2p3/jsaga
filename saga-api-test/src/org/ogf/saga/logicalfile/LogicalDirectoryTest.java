@@ -1,6 +1,6 @@
 package org.ogf.saga.logicalfile;
 
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URLFactory;
 import org.ogf.saga.namespace.abstracts.AbstractNSDirectoryTest;
 import org.ogf.saga.namespace.*;
 
@@ -22,7 +22,7 @@ public class LogicalDirectoryTest extends AbstractNSDirectoryTest {
     }
 
     public void test_openDir() throws Exception {
-        NSDirectory dir = m_subDir.openDir(new URL(".."), Flags.NONE.getValue());
+        NSDirectory dir = m_subDir.openDir(URLFactory.createURL(".."), Flags.NONE.getValue());
         assertTrue(
                 dir instanceof LogicalDirectory);
         assertEquals(
@@ -31,7 +31,7 @@ public class LogicalDirectoryTest extends AbstractNSDirectoryTest {
     }
 
     public void test_openEntry() throws Exception {
-        NSEntry entry = m_subDir.open(new URL(DEFAULT_FILENAME), Flags.NONE.getValue());
+        NSEntry entry = m_subDir.open(URLFactory.createURL(DEFAULT_FILENAME), Flags.NONE.getValue());
         assertTrue(
                 entry instanceof LogicalFile);
         assertEquals(

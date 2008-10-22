@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.impl.namespace;
 
-import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataFilteredList;
@@ -9,12 +8,14 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.helpers.SAGAPattern;
-import fr.in2p3.jsaga.helpers.URLFactory;
+import fr.in2p3.jsaga.impl.url.URLHelper;
+import fr.in2p3.jsaga.impl.url.URLImpl;
 import org.ogf.saga.ObjectType;
-import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 
 import java.lang.Exception;
 import java.util.ArrayList;
@@ -36,19 +37,19 @@ import java.util.regex.Pattern;
 public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryImpl implements NSDirectory {
     /** constructor for factory */
     public AbstractNSDirectoryImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(session, URLFactory.toDirectoryURL(url), adaptor, flags);
+        super(session, URLHelper.toDirectoryURL(url), adaptor, flags);
         this.init(flags);
     }
 
     /** constructor for NSDirectory.open() */
     public AbstractNSDirectoryImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(dir, URLFactory.toDirectoryURL(relativeUrl), flags);
+        super(dir, URLHelper.toDirectoryURL(relativeUrl), flags);
         this.init(flags);
     }
 
     /** constructor for NSEntry.openAbsolute() */
     public AbstractNSDirectoryImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(entry, URLFactory.toDirectoryPath(absolutePath), flags);
+        super(entry, URLHelper.toDirectoryPath(absolutePath), flags);
         this.init(flags);
     }
 
@@ -90,7 +91,7 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
             }
         } else if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
             this._makeParentDirs();
-        } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !(m_url instanceof JSagaURL) && m_adaptor instanceof DataReaderAdaptor) {
+        } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !((URLImpl)m_url).hasCache() && m_adaptor instanceof DataReaderAdaptor) {
             boolean exists = ((DataReaderAdaptor)m_adaptor).exists(m_url.getPath(), m_url.getQuery());
             if (! exists) {
                 throw new DoesNotExist("Directory does not exist: "+ m_url);
@@ -153,7 +154,9 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         List<URL> matchingNames = new ArrayList<URL>();
         for (int i=0; i<childs.length; i++) {
             if (p==null || p.matcher(childs[i].getName()).matches()) {
-                matchingNames.add(new JSagaURL(childs[i]));
+                URL childUrl = URLFactory.createURL(childs[i].getName());
+                ((URLImpl)childUrl).setCache(childs[i]);
+                matchingNames.add(childUrl);
             }
         }
         return matchingNames;
@@ -189,7 +192,7 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         FileAttributes[] childs = this._listAttributes(m_url.getPath());
         for (int i=0; i<childs.length; i++) {
             // set child relative path
-            URL childRelativePath = URLFactory.createURL(currentRelativePath, childs[i].getName());
+            URL childRelativePath = URLHelper.createURL(currentRelativePath, childs[i].getName());
             // add child relative path to matching list
             if (p==null || p.matcher(childs[i].getName()).matches()) {
                 matchingPath.add(childRelativePath);
@@ -244,7 +247,7 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
             }
             if (entry < m_entriesCache.length) {
                 try {
-                    return new URL(m_entriesCache[entry]);
+                    return org.ogf.saga.url.URLFactory.createURL(m_entriesCache[entry]);
                 } catch (BadParameter e) {
                     throw new NoSuccess(e);
                 }
@@ -269,7 +272,7 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
                 this._openNSEntry(source).copy(target, flags);
             }
         } else {
-            URL source = new URL(sourcePattern);
+            URL source = org.ogf.saga.url.URLFactory.createURL(sourcePattern);
             this._openNSEntry(source).copy(target, flags);
         }
     }
@@ -290,7 +293,7 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
                 this._openNSEntry(source);
             }
         } else {
-            URL source = new URL(sourcePattern);
+            URL source = org.ogf.saga.url.URLFactory.createURL(sourcePattern);
             this._openNSEntry(source).link(target, flags);
         }
     }
@@ -311,7 +314,7 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
                 this._openNSEntry(source);
             }
         } else {
-            URL source = new URL(sourcePattern);
+            URL source = org.ogf.saga.url.URLFactory.createURL(sourcePattern);
             this._openNSEntry(source).move(target, flags);
         }
     }
@@ -332,7 +335,7 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
                 this._openNSEntry(target).remove(flags);
             }
         } else {
-            URL target = new URL(targetPattern);
+            URL target = org.ogf.saga.url.URLFactory.createURL(targetPattern);
             this._openNSEntry(target).remove(flags);
         }
     }
@@ -363,7 +366,7 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
                 }
             } catch(IncorrectURL e) {throw new NoSuccess(e);}
         } else {
-            URL target = new URL(targetPattern);
+            URL target = org.ogf.saga.url.URLFactory.createURL(targetPattern);
             this._openNSEntry(target, flags).permissionsAllow(id, permissions);
         }
     }
@@ -387,7 +390,7 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
             } catch(IncorrectURL e) {throw new NoSuccess(e);
             } catch(IncorrectState e) {throw new NoSuccess(e);}
         } else {
-            URL target = new URL(targetPattern);
+            URL target = org.ogf.saga.url.URLFactory.createURL(targetPattern);
             this._openNSEntry(target, flags).permissionsDeny(id, permissions);
         }
     }
@@ -400,7 +403,7 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
     protected static URL CURRENT_DIR_RELATIVE_PATH;
     static {
         try {
-            CURRENT_DIR_RELATIVE_PATH = new URL("./");
+            CURRENT_DIR_RELATIVE_PATH = org.ogf.saga.url.URLFactory.createURL("./");
         } catch (Exception e) {
             e.printStackTrace();
         }

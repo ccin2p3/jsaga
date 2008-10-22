@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.*;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 import org.ogf.saga.error.Exception;
@@ -11,6 +11,7 @@ import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
+import org.ogf.saga.url.URLFactory;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -49,8 +50,8 @@ public class NamespaceCopy extends AbstractCommand {
         else
         {
             // get arguments
-            URL source = URLFactory.create(command.m_nonOptionValues[0]);
-            URL target = URLFactory.create(command.m_nonOptionValues[1]);
+            URL source = URLFactory.createURL(command.m_nonOptionValues[0]);
+            URL target = URLFactory.createURL(command.m_nonOptionValues[1]);
             int flags = (line.hasOption(OPT_NOT_OVERWRITE) ? Flags.NONE : Flags.OVERWRITE)
                     .or((line.hasOption(OPT_RECURSIVE) ? Flags.RECURSIVE : Flags.NONE)
                     .or((line.hasOption(OPT_PRESERVE_TIMES) ? FLAGS_PRESERVETIMES : Flags.NONE.getValue())));

@@ -1,6 +1,7 @@
 package integration;
 
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 import org.ogf.saga.file.File;
 import org.ogf.saga.file.FileFactory;
 import integration.abstracts.AbstractSubmitTest;
@@ -23,26 +24,29 @@ public class SubmitTest extends AbstractSubmitTest {
     }
 
     public void test_singlejob() throws Exception {
-        super.checkSubmit(new URL[]{new URL("test://emulator")});
+        super.checkSubmit(new URL[]{URLFactory.createURL("test://emulator")});
     }
 
     public void test_multijobs() throws Exception {
-        super.checkSubmit(new URL[]{new URL("test://emulator"), new URL("test://emulator"), new URL("test://emulator")});
+        super.checkSubmit(new URL[]{
+                URLFactory.createURL("test://emulator"),
+                URLFactory.createURL("test://emulator"),
+                URLFactory.createURL("test://emulator")});
     }
 
     public void test_staging() throws Exception {
-//        super.checkSubmit(new URL[]{new URL("gatekeeper://localhost:2119/C=FR/ST=France/L=Villeurbanne/O=CNRS/OU=IN2P3/CN=Sylvain%20Reynaud/E=sreynaud@in2p3.fr")});
-//        super.checkSubmit(new URL[]{new URL("ssh://localhost:22")});
-        super.checkSubmit(new URL[]{new URL("local:/")});
-        URL expected = new URL("file://./jsaga-engine/config/var/"+this.getName()+".txt");
+//        super.checkSubmit(new URL[]{URLFactory.createURL("gatekeeper://localhost:2119/C=FR/ST=France/L=Villeurbanne/O=CNRS/OU=IN2P3/CN=Sylvain%20Reynaud/E=sreynaud@in2p3.fr")});
+//        super.checkSubmit(new URL[]{URLFactory.createURL("ssh://localhost:22")});
+        super.checkSubmit(new URL[]{URLFactory.createURL("local:/")});
+        URL expected = URLFactory.createURL("file://./jsaga-engine/config/var/"+this.getName()+".txt");
         File file = FileFactory.createFile(expected);
         assertTrue(file.isEntry());
         assertTrue(file.getSize() > 0);
     }
 
     public void test_sandbox() throws Exception {
-        super.checkSubmit(new URL[]{new URL("local:/")});
-        URL expected = new URL("file://./jsaga-engine/config/var/"+this.getName()+".txt");
+        super.checkSubmit(new URL[]{URLFactory.createURL("local:/")});
+        URL expected = URLFactory.createURL("file://./jsaga-engine/config/var/"+this.getName()+".txt");
         File file = FileFactory.createFile(expected);
         assertTrue(file.isEntry());
         assertTrue(file.getSize() > 0);

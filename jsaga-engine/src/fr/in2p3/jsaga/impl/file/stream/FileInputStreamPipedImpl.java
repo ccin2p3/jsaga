@@ -2,9 +2,9 @@ package fr.in2p3.jsaga.impl.file.stream;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderGetter;
-import fr.in2p3.jsaga.helpers.URLFactory;
+import fr.in2p3.jsaga.impl.url.URLHelper;
 import org.ogf.saga.SagaObject;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 
@@ -34,7 +34,7 @@ public class FileInputStreamPipedImpl extends AbstractAsyncFileInputStreamImpl {
         m_connection = (disconnectable ? adaptor : null);
 
         // open stream
-        URL fileUrl = URLFactory.toFileURL(url);
+        URL fileUrl = URLHelper.toFileURL(url);
         m_inStream = new PipedInputStreamImpl(
                 adaptor,
                 fileUrl.getPath(),

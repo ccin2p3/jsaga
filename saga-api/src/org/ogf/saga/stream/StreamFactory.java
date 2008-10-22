@@ -1,6 +1,6 @@
 package org.ogf.saga.stream;
 
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.bootstrap.ImplementationBootstrapLoader;
 import org.ogf.saga.error.AuthenticationFailed;
 import org.ogf.saga.error.AuthorizationFailed;

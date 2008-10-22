@@ -1,7 +1,8 @@
 package org.ogf.saga.namespace.abstracts;
 
 import org.ogf.saga.AbstractTest;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.error.NotImplemented;
@@ -54,14 +55,14 @@ public abstract class AbstractNSEntryTest extends AbstractTest {
         super();
 
         // configure
-        URL baseUrl = new URL(getRequiredProperty(protocol, CONFIG_BASE_URL).replaceAll(" ", "%20"));
+        URL baseUrl = URLFactory.createURL(getRequiredProperty(protocol, CONFIG_BASE_URL).replaceAll(" ", "%20"));
         m_dirUrl = createURL(baseUrl, DEFAULT_DIRNAME);
         m_subDirUrl = createURL(m_dirUrl, DEFAULT_SUBDIRNAME);
         m_fileUrl = createURL(m_subDirUrl, DEFAULT_FILENAME);
         m_session = SessionFactory.createSession(true);
         if (getOptionalProperty(protocol, CONFIG_PHYSICAL_PROTOCOL) != null) {
             String physicalProtocol = getOptionalProperty(protocol, CONFIG_PHYSICAL_PROTOCOL);
-            URL basePhysicalUrl = new URL(getRequiredProperty(physicalProtocol, CONFIG_BASE_URL));
+            URL basePhysicalUrl = URLFactory.createURL(getRequiredProperty(physicalProtocol, CONFIG_BASE_URL));
             m_physicalDirUrl = createURL(basePhysicalUrl, DEFAULT_DIRNAME);
             m_physicalFileUrl = createURL(m_physicalDirUrl, DEFAULT_PHYSICAL);
             m_physicalFileUrl2 = createURL(m_physicalDirUrl, DEFAULT_PHYSICAL2);

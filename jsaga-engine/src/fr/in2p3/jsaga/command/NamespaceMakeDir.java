@@ -1,10 +1,11 @@
 package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.*;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
+import org.ogf.saga.url.URLFactory;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -39,7 +40,7 @@ public class NamespaceMakeDir extends AbstractCommand {
         else
         {
             // get arguments
-            URL url = URLFactory.create(command.m_nonOptionValues[0]);
+            URL url = URLFactory.createURL(command.m_nonOptionValues[0]);
             int flags =(line.hasOption(OPT_NOT_EXCL) ? Flags.NONE : Flags.EXCL)
                     .or(line.hasOption(OPT_CREATEPARENTS)
                             ? Flags.CREATE.or(Flags.CREATEPARENTS)

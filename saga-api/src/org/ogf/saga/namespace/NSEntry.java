@@ -1,7 +1,7 @@
 package org.ogf.saga.namespace;
 
 import org.ogf.saga.SagaObject;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.AlreadyExists;
 import org.ogf.saga.error.AuthenticationFailed;
 import org.ogf.saga.error.AuthorizationFailed;

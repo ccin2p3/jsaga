@@ -3,12 +3,13 @@ package fr.in2p3.jsaga.engine.workflow.task;
 import fr.in2p3.jsaga.engine.schema.status.Task;
 import fr.in2p3.jsaga.engine.schema.status.types.TaskTypeType;
 import fr.in2p3.jsaga.engine.workflow.AbstractWorkflowTaskImpl;
-import org.ogf.saga.URL;
+import fr.in2p3.jsaga.impl.url.URLFactoryImpl;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
+import org.ogf.saga.url.URL;
 
 import java.lang.Exception;
 
@@ -33,7 +34,7 @@ public class MkdirTask extends AbstractWorkflowTaskImpl {
         super(null, "mkdir_"+dir);
         // set URL
         m_session = session;
-        m_dir = new URL(dir);
+        m_dir = URLFactoryImpl.createUnencodedURL(dir);
         // update XML status
         URLDecomposer u = new URLDecomposer(dir);
         Task xmlStatus = super.getStateAsXML();

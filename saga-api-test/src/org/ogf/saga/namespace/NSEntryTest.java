@@ -1,6 +1,7 @@
 package org.ogf.saga.namespace;
 
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 import org.ogf.saga.error.DoesNotExist;
 import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
 
@@ -29,7 +30,7 @@ public class NSEntryTest extends AbstractNSEntryTest {
     }
 
     public void test_getCWD() throws Exception {
-        URL expected = new URL(m_subDirUrl.toString());
+        URL expected = URLFactory.createURL(m_subDirUrl.toString());
         expected.setFragment(null);
         assertEquals(
                 expected.toString(),

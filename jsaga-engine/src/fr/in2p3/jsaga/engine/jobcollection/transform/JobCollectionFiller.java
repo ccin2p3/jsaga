@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.engine.jobcollection.transform;
 
-import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.engine.data.FilledURL;
 import fr.in2p3.jsaga.helpers.xpath.XJSDLXPathSelector;
 import org.ogf.saga.error.*;
@@ -28,9 +27,8 @@ public class JobCollectionFiller {
         for (int i=0; i<list.getLength(); i++) {
             Text node = (Text) list.item(i);
             String url = node.getData();
-            String filledUrl = (node.getData().contains("@{")
-                    ? JSagaURL.decode(new FilledURL(JSagaURL.encodeUrl(url)).getURI())
-                    : new FilledURL(url).getURI().toString());
+            // getString() decodes the URL
+            String filledUrl = new FilledURL(url).getString();
             node.setData(filledUrl);
         }
 

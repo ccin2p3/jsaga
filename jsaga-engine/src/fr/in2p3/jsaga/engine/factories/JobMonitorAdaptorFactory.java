@@ -9,7 +9,8 @@ import fr.in2p3.jsaga.engine.config.bean.JobserviceEngineConfiguration;
 import fr.in2p3.jsaga.engine.schema.config.JobService;
 import fr.in2p3.jsaga.engine.schema.config.MonitorService;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 
@@ -48,7 +49,7 @@ public class JobMonitorAdaptorFactory extends ServiceAdaptorFactory {
 
         // get monitorURL
         if (config.getUrl() != null) {
-            return new URL(config.getUrl());
+            return URLFactory.createURL(config.getUrl());
         } else {
             return controlURL;
         }

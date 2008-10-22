@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga;
 
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -15,12 +16,16 @@ import org.ogf.saga.URL;
  *
  */
 public class uri {
+    static {
+        System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
+    }
+
     public static String protocol(String uri) throws Exception {
-        return new URL(uri).getScheme();
+        return URLFactory.createURL(uri).getScheme();
     }
 
     public static String host(String uri) throws Exception {
-        String host = new URL(uri).getHost();
+        String host = URLFactory.createURL(uri).getHost();
         if (host != null) {
             return host;
         } else {
@@ -29,31 +34,31 @@ public class uri {
     }
 
     public static String basedirURI(String uri) throws Exception {
-        URL u = new URL(uri);
+        URL u = URLFactory.createURL(uri);
         return new java.net.URI(u.getScheme(), u.getUserInfo(), u.getHost(), u.getPort(), _basedirPath(u), null, null).toString();
     }
 
     public static String basedirPath(String uri) throws Exception {
-        return _basedirPath(new URL(uri));
+        return _basedirPath(URLFactory.createURL(uri));
     }
 
     public static String filename(String uri) throws Exception {
-        return _filename(new URL(uri));
+        return _filename(URLFactory.createURL(uri));
     }
 
     public static String context(String uri) throws Exception {
-        return new URL(uri).getFragment();
+        return URLFactory.createURL(uri).getFragment();
     }
 
     public static boolean isDirectory(String uri) throws Exception {
-        return new URL(uri).getPath().endsWith("/");
+        return URLFactory.createURL(uri).getPath().endsWith("/");
     }
 
     public static boolean isRelative(String uri) throws Exception {
-        return new URL(uri).getPath().startsWith("/");
+        return URLFactory.createURL(uri).getPath().startsWith("/");
     }
 
-    public static String _basedirPath(URL uri) throws Exception {
+    private static String _basedirPath(URL uri) throws Exception {
         String[] array = uri.getPath().split("/");
         if (array.length > 0) {
             StringBuffer buffer = new StringBuffer();
@@ -74,7 +79,7 @@ public class uri {
         }
     }
 
-    public static String _filename(URL uri) throws Exception {
+    private static String _filename(URL uri) throws Exception {
         String[] array = uri.getPath().split("/");
         if (array.length > 0) {
             return array[array.length-1];

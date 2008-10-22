@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.*;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.file.File;
@@ -9,6 +9,7 @@ import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
+import org.ogf.saga.url.URLFactory;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -42,7 +43,7 @@ public class NamespaceCat extends AbstractCommand {
         else
         {
             // get arguments
-            URL source = URLFactory.create(command.m_nonOptionValues[0]);
+            URL source = URLFactory.createURL(command.m_nonOptionValues[0]);
 
             // execute command
             Session session = SessionFactory.createSession(true);

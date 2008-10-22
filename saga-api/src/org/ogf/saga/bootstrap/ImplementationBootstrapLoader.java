@@ -15,6 +15,7 @@ import org.ogf.saga.rpc.RPCFactory;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.stream.StreamFactory;
 import org.ogf.saga.task.TaskFactory;
+import org.ogf.saga.url.URLFactory;
 
 /**
  * The idea of this class is that the SAGA user sets the environment variable
@@ -178,5 +179,18 @@ public class ImplementationBootstrapLoader {
         throws NotImplemented {
         initFactory();
         return factory.createTaskFactory();
+    }
+
+    /**
+     * Creates an URL factory.
+     *
+     * @return an URL factory.
+     * @throws NotImplemented
+     *             is thrown when URLs are not implemented.
+     */
+    public static URLFactory createURLFactory()
+            throws NotImplemented {
+        initFactory();
+        return factory.createURLFactory();
     }
 }

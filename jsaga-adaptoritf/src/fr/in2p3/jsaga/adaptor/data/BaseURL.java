@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.data;
 
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.IncorrectURL;
 import org.ogf.saga.error.NotImplemented;
 

@@ -4,6 +4,8 @@ import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
 import org.ogf.saga.error.*;
+import org.ogf.saga.url.URLFactory;
+import org.ogf.saga.url.URL;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -104,7 +106,7 @@ public abstract class AbstractTest extends TestCase {
     protected static URL createURL(URL base, String name) throws NotImplemented, NoSuccess, BadParameter {
         String basePath = base.getPath();
         String path = (basePath.endsWith("/") ? basePath+name : basePath+"/"+name);
-        URL url = new URL(base.toString());
+        URL url = URLFactory.createURL(base.toString());
         url.setPath(path);
         return url;
     }

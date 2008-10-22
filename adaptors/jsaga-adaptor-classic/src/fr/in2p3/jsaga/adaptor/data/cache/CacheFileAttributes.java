@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.adaptor.data.cache;
 
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.file.File;
 import org.ogf.saga.namespace.NSEntry;
 import org.ogf.saga.permissions.Permission;

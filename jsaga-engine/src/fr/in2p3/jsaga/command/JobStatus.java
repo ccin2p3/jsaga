@@ -1,12 +1,13 @@
 package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.*;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.BadParameter;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.task.State;
+import org.ogf.saga.url.URLFactory;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,7 +48,7 @@ public class JobStatus extends AbstractCommand {
             Pattern pattern = Pattern.compile("\\[(.*)\\]-\\[(.*)\\]");
             Matcher matcher = pattern.matcher(command.m_nonOptionValues[0]);
             if (matcher.find()) {
-                serviceURL = URLFactory.create(matcher.group(1));
+                serviceURL = URLFactory.createURL(matcher.group(1));
                 nativeJobId = matcher.group(2);
             } else {
                 throw new BadParameter("Job ID does not match regular expression: "+pattern.pattern());

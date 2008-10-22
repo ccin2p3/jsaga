@@ -7,7 +7,7 @@ import fr.in2p3.jsaga.helpers.SAGAPatternFinder;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSDirectoryImpl;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
 import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.attributes.AsyncAttributes;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.NSEntry;

@@ -1,10 +1,11 @@
 package fr.in2p3.jsaga.impl.file;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
-import fr.in2p3.jsaga.helpers.URLFactory;
+import fr.in2p3.jsaga.impl.url.URLHelper;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSDirectoryImpl;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
 import org.ogf.saga.*;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.file.*;
 import org.ogf.saga.namespace.*;
@@ -54,7 +55,7 @@ public class DirectoryImpl extends AbstractAsyncDirectoryImpl implements Directo
     }
 
     public NSEntry openAbsolute(String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        if (URLFactory.isDirectory(absolutePath)) {
+        if (URLHelper.isDirectory(absolutePath)) {
             return new DirectoryImpl(this, absolutePath, flags);
         } else {
             return new FileImpl(this, absolutePath, flags);
@@ -71,14 +72,14 @@ public class DirectoryImpl extends AbstractAsyncDirectoryImpl implements Directo
     }
 
     public NSEntry open(URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        if (URLFactory.isDirectory(name)) {
+        if (URLHelper.isDirectory(name)) {
             return this.openDirectory(name, flags);
         } else {
             return this.openFile(name, flags);
         }
     }
     public NSEntry open(URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        if (URLFactory.isDirectory(name)) {
+        if (URLHelper.isDirectory(name)) {
             return this.openDirectory(name);
         } else {
             return this.openFile(name);

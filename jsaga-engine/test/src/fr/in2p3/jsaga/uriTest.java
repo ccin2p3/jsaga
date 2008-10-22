@@ -24,7 +24,7 @@ public class uriTest extends TestCase {
                 uri.basedirPath("http://host:1234/path/to/directory/"));
         assertEquals(
                 "/C:/Program Files/app/",
-                uri.basedirPath("file:///C:/Program%20Files/app/file.dll"));
+                uri.basedirPath("file:///C:/Program Files/app/file.dll"));
         assertEquals(
                 "/",
                 uri.basedirPath("gsiftp://host:2811/"));
@@ -42,7 +42,7 @@ public class uriTest extends TestCase {
                 uri.filename("http://host:1234/path/to/directory/"));
         assertEquals(
                 "file.dll",
-                uri.filename("file:///C:/Program%20Files/app/file.dll"));
+                uri.filename("file:///C:/Program Files/app/file.dll"));
         assertEquals(
                 "",
                 uri.filename("gsiftp://host:2811/"));

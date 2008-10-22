@@ -26,6 +26,7 @@ import java.io.InputStream;
  */
 public abstract class AbstractJobCollectionTest extends AbstractXMLTestCase {
     private static final boolean CLEANUP = true;
+    private static final boolean DOT_GRAPH = true;
     private ResourcesLoader m_resources;
     private JobCollectionManager m_manager;
 
@@ -97,7 +98,7 @@ public abstract class AbstractJobCollectionTest extends AbstractXMLTestCase {
         assertXMLSimilarDetailed(expectedStaging, xmlStatus);
 
         // graphviz
-        if (true) {
+        if (DOT_GRAPH) {
             GraphGenerator generator = new GraphGenerator(jc.getJobCollectionName(), xmlStatus);
             generator.generateStatusGraph();
             generator.generateStagingGraph();

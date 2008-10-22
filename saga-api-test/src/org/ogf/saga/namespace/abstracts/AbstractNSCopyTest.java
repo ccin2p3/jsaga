@@ -1,6 +1,7 @@
 package org.ogf.saga.namespace.abstracts;
 
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.file.Directory;
@@ -45,12 +46,12 @@ public abstract class AbstractNSCopyTest extends AbstractNSDirectoryTest {
         URL baseUrl2;
         if (protocol.equals(targetProtocol)) {
             if (getOptionalProperty(protocol, CONFIG_BASE2_URL) != null) {
-                baseUrl2 = new URL(getOptionalProperty(protocol, CONFIG_BASE2_URL));
+                baseUrl2 = URLFactory.createURL(getOptionalProperty(protocol, CONFIG_BASE2_URL));
             } else {
-                baseUrl2 = new URL(getRequiredProperty(protocol, CONFIG_BASE_URL));
+                baseUrl2 = URLFactory.createURL(getRequiredProperty(protocol, CONFIG_BASE_URL));
             }
         } else {
-            baseUrl2 = new URL(getRequiredProperty(targetProtocol, CONFIG_BASE_URL));
+            baseUrl2 = URLFactory.createURL(getRequiredProperty(targetProtocol, CONFIG_BASE_URL));
         }
         m_dirUrl2 = createURL(baseUrl2, DEFAULT_DIRNAME_2);
         m_subDirUrl2 = createURL(m_dirUrl2, DEFAULT_SUBDIRNAME);
@@ -60,7 +61,7 @@ public abstract class AbstractNSCopyTest extends AbstractNSDirectoryTest {
         }
         if (m_physicalDirUrl ==null && getOptionalProperty(targetProtocol, CONFIG_PHYSICAL_PROTOCOL) != null) {
             String physicalProtocol = getOptionalProperty(targetProtocol, CONFIG_PHYSICAL_PROTOCOL);
-            URL basePhysicalUrl = new URL(getRequiredProperty(physicalProtocol, CONFIG_BASE_URL));
+            URL basePhysicalUrl = URLFactory.createURL(getRequiredProperty(physicalProtocol, CONFIG_BASE_URL));
             m_physicalDirUrl = createURL(basePhysicalUrl, DEFAULT_DIRNAME);
             m_physicalFileUrl = createURL(m_physicalDirUrl, DEFAULT_PHYSICAL);
             m_physicalFileUrl2 = createURL(m_physicalDirUrl, DEFAULT_PHYSICAL2);

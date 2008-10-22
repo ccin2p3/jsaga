@@ -5,10 +5,11 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.LogicalReaderMetaData;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.helpers.SAGAPattern;
-import fr.in2p3.jsaga.helpers.URLFactory;
+import fr.in2p3.jsaga.impl.url.URLHelper;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSDirectoryImpl;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
 import org.ogf.saga.*;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.logicalfile.LogicalDirectory;
 import org.ogf.saga.logicalfile.LogicalFile;
@@ -62,7 +63,7 @@ public class LogicalDirectoryImpl extends AbstractAsyncLogicalDirectoryImpl impl
     }
 
     public NSEntry openAbsolute(String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        if (URLFactory.isDirectory(absolutePath)) {
+        if (URLHelper.isDirectory(absolutePath)) {
             return new LogicalDirectoryImpl(this, absolutePath, flags);
         } else {
             return new LogicalFileImpl(this, absolutePath, flags);
@@ -79,14 +80,14 @@ public class LogicalDirectoryImpl extends AbstractAsyncLogicalDirectoryImpl impl
     }
 
     public NSEntry open(URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        if (URLFactory.isDirectory(name)) {
+        if (URLHelper.isDirectory(name)) {
             return this.openLogicalDir(name, flags);
         } else {
             return this.openLogicalFile(name, flags);
         }
     }
     public NSEntry open(URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        if (URLFactory.isDirectory(name)) {
+        if (URLHelper.isDirectory(name)) {
             return this.openLogicalDir(name);
         } else {
             return this.openLogicalFile(name);
@@ -152,7 +153,7 @@ public class LogicalDirectoryImpl extends AbstractAsyncLogicalDirectoryImpl impl
         for (int i=0; i<childs.length; i++) {
             if (p==null || p.matcher(childs[i].getName()).matches()) {
                 // add child relative path
-                URL childRelativePath = URLFactory.createURL(currentRelativePath, childs[i].getName());
+                URL childRelativePath = URLHelper.createURL(currentRelativePath, childs[i].getName());
                 matchingPath.add(childRelativePath);
                 // may recurse
                 if (effectiveFlags.contains(Flags.RECURSIVE) && childs[i].getType()==FileAttributes.DIRECTORY_TYPE) {

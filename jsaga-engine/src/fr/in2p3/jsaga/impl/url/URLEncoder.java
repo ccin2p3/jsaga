@@ -1,8 +1,4 @@
-package fr.in2p3.jsaga;
-
-import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import org.ogf.saga.URL;
-import org.ogf.saga.error.*;
+package fr.in2p3.jsaga.impl.url;
 
 import java.net.URI;
 
@@ -10,44 +6,27 @@ import java.net.URI;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   JSagaURL
+* File:   URLEncoder
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   24 janv. 2008
+* Date:   21 oct. 2008
 * ***************************************************
 * Description:                                      */
 /**
  *
  */
-public class JSagaURL extends URL {
-    private FileAttributes m_attributes;
-
-    /** constructor for absolutePath */
-    public JSagaURL(FileAttributes attributes, String absolutePath) throws NotImplemented, BadParameter, NoSuccess {
-        super(absolutePath);
-        m_attributes = attributes;
-    }
-
-    /** constructor for relativePath */
-    public JSagaURL(FileAttributes attributes) throws NotImplemented, BadParameter, NoSuccess {
-        super(encodePath(attributes.getName()));
-        m_attributes = attributes;
-    }
-
-    public FileAttributes getAttributes() {
-        return m_attributes;
-    }
-
-    public static String encodeUrl(String url) {
+public class URLEncoder {
+    static String encode(String url) {
         int query, fragment;
         if ((query=url.lastIndexOf('?')) > -1) {
-            return encodePath(url.substring(0,query)) + url.substring(query);
+            return encodePathOnly(url.substring(0,query)) + url.substring(query);
         } else if ((fragment=url.lastIndexOf('#')) > -1) {
-            return encodePath(url.substring(0,fragment)) + url.substring(fragment);
+            return encodePathOnly(url.substring(0,fragment)) + url.substring(fragment);
         } else {
-            return encodePath(url);
+            return encodePathOnly(url);
         }
     }
-    public static String encodePath(String path) {
+
+    static String encodePathOnly(String path) {
         StringBuffer buffer = new StringBuffer();
         char[] array = path.toCharArray();
         for (int i=0; i<array.length; i++) {
@@ -95,38 +74,7 @@ public class JSagaURL extends URL {
     }
 
     // [scheme://][[user-info@]host[:port]][path][?query][#fragment]
-    public static String decode(URL url) throws NotImplemented {
-        StringBuffer buffer = new StringBuffer();
-        if (url.getScheme() != null) {
-            buffer.append(url.getScheme());
-            buffer.append("://");
-        }
-        if (url.getHost() != null) {
-            if (url.getUserInfo() != null) {
-                buffer.append(url.getUserInfo());
-                buffer.append('@');
-            }
-            buffer.append(url.getHost());
-            if (url.getPort() != -1) {
-                buffer.append(':');
-                buffer.append(url.getPort());
-            }
-        }
-        if (url.getPath() != null) {
-            buffer.append(url.getPath());
-        }
-        if (url.getQuery() != null) {
-            buffer.append('?');
-            buffer.append(url.getQuery());
-        }
-        if (url.getFragment() != null) {
-            buffer.append('#');
-            buffer.append(url.getFragment());
-        }
-        return buffer.toString();
-    }
-
-    public static String decode(URI url) throws NotImplemented {
+    static String decode(URI url) {
         StringBuffer buffer = new StringBuffer();
         if (url.getScheme() != null) {
             buffer.append(url.getScheme());

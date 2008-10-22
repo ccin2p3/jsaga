@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.CommandLine;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.AlreadyExists;
 import org.ogf.saga.error.DoesNotExist;
 import org.ogf.saga.namespace.Flags;

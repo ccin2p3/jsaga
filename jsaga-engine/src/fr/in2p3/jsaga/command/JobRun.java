@@ -1,11 +1,12 @@
 package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.*;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.task.State;
+import org.ogf.saga.url.URLFactory;
 
 import java.io.*;
 
@@ -47,7 +48,7 @@ public class JobRun extends AbstractCommand {
         else
         {
             // get arguments
-            URL serviceURL = URLFactory.create(line.getOptionValue(OPT_RESOURCE));
+            URL serviceURL = URLFactory.createURL(line.getOptionValue(OPT_RESOURCE));
             JobDescription desc = createJobDescription(line);
             if (!line.hasOption(OPT_BATCH)) {
                 desc.setAttribute(JobDescription.INTERACTIVE, "true");

@@ -46,6 +46,7 @@ import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.error.PermissionDenied;
 import org.ogf.saga.error.Timeout;
+import org.ogf.saga.url.URL;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -128,7 +129,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     	m_wmsServerUrl = "https://"+host+":"+port+basePath;
     	if(attributes.containsKey(MONITOR_SERVICE_URL)) {
     		// LB server name get in config
-    		m_lbServerHost = ((org.ogf.saga.URL) attributes.get(MONITOR_SERVICE_URL)).getHost();
+    		m_lbServerHost = ((URL) attributes.get(MONITOR_SERVICE_URL)).getHost();
     	}
     	else {
     		// LB And WMS on the same server

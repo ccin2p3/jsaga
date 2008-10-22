@@ -12,7 +12,7 @@ import fr.in2p3.jsaga.impl.file.FileImpl;
 import fr.in2p3.jsaga.impl.logicalfile.LogicalDirectoryImpl;
 import fr.in2p3.jsaga.impl.logicalfile.LogicalFileImpl;
 import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;

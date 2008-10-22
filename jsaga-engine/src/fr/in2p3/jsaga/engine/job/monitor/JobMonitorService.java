@@ -6,7 +6,7 @@ import fr.in2p3.jsaga.engine.job.monitor.listen.FilteredJobStatusListener;
 import fr.in2p3.jsaga.engine.job.monitor.listen.IndividualJobStatusListener;
 import fr.in2p3.jsaga.engine.job.monitor.poll.*;
 import fr.in2p3.jsaga.engine.job.monitor.request.JobStatusRequestor;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 
 import java.util.Timer;

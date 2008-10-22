@@ -7,7 +7,7 @@ import fr.in2p3.jsaga.impl.file.copy.FileCopyFromTask;
 import fr.in2p3.jsaga.impl.file.copy.FileCopyTask;
 import fr.in2p3.jsaga.impl.permissions.AbstractDataPermissionsImpl;
 import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.NSEntry;

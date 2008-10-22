@@ -1,21 +1,23 @@
 package fr.in2p3.jsaga.impl.logicalfile;
 
-import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytesLogical;
-import fr.in2p3.jsaga.helpers.URLFactory;
 import fr.in2p3.jsaga.impl.logicalfile.copy.LogicalFileCopy;
 import fr.in2p3.jsaga.impl.logicalfile.copy.LogicalFileCopyFrom;
 import fr.in2p3.jsaga.impl.namespace.*;
-import org.ogf.saga.*;
+import fr.in2p3.jsaga.impl.url.URLHelper;
+import fr.in2p3.jsaga.impl.url.URLImpl;
+import org.ogf.saga.ObjectType;
+import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
 import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.url.URL;
 
 import java.util.*;
 
@@ -34,19 +36,19 @@ import java.util.*;
 public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements LogicalFile {
     /** constructor for factory */
     public LogicalFileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(session, URLFactory.toFileURL(url), adaptor, flags);
+        super(session, URLHelper.toFileURL(url), adaptor, flags);
         this.init(flags);
     }
 
     /** constructor for NSDirectory.open() */
     public LogicalFileImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(dir, URLFactory.toFileURL(relativeUrl), flags);
+        super(dir, URLHelper.toFileURL(relativeUrl), flags);
         this.init(flags);
     }
 
     /** constructor for NSEntry.openAbsolute() */
     public LogicalFileImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(entry, URLFactory.toFilePath(absolutePath), flags);
+        super(entry, URLHelper.toFilePath(absolutePath), flags);
         this.init(flags);
     }
 
@@ -66,7 +68,7 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
             }
         } else if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
             this._makeParentDirs();
-        } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !(m_url instanceof JSagaURL) && m_adaptor instanceof DataReaderAdaptor) {
+        } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !((URLImpl)m_url).hasCache() && m_adaptor instanceof DataReaderAdaptor) {
             boolean exists = ((DataReaderAdaptor)m_adaptor).exists(
                     m_url.getPath(),
                     m_url.getQuery());
@@ -140,7 +142,7 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
     }
 
     public NSEntry openAbsolute(String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        if (URLFactory.isDirectory(absolutePath)) {
+        if (URLHelper.isDirectory(absolutePath)) {
             return new LogicalDirectoryImpl(this, absolutePath, flags);
         } else {
             return new LogicalFileImpl(this, absolutePath, flags);
@@ -195,7 +197,7 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
                 List<URL> list = new ArrayList<URL>();
                 try {
                     for (String location : array) {
-                        list.add(new URL(location));
+                        list.add(org.ogf.saga.url.URLFactory.createURL(location));
                     }
                 } catch (BadParameter e) {
                     throw new NoSuccess(e);

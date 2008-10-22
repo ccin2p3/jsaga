@@ -1,12 +1,12 @@
 package fr.in2p3.jsaga.command;
 
-import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.helpers.SAGAPattern;
 import org.apache.commons.cli.*;
-import org.ogf.saga.URL;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -51,14 +51,14 @@ public class NamespaceList extends AbstractCommand {
             if (SAGAPattern.hasWildcard(arg) && !line.hasOption(OPT_NOWILDCARD)) {
                 Matcher matcher = Pattern.compile("((.*)/)*(.*/)/*").matcher(arg);
                 if (matcher.matches() && matcher.groupCount()>1) {
-                    url = URLFactory.create(matcher.group(1));
+                    url = URLFactory.createURL(matcher.group(1));
                     pattern = matcher.group(3);
                 } else {
-                    url = URLFactory.create(arg.substring(0, arg.lastIndexOf('/')+1));
+                    url = URLFactory.createURL(arg.substring(0, arg.lastIndexOf('/')+1));
                     pattern = arg.substring(arg.lastIndexOf('/')+1);
                 }
             } else {
-                url = URLFactory.create(arg);
+                url = URLFactory.createURL(arg);
                 pattern = null;
             }
 
@@ -80,7 +80,8 @@ public class NamespaceList extends AbstractCommand {
                 dir.close();
                 // display list
                 for (URL entry : list) {
-                    System.out.println(JSagaURL.decode(entry));
+                    // getString() decodes the URL, while toString() does not
+                    System.out.println(entry.getString());
                 }
             }
         }

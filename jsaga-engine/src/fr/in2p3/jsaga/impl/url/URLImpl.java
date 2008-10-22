@@ -1,0 +1,307 @@
+package fr.in2p3.jsaga.impl.url;
+
+import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
+import org.ogf.saga.error.BadParameter;
+import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.url.URL;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
+/* ***************************************************
+* *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
+* ***             http://cc.in2p3.fr/             ***
+* ***************************************************
+* File:   URLImpl
+* Author: Sylvain Reynaud (sreynaud@in2p3.fr)
+* Date:   20 oct. 2008
+* ***************************************************
+* Description:                                      */
+/**
+ *
+ */
+public class URLImpl implements URL {
+    private URI u;
+    private FileAttributes m_cache;
+
+    /** MAY encode the URL */
+    URLImpl(String url, boolean encode) throws BadParameter {
+        if (encode) {
+            url = (url.startsWith("file://"))
+                    ? URLEncoder.encodePathOnly(url)
+                    : URLEncoder.encode(url);
+        }
+        try {
+            u = new URI(url);
+            this.fixFileURI();  //sreynaud
+        } catch(URISyntaxException e) {
+            throw new BadParameter("syntax error in url", e);
+        }
+    }
+
+    /** Encode the URL */
+    URLImpl(URL base, String name) throws BadParameter {
+        this(   base,
+                URLEncoder.encodePathOnly(name),
+                null,
+                null
+        );
+    }
+
+    /** Encode the URL */
+    URLImpl(URL base, URL relativeUrl) throws BadParameter {
+        this(   base,
+                URLEncoder.encodePathOnly(relativeUrl.getPath()),
+                relativeUrl.getQuery()!=null ? relativeUrl.getQuery() : base.getQuery(),
+                relativeUrl.getFragment()!=null ? relativeUrl.getFragment() : base.getFragment()
+        );
+    }
+
+    /** DO NOT encode the URL */
+    private URLImpl(URL base, String relativePath, String query, String fragment) {
+        //bugfix: Windows drive letter is considered as hostname if URL is "file://C:/"
+        int i;for(i=0; i<relativePath.length() && relativePath.charAt(i)=='/'; i++);
+        if(i>1)relativePath="/"+relativePath.substring(i);
+
+        // resolve URI
+        URI baseUri = ((URLImpl) base).u;
+        String relativeUri = relativePath
+                + (query!=null ? "?"+query : "")
+                + (fragment!=null ? "#"+fragment : "");
+        u = baseUri.resolve(relativeUri);
+    }
+
+    /** DO NOT encode the URL */
+    private URLImpl(URI u) {
+        this.u = u;
+    }
+
+    /** Encode the URL */
+    public void setString(String url) throws BadParameter {
+        String encodedUrl = (url.startsWith("file://"))
+                ? URLEncoder.encodePathOnly(url)
+                : URLEncoder.encode(url);
+        try {
+            u = new URI(encodedUrl);
+            this.fixFileURI();  //sreynaud
+        } catch(URISyntaxException e) {
+            throw new BadParameter("syntax error in url", e);
+        }
+    }
+
+    /** Decode the URL */
+    public String getString() {
+        return URLEncoder.decode(u);
+    }
+
+    public String getFragment() {
+        return u.getFragment();
+    }
+
+    public void setFragment(String fragment) throws BadParameter {
+        try {
+            u = new URI(u.getScheme(), u.getUserInfo(), u.getHost(),
+                    u.getPort(), u.getPath(), u.getQuery(), fragment);
+        } catch(URISyntaxException e) {
+            throw new BadParameter("syntax error in fragment", e);
+        }
+    }
+
+    public String getHost() {
+        if (u.getHost() == null) {
+            return this.getSchemeSpecificPart().getHost();   //sreynaud
+        }
+        return u.getHost();
+    }
+
+    public void setHost(String host) throws BadParameter {
+        try {
+            u = new URI(u.getScheme(), u.getUserInfo(), host,
+                    u.getPort(), u.getPath(), u.getQuery(), u.getFragment());
+        } catch(URISyntaxException e) {
+            throw new BadParameter("syntax error in host", e);
+        }
+    }
+
+    public String getPath() {
+        if (u.getPath() == null) {
+            return this.getSchemeSpecificPart().getPath();  //sreynaud
+        } else if (".".equals(u.getAuthority())) {
+            return "."+u.getPath();                         //sreynaud
+        } else if (u.getPath().startsWith("/./")) {
+            return u.getPath().substring(1);                //sreynaud
+        }
+        return u.getPath();
+    }
+
+    public void setPath(String path) throws BadParameter {
+        try {
+            if (path.startsWith("./")) {
+                //sreynaud: set relative path
+                u = new URI(u.getScheme(), u.getAuthority(),
+                        path.substring(2), u.getQuery(), u.getFragment());
+            } else {
+                //sreynaud: fix absolute path
+                int i;for(i=0; i<path.length() && path.charAt(i)=='/'; i++);
+                if(i>1)path="/"+path.substring(i);
+                u = new URI(u.getScheme(), u.getUserInfo(), u.getHost(),
+                        u.getPort(), path, u.getQuery(), u.getFragment());
+            }
+        } catch(URISyntaxException e) {
+            throw new BadParameter("syntax error in path", e);
+        }
+    }
+
+    public int getPort() {
+        if (u.getPort() == -1) {
+            return this.getSchemeSpecificPart().getPort();  //sreynaud
+        }
+        return u.getPort();
+    }
+
+    public void setPort(int port) throws BadParameter {
+        try {
+            u = new URI(u.getScheme(), u.getUserInfo(), u.getHost(),
+                    port, u.getPath(), u.getQuery(), u.getFragment());
+        } catch(URISyntaxException e) {
+            throw new BadParameter("syntax error in port", e);     // ???
+        }
+    }
+
+    public String getQuery() {
+        if (u.getQuery() == null) {
+            return this.getSchemeSpecificPart().getQuery(); //sreynaud
+        }
+        return u.getQuery();
+    }
+
+    public void setQuery(String query) throws BadParameter {
+        try {
+            u = new URI(u.getScheme(), u.getUserInfo(), u.getHost(),
+                    u.getPort(), u.getPath(), query, u.getFragment());
+        } catch(URISyntaxException e) {
+            throw new BadParameter("syntax error in query", e);
+        }
+    }
+
+    public String getScheme() {
+        return u.getScheme();
+    }
+
+    public void setScheme(String scheme) throws BadParameter {
+        try {
+            u = new URI(scheme, u.getUserInfo(), u.getHost(),
+                    u.getPort(), u.getPath(), u.getQuery(), u.getFragment());
+        } catch(URISyntaxException e) {
+            throw new BadParameter("syntax error in scheme", e);
+        }
+    }
+
+    public String getUserInfo() {
+        if (u.getUserInfo() == null) {
+            return this.getSchemeSpecificPart().getUserInfo();  //sreynaud
+        }
+        return u.getUserInfo();
+    }
+
+    public void setUserInfo(String userInfo) throws BadParameter {
+        try {
+            u = new URI(u.getScheme(), userInfo, u.getHost(),
+                    u.getPort(), u.getPath(), u.getQuery(), u.getFragment());
+        } catch(URISyntaxException e) {
+            throw new BadParameter("syntax error in query", e);
+        }
+    }
+
+    public URL translate(String scheme) throws BadParameter, NoSuccess {
+        try {
+            URI url = new URI(scheme, u.getUserInfo(), u.getHost(),
+                    u.getPort(), u.getPath(), u.getQuery(), u.getFragment());
+            // Not quite correct: the SAGA specs say that NoSuccess should be
+            // thrown when the scheme is not supported. How to check this
+            // here ???
+            return new URLImpl(url);
+        } catch(URISyntaxException e) {
+            throw new BadParameter("syntax error in scheme", e);
+        }
+    }
+
+    public URL resolve(URL url) throws NoSuccess {
+        URLImpl urlimpl = (URLImpl) url;
+        URI uri = u.resolve(urlimpl.u);
+        if (uri == urlimpl.u) {
+            return url;
+        }
+        return new URLImpl(uri);
+    }
+
+    public boolean isAbsolute() {
+        return u.isAbsolute();
+    }
+
+    public URL normalize() {
+        URI uri = u.normalize();
+        if (uri == u) {
+            return this;
+        }
+        return new URLImpl(uri);
+    }
+
+    ////////////////////////////////////////// java methods ///////////////////////////////////////////
+
+    public int hashCode() {
+        return u.hashCode();
+    }
+
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        if (! (o instanceof URLImpl)) {
+            return false;
+        }
+        URLImpl other = (URLImpl) o;
+        return u.equals(other.u);
+    }
+
+    /** DO NOT decode the URL */
+    public String toString() {
+        return u.toString();
+    }
+
+    ////////////////////////////////////////// cache methods //////////////////////////////////////////
+
+    public void setCache(FileAttributes cache) {
+        m_cache = cache;
+    }
+
+    public FileAttributes getCache() {
+        return m_cache;
+    }
+
+    public boolean hasCache() {
+        return (m_cache != null);
+    }
+
+    ///////////////////////////////////////// private methods /////////////////////////////////////////
+
+    private void fixFileURI() throws URISyntaxException {
+        boolean isRelative = (u.getHost()==null && u.getAuthority()!=null && !u.getAuthority().equals("."));
+        boolean isWindows = (u.getHost()!=null && u.getHost().length()==1 && u.getAuthority()!=null && u.getAuthority().endsWith(":"));
+        if (isRelative || isWindows) {
+            u = new URI(u.getScheme(), u.getUserInfo(),
+                    "",                                 // fix number of '/' after scheme
+                    u.getPort(),
+                    "/"+u.getAuthority()+u.getPath(),   // fix path
+                    u.getQuery(), u.getFragment());
+        }
+    }
+
+    private URI getSchemeSpecificPart() {
+        try {
+            return new URI(u.getRawSchemeSpecificPart());
+        } catch (URISyntaxException e) {
+            return u;
+        }
+    }
+}

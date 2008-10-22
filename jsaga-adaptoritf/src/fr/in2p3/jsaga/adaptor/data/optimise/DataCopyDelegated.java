@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.adaptor.data.optimise;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 
 /* ***************************************************

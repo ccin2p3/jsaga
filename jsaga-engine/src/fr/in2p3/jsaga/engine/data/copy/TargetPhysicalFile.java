@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.engine.data.copy;
 
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.impl.file.FileImpl;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.file.*;
 import org.ogf.saga.logicalfile.LogicalFile;

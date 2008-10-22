@@ -5,7 +5,7 @@ import fr.in2p3.jsaga.adaptor.data.read.FileReaderGetter;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterPutter;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.file.FileInputStream;
 import org.ogf.saga.file.FileOutputStream;

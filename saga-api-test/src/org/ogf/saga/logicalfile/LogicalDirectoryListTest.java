@@ -1,6 +1,7 @@
 package org.ogf.saga.logicalfile;
 
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.abstracts.AbstractNSDirectoryListTest;
 
@@ -39,7 +40,7 @@ public class LogicalDirectoryListTest extends AbstractNSDirectoryListTest {
 
     public void test_find_norecurse() throws Exception {
         if (m_subDir instanceof LogicalDirectory) {
-            LogicalDirectory dir = (LogicalDirectory) m_subDir.openDir(new URL(".."), Flags.NONE.getValue());
+            LogicalDirectory dir = (LogicalDirectory) m_subDir.openDir(URLFactory.createURL(".."), Flags.NONE.getValue());
             List<URL> list = dir.find(DEFAULT_FILEPATTERN, null, Flags.NONE.getValue());
             assertEquals(
                     0,
@@ -51,7 +52,7 @@ public class LogicalDirectoryListTest extends AbstractNSDirectoryListTest {
 
     public void test_find_recurse() throws Exception {
         if (m_subDir instanceof LogicalDirectory) {
-            LogicalDirectory dir = (LogicalDirectory) m_subDir.openDir(new URL(".."), Flags.NONE.getValue());
+            LogicalDirectory dir = (LogicalDirectory) m_subDir.openDir(URLFactory.createURL(".."), Flags.NONE.getValue());
             List<URL> list = dir.find(DEFAULT_FILEPATTERN, null, Flags.RECURSIVE.getValue());
             assertEquals(
                     1,
@@ -66,8 +67,8 @@ public class LogicalDirectoryListTest extends AbstractNSDirectoryListTest {
 
     public void test_isFile() throws Exception {
         if (m_subDir instanceof LogicalDirectory) {
-            assertFalse(((LogicalDirectory) m_subDir).isFile(new URL("..")));
-            assertTrue(((LogicalDirectory) m_subDir).isFile(new URL(DEFAULT_FILENAME)));
+            assertFalse(((LogicalDirectory) m_subDir).isFile(URLFactory.createURL("..")));
+            assertTrue(((LogicalDirectory) m_subDir).isFile(URLFactory.createURL(DEFAULT_FILENAME)));
         } else {
             fail("Not an instance of class: LogicalDirectory");
         }

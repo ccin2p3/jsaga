@@ -1,6 +1,6 @@
 package org.ogf.saga.namespace;
 
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.abstracts.AbstractNSCopyTest;
 

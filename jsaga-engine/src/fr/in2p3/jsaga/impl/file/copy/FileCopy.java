@@ -10,7 +10,8 @@ import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytesPhysical;
 import fr.in2p3.jsaga.engine.schema.config.Protocol;
 import fr.in2p3.jsaga.impl.file.FileImpl;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 import org.ogf.saga.error.*;
 import org.ogf.saga.file.*;
 import org.ogf.saga.namespace.Flags;
@@ -72,7 +73,7 @@ public class FileCopy {
                         effectiveTarget.getHost(), base.getPort(effectiveTarget), effectiveTarget.getPath(),
                         overwrite, source.getQuery());
             } catch (ParentDoesNotExist parentDoesNotExist) {
-                throw new DoesNotExist("Target parent directory does not exist: "+effectiveTarget.resolve(new URL(".")), parentDoesNotExist);
+                throw new DoesNotExist("Target parent directory does not exist: "+effectiveTarget.resolve(URLFactory.createURL(".")), parentDoesNotExist);
             } catch (DoesNotExist doesNotExist) {
                 throw new IncorrectState("Source file does not exist: "+source, doesNotExist);
             } catch (AlreadyExists alreadyExists) {

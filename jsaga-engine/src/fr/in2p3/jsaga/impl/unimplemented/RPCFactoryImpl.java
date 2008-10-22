@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.impl.unimplemented;
 
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.rpc.*;
 import org.ogf.saga.session.Session;

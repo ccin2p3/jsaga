@@ -1,10 +1,9 @@
 package fr.in2p3.jsaga.impl.jobcollection;
 
-import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.engine.schema.jsdl.extension.ResourceSelection;
 import fr.in2p3.jsaga.engine.workflow.WorkflowImpl;
 import fr.in2p3.jsaga.jobcollection.JobCollection;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.w3c.dom.Document;
 

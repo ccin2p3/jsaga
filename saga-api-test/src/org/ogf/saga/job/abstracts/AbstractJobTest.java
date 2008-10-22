@@ -5,7 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.ogf.saga.AbstractTest;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.AuthorizationFailed;
 import org.ogf.saga.error.NoSuccess;
@@ -59,7 +60,7 @@ public class AbstractJobTest extends AbstractTest {
         super();
 
         // configure
-        m_jobservice = new URL(getRequiredProperty(jobprotocol, CONFIG_JOBSERVICE_URL).replaceAll(" ", "%20"));
+        m_jobservice = URLFactory.createURL(getRequiredProperty(jobprotocol, CONFIG_JOBSERVICE_URL).replaceAll(" ", "%20"));
         m_session = SessionFactory.createSession(true);
         
         // init values

@@ -1,21 +1,23 @@
 package fr.in2p3.jsaga.impl.file;
 
-import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.*;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytesPhysical;
-import fr.in2p3.jsaga.helpers.URLFactory;
 import fr.in2p3.jsaga.impl.file.copy.FileCopy;
 import fr.in2p3.jsaga.impl.file.copy.FileCopyFrom;
 import fr.in2p3.jsaga.impl.namespace.*;
-import org.ogf.saga.*;
+import fr.in2p3.jsaga.impl.url.URLHelper;
+import fr.in2p3.jsaga.impl.url.URLImpl;
+import org.ogf.saga.ObjectType;
+import org.ogf.saga.SagaObject;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.error.*;
 import org.ogf.saga.file.*;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.url.URL;
 
 import java.io.IOException;
 import java.util.Date;
@@ -38,19 +40,19 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
 
     /** constructor for factory */
     public FileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(session, URLFactory.toFileURL(url), adaptor, flags);
+        super(session, URLHelper.toFileURL(url), adaptor, flags);
         this.init(flags);
     }
 
     /** constructor for NSDirectory.open() */
     public FileImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(dir, URLFactory.toFileURL(relativeUrl), flags);
+        super(dir, URLHelper.toFileURL(relativeUrl), flags);
         this.init(flags);
     }
 
     /** constructor for NSEntry.openAbsolute() */
     public FileImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        super(entry, URLFactory.toFilePath(absolutePath), flags);
+        super(entry, URLHelper.toFilePath(absolutePath), flags);
         this.init(flags);
     }
 
@@ -83,7 +85,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         }
         if (effectiveFlags.contains(Flags.READ) || effectiveFlags.contains(Flags.WRITE)) {
             // exists check already done
-        } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !(m_url instanceof JSagaURL) && m_adaptor instanceof DataReaderAdaptor) {
+        } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !((URLImpl)m_url).hasCache() && m_adaptor instanceof DataReaderAdaptor) {
             boolean exists = ((DataReaderAdaptor)m_adaptor).exists(m_url.getPath(), m_url.getQuery());
             if (! exists) {
                 throw new DoesNotExist("File does not exist: "+ m_url);
@@ -189,7 +191,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
     }
 
     public NSEntry openAbsolute(String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        if (URLFactory.isDirectory(absolutePath)) {
+        if (URLHelper.isDirectory(absolutePath)) {
             return new DirectoryImpl(this, absolutePath, flags);
         } else {
             return new FileImpl(this, absolutePath, flags);

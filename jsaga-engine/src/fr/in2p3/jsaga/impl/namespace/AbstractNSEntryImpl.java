@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.impl.namespace;
 
-import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.link.LinkAdaptor;
 import fr.in2p3.jsaga.adaptor.data.link.NotLink;
@@ -10,13 +9,15 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
 import fr.in2p3.jsaga.adaptor.data.write.DataWriterTimes;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
-import fr.in2p3.jsaga.helpers.URLFactory;
-import org.ogf.saga.*;
+import fr.in2p3.jsaga.impl.url.URLHelper;
+import org.ogf.saga.ObjectType;
+import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
+import org.ogf.saga.url.URL;
 
 import java.util.Date;
 
@@ -58,7 +59,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
         } else if (relativeUrl.getHost()!=null && !relativeUrl.getHost().equals(baseUrl.getHost())) {
             throw new IncorrectURL("You must not modify the host of the URL: "+ baseUrl.getHost());
         }
-        return URLFactory.createURL(baseUrl, relativeUrl);
+        return URLHelper.createURL(baseUrl, relativeUrl);
     }
 
     /** constructor for NSEntry.openAbsolute() */
@@ -73,7 +74,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
         } else if (! absolutePath.startsWith("/")) {
             throw new IncorrectURL("URL must contain an absolute path: "+ baseUrl.getPath());
         }
-        return URLFactory.createURL(baseUrl, absolutePath);
+        return URLHelper.createURL(baseUrl, absolutePath);
     }
 
     private void init(int flags) throws BadParameter {
@@ -98,7 +99,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
 
     public URL getCWD() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
         try {
-            return m_url.resolve(new URL("."));
+            return m_url.resolve(org.ogf.saga.url.URLFactory.createURL("."));
         } catch (BadParameter e) {
             throw new NoSuccess(e);
         }
@@ -110,10 +111,10 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             if (name != null) {
                 if (name.matches("[A-Za-z]:")) {
                     // windows drive
-                    return new URL("/"+name);
+                    return org.ogf.saga.url.URLFactory.createURL("/"+name);
                 } else {
                     // entry name
-                    return new URL(JSagaURL.encodePath(name));
+                    return org.ogf.saga.url.URLFactory.createURL(name);
                 }
             } else {
                 return null;
@@ -170,7 +171,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             } catch (NotLink notLink) {
                 throw new BadParameter("Not a link: "+ m_url, this);
             }
-            return URLFactory.createURL(m_url, absolutePath);
+            return URLHelper.createURL(m_url, absolutePath);
         } else {
             throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
@@ -417,17 +418,17 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
 
     protected URL _getEffectiveURL(URL target) throws NotImplemented, BadParameter, IncorrectState, Timeout, NoSuccess {
         if (target.getPath().endsWith("/")) {
-            return URLFactory.createURL(target, this._getEntryName());
+            return URLHelper.createURL(target, this._getEntryName());
         } else {
             return target;
         }
     }
 
     protected URL _getParentDirURL() throws NotImplemented, BadParameter, NoSuccess {
-        return URLFactory.getParentURL(m_url);
+        return URLHelper.getParentURL(m_url);
     }
     protected String _getEntryName() throws NotImplemented {
-        return URLFactory.getName(m_url);
+        return URLHelper.getName(m_url);
     }
 
     protected void _makeParentDirs() throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, Timeout, NoSuccess {

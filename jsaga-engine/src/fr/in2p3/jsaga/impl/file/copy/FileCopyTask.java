@@ -5,7 +5,7 @@ import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.impl.file.FileImpl;
 import fr.in2p3.jsaga.impl.monitoring.*;
 import fr.in2p3.jsaga.impl.task.AbstractTaskImplWithAsyncAttributes;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.session.Session;

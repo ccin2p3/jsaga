@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.engine.config.bean;
 
 import fr.in2p3.jsaga.engine.config.*;
 import fr.in2p3.jsaga.engine.schema.config.*;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.NoSuccess;
 import org.ogf.saga.error.NotImplemented;
 

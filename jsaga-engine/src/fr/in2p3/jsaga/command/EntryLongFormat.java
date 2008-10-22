@@ -1,12 +1,11 @@
 package fr.in2p3.jsaga.command;
 
-import fr.in2p3.jsaga.JSagaURL;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
-import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.file.File;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.permissions.Permission;
+import org.ogf.saga.url.URL;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -113,7 +112,8 @@ public class EntryLongFormat {
     public String getName(NSEntry entry) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         try {
             URL nameUrl = entry.getName();
-            String name = (nameUrl!=null ? JSagaURL.decode(nameUrl) : "");
+            // getString() decodes the URL, while toString() does not
+            String name = (nameUrl!=null ? nameUrl.getString() : "");
             if (this.isDir(entry)) {
                 name += "/";
             }

@@ -8,6 +8,9 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
+import java.net.URL;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -57,12 +60,7 @@ public class GraphGenerator {
         ).transform(
                 new DOMSource(m_xmlStatus),
                 new StreamResult(dotStream));
-        File dot;
-        try {
-            dot = getDot(Base.JSAGA_HOME);
-        } catch(FileNotFoundException e) {
-            dot = getDot(new File("externals/graphviz/config"));
-        }
+        File dot = getDot();
         //Process p = Runtime.getRuntime().exec("f:/cygwin/bin/cat.exe");
         Process p = Runtime.getRuntime().exec(dot.getAbsolutePath()+" -Tgif -o\""+graph.getAbsolutePath()+"\"");
         OutputStream stdin = p.getOutputStream();
@@ -80,6 +78,22 @@ public class GraphGenerator {
         }
     }
 
+    private static File getDot() throws IOException {
+        File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+        try {
+            return getDot(Base.JSAGA_HOME);
+        } catch(FileNotFoundException e) {
+            try {
+                return getDot(tmpDir);
+            } catch(FileNotFoundException e2) {
+                if (installGraphviz(tmpDir)) {
+                    return getDot(tmpDir);
+                } else {
+                    throw e2;
+                }
+            }
+        }
+    }
     private static File getDot(File baseDir) throws FileNotFoundException {
         File dotFile;
         String os = System.getProperty("os.name").toLowerCase();
@@ -92,6 +106,34 @@ public class GraphGenerator {
             return dotFile;
         } else {
             throw new FileNotFoundException("You must install the Graphviz module to use this option");
+        }
+    }
+    private static boolean installGraphviz(File tmpDir) {
+        try {
+            // find Graphviz package
+            URL jar = GraphGenerator.class.getClassLoader().getResource("org/graphviz/GraphvizSingleton.class");
+            File jarFile = new File(jar.getFile().substring(0, jar.getFile().lastIndexOf('!')));
+            String prefix = jarFile.getName().substring(0, jarFile.getName().lastIndexOf('.'));
+            File baseDir = jarFile.getParentFile();
+            URL zip = new URL(new File(baseDir, prefix+"-bin.zip").toString());
+            ZipInputStream zipStream = new ZipInputStream(zip.openStream());
+
+            // unzip Graphviz package
+            ZipEntry zipEntry;
+            while( (zipEntry=zipStream.getNextEntry()) != null ) {
+                File entry = new File(tmpDir, zipEntry.getName());
+                if(zipEntry.isDirectory()) {
+                    entry.mkdir();
+                } else {
+                    OutputStream out = new FileOutputStream(entry);
+                    copy(zipStream, out);
+                    out.close();
+                }
+            }
+            zipStream.close();
+            return true;
+        } catch(IOException e) {
+            return false;
         }
     }
 

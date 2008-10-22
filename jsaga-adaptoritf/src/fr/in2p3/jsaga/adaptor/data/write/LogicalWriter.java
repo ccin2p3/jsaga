@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.data.write;
 
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 
 /* ***************************************************

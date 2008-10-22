@@ -9,7 +9,8 @@ import fr.in2p3.jsaga.engine.config.adaptor.SecurityAdaptorDescriptor;
 import fr.in2p3.jsaga.engine.config.bean.JobserviceEngineConfiguration;
 import fr.in2p3.jsaga.engine.schema.config.JobService;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 
@@ -110,7 +111,7 @@ public class JobAdaptorFactory extends ServiceAdaptorFactory {
             attributes.put(config.getAttribute(i).getName(), config.getAttribute(i).getValue());
         }
         if (config.getMonitorService()!=null && config.getMonitorService().getUrl()!=null) {
-            URL monitorURL = new URL(config.getMonitorService().getUrl());
+            URL monitorURL = URLFactory.createURL(config.getMonitorService().getUrl());
             attributes.put(JobControlAdaptor.MONITOR_SERVICE_URL, monitorURL);
         }
 

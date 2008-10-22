@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.command;
 
 import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
 import org.apache.commons.cli.*;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.file.File;
 import org.ogf.saga.namespace.NSEntry;
@@ -10,6 +10,7 @@ import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.permissions.Permission;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
+import org.ogf.saga.url.URLFactory;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -49,7 +50,7 @@ public class NamespaceStat extends AbstractCommand {
         else
         {
             // get arguments
-            URL url = URLFactory.create(command.m_nonOptionValues[0]);
+            URL url = URLFactory.createURL(command.m_nonOptionValues[0]);
 
             // execute command
             Session session = SessionFactory.createSession(true);

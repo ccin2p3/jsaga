@@ -1,6 +1,6 @@
 package org.ogf.saga.namespace.abstracts;
 
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URLFactory;
 import org.ogf.saga.error.NotImplemented;
 import org.ogf.saga.namespace.Flags;
 
@@ -24,7 +24,7 @@ public abstract class AbstractNSDirectoryListTest extends AbstractNSDirectoryTes
     }
 
     public void test_changeDir() throws Exception {
-        m_subDir.changeDir(new URL(".."));
+        m_subDir.changeDir(URLFactory.createURL(".."));
         assertEquals(
                 DEFAULT_DIRNAME,
                 m_subDir.getName().getPath()+"/");

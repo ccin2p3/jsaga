@@ -5,7 +5,8 @@ import fr.in2p3.jsaga.engine.schema.jsdl.extension.Resource;
 import fr.in2p3.jsaga.impl.job.description.XJSDLJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.monitoring.MetricImpl;
 import fr.in2p3.jsaga.jobcollection.LateBindedJob;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
@@ -62,7 +63,7 @@ public class LateBindedJobImpl extends AbstractAsyncJobImpl implements LateBinde
 
     public void allocate(Resource rm) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
         // find grid name and allocate resource
-        m_resourceManager = new URL(rm.getId());
+        m_resourceManager = URLFactory.createURL(rm.getId());
         if (rm.getGrid() == null) {
             rm.setGrid(Configuration.getInstance().getConfigurations().getJobserviceCfg().findJobService(m_resourceManager).getName());
         }

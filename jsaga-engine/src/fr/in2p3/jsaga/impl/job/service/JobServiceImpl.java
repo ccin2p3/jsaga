@@ -8,6 +8,7 @@ import fr.in2p3.jsaga.helpers.xslt.XSLTransformerFactory;
 import fr.in2p3.jsaga.impl.job.description.AbstractJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.job.instance.JobImpl;
 import org.ogf.saga.*;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;

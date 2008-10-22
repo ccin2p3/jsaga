@@ -12,6 +12,7 @@ import org.ogf.saga.rpc.RPCFactory;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.stream.StreamFactory;
 import org.ogf.saga.task.TaskFactory;
+import org.ogf.saga.url.URLFactory;
 
 /**
  * This interface must be implemented by a SAGA implementation that uses
@@ -96,4 +97,13 @@ public interface SagaFactory {
      * @exception NotImplemented is thrown when tasks are not implemented.
      */
     TaskFactory createTaskFactory() throws NotImplemented;
+
+    /**
+     * Creates a factory for the Saga URL package.
+     *
+     * @return the URL factory.
+     * @exception NotImplemented
+     *                is thrown when URLs are not implemented.
+     */
+    URLFactory createURLFactory() throws NotImplemented;
 }

@@ -3,8 +3,9 @@ package fr.in2p3.jsaga.engine.data;
 import fr.in2p3.jsaga.adaptor.data.BaseURL;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.schema.config.DataService;
-import org.ogf.saga.URL;
 import org.ogf.saga.error.*;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,7 +28,7 @@ public class FilledURL {
     private URL m_url;
 
     public FilledURL(String url) throws NotImplemented, BadParameter, NoSuccess {
-        this(new URL(url));
+        this(URLFactory.createURL(url));
     }
     
     public FilledURL(URL url) throws NotImplemented, NoSuccess {
@@ -50,7 +51,7 @@ public class FilledURL {
         m_url = url;
     }
 
-    public String getUserInfo() throws NotImplemented {
+    public String getUserInfo() {
         if (m_url !=null && m_url.getUserInfo()!=null) {
             return m_url.getUserInfo();
         } else {
@@ -58,7 +59,7 @@ public class FilledURL {
         }
     }
 
-    public String getHost() throws NotImplemented {
+    public String getHost() {
         if (m_url !=null && m_url.getHost()!=null) {
             return m_url.getHost();
         } else if (BaseURL.NO_HOST.equals(m_base.getHost())) {
@@ -68,7 +69,7 @@ public class FilledURL {
         }
     }
 
-    public int getPort() throws NotImplemented {
+    public int getPort() {
         if (m_url !=null && m_url.getPort()!=BaseURL.NO_PORT) {
             return m_url.getPort();
         } else {
@@ -76,7 +77,7 @@ public class FilledURL {
         }
     }
 
-    public String getPath() throws NotImplemented {
+    public String getPath() {
         if (m_url !=null && m_url.getPath()!=null) {
             if (m_base.getPath() != null && !m_url.getPath().startsWith(m_base.getPath())) {
                 return m_base.getPath() + "/" + m_url.getPath();
@@ -88,7 +89,7 @@ public class FilledURL {
         }
     }
 
-    public void setAttributes(Map attributes) throws NotImplemented {
+    public void setAttributes(Map attributes) {
         if (m_base.getQuery()!=null) {
             setAttributes(m_base.getQuery(), attributes);
         }
@@ -109,55 +110,41 @@ public class FilledURL {
         }
     }
 
-    public URI getURI() {
-        try {
-            String host = this.getHost();
-            String path = this.getPath();
-            if (path.startsWith("./")) {
-                // can not create relative URI with multi-arguments constructors
-                StringBuffer buf = new StringBuffer();
-                if (this.getScheme() != null) {
-                    buf.append(this.getScheme());
-                    buf.append("://");
-                }
-                if (this.getHost() != null) {
-                    if (this.getUserInfo() != null) {
-                        buf.append(this.getUserInfo());
-                        buf.append("@");
-                    }
-                    buf.append(this.getHost());
-                    if (this.getPort() > -1) {
-                        buf.append(':');
-                        buf.append(this.getPort());
-                    }
-                }
-                buf.append(path);
-                if (this.getQuery() != null) {
-                    buf.append('?');
-                    buf.append(this.getQuery());
-                }
-                if (this.getFragment() != null) {
-                    buf.append('#');
-                    buf.append(this.getFragment());
-                }
-                return new URI(buf.toString());
-            } else {
-                return new URI(this.getScheme(), this.getUserInfo(), (host!=null ? host : ""),
-                        this.getPort(), path,
-                        this.getQuery(), this.getFragment());
-            }
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        } catch (NotImplemented e) {
-            throw new RuntimeException(e);
+    /** Decodes the URL */
+    public String getString() {
+        StringBuffer buf = new StringBuffer();
+        if (this.getScheme() != null) {
+            buf.append(this.getScheme());
+            buf.append("://");
         }
+        if (this.getHost() != null) {
+            if (this.getUserInfo() != null) {
+                buf.append(this.getUserInfo());
+                buf.append("@");
+            }
+            buf.append(this.getHost());
+            if (this.getPort() > -1) {
+                buf.append(':');
+                buf.append(this.getPort());
+            }
+        }
+        buf.append(this.getPath());
+        if (this.getQuery() != null) {
+            buf.append('?');
+            buf.append(this.getQuery());
+        }
+        if (this.getFragment() != null) {
+            buf.append('#');
+            buf.append(this.getFragment());
+        }
+        return buf.toString();
     }
 
-    private String getScheme() throws NotImplemented {
+    private String getScheme() {
         return m_url.getScheme();
     }
 
-    private String getQuery() throws NotImplemented {
+    private String getQuery() {
         if (m_base.getQuery()!=null && m_url.getQuery()!=null) {
             return m_base.getQuery()+"&"+m_url.getQuery();
         } else if (m_base.getQuery()!=null) {
@@ -169,7 +156,7 @@ public class FilledURL {
         }
     }
 
-    private String getFragment() throws NotImplemented {
+    private String getFragment() {
         return m_url.getFragment();
     }
 }

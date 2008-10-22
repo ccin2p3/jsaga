@@ -6,8 +6,8 @@ import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
 import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
-import fr.in2p3.jsaga.helpers.URLFactory;
-import org.ogf.saga.URL;
+import fr.in2p3.jsaga.impl.url.URLHelper;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
@@ -128,7 +128,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             // move source childs to target directory
             FileAttributes[] sourceChilds = this._listAttributes(m_url.getPath());
             for (int i=0; i<sourceChilds.length; i++) {
-                URL remoteChild = URLFactory.createURL(effectiveTarget, sourceChilds[i].getName());
+                URL remoteChild = URLHelper.createURL(effectiveTarget, sourceChilds[i].getName());
                 NSEntry entry = this._openNS(sourceChilds[i]);
                 if (entry instanceof NSDirectory) {
                     entry.move(remoteChild, flags);
@@ -197,7 +197,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
     /** override super._getEffectiveURL() */
     protected URL _getEffectiveURL(URL target) throws NotImplemented, IncorrectState, BadParameter, Timeout, NoSuccess {
         if (target.getPath().endsWith("/")) {
-            return URLFactory.createURL(target, super._getEntryName()+"/");
+            return URLHelper.createURL(target, super._getEntryName()+"/");
         } else {
             return target;
         }
@@ -221,15 +221,15 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
     protected NSEntry _openNS(FileAttributes attr) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IncorrectURL {
         switch(attr.getType()) {
             case FileAttributes.DIRECTORY_TYPE:
-                return this._openNSDir(new URL(attr.getName()));
+                return this._openNSDir(org.ogf.saga.url.URLFactory.createURL(attr.getName()));
             case FileAttributes.FILE_TYPE:
             case FileAttributes.LINK_TYPE:
-                return this._openNSEntry(new URL(attr.getName()));
+                return this._openNSEntry(org.ogf.saga.url.URLFactory.createURL(attr.getName()));
             case FileAttributes.UNKNOWN_TYPE:
             default:
-                NSEntry entry = this._openNSEntry(new URL(attr.getName()));
+                NSEntry entry = this._openNSEntry(org.ogf.saga.url.URLFactory.createURL(attr.getName()));
                 if (entry.isDir()) {
-                    return this._openNSDir(new URL(attr.getName()));
+                    return this._openNSDir(org.ogf.saga.url.URLFactory.createURL(attr.getName()));
                 } else {
                     return entry;
                 }

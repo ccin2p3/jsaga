@@ -13,7 +13,7 @@ import fr.in2p3.jsaga.jobcollection.*;
 import org.exolab.castor.xml.Unmarshaller;
 import org.ggf.schemas.jsdl.JobDefinition;
 import org.ogf.saga.SagaObject;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.Task;

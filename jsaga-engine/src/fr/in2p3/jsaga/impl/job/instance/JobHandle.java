@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.impl.job.instance;
 
 import fr.in2p3.jsaga.impl.monitoring.MetricImpl;
 import fr.in2p3.jsaga.impl.task.TaskCallback;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;

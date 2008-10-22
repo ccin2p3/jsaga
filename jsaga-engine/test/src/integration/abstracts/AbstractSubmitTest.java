@@ -3,7 +3,7 @@ package integration.abstracts;
 import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.jobcollection.*;
 import junit.framework.TestCase;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.job.Job;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;

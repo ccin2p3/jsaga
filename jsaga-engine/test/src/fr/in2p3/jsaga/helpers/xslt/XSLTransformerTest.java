@@ -1,7 +1,8 @@
 package fr.in2p3.jsaga.helpers.xslt;
 
 import junit.framework.TestCase;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 
 import java.io.ByteArrayInputStream;
 import java.util.Properties;
@@ -21,23 +22,23 @@ import java.util.Properties;
 public class XSLTransformerTest extends TestCase {
     public void test_wrapper_1_generate_URL() throws Exception {
         final URL[] urls = new URL[] {
-                new URL("gsiftp://host:2811/absolute/path/to/file.txt?query#grid"),
-                new URL("gsiftp://host:2811/absolute/path/to/file.txt#grid"),
-                new URL("gsiftp://host:2811?query#grid"),
-                new URL("gsiftp://host:2811#grid"),
-                new URL("gsiftp://host:2811"),
-                new URL("gsiftp://host:2811/absolute/path/to/file.txt"),
-                new URL("gsiftp://host:2811/./relative/path/to/file.txt"),
-                new URL("srb://user@host/absolute/path/to/file.txt"),
-                new URL("srb:///absolute/path/to/file.txt"),
-                new URL("file:///C:/absolute/path/to/dir/"),
-                new URL("file:///absolute/path/to/dir/"),
-                new URL("file://./relative/path/to/file.txt"),
-                new URL("file://$PWD/relative/path/to/file.txt")
+                URLFactory.createURL("gsiftp://host:2811/absolute/path/to/file.txt?query#grid"),
+                URLFactory.createURL("gsiftp://host:2811/absolute/path/to/file.txt#grid"),
+                URLFactory.createURL("gsiftp://host:2811?query#grid"),
+                URLFactory.createURL("gsiftp://host:2811#grid"),
+                URLFactory.createURL("gsiftp://host:2811"),
+                URLFactory.createURL("gsiftp://host:2811/absolute/path/to/file.txt"),
+                URLFactory.createURL("gsiftp://host:2811/./relative/path/to/file.txt"),
+                URLFactory.createURL("srb://user@host/absolute/path/to/file.txt"),
+                URLFactory.createURL("srb:///absolute/path/to/file.txt"),
+                URLFactory.createURL("file:///C:/absolute/path/to/dir/"),
+                URLFactory.createURL("file:///absolute/path/to/dir/"),
+                URLFactory.createURL("file://./relative/path/to/file.txt"),
+                URLFactory.createURL("file://$PWD/relative/path/to/file.txt")
         };
         XSLTransformer t = XSLTransformerFactory.getInstance().create("xsl/execution/wrapper_1-generate.xsl");
         for (int i=0; i<urls.length; i++) {
-            byte[] xml = ("<test>"+urls[i].getURL()+"</test>").getBytes();
+            byte[] xml = ("<test>"+urls[i]+"</test>").getBytes();
             Properties prop = new Properties();
             prop.load(new ByteArrayInputStream(t.transform(xml)));
             assertEquals(

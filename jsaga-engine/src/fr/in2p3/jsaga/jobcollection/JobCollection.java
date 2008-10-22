@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.jobcollection;
 
 import fr.in2p3.jsaga.engine.schema.jsdl.extension.ResourceSelection;
 import fr.in2p3.jsaga.workflow.Workflow;
-import org.ogf.saga.URL;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.error.NoSuccess;
 
 import java.io.File;
