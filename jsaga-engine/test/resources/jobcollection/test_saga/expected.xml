@@ -14,7 +14,7 @@
                 </JobIdentification>
                 <Application>
                     <p:POSIXApplication xmlns:p="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix">
-                        <p:Executable filesystemName="WorkingDirectory">/bin/date</p:Executable>
+                        <p:Executable>/bin/date</p:Executable>
                         <p:Output filesystemName="WorkingDirectory">stdout.txt</p:Output>
                         <p:Error filesystemName="WorkingDirectory">stderr.txt</p:Error>
                     </p:POSIXApplication>
