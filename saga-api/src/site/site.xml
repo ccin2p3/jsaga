@@ -8,8 +8,10 @@
     <bannerLeft><src>images/logo-jsaga.png</src><alt>JSAGA</alt></bannerLeft>
     <bannerRight><src>http://www.gridforum.org/images/OGF_tagline.gif</src><alt>OGF</alt></bannerRight>
     <poweredBy>
-        <logo name="CC-IN2P3" href="http://cc.in2p3.fr/" img="http://cc.in2p3.fr/images/site/logoCC72.gif"/>
-        <logo name="British Telecom" href="http://www.bt.com/" img="http://www.bt.com/static/wa/homepage/images/logo_75x36.gif"/>
+        <logo name="Vrije University" href="http://www.vu.nl/en/" img="http://saga.cct.lsu.edu/images/SAGA/logos/footer_logo_vrije.png"/>
+        <logo name="LSU" href="http://www.cct.lsu.edu/" img="http://saga.cct.lsu.edu/images/SAGA/logos/footer_logo_cct.png"/>
+        <logo name="Xtreem OS" href="http://www.xtreemos.eu/" img="http://saga.cct.lsu.edu/images/SAGA/logos/footer_logo_xtreemos.jpg"/>
+        <logo name="OMII-UK" href="http://www.omii.ac.uk/" img="http://saga.cct.lsu.edu/images/SAGA/logos/footer_logo_omii-uk.png"/>
     </poweredBy>
     <body>
         <links>
@@ -21,6 +23,6 @@
             <item name="Project Home" href="../index.html"/>
         </menu>
         <menu name="Module Documentation" ref="reports"/>
-        <menu name="Test-suite provided by..."/>
+        <menu name="Provided by..."/>
     </body>
 </project>
