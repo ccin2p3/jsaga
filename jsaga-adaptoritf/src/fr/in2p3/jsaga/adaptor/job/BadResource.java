@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.adaptor.job;
 
 import org.ogf.saga.SagaObject;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -15,7 +15,7 @@ import org.ogf.saga.error.NoSuccess;
 /**
  *
  */
-public class BadResource extends NoSuccess {
+public class BadResource extends NoSuccessException {
 
     private static final long serialVersionUID = 1L;
 

@@ -1,7 +1,5 @@
 package org.ogf.saga.namespace.abstracts;
 
-import org.ogf.saga.url.URL;
-import org.ogf.saga.url.URLFactory;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.file.Directory;
@@ -9,6 +7,8 @@ import org.ogf.saga.file.File;
 import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.SessionFactory;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 
 import java.util.List;
 

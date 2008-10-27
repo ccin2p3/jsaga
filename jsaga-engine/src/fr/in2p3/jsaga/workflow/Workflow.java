@@ -24,14 +24,14 @@ public interface Workflow extends TaskContainer {
      * @param successorName name of a successor task.
      */
     public void add(WorkflowTask task, String predecessorName, String successorName)
-            throws NotImplemented, BadParameter, Timeout, NoSuccess;
+            throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException;
 
     /**
      * Removes a single task from the workflow.
      * @param name the name identifying the task.
      */
     public void remove(String name)
-            throws NotImplemented, Timeout, NoSuccess;
+            throws NotImplementedException, TimeoutException, NoSuccessException;
 
     /**
      * Gets a single task from the workflow.
@@ -39,14 +39,14 @@ public interface Workflow extends TaskContainer {
      * @return the task.
      */
     public WorkflowTask getTask(String name)
-        throws NotImplemented, DoesNotExist, Timeout, NoSuccess;
+        throws NotImplementedException, DoesNotExistException, TimeoutException, NoSuccessException;
 
     /**
      * Gets the states of all tasks in the workflow.
      * @return the states in a XML document.
      */
     public Document getStatesAsXML()
-            throws NotImplemented, Timeout, NoSuccess;
+            throws NotImplementedException, TimeoutException, NoSuccessException;
 
     ////////////////////////////////// interface TaskContainer /////////////////////////////////
 
@@ -54,5 +54,5 @@ public interface Workflow extends TaskContainer {
      * TO BE OVERRIDED FOR IMPLEMENTING WORKFLOW BEHAVIOR.
      */
     public void run()
-            throws NotImplemented, IncorrectState, DoesNotExist, Timeout, NoSuccess;
+            throws NotImplementedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException;
 }

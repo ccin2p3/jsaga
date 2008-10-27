@@ -22,7 +22,7 @@ import java.util.Set;
 public class JobSchemeIntrospectorImpl extends AbstractIntrospectorImpl implements Introspector {
     private Execution m_config;
 
-    public JobSchemeIntrospectorImpl(Execution config) throws NoSuccess {
+    public JobSchemeIntrospectorImpl(Execution config) throws NoSuccessException {
         super(config.getScheme());
         m_config = config;
     }
@@ -58,7 +58,7 @@ public class JobSchemeIntrospectorImpl extends AbstractIntrospectorImpl implemen
      * @param key the host
      * @return the created introspector
      */
-    public Introspector getChildIntrospector(String key) throws NotImplemented, DoesNotExist, NoSuccess {
+    public Introspector getChildIntrospector(String key) throws NotImplementedException, DoesNotExistException, NoSuccessException {
         return new JobHostPatternIntrospectorImpl(m_config, key);
     }
 }

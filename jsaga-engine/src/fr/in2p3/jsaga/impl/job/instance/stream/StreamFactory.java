@@ -18,7 +18,7 @@ import org.ogf.saga.error.*;
  * TODO: not used yet...
  */
 public class StreamFactory {
-    public static Stdin createStdin(JobImpl job, JobControlAdaptor adaptor) throws NotImplemented, DoesNotExist, Timeout, NoSuccess {
+    public static Stdin createStdin(JobImpl job, JobControlAdaptor adaptor) throws NotImplementedException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (adaptor instanceof StreamableJobInteractiveSet) {
             return new PostconnectedStdinOutputStream(job);
         } else {
@@ -26,7 +26,7 @@ public class StreamFactory {
         }
     }
 
-    public static Stdout createStdout(JobImpl job, JobControlAdaptor adaptor, JobIOHandler ioHandler) throws NotImplemented, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public static Stdout createStdout(JobImpl job, JobControlAdaptor adaptor, JobIOHandler ioHandler) throws NotImplementedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (adaptor instanceof StreamableJobInteractiveGet) {
             return new GetterInputStream(((JobIOGetterInteractive)ioHandler).getStdout());
         } else if (adaptor instanceof StreamableJobInteractiveSet) {
@@ -34,11 +34,11 @@ public class StreamFactory {
         } else if (adaptor instanceof StreamableJobBatch) {
             return new JobStdoutInputStream(job, ioHandler);
         } else {
-            throw new NotImplemented("Unsupported streamable interface: "+adaptor.getClass().getName());
+            throw new NotImplementedException("Unsupported streamable interface: "+adaptor.getClass().getName());
         }
     }
 
-    public static Stdout createStderr(JobImpl job, JobControlAdaptor adaptor, JobIOHandler ioHandler) throws NotImplemented, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public static Stdout createStderr(JobImpl job, JobControlAdaptor adaptor, JobIOHandler ioHandler) throws NotImplementedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (adaptor instanceof StreamableJobInteractiveGet) {
             return new GetterInputStream(((JobIOGetterInteractive)ioHandler).getStderr());
         } else if (adaptor instanceof StreamableJobInteractiveSet) {
@@ -46,7 +46,7 @@ public class StreamFactory {
         } else if (adaptor instanceof StreamableJobBatch) {
             return new JobStderrInputStream(job, ioHandler);
         } else {
-            throw new NotImplemented("Unsupported streamable interface: "+adaptor.getClass().getName());
+            throw new NotImplementedException("Unsupported streamable interface: "+adaptor.getClass().getName());
         }
     }
 }

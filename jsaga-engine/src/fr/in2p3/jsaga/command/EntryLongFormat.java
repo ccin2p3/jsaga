@@ -30,12 +30,12 @@ public class EntryLongFormat {
         m_parentDir = parentDir;
     }
 
-    public String toString(URL url) throws org.ogf.saga.error.Exception {
+    public String toString(URL url) throws SagaException {
         NSEntry entry = m_parentDir.open(url, Flags.NONE.getValue());
         return this.toString(entry);
     }
 
-    public String toString(NSEntry entry) throws org.ogf.saga.error.Exception {
+    public String toString(NSEntry entry) throws SagaException {
         String owner = this.getOwner(entry);
         StringBuffer buf = new StringBuffer();
         buf.append(this.isDir(entry) ? 'd' : '-');
@@ -61,35 +61,35 @@ public class EntryLongFormat {
         return buf.toString();
     }
 
-    public boolean isDir(NSEntry entry) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    public boolean isDir(NSEntry entry) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         try {
             return entry.isDir();
-        } catch (NotImplemented e) {
+        } catch (NotImplementedException e) {
             return false;
         }
     }
 
-    public String getOwner(NSEntry entry) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
+    public String getOwner(NSEntry entry) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
         try {
             return entry.getOwner();
-        } catch (NotImplemented e) {
+        } catch (NotImplementedException e) {
             return null;
         }
     }
 
-    public boolean permissionsCheck(NSEntry entry, String owner, Permission perm) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+    public boolean permissionsCheck(NSEntry entry, String owner, Permission perm) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         try {
             return entry.permissionsCheck(owner, perm.getValue());
-        } catch (NotImplemented e) {
+        } catch (NotImplementedException e) {
             return false;
         }
     }
 
-    public String getSize(NSEntry entry) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public String getSize(NSEntry entry) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (entry instanceof File) {
             try {
                 return ""+((File)entry).getSize();
-            } catch (NotImplemented e) {
+            } catch (NotImplementedException e) {
                 return "?";
             }
         } else {
@@ -97,11 +97,11 @@ public class EntryLongFormat {
         }
     }
 
-    public Date getLastModified(NSEntry entry) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public Date getLastModified(NSEntry entry) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (entry instanceof AbstractNSEntryImpl) {
             try {
                 return ((AbstractNSEntryImpl)entry).getLastModified();
-            } catch (NotImplemented e) {
+            } catch (NotImplementedException e) {
                 return new Date(0);
             }
         } else {
@@ -109,7 +109,7 @@ public class EntryLongFormat {
         }
     }
 
-    public String getName(NSEntry entry) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    public String getName(NSEntry entry) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         try {
             URL nameUrl = entry.getName();
             // getString() decodes the URL, while toString() does not
@@ -118,7 +118,7 @@ public class EntryLongFormat {
                 name += "/";
             }
             return name;
-        } catch (NotImplemented e) {
+        } catch (NotImplementedException e) {
             return "?";
         }
     }

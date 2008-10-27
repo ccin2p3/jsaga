@@ -1,10 +1,8 @@
 package org.ogf.saga.namespace.abstracts;
 
-import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.*;
-
-import java.lang.Exception;
+import org.ogf.saga.url.URL;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -45,8 +43,8 @@ public abstract class AbstractNSDirectoryMakeTest extends AbstractNSDirectoryTes
     	m_subDir.remove(Flags.RECURSIVE.getValue());
         try {
     		NSFactory.createNSDirectory(m_session, m_subDirUrl2, Flags.CREATE.getValue());
-            fail("Expected DoesNotExist exception");
-        } catch(DoesNotExist e) {
+            fail("Expected exception: "+ DoesNotExistException.class);
+        } catch(DoesNotExistException e) {
         }
     }
 
@@ -65,7 +63,7 @@ public abstract class AbstractNSDirectoryMakeTest extends AbstractNSDirectoryTes
     	try {
     		NSFactory.createNSDirectory(m_session, m_subDirUrl, Flags.CREATE.or(Flags.EXCL));
             fail("Expected AlreadyExist exception");
-        } catch(AlreadyExists e) {
+        } catch(AlreadyExistsException e) {
         }
     }
 
@@ -74,8 +72,8 @@ public abstract class AbstractNSDirectoryMakeTest extends AbstractNSDirectoryTes
         m_subDir.remove(Flags.RECURSIVE.getValue());
         try {
             NSFactory.createNSDirectory(m_session, m_subDirUrl, Flags.NONE.getValue());
-            fail("Expected DoesNotExist exception");
-        } catch(DoesNotExist e) {
+            fail("Expected exception: "+ DoesNotExistException.class);
+        } catch(DoesNotExistException e) {
         }
     }
 
@@ -83,8 +81,8 @@ public abstract class AbstractNSDirectoryMakeTest extends AbstractNSDirectoryTes
     	m_subDir2 = m_dir.openDir(m_subDirUrl2, Flags.CREATE.getValue());
         try {
         	m_subDir.remove(Flags.NONE.getValue());
-            fail("Expected NoSuccess exception");
-        } catch(NoSuccess e) {
+            fail("Expected exception: "+ NoSuccessException.class);
+        } catch(NoSuccessException e) {
         }
     }
 }

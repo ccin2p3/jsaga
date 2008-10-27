@@ -6,17 +6,16 @@ import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
-import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
+import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
 import fr.in2p3.jsaga.impl.url.URLImpl;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
+import org.ogf.saga.namespace.NSEntry;
 import org.ogf.saga.permissions.Permissions;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
 import org.ogf.saga.url.URL;
-
-import java.lang.Exception;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -30,12 +29,12 @@ import java.lang.Exception;
 /**
  *
  */
-public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl implements Permissions {
+public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl implements Permissions<NSEntry>, NSEntry {
     protected URL m_url;
     protected DataAdaptor m_adaptor;
 
     /** constructor */
-    public AbstractDataPermissionsImpl(Session session, URL url, DataAdaptor adaptor) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public AbstractDataPermissionsImpl(Session session, URL url, DataAdaptor adaptor) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session);
 
         // set URL
@@ -59,7 +58,7 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
 
     //////////////////////////////////////////// Synchronous ////////////////////////////////////////////
 
-    public void permissionsAllow(String id, int permissions) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+    public void permissionsAllow(String id, int permissions) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof PermissionAdaptor) {
             PermissionBytes effectivePermissions = new PermissionBytes(permissions);
             ((PermissionAdaptor)m_adaptor).permissionsAllow(
@@ -67,11 +66,11 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
                     id,
                     effectivePermissions);
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
 
-    public void permissionsDeny(String id, int permissions) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+    public void permissionsDeny(String id, int permissions) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof PermissionAdaptor) {
             PermissionBytes effectivePermissions = new PermissionBytes(permissions);
             ((PermissionAdaptor)m_adaptor).permissionsDeny(
@@ -79,11 +78,11 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
                     id,
                     effectivePermissions);
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
 
-    public boolean permissionsCheck(String id, int permissions) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+    public boolean permissionsCheck(String id, int permissions) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         try {
             FileAttributes attrs = this._getFileAttributes();
             PermissionBytes perm = attrs.getPermission();
@@ -95,105 +94,85 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
                     return perm.containsAll(permissions);
                 }
             }
-        } catch (IncorrectState e) {
-            throw new NoSuccess(e);
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
         }
-        throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
+        throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
     }
 
-    public String getOwner() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
+    public String getOwner() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
         try {
             FileAttributes attrs = this._getFileAttributes();
             String owner = attrs.getOwner();
             if (owner != null) {
                 return owner;
             }
-        } catch (IncorrectState e) {
-            throw new NoSuccess(e);
-        } catch (BadParameter e) {
-            throw new NoSuccess(e);
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
+        } catch (BadParameterException e) {
+            throw new NoSuccessException(e);
         }
-        throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
+        throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
     }
 
-    public String getGroup() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
+    public String getGroup() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
         try {
             FileAttributes attrs = this._getFileAttributes();
             String group = attrs.getGroup();
             if (group != null) {
                 return group;
             }
-        } catch (IncorrectState e) {
-            throw new NoSuccess(e);
-        } catch (BadParameter e) {
-            throw new NoSuccess(e);
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
+        } catch (BadParameterException e) {
+            throw new NoSuccessException(e);
         }
-        throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
+        throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
     }
 
     //////////////////////////////////////////// Asynchronous ////////////////////////////////////////////
 
-    public Task permissionsAllow(TaskMode mode, String id, int permissions) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractDataPermissionsImpl.class.getMethod("permissionsAllow", new Class[]{String.class, int.class}),
-                    new Object[]{id, permissions}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<NSEntry, Void> permissionsAllow(TaskMode mode, String id, int permissions) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<NSEntry,Void>().create(
+                mode, m_session, this,
+                "permissionsAllow",
+                new Class[]{String.class, int.class},
+                new Object[]{id, permissions});
     }
 
-    public Task permissionsDeny(TaskMode mode, String id, int permissions) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractDataPermissionsImpl.class.getMethod("permissionsDeny", new Class[]{String.class, int.class}),
-                    new Object[]{id, permissions}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<NSEntry, Void> permissionsDeny(TaskMode mode, String id, int permissions) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<NSEntry,Void>().create(
+                mode, m_session, this,
+                "permissionsDeny",
+                new Class[]{String.class, int.class},
+                new Object[]{id, permissions});
     }
 
-    public Task<Boolean> permissionsCheck(TaskMode mode, String id, int permissions) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractDataPermissionsImpl.class.getMethod("permissionsCheck", new Class[]{String.class, int.class}),
-                    new Object[]{id, permissions}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<NSEntry, Boolean> permissionsCheck(TaskMode mode, String id, int permissions) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<NSEntry,Boolean>().create(
+                mode, m_session, this,
+                "permissionsCheck",
+                new Class[]{String.class, int.class},
+                new Object[]{id, permissions});
     }
 
-    public Task<String> getOwner(TaskMode mode) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractDataPermissionsImpl.class.getMethod("getOwner", new Class[]{}),
-                    new Object[]{}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<NSEntry, String> getOwner(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<NSEntry,String>().create(
+                mode, m_session, this,
+                "getOwner",
+                new Class[]{},
+                new Object[]{});
     }
 
-    public Task<String> getGroup(TaskMode mode) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractDataPermissionsImpl.class.getMethod("getGroup", new Class[]{}),
-                    new Object[]{}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<NSEntry, String> getGroup(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<NSEntry,String>().create(
+                mode, m_session, this,
+                "getGroup",
+                new Class[]{},
+                new Object[]{});
     }
 
-    protected FileAttributes _getFileAttributes() throws NotImplemented, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    protected FileAttributes _getFileAttributes() throws NotImplementedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         FileAttributes attrs;
         if ( ((URLImpl)m_url).hasCache() ) {
             // get file attributes from cache
@@ -204,14 +183,14 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
                 attrs = ((DataReaderAdaptor)m_adaptor).getAttributes(
                         m_url.getPath(),
                         m_url.getQuery());
-            } catch (DoesNotExist doesNotExist) {
-                throw new IncorrectState("Entry does not exist: "+m_url, doesNotExist);
+            } catch (DoesNotExistException doesNotExist) {
+                throw new IncorrectStateException("Entry does not exist: "+m_url, doesNotExist);
             }
 
             // set file attributes to cache
             ((URLImpl)m_url).setCache(attrs);
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: "+m_url.getScheme(), this);
         }
         return attrs;
     }

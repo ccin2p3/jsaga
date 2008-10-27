@@ -5,8 +5,8 @@ import fr.in2p3.jsaga.engine.schema.jsdl.extension.*;
 import fr.in2p3.jsaga.impl.job.description.XJSDLJobDescriptionImpl;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.NoSuccessException;
 import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -28,7 +28,7 @@ public class JobCollectionSplitter {
     private JobCollection m_jcBean;
     private XJSDLJobDescriptionImpl[] m_individualJobArray;
 
-    public JobCollectionSplitter(Document jobCollection, Evaluator evaluator) throws NoSuccess {
+    public JobCollectionSplitter(Document jobCollection, Evaluator evaluator) throws NoSuccessException {
         try {
             // marshall <JobCollection>
             m_jcBean = (JobCollection) Unmarshaller.unmarshal(JobCollection.class, jobCollection);
@@ -41,9 +41,9 @@ public class JobCollectionSplitter {
 
             // set jobTemplate
             if (m_jcBean.getJobCount() == 0) {
-                throw new NoSuccess("Found no <Job> in description");
+                throw new NoSuccessException("Found no <Job> in description");
             } else if (m_jcBean.getJobCount() > 1) {
-                throw new NoSuccess("Several <Job> in description is not supported");
+                throw new NoSuccessException("Several <Job> in description is not supported");
             }
             Job jobBean = m_jcBean.getJob(0);
             ByteArrayOutputStream jobBytes = new ByteArrayOutputStream();
@@ -76,7 +76,7 @@ public class JobCollectionSplitter {
                 m_individualJobArray[i] = new XJSDLJobDescriptionImpl(collectionName, jobName, clone);
             }
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 
@@ -88,7 +88,7 @@ public class JobCollectionSplitter {
         return m_individualJobArray;
     }
 
-    private static void evaluate(Element current, Evaluator evaluator) throws BadParameter {
+    private static void evaluate(Element current, Evaluator evaluator) throws BadParameterException {
         NodeList list = current.getChildNodes();
         for (int i=0; i<list.getLength(); i++) {
             Node n = list.item(i);
@@ -115,7 +115,7 @@ public class JobCollectionSplitter {
         }
     }
 
-    private static String evaluate(String value, Evaluator evaluator) throws BadParameter {
+    private static String evaluate(String value, Evaluator evaluator) throws BadParameterException {
         int start = value.indexOf("@{");
         if (start > -1) {
             int end = value.indexOf("}", start);

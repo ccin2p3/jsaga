@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.engine.config.bean;
 
 import fr.in2p3.jsaga.engine.schema.config.*;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +19,7 @@ import java.util.Map;
  *
  */
 public class ServiceEngineConfigurationAbstract {
-    public ServiceRef[] listServiceRefByHostname(Mapping mapping, String hostname) throws NoSuccess {
+    public ServiceRef[] listServiceRefByHostname(Mapping mapping, String hostname) throws NoSuccessException {
         if (mapping != null) {
             if (hostname != null) {
                 for (int d=0; d<mapping.getDomainCount(); d++) {

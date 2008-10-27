@@ -7,8 +7,6 @@ import fr.in2p3.jsaga.impl.job.instance.JobHandle;
 import org.ogf.saga.error.*;
 import org.ogf.saga.task.State;
 
-import java.lang.Exception;
-
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -25,7 +23,7 @@ public class JobRunTask extends AbstractWorkflowTaskImpl {
     private JobHandle m_jobHandle;
 
     /** constructor */
-    public JobRunTask(String jobName, JobHandle jobHandle) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public JobRunTask(String jobName, JobHandle jobHandle) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         super(null, name(jobName));
         m_jobHandle = jobHandle;
         // update XML status
@@ -37,7 +35,7 @@ public class JobRunTask extends AbstractWorkflowTaskImpl {
 
     //////////////////////////////////////////// abstract methods ////////////////////////////////////////////
 
-    protected void doSubmit() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    protected void doSubmit() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         m_jobHandle.run();
     }
 
@@ -49,16 +47,16 @@ public class JobRunTask extends AbstractWorkflowTaskImpl {
         }
     }
 
-    protected State queryState() throws NotImplemented, Timeout, NoSuccess {
+    protected State queryState() throws NotImplementedException, TimeoutException, NoSuccessException {
         return m_jobHandle.getState();
     }
 
-    public boolean startListening() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
-        throw new NotImplemented("Not supported");
+    public boolean startListening() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
+        throw new NotImplementedException("Not supported");
     }
 
-    public void stopListening() throws NotImplemented, Timeout, NoSuccess {
-        throw new NotImplemented("Not supported");
+    public void stopListening() throws NotImplementedException, TimeoutException, NoSuccessException {
+        throw new NotImplementedException("Not supported");
     }
 
     public static String name(String jobName) {

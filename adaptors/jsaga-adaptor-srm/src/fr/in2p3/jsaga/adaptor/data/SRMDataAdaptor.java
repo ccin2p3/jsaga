@@ -35,7 +35,7 @@ public class SRMDataAdaptor implements DataAdaptor {
         return m_adaptor.getUsage();
     }
 
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return m_adaptor.getDefaults(attributes);
     }
 
@@ -47,11 +47,11 @@ public class SRMDataAdaptor implements DataAdaptor {
         m_adaptor.setSecurityAdaptor(securityAdaptor);
     }
 
-    public BaseURL getBaseURL() throws IncorrectURL {
+    public BaseURL getBaseURL() throws IncorrectURLException {
         return m_adaptor.getBaseURL();
     }
 
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         // connect
         m_adaptor.connect(userInfo, host, port, null, attributes);
 
@@ -59,14 +59,14 @@ public class SRMDataAdaptor implements DataAdaptor {
         try {
             m_adaptor.ping();
             // v 2.2 => done
-        } catch(BadParameter e) {
+        } catch(BadParameterException e) {
             // v 1.1 => reconnect
             m_adaptor = new SRM11DataAdaptor();
             m_adaptor.connect(userInfo, host, port, null, attributes);
         }
     }
 
-    public void disconnect() throws NoSuccess {
+    public void disconnect() throws NoSuccessException {
         m_adaptor.disconnect();
     }
 }

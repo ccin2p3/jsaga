@@ -6,8 +6,8 @@ import fr.in2p3.jsaga.engine.schema.jsdl.extension.Intermediary;
 import fr.in2p3.jsaga.engine.schema.jsdl.extension.Resource;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformerFactory;
 import fr.in2p3.jsaga.impl.job.description.XJSDLJobDescriptionImpl;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
 import org.w3c.dom.Document;
 
 import java.io.File;
@@ -39,7 +39,7 @@ public class IndividualJobPreprocessor {
     private String m_wrapper;
     private File m_wrapperFile;
 
-    public IndividualJobPreprocessor(XJSDLJobDescriptionImpl jobDesc, Resource rm) throws NotImplemented, NoSuccess {
+    public IndividualJobPreprocessor(XJSDLJobDescriptionImpl jobDesc, Resource rm) throws NotImplementedException, NoSuccessException {
         // Set stylesheet parameters
         Map<String,String> parameters = new HashMap<String,String>();
         parameters.put("resourceId", rm.getId());
@@ -77,7 +77,7 @@ public class IndividualJobPreprocessor {
             jobContainer.save();
             m_effectiveJob = jobContainer.getAsDocument();
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 

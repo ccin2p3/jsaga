@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.base.usage;
 
-import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.DoesNotExistException;
 
 import java.util.*;
 
@@ -23,29 +23,29 @@ public class UOr implements Usage {
         m_or = usage;
     }
 
-    public String correctValue(String attributeName, String attributeValue) throws DoesNotExist {
+    public String correctValue(String attributeName, String attributeValue) throws DoesNotExistException {
         for (int i=0; m_or!=null && i<m_or.length; i++) {
             try {
                 return m_or[i].correctValue(attributeName, attributeValue);
-            } catch(DoesNotExist e) {
+            } catch(DoesNotExistException e) {
                 // next iteration
             }
         }
-        throw new DoesNotExist("Attribute not found: "+attributeName);
+        throw new DoesNotExistException("Attribute not found: "+attributeName);
     }
 
-    public int getFirstMatchingUsage(Map attributes) throws DoesNotExist {
+    public int getFirstMatchingUsage(Map attributes) throws DoesNotExistException {
         for (int i=0; m_or!=null && i<m_or.length; i++) {
             try {
                 int id = m_or[i].getFirstMatchingUsage(attributes);
                 if (id > -1) {
                     return id;
                 }
-            } catch(DoesNotExist e) {
+            } catch(DoesNotExistException e) {
                 // try next
             }
         }
-        throw new DoesNotExist("No matching usage found");
+        throw new DoesNotExistException("No matching usage found");
     }
 
     public Usage getMissingValues(Map attributes) {

@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.base.usage;
 
-import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.DoesNotExistException;
 
 import java.util.Map;
 
@@ -22,16 +22,16 @@ public interface Usage {
      * @param attributeName the name of the attribute to correct
      * @param attributeValue the value of the attribute to correct
      * @return the corrected value
-     * @throws DoesNotExist if the attribute is not contained within this usage instance
+     * @throws DoesNotExistException if the attribute is not contained within this usage instance
      */
-    public String correctValue(String attributeName, String attributeValue) throws DoesNotExist;
+    public String correctValue(String attributeName, String attributeValue) throws DoesNotExistException;
 
     /**
      * @param attributes a map containing all the attributes
      * @return the first matching usage
-     * @throws DoesNotExist if no usage matches the attributes
+     * @throws DoesNotExistException if no usage matches the attributes
      */
-    public int getFirstMatchingUsage(Map attributes) throws DoesNotExist;
+    public int getFirstMatchingUsage(Map attributes) throws DoesNotExistException;
 
     /**
      * Build a usage instance containing missing attributes only

@@ -23,26 +23,26 @@ public interface DataReaderAdaptor extends DataAdaptor {
      * @return true if the entry exists.
      */
     public boolean exists(String absolutePath, String additionalArgs)
-        throws PermissionDenied, Timeout, NoSuccess;
+        throws PermissionDeniedException, TimeoutException, NoSuccessException;
 
     /**
      * Get the file attributes of the entry <code>absolutePath</code>.
      * @param absolutePath the absolute path of the entry.
      * @param additionalArgs adaptor specific arguments.
      * @return the file attributes.
-     * @throws DoesNotExist if <code>absolutePath</code> does not exist.
+     * @throws DoesNotExistException if <code>absolutePath</code> does not exist.
      */
     public FileAttributes getAttributes(String absolutePath, String additionalArgs)
-        throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
+        throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException;
 
     /**
      * Lists all the entries in the directory <code>absolutePath</code>.
      * @param absolutePath the directory containing entries to list.
      * @param additionalArgs adaptor specific arguments.
      * @return the entry attributes.
-     * @throws BadParameter if <code>absolutePath</code> is not a directory.
-     * @throws DoesNotExist if <code>absolutePath</code> does not exist.
+     * @throws BadParameterException if <code>absolutePath</code> is not a directory.
+     * @throws DoesNotExistException if <code>absolutePath</code> does not exist.
      */
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs)
-        throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess;
+        throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException;
 }

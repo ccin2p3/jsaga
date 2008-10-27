@@ -20,7 +20,7 @@ public abstract class WorkflowFactory {
     private static WorkflowFactory factory;
 
     private synchronized static void initializeFactory()
-        throws NotImplemented, NoSuccess {
+        throws NotImplementedException, NoSuccessException {
         if (factory == null) {
             factory = new SagaFactoryImpl().createWorkflowFactory();
         }
@@ -32,7 +32,7 @@ public abstract class WorkflowFactory {
      * @return the workflow.
      */
     protected abstract Workflow doCreateWorkflow()
-        throws NotImplemented, BadParameter, Timeout, NoSuccess;
+        throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException;
 
     /**
      * Constructs a <code>Workflow</code> object.
@@ -40,7 +40,7 @@ public abstract class WorkflowFactory {
      * @return the workflow.
      */
     public synchronized static Workflow createWorkflow()
-        throws NotImplemented, BadParameter, Timeout, NoSuccess {
+        throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         initializeFactory();
         return factory.doCreateWorkflow();
     }

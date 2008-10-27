@@ -36,7 +36,7 @@ public class TaskStateMetricImpl<E> extends MetricImpl<E> {
         return clone;
     }
 
-    public synchronized int addCallback(Callback cb) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public synchronized int addCallback(Callback cb) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         int nbBefore = super.getNumberOfCallbacks();
         int cookie = super.addCallback(cb);
         int nbAfter = super.getNumberOfCallbacks();
@@ -46,7 +46,7 @@ public class TaskStateMetricImpl<E> extends MetricImpl<E> {
         return cookie;
     }
 
-    public synchronized void removeCallback(int cookie) throws NotImplemented, BadParameter, AuthenticationFailed, AuthorizationFailed,PermissionDenied, Timeout, NoSuccess {
+    public synchronized void removeCallback(int cookie) throws NotImplementedException, BadParameterException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
         int nbBefore = super.getNumberOfCallbacks();
         super.removeCallback(cookie);
         int nbAfter = super.getNumberOfCallbacks();

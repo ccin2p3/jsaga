@@ -1,354 +1,467 @@
 package org.ogf.saga.namespace;
 
-import org.ogf.saga.url.URL;
 import org.ogf.saga.bootstrap.ImplementationBootstrapLoader;
-import org.ogf.saga.error.AlreadyExists;
-import org.ogf.saga.error.AuthenticationFailed;
-import org.ogf.saga.error.AuthorizationFailed;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.DoesNotExist;
-import org.ogf.saga.error.IncorrectURL;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
-import org.ogf.saga.error.PermissionDenied;
-import org.ogf.saga.error.Timeout;
+import org.ogf.saga.error.AlreadyExistsException;
+import org.ogf.saga.error.AuthenticationFailedException;
+import org.ogf.saga.error.AuthorizationFailedException;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.error.IncorrectURLException;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.PermissionDeniedException;
+import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.task.TaskMode;
 import org.ogf.saga.task.Task;
+import org.ogf.saga.url.URL;
 
 /**
  * Factory for objects from the namespace package.
  */
 public abstract class NSFactory {
-    
+
     private static NSFactory factory;
 
     private static synchronized void initializeFactory()
-        throws NotImplemented {
+            throws NotImplementedException, NoSuccessException {
         if (factory == null) {
             factory = ImplementationBootstrapLoader.createNamespaceFactory();
         }
     }
-    
+
     /**
-     * Creates a task that creates a namespace entry.
-     * To be provided by the implementation.
-     * @param mode the task mode.
-     * @param session the session handle.
-     * @param name the initial working directory.
-     * @param flags the open mode.
+     * Creates a task that creates a namespace entry. To be provided by the
+     * implementation.
+     * 
+     * @param mode
+     *            the task mode.
+     * @param session
+     *            the session handle.
+     * @param name
+     *            the initial working directory.
+     * @param flags
+     *            the open mode.
      * @return the task.
-     * @exception NotImplemented is thrown when the task version of this
-     *     method is not implemented.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
      */
-    protected abstract Task<NSEntry> doCreateNSEntry(
+    protected abstract Task<NSFactory, NSEntry> doCreateNSEntry(TaskMode mode,
+            Session session, URL name, int flags)
+            throws NotImplementedException;
+
+    /**
+     * Creates a task that creates a namespace directory. To be provided by the
+     * implementation.
+     * 
+     * @param mode
+     *            the task mode.
+     * @param session
+     *            the session handle.
+     * @param name
+     *            the initial working directory.
+     * @param flags
+     *            the open mode.
+     * @return the task.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     */
+    protected abstract Task<NSFactory, NSDirectory> doCreateNSDirectory(
             TaskMode mode, Session session, URL name, int flags)
-        throws NotImplemented;
-    
-    /**
-     * Creates a task that creates a namespace directory.
-     * To be provided by the implementation.
-     * @param mode the task mode.
-     * @param session the session handle.
-     * @param name the initial working directory.
-     * @param flags the open mode.
-     * @return the task.
-     * @exception NotImplemented is thrown when the task version of this
-     *     method is not implemented.
-     */
-    protected abstract Task<NSDirectory>
-            doCreateNSDirectory(TaskMode mode, Session session, URL name,
-                    int flags)
-            throws NotImplemented;
-    
-    
+            throws NotImplementedException;
+
     /**
      * Creates a namespace entry. To be provided by the implementation.
-     * @param session the session handle.
-     * @param name the initial working directory.
-     * @param flags the open mode.
+     * 
+     * @param session
+     *            the session handle.
+     * @param name
+     *            the initial working directory.
+     * @param flags
+     *            the open mode.
      * @return the namespace entry.
      */
-    protected abstract NSEntry doCreateNSEntry(
-            Session session, URL name, int flags)
-        throws NotImplemented, IncorrectURL,
-            AuthenticationFailed, AuthorizationFailed, PermissionDenied,
-            BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess;
-    
+    protected abstract NSEntry doCreateNSEntry(Session session, URL name,
+            int flags) throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            DoesNotExistException, AlreadyExistsException, TimeoutException,
+            NoSuccessException;
+
     /**
      * Creates a namespace directory. To be provided by the implementation.
-     * @param session the session handle.
-     * @param name the initial working directory.
-     * @param flags the open mode.
+     * 
+     * @param session
+     *            the session handle.
+     * @param name
+     *            the initial working directory.
+     * @param flags
+     *            the open mode.
      * @return the namespace directory.
      */
-    protected abstract NSDirectory doCreateNSDirectory(
-            Session session, URL name, int flags)
-        throws NotImplemented, IncorrectURL,
-            AuthenticationFailed, AuthorizationFailed, PermissionDenied,
-            BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess;
-    
+    protected abstract NSDirectory doCreateNSDirectory(Session session,
+            URL name, int flags) throws NotImplementedException,
+            IncorrectURLException, AuthenticationFailedException,
+            AuthorizationFailedException, PermissionDeniedException,
+            BadParameterException, DoesNotExistException,
+            AlreadyExistsException, TimeoutException, NoSuccessException;
+
     /**
      * Creates a namespace entry.
-     * @param session the session handle.
-     * @param name the initial working directory.
-     * @param flags the open mode.
+     * 
+     * @param session
+     *            the session handle.
+     * @param name
+     *            the initial working directory.
+     * @param flags
+     *            the open mode.
      * @return the namespace entry.
      */
-    public static NSEntry createNSEntry(
-            Session session, URL name, int flags)
-        throws NotImplemented, IncorrectURL,
-            AuthenticationFailed, AuthorizationFailed, PermissionDenied,
-            BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+    public static NSEntry createNSEntry(Session session, URL name, int flags)
+            throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            DoesNotExistException, AlreadyExistsException, TimeoutException,
+            NoSuccessException {
         initializeFactory();
         return factory.doCreateNSEntry(session, name, flags);
     }
-    
+
     /**
      * Creates a namespace entry.
-     * @param session the session handle.
-     * @param name the initial working directory.
+     * 
+     * @param session
+     *            the session handle.
+     * @param name
+     *            the initial working directory.
      * @return the namespace entry.
      */
-    public static NSEntry createNSEntry(
-            Session session, URL name)
-        throws NotImplemented, IncorrectURL,
-            AuthenticationFailed, AuthorizationFailed, PermissionDenied,
-            BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+    public static NSEntry createNSEntry(Session session, URL name)
+            throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            DoesNotExistException, AlreadyExistsException, TimeoutException,
+            NoSuccessException {
         initializeFactory();
         return factory.doCreateNSEntry(session, name, Flags.NONE.getValue());
     }
 
     /**
-     * Creates a namespace directory.
-     * @param session the session handle.
-     * @param name the initial working directory.
-     * @param flags the open mode.
-     * @return the namespace entry.
-     */
-    public static NSDirectory createNSDirectory(
-            Session session, URL name, int flags)
-        throws NotImplemented, IncorrectURL,
-            AuthenticationFailed, AuthorizationFailed, PermissionDenied,
-            BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
-        initializeFactory();
-        return factory.doCreateNSDirectory(session, name, flags);
-    }
-    
-    /**
-     * Creates a namespace directory.
-     * @param session the session handle.
-     * @param name the initial working directory.
-     * @return the namespace entry.
-     */
-    public static NSDirectory createNSDirectory(
-            Session session, URL name)
-        throws NotImplemented, IncorrectURL,
-            AuthenticationFailed, AuthorizationFailed, PermissionDenied,
-            BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
-        initializeFactory();
-        return factory.doCreateNSDirectory(session, name, Flags.NONE.getValue());
-    }
-
-    /**
-     * Creates a task that creates a namespace entry.
-     * @param mode the task mode.
-     * @param session the session handle.
-     * @param name the initial working directory.
-     * @param flags the open mode.
-     * @return the task.
-     * @exception NotImplemented is thrown when the task version of this
-     *     method is not implemented.
-     */
-    public static Task<NSEntry> createNSEntry(TaskMode mode,
-            Session session, URL name, int flags)
-        throws NotImplemented {
-        initializeFactory();
-        return factory.doCreateNSEntry(mode, session, name, flags);
-    }
-    
-    /**
-     * Creates a task that creates a namespace entry.
-     * @param mode the task mode.
-     * @param session the session handle.
-     * @param name the initial working directory.
-     * @return the task.
-     * @exception NotImplemented is thrown when the task version of this
-     *     method is not implemented.
-     */
-    public static Task<NSEntry> createNSEntry(TaskMode mode,
-            Session session, URL name)
-        throws NotImplemented {
-        initializeFactory();
-        return factory.doCreateNSEntry(mode, session, name, Flags.NONE.getValue());
-    }
-
-
-    /**
-     * Creates a task that creates a namespace directory.
-     * @param mode the task mode.
-     * @param session the session handle.
-     * @param name the initial working directory.
-     * @param flags the open mode.
-     * @return the task.
-     * @exception NotImplemented is thrown when the task version of this
-     *     method is not implemented.
-     */
-    
-    public static Task<NSDirectory> createNSDirectory(
-            TaskMode mode, Session session, URL name, int flags)
-        throws NotImplemented {
-        initializeFactory();
-        return factory.doCreateNSDirectory(mode, session, name, flags);
-    }
-    
-    /**
-     * Creates a task that creates a namespace directory.
-     * @param mode the task mode.
-     * @param session the session handle.
-     * @param name the initial working directory.
-     * @return the task.
-     * @exception NotImplemented is thrown when the task version of this
-     *     method is not implemented.
-     */
-    public static Task<NSDirectory> createNSDirectory(
-            TaskMode mode, Session session, URL name)
-        throws NotImplemented {
-        initializeFactory();
-        return factory.doCreateNSDirectory(mode, session, name, Flags.NONE.getValue());
-    }
-    
-    
-    
-    /**
      * Creates a namespace entry using the default session.
-     * @param name the initial working directory.
-     * @param flags the open mode.
+     * 
+     * @param name
+     *            the initial working directory.
+     * @param flags
+     *            the open mode.
      * @return the namespace entry.
      */
     public static NSEntry createNSEntry(URL name, int flags)
-        throws NotImplemented, IncorrectURL,
-            AuthenticationFailed, AuthorizationFailed, PermissionDenied,
-            BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
-        Session session = SessionFactory.createSession(); 
+            throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            DoesNotExistException, AlreadyExistsException, TimeoutException,
+            NoSuccessException {
+        Session session = SessionFactory.createSession();
         initializeFactory();
         return factory.doCreateNSEntry(session, name, flags);
     }
-    
+
     /**
      * Creates a namespace entry using the default session.
-     * @param name the initial working directory.
+     * 
+     * @param name
+     *            the initial working directory.
      * @return the namespace entry.
      */
     public static NSEntry createNSEntry(URL name)
-        throws NotImplemented, IncorrectURL,
-            AuthenticationFailed, AuthorizationFailed, PermissionDenied,
-            BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+            throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            DoesNotExistException, AlreadyExistsException, TimeoutException,
+            NoSuccessException {
         Session session = SessionFactory.createSession();
         initializeFactory();
         return factory.doCreateNSEntry(session, name, Flags.NONE.getValue());
     }
 
     /**
+     * Creates a namespace directory.
+     * 
+     * @param session
+     *            the session handle.
+     * @param name
+     *            the initial working directory.
+     * @param flags
+     *            the open mode.
+     * @return the namespace entry.
+     */
+    public static NSDirectory createNSDirectory(Session session, URL name,
+            int flags) throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            DoesNotExistException, AlreadyExistsException, TimeoutException,
+            NoSuccessException {
+        initializeFactory();
+        return factory.doCreateNSDirectory(session, name, flags);
+    }
+
+    /**
+     * Creates a namespace directory.
+     * 
+     * @param session
+     *            the session handle.
+     * @param name
+     *            the initial working directory.
+     * @return the namespace entry.
+     */
+    public static NSDirectory createNSDirectory(Session session, URL name)
+            throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            DoesNotExistException, AlreadyExistsException, TimeoutException,
+            NoSuccessException {
+        initializeFactory();
+        return factory
+                .doCreateNSDirectory(session, name, Flags.NONE.getValue());
+    }
+
+    /**
      * Creates a namespace directory using the default session.
-     * @param name the initial working directory.
-     * @param flags the open mode.
+     * 
+     * @param name
+     *            the initial working directory.
+     * @param flags
+     *            the open mode.
      * @return the namespace entry.
      */
     public static NSDirectory createNSDirectory(URL name, int flags)
-        throws NotImplemented, IncorrectURL,
-            AuthenticationFailed, AuthorizationFailed, PermissionDenied,
-            BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+            throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            DoesNotExistException, AlreadyExistsException, TimeoutException,
+            NoSuccessException {
         Session session = SessionFactory.createSession();
         initializeFactory();
         return factory.doCreateNSDirectory(session, name, flags);
     }
-    
+
     /**
      * Creates a namespace directory using the default session.
-     * @param name the initial working directory.
+     * 
+     * @param name
+     *            the initial working directory.
      * @return the namespace entry.
      */
     public static NSDirectory createNSDirectory(URL name)
-        throws NotImplemented, IncorrectURL,
-            AuthenticationFailed, AuthorizationFailed, PermissionDenied,
-            BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+            throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            DoesNotExistException, AlreadyExistsException, TimeoutException,
+            NoSuccessException {
         Session session = SessionFactory.createSession();
         initializeFactory();
-        return factory.doCreateNSDirectory(session, name, Flags.NONE.getValue());
+        return factory
+                .doCreateNSDirectory(session, name, Flags.NONE.getValue());
+    }
+
+    /**
+     * Creates a task that creates a namespace entry.
+     * 
+     * @param mode
+     *            the task mode.
+     * @param session
+     *            the session handle.
+     * @param name
+     *            the initial working directory.
+     * @param flags
+     *            the open mode.
+     * @return the task.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     * @throws NoSuccessException
+     *             is thrown when the Saga factory could not be created.
+     */
+    public static Task<NSFactory, NSEntry> createNSEntry(TaskMode mode,
+            Session session, URL name, int flags)
+            throws NotImplementedException, NoSuccessException {
+        initializeFactory();
+        return factory.doCreateNSEntry(mode, session, name, flags);
+    }
+
+    /**
+     * Creates a task that creates a namespace entry.
+     * 
+     * @param mode
+     *            the task mode.
+     * @param session
+     *            the session handle.
+     * @param name
+     *            the initial working directory.
+     * @return the task.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     * @throws NoSuccessException
+     *             is thrown when the Saga factory could not be created.
+     */
+    public static Task<NSFactory, NSEntry> createNSEntry(TaskMode mode,
+            Session session, URL name) throws NotImplementedException,
+            NoSuccessException {
+        initializeFactory();
+        return factory.doCreateNSEntry(mode, session, name, Flags.NONE
+                .getValue());
     }
 
     /**
      * Creates a task that creates a namespace entry using the default session.
-     * @param mode the task mode.
-      * @param name the initial working directory.
-     * @param flags the open mode.
+     * 
+     * @param mode
+     *            the task mode.
+     * @param name
+     *            the initial working directory.
+     * @param flags
+     *            the open mode.
      * @return the task.
-     * @exception NotImplemented is thrown when the task version of this
-     *     method is not implemented.
-     * @exception NoSuccess is thrown when the default session could not be
-     *     created.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     * @exception NoSuccessException
+     *                is thrown when the default session could not be created or
+     *                when the Saga factory could not be created.
      */
-    public static Task<NSEntry> createNSEntry(TaskMode mode, URL name, int flags)
-        throws NotImplemented, NoSuccess {
+    public static Task<NSFactory, NSEntry> createNSEntry(TaskMode mode,
+            URL name, int flags) throws NotImplementedException,
+            NoSuccessException {
         Session session = SessionFactory.createSession();
         initializeFactory();
         return factory.doCreateNSEntry(mode, session, name, flags);
     }
-    
+
     /**
      * Creates a task that creates a namespace entry using the default session.
-     * @param mode the task mode.
-     * @param name the initial working directory.
+     * 
+     * @param mode
+     *            the task mode.
+     * @param name
+     *            the initial working directory.
      * @return the task.
-     * @exception NotImplemented is thrown when the task version of this
-     *     method is not implemented.
-     * @exception NoSuccess is thrown when the default session could not be
-     *     created.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     * @exception NoSuccessException
+     *                is thrown when the default session could not be created or
+     *                when the Saga factory could not be created.
      */
-    public static Task<NSEntry> createNSEntry(TaskMode mode, URL name)
-        throws NotImplemented, NoSuccess {
+    public static Task<NSFactory, NSEntry> createNSEntry(TaskMode mode, URL name)
+            throws NotImplementedException, NoSuccessException {
         Session session = SessionFactory.createSession();
         initializeFactory();
-        return factory.doCreateNSEntry(mode, session, name, Flags.NONE.getValue());
+        return factory.doCreateNSEntry(mode, session, name, Flags.NONE
+                .getValue());
     }
 
+    /**
+     * Creates a task that creates a namespace directory.
+     * 
+     * @param mode
+     *            the task mode.
+     * @param session
+     *            the session handle.
+     * @param name
+     *            the initial working directory.
+     * @param flags
+     *            the open mode.
+     * @return the task.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     * @throws NoSuccessException
+     *             is thrown when the Saga factory could not be created.
+     */
+
+    public static Task<NSFactory, NSDirectory> createNSDirectory(TaskMode mode,
+            Session session, URL name, int flags)
+            throws NotImplementedException, NoSuccessException {
+        initializeFactory();
+        return factory.doCreateNSDirectory(mode, session, name, flags);
+    }
 
     /**
-     * Creates a task that creates a namespace directory using the default session.
-     * @param mode the task mode.
-     * @param name the initial working directory.
-     * @param flags the open mode.
+     * Creates a task that creates a namespace directory.
+     * 
+     * @param mode
+     *            the task mode.
+     * @param session
+     *            the session handle.
+     * @param name
+     *            the initial working directory.
      * @return the task.
-     * @exception NotImplemented is thrown when the task version of this
-     *     method is not implemented.
-     * @exception NoSuccess is thrown when the default session could not be
-     *     created.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     * @throws NoSuccessException
+     *             is thrown when the Saga factory could not be created.
      */
-    
-    public static Task<NSDirectory> createNSDirectory(
-            TaskMode mode, URL name, int flags)
-        throws NotImplemented, NoSuccess {
+    public static Task<NSFactory, NSDirectory> createNSDirectory(TaskMode mode,
+            Session session, URL name) throws NotImplementedException,
+            NoSuccessException {
+        initializeFactory();
+        return factory.doCreateNSDirectory(mode, session, name, Flags.NONE
+                .getValue());
+    }
+
+    /**
+     * Creates a task that creates a namespace directory using the default
+     * session.
+     * 
+     * @param mode
+     *            the task mode.
+     * @param name
+     *            the initial working directory.
+     * @param flags
+     *            the open mode.
+     * @return the task.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     * @exception NoSuccessException
+     *                is thrown when the default session could not be created or
+     *                when the Saga factory could not be created.
+     */
+
+    public static Task<NSFactory, NSDirectory> createNSDirectory(TaskMode mode,
+            URL name, int flags) throws NotImplementedException,
+            NoSuccessException {
         Session session = SessionFactory.createSession();
         initializeFactory();
         return factory.doCreateNSDirectory(mode, session, name, flags);
     }
-    
+
     /**
-     * Creates a task that creates a namespace directory using the default session.
-     * @param mode the task mode.
-     * @param name the initial working directory.
+     * Creates a task that creates a namespace directory using the default
+     * session.
+     * 
+     * @param mode
+     *            the task mode.
+     * @param name
+     *            the initial working directory.
      * @return the task.
-     * @exception NotImplemented is thrown when the task version of this
-     *     method is not implemented.
-     * @exception NoSuccess is thrown when the default session could not be
-     *     created.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     * @exception NoSuccessException
+     *                is thrown when the default session could not be created or
+     *                when the Saga factory could not be created.
      */
-    public static Task<NSDirectory> createNSDirectory(TaskMode mode, URL name)
-        throws NotImplemented, NoSuccess {
+    public static Task<NSFactory, NSDirectory> createNSDirectory(TaskMode mode,
+            URL name) throws NotImplementedException, NoSuccessException {
         Session session = SessionFactory.createSession();
         initializeFactory();
-        return factory.doCreateNSDirectory(mode, session, name, Flags.NONE.getValue());
+        return factory.doCreateNSDirectory(mode, session, name, Flags.NONE
+                .getValue());
     }
 }

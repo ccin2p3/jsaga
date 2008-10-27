@@ -25,7 +25,7 @@ import java.util.List;
 public class NSIntrospectorImpl extends AbstractIntrospectorImpl implements Introspector {
     private ProtocolEngineConfiguration m_config;
 
-    public NSIntrospectorImpl() throws NoSuccess {
+    public NSIntrospectorImpl() throws NoSuccessException {
         super(System.getProperty("saga.factory"));
         m_config = Configuration.getInstance().getConfigurations().getProtocolCfg();
     }
@@ -35,7 +35,7 @@ public class NSIntrospectorImpl extends AbstractIntrospectorImpl implements Intr
     }
 
     /** @return schemes */
-    protected String[] getChildIntrospectorKeys() throws NoSuccess {
+    protected String[] getChildIntrospectorKeys() throws NoSuccessException {
         List<String> result = new ArrayList<String>();
         for (Protocol protocol : m_config.toXMLArray()) {
             result.add(protocol.getScheme());
@@ -51,10 +51,10 @@ public class NSIntrospectorImpl extends AbstractIntrospectorImpl implements Intr
      * @param key the scheme
      * @return the created introspector
      */
-    public Introspector getChildIntrospector(String key) throws NotImplemented, DoesNotExist, NoSuccess {
+    public Introspector getChildIntrospector(String key) throws NotImplementedException, DoesNotExistException, NoSuccessException {
         return new NSSchemeIntrospectorImpl(this.findProtocol(key));
     }
-    private Protocol findProtocol(String scheme) throws DoesNotExist, ConfigurationException {
+    private Protocol findProtocol(String scheme) throws DoesNotExistException, ConfigurationException {
         for (Protocol protocol : m_config.toXMLArray()) {
             if (protocol.getScheme().equals(scheme)) {
                 return protocol;
@@ -66,6 +66,6 @@ public class NSIntrospectorImpl extends AbstractIntrospectorImpl implements Intr
                 }
             }
         }
-        throw new DoesNotExist("Scheme not found: "+scheme);
+        throw new DoesNotExistException("Scheme not found: "+scheme);
     }
 }

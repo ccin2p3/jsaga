@@ -9,13 +9,13 @@ import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.ssh.security.SSHSecurityAdaptor;
 
-import org.ogf.saga.error.AuthenticationFailed;
-import org.ogf.saga.error.AuthorizationFailed;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.IncorrectState;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
-import org.ogf.saga.error.Timeout;
+import org.ogf.saga.error.AuthenticationFailedException;
+import org.ogf.saga.error.AuthorizationFailedException;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.TimeoutException;
 
 import com.jcraft.jsch.Identity;
 import com.jcraft.jsch.IdentityFile;
@@ -69,14 +69,14 @@ public abstract class SSHAdaptorAbstract implements SagaSecureAdaptor {
       					 new UOptional(COMPRESSION_LEVEL)});
     }
 
-    public Default[] getDefaults(Map map) throws IncorrectState {
+    public Default[] getDefaults(Map map) throws IncorrectStateException {
     	return new Default[]{
                 new Default(KNOWN_HOSTS, new File[]{
                 		new File(System.getProperty("user.home")+"/.ssh/known_hosts")})
            };
     }
 
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     		
     	try {
     		
@@ -84,7 +84,7 @@ public abstract class SSHAdaptorAbstract implements SagaSecureAdaptor {
     		// set known hosts file : checking will be done
     		if (attributes.containsKey(KNOWN_HOSTS)) {
     			if(!new File((String) attributes.get(KNOWN_HOSTS)).exists())
-    				throw new BadParameter("Unable to find the selected known host file.");    			
+    				throw new BadParameterException("Unable to find the selected known host file.");
 				jsch.setKnownHosts((String) attributes.get(KNOWN_HOSTS));
 			}
     		
@@ -110,7 +110,7 @@ public abstract class SSHAdaptorAbstract implements SagaSecureAdaptor {
     			session = jsch.getSession(userId, host, port);
         	}
         	else {
-        		throw new AuthenticationFailed("Invalid security instance.");
+        		throw new AuthenticationFailedException("Invalid security instance.");
         	}
     		
     		// checking know host will not be done
@@ -123,10 +123,10 @@ public abstract class SSHAdaptorAbstract implements SagaSecureAdaptor {
     			try {
     				compression_level = Integer.valueOf(((String) attributes.get(COMPRESSION_LEVEL)));
     				if(compression_level > 9 || compression_level < 0 )
-    					throw new BadParameter("Invalid value for CompressionLevel attribute: "+ compression_level+ " must be in the 0-9 range.");
+    					throw new BadParameterException("Invalid value for CompressionLevel attribute: "+ compression_level+ " must be in the 0-9 range.");
     			}
     			catch (NumberFormatException e) {
-    				throw new BadParameter("Unable to parse CompressionLevel attribute.",e);
+    				throw new BadParameterException("Unable to parse CompressionLevel attribute.",e);
     			}
     		}
 			if (compression_level == 0) {
@@ -141,12 +141,12 @@ public abstract class SSHAdaptorAbstract implements SagaSecureAdaptor {
     		session.connect();
     	} catch (JSchException e) {
     		if(e.getMessage().equals("Auth fail"))
-    			throw new AuthenticationFailed(e);
-    		throw new NoSuccess("Unable to connect to server", e);
+    			throw new AuthenticationFailedException(e);
+    		throw new NoSuccessException("Unable to connect to server", e);
     	}
     }
 
-    public void disconnect() throws NoSuccess {
+    public void disconnect() throws NoSuccessException {
     	session.disconnect();
         session = null;
     } 

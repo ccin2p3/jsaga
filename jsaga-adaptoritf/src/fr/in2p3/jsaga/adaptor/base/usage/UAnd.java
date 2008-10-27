@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.base.usage;
 
-import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.DoesNotExistException;
 
 import java.util.*;
 
@@ -29,18 +29,18 @@ public class UAnd implements Usage {
         m_and = usage;
     }
 
-    public String correctValue(String attributeName, String attributeValue) throws DoesNotExist {
+    public String correctValue(String attributeName, String attributeValue) throws DoesNotExistException {
         for (int i=0; m_and!=null && i<m_and.length; i++) {
             try {
                 return m_and[i].correctValue(attributeName, attributeValue);
-            } catch(DoesNotExist e) {
+            } catch(DoesNotExistException e) {
                 // next iteration
             }
         }
-        throw new DoesNotExist("Attribute not found: "+attributeName);
+        throw new DoesNotExistException("Attribute not found: "+attributeName);
     }
 
-    public int getFirstMatchingUsage(Map attributes) throws DoesNotExist {
+    public int getFirstMatchingUsage(Map attributes) throws DoesNotExistException {
         int firstMatchingUsage = -1;
         for (int i=0; m_and!=null && i<m_and.length; i++) {
             int id = m_and[i].getFirstMatchingUsage(attributes);

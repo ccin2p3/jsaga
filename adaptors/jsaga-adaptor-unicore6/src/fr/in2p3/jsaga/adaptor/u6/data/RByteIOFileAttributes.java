@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.adaptor.u6.data;
 
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.DoesNotExistException;
 
 import com.intel.gpe.clients.api.GridFile;
 
@@ -21,7 +21,7 @@ import com.intel.gpe.clients.api.GridFile;
  */
 public class RByteIOFileAttributes extends FileAttributes {
    
-	public RByteIOFileAttributes(GridFile file, String separator) throws DoesNotExist {
+	public RByteIOFileAttributes(GridFile file, String separator) throws DoesNotExistException {
         // set name
         m_name = file.getPath().substring(file.getPath().lastIndexOf(separator)+separator.length(), file.getPath().length());
         // set type

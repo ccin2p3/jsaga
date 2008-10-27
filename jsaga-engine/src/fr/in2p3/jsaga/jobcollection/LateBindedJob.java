@@ -22,6 +22,6 @@ public interface LateBindedJob extends Job {
      * @param rm the resource to allocate
      */
     public void allocate(Resource rm)
-        throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess;
+        throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException;
 }

@@ -27,15 +27,15 @@ public class FilledURL {
     private URI m_base;
     private URL m_url;
 
-    public FilledURL(String url) throws NotImplemented, BadParameter, NoSuccess {
+    public FilledURL(String url) throws NotImplementedException, BadParameterException, NoSuccessException {
         this(URLFactory.createURL(url));
     }
     
-    public FilledURL(URL url) throws NotImplemented, NoSuccess {
+    public FilledURL(URL url) throws NotImplementedException, NoSuccessException {
         this(url, Configuration.getInstance().getConfigurations().getProtocolCfg().findDataService(url));
     }
 
-    public FilledURL(URL url, DataService config) throws NotImplemented, NoSuccess {
+    public FilledURL(URL url, DataService config) throws NotImplementedException, NoSuccessException {
         // set base URL
         try {
             if (config.getBase() != null) {
@@ -44,7 +44,7 @@ public class FilledURL {
                 m_base = new URI("base", null, BaseURL.NO_HOST, BaseURL.NO_PORT, null, null, null);
             }
         } catch (URISyntaxException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
 
         // set URL

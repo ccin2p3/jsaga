@@ -55,7 +55,7 @@ public class SuperSchedulerJobMonitorAdaptor extends SuperSchedulerJobAdaptorAbs
         return null;
     }
 
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return null;
     }
 
@@ -63,7 +63,7 @@ public class SuperSchedulerJobMonitorAdaptor extends SuperSchedulerJobAdaptorAbs
         return 0;   // no default port
     }
 
-    public JobStatus getStatus(String nativeJobId) throws Timeout, NoSuccess {
+    public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
         String epr = new JobEPR(nativeJobId).getEPR();
         Document detail;
         try {
@@ -74,9 +74,9 @@ public class SuperSchedulerJobMonitorAdaptor extends SuperSchedulerJobAdaptorAbs
             }
         } catch (JobScheduleServiceException e) {
             if (e.getMessage().startsWith("Super Scheduler command error occurred.")) {
-                throw new NoSuccess("Failed to get status (job may have been cleaned up)");
+                throw new NoSuccessException("Failed to get status (job may have been cleaned up)");
             } else {
-                throw new NoSuccess(e);
+                throw new NoSuccessException(e);
             }
         }
 
@@ -98,7 +98,7 @@ public class SuperSchedulerJobMonitorAdaptor extends SuperSchedulerJobAdaptorAbs
                 stateString = null;
             }
         } catch (XPathExpressionException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
 
         return new SuperSchedulerJobStatus(epr, stateString);

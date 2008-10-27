@@ -17,7 +17,7 @@ import java.io.InputStream;
  *
  */
 public interface JobIOGetter extends JobIOHandler {
-    public InputStream getStdout() throws PermissionDenied, Timeout, NoSuccess;
+    public InputStream getStdout() throws PermissionDeniedException, TimeoutException, NoSuccessException;
 
-    public InputStream getStderr() throws PermissionDenied, Timeout, NoSuccess;
+    public InputStream getStderr() throws PermissionDeniedException, TimeoutException, NoSuccessException;
 }

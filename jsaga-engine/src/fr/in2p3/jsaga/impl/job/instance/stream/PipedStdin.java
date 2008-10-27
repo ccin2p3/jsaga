@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.impl.job.instance.stream;
 
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.io.*;
 
@@ -21,14 +21,14 @@ public class PipedStdin extends PipedOutputStream implements Runnable {
     protected boolean m_closed;
     protected InputStream m_in;
 
-    public PipedStdin() throws NoSuccess {
+    public PipedStdin() throws NoSuccessException {
         m_exception = null;
         m_closed = false;
         try {
             // pipe must be connected before writing (else will hang on 2nd test case)
             m_in = new PipedInputStream(this);
         } catch (IOException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         new Thread(this).start();        
     }

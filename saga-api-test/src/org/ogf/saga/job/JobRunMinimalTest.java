@@ -3,8 +3,6 @@ package org.ogf.saga.job;
 import org.ogf.saga.job.abstracts.AbstractJobTest;
 import org.ogf.saga.task.State;
 
-import java.lang.Exception;
-
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***

@@ -25,11 +25,11 @@ public class LocalJobMonitorAdaptor extends LocalAdaptorAbstract implements Quer
     	return null;
     }
 
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return null;
     }
 
-    public JobStatus getStatus(String nativeJobId) throws Timeout, NoSuccess {
+    public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
 
     	try {    		
     		Process p = (Process) LocalAdaptorAbstract.sessionMap.get(nativeJobId);    		
@@ -39,7 +39,7 @@ public class LocalJobMonitorAdaptor extends LocalAdaptorAbstract implements Quer
     			// return "process has not exited" message
     			return new LocalJobStatus(nativeJobId, -1);
     		else
-    			throw new NoSuccess(e);
+    			throw new NoSuccessException(e);
 		}
     }        
 

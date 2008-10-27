@@ -92,9 +92,9 @@ public class CacheFileAttributes extends FileAttributes {
 
     private static long getLastModified(NSEntry entry) {
         try {
-            Method m = entry.getClass().getMethod("getLastModified", null);
+            Method m = entry.getClass().getMethod("getLastModified", (Class[]) null);
             return (m != null
-                    ? ((Long)m.invoke(entry, null)).longValue()
+                    ? ((Long)m.invoke(entry, (Object[]) null)).longValue()
                     : 0);
         } catch (Exception e) {
             return 0;

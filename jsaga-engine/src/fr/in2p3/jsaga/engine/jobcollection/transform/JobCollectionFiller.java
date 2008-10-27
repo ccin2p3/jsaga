@@ -20,7 +20,7 @@ import org.w3c.dom.*;
 public class JobCollectionFiller {
     private Document m_effectiveJobCollection;
 
-    public JobCollectionFiller(Document jobCollecDesc) throws NotImplemented, BadParameter, NoSuccess {
+    public JobCollectionFiller(Document jobCollecDesc) throws NotImplementedException, BadParameterException, NoSuccessException {
         // modify the <URI> elements of job collection
         XJSDLXPathSelector selector = new XJSDLXPathSelector(jobCollecDesc);
         NodeList list = selector.getNodes("/ext:JobCollection/ext:Job/jsdl:JobDefinition/jsdl:JobDescription/jsdl:DataStaging/jsdl:*/jsdl:URI/text()");

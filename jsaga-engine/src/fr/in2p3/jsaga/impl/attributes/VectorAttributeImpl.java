@@ -70,34 +70,34 @@ public class VectorAttributeImpl<E> implements Attribute {
         }
     }
 
-    public void setValue(String value) throws IncorrectState {
-        throw new IncorrectState("Attribute "+m_key+" not scalar");
+    public void setValue(String value) throws IncorrectStateException {
+        throw new IncorrectStateException("Attribute "+m_key+" not scalar");
     }
 
-    public String getValue() throws IncorrectState {
-        throw new IncorrectState("Attribute "+m_key+" not scalar");
+    public String getValue() throws IncorrectStateException {
+        throw new IncorrectStateException("Attribute "+m_key+" not scalar");
     }
 
-    public void setValues(String[] values) throws NotImplemented, IncorrectState, PermissionDenied {
+    public void setValues(String[] values) throws NotImplementedException, IncorrectStateException, PermissionDeniedException {
         AttributeSerializer<E> serializer = new AttributeSerializer<E>(m_type);
         m_objects = (E[]) new Object[values!=null ? values.length : 0];
         for (int i=0; i<m_objects.length; i++) {
             try {
                 m_objects[i] = serializer.fromString(values[i]);
-            } catch (DoesNotExist e) {
-                throw new NotImplemented("INTERNAL ERROR: unexpected exception", e);
+            } catch (DoesNotExistException e) {
+                throw new NotImplementedException("INTERNAL ERROR: unexpected exception", e);
             }
         }
     }
 
-    public String[] getValues() throws NotImplemented, IncorrectState {
+    public String[] getValues() throws NotImplementedException, IncorrectStateException {
         AttributeSerializer<E> serializer = new AttributeSerializer<E>(m_type);
         String[] values = new String[m_objects!=null ? m_objects.length : 0];
         for (int i=0; i<values.length; i++) {
             try {
                 values[i] = serializer.toString(m_objects[i]);
-            } catch (DoesNotExist e) {
-                throw new NotImplemented("INTERNAL ERROR: unexpected exception", e);
+            } catch (DoesNotExistException e) {
+                throw new NotImplementedException("INTERNAL ERROR: unexpected exception", e);
             }
         }
         return values;

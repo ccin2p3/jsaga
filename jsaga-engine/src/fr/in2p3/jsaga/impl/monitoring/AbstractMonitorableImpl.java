@@ -1,12 +1,12 @@
 package fr.in2p3.jsaga.impl.monitoring;
 
+import fr.in2p3.jsaga.helpers.cloner.SagaObjectCloner;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
 import org.ogf.saga.monitoring.*;
 import org.ogf.saga.session.Session;
 
-import java.lang.Exception;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,50 +34,44 @@ public abstract class AbstractMonitorableImpl extends AbstractSagaObjectImpl imp
     /** clone */
     public SagaObject clone() throws CloneNotSupportedException {
         AbstractMonitorableImpl clone = (AbstractMonitorableImpl) super.clone();
-        clone.m_metrics = clone(m_metrics);
+        clone.m_metrics = new SagaObjectCloner<String,Metric>().cloneMap(m_metrics);
         return clone;
     }
 
-    public String[] listMetrics() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
+    public String[] listMetrics() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
         return m_metrics.keySet().toArray(new String[m_metrics.keySet().size()]);
     }
 
-    public Metric getMetric(String name) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public Metric getMetric(String name) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         Metric metric = m_metrics.get(name);
         if (metric != null) {
             return metric;
         } else {
-            throw new DoesNotExist("Metric "+name+" does not exist", this);
+            throw new DoesNotExistException("Metric "+name+" does not exist", this);
         }
     }
 
-    public int addCallback(String name, Callback cb) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess, IncorrectState {
+    public int addCallback(String name, Callback cb) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException {
         Metric metric = m_metrics.get(name);
         if (metric != null) {
             return metric.addCallback(cb);
         } else {
-            throw new DoesNotExist("Metric "+name+" does not exist", this);
+            throw new DoesNotExistException("Metric "+name+" does not exist", this);
         }
     }
 
-    public void removeCallback(String name, int cookie) throws NotImplemented, DoesNotExist, BadParameter, Timeout, NoSuccess, AuthenticationFailed, AuthorizationFailed, PermissionDenied {
+    public void removeCallback(String name, int cookie) throws NotImplementedException, DoesNotExistException, BadParameterException, TimeoutException, NoSuccessException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException {
         Metric metric = m_metrics.get(name);
         if (metric != null) {
             metric.removeCallback(cookie);
         } else {
-            throw new DoesNotExist("Metric "+name+" does not exist", this);
+            throw new DoesNotExistException("Metric "+name+" does not exist", this);
         }
     }
 
     //////////////////////////////////////////// internal methods ////////////////////////////////////////////
 
-    public MetricImpl _addMetric(MetricImpl metric) throws NotImplemented {
-        try {
-            String name = metric.getAttribute(Metric.NAME);
-            m_metrics.put(name, metric);
-        } catch (Exception e) {
-            throw new NotImplemented("INTERNAL ERROR", e);
-        }
-        return metric;
+    public void _addMetric(String name, MetricImpl<?> metric) {
+        m_metrics.put(name, metric);
     }
 }

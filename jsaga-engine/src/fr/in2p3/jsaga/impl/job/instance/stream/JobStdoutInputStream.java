@@ -5,7 +5,6 @@ import fr.in2p3.jsaga.impl.job.instance.JobImpl;
 import org.ogf.saga.error.*;
 
 import java.io.*;
-import java.lang.Exception;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -23,7 +22,7 @@ public class JobStdoutInputStream extends Stdout {
     protected JobImpl m_job;
     private JobIOHandler m_ioHandler;
 
-    public JobStdoutInputStream(JobImpl job, JobIOHandler ioHandler) throws NotImplemented, DoesNotExist, Timeout, NoSuccess {
+    public JobStdoutInputStream(JobImpl job, JobIOHandler ioHandler) throws NotImplementedException, DoesNotExistException, TimeoutException, NoSuccessException {
         m_job = job;
         m_ioHandler = ioHandler;
         switch(m_job.getJobState()) {
@@ -34,7 +33,7 @@ public class JobStdoutInputStream extends Stdout {
                 // OK
                 break;
             default:
-                throw new DoesNotExist("Stdout is not available because job is neither finished nor running: "+m_job.getState());
+                throw new DoesNotExistException("Stdout is not available because job is neither finished nor running: "+m_job.getState());
         }
     }
 
@@ -43,7 +42,7 @@ public class JobStdoutInputStream extends Stdout {
         m_job = job;
     }
 
-    public void closeJobIOHandler() throws PermissionDenied, Timeout, NoSuccess {
+    public void closeJobIOHandler() throws PermissionDeniedException, TimeoutException, NoSuccessException {
         // get stream
         if (m_stream == null) {
             if (m_ioHandler instanceof JobIOGetter) {
@@ -62,7 +61,7 @@ public class JobStdoutInputStream extends Stdout {
                 buffer.write(bytes, 0, len);
             }
         } catch (IOException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         m_buffer = new ByteArrayInputStream(buffer.toByteArray());
     }
@@ -86,7 +85,7 @@ public class JobStdoutInputStream extends Stdout {
                 case CANCELED:
                 case FAILED:
                     if (m_buffer == null) {
-                        throw new NoSuccess("INTERNAL ERROR: JobIOHandler has not been closed");
+                        throw new NoSuccessException("INTERNAL ERROR: JobIOHandler has not been closed");
                     }
                     return m_buffer;
                 case RUNNING:
@@ -96,12 +95,12 @@ public class JobStdoutInputStream extends Stdout {
                         } else if (m_ioHandler instanceof JobIOSetter) {
                             m_stream = new PipedStdout((JobIOSetter) m_ioHandler);
                         } else {
-                            throw new NoSuccess("Can not read from stdout because job is running and adaptor does not support job interactivity");
+                            throw new NoSuccessException("Can not read from stdout because job is running and adaptor does not support job interactivity");
                         }
                     }
                     return m_stream;
                 default:
-                    throw new DoesNotExist("Stdout is not available because job is neither finished nor running");
+                    throw new DoesNotExistException("Stdout is not available because job is neither finished nor running");
             }
         } catch (Exception e) {
             throw new IOException(e.getMessage());

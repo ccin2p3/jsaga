@@ -25,7 +25,7 @@ import java.util.List;
 public class JobIntrospectorImpl extends AbstractIntrospectorImpl implements Introspector {
     private JobserviceEngineConfiguration m_config;
 
-    public JobIntrospectorImpl() throws NoSuccess {
+    public JobIntrospectorImpl() throws NoSuccessException {
         super(System.getProperty("saga.factory"));
         m_config = Configuration.getInstance().getConfigurations().getJobserviceCfg();
     }
@@ -35,7 +35,7 @@ public class JobIntrospectorImpl extends AbstractIntrospectorImpl implements Int
     }
 
     /** @return schemes */
-    protected String[] getChildIntrospectorKeys() throws NoSuccess {
+    protected String[] getChildIntrospectorKeys() throws NoSuccessException {
         List<String> result = new ArrayList<String>();
         for (Execution execution : m_config.toXMLArray()) {
             result.add(execution.getScheme());
@@ -51,10 +51,10 @@ public class JobIntrospectorImpl extends AbstractIntrospectorImpl implements Int
      * @param key the scheme
      * @return the created introspector
      */
-    public Introspector getChildIntrospector(String key) throws NotImplemented, DoesNotExist, NoSuccess {
+    public Introspector getChildIntrospector(String key) throws NotImplementedException, DoesNotExistException, NoSuccessException {
         return new JobSchemeIntrospectorImpl(this.findExecution(key));
     }
-    private Execution findExecution(String scheme) throws DoesNotExist, ConfigurationException {
+    private Execution findExecution(String scheme) throws DoesNotExistException, ConfigurationException {
         for (Execution execution : m_config.toXMLArray()) {
             if (execution.getScheme().equals(scheme)) {
                 return execution;
@@ -66,6 +66,6 @@ public class JobIntrospectorImpl extends AbstractIntrospectorImpl implements Int
                 }
             }
         }
-        throw new DoesNotExist("Scheme not found: "+scheme);
+        throw new DoesNotExistException("Scheme not found: "+scheme);
     }
 }

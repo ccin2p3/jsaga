@@ -3,7 +3,7 @@ package fr.in2p3.jsaga.engine.config.bean;
 import fr.in2p3.jsaga.engine.config.AmbiguityException;
 import fr.in2p3.jsaga.engine.config.NoMatchException;
 import fr.in2p3.jsaga.engine.schema.config.Context;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +29,9 @@ public class ContextEngineConfiguration {
 
     /**
      * @param id may be a context or a context type
-     * @throws NoSuccess if no match or ambiguity
+     * @throws NoSuccessException if no match or ambiguity
      */
-    public Context findContext(String id) throws NoSuccess {
+    public Context findContext(String id) throws NoSuccessException {
         if (id != null) {
             Context[] ctxArray = this.listContextsArray(id);
             switch(ctxArray.length) {
@@ -43,14 +43,14 @@ public class ContextEngineConfiguration {
                     throw new AmbiguityException(id, "several context instances match, please specify grid name instead of context type");
             }
         } else {
-            throw new NoSuccess("Null context identifier");
+            throw new NoSuccessException("Null context identifier");
         }
     }
 
     /**
      * @param id may be a context or a context type
      */
-    public Context[] listContextsArray(String id) throws NoSuccess {
+    public Context[] listContextsArray(String id) throws NoSuccessException {
         if (id != null) {
             // try by name
             Context ctx = this.findContextByName(id);
@@ -61,15 +61,15 @@ public class ContextEngineConfiguration {
                 return this.listContextsArrayByType(id);
             }
         } else {
-            throw new NoSuccess("Null context identifier");
+            throw new NoSuccessException("Null context identifier");
         }
     }
 
     /**
      * @return null if no match
-     * @throws NoSuccess if null context name
+     * @throws NoSuccessException if null context name
      */
-    public Context findContextByName(String name) throws NoSuccess {
+    public Context findContextByName(String name) throws NoSuccessException {
         if (name != null) {
             for (int c=0; c<m_context.length; c++) {
                 Context context = m_context[c];
@@ -79,15 +79,15 @@ public class ContextEngineConfiguration {
             }
             return null;
         } else {
-            throw new NoSuccess("Null context name");
+            throw new NoSuccessException("Null context name");
         }
     }
 
     /**
      * @return empty array if no match
-     * @throws NoSuccess if null context type
+     * @throws NoSuccessException if null context type
      */
-    public Context[] listContextsArrayByType(String type) throws NoSuccess {
+    public Context[] listContextsArrayByType(String type) throws NoSuccessException {
         if (type != null) {
             List list = new ArrayList();
             for (int c=0; c<m_context.length; c++) {
@@ -98,7 +98,7 @@ public class ContextEngineConfiguration {
             }
             return (Context[]) list.toArray(new Context[list.size()]);
         } else {
-            throw new NoSuccess("Null context type");
+            throw new NoSuccessException("Null context type");
         }
     }
 

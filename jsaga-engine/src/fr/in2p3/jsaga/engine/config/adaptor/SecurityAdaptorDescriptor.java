@@ -3,7 +3,7 @@ package fr.in2p3.jsaga.engine.config.adaptor;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptorBuilder;
 import fr.in2p3.jsaga.engine.schema.config.Context;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.util.*;
 
@@ -44,12 +44,12 @@ public class SecurityAdaptorDescriptor {
         }
     }
 
-    public Class getBuilderClass(String type) throws NoSuccess {
+    public Class getBuilderClass(String type) throws NoSuccessException {
         Class clazz = (Class) m_builderClasses.get(type);
         if (clazz != null) {
             return clazz;
         } else {
-            throw new NoSuccess("Found no security adaptor supporting type: "+type);
+            throw new NoSuccessException("Found no security adaptor supporting type: "+type);
         }
     }
 

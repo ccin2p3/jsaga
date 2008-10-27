@@ -3,14 +3,10 @@ package fr.in2p3.jsaga.impl.file;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.*;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
-import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
-import fr.in2p3.jsaga.engine.data.flags.FlagsBytesPhysical;
-import fr.in2p3.jsaga.impl.file.copy.FileCopy;
-import fr.in2p3.jsaga.impl.file.copy.FileCopyFrom;
+import fr.in2p3.jsaga.impl.file.copy.*;
 import fr.in2p3.jsaga.impl.namespace.*;
 import fr.in2p3.jsaga.impl.url.URLHelper;
 import fr.in2p3.jsaga.impl.url.URLImpl;
-import org.ogf.saga.ObjectType;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.error.*;
@@ -39,56 +35,56 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
     protected FileInputStream m_inStream;
 
     /** constructor for factory */
-    public FileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public FileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session, URLHelper.toFileURL(url), adaptor, flags);
         this.init(flags);
     }
 
     /** constructor for NSDirectory.open() */
-    public FileImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public FileImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(dir, URLHelper.toFileURL(relativeUrl), flags);
         this.init(flags);
     }
 
     /** constructor for NSEntry.openAbsolute() */
-    public FileImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public FileImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(entry, URLHelper.toFilePath(absolutePath), flags);
         this.init(flags);
     }
 
-    private void init(int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        FlagsBytes effectiveFlags = new FlagsBytesPhysical(flags);
-        if (effectiveFlags.contains(Flags.READ)) {
+    private void init(int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        new FlagsHelper(flags).allowed(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS, Flags.ALLFILEFLAGS);
+        if (Flags.READ.isSet(flags)) {
             m_inStream = FileFactoryImpl.openFileInputStream(m_session, m_url, m_adaptor);
         }
-        if (effectiveFlags.contains(Flags.WRITE)) {
-            boolean append = effectiveFlags.contains(Flags.APPEND);
-            boolean exclusive = effectiveFlags.contains(Flags.EXCL);
+        if (Flags.WRITE.isSet(flags)) {
+            boolean append = Flags.APPEND.isSet(flags);
+            boolean exclusive = Flags.EXCL.isSet(flags);
             try {
                 m_outStream = FileFactoryImpl.openFileOutputStream(m_session, m_url, m_adaptor, append, exclusive);
-            } catch(DoesNotExist e) {
+            } catch(DoesNotExistException e) {
                 // make parent directories, then retry
-                if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
+                if (Flags.CREATEPARENTS.isSet(flags)) {
                     this._makeParentDirs();
                     try {
                         m_outStream = FileFactoryImpl.openFileOutputStream(m_session, m_url, m_adaptor, append, exclusive);
-                    } catch(DoesNotExist e2) {
-                        throw new DoesNotExist("Failed to create parent directory", e2.getCause());
+                    } catch(DoesNotExistException e2) {
+                        throw new DoesNotExistException("Failed to create parent directory", e2.getCause());
                     }
                 } else {
                     throw e;
                 }
             }
-        } else if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
+        } else if (Flags.CREATEPARENTS.isSet(flags)) {
             // make parent directories
             this._makeParentDirs();
         }
-        if (effectiveFlags.contains(Flags.READ) || effectiveFlags.contains(Flags.WRITE)) {
+        if (Flags.READ.isSet(flags) || Flags.WRITE.isSet(flags)) {
             // exists check already done
         } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !((URLImpl)m_url).hasCache() && m_adaptor instanceof DataReaderAdaptor) {
             boolean exists = ((DataReaderAdaptor)m_adaptor).exists(m_url.getPath(), m_url.getQuery());
             if (! exists) {
-                throw new DoesNotExist("File does not exist: "+ m_url);
+                throw new DoesNotExistException("File does not exist: "+ m_url);
             }
         }
     }
@@ -100,14 +96,10 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         return clone;
     }
 
-    public ObjectType getType() {
-        return ObjectType.FILE;
-    }
-
     ///////////////////////////// override some NSEntry methods /////////////////////////////
 
     /** override super.close() in order to close opened input and output streams */
-    public synchronized void close() throws NotImplemented, IncorrectState, NoSuccess {
+    public synchronized void close() throws NotImplementedException, IncorrectStateException, NoSuccessException {
         try {
             if (m_outStream != null) {
                 m_outStream.close();
@@ -118,79 +110,83 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
                 m_inStream = null;
             }
         } catch (IOException e) {
-            throw new IncorrectState(e);
+            throw new IncorrectStateException(e);
         } finally {
             super.close();
         }
     }
 
     /** override super.close() in order to close opened input and output streams */
-    public synchronized void close(float timeoutInSeconds) throws NotImplemented, IncorrectState, NoSuccess {
+    public synchronized void close(float timeoutInSeconds) throws NotImplementedException, IncorrectStateException, NoSuccessException {
         this.close();
     }
 
     /** implements super.copy() */
-    public void copy(URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
-        FlagsBytes effectiveFlags = new FlagsBytes(flags);
-        if (effectiveFlags.contains(Flags.DEREFERENCE)) {
-            this._dereferenceEntry().copy(target, effectiveFlags.remove(Flags.DEREFERENCE));
+    public void copy(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+        this._copyAndMonitor(target, flags, null);
+    }
+    public void _copyAndMonitor(URL target, int flags, FileCopyTask progressMonitor) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+        new FlagsHelper(flags).allowed(JSAGAFlags.PRESERVETIMES, Flags.DEREFERENCE, Flags.OVERWRITE, Flags.CREATEPARENTS);
+        if (Flags.DEREFERENCE.isSet(flags)) {
+            this._dereferenceEntry().copy(target, flags - Flags.DEREFERENCE.getValue());
             return; //==========> EXIT
         }
-        effectiveFlags.checkAllowed(Flags.DEREFERENCE.or(Flags.CREATEPARENTS.or(Flags.OVERWRITE)));
         URL effectiveTarget = this._getEffectiveURL(target);
         if (m_outStream != null) {
             try {m_outStream.close();} catch (IOException e) {/*ignore*/}
         }
         if (JSAGAFlags.PRESERVETIMES.isSet(flags)) {
-            // throw NotImplemented if can not preserve times
+            // throw NotImplementedException if can not preserve times
             Date sourceTimes = this.getLastModified();
             AbstractNSEntryImpl targetEntry = super._getTargetEntry_checkPreserveTimes(effectiveTarget);
 
             // copy
-            new FileCopy(m_session, this, m_adaptor).copy(effectiveTarget, effectiveFlags);
+            new FileCopy(m_session, this, m_adaptor).copy(effectiveTarget, flags, progressMonitor);
 
             // preserve times
             targetEntry.setLastModified(sourceTimes);
         } else {
             // copy only
-            new FileCopy(m_session, this, m_adaptor).copy(effectiveTarget, effectiveFlags);
+            new FileCopy(m_session, this, m_adaptor).copy(effectiveTarget, flags, progressMonitor);
         }
     }
 
     /** implements super.copyFrom() */
-    public void copyFrom(URL source, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
-        FlagsBytes effectiveFlags = new FlagsBytes(flags);
-        if (effectiveFlags.contains(Flags.DEREFERENCE)) {
-            this._dereferenceEntry().copyFrom(source, effectiveFlags.remove(Flags.DEREFERENCE));
+    public void copyFrom(URL source, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
+        this._copyFromAndMonitor(source, flags, null);
+    }
+    public void _copyFromAndMonitor(URL source, int flags, FileCopyFromTask progressMonitor) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
+        new FlagsHelper(flags).allowed(JSAGAFlags.PRESERVETIMES, Flags.DEREFERENCE, Flags.OVERWRITE);
+        if (Flags.DEREFERENCE.isSet(flags)) {
+            this._dereferenceEntry().copyFrom(source, flags - Flags.DEREFERENCE.getValue());
             return; //==========> EXIT
         }
-        effectiveFlags.checkAllowed(Flags.DEREFERENCE.or(Flags.OVERWRITE));
         URL effectiveSource = this._getEffectiveURL(source);
         if (m_inStream != null) {
             try {m_inStream.close();} catch (IOException e) {/*ignore*/}
         }
         if (JSAGAFlags.PRESERVETIMES.isSet(flags)) {
-            // throw NotImplemented if can not preserve times
+            // throw NotImplementedException if can not preserve times
             Date sourceTimes = super._getSourceTimes_checkPreserveTimes(effectiveSource);
 
             // copy
-            new FileCopyFrom(m_session, this, m_adaptor).copyFrom(effectiveSource, effectiveFlags);
+            new FileCopyFrom(m_session, this, m_adaptor).copyFrom(effectiveSource, flags, progressMonitor);
 
             // preserve times
             this.setLastModified(sourceTimes);
         } else {
             // copy only
-            new FileCopyFrom(m_session, this, m_adaptor).copyFrom(effectiveSource, effectiveFlags);
+            new FileCopyFrom(m_session, this, m_adaptor).copyFrom(effectiveSource, flags, progressMonitor);
         }
     }
 
     ////////////////////////////// class AbstractNSEntryImpl //////////////////////////////
 
-    public NSDirectory openAbsoluteDir(String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public NSDirectory openAbsoluteDir(String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         return new DirectoryImpl(this, absolutePath, flags);
     }
 
-    public NSEntry openAbsolute(String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public NSEntry openAbsolute(String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (URLHelper.isDirectory(absolutePath)) {
             return new DirectoryImpl(this, absolutePath, flags);
         } else {
@@ -200,7 +196,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
 
     /////////////////////////////////// interface File ///////////////////////////////////
 
-    public long getSize() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public long getSize() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof FileReader) {
             if (m_outStream != null) {
                 try {m_outStream.close();} catch (IOException e) {/*ignore*/}
@@ -212,113 +208,119 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
             if (size > -1) {
                 return size;
             }
-        } catch (BadParameter e) {
-            throw new NoSuccess(e);
+        } catch (BadParameterException e) {
+            throw new NoSuccessException(e);
         }
-        throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
+        throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
     }
 
-    public int read(Buffer buffer, int len) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IOException {
+    public int read(Buffer buffer, int offset, int len) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, SagaIOException {
         final int EOF = -1;
         if (m_inStream == null) {
-            throw new IncorrectState("Reading file requires READ or READWRITE flags", this);
+            throw new IncorrectStateException("Reading file requires READ or READWRITE flags", this);
         }
         if (len < 0) {
-            throw new BadParameter("Read length must have a positive value: "+len, this);
+            throw new BadParameterException("Read length must have a positive value: "+len, this);
         }
         if (m_adaptor instanceof FileReader) {
             int readlen;
             try {
                 byte[] bytes = buffer.getData();
-                readlen = m_inStream.read(bytes, 0, len);
-            } catch (DoesNotExist e) {
+                readlen = m_inStream.read(bytes, offset, len);
+            } catch (DoesNotExistException e) {
                 try {m_inStream.close();} catch (IOException e1) {/*ignore*/}
-                throw new IncorrectState(e);
+                throw new IncorrectStateException(e);
             } catch (IOException e) {
                 try {m_inStream.close();} catch (IOException e1) {/*ignore*/}
-                throw new Timeout(e);
+                throw new SagaIOException(e);
             }
             if (readlen == EOF) {
                 try {
                     m_inStream.close();
                 } catch (IOException e) {
-                    throw new IncorrectState(e);
+                    throw new SagaIOException(e);
                 }
             }
             return readlen;
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
-    public int read(Buffer buffer) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IOException {
-        return this.read(buffer, buffer.getSize());
+    public int read(Buffer buffer, int len) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, SagaIOException {
+        return this.read(buffer, 0, len);
+    }
+    public int read(Buffer buffer) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, SagaIOException {
+        return this.read(buffer, 0, buffer.getSize());
     }
 
-    public int write(Buffer buffer, int len) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IOException {
+    public int write(Buffer buffer, int offset, int len) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, SagaIOException {
         if (m_outStream == null) {
-            throw new IncorrectState("Writing file requires WRITE or READWRITE flags", this);
+            throw new IncorrectStateException("Writing file requires WRITE or READWRITE flags", this);
         }
         if (len < 0) {
-            throw new BadParameter("Write length must have a positive value: "+len, this);
+            throw new BadParameterException("Write length must have a positive value: "+len, this);
         }
         if (m_adaptor instanceof FileWriter) {
             try {
                 byte[] bytes = buffer.getData();
-                m_outStream.write(bytes, 0, len);
-            } catch (DoesNotExist e) {
+                m_outStream.write(bytes, offset, len);
+            } catch (DoesNotExistException e) {
                 try {m_outStream.close();} catch (IOException e1) {/*ignore*/}
-                throw new Timeout(e);
+                throw new NoSuccessException(e);
             } catch (IOException e) {
                 try {m_outStream.close();} catch (IOException e1) {/*ignore*/}
-                throw new Timeout(e);
+                throw new SagaIOException(e);
             }
             return len;
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
-    public int write(Buffer buffer) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IOException {
-        return this.write(buffer, buffer.getSize());
+    public int write(Buffer buffer, int len) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, SagaIOException {
+        return this.write(buffer, 0, len);
+    }
+    public int write(Buffer buffer) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, SagaIOException {
+        return this.write(buffer, 0, buffer.getSize());
     }
 
-    public long seek(long offset, SeekMode whence) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess, IOException {
-        throw new NotImplemented("Not implemented by the SAGA engine", this);
+    public long seek(long offset, SeekMode whence) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException, SagaIOException {
+        throw new NotImplementedException("Not implemented by the SAGA engine", this);
     }
 
-    public void readV(IOVec[] iovecs) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IOException {
-        throw new NotImplemented("Not implemented by the SAGA engine", this);
+    public void readV(IOVec[] iovecs) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, SagaIOException {
+        throw new NotImplementedException("Not implemented by the SAGA engine", this);
     }
 
-    public void writeV(IOVec[] iovecs) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IOException {
-        throw new NotImplemented("Not implemented by the SAGA engine", this);
+    public void writeV(IOVec[] iovecs) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, SagaIOException {
+        throw new NotImplementedException("Not implemented by the SAGA engine", this);
     }
 
-    public int sizeP(String pattern) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
-        throw new NotImplemented("Not implemented by the SAGA engine", this);
+    public int sizeP(String pattern) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+        throw new NotImplementedException("Not implemented by the SAGA engine", this);
     }
 
-    public int readP(String pattern, Buffer buffer) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IOException {
-        throw new NotImplemented("Not implemented by the SAGA engine", this);
+    public int readP(String pattern, Buffer buffer) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, SagaIOException {
+        throw new NotImplementedException("Not implemented by the SAGA engine", this);
     }
 
-    public int writeP(String pattern, Buffer buffer) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IOException {
-        throw new NotImplemented("Not implemented by the SAGA engine", this);
+    public int writeP(String pattern, Buffer buffer) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, SagaIOException {
+        throw new NotImplementedException("Not implemented by the SAGA engine", this);
     }
 
-    public List<String> modesE() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
-        throw new NotImplemented("Not implemented by the SAGA engine", this);
+    public List<String> modesE() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
+        throw new NotImplementedException("Not implemented by the SAGA engine", this);
     }
 
-    public int sizeE(String emode, String spec) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
-        throw new NotImplemented("Not implemented by the SAGA engine", this);
+    public int sizeE(String emode, String spec) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+        throw new NotImplementedException("Not implemented by the SAGA engine", this);
     }
 
-    public int readE(String emode, String spec, Buffer buffer) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IOException {
-        throw new NotImplemented("Not implemented by the SAGA engine", this);
+    public int readE(String emode, String spec, Buffer buffer) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, SagaIOException {
+        throw new NotImplementedException("Not implemented by the SAGA engine", this);
     }
 
-    public int writeE(String emode, String spec, Buffer buffer) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IOException {
-        throw new NotImplemented("Not implemented by the SAGA engine", this);
+    public int writeE(String emode, String spec, Buffer buffer) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, SagaIOException {
+        throw new NotImplementedException("Not implemented by the SAGA engine", this);
     }
 
     ////////////////////////////////// unofficial public methods //////////////////////////////////
@@ -331,11 +333,11 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         return m_outStream;
     }
 
-    public FileInputStream newFileInputStream() throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    public FileInputStream newFileInputStream() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         return FileFactoryImpl.openFileInputStream(m_session, m_url, m_adaptor);
     }
 
-    public FileOutputStream newFileOutputStream(boolean overwrite) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public FileOutputStream newFileOutputStream(boolean overwrite) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         boolean append = false;
         boolean exclusive = !overwrite;
         return FileFactoryImpl.openFileOutputStream(m_session, m_url, m_adaptor, append, exclusive);

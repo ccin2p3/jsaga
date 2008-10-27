@@ -25,12 +25,12 @@ public class DataStagingTaskGenerator {
     private String m_jobName;
     private XJSDLXPathSelector m_selector;
 
-    public DataStagingTaskGenerator(String jobName, Document jobDesc) throws NotImplemented, BadParameter, NoSuccess {
+    public DataStagingTaskGenerator(String jobName, Document jobDesc) throws NotImplementedException, BadParameterException, NoSuccessException {
         m_jobName = jobName;
         m_selector = new XJSDLXPathSelector(jobDesc);
     }
     
-    public void updateWorkflow(Session session, Workflow workflow) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public void updateWorkflow(Session session, Workflow workflow) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         final boolean keep = true;
         final boolean notKeep = false;
 
@@ -161,8 +161,8 @@ public class DataStagingTaskGenerator {
                 String endTaskName = JobEndTask.name(m_jobName);
                 workflow.add(jobTask, null, endTaskName);
             }
-        } catch (DoesNotExist e) {
-            throw new NoSuccess("INTERNAL ERROR: unexpected exception", e);
+        } catch (DoesNotExistException e) {
+            throw new NoSuccessException("INTERNAL ERROR: unexpected exception", e);
         }
     }
 

@@ -5,8 +5,8 @@ import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
 import fr.in2p3.jsaga.engine.config.attributes.FilePropertiesAttributesParser;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.IncorrectState;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.io.*;
 import java.util.Map;
@@ -49,14 +49,14 @@ public class UserPassSecurityAdaptorBuilder implements ExpirableSecurityAdaptorB
         });
     }
 
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return new Default[]{
                 new Default(Context.USERID, "anonymous"),
                 new Default(Context.USERPASS, "anon")
         };
     }
 
-    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectState, NoSuccess {
+    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectStateException, NoSuccessException {
         try {
             switch(usage) {
                 case USAGE_INIT:
@@ -109,14 +109,14 @@ public class UserPassSecurityAdaptorBuilder implements ExpirableSecurityAdaptorB
                     return new UserPassExpirableSecurityAdaptor(name, password, expiryDate);
                 }
                 default:
-                    throw new NoSuccess("INTERNAL ERROR: unexpected exception");
+                    throw new NoSuccessException("INTERNAL ERROR: unexpected exception");
             }
-        } catch(IncorrectState e) {
+        } catch(IncorrectStateException e) {
             throw e;
-        } catch(NoSuccess e) {
+        } catch(NoSuccessException e) {
             throw e;
         } catch(Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 

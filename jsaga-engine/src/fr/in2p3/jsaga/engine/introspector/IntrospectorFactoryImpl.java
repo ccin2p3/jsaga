@@ -2,8 +2,8 @@ package fr.in2p3.jsaga.engine.introspector;
 
 import fr.in2p3.jsaga.introspector.Introspector;
 import fr.in2p3.jsaga.introspector.IntrospectorFactory;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -18,11 +18,11 @@ import org.ogf.saga.error.NotImplemented;
  *
  */
 public class IntrospectorFactoryImpl extends IntrospectorFactory {
-    protected Introspector doCreateNSIntrospector() throws NotImplemented, NoSuccess {
+    protected Introspector doCreateNSIntrospector() throws NotImplementedException, NoSuccessException {
         return new NSIntrospectorImpl();
     }
 
-    protected Introspector doCreateJobIntrospector() throws NotImplemented, NoSuccess {
+    protected Introspector doCreateJobIntrospector() throws NotImplementedException, NoSuccessException {
         return new JobIntrospectorImpl();
     }
 }

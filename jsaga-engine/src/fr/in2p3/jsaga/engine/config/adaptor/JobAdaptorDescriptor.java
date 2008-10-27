@@ -7,7 +7,7 @@ import fr.in2p3.jsaga.adaptor.job.control.BulkJobSubmit;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.engine.schema.config.*;
 import fr.in2p3.jsaga.engine.schema.config.types.AttributeSourceType;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,12 +46,12 @@ public class JobAdaptorDescriptor {
         }
     }
 
-    public Class getClass(String type) throws NoSuccess {
+    public Class getClass(String type) throws NoSuccessException {
         Class clazz = (Class) m_classes.get(type);
         if (clazz != null) {
             return clazz;
         } else {
-            throw new NoSuccess("Found no job adaptor supporting type: "+type);
+            throw new NoSuccessException("Found no job adaptor supporting type: "+type);
         }
     }
 

@@ -20,6 +20,6 @@ public interface JobWithStaging extends LateBindedJob {
      * @return the job wrapper script
      */
     public String getWrapper()
-        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, DoesNotExist, Timeout, NoSuccess;
+        throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException;
 }

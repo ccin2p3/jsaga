@@ -1,10 +1,8 @@
 package org.ogf.saga.namespace;
 
-import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.abstracts.AbstractNSCopyTest;
-
-import java.lang.Exception;
+import org.ogf.saga.url.URL;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -40,7 +38,7 @@ public class NSCopyTest extends AbstractNSCopyTest {
         try {
             m_file.copy(target, Flags.NONE.getValue());
             fail("Expected AlreadyExist exception");
-        } catch(AlreadyExists e) {
+        } catch(AlreadyExistsException e) {
             checkCopied(target, DEFAULT_CONTENT_2);
         }
     }
@@ -55,18 +53,18 @@ public class NSCopyTest extends AbstractNSCopyTest {
         NSEntry entry = null;
         try {
             entry = NSFactory.createNSEntry(m_session, createURL(m_subDirUrl, "unexisting.txt"), FLAGS_BYPASSEXIST);
-        } catch(DoesNotExist e) {
-            fail("Unexpected DoesNotExist exception");
+        } catch(DoesNotExistException e) {
+            fail("Unexpected exception: "+ DoesNotExistException.class);
         }
         try {
             entry.copy(m_subDirUrl2, Flags.NONE.getValue());
-            fail("Expected IncorrectState exception");
-        } catch(IncorrectState e) {
+            fail("Expected exception: "+ IncorrectStateException.class);
+        } catch(IncorrectStateException e) {
         }
         try {
             NSFactory.createNSEntry(m_session, createURL(m_subDirUrl2, "unexisting.txt"), Flags.NONE.getValue());
-            fail("Expected DoesNotExist exception");
-        } catch(DoesNotExist e) {
+            fail("Expected exception: "+ DoesNotExistException.class);
+        } catch(DoesNotExistException e) {
         }
     }
 }

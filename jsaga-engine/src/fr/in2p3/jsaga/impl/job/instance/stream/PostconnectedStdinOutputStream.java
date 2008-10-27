@@ -4,7 +4,6 @@ import fr.in2p3.jsaga.impl.job.instance.JobImpl;
 import org.ogf.saga.error.*;
 
 import java.io.*;
-import java.lang.Exception;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -22,7 +21,7 @@ public class PostconnectedStdinOutputStream extends JobStdinOutputStream {
     private InputStreamContainer m_in;
 
     /** constructor for StreamableJobInteractiveSet */
-    public PostconnectedStdinOutputStream(JobImpl job) throws Timeout, DoesNotExist, NoSuccess, NotImplemented {
+    public PostconnectedStdinOutputStream(JobImpl job) throws TimeoutException, DoesNotExistException, NoSuccessException, NotImplementedException {
         super(job);
         m_in = new InputStreamContainer();
     }
@@ -47,9 +46,9 @@ public class PostconnectedStdinOutputStream extends JobStdinOutputStream {
                 case NEW:
                     return m_in.getOutputStream();
                 case RUNNING:
-                    throw new NoSuccess("Not supported yet...");
+                    throw new NoSuccessException("Not supported yet...");
                 default:
-                    throw new DoesNotExist("Stdin is not available because job is finished or suspended");
+                    throw new DoesNotExistException("Stdin is not available because job is finished or suspended");
             }
         } catch (Exception e) {
             throw new IOException(e.getMessage());

@@ -3,8 +3,8 @@ package fr.in2p3.jsaga.adaptor.security;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
 
 import java.io.PrintStream;
 
@@ -30,7 +30,7 @@ public class UserPassExpirableSecurityAdaptor extends UserPassSecurityAdaptor {
     }
 
     /** override super.getAttribute() */
-    public String getAttribute(String key) throws NotImplemented, NoSuccess {
+    public String getAttribute(String key) throws NotImplementedException, NoSuccessException {
         if (Context.LIFETIME.equals(key)) {
             return ""+this.getLifeTime();
         } else {

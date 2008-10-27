@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.adaptor.data;
 
 import org.ogf.saga.SagaObject;
-import org.ogf.saga.error.Exception;
+import org.ogf.saga.error.SagaException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -15,12 +15,12 @@ import org.ogf.saga.error.Exception;
 /**
  *
  */
-public class ParentDoesNotExist extends Exception {
+public class ParentDoesNotExist extends SagaException {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Constructs a DoesNotExist exception.
+     * Constructs a DoesNotExistException exception.
      */
     public ParentDoesNotExist() {
         super(DOES_NOT_EXIST);

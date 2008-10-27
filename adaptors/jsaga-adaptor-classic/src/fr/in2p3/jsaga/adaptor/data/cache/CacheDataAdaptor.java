@@ -50,7 +50,7 @@ public class CacheDataAdaptor implements FileReaderStreamFactory, FileWriter {
         return new UOr(new Usage[]{new U(BASE_URL), new U(AUTO_REFRESH)});
     }
 
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         String tmp = System.getProperty("java.io.tmpdir");
         if(System.getProperty("os.name").startsWith("Windows")) tmp = "/"+tmp.replaceAll("\\\\","/");
         return new Default[] {
@@ -60,65 +60,65 @@ public class CacheDataAdaptor implements FileReaderStreamFactory, FileWriter {
 
     public Class[] getSupportedSecurityAdaptorClasses() {return null;}
     public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {}
-    public BaseURL getBaseURL() throws IncorrectURL {return null;}
+    public BaseURL getBaseURL() throws IncorrectURLException {return null;}
 
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         m_baseURL = URLFactory.createURL((String) attributes.get(BASE_URL));
         URL remoteUrl;
         try {
             String protocol = "http";   //todo: read protocol from attributes
             remoteUrl = URLFactory.createURL(new URI(protocol, userInfo, host, port, basePath, null, null).toString());
         }
-        catch (URISyntaxException e) {throw new BadParameter(e);}
+        catch (URISyntaxException e) {throw new BadParameterException(e);}
         try {
             m_cache = FileFactory.createDirectory(m_baseURL);
             m_connection = FileFactory.createDirectory(remoteUrl);
         }
-        catch (IncorrectURL e) {throw new BadParameter(e);}
-        catch (PermissionDenied e) {throw new AuthorizationFailed(e);}
-        catch (DoesNotExist e) {throw new NoSuccess(e);}
-        catch (AlreadyExists e) {throw new NoSuccess(e);}
+        catch (IncorrectURLException e) {throw new BadParameterException(e);}
+        catch (PermissionDeniedException e) {throw new AuthorizationFailedException(e);}
+        catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+        catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
     }
 
-    public void disconnect() throws NoSuccess {
+    public void disconnect() throws NoSuccessException {
         try {
             m_connection.close();
             m_cache.close();
-        } catch (NotImplemented e) {
-            throw new NoSuccess(e);
-        } catch (IncorrectState e) {
-            throw new NoSuccess(e);
+        } catch (NotImplementedException e) {
+            throw new NoSuccessException(e);
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
         }
     }
 
-    public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
+    public boolean exists(String absolutePath, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         try {
             URL remoteURL = getURL(absolutePath, additionalArgs);
             m_connection.open(remoteURL);
             return true;
-        } catch (DoesNotExist e) {
+        } catch (DoesNotExistException e) {
             return false;
         }
-        catch (PermissionDenied e) {throw e;}
-        catch (Timeout e) {throw e;}
-        catch (NoSuccess e) {throw e;}
-        catch (Exception e) {throw new NoSuccess(e);}
+        catch (PermissionDeniedException e) {throw e;}
+        catch (TimeoutException e) {throw e;}
+        catch (NoSuccessException e) {throw e;}
+        catch (Exception e) {throw new NoSuccessException(e);}
     }
 
-    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         try {
             URL remoteURL = getURL(absolutePath, additionalArgs);
             NSEntry entry = m_connection.open(remoteURL);
             return new CacheFileAttributes(entry);
         }
-        catch (PermissionDenied e) {throw e;}
-        catch (DoesNotExist e) {throw e;}
-        catch (Timeout e) {throw e;}
-        catch (NoSuccess e) {throw e;}
-        catch (Exception e) {throw new NoSuccess(e);}
+        catch (PermissionDeniedException e) {throw e;}
+        catch (DoesNotExistException e) {throw e;}
+        catch (TimeoutException e) {throw e;}
+        catch (NoSuccessException e) {throw e;}
+        catch (Exception e) {throw new NoSuccessException(e);}
     }
 
-    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         try {
             URL remoteURL = getURL(absolutePath, additionalArgs);
             List list = m_connection.openDir(remoteURL).list();
@@ -130,14 +130,14 @@ public class CacheDataAdaptor implements FileReaderStreamFactory, FileWriter {
             }
             return attrs;
         }
-        catch (PermissionDenied e) {throw e;}
-        catch (DoesNotExist e) {throw e;}
-        catch (Timeout e) {throw e;}
-        catch (NoSuccess e) {throw e;}
-        catch (Exception e) {throw new NoSuccess(e);}
+        catch (PermissionDeniedException e) {throw e;}
+        catch (DoesNotExistException e) {throw e;}
+        catch (TimeoutException e) {throw e;}
+        catch (NoSuccessException e) {throw e;}
+        catch (Exception e) {throw new NoSuccessException(e);}
     }
 
-    public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         URL remoteURL = getURL(absolutePath, additionalArgs);
         URL cacheURL = this.getCacheURL(absolutePath, additionalArgs);
         try {
@@ -146,66 +146,66 @@ public class CacheDataAdaptor implements FileReaderStreamFactory, FileWriter {
             }
             return m_cache.openFileInputStream(cacheURL);
         }
-        catch (PermissionDenied e) {throw e;}
-        catch (BadParameter e) {throw e;}
-        catch (DoesNotExist e) {throw e;}
-        catch (Timeout e) {throw e;}
-        catch (NoSuccess e) {throw e;}
-        catch (Exception e) {throw new NoSuccess(e);}
+        catch (PermissionDeniedException e) {throw e;}
+        catch (BadParameterException e) {throw e;}
+        catch (DoesNotExistException e) {throw e;}
+        catch (TimeoutException e) {throw e;}
+        catch (NoSuccessException e) {throw e;}
+        catch (Exception e) {throw new NoSuccessException(e);}
     }
 
-    public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+    public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         URL cacheURL = this.getCacheURL(parentAbsolutePath+"/"+directoryName, additionalArgs);
         try {
             m_cache.makeDir(cacheURL);
         }
-        catch (PermissionDenied e) {throw e;}
-        catch (BadParameter e) {throw e;}
-        catch (DoesNotExist e) {throw new ParentDoesNotExist(e);}
-        catch (Timeout e) {throw e;}
-        catch (NoSuccess e) {throw e;}
-        catch (Exception e) {throw new NoSuccess(e);}
+        catch (PermissionDeniedException e) {throw e;}
+        catch (BadParameterException e) {throw e;}
+        catch (DoesNotExistException e) {throw new ParentDoesNotExist(e);}
+        catch (TimeoutException e) {throw e;}
+        catch (NoSuccessException e) {throw e;}
+        catch (Exception e) {throw new NoSuccessException(e);}
     }
 
-    public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         URL cacheURL = this.getCacheURL(parentAbsolutePath+"/"+directoryName, additionalArgs);
         try {
             m_cache.remove(cacheURL);
         }
-        catch (PermissionDenied e) {throw e;}
-        catch (BadParameter e) {throw e;}
-        catch (DoesNotExist e) {throw e;}
-        catch (Timeout e) {throw e;}
-        catch (NoSuccess e) {throw e;}
-        catch (Exception e) {throw new NoSuccess(e);}
+        catch (PermissionDeniedException e) {throw e;}
+        catch (BadParameterException e) {throw e;}
+        catch (DoesNotExistException e) {throw e;}
+        catch (TimeoutException e) {throw e;}
+        catch (NoSuccessException e) {throw e;}
+        catch (Exception e) {throw new NoSuccessException(e);}
     }
 
-    public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         URL cacheURL = this.getCacheURL(parentAbsolutePath+"/"+fileName, additionalArgs);
         try {
             m_cache.remove(cacheURL);
         }
-        catch (PermissionDenied e) {throw e;}
-        catch (BadParameter e) {throw e;}
-        catch (DoesNotExist e) {throw e;}
-        catch (Timeout e) {throw e;}
-        catch (NoSuccess e) {throw e;}
-        catch (Exception e) {throw new NoSuccess(e);}
+        catch (PermissionDeniedException e) {throw e;}
+        catch (BadParameterException e) {throw e;}
+        catch (DoesNotExistException e) {throw e;}
+        catch (TimeoutException e) {throw e;}
+        catch (NoSuccessException e) {throw e;}
+        catch (Exception e) {throw new NoSuccessException(e);}
     }
 
     ////////////////////////////////////////// private methods /////////////////////////////////////////
 
-    private URL getCacheURL(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, Timeout, NoSuccess {
+    private URL getCacheURL(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         return m_baseURL.resolve(getURL(absolutePath, additionalArgs));
     }
 
-    private static URL getURL(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, Timeout, NoSuccess {
+    private static URL getURL(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         try {
             return URLFactory.createURL(additionalArgs!=null
                     ? absolutePath+"?"+additionalArgs
                     : absolutePath);
-        } catch (NotImplemented e) {
-            throw new NoSuccess(e);
+        } catch (NotImplementedException e) {
+            throw new NoSuccessException(e);
         }
     }
 }

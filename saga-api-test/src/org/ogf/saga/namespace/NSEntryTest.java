@@ -1,9 +1,9 @@
 package org.ogf.saga.namespace;
 
+import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
-import org.ogf.saga.error.DoesNotExist;
-import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -46,8 +46,8 @@ public class NSEntryTest extends AbstractNSEntryTest {
     public void test_unexisting() throws Exception {
         try {
             NSFactory.createNSEntry(m_session, createURL(m_subDirUrl, "unexisting.txt"), Flags.NONE.getValue());
-            fail("Expected DoesNotExist exception");
-        } catch(DoesNotExist e) {
+            fail("Expected exception: "+ DoesNotExistException.class);
+        } catch(DoesNotExistException e) {
         }
     }
 }

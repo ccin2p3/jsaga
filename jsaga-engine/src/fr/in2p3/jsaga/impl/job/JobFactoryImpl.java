@@ -5,19 +5,16 @@ import fr.in2p3.jsaga.engine.factories.JobAdaptorFactory;
 import fr.in2p3.jsaga.engine.factories.JobMonitorAdaptorFactory;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorServiceFactory;
-import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import fr.in2p3.jsaga.impl.job.description.SAGAJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.job.service.JobServiceImpl;
 import fr.in2p3.jsaga.impl.job.service.LateBindedJobServiceImpl;
-import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
-import org.ogf.saga.url.URL;
+import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
-
-import java.lang.Exception;
+import org.ogf.saga.url.URL;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -40,28 +37,28 @@ public class JobFactoryImpl extends JobFactory {
         m_monitorServiceFactory = new JobMonitorServiceFactory(monitorAdaptorFactory);
     }
 
-    protected JobDescription doCreateJobDescription() throws NotImplemented {
+    protected JobDescription doCreateJobDescription() throws NotImplementedException {
         try {
             return new SAGAJobDescriptionImpl();
         } catch (Exception e) {
-            throw new NotImplemented("INTERNAL ERROR: Unexpected exception");
+            throw new NotImplementedException("INTERNAL ERROR: Unexpected exception");
         }
     }
 
     //NOTICE: resource discovery should NOT be done here because it should depend on the job description
-    protected JobService doCreateJobService(Session session, URL rm) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
+    protected JobService doCreateJobService(Session session, URL rm) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
         if (rm!=null && !rm.toString().equals("")) {
             JobControlAdaptor controlAdaptor;
             try {
                 controlAdaptor = m_adaptorFactory.getJobControlAdaptor(rm, session);
-            } catch (BadParameter e) {
-                throw new NoSuccess(e);
+            } catch (BadParameterException e) {
+                throw new NoSuccessException(e);
             }
             JobMonitorService monitorService;
             try {
                 monitorService = m_monitorServiceFactory.getJobMonitorService(rm, session);
-            } catch (BadParameter e) {
-                throw new NoSuccess(e);
+            } catch (BadParameterException e) {
+                throw new NoSuccessException(e);
             }
             return new JobServiceImpl(session, rm, controlAdaptor, monitorService);
         } else {
@@ -69,15 +66,11 @@ public class JobFactoryImpl extends JobFactory {
         }
     }
 
-    protected Task<JobService> doCreateJobService(TaskMode mode, Session session, URL rm) throws NotImplemented {
-        try {
-            return AbstractSagaObjectImpl.prepareTask(mode, new GenericThreadedTask(
-                    null,
-                    this,
-                    JobFactoryImpl.class.getMethod("doCreateJobService", new Class[]{Session.class, URL.class}),
-                    new Object[]{session, rm}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    protected Task<JobFactory, JobService> doCreateJobService(TaskMode mode, Session session, URL rm) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<JobFactory,JobService>().create(
+                mode, null, this,
+                "doCreateJobService",
+                new Class[]{Session.class, URL.class},
+                new Object[]{session, rm});
     }
 }

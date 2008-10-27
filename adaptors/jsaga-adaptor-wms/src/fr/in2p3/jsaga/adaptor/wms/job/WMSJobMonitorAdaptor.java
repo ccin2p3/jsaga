@@ -27,13 +27,13 @@ import org.glite.wsdl.types.lb.holders.JobStatusArrayHolder;
 import org.globus.axis.transport.HTTPSSender;
 import org.globus.axis.util.Util;
 import org.ietf.jgss.GSSCredential;
-import org.ogf.saga.error.AuthenticationFailed;
-import org.ogf.saga.error.AuthorizationFailed;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.IncorrectState;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
-import org.ogf.saga.error.Timeout;
+import org.ogf.saga.error.AuthenticationFailedException;
+import org.ogf.saga.error.AuthorizationFailedException;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.TimeoutException;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -69,24 +69,24 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
         return new UAnd(new Usage[]{new U(MONITOR_PORT)});
     }
 
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
     	return new Default[]{
     			new Default(MONITOR_PORT, "9003")};
     }
   
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     	m_lbHost = host;
     	if(attributes.containsKey(MONITOR_PORT))
     		m_lbPort = Integer.parseInt((String) attributes.get(MONITOR_PORT));
     }
 
-    public void disconnect() throws NoSuccess {    	
+    public void disconnect() throws NoSuccessException {
 	}
     
     /**
 	 * Get one job status
 	 */
-    public JobStatus getStatus(String nativeJobId) throws Timeout, NoSuccess {
+    public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
     	
     	try {
 
@@ -100,25 +100,25 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	        JobFlags jobFlags = new JobFlags(jobFlagsValue);
 	        org.glite.wsdl.types.lb.JobStatus jobState = stub.jobStatus(nativeJobId,jobFlags );
 	        if(jobState == null) {
-	            throw new NoSuccess("Unable to get status for job:"+nativeJobId);
+	            throw new NoSuccessException("Unable to get status for job:"+nativeJobId);
 	        }
 	        return new WMSJobStatus(nativeJobId,jobState.getState(), jobState.getState().getValue());
     	}
     	catch (MalformedURLException e) {
-    		throw new NoSuccess(e);
+    		throw new NoSuccessException(e);
     	} catch (ServiceException e) {
-    		throw new NoSuccess(e);
+    		throw new NoSuccessException(e);
 		} catch (GenericFault e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (RemoteException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
     }
 
 	/**
 	 * Get all jobs for authenticated user 
 	 */
-	public JobStatus[] getFilteredStatus(Object[] filters) throws Timeout, NoSuccess {
+	public JobStatus[] getFilteredStatus(Object[] filters) throws TimeoutException, NoSuccessException {
 		try {
 			
 			// get stub
@@ -155,7 +155,7 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	        // TODO : exception or null ?
 	        return null;
     	} catch (Exception e) {
-    		throw new NoSuccess(e);
+    		throw new NoSuccessException(e);
     	}
 	}
 

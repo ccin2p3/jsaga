@@ -17,7 +17,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.InputStream;
-import java.lang.Exception;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -40,11 +39,11 @@ public class JobCollectionFactoryImpl extends JobCollectionFactory {
         m_evaluatorFactory = evaluatorFactory;
     }
 
-    protected JobCollectionDescription doCreateJobCollectionDescription(String language, InputStream jobDescStream) throws NotImplemented, BadParameter, NoSuccess {
+    protected JobCollectionDescription doCreateJobCollectionDescription(String language, InputStream jobDescStream) throws NotImplementedException, BadParameterException, NoSuccessException {
         return this.doCreateJobCollectionDescription(language, jobDescStream, null);
     }
 
-    protected JobCollectionDescription doCreateJobCollectionDescription(String language, InputStream jobDescStream, String collectionName) throws NotImplemented, BadParameter, NoSuccess {
+    protected JobCollectionDescription doCreateJobCollectionDescription(String language, InputStream jobDescStream, String collectionName) throws NotImplementedException, BadParameterException, NoSuccessException {
         LanguageAdaptor parser = m_languageFactory.getLanguageAdaptor(language);
 
         // parse
@@ -62,19 +61,19 @@ public class JobCollectionFactoryImpl extends JobCollectionFactory {
         // translate to JSDL
         String stylesheet = parser.getTranslator();
         if (stylesheet == null) {
-            throw new NotImplemented("[ADAPTOR ERROR] Method getTranslator() must not return 'null'");
+            throw new NotImplementedException("[ADAPTOR ERROR] Method getTranslator() must not return 'null'");
         }
         Document jcDesc;
         try {
             XSLTransformer transformer = XSLTransformerFactory.getInstance().getCached(stylesheet);
             jcDesc = transformer.transformToDOM(jobDescDOM);
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         return new JobCollectionDescriptionImpl(jcDesc, collectionName);
     }
 
-    protected JobCollectionManager doCreateJobCollectionManager(Session session) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
+    protected JobCollectionManager doCreateJobCollectionManager(Session session) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
         return new JobCollectionManagerImpl(session, m_evaluatorFactory.getEvaluatorAdaptor());
     }
 }

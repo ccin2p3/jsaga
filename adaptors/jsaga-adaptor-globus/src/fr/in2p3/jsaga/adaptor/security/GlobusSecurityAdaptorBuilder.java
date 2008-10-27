@@ -66,7 +66,7 @@ public abstract class GlobusSecurityAdaptorBuilder implements ExpirableSecurityA
                                         if (super.throwExceptionIfInvalid(value) != null) {
                                             String v = (String) value;
                                             if (!v.equalsIgnoreCase("limited") && !v.equalsIgnoreCase("full")) {
-                                                throw new BadParameter("Expected: limited | full");
+                                                throw new BadParameterException("Expected: limited | full");
                                             }
                                         }
                                         return value;
@@ -80,7 +80,7 @@ public abstract class GlobusSecurityAdaptorBuilder implements ExpirableSecurityA
         });
     }
 
-    public Default[] getDefaults(Map map) throws IncorrectState {
+    public Default[] getDefaults(Map map) throws IncorrectStateException {
         EnvironmentVariables env = EnvironmentVariables.getInstance();
         return new Default[]{
                 new Default(Context.USERPROXY, new String[]{
@@ -107,7 +107,7 @@ public abstract class GlobusSecurityAdaptorBuilder implements ExpirableSecurityA
                 new Default(GlobusContext.DELEGATION, "full")
         };
     }
-    protected static String getUnixUID() throws IncorrectState {
+    protected static String getUnixUID() throws IncorrectStateException {
         try {
             Process p = Runtime.getRuntime().exec("id -u");
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -115,11 +115,11 @@ public abstract class GlobusSecurityAdaptorBuilder implements ExpirableSecurityA
             reader.close();
             return uid;
         } catch (IOException e) {
-            throw new IncorrectState(e);
+            throw new IncorrectStateException(e);
         }
     }
 
-    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectState, NoSuccess {
+    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectStateException, NoSuccessException {
         try {
             switch(usage) {
                 case USAGE_INIT_PKCS12:
@@ -148,21 +148,21 @@ public abstract class GlobusSecurityAdaptorBuilder implements ExpirableSecurityA
                     return this.createSecurityAdaptor(cred);
                 }
                 default:
-                    throw new NoSuccess("INTERNAL ERROR: unexpected exception");
+                    throw new NoSuccessException("INTERNAL ERROR: unexpected exception");
             }
-        } catch(IncorrectState e) {
+        } catch(IncorrectStateException e) {
             throw e;
-        } catch(NoSuccess e) {
+        } catch(NoSuccessException e) {
             throw e;
         } catch(Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
-    private SecurityAdaptor createSecurityAdaptor(GSSCredential cred) throws IncorrectState {
+    private SecurityAdaptor createSecurityAdaptor(GSSCredential cred) throws IncorrectStateException {
         if (this.checkType(cred) && !hasNonCriticalExtensions(cred)) {
             return new GlobusSecurityAdaptor(cred);
         } else {
-            throw new IncorrectState("Security context is not of type: "+this.getType());
+            throw new IncorrectStateException("Security context is not of type: "+this.getType());
         }
     }
 

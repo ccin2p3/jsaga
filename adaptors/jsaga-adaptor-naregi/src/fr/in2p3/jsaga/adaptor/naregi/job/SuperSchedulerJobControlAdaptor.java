@@ -33,7 +33,7 @@ public class SuperSchedulerJobControlAdaptor extends SuperSchedulerJobAdaptorAbs
         return null;
     }
 
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return null;
     }
 
@@ -57,14 +57,14 @@ public class SuperSchedulerJobControlAdaptor extends SuperSchedulerJobAdaptorAbs
         return new SuperSchedulerJobMonitorAdaptor();
     }
 
-    public String submit(String jobDesc, boolean checkMatch) throws PermissionDenied, Timeout, NoSuccess, BadResource {
+    public String submit(String jobDesc, boolean checkMatch) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         Document doc;
         try {
             DocumentBuilder db = dbf.newDocumentBuilder();
             doc = db.parse(new ByteArrayInputStream(jobDesc.getBytes()));
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         String epr;
         try {
@@ -74,12 +74,12 @@ public class SuperSchedulerJobControlAdaptor extends SuperSchedulerJobAdaptorAbs
                 epr = m_jss.submitJob(doc, m_account, m_passPhrase);
             }
         } catch (JobScheduleServiceException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         return new JobEPR(new ByteArrayInputStream(epr.getBytes())).getJobId();
     }
 
-    public void cancel(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess {
+    public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         String epr = new JobEPR(nativeJobId).getEPR();
         try {
             if (m_credential != null) {
@@ -88,11 +88,11 @@ public class SuperSchedulerJobControlAdaptor extends SuperSchedulerJobAdaptorAbs
                 m_jss.cancelJob(epr, m_account, m_passPhrase);
             }
         } catch (JobScheduleServiceException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 
-    public void clean(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess {
+    public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         String epr = new JobEPR(nativeJobId).getEPR();
         try {
             if (m_credential != null) {
@@ -101,7 +101,7 @@ public class SuperSchedulerJobControlAdaptor extends SuperSchedulerJobAdaptorAbs
                 m_jss.deleteJob(epr, m_account, m_passPhrase);
             }
         } catch (JobScheduleServiceException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 }

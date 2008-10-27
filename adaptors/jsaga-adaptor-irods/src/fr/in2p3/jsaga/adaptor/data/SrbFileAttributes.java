@@ -4,7 +4,7 @@ import edu.sdsc.grid.io.MetaDataRecordList;
 import edu.sdsc.grid.io.srb.SRBMetaDataSet;
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.DoesNotExistException;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -23,7 +23,7 @@ import java.util.Date;
  */
 public class SrbFileAttributes extends FileAttributes {
 
-    public SrbFileAttributes(MetaDataRecordList collection, MetaDataRecordList file) throws DoesNotExist {
+    public SrbFileAttributes(MetaDataRecordList collection, MetaDataRecordList file) throws DoesNotExistException {
         // set name
 		if (collection != null) {
 			m_name = (String) collection.getValue(collection.getFieldIndex(SRBMetaDataSet.DIRECTORY_NAME));
@@ -32,7 +32,7 @@ public class SrbFileAttributes extends FileAttributes {
 		}
 
 		if (m_name ==null || m_name.equals(".") || m_name.equals("..")) {
-			throw new DoesNotExist("Ignore this entry");
+			throw new DoesNotExistException("Ignore this entry");
 		}
 
         // set type        

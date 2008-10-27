@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.impl.attributes;
 
-import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
+import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
 import org.ogf.saga.attributes.AsyncAttributes;
-import org.ogf.saga.error.NotImplemented;
+import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
@@ -19,140 +19,99 @@ import org.ogf.saga.task.TaskMode;
 /**
  *
  */
-public abstract class AbstractAsyncAttributesImpl extends AbstractAttributesImpl implements AsyncAttributes {
-    public AbstractAsyncAttributesImpl(Session session) {
+public abstract class AbstractAsyncAttributesImpl<T> extends AbstractAttributesImpl implements AsyncAttributes<T> {
+    private T m_object;
+
+    public AbstractAsyncAttributesImpl(Session session, T object) {
         super(session);
+        m_object = object;
     }
 
-    public Task setAttribute(TaskMode mode, String key, String value) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractAttributesImpl.class.getMethod("setAttribute", new Class[]{String.class, String.class}),
-                    new Object[]{key, value}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<T, Void> setAttribute(TaskMode mode, String key, String value) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<T,Void>().create(
+                mode, m_session, m_object,
+                "setAttribute",
+                new Class[]{String.class, String.class},
+                new Object[]{key, value});
     }
 
-    public Task<String> getAttribute(TaskMode mode, String key) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractAttributesImpl.class.getMethod("getAttribute", new Class[]{String.class}),
-                    new Object[]{key}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<T, String> getAttribute(TaskMode mode, String key) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<T,String>().create(
+                mode, m_session, m_object,
+                "getAttribute",
+                new Class[]{String.class},
+                new Object[]{key});
     }
 
-    public Task setVectorAttribute(TaskMode mode, String key, String[] values) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractAttributesImpl.class.getMethod("setVectorAttribute", new Class[]{String.class, String[].class}),
-                    new Object[]{key, values}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<T, Void> setVectorAttribute(TaskMode mode, String key, String[] values) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<T,Void>().create(
+                mode, m_session, m_object,
+                "setVectorAttribute",
+                new Class[]{String.class, String[].class},
+                new Object[]{key, values});
     }
 
-    public Task<String[]> getVectorAttribute(TaskMode mode, String key) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractAttributesImpl.class.getMethod("getVectorAttribute", new Class[]{String.class}),
-                    new Object[]{key}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<T, String[]> getVectorAttribute(TaskMode mode, String key) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<T,String[]>().create(
+                mode, m_session, m_object,
+                "getVectorAttribute",
+                new Class[]{String.class},
+                new Object[]{key});
     }
 
-    public Task removeAttribute(TaskMode mode, String key) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractAttributesImpl.class.getMethod("removeAttribute", new Class[]{String.class}),
-                    new Object[]{key}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<T, Void> removeAttribute(TaskMode mode, String key) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<T,Void>().create(
+                mode, m_session, m_object,
+                "removeAttribute",
+                new Class[]{String.class},
+                new Object[]{key});
     }
 
-    public Task<String[]> listAttributes(TaskMode mode) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractAttributesImpl.class.getMethod("listAttributes", new Class[]{}),
-                    new Object[]{}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<T, String[]> listAttributes(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<T,String[]>().create(
+                mode, m_session, m_object,
+                "listAttributes",
+                new Class[]{},
+                new Object[]{});
     }
 
-    public Task<String[]> findAttributes(TaskMode mode, String... patterns) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractAttributesImpl.class.getMethod("findAttributes", new Class[]{String[].class}),
-                    new Object[]{patterns}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<T, String[]> findAttributes(TaskMode mode, String... patterns) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<T,String[]>().create(
+                mode, m_session, m_object,
+                "findAttributes",
+                new Class[]{String[].class},
+                new Object[]{patterns});
     }
 
-    public Task<Boolean> isReadOnlyAttribute(TaskMode mode, String key) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractAttributesImpl.class.getMethod("isReadOnlyAttribute", new Class[]{String.class}),
-                    new Object[]{key}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<T, Boolean> isReadOnlyAttribute(TaskMode mode, String key) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<T,Boolean>().create(
+                mode, m_session, m_object,
+                "isReadOnlyAttribute",
+                new Class[]{String.class},
+                new Object[]{key});
     }
 
-    public Task<Boolean> isWritableAttribute(TaskMode mode, String key) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractAttributesImpl.class.getMethod("isWritableAttribute", new Class[]{String.class}),
-                    new Object[]{key}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<T, Boolean> isWritableAttribute(TaskMode mode, String key) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<T,Boolean>().create(
+                mode, m_session, m_object,
+                "isWritableAttribute",
+                new Class[]{String.class},
+                new Object[]{key});
     }
 
-    public Task<Boolean> isRemovableAttribute(TaskMode mode, String key) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractAttributesImpl.class.getMethod("isRemovableAttribute", new Class[]{String.class}),
-                    new Object[]{key}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<T, Boolean> isRemovableAttribute(TaskMode mode, String key) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<T,Boolean>().create(
+                mode, m_session, m_object,
+                "isRemovableAttribute",
+                new Class[]{String.class},
+                new Object[]{key});
     }
 
-    public Task<Boolean> isVectorAttribute(TaskMode mode, String key) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractAttributesImpl.class.getMethod("isVectorAttribute", new Class[]{String.class}),
-                    new Object[]{key}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<T, Boolean> isVectorAttribute(TaskMode mode, String key) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<T,Boolean>().create(
+                mode, m_session, m_object,
+                "isVectorAttribute",
+                new Class[]{String.class},
+                new Object[]{key});
     }
 }

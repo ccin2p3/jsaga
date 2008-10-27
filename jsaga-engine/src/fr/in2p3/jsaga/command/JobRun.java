@@ -1,11 +1,11 @@
 package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.*;
-import org.ogf.saga.url.URL;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.task.State;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
 import java.io.*;
@@ -39,8 +39,6 @@ public class JobRun extends AbstractCommand {
     public static void main(String[] args) throws Exception {
         JobRun command = new JobRun();
         CommandLine line = command.parse(args);
-
-        System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
         if (line.hasOption(OPT_HELP))
         {
             command.printHelpAndExit(null);

@@ -16,14 +16,14 @@ import org.ggf.schemas.jsdl.x2005.x11.jsdl.JobDefinitionType;
 import org.ggf.schemas.jsdl.x2005.x11.jsdl.RangeValueType;
 import org.ggf.schemas.jsdl.x2005.x11.jsdlPosix.ArgumentType;
 import org.ggf.schemas.jsdl.x2005.x11.jsdlPosix.EnvironmentType;
-import org.ogf.saga.error.AuthenticationFailed;
-import org.ogf.saga.error.AuthorizationFailed;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.IncorrectState;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
-import org.ogf.saga.error.PermissionDenied;
-import org.ogf.saga.error.Timeout;
+import org.ogf.saga.error.AuthenticationFailedException;
+import org.ogf.saga.error.AuthorizationFailedException;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.PermissionDeniedException;
+import org.ogf.saga.error.TimeoutException;
 import org.unigrids.x2006.x04.services.tss.TargetSystemPropertiesDocument;
 import org.w3c.dom.Element;
 
@@ -81,7 +81,7 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract
     			new U(DEFAULT_CPU_TIME)});
     }
 
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
     	return new Default[]{
     			new Default(APPLICATION_NAME, "Bash shell"),
     			new Default(DEFAULT_CPU_TIME, "3600")};
@@ -103,7 +103,7 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract
         return new U6JobMonitorAdaptor();
     }
     
-	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     	super.connect(userInfo, host, port, basePath, attributes);
     	
     	// get DEFAULT_CPU_TIME
@@ -111,12 +111,12 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract
     		cpuTime = Integer.parseInt((String) attributes.get(DEFAULT_CPU_TIME));
     	}
     	catch(NumberFormatException e) {
-    		throw new BadParameter("DefaultCpuTime value is not an integer",e);
+    		throw new BadParameterException("DefaultCpuTime value is not an integer",e);
 		}
     }
     
     public JobClient createJob(GPEJobImpl jobJsdl , boolean checkMatch, String scriptFilename, TargetSystemInfo targetSystemInfo) 
-    	throws PermissionDenied, Timeout, NoSuccess, BadResource {
+    	throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
     	try {
     		
 	        // get target and create new job
@@ -290,24 +290,24 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract
 	        }
 
 	        if (jobClient.getStatus().isFailed()) {
-	            throw new NoSuccess("Unable to submit job: job already failed !");
+	            throw new NoSuccessException("Unable to submit job: job already failed !");
 	        }
 	        
 	        return jobClient;            
     	} catch (GPEWrongJobTypeException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (Exception e) {
 			if(e instanceof BadResource) {
 				throw new BadResource(e);
 			}
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (Throwable e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
     }
     
     public JobIOHandler submit(String jobDesc, boolean checkMatch, InputStream inputStream)
-    		throws PermissionDenied, Timeout, NoSuccess {	
+    		throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		try {
 			// create target
 			TargetSystemInfo targetSystemInfo = findTargetSystem();
@@ -362,12 +362,12 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract
 			if(e instanceof BadResource) {
 				throw new BadResource(e);
 			}
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
 	}
 
     public String submit(String jobDesc, boolean checkMatch)  
-    		throws PermissionDenied, Timeout, NoSuccess, BadResource {
+    		throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
     	try {
         	TargetSystemInfo targetSystemInfo = findTargetSystem();        
         	JobClient jobClient = createJob(jobDesc, null, targetSystemInfo, checkMatch);
@@ -378,12 +378,12 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract
 			if(e instanceof BadResource) {
 				throw new BadResource(e);
 			}
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
     }
     
     public JobClient createJob(String jobDesc, String stdinScript, TargetSystemInfo targetSystemInfo, boolean checkMatch) 
-    		throws PermissionDenied, Timeout, NoSuccess , BadResource {
+    		throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
 
     	try {
 			// parse JSDL to create jobDefinition 
@@ -440,41 +440,41 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract
 	        
 	    	return jobClient;
     	} catch (GPESecurityException e) {
-			throw new PermissionDenied(e);
+			throw new PermissionDeniedException(e);
 		} catch (Throwable e) {
 			if(e instanceof BadResource) {
 				throw new BadResource(e);
 			}
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
 	}
     
-    public void cancel(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess {    	
+    public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
     	try {
     		// abort
     		getJobById(nativeJobId).abort();
     	} catch (GPEResourceUnknownException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (GPESecurityException e) {
-			throw new PermissionDenied(e);
+			throw new PermissionDeniedException(e);
 		} catch (GPEMiddlewareRemoteException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (GPEMiddlewareServiceException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (GPEJobNotAbortedException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (Exception e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
     }
 
-	public void clean(String nativeJobId) throws PermissionDenied, Timeout,
-			NoSuccess {
+	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException,
+            NoSuccessException {
 		try {
 			// destroy
 	        getJobById(nativeJobId).destroy();
 		} catch (Exception e1) {
-			throw new NoSuccess(e1);
+			throw new NoSuccessException(e1);
 		}
 	}
 	

@@ -1,6 +1,6 @@
 package org.ogf.saga.job;
 
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.job.abstracts.AbstractJobTest;
 import org.ogf.saga.job.abstracts.Attribute;
 import org.ogf.saga.task.State;
@@ -45,7 +45,7 @@ public class JobRunDescriptionTest extends AbstractJobTest {
 	                State.FAILED,
 	                job.getState());
         }
-        catch (NoSuccess noSuccess) {
+        catch (NoSuccessException noSuccess) {
         	// test is successful is exception instance of BadResource
             if (!noSuccess.getClass().getName().endsWith("BadResource")) {
                 throw noSuccess;
@@ -81,7 +81,7 @@ public class JobRunDescriptionTest extends AbstractJobTest {
 	                State.FAILED,
 	                job.getState()); 	        
         }
-        catch (NoSuccess noSuccess) {
+        catch (NoSuccessException noSuccess) {
         	// test may be successful
         }
         finally {
@@ -114,7 +114,7 @@ public class JobRunDescriptionTest extends AbstractJobTest {
 	                State.FAILED,
 	                job.getState());
     	}
-    	catch (NoSuccess noSuccess) {
+    	catch (NoSuccessException noSuccess) {
         	// test is successful is exception instance of BadResource
             if (!noSuccess.getClass().getName().endsWith("BadResource")) {
                 throw noSuccess;
@@ -174,7 +174,7 @@ public class JobRunDescriptionTest extends AbstractJobTest {
 	                State.FAILED,
 	                job.getState());
     	}
-    	catch (NoSuccess noSuccess) {
+    	catch (NoSuccessException noSuccess) {
         	// test is successful is exception instance of BadResource
             if (!noSuccess.getClass().getName().endsWith("BadResource")) {
                 throw noSuccess;

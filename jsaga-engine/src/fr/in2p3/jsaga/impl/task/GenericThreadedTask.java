@@ -5,7 +5,6 @@ import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
 import org.ogf.saga.task.Task;
 
-import java.lang.Exception;
 import java.lang.reflect.Method;
 
 /* ***************************************************
@@ -20,30 +19,28 @@ import java.lang.reflect.Method;
 /**
  *
  */
-public class GenericThreadedTask extends AbstractTaskImpl implements Task {
+public class GenericThreadedTask<T,E> extends AbstractTaskImpl<T,E> implements Task<T,E> {
     private Method m_method;
     private Object[] m_arguments;
     private Thread m_thread;
 
     /** constructor */
-    public GenericThreadedTask(Session session, Object object, Method method, Object[] arguments) throws NotImplemented {
+    public GenericThreadedTask(Session session, T object, Method method, Object[] arguments) throws NotImplementedException {
         super(session, object, true);
-        this.init(method, arguments);
-    }
 
-    private void init(Method method, Object[] arguments) {
+        // set thread
         m_method = method;
         m_arguments = arguments;
         m_thread = new Thread(new Runnable(){
             public void run() {
                 GenericThreadedTask.super.setState(State.RUNNING);
                 try {
-                    Object object = GenericThreadedTask.super.getObject();
-                    Object result = m_method.invoke(object, m_arguments);
+                    T object = GenericThreadedTask.super.getObject();
+                    E result = (E) m_method.invoke(object, m_arguments);
                     GenericThreadedTask.super.setResult(result);
                     GenericThreadedTask.super.setState(State.DONE);
                 } catch (Exception e) {
-                    GenericThreadedTask.super.setException(new NoSuccess(e));
+                    GenericThreadedTask.super.setException(new NoSuccessException(e));
                     GenericThreadedTask.super.setState(State.FAILED);
                 }
             }
@@ -52,13 +49,15 @@ public class GenericThreadedTask extends AbstractTaskImpl implements Task {
 
     ////////////////////////////////////// implementation of AbstractTaskImpl //////////////////////////////////////
 
-    public void doSubmit() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public void doSubmit() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
+        // start thread
         m_thread.start();
     }
 
     protected void doCancel() {
+        // cancel thread
         try {
-            Thread.currentThread().interrupt();
+            m_thread.interrupt();
             this.setState(State.CANCELED);
         } catch(SecurityException e) {
             // do nothing (failed to cancel task)

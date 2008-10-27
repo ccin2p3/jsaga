@@ -10,8 +10,8 @@ import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
 import fr.in2p3.jsaga.engine.schema.config.DataService;
 import fr.in2p3.jsaga.engine.schema.config.Protocol;
-import org.ogf.saga.error.IncorrectURL;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.IncorrectURLException;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +33,7 @@ public class DataAdaptorDescriptor {
     private Map m_usages;
     protected Protocol[] m_xml;
 
-    public DataAdaptorDescriptor(Class[] adaptorClasses, SecurityAdaptorDescriptor securityDesc) throws IllegalAccessException, InstantiationException, IncorrectURL {
+    public DataAdaptorDescriptor(Class[] adaptorClasses, SecurityAdaptorDescriptor securityDesc) throws IllegalAccessException, InstantiationException, IncorrectURLException {
         m_classes = new HashMap();
         m_usages = new HashMap();
         m_xml = new Protocol[adaptorClasses.length];
@@ -53,12 +53,12 @@ public class DataAdaptorDescriptor {
         }
     }
 
-    public Class getClass(String scheme) throws NoSuccess {
+    public Class getClass(String scheme) throws NoSuccessException {
         Class clazz = (Class) m_classes.get(scheme);
         if (clazz != null) {
             return clazz;
         } else {
-            throw new NoSuccess("Found no data adaptor supporting scheme: "+ scheme);
+            throw new NoSuccessException("Found no data adaptor supporting scheme: "+ scheme);
         }
     }
 
@@ -66,7 +66,7 @@ public class DataAdaptorDescriptor {
         return (Usage) m_usages.get(scheme);
     }
 
-    private static Protocol toXML(DataAdaptor adaptor, SecurityAdaptorDescriptor securityDesc) throws IncorrectURL {
+    private static Protocol toXML(DataAdaptor adaptor, SecurityAdaptorDescriptor securityDesc) throws IncorrectURLException {
         Protocol protocol = new Protocol();
         protocol.setScheme(adaptor.getType());
         protocol.setRead(adaptor instanceof DataReaderAdaptor);

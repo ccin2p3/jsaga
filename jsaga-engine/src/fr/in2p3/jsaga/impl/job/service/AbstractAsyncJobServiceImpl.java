@@ -1,17 +1,16 @@
 package fr.in2p3.jsaga.impl.job.service;
 
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
-import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
-import org.ogf.saga.url.URL;
-import org.ogf.saga.url.URLFactory;
+import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 
-import java.lang.Exception;
 import java.util.List;
 
 /* ***************************************************
@@ -32,7 +31,7 @@ public abstract class AbstractAsyncJobServiceImpl extends AbstractSagaObjectImpl
         super(session);
     }
 
-    public Job runJob(String commandLine, String host, boolean interactive) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+    public Job runJob(String commandLine, String host, boolean interactive) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         try {
             // set job description
             JobDescription desc = JobFactory.createJobDescription();
@@ -49,90 +48,70 @@ public abstract class AbstractAsyncJobServiceImpl extends AbstractSagaObjectImpl
             Job job = service.createJob(desc);
             job.run();
             return job;
-        } catch (IncorrectState e) {
-            throw new NoSuccess(e);
-        } catch (DoesNotExist e) {
-            throw new NoSuccess(e);
-        } catch (IncorrectURL e) {
-            throw new NoSuccess(e);
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
+        } catch (DoesNotExistException e) {
+            throw new NoSuccessException(e);
+        } catch (IncorrectURLException e) {
+            throw new NoSuccessException(e);
         }
     }
-    public Job runJob(String commandLine, String host) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+    public Job runJob(String commandLine, String host) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         return this.runJob(commandLine, host, false);
     }
-    public Job runJob(String commandLine, boolean interactive) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+    public Job runJob(String commandLine, boolean interactive) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         return this.runJob(commandLine, "", interactive);
     }
-    public Job runJob(String commandLine) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+    public Job runJob(String commandLine) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         return this.runJob(commandLine, "", false);
     }
 
-    public Task<Job> createJob(TaskMode mode, JobDescription jd) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    JobServiceImpl.class.getMethod("createJob", new Class[]{JobDescription.class}),
-                    new Object[]{jd}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<JobService, Job> createJob(TaskMode mode, JobDescription jd) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<JobService,Job>().create(
+                mode, m_session, this,
+                "createJob",
+                new Class[]{JobDescription.class},
+                new Object[]{jd});
     }
 
-    public Task<List<String>> list(TaskMode mode) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    JobServiceImpl.class.getMethod("list", new Class[]{}),
-                    new Object[]{}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<JobService, List<String>> list(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<JobService,List<String>>().create(
+                mode, m_session, this,
+                "list",
+                new Class[]{},
+                new Object[]{});
     }
 
-    public Task<Job> getJob(TaskMode mode, String jobId) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    JobServiceImpl.class.getMethod("getJob", new Class[]{String.class}),
-                    new Object[]{jobId}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<JobService, Job> getJob(TaskMode mode, String jobId) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<JobService,Job>().create(
+                mode, m_session, this,
+                "getJob",
+                new Class[]{String.class},
+                new Object[]{jobId});
     }
 
-    public Task<JobSelf> getSelf(TaskMode mode) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    JobServiceImpl.class.getMethod("getSelf", new Class[]{}),
-                    new Object[]{}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<JobService, JobSelf> getSelf(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<JobService,JobSelf>().create(
+                mode, m_session, this,
+                "getSelf",
+                new Class[]{},
+                new Object[]{});
     }
 
-    public Task<Job> runJob(TaskMode mode, String commandLine, String host, boolean interactive) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    JobServiceImpl.class.getMethod("runJob", new Class[]{String.class, String.class, boolean.class}),
-                    new Object[]{commandLine, host, interactive}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<JobService, Job> runJob(TaskMode mode, String commandLine, String host, boolean interactive) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<JobService,Job>().create(
+                mode, m_session, this,
+                "runJob",
+                new Class[]{String.class, String.class, boolean.class},
+                new Object[]{commandLine, host, interactive});
     }
-    public Task<Job> runJob(TaskMode mode, String commandLine, String host) throws NotImplemented {
+    public Task<JobService, Job> runJob(TaskMode mode, String commandLine, String host) throws NotImplementedException {
         return this.runJob(mode, commandLine, host, false);
     }
-    public Task<Job> runJob(TaskMode mode, String commandLine, boolean interactive) throws NotImplemented {
+    public Task<JobService, Job> runJob(TaskMode mode, String commandLine, boolean interactive) throws NotImplementedException {
         return this.runJob(mode, commandLine, "", interactive);
     }
-    public Task<Job> runJob(TaskMode mode, String commandLine) throws NotImplemented {
+    public Task<JobService, Job> runJob(TaskMode mode, String commandLine) throws NotImplementedException {
         return this.runJob(mode, commandLine, "", false);
     }
 }

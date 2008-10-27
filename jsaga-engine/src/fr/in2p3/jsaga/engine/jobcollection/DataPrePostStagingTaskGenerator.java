@@ -25,12 +25,12 @@ public class DataPrePostStagingTaskGenerator {
     private String m_jobName;
     private XJSDLXPathSelector m_selector;
 
-    public DataPrePostStagingTaskGenerator(String jobName, Document jobDesc) throws NotImplemented, BadParameter, NoSuccess {
+    public DataPrePostStagingTaskGenerator(String jobName, Document jobDesc) throws NotImplementedException, BadParameterException, NoSuccessException {
         m_jobName = jobName;
         m_selector = new XJSDLXPathSelector(jobDesc);
     }
 
-    public void updateWorkflow(Session session, Workflow workflow) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public void updateWorkflow(Session session, Workflow workflow) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         final boolean keep = true;
         final boolean notKeep = false;
 

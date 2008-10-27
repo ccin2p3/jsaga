@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.base.usage;
 
-import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.DoesNotExistException;
 
 import java.util.Map;
 
@@ -25,7 +25,7 @@ public class UOptional extends U {
         return "["+m_name+"]";
     }
 
-    public int getFirstMatchingUsage(Map attributes) throws DoesNotExist {
+    public int getFirstMatchingUsage(Map attributes) throws DoesNotExistException {
         return m_id;
     }
 

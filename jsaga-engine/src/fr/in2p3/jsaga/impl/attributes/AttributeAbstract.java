@@ -52,21 +52,21 @@ public abstract class AttributeAbstract implements Attribute {
         return m_isReadOnly;
     }
 
-    public void setValue(String value) throws NotImplemented, IncorrectState, PermissionDenied {
+    public void setValue(String value) throws NotImplementedException, IncorrectStateException, PermissionDeniedException {
         this.checkSupported();
         this.checkWritable();
         this._setValue(value);
     }
-    public String getValue() throws NotImplemented, IncorrectState {
+    public String getValue() throws NotImplementedException, IncorrectStateException {
         this.checkSupported();
         return this._getValue();
     }
-    public void setValues(String[] values) throws NotImplemented, IncorrectState, PermissionDenied {
+    public void setValues(String[] values) throws NotImplementedException, IncorrectStateException, PermissionDeniedException {
         this.checkSupported();
         this.checkWritable();
         this._setValues(values);
     }
-    public String[] getValues() throws NotImplemented, IncorrectState {
+    public String[] getValues() throws NotImplementedException, IncorrectStateException {
         this.checkSupported();
         return this._getValues();
     }
@@ -88,15 +88,15 @@ public abstract class AttributeAbstract implements Attribute {
 
     //////////////////////////////////////// protected methods ////////////////////////////////////////
 
-    private void checkSupported() throws NotImplemented {
+    private void checkSupported() throws NotImplementedException {
         if (!m_isSupported) {
             // as specified in SAGA document
-            throw new NotImplemented("Attribute "+m_key+" not available in this implementation");
+            throw new NotImplementedException("Attribute "+m_key+" not available in this implementation");
         }
     }
-    private void checkWritable() throws PermissionDenied {
+    private void checkWritable() throws PermissionDeniedException {
         if (m_isReadOnly) {
-            throw new PermissionDenied("Attribute "+m_key+" not writable");
+            throw new PermissionDeniedException("Attribute "+m_key+" not writable");
         }
     }
 

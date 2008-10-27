@@ -35,16 +35,16 @@ public class SecureEmulatorDataAdaptor extends EmulatorDataAdaptor {
         m_securityAdaptor = (UserPassSecurityAdaptor) securityAdaptor;
     }
 
-    public BaseURL getBaseURL() throws IncorrectURL {
+    public BaseURL getBaseURL() throws IncorrectURLException {
         return new BaseURL(43);
     }
 
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {
         m_server = new DataEmulatorConnectionSecure(this.getType(), host, port, m_securityAdaptor);
         if(Base.DEBUG) m_server.commit();
     }
 
-    public void disconnect() throws NoSuccess {
+    public void disconnect() throws NoSuccessException {
         m_server.commit();
     }
 }

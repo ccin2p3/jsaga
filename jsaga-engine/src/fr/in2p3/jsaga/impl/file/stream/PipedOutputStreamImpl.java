@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.impl.file.stream;
 
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterPutter;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.io.*;
 
@@ -26,7 +26,7 @@ public class PipedOutputStreamImpl extends PipedOutputStream implements Runnable
     private boolean m_closed;
     private InputStream m_in;
 
-    public PipedOutputStreamImpl(FileWriterPutter adaptor, String absolutePath, String additionalArgs, boolean append) throws NoSuccess {
+    public PipedOutputStreamImpl(FileWriterPutter adaptor, String absolutePath, String additionalArgs, boolean append) throws NoSuccessException {
         m_adaptor = adaptor;
         m_absolutePath = absolutePath;
         m_additionalArgs = additionalArgs;
@@ -37,7 +37,7 @@ public class PipedOutputStreamImpl extends PipedOutputStream implements Runnable
             // pipe must be connected before writing (else will hang on 2nd test case)
             m_in = new PipedInputStream(this);
         } catch (IOException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         new Thread(this).start();
     }

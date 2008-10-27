@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.impl.job.instance.stream;
 
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.io.*;
 
@@ -23,7 +23,7 @@ public class GetterBufferedInputStream extends InputStream implements Runnable {
     private IOException m_exception;
     private boolean m_closed;
 
-    public GetterBufferedInputStream(InputStream stdout) throws NoSuccess {
+    public GetterBufferedInputStream(InputStream stdout) throws NoSuccessException {
         m_stream = stdout;
         m_buffer = new ByteArrayOutputStream();
         m_bufferedStream = null;

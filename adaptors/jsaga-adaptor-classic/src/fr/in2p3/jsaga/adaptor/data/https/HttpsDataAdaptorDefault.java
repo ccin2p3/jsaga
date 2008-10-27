@@ -54,7 +54,7 @@ public class HttpsDataAdaptorDefault extends HttpDataAdaptorDefault implements F
         return new UOptional(MUTUAL_AUTHENTICATION);
     }
 
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return new Default[]{new Default(MUTUAL_AUTHENTICATION, "false")};
     }
 
@@ -68,11 +68,11 @@ public class HttpsDataAdaptorDefault extends HttpDataAdaptorDefault implements F
         m_keyManager = adaptor.getKeyManager();
     }
 
-    public BaseURL getBaseURL() throws IncorrectURL {
+    public BaseURL getBaseURL() throws IncorrectURLException {
         return new BaseURL(443);
     }
 
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         super.connect(userInfo, host, port, basePath, attributes);
 
         // set trust manager
@@ -88,9 +88,9 @@ public class HttpsDataAdaptorDefault extends HttpDataAdaptorDefault implements F
             m_sslContext = SSLContext.getInstance("SSL");
             m_sslContext.init(m_keyManager, trustManager, new java.security.SecureRandom());
         } catch (NoSuchAlgorithmException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         } catch (KeyManagementException e) {
-            throw new AuthenticationFailed(e);
+            throw new AuthenticationFailedException(e);
         }
 
         // set hostname verifier (relaxed about hostnames)
@@ -101,7 +101,7 @@ public class HttpsDataAdaptorDefault extends HttpDataAdaptorDefault implements F
         };
     }
 
-    public void disconnect() throws NoSuccess {
+    public void disconnect() throws NoSuccessException {
         super.disconnect();
 
         // unset SSL context
@@ -111,7 +111,7 @@ public class HttpsDataAdaptorDefault extends HttpDataAdaptorDefault implements F
         m_verifier = null;
     }
 
-    public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         HttpURLConnection connection = this.getConnection(absolutePath, additionalArgs);
         try {
             connection.setRequestMethod("GET");
@@ -120,17 +120,17 @@ public class HttpsDataAdaptorDefault extends HttpDataAdaptorDefault implements F
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 in.close();
                 //todo: detailler les exception
-                throw new NoSuccess("Received error message: "+ connection.getResponseMessage());
+                throw new NoSuccessException("Received error message: "+ connection.getResponseMessage());
             }
             return in;
         } catch (SSLHandshakeException e) {
-            throw new PermissionDenied("User not allowed: "+m_userID, e);
+            throw new PermissionDeniedException("User not allowed: "+m_userID, e);
         } catch (IOException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 
-    protected HttpURLConnection getConnection(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, NoSuccess {
+    protected HttpURLConnection getConnection(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, NoSuccessException {
         HttpURLConnection connection = super.getConnection(absolutePath, additionalArgs);
         if (connection instanceof HttpsURLConnection) {
             // set HTTPS specific parameters
@@ -141,9 +141,9 @@ public class HttpsDataAdaptorDefault extends HttpDataAdaptorDefault implements F
         } else if (connection instanceof HttpURLConnection) {
             return connection;
         } else if (connection.getClass().getName().equals("org.globus.net.GSIHttpURLConnection")) {
-            throw new NoSuccess("This class cannot be used within a Globus container...");
+            throw new NoSuccessException("This class cannot be used within a Globus container...");
         } else {
-            throw new NoSuccess("Unexpected connection type: "+connection.getClass().getName());
+            throw new NoSuccessException("Unexpected connection type: "+connection.getClass().getName());
         }
     }
 }

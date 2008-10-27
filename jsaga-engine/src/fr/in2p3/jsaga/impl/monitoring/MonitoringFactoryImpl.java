@@ -17,7 +17,7 @@ import org.ogf.saga.monitoring.MonitoringFactory;
  *
  */
 public class MonitoringFactoryImpl extends MonitoringFactory {
-    protected Metric doCreateMetric(String name, String desc, String mode, String unit, String type, String value) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    protected Metric doCreateMetric(String name, String desc, String mode, String unit, String type, String value) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         return new MetricImpl(null, name, desc, MetricMode.valueOf(mode), unit, MetricType.valueOf(type), value);
     }
 }

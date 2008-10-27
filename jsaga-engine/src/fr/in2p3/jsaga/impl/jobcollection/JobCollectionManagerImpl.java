@@ -4,13 +4,11 @@ import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.evaluator.Evaluator;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import fr.in2p3.jsaga.jobcollection.*;
-import org.ogf.saga.ObjectType;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 
 import java.io.File;
-import java.lang.Exception;
 import java.util.List;
 
 /* ***************************************************
@@ -41,38 +39,34 @@ public class JobCollectionManagerImpl extends AbstractSagaObjectImpl implements 
         return clone;
     }
 
-    public ObjectType getType() {
-        return ObjectType.UNKNOWN;
-    }
-
-    public JobCollection createJobCollection(JobCollectionDescription description) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+    public JobCollection createJobCollection(JobCollectionDescription description) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         return new JobCollectionImpl(m_session, description, m_evaluator);
     }
 
-    public JobCollection createJobCollection(JobCollectionDescription description, boolean force) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+    public JobCollection createJobCollection(JobCollectionDescription description, boolean force) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         if (force) {
             // Cleanup if needed
             try {
                 JobCollectionCleaner cleaner = new JobCollectionCleaner(m_session, description.getCollectionName());
                 cleaner.cleanup();
             } catch(Exception e) {
-                throw new NoSuccess("Failed to cleanup job collection: "+description.getCollectionName(), e);
+                throw new NoSuccessException("Failed to cleanup job collection: "+description.getCollectionName(), e);
             }
         }
         // create job collection
         return this.createJobCollection(description);
     }
 
-    public List<String> list() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
+    public List<String> list() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
         return null;  //todo
     }
 
-    public JobCollection getJobCollection(String jobCollectionId) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public JobCollection getJobCollection(String jobCollectionId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         File baseDir = new File(new File(Base.JSAGA_VAR, "jobs"), jobCollectionId);
         if (baseDir.exists()) {
             return new JobCollectionReadOnlyImpl(jobCollectionId);
         } else {
-            throw new DoesNotExist("Job collection does not exist: "+jobCollectionId);
+            throw new DoesNotExistException("Job collection does not exist: "+jobCollectionId);
         }
     }
 }

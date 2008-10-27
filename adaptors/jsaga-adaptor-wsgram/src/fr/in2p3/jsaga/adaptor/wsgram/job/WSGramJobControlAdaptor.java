@@ -13,9 +13,9 @@ import org.globus.gram.GramException;
 import org.globus.gram.internal.GRAMProtocolErrorConstants;
 import org.globus.wsrf.impl.security.authorization.Authorization;
 import org.ietf.jgss.GSSException;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.PermissionDenied;
-import org.ogf.saga.error.Timeout;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.PermissionDeniedException;
+import org.ogf.saga.error.TimeoutException;
 
 import java.util.Map;
 
@@ -51,14 +51,14 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
         return new WSGramJobMonitorAdaptor();
     }
 
-    public String submit(String jobDesc, boolean checkMatch) throws PermissionDenied, Timeout, NoSuccess {
+    public String submit(String jobDesc, boolean checkMatch) throws PermissionDeniedException, TimeoutException, NoSuccessException {
     	try {
     		// parse and create
 			try {
 				RSLHelper.readRSL(jobDesc);
 			}
 			catch (RSLParseException e) {
-				throw new NoSuccess(e);    				
+				throw new NoSuccessException(e);
 			}
     		
 			if(checkMatch) {
@@ -92,48 +92,48 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
         } catch (GramException e) {
             return this.rethrowException(e);
         } catch (GSSException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         } catch (Exception e) {
-        	 throw new NoSuccess(e);
+        	 throw new NoSuccessException(e);
 		}
     }
 
-    public void cancel(String nativeJobHandle) throws PermissionDenied, Timeout, NoSuccess {
+    public void cancel(String nativeJobHandle) throws PermissionDeniedException, TimeoutException, NoSuccessException {
     	GramJob job = super.getGramJobById(nativeJobHandle);        
     	try {
             job.cancel();
         } catch (GramException e) {
             this.rethrowException(e);
         } catch (GSSException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         } catch (Exception e) {
-       	 	throw new NoSuccess(e);
+       	 	throw new NoSuccessException(e);
 		}
     }
     
-    private String rethrowException(GramException e) throws PermissionDenied, Timeout, NoSuccess {
+    private String rethrowException(GramException e) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         switch(e.getErrorCode()) {
             case GRAMProtocolErrorConstants.ERROR_AUTHORIZATION:
-                throw new PermissionDenied(e);
+                throw new PermissionDeniedException(e);
             case GRAMProtocolErrorConstants.INVALID_JOB_CONTACT:
             case GRAMProtocolErrorConstants.ERROR_CONNECTION_FAILED:
-                throw new Timeout(e);
+                throw new TimeoutException(e);
             default:
-                throw new NoSuccess(e);
+                throw new NoSuccessException(e);
         }
     }
 
-	public void clean(String nativeJobId) throws PermissionDenied, Timeout,
-			NoSuccess {
+	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException,
+            NoSuccessException {
 		GramJob job = super.getGramJobById(nativeJobId);        
     	try {
             job.destroy();
         } catch (GramException e) {
             this.rethrowException(e);
         } catch (GSSException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         } catch (Exception e) {
-       	 	throw new NoSuccess(e);
+       	 	throw new NoSuccessException(e);
 		}
 	}
 }

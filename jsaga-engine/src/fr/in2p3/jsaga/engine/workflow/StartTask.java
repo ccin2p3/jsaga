@@ -21,7 +21,7 @@ public class StartTask extends DummyTask {
     public static final String NAME = "start";
 
     /** constructor */
-    StartTask() throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    StartTask() throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         super(NAME);
         // update XML status
         Task xmlStatus = super.getStateAsXML();
@@ -30,7 +30,7 @@ public class StartTask extends DummyTask {
     }
 
     /** override super.run() */
-    public void run() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public void run() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         // inconditionally submit task
         if (!this.isCancelled()) {
             this.doSubmit();

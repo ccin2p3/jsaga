@@ -3,7 +3,7 @@ package fr.in2p3.jsaga.adaptor.data;
 import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.data.impl.DataEmulatorConnectionAbstract;
 import fr.in2p3.jsaga.adaptor.schema.data.emulator.File;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -44,7 +44,7 @@ public class EmulatorOutputStream extends OutputStream {
         m_file.setContent(b.toString());
         try {
             if(Base.DEBUG) m_server.commit();
-        } catch (NoSuccess e) {
+        } catch (NoSuccessException e) {
             throw new IOException("Failed to commit modification");
         }
     }
@@ -59,7 +59,7 @@ public class EmulatorOutputStream extends OutputStream {
 /*
         try {
             if(Base.DEBUG) m_server.commit();
-        } catch (NoSuccess e) {
+        } catch (NoSuccessException e) {
             throw new IOException("Failed to commit modification");
         }
 */
@@ -68,7 +68,7 @@ public class EmulatorOutputStream extends OutputStream {
     public void close() throws IOException {
         try {
             m_server.commit();
-        } catch (NoSuccess e) {
+        } catch (NoSuccessException e) {
             throw new IOException("Failed to commit modification");
         }
     }

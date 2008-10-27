@@ -1,12 +1,12 @@
 package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.CommandLine;
-import org.ogf.saga.url.URL;
-import org.ogf.saga.error.AlreadyExists;
-import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.AlreadyExistsException;
+import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.url.URL;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -30,8 +30,8 @@ public class NamespaceRename extends NamespaceMove {
     protected void changeBehavior(Session session, URL target) throws Exception {
         try {
             NSFactory.createNSEntry(session, target, Flags.NONE.getValue());
-            throw new AlreadyExists("Target entry already exists: "+target);
-        } catch(DoesNotExist e) {
+            throw new AlreadyExistsException("Target entry already exists: "+target);
+        } catch(DoesNotExistException e) {
             // do nothing
         }
     }

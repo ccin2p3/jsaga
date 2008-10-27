@@ -5,12 +5,12 @@ import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
 import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
-import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.impl.url.URLHelper;
-import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -26,34 +26,33 @@ import org.ogf.saga.session.Session;
  */
 public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl implements NSDirectory {
     /** constructor for factory */
-    public AbstractNSEntryDirImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    protected AbstractNSEntryDirImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session, url, adaptor, flags);
     }
 
     /** constructor for NSDirectory.open() */
-    public AbstractNSEntryDirImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    protected AbstractNSEntryDirImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(dir, relativeUrl, flags);
     }
 
     /** constructor for NSEntry.openAbsolute() */
-    public AbstractNSEntryDirImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    protected AbstractNSEntryDirImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(entry, absolutePath, flags);
     }
 
     /** override super.getCWD() */
-    public URL getCWD() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public URL getCWD() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         return m_url.normalize();
     }
 
     /** override super.copy() */
-    public void copy(URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
-        FlagsBytes effectiveFlags = new FlagsBytes(flags);
-        if (effectiveFlags.contains(Flags.DEREFERENCE)) {
-            this._dereferenceDir().copy(target, effectiveFlags.remove(Flags.DEREFERENCE));
+    public void copy(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+        new FlagsHelper(flags).allowed(JSAGAFlags.PRESERVETIMES, Flags.DEREFERENCE, Flags.RECURSIVE, Flags.OVERWRITE, Flags.CREATEPARENTS);
+        new FlagsHelper(flags).required(Flags.RECURSIVE);
+        if (Flags.DEREFERENCE.isSet(flags)) {
+            this._dereferenceDir().copy(target, flags - Flags.DEREFERENCE.getValue());
             return; //==========> EXIT
         }
-        effectiveFlags.checkAllowed(Flags.RECURSIVE.or(Flags.DEREFERENCE.or(Flags.OVERWRITE.or(Flags.CREATEPARENTS))));
-        effectiveFlags.checkRequired(Flags.RECURSIVE.getValue());
         URL effectiveTarget = this._getEffectiveURL(target);
         if (m_adaptor instanceof DataReaderAdaptor) {
             // make target directory
@@ -62,47 +61,46 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             FileAttributes[] sourceChilds = this._listAttributes(m_url.getPath());
             for (int i=0; i<sourceChilds.length; i++) {
                 NSEntry sourceChildEntry = this._openNS(sourceChilds[i]);
-                int targetFlags =
-                        (sourceChildEntry instanceof NSDirectory
-                                ? flags
-                                : effectiveFlags.remove(Flags.RECURSIVE));
-                sourceChildEntry.copy(effectiveTarget, targetFlags);
+                if (sourceChildEntry instanceof NSDirectory) {
+                    sourceChildEntry.copy(effectiveTarget, flags);
+                } else {
+                    // remove RECURSIVE flag (always set for NSDirectory.copy())
+                    sourceChildEntry.copy(effectiveTarget, flags - Flags.RECURSIVE.getValue());
+                }
             }
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
 
     /** override super.copyFrom() */
-    public void copyFrom(URL source, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
-        FlagsBytes effectiveFlags = new FlagsBytes(flags);
-        if (effectiveFlags.contains(Flags.DEREFERENCE)) {
-            this._dereferenceDir().copyFrom(source, effectiveFlags.remove(Flags.DEREFERENCE));
+    public void copyFrom(URL source, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
+        new FlagsHelper(flags).allowed(JSAGAFlags.PRESERVETIMES, Flags.DEREFERENCE, Flags.RECURSIVE, Flags.OVERWRITE);
+        new FlagsHelper(flags).required(Flags.RECURSIVE);
+        if (Flags.DEREFERENCE.isSet(flags)) {
+            this._dereferenceDir().copyFrom(source, flags - Flags.DEREFERENCE.getValue());
             return; //==========> EXIT
         }
-        effectiveFlags.checkAllowed(Flags.RECURSIVE.or(Flags.DEREFERENCE.or(Flags.OVERWRITE)));
-        effectiveFlags.checkRequired(Flags.RECURSIVE.getValue());
         if (m_adaptor instanceof DataWriterAdaptor) {
             try {
                 NSDirectory sourceDir = NSFactory.createNSDirectory(m_session, source);
                 sourceDir.copy(m_url, flags);
-            } catch (AlreadyExists e) {
-                throw new IncorrectState("Unexpected exception", e);
+            } catch (AlreadyExistsException e) {
+                throw new IncorrectStateException("Unexpected exception", e);
             }
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
 
     /** override super.move() */
-    public void move(URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
-        FlagsBytes effectiveFlags = new FlagsBytes(flags);
-        if (effectiveFlags.contains(Flags.DEREFERENCE)) {
-            this._dereferenceDir().move(target, effectiveFlags.remove(Flags.DEREFERENCE));
+    public void move(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+        new FlagsHelper(flags).allowed(Flags.DEREFERENCE, Flags.RECURSIVE, Flags.OVERWRITE, Flags.CREATEPARENTS);
+        new FlagsHelper(flags).required(Flags.RECURSIVE);
+        if (Flags.DEREFERENCE.isSet(flags)) {
+            this._dereferenceDir().move(target, flags - Flags.DEREFERENCE.getValue());
             return; //==========> EXIT
         }
-        effectiveFlags.checkAllowed(Flags.RECURSIVE.or(Flags.DEREFERENCE.or(Flags.OVERWRITE.or(Flags.CREATEPARENTS))));
-        effectiveFlags.checkRequired(Flags.RECURSIVE.getValue());
         URL effectiveTarget = this._getEffectiveURL(target);
         if (m_adaptor instanceof DataRename
                 && m_url.getScheme().equals(effectiveTarget.getScheme())
@@ -110,17 +108,17 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
                 && (m_url.getHost()==null || m_url.getHost().equals(effectiveTarget.getHost()))
                 && (m_url.getPort()==effectiveTarget.getPort()))
         {
-            boolean overwrite = effectiveFlags.contains(Flags.OVERWRITE);
+            boolean overwrite = Flags.OVERWRITE.isSet(flags);
             try {
                 ((DataRename)m_adaptor).rename(
                         m_url.getPath(),
                         effectiveTarget.getPath(),
                         overwrite,
                         m_url.getQuery());
-            } catch (DoesNotExist doesNotExist) {
-                throw new IncorrectState("Directory does not exist: "+ m_url, doesNotExist);
-            } catch (AlreadyExists alreadyExists) {
-                throw new AlreadyExists("Target entry already exists: "+effectiveTarget, alreadyExists.getCause());
+            } catch (DoesNotExistException doesNotExist) {
+                throw new IncorrectStateException("Directory does not exist: "+ m_url, doesNotExist);
+            } catch (AlreadyExistsException alreadyExists) {
+                throw new AlreadyExistsException("Target entry already exists: "+effectiveTarget, alreadyExists.getCause());
             }
         } else if (m_adaptor instanceof DataReaderAdaptor) {
             // make target directory
@@ -133,13 +131,14 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
                 if (entry instanceof NSDirectory) {
                     entry.move(remoteChild, flags);
                 } else {
-                    entry.move(remoteChild, effectiveFlags.remove(Flags.RECURSIVE));
+                    // remove RECURSIVE flag (always set for NSDirectory.move())
+                    entry.move(remoteChild, flags - Flags.RECURSIVE.getValue());
                 }
             }
             // remove source directory
             this.remove(flags);
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
 
@@ -147,32 +146,32 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
      * override super.remove()
      * <br>Note: does not throw a BadParamater exception when RECURSIVE flag is not set, unless directory has some descendants.
      */
-    public void remove(int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        FlagsBytes effectiveFlags = new FlagsBytes(flags);
-        if (effectiveFlags.contains(Flags.DEREFERENCE)) {
+    public void remove(int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+        new FlagsHelper(flags).allowed(Flags.DEREFERENCE, Flags.RECURSIVE);
+        if (Flags.DEREFERENCE.isSet(flags)) {
             try {
-                this._dereferenceDir().remove(effectiveFlags.remove(Flags.DEREFERENCE));
-            } catch (IncorrectURL e) {
-                throw new NoSuccess(e);
+                this._dereferenceDir().remove(flags - Flags.DEREFERENCE.getValue());
+            } catch (IncorrectURLException e) {
+                throw new NoSuccessException(e);
             }
             return; //==========> EXIT
         }
-        effectiveFlags.checkAllowed(Flags.RECURSIVE.or(Flags.DEREFERENCE));
         if (m_adaptor instanceof DataReaderAdaptor && m_adaptor instanceof DataWriterAdaptor) {
             // remove source childs
-            if (effectiveFlags.contains(Flags.RECURSIVE)) {
+            if (Flags.RECURSIVE.isSet(flags)) {
                 FileAttributes[] sourceChilds = this._listAttributes(m_url.getPath());
                 for (int i=0; i<sourceChilds.length; i++) {
                     NSEntry entry;
                     try {
                         entry = this._openNS(sourceChilds[i]);
-                    } catch (IncorrectURL e) {
-                        throw new NoSuccess(e);
+                    } catch (IncorrectURLException e) {
+                        throw new NoSuccessException(e);
                     }
                     if (entry instanceof NSDirectory) {
                         entry.remove(flags);
                     } else {
-                        entry.remove(effectiveFlags.remove(Flags.RECURSIVE));
+                        // remove RECURSIVE flag (always set here)
+                        entry.remove(flags - Flags.RECURSIVE.getValue());
                     }
                 }
             }
@@ -184,18 +183,18 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
                         parent.getPath(),
                         directoryName,
                         m_url.getQuery());
-            } catch (DoesNotExist doesNotExist) {
-                throw new IncorrectState("Directory does not exist: "+ m_url, doesNotExist);
+            } catch (DoesNotExistException doesNotExist) {
+                throw new IncorrectStateException("Directory does not exist: "+ m_url, doesNotExist);
             }
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
 
     ///////////////////////////////////////// protected methods /////////////////////////////////////////
 
     /** override super._getEffectiveURL() */
-    protected URL _getEffectiveURL(URL target) throws NotImplemented, IncorrectState, BadParameter, Timeout, NoSuccess {
+    protected URL _getEffectiveURL(URL target) throws NotImplementedException, IncorrectStateException, BadParameterException, TimeoutException, NoSuccessException {
         if (target.getPath().endsWith("/")) {
             return URLHelper.createURL(target, super._getEntryName()+"/");
         } else {
@@ -203,62 +202,62 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         }
     }
 
-    protected FileAttributes[] _listAttributes(String absolutePath) throws NotImplemented, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    protected FileAttributes[] _listAttributes(String absolutePath) throws NotImplementedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof DataReaderAdaptor) {
             try {
                 return ((DataReaderAdaptor)m_adaptor).listAttributes(absolutePath, m_url.getQuery());
-            } catch (BadParameter badParameter) {
-                throw new IncorrectState("Entry is not a directory: "+absolutePath, badParameter);
-            } catch (DoesNotExist doesNotExist) {
-                throw new IncorrectState("Directory does not exist: "+absolutePath, doesNotExist);
+            } catch (BadParameterException badParameter) {
+                throw new IncorrectStateException("Entry is not a directory: "+absolutePath, badParameter);
+            } catch (DoesNotExistException doesNotExist) {
+                throw new IncorrectStateException("Directory does not exist: "+absolutePath, doesNotExist);
             }
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
 
-    //does not throw DoesNotExist because it would mean "parent directory does not exist"
-    protected NSEntry _openNS(FileAttributes attr) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IncorrectURL {
+    //does not throw DoesNotExistException because it would mean "parent directory does not exist"
+    protected NSEntry _openNS(FileAttributes attr) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
         switch(attr.getType()) {
             case FileAttributes.DIRECTORY_TYPE:
-                return this._openNSDir(org.ogf.saga.url.URLFactory.createURL(attr.getName()));
+                return this._openNSDir(URLFactory.createURL(attr.getName()));
             case FileAttributes.FILE_TYPE:
             case FileAttributes.LINK_TYPE:
-                return this._openNSEntry(org.ogf.saga.url.URLFactory.createURL(attr.getName()));
+                return this._openNSEntry(URLFactory.createURL(attr.getName()));
             case FileAttributes.UNKNOWN_TYPE:
             default:
-                NSEntry entry = this._openNSEntry(org.ogf.saga.url.URLFactory.createURL(attr.getName()));
+                NSEntry entry = this._openNSEntry(URLFactory.createURL(attr.getName()));
                 if (entry.isDir()) {
-                    return this._openNSDir(org.ogf.saga.url.URLFactory.createURL(attr.getName()));
+                    return this._openNSDir(URLFactory.createURL(attr.getName()));
                 } else {
                     return entry;
                 }
         }
     }
 
-    //does not throw DoesNotExist because it would mean "parent directory does not exist"
-    protected NSDirectory _openNSDir(URL name) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IncorrectURL {
+    //does not throw DoesNotExistException because it would mean "parent directory does not exist"
+    protected NSDirectory _openNSDir(URL name) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
         try {
             return this.openDir(name, Flags.NONE.getValue());
-        } catch (DoesNotExist e) {
-            throw new IncorrectState(e);
-        } catch (AlreadyExists e) {
-            throw new IncorrectState(e);
+        } catch (DoesNotExistException e) {
+            throw new IncorrectStateException(e);
+        } catch (AlreadyExistsException e) {
+            throw new IncorrectStateException(e);
         }
     }
 
-    //does not throw DoesNotExist because it would mean "parent directory does not exist"
-    protected NSEntry _openNSEntry(URL name) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess, IncorrectURL {
+    //does not throw DoesNotExistException because it would mean "parent directory does not exist"
+    protected NSEntry _openNSEntry(URL name) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
         try {
             return this.open(name, Flags.NONE.getValue());
-        } catch (DoesNotExist e) {
-            throw new IncorrectState(e);
-        } catch (AlreadyExists e) {
-            throw new IncorrectState(e);
+        } catch (DoesNotExistException e) {
+            throw new IncorrectStateException(e);
+        } catch (AlreadyExistsException e) {
+            throw new IncorrectStateException(e);
         }
     }
 
-    protected void _makeDir(URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
+    protected void _makeDir(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
         // set makeDirFlags
         int makeDirFlags = Flags.CREATE.getValue();
         if (! Flags.OVERWRITE.isSet(flags)) {

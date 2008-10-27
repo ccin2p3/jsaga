@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.evaluator;
 
-import org.ogf.saga.error.BadParameter;
+import org.ogf.saga.error.BadParameterException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -21,11 +21,11 @@ public class BasicEvaluator implements Evaluator {
         m_index = index;
     }
     
-    public String evaluate(String expression) throws BadParameter {
+    public String evaluate(String expression) throws BadParameterException {
         if (expression.equals("INDEX")) {
             return ""+ m_index;
         } else {
-            throw new BadParameter("Expression is not supported: "+expression);
+            throw new BadParameterException("Expression is not supported: "+expression);
         }
     }
 }

@@ -2,8 +2,6 @@ package fr.in2p3.jsaga.impl.task;
 
 import fr.in2p3.jsaga.impl.attributes.AbstractAsyncAttributesImpl;
 import fr.in2p3.jsaga.impl.attributes.AttributeImpl;
-import org.ogf.saga.ObjectType;
-import org.ogf.saga.SagaObject;
 import org.ogf.saga.attributes.AsyncAttributes;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
@@ -22,104 +20,100 @@ import org.ogf.saga.task.TaskMode;
 /**
  *
  */
-public abstract class AbstractTaskImplWithAsyncAttributes<E> extends AbstractTaskImpl<E> implements AsyncAttributes {
-    private AbstractAsyncAttributesImpl m_attributes;
+public abstract class AbstractTaskImplWithAsyncAttributes<T,E,A> extends AbstractTaskImpl<T,E> implements AsyncAttributes<A> {
+    private AbstractAsyncAttributesImpl<A> m_attributes;
 
     /** constructor */
-    public AbstractTaskImplWithAsyncAttributes(Session session, SagaObject object, boolean create) throws NotImplemented {
-        super(session, object, create);
-        m_attributes = new AbstractAsyncAttributesImpl(m_session){
-            public ObjectType getType() {
-                return ObjectType.UNKNOWN;
-            }
-        };
+    public AbstractTaskImplWithAsyncAttributes(Session session, boolean create) throws NotImplementedException {
+        super(session, null, create);
+        m_attributes = new AbstractAsyncAttributesImpl<A>(m_session, (A) this){};
     }
 
-    public void setAttribute(String key, String value) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void setAttribute(String key, String value) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         m_attributes.setAttribute(key, value);
     }
 
-    public String getAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    public String getAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         return m_attributes.getAttribute(key);
     }
 
-    public void setVectorAttribute(String key, String[] values) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void setVectorAttribute(String key, String[] values) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         m_attributes.setVectorAttribute(key, values);
     }
 
-    public String[] getVectorAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    public String[] getVectorAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         return m_attributes.getVectorAttribute(key);
     }
 
-    public void removeAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public void removeAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         m_attributes.removeAttribute(key);
     }
 
-    public String[] listAttributes() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
+    public String[] listAttributes() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
         return m_attributes.listAttributes();
     }
 
-    public String[] findAttributes(String... patterns) throws NotImplemented, BadParameter, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
+    public String[] findAttributes(String... patterns) throws NotImplementedException, BadParameterException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
         return m_attributes.findAttributes(patterns);
     }
 
-    public boolean isReadOnlyAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isReadOnlyAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         return m_attributes.isReadOnlyAttribute(key);
     }
 
-    public boolean isWritableAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isWritableAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         return m_attributes.isWritableAttribute(key);
     }
 
-    public boolean isRemovableAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isRemovableAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         return m_attributes.isRemovableAttribute(key);
     }
 
-    public boolean isVectorAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isVectorAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         return m_attributes.isVectorAttribute(key);
     }
 
-    public Task setAttribute(TaskMode mode, String key, String value) throws NotImplemented {
+    public Task<A, Void> setAttribute(TaskMode mode, String key, String value) throws NotImplementedException {
         return m_attributes.setAttribute(mode, key, value);
     }
 
-    public Task<String> getAttribute(TaskMode mode, String key) throws NotImplemented {
+    public Task<A, String> getAttribute(TaskMode mode, String key) throws NotImplementedException {
         return m_attributes.getAttribute(mode, key);
     }
 
-    public Task setVectorAttribute(TaskMode mode, String key, String[] values) throws NotImplemented {
+    public Task<A, Void> setVectorAttribute(TaskMode mode, String key, String[] values) throws NotImplementedException {
         return m_attributes.setVectorAttribute(mode, key, values);
     }
 
-    public Task<String[]> getVectorAttribute(TaskMode mode, String key) throws NotImplemented {
+    public Task<A, String[]> getVectorAttribute(TaskMode mode, String key) throws NotImplementedException {
         return m_attributes.getVectorAttribute(mode, key);
     }
 
-    public Task removeAttribute(TaskMode mode, String key) throws NotImplemented {
+    public Task<A, Void> removeAttribute(TaskMode mode, String key) throws NotImplementedException {
         return m_attributes.removeAttribute(mode, key);
     }
 
-    public Task<String[]> listAttributes(TaskMode mode) throws NotImplemented {
+    public Task<A, String[]> listAttributes(TaskMode mode) throws NotImplementedException {
         return m_attributes.listAttributes(mode);
     }
 
-    public Task<String[]> findAttributes(TaskMode mode, String... patterns) throws NotImplemented {
+    public Task<A, String[]> findAttributes(TaskMode mode, String... patterns) throws NotImplementedException {
         return m_attributes.findAttributes(mode, patterns);
     }
 
-    public Task<Boolean> isReadOnlyAttribute(TaskMode mode, String key) throws NotImplemented {
+    public Task<A, Boolean> isReadOnlyAttribute(TaskMode mode, String key) throws NotImplementedException {
         return m_attributes.isReadOnlyAttribute(mode, key);
     }
 
-    public Task<Boolean> isWritableAttribute(TaskMode mode, String key) throws NotImplemented {
+    public Task<A, Boolean> isWritableAttribute(TaskMode mode, String key) throws NotImplementedException {
         return m_attributes.isWritableAttribute(mode, key);
     }
 
-    public Task<Boolean> isRemovableAttribute(TaskMode mode, String key) throws NotImplemented {
+    public Task<A, Boolean> isRemovableAttribute(TaskMode mode, String key) throws NotImplementedException {
         return m_attributes.isRemovableAttribute(mode, key);
     }
 
-    public Task<Boolean> isVectorAttribute(TaskMode mode, String key) throws NotImplemented {
+    public Task<A, Boolean> isVectorAttribute(TaskMode mode, String key) throws NotImplementedException {
         return m_attributes.isVectorAttribute(mode, key);
     }
 

@@ -6,8 +6,7 @@ import fr.in2p3.jsaga.engine.config.bean.ContextEngineConfiguration;
 import fr.in2p3.jsaga.helpers.StringArray;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
+import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 
 import java.util.*;
@@ -31,7 +30,7 @@ public class ServiceAdaptorFactory {
         m_config = config;
     }
 
-    protected ContextImpl findContext(Session session, String contextRef) throws NotImplemented, NoSuccess {
+    protected ContextImpl findContext(Session session, String contextRef) throws NotImplementedException, NoSuccessException {
         if (session != null) {
             Context[] contextArray = session.listContexts();
             for (int i=0; contextArray!=null && i<contextArray.length; i++) {
@@ -40,14 +39,14 @@ public class ServiceAdaptorFactory {
                         return (ContextImpl) contextArray[i];
                     }
                 } catch(Exception e) {
-                    throw new NoSuccess(e.getMessage(), contextArray[i]);
+                    throw new NoSuccessException(e.getMessage(), contextArray[i]);
                 }
             }
         }
         return null;
     }
 
-    protected ContextImpl findContext(Session session, String[] supportedContextTypeArray) throws NotImplemented, NoSuccess {
+    protected ContextImpl findContext(Session session, String[] supportedContextTypeArray) throws NotImplementedException, NoSuccessException {
         Set<String> contextRefCandidates = new HashSet<String>();
         for (int i=0; supportedContextTypeArray!=null && i<supportedContextTypeArray.length; i++) {
             if ("None".equals(supportedContextTypeArray[i])) {
@@ -69,7 +68,7 @@ public class ServiceAdaptorFactory {
             try {
                 context.getAdaptor();
                 contextCandidates.add(context);
-            } catch(org.ogf.saga.error.Exception e) {
+            } catch(SagaException e) {
                 // ignore invalid contexts
             }
         }

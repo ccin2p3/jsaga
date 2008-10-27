@@ -20,11 +20,11 @@ import org.ogf.saga.error.*;
 public class DataEmulatorConnectionSecure extends DataEmulatorConnectionAbstract {
     private SecureServer m_serverRoot;
 
-    public DataEmulatorConnectionSecure(String protocol, String host, int port, UserPassSecurityAdaptor security) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {
+    public DataEmulatorConnectionSecure(String protocol, String host, int port, UserPassSecurityAdaptor security) throws AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {
         super();
         m_serverRoot = m_grid.connect(protocol, host, port, security);
         if (m_serverRoot == null) {
-            throw new Timeout("Failed to connect to host: "+host);
+            throw new TimeoutException("Failed to connect to host: "+host);
         }
     }
 

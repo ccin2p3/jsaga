@@ -4,11 +4,11 @@ import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.engine.jobcollection.preprocess.XMLDocument;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformerFactory;
 import org.apache.log4j.Logger;
-import org.ogf.saga.url.URL;
-import org.ogf.saga.url.URLFactory;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
@@ -50,7 +50,7 @@ public class JobCollectionCleaner {
                 cleanupContainer.set(t.getCached(XSL_1_GENERATE_CLEANUP).transform(new StreamSource(statusFile)));
                 //cleanupContainer.save();
             } catch (Exception e) {
-                throw new NoSuccess(e);
+                throw new NoSuccessException(e);
             }
 
             // Load generated properties

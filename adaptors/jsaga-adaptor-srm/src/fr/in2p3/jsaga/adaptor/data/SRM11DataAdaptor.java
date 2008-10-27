@@ -35,7 +35,7 @@ public class SRM11DataAdaptor extends SRMDataAdaptorAbstract implements DataAdap
         return "srm-v1.1";
     }
 
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         super.connect(userInfo, host, port, basePath, attributes);
         try {
             URL serviceUrl = new URL(SERVICE_PROTOCOL, host, port, SERVICE_PATH);
@@ -46,23 +46,23 @@ public class SRM11DataAdaptor extends SRMDataAdaptorAbstract implements DataAdap
             stub._setProperty(GSIConstants.GSI_CREDENTIALS, m_credential);
 //            stub._setProperty(GSIConstants.GSI_MODE, GSIConstants.GSI_MODE_FULL_DELEG);
         } catch (ServiceException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         } catch (MalformedURLException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 
-    public void disconnect() throws NoSuccess {
+    public void disconnect() throws NoSuccessException {
         // do nothing
     }
 
-    protected void ping() throws NoSuccess {
+    protected void ping() throws NoSuccessException {
         try {
             if (m_stub.ping()) {
-                throw new NoSuccess("SRM service is not available");
+                throw new NoSuccessException("SRM service is not available");
             }
         } catch (RemoteException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 

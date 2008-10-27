@@ -1,18 +1,19 @@
 package org.ogf.saga.buffer;
 
 import org.ogf.saga.bootstrap.ImplementationBootstrapLoader;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
 
 /**
  * Factory for creating buffers.
  */
 public abstract class BufferFactory {
-    
+
     private static BufferFactory factory;
-    
-    private synchronized static void initFactory() throws NotImplemented {
+
+    private synchronized static void initFactory()
+            throws NotImplementedException, NoSuccessException {
         if (factory == null) {
             factory = ImplementationBootstrapLoader.createBufferFactory();
         }
@@ -20,59 +21,74 @@ public abstract class BufferFactory {
 
     /**
      * Creates a buffer. To be provided by an implementation.
-     * @param data the storage.
+     * 
+     * @param data
+     *            the storage.
      * @return the buffer.
      */
     protected abstract Buffer doCreateBuffer(byte[] data)
-        throws NotImplemented, BadParameter, NoSuccess;
-    
+            throws NotImplementedException, BadParameterException,
+            NoSuccessException;
+
     /**
      * Creates a buffer. To be provided by an implementation.
+     * 
      * @return the buffer.
      */
-    protected abstract Buffer doCreateBuffer()
-        throws NotImplemented, BadParameter, NoSuccess;
-    
+    protected abstract Buffer doCreateBuffer() throws NotImplementedException,
+            BadParameterException, NoSuccessException;
+
     /**
      * Creates a buffer. To be provided by an implementation.
-     * @param size the size of the buffer.
+     * 
+     * @param size
+     *            the size of the buffer.
      * @return the buffer.
      */
     protected abstract Buffer doCreateBuffer(int size)
-        throws NotImplemented, BadParameter, NoSuccess;
-    
+            throws NotImplementedException, BadParameterException,
+            NoSuccessException;
+
     /**
-     * Creates a (application-allocated) buffer. The size is implicit in
-     * the size of the specified array.
-     * @param data the storage.
+     * Creates a (application-allocated) buffer. The size is implicit in the
+     * size of the specified array.
+     * 
+     * @param data
+     *            the storage.
      * @return the buffer.
-     * @throws NoSuccess 
+     * @throws NoSuccessException
+     *             is thrown when the Saga factory could not be created.
      */
     public static Buffer createBuffer(byte[] data)
-        throws NotImplemented, BadParameter, NoSuccess {
+            throws NotImplementedException, BadParameterException,
+            NoSuccessException {
         initFactory();
         return factory.doCreateBuffer(data);
     }
 
     /**
-     * Creates a (implementation-managed and implementation-allocated) buffer
-     * of the specified size.
-     * @param size the size.
+     * Creates a (implementation-managed and implementation-allocated) buffer of
+     * the specified size.
+     * 
+     * @param size
+     *            the size.
      * @return the buffer.
      */
-    public static Buffer createBuffer(int size)
-        throws NotImplemented, BadParameter, NoSuccess {
+    public static Buffer createBuffer(int size) throws NotImplementedException,
+            BadParameterException, NoSuccessException {
         initFactory();
         return factory.doCreateBuffer(size);
     }
 
     /**
      * Creates a (implementation-managed) buffer.
+     * 
      * @return the buffer.
-     * @throws NoSuccess 
+     * @throws NoSuccessException
+     *             is thrown when the Saga factory could not be created.
      */
-    public static Buffer createBuffer()
-        throws NotImplemented, BadParameter, NoSuccess {
+    public static Buffer createBuffer() throws NotImplementedException,
+            BadParameterException, NoSuccessException {
         initFactory();
         return factory.doCreateBuffer();
     }

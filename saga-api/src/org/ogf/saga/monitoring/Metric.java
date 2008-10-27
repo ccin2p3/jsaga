@@ -2,14 +2,14 @@ package org.ogf.saga.monitoring;
 
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.attributes.Attributes;
-import org.ogf.saga.error.AuthenticationFailed;
-import org.ogf.saga.error.AuthorizationFailed;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.IncorrectState;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
-import org.ogf.saga.error.PermissionDenied;
-import org.ogf.saga.error.Timeout;
+import org.ogf.saga.error.AuthenticationFailedException;
+import org.ogf.saga.error.AuthorizationFailedException;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.PermissionDeniedException;
+import org.ogf.saga.error.TimeoutException;
 
 /**
  * Metrics represent monitorable entities.
@@ -23,9 +23,9 @@ public interface Metric extends SagaObject, Attributes {
     public static final String DESCRIPTION = "Description";
 
     /**
-     * Attribute name: access mode of the metric (ReadOnly).
-     * Possible values: "ReadOnly", "ReadWrite", or "Final".
-     * This determines what can be done with the VALUE attribute.
+     * Attribute name: access mode of the metric (ReadOnly). Possible values:
+     * "ReadOnly", "ReadWrite", or "Final". This determines what can be done
+     * with the VALUE attribute.
      */
     public static final String MODE = "Mode";
 
@@ -33,9 +33,8 @@ public interface Metric extends SagaObject, Attributes {
     public static final String UNIT = "Unit";
 
     /**
-     * Attribute name: value type of the metric (ReadOnly).
-     * Possible values: "String", "Int", "Enum", "Float", "Bool",
-     * "Time", "Trigger".
+     * Attribute name: value type of the metric (ReadOnly). Possible values:
+     * "String", "Int", "Enum", "Float", "Bool", "Time", "Trigger".
      */
     public static final String TYPE = "Type";
 
@@ -44,25 +43,30 @@ public interface Metric extends SagaObject, Attributes {
 
     /**
      * Adds the specified callback to the metric.
+     * 
      * @return the cookie that identifies the callback in the metric.
      */
-    public int addCallback(Callback cb)
-        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, IncorrectState, Timeout, NoSuccess;
+    public int addCallback(Callback cb) throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, IncorrectStateException,
+            TimeoutException, NoSuccessException;
 
     /**
      * Removes a callback from the metric.
-     * @param cookie the cookie that identifies the metric.
+     * 
+     * @param cookie
+     *            the cookie that identifies the metric.
      */
-    public void removeCallback(int cookie)
-        throws NotImplemented, BadParameter, AuthenticationFailed,
-            AuthorizationFailed, PermissionDenied, Timeout,
-            NoSuccess;
+    public void removeCallback(int cookie) throws NotImplementedException,
+            BadParameterException, AuthenticationFailedException,
+            AuthorizationFailedException, PermissionDeniedException,
+            TimeoutException, NoSuccessException;
 
     /**
      * Pushes the metric value to the backend.
      */
-    public void fire()
-        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, IncorrectState, Timeout, NoSuccess;
+    public void fire() throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, IncorrectStateException,
+            TimeoutException, NoSuccessException;
 }

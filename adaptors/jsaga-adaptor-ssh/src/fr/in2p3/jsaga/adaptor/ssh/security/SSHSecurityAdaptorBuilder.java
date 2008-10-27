@@ -43,7 +43,7 @@ public class SSHSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
    					 new UOptional(Context.USERPASS)});
     }
 
-    public Default[] getDefaults(Map map) throws IncorrectState {
+    public Default[] getDefaults(Map map) throws IncorrectStateException {
     	return new Default[]{
        		new Default(Context.USERKEY, new File[]{
                         new File(System.getProperty("user.home")+"/.ssh/id_rsa"),
@@ -56,7 +56,7 @@ public class SSHSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
        };
     }
     
-    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectState, NoSuccess {
+    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectStateException, NoSuccessException {
         try {
         	// load private key
         	String privateKeyPath = (String) attributes.get(Context.USERKEY);
@@ -117,7 +117,7 @@ public class SSHSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
 						
 		    return new SSHSecurityAdaptor(privateKey, publicKey, userPass, (String) attributes.get(Context.USERID));		    
         } catch(Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 }

@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.engine.job.monitor;
 
 import fr.in2p3.jsaga.adaptor.job.SubState;
+import org.ogf.saga.error.SagaException;
 import org.ogf.saga.task.State;
 
 /* ***************************************************
@@ -16,5 +17,5 @@ import org.ogf.saga.task.State;
  *
  */
 public interface JobMonitorCallback {
-    public void setState(State state, String stateDetail, SubState subState, org.ogf.saga.error.Exception cause);
+    public void setState(State state, String stateDetail, SubState subState, SagaException cause);
 }

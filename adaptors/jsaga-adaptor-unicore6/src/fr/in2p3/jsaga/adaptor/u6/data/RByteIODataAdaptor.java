@@ -53,7 +53,7 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
         return "rbyteio";
     }
 
-    public BaseURL getBaseURL() throws IncorrectURL {
+    public BaseURL getBaseURL() throws IncorrectURLException {
         return new BaseURL(8080);
     }
 
@@ -62,13 +62,13 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
     								new U(APPLICATION_NAME)});
     }
 
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
     	return new Default[]{
     			new Default(SERVICE_NAME, "Registry"), 
     			new Default(APPLICATION_NAME, "Bash shell")};
     }
 
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     	super.connect(userInfo, host, port, basePath, attributes);
     	
     	// get SERVICE_NAME
@@ -77,18 +77,18 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
     	    	
     	// get registry
     	if(basePath.indexOf(m_serviceName) == -1 ) {
-    		throw new BadParameter("Invalid base path:"+basePath);
+    		throw new BadParameterException("Invalid base path:"+basePath);
     	}
     	String registryPath = basePath.substring(0,basePath.indexOf(m_serviceName)+m_serviceName.length());
     	m_serverUrl = "https://"+host+":"+port+registryPath;
     	
     	// get storage name
     	if(basePath.indexOf(m_serviceName)+m_serviceName.length() >= basePath.length()) {
-    		throw new BadParameter("Invalid storage name: the name cannot be empty '"+basePath+"'");
+    		throw new BadParameterException("Invalid storage name: the name cannot be empty '"+basePath+"'");
     	}
     	String storageName =  basePath.substring(basePath.indexOf(m_serviceName)+m_serviceName.length()+1,basePath.length());
     	if(storageName.indexOf("/") < 1) {
-    		throw new BadParameter("invalid storage name, must contain '/': '"+storageName+"'.");
+    		throw new BadParameterException("invalid storage name, must contain '/': '"+storageName+"'.");
 		}
     	storageName = storageName.substring(0,storageName.indexOf("/"));
     	
@@ -98,7 +98,7 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
         	targetSystemInfo = findTargetSystem();
         	m_client = targetSystemInfo.getTargetSystem().getStorage(storageName);
         	if(m_client == null)
-        		throw new NoSuccess("Unable to get storage:"+storageName);
+        		throw new NoSuccessException("Unable to get storage:"+storageName);
         	m_serverFileSeparator = m_client.getFileSeparator();
         } catch (GPEMiddlewareRemoteException e) {
             if ("Client exception".equals(e.getMessage())) {
@@ -109,21 +109,21 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
                     m_isRetrying = false;
                     return; //====================> EXIT OK
                 }
-                throw new NoSuccess("Retry failed", e);
+                throw new NoSuccessException("Retry failed", e);
             }
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         } catch (Exception e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
     }
 
-    public void disconnect() throws NoSuccess {    	
+    public void disconnect() throws NoSuccessException {
     	targetSystemInfo = null;
     	m_client = null;
     	super.disconnect();
     }
     
-    public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
+    public boolean exists(String absolutePath, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
     	// prepare path
 		absolutePath = getEntryPath(absolutePath);
 		// if absolutePath is the root
@@ -135,7 +135,7 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
             com.intel.gpe.clients.api.GridFile entry = m_client.listProperties(absolutePath);
             return (entry.getPath() != null);
 		} catch (GPESecurityException e) {
-			throw new PermissionDenied("Unable to check entry",e);
+			throw new PermissionDeniedException("Unable to check entry",e);
         } catch (GPEMiddlewareRemoteException e) {
             if ("Unknown exception".equals(e.getMessage())) {
                 // occurs when parent entry is not a directory
@@ -148,15 +148,15 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
                     m_isRetrying = false;
                     return ret; //====================> EXIT OK
                 }
-                throw new NoSuccess("Retry failed", e);
+                throw new NoSuccessException("Retry failed", e);
             }
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         } catch (Throwable e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
 		}
     }
 
-    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         //prepare path and connection
         absolutePath = getEntryPath(absolutePath);
         try {
@@ -165,12 +165,12 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
             if (entry.getPath() != null) {
                 return new RByteIOFileAttributes(entry, m_serverFileSeparator);
             } else {
-                throw new DoesNotExist("Entry does not exist: "+absolutePath);
+                throw new DoesNotExistException("Entry does not exist: "+absolutePath);
             }
-        } catch (DoesNotExist e) {
+        } catch (DoesNotExistException e) {
             throw e;
         } catch (GPESecurityException e) {
-            throw new PermissionDenied("Unable to get entry attributes",e);
+            throw new PermissionDeniedException("Unable to get entry attributes",e);
         } catch (GPEMiddlewareRemoteException e) {
             if ("Client exception".equals(e.getMessage())) {
                 if (!m_isRetrying) {
@@ -180,15 +180,15 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
                     m_isRetrying = false;
                     return ret; //====================> EXIT OK
                 }
-                throw new NoSuccess("Retry failed", e);
+                throw new NoSuccessException("Retry failed", e);
             }
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         } catch (Throwable e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 
-    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {        
+    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
     	// prepare path
     	absolutePath = getEntryPath(absolutePath);
 
@@ -204,11 +204,11 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
 			}
 	        return list;
 		} catch (GPESecurityException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
         } catch (GPEMiddlewareRemoteException e) {
             if ("Unknown exception".equals(e.getMessage())) {
                 if(!exists(absolutePath, additionalArgs)) {
-                    throw new DoesNotExist("The entry ["+absolutePath+"] does not exist.");
+                    throw new DoesNotExistException("The entry ["+absolutePath+"] does not exist.");
                 }
             } else if ("Client exception".equals(e.getMessage())) {
                 if (!m_isRetrying) {
@@ -218,15 +218,15 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
                     m_isRetrying = false;
                     return ret; //====================> EXIT OK
                 }
-                throw new NoSuccess("Retry failed", e);
+                throw new NoSuccessException("Retry failed", e);
             }
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
 		} catch (Throwable e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
     }
 
-    public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+    public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
     	String absolutePath = getEntryPath(parentAbsolutePath + directoryName);
     	try {
     		// check parent here, else no exception returned during creation
@@ -240,13 +240,13 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
         } catch (ParentDoesNotExist e) {
             throw e;
         } catch (GPESecurityException e) {
-			throw new PermissionDenied(e);
+			throw new PermissionDeniedException(e);
         } catch (GPEMiddlewareRemoteException e) {
             if ("Unknown exception".equals(e.getMessage())) {
                 if (exists(absolutePath, additionalArgs)) {
-                    throw new AlreadyExists("Entry already exists: "+absolutePath);
+                    throw new AlreadyExistsException("Entry already exists: "+absolutePath);
                 } else {
-                    throw new BadParameter("Parent entry is not a directory: "+parentAbsolutePath, e);
+                    throw new BadParameterException("Parent entry is not a directory: "+parentAbsolutePath, e);
                 }
             } else if ("Client exception".equals(e.getMessage())) {
                 if (!m_isRetrying) {
@@ -256,43 +256,43 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
                     m_isRetrying = false;
                     return; //====================> EXIT OK
                 }
-                throw new NoSuccess("Retry failed", e);
+                throw new NoSuccessException("Retry failed", e);
             }
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         } catch (Throwable e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
     }
 
-    public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
     	// prepare path
 		String absolutePath = getEntryPath(parentAbsolutePath + directoryName) ;
 		try {
             // get directory
             com.intel.gpe.clients.api.GridFile directory = m_client.listProperties(absolutePath);
             if (!directory.isDirectory()) {
-                throw new BadParameter("Entry is not a directory: "+absolutePath);
+                throw new BadParameterException("Entry is not a directory: "+absolutePath);
             }
 
 			// check children here, else no exception returned during deletion !			
 			List<com.intel.gpe.clients.api.GridFile> directoryList = m_client.listDirectory(absolutePath);
 	        if(directoryList.size() > 0) {
-	        	throw new NoSuccess("Directory is not empty: "+absolutePath);
+	        	throw new NoSuccessException("Directory is not empty: "+absolutePath);
 	        }
 
             // remove
             DeleteFileRequest requestRmFile = new DeleteFileRequest(m_client, directory);
             requestRmFile.perform();
-        } catch (BadParameter e) {
+        } catch (BadParameterException e) {
             throw e;
-        } catch (NoSuccess e) {
+        } catch (NoSuccessException e) {
             throw e;
         } catch (GPESecurityException e) {
-			throw new PermissionDenied(e);
+			throw new PermissionDeniedException(e);
         } catch (GPEMiddlewareRemoteException e) {
             if ("Unknown exception".equals(e.getMessage())) {
                 if (!exists(absolutePath, additionalArgs)) {
-                    throw new DoesNotExist("Entry does not exist: "+absolutePath);
+                    throw new DoesNotExistException("Entry does not exist: "+absolutePath);
                 }
             } else if ("Client exception".equals(e.getMessage())) {
                 if (!m_isRetrying) {
@@ -302,35 +302,35 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
                     m_isRetrying = false;
                     return; //====================> EXIT OK
                 }
-                throw new NoSuccess("Retry failed", e);
+                throw new NoSuccessException("Retry failed", e);
             }
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         } catch (Throwable e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
     }
 
-    public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
     	//prepare path
 		String absolutePath = getEntryPath(parentAbsolutePath + fileName);
 		try {
             // get file
             com.intel.gpe.clients.api.GridFile file = m_client.listProperties(absolutePath);
             if (file.isDirectory()) {
-                throw new BadParameter("Entry is a directory: "+absolutePath);
+                throw new BadParameterException("Entry is a directory: "+absolutePath);
             }
 
             // remove
             DeleteFileRequest requestRmFile = new DeleteFileRequest(m_client, file);
             requestRmFile.perform();
-        } catch (BadParameter e) {
+        } catch (BadParameterException e) {
             throw e;
         } catch (GPESecurityException e) {
-			throw new PermissionDenied(e);
+			throw new PermissionDeniedException(e);
         } catch (GPEMiddlewareRemoteException e) {
             if ("Unknown exception".equals(e.getMessage())) {
                 if (!exists(absolutePath, additionalArgs)) {
-                    throw new DoesNotExist("Entry does not exist: "+absolutePath);
+                    throw new DoesNotExistException("Entry does not exist: "+absolutePath);
                 }
             } else if ("Client exception".equals(e.getMessage())) {
                 if (!m_isRetrying) {
@@ -340,19 +340,19 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
                     m_isRetrying = false;
                     return; //====================> EXIT OK
                 }
-                throw new NoSuccess("Retry failed", e);
+                throw new NoSuccessException("Retry failed", e);
             }
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         } catch (Throwable e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 
 	public void putFromStream(String absolutePath, boolean append, String additionalArgs,
-			InputStream stream) throws PermissionDenied,
-			BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+			InputStream stream) throws PermissionDeniedException,
+            BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
 		if(append) {
-			throw new NoSuccess("Append not supported.");
+			throw new NoSuccessException("Append not supported.");
 		}
 		
 		try {
@@ -378,13 +378,13 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
 			             Messages.getString(MessagesKeys.common_requests_PutFilesRequest_Cannot_put_file_to_remote_location__no_suitable_protocol_found));
 			}            
         } catch (Throwable e) {
-			throw new NoSuccess("Unable to put file", e);
+			throw new NoSuccessException("Unable to put file", e);
 		}
 	}
 
 	public void getToStream(String absolutePath, String additionalArgs,
-			OutputStream stream) throws PermissionDenied, BadParameter,
-			DoesNotExist, Timeout, NoSuccess {
+			OutputStream stream) throws PermissionDeniedException, BadParameterException,
+            DoesNotExistException, TimeoutException, NoSuccessException {
 		try {
     		// prepare path
     		absolutePath = getEntryPath(absolutePath);
@@ -412,7 +412,7 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
             }
             
         } catch (Throwable e) {
-			throw new NoSuccess("Unable to get file", e);
+			throw new NoSuccessException("Unable to get file", e);
 		}
 	}
 

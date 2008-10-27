@@ -67,7 +67,7 @@ public class VOMSSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuild
                                         if (super.throwExceptionIfInvalid(value) != null) {
                                             String v = (String) value;
                                             if (!v.equalsIgnoreCase("none") && !v.equalsIgnoreCase("limited") && !v.equalsIgnoreCase("full")) {
-                                                throw new BadParameter("Expected: none | limited | full");
+                                                throw new BadParameterException("Expected: none | limited | full");
                                             }
                                         }
                                         return value;
@@ -78,7 +78,7 @@ public class VOMSSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuild
                                         if (super.throwExceptionIfInvalid(value) != null) {
                                             String v = (String) value;
                                             if (!v.equalsIgnoreCase("old") && !v.equalsIgnoreCase("globus") && !v.equalsIgnoreCase("RFC820")) {
-                                                throw new BadParameter("Expected: old | globus | RFC820");
+                                                throw new BadParameterException("Expected: old | globus | RFC820");
                                             }
                                         }
                                         return value;
@@ -93,7 +93,7 @@ public class VOMSSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuild
         });
     }
 
-    public Default[] getDefaults(Map map) throws IncorrectState {
+    public Default[] getDefaults(Map map) throws IncorrectStateException {
         EnvironmentVariables env = EnvironmentVariables.getInstance();
         return new Default[]{
                 new Default(Context.USERPROXY, new String[]{
@@ -124,7 +124,7 @@ public class VOMSSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuild
                 new Default(Context.LIFETIME, "PT12H")
         };
     }
-    protected static String getUnixUID() throws IncorrectState {
+    protected static String getUnixUID() throws IncorrectStateException {
         try {
             Process p = Runtime.getRuntime().exec("id -u");
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -132,11 +132,11 @@ public class VOMSSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuild
             reader.close();
             return uid;
         } catch (IOException e) {
-            throw new IncorrectState(e);
+            throw new IncorrectStateException(e);
         }
     }
 
-    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectState, NoSuccess {
+    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectStateException, NoSuccessException {
         try {
             switch(usage) {
                 case USAGE_INIT_PKCS12:
@@ -163,17 +163,17 @@ public class VOMSSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuild
                     return this.createSecurityAdaptor(cred);
                 }
                 default:
-                    throw new NoSuccess("INTERNAL ERROR: unexpected exception");
+                    throw new NoSuccessException("INTERNAL ERROR: unexpected exception");
             }
-        } catch(IncorrectState e) {
+        } catch(IncorrectStateException e) {
             throw e;
-        } catch(NoSuccess e) {
+        } catch(NoSuccessException e) {
             throw e;
         } catch(Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
-    private SecurityAdaptor createSecurityAdaptor(GSSCredential cred) throws IncorrectState {
+    private SecurityAdaptor createSecurityAdaptor(GSSCredential cred) throws IncorrectStateException {
         // check if proxy contains extension
         /*GlobusCredential globusProxy = ((GlobusGSSCredentialImpl)cred).getGlobusCredential();        
         if(hasNonCriticalExtensions(cred)) {
@@ -207,7 +207,7 @@ public class VOMSSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuild
         if (hasNonCriticalExtensions(cred)) {
             return new VOMSSecurityAdaptor(cred);
         } else {
-            throw new IncorrectState("Security context is not of type: "+this.getType());
+            throw new IncorrectStateException("Security context is not of type: "+this.getType());
         }
     }
 

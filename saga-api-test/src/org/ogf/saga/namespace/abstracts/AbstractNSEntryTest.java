@@ -1,17 +1,17 @@
 package org.ogf.saga.namespace.abstracts;
 
 import org.ogf.saga.AbstractTest;
-import org.ogf.saga.url.URL;
-import org.ogf.saga.url.URLFactory;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
-import org.ogf.saga.error.NotImplemented;
-import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.file.File;
 import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -87,14 +87,14 @@ public abstract class AbstractNSEntryTest extends AbstractTest {
             }
             m_file.close();
             m_toBeRemoved = true;
-        } catch(NotImplemented e) {
+        } catch(NotImplementedException e) {
             // read-only protocol
             try {
                 m_dir = NSFactory.createNSDirectory(m_session, m_dirUrl, Flags.NONE.getValue());
                 m_file = m_dir.open(m_fileUrl, Flags.NONE.getValue());
                 m_toBeRemoved = false;
-            } catch(DoesNotExist e2) {
-                throw new DoesNotExist("Please create the expected files and directories for test suite (http://grid.in2p3.fr/jsaga-dev/faq.html#create-test-entries)", e2);
+            } catch(DoesNotExistException e2) {
+                throw new DoesNotExistException("Please create the expected files and directories for test suite (http://grid.in2p3.fr/jsaga-dev/faq.html#create-test-entries)", e2);
             }
         } catch(Exception e) {
 //            try{this.tearDown();}catch(Exception e2){/**/}

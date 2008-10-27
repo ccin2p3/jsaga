@@ -17,7 +17,7 @@ import org.ogf.saga.task.Task;
 /**
  *
  */
-public interface WorkflowTask<E> extends Task<E>, TaskCallback<E> {
+public interface WorkflowTask<T,E> extends Task<T,E>, TaskCallback<E> {
     /**
      * Gets the name of the task.
      * @return the name of the task.
@@ -69,7 +69,7 @@ public interface WorkflowTask<E> extends Task<E>, TaskCallback<E> {
      * Gets the state of the task.
      * @return the state of the task in a XML bean.
      */
-    public fr.in2p3.jsaga.engine.schema.status.Task getStateAsXML() throws Timeout, NoSuccess, NotImplemented;
+    public fr.in2p3.jsaga.engine.schema.status.Task getStateAsXML() throws TimeoutException, NoSuccessException, NotImplementedException;
 
     ////////////////////////////////////// interface Task //////////////////////////////////////
 
@@ -77,7 +77,7 @@ public interface WorkflowTask<E> extends Task<E>, TaskCallback<E> {
      * TO BE OVERRIDED FOR IMPLEMENTING WORKFLOW BEHAVIOR.
      */
     public void run()
-            throws NotImplemented, IncorrectState, Timeout, NoSuccess;
+            throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException;
 
     ////////////////////////////////// interface TaskCallback //////////////////////////////////
 

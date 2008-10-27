@@ -26,10 +26,10 @@ public interface FileWriterStreamFactory extends FileWriter {
      * @param append if true, append stream at the end of file.
      * @param additionalArgs adaptor specific arguments
      * @return an output stream.
-     * @throws BadParameter if <code>parentAbsolutePath</code> is not a directory.
-     * @throws AlreadyExists if <code>fileName</code> already exists and <code>exclusive</code> and <code>append</code> are both false.
+     * @throws BadParameterException if <code>parentAbsolutePath</code> is not a directory.
+     * @throws AlreadyExistsException if <code>fileName</code> already exists and <code>exclusive</code> and <code>append</code> are both false.
      * @throws ParentDoesNotExist if <code>parentAbsolutePath</code> does not exist.
      */
     public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs)
-        throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess;
+        throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException;
 }

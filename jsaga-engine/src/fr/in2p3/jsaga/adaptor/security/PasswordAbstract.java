@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.security;
 
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.io.*;
 import java.security.Key;
@@ -46,7 +46,7 @@ public abstract class PasswordAbstract {
     }
 
     private static File s_file;
-    protected static File getFile() throws NoSuccess {
+    protected static File getFile() throws NoSuccessException {
         if (s_file == null) {
             // set keystore file
             s_file = new File(new File(new File(System.getProperty("user.home")), ".jsaga"), "jce-keystore.dat");
@@ -54,7 +54,7 @@ public abstract class PasswordAbstract {
             // create parent directory if needed
             File dir = s_file.getParentFile();
             if (!dir.exists() && !dir.mkdir()) {
-                throw new NoSuccess("Failed to create directory: "+dir);
+                throw new NoSuccessException("Failed to create directory: "+dir);
             }
         }
         return s_file;

@@ -38,7 +38,7 @@ public class GatekeeperJobMonitorAdaptor extends GatekeeperJobAdaptorAbstract im
         		new UOptional(TCP_PORT_RANGE)});
     }
 
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
     	try {
 			String defaultIp = InetAddress.getLocalHost().getHostAddress();
 			String defaultTcpPortRange="40000,45000";
@@ -48,7 +48,7 @@ public class GatekeeperJobMonitorAdaptor extends GatekeeperJobAdaptorAbstract im
 		}
     }
     
-    public JobStatus getStatus(String nativeJobId) throws Timeout, NoSuccess {    	
+    public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
         GramJob job = getGramJobById(nativeJobId);
         try {
         	Gram.jobStatus(job);
@@ -61,12 +61,12 @@ public class GatekeeperJobMonitorAdaptor extends GatekeeperJobAdaptorAbstract im
                 this.rethrowException(e);
             }
         } catch (GSSException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         return new GatekeeperJobStatus(nativeJobId, new Integer(job.getStatus()), job.getStatusAsString(), job.getError());
     }
 
-    public void subscribeJob(String nativeJobId, JobStatusNotifier notifier) throws Timeout, NoSuccess {
+    public void subscribeJob(String nativeJobId, JobStatusNotifier notifier) throws TimeoutException, NoSuccessException {
         GramJob job = getGramJobById(nativeJobId);
         GramJobListener listener = new GatekeeperJobStatusListener(notifier);
         job.addListener(listener);
@@ -86,11 +86,11 @@ public class GatekeeperJobMonitorAdaptor extends GatekeeperJobAdaptorAbstract im
             }
         } catch (GSSException e) {
             job.removeListener(listener);
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 
-    public void unsubscribeJob(String nativeJobId) throws Timeout, NoSuccess {
+    public void unsubscribeJob(String nativeJobId) throws TimeoutException, NoSuccessException {
         GramJob job = getGramJobById(nativeJobId);
         try {
             job.unbind();
@@ -103,18 +103,18 @@ public class GatekeeperJobMonitorAdaptor extends GatekeeperJobAdaptorAbstract im
                 this.rethrowException(e);
             }
         } catch (GSSException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         //NOTICE: no need to remove GramJobListener since job is unregistered from CallbackHandler
     }
 
-    private void rethrowException(GramException e) throws Timeout, NoSuccess {
+    private void rethrowException(GramException e) throws TimeoutException, NoSuccessException {
         switch(e.getErrorCode()) {
             case GRAMProtocolErrorConstants.INVALID_JOB_CONTACT:
             case GRAMProtocolErrorConstants.ERROR_CONNECTION_FAILED:
-                throw new Timeout(e);
+                throw new TimeoutException(e);
             default:
-                throw new NoSuccess(e);
+                throw new NoSuccessException(e);
         }
     }
 }

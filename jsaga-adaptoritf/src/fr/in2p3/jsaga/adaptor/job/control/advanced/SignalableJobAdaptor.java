@@ -22,5 +22,5 @@ public interface SignalableJobAdaptor extends JobControlAdaptor {
      * @param signum the signal number
      * @return true if the job has been successfully signaled, false if it was not active
      */
-    public boolean signal(String nativeJobId, int signum) throws PermissionDenied, Timeout, NoSuccess;
+    public boolean signal(String nativeJobId, int signum) throws PermissionDeniedException, TimeoutException, NoSuccessException;
 }

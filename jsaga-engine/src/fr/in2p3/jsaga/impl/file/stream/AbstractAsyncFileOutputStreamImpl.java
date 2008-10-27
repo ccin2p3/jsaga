@@ -1,10 +1,13 @@
 package fr.in2p3.jsaga.impl.file.stream;
 
-import org.ogf.saga.ObjectType;
+import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
 import org.ogf.saga.SagaObject;
-import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.file.FileOutputStream;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.task.Task;
+import org.ogf.saga.task.TaskMode;
 
 import java.util.UUID;
 
@@ -40,11 +43,11 @@ public abstract class AbstractAsyncFileOutputStreamImpl extends FileOutputStream
 
     /////////////////////////////////// interface SagaObject ////////////////////////////////////
 
-    public Session getSession() throws DoesNotExist {
+    public Session getSession() throws DoesNotExistException {
         if (m_session != null) {
             return m_session;
         } else {
-            throw new DoesNotExist("This object does not have a session attached", this);
+            throw new DoesNotExistException("This object does not have a session attached", this);
         }
     }
 
@@ -52,11 +55,37 @@ public abstract class AbstractAsyncFileOutputStreamImpl extends FileOutputStream
         return m_uuid.toString();
     }
 
-    public ObjectType getType() {
-        return ObjectType.FILEOUTPUTSTREAM;
-    }
-
     ///////////////////////////////// interface FileInputStream /////////////////////////////////
 
-    //todo: implement asynchronous methods of interface FileOutputStream
+    public Task<FileOutputStream, Void> write(TaskMode mode, int b) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<FileOutputStream,Void>().create(
+                mode, m_session, this,
+                "write",
+                new Class[]{int.class},
+                new Object[]{b});
+    }
+
+    public Task<FileOutputStream, Void> write(TaskMode mode, byte[] buf, int off, int len) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<FileOutputStream,Void>().create(
+                mode, m_session, this,
+                "write",
+                new Class[]{byte[].class, int.class, int.class},
+                new Object[]{buf, off, len});
+    }
+
+    public Task<FileOutputStream, Void> flush(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<FileOutputStream,Void>().create(
+                mode, m_session, this,
+                "flush",
+                new Class[]{},
+                new Object[]{});
+    }
+
+    public Task<FileOutputStream, Void> close(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<FileOutputStream,Void>().create(
+                mode, m_session, this,
+                "close",
+                new Class[]{},
+                new Object[]{});
+    }
 }

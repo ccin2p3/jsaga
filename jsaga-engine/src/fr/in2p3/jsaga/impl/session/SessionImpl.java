@@ -1,11 +1,11 @@
 package fr.in2p3.jsaga.impl.session;
 
+import fr.in2p3.jsaga.helpers.cloner.SagaObjectCloner;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
-import org.ogf.saga.ObjectType;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.session.Session;
 
 import java.util.ArrayList;
@@ -35,12 +35,8 @@ public class SessionImpl extends AbstractSagaObjectImpl implements Session {
     /** clone */
     public SagaObject clone() throws CloneNotSupportedException {
         SessionImpl clone = (SessionImpl) super.clone();
-        clone.m_contexts = clone(m_contexts);
+        clone.m_contexts = new SagaObjectCloner<Void,Context>().cloneList(m_contexts);
         return clone;
-    }
-
-    public ObjectType getType() {
-        return ObjectType.SESSION;
     }
 
     public void addContext(Context context) {
@@ -49,7 +45,7 @@ public class SessionImpl extends AbstractSagaObjectImpl implements Session {
         }
     }
 
-    public void removeContext(Context context) throws DoesNotExist {
+    public void removeContext(Context context) throws DoesNotExistException {
         m_contexts.remove(context);
     }
 

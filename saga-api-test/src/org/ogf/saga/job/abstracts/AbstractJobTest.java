@@ -1,28 +1,20 @@
 package org.ogf.saga.job.abstracts;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.ogf.saga.AbstractTest;
-import org.ogf.saga.url.URL;
-import org.ogf.saga.url.URLFactory;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.AuthorizationFailed;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
-import org.ogf.saga.error.Timeout;
-import org.ogf.saga.job.Job;
-import org.ogf.saga.job.JobDescription;
-import org.ogf.saga.job.JobFactory;
-import org.ogf.saga.job.JobService;
-import org.ogf.saga.monitoring.Callback;
-import org.ogf.saga.monitoring.Metric;
-import org.ogf.saga.monitoring.Monitorable;
+import org.ogf.saga.error.*;
+import org.ogf.saga.job.*;
+import org.ogf.saga.monitoring.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.task.State;
 import org.ogf.saga.task.Task;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -181,7 +173,7 @@ public class AbstractJobTest extends AbstractTest {
         System.out.println(df.format(new Date()));
 	}
 
-    protected void printStatus(Job job) throws NotImplemented, Timeout, NoSuccess {
+    protected void printStatus(Job job) throws NotImplementedException, TimeoutException, NoSuccessException {
 		System.out.println("Status: "+job.getState());
 	}
 
@@ -190,11 +182,11 @@ public class AbstractJobTest extends AbstractTest {
     protected boolean waitForSubState(Job job, String subState) throws Exception {
     	float timeoutInSeconds = Float.valueOf(MAX_QUEUING_TIME);
     	int cookie = job.addCallback("job.sub_state", new Callback(){
-            public boolean cb(Monitorable mt, Metric metric, Context ctx) throws NotImplemented, AuthorizationFailed {
+            public boolean cb(Monitorable mt, Metric metric, Context ctx) throws NotImplementedException, AuthorizationFailedException {
                 try {
                 	m_subState = metric.getAttribute(Metric.VALUE);
                 } catch (Exception e) {
-                    throw new NotImplemented(e);
+                    throw new NotImplementedException(e);
                 }
                 return true;
             }

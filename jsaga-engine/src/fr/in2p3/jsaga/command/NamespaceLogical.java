@@ -1,15 +1,13 @@
 package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.*;
-import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
-
-import java.lang.Exception;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -36,8 +34,6 @@ public class NamespaceLogical extends AbstractCommand {
     public static void main(String[] args) throws Exception {
         NamespaceLogical command = new NamespaceLogical();
         CommandLine line = command.parse(args);
-
-        System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
         if (line.hasOption(OPT_HELP))
         {
             command.printHelpAndExit(null);
@@ -64,7 +60,7 @@ public class NamespaceLogical extends AbstractCommand {
         }
     }
 
-    private LogicalFile getLogicalFile() throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess, IncorrectState, AlreadyExists {
+    private LogicalFile getLogicalFile() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException, AlreadyExistsException {
         URL logicalUrl = URLFactory.createURL(m_nonOptionValues[0]);
         Session session = SessionFactory.createSession(true);
         NSEntry entry = NSFactory.createNSEntry(session, logicalUrl, Flags.NONE.getValue());
@@ -72,7 +68,7 @@ public class NamespaceLogical extends AbstractCommand {
             LogicalFile file = (LogicalFile) entry;
             return file;
         } else {
-            throw new BadParameter("Provided URL is not a logical file: "+logicalUrl);
+            throw new BadParameterException("Provided URL is not a logical file: "+logicalUrl);
         }
     }
 

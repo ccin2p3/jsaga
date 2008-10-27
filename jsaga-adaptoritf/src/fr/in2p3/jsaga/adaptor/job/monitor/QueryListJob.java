@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.adaptor.job.monitor;
 
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.Timeout;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.TimeoutException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -16,5 +16,5 @@ import org.ogf.saga.error.Timeout;
  *
  */
 public interface QueryListJob extends QueryJob {
-    public JobStatus[] getStatusList(String[] nativeJobIdArray) throws Timeout, NoSuccess;
+    public JobStatus[] getStatusList(String[] nativeJobIdArray) throws TimeoutException, NoSuccessException;
 }

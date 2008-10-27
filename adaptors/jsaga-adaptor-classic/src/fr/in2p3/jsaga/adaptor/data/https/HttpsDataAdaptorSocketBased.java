@@ -53,7 +53,7 @@ public class HttpsDataAdaptorSocketBased extends HttpDataAdaptorSocketBased impl
         return new UOptional(MUTUAL_AUTHENTICATION);
     }
 
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return new Default[]{new Default(MUTUAL_AUTHENTICATION, "false")};
     }
 
@@ -67,11 +67,11 @@ public class HttpsDataAdaptorSocketBased extends HttpDataAdaptorSocketBased impl
         m_keyManager = adaptor.getKeyManager();
     }
 
-    public BaseURL getBaseURL() throws IncorrectURL {
+    public BaseURL getBaseURL() throws IncorrectURLException {
         return new BaseURL(443);
     }
 
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         super.connect(userInfo, host, port, basePath, attributes);
 
         // set socket factory
@@ -84,23 +84,23 @@ public class HttpsDataAdaptorSocketBased extends HttpDataAdaptorSocketBased impl
                 context.init(m_keyManager, trustManager, new java.security.SecureRandom());
                 m_socketFactory = context.getSocketFactory();
             } catch (NoSuchAlgorithmException e) {
-                throw new NoSuccess(e);
+                throw new NoSuccessException(e);
             } catch (KeyManagementException e) {
-                throw new AuthenticationFailed(e);
+                throw new AuthenticationFailedException(e);
             }
         }
     }
 
-    public void disconnect() throws NoSuccess {
+    public void disconnect() throws NoSuccessException {
         super.disconnect();
 
         // unset socket factory
         m_socketFactory = null;
     }
 
-    protected HttpRequest getRequest(String absolutePath, String additionalArgs, String requestType) throws PermissionDenied, DoesNotExist, NoSuccess {
+    protected HttpRequest getRequest(String absolutePath, String additionalArgs, String requestType) throws PermissionDeniedException, DoesNotExistException, NoSuccessException {
         if (m_baseUrl == null) {
-            throw new NoSuccess("Connection is closed");
+            throw new NoSuccessException("Connection is closed");
         }
 
         // get path
@@ -113,11 +113,11 @@ public class HttpsDataAdaptorSocketBased extends HttpDataAdaptorSocketBased impl
             socket.startHandshake();
             request = new HttpRequest(requestType, path, socket);
         } catch (UnknownHostException e) {
-            throw new DoesNotExist("Unknown host: "+m_baseUrl.getHost(), e);
+            throw new DoesNotExistException("Unknown host: "+m_baseUrl.getHost(), e);
         } catch (SSLHandshakeException e) {
-            throw new PermissionDenied("User not allowed: "+m_userID, e);
+            throw new PermissionDeniedException("User not allowed: "+m_userID, e);
         } catch (IOException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
 
         // check status
@@ -125,11 +125,11 @@ public class HttpsDataAdaptorSocketBased extends HttpDataAdaptorSocketBased impl
         if (status.endsWith("200 OK")) {
             return request;
         } else if (status.endsWith("404 Not Found")) {
-            throw new DoesNotExist(status);
+            throw new DoesNotExistException(status);
         } else if (status.endsWith("403 Forbidden")) {
-            throw new PermissionDenied(status);
+            throw new PermissionDeniedException(status);
         } else {
-            throw new NoSuccess(status);
+            throw new NoSuccessException(status);
         }
     }
 }

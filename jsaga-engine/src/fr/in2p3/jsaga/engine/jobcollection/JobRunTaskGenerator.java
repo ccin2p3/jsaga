@@ -25,13 +25,13 @@ public class JobRunTaskGenerator {
     private JobDescription m_jobDesc;
     private JobRunTask m_jobRunTask;
 
-    public JobRunTaskGenerator(String jobName, JobDefinition jobDesc, JobHandle jobHandle) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public JobRunTaskGenerator(String jobName, JobDefinition jobDesc, JobHandle jobHandle) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         m_jobName = jobName;
         m_jobDesc = jobDesc.getJobDescription();
         m_jobRunTask = new JobRunTask(m_jobName, jobHandle);
     }
 
-    public void updateWorkflow(Workflow workflow) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public void updateWorkflow(Workflow workflow) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         boolean hasStagedTask = false;
         workflow.add(m_jobRunTask, null, null);
         for (int i=0; i<m_jobDesc.getDataStagingCount(); i++) {

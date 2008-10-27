@@ -2,8 +2,8 @@ package fr.in2p3.jsaga.introspector;
 
 import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.introspector.IntrospectorFactoryImpl;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -22,7 +22,7 @@ public abstract class IntrospectorFactory {
     private static IntrospectorFactory factory;
 
     private static synchronized void initializeFactory()
-        throws NotImplemented, ConfigurationException {
+        throws NotImplementedException, ConfigurationException {
         if (factory == null) {
             factory = new IntrospectorFactoryImpl();
         }
@@ -33,20 +33,20 @@ public abstract class IntrospectorFactory {
      * @return the created introspector.
      */
     protected abstract Introspector doCreateNSIntrospector()
-        throws NotImplemented, NoSuccess;
+        throws NotImplementedException, NoSuccessException;
 
     /**
      * Creates an introspector for jobs. To be provided by the implementation.
      * @return the created introspector.
      */
     protected abstract Introspector doCreateJobIntrospector()
-        throws NotImplemented, NoSuccess;
+        throws NotImplementedException, NoSuccessException;
 
     /**
      * Creates an introspector for namespaces.
      * @return the created introspector.
      */
-    public static Introspector createNSIntrospector() throws NotImplemented, NoSuccess {
+    public static Introspector createNSIntrospector() throws NotImplementedException, NoSuccessException {
         initializeFactory();
         return factory.doCreateNSIntrospector();
     }
@@ -55,7 +55,7 @@ public abstract class IntrospectorFactory {
      * Creates an introspector for jobs.
      * @return the created introspector.
      */
-    public static Introspector createJobIntrospector() throws NotImplemented, NoSuccess {
+    public static Introspector createJobIntrospector() throws NotImplementedException, NoSuccessException {
         initializeFactory();
         return factory.doCreateJobIntrospector();
     }

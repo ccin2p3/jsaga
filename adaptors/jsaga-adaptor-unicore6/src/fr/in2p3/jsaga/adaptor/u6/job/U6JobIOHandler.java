@@ -3,9 +3,9 @@ package fr.in2p3.jsaga.adaptor.u6.job;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOSetter;
 import fr.in2p3.jsaga.adaptor.u6.TargetSystemInfo;
 
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.PermissionDenied;
-import org.ogf.saga.error.Timeout;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.PermissionDeniedException;
+import org.ogf.saga.error.TimeoutException;
 
 import com.intel.gpe.client2.common.i18n.Messages;
 import com.intel.gpe.client2.common.i18n.MessagesKeys;
@@ -51,17 +51,17 @@ public class U6JobIOHandler implements JobIOSetter {
 		return jobId;
 	}
 
-	public void setStderr(OutputStream err) throws PermissionDenied, Timeout,
-			NoSuccess {
+	public void setStderr(OutputStream err) throws PermissionDeniedException, TimeoutException,
+            NoSuccessException {
 		getStream(err, "stderr");
 	}
 
-	public void setStdout(OutputStream out) throws PermissionDenied, Timeout,
-			NoSuccess {
+	public void setStdout(OutputStream out) throws PermissionDeniedException, TimeoutException,
+            NoSuccessException {
 		getStream(out, "stdout");
 	}
 	
-	public void getStream(OutputStream outputStream, String type) throws PermissionDenied, Timeout, NoSuccess {
+	public void getStream(OutputStream outputStream, String type) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		
 		try {	
 			// create tmp File
@@ -88,19 +88,19 @@ public class U6JobIOHandler implements JobIOSetter {
             	throw new Exception(Messages.getString(MessagesKeys.common_requests_GetFilesRequest_Cannot_fetch_file_from_remote_location__no_suitable_protocol_found));
             }
 		} catch (GPEResourceUnknownException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (GPEMiddlewareRemoteException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (GPEMiddlewareServiceException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (InstantiationException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (IllegalAccessException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (ClassNotFoundException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (Exception e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
 	}
 }

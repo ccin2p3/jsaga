@@ -4,13 +4,12 @@ import org.ogf.saga.SagaObject;
 import org.ogf.saga.attributes.Attributes;
 
 /**
- * Contents of a job description is defined by its attributes.
- * Should we have separate methods for each of the attributes???
+ * The contents of a job description is defined by its attributes.
  */
 public interface JobDescription extends SagaObject, Attributes {
 
     // Required attributes:
-    
+
     /** Attribute name, command to execute. */
     public static final String EXECUTABLE = "Executable";
 
@@ -56,8 +55,8 @@ public interface JobDescription extends SagaObject, Attributes {
     public static final String FILETRANSFER = "FileTransfer";
 
     /**
-     * Attribute name, defines whether output files get removed after the
-     * job finishes.
+     * Attribute name, defines whether output files get removed after the job
+     * finishes.
      */
     public static final String CLEANUP = "Cleanup";
 

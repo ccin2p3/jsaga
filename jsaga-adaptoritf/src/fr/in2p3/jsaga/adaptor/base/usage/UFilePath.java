@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.adaptor.base.usage;
 
 import fr.in2p3.jsaga.Base;
-import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.DoesNotExistException;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +28,7 @@ public class UFilePath extends U {
     }
 
     /** override U.correctValue() */
-    public String correctValue(String attributeName, String attributeValue) throws DoesNotExist {
+    public String correctValue(String attributeName, String attributeValue) throws DoesNotExistException {
         if (m_name.equals(attributeName)) {
             try {
                 File file = (File) this.throwExceptionIfInvalid(attributeValue);
@@ -42,7 +42,7 @@ public class UFilePath extends U {
                 return null;
             }
         } else {
-            throw new DoesNotExist("Attribute not found: "+attributeName);
+            throw new DoesNotExistException("Attribute not found: "+attributeName);
         }
     }
 

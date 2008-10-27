@@ -18,7 +18,7 @@ import org.ogf.saga.error.*;
  */
 public class ApplicationAllocatedBufferImpl extends AbstractBufferImpl implements Buffer {
     /** constructor */
-    public ApplicationAllocatedBufferImpl(byte[] data) throws BadParameter, NotImplemented, NoSuccess {
+    public ApplicationAllocatedBufferImpl(byte[] data) throws BadParameterException, NotImplementedException, NoSuccessException {
         super();
         this.setData(data);
     }
@@ -30,19 +30,19 @@ public class ApplicationAllocatedBufferImpl extends AbstractBufferImpl implement
         return clone;
     }
 
-    public void setSize(int size) throws NotImplemented, BadParameter, NoSuccess {
-        throw new NotImplemented("Not allowed to change the size of an application-allocated buffer", this);
+    public void setSize(int size) throws NotImplementedException, BadParameterException, NoSuccessException {
+        throw new NotImplementedException("Not allowed to change the size of an application-allocated buffer", this);
     }
 
-    public void setSize() throws NotImplemented, BadParameter, NoSuccess {
-        throw new NotImplemented("Not allowed to change the size of an application-allocated buffer", this);
+    public void setSize() throws NotImplementedException, BadParameterException, NoSuccessException {
+        throw new NotImplementedException("Not allowed to change the size of an application-allocated buffer", this);
     }
 
-    public void setData(byte[] data) throws NotImplemented, BadParameter, NoSuccess {
+    public void setData(byte[] data) throws NotImplementedException, BadParameterException, NoSuccessException {
         if (data != null) {
             m_buffer = data;
         } else {
-            throw new NotImplemented("You must specify either the buffer or its size");
+            throw new NotImplementedException("You must specify either the buffer or its size");
         }
     }
 }

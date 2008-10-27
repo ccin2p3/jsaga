@@ -1,7 +1,8 @@
 package fr.in2p3.jsaga.adaptor.job.monitor;
 
 import fr.in2p3.jsaga.adaptor.job.SubState;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.SagaException;
 import org.ogf.saga.task.State;
 
 /* ***************************************************
@@ -20,7 +21,7 @@ public abstract class JobStatus {
     private String m_nativeJobId;
     protected Object m_nativeStateCode;
     protected String m_nativeStateString;
-    protected org.ogf.saga.error.Exception m_nativeCause;
+    protected SagaException m_nativeCause;
 
     public JobStatus(String jobId, Object stateCode, String stateString, int returnCode) {
         this(jobId, stateCode, stateString);
@@ -31,7 +32,7 @@ public abstract class JobStatus {
     public JobStatus(String jobId, Object stateCode, String stateString, String cause) {
         this(jobId, stateCode, stateString);
         if (cause != null) {
-            m_nativeCause = new NoSuccess("Job '"+jobId+"': "+cause);
+            m_nativeCause = new NoSuccessException("Job '"+jobId+"': "+cause);
         }
     }
     public JobStatus(String jobId, Object stateCode, String stateString) {
@@ -53,7 +54,7 @@ public abstract class JobStatus {
         return this.getModel()+":"+m_nativeStateString;
     }
 
-    public org.ogf.saga.error.Exception getCause() {
+    public SagaException getCause() {
         return m_nativeCause;
     }
 

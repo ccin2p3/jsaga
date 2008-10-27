@@ -1,7 +1,6 @@
 package fr.in2p3.jsaga.impl.buffer;
 
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
-import org.ogf.saga.ObjectType;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.error.*;
@@ -32,11 +31,7 @@ public abstract class AbstractBufferImpl extends AbstractSagaObjectImpl implemen
         return super.clone();
     }
 
-    public ObjectType getType() {
-        return ObjectType.BUFFER;
-    }
-
-    public int getSize() throws NotImplemented, IncorrectState {
+    public int getSize() throws NotImplementedException, IncorrectStateException {
         if (m_buffer != null) {
             return m_buffer.length;
         } else {
@@ -44,19 +39,19 @@ public abstract class AbstractBufferImpl extends AbstractSagaObjectImpl implemen
         }
     }
 
-    public byte[] getData() throws NotImplemented, DoesNotExist, IncorrectState {
+    public byte[] getData() throws NotImplementedException, DoesNotExistException, IncorrectStateException {
         if (m_buffer != null) {
             return m_buffer;
         } else {
-            throw new DoesNotExist("No I/O operation has been done on this buffer yet");
+            throw new DoesNotExistException("No I/O operation has been done on this buffer yet");
         }
     }
 
-    public void close() throws NotImplemented {
+    public void close() throws NotImplementedException {
         m_buffer = null;
     }
 
-    public void close(float timeoutInSeconds) throws NotImplemented {
+    public void close(float timeoutInSeconds) throws NotImplementedException {
         this.close();
     }
 }

@@ -3,7 +3,7 @@ package fr.in2p3.jsaga.command;
 import fr.in2p3.jsaga.helpers.XMLFileParser;
 import fr.in2p3.jsaga.jobcollection.*;
 import org.apache.commons.cli.*;
-import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.task.Task;
@@ -45,8 +45,6 @@ public class JobCollectionRun extends AbstractCommand {
     public static void main(String[] args) throws Exception {
         JobCollectionRun command = new JobCollectionRun();
         CommandLine line = command.parse(args);
-
-        System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
         if (line.hasOption(OPT_HELP))
         {
             command.printHelpAndExit(null);
@@ -128,7 +126,7 @@ public class JobCollectionRun extends AbstractCommand {
                 return job;
             }
         }
-        throw new DoesNotExist("Job not found in collection: "+jobName);
+        throw new DoesNotExistException("Job not found in collection: "+jobName);
     }
 
     protected Options createOptions() {

@@ -4,8 +4,8 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.security.impl.X509SecurityAdaptor;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.IncorrectState;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NoSuccessException;
 
 import javax.crypto.BadPaddingException;
 import java.io.*;
@@ -34,7 +34,7 @@ public class X509SecurityAdaptorBuilder implements SecurityAdaptorBuilder {
         return X509SecurityAdaptor.class;
     }
 
-    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectState, NoSuccess {
+    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectStateException, NoSuccessException {
         // get required attributes
         String userCert = (String) attributes.get(Context.USERCERT);
         String userPass = (String) attributes.get(Context.USERPASS);
@@ -57,14 +57,14 @@ public class X509SecurityAdaptorBuilder implements SecurityAdaptorBuilder {
             return new X509SecurityAdaptor(keyStore, userPass, alias, userPass);
         } catch(IOException e) {
             if (e.getMessage()!=null && e.getMessage().endsWith("too big.")) {
-                throw new IncorrectState("Not a PKCS12 file", e);
+                throw new IncorrectStateException("Not a PKCS12 file", e);
             } else if (e.getCause()!=null && e.getCause() instanceof BadPaddingException) {
-                throw new IncorrectState("Bad passphrase", e);
+                throw new IncorrectStateException("Bad passphrase", e);
             } else {
-                throw new NoSuccess(e);
+                throw new NoSuccessException(e);
             }
         } catch(Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 
@@ -75,7 +75,7 @@ public class X509SecurityAdaptorBuilder implements SecurityAdaptorBuilder {
         });
     }
 
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return new Default[]{
         		new Default(Context.USERCERT, new File[]{
                          new File(System.getProperty("user.home")+"/usercert.p12")})

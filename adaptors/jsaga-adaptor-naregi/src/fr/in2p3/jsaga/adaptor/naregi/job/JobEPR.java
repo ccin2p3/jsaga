@@ -7,7 +7,7 @@ import org.apache.axis.types.URI;
 import org.apache.axis.utils.XMLUtils;
 import org.globus.wsrf.encoding.ObjectSerializer;
 import org.globus.wsrf.encoding.SerializationException;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 public class JobEPR {
     private EndpointReference m_epr;
 
-    public JobEPR(InputStream eprStream) throws NoSuccess {
+    public JobEPR(InputStream eprStream) throws NoSuccessException {
 //        m_epr = (EndpointReference) ObjectDeserializer.deserialize(new InputSource(eprStream), EndpointReference.class);
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
@@ -39,18 +39,18 @@ public class JobEPR {
             Element elem = doc.getDocumentElement();
             m_epr = new EndpointReference(elem);
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 
-    public JobEPR(String jobid) throws NoSuccess {
+    public JobEPR(String jobid) throws NoSuccessException {
         String part1 = jobid.substring(0, jobid.lastIndexOf('/'));
         String part2 = jobid.substring(jobid.lastIndexOf('/')+1);
         // create EPR
         try {
             m_epr = new EndpointReference(part1);
         } catch (URI.MalformedURIException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         MessageElement msg = new MessageElement();
         msg.setName("resourceId");
@@ -67,12 +67,12 @@ public class JobEPR {
         return m_epr.getAddress().toString() + "/" + m_epr.getProperties().get_any()[0].getChildren().get(0);
     }
 
-    public String getEPR() throws NoSuccess {
+    public String getEPR() throws NoSuccessException {
         Element oldRoot;
         try {
             oldRoot = ObjectSerializer.toElement(m_epr, EndpointReference.getTypeDesc().getXmlType());
         } catch (SerializationException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         Document factory = oldRoot.getOwnerDocument();
         Element newRoot = factory.createElementNS("http://schemas.xmlsoap.org/ws/2004/03/addressing", "EndpointReference");

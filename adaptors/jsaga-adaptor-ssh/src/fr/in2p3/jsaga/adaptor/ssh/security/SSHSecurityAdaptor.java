@@ -2,8 +2,8 @@ package fr.in2p3.jsaga.adaptor.ssh.security;
 
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
 
 import java.io.PrintStream;
 
@@ -23,7 +23,7 @@ public class SSHSecurityAdaptor implements SecurityAdaptor {
 	private String password;
 	private String userId;
 	
-    public SSHSecurityAdaptor(byte[] privateKey, byte[] publicKey, String password, String userId) throws NoSuccess {
+    public SSHSecurityAdaptor(byte[] privateKey, byte[] publicKey, String password, String userId) throws NoSuccessException {
     	this.privateKey = privateKey;
     	this.publicKey = publicKey;
     	this.password = password;
@@ -57,7 +57,7 @@ public class SSHSecurityAdaptor implements SecurityAdaptor {
       	System.out.println("Key type: "+type);
     }
     
-    public String getUserID() throws NoSuccess {
+    public String getUserID() throws NoSuccessException {
         return userId;
     }
     
@@ -65,11 +65,11 @@ public class SSHSecurityAdaptor implements SecurityAdaptor {
         return password;
     }
 
-    public String getAttribute(String key) throws NotImplemented, NoSuccess {
+    public String getAttribute(String key) throws NotImplementedException, NoSuccessException {
         if (Context.LIFETIME.equals(key)) {
             return ""+INFINITE_LIFETIME;
         } else {
-            throw new NotImplemented("Attribute not supported: "+key);
+            throw new NotImplementedException("Attribute not supported: "+key);
         }
     }
 

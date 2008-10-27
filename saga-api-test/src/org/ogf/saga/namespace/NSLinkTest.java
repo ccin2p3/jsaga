@@ -1,7 +1,7 @@
 package org.ogf.saga.namespace;
 
-import org.ogf.saga.url.URL;
 import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
+import org.ogf.saga.url.URL;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***

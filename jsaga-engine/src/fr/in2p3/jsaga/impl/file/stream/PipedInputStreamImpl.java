@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.impl.file.stream;
 
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderGetter;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.io.*;
 
@@ -25,7 +25,7 @@ public class PipedInputStreamImpl extends PipedInputStream implements Runnable {
     private boolean m_closed;
     private OutputStream m_out;
 
-    public PipedInputStreamImpl(FileReaderGetter adaptor, String absolutePath, String additionalArgs) throws NoSuccess {
+    public PipedInputStreamImpl(FileReaderGetter adaptor, String absolutePath, String additionalArgs) throws NoSuccessException {
         m_adaptor = adaptor;
         m_absolutePath = absolutePath;
         m_additionalArgs = additionalArgs;
@@ -35,7 +35,7 @@ public class PipedInputStreamImpl extends PipedInputStream implements Runnable {
             // pipe must be connected before reading (else will throw exception)
             m_out = new PipedOutputStream(this);
         } catch (IOException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         new Thread(this).start();
     }

@@ -1,8 +1,8 @@
 package org.ogf.saga.logicalfile;
 
-import org.ogf.saga.url.URLFactory;
-import org.ogf.saga.namespace.abstracts.AbstractNSDirectoryTest;
 import org.ogf.saga.namespace.*;
+import org.ogf.saga.namespace.abstracts.AbstractNSDirectoryTest;
+import org.ogf.saga.url.URLFactory;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***

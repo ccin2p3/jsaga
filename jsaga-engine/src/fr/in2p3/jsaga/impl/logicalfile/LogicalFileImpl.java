@@ -4,20 +4,18 @@ import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
-import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
-import fr.in2p3.jsaga.engine.data.flags.FlagsBytesLogical;
 import fr.in2p3.jsaga.impl.logicalfile.copy.LogicalFileCopy;
 import fr.in2p3.jsaga.impl.logicalfile.copy.LogicalFileCopyFrom;
 import fr.in2p3.jsaga.impl.namespace.*;
 import fr.in2p3.jsaga.impl.url.URLHelper;
 import fr.in2p3.jsaga.impl.url.URLImpl;
-import org.ogf.saga.ObjectType;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
 import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 
 import java.util.*;
 
@@ -35,45 +33,45 @@ import java.util.*;
  */
 public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements LogicalFile {
     /** constructor for factory */
-    public LogicalFileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public LogicalFileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session, URLHelper.toFileURL(url), adaptor, flags);
         this.init(flags);
     }
 
     /** constructor for NSDirectory.open() */
-    public LogicalFileImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public LogicalFileImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(dir, URLHelper.toFileURL(relativeUrl), flags);
         this.init(flags);
     }
 
     /** constructor for NSEntry.openAbsolute() */
-    public LogicalFileImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public LogicalFileImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(entry, URLHelper.toFilePath(absolutePath), flags);
         this.init(flags);
     }
 
-    private void init(int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
-        FlagsBytes effectiveFlags = new FlagsBytesLogical(flags);
-        if (effectiveFlags.contains(Flags.CREATE)) {
+    private void init(int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        new FlagsHelper(flags).allowed(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS, Flags.ALLLOGICALFILEFLAGS);
+        if (Flags.CREATE.isSet(flags)) {
             if (m_adaptor instanceof LogicalWriter) {
                 if (this.exists()) {
-                    if (effectiveFlags.contains(Flags.EXCL)) {
-                        throw new AlreadyExists("Entry already exists: "+ m_url);
+                    if (Flags.EXCL.isSet(flags)) {
+                        throw new AlreadyExistsException("Entry already exists: "+ m_url);
                     }
-                } else if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
+                } else if (Flags.CREATEPARENTS.isSet(flags)) {
                     this._makeParentDirs();
                 }
             } else {
-                throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme());
+                throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme());
             }
-        } else if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
+        } else if (Flags.CREATEPARENTS.isSet(flags)) {
             this._makeParentDirs();
         } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !((URLImpl)m_url).hasCache() && m_adaptor instanceof DataReaderAdaptor) {
             boolean exists = ((DataReaderAdaptor)m_adaptor).exists(
                     m_url.getPath(),
                     m_url.getQuery());
             if (! exists) {
-                throw new DoesNotExist("Logical file does not exist: "+ m_url);
+                throw new DoesNotExistException("Logical file does not exist: "+ m_url);
             }
         }
     }
@@ -83,65 +81,59 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
         return super.clone();
     }
 
-    public ObjectType getType() {
-        return ObjectType.LOGICALFILE;
-    }
-
     /** implements super.copy() */
-    public void copy(URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
-        FlagsBytes effectiveFlags = new FlagsBytes(flags);
-        if (effectiveFlags.contains(Flags.DEREFERENCE)) {
-            this._dereferenceEntry().copy(target, effectiveFlags.remove(Flags.DEREFERENCE));
+    public void copy(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+        new FlagsHelper(flags).allowed(JSAGAFlags.PRESERVETIMES, Flags.DEREFERENCE, Flags.CREATEPARENTS, Flags.OVERWRITE);
+        if (Flags.DEREFERENCE.isSet(flags)) {
+            this._dereferenceEntry().copy(target, flags - Flags.DEREFERENCE.getValue());
             return; //==========> EXIT
         }
-        effectiveFlags.checkAllowed(Flags.DEREFERENCE.or(Flags.CREATEPARENTS.or(Flags.OVERWRITE)));
         URL effectiveTarget = this._getEffectiveURL(target);
         if (JSAGAFlags.PRESERVETIMES.isSet(flags)) {
-            // throw NotImplemented if can not preserve times
+            // throw NotImplementedException if can not preserve times
             Date sourceTimes = this.getLastModified();
             AbstractNSEntryImpl targetEntry = super._getTargetEntry_checkPreserveTimes(effectiveTarget);
 
             // copy
-            new LogicalFileCopy(m_session, this, m_adaptor).copy(effectiveTarget, effectiveFlags);
+            new LogicalFileCopy(m_session, this, m_adaptor).copy(effectiveTarget, flags);
 
             // preserve times
             targetEntry.setLastModified(sourceTimes);
         } else {
             // copy only
-            new LogicalFileCopy(m_session, this, m_adaptor).copy(effectiveTarget, effectiveFlags);
+            new LogicalFileCopy(m_session, this, m_adaptor).copy(effectiveTarget, flags);
         }
     }
 
-    public void copyFrom(URL source, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
-        FlagsBytes effectiveFlags = new FlagsBytes(flags);
-        if (effectiveFlags.contains(Flags.DEREFERENCE)) {
-            this._dereferenceEntry().copyFrom(source, effectiveFlags.remove(Flags.DEREFERENCE));
+    public void copyFrom(URL source, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
+        new FlagsHelper(flags).allowed(JSAGAFlags.PRESERVETIMES, Flags.DEREFERENCE, Flags.OVERWRITE);
+        if (Flags.DEREFERENCE.isSet(flags)) {
+            this._dereferenceEntry().copyFrom(source, flags - Flags.DEREFERENCE.getValue());
             return; //==========> EXIT
         }
-        effectiveFlags.checkAllowed(Flags.DEREFERENCE.or(Flags.OVERWRITE));
         URL effectiveSource = this._getEffectiveURL(source);
         if (JSAGAFlags.PRESERVETIMES.isSet(flags)) {
-            // throw NotImplemented if can not preserve times
+            // throw NotImplementedException if can not preserve times
             Date sourceTimes = super._getSourceTimes_checkPreserveTimes(effectiveSource);
 
             // copy
-            new LogicalFileCopyFrom(m_session, this, m_adaptor).copyFrom(effectiveSource, effectiveFlags);
+            new LogicalFileCopyFrom(m_session, this, m_adaptor).copyFrom(effectiveSource, flags);
 
             // preserve times
             this.setLastModified(sourceTimes);
         } else {
             // copy only
-            new LogicalFileCopyFrom(m_session, this, m_adaptor).copyFrom(effectiveSource, effectiveFlags);
+            new LogicalFileCopyFrom(m_session, this, m_adaptor).copyFrom(effectiveSource, flags);
         }
     }
 
     /////////////////////////////// class AbstractNSEntryImpl ///////////////////////////////
 
-    public NSDirectory openAbsoluteDir(String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public NSDirectory openAbsoluteDir(String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         return new LogicalDirectoryImpl(this, absolutePath, flags);
     }
 
-    public NSEntry openAbsolute(String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public NSEntry openAbsolute(String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (URLHelper.isDirectory(absolutePath)) {
             return new LogicalDirectoryImpl(this, absolutePath, flags);
         } else {
@@ -151,29 +143,29 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
 
     ///////////////////////////////// interface LogicalFile /////////////////////////////////
 
-    public void addLocation(URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    public void addLocation(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof LogicalWriter) {
             ((LogicalWriter)m_adaptor).addLocation(
                     m_url.getPath(),
                     name,
                     m_url.getQuery());
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
 
-    public void removeLocation(URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    public void removeLocation(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof LogicalWriter) {
             ((LogicalWriter)m_adaptor).removeLocation(
                     m_url.getPath(),
                     name,
                     m_url.getQuery());
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
 
-    public void updateLocation(URL nameOld, URL nameNew) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public void updateLocation(URL nameOld, URL nameNew) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof LogicalWriter) {
             ((LogicalWriter)m_adaptor).addLocation(
                     m_url.getPath(),
@@ -184,11 +176,11 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
                     nameOld,
                     m_url.getQuery());
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
 
-    public List<URL> listLocations() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public List<URL> listLocations() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof LogicalReader) {
             try {
                 String[] array = ((LogicalReader)m_adaptor).listLocations(
@@ -197,86 +189,86 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
                 List<URL> list = new ArrayList<URL>();
                 try {
                     for (String location : array) {
-                        list.add(org.ogf.saga.url.URLFactory.createURL(location));
+                        list.add(URLFactory.createURL(location));
                     }
-                } catch (BadParameter e) {
-                    throw new NoSuccess(e);
+                } catch (BadParameterException e) {
+                    throw new NoSuccessException(e);
                 }
                 return list;
-            } catch (DoesNotExist doesNotExist) {
-                throw new IncorrectState("Logical file does not exist: "+ m_url, doesNotExist);
+            } catch (DoesNotExistException doesNotExist) {
+                throw new IncorrectStateException("Logical file does not exist: "+ m_url, doesNotExist);
             }
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
 
-    public void replicate(URL name, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public void replicate(URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof LogicalReader && m_adaptor instanceof LogicalWriter) {
             this._replicate_step1(name, flags);
             this._replicate_step2(name);
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
-    public void replicate(URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public void replicate(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         this.replicate(name, Flags.NONE.getValue());
     }
 
-    private void _replicate_step1(URL physicalTarget, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    private void _replicate_step1(URL physicalTarget, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         final String MESSAGE = "Failed to copy replica (state is still consistent)";
         try {
             List<URL> locations = this.listLocations();
             if (locations==null || locations.size()==0) {
-                throw new IncorrectState("Can not replicate a logical entry with empty location", this);
+                throw new IncorrectStateException("Can not replicate a logical entry with empty location", this);
             }
             URL physicalSource = locations.get(0);
             NSEntry physicalSourceEntry = NSFactory.createNSEntry(m_session, physicalSource, Flags.NONE.getValue());
             physicalSourceEntry.copy(physicalTarget, flags);
-        } catch (NotImplemented e) {
-            throw new NotImplemented(MESSAGE, e);
-        } catch (IncorrectURL e) {
-            throw new IncorrectURL(MESSAGE, e);
-        } catch (AuthenticationFailed e) {
-            throw new AuthenticationFailed(MESSAGE, e);
-        } catch (AuthorizationFailed e) {
-            throw new AuthorizationFailed(MESSAGE, e);
-        } catch (PermissionDenied e) {
-            throw new PermissionDenied(MESSAGE, e);
-        } catch (BadParameter e) {
-            throw new BadParameter(MESSAGE, e);
-        } catch (IncorrectState e) {
-            throw new IncorrectState(MESSAGE, e);
-        } catch (AlreadyExists e) {
-            throw new AlreadyExists(MESSAGE, e);
-        } catch (Timeout e) {
-            throw new Timeout(MESSAGE, e);
-        } catch (NoSuccess e) {
-            throw new NoSuccess(MESSAGE, e);
+        } catch (NotImplementedException e) {
+            throw new NotImplementedException(MESSAGE, e);
+        } catch (IncorrectURLException e) {
+            throw new IncorrectURLException(MESSAGE, e);
+        } catch (AuthenticationFailedException e) {
+            throw new AuthenticationFailedException(MESSAGE, e);
+        } catch (AuthorizationFailedException e) {
+            throw new AuthorizationFailedException(MESSAGE, e);
+        } catch (PermissionDeniedException e) {
+            throw new PermissionDeniedException(MESSAGE, e);
+        } catch (BadParameterException e) {
+            throw new BadParameterException(MESSAGE, e);
+        } catch (IncorrectStateException e) {
+            throw new IncorrectStateException(MESSAGE, e);
+        } catch (AlreadyExistsException e) {
+            throw new AlreadyExistsException(MESSAGE, e);
+        } catch (TimeoutException e) {
+            throw new TimeoutException(MESSAGE, e);
+        } catch (NoSuccessException e) {
+            throw new NoSuccessException(MESSAGE, e);
         }
     }
-    private void _replicate_step2(URL name) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
+    private void _replicate_step2(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, TimeoutException, NoSuccessException {
         final String MESSAGE = "INCONSISTENT STATE: Replica has been copied but failed to register the new location";
         try {
             this.addLocation(name);
-        } catch (NotImplemented e) {
-            throw new NotImplemented(MESSAGE, e);
-        } catch (IncorrectURL e) {
-            throw new IncorrectURL(MESSAGE, e);
-        } catch (AuthenticationFailed e) {
-            throw new AuthenticationFailed(MESSAGE, e);
-        } catch (AuthorizationFailed e) {
-            throw new AuthorizationFailed(MESSAGE, e);
-        } catch (PermissionDenied e) {
-            throw new PermissionDenied(MESSAGE, e);
-        } catch (BadParameter e) {
-            throw new BadParameter(MESSAGE, e);
-        } catch (IncorrectState e) {
-            throw new IncorrectState(MESSAGE, e);
-        } catch (Timeout e) {
-            throw new Timeout(MESSAGE, e);
-        } catch (NoSuccess e) {
-            throw new NoSuccess(MESSAGE, e);
+        } catch (NotImplementedException e) {
+            throw new NotImplementedException(MESSAGE, e);
+        } catch (IncorrectURLException e) {
+            throw new IncorrectURLException(MESSAGE, e);
+        } catch (AuthenticationFailedException e) {
+            throw new AuthenticationFailedException(MESSAGE, e);
+        } catch (AuthorizationFailedException e) {
+            throw new AuthorizationFailedException(MESSAGE, e);
+        } catch (PermissionDeniedException e) {
+            throw new PermissionDeniedException(MESSAGE, e);
+        } catch (BadParameterException e) {
+            throw new BadParameterException(MESSAGE, e);
+        } catch (IncorrectStateException e) {
+            throw new IncorrectStateException(MESSAGE, e);
+        } catch (TimeoutException e) {
+            throw new TimeoutException(MESSAGE, e);
+        } catch (NoSuccessException e) {
+            throw new NoSuccessException(MESSAGE, e);
         }
     }
 }

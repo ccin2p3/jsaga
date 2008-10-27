@@ -2,8 +2,8 @@ package fr.in2p3.jsaga.adaptor.security.impl;
 
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
 
 import java.io.PrintStream;
 
@@ -32,11 +32,11 @@ public class UserPassSecurityAdaptor implements SecurityAdaptor {
         return m_userId;
     }
 
-    public String getAttribute(String key) throws NotImplemented, NoSuccess {
+    public String getAttribute(String key) throws NotImplementedException, NoSuccessException {
         if (Context.USERPASS.equals(key)) {
             return m_userPass;
         } else {
-            throw new NotImplemented("Attribute not supported: "+key);
+            throw new NotImplementedException("Attribute not supported: "+key);
         }
     }
 

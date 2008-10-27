@@ -7,8 +7,8 @@ import org.globus.exec.client.GramJob;
 import org.globus.gram.GramException;
 import org.globus.gram.internal.GRAMProtocolErrorConstants;
 import org.ietf.jgss.GSSException;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.Timeout;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.TimeoutException;
 
 
 /* ***************************************************
@@ -22,27 +22,27 @@ import org.ogf.saga.error.Timeout;
 
 public class WSGramJobMonitorAdaptor extends WSGramJobAdaptorAbstract implements QueryIndividualJob {
     
-    public JobStatus getStatus(String nativeJobHandle) throws Timeout, NoSuccess {
+    public JobStatus getStatus(String nativeJobHandle) throws TimeoutException, NoSuccessException {
     	GramJob job = this.getGramJobById(nativeJobHandle);
         try {
 			job.refreshStatus();
 		} catch (GramException e) {
 			this.rethrowException(e);
         } catch (GSSException e) {
-        	throw new NoSuccess(e);
+        	throw new NoSuccessException(e);
         } catch (Exception e) {
-        	throw new NoSuccess(e);
+        	throw new NoSuccessException(e);
 		}       
         return new WSGramJobStatus(job.getHandle(),job.getState(), job.getState().toString());
     }
     
-    private void rethrowException(GramException e) throws Timeout, NoSuccess {
+    private void rethrowException(GramException e) throws TimeoutException, NoSuccessException {
     	switch(e.getErrorCode()) {
             case GRAMProtocolErrorConstants.INVALID_JOB_CONTACT:
             case GRAMProtocolErrorConstants.ERROR_CONNECTION_FAILED:
-                throw new Timeout(e);
+                throw new TimeoutException(e);
             default:
-                throw new NoSuccess(e);
+                throw new NoSuccessException(e);
         }
     }
 

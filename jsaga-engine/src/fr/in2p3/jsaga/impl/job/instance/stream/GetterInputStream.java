@@ -21,12 +21,12 @@ public class GetterInputStream extends Stdout {
     private GetterBufferedInputStream m_buffer;
     private InputStream m_stream;
 
-    public GetterInputStream(InputStream stdout) throws NotImplemented, DoesNotExist, Timeout, NoSuccess {
+    public GetterInputStream(InputStream stdout) throws NotImplementedException, DoesNotExistException, TimeoutException, NoSuccessException {
         m_buffer = new GetterBufferedInputStream(stdout);
         m_stream = stdout;
     }
 
-    public void closeJobIOHandler() throws PermissionDenied, Timeout, NoSuccess {
+    public void closeJobIOHandler() throws PermissionDeniedException, TimeoutException, NoSuccessException {
         // do nothing
     }
 

@@ -13,11 +13,11 @@ import fr.in2p3.jsaga.jobcollection.*;
 import org.exolab.castor.xml.Unmarshaller;
 import org.ggf.schemas.jsdl.JobDefinition;
 import org.ogf.saga.SagaObject;
-import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.WaitMode;
+import org.ogf.saga.url.URL;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
@@ -25,7 +25,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
-import java.lang.Exception;
 import java.util.LinkedList;
 
 /* ***************************************************
@@ -45,7 +44,7 @@ public class JobCollectionImpl extends WorkflowImpl implements JobCollection {
     private LinkedList<JobWithStaging> m_unallocatedJobs;
 
     /** constructor */
-    public JobCollectionImpl(Session session, JobCollectionDescription jcDesc, Evaluator evaluator) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+    public JobCollectionImpl(Session session, JobCollectionDescription jcDesc, Evaluator evaluator) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         super(session, jcDesc.getCollectionName());
         m_jobCollectionName = jcDesc.getCollectionName();
 
@@ -54,7 +53,7 @@ public class JobCollectionImpl extends WorkflowImpl implements JobCollection {
         if(!baseDir.exists()) baseDir.mkdir();
         baseDir = new File(baseDir, m_jobCollectionName);
         if(baseDir.exists()) {
-            throw new NoSuccess("Collection already exists: "+m_jobCollectionName+", please clean it up first.");
+            throw new NoSuccessException("Collection already exists: "+m_jobCollectionName+", please clean it up first.");
         } else {
             baseDir.mkdir();
         }
@@ -153,16 +152,16 @@ public class JobCollectionImpl extends WorkflowImpl implements JobCollection {
         }
     }
 
-    public void cleanup() throws NoSuccess {
+    public void cleanup() throws NoSuccessException {
         try {
             JobCollectionCleaner cleaner = new JobCollectionCleaner(m_session, m_jobCollectionName);
             cleaner.cleanup();
         } catch(Exception e) {
-            throw new NoSuccess("Failed to cleanup job collection: "+m_jobCollectionName, e);
+            throw new NoSuccessException("Failed to cleanup job collection: "+m_jobCollectionName, e);
         }
     }
 
-    public Task waitFor(float timeoutInSeconds, WaitMode mode) throws NotImplemented, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    public Task waitFor(float timeoutInSeconds, WaitMode mode) throws NotImplementedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         Task task = super.waitFor(timeoutInSeconds, mode);
         if (super.size() == 0) {
             this.saveStatesAsXML();
@@ -171,7 +170,7 @@ public class JobCollectionImpl extends WorkflowImpl implements JobCollection {
     }
 
     /** override super.getStatesAsXML() */
-    public synchronized Document getStatesAsXML() throws NotImplemented, Timeout, NoSuccess {
+    public synchronized Document getStatesAsXML() throws NotImplementedException, TimeoutException, NoSuccessException {
         Document status = super.getStatesAsXML();
         try {
             // save states to file
@@ -181,19 +180,19 @@ public class JobCollectionImpl extends WorkflowImpl implements JobCollection {
                     new StreamResult(out));
             out.close();
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         return status;
     }
 
-    public synchronized void saveStatesAsXML() throws NotImplemented, Timeout, NoSuccess {
+    public synchronized void saveStatesAsXML() throws NotImplementedException, TimeoutException, NoSuccessException {
         try {
             // save states to file
             OutputStream out = new FileOutputStream(statusFile(m_jobCollectionName));
             super.dumpStatesToWriter(new OutputStreamWriter(out));
             out.close();
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 

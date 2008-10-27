@@ -38,11 +38,11 @@ public interface SagaSecureAdaptor extends SagaBaseAdaptor {
      * @param attributes the provided attributes
      */
     public void connect(String userInfo, String host, int port, String basePath, Map attributes)
-        throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess;
+        throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException;
 
     /**
      * Disconnect from the server.
      */
     public void disconnect()
-        throws NoSuccess;
+        throws NoSuccessException;
 }

@@ -6,8 +6,8 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityAdaptor;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.IncorrectState;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.util.Map;
 
@@ -37,7 +37,7 @@ public class InMemoryProxySecurityAdaptorBuilder implements SecurityAdaptorBuild
 //        return new UAnd(new Usage[]{new UNoPrompt(Context.USERPROXY), new UFile(Context.CERTREPOSITORY)});
     }
 
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return null;
 /*
         EnvironmentVariables env = EnvironmentVariables.getInstance();
@@ -50,12 +50,12 @@ public class InMemoryProxySecurityAdaptorBuilder implements SecurityAdaptorBuild
 */
     }
 
-    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectState, NoSuccess {
+    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectStateException, NoSuccessException {
         String base64 = (String) attributes.get(Context.USERPROXY);
         if (base64 != null) {
             return new InMemoryProxySecurityAdaptor(base64);
         } else {
-            throw new NoSuccess("Attribute is null: "+Context.USERPROXY);
+            throw new NoSuccessException("Attribute is null: "+Context.USERPROXY);
         }
     }
 }

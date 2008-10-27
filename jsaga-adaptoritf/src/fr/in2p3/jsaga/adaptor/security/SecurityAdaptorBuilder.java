@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.adaptor.security;
 
 import fr.in2p3.jsaga.adaptor.base.SagaBaseAdaptor;
-import org.ogf.saga.error.IncorrectState;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.util.Map;
 
@@ -30,8 +30,8 @@ public interface SecurityAdaptorBuilder extends SagaBaseAdaptor {
      * @param attributes the provided attributes.
      * @param contextId the identifier of the context instance.
      * @return the security context instance.
-     * @throws IncorrectState if the attributes refer to a context that is not of expected type
-     * @throws NoSuccess if creating the adaptor failed
+     * @throws IncorrectStateException if the attributes refer to a context that is not of expected type
+     * @throws NoSuccessException if creating the adaptor failed
      */
-    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectState, NoSuccess;
+    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectStateException, NoSuccessException;
 }

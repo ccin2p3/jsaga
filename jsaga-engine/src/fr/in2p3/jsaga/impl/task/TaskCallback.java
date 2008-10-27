@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl.task;
 
+import org.ogf.saga.error.SagaException;
 import org.ogf.saga.task.State;
 
 /* ***************************************************
@@ -17,5 +18,5 @@ import org.ogf.saga.task.State;
 public interface TaskCallback<E> {
     public void setState(State state);
     public void setResult(E result);
-    public void setException(org.ogf.saga.error.Exception exception);
+    public void setException(SagaException exception);
 }

@@ -18,10 +18,10 @@ public interface Attribute extends Cloneable {
     public String getKey();
     public boolean isReadOnly();
 
-    public void setValue(String value) throws NotImplemented, IncorrectState, PermissionDenied;
-    public String getValue() throws NotImplemented, IncorrectState;
-    public void setValues(String[] values) throws NotImplemented, IncorrectState, PermissionDenied;
-    public String[] getValues() throws NotImplemented, IncorrectState;
+    public void setValue(String value) throws NotImplementedException, IncorrectStateException, PermissionDeniedException;
+    public String getValue() throws NotImplementedException, IncorrectStateException;
+    public void setValues(String[] values) throws NotImplementedException, IncorrectStateException, PermissionDeniedException;
+    public String[] getValues() throws NotImplementedException, IncorrectStateException;
 
     public boolean equals(Object o);
 }

@@ -14,8 +14,6 @@ import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
 import org.w3c.dom.Document;
 
-import java.lang.Exception;
-
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -35,27 +33,27 @@ public class JobWithStagingImpl extends LateBindedJobImpl implements JobWithStag
     private String m_wrapper;
 
     /** constructor for submission */
-    public JobWithStagingImpl(Session session, XJSDLJobDescriptionImpl jobDesc, JobHandle jobHandle, JobCollectionImpl workflow, DummyTask jobEnd) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public JobWithStagingImpl(Session session, XJSDLJobDescriptionImpl jobDesc, JobHandle jobHandle, JobCollectionImpl workflow, DummyTask jobEnd) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         super(session, jobDesc, jobHandle);
         m_workflow = workflow;
         m_jobEnd = jobEnd;
         try {
             m_startTask = (DummyTask) m_workflow.getTask(StartTask.NAME);
-        } catch (DoesNotExist e) {
-            throw new NoSuccess(e);
+        } catch (DoesNotExistException e) {
+            throw new NoSuccessException(e);
         }
     }
 
     //////////////////////////////////////// implementation of JobWithStaging //////////////////////////////////////
 
-    public String getWrapper() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public String getWrapper() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         return m_wrapper;
     }    
 
     ////////////////////////////////////// implementation of LateBindedJobImpl /////////////////////////////////////
 
     /** override super.transformJobDescription() */
-    protected XJSDLJobDescriptionImpl transformJobDescription(JobHandle jobHandle, XJSDLJobDescriptionImpl jobDesc, Resource rm) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    protected XJSDLJobDescriptionImpl transformJobDescription(JobHandle jobHandle, XJSDLJobDescriptionImpl jobDesc, Resource rm) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         // transform job description
         IndividualJobPreprocessor preprocessor = new IndividualJobPreprocessor(jobDesc, rm);
         Document effectiveJobDescDOM = preprocessor.getEffectiveJobDescription();
@@ -92,7 +90,7 @@ public class JobWithStagingImpl extends LateBindedJobImpl implements JobWithStag
                 try {
                     m_jobHandle.rethrow();
                     m_jobEnd.rethrow();
-                } catch (org.ogf.saga.error.Exception e) {
+                } catch (SagaException e) {
                     super.setException(e);
                 }
                 super.setState(jobEndState);
@@ -116,7 +114,7 @@ public class JobWithStagingImpl extends LateBindedJobImpl implements JobWithStag
     ////////////////////////////////////// implementation of AbstractTaskImpl //////////////////////////////////////
 
     /** override super.queryState() */
-    protected State queryState() throws NotImplemented, Timeout, NoSuccess {
+    protected State queryState() throws NotImplementedException, TimeoutException, NoSuccessException {
         State state = m_jobEnd.getState();
         switch(state) {
             case DONE:

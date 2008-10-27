@@ -2,8 +2,8 @@ package fr.in2p3.jsaga.jobcollection;
 
 import fr.in2p3.jsaga.engine.schema.jsdl.extension.ResourceSelection;
 import fr.in2p3.jsaga.workflow.Workflow;
+import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.url.URL;
-import org.ogf.saga.error.NoSuccess;
 
 import java.io.File;
 import java.io.InputStream;
@@ -26,5 +26,5 @@ public interface JobCollection extends Workflow {
     public void allocateResources(InputStream resourcesStream) throws Exception;
     public void allocateResources(URL[] resourceUrls) throws Exception;
     public void allocateResources(ResourceSelection resources) throws Exception;
-    public void cleanup() throws NoSuccess;
+    public void cleanup() throws NoSuccessException;
 }

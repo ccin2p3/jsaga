@@ -4,21 +4,29 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.ogf.saga.attributes.AsyncAttributes;
-import org.ogf.saga.error.AuthenticationFailed;
-import org.ogf.saga.error.AuthorizationFailed;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.DoesNotExist;
-import org.ogf.saga.error.IncorrectState;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
-import org.ogf.saga.error.PermissionDenied;
-import org.ogf.saga.error.Timeout;
+import org.ogf.saga.error.AuthenticationFailedException;
+import org.ogf.saga.error.AuthorizationFailedException;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.PermissionDeniedException;
+import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.permissions.Permissions;
 import org.ogf.saga.task.Async;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
 
-public interface Job extends Task<Object>, Async, AsyncAttributes, Permissions {
+/**
+ * Jobs are created by a {@link JobService}, using a {@link JobDescription}.
+ * The <code>Job</code> interface extends the
+ * {@link org.ogf.saga.task.Task Task} interface, but jobs don't have an
+ * associated Saga object or a result object, so the generic instantiation
+ * parameters are {@link java.lang.Void Void}.
+ */
+public interface Job extends Task<Void, Void>, Async, AsyncAttributes<Job>,
+        Permissions<Job> {
 
     // Required attributes:
 
@@ -28,8 +36,8 @@ public interface Job extends Task<Object>, Async, AsyncAttributes, Permissions {
     // Optional attributes:
 
     /**
-     * Attribute name, list of host names or IP addresses allocated to run
-     * this job.
+     * Attribute name, list of host names or IP addresses allocated to run this
+     * job.
      */
     public static final String EXECUTIONHOSTS = "ExecutionHosts";
 
@@ -81,181 +89,222 @@ public interface Job extends Task<Object>, Async, AsyncAttributes, Permissions {
     // Methods
 
     /**
-     * Retrieves the job description that was used to submit this job
-     * instance.
+     * Retrieves the job description that was used to submit this job instance.
+     * 
      * @return the job description
      */
-    public JobDescription getJobDescription()
-        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, DoesNotExist, Timeout, NoSuccess;
+    public JobDescription getJobDescription() throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, DoesNotExistException, TimeoutException,
+            NoSuccessException;
 
     /**
      * Returns the input stream of this job (to which can be written).
+     * 
      * @return the stream.
      */
-    public OutputStream getStdin()
-        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, BadParameter, DoesNotExist, Timeout,
-            IncorrectState, NoSuccess;
+    public OutputStream getStdin() throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            DoesNotExistException, TimeoutException, IncorrectStateException,
+            NoSuccessException;
 
     /**
      * Returns the output stream of this job (which can be read).
+     * 
      * @return the stream.
      */
-    public InputStream getStdout()
-        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, BadParameter, DoesNotExist, Timeout,
-            IncorrectState, NoSuccess;
+    public InputStream getStdout() throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            DoesNotExistException, TimeoutException, IncorrectStateException,
+            NoSuccessException;
 
     /**
      * Returns the error stream of this job (which can be read).
+     * 
      * @return the stream.
      */
-    public InputStream getStderr()
-        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, BadParameter, DoesNotExist, Timeout,
-            IncorrectState, NoSuccess;
+    public InputStream getStderr() throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            DoesNotExistException, TimeoutException, IncorrectStateException,
+            NoSuccessException;
 
     /**
-     * Asks the resource manager to perform a suspend operation on a
-     * running job.
+     * Asks the resource manager to perform a suspend operation on a running
+     * job.
      */
-    public void suspend()
-        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, IncorrectState, Timeout, NoSuccess;
+    public void suspend() throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, IncorrectStateException,
+            TimeoutException, NoSuccessException;
 
     /**
-     * Asks the resource manager to perform a resume operation on a
-     * suspended job.
+     * Asks the resource manager to perform a resume operation on a suspended
+     * job.
      */
-    public void resume()
-        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, IncorrectState, Timeout, NoSuccess;
+    public void resume() throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, IncorrectStateException,
+            TimeoutException, NoSuccessException;
 
     /**
-     * Asks the resource manager to initiate a checkpoint operation on a
-     * running job.
+     * Asks the resource manager to initiate a checkpoint operation on a running
+     * job.
      */
-    public void checkpoint()
-        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, IncorrectState, Timeout, NoSuccess;
+    public void checkpoint() throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, IncorrectStateException,
+            TimeoutException, NoSuccessException;
 
     /**
      * Asks the resource manager to migrate a job.
-     * @param jd new job parameters to apply when the job is migrated.
+     * 
+     * @param jd
+     *            new job parameters to apply when the job is migrated.
      */
-    public void migrate(JobDescription jd)
-        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess;
+    public void migrate(JobDescription jd) throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            IncorrectStateException, TimeoutException, NoSuccessException;
 
     /**
-     * Asks the resource manager to deliver an arbitrary signal to a
-     * dispatched job.
+     * Asks the resource manager to deliver an arbitrary signal to a dispatched
+     * job.
      */
-    public void signal(int signum)
-        throws NotImplemented, AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess;
+    public void signal(int signum) throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            IncorrectStateException, TimeoutException, NoSuccessException;
 
     //
     // Task versions ...
     //
 
     /**
-     * Creates a task that retrieves the job description that was used to
-     * submit this job instance.
-     * @param mode the task mode.
+     * Creates a task that retrieves the job description that was used to submit
+     * this job instance.
+     * 
+     * @param mode
+     *            the task mode.
      * @return the task.
-     * @exception NotImplemented is thrown when the task version of this
-     *     method is not implemented.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
      */
-    public Task<JobDescription> getJobDescription(TaskMode mode)
-        throws NotImplemented;
+    public Task<Job, JobDescription> getJobDescription(TaskMode mode)
+            throws NotImplementedException;
 
     /**
-     * Creates a task that obtains the input stream of this job (to which can
-     * be written).
-     * @param mode the task mode.
+     * Creates a task that obtains the input stream of this job (to which can be
+     * written).
+     * 
+     * @param mode
+     *            the task mode.
      * @return the task.
-     * @exception NotImplemented is thrown when the task version of this
-     *     method is not implemented.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
      */
-    public Task<OutputStream> getStdin(TaskMode mode)
-        throws NotImplemented;
+    public Task<Job, OutputStream> getStdin(TaskMode mode)
+            throws NotImplementedException;
 
     /**
-     * Creates a task that obtains the output stream of this job (which can
-     * be read).
-     * @param mode the task mode.
+     * Creates a task that obtains the output stream of this job (which can be
+     * read).
+     * 
+     * @param mode
+     *            the task mode.
      * @return the task.
-     * @exception NotImplemented is thrown when the task version of this
-     *     method is not implemented.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
      */
-    public Task<InputStream> getStdout(TaskMode mode)
-        throws NotImplemented;
+    public Task<Job, InputStream> getStdout(TaskMode mode)
+            throws NotImplementedException;
 
     /**
-     * Creates a task that obtains the error stream of this job (which can
-     * be read).
-     * @param mode the task mode.
+     * Creates a task that obtains the error stream of this job (which can be
+     * read).
+     * 
+     * @param mode
+     *            the task mode.
      * @return the task.
-     * @exception NotImplemented is thrown when the task version of this
-     *     method is not implemented.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
      */
-    public Task<InputStream> getStderr(TaskMode mode)
-        throws NotImplemented;
+    public Task<Job, InputStream> getStderr(TaskMode mode)
+            throws NotImplementedException;
 
     /**
      * Creates a task that asks the resource manager to perform a suspend
      * operation on a running job.
-     * @param mode the task mode.
+     * 
+     * @param mode
+     *            the task mode.
      * @return the task.
-     * @exception NotImplemented is thrown when the task version of this
-     *     method is not implemented.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
      */
-    public Task suspend(TaskMode mode)
-        throws NotImplemented;
+    public Task<Job, Void> suspend(TaskMode mode)
+            throws NotImplementedException;
 
     /**
      * Creates a task that asks the resource manager to perform a resume
      * operation on a suspended job.
-     * @param mode the task mode.
+     * 
+     * @param mode
+     *            the task mode.
      * @return the task.
-     * @exception NotImplemented is thrown when the task version of this
-     *     method is not implemented.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
      */
-    public Task resume(TaskMode mode)
-        throws NotImplemented;
+    public Task<Job, Void> resume(TaskMode mode) throws NotImplementedException;
 
     /**
      * Creates a task that asks the resource manager to initiate a checkpoint
      * operation on a running job.
-     * @param mode the task mode.
+     * 
+     * @param mode
+     *            the task mode.
      * @return the task.
-     * @exception NotImplemented is thrown when the task version of this
-     *     method is not implemented.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
      */
-    public Task checkpoint(TaskMode mode)
-        throws NotImplemented;
+    public Task<Job, Void> checkpoint(TaskMode mode)
+            throws NotImplementedException;
 
     /**
      * Creates a task that asks the resource manager to migrate a job.
-     * @param jd new job parameters to apply when the job is migrated.
-     * @param mode the task mode.
+     * 
+     * @param jd
+     *            new job parameters to apply when the job is migrated.
+     * @param mode
+     *            the task mode.
      * @return the task.
-     * @exception NotImplemented is thrown when the task version of this
-     *     method is not implemented.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
      */
-    public Task migrate(TaskMode mode, JobDescription jd)
-        throws NotImplemented;
+    public Task<Job, Void> migrate(TaskMode mode, JobDescription jd)
+            throws NotImplementedException;
 
     /**
      * Creates a task that asks the resource manager to deliver an arbitrary
      * signal to a dispatched job.
-     * @param mode the task mode.
+     * 
+     * @param mode
+     *            the task mode.
      * @return the task.
-     * @exception NotImplemented is thrown when the task version of this
-     *     method is not implemented.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
      */
-    public Task signal(TaskMode mode, int signum)
-        throws NotImplemented;
+    public Task<Job, Void> signal(TaskMode mode, int signum)
+            throws NotImplementedException;
 }

@@ -1,11 +1,11 @@
 package fr.in2p3.jsaga.impl.attributes;
 
 import fr.in2p3.jsaga.helpers.SAGAPattern;
+import fr.in2p3.jsaga.helpers.cloner.ObjectCloner;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.attributes.Attributes;
 import org.ogf.saga.error.*;
-import org.ogf.saga.error.Exception;
 import org.ogf.saga.session.Session;
 
 import java.util.*;
@@ -42,72 +42,72 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
     /** clone */
     public SagaObject clone() throws CloneNotSupportedException {
         AbstractAttributesImpl clone = (AbstractAttributesImpl) super.clone();
-        clone.m_attributes = clone(m_attributes);
+        clone.m_attributes = new ObjectCloner<String,Attribute>().cloneMap(m_attributes);
         clone.m_isExtensible = m_isExtensible;
         return clone;
     }
 
-    public void setAttribute(String key, String value) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void setAttribute(String key, String value) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         Attribute attribute = m_attributes.get(key);
         if (attribute != null) {
             attribute.setValue(value);
         } else if (m_isExtensible) {
             m_attributes.put(key, new AttributeScalar(key, value));
         } else {
-            throw new DoesNotExist("Attribute "+key+" does not exist", this);
+            throw new DoesNotExistException("Attribute "+key+" does not exist", this);
         }
     }
 
-    public String getAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    public String getAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         Attribute attribute = m_attributes.get(key);
         if (attribute != null) {
             return attribute.getValue();
         } else {
-            throw new DoesNotExist("Attribute "+key+" does not exist", this);
+            throw new DoesNotExistException("Attribute "+key+" does not exist", this);
         }
     }
 
-    public void setVectorAttribute(String key, String[] values) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void setVectorAttribute(String key, String[] values) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         Attribute attribute = m_attributes.get(key);
         if (attribute != null) {
             attribute.setValues(values);
         } else if (m_isExtensible) {
             m_attributes.put(key, new AttributeVector(key, values));
         } else {
-            throw new DoesNotExist("Attribute "+key+" does not exist", this);
+            throw new DoesNotExistException("Attribute "+key+" does not exist", this);
         }
     }
 
-    public String[] getVectorAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    public String[] getVectorAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         Attribute attribute = m_attributes.get(key);
         if (attribute != null) {
             return attribute.getValues();
         } else {
-            throw new DoesNotExist("Attribute "+key+" does not exist", this);
+            throw new DoesNotExistException("Attribute "+key+" does not exist", this);
         }
     }
 
-    public void removeAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public void removeAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (!m_isExtensible) {
-            throw new NoSuccess("Object does not support removing attributes", this);
+            throw new NoSuccessException("Object does not support removing attributes", this);
         }
         Attribute attribute = m_attributes.get(key);
         if (attribute != null) {
             if (!attribute.isReadOnly()) {
                 m_attributes.remove(key);
             } else {
-                throw new PermissionDenied("Attribute "+key+" not removable", this);
+                throw new PermissionDeniedException("Attribute "+key+" not removable", this);
             }
         } else {
-            throw new DoesNotExist("Attribute "+key+" does not exist", this);
+            throw new DoesNotExistException("Attribute "+key+" does not exist", this);
         }
     }
 
-    public String[] listAttributes() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
+    public String[] listAttributes() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
         return m_attributes.keySet().toArray(new String[m_attributes.keySet().size()]);
     }
 
-    public String[] findAttributes(String... patterns) throws NotImplemented, BadParameter, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
+    public String[] findAttributes(String... patterns) throws NotImplementedException, BadParameterException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
         List<String> foundKeys = new ArrayList<String>();
         for (Attribute attribute : m_attributes.values()) {
             if (matches(attribute, patterns)) {
@@ -117,7 +117,7 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
         return foundKeys.toArray(new String[foundKeys.size()]);
     }
     private static final Pattern PATTERN = Pattern.compile("([^=]*)(=(.*))?");
-    private static boolean matches(Attribute attribute, String... patterns) throws NotImplemented, NoSuccess {
+    private static boolean matches(Attribute attribute, String... patterns) throws NotImplementedException, NoSuccessException {
         for (String pattern : patterns) {
             Matcher matcher = PATTERN.matcher(pattern);
             if (matcher.matches()) {
@@ -136,8 +136,8 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
                                 if (valueRegexp.matcher(attribute.getValue()).matches()) {
                                     return true;    //found
                                 }
-                            } catch (IncorrectState e) {
-                                throw new NoSuccess(e);
+                            } catch (IncorrectStateException e) {
+                                throw new NoSuccessException(e);
                             }
                         }
                     }
@@ -147,39 +147,39 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
         return false;   //not found
     }
 
-    public boolean isReadOnlyAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isReadOnlyAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         Attribute attribute = m_attributes.get(key);
         if (attribute != null) {
             return attribute.isReadOnly();
         } else {
-            throw new DoesNotExist("Attribute "+key+" does not exist", this);
+            throw new DoesNotExistException("Attribute "+key+" does not exist", this);
         }
     }
 
-    public boolean isWritableAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isWritableAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         Attribute attribute = m_attributes.get(key);
         if (attribute != null) {
             return !attribute.isReadOnly();
         } else {
-            throw new DoesNotExist("Attribute "+key+" does not exist", this);
+            throw new DoesNotExistException("Attribute "+key+" does not exist", this);
         }
     }
 
-    public boolean isRemovableAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isRemovableAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         Attribute attribute = m_attributes.get(key);
         if (attribute != null) {
             return m_isExtensible;
         } else {
-            throw new DoesNotExist("Attribute "+key+" does not exist", this);
+            throw new DoesNotExistException("Attribute "+key+" does not exist", this);
         }
     }
 
-    public boolean isVectorAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isVectorAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         Attribute attribute = m_attributes.get(key);
         if (attribute != null) {
             return attribute instanceof AttributeVector;
         } else {
-            throw new DoesNotExist("Attribute "+key+" does not exist", this);
+            throw new DoesNotExistException("Attribute "+key+" does not exist", this);
         }
     }
 
@@ -203,7 +203,7 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
     public void _addReadOnlyAttribute(String key, String[] constantValues) {
         m_attributes.put(key, new AttributeVector(key, true, true, constantValues));
     }
-    protected Map _getAttributesMap() throws NotImplemented, IncorrectState {
+    protected Map _getAttributesMap() throws NotImplementedException, IncorrectStateException {
         Map<String,String> map = new HashMap<String,String>();
         for (Map.Entry<String, Attribute> entry : m_attributes.entrySet()) {
             String key = entry.getKey();
@@ -220,7 +220,7 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
     /**
      * To be used with fixed keys only
      */
-    protected String _getOptionalAttribute(String key) throws NotImplemented, IncorrectState {
+    protected String _getOptionalAttribute(String key) throws NotImplementedException, IncorrectStateException {
         Attribute attribute = m_attributes.get(key);
         if (attribute != null) {
             return attribute.getValue();
@@ -230,7 +230,7 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
     }
 
     /** For MetricImpl */
-    protected boolean _changeAttribute(String key, String value) throws NoSuccess {
+    protected boolean _changeAttribute(String key, String value) throws NoSuccessException {
         Attribute attribute = m_attributes.get(key);
         if (attribute != null) {
             try {
@@ -249,14 +249,14 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
                         return false;
                     }
                 }
-            } catch(Exception e) {
-                throw new NoSuccess(e);
+            } catch(SagaException e) {
+                throw new NoSuccessException(e);
             }
         } else if (m_isExtensible) {
             m_attributes.put(key, new AttributeScalar(key, value));
             return false;   //initial value must not be notified
         } else {
-            throw new NoSuccess("Attribute "+key+" does not exist", this);
+            throw new NoSuccessException("Attribute "+key+" does not exist", this);
         }
     }
 }

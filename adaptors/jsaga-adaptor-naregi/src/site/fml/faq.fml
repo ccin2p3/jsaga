@@ -4,7 +4,7 @@
         <title>NAREGI Super Scheduler</title>
         <faq id="post-install">
             <question>Job submission fails with this error message, what should I do ?
-                <pre>Exception in thread "main" org.ogf.saga.error.NoSuccess: NoSuccess: org.naregi.s
+                <pre>Exception in thread "main" org.ogf.saga.error.NoSuccessException: NoSuccess: org.naregi.s
 s.service.client.JobScheduleServiceException: Unable to get SS command location
 path.</pre>
             </question>

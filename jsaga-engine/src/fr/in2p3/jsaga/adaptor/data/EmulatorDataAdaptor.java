@@ -43,7 +43,7 @@ public class EmulatorDataAdaptor implements FileReaderStreamFactory, FileWriterS
         return null;
     }
 
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return null;
     }
 
@@ -55,69 +55,69 @@ public class EmulatorDataAdaptor implements FileReaderStreamFactory, FileWriterS
         // do nothing
     }
 
-    public BaseURL getBaseURL() throws IncorrectURL {
+    public BaseURL getBaseURL() throws IncorrectURLException {
         return new BaseURL(1234);
     }
 
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {
         m_server = new DataEmulatorConnection(this.getType(), host, port);
         if(Base.DEBUG) m_server.commit();
     }
 
-    public void disconnect() throws NoSuccess {
+    public void disconnect() throws NoSuccessException {
         m_server.commit();
     }
 
-    public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
+    public boolean exists(String absolutePath, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         try {
             m_server.getEntry(absolutePath);
             return true;
-        } catch (DoesNotExist e) {
+        } catch (DoesNotExistException e) {
             return false;
         }
     }
 
-    public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         File file = m_server.getFile(absolutePath);
         String content = file.getContent()!=null ? file.getContent() : "";
         return new ByteArrayInputStream(content.getBytes());
     }
 
-    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         DirectoryType parent;
         try {
             parent = m_server.getDirectory(parentAbsolutePath);
-        } catch (DoesNotExist e) {
+        } catch (DoesNotExistException e) {
             throw new ParentDoesNotExist("Parent directory does not exist");
         }
         File file;
         try {
             file = m_server.getFile(parent, fileName);
             if (exclusive) {
-                throw new AlreadyExists("File already exists");
+                throw new AlreadyExistsException("File already exists");
             } else if (append) {
                 // do nothing
             } else {
                 file.setContent(null);  //overwrite
             }
-        } catch(DoesNotExist e) {
+        } catch(DoesNotExistException e) {
             file = m_server.addFile(parent, fileName);
         }
         return new EmulatorOutputStream(m_server, file);
     }
 
-    public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         DirectoryType parent = m_server.getDirectory(parentAbsolutePath);
         m_server.removeFile(parent, fileName);
         if(Base.DEBUG) m_server.commit();
     }
 
-    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         EntryType entry = m_server.getEntry(absolutePath);
         return new EmulatorFileAttributes(entry);
     }
 
-    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         EntryType[] list = m_server.listEntries(absolutePath);
         FileAttributes[] ret = new FileAttributes[list.length];
         for (int i=0; i<list.length; i++) {
@@ -126,34 +126,34 @@ public class EmulatorDataAdaptor implements FileReaderStreamFactory, FileWriterS
         return ret;
     }
 
-    public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+    public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         DirectoryType parent;
         try {
             parent = m_server.getDirectory(parentAbsolutePath);
-        } catch (DoesNotExist e) {
+        } catch (DoesNotExistException e) {
             throw new ParentDoesNotExist("Parent directory does not exist");
         }
         try {
             m_server.getEntry(parent, directoryName);
-            throw new AlreadyExists("Entry already exists");
-        } catch(DoesNotExist e) {
+            throw new AlreadyExistsException("Entry already exists");
+        } catch(DoesNotExistException e) {
             m_server.addDirectory(parent, directoryName);
         }
         if(Base.DEBUG) m_server.commit();
     }
 
-    public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         DirectoryType parent = m_server.getDirectory(parentAbsolutePath);
         m_server.removeDirectory(parent, directoryName);
         if(Base.DEBUG) m_server.commit();
     }
 
-    public boolean isLink(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public boolean isLink(String absolutePath) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         EntryType entry = m_server.getEntry(absolutePath);
         return entry instanceof FileType && ((FileType)entry).getLink()!=null;
     }
 
-    public String readLink(String absolutePath) throws NotLink, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public String readLink(String absolutePath) throws NotLink, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         EntryType entry = m_server.getEntry(absolutePath);
         if (entry instanceof FileType && ((FileType)entry).getLink()!=null) {
             return ((FileType)entry).getLink();
@@ -162,14 +162,14 @@ public class EmulatorDataAdaptor implements FileReaderStreamFactory, FileWriterS
         }
     }
 
-    public void link(String sourceAbsolutePath, String linkAbsolutePath, boolean overwrite) throws PermissionDenied, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+    public void link(String sourceAbsolutePath, String linkAbsolutePath, boolean overwrite) throws PermissionDeniedException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException {
         File link;
         try {
             link = m_server.getFile(linkAbsolutePath);
             if (! overwrite) {
-                throw new AlreadyExists("Link already exists");
+                throw new AlreadyExistsException("Link already exists");
             }
-        } catch(DoesNotExist e) {
+        } catch(DoesNotExistException e) {
             link = m_server.addFile(linkAbsolutePath);
         }
         link.setLink(sourceAbsolutePath);
@@ -177,7 +177,7 @@ public class EmulatorDataAdaptor implements FileReaderStreamFactory, FileWriterS
 
     ///////////////////////////////////////// optional interfaces /////////////////////////////////////////
 
-    public FileAttributes[] listDirectories(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public FileAttributes[] listDirectories(String absolutePath) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         EntryType[] list = m_server.listDirectories(absolutePath);
         FileAttributes[] ret = new FileAttributes[list.length];
         for (int i=0; i<list.length; i++) {

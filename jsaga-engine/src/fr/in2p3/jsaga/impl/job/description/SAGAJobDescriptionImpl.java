@@ -9,7 +9,6 @@ import org.ogf.saga.job.JobDescription;
 import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.lang.Exception;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -49,20 +48,20 @@ public class SAGAJobDescriptionImpl extends AbstractJobDescriptionImpl implement
     }
 
     /** override super.setAttribute() */
-    public void setAttribute(String key, String value) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void setAttribute(String key, String value) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (s_adaptor.isProperty(key)) {
             Element attribute = this.createAttribute(key);
             attribute.setAttribute("value", value);
             super.setAttribute(key, value);
         } else if (s_adaptor.isVectoryProperty(key)) {
-            throw new IncorrectState("Attempt to set a vector attribute with method setAttribute: "+key);
+            throw new IncorrectStateException("Attempt to set a vector attribute with method setAttribute: "+key);
         } else {
-            throw new BadParameter("Unexpected attribute name: "+key);
+            throw new BadParameterException("Unexpected attribute name: "+key);
         }
     }
 
     /** override super.setVectorAttribute() */
-    public void setVectorAttribute(String key, String[] values) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void setVectorAttribute(String key, String[] values) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (s_adaptor.isVectoryProperty(key)) {
             Element vectorAttribute = this.createAttribute(key);
             for (int i=0; i<values.length; i++) {
@@ -72,26 +71,26 @@ public class SAGAJobDescriptionImpl extends AbstractJobDescriptionImpl implement
             }
             super.setVectorAttribute(key, values);
         } else if (s_adaptor.isProperty(key)) {
-            throw new IncorrectState("Attempt to set a scalar attribute with method setVectorAttribute: "+key);
+            throw new IncorrectStateException("Attempt to set a scalar attribute with method setVectorAttribute: "+key);
         } else {
-            throw new BadParameter("Unexpected attribute name: "+key);
+            throw new BadParameterException("Unexpected attribute name: "+key);
         }
     }
 
-    public Document getAsDocument() throws NoSuccess {
+    public Document getAsDocument() throws NoSuccessException {
         String stylesheet = s_adaptor.getTranslator();
         if (stylesheet == null) {
-            throw new NoSuccess("[INTERNAL ERROR] Stylesheet is null");
+            throw new NoSuccessException("[INTERNAL ERROR] Stylesheet is null");
         }
         try {
             XSLTransformer t = XSLTransformerFactory.getInstance().getCached(stylesheet);
             return t.transformToDOM(m_document);
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 
-    private Element createAttribute(String key) throws NoSuccess {
+    private Element createAttribute(String key) throws NoSuccessException {
         Element attribute;
         NodeList list = m_root.getElementsByTagName(key);
         switch(list.getLength()) {
@@ -104,7 +103,7 @@ public class SAGAJobDescriptionImpl extends AbstractJobDescriptionImpl implement
                 m_root.replaceChild(attribute, list.item(0));
                 return attribute;
             default:
-                throw new NoSuccess("[INTERNAL ERROR] Unexpected exception", this);
+                throw new NoSuccessException("[INTERNAL ERROR] Unexpected exception", this);
         }
     }
 }

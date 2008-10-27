@@ -2,8 +2,8 @@ package fr.in2p3.jsaga.adaptor.security.impl;
 
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -60,7 +60,7 @@ public class X509SecurityAdaptor  implements SecurityAdaptor {
         out.println("  not valid after \t: "+ DF.format(certificate.getNotAfter()));
         
 	}
-	public String getAttribute(String key) throws NotImplemented, NoSuccess {
+	public String getAttribute(String key) throws NotImplementedException, NoSuccessException {
 		if (Context.LIFETIME.equals(key)) {
 			long remainingTimeInMs = certificate.getNotAfter().getTime() - new Date().getTime();
 			if(String.valueOf(remainingTimeInMs).length() > 3)
@@ -71,22 +71,22 @@ public class X509SecurityAdaptor  implements SecurityAdaptor {
         	try {
 				return getUserID();
 			} catch (Exception e) {
-				throw new NoSuccess(e);
+				throw new NoSuccessException(e);
 			}
 		} else if(Context.USERKEY.equals(key)) {
         	try {
 				return privateKey.toString();
 			} catch (Exception e) {
-				throw new NoSuccess(e);
+				throw new NoSuccessException(e);
 			}
 		} else if(Context.USERCERT.equals(key)) {
         	try {
 				return certificate.toString();
 			} catch (Exception e) {
-				throw new NoSuccess(e);
+				throw new NoSuccessException(e);
 			}
 		} else {
-            throw new NotImplemented("Attribute not supported: "+key);
+            throw new NotImplementedException("Attribute not supported: "+key);
         }
 	}
 	

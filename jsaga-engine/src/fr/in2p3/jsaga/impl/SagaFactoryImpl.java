@@ -21,7 +21,7 @@ import fr.in2p3.jsaga.workflow.WorkflowFactory;
 import org.ogf.saga.bootstrap.SagaFactory;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.context.ContextFactory;
-import org.ogf.saga.error.NotImplemented;
+import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.file.FileFactory;
 import org.ogf.saga.job.JobFactory;
 import org.ogf.saga.logicalfile.LogicalFileFactory;
@@ -64,7 +64,7 @@ public class SagaFactoryImpl implements SagaFactory {
         m_evaluatorAdaptorFactory = new EvaluatorAdaptorFactory(config);
     }
 
-    public BufferFactory createBufferFactory() throws NotImplemented {
+    public BufferFactory createBufferFactory() throws NotImplementedException {
         return new BufferFactoryImpl();
     }
 
@@ -76,19 +76,19 @@ public class SagaFactoryImpl implements SagaFactory {
         return new FileFactoryImpl(m_dataAdaptorFactory);
     }
 
-    public JobFactory createJobFactory() throws NotImplemented {
+    public JobFactory createJobFactory() throws NotImplementedException {
         return new JobFactoryImpl(m_jobAdaptorFactory, m_jobMonitorAdaptorFactory);
     }
 
-    public LogicalFileFactory createLogicalFileFactory() throws NotImplemented {
+    public LogicalFileFactory createLogicalFileFactory() throws NotImplementedException {
         return new LogicalFileFactoryImpl(m_dataAdaptorFactory);
     }
 
-    public MonitoringFactory createMonitoringFactory() throws NotImplemented {
+    public MonitoringFactory createMonitoringFactory() throws NotImplementedException {
         return new MonitoringFactoryImpl();
     }
 
-    public NSFactory createNamespaceFactory() throws NotImplemented {
+    public NSFactory createNamespaceFactory() throws NotImplementedException {
         return new NSFactoryImpl(m_dataAdaptorFactory);
     }
 
@@ -100,23 +100,23 @@ public class SagaFactoryImpl implements SagaFactory {
         return new SessionFactoryImpl();
     }
 
-    public StreamFactory createStreamFactory() throws NotImplemented {
-        throw new NotImplemented("Not implemented by the SAGA engine");
+    public StreamFactory createStreamFactory() throws NotImplementedException {
+        throw new NotImplementedException("Not implemented by the SAGA engine");
     }
 
-    public TaskFactory createTaskFactory() throws NotImplemented {
+    public TaskFactory createTaskFactory() throws NotImplementedException {
         return new TaskFactoryImpl();
     }
 
-    public URLFactory createURLFactory() throws NotImplemented {
+    public URLFactory createURLFactory() throws NotImplementedException {
         return new URLFactoryImpl();
     }
 
-    public WorkflowFactory createWorkflowFactory() throws NotImplemented {
+    public WorkflowFactory createWorkflowFactory() throws NotImplementedException {
         return new WorkflowFactoryImpl();
     }
 
-    public JobCollectionFactory createJobCollectionFactory() throws NotImplemented {
+    public JobCollectionFactory createJobCollectionFactory() throws NotImplementedException {
         return new JobCollectionFactoryImpl(m_languageAdaptorFactory, m_evaluatorAdaptorFactory);
     }
 }

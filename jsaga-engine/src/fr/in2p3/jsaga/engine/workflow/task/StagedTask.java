@@ -18,7 +18,7 @@ import org.ogf.saga.error.*;
  */
 public class StagedTask extends DummyTask {
     /** constructor */
-    public StagedTask(String jobName, String dataStagingName, boolean input) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public StagedTask(String jobName, String dataStagingName, boolean input) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         super(name(jobName, dataStagingName, input));
         // update XML status
         Task xmlStatus = super.getStateAsXML();

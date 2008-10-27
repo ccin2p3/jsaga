@@ -2,8 +2,8 @@ package fr.in2p3.jsaga.impl.task;
 
 import junit.framework.TestCase;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.AuthorizationFailed;
-import org.ogf.saga.error.NotImplemented;
+import org.ogf.saga.error.AuthorizationFailedException;
+import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.monitoring.*;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
@@ -22,14 +22,14 @@ import org.ogf.saga.task.TaskMode;
  */
 public class GenericThreadedTaskTest extends TestCase implements Callback {
     public void test_sync() throws Exception {
-        Task<String> task = new AsyncTest().getHello(TaskMode.SYNC, "test");
+        Task<AsyncTest,String> task = new AsyncTest().getHello(TaskMode.SYNC, "test");
         assertEquals(
                 "Hello test !",
                 task.getResult());
     }
 
     public void test_task() throws Exception {
-        Task<String> task = new AsyncTest().getHello(TaskMode.TASK, "test");
+        Task<AsyncTest,String> task = new AsyncTest().getHello(TaskMode.TASK, "test");
         task.addCallback(Task.TASK_STATE, this);
         task.run();
         task.waitFor();
@@ -38,13 +38,13 @@ public class GenericThreadedTaskTest extends TestCase implements Callback {
                 task.getResult());
     }
 
-    public boolean cb(Monitorable mt, Metric metric, Context ctx) throws NotImplemented, AuthorizationFailed {
+    public boolean cb(Monitorable mt, Metric metric, Context ctx) throws NotImplementedException, AuthorizationFailedException {
         try {
             String name = metric.getAttribute(Metric.NAME);
             String value = metric.getAttribute(Metric.VALUE);
 //            System.out.println("  "+name+" = "+value);
         } catch (Exception e) {
-            throw new NotImplemented(e);
+            throw new NotImplementedException(e);
         }
         return true;
     }

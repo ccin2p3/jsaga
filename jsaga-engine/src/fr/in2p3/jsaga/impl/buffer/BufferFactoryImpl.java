@@ -17,15 +17,15 @@ import org.ogf.saga.error.*;
  *
  */
 public class BufferFactoryImpl extends BufferFactory {
-    protected Buffer doCreateBuffer(byte[] data) throws NotImplemented, BadParameter, NoSuccess {
+    protected Buffer doCreateBuffer(byte[] data) throws NotImplementedException, BadParameterException, NoSuccessException {
         return new ApplicationAllocatedBufferImpl(data);
     }
 
-    protected Buffer doCreateBuffer() throws NotImplemented, BadParameter, NoSuccess {
-        throw new NotImplemented("You must specify either the buffer or its size");
+    protected Buffer doCreateBuffer() throws NotImplementedException, BadParameterException, NoSuccessException {
+        throw new NotImplementedException("You must specify either the buffer or its size");
     }
 
-    protected Buffer doCreateBuffer(int size) throws NotImplemented, BadParameter, NoSuccess {
+    protected Buffer doCreateBuffer(int size) throws NotImplementedException, BadParameterException, NoSuccessException {
         return new ImplementationAllocatedBufferImpl(size);
     }
 }

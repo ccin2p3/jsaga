@@ -2,9 +2,9 @@ package fr.in2p3.jsaga.engine.config.bean;
 
 import fr.in2p3.jsaga.engine.config.*;
 import fr.in2p3.jsaga.engine.schema.config.*;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.url.URL;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -29,7 +29,7 @@ public class JobserviceEngineConfiguration extends ServiceEngineConfigurationAbs
         return m_execution;
     }
 
-    public JobService findJobService(URL url) throws NotImplemented, NoSuccess {
+    public JobService findJobService(URL url) throws NotImplementedException, NoSuccessException {
         if (url != null) {
             Execution execution = findExecution(url.getScheme());
             if (url.getFragment() != null) {
@@ -66,21 +66,21 @@ public class JobserviceEngineConfiguration extends ServiceEngineConfigurationAbs
                 }
             }
         } else {
-            throw new NoSuccess("URL is null");
+            throw new NoSuccessException("URL is null");
         }
     }
 
-    public Execution findExecution(String scheme) throws NoSuccess {
+    public Execution findExecution(String scheme) throws NoSuccessException {
         for (int j=0; j<m_execution.length; j++) {
             Execution job = m_execution[j];
             if (job.getScheme().equals(scheme)) {
                 return job;
             }
         }
-        throw new NoSuccess("No execution manager matches scheme: "+ scheme);
+        throw new NoSuccessException("No execution manager matches scheme: "+ scheme);
     }
 
-    private JobService findJobServiceByServiceRef(Execution execution, String serviceRef) throws NoSuccess {
+    private JobService findJobServiceByServiceRef(Execution execution, String serviceRef) throws NoSuccessException {
         for (int s=0; s<execution.getJobServiceCount(); s++) {
             JobService service = execution.getJobService(s);
             if (service.getName().equals(serviceRef)) {
@@ -90,7 +90,7 @@ public class JobserviceEngineConfiguration extends ServiceEngineConfigurationAbs
         return null;
     }
 
-    private JobService findJobServiceByContextRef(Execution execution, String contextRef) throws NoSuccess {
+    private JobService findJobServiceByContextRef(Execution execution, String contextRef) throws NoSuccessException {
         for (int s=0; s<execution.getJobServiceCount(); s++) {
             JobService service = execution.getJobService(s);
             if (service.getContextRef().equals(contextRef)) {

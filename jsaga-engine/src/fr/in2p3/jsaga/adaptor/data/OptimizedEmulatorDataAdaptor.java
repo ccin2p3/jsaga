@@ -12,7 +12,6 @@ import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.Serializable;
-import java.lang.Exception;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -31,7 +30,7 @@ public class OptimizedEmulatorDataAdaptor extends EmulatorDataAdaptor implements
         return "otest";
     }
 
-    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, ParentDoesNotExist, Timeout, NoSuccess {
+    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         File file = m_server.getFile(sourceAbsolutePath);
         DataEmulatorConnection targetServer = new DataEmulatorConnection(this.getType(), targetHost, targetPort);
 
@@ -39,11 +38,11 @@ public class OptimizedEmulatorDataAdaptor extends EmulatorDataAdaptor implements
         try {
             targetServer.getFile(targetAbsolutePath);
             if (!overwrite) {
-                throw new AlreadyExists("File already exist");
+                throw new AlreadyExistsException("File already exist");
             } else {
                 targetServer.removeFile(targetAbsolutePath);
             }
-        } catch(DoesNotExist e) {
+        } catch(DoesNotExistException e) {
             // do nothing
         }
 
@@ -55,14 +54,14 @@ public class OptimizedEmulatorDataAdaptor extends EmulatorDataAdaptor implements
         DirectoryType parent;
         try {
             parent = targetServer.getParentDirectory(targetAbsolutePath);
-        } catch (DoesNotExist e) {
+        } catch (DoesNotExistException e) {
             throw new ParentDoesNotExist("Parent directory does not exist");
         }
         parent.addFile(fileClone);
         if(Base.DEBUG) targetServer.commit();
     }
 
-    public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         DataEmulatorConnection sourceServer = new DataEmulatorConnection(this.getType(), sourceHost, sourcePort);
         File file = sourceServer.getFile(sourceAbsolutePath);
 
@@ -70,11 +69,11 @@ public class OptimizedEmulatorDataAdaptor extends EmulatorDataAdaptor implements
         try {
             m_server.getFile(targetAbsolutePath);
             if (!overwrite) {
-                throw new AlreadyExists("File already exist");
+                throw new AlreadyExistsException("File already exist");
             } else {
                 m_server.removeFile(targetAbsolutePath);
             }
-        } catch(DoesNotExist e) {
+        } catch(DoesNotExistException e) {
             // do nothing
         }
 
@@ -88,7 +87,7 @@ public class OptimizedEmulatorDataAdaptor extends EmulatorDataAdaptor implements
         if(Base.DEBUG) m_server.commit();
     }
 
-    public void rename(String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+    public void rename(String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException {
         // get parents and entry names
         DirectoryType sourceParent = m_server.getParentDirectory(sourceAbsolutePath);
         DirectoryType targetParent = m_server.getParentDirectory(targetAbsolutePath);
@@ -111,18 +110,18 @@ public class OptimizedEmulatorDataAdaptor extends EmulatorDataAdaptor implements
             targetParent.addFile(file);
             sourceParent.removeFile(file);
         } else {
-            throw new NoSuccess("[ADAPTOR ERROR] Unexpected entry type: "+entry.getClass().getName());
+            throw new NoSuccessException("[ADAPTOR ERROR] Unexpected entry type: "+entry.getClass().getName());
         }
         if(Base.DEBUG) m_server.commit();
     }
 
-    private static Serializable clone(Serializable bean) throws NoSuccess {
+    private static Serializable clone(Serializable bean) throws NoSuccessException {
         try {
             Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
             Marshaller.marshal(bean, doc);
             return (Serializable) Unmarshaller.unmarshal(bean.getClass(), doc);
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 }

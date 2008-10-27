@@ -2,9 +2,9 @@ package fr.in2p3.jsaga.engine.job.monitor;
 
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.engine.factories.JobMonitorAdaptorFactory;
-import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.url.URL;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +30,7 @@ public class JobMonitorServiceFactory {
         m_services = new HashMap<URL,JobMonitorService>();
     }
 
-    public JobMonitorService getJobMonitorService(URL controlURL, Session session) throws Timeout, PermissionDenied, NoSuccess, BadParameter, IncorrectURL, AuthorizationFailed, NotImplemented, AuthenticationFailed {
+    public JobMonitorService getJobMonitorService(URL controlURL, Session session) throws TimeoutException, PermissionDeniedException, NoSuccessException, BadParameterException, IncorrectURLException, AuthorizationFailedException, NotImplementedException, AuthenticationFailedException {
         URL monitorURL = m_adaptorFactory.getJobMonitorURL(controlURL);
         JobMonitorService service = m_services.get(monitorURL);
         if (service == null) {

@@ -23,28 +23,28 @@ import java.net.UnknownHostException;
  *
  */
 public class HttpDataAdaptorSocketBased extends HttpDataAdaptorAbstract implements FileReaderStreamFactory {
-    public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
+    public boolean exists(String absolutePath, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         try {
             this.getRequest(absolutePath, additionalArgs, HttpRequest.TYPE_HEAD);
             return true;
-        } catch (DoesNotExist e) {
+        } catch (DoesNotExistException e) {
             return false;
         }
     }
 
-    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         HttpRequest request = this.getRequest(absolutePath, additionalArgs, HttpRequest.TYPE_HEAD);
         return new HttpFileAttributesSockedBased(absolutePath, request);
     }
 
-    public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         HttpRequest request = this.getRequest(absolutePath, additionalArgs, HttpRequest.TYPE_GET);
         return new HttpInputStreamSocketBased(request);
     }
 
-    protected HttpRequest getRequest(String absolutePath, String additionalArgs, String requestType) throws PermissionDenied, DoesNotExist, NoSuccess {
+    protected HttpRequest getRequest(String absolutePath, String additionalArgs, String requestType) throws PermissionDeniedException, DoesNotExistException, NoSuccessException {
         if (m_baseUrl == null) {
-            throw new NoSuccess("Connection is closed");
+            throw new NoSuccessException("Connection is closed");
         }
 
         // get path
@@ -56,9 +56,9 @@ public class HttpDataAdaptorSocketBased extends HttpDataAdaptorAbstract implemen
             Socket socket = new Socket(m_baseUrl.getHost(), m_baseUrl.getPort());
             request = new HttpRequest(requestType, path, socket);
         } catch (UnknownHostException e) {
-            throw new DoesNotExist("Unknown host: "+m_baseUrl.getHost(), e);
+            throw new DoesNotExistException("Unknown host: "+m_baseUrl.getHost(), e);
         } catch (IOException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
 
         // check status
@@ -66,11 +66,11 @@ public class HttpDataAdaptorSocketBased extends HttpDataAdaptorAbstract implemen
         if (status.endsWith("200 OK")) {
             return request;
         } else if (status.endsWith("404 Not Found")) {
-            throw new DoesNotExist(status);
+            throw new DoesNotExistException(status);
         } else if (status.endsWith("403 Forbidden")) {
-            throw new PermissionDenied(status);
+            throw new PermissionDeniedException(status);
         } else {
-            throw new NoSuccess(status);
+            throw new NoSuccessException(status);
         }
     }
 }

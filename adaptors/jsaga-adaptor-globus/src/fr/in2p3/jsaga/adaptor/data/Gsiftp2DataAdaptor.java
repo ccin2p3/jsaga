@@ -37,12 +37,12 @@ public class Gsiftp2DataAdaptor extends GsiftpDataAdaptorAbstract {
         return new UOptional(PROTECTION);
     }
 
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return new Default[]{new Default(PROTECTION, "none")};
     }
 
     /** override super.connect() to set data channel protection level */
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         super.connect(userInfo, host, port, basePath, attributes);
         if (attributes!=null && attributes.containsKey(PROTECTION)) {
             String value = ((String) attributes.get(PROTECTION)).toLowerCase();
@@ -58,7 +58,7 @@ public class Gsiftp2DataAdaptor extends GsiftpDataAdaptorAbstract {
             } else if (value.equalsIgnoreCase("privacy")) {
                 protection = GridFTPSession.PROTECTION_PRIVATE;
             } else {
-                throw new BadParameter("Attribute '"+PROTECTION+"' has unexpected value: "+value);
+                throw new BadParameterException("Attribute '"+PROTECTION+"' has unexpected value: "+value);
             }
 
             // set protection level to data channel
@@ -66,15 +66,15 @@ public class Gsiftp2DataAdaptor extends GsiftpDataAdaptorAbstract {
                 m_client.setDataChannelProtection(protection);
                 m_client.setProtectionBufferSize(16384);
             } catch (IOException e) {
-                throw new NoSuccess(e);
+                throw new NoSuccessException(e);
             } catch (ServerException e) {
-                throw new NoSuccess(e);
+                throw new NoSuccessException(e);
             }
         }
     }
 
     /** override super.getAttributes() to use mlst command */
-    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         MlsxEntry entry;
         try {
             m_client.setPassiveMode(false);
@@ -82,15 +82,15 @@ public class Gsiftp2DataAdaptor extends GsiftpDataAdaptorAbstract {
         } catch (Exception e) {
             try {
                 throw rethrowException(e);
-            } catch (BadParameter badParameter) {
-                throw new NoSuccess("Unexpected exception", e);
+            } catch (BadParameterException badParameter) {
+                throw new NoSuccessException("Unexpected exception", e);
             }
         }
         return new Gsiftp2FileAttributes(entry);
     }
 
     /** override super.listAttributes() to use mlsd command */
-    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         Vector v;
         try {
             m_client.setMode(GridFTPSession.MODE_STREAM);
@@ -99,8 +99,8 @@ public class Gsiftp2DataAdaptor extends GsiftpDataAdaptorAbstract {
         } catch (Exception e) {
             try {
                 throw rethrowException(e);
-            } catch (BadParameter badParameter) {
-                throw new NoSuccess("Unexpected exception", e);
+            } catch (BadParameterException badParameter) {
+                throw new NoSuccessException("Unexpected exception", e);
             }
         }
         List files = new ArrayList();
@@ -108,23 +108,23 @@ public class Gsiftp2DataAdaptor extends GsiftpDataAdaptorAbstract {
             MlsxEntry entry = (MlsxEntry) v.get(i);
             try {
                 files.add(new Gsiftp2FileAttributes(entry));
-            } catch(DoesNotExist e) {
+            } catch(DoesNotExistException e) {
                 // ignore this entry: ., .. or null
             }
         }
         return (FileAttributes[]) files.toArray(new FileAttributes[files.size()]);
     }
 
-    protected void rethrowParsedException(UnexpectedReplyCodeException e) throws DoesNotExist, AlreadyExists, PermissionDenied, NoSuccess {
+    protected void rethrowParsedException(UnexpectedReplyCodeException e) throws DoesNotExistException, AlreadyExistsException, PermissionDeniedException, NoSuccessException {
         String message = e.getReply().getMessage();
         if (message.indexOf("No such") > -1) {
-            throw new DoesNotExist(e);
+            throw new DoesNotExistException(e);
         } else if (message.indexOf("exists") > -1) {
-            throw new AlreadyExists(e);
+            throw new AlreadyExistsException(e);
         } else if (message.indexOf("Permission denied") > -1) {
-            throw new PermissionDenied(e);
+            throw new PermissionDeniedException(e);
         } else {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 }

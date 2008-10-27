@@ -1,16 +1,15 @@
 package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.*;
-import org.ogf.saga.url.URL;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
-import org.ogf.saga.error.Exception;
 import org.ogf.saga.monitoring.*;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
 /* ***************************************************
@@ -41,8 +40,6 @@ public class NamespaceCopy extends AbstractCommand {
     public static void main(String[] args) throws Exception {
         NamespaceCopy command = new NamespaceCopy();
         CommandLine line = command.parse(args);
-
-        System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
         if (line.hasOption(OPT_HELP))
         {
             command.printHelpAndExit(null);
@@ -69,14 +66,14 @@ public class NamespaceCopy extends AbstractCommand {
                 try {
                     Metric metric = task.getMetric("file.copy.progress");
                     metric.addCallback(new Callback(){
-                        public boolean cb(Monitorable mt, Metric metric, Context ctx) throws NotImplemented, AuthorizationFailed {
+                        public boolean cb(Monitorable mt, Metric metric, Context ctx) throws NotImplementedException, AuthorizationFailedException {
                             try {
                                 String value = metric.getAttribute(Metric.VALUE);
                                 String unit = metric.getAttribute(Metric.UNIT);
                                 System.out.println("Progress: "+value+" "+unit);
                             }
-                            catch (NotImplemented e) {throw e;}
-                            catch (AuthorizationFailed e) {throw e;}
+                            catch (NotImplementedException e) {throw e;}
+                            catch (AuthorizationFailedException e) {throw e;}
                             catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -84,7 +81,7 @@ public class NamespaceCopy extends AbstractCommand {
                             return true;
                         }
                     });
-                } catch(DoesNotExist e) {
+                } catch(DoesNotExistException e) {
                     System.err.println("WARN: Monitoring is not supported for this kind of transfer");
                 }
                 task.run();

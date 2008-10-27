@@ -1,10 +1,10 @@
 package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.*;
-import org.ogf.saga.url.URL;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
 /* ***************************************************
@@ -35,7 +35,6 @@ public class NamespaceMove extends AbstractCommand {
     }
 
     public void execute(CommandLine line) throws Exception {
-        System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
         if (line.hasOption(OPT_HELP))
         {
             super.printHelpAndExit(null);

@@ -3,7 +3,7 @@ package fr.in2p3.jsaga.engine.factories;
 import fr.in2p3.jsaga.adaptor.language.LanguageAdaptor;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.config.adaptor.LanguageAdaptorDescriptor;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -29,21 +29,21 @@ public class LanguageAdaptorFactory {
      * @param language the name of the language
      * @return the language adaptor instance
      */
-    public LanguageAdaptor getLanguageAdaptor(String language) throws NoSuccess {
+    public LanguageAdaptor getLanguageAdaptor(String language) throws NoSuccessException {
         // create instance
         Class clazz = m_descriptor.getClass(language);
         LanguageAdaptor adaptor;
         try {
             adaptor = (LanguageAdaptor) clazz.newInstance();
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
 
         // initialize adaptor
         try {
             adaptor.initParser();
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         return adaptor;
     }

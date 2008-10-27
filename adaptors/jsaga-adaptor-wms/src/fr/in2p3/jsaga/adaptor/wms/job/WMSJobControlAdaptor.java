@@ -38,14 +38,14 @@ import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.util.GlobusURL;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.AuthenticationFailed;
-import org.ogf.saga.error.AuthorizationFailed;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.IncorrectState;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
-import org.ogf.saga.error.PermissionDenied;
-import org.ogf.saga.error.Timeout;
+import org.ogf.saga.error.AuthenticationFailedException;
+import org.ogf.saga.error.AuthorizationFailedException;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.PermissionDeniedException;
+import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.url.URL;
 
 import java.io.File;
@@ -97,7 +97,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         		new U(MONITOR_PORT)}); 
     }
     
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
     	EnvironmentVariables env = EnvironmentVariables.getInstance();
         return new Default[]{
         		new Default(MONITOR_PORT, "9000"),
@@ -124,7 +124,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         return new WMSJobMonitorAdaptor();
     }
 
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
 
     	m_wmsServerUrl = "https://"+host+":"+port+basePath;
     	if(attributes.containsKey(MONITOR_SERVICE_URL)) {
@@ -153,7 +153,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             out.close();
         }
         catch (IOException e){
-        	throw new AuthenticationFailed(e);        	
+        	throw new AuthenticationFailedException(e);
         }
         
         try  {
@@ -169,9 +169,9 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     	    		}
     	    		fos.close();
     			} catch (FileNotFoundException e) {
-    				throw new NoSuccess(e);
+    				throw new NoSuccessException(e);
     			} catch (IOException e) {
-    				throw new NoSuccess(e);
+    				throw new NoSuccessException(e);
     			}
         	} 
         	AxisProperties.setProperty(EngineConfigurationFactoryDefault.OPTION_CLIENT_CONFIG_FILE,clientConfigFile);
@@ -183,19 +183,19 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 	    	
         } catch (ServiceException e) {
         	disconnect();
-        	throw new NoSuccess(e);
+        	throw new NoSuccessException(e);
         } catch (ServiceURLException e) {
         	disconnect();
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (CredentialException e) {
 			disconnect();
-			throw new AuthenticationFailed(e);
+			throw new AuthenticationFailedException(e);
 		} catch (AuthenticationFaultException e) {
 			disconnect();
-			throw new AuthenticationFailed(e);
+			throw new AuthenticationFailedException(e);
 		} catch (AuthorizationFaultException e) {
 			disconnect();
-			throw new AuthenticationFailed(e);
+			throw new AuthenticationFailedException(e);
 		} 
 		
         // ping service
@@ -204,23 +204,23 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             	m_client.getVersion();
 			} catch (AuthenticationFaultException e) {
 				disconnect();
-				throw new AuthenticationFailed(e);
+				throw new AuthenticationFailedException(e);
 			} catch (ServiceException e) {
 				disconnect();
-				throw new NoSuccess(e);
+				throw new NoSuccessException(e);
 			}
         }
 
     }	
 
-	public void disconnect() throws NoSuccess {
+	public void disconnect() throws NoSuccessException {
         m_wmsServerUrl = null;
         m_credential = null;
         m_client = null;
     }
     
     public String submit(String jobDesc, boolean checkMatch) 
-    	throws PermissionDenied, Timeout, NoSuccess, BadResource {
+    	throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
     	try {
     		
     		//Add LB Address in JDL
@@ -235,22 +235,22 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             	logger.debug("Id for job:"+jobId);
 	    	return jobId;
     	} catch (ServiceException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (AuthorizationFaultException e) {
-			throw new PermissionDenied(e);
+			throw new PermissionDeniedException(e);
 		} catch (AuthenticationFaultException e) {
-			throw new PermissionDenied(e);
+			throw new PermissionDeniedException(e);
 		} catch (InvalidArgumentFaultException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (NoSuitableResourcesFaultException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
     }
     
 
 
 	public JobIOHandler submit(String jobDesc, boolean checkMatch,
-			InputStream stdin) throws PermissionDenied, Timeout, NoSuccess {
+			InputStream stdin) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		
 		try {
 			
@@ -289,7 +289,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 			    // upload input file to the sandbox associated to the registered job 
 				StringList list = m_client.getSandboxDestURI(jobId, "gsiftp");
 				if(list == null  || list.getItem() == null || list.getItem().length < 1) {
-					throw new NoSuccess("Unable to find a input sandbox uri to put stdin file");
+					throw new NoSuccessException("Unable to find a input sandbox uri to put stdin file");
 				}				
 				
 				try {
@@ -300,7 +300,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 		            test.put(stdinFile, "/"+to.getPath(), true);
 				}
 				catch(Exception e) {
-					throw new NoSuccess("Unable to upload stdin file to input sandbox",e);
+					throw new NoSuccessException("Unable to upload stdin file to input sandbox",e);
 				}
 				finally {
 					// clean stdin tmp file
@@ -322,21 +322,21 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             	logger.debug("Id for job:"+jobId);
 			return new WMSJobIOHandler(jobId, m_client, m_credential, stdoutFile.getAbsolutePath(), stderrFile.getAbsolutePath());
 		} catch (AuthorizationFaultException e) {
-			throw new PermissionDenied(e);
+			throw new PermissionDeniedException(e);
 		} catch (AuthenticationFaultException e) {
-			throw new PermissionDenied(e);
+			throw new PermissionDeniedException(e);
 		} catch(Exception e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
 	}
 
     private void checkJDLAndMAtch(String jobDesc, boolean checkMatch,
-			WMProxyAPI m_client2) throws NoSuccess, AuthorizationFaultException, AuthenticationFaultException, InvalidArgumentFaultException, NoSuitableResourcesFaultException, ServiceException {
+			WMProxyAPI m_client2) throws NoSuccessException, AuthorizationFaultException, AuthenticationFaultException, InvalidArgumentFaultException, NoSuitableResourcesFaultException, ServiceException {
 		// parse JDL
 		try {
 			AdParser.parseJdl(jobDesc);
 		} catch (JobAdException e) {
-			throw new NoSuccess("The job description is not valid", e);
+			throw new NoSuccessException("The job description is not valid", e);
 		}
 
 		if(checkMatch) {				
@@ -354,27 +354,27 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 
 	}
 
-	public void cancel(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess {
+	public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
     	try {
 	    	// cancel
 	    	m_client.jobCancel(nativeJobId);
     	} catch (ServiceException e) {
-    		throw new NoSuccess(e);
+    		throw new NoSuccessException(e);
 		} catch (AuthorizationFaultException e) {
-			throw new PermissionDenied(e);
+			throw new PermissionDeniedException(e);
 		} catch (AuthenticationFaultException e) {
-			throw new PermissionDenied(e);
+			throw new PermissionDeniedException(e);
 		} catch (OperationNotAllowedFaultException e) {
-			throw new PermissionDenied(e);
+			throw new PermissionDeniedException(e);
 		} catch (InvalidArgumentFaultException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (JobUnknownFaultException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
     }
 
-	public void clean(String nativeJobId) throws PermissionDenied, Timeout,
-			NoSuccess {
+	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException,
+            NoSuccessException {
         try  {
 	    	// purge
         	try {
@@ -398,7 +398,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 				// fixme: file not deleted!
 			}
         } catch (Exception e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
 	}
 }

@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.impl.job.instance;
 
 import fr.in2p3.jsaga.impl.permissions.AbstractJobPermissionsImpl;
-import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
+import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.Job;
 import org.ogf.saga.job.JobDescription;
@@ -11,7 +11,6 @@ import org.ogf.saga.task.TaskMode;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.Exception;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -27,115 +26,79 @@ import java.lang.Exception;
  */
 public abstract class AbstractAsyncJobImpl extends AbstractJobPermissionsImpl implements Job {
     /** constructor */
-    public AbstractAsyncJobImpl(Session session, boolean create) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public AbstractAsyncJobImpl(Session session, boolean create) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         super(session, create);
     }
 
-    public Task<JobDescription> getJobDescription(TaskMode mode) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    JobImpl.class.getMethod("getJobDescription", new Class[]{}),
-                    new Object[]{}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<Job, JobDescription> getJobDescription(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<Job,JobDescription>().create(
+                mode, m_session, this,
+                "getJobDescription",
+                new Class[]{},
+                new Object[]{});
     }
 
-    public Task<OutputStream> getStdin(TaskMode mode) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    JobImpl.class.getMethod("getStdin", new Class[]{}),
-                    new Object[]{}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<Job, OutputStream> getStdin(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<Job,OutputStream>().create(
+                mode, m_session, this,
+                "getStdin",
+                new Class[]{},
+                new Object[]{});
     }
 
-    public Task<InputStream> getStdout(TaskMode mode) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    JobImpl.class.getMethod("getStdout", new Class[]{}),
-                    new Object[]{}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<Job, InputStream> getStdout(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<Job,InputStream>().create(
+                mode, m_session, this,
+                "getStdout",
+                new Class[]{},
+                new Object[]{});
     }
 
-    public Task<InputStream> getStderr(TaskMode mode) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    JobImpl.class.getMethod("getStderr", new Class[]{}),
-                    new Object[]{}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<Job, InputStream> getStderr(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<Job,InputStream>().create(
+                mode, m_session, this,
+                "getStderr",
+                new Class[]{},
+                new Object[]{});
     }
 
-    public Task suspend(TaskMode mode) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    JobImpl.class.getMethod("suspend", new Class[]{}),
-                    new Object[]{}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<Job, Void> suspend(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<Job,Void>().create(
+                mode, m_session, this,
+                "suspend",
+                new Class[]{},
+                new Object[]{});
     }
 
-    public Task resume(TaskMode mode) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    JobImpl.class.getMethod("resume", new Class[]{}),
-                    new Object[]{}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<Job, Void> resume(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<Job,Void>().create(
+                mode, m_session, this,
+                "resume",
+                new Class[]{},
+                new Object[]{});
     }
 
-    public Task checkpoint(TaskMode mode) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    JobImpl.class.getMethod("checkpoint", new Class[]{}),
-                    new Object[]{}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<Job, Void> checkpoint(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<Job,Void>().create(
+                mode, m_session, this,
+                "checkpoint",
+                new Class[]{},
+                new Object[]{});
     }
 
-    public Task migrate(TaskMode mode, JobDescription jd) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    JobImpl.class.getMethod("migrate", new Class[]{JobDescription.class}),
-                    new Object[]{jd}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<Job, Void> migrate(TaskMode mode, JobDescription jd) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<Job,Void>().create(
+                mode, m_session, this,
+                "migrate",
+                new Class[]{JobDescription.class},
+                new Object[]{jd});
     }
 
-    public Task signal(TaskMode mode, int signum) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    JobImpl.class.getMethod("signal", new Class[]{int.class}),
-                    new Object[]{signum}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<Job, Void> signal(TaskMode mode, int signum) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<Job,Void>().create(
+                mode, m_session, this,
+                "signal",
+                new Class[]{int.class},
+                new Object[]{signum});
     }
 }

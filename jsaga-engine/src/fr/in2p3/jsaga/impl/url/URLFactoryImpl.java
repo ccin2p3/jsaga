@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.impl.url;
 
-import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
 /* ***************************************************
@@ -17,11 +17,15 @@ import org.ogf.saga.url.URLFactory;
  *
  */
 public class URLFactoryImpl extends URLFactory {
-    protected URL doCreateURL(String url) throws BadParameter, NoSuccess, NotImplemented {
+    protected URL doCreateURL(String url) throws BadParameterException, NoSuccessException, NotImplementedException {
         return new URLImpl(url, true);  // encode = true
     }
 
-    public static URL createUnencodedURL(String url) throws BadParameter {
+    public static URL createUnencodedURL(String url) throws BadParameterException {
         return new URLImpl(url, false); // encode = false
+    }
+
+    public static URL createRelativePath(String relativePath) throws BadParameterException {
+        return new URLImpl(relativePath);
     }
 }

@@ -2,7 +2,7 @@ package org.ogf.saga.logicalfile;
 
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
-import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.file.Directory;
 import org.ogf.saga.file.File;
 import org.ogf.saga.namespace.Flags;
@@ -49,8 +49,8 @@ public class LogicalFileWriteTest extends AbstractNSEntryWriteTest {
             // should throw an exception (does not exist)
             try {
                 ((LogicalFile)m_file).removeLocation(m_physicalFileUrl2);
-                fail("Expected DoesNotExist exception");
-            } catch(DoesNotExist e) {
+                fail("Expected exception: "+ DoesNotExistException.class);
+            } catch(DoesNotExistException e) {
                 assertEquals(
                         1,
                         ((LogicalFile)m_file).listLocations().size());

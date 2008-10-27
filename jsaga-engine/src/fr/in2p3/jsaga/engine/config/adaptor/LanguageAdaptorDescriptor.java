@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.engine.config.adaptor;
 
 import fr.in2p3.jsaga.adaptor.language.LanguageAdaptor;
 import fr.in2p3.jsaga.engine.schema.config.Language;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,12 +33,12 @@ public class LanguageAdaptorDescriptor {
         }
     }
 
-    public Class getClass(String language) throws NoSuccess {
+    public Class getClass(String language) throws NoSuccessException {
         Class clazz = (Class) m_classes.get(language);
         if (clazz != null) {
             return clazz;
         } else {
-            throw new NoSuccess("Found no language adaptor supporting language: "+ language);
+            throw new NoSuccessException("Found no language adaptor supporting language: "+ language);
         }
     }
 

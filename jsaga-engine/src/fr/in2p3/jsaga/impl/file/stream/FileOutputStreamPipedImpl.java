@@ -5,9 +5,9 @@ import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterPutter;
 import fr.in2p3.jsaga.impl.url.URLHelper;
 import org.ogf.saga.SagaObject;
-import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.url.URL;
 
 import java.io.IOException;
 
@@ -28,7 +28,7 @@ public class FileOutputStreamPipedImpl extends AbstractAsyncFileOutputStreamImpl
     private PipedOutputStreamImpl m_outStream;
 
     /** constructor */
-    FileOutputStreamPipedImpl(Session session, URL url, FileWriterPutter adaptor, boolean disconnectable, boolean append, boolean exclusive) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    FileOutputStreamPipedImpl(Session session, URL url, FileWriterPutter adaptor, boolean disconnectable, boolean append, boolean exclusive) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session);
 
         // save connection
@@ -38,15 +38,15 @@ public class FileOutputStreamPipedImpl extends AbstractAsyncFileOutputStreamImpl
         URL fileUrl = URLHelper.toFileURL(url);
         URL parent = URLHelper.getParentURL(fileUrl);
         if (exclusive && append) {
-            throw new BadParameter("Incompatible flags: EXCL and APPEND");
+            throw new BadParameterException("Incompatible flags: EXCL and APPEND");
         } else if (adaptor instanceof DataReaderAdaptor) {
             DataReaderAdaptor a = (DataReaderAdaptor) adaptor;
             if (exclusive && a.exists(fileUrl.getPath(), fileUrl.getQuery())) {
                 // need to check existence explicitely, else exception is never thrown
-                throw new AlreadyExists("File already exists: "+fileUrl);
+                throw new AlreadyExistsException("File already exists: "+fileUrl);
             } else if (!a.exists(parent.getPath(), parent.getQuery())) {
                 // need to check existence explicitely, else exception is thrown to late (when writing bytes)
-                throw new DoesNotExist("Parent directory does not exist: "+parent);
+                throw new DoesNotExistException("Parent directory does not exist: "+parent);
             }
         }
         m_outStream = new PipedOutputStreamImpl(
@@ -73,7 +73,7 @@ public class FileOutputStreamPipedImpl extends AbstractAsyncFileOutputStreamImpl
         if (m_connection != null) {
             try {
                 m_connection.disconnect();
-            } catch (NoSuccess e) {
+            } catch (NoSuccessException e) {
                 throw new IOException(e.getMessage());
             }
         }

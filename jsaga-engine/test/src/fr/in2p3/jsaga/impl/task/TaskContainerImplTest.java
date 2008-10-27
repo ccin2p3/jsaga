@@ -19,7 +19,7 @@ public class TaskContainerImplTest extends TestCase {
     public void test_sync() throws Exception {
         TaskContainer container = new TaskContainerImpl(null);
         int cookie1 = container.add(new AsyncTest().getHello(TaskMode.SYNC, "test1"));
-        Task<String> task1 = container.getTask(cookie1);
+        Task<?,?> task1 = container.getTask(cookie1);
         assertEquals(
                 "Hello test1 !",
                 task1.getResult());
@@ -29,7 +29,7 @@ public class TaskContainerImplTest extends TestCase {
         TaskContainer container = new TaskContainerImpl(null);
         container.add(new AsyncTest().getHello(TaskMode.TASK, "test1"));
         container.run();
-        Task<String> task1 = container.waitFor(WaitMode.ALL);
+        Task<?,?> task1 = container.waitFor(WaitMode.ALL);
         assertEquals(
                 "Hello test1 !",
                 task1.getResult());
@@ -39,7 +39,7 @@ public class TaskContainerImplTest extends TestCase {
         TaskContainer container = new TaskContainerImpl(null);
         container.add(new TaskForTesting(true));
         container.run();
-        Task<String> task1 = container.waitFor(WaitMode.ALL);
+        Task<?,?> task1 = container.waitFor(WaitMode.ALL);
         assertEquals(
                 "result",
                 task1.getResult());
@@ -49,7 +49,7 @@ public class TaskContainerImplTest extends TestCase {
         TaskContainer container = new TaskContainerImpl(null);
         container.add(new TaskForTesting(false));
         container.run();
-        Task<String> task1 = container.waitFor(WaitMode.ALL);
+        Task<?,?> task1 = container.waitFor(WaitMode.ALL);
         assertEquals(
                 "result",
                 task1.getResult());

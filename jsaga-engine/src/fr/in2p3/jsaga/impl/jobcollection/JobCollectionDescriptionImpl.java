@@ -3,9 +3,8 @@ package fr.in2p3.jsaga.impl.jobcollection;
 import fr.in2p3.jsaga.helpers.xpath.XJSDLXPathSelector;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import fr.in2p3.jsaga.jobcollection.JobCollectionDescription;
-import org.ogf.saga.ObjectType;
 import org.ogf.saga.SagaObject;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -26,12 +25,12 @@ public class JobCollectionDescriptionImpl extends AbstractSagaObjectImpl impleme
     private Document m_document;
 
     /** constructor */
-    public JobCollectionDescriptionImpl(Document jcDesc, String collectionName) throws NoSuccess {
+    public JobCollectionDescriptionImpl(Document jcDesc, String collectionName) throws NoSuccessException {
         super();
         XJSDLXPathSelector selector = new XJSDLXPathSelector(jcDesc);
         Element elem = (Element) selector.getNode("/ext:JobCollection/ext:JobCollectionDescription/ext:JobCollectionIdentification/ext:JobCollectionName");
         if (elem == null) {
-            throw new NoSuccess("Language adaptor must create a default JobCollectionName element");
+            throw new NoSuccessException("Language adaptor must create a default JobCollectionName element");
         }
         if (collectionName != null) {
             elem.setTextContent(collectionName);
@@ -48,10 +47,6 @@ public class JobCollectionDescriptionImpl extends AbstractSagaObjectImpl impleme
         clone.m_collectionName = m_collectionName;
         clone.m_document = m_document;
         return clone;
-    }
-
-    public ObjectType getType() {
-        return ObjectType.UNKNOWN;
     }
 
     public String getCollectionName() {

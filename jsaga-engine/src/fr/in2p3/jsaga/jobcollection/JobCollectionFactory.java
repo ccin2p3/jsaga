@@ -23,7 +23,7 @@ public abstract class JobCollectionFactory {
     private static JobCollectionFactory factory;
 
     private static synchronized void initializeFactory()
-        throws NotImplemented, NoSuccess {
+        throws NotImplementedException, NoSuccessException {
         if (factory == null) {
             factory = new SagaFactoryImpl().createJobCollectionFactory();
         }
@@ -36,7 +36,7 @@ public abstract class JobCollectionFactory {
      * @return the job collection description.
      */
     protected abstract JobCollectionDescription doCreateJobCollectionDescription(String language, InputStream jobDescStream)
-        throws NotImplemented, BadParameter, NoSuccess;
+        throws NotImplementedException, BadParameterException, NoSuccessException;
 
     /**
      * Creates a job collection description. To be provided by the implementation.
@@ -46,7 +46,7 @@ public abstract class JobCollectionFactory {
      * @return the job collection description.
      */
     protected abstract JobCollectionDescription doCreateJobCollectionDescription(String language, InputStream jobDescStream, String collectionName)
-        throws NotImplemented, BadParameter, NoSuccess;
+        throws NotImplementedException, BadParameterException, NoSuccessException;
 
     /**
      * Creates a job collection manager. To be provided by the implementation.
@@ -54,9 +54,9 @@ public abstract class JobCollectionFactory {
      * @return the job collection manager.
      */
     protected abstract JobCollectionManager doCreateJobCollectionManager(Session session)
-        throws NotImplemented, IncorrectURL,
-            AuthenticationFailed, AuthorizationFailed, PermissionDenied,
-            Timeout, NoSuccess;
+        throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException,
+            TimeoutException, NoSuccessException;
 
     /**
      * Creates a job collection description.
@@ -65,7 +65,7 @@ public abstract class JobCollectionFactory {
      * @return the job collection description.
      */
     public static JobCollectionDescription createJobCollectionDescription(String language, File jobDescFile)
-        throws NotImplemented, BadParameter, NoSuccess {
+        throws NotImplementedException, BadParameterException, NoSuccessException {
         initializeFactory();
         try {
             InputStream jobDescStream = new FileInputStream(jobDescFile);
@@ -73,7 +73,7 @@ public abstract class JobCollectionFactory {
             jobDescStream.close();
             return jobDesc;
         } catch (IOException e) {
-            throw new NoSuccess("Failed to load job collection description: "+jobDescFile.getPath(), e);
+            throw new NoSuccessException("Failed to load job collection description: "+jobDescFile.getPath(), e);
         }
     }
 
@@ -85,7 +85,7 @@ public abstract class JobCollectionFactory {
      * @return the job collection description.
      */
     public static JobCollectionDescription createJobCollectionDescription(String language, File jobDescFile, String collectionName)
-        throws NotImplemented, BadParameter, NoSuccess {
+        throws NotImplementedException, BadParameterException, NoSuccessException {
         initializeFactory();
         try {
             InputStream jobDescStream = new FileInputStream(jobDescFile);
@@ -93,7 +93,7 @@ public abstract class JobCollectionFactory {
             jobDescStream.close();
             return jobDesc;
         } catch (IOException e) {
-            throw new NoSuccess("Failed to load job collection description: "+jobDescFile.getPath(), e);
+            throw new NoSuccessException("Failed to load job collection description: "+jobDescFile.getPath(), e);
         }
     }
 
@@ -104,7 +104,7 @@ public abstract class JobCollectionFactory {
      * @return the job collection description.
      */
     public static JobCollectionDescription createJobCollectionDescription(String language, InputStream jobDescStream)
-        throws NotImplemented, BadParameter, NoSuccess {
+        throws NotImplementedException, BadParameterException, NoSuccessException {
         initializeFactory();
         return factory.doCreateJobCollectionDescription(language, jobDescStream);
     }
@@ -117,7 +117,7 @@ public abstract class JobCollectionFactory {
      * @return the job collection description.
      */
     public static JobCollectionDescription createJobCollectionDescription(String language, InputStream jobDescStream, String collectionName)
-        throws NotImplemented, BadParameter, NoSuccess {
+        throws NotImplementedException, BadParameterException, NoSuccessException {
         initializeFactory();
         return factory.doCreateJobCollectionDescription(language, jobDescStream, collectionName);
     }
@@ -128,9 +128,9 @@ public abstract class JobCollectionFactory {
      * @return the job collection manager.
      */
     public static JobCollectionManager createJobCollectionManager(Session session)
-        throws NotImplemented, IncorrectURL,
-            AuthenticationFailed, AuthorizationFailed, PermissionDenied,
-            Timeout, NoSuccess {
+        throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException,
+            TimeoutException, NoSuccessException {
         initializeFactory();
         return factory.doCreateJobCollectionManager(session);
     }

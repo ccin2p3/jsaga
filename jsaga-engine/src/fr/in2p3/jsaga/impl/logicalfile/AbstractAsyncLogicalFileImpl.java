@@ -3,16 +3,15 @@ package fr.in2p3.jsaga.impl.logicalfile;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSDirectoryImpl;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
-import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
-import org.ogf.saga.url.URL;
+import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
 import org.ogf.saga.error.*;
 import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
+import org.ogf.saga.url.URL;
 
-import java.lang.Exception;
 import java.util.List;
 
 /* ***************************************************
@@ -29,80 +28,60 @@ import java.util.List;
  */
 public abstract class AbstractAsyncLogicalFileImpl extends AbstractNSEntryImplWithMetaData implements LogicalFile {
     /** constructor for factory */
-    public AbstractAsyncLogicalFileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    protected AbstractAsyncLogicalFileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session, url, adaptor, flags);
     }
 
     /** constructor for NSDirectory.open() */
-    public AbstractAsyncLogicalFileImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    protected AbstractAsyncLogicalFileImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(dir, relativeUrl, flags);
     }
 
     /** constructor for NSEntry.openAbsolute() */
-    public AbstractAsyncLogicalFileImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    protected AbstractAsyncLogicalFileImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(entry, absolutePath, flags);
     }
 
-    public Task addLocation(TaskMode mode, URL name) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    LogicalFileImpl.class.getMethod("addLocation", new Class[]{URL.class}),
-                    new Object[]{name}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<LogicalFile, Void> addLocation(TaskMode mode, URL name) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<LogicalFile,Void>().create(
+                mode, m_session, this,
+                "addLocation",
+                new Class[]{URL.class},
+                new Object[]{name});
     }
 
-    public Task removeLocation(TaskMode mode, URL name) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    LogicalFileImpl.class.getMethod("removeLocation", new Class[]{URL.class}),
-                    new Object[]{name}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<LogicalFile, Void> removeLocation(TaskMode mode, URL name) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<LogicalFile,Void>().create(
+                mode, m_session, this,
+                "removeLocation",
+                new Class[]{URL.class},
+                new Object[]{name});
     }
 
-    public Task updateLocation(TaskMode mode, URL nameOld, URL nameNew) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    LogicalFileImpl.class.getMethod("updateLocation", new Class[]{URL.class, URL.class}),
-                    new Object[]{nameOld, nameNew}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<LogicalFile, Void> updateLocation(TaskMode mode, URL nameOld, URL nameNew) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<LogicalFile,Void>().create(
+                mode, m_session, this,
+                "updateLocation",
+                new Class[]{URL.class, URL.class},
+                new Object[]{nameOld, nameNew});
     }
 
-    public Task<List<URL>> listLocations(TaskMode mode) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    LogicalFileImpl.class.getMethod("listLocations", new Class[]{}),
-                    new Object[]{}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<LogicalFile, List<URL>> listLocations(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<LogicalFile,List<URL>>().create(
+                mode, m_session, this,
+                "listLocations",
+                new Class[]{},
+                new Object[]{});
     }
 
-    public Task replicate(TaskMode mode, URL name, int flags) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    LogicalFileImpl.class.getMethod("replicate", new Class[]{URL.class, int.class}),
-                    new Object[]{name, flags}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<LogicalFile, Void> replicate(TaskMode mode, URL name, int flags) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<LogicalFile,Void>().create(
+                mode, m_session, this,
+                "replicate",
+                new Class[]{URL.class, int.class},
+                new Object[]{name, flags});
     }
-    public Task replicate(TaskMode mode, URL name) throws NotImplemented {
+    public Task<LogicalFile, Void> replicate(TaskMode mode, URL name) throws NotImplementedException {
         return this.replicate(mode, name, Flags.NONE.getValue());
     }
 }

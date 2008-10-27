@@ -1,9 +1,9 @@
 package org.ogf.saga.logicalfile;
 
-import org.ogf.saga.url.URL;
-import org.ogf.saga.url.URLFactory;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.abstracts.AbstractNSDirectoryListTest;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 
 import java.util.List;
 

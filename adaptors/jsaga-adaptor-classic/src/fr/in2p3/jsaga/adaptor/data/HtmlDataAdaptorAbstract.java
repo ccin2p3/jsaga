@@ -28,27 +28,27 @@ import java.util.Map;
 public abstract class HtmlDataAdaptorAbstract implements FileReaderStreamFactory {
     protected URL m_baseUrl;
 
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         // set base URL
         try {
             m_baseUrl = new URL(this.getType(), host, port, "/");
         } catch (MalformedURLException e) {
-            throw new BadParameter(e);
+            throw new BadParameterException(e);
         }
     }
 
-    public void disconnect() throws NoSuccess {
+    public void disconnect() throws NoSuccessException {
         // unset base URL
         m_baseUrl = null;
     }
 
-    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         try {
             // get web page
             InputStream rawStream = this.getInputStream(absolutePath, additionalArgs);
             String raw = toString(rawStream);
             if (raw.contains("403 Forbidden")) {
-                throw new PermissionDenied("Not allowed to list this directory");
+                throw new PermissionDeniedException("Not allowed to list this directory");
             }
 
             // convert to XML
@@ -70,11 +70,11 @@ public abstract class HtmlDataAdaptorAbstract implements FileReaderStreamFactory
             }
             return list;
         } catch (SAXParseException e) {
-            throw new PermissionDenied(e);
-        } catch (BadParameter e) {
-            throw new NoSuccess(e);
+            throw new PermissionDeniedException(e);
+        } catch (BadParameterException e) {
+            throw new NoSuccessException(e);
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
     private String toString(InputStream in) throws IOException {

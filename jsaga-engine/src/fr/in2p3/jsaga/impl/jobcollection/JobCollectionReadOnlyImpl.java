@@ -3,14 +3,13 @@ package fr.in2p3.jsaga.impl.jobcollection;
 import fr.in2p3.jsaga.engine.schema.jsdl.extension.ResourceSelection;
 import fr.in2p3.jsaga.engine.workflow.WorkflowImpl;
 import fr.in2p3.jsaga.jobcollection.JobCollection;
-import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
+import org.ogf.saga.url.URL;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.InputStream;
-import java.lang.Exception;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -28,7 +27,7 @@ public class JobCollectionReadOnlyImpl extends WorkflowImpl implements JobCollec
     private String m_jobCollectionName;
 
     /** constructor */
-    public JobCollectionReadOnlyImpl(String collectionName) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public JobCollectionReadOnlyImpl(String collectionName) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         super(null, collectionName);
         m_jobCollectionName = collectionName;
     }
@@ -38,32 +37,32 @@ public class JobCollectionReadOnlyImpl extends WorkflowImpl implements JobCollec
     }
 
     public void allocateResources(File resourcesFile) throws Exception {
-        throw new NotImplemented("Not implemented yet...");
+        throw new NotImplementedException("Not implemented yet...");
     }
 
     public void allocateResources(InputStream resourcesStream) throws Exception {
-        throw new NotImplemented("Not implemented yet...");
+        throw new NotImplementedException("Not implemented yet...");
     }
 
     public void allocateResources(URL[] resourceUrls) throws Exception {
-        throw new NotImplemented("Not implemented yet...");
+        throw new NotImplementedException("Not implemented yet...");
     }
 
     public void allocateResources(ResourceSelection resources) throws Exception {
-        throw new NotImplemented("Not implemented yet...");
+        throw new NotImplementedException("Not implemented yet...");
     }
 
-    public void cleanup() throws NoSuccess {
+    public void cleanup() throws NoSuccessException {
         try {
             JobCollectionCleaner cleaner = new JobCollectionCleaner(m_session, m_jobCollectionName);
             cleaner.cleanup();
         } catch(Exception e) {
-            throw new NoSuccess("Failed to cleanup job collection: "+m_jobCollectionName, e);
+            throw new NoSuccessException("Failed to cleanup job collection: "+m_jobCollectionName, e);
         }
     }
 
     /** override super.getStatesAsXML() */
-    public Document getStatesAsXML() throws NotImplemented, Timeout, NoSuccess {
+    public Document getStatesAsXML() throws NotImplementedException, TimeoutException, NoSuccessException {
         File statusFile = JobCollectionImpl.statusFile(m_jobCollectionName);
         if (statusFile.exists()) {
             try {
@@ -71,10 +70,10 @@ public class JobCollectionReadOnlyImpl extends WorkflowImpl implements JobCollec
                 factory.setNamespaceAware(true);
                 return factory.newDocumentBuilder().parse(statusFile);
             } catch (Exception e) {
-                throw new NoSuccess(e);
+                throw new NoSuccessException(e);
             }
         } else {
-            throw new NoSuccess("Status not found for job collection: "+m_jobCollectionName+". Please check if this collection exists.");
+            throw new NoSuccessException("Status not found for job collection: "+m_jobCollectionName+". Please check if this collection exists.");
         }
     }
 }

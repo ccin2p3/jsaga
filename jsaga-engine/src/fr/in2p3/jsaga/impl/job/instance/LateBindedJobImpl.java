@@ -5,8 +5,6 @@ import fr.in2p3.jsaga.engine.schema.jsdl.extension.Resource;
 import fr.in2p3.jsaga.impl.job.description.XJSDLJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.monitoring.MetricImpl;
 import fr.in2p3.jsaga.jobcollection.LateBindedJob;
-import org.ogf.saga.url.URL;
-import org.ogf.saga.url.URLFactory;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
@@ -14,6 +12,8 @@ import org.ogf.saga.monitoring.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
 import org.ogf.saga.task.Task;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -36,7 +36,7 @@ public class LateBindedJobImpl extends AbstractAsyncJobImpl implements LateBinde
     private URL m_resourceManager;
 
     /** constructor for JobWithStagingImpl */
-    protected LateBindedJobImpl(Session session, XJSDLJobDescriptionImpl jobDesc, JobHandle jobHandle) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    protected LateBindedJobImpl(Session session, XJSDLJobDescriptionImpl jobDesc, JobHandle jobHandle) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         super(session, true);
         m_jobHandle = jobHandle;
         m_jobDesc = jobDesc;
@@ -44,7 +44,7 @@ public class LateBindedJobImpl extends AbstractAsyncJobImpl implements LateBinde
     }
 
     /** constructor for submission */
-    public LateBindedJobImpl(Session session, XJSDLJobDescriptionImpl jobDesc) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public LateBindedJobImpl(Session session, XJSDLJobDescriptionImpl jobDesc) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         super(session, true);
         m_jobHandle = new JobHandle(session);
         m_jobDesc = jobDesc;
@@ -52,7 +52,7 @@ public class LateBindedJobImpl extends AbstractAsyncJobImpl implements LateBinde
     }
 
     /** constructor for control and monitoring only */
-    public LateBindedJobImpl(Session session, URL rm, String nativeJobId) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public LateBindedJobImpl(Session session, URL rm, String nativeJobId) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session, false);
         m_jobHandle = new JobHandle(session, rm, nativeJobId);
         m_jobDesc = (XJSDLJobDescriptionImpl) m_jobHandle.getJobDescription();
@@ -61,7 +61,7 @@ public class LateBindedJobImpl extends AbstractAsyncJobImpl implements LateBinde
 
     /////////////////////////////////////// implementation of LateBindedJob ////////////////////////////////////////
 
-    public void allocate(Resource rm) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    public void allocate(Resource rm) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         // find grid name and allocate resource
         m_resourceManager = URLFactory.createURL(rm.getId());
         if (rm.getGrid() == null) {
@@ -80,28 +80,28 @@ public class LateBindedJobImpl extends AbstractAsyncJobImpl implements LateBinde
     protected boolean isAllocated() {
         return (m_resourceManager != null);
     }
-    protected XJSDLJobDescriptionImpl transformJobDescription(JobHandle jobHandle, XJSDLJobDescriptionImpl jobDesc, Resource rm) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    protected XJSDLJobDescriptionImpl transformJobDescription(JobHandle jobHandle, XJSDLJobDescriptionImpl jobDesc, Resource rm) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         return jobDesc;     // default implementation does nothing
     }
 
     ////////////////////////////////////// implementation of AbstractTaskImpl //////////////////////////////////////
 
-    protected void doSubmit() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    protected void doSubmit() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         m_jobHandle.doSubmit();
     }
     protected void doCancel() {
         m_jobHandle.doCancel();
         this.setState(State.CANCELED);
     }
-    protected State queryState() throws NotImplemented, Timeout, NoSuccess {
+    protected State queryState() throws NotImplementedException, TimeoutException, NoSuccessException {
         return m_jobHandle.queryState();
     }
 
     private int m_cookie;    
-    public boolean startListening() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public boolean startListening() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         try {
             m_cookie = m_jobHandle.addCallback(Task.TASK_STATE, new Callback(){
-                public boolean cb(Monitorable mt, Metric metric, Context ctx) throws NotImplemented, AuthorizationFailed {
+                public boolean cb(Monitorable mt, Metric metric, Context ctx) throws NotImplementedException, AuthorizationFailedException {
                     State state = ((MetricImpl<State>) metric).getValue();
                     LateBindedJobImpl.this.setState(state);
                     switch(state) {
@@ -115,51 +115,51 @@ public class LateBindedJobImpl extends AbstractAsyncJobImpl implements LateBinde
                 }
             });
         }
-        catch (AuthenticationFailed e) {throw new NoSuccess(e);}
-        catch (AuthorizationFailed e) {throw new NoSuccess(e);}
-        catch (PermissionDenied e) {throw new NoSuccess(e);}
-        catch (DoesNotExist e) {throw new NoSuccess(e);}
+        catch (AuthenticationFailedException e) {throw new NoSuccessException(e);}
+        catch (AuthorizationFailedException e) {throw new NoSuccessException(e);}
+        catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
+        catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         return true;
     }
 
-    public void stopListening() throws NotImplemented, Timeout, NoSuccess {
+    public void stopListening() throws NotImplementedException, TimeoutException, NoSuccessException {
         try {
             m_jobHandle.removeCallback(Task.TASK_STATE, m_cookie);
         }
-        catch (DoesNotExist e) {throw new NoSuccess(e);}
-        catch (BadParameter e) {throw new NoSuccess(e);}
-        catch (AuthenticationFailed e) {throw new NoSuccess(e);}
-        catch (AuthorizationFailed e) {throw new NoSuccess(e);}
-        catch (PermissionDenied e) {throw new NoSuccess(e);}
+        catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+        catch (BadParameterException e) {throw new NoSuccessException(e);}
+        catch (AuthenticationFailedException e) {throw new NoSuccessException(e);}
+        catch (AuthorizationFailedException e) {throw new NoSuccessException(e);}
+        catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
     }
 
     ////////////////////////////////////// implementation of Job //////////////////////////////////////
 
-    public JobDescription getJobDescription() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public JobDescription getJobDescription() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         return m_jobDesc;
     }
-    public OutputStream getStdin() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, IncorrectState, NoSuccess {
+    public OutputStream getStdin() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         return m_jobHandle.getStdin();
     }
-    public InputStream getStdout() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, IncorrectState, NoSuccess {
+    public InputStream getStdout() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         return m_jobHandle.getStdout();
     }
-    public InputStream getStderr() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, IncorrectState, NoSuccess {
+    public InputStream getStderr() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         return m_jobHandle.getStderr();
     }
-    public void suspend() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public void suspend() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         m_jobHandle.suspend();
     }
-    public void resume() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public void resume() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         m_jobHandle.resume();
     }
-    public void checkpoint() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public void checkpoint() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         m_jobHandle.checkpoint();
     }
-    public void migrate(JobDescription jd) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    public void migrate(JobDescription jd) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         m_jobHandle.migrate(jd);
     }
-    public void signal(int signum) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    public void signal(int signum) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         m_jobHandle.signal(signum);
     }
 }

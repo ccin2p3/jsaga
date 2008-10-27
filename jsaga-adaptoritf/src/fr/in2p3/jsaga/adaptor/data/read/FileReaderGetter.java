@@ -22,9 +22,9 @@ public interface FileReaderGetter extends FileReader {
      * @param absolutePath the path of the file to get.
      * @param stream the output stream.
      * @param additionalArgs adaptor specific arguments
-     * @throws BadParameter if <code>absolutePath</code> is not a file.
-     * @throws DoesNotExist if <code>absolutePath</code> does not exist.
+     * @throws BadParameterException if <code>absolutePath</code> is not a file.
+     * @throws DoesNotExistException if <code>absolutePath</code> does not exist.
      */
     public void getToStream(String absolutePath, String additionalArgs, OutputStream stream)
-        throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess;
+        throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException;
 }

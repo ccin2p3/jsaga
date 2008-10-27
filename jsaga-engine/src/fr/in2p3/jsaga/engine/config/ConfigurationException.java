@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.engine.config;
 
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -14,7 +14,7 @@ import org.ogf.saga.error.NoSuccess;
 /**
  *
  */
-public class ConfigurationException extends NoSuccess {
+public class ConfigurationException extends NoSuccessException {
     public ConfigurationException(String message) {
         super(message);
     }

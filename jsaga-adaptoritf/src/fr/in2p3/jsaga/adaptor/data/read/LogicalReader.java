@@ -20,8 +20,8 @@ public interface LogicalReader extends DataReaderAdaptor {
      * @param logicalEntry absolute path of the logical entry.
      * @param additionalArgs adaptor specific arguments
      * @return array of locations in set.
-     * @throws DoesNotExist if <code>absolutePath</code> does not exist.
+     * @throws DoesNotExistException if <code>absolutePath</code> does not exist.
      */
     public String[] listLocations(String logicalEntry, String additionalArgs)
-        throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
+        throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException;
 }

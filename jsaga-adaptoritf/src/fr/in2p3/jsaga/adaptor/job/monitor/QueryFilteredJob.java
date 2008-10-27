@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.adaptor.job.monitor;
 
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.Timeout;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.TimeoutException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -28,5 +28,5 @@ public interface QueryFilteredJob extends QueryJob {
      * @param filters the filter values.
      * @return the status of jobs matching filter.
      */
-    public JobStatus[] getFilteredStatus(Object[] filters) throws Timeout, NoSuccess;
+    public JobStatus[] getFilteredStatus(Object[] filters) throws TimeoutException, NoSuccessException;
 }

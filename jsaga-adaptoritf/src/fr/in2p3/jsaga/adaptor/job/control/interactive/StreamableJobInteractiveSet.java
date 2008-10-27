@@ -28,5 +28,5 @@ public interface StreamableJobInteractiveSet extends StreamableJobAdaptor {
      * @return the identifier of the job in the grid
      */
     public String submitInteractive(String jobDesc, boolean checkMatch, InputStream stdin, OutputStream stdout, OutputStream stderr)
-            throws PermissionDenied, Timeout, NoSuccess;
+            throws PermissionDeniedException, TimeoutException, NoSuccessException;
 }

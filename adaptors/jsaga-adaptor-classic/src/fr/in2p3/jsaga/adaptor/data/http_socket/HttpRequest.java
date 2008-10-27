@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.data.http_socket;
 
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.io.*;
 import java.net.Socket;
@@ -81,13 +81,13 @@ public class HttpRequest {
         }
     }
 
-    public Date getLastModified() throws NoSuccess {
+    public Date getLastModified() throws NoSuccessException {
         String value = m_prop.getProperty(LAST_MODIFIED);
         if (value != null) {
             try {
                 return DF.parse(value);
             } catch (ParseException e) {
-                throw new NoSuccess(e);
+                throw new NoSuccessException(e);
             }
         } else {
             return null;

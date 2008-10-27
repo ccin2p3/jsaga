@@ -25,7 +25,7 @@ public class NSHostPatternIntrospectorImpl extends AbstractIntrospectorImpl impl
     private Protocol m_config;
     private String m_host;
 
-    public NSHostPatternIntrospectorImpl(Protocol config, String host) throws NoSuccess {
+    public NSHostPatternIntrospectorImpl(Protocol config, String host) throws NoSuccessException {
         super(host);
         m_config = config;
         m_host = host;
@@ -36,7 +36,7 @@ public class NSHostPatternIntrospectorImpl extends AbstractIntrospectorImpl impl
     }
 
     /** @return services */
-    protected String[] getChildIntrospectorKeys() throws NoSuccess {
+    protected String[] getChildIntrospectorKeys() throws NoSuccessException {
         ServiceEngineConfigurationAbstract config = Configuration.getInstance().getConfigurations().getProtocolCfg();
         List<String> result = new ArrayList<String>();
         for (ServiceRef service : config.listServiceRefByHostname(m_config.getMapping(), m_host)) {
@@ -50,12 +50,12 @@ public class NSHostPatternIntrospectorImpl extends AbstractIntrospectorImpl impl
      * @param key the service
      * @return the created introspector
      */
-    public Introspector getChildIntrospector(String key) throws NotImplemented, DoesNotExist, NoSuccess {
+    public Introspector getChildIntrospector(String key) throws NotImplementedException, DoesNotExistException, NoSuccessException {
         for (DataService service : m_config.getDataService()) {
             if (service.getName().equals(key)) {
                 return new NSServiceIntrospectorImpl(service);
             }
         }
-        throw new DoesNotExist("Service not found: "+key);
+        throw new DoesNotExistException("Service not found: "+key);
     }
 }

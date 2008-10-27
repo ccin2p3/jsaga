@@ -2,8 +2,8 @@ package fr.in2p3.jsaga.adaptor.data.impl;
 
 import fr.in2p3.jsaga.adaptor.schema.data.emulator.Server;
 import fr.in2p3.jsaga.adaptor.schema.data.emulator.ServerType;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.Timeout;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.TimeoutException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -20,11 +20,11 @@ import org.ogf.saga.error.Timeout;
 public class DataEmulatorConnection extends DataEmulatorConnectionAbstract {
     private Server m_serverRoot;
 
-    public DataEmulatorConnection(String protocol, String host, int port) throws Timeout, NoSuccess {
+    public DataEmulatorConnection(String protocol, String host, int port) throws TimeoutException, NoSuccessException {
         super();
         m_serverRoot = m_grid.connect(protocol, host, port);
         if (m_serverRoot == null) {
-            throw new Timeout("Failed to connect to host: "+host);
+            throw new TimeoutException("Failed to connect to host: "+host);
         }
     }
 

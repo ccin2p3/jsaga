@@ -18,6 +18,6 @@ import java.io.OutputStream;
  *
  */
 public abstract class Stdin extends OutputStream {
-    public abstract void openJobIOHandler(JobIOGetterInteractive ioHandler) throws NotImplemented, PermissionDenied, Timeout, NoSuccess;
+    public abstract void openJobIOHandler(JobIOGetterInteractive ioHandler) throws NotImplementedException, PermissionDeniedException, TimeoutException, NoSuccessException;
     public abstract byte[] getBuffer();
 }

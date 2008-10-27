@@ -10,11 +10,10 @@ import fr.in2p3.jsaga.engine.config.bean.ProtocolEngineConfiguration;
 import fr.in2p3.jsaga.engine.data.FilledURL;
 import fr.in2p3.jsaga.engine.schema.config.DataService;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
-import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.url.URL;
 
-import java.lang.Exception;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,9 +46,9 @@ public class DataAdaptorFactory extends ServiceAdaptorFactory {
      * @param session the security session
      * @return the data adaptor instance
      */
-    public DataAdaptor getDataAdaptor(URL url, Session session) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public DataAdaptor getDataAdaptor(URL url, Session session) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (url==null || url.getScheme()==null) {
-            throw new IncorrectURL("Invalid entry name");
+            throw new IncorrectURLException("Invalid entry name");
         }
 
         // get config
@@ -61,7 +60,7 @@ public class DataAdaptorFactory extends ServiceAdaptorFactory {
         try {
             dataAdaptor = (DataAdaptor) clazz.newInstance();
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
 
         // get security context
@@ -74,17 +73,17 @@ public class DataAdaptorFactory extends ServiceAdaptorFactory {
         } else if (url.getFragment() != null) {
             context = super.findContext(session, url.getFragment());
             if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(dataAdaptor.getSupportedSecurityAdaptorClasses())) {
-                throw new NoSuccess("Security context not found: "+url.getFragment());
+                throw new NoSuccessException("Security context not found: "+url.getFragment());
             }
         } else if (config.getSupportedContextTypeCount() > 0) {
             context = super.findContext(session, config.getSupportedContextType());
             if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(dataAdaptor.getSupportedSecurityAdaptorClasses())) {
-                throw new NoSuccess("None of the supported security context is valid");
+                throw new NoSuccessException("None of the supported security context is valid");
             }
         } else {
             context = null;
             if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(dataAdaptor.getSupportedSecurityAdaptorClasses())) {
-                throw new NoSuccess("None of the supported security context is found");
+                throw new NoSuccessException("None of the supported security context is found");
             }
         }
 
@@ -93,15 +92,15 @@ public class DataAdaptorFactory extends ServiceAdaptorFactory {
             SecurityAdaptor securityAdaptor;
             try {
                 securityAdaptor = context.getAdaptor();
-            } catch (IncorrectState e) {
-                throw new NoSuccess("Bad security context: "+super.getContextType(context), e);
+            } catch (IncorrectStateException e) {
+                throw new NoSuccessException("Bad security context: "+super.getContextType(context), e);
             }
             if (SecurityAdaptorDescriptor.isSupported(securityAdaptor.getClass(), dataAdaptor.getSupportedSecurityAdaptorClasses())) {
                 dataAdaptor.setSecurityAdaptor(securityAdaptor);
             } else if (SecurityAdaptorDescriptor.isSupportedNoContext(dataAdaptor.getSupportedSecurityAdaptorClasses())) {
                 dataAdaptor.setSecurityAdaptor(null);
             } else {
-                throw new AuthenticationFailed("Security context class '"+ securityAdaptor.getClass().getName() +"' not supported for protocol: "+url.getScheme());
+                throw new AuthenticationFailedException("Security context class '"+ securityAdaptor.getClass().getName() +"' not supported for protocol: "+url.getScheme());
             }
         }
 

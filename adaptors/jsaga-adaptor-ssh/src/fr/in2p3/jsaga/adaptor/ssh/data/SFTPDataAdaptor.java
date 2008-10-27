@@ -34,14 +34,14 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 		return "sftp";
 	}
 
-    public BaseURL getBaseURL() throws IncorrectURL {
+    public BaseURL getBaseURL() throws IncorrectURLException {
         return new BaseURL(22);
     }
 
 	public void connect(String userInfo, String host, int port,
-			String basePath, Map attributes) throws NotImplemented,
-			AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout,
-			NoSuccess {
+			String basePath, Map attributes) throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException,
+            NoSuccessException {
 		super.connect(userInfo, host, port, basePath, attributes);
 		
 		// start sftp channel
@@ -50,59 +50,59 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 			channel.connect();
 			channelSftp = (ChannelSftp) channel;
 		} catch (JSchException e) {
-			throw new NoSuccess("Unable to open channel", e);
+			throw new NoSuccessException("Unable to open channel", e);
 		}
 	}
 
-	public void disconnect() throws NoSuccess {
+	public void disconnect() throws NoSuccessException {
 		channelSftp.exit();
 		super.disconnect();
 	}
 
 	public void getToStream(String absolutePath, String additionalArgs,
-			OutputStream stream) throws PermissionDenied, BadParameter,
-			DoesNotExist, Timeout, NoSuccess {
+			OutputStream stream) throws PermissionDeniedException, BadParameterException,
+            DoesNotExistException, TimeoutException, NoSuccessException {
 		try {
 			channelSftp.get(absolutePath, stream);
 		} catch (SftpException e) {
 			if (e.getid() == ChannelSftp.SSH_FX_NO_SUCH_FILE)
-				throw new DoesNotExist(e);
+				throw new DoesNotExistException(e);
 			else if (e.getid() == ChannelSftp.SSH_FX_PERMISSION_DENIED)
-				throw new PermissionDenied(e);
+				throw new PermissionDeniedException(e);
 			else
-				throw new NoSuccess(e);
+				throw new NoSuccessException(e);
 		}
 	}
 
 	public boolean exists(String absolutePath, String additionalArgs)
-			throws PermissionDenied, Timeout, NoSuccess {
+			throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		try {
             return (channelSftp.lstat(absolutePath) != null);
         } catch (SftpException e) {
 			if (e.getid() == ChannelSftp.SSH_FX_NO_SUCH_FILE)
 				return false;
 			else
-				throw new NoSuccess(e);
+				throw new NoSuccessException(e);
 		}
 	}
 
-    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         try {
             String filename = new EntryPath(absolutePath).getEntryName();
             SftpATTRS attrs = channelSftp.lstat(absolutePath);
             return new SFTPFileAttributes(filename, attrs);
         } catch (SftpException e) {
             if (e.getid() == ChannelSftp.SSH_FX_NO_SUCH_FILE)
-                throw new DoesNotExist(e);
+                throw new DoesNotExistException(e);
             if (e.getid() == ChannelSftp.SSH_FX_PERMISSION_DENIED)
-                throw new PermissionDenied(e);
-            throw new NoSuccess(e);
+                throw new PermissionDeniedException(e);
+            throw new NoSuccessException(e);
         }
     }
 
     public FileAttributes[] listAttributes(String absolutePath,
-			String additionalArgs) throws PermissionDenied, DoesNotExist,
-			Timeout, NoSuccess {
+			String additionalArgs) throws PermissionDeniedException, DoesNotExistException,
+            TimeoutException, NoSuccessException {
 		try {
 			Vector<LsEntry> vv = channelSftp.ls(absolutePath);
 			if (vv != null && vv.size() > 2) {
@@ -121,16 +121,16 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 			}
 		} catch (SftpException e) {
 			if (e.getid() == ChannelSftp.SSH_FX_NO_SUCH_FILE)
-				throw new DoesNotExist(e);
+				throw new DoesNotExistException(e);
 			if (e.getid() == ChannelSftp.SSH_FX_PERMISSION_DENIED)
-				throw new PermissionDenied(e);
-			throw new NoSuccess(e);
+				throw new PermissionDeniedException(e);
+			throw new NoSuccessException(e);
 		}
 	}
 
 	public void putFromStream(String absolutePath, boolean append,
-			String additionalArgs, InputStream stream) throws PermissionDenied,
-			BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+			String additionalArgs, InputStream stream) throws PermissionDeniedException,
+            BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
 		try {
 			if (append)
 				channelSftp.put(stream, absolutePath, ChannelSftp.APPEND);
@@ -138,23 +138,23 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 				channelSftp.put(stream, absolutePath, ChannelSftp.OVERWRITE);
 		} catch (SftpException e) {
 			if (!exists(absolutePath, additionalArgs))
-				throw new AlreadyExists(e);
+				throw new AlreadyExistsException(e);
 			if (e.getid() == ChannelSftp.SSH_FX_PERMISSION_DENIED)
-				throw new PermissionDenied(e);
-			throw new NoSuccess(e);
+				throw new PermissionDeniedException(e);
+			throw new NoSuccessException(e);
 		}
 	}
 
 	public void makeDir(String parentAbsolutePath, String directoryName,
-			String additionalArgs) throws PermissionDenied, BadParameter,
-			AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+			String additionalArgs) throws PermissionDeniedException, BadParameterException,
+            AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         String absolutePath = parentAbsolutePath+"/"+directoryName;
 		try {
 			channelSftp.mkdir(absolutePath);
 		} catch (SftpException e) {
             switch(e.getid()) {
                 case ChannelSftp.SSH_FX_PERMISSION_DENIED:
-                    throw new PermissionDenied(e);
+                    throw new PermissionDeniedException(e);
                 case ChannelSftp.SSH_FX_NO_SUCH_FILE:
                     // check parent entry
                     while(parentAbsolutePath.endsWith("/")) {
@@ -163,63 +163,63 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
                     try {
                         switch(this.getAttributes(parentAbsolutePath, additionalArgs).getType()) {
                             case FileAttributes.FILE_TYPE:
-                                throw new BadParameter("Parent entry is a file: "+parentAbsolutePath);
+                                throw new BadParameterException("Parent entry is a file: "+parentAbsolutePath);
                             case FileAttributes.LINK_TYPE:
-                                throw new BadParameter("Parent entry is a link: "+parentAbsolutePath);
+                                throw new BadParameterException("Parent entry is a link: "+parentAbsolutePath);
                             case FileAttributes.UNKNOWN_TYPE:
-                                throw new NoSuccess("Parent entry type is unknown: "+parentAbsolutePath, e);
+                                throw new NoSuccessException("Parent entry type is unknown: "+parentAbsolutePath, e);
                             default:
-                                throw new NoSuccess("Unexpected error");
+                                throw new NoSuccessException("Unexpected error");
                         }
-                    } catch (DoesNotExist e2) {
+                    } catch (DoesNotExistException e2) {
                         throw new ParentDoesNotExist("Parent entry does not exist: "+parentAbsolutePath, e);
                     }
                 case ChannelSftp.SSH_FX_FAILURE:
                     // check entry
                     if (exists(absolutePath, additionalArgs)) {
-                        throw new AlreadyExists("Entry already exists: "+absolutePath);
+                        throw new AlreadyExistsException("Entry already exists: "+absolutePath);
                     }
-                    throw new NoSuccess(e);
+                    throw new NoSuccessException(e);
                 default:
-                    throw new NoSuccess(e);
+                    throw new NoSuccessException(e);
             }
 		}
 	}
 
 	public void removeDir(String parentAbsolutePath, String directoryName,
-			String additionalArgs) throws PermissionDenied, BadParameter,
-			DoesNotExist, Timeout, NoSuccess {
+			String additionalArgs) throws PermissionDeniedException, BadParameterException,
+            DoesNotExistException, TimeoutException, NoSuccessException {
         String absolutePath = parentAbsolutePath+"/"+directoryName;
 		try {
 			channelSftp.rmdir(absolutePath);
 		} catch (SftpException e) {
             switch(e.getid()) {
                 case ChannelSftp.SSH_FX_PERMISSION_DENIED:
-                    throw new PermissionDenied(e);
+                    throw new PermissionDeniedException(e);
                 case ChannelSftp.SSH_FX_NO_SUCH_FILE:
                     try {
                         switch(this.getAttributes(absolutePath, additionalArgs).getType()) {
                             case FileAttributes.FILE_TYPE:
-                                throw new BadParameter("Entry is a file: "+absolutePath);
+                                throw new BadParameterException("Entry is a file: "+absolutePath);
                             case FileAttributes.LINK_TYPE:
-                                throw new BadParameter("Entry is a link: "+absolutePath);
+                                throw new BadParameterException("Entry is a link: "+absolutePath);
                             case FileAttributes.UNKNOWN_TYPE:
-                                throw new NoSuccess("Entry type is unknown: "+absolutePath, e);
+                                throw new NoSuccessException("Entry type is unknown: "+absolutePath, e);
                             default:
-                                throw new NoSuccess("Unexpected error");
+                                throw new NoSuccessException("Unexpected error");
                         }
-                    } catch(DoesNotExist e2) {
-                        throw new DoesNotExist("Entry does not exist: "+absolutePath, e);
+                    } catch(DoesNotExistException e2) {
+                        throw new DoesNotExistException("Entry does not exist: "+absolutePath, e);
                     }
                 default:
-                    throw new NoSuccess(e);
+                    throw new NoSuccessException(e);
             }
 		}
 	}
 
 	public void removeFile(String parentAbsolutePath, String fileName,
-			String additionalArgs) throws PermissionDenied, BadParameter,
-			DoesNotExist, Timeout, NoSuccess {
+			String additionalArgs) throws PermissionDeniedException, BadParameterException,
+            DoesNotExistException, TimeoutException, NoSuccessException {
         String absolutePath = parentAbsolutePath+"/"+fileName;
         try {
 			channelSftp.rm(absolutePath);
@@ -229,35 +229,35 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
                     try {
                         switch(this.getAttributes(absolutePath, additionalArgs).getType()) {
                             case FileAttributes.DIRECTORY_TYPE:
-                                throw new BadParameter("Entry is a directory: "+absolutePath);
+                                throw new BadParameterException("Entry is a directory: "+absolutePath);
                             default:
-                                throw new PermissionDenied(e);
+                                throw new PermissionDeniedException(e);
                         }
-                    } catch(DoesNotExist e2) {
-                        throw new DoesNotExist("Entry does not exist: "+absolutePath, e);
+                    } catch(DoesNotExistException e2) {
+                        throw new DoesNotExistException("Entry does not exist: "+absolutePath, e);
                     }
                 case ChannelSftp.SSH_FX_NO_SUCH_FILE:
-                    throw new DoesNotExist("Entry does not exist: "+absolutePath, e);
+                    throw new DoesNotExistException("Entry does not exist: "+absolutePath, e);
                 default:
-                    throw new NoSuccess(e);
+                    throw new NoSuccessException(e);
             }
 		}
 	}
 
 	public void rename(String sourceAbsolutePath, String targetAbsolutePath,
-			boolean overwrite, String additionalArgs) throws PermissionDenied,
-			BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+			boolean overwrite, String additionalArgs) throws PermissionDeniedException,
+            BadParameterException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException {
 		if (overwrite)
-			throw new NoSuccess("Overwrite not implemented");
+			throw new NoSuccessException("Overwrite not implemented");
 
 		try {
 			channelSftp.rename(sourceAbsolutePath, targetAbsolutePath);
 		} catch (SftpException e) {
 			if (e.getid() == ChannelSftp.SSH_FX_NO_SUCH_FILE)
-				throw new DoesNotExist(e);
+				throw new DoesNotExistException(e);
 			if (e.getid() == ChannelSftp.SSH_FX_PERMISSION_DENIED)
-				throw new PermissionDenied(e);
-			throw new NoSuccess(e);
+				throw new PermissionDeniedException(e);
+			throw new NoSuccessException(e);
 		}
 	}
 }

@@ -22,13 +22,13 @@ public class JobEndTaskGenerator {
     private JobDescription m_jobDesc;
     private JobEndTask m_jobEndTask;
 
-    public JobEndTaskGenerator(String jobName, JobDefinition jobDesc) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public JobEndTaskGenerator(String jobName, JobDefinition jobDesc) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         m_jobName = jobName;
         m_jobDesc = jobDesc.getJobDescription();
         m_jobEndTask = new JobEndTask(m_jobName);
     }
 
-    public void updateWorkflow(Workflow workflow) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public void updateWorkflow(Workflow workflow) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         boolean hasStagedTask = false;
         workflow.add(m_jobEndTask, null, null);
         for (int i=0; i<m_jobDesc.getDataStagingCount(); i++) {

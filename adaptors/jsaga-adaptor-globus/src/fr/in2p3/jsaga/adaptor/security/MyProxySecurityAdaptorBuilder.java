@@ -14,8 +14,8 @@ import org.gridforum.jgss.ExtendedGSSManager;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.IncorrectState;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -94,7 +94,7 @@ public class MyProxySecurityAdaptorBuilder implements ExpirableSecurityAdaptorBu
         });
     }
 
-    public Default[] getDefaults(Map map) throws IncorrectState {
+    public Default[] getDefaults(Map map) throws IncorrectStateException {
         EnvironmentVariables env = EnvironmentVariables.getInstance();
         return new Default[]{
                 // concat with ".myproxy" to avoid conflict with Globus context type
@@ -123,7 +123,7 @@ public class MyProxySecurityAdaptorBuilder implements ExpirableSecurityAdaptorBu
         };
     }
 
-    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectState, NoSuccess {
+    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectStateException, NoSuccessException {
         try {
             switch(usage) {
                 case USAGE_INIT_PEM:
@@ -185,17 +185,17 @@ public class MyProxySecurityAdaptorBuilder implements ExpirableSecurityAdaptorBu
                 }
 */
                 default:
-                    throw new NoSuccess("INTERNAL ERROR: unexpected exception");
+                    throw new NoSuccessException("INTERNAL ERROR: unexpected exception");
             }
-        } catch(IncorrectState e) {
+        } catch(IncorrectStateException e) {
             throw e;
-        } catch(NoSuccess e) {
+        } catch(NoSuccessException e) {
             throw e;
         } catch(Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
-    private SecurityAdaptor createSecurityAdaptor(GSSCredential cred, Map attributes) throws IncorrectState {
+    private SecurityAdaptor createSecurityAdaptor(GSSCredential cred, Map attributes) throws IncorrectStateException {
         String server = (String) attributes.get(Context.SERVER);
         String userId = (String) attributes.get(Context.USERID);
         String myProxyPass = (String) attributes.get(GlobusContext.MYPROXYPASS);

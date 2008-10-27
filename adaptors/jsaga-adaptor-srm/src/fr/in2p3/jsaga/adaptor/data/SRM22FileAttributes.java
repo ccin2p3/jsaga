@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.adaptor.data;
 
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 import org.ogf.srm22.*;
 
 /* ***************************************************
@@ -18,14 +18,14 @@ import org.ogf.srm22.*;
  *
  */
 public class SRM22FileAttributes extends FileAttributes {
-    public SRM22FileAttributes(TMetaDataPathDetail entry) throws NoSuccess {
+    public SRM22FileAttributes(TMetaDataPathDetail entry) throws NoSuccessException {
         // set name
         String path = entry.getPath();
         int pos = path.lastIndexOf("/");
         if (pos > 0) {
             m_name = path.substring(pos+1);
         } else {
-            throw new NoSuccess("unexpected exception");
+            throw new NoSuccessException("unexpected exception");
         }
 
         // set type

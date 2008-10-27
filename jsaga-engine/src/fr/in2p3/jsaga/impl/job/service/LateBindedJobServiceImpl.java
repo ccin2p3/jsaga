@@ -2,7 +2,6 @@ package fr.in2p3.jsaga.impl.job.service;
 
 import fr.in2p3.jsaga.impl.job.description.XJSDLJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.job.instance.LateBindedJobImpl;
-import org.ogf.saga.ObjectType;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
@@ -27,27 +26,23 @@ public class LateBindedJobServiceImpl extends AbstractAsyncJobServiceImpl implem
         super(session);
     }
 
-    public ObjectType getType() {
-        return ObjectType.JOBSERVICE;
-    }
-
-    public Job createJob(JobDescription jd) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+    public Job createJob(JobDescription jd) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         return new LateBindedJobImpl(m_session, (XJSDLJobDescriptionImpl) jd);
     }
 
-    public List<String> list() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
-        throw new NotImplemented("Not implemented yet..."); //todo: implement method list()
+    public List<String> list() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
+        throw new NotImplementedException("Not implemented yet..."); //todo: implement method list()
     }
 
-    public Job getJob(String jobId) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public Job getJob(String jobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         try {
             return new LateBindedJobImpl(m_session, null, jobId);   //fixme: split jobId into rm + nativeJobId
-        } catch (IncorrectURL e) {
-            throw new NoSuccess(e);
+        } catch (IncorrectURLException e) {
+            throw new NoSuccessException(e);
         }
     }
 
-    public JobSelf getSelf() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
-        throw new NotImplemented("Not implemented by the SAGA engine", this);
+    public JobSelf getSelf() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
+        throw new NotImplementedException("Not implemented by the SAGA engine", this);
     }
 }

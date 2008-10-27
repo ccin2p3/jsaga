@@ -20,5 +20,5 @@ public interface CleanableJobAdaptor extends JobControlAdaptor {
      * clean an ended job
      * @param nativeJobId the identifier of the job in the grid
      */
-    public void clean(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess;
+    public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException;
 }

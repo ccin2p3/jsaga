@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.adaptor.job.monitor;
 
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.Timeout;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.TimeoutException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -16,6 +16,6 @@ import org.ogf.saga.error.Timeout;
  *
  */
 public interface ListenFilteredJob extends ListenJob {
-    public void subscribeFilteredJob(JobStatusNotifier notifier) throws Timeout, NoSuccess;
-    public void unsubscribeFilteredJob() throws Timeout, NoSuccess;
+    public void subscribeFilteredJob(JobStatusNotifier notifier) throws TimeoutException, NoSuccessException;
+    public void unsubscribeFilteredJob() throws TimeoutException, NoSuccessException;
 }

@@ -22,9 +22,9 @@ public interface DataRename extends DataAdaptor {
      * @param targetAbsolutePath the new path of the entry.
      * @param overwrite if true, the target is overwrited if it exists.
      * @param additionalArgs adaptor specific arguments
-     * @throws AlreadyExists if <code>targetAbsolutePath</code> already exists and <code>overwrite</code> is false.
-     * @throws DoesNotExist if <code>sourceAbsolutePath</code> does not exist.
+     * @throws AlreadyExistsException if <code>targetAbsolutePath</code> already exists and <code>overwrite</code> is false.
+     * @throws DoesNotExistException if <code>sourceAbsolutePath</code> does not exist.
      */
     public void rename(String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs)
-        throws PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess;
+        throws PermissionDeniedException, BadParameterException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException;
 }

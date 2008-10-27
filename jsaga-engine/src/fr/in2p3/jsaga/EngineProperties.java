@@ -1,7 +1,6 @@
 package fr.in2p3.jsaga;
 
 import fr.in2p3.jsaga.engine.config.ConfigurationException;
-import org.ogf.saga.error.SagaError;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -76,7 +75,7 @@ public class EngineProperties {
         if (value != null) {
             return value;
         } else {
-            throw new SagaError("[INTERNAL ERROR] Engine property not found: "+name);
+            throw new RuntimeException("[INTERNAL ERROR] Engine property not found: "+name);
         }
     }
 

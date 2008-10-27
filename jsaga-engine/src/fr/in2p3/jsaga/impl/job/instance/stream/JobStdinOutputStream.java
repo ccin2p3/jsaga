@@ -5,7 +5,6 @@ import org.ogf.saga.error.*;
 import org.ogf.saga.job.Job;
 
 import java.io.*;
-import java.lang.Exception;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -23,7 +22,7 @@ public class JobStdinOutputStream extends Stdin {
     protected Job m_job;
     private JobIOGetterInteractive m_ioHandler;
 
-    public JobStdinOutputStream(Job job) throws NotImplemented, DoesNotExist, Timeout, NoSuccess {
+    public JobStdinOutputStream(Job job) throws NotImplementedException, DoesNotExistException, TimeoutException, NoSuccessException {
         m_job = job;
         switch(m_job.getState()) {
             case NEW:
@@ -31,7 +30,7 @@ public class JobStdinOutputStream extends Stdin {
                 // OK
                 break;
             default:
-                throw new DoesNotExist("Stdin is not available because job is ended or suspended");
+                throw new DoesNotExistException("Stdin is not available because job is ended or suspended");
         }
     }
 
@@ -43,7 +42,7 @@ public class JobStdinOutputStream extends Stdin {
         }
     }
     
-    public void openJobIOHandler(JobIOGetterInteractive ioHandler) throws NotImplemented, PermissionDenied, Timeout, NoSuccess {
+    public void openJobIOHandler(JobIOGetterInteractive ioHandler) throws NotImplementedException, PermissionDeniedException, TimeoutException, NoSuccessException {
         m_ioHandler = ioHandler;
 
         // get stream
@@ -57,7 +56,7 @@ public class JobStdinOutputStream extends Stdin {
                 m_stream.write(m_buffer.toByteArray());
                 m_stream.close();
             } catch (IOException e) {
-                throw new NoSuccess(e);
+                throw new NoSuccessException(e);
             }
         }
     }
@@ -87,12 +86,12 @@ public class JobStdinOutputStream extends Stdin {
                         if (m_ioHandler instanceof JobIOGetterInteractive) {
                             m_stream = ((JobIOGetterInteractive)m_ioHandler).getStdin();
                         } else if (m_ioHandler instanceof JobIOGetter || m_ioHandler instanceof JobIOSetter) {
-                            throw new NotImplemented("Can not write to stdin because job is running and adaptor does not support job interactivity");
+                            throw new NotImplementedException("Can not write to stdin because job is running and adaptor does not support job interactivity");
                         }
                     }
                     return m_stream;
                 default:
-                    throw new DoesNotExist("Stdin is not available because job neither unsubmitted nor running");
+                    throw new DoesNotExistException("Stdin is not available because job neither unsubmitted nor running");
             }
         } catch (Exception e) {
             throw new IOException(e.getMessage());

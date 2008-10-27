@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.adaptor.evaluator;
 
 import junit.framework.TestCase;
-import org.ogf.saga.error.BadParameter;
+import org.ogf.saga.error.BadParameterException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -30,7 +30,7 @@ public class BasicEvaluatorTest extends TestCase {
         m_evaluator = null;
     }
 
-    public void test_basic() throws BadParameter {
+    public void test_basic() throws BadParameterException {
         assertEquals(
                 "3",
                 m_evaluator.evaluate("INDEX"));

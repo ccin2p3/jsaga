@@ -25,7 +25,7 @@ import java.util.Set;
 public class JobServiceIntrospectorImpl extends AbstractIntrospectorImpl implements Introspector {
     private JobService m_config;
 
-    public JobServiceIntrospectorImpl(JobService config) throws NoSuccess {
+    public JobServiceIntrospectorImpl(JobService config) throws NoSuccessException {
         super(config.getName());
         m_config = config;
     }
@@ -35,17 +35,17 @@ public class JobServiceIntrospectorImpl extends AbstractIntrospectorImpl impleme
     }
 
     /** override super.getAttribute() */
-    public String getAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    public String getAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         for (int i=0; i<m_config.getAttributeCount(); i++) {
             if (m_config.getAttribute(i).getName().equals(key)) {
                 return m_config.getAttribute(i).getValue();
             }
         }
-        throw new DoesNotExist("Attribute "+key+" does not exist", this);
+        throw new DoesNotExistException("Attribute "+key+" does not exist", this);
     }
 
     /** @return contexts */
-    protected String[] getChildIntrospectorKeys() throws NoSuccess {
+    protected String[] getChildIntrospectorKeys() throws NoSuccessException {
         Set<String> result = new HashSet<String>();
         if (m_config.getContextRef() != null) {
             result.add(m_config.getContextRef());
@@ -61,8 +61,8 @@ public class JobServiceIntrospectorImpl extends AbstractIntrospectorImpl impleme
         return result.toArray(new String[result.size()]);
     }
 
-    /** Throw NotImplemented exception */
-    public Introspector getChildIntrospector(String key) throws NotImplemented, DoesNotExist, NoSuccess {
-        throw new NotImplemented("Please use SAGA interface for introspecting security contexts");
+    /** Throw NotImplementedException exception */
+    public Introspector getChildIntrospector(String key) throws NotImplementedException, DoesNotExistException, NoSuccessException {
+        throw new NotImplementedException("Please use SAGA interface for introspecting security contexts");
     }
 }

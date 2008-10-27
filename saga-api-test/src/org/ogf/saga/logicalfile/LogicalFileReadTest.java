@@ -1,7 +1,7 @@
 package org.ogf.saga.logicalfile;
 
-import org.ogf.saga.url.URL;
 import org.ogf.saga.namespace.abstracts.AbstractNSEntryReadTest;
+import org.ogf.saga.url.URL;
 
 import java.util.List;
 

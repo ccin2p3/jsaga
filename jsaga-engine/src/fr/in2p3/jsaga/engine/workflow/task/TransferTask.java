@@ -11,8 +11,6 @@ import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
 import org.ogf.saga.url.URL;
 
-import java.lang.Exception;
-
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -32,7 +30,7 @@ public class TransferTask extends AbstractWorkflowTaskImpl {
     private boolean m_overwrite;
 
     /** constructor */
-    public TransferTask(Session session, String destination, boolean input, boolean overwrite, boolean keep) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public TransferTask(Session session, String destination, boolean input, boolean overwrite, boolean keep) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         super(null, destination);
         // set URL
         m_session = session;
@@ -50,20 +48,20 @@ public class TransferTask extends AbstractWorkflowTaskImpl {
         xmlStatus.setKeep(keep);
     }
 
-    public void setSource(String source) throws NotImplemented, BadParameter, NoSuccess {
+    public void setSource(String source) throws NotImplementedException, BadParameterException, NoSuccessException {
         m_source = URLFactoryImpl.createUnencodedURL(source);
     }
 
     //////////////////////////////////////////// abstract methods ////////////////////////////////////////////
 
-    protected void doSubmit() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    protected void doSubmit() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         try {
             int flags = (m_overwrite
                     ? Flags.CREATEPARENTS.or(Flags.OVERWRITE)
                     : Flags.CREATEPARENTS.getValue());
             NSFactory.createNSEntry(m_session, m_source).copy(m_destination, flags);
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         super.setState(State.DONE);
     }
@@ -72,15 +70,15 @@ public class TransferTask extends AbstractWorkflowTaskImpl {
         super.setState(State.CANCELED);
     }
 
-    protected State queryState() throws NotImplemented, Timeout, NoSuccess {
+    protected State queryState() throws NotImplementedException, TimeoutException, NoSuccessException {
         return super.getState_LocalCheckOnly();
     }
 
-    public boolean startListening() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public boolean startListening() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         return true;    // do nothing
     }
 
-    public void stopListening() throws NotImplemented, Timeout, NoSuccess {
+    public void stopListening() throws NotImplementedException, TimeoutException, NoSuccessException {
         // do nothing
     }
 }

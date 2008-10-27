@@ -1,9 +1,9 @@
 package fr.in2p3.jsaga.impl.monitoring;
 
 import fr.in2p3.jsaga.helpers.AttributeSerializer;
+import fr.in2p3.jsaga.helpers.cloner.ObjectCloner;
 import fr.in2p3.jsaga.impl.attributes.AbstractAttributesImpl;
 import org.apache.log4j.Logger;
-import org.ogf.saga.ObjectType;
 import org.ogf.saga.error.*;
 import org.ogf.saga.monitoring.*;
 
@@ -59,13 +59,9 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
         clone.m_monitorable = m_monitorable;
         clone.m_mode = m_mode;
         clone.m_type = m_type;
-        clone.m_callbacks = clone(m_callbacks);
+        clone.m_callbacks = new ObjectCloner<Integer,Callback>().cloneMap(m_callbacks);
         clone.m_cookieGenerator = m_cookieGenerator;
         return clone;
-    }
-
-    public ObjectType getType() {
-        return ObjectType.METRIC;
     }
 
     /**
@@ -102,9 +98,9 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
      * ReadWrite metrics MAY override this method if default behavior does not suit to your needs
      * @param value the value as a string
      * @return the value object
-     * @throws NotImplemented if this method is not overrided
+     * @throws NotImplementedException if this method is not overrided
      */
-    protected E getValuefromString(String value) throws NotImplemented, DoesNotExist {
+    protected E getValuefromString(String value) throws NotImplementedException, DoesNotExistException {
         return new AttributeSerializer<E>(m_type).fromString(value);
     }
 
@@ -112,9 +108,9 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
      * ReadWrite metrics MAY override this method if default behavior does not suit to your needs
      * @param values the value as a string array
      * @return the value object
-     * @throws NotImplemented if this method is not overrided
+     * @throws NotImplementedException if this method is not overrided
      */
-    protected E getValuefromStringArray(String[] values) throws NotImplemented, DoesNotExist {
+    protected E getValuefromStringArray(String[] values) throws NotImplementedException, DoesNotExistException {
         return new AttributeSerializer<E>(m_type).fromStringArray(values);
     }
 
@@ -122,7 +118,7 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
      * Metrics MAY override this method if default behavior does not suit to your needs
      * @return the value as a string
      */
-    protected String getStringFromValue() throws DoesNotExist {
+    protected String getStringFromValue() throws DoesNotExistException {
         return new AttributeSerializer<E>(m_type).toString(m_value);
     }
 
@@ -130,45 +126,45 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
      * Metrics MAY override this method if default behavior does not suit to your needs
      * @return the value as a string array
      */
-    protected String[] getStringArrayFromValue() throws DoesNotExist {
+    protected String[] getStringArrayFromValue() throws DoesNotExistException {
         return new AttributeSerializer<E>(m_type).toStringArray(m_value);
     }
 
     //////////////////////////////////////////// interface Metric ////////////////////////////////////////////
 
-    public int addCallback(Callback cb) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public int addCallback(Callback cb) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         switch (m_mode) {
             case ReadWrite:
             case ReadOnly:
                 m_callbacks.put(m_cookieGenerator, cb);
                 return ++m_cookieGenerator;
             case Final:
-                throw new IncorrectState("Can not add callback to a metric with mode: "+m_mode.name(), this);
+                throw new IncorrectStateException("Can not add callback to a metric with mode: "+m_mode.name(), this);
             default:
-                throw new NoSuccess("INTERNAL ERROR: unexpected exception");
+                throw new NoSuccessException("INTERNAL ERROR: unexpected exception");
         }
     }
 
-    public void removeCallback(int cookie) throws NotImplemented, BadParameter, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
+    public void removeCallback(int cookie) throws NotImplementedException, BadParameterException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
         m_callbacks.remove(cookie);
     }
 
-    public void fire() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public void fire() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         switch(m_mode) {
             case ReadWrite:
-                throw new NotImplemented("Not implemented yet");    //todo: Implement method fire()
+                throw new NotImplementedException("Not implemented yet");    //todo: Implement method fire()
             case ReadOnly:
             case Final:
-                throw new IncorrectState("Can not fire callback on a metric with mode: "+m_mode.name(), this);
+                throw new IncorrectStateException("Can not fire callback on a metric with mode: "+m_mode.name(), this);
             default:
-                throw new NoSuccess("INTERNAL ERROR: unexpected exception");
+                throw new NoSuccessException("INTERNAL ERROR: unexpected exception");
         }
     }
 
     //////////////////////////////////////////// interface Attributes ////////////////////////////////////////////
 
     /** override Attributes.setAttribute() */
-    public void setAttribute(String key, String value) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void setAttribute(String key, String value) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (Metric.VALUE.equals(key)) {
             switch(m_mode) {
                 case ReadWrite:
@@ -176,9 +172,9 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
                     break;
                 case ReadOnly:
                 case Final:
-                    throw new IncorrectState("Can not set attributes of a metric with mode: "+m_mode.name(), this);
+                    throw new IncorrectStateException("Can not set attributes of a metric with mode: "+m_mode.name(), this);
                 default:
-                    throw new NoSuccess("INTERNAL ERROR: unexpected exception");
+                    throw new NoSuccessException("INTERNAL ERROR: unexpected exception");
             }
         } else {
             super.setAttribute(key, value);
@@ -186,7 +182,7 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
     }
 
     /** override Attributes.getAttribute() */
-    public String getAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    public String getAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (Metric.VALUE.equals(key)) {
             return this.getStringFromValue();
         } else {
@@ -195,16 +191,16 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
     }
 
     /** override Attributes.setVectorAttribute() */
-    public void setVectorAttribute(String key, String[] values) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void setVectorAttribute(String key, String[] values) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (Metric.VALUE.equals(key)) {
             switch(m_mode) {
                 case ReadWrite:
                     this.setValue(this.getValuefromStringArray(values));
                 case ReadOnly:
                 case Final:
-                    throw new IncorrectState("Can not set attributes of a metric with mode: "+m_mode.name(), this);
+                    throw new IncorrectStateException("Can not set attributes of a metric with mode: "+m_mode.name(), this);
                 default:
-                    throw new NoSuccess("INTERNAL ERROR: unexpected exception");
+                    throw new NoSuccessException("INTERNAL ERROR: unexpected exception");
             }
         } else {
             super.setVectorAttribute(key, values);
@@ -212,7 +208,7 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
     }
 
     /** override Attributes.getVectorAttribute() */
-    public String[] getVectorAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    public String[] getVectorAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (Metric.VALUE.equals(key)) {
             return this.getStringArrayFromValue();
         } else {

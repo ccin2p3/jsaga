@@ -3,7 +3,7 @@ package fr.in2p3.jsaga.adaptor.data;
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import org.globus.ftp.MlsxEntry;
-import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.DoesNotExistException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,11 +27,11 @@ public class Gsiftp2FileAttributes extends FileAttributes {
     private static final int UNIX_WRITE = 2;
     private static final int UNIX_EXEC = 1;
 
-    public Gsiftp2FileAttributes(MlsxEntry entry) throws DoesNotExist {
+    public Gsiftp2FileAttributes(MlsxEntry entry) throws DoesNotExistException {
         // set name
         m_name = entry.getFileName();
         if (m_name ==null || m_name.equals(".") || m_name.equals("..")) {
-            throw new DoesNotExist("Ignore this entry");
+            throw new DoesNotExistException("Ignore this entry");
         }
 
         // set type

@@ -25,16 +25,16 @@ public interface PermissionAdaptor extends DataAdaptor {
      * @param permissions the permissions to enable.
      */
     public void permissionsAllow(String absolutePath, String id, PermissionBytes permissions)
-            throws PermissionDenied, Timeout, NoSuccess;
+            throws PermissionDeniedException, TimeoutException, NoSuccessException;
 
     /**
      * Disables the specified permissions for the specified id.
      * An id of "*" disables the permissions for all.
-     * Unsupported permission types throw NotImplemented exception.
+     * Unsupported permission types throw NotImplementedException exception.
      * @param absolutePath the absolute path of the entry.
      * @param id the id.
      * @param permissions the permissions to disable.
      */
     public void permissionsDeny(String absolutePath, String id, PermissionBytes permissions)
-            throws PermissionDenied, Timeout, NoSuccess;
+            throws PermissionDeniedException, TimeoutException, NoSuccessException;
 }

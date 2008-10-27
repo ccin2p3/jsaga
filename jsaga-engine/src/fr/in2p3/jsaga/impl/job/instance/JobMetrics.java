@@ -2,8 +2,8 @@ package fr.in2p3.jsaga.impl.job.instance;
 
 import fr.in2p3.jsaga.adaptor.job.SubState;
 import fr.in2p3.jsaga.impl.monitoring.*;
-import fr.in2p3.jsaga.impl.task.TaskStateMetricImpl;
-import org.ogf.saga.error.NotImplemented;
+import fr.in2p3.jsaga.impl.task.TaskStateMetricFactoryImpl;
+import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.job.Job;
 import org.ogf.saga.task.State;
 
@@ -26,31 +26,28 @@ public class JobMetrics {
     MetricImpl<String> m_SubState;
 
     /** constructor */
-    JobMetrics(JobImpl job) throws NotImplemented {
-        m_State = job._addMetric(new TaskStateMetricImpl<State>(
-                job,
+    JobMetrics(JobImpl job) throws NotImplementedException {
+        m_State = new TaskStateMetricFactoryImpl<State>(job).createAndRegister(
                 Job.JOB_STATE,
                 "fires on state changes of the job, and has the literal value of the job state enum.",
                 MetricMode.ReadOnly,
                 "1",
                 MetricType.Enum,
-                State.NEW));
-        m_StateDetail = job._addMetric(new TaskStateMetricImpl<String>(
-                job,
+                State.NEW);
+        m_StateDetail = new TaskStateMetricFactoryImpl<String>(job).createAndRegister(
                 Job.JOB_STATEDETAIL,
                 "fires as a job changes its state detail",
                 MetricMode.ReadOnly,
                 "1",
                 MetricType.String,
-                "Unknown:Unknown"));
-        m_SubState = job._addMetric(new TaskStateMetricImpl<String>(
-                job,
+                "Unknown:Unknown");
+        m_SubState = new TaskStateMetricFactoryImpl<String>(job).createAndRegister(
                 JobImpl.JOB_SUBSTATE,
                 "fires on sub-state changes of the job (deviation from SAGA specification)",
                 MetricMode.ReadOnly,
                 "1",
                 MetricType.String,
-                SubState.SUBMITTED.toString()));
+                SubState.SUBMITTED.toString());
     }
 
     /** clone */

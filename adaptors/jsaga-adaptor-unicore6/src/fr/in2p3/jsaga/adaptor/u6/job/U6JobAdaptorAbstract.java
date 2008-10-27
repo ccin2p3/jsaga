@@ -4,7 +4,7 @@ import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
 import fr.in2p3.jsaga.adaptor.u6.TargetSystemInfo;
 import fr.in2p3.jsaga.adaptor.u6.U6Abstract;
 
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 
 import com.intel.gpe.clients.api.JobClient;
 import com.intel.gpe.clients.api.exceptions.GPEInvalidResourcePropertyQNameException;
@@ -32,7 +32,7 @@ public abstract class U6JobAdaptorAbstract extends U6Abstract implements SagaSec
         return "unicore6";
     }
     
-	protected JobClient getJobById(String nativeJobId) throws NoSuccess {
+	protected JobClient getJobById(String nativeJobId) throws NoSuccessException {
 		try {		
 	    	// TODO Optimize this
 	        // list jobs
@@ -45,18 +45,18 @@ public abstract class U6JobAdaptorAbstract extends U6Abstract implements SagaSec
 				}
 			}
 		} catch (GPEInvalidResourcePropertyQNameException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (GPEResourceUnknownException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (GPEUnmarshallingException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (GPEMiddlewareRemoteException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (GPEMiddlewareServiceException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (Exception e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
-        throw new NoSuccess("Unable to get job:"+nativeJobId);
+        throw new NoSuccessException("Unable to get job:"+nativeJobId);
 	}
  }

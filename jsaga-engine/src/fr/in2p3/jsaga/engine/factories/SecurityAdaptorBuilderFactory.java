@@ -5,7 +5,7 @@ import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.config.adaptor.SecurityAdaptorDescriptor;
 import fr.in2p3.jsaga.engine.schema.config.Context;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -34,7 +34,7 @@ public class SecurityAdaptorBuilderFactory {
         m_descriptor = Configuration.getInstance().getDescriptors().getSecurityDesc();
     }
 
-    public SecurityAdaptorBuilder getSecurityAdaptorBuilder(String id) throws NoSuccess {
+    public SecurityAdaptorBuilder getSecurityAdaptorBuilder(String id) throws NoSuccessException {
         Context byName = Configuration.getInstance().getConfigurations().getContextCfg().findContextByName(id);
         if (byName != null) {
             return this.getSecurityAdaptorBuilderByType(byName.getType());
@@ -43,14 +43,14 @@ public class SecurityAdaptorBuilderFactory {
         }
     }
 
-    private SecurityAdaptorBuilder getSecurityAdaptorBuilderByType(String type) throws NoSuccess {
+    private SecurityAdaptorBuilder getSecurityAdaptorBuilderByType(String type) throws NoSuccessException {
         // create instance
         Class clazz = m_descriptor.getBuilderClass(type);
         SecurityAdaptorBuilder adaptorBuilder;
         try {
             adaptorBuilder = (SecurityAdaptorBuilder) clazz.newInstance();
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         return adaptorBuilder;
     }

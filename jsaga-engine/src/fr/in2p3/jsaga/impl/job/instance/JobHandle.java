@@ -2,7 +2,6 @@ package fr.in2p3.jsaga.impl.job.instance;
 
 import fr.in2p3.jsaga.impl.monitoring.MetricImpl;
 import fr.in2p3.jsaga.impl.task.TaskCallback;
-import org.ogf.saga.url.URL;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
@@ -10,9 +9,9 @@ import org.ogf.saga.monitoring.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
 import org.ogf.saga.task.Task;
+import org.ogf.saga.url.URL;
 
 import java.io.*;
-import java.lang.Exception;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -32,7 +31,7 @@ public class JobHandle extends AbstractAsyncJobImpl implements Job {
     private TaskCallback m_jobRunTask;
 
     /** constructor for submission */
-    public JobHandle(Session session) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public JobHandle(Session session) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         super(session, true);
         m_job = null;
         m_inputFile = null;
@@ -40,7 +39,7 @@ public class JobHandle extends AbstractAsyncJobImpl implements Job {
     }
 
     /** constructor for control and monitoring only */
-    public JobHandle(Session session, URL rm, String nativeJobId) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public JobHandle(Session session, URL rm, String nativeJobId) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session, false);
         m_job = (JobImpl) JobFactory.createJobService(m_session, rm).getJob(nativeJobId);
         m_inputFile = null;
@@ -49,18 +48,18 @@ public class JobHandle extends AbstractAsyncJobImpl implements Job {
 
     ////////////////////////////////////////// JobHandler specific method //////////////////////////////////////////
 
-    public void setJob(JobImpl job) throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public void setJob(JobImpl job) throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         m_job = job;
         if (m_isRunning) {
             this.doSubmit();
         }
     }
 
-    public void setInputFile(File inputFile) throws NoSuccess {
+    public void setInputFile(File inputFile) throws NoSuccessException {
         if (m_job==null || !m_isRunning) {
             m_inputFile = inputFile;
         } else {
-            throw new NoSuccess("Can not set stdin on a running job");
+            throw new NoSuccessException("Can not set stdin on a running job");
         }
     }
 
@@ -71,7 +70,7 @@ public class JobHandle extends AbstractAsyncJobImpl implements Job {
     //////////////////////////////////////////// implementation of Task ////////////////////////////////////////////
 
     /** override super.rethrow() */
-    public void rethrow() throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public void rethrow() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (m_job != null) {
             m_job.rethrow();
         }
@@ -80,7 +79,7 @@ public class JobHandle extends AbstractAsyncJobImpl implements Job {
     ////////////////////////////////////// implementation of AbstractTaskImpl //////////////////////////////////////
 
     private boolean m_isRunning = false;
-    protected void doSubmit() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    protected void doSubmit() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_job != null) {
             // send input stream to job
             if (m_inputFile != null) {
@@ -96,7 +95,7 @@ public class JobHandle extends AbstractAsyncJobImpl implements Job {
                     out.close();
                     in.close();
                 } catch (Exception e) {
-                    throw new NoSuccess(e);
+                    throw new NoSuccessException(e);
                 }
             }
 
@@ -118,7 +117,7 @@ public class JobHandle extends AbstractAsyncJobImpl implements Job {
         super.setState(State.CANCELED);
     }
 
-    protected State queryState() throws NotImplemented, Timeout, NoSuccess {
+    protected State queryState() throws NotImplementedException, TimeoutException, NoSuccessException {
         if (m_job != null) {
             return m_job.queryState();
         } else {
@@ -127,11 +126,11 @@ public class JobHandle extends AbstractAsyncJobImpl implements Job {
     }
 
     private int m_cookie;
-    public boolean startListening() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public boolean startListening() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_job != null) {
             try {
                 m_cookie = m_job.addCallback(Task.TASK_STATE, new Callback(){
-                    public boolean cb(Monitorable mt, Metric metric, Context ctx) throws NotImplemented, AuthorizationFailed {
+                    public boolean cb(Monitorable mt, Metric metric, Context ctx) throws NotImplementedException, AuthorizationFailedException {
                         State state = ((MetricImpl<State>) metric).getValue();
                         m_jobRunTask.setState(state);
                         JobHandle.this.setState(state);
@@ -146,101 +145,101 @@ public class JobHandle extends AbstractAsyncJobImpl implements Job {
                     }
                 });
             }
-            catch (AuthenticationFailed e) {throw new NoSuccess(e);}
-            catch (AuthorizationFailed e) {throw new NoSuccess(e);}
-            catch (PermissionDenied e) {throw new NoSuccess(e);}
-            catch (DoesNotExist e) {throw new NoSuccess(e);}
+            catch (AuthenticationFailedException e) {throw new NoSuccessException(e);}
+            catch (AuthorizationFailedException e) {throw new NoSuccessException(e);}
+            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
             return m_job.startListening();
         } else {
             return true;    // a job task is always listening (either with notification, or with polling)
         }
     }
 
-    public void stopListening() throws NotImplemented, Timeout, NoSuccess {
+    public void stopListening() throws NotImplementedException, TimeoutException, NoSuccessException {
         if (m_job != null) {
             try {
                 m_job.removeCallback(Task.TASK_STATE, m_cookie);
             }
-            catch (DoesNotExist e) {throw new NoSuccess(e);}
-            catch (BadParameter e) {throw new NoSuccess(e);}
-            catch (AuthenticationFailed e) {throw new NoSuccess(e);}
-            catch (AuthorizationFailed e) {throw new NoSuccess(e);}
-            catch (PermissionDenied e) {throw new NoSuccess(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (BadParameterException e) {throw new NoSuccessException(e);}
+            catch (AuthenticationFailedException e) {throw new NoSuccessException(e);}
+            catch (AuthorizationFailedException e) {throw new NoSuccessException(e);}
+            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
             m_job.stopListening();
         }
     }
 
     ////////////////////////////////////// implementation of Job //////////////////////////////////////
 
-    public JobDescription getJobDescription() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public JobDescription getJobDescription() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (m_job != null) {
             return m_job.getJobDescription();
         } else {
-            throw new NoSuccess("No resource has been allocated yet", this);
+            throw new NoSuccessException("No resource has been allocated yet", this);
         }
     }
 
-    public OutputStream getStdin() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, IncorrectState, NoSuccess {
+    public OutputStream getStdin() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         if (m_job != null) {
             return m_job.getStdin();
         } else {
-            throw new IncorrectState("No resource has been allocated yet", this);
+            throw new IncorrectStateException("No resource has been allocated yet", this);
         }
     }
 
-    public InputStream getStdout() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, IncorrectState, NoSuccess {
+    public InputStream getStdout() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         if (m_job != null) {
             return m_job.getStdout();
         } else {
-            throw new IncorrectState("No resource has been allocated yet", this);
+            throw new IncorrectStateException("No resource has been allocated yet", this);
         }
     }
 
-    public InputStream getStderr() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, IncorrectState, NoSuccess {
+    public InputStream getStderr() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         if (m_job != null) {
             return m_job.getStderr();
         } else {
-            throw new IncorrectState("No resource has been allocated yet", this);
+            throw new IncorrectStateException("No resource has been allocated yet", this);
         }
     }
 
-    public void suspend() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public void suspend() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_job != null) {
             m_job.suspend();
         } else {
-            throw new IncorrectState("No resource has been allocated yet", this);
+            throw new IncorrectStateException("No resource has been allocated yet", this);
         }
     }
 
-    public void resume() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public void resume() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_job != null) {
             m_job.resume();
         } else {
-            throw new IncorrectState("No resource has been allocated yet", this);
+            throw new IncorrectStateException("No resource has been allocated yet", this);
         }
     }
 
-    public void checkpoint() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public void checkpoint() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_job != null) {
             m_job.checkpoint();
         } else {
-            throw new IncorrectState("No resource has been allocated yet", this);
+            throw new IncorrectStateException("No resource has been allocated yet", this);
         }
     }
 
-    public void migrate(JobDescription jd) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    public void migrate(JobDescription jd) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_job != null) {
             m_job.migrate(jd);
         } else {
-            throw new IncorrectState("No resource has been allocated yet", this);
+            throw new IncorrectStateException("No resource has been allocated yet", this);
         }
     }
 
-    public void signal(int signum) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    public void signal(int signum) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_job != null) {
             m_job.signal(signum);
         } else {
-            throw new IncorrectState("No resource has been allocated yet", this);
+            throw new IncorrectStateException("No resource has been allocated yet", this);
         }
     }
 }

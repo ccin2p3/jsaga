@@ -23,9 +23,9 @@ public interface JobCollectionManager extends SagaObject {
      * @param jd the job collection description.
      * @return the job collection.
      */
-    public JobCollection createJobCollection(JobCollectionDescription jd) throws NotImplemented,
-           AuthenticationFailed, AuthorizationFailed, PermissionDenied,
-           BadParameter, Timeout, NoSuccess;
+    public JobCollection createJobCollection(JobCollectionDescription jd) throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException,
+            BadParameterException, TimeoutException, NoSuccessException;
 
     /**
      * Creates a job collection instance as specified by the job collection description provided.
@@ -33,17 +33,17 @@ public interface JobCollectionManager extends SagaObject {
      * @param force cleanup previous execution of job collection if needed
      * @return the job collection.
      */
-    public JobCollection createJobCollection(JobCollectionDescription jd, boolean force) throws NotImplemented,
-           AuthenticationFailed, AuthorizationFailed, PermissionDenied,
-           BadParameter, Timeout, NoSuccess;
+    public JobCollection createJobCollection(JobCollectionDescription jd, boolean force) throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException,
+            BadParameterException, TimeoutException, NoSuccessException;
 
     /**
      * Obtains the list of job collections that are currently known to this
      * job collection manager.
      * @return a list of job collection ids.
      */
-    public List<String> list() throws NotImplemented, AuthenticationFailed,
-           AuthorizationFailed, PermissionDenied, Timeout, NoSuccess;
+    public List<String> list() throws NotImplementedException, AuthenticationFailedException,
+            AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException;
 
     /**
      * Returns the job collection instance associated with the specified job collection
@@ -51,7 +51,7 @@ public interface JobCollectionManager extends SagaObject {
      * @param jobCollectionId the job collection identification.
      * @return the job collection instance.
      */
-    public JobCollection getJobCollection(String jobCollectionId) throws NotImplemented,
-           AuthenticationFailed, AuthorizationFailed, PermissionDenied,
-           BadParameter, DoesNotExist, Timeout, NoSuccess;
+    public JobCollection getJobCollection(String jobCollectionId) throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException,
+            BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException;
 }

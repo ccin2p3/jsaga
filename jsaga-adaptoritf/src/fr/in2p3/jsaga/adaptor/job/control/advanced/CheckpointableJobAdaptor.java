@@ -21,5 +21,5 @@ public interface CheckpointableJobAdaptor extends JobControlAdaptor {
      * @param nativeJobId the identifier of the job in the grid
      * @return true if the job has been successfully checkpointed, false if it was not active
      */
-    public boolean checkpoint(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess;
+    public boolean checkpoint(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException;
 }

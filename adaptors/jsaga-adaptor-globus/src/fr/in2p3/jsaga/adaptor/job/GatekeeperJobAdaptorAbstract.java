@@ -45,7 +45,7 @@ public abstract class GatekeeperJobAdaptorAbstract implements SagaSecureAdaptor 
         return 2119;
     }
    
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     	if(basePath.indexOf("=") > -1)
     		m_serverUrl = host+":"+port+":"+basePath;
     	else
@@ -75,35 +75,35 @@ public abstract class GatekeeperJobAdaptorAbstract implements SagaSecureAdaptor 
                             msg = msg.substring(msg.lastIndexOf("Caused by: "));
                             msg = msg.substring(0, msg.indexOf("]"));
                             String dn=null; try{dn=m_credential.getName().toString();} catch(GSSException e1){}
-                            throw new AuthenticationFailed(msg+" ("+dn+")");
+                            throw new AuthenticationFailedException(msg+" ("+dn+")");
                         } else {
-                            throw new AuthenticationFailed("Please check stack trace", e);
+                            throw new AuthenticationFailedException("Please check stack trace", e);
                         }
                     case GRAMProtocolErrorConstants.ERROR_AUTHORIZATION:
-	                    throw new AuthorizationFailed(e);
+	                    throw new AuthorizationFailedException(e);
 	                case GRAMProtocolErrorConstants.INVALID_JOB_CONTACT:
 	                case GRAMProtocolErrorConstants.ERROR_CONNECTION_FAILED:
-	                    throw new Timeout(e);
+	                    throw new TimeoutException(e);
 	                default:
-	                    throw new NoSuccess(e);
+	                    throw new NoSuccessException(e);
 	            }
 	        } catch (GSSException e) {
-	            throw new AuthenticationFailed(e);
+	            throw new AuthenticationFailedException(e);
 	        }
     	}
     }
 
-    public void disconnect() throws NoSuccess {
+    public void disconnect() throws NoSuccessException {
         m_serverUrl = null;
     }
     
 
-    protected GramJob getGramJobById(String nativeJobId) throws NoSuccess {
+    protected GramJob getGramJobById(String nativeJobId) throws NoSuccessException {
         GramJob job = new GramJob(m_credential, null);
         try {
             job.setID(nativeJobId);
         } catch (MalformedURLException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         return job;
     }

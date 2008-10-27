@@ -7,14 +7,12 @@ import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.factories.SecurityAdaptorBuilderFactory;
 import fr.in2p3.jsaga.impl.attributes.AbstractAttributesImpl;
 import org.apache.log4j.Logger;
-import org.ogf.saga.ObjectType;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.lang.Exception;
 import java.util.Map;
 
 /* ***************************************************
@@ -36,7 +34,7 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     private SecurityAdaptor m_adaptor;
 
     /** constructor */
-    public ContextImpl(String type) throws NotImplemented, IncorrectState, NoSuccess {
+    public ContextImpl(String type) throws NotImplementedException, IncorrectStateException, NoSuccessException {
         super(null, true);  //not attached to a session, isExtensible=true
         m_attributes = new ContextAttributes(this);
         if (type!=null && !type.equals("")) {
@@ -58,14 +56,10 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
         return clone;
     }
 
-    public ObjectType getType() {
-        return ObjectType.CONTEXT;
-    }
-
     ////////////////////////// override some AbstractAttributesImpl methods //////////////////////////
 
     /** override super.setAttribute() */
-    public void setAttribute(String key, String value) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void setAttribute(String key, String value) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         // set attribute
         if (Context.TYPE.equals(key)) {
             m_attributes.m_type.setObject(value);
@@ -78,7 +72,7 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     }
 
     /** override super.getAttribute() */
-    public String getAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    public String getAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (Context.TYPE.equals(key)) {
             return super.getAttribute(key);
         } else {
@@ -89,7 +83,7 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
                 try {
                     return adaptor.getUserID();
                 } catch (Exception e) {
-                    throw new NoSuccess(e);
+                    throw new NoSuccessException(e);
                 }
             } else {
                 String value = adaptor.getAttribute(key);
@@ -103,10 +97,10 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     }
 
     /** override super.setVectorAttribute() */
-    public void setVectorAttribute(String key, String[] values) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void setVectorAttribute(String key, String[] values) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         // set attribute
         if (Context.TYPE.equals(key)) {
-            throw new IncorrectState("Operation setVectorAttribute not allowed on scalar attribute: "+key, this);
+            throw new IncorrectStateException("Operation setVectorAttribute not allowed on scalar attribute: "+key, this);
         } else {
             super.setVectorAttribute(key, values);
         }
@@ -115,7 +109,7 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     }
 
     /** override super.getVectorAttribute() */
-    public String[] getVectorAttribute(String key) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    public String[] getVectorAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (Context.TYPE.equals(key)) {
             return super.getVectorAttribute(key);
         } else {
@@ -124,26 +118,26 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
             // get attribute
             try {
                 if (Context.USERID.equals(key)) {
-                    throw new IncorrectState("Operation getVectorAttribute not allowed on scalar attribute: "+key, this);
+                    throw new IncorrectStateException("Operation getVectorAttribute not allowed on scalar attribute: "+key, this);
                 } else {
                     String value = adaptor.getAttribute(key);
                     if (value != null) {
-                        throw new IncorrectState("Operation getVectorAttribute not allowed on scalar attribute: "+key, this);
+                        throw new IncorrectStateException("Operation getVectorAttribute not allowed on scalar attribute: "+key, this);
                     } else {
                         return super.getVectorAttribute(key);
                     }
                 }
             } catch (Exception e) {
-                throw new NoSuccess(e);
+                throw new NoSuccessException(e);
             }
         }
     }
 
     ///////////////////////////////////////// implementation /////////////////////////////////////////
 
-    public void setDefaults() throws NotImplemented, IncorrectState, NoSuccess {
+    public void setDefaults() throws NotImplementedException, IncorrectStateException, NoSuccessException {
         if (m_attributes.m_type.getObject().equals("Unknown") || m_adaptorBuilder==null) {
-            throw new IncorrectState("Attribute MUST be set before setting defaults: "+Context.TYPE, this);
+            throw new IncorrectStateException("Attribute MUST be set before setting defaults: "+Context.TYPE, this);
         }
 
         // set default attributes with config
@@ -169,7 +163,7 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
                 }
             }
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
 
         // reset adaptor
@@ -194,16 +188,16 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     /**
      * This method is specific to JSAGA implementation.
      */
-    public void destroy() throws IncorrectState, NoSuccess {
+    public void destroy() throws IncorrectStateException, NoSuccessException {
         if (m_adaptorBuilder == null) {
-            throw new IncorrectState("Attribute MUST be set before destroying context: "+Context.TYPE, this);
+            throw new IncorrectStateException("Attribute MUST be set before destroying context: "+Context.TYPE, this);
         }
         if (m_adaptorBuilder instanceof ExpirableSecurityAdaptorBuilder) {
             try {
                 ((ExpirableSecurityAdaptorBuilder) m_adaptorBuilder).destroySecurityAdaptor(
                         super._getAttributesMap(), m_attributes.m_type.getObject());
             } catch (Exception e) {
-                throw new NoSuccess(e);
+                throw new NoSuccessException(e);
             }
         }
         // reset adaptor
@@ -232,9 +226,9 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     /**
      * This method is specific to JSAGA implementation.
      */
-    public SecurityAdaptor getAdaptor() throws NotImplemented, IncorrectState, NoSuccess {
+    public SecurityAdaptor getAdaptor() throws NotImplementedException, IncorrectStateException, NoSuccessException {
         if (m_adaptorBuilder == null) {
-            throw new IncorrectState("Attribute MUST be set before using context: "+Context.TYPE, this);
+            throw new IncorrectStateException("Attribute MUST be set before using context: "+Context.TYPE, this);
         }
 
         // create adaptor if needed
@@ -244,18 +238,18 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
             int matching;
             try {
                 matching = (usage!=null ? usage.getFirstMatchingUsage(attributes) : -1);
-            } catch(DoesNotExist e) {
+            } catch(DoesNotExistException e) {
                 Usage missing = (usage!=null ? usage.getMissingValues(attributes) : null);
                 if (missing != null) {
-                    throw new IncorrectState("Missing attribute(s): "+missing.toString(), this);
+                    throw new IncorrectStateException("Missing attribute(s): "+missing.toString(), this);
                 } else {
-                    throw new NoSuccess("[INTERNAL ERROR] Unexpected exception", this);
+                    throw new NoSuccessException("[INTERNAL ERROR] Unexpected exception", this);
                 }
             }
             m_adaptor = m_adaptorBuilder.createSecurityAdaptor(
                     matching, attributes, m_attributes.m_type.getObject());
             if (m_adaptor == null) {
-                throw new NotImplemented("[INTERNAL ERROR] Method createSecurityAdaptor should never return 'null'");
+                throw new NotImplementedException("[INTERNAL ERROR] Method createSecurityAdaptor should never return 'null'");
             }
         }
         return m_adaptor;

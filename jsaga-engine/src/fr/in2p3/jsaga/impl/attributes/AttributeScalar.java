@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.impl.attributes;
 
-import org.ogf.saga.error.IncorrectState;
+import org.ogf.saga.error.IncorrectStateException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -41,13 +41,13 @@ public class AttributeScalar extends AttributeAbstract {
     }
 
     /** override Attribute.setValues() */
-    public void setValues(String[] values) throws IncorrectState {
-        throw new IncorrectState("Attribute "+super.getKey()+" not vector");
+    public void setValues(String[] values) throws IncorrectStateException {
+        throw new IncorrectStateException("Attribute "+super.getKey()+" not vector");
     }
 
     /** override Attribute.getValues() */
-    public String[] getValues() throws IncorrectState {
-        throw new IncorrectState("Attribute "+super.getKey()+" not vector");
+    public String[] getValues() throws IncorrectStateException {
+        throw new IncorrectStateException("Attribute "+super.getKey()+" not vector");
     }
 
     public void _setValue(String value) {

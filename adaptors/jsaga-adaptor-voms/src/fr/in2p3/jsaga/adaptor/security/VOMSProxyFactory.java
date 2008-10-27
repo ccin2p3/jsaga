@@ -9,8 +9,8 @@ import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -42,7 +42,7 @@ public class VOMSProxyFactory {
     private VOMSProxyInit m_proxyInit;
     private VOMSRequestOptions m_requestOptions;
 
-    public VOMSProxyFactory(Map attributes, int certificateFormat) throws BadParameter, ParseException, URISyntaxException {
+    public VOMSProxyFactory(Map attributes, int certificateFormat) throws BadParameterException, ParseException, URISyntaxException {
         // required attributes
         System.setProperty("X509_CERT_DIR", (String) attributes.get(Context.CERTREPOSITORY));
         System.setProperty("CADIR", (String) attributes.get(Context.CERTREPOSITORY));
@@ -58,12 +58,12 @@ public class VOMSProxyFactory {
                 System.setProperty("PKCS12_USER_CERT", (String) attributes.get(VOMSContext.USERCERTKEY));
                 break;
             default:
-                throw new BadParameter("Invalid case, either PEM or PKCS12 certificates is supported");
+                throw new BadParameterException("Invalid case, either PEM or PKCS12 certificates is supported");
         }
 
         URI uri = new URI((String) attributes.get(Context.SERVER));
         if (uri.getHost()==null) {
-            throw new BadParameter("Attribute Server has no host name: "+uri.toString());
+            throw new BadParameterException("Attribute Server has no host name: "+uri.toString());
         }
         VOMSServerInfo server = new VOMSServerInfo();
         server.setHostName(uri.getHost());
@@ -109,7 +109,7 @@ public class VOMSProxyFactory {
         }
     }
 
-    public GSSCredential createProxy() throws GSSException, BadParameter, NoSuccess {
+    public GSSCredential createProxy() throws GSSException, BadParameterException, NoSuccessException {
         // create
         GlobusCredential globusProxy;
         if("NOVO".equals(m_requestOptions.getVoName())) {
@@ -126,11 +126,11 @@ public class VOMSProxyFactory {
 		        for (int i=0; i<v.size(); i++) {
 		            VOMSAttribute attr = (VOMSAttribute) v.elementAt(i);
 		            if(!attr.getVO().equals(m_requestOptions.getVoName()))
-		            	throw new NoSuccess("The VO name of the created VOMS proxy ('"+attr.getVO()+"') does not match with the required VO name ('"+m_requestOptions.getVoName()+"').");
+		            	throw new NoSuccessException("The VO name of the created VOMS proxy ('"+attr.getVO()+"') does not match with the required VO name ('"+m_requestOptions.getVoName()+"').");
 		        }
 	        }
 	        catch (IllegalArgumentException iAE) {
-	        	throw new BadParameter("The lifetime may be too long", iAE);
+	        	throw new BadParameterException("The lifetime may be too long", iAE);
 	        }
         }
         return new GlobusGSSCredentialImpl(globusProxy, GSSCredential.INITIATE_AND_ACCEPT);

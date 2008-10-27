@@ -3,7 +3,7 @@ package fr.in2p3.jsaga.adaptor.language.abstracts;
 import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.language.LanguageAdaptor;
 import fr.in2p3.jsaga.helpers.XMLFileParser;
-import org.ogf.saga.error.BadParameter;
+import org.ogf.saga.error.BadParameterException;
 import org.w3c.dom.Document;
 
 import java.io.File;
@@ -28,12 +28,12 @@ public abstract class AbstractLanguageAdaptorXML implements LanguageAdaptor {
         m_parser = new XMLFileParser(schemaResourcePaths);
     }
 
-    public Document parseJobDescription(InputStream jobDescStream) throws BadParameter {
+    public Document parseJobDescription(InputStream jobDescStream) throws BadParameterException {
         try {
             File debugFile = new File(new File(Base.JSAGA_VAR, "debug"), "parsed-job-description.xml");
             return m_parser.parse(jobDescStream, debugFile);
         } catch (Exception e) {
-            throw new BadParameter(e);
+            throw new BadParameterException(e);
         }
     }
 }

@@ -5,7 +5,6 @@ import fr.in2p3.jsaga.introspector.IntrospectorFactory;
 import org.ogf.saga.error.*;
 
 import java.io.*;
-import java.lang.Exception;
 import java.net.URL;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -138,10 +137,10 @@ public class PostInstall {
         return value;
     }
 
-    private static Introspector getIntrospector(String scheme, String type) throws NotImplemented, DoesNotExist, NoSuccess {
+    private static Introspector getIntrospector(String scheme, String type) throws NotImplementedException, DoesNotExistException, NoSuccessException {
         switch (PostInstallType.valueOf(type)) {
             case security:
-                throw new NotImplemented("Security contexts introspection not yet implemented"); //TODO
+                throw new NotImplementedException("Security contexts introspection not yet implemented"); //TODO
             case data:
                 Introspector nsIntr = IntrospectorFactory.createNSIntrospector();
                 return nsIntr.getChildIntrospector(scheme);
@@ -149,7 +148,7 @@ public class PostInstall {
                 Introspector jobIntr = IntrospectorFactory.createJobIntrospector();
                 return jobIntr.getChildIntrospector(scheme);
             default:
-                throw new NoSuccess("Unexpected type: "+type);
+                throw new NoSuccessException("Unexpected type: "+type);
         }
     }
 

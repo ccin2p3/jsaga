@@ -4,7 +4,7 @@ import edu.sdsc.grid.io.MetaDataRecordList;
 import edu.sdsc.grid.io.irods.IRODSMetaDataSet;
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.DoesNotExistException;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -20,8 +20,7 @@ import org.ogf.saga.error.DoesNotExist;
  */
 public class IrodsFileAttributes extends FileAttributes {
 
-    public IrodsFileAttributes(MetaDataRecordList collection, MetaDataRecordList file) throws DoesNotExist
-	{
+    public IrodsFileAttributes(MetaDataRecordList collection, MetaDataRecordList file) throws DoesNotExistException {
         // set name
 		if (collection != null) {
 			m_name = (String) collection.getValue(collection.getFieldIndex(IRODSMetaDataSet.DIRECTORY_NAME));
@@ -30,7 +29,7 @@ public class IrodsFileAttributes extends FileAttributes {
 		}
 
 		if (m_name ==null || m_name.equals(".") || m_name.equals("..")) {
-			throw new DoesNotExist("Ignore this entry");
+			throw new DoesNotExistException("Ignore this entry");
 		}
 
         // set type        

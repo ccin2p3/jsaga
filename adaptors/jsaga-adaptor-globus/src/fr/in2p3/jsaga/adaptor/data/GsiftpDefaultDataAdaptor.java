@@ -29,19 +29,19 @@ public class GsiftpDefaultDataAdaptor extends GsiftpDataAdaptorAbstract {
         return null;
     }
 
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return null;
     }
 
-    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        throw new NoSuccess("INTERNAL ERROR: this should never occur");
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+        throw new NoSuccessException("INTERNAL ERROR: this should never occur");
     }
 
-    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        throw new NoSuccess("INTERNAL ERROR: this should never occur");
+    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+        throw new NoSuccessException("INTERNAL ERROR: this should never occur");
     }
 
-    protected void rethrowParsedException(UnexpectedReplyCodeException e) throws DoesNotExist, AlreadyExists, PermissionDenied, NoSuccess {
-        throw new NoSuccess(e);
+    protected void rethrowParsedException(UnexpectedReplyCodeException e) throws DoesNotExistException, AlreadyExistsException, PermissionDeniedException, NoSuccessException {
+        throw new NoSuccessException(e);
     }
 }

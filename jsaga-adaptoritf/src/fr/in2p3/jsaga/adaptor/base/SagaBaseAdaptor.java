@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.adaptor.base;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import org.ogf.saga.error.IncorrectState;
+import org.ogf.saga.error.IncorrectStateException;
 
 import java.util.Map;
 
@@ -35,7 +35,7 @@ public interface SagaBaseAdaptor {
      * These values may be statically defined, or they may be generated according to the available information.
      * @param attributes the available information.
      * @return array of default values for some attributes.
-     * @throws IncorrectState if cannot create valid default values based on the available information.
+     * @throws IncorrectStateException if cannot create valid default values based on the available information.
      */
-    public Default[] getDefaults(Map attributes) throws IncorrectState;
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException;
 }

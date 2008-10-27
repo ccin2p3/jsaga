@@ -23,20 +23,20 @@ public interface LogicalReaderMetaData extends LogicalReader {
      * @param keyValuePatterns map of meta-data keys to values of entries to be found.
      * @param additionalArgs adaptor specific arguments
      * @return attributes of the matching entries.
-     * @throws DoesNotExist if <code>absolutePath</code> does not exist.
+     * @throws DoesNotExistException if <code>absolutePath</code> does not exist.
      */
     public FileAttributes[] listAttributes(String logicalDir, Map keyValuePatterns, String additionalArgs)
-        throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
+        throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException;
 
     /**
      * List the meta data of the logical entry.
      * @param logicalEntry absolute path of the logical entry.
      * @param additionalArgs adaptor specific arguments
      * @return a key-value map containing the meta data
-     * @throws NoSuccess if <code>absolutePath</code> does not exist.
+     * @throws NoSuccessException if <code>absolutePath</code> does not exist.
      */
     public Map listMetaData(String logicalEntry, String additionalArgs)
-        throws PermissionDenied, Timeout, NoSuccess;
+        throws PermissionDeniedException, TimeoutException, NoSuccessException;
 
     /**
      * Get a meta data from the logical entry.
@@ -44,9 +44,9 @@ public interface LogicalReaderMetaData extends LogicalReader {
      * @param name name of the metadata to get.
      * @param additionalArgs adaptor specific arguments
      * @return the meta data value.
-     * @throws NoSuccess if <code>logicalEntry</code> does not exist.
-     * @throws DoesNotExist if the meta data does not exist.
+     * @throws NoSuccessException if <code>logicalEntry</code> does not exist.
+     * @throws DoesNotExistException if the meta data does not exist.
      */
     public String getMetaData(String logicalEntry, String name, String additionalArgs)
-        throws PermissionDenied, Timeout, NoSuccess, DoesNotExist;
+        throws PermissionDeniedException, TimeoutException, NoSuccessException, DoesNotExistException;
 }

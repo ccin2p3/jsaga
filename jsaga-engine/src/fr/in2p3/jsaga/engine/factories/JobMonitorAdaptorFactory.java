@@ -9,12 +9,11 @@ import fr.in2p3.jsaga.engine.config.bean.JobserviceEngineConfiguration;
 import fr.in2p3.jsaga.engine.schema.config.JobService;
 import fr.in2p3.jsaga.engine.schema.config.MonitorService;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
-import org.ogf.saga.url.URL;
-import org.ogf.saga.url.URLFactory;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 
-import java.lang.Exception;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,9 +37,9 @@ public class JobMonitorAdaptorFactory extends ServiceAdaptorFactory {
         m_configuration = configuration.getConfigurations().getJobserviceCfg();
     }
 
-    public URL getJobMonitorURL(URL controlURL) throws NotImplemented, IncorrectURL, BadParameter, NoSuccess {
+    public URL getJobMonitorURL(URL controlURL) throws NotImplementedException, IncorrectURLException, BadParameterException, NoSuccessException {
         if (controlURL==null || controlURL.getScheme()==null) {
-            throw new IncorrectURL("Invalid entry name: "+controlURL);
+            throw new IncorrectURLException("Invalid entry name: "+controlURL);
         }
 
         // get config
@@ -61,9 +60,9 @@ public class JobMonitorAdaptorFactory extends ServiceAdaptorFactory {
      * @param session the security session
      * @return the job monitor adaptor instance
      */
-    public JobMonitorAdaptor getJobMonitorAdaptor(URL url, Session session) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+    public JobMonitorAdaptor getJobMonitorAdaptor(URL url, Session session) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         if (url==null || url.getScheme()==null) {
-            throw new IncorrectURL("Invalid entry name: "+url);
+            throw new IncorrectURLException("Invalid entry name: "+url);
         }
 
         // get config
@@ -76,7 +75,7 @@ public class JobMonitorAdaptorFactory extends ServiceAdaptorFactory {
             Class clazz = Class.forName(config.getImpl());
             monitorAdaptor = (JobMonitorAdaptor) clazz.newInstance();
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
 
         // get security context
@@ -89,17 +88,17 @@ public class JobMonitorAdaptorFactory extends ServiceAdaptorFactory {
         } else if (url.getFragment() != null) {
             context = super.findContext(session, url.getFragment());
             if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(monitorAdaptor.getSupportedSecurityAdaptorClasses())) {
-                throw new NoSuccess("Security context not found: "+url.getFragment());
+                throw new NoSuccessException("Security context not found: "+url.getFragment());
             }
         } else if (jobServiceConfig.getSupportedContextTypeCount() > 0) {
             context = super.findContext(session, jobServiceConfig.getSupportedContextType());
             if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(monitorAdaptor.getSupportedSecurityAdaptorClasses())) {
-                throw new NoSuccess("None of the supported security context is valid");
+                throw new NoSuccessException("None of the supported security context is valid");
             }
         } else {
             context = null;
             if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(monitorAdaptor.getSupportedSecurityAdaptorClasses())) {
-                throw new NoSuccess("None of the supported security context is found");
+                throw new NoSuccessException("None of the supported security context is found");
             }
         }
 
@@ -108,15 +107,15 @@ public class JobMonitorAdaptorFactory extends ServiceAdaptorFactory {
             SecurityAdaptor securityAdaptor;
             try {
                 securityAdaptor = context.getAdaptor();
-            } catch (IncorrectState e) {
-                throw new NoSuccess("Bad security context: "+super.getContextType(context), e);
+            } catch (IncorrectStateException e) {
+                throw new NoSuccessException("Bad security context: "+super.getContextType(context), e);
             }
             if (SecurityAdaptorDescriptor.isSupported(securityAdaptor.getClass(), monitorAdaptor.getSupportedSecurityAdaptorClasses())) {
                 monitorAdaptor.setSecurityAdaptor(securityAdaptor);
             } else if (SecurityAdaptorDescriptor.isSupportedNoContext(monitorAdaptor.getSupportedSecurityAdaptorClasses())) {
                 monitorAdaptor.setSecurityAdaptor(null);
             } else {
-                throw new AuthenticationFailed("Security context class '"+ securityAdaptor.getClass().getName() +"' not supported for protocol: "+url.getScheme());
+                throw new AuthenticationFailedException("Security context class '"+ securityAdaptor.getClass().getName() +"' not supported for protocol: "+url.getScheme());
             }
         }
 

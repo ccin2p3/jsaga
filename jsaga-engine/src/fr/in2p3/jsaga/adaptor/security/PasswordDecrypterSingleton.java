@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.security;
 
-import org.ogf.saga.error.BadParameter;
+import org.ogf.saga.error.BadParameterException;
 import sun.misc.BASE64Decoder;
 
 import javax.crypto.Cipher;
@@ -29,7 +29,7 @@ public class PasswordDecrypterSingleton extends PasswordAbstract {
         // load key from keystore
         m_key = m_keystore.getKey(keyalias, m_keypass);
         if (m_key == null) {
-            throw new BadParameter("Key not found in keystore: "+keyalias);
+            throw new BadParameterException("Key not found in keystore: "+keyalias);
         }
     }
 

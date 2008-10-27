@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.adaptor.language.abstracts;
 
 import fr.in2p3.jsaga.adaptor.language.LanguageAdaptor;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.NoSuccessException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -48,13 +48,13 @@ public abstract class AbstractLanguageAdaptorProperties implements LanguageAdapt
         m_vectoryPropertySeparator = (vectorPropertySeparator!=null ? vectorPropertySeparator : ",");
     }
 
-    public Document parseJobDescription(InputStream jobDescStream) throws BadParameter, NoSuccess {
+    public Document parseJobDescription(InputStream jobDescStream) throws BadParameterException, NoSuccessException {
         // load properties
         Properties prop = new Properties();
         try {
             prop.load(jobDescStream);
         } catch (IOException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
 
         // check if required elements are present
@@ -62,7 +62,7 @@ public abstract class AbstractLanguageAdaptorProperties implements LanguageAdapt
             String name = (String) it.next();
             String value = prop.getProperty(name);
             if (value == null) {
-                throw new BadParameter("Missing required attribute: "+name);
+                throw new BadParameterException("Missing required attribute: "+name);
             }
         }
 
@@ -71,7 +71,7 @@ public abstract class AbstractLanguageAdaptorProperties implements LanguageAdapt
         try {
             jobDescDOM = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         } catch (ParserConfigurationException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         Element root = jobDescDOM.createElement("attributes");
         jobDescDOM.appendChild(root);
@@ -93,7 +93,7 @@ public abstract class AbstractLanguageAdaptorProperties implements LanguageAdapt
                 }
                 root.appendChild(vectorAttribute);
             } else {
-                throw new BadParameter("Unexpected attribute name: "+name);
+                throw new BadParameterException("Unexpected attribute name: "+name);
             }
         }
 

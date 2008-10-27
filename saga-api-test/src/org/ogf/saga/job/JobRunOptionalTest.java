@@ -1,15 +1,10 @@
 package org.ogf.saga.job;
 
-import java.util.List;
-
-import org.ogf.saga.error.IncorrectState;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
+import org.ogf.saga.error.*;
 import org.ogf.saga.job.abstracts.AbstractJobTest;
-import org.ogf.saga.task.State;
-import org.ogf.saga.task.TaskContainer;
-import org.ogf.saga.task.TaskFactory;
-import org.ogf.saga.task.WaitMode;
+import org.ogf.saga.task.*;
+
+import java.util.List;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -84,9 +79,9 @@ public class JobRunOptionalTest extends AbstractJobTest {
         try {
             // suspend job
             job.suspend();
-            fail("Expected IncorrectState exception");
+            fail("Expected exception: "+ IncorrectStateException.class);
         }
-        catch (IncorrectState incorrectState) {
+        catch (IncorrectStateException incorrectState) {
         }
         finally {
         	job.waitFor(Float.valueOf(FINALY_TIMEOUT));
@@ -114,7 +109,7 @@ public class JobRunOptionalTest extends AbstractJobTest {
         	// suspend job
         	job.suspend();
         }
-        catch (NotImplemented notImplemented) {
+        catch (NotImplementedException notImplemented) {
         	job.waitFor(Float.valueOf(FINALY_TIMEOUT));
         	throw notImplemented;
         }
@@ -137,7 +132,7 @@ public class JobRunOptionalTest extends AbstractJobTest {
 	                State.RUNNING,
 	                job.getState());
         }
-        catch (IncorrectState incorrectState) {
+        catch (IncorrectStateException incorrectState) {
         }
         finally {
         	job.waitFor(Float.valueOf(FINALY_TIMEOUT));
@@ -164,9 +159,9 @@ public class JobRunOptionalTest extends AbstractJobTest {
         try {
             // resume job
             job.resume();
-            fail("Expected IncorrectState exception");
+            fail("Expected exception: "+ IncorrectStateException.class);
         }
-        catch (IncorrectState incorrectState) {
+        catch (IncorrectStateException incorrectState) {
         }
         finally {
         	job.waitFor(Float.valueOf(FINALY_TIMEOUT));
@@ -231,9 +226,9 @@ public class JobRunOptionalTest extends AbstractJobTest {
 			}
 		}
 		if(numberOfFailed > 1) 
-			throw new NoSuccess(numberOfFailed + " jobs of "+numberOfJobs+" are failed.");
+			throw new NoSuccessException(numberOfFailed + " jobs of "+numberOfJobs+" are failed.");
 		if(numberOfFailed > 0) 
-			throw new NoSuccess(numberOfFailed + " job of "+numberOfJobs+" is failed.");
+			throw new NoSuccessException(numberOfFailed + " job of "+numberOfJobs+" is failed.");
 
     }
 
@@ -266,9 +261,9 @@ public class JobRunOptionalTest extends AbstractJobTest {
 			}
 		}
 		if(numberOfFailed > 1) 
-			throw new NoSuccess(numberOfFailed + " jobs of "+numberOfJobs+" are failed.");
+			throw new NoSuccessException(numberOfFailed + " jobs of "+numberOfJobs+" are failed.");
 		if(numberOfFailed > 0) 
-			throw new NoSuccess(numberOfFailed + " job of "+numberOfJobs+" is failed.");
+			throw new NoSuccessException(numberOfFailed + " job of "+numberOfJobs+" is failed.");
 		
     	assertEquals(
 	                0,
@@ -313,9 +308,9 @@ public class JobRunOptionalTest extends AbstractJobTest {
 		}
 		
 		if(numberOfFailed > 1) 
-			throw new NoSuccess(numberOfFailed + " jobs of "+numberOfJobs+" are failed.");
+			throw new NoSuccessException(numberOfFailed + " jobs of "+numberOfJobs+" are failed.");
 		if(numberOfFailed > 0) 
-			throw new NoSuccess(numberOfFailed + " job of "+numberOfJobs+" is failed.");
+			throw new NoSuccessException(numberOfFailed + " job of "+numberOfJobs+" is failed.");
 		
     	assertEquals(
 	                0,

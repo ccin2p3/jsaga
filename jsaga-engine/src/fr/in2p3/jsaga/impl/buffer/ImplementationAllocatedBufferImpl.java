@@ -18,7 +18,7 @@ import org.ogf.saga.error.*;
  */
 public class ImplementationAllocatedBufferImpl extends AbstractBufferImpl implements Buffer {
     /** constructor */
-    public ImplementationAllocatedBufferImpl(int size) throws BadParameter, NotImplemented, NoSuccess {
+    public ImplementationAllocatedBufferImpl(int size) throws BadParameterException, NotImplementedException, NoSuccessException {
         super();
         this.setSize(size);
     }
@@ -35,23 +35,23 @@ public class ImplementationAllocatedBufferImpl extends AbstractBufferImpl implem
         return clone;
     }
 
-    public void setSize(int size) throws NotImplemented, BadParameter, NoSuccess {
+    public void setSize(int size) throws NotImplementedException, BadParameterException, NoSuccessException {
         if (size > -1) {
             m_buffer = new byte[size];
         } else {
-            throw new NotImplemented("You must specify either the buffer or its size");
+            throw new NotImplementedException("You must specify either the buffer or its size");
         }
     }
 
-    public void setSize() throws NotImplemented, BadParameter, NoSuccess {
+    public void setSize() throws NotImplementedException, BadParameterException, NoSuccessException {
         if (m_buffer != null) {
             m_buffer = new byte[m_buffer.length];
         } else {
-            throw new NotImplemented("You must specify either the buffer or its size");
+            throw new NotImplementedException("You must specify either the buffer or its size");
         }
     }
 
-    public void setData(byte[] data) throws NotImplemented, BadParameter, NoSuccess {
-        throw new NotImplemented("Not allowed to change the byte[] of an implementation-allocated buffer", this);
+    public void setData(byte[] data) throws NotImplementedException, BadParameterException, NoSuccessException {
+        throw new NotImplementedException("Not allowed to change the byte[] of an implementation-allocated buffer", this);
     }
 }

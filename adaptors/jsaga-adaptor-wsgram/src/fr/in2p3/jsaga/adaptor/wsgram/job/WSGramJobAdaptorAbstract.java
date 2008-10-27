@@ -24,13 +24,13 @@ import org.ietf.jgss.GSSCredential;
 import org.oasis.wsrf.properties.GetResourceProperty;
 import org.oasis.wsrf.properties.InvalidResourcePropertyQNameFaultType;
 import org.oasis.wsrf.properties.WSResourcePropertiesServiceAddressingLocator;
-import org.ogf.saga.error.AuthenticationFailed;
-import org.ogf.saga.error.AuthorizationFailed;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.IncorrectState;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
-import org.ogf.saga.error.Timeout;
+import org.ogf.saga.error.AuthenticationFailedException;
+import org.ogf.saga.error.AuthorizationFailedException;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.TimeoutException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -85,7 +85,7 @@ public abstract class WSGramJobAdaptorAbstract implements SagaSecureAdaptor {
         return new UOptional(IP_ADDRESS);
     }
 
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
     	try {
 			String defaultIp = InetAddress.getLocalHost().getHostAddress();
 	    	return new Default[]{new Default(IP_ADDRESS, defaultIp)};
@@ -94,7 +94,7 @@ public abstract class WSGramJobAdaptorAbstract implements SagaSecureAdaptor {
 		}
     }
 
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     	m_serverUrl = "https://"+host+":"+port;
     	if(basePath != null &&
     			!basePath.equals("") && 
@@ -136,9 +136,9 @@ public abstract class WSGramJobAdaptorAbstract implements SagaSecureAdaptor {
 	    		}
 	    		fos.close();
 			} catch (FileNotFoundException e) {
-				throw new NoSuccess(e);
+				throw new NoSuccessException(e);
 			} catch (IOException e) {
-				throw new NoSuccess(e);
+				throw new NoSuccessException(e);
 			}
     	}    	
     	AxisProperties.setProperty(EngineConfigurationFactoryDefault.OPTION_CLIENT_CONFIG_FILE, clientConfigFile);
@@ -162,31 +162,31 @@ public abstract class WSGramJobAdaptorAbstract implements SagaSecureAdaptor {
 	            stub.getResourceProperty(qname);
 	
 			} catch (MalformedURLException e) {
-				throw new NoSuccess(e);
+				throw new NoSuccessException(e);
 			} catch (ServiceException e) {
-				throw new NoSuccess(e);
+				throw new NoSuccessException(e);
 			} catch (InvalidResourcePropertyQNameFaultType e) {
-				throw new NoSuccess(e);
+				throw new NoSuccessException(e);
 			} catch (RemoteException e) {
-				throw new NoSuccess(e);
+				throw new NoSuccessException(e);
 			}
     	}
     }
 
-    public void disconnect() throws NoSuccess {
+    public void disconnect() throws NoSuccessException {
         m_serverUrl = null;
         m_serverBatch = null;
         m_credential = null;
     }
     
-    protected GramJob getGramJobById(String nativeJobId) throws NoSuccess {
+    protected GramJob getGramJobById(String nativeJobId) throws NoSuccessException {
     	GramJob job = new GramJob();
         try {
         	job.setCredentials(m_credential);
             job.setHandle(nativeJobId);
         }
         catch (Exception e) {
-        	throw new NoSuccess("could not find job with endpoint: " + nativeJobId);
+        	throw new NoSuccessException("could not find job with endpoint: " + nativeJobId);
         }
     	return job;
     }

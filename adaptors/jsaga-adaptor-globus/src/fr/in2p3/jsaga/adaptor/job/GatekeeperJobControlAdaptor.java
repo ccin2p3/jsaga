@@ -47,7 +47,7 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
         		new UOptional(TCP_PORT_RANGE)});
     }
 
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
     	try {
 			String defaultIp = InetAddress.getLocalHost().getHostAddress();
 			String defaultTcpPortRange="40000,45000";
@@ -73,34 +73,34 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
         return new GatekeeperJobMonitorAdaptor();
     }
 
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         super.connect(userInfo, host, port, basePath, attributes);
         m_parameters = attributes;
     }
 
-    public void disconnect() throws NoSuccess {
+    public void disconnect() throws NoSuccessException {
         super.disconnect();
         m_parameters = null;
     }
 
-    public String submit(String jobDesc, boolean checkMatch)  throws PermissionDenied, Timeout, NoSuccess, BadResource {
+    public String submit(String jobDesc, boolean checkMatch)  throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
     	RslNode rslTree;
         try {
         	rslTree = RSLParser.parse(jobDesc);
         } catch (ParseException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         return submit(rslTree, checkMatch, false);
     }
 
-    public String submitInteractive(String jobDesc, boolean checkMatch, InputStream stdin, OutputStream stdout, OutputStream stderr) throws PermissionDenied, Timeout, NoSuccess {
+    public String submitInteractive(String jobDesc, boolean checkMatch, InputStream stdin, OutputStream stdout, OutputStream stderr) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         RslNode rslTree;
         String gassURL;
         try {
             rslTree = RSLParser.parse(jobDesc);
             gassURL = startGassServer(stdout, stderr);
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         // update RSL
         Bindings subst = new Bindings("rsl_substitution");
@@ -108,7 +108,7 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
         rslTree.add(subst);
         if (stdin != null) {
             File stdinFile;
-            try{stdinFile=File.createTempFile("stdin-",".txt",new File("./"));} catch(IOException e){throw new NoSuccess(e);}
+            try{stdinFile=File.createTempFile("stdin-",".txt",new File("./"));} catch(IOException e){throw new NoSuccessException(e);}
             //todo: remove stdinFile on cleanup() instead of on exit
             stdinFile.deleteOnExit();
             save(stdin, stdinFile);
@@ -125,7 +125,7 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
         return this.submit(rslTree, checkMatch, true);
     }
     
-    private String submit(RslNode rslTree, boolean checkMatch, boolean isInteractive) throws PermissionDenied, Timeout, NoSuccess, BadResource {
+    private String submit(RslNode rslTree, boolean checkMatch, boolean isInteractive) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
         if(checkMatch) {
 			logger.debug("CheckMatch not supported");
 		}
@@ -149,36 +149,36 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
         } catch (GramException e) {
             this.rethrowException(e);
         } catch (GSSException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         return job.getIDAsString();
     }
 
-    public void cancel(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess {
+    public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         GramJob job = getGramJobById(nativeJobId);
         try {
             job.cancel();
         } catch (GramException e) {
             this.rethrowException(e);
         } catch (GSSException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 
-    /*public boolean suspend(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess {
+    /*public boolean suspend(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         return this.signal(nativeJobId, GRAMConstants.SIGNAL_SUSPEND);
     }
 
-    public boolean resume(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess {
+    public boolean resume(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         return this.signal(nativeJobId, GRAMConstants.SIGNAL_RESUME);
     }
 
-    public boolean signal(String nativeJobId, int signal) throws PermissionDenied, Timeout, NoSuccess {
+    public boolean signal(String nativeJobId, int signal) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         GramJob job = new GramJob(m_credential, null);
         try {
             job.setID(nativeJobId);
         } catch (MalformedURLException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         int errorCode = -1;
         try {
@@ -186,27 +186,27 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
         } catch (GramException e) {
             this.rethrowException(e);
         } catch (GSSException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         return errorCode==0;
     }*/
 
-    private void rethrowException(GramException e) throws PermissionDenied, Timeout, NoSuccess , BadResource{
+    private void rethrowException(GramException e) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource{
     	switch(e.getErrorCode()) {
     		case GRAMProtocolErrorConstants.BAD_DIRECTORY:
     			throw new BadResource(e);
             case GRAMProtocolErrorConstants.ERROR_AUTHORIZATION:
-                throw new PermissionDenied(e);
+                throw new PermissionDeniedException(e);
             case GRAMProtocolErrorConstants.INVALID_JOB_CONTACT:
             case GRAMProtocolErrorConstants.ERROR_CONNECTION_FAILED:
-                throw new Timeout(e);
+                throw new TimeoutException(e);
             default:
-                throw new NoSuccess(e);
+                throw new NoSuccessException(e);
         }
     }
 
-	public void clean(String nativeJobId) throws PermissionDenied, Timeout,
-			NoSuccess {
+	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException,
+            NoSuccessException {
 		try {
 			if(twoPhaseUsed ) {
 				GramJob job = getGramJobById(nativeJobId);			
@@ -214,9 +214,9 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
 				job.signal(GRAMConstants.SIGNAL_COMMIT_END);
 			}
 		} catch (GramException e) {
-			throw new NoSuccess("Unable to send commit end signal", e);
+			throw new NoSuccessException("Unable to send commit end signal", e);
 		} catch (GSSException e) {
-			throw new NoSuccess("Unable to send commit end signal", e);
+			throw new NoSuccessException("Unable to send commit end signal", e);
 		}
 	}
 
@@ -235,7 +235,7 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
         return gassURL;
     }
 
-    private static void save(InputStream in, File file) throws NoSuccess {
+    private static void save(InputStream in, File file) throws NoSuccessException {
         try {
             OutputStream out = new FileOutputStream(file);
             byte[] buffer = new byte[1024];
@@ -244,7 +244,7 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
             }
             out.close();
         } catch(IOException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 }

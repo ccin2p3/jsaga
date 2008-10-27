@@ -42,7 +42,7 @@ public class WorkflowImplTest extends TestCase {
     }
 
     class TestTask extends DummyTask {
-        public TestTask(String name) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+        public TestTask(String name) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
             super(name);
         }
     }

@@ -1,7 +1,7 @@
 package org.ogf.saga.url;
 
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.NoSuccessException;
 
 public interface URL {
 
@@ -10,10 +10,10 @@ public interface URL {
      * 
      * @param url
      *            the string.
-     * @exception BadParameter
+     * @exception BadParameterException
      *                is thrown when there is a syntax error in the parameter.
      */
-    public void setString(String url) throws BadParameter;
+    public void setString(String url) throws BadParameterException;
 
     /**
      * Returns this URL as a string.
@@ -34,10 +34,10 @@ public interface URL {
      * 
      * @param fragment
      *            the fragment.
-     * @exception BadParameter
+     * @exception BadParameterException
      *                is thrown when there is a syntax error in the parameter.
      */
-    public void setFragment(String fragment) throws BadParameter;
+    public void setFragment(String fragment) throws BadParameterException;
 
     /**
      * Returns the host part of this URL.
@@ -51,10 +51,10 @@ public interface URL {
      * 
      * @param host
      *            the host.
-     * @exception BadParameter
+     * @exception BadParameterException
      *                is thrown when there is a syntax error in the parameter.
      */
-    public void setHost(String host) throws BadParameter;
+    public void setHost(String host) throws BadParameterException;
 
     /**
      * Returns the path part of this URL.
@@ -68,10 +68,10 @@ public interface URL {
      * 
      * @param path
      *            the path.
-     * @exception BadParameter
+     * @exception BadParameterException
      *                is thrown when there is a syntax error in the path.
      */
-    public void setPath(String path) throws BadParameter;
+    public void setPath(String path) throws BadParameterException;
 
     /**
      * Returns the port number of this URL.
@@ -85,11 +85,11 @@ public interface URL {
      * 
      * @param port
      *            the port number.
-     * @exception BadParameter
+     * @exception BadParameterException
      *                is thrown when there is a syntax error in the parameter.
      *                (???)
      */
-    public void setPort(int port) throws BadParameter;
+    public void setPort(int port) throws BadParameterException;
 
     /**
      * Returns the query part from this URL.
@@ -103,10 +103,10 @@ public interface URL {
      * 
      * @param query
      *            the query.
-     * @exception BadParameter
+     * @exception BadParameterException
      *                is thrown when there is a syntax error in the parameter.
      */
-    public void setQuery(String query) throws BadParameter;
+    public void setQuery(String query) throws BadParameterException;
 
     /**
      * Returns the scheme part from this URL.
@@ -120,10 +120,10 @@ public interface URL {
      * 
      * @param scheme
      *            the scheme.
-     * @exception BadParameter
+     * @exception BadParameterException
      *                is thrown when there is a syntax error in the parameter.
      */
-    public void setScheme(String scheme) throws BadParameter;
+    public void setScheme(String scheme) throws BadParameterException;
 
     /**
      * Returns the userinfo part from this URL.
@@ -137,10 +137,10 @@ public interface URL {
      * 
      * @param userInfo
      *            the userinfo.
-     * @exception BadParameter
+     * @exception BadParameterException
      *                is thrown when there is a syntax error in the parameter.
      */
-    public void setUserInfo(String userInfo) throws BadParameter;
+    public void setUserInfo(String userInfo) throws BadParameterException;
 
     /**
      * Returns a new URL with the scheme part replaced.
@@ -148,10 +148,10 @@ public interface URL {
      * @param scheme
      *            the new scheme.
      * @return the new URL.
-     * @exception BadParameter
+     * @exception BadParameterException
      *                is thrown when there is a syntax error in the new URL.
      */
-    public URL translate(String scheme) throws BadParameter, NoSuccess;
+    public URL translate(String scheme) throws BadParameterException, NoSuccessException;
 
     /**
      * See {@link java.net.URI#resolve(java.net.URI)}.
@@ -160,7 +160,7 @@ public interface URL {
      *            the url to resolve with respect to this one.
      * @return the resolved url.
      */
-    public URL resolve(URL url) throws NoSuccess;
+    public URL resolve(URL url) throws NoSuccessException;
 
     /**
      * See {@link java.net.URI#isAbsolute()}.

@@ -17,7 +17,7 @@ import org.ogf.saga.error.*;
  *
  */
 public class ContextFactoryImpl extends ContextFactory {
-    protected Context doCreateContext(String type) throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    protected Context doCreateContext(String type) throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         return new ContextImpl(type);
     }
 }

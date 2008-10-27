@@ -16,10 +16,6 @@ import org.ogf.saga.url.URLFactory;
  *
  */
 public class uri {
-    static {
-        System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
-    }
-
     public static String protocol(String uri) throws Exception {
         return URLFactory.createURL(uri).getScheme();
     }

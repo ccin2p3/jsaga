@@ -34,7 +34,7 @@ public abstract class HttpDataAdaptorAbstract extends HtmlDataAdaptorAbstract im
         return null;    // no usage
     }
 
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return null;    // no default
     }
 
@@ -50,11 +50,11 @@ public abstract class HttpDataAdaptorAbstract extends HtmlDataAdaptorAbstract im
         }
     }
 
-    public BaseURL getBaseURL() throws IncorrectURL {
+    public BaseURL getBaseURL() throws IncorrectURLException {
         return new BaseURL(80);
     }
 
-    public abstract boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess;
-    public abstract FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
-    public abstract InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess;
+    public abstract boolean exists(String absolutePath, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException;
+    public abstract FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException;
+    public abstract InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException;
 }

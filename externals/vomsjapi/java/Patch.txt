@@ -5,7 +5,7 @@ Patch : org\glite\voms\contact\VOMSProxyInit.java
 > comment line 262 : validateACs( ACs );
 >> else error :
 
-Exception in thread "main" org.ogf.saga.error.NoSuccess: NoSuccess: org.glite.voms.contact.VOMSException: Error communicating with server lcg-voms.cern.ch:15004:Authentication failed [Caused by: Failure unspecified at GSS-API level [Caused by: Unknown CA]]
+Exception in thread "main" org.ogf.saga.error.NoSuccessException: NoSuccessException: org.glite.voms.contact.VOMSException: Error communicating with server lcg-voms.cern.ch:15004:Authentication failed [Caused by: Failure unspecified at GSS-API level [Caused by: Unknown CA]]
         at fr.in2p3.jsaga.impl.context.ContextImpl.init(ContextImpl.java:175)
         at fr.in2p3.jsaga.command.ContextInit.main(ContextInit.java:58)
 Caused by: org.glite.voms.contact.VOMSException: Error communicating with server lcg-voms.cern.ch:15004:Authentication failed [Caused by: Failure unspecified at

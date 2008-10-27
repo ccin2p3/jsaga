@@ -17,7 +17,7 @@ import org.ogf.saga.task.TaskFactory;
  *
  */
 public class TaskFactoryImpl extends TaskFactory {
-    protected TaskContainer doCreateTaskContainer() throws NotImplemented, Timeout, NoSuccess {
+    protected TaskContainer doCreateTaskContainer() throws NotImplementedException, TimeoutException, NoSuccessException {
         return new TaskContainerImpl(null);
     }
 }

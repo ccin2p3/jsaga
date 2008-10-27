@@ -21,5 +21,5 @@ public interface StreamableJobInteractiveGet extends StreamableJobAdaptor {
      * @param checkMatch if true then check if job description matches job service before submitting job
      * @return the job input/output streams handler
      */
-    public JobIOGetterInteractive submitInteractive(String jobDesc, boolean checkMatch) throws PermissionDenied, Timeout, NoSuccess;
+    public JobIOGetterInteractive submitInteractive(String jobDesc, boolean checkMatch) throws PermissionDeniedException, TimeoutException, NoSuccessException;
 }

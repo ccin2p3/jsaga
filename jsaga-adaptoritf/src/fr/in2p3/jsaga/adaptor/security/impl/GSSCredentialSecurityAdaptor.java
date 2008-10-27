@@ -4,8 +4,8 @@ import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
 
 import java.io.PrintStream;
 
@@ -36,15 +36,15 @@ public abstract class GSSCredentialSecurityAdaptor implements SecurityAdaptor {
         return m_proxy.getName().toString();
     }
 
-    public String getAttribute(String key) throws NotImplemented, NoSuccess {
+    public String getAttribute(String key) throws NotImplementedException, NoSuccessException {
         if (Context.LIFETIME.equals(key)) {
             try {
                 return ""+m_proxy.getRemainingLifetime();
             } catch (GSSException e) {
-                throw new NoSuccess(e);
+                throw new NoSuccessException(e);
             }
         } else {
-            throw new NotImplemented("Attribute not supported: "+key);
+            throw new NotImplementedException("Attribute not supported: "+key);
         }
     }
 

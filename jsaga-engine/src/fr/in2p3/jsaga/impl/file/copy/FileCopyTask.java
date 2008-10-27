@@ -1,18 +1,14 @@
 package fr.in2p3.jsaga.impl.file.copy;
 
-import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
-import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.impl.file.FileImpl;
 import fr.in2p3.jsaga.impl.monitoring.*;
 import fr.in2p3.jsaga.impl.task.AbstractTaskImplWithAsyncAttributes;
-import org.ogf.saga.url.URL;
+import org.ogf.saga.attributes.AsyncAttributes;
 import org.ogf.saga.error.*;
-import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
 import org.ogf.saga.task.Task;
-
-import java.lang.Exception;
+import org.ogf.saga.url.URL;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -26,59 +22,51 @@ import java.lang.Exception;
 /**
  *
  */
-public class FileCopyTask extends AbstractTaskImplWithAsyncAttributes implements Task {
+public class FileCopyTask<T,E> extends AbstractTaskImplWithAsyncAttributes<T,E,T> implements Task<T,E>, AsyncAttributes<T> {
     public static final String FILE_COPY_PROGRESS = "file.copy.progress";
     // internal
-    private FileCopy m_copy;
-    private URL m_effectiveTarget;
-    private FlagsBytes m_effectiveFlags;
+    private FileImpl m_sourceFile;
+    private URL m_target;
+    private int m_flags;
     // metrics
     private long m_totalWrittenBytes;
     private MetricImpl<Long> m_metric_Progress;
 
     /** constructor */
-    public FileCopyTask(Session session, FileImpl sourceFile, DataAdaptor adaptor, URL effectiveTarget, FlagsBytes effectiveFlags) throws NotImplemented {
-        super(session, null, true);
-        // check flags
-        try {
-            effectiveFlags.checkAllowed(Flags.DEREFERENCE.or(Flags.CREATEPARENTS.or(Flags.OVERWRITE)));
-        } catch (BadParameter e) {
-            FileCopyTask.super.setException(e);
-            FileCopyTask.super.setState(State.FAILED);
-        }
+    public FileCopyTask(Session session, FileImpl sourceFile, URL target, int flags) throws NotImplementedException {
+        super(session, true);
         // internal
-        m_copy = new FileCopy(session, sourceFile, adaptor);
-        m_effectiveTarget = effectiveTarget;
-        m_effectiveFlags = effectiveFlags;
+        m_sourceFile = sourceFile;
+        m_target = target;
+        m_flags = flags;
         // metrics
-        m_totalWrittenBytes = 0;
-        m_metric_Progress = (MetricImpl<Long>) this._addMetric(new MetricImpl<Long>(
-                this,
+        m_totalWrittenBytes = 0L;
+        m_metric_Progress = new MetricFactoryImpl<Long>(this).createAndRegister(
                 FILE_COPY_PROGRESS,
                 "this metric gives the state of ongoing file transfer as number of bytes transfered.",
                 MetricMode.ReadOnly,
                 "bytes",
                 MetricType.Int,
-                new Long(0)));
+                0L);
     }
 
     void increment(long writtenBytes) {
         m_totalWrittenBytes += writtenBytes;
-        m_metric_Progress.setValue(new Long(m_totalWrittenBytes));
+        m_metric_Progress.setValue(m_totalWrittenBytes);
     }
 
     ////////////////////////////////////// implementation of AbstractTaskImpl //////////////////////////////////////
 
     private Thread m_thread;
-    public void doSubmit() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public void doSubmit() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         m_thread = new Thread(new Runnable(){
             public void run() {
                 FileCopyTask.super.setState(State.RUNNING);
                 try {
-                    m_copy.copy(m_effectiveTarget, m_effectiveFlags, FileCopyTask.this);
+                    m_sourceFile._copyAndMonitor(m_target, m_flags, FileCopyTask.this);
                     FileCopyTask.super.setState(State.DONE);
                 } catch (Exception e) {
-                    FileCopyTask.super.setException(new NoSuccess(e));
+                    FileCopyTask.super.setException(new NoSuccessException(e));
                     FileCopyTask.super.setState(State.FAILED);
                 }
             }

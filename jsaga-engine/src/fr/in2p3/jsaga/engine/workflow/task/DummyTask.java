@@ -18,13 +18,13 @@ import org.ogf.saga.task.State;
  */
 public abstract class DummyTask extends AbstractWorkflowTaskImpl {
     /** constructor */
-    public DummyTask(String name) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public DummyTask(String name) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         super(null, name);
     }
 
     //////////////////////////////////////////// abstract methods ////////////////////////////////////////////
 
-    protected void doSubmit() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    protected void doSubmit() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         super.setState(State.DONE);
     }
 
@@ -32,15 +32,15 @@ public abstract class DummyTask extends AbstractWorkflowTaskImpl {
         super.setState(State.CANCELED);
     }
 
-    protected State queryState() throws NotImplemented, Timeout, NoSuccess {
+    protected State queryState() throws NotImplementedException, TimeoutException, NoSuccessException {
         return super.getState_LocalCheckOnly();
     }
 
-    public boolean startListening() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public boolean startListening() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         return true;    // do nothing
     }
 
-    public void stopListening() throws NotImplemented, Timeout, NoSuccess {
+    public void stopListening() throws NotImplementedException, TimeoutException, NoSuccessException {
         // do nothing
     }
 }

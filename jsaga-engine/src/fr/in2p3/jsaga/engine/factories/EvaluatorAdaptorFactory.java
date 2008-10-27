@@ -3,7 +3,7 @@ package fr.in2p3.jsaga.engine.factories;
 import fr.in2p3.jsaga.adaptor.evaluator.Evaluator;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.config.adaptor.EvaluatorAdaptorDescriptor;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -28,12 +28,12 @@ public class EvaluatorAdaptorFactory {
      * Create a new instance of evaluator adaptor.
      * @return the evaluator adaptor instance
      */
-    public Evaluator getEvaluatorAdaptor() throws NoSuccess {
+    public Evaluator getEvaluatorAdaptor() throws NoSuccessException {
         Class clazz = m_descriptor.getClazz();
         try {
             return (Evaluator) clazz.newInstance();
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 }

@@ -45,7 +45,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         return "srm";   //todo: replace with srm-v2.2 when a generic plugin will be developed
     }
 
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         super.connect(userInfo, host, port, basePath, attributes);
         try {
             java.net.URL serviceUrl = new java.net.URL(SERVICE_PROTOCOL, host, port, SERVICE_PATH);
@@ -56,13 +56,13 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             stub._setProperty(GSIConstants.GSI_CREDENTIALS, m_credential);
 //            stub._setProperty(GSIConstants.GSI_MODE, GSIConstants.GSI_MODE_FULL_DELEG);
         } catch (MalformedURLException e) {
-            throw new NoSuccess("unexpected exception", e);
+            throw new NoSuccessException("unexpected exception", e);
         } catch (ServiceException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 
-    public void disconnect() throws NoSuccess {
+    public void disconnect() throws NoSuccessException {
         try {
             for (Iterator it=m_readFiles.iterator(); it.hasNext(); ) {
                 Map.Entry entry = (Map.Entry) it.next();
@@ -76,36 +76,36 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
                 String absolutePath = (String) entry.getValue();
                 this.closeOutputStream(token, absolutePath);
             }
-        } catch (PermissionDenied e) {
-            throw new NoSuccess(e);
-        } catch (DoesNotExist e) {
-            throw new NoSuccess(e);
-        } catch (Timeout e) {
-            throw new NoSuccess(e);
+        } catch (PermissionDeniedException e) {
+            throw new NoSuccessException(e);
+        } catch (DoesNotExistException e) {
+            throw new NoSuccessException(e);
+        } catch (TimeoutException e) {
+            throw new NoSuccessException(e);
         }
     }
 
-    protected void ping() throws BadParameter, NoSuccess {
+    protected void ping() throws BadParameterException, NoSuccessException {
         try {
             SrmPingResponse response = m_stub.srmPing(new SrmPingRequest());
             if (response.getVersionInfo() == null) {
-                throw new NoSuccess("Unknown version");
+                throw new NoSuccessException("Unknown version");
             }
         } catch (RemoteException e) {
-            throw new BadParameter(e);
+            throw new BadParameterException(e);
         }
     }
 
-    public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
+    public boolean exists(String absolutePath, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         try {
             this.getMetaData(absolutePath);
             return true;
-        } catch (DoesNotExist doesNotExist) {
+        } catch (DoesNotExistException doesNotExist) {
             return false;
         }
     }
 
-    public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         org.apache.axis.types.URI logicalUri = this.toSrmURI(absolutePath);
         SrmPrepareToGetRequest request = new SrmPrepareToGetRequest();
         request.setArrayOfFileRequests(new ArrayOfTGetFileRequest(new TGetFileRequest[]{
@@ -150,7 +150,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
                 if (detailedStatus!=null && detailedStatus.getStatusCode().equals(TStatusCode.SRM_FILE_PINNED)) {
                     transferUrl = new java.net.URI(fileStatus.getTransferURL().toString());
                 } else {
-                    throw new NoSuccess("Request successful but file is not pinned");
+                    throw new NoSuccessException("Request successful but file is not pinned");
                 }
             } else {
                 try {
@@ -159,21 +159,21 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
                     } else {
                         rethrowException(status);
                     }
-                    throw new NoSuccess("INTERNAL ERROR: an exception should have been raised");
-                } catch (AlreadyExists e) {
-                    throw new NoSuccess("INTERNAL ERROR: unexpected exception", e);
+                    throw new NoSuccessException("INTERNAL ERROR: an exception should have been raised");
+                } catch (AlreadyExistsException e) {
+                    throw new NoSuccessException("INTERNAL ERROR: unexpected exception", e);
                 }
             }
         } catch (RemoteException e) {
-            throw new Timeout(e);
+            throw new TimeoutException(e);
         } catch (URISyntaxException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         // connect to transfer server
         SagaDataAdaptor adaptor = new SagaDataAdaptor(transferUrl, m_credential);
         return adaptor.getInputStream(transferUrl.getPath(), null);
     }
-    private void closeInputStream(String token, String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    private void closeInputStream(String token, String absolutePath) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         org.apache.axis.types.URI logicalUri = toSrmURI(absolutePath);
         SrmReleaseFilesRequest request = new SrmReleaseFilesRequest();
         request.setRequestToken(token);
@@ -184,7 +184,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             // send request
             response = m_stub.srmReleaseFiles(request);
         } catch (RemoteException e) {
-            throw new Timeout(e);
+            throw new TimeoutException(e);
         }
         TSURLReturnStatus fileStatus = null;
         if (response.getArrayOfFileStatuses()!=null && response.getArrayOfFileStatuses().getStatusArray().length>0) {
@@ -201,16 +201,16 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
                 } else {
                     rethrowException(status);
                 }
-                throw new NoSuccess("INTERNAL ERROR: an exception should have been raised");
-            } catch (BadParameter e) {
-                throw new NoSuccess("INTERNAL ERROR: unexpected exception", e);
-            } catch (AlreadyExists e) {
-                throw new NoSuccess("INTERNAL ERROR: unexpected exception", e);
+                throw new NoSuccessException("INTERNAL ERROR: an exception should have been raised");
+            } catch (BadParameterException e) {
+                throw new NoSuccessException("INTERNAL ERROR: unexpected exception", e);
+            } catch (AlreadyExistsException e) {
+                throw new NoSuccessException("INTERNAL ERROR: unexpected exception", e);
             }
         }
     }
 
-    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         org.apache.axis.types.URI logicalUri = this.toSrmURI(parentAbsolutePath+"/"+fileName);
         SrmPrepareToPutRequest request = new SrmPrepareToPutRequest();
         request.setArrayOfFileRequests(new ArrayOfTPutFileRequest(new TPutFileRequest[]{new TPutFileRequest(logicalUri, null)}));
@@ -254,7 +254,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
                 if (detailedStatus!=null && detailedStatus.getStatusCode().equals(TStatusCode.SRM_SPACE_AVAILABLE)) {
                     transferUrl = new java.net.URI(fileStatus.getTransferURL().toString());
                 } else {
-                    throw new NoSuccess("Request successful but space is not available");
+                    throw new NoSuccessException("Request successful but space is not available");
                 }
             } else {
                 try {
@@ -263,21 +263,21 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
                     } else {
                         rethrowException(status);
                     }
-                } catch (DoesNotExist e2) {
-                    throw new NoSuccess(e2);
+                } catch (DoesNotExistException e2) {
+                    throw new NoSuccessException(e2);
                 }
-                throw new NoSuccess("INTERNAL ERROR: an exception should have been raised");
+                throw new NoSuccessException("INTERNAL ERROR: an exception should have been raised");
             }
         } catch (RemoteException e) {
-            throw new Timeout(e);
+            throw new TimeoutException(e);
         } catch (URISyntaxException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         // connect to transfer server
         SagaDataAdaptor adaptor;
         try {
             adaptor = new SagaDataAdaptor(transferUrl, m_credential);
-        } catch (DoesNotExist e) {
+        } catch (DoesNotExistException e) {
             throw new ParentDoesNotExist("Parent directory does not exist");
         }
         int pos = transferUrl.getPath().lastIndexOf('/');
@@ -285,7 +285,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         String transferFileName = (pos>-1 ? transferUrl.getPath().substring(pos+1) : transferUrl.getPath());
         return adaptor.getOutputStream(transferParentPath, transferFileName, exclusive, append, null);
     }
-    private void closeOutputStream(String token, String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    private void closeOutputStream(String token, String absolutePath) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         org.apache.axis.types.URI logicalUri = toSrmURI(absolutePath);
         SrmPutDoneRequest request = new SrmPutDoneRequest();
         request.setRequestToken(token);
@@ -295,7 +295,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             // send request
             response = m_stub.srmPutDone(request);
         } catch (RemoteException e) {
-            throw new Timeout(e);
+            throw new TimeoutException(e);
         }
         TSURLReturnStatus fileStatus = null;
         if (response.getArrayOfFileStatuses()!=null && response.getArrayOfFileStatuses().getStatusArray().length>0) {
@@ -312,21 +312,21 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
                 } else {
                     rethrowException(status);
                 }
-                throw new NoSuccess("INTERNAL ERROR: an exception should have been raised");
-            } catch (BadParameter e) {
-                throw new NoSuccess("INTERNAL ERROR: unexpected exception", e);
-            } catch (AlreadyExists e) {
-                throw new NoSuccess("INTERNAL ERROR: unexpected exception", e);
+                throw new NoSuccessException("INTERNAL ERROR: an exception should have been raised");
+            } catch (BadParameterException e) {
+                throw new NoSuccessException("INTERNAL ERROR: unexpected exception", e);
+            } catch (AlreadyExistsException e) {
+                throw new NoSuccessException("INTERNAL ERROR: unexpected exception", e);
             }
         }
     }
 
-    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         TMetaDataPathDetail metadata = this.getMetaData(absolutePath);
         return new SRM22FileAttributes(metadata);
     }
 
-    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         TMetaDataPathDetail metadata = this.getMetaData(absolutePath);
         TMetaDataPathDetail[] list = metadata.getArrayOfSubPaths().getPathDetailArray();
         if (list != null) {
@@ -340,7 +340,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         }
     }
 
-    public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+    public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         org.apache.axis.types.URI uri = this.toSrmURI(parentAbsolutePath+"/"+directoryName);
         SrmMkdirRequest request = new SrmMkdirRequest();
         request.setSURL(uri);
@@ -349,21 +349,21 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             // send request
             response = m_stub.srmMkdir(request);
         } catch (RemoteException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         // returns
         TReturnStatus status = response.getReturnStatus();
         if (! status.getStatusCode().equals(TStatusCode.SRM_SUCCESS)) {
             try {
                 rethrowException(status);
-            } catch (DoesNotExist e) {
-                throw new NoSuccess(e);
+            } catch (DoesNotExistException e) {
+                throw new NoSuccessException(e);
             }
-            throw new NoSuccess("INTERNAL ERROR: an exception should have been raised");
+            throw new NoSuccessException("INTERNAL ERROR: an exception should have been raised");
         }
     }
 
-    public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         org.apache.axis.types.URI uri = this.toSrmURI(parentAbsolutePath+"/"+directoryName);
         SrmRmdirRequest request = new SrmRmdirRequest();
         request.setSURL(uri);
@@ -373,21 +373,21 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             // send request
             response = m_stub.srmRmdir(request);
         } catch (RemoteException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         // returns
         TReturnStatus status = response.getReturnStatus();
         if (! status.getStatusCode().equals(TStatusCode.SRM_SUCCESS)) {
             try {
                 rethrowException(status);
-                throw new NoSuccess("INTERNAL ERROR: an exception should have been raised");
-            } catch (AlreadyExists e) {
-                throw new NoSuccess("INTERNAL ERROR: unexpected exception", e);
+                throw new NoSuccessException("INTERNAL ERROR: an exception should have been raised");
+            } catch (AlreadyExistsException e) {
+                throw new NoSuccessException("INTERNAL ERROR: unexpected exception", e);
             }
         }
     }
 
-    public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         org.apache.axis.types.URI uri = this.toSrmURI(parentAbsolutePath+"/"+fileName);
         SrmRmRequest request = new SrmRmRequest();
         request.setArrayOfSURLs(new ArrayOfAnyURI(new org.apache.axis.types.URI[]{uri}));
@@ -396,7 +396,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             // send request
             response = m_stub.srmRm(request);
         } catch (RemoteException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         TSURLReturnStatus fileStatus = null;
         if (response.getArrayOfFileStatuses()!=null && response.getArrayOfFileStatuses().getStatusArray().length>0) {
@@ -413,16 +413,16 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
                 } else {
                     rethrowException(status);
                 }
-                throw new NoSuccess("INTERNAL ERROR: an exception should have been raised");
-            } catch (AlreadyExists e) {
-                throw new NoSuccess("INTERNAL ERROR: unexpected exception", e);
+                throw new NoSuccessException("INTERNAL ERROR: an exception should have been raised");
+            } catch (AlreadyExistsException e) {
+                throw new NoSuccessException("INTERNAL ERROR: unexpected exception", e);
             }
         }
     }
 
     //////////////////////////////////////// private methods ////////////////////////////////////////
 
-    private TMetaDataPathDetail getMetaData(String absolutePath) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    private TMetaDataPathDetail getMetaData(String absolutePath) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         org.apache.axis.types.URI uri = this.toSrmURI(absolutePath);
         SrmLsRequest request = new SrmLsRequest();
         request.setArrayOfSURLs(new ArrayOfAnyURI(new org.apache.axis.types.URI[]{uri}));
@@ -432,7 +432,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             // send request
             response = m_stub.srmLs(request);
         } catch (RemoteException e) {
-            throw new Timeout(e);
+            throw new TimeoutException(e);
         }
         TMetaDataPathDetail metadata = null;
         if (response.getDetails()!=null && response.getDetails().getPathDetailArray().length>0) {
@@ -446,7 +446,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             if (detailedStatus!=null && detailedStatus.getStatusCode().equals(TStatusCode.SRM_SUCCESS)) {
                 return metadata;
             } else {
-                throw new NoSuccess("Request successful but metadata not received");
+                throw new NoSuccessException("Request successful but metadata not received");
             }
         } else {
             try {
@@ -455,42 +455,42 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
                 } else {
                     rethrowException(status);
                 }
-                throw new NoSuccess("INTERNAL ERROR: an exception should have been raised");
-            } catch (BadParameter e) {
-                throw new NoSuccess("INTERNAL ERROR: unexpected exception", e);
-            } catch (AlreadyExists e) {
-                throw new NoSuccess("INTERNAL ERROR: unexpected exception", e);
+                throw new NoSuccessException("INTERNAL ERROR: an exception should have been raised");
+            } catch (BadParameterException e) {
+                throw new NoSuccessException("INTERNAL ERROR: unexpected exception", e);
+            } catch (AlreadyExistsException e) {
+                throw new NoSuccessException("INTERNAL ERROR: unexpected exception", e);
             }
         }
     }
 
-    private org.apache.axis.types.URI toSrmURI(String absolutePath) throws NoSuccess {
+    private org.apache.axis.types.URI toSrmURI(String absolutePath) throws NoSuccessException {
         try {
             return new org.apache.axis.types.URI("srm", null, m_host, m_port, absolutePath, null, null);
         } catch (org.apache.axis.types.URI.MalformedURIException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 
     //todo: convert missing parent directory error to ParentDoesNotExist exception
-    private void rethrowException(TReturnStatus status) throws PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+    private void rethrowException(TReturnStatus status) throws PermissionDeniedException, BadParameterException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException {
         TStatusCode code = status.getStatusCode();
         String explanation = status.getExplanation();
         if (code.equals(TStatusCode.SRM_AUTHORIZATION_FAILURE)) {
-            throw new PermissionDenied(explanation);
+            throw new PermissionDeniedException(explanation);
         } else if (code.equals(TStatusCode.SRM_NON_EMPTY_DIRECTORY)) {
-            throw new NoSuccess(explanation);
+            throw new NoSuccessException(explanation);
         } else if (code.equals(TStatusCode.SRM_INVALID_PATH)
                 || code.equals(TStatusCode.SRM_FILE_LOST)) {
-            throw new DoesNotExist(explanation);
+            throw new DoesNotExistException(explanation);
         } else if (code.equals(TStatusCode.SRM_DUPLICATION_ERROR)) {
-            throw new AlreadyExists(explanation);
+            throw new AlreadyExistsException(explanation);
         } else if (code.equals(TStatusCode.SRM_REQUEST_TIMED_OUT)
                 || code.equals(TStatusCode.SRM_FILE_LIFETIME_EXPIRED)
                 || code.equals(TStatusCode.SRM_SPACE_LIFETIME_EXPIRED)) {
-            throw new Timeout(explanation);
+            throw new TimeoutException(explanation);
         } else {
-            throw new NoSuccess(code.getValue()+": "+explanation);
+            throw new NoSuccessException(code.getValue()+": "+explanation);
         }
     }
 }

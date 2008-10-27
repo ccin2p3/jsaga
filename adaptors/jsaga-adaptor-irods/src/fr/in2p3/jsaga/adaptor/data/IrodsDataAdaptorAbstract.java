@@ -44,18 +44,18 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor, Fil
 		this.securityAdaptor = securityAdaptor;	
     }
 	
-	public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
+	public boolean exists(String absolutePath, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         // TODO: check existence as efficiently as possible, else re-use getAttributes()
         return true;
 	}
 
-	void parseValue(Map attributes) throws NoSuccess {
+	void parseValue(Map attributes) throws NoSuccessException {
 	
 		if (securityAdaptor instanceof UserPassSecurityAdaptor) {
             try {
                 userName = securityAdaptor.getUserID();
             } catch (Exception e) {
-                throw new NoSuccess(e);
+                throw new NoSuccessException(e);
             }
             passWord = ((UserPassSecurityAdaptor)securityAdaptor).getUserPass();
 		} else if (securityAdaptor instanceof GSSCredentialSecurityAdaptor) {

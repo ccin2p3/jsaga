@@ -24,5 +24,5 @@ public interface StreamableJobBatch extends StreamableJobAdaptor {
      * @param stdin the job standard input stream
      * @return the job input/output streams handler
      */
-    public JobIOHandler submit(String jobDesc, boolean checkMatch, InputStream stdin) throws PermissionDenied, Timeout, NoSuccess;
+    public JobIOHandler submit(String jobDesc, boolean checkMatch, InputStream stdin) throws PermissionDeniedException, TimeoutException, NoSuccessException;
 }

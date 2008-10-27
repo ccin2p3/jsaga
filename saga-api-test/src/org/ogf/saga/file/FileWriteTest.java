@@ -2,7 +2,7 @@ package org.ogf.saga.file;
 
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
-import org.ogf.saga.error.AlreadyExists;
+import org.ogf.saga.error.AlreadyExistsException;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
@@ -32,7 +32,7 @@ public class FileWriteTest extends AbstractNSEntryTest {
             try {
                 NSFactory.createNSEntry(m_session, m_fileUrl, Flags.WRITE.or(Flags.EXCL));
                 fail("Expected AlreadyExist exception");
-            } catch(AlreadyExists e) {
+            } catch(AlreadyExistsException e) {
                 checkWrited(m_fileUrl, DEFAULT_CONTENT);
             }
         } else {

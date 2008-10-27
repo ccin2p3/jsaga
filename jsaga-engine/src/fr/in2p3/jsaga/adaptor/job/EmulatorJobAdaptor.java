@@ -33,7 +33,7 @@ public class EmulatorJobAdaptor implements JobControlAdaptor, CleanableJobAdapto
     }
 
     public Usage getUsage() {return null;}
-    public Default[] getDefaults(Map attributes) throws IncorrectState {return null;}
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {return null;}
     public Class[] getSupportedSecurityAdaptorClasses() {return null;}
     public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {}
     public int getDefaultPort() {return 5678;}
@@ -42,45 +42,45 @@ public class EmulatorJobAdaptor implements JobControlAdaptor, CleanableJobAdapto
     public Map getTranslatorParameters() {return null;}
     public JobMonitorAdaptor getDefaultJobMonitor() {return this;}
 
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         //todo: split JobControlAdaptor and JobMonitorAdaptor
         // => JobControlAdaptor: create new status map and register JobControlAdaptor
         // => JobMonitorAdaptor: get status map from JobControlAdaptor
     }
 
-    public void disconnect() throws NoSuccess {
+    public void disconnect() throws NoSuccessException {
         //todo: split JobControlAdaptor and JobMonitorAdaptor
         // => JobControlAdaptor: unregister JobControlAdaptor
         // => JobMonitorAdaptor: do nothing
     }
 
-    public String submit(String jobDesc, boolean checkMatch) throws PermissionDenied, Timeout, NoSuccess {
+    public String submit(String jobDesc, boolean checkMatch) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         String nativeJobId = UUID.randomUUID().toString();
         s_status.put(nativeJobId, new EmulatorJobStatus(nativeJobId, SubState.SUBMITTED));
         return nativeJobId;
     }
 
-    public JobIOHandler submit(String jobDesc, boolean checkMatch, InputStream stdin) throws PermissionDenied, Timeout, NoSuccess {
+    public JobIOHandler submit(String jobDesc, boolean checkMatch, InputStream stdin) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         final String nativeJobId = this.submit(jobDesc, checkMatch);
         return new JobIOGetter() {
             private String m_nativeJobId = nativeJobId;
             private InputStream m_stdout = new ByteArrayInputStream("output\n".getBytes());
             private InputStream m_stderr = new ByteArrayInputStream("error\n".getBytes());
             public String getJobId() {return m_nativeJobId;}
-            public InputStream getStdout() throws PermissionDenied, Timeout, NoSuccess {return m_stdout;}
-            public InputStream getStderr() throws PermissionDenied, Timeout, NoSuccess {return m_stderr;}
+            public InputStream getStdout() throws PermissionDeniedException, TimeoutException, NoSuccessException {return m_stdout;}
+            public InputStream getStderr() throws PermissionDeniedException, TimeoutException, NoSuccessException {return m_stderr;}
         };
     }
 
-    public void cancel(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess {
+    public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         s_status.put(nativeJobId, new EmulatorJobStatus(nativeJobId, SubState.CANCELED));
     }
 
-    public void clean(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess {
+    public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         s_status.remove(nativeJobId);
     }
 
-    public JobStatus getStatus(String nativeJobId) throws Timeout, NoSuccess {
+    public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
         EmulatorJobStatus currentStatus = s_status.get(nativeJobId);
         if (currentStatus.getSubState().getValue()==SubState.SUBMITTED.getValue() && currentStatus.getElapsedTime()>1000) {
             s_status.put(nativeJobId, new EmulatorJobStatus(nativeJobId, SubState.DONE));

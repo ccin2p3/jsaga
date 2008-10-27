@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.job.monitor;
 
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -14,7 +14,7 @@ import org.ogf.saga.error.NoSuccess;
 /**
  *
  */
-public class JobWrapperException extends NoSuccess {
+public class JobWrapperException extends NoSuccessException {
     private static final int _ERROR_INPUT_DOES_NOT_EXIST_=90;
     private static final int _ERROR_INPUT_ALREADY_EXISTS_LOCALLY_=91;
     private static final int _ERROR_INPUT_FAIL_TO_TRANSFER_=92;

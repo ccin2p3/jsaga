@@ -5,9 +5,9 @@ import java.util.UUID;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.PermissionDenied;
-import org.ogf.saga.error.Timeout;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.PermissionDeniedException;
+import org.ogf.saga.error.TimeoutException;
 
 import com.jcraft.jsch.ChannelExec;
 
@@ -53,7 +53,7 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 	}
 
 	public String submit(String commandLine, boolean checkMatch)
-			throws PermissionDenied, Timeout, NoSuccess {
+			throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		try {
 
 			ChannelExec channel = (ChannelExec) session.openChannel("exec");
@@ -71,11 +71,11 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 			return jobId;
 			
 		} catch (Exception e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
 	}
 
-    public String submitInteractive(String commandLine, boolean checkMatch, InputStream stdin, OutputStream stdout, OutputStream stderr) throws PermissionDenied, Timeout, NoSuccess {
+    public String submitInteractive(String commandLine, boolean checkMatch, InputStream stdin, OutputStream stdout, OutputStream stderr) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		try {
 			ChannelExec channel = (ChannelExec) session.openChannel("exec");
 
@@ -99,7 +99,7 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 			SSHAdaptorAbstract.sessionMap.put(jobId, channel);
 			return jobId;
 		} catch (Exception e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
 	}
 
@@ -113,8 +113,8 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 			"exit $ENDCODE;";
 	}
 
-	public void cancel(String nativeJobId) throws PermissionDenied, Timeout,
-			NoSuccess {
+	public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException,
+            NoSuccessException {
 		try {
 			
 			ChannelExec channelCancel = (ChannelExec) session.openChannel("exec");
@@ -126,12 +126,12 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 			}
 			channelCancel.disconnect();
 		} catch (Exception e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
 	}
 
-	public void clean(String nativeJobId) throws PermissionDenied, Timeout,
-			NoSuccess {
+	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException,
+            NoSuccessException {
 		ChannelExec channel = (ChannelExec) SSHAdaptorAbstract.sessionMap.get(nativeJobId);
 		channel.disconnect();
 		SSHAdaptorAbstract.sessionMap.remove(channel);

@@ -1,16 +1,11 @@
 package org.ogf.saga.job;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.job.abstracts.AbstractJobTest;
 import org.ogf.saga.job.abstracts.AttributeVector;
-import org.ogf.saga.task.State;
-import org.ogf.saga.task.TaskContainer;
-import org.ogf.saga.task.TaskFactory;
-import org.ogf.saga.task.WaitMode;
+import org.ogf.saga.task.*;
+
+import java.io.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -260,9 +255,9 @@ public class JobRunInteractiveTest extends AbstractJobTest {
 		}
 		
 		if(numberOfFailed > 1) 
-			throw new NoSuccess(numberOfFailed + "jobs of "+numberOfJobs+" are failed.");
+			throw new NoSuccessException(numberOfFailed + "jobs of "+numberOfJobs+" are failed.");
 		if(numberOfFailed > 0) 
-			throw new NoSuccess(numberOfFailed + "job of "+numberOfJobs+" is failed.");
+			throw new NoSuccessException(numberOfFailed + "job of "+numberOfJobs+" is failed.");
 		
 		int numberOfWrongStdout = 0;
 		for (int j = 0; j < jobs.length; j++) {

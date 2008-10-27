@@ -3,7 +3,7 @@ package fr.in2p3.jsaga.adaptor.data.http;
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.helpers.EntryPath;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.io.IOException;
 import java.net.URLConnection;
@@ -21,7 +21,7 @@ import java.net.URLConnection;
  *
  */
 public class HttpFileAttributesDefault extends FileAttributes {
-    public HttpFileAttributesDefault(URLConnection cnx) throws NoSuccess {
+    public HttpFileAttributesDefault(URLConnection cnx) throws NoSuccessException {
         String path = cnx.getURL().getPath();
         m_name = new EntryPath(path).getEntryName();
         m_type = cnx.getLastModified()==0 ? DIRECTORY_TYPE : FILE_TYPE;
@@ -36,7 +36,7 @@ public class HttpFileAttributesDefault extends FileAttributes {
                 m_permission = PermissionBytes.NONE;
             }
         } catch (IOException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
 
         m_lastModified = cnx.getLastModified();

@@ -2,9 +2,8 @@ package fr.in2p3.jsaga.impl.job.description;
 
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformer;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformerFactory;
-import org.ogf.saga.ObjectType;
 import org.ogf.saga.SagaObject;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.job.JobDescription;
 import org.w3c.dom.Document;
 
@@ -30,7 +29,7 @@ public class XJSDLJobDescriptionImpl extends AbstractJobDescriptionImpl implemen
     private Document m_document;
 
     /** constructor */
-    public XJSDLJobDescriptionImpl(String collectionName, String jobName, Document document) throws NoSuccess {
+    public XJSDLJobDescriptionImpl(String collectionName, String jobName, Document document) throws NoSuccessException {
         super();
 
         // set job collection name
@@ -50,7 +49,7 @@ public class XJSDLJobDescriptionImpl extends AbstractJobDescriptionImpl implemen
             prop = new Properties();
             prop.load(new ByteArrayInputStream(propBytes));
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         for (Iterator it=prop.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry entry = (Map.Entry) it.next();
@@ -65,10 +64,6 @@ public class XJSDLJobDescriptionImpl extends AbstractJobDescriptionImpl implemen
         XJSDLJobDescriptionImpl clone = (XJSDLJobDescriptionImpl) super.clone();
         clone.m_document = (Document) m_document.cloneNode(true);
         return clone;
-    }
-
-    public ObjectType getType() {
-        return ObjectType.JOBDESCRIPTION;
     }
 
     public String getCollectionName() {

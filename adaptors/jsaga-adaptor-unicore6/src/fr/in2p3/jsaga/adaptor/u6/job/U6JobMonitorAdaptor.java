@@ -7,9 +7,9 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryFilteredJob;
 
-import org.ogf.saga.error.IncorrectState;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.Timeout;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.TimeoutException;
 
 import com.intel.gpe.clients.api.JobClient;
 import com.intel.gpe.clients.api.Status;
@@ -38,12 +38,12 @@ public class U6JobMonitorAdaptor extends U6JobAdaptorAbstract implements QueryFi
     	return new UAnd(new Usage[]{new U(APPLICATION_NAME)});
     }
 
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
     	return new Default[]{
     			new Default(APPLICATION_NAME, "Bash shell")};
     }
     
-    public JobStatus[] getFilteredStatus(Object[] filters) throws Timeout, NoSuccess {
+    public JobStatus[] getFilteredStatus(Object[] filters) throws TimeoutException, NoSuccessException {
 		try {
 			// list jobs
 			TargetSystemInfo targetSystemInfo = findTargetSystem();
@@ -58,17 +58,17 @@ public class U6JobMonitorAdaptor extends U6JobAdaptorAbstract implements QueryFi
 			}
             return jobListStatus;
     	} catch (GPEInvalidResourcePropertyQNameException e) {
-    		throw new NoSuccess(e);
+    		throw new NoSuccessException(e);
 		} catch (GPEResourceUnknownException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (GPEUnmarshallingException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (GPEMiddlewareRemoteException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (GPEMiddlewareServiceException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (Exception e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
 	}
 

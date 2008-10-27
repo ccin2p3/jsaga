@@ -2,10 +2,10 @@ package org.ogf.saga.context;
 
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.attributes.Attributes;
-import org.ogf.saga.error.IncorrectState;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
-import org.ogf.saga.error.Timeout;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.TimeoutException;
 
 /**
  * A <code>Context</code> provides the functionality of a security information
@@ -55,8 +55,8 @@ public interface Context extends SagaObject, Attributes {
     public static final String REMOTEHOST = "RemoteHost";
 
     /**
-     * Attribute name: the port used for the connection which is identified
-     * by this context. (ReadOnly)
+     * Attribute name: the port used for the connection which is identified by
+     * this context. (ReadOnly)
      */
     public static final String REMOTEPORT = "RemotePort";
 
@@ -64,6 +64,6 @@ public interface Context extends SagaObject, Attributes {
      * Sets default attribute values for this context type, based on all
      * non-empty attributes.
      */
-    public void setDefaults()
-        throws NotImplemented, IncorrectState, Timeout, NoSuccess;
+    public void setDefaults() throws NotImplementedException,
+            IncorrectStateException, TimeoutException, NoSuccessException;
 }

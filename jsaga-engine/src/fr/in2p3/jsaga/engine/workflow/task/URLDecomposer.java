@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.engine.workflow.task;
 
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -20,11 +20,11 @@ import java.net.URISyntaxException;
 public class URLDecomposer {
     private URI m_uri;
     
-    public URLDecomposer(String url) throws NoSuccess {
+    public URLDecomposer(String url) throws NoSuccessException {
         try {
             m_uri = new URI(url);
         } catch (URISyntaxException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 

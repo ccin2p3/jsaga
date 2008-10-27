@@ -17,7 +17,7 @@ import java.io.OutputStream;
  *
  */
 public interface JobIOSetter extends JobIOHandler {
-    public void setStdout(OutputStream out) throws PermissionDenied, Timeout, NoSuccess;
+    public void setStdout(OutputStream out) throws PermissionDeniedException, TimeoutException, NoSuccessException;
 
-    public void setStderr(OutputStream err) throws PermissionDenied, Timeout, NoSuccess;
+    public void setStderr(OutputStream err) throws PermissionDeniedException, TimeoutException, NoSuccessException;
 }

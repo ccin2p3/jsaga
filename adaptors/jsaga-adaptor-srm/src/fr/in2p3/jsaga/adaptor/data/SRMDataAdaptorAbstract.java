@@ -44,9 +44,9 @@ public abstract class SRMDataAdaptorAbstract implements DataAdaptor {
         org.globus.axis.util.Util.registerTransport();
     }
 
-    protected abstract void ping() throws BadParameter, NoSuccess;
+    protected abstract void ping() throws BadParameterException, NoSuccessException;
 
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         m_host = host;
         m_port = port;
         if (attributes!=null && attributes.containsKey(TRANSFER_PROTOCOLS)) {
@@ -63,7 +63,7 @@ public abstract class SRMDataAdaptorAbstract implements DataAdaptor {
         return new UOptional(TRANSFER_PROTOCOLS);
     }
 
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return new Default[]{new Default(TRANSFER_PROTOCOLS, "gsiftp")};
     }
 
@@ -75,7 +75,7 @@ public abstract class SRMDataAdaptorAbstract implements DataAdaptor {
         m_credential = ((GSSCredentialSecurityAdaptor) securityAdaptor).getGSSCredential();
     }
 
-    public BaseURL getBaseURL() throws IncorrectURL {
+    public BaseURL getBaseURL() throws IncorrectURLException {
         return new BaseURL(8443);
     }
 }

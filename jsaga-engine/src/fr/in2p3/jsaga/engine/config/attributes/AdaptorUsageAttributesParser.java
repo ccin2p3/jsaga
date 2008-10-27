@@ -4,7 +4,7 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.config.adaptor.AdaptorDescriptors;
 import fr.in2p3.jsaga.engine.schema.config.*;
-import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.DoesNotExistException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -63,7 +63,7 @@ public class AdaptorUsageAttributesParser implements AttributesParser {
                 if (attribute.getValue() != null) {
                     try {
                         attribute.setValue(usage.correctValue(attribute.getName(), attribute.getValue()));
-                    } catch(DoesNotExist e) {/*do nothing*/}
+                    } catch(DoesNotExistException e) {/*do nothing*/}
                 }
             }
         }

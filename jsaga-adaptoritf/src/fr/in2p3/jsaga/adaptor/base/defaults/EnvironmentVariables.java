@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.base.defaults;
 
-import org.ogf.saga.error.IncorrectState;
+import org.ogf.saga.error.IncorrectStateException;
 
 import java.io.*;
 import java.util.Properties;
@@ -21,12 +21,12 @@ public class EnvironmentVariables {
     private static EnvironmentVariables _instance;
     private Properties m_env = new Properties();
 
-    public static EnvironmentVariables getInstance() throws IncorrectState {
+    public static EnvironmentVariables getInstance() throws IncorrectStateException {
         if (_instance == null) {
             try {
                 _instance = new EnvironmentVariables();
             } catch(IOException e) {
-                throw new IncorrectState(e);
+                throw new IncorrectStateException(e);
             }
         }
         return _instance;

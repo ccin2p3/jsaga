@@ -21,12 +21,12 @@ public interface HoldableJobAdaptor extends JobControlAdaptor {
      * @param nativeJobId the identifier of the job in the grid
      * @return true if the job has been successfully held, false if it was not queued
      */
-    public boolean hold(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess;
+    public boolean hold(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException;
 
     /**
      * release a held job
      * @param nativeJobId the identifier of the job in the grid
      * @return true if the job has been successfully released, false if it was not held
      */
-    public boolean release(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess;
+    public boolean release(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException;
 }

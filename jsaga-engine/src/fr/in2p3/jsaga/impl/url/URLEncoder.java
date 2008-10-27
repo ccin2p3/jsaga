@@ -32,7 +32,9 @@ public class URLEncoder {
         for (int i=0; i<array.length; i++) {
             char c = array[i];
             if (c < 128) {      // ASCII
-                if (isIllegalASCII(c)) {
+                if (c=='%' && (isEncodedQuestionMark(array,i) || isEncodedSharp(array,i))) {
+                    buffer.append(c);   // allow already encoded '?' or '#'
+                } else if (isIllegalASCII(c)) {
                     appendHex(buffer, c);
                 } else {
                     buffer.append(c);
@@ -66,6 +68,12 @@ public class URLEncoder {
             }
         }
     }
+    private static boolean isEncodedQuestionMark(char[] array, int pos) {
+        return pos+2<array.length && array[pos+1]=='3' && array[pos+2]=='F';
+    }
+    private static boolean isEncodedSharp(char[] array, int pos) {
+        return pos+2<array.length && array[pos+1]=='2' && array[pos+2]=='3';
+    }
     private static void appendHex(StringBuffer buffer, int c) {
         final char[] HEX = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
         buffer.append('%');
@@ -74,7 +82,7 @@ public class URLEncoder {
     }
 
     // [scheme://][[user-info@]host[:port]][path][?query][#fragment]
-    static String decode(URI url) {
+    static String decode(URI url, boolean mustRemoveSlash) {
         StringBuffer buffer = new StringBuffer();
         if (url.getScheme() != null) {
             buffer.append(url.getScheme());
@@ -92,7 +100,11 @@ public class URLEncoder {
             }
         }
         if (url.getPath() != null) {
-            buffer.append(url.getPath());
+            if (mustRemoveSlash) {
+                buffer.append(url.getPath().substring(1));
+            } else {
+                buffer.append(url.getPath());
+            }
         }
         if (url.getQuery() != null) {
             buffer.append('?');

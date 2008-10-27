@@ -5,8 +5,8 @@ import fr.in2p3.jsaga.adaptor.schema.data.emulator.*;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.*;
-import org.ogf.saga.error.AuthenticationFailed;
-import org.ogf.saga.error.AuthorizationFailed;
+import org.ogf.saga.error.AuthenticationFailedException;
+import org.ogf.saga.error.AuthorizationFailedException;
 
 import java.io.*;
 import java.util.Properties;
@@ -69,9 +69,9 @@ public class DataEmulatorGrid {
     /**
      * find the secure server
      */
-    SecureServer connect(String protocol, String host, int port, UserPassSecurityAdaptor security) throws AuthenticationFailed, AuthorizationFailed {
+    SecureServer connect(String protocol, String host, int port, UserPassSecurityAdaptor security) throws AuthenticationFailedException, AuthorizationFailedException {
         if (security == null) {
-            throw new AuthenticationFailed("No security context found");
+            throw new AuthenticationFailedException("No security context found");
         }
         SecureServer s = findSecureServer(protocol, host, port);
         String login = security.getUserID();
@@ -81,11 +81,11 @@ public class DataEmulatorGrid {
                 if (s.getUser(i).getPassword().equals(password)) {
                     return s;    
                 } else {
-                    throw new AuthorizationFailed("Bad password for user: "+login);
+                    throw new AuthorizationFailedException("Bad password for user: "+login);
                 }
             }
         }
-        throw new AuthorizationFailed("Unkown user: "+login);
+        throw new AuthorizationFailedException("Unkown user: "+login);
     }
 
     private Server findServer(String protocol, String host, int port) {

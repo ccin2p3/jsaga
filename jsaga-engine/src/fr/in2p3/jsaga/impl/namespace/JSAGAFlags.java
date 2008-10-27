@@ -13,8 +13,12 @@ package fr.in2p3.jsaga.impl.namespace;
  *
  */
 public enum JSAGAFlags {
+    /** Bypass existence check */
     BYPASSEXIST(4096),
-    PRESERVETIMES(8192);
+    /** Preserve times */
+    PRESERVETIMES(8192),
+    /** All flags */
+    ALLFLAGS(4096 | 8192);
 
     private int value;
 
@@ -28,6 +32,15 @@ public enum JSAGAFlags {
      */
     public int getValue() {
         return value;
+    }
+
+    /**
+     * Returns the result of or-ing this flag into an integer.
+     * @param val the value to OR this enumeration value into.
+     * @return the result of or-ing this flag into the integer parameter.
+     */
+    public int or(int val) {
+        return val | value;
     }
 
     /**

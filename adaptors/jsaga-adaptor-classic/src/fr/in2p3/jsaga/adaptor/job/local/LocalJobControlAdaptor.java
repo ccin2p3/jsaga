@@ -38,7 +38,7 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
         return new UOptional(SHELLPATH);
     }
 
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return new Default[]{new Default(SHELLPATH, "/bin/sh")};
     }
 
@@ -58,14 +58,14 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 		return new LocalJobMonitorAdaptor();
 	}
 	
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     	super.connect(userInfo, host, port, basePath, attributes);
         m_shellPath = (String) attributes.get(SHELLPATH);
         m_parameters = attributes;
     }
 
 	public String submit(String commandLine, boolean checkMatch)
-			throws PermissionDenied, Timeout, NoSuccess {
+			throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		try {
 
 			String jobId = UUID.randomUUID().toString();
@@ -76,12 +76,12 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 			return jobId;
 			
 		} catch (Exception e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
 	}
 	
 	public JobIOGetterInteractive submitInteractive(String commandLine,
-			boolean checkMatch) throws PermissionDenied, Timeout, NoSuccess {
+			boolean checkMatch) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		
 		try {
 		
@@ -93,7 +93,7 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 			LocalAdaptorAbstract.sessionMap.put(jobId, p);
 			return new LocalJobIOHandler(p, jobId);
 		} catch (Exception e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
 	}
 
@@ -107,21 +107,21 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 			"exit $ENDCODE;";
 	}
 
-	public void cancel(String nativeJobId) throws PermissionDenied, Timeout,
-			NoSuccess {
+	public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException,
+            NoSuccessException {
 		try {			
 			String cde = m_shellPath+" -c 'echo \"MYPID=`cat ."+nativeJobId+"`; kill $MYPID ;'";
 			Process p = Runtime.getRuntime().exec(cde);
 			p.waitFor();
 		} catch (IOException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (InterruptedException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
 	}
 
-	public void clean(String nativeJobId) throws PermissionDenied, Timeout,
-			NoSuccess {
+	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException,
+            NoSuccessException {
 		Process p = (Process) LocalAdaptorAbstract.sessionMap.get(nativeJobId);
 		p.destroy();
 		LocalAdaptorAbstract.sessionMap.remove(p);

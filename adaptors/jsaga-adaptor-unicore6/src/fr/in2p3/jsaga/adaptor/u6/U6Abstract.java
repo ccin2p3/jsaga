@@ -8,12 +8,12 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.ogf.saga.error.AuthenticationFailed;
-import org.ogf.saga.error.AuthorizationFailed;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
-import org.ogf.saga.error.Timeout;
+import org.ogf.saga.error.AuthenticationFailedException;
+import org.ogf.saga.error.AuthorizationFailedException;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.TimeoutException;
 
 import com.intel.gpe.clients.api.RegistryClient;
 import com.intel.gpe.clients.api.TargetSystemClient;
@@ -54,14 +54,14 @@ public class U6Abstract {
         return 8080;
     }
 
-	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     	m_serverUrl = "https://"+host+":"+port+basePath;
         
     	// get APPLICATION_NAME
     	m_applicationName = (String) attributes.get(APPLICATION_NAME);
     }
 
-	public void disconnect() throws NoSuccess {
+	public void disconnect() throws NoSuccessException {
         m_serverUrl = null;
         m_credential = null;
         m_applicationName = null;
@@ -92,12 +92,12 @@ public class U6Abstract {
                 securityManager.init(caCertificateVector, m_credential.getCertificate(), m_credential.getPrivateKey());
                 
     	    	if(securityManager == null) {
-                    throw new AuthenticationFailed("Unable to initialize security manager");
+                    throw new AuthenticationFailedException("Unable to initialize security manager");
                 }
     	    	m_securityManager = securityManager;
     	        
     		} catch (Exception e) {
-    			throw new AuthenticationFailed(e);
+    			throw new AuthenticationFailedException(e);
     		}
     		
     		RegistryClient registry = m_securityManager.getRegistryClient(m_serverUrl);
@@ -128,11 +128,11 @@ public class U6Abstract {
 	             }
 	        }
         } catch (NullPointerException e)  {
-    		throw new NoSuccess("Unable to find regitry in "+m_serverUrl, e);        	
+    		throw new NoSuccessException("Unable to find regitry in "+m_serverUrl, e);
         }
         
         // no target system factory available that supports requested application.
-        throw new NoSuccess("No factory available for '"+m_applicationName+ "'.");
+        throw new NoSuccessException("No factory available for '"+m_applicationName+ "'.");
     }
 	
 }

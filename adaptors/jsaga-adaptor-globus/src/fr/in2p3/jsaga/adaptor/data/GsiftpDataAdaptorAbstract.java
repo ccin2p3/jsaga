@@ -39,9 +39,9 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
 
     public abstract String getType();
     public abstract Usage getUsage();
-    public abstract Default[] getDefaults(Map attributes) throws IncorrectState;
-    public abstract FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
-    public abstract FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
+    public abstract Default[] getDefaults(Map attributes) throws IncorrectStateException;
+    public abstract FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException;
+    public abstract FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException;
 
     public Class[] getSupportedSecurityAdaptorClasses() {
         return new Class[]{GSSCredentialSecurityAdaptor.class};
@@ -51,11 +51,11 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
         m_credential = ((GSSCredentialSecurityAdaptor) securityAdaptor).getGSSCredential();
     }
 
-    public BaseURL getBaseURL() throws IncorrectURL {
+    public BaseURL getBaseURL() throws IncorrectURLException {
         return new BaseURL(2811);
     }
 
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         try {
             m_client = new GridFTPClient(host, port);
             m_client.setAuthorization(HostAuthorization.getInstance());
@@ -64,15 +64,15 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
             try {
                 throw e.getException();
             } catch (GlobusGSSException gssException) {
-                throw new AuthenticationFailed(gssException);
+                throw new AuthenticationFailedException(gssException);
             } catch (Throwable throwable) {
-                throw new Timeout(throwable);
+                throw new TimeoutException(throwable);
             }
         } catch (IOException e) {
             if (e.getMessage()!=null && e.getMessage().indexOf("Authentication") > -1) {
-                throw new AuthenticationFailed(e);
+                throw new AuthenticationFailedException(e);
             } else {
-                throw new Timeout(e);
+                throw new TimeoutException(e);
             }
         } catch (ServerException e) {
             switch(e.getCode()) {
@@ -82,40 +82,40 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
                     } catch (UnexpectedReplyCodeException unexpectedReplyCode) {
                         switch(unexpectedReplyCode.getReply().getCode()) {
                             case 530:
-                                throw new AuthorizationFailed(unexpectedReplyCode);
+                                throw new AuthorizationFailedException(unexpectedReplyCode);
                             default:
-                                throw new NoSuccess(unexpectedReplyCode);
+                                throw new NoSuccessException(unexpectedReplyCode);
                         }
                     } catch (Exception e1) {
-                        throw new NoSuccess(e1);
+                        throw new NoSuccessException(e1);
                     }
             }
         }
     }
 
-    public void disconnect() throws NoSuccess {
+    public void disconnect() throws NoSuccessException {
         try {
             m_client.close();
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 
-    public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
+    public boolean exists(String absolutePath, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         try {
             return m_client.exists(absolutePath);
         } catch (Exception e) {
             try {
                 throw rethrowException(e);
-            } catch (DoesNotExist doesNotExist) {
-                throw new NoSuccess(e);
-            } catch (BadParameter badParameter) {
-                throw new NoSuccess("Unexpected exception", e);
+            } catch (DoesNotExistException doesNotExist) {
+                throw new NoSuccessException(e);
+            } catch (BadParameterException badParameter) {
+                throw new NoSuccessException("Unexpected exception", e);
             }
         }
     }
 
-    public void getToStream(String absolutePath, String additionalArgs, OutputStream stream) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void getToStream(String absolutePath, String additionalArgs, OutputStream stream) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         final boolean autoFlush = false;
         final boolean ignoreOffset = true;
         try {
@@ -132,7 +132,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
         }
     }
 
-    public void putFromStream(String absolutePath, boolean append, String additionalArgs, InputStream stream) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+    public void putFromStream(String absolutePath, boolean append, String additionalArgs, InputStream stream) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         final int DEFAULT_BUFFER_SIZE = 16384;
         try {
             m_client.setType(GridFTPSession.TYPE_IMAGE);
@@ -147,13 +147,13 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
         } catch (Exception e) {
             try {
                 throw rethrowExceptionFull(e);
-            } catch (DoesNotExist e2) {
+            } catch (DoesNotExistException e2) {
                 throw new ParentDoesNotExist(e);
             }
         }
     }
 
-    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, ParentDoesNotExist, Timeout, NoSuccess {
+    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         // connect to peer server
         GsiftpDataAdaptorAbstract targetAdaptor = new Gsiftp1DataAdaptor();
         targetAdaptor.m_credential = m_credential;
@@ -164,13 +164,13 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
             try {
                 targetAdaptor.m_client.deleteFile(targetAbsolutePath);
             } catch (Exception e) {
-                throw new PermissionDenied("Failed to overwrite target file", e);
+                throw new PermissionDeniedException("Failed to overwrite target file", e);
             }
         }
 
         // need to check existence of target explicitely, else exception is never thrown
         if (!overwrite && targetAdaptor.exists(targetAbsolutePath, additionalArgs)) {
-            throw new AlreadyExists("File already exists");
+            throw new AlreadyExistsException("File already exists");
         }
 
         try {
@@ -193,7 +193,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
         }
     }
 
-    public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         // connect to peer server
         GsiftpDataAdaptorAbstract sourceAdaptor = new Gsiftp1DataAdaptor();
         sourceAdaptor.m_credential = m_credential;
@@ -204,13 +204,13 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
             try {
                 m_client.deleteFile(targetAbsolutePath);
             } catch (Exception e) {
-                throw new PermissionDenied("Failed to overwrite target file", e);
+                throw new PermissionDeniedException("Failed to overwrite target file", e);
             }
         }
 
         // need to check existence of target explicitely, else exception is never thrown
         if (!overwrite && this.exists(targetAbsolutePath, additionalArgs)) {
-            throw new AlreadyExists("File already exists");
+            throw new AlreadyExistsException("File already exists");
         }
 
         try {
@@ -233,7 +233,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
         }
     }
 
-    public void rename(String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+    public void rename(String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException {
         try {
             m_client.rename(sourceAbsolutePath, targetAbsolutePath);
         } catch (Exception e) {
@@ -241,7 +241,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
         }
     }
 
-    public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         try {
             m_client.deleteFile(parentAbsolutePath+"/"+fileName);
         } catch (Exception e) {
@@ -249,19 +249,19 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
         }
     }
 
-    public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+    public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         try {
             m_client.makeDir(parentAbsolutePath+"/"+directoryName);
         } catch (Exception e) {
             try {
                 throw rethrowExceptionFull(e);
-            } catch (DoesNotExist e2) {
+            } catch (DoesNotExistException e2) {
                 throw new ParentDoesNotExist(e);
             }
         }
     }
 
-    public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         try {
             m_client.deleteDir(parentAbsolutePath+"/"+directoryName);
         } catch (Exception e) {
@@ -269,21 +269,21 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
         }
     }
 
-    protected NoSuccess rethrowException(Exception exception) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    protected NoSuccessException rethrowException(Exception exception) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         try {
             throw rethrowExceptionFull(exception);
-        } catch (AlreadyExists e) {
-            throw new NoSuccess(e);
+        } catch (AlreadyExistsException e) {
+            throw new NoSuccessException(e);
         }
     }
 
-    private NoSuccess rethrowExceptionFull(Exception exception) throws PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+    private NoSuccessException rethrowExceptionFull(Exception exception) throws PermissionDeniedException, BadParameterException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException {
         try {
             throw exception;
         } catch (IllegalArgumentException e) {
-            throw new BadParameter(e);
+            throw new BadParameterException(e);
         } catch (IOException e) {
-            throw new Timeout(e);
+            throw new TimeoutException(e);
         } catch (ServerException e) {
             switch(e.getCode()) {
                 case ServerException.SERVER_REFUSED:
@@ -292,29 +292,29 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
                     } catch (UnexpectedReplyCodeException unexpectedReplyCode) {
                         switch(unexpectedReplyCode.getReply().getCode()) {
                             case 112:
-                                throw new Timeout(e);
+                                throw new TimeoutException(e);
                             case 500:
                             case 521:
                             case 550:
                                 this.rethrowParsedException(unexpectedReplyCode);
                             default:
-                                throw new NoSuccess(e);
+                                throw new NoSuccessException(e);
                         }
                     } catch (Exception e1) {
-                        throw new PermissionDenied(e1);
+                        throw new PermissionDeniedException(e1);
                     }
-                case ServerException.REPLY_TIMEOUT:             throw new Timeout(e);
-                default:                                        throw new NoSuccess(e);
+                case ServerException.REPLY_TIMEOUT:             throw new TimeoutException(e);
+                default:                                        throw new NoSuccessException(e);
             }
         } catch (ClientException e) {
             switch(e.getCode()) {
-                case ClientException.NOT_AUTHORIZED:            throw new PermissionDenied(e);
-                case ClientException.REPLY_TIMEOUT:             throw new Timeout(e);
-                default:                                        throw new NoSuccess(e);
+                case ClientException.NOT_AUTHORIZED:            throw new PermissionDeniedException(e);
+                case ClientException.REPLY_TIMEOUT:             throw new TimeoutException(e);
+                default:                                        throw new NoSuccessException(e);
             }
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
-    protected abstract void rethrowParsedException(UnexpectedReplyCodeException e) throws DoesNotExist, AlreadyExists, PermissionDenied, NoSuccess;
+    protected abstract void rethrowParsedException(UnexpectedReplyCodeException e) throws DoesNotExistException, AlreadyExistsException, PermissionDeniedException, NoSuccessException;
 }

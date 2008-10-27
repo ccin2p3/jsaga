@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.base.usage;
 
-import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.DoesNotExistException;
 
 import java.util.Map;
 
@@ -30,7 +30,7 @@ public class U implements Usage {
     }
 
     /** Default implementation to override if needed */
-    public String correctValue(String attributeName, String attributeValue) throws DoesNotExist {
+    public String correctValue(String attributeName, String attributeValue) throws DoesNotExistException {
         if (m_name.equals(attributeName)) {
             try {
                 this.throwExceptionIfInvalid(attributeValue);
@@ -39,11 +39,11 @@ public class U implements Usage {
                 return null;
             }
         } else {
-            throw new DoesNotExist("Attribute not found: "+attributeName);
+            throw new DoesNotExistException("Attribute not found: "+attributeName);
         }
     }
 
-    public int getFirstMatchingUsage(Map attributes) throws DoesNotExist {
+    public int getFirstMatchingUsage(Map attributes) throws DoesNotExistException {
         if (attributes.containsKey(m_name)) {
             try {
                 this.throwExceptionIfInvalid(attributes.get(m_name));
@@ -52,7 +52,7 @@ public class U implements Usage {
                 return -1;
             }
         } else {
-            throw new DoesNotExist("Attribute not found: "+m_name);
+            throw new DoesNotExistException("Attribute not found: "+m_name);
         }
     }
 

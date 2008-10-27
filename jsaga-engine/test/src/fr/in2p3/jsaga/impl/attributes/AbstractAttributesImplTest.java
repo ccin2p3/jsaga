@@ -1,7 +1,6 @@
 package fr.in2p3.jsaga.impl.attributes;
 
 import junit.framework.TestCase;
-import org.ogf.saga.ObjectType;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -19,11 +18,7 @@ public class AbstractAttributesImplTest extends TestCase {
     private AbstractAttributesImpl m_attributes;
 
     public void setUp() {
-        m_attributes = new AbstractAttributesImpl(null) {
-            public ObjectType getType() {
-                return ObjectType.UNKNOWN;
-            }
-        };
+        m_attributes = new AbstractAttributesImpl(null) {};
         m_attributes._addReadOnlyAttribute("mykey", "myvalue");
     }
 

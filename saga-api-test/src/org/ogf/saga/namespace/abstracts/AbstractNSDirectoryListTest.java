@@ -1,8 +1,8 @@
 package org.ogf.saga.namespace.abstracts;
 
-import org.ogf.saga.url.URLFactory;
-import org.ogf.saga.error.NotImplemented;
+import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.namespace.Flags;
+import org.ogf.saga.url.URLFactory;
 
 import java.util.List;
 
@@ -47,7 +47,7 @@ public abstract class AbstractNSDirectoryListTest extends AbstractNSDirectoryTes
             assertEquals(
                     0,
                     list.size());
-        } catch(NotImplemented e) {
+        } catch(NotImplementedException e) {
             // ignore this test for read-only protocols
         }
     }

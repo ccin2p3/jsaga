@@ -5,7 +5,7 @@ import org.gridforum.jgss.ExtendedGSSCredential;
 import org.gridforum.jgss.ExtendedGSSManager;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
-import org.ogf.saga.error.IncorrectState;
+import org.ogf.saga.error.IncorrectStateException;
 
 import java.io.*;
 
@@ -37,7 +37,7 @@ public class UProxyFile extends UFile {
         File file = (File) super.throwExceptionIfInvalid(value);
         GSSCredential cred = load(file);
         if (cred.getRemainingLifetime() < m_minLifeTime) {
-            throw new IncorrectState("Proxy file remaining lifetime is not enougth: "+cred.getRemainingLifetime());
+            throw new IncorrectStateException("Proxy file remaining lifetime is not enougth: "+cred.getRemainingLifetime());
         }
         return cred;
     }

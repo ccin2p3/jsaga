@@ -7,15 +7,14 @@ import fr.in2p3.jsaga.helpers.xslt.XSLTransformer;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformerFactory;
 import fr.in2p3.jsaga.impl.job.description.AbstractJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.job.instance.JobImpl;
-import org.ogf.saga.*;
-import org.ogf.saga.url.URL;
+import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.url.URL;
 import org.w3c.dom.Element;
 
 import java.io.ByteArrayOutputStream;
-import java.lang.Exception;
 import java.util.List;
 
 /* ***************************************************
@@ -52,16 +51,12 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
         return clone;
     }
 
-    public ObjectType getType() {
-        return ObjectType.JOBSERVICE;
-    }
-
-    public Job createJob(JobDescription jobDesc) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+    public Job createJob(JobDescription jobDesc) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         Element jsdlDOM;
         if (jobDesc instanceof AbstractJobDescriptionImpl) {
             jsdlDOM = ((AbstractJobDescriptionImpl) jobDesc).getJSDL();
         } else {
-            throw new NotImplemented("Unsupported JobDescription implementation: "+jobDesc.getClass().getName());
+            throw new NotImplementedException("Unsupported JobDescription implementation: "+jobDesc.getClass().getName());
         }
 
         // translate from JSDL
@@ -78,22 +73,22 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
                 nativeJobDesc = out.toString();
             }
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
 
         // returns
         return new JobImpl(m_session, jobDesc, nativeJobDesc, m_controlAdaptor, m_monitorService);
     }
 
-    public List<String> list() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
-        throw new NotImplemented("Not implemented yet..."); //todo: implement method list()
+    public List<String> list() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
+        throw new NotImplementedException("Not implemented yet..."); //todo: implement method list()
     }
 
-    public Job getJob(String nativeJobId) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public Job getJob(String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         return new JobImpl(m_session, nativeJobId, m_controlAdaptor, m_monitorService);
     }
 
-    public JobSelf getSelf() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, Timeout, NoSuccess {
-        throw new NotImplemented("Not implemented by the SAGA engine", this);
+    public JobSelf getSelf() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
+        throw new NotImplementedException("Not implemented by the SAGA engine", this);
     }
 }

@@ -9,8 +9,8 @@ import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.util.Util;
 import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
 
 import java.io.PrintStream;
 import java.text.ParseException;
@@ -35,13 +35,13 @@ public class VOMSSecurityAdaptor extends GSSCredentialSecurityAdaptor implements
     }
 
     /** override super.getAttribute() */
-    public String getAttribute(String key) throws NotImplemented, NoSuccess {
+    public String getAttribute(String key) throws NotImplementedException, NoSuccessException {
         // same as globus
         GlobusCredential globusProxy;
         if (m_proxy instanceof GlobusGSSCredentialImpl) {
             globusProxy = ((GlobusGSSCredentialImpl)m_proxy).getGlobusCredential();
         } else {
-            throw new NoSuccess("Not a globus proxy");
+            throw new NoSuccessException("Not a globus proxy");
         }
         Vector v = VOMSValidator.parse(globusProxy.getCertificateChain());
         VOMSAttribute attr = (VOMSAttribute) v.elementAt(0);
@@ -59,7 +59,7 @@ public class VOMSSecurityAdaptor extends GSSCredentialSecurityAdaptor implements
                 long timeleft = (attr.getNotAfter().getTime() - System.currentTimeMillis()) / 1000;
                 return ""+(timeleft>0 ? timeleft : 0);
             } catch (ParseException e) {
-                throw new NoSuccess(e);
+                throw new NoSuccessException(e);
             }
         } else {
             return super.getAttribute(key);

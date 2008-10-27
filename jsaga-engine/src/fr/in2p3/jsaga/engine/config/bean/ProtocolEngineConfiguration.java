@@ -3,9 +3,9 @@ package fr.in2p3.jsaga.engine.config.bean;
 import fr.in2p3.jsaga.engine.config.*;
 import fr.in2p3.jsaga.engine.schema.config.*;
 import fr.in2p3.jsaga.helpers.StringArray;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.url.URL;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -30,7 +30,7 @@ public class ProtocolEngineConfiguration extends ServiceEngineConfigurationAbstr
         return m_protocol;
     }
 
-    public DataService findDataService(URL url) throws NotImplemented, NoSuccess {
+    public DataService findDataService(URL url) throws NotImplementedException, NoSuccessException {
         if (url != null) {
             Protocol protocol = findProtocol(url.getScheme());
             if (url.getFragment() != null) {
@@ -67,18 +67,18 @@ public class ProtocolEngineConfiguration extends ServiceEngineConfigurationAbstr
                 }
             }
         } else {
-            throw new NoSuccess("URL is null");
+            throw new NoSuccessException("URL is null");
         }
     }
 
-    public Protocol findProtocol(String scheme) throws NoSuccess {
+    public Protocol findProtocol(String scheme) throws NoSuccessException {
         for (int p=0; p<m_protocol.length; p++) {
             Protocol protocol = m_protocol[p];
             if (protocol.getScheme().equals(scheme) || StringArray.arrayContains(protocol.getSchemeAlias(), scheme)) {
                 return protocol;
             }
         }
-        throw new NoSuccess("Protocol not found: "+scheme);
+        throw new NoSuccessException("Protocol not found: "+scheme);
     }
 
     private DataService findDataServiceByServiceRef(Protocol protocol, String serviceRef) {

@@ -3,16 +3,14 @@ package fr.in2p3.jsaga.impl.file;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSDirectoryImpl;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
-import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
-import org.ogf.saga.url.URL;
+import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
 import org.ogf.saga.error.*;
 import org.ogf.saga.file.*;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
-
-import java.lang.Exception;
+import org.ogf.saga.url.URL;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -28,100 +26,77 @@ import java.lang.Exception;
  */
 public abstract class AbstractAsyncDirectoryImpl extends AbstractNSDirectoryImpl implements Directory {
     /** constructor for factory */
-    public AbstractAsyncDirectoryImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    protected AbstractAsyncDirectoryImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session, url, adaptor, flags);
     }
 
     /** constructor for NSDirectory.open() */
-    public AbstractAsyncDirectoryImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    protected AbstractAsyncDirectoryImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(dir, relativeUrl, flags);
     }
 
     /** constructor for NSEntry.openAbsolute() */
-    public AbstractAsyncDirectoryImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    protected AbstractAsyncDirectoryImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(entry, absolutePath, flags);
     }
 
-    public Task<Long> getSize(TaskMode mode, URL name, int flags) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    DirectoryImpl.class.getMethod("getSize", new Class[]{URL.class, int.class}),
-                    new Object[]{name, flags}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<Directory, Long> getSize(TaskMode mode, URL name, int flags) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<Directory,Long>().create(
+                mode, m_session, this,
+                "getSize",
+                new Class[]{URL.class, int.class},
+                new Object[]{name, flags});
     }
-    public Task<Long> getSize(TaskMode mode, URL name) throws NotImplemented {
+    public Task<Directory, Long> getSize(TaskMode mode, URL name) throws NotImplementedException {
         return this.getSize(mode, name, Flags.NONE.getValue());
     }
 
-    public Task<Boolean> isFile(TaskMode mode, URL name) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    DirectoryImpl.class.getMethod("isFile", new Class[]{URL.class}),
-                    new Object[]{name}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<Directory, Boolean> isFile(TaskMode mode, URL name) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<Directory,Boolean>().create(
+                mode, m_session, this,
+                "isFile",
+                new Class[]{URL.class},
+                new Object[]{name});
     }
 
-    public Task<Directory> openDirectory(TaskMode mode, URL name, int flags) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    DirectoryImpl.class.getMethod("openDirectory", new Class[]{URL.class, int.class}),
-                    new Object[]{name, flags}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<Directory, Directory> openDirectory(TaskMode mode, URL name, int flags) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<Directory,Directory>().create(
+                mode, m_session, this,
+                "openDirectory",
+                new Class[]{URL.class, int.class},
+                new Object[]{name, flags});
     }
-    public Task<Directory> openDirectory(TaskMode mode, URL name) throws NotImplemented {
+    public Task<Directory, Directory> openDirectory(TaskMode mode, URL name) throws NotImplementedException {
         return this.openDirectory(mode, name, Flags.READ.getValue());
     }
 
-    public Task<File> openFile(TaskMode mode, URL name, int flags) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    DirectoryImpl.class.getMethod("openFile", new Class[]{URL.class, int.class}),
-                    new Object[]{name, flags}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<Directory, File> openFile(TaskMode mode, URL name, int flags) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<Directory,File>().create(
+                mode, m_session, this,
+                "openFile",
+                new Class[]{URL.class, int.class},
+                new Object[]{name, flags});
     }
-    public Task<File> openFile(TaskMode mode, URL name) throws NotImplemented {
+    public Task<Directory, File> openFile(TaskMode mode, URL name) throws NotImplementedException {
         return this.openFile(mode, name, Flags.READ.getValue());
     }
 
-    public Task<FileInputStream> openFileInputStream(TaskMode mode, URL name) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    DirectoryImpl.class.getMethod("openFileInputStream", new Class[]{URL.class}),
-                    new Object[]{name}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<Directory, FileInputStream> openFileInputStream(TaskMode mode, URL name) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<Directory,FileInputStream>().create(
+                mode, m_session, this,
+                "openFileInputStream",
+                new Class[]{URL.class},
+                new Object[]{name});
     }
-    public Task<FileOutputStream> openFileOutputStream(TaskMode mode, URL name) throws NotImplemented {
+
+    public Task<Directory, FileOutputStream> openFileOutputStream(TaskMode mode, URL name, boolean append) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<Directory,FileOutputStream>().create(
+                mode, m_session, this,
+                "openFileOutputStream",
+                new Class[]{URL.class, boolean.class},
+                new Object[]{name, append});
+    }
+    public Task<Directory, FileOutputStream> openFileOutputStream(TaskMode mode, URL name) throws NotImplementedException {
         return this.openFileOutputStream(mode, name, false);
-    }
-    public Task<FileOutputStream> openFileOutputStream(TaskMode mode, URL name, boolean append) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    DirectoryImpl.class.getMethod("openFileOutputStream", new Class[]{URL.class, boolean.class}),
-                    new Object[]{name, append}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
     }
 }

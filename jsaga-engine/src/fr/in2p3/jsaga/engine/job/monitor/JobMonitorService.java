@@ -6,8 +6,8 @@ import fr.in2p3.jsaga.engine.job.monitor.listen.FilteredJobStatusListener;
 import fr.in2p3.jsaga.engine.job.monitor.listen.IndividualJobStatusListener;
 import fr.in2p3.jsaga.engine.job.monitor.poll.*;
 import fr.in2p3.jsaga.engine.job.monitor.request.JobStatusRequestor;
-import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
+import org.ogf.saga.url.URL;
 
 import java.util.Timer;
 
@@ -30,7 +30,7 @@ public class JobMonitorService {
     private Timer m_timer;
 
     /** constructor */
-    public JobMonitorService(URL url, JobMonitorAdaptor adaptor) throws NotImplemented, Timeout, NoSuccess {
+    public JobMonitorService(URL url, JobMonitorAdaptor adaptor) throws NotImplementedException, TimeoutException, NoSuccessException {
         // set URL
         m_url = url;
 
@@ -51,14 +51,14 @@ public class JobMonitorService {
             } else if (adaptor instanceof QueryIndividualJob) {
                 poller = new IndividualJobStatusPoller((QueryIndividualJob)adaptor);
             } else {
-                throw new NotImplemented("Querying job status not implemented for adaptor: "+adaptor.getClass().getName());
+                throw new NotImplementedException("Querying job status not implemented for adaptor: "+adaptor.getClass().getName());
             }
             m_registry = poller;
             int pollPeriod = EngineProperties.getInteger(EngineProperties.JOB_MONITOR_POLL_PERIOD);
             m_timer = new Timer();
             m_timer.schedule(poller, 0, pollPeriod);
         } else {
-            throw new NotImplemented("Adaptor does not implement any monitoring interface: "+adaptor.getClass().getName());
+            throw new NotImplementedException("Adaptor does not implement any monitoring interface: "+adaptor.getClass().getName());
         }
     }
 
@@ -72,15 +72,15 @@ public class JobMonitorService {
         return m_url;
     }
 
-    public JobStatus getState(String nativeJobId) throws NotImplemented, Timeout, NoSuccess {
+    public JobStatus getState(String nativeJobId) throws NotImplementedException, TimeoutException, NoSuccessException {
         return m_requestor.getJobStatus(nativeJobId);
     }
 
-    public void startListening(String nativeJobId, JobMonitorCallback callback) throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public void startListening(String nativeJobId, JobMonitorCallback callback) throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         m_registry.subscribeJob(nativeJobId, callback);
     }
 
-    public void stopListening(String nativeJobId) throws NotImplemented, Timeout, NoSuccess {
+    public void stopListening(String nativeJobId) throws NotImplementedException, TimeoutException, NoSuccessException {
         m_registry.unsubscribeJob(nativeJobId);
     }
 }

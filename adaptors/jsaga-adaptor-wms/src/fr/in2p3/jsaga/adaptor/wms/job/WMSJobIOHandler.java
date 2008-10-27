@@ -15,9 +15,9 @@ import org.globus.io.urlcopy.UrlCopy;
 import org.globus.io.urlcopy.UrlCopyException;
 import org.globus.util.GlobusURL;
 import org.ietf.jgss.GSSCredential;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.PermissionDenied;
-import org.ogf.saga.error.Timeout;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.PermissionDeniedException;
+import org.ogf.saga.error.TimeoutException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -58,25 +58,25 @@ public class WMSJobIOHandler implements JobIOGetter {
 		return jobId;
 	}
 
-	public InputStream getStderr() throws PermissionDenied, Timeout, NoSuccess {
+	public InputStream getStderr() throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		try {
 			getSandboxFile(stderrFile);
 			return new FileInputStream(stderrFile);
 		} catch (FileNotFoundException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
 	}
 
-	public InputStream getStdout() throws PermissionDenied, Timeout, NoSuccess {
+	public InputStream getStdout() throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		try {
 			getSandboxFile(stdoutFile);
 			return new FileInputStream(stdoutFile);
 		} catch (FileNotFoundException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
 	}
 	
-	private void getSandboxFile(String file) throws NoSuccess, PermissionDenied {
+	private void getSandboxFile(String file) throws NoSuccessException, PermissionDeniedException {
 		
 		try {
 			//Use the "gsiftp" transfer protocols to retrieve the list of files produced by the jobs.
@@ -114,21 +114,21 @@ public class WMSJobIOHandler implements JobIOGetter {
 	            }
 	        }
 		} catch( UrlCopyException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (MalformedURLException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (AuthorizationFaultException e) {
-			throw new PermissionDenied(e);
+			throw new PermissionDeniedException(e);
 		} catch (AuthenticationFaultException e) {
-			throw new PermissionDenied(e);
+			throw new PermissionDeniedException(e);
 		} catch (OperationNotAllowedFaultException e) {
-			throw new PermissionDenied(e);
+			throw new PermissionDeniedException(e);
 		} catch (InvalidArgumentFaultException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (JobUnknownFaultException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		} catch (ServiceException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
 		}
 	}
 }

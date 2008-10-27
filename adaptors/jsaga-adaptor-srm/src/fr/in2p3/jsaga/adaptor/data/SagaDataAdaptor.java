@@ -46,12 +46,12 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
 
     public String getType() {return null;}
     public Usage getUsage() {return null;}
-    public Default[] getDefaults(Map attributes) throws IncorrectState {return null;}
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {return null;}
     public Class[] getSupportedSecurityAdaptorClasses() {return new Class[]{InMemoryProxySecurityAdaptor.class};}
     public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {}
-    public BaseURL getBaseURL() throws IncorrectURL {return null;}
+    public BaseURL getBaseURL() throws IncorrectURLException {return null;}
 
-    public SagaDataAdaptor(URI url, GSSCredential cred) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public SagaDataAdaptor(URI url, GSSCredential cred) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         try {
             Context context = ContextFactory.createContext();
             context.setAttribute("Type", "InMemoryProxy");
@@ -61,62 +61,62 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
             URL rootUrl = URLFactory.createURL(url.resolve(".").toString());
             rootUrl.setFragment("InMemoryProxy");
             m_root = NSFactory.createNSDirectory(session, rootUrl, Flags.NONE.getValue());
-        } catch (NotImplemented e) {
-            throw new NoSuccess(e);
-        } catch (IncorrectURL e) {
-            throw new NoSuccess(e);
-        } catch (AuthenticationFailed e) {
-            throw new NoSuccess(e);
-        } catch (AuthorizationFailed e) {
-            throw new NoSuccess(e);
-        } catch (IncorrectState e) {
-            throw new NoSuccess(e);
-        } catch (AlreadyExists e) {
-            throw new NoSuccess(e);
+        } catch (NotImplementedException e) {
+            throw new NoSuccessException(e);
+        } catch (IncorrectURLException e) {
+            throw new NoSuccessException(e);
+        } catch (AuthenticationFailedException e) {
+            throw new NoSuccessException(e);
+        } catch (AuthorizationFailedException e) {
+            throw new NoSuccessException(e);
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
+        } catch (AlreadyExistsException e) {
+            throw new NoSuccessException(e);
         }
     }
 
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         // do nothing
     }
 
-    public void disconnect() throws NoSuccess {
+    public void disconnect() throws NoSuccessException {
         try {
             m_root.close();
-        } catch (NotImplemented e) {
-            throw new NoSuccess(e);
-        } catch (IncorrectState e) {
-            throw new NoSuccess(e);
+        } catch (NotImplementedException e) {
+            throw new NoSuccessException(e);
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
         }
     }
 
-    public boolean exists(String absolutePath, String additionalArgs) throws PermissionDenied, Timeout, NoSuccess {
+    public boolean exists(String absolutePath, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         NSEntry entry = this.getEntry(absolutePath);
         try {
             return entry.isDir() || entry.isEntry() || entry.isLink();
-        } catch (NotImplemented e) {
-            throw new NoSuccess(e);
-        } catch (AuthenticationFailed e) {
-            throw new NoSuccess(e);
-        } catch (AuthorizationFailed e) {
-            throw new NoSuccess(e);
-        } catch (BadParameter e) {
-            throw new NoSuccess(e);
-        } catch (IncorrectState e) {
-            throw new NoSuccess(e);
+        } catch (NotImplementedException e) {
+            throw new NoSuccessException(e);
+        } catch (AuthenticationFailedException e) {
+            throw new NoSuccessException(e);
+        } catch (AuthorizationFailedException e) {
+            throw new NoSuccessException(e);
+        } catch (BadParameterException e) {
+            throw new NoSuccessException(e);
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
         }
     }
 
-    public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         NSEntry entry = this.getEntry(absolutePath);
         if (entry instanceof File) {
             return new SagaInputStream((File) entry);
         } else {
-            throw new NoSuccess("Tranfer URL is not a file");
+            throw new NoSuccessException("Tranfer URL is not a file");
         }
     }
 
-    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         NSEntry entry;
         try {
             int flags = (exclusive ? Flags.EXCL : Flags.NONE).or(append ? Flags.APPEND : Flags.NONE);
@@ -124,16 +124,16 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
                     URLFactory.createURL(parentAbsolutePath+"/"+fileName),
                     flags);
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         if (entry instanceof File) {
             return new SagaOutputStream((File) entry);
         } else {
-            throw new NoSuccess("Tranfer URL is not a file");
+            throw new NoSuccessException("Tranfer URL is not a file");
         }
     }
 
-    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, ParentDoesNotExist, Timeout, NoSuccess {
+    public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         try {
             String protocol = m_root.getURL().getScheme();
             URL targetUrl = URLFactory.createURL(getURLString(protocol, targetHost, targetPort, targetAbsolutePath));
@@ -141,26 +141,26 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
             this.getEntry(sourceAbsolutePath).copy(
                     targetUrl,
                     flags);
-        } catch (NotImplemented e) {
-            throw new NoSuccess(e);
-        } catch (IncorrectState e) {
-            throw new NoSuccess(e);
-        } catch (IncorrectURL e) {
-            throw new NoSuccess(e);
+        } catch (NotImplementedException e) {
+            throw new NoSuccessException(e);
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
+        } catch (IncorrectURLException e) {
+            throw new NoSuccessException(e);
         }
     }
 
-    public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         URL sourceUrl;
         try {
             String protocol = m_root.getURL().getScheme();
             sourceUrl = URLFactory.createURL(getURLString(protocol, sourceHost, sourcePort, sourceAbsolutePath));
-        } catch (IncorrectState e) {
-            throw new NoSuccess(e);
-        } catch (NotImplemented e) {
-            throw new NoSuccess(e);
-        } catch (IncorrectURL e) {
-            throw new NoSuccess(e);
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
+        } catch (NotImplementedException e) {
+            throw new NoSuccessException(e);
+        } catch (IncorrectURLException e) {
+            throw new NoSuccessException(e);
         }
         NSEntry entry = this.getEntry(targetAbsolutePath);
         try {
@@ -169,76 +169,76 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
                 m.invoke(entry, new Object[]{sourceUrl, (overwrite ? Flags.OVERWRITE : Flags.NONE)});
             }
         } catch (NoSuchMethodException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         } catch (IllegalAccessException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         } catch (InvocationTargetException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 
-    public void rename(String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, AlreadyExists, Timeout, NoSuccess {
+    public void rename(String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException {
         try {
             int flags = (overwrite ? Flags.OVERWRITE : Flags.NONE).getValue();
             this.getEntry(sourceAbsolutePath).move(
                     URLFactory.createURL(targetAbsolutePath),
                     flags);
-        } catch (NotImplemented e) {
-            throw new NoSuccess(e);
-        } catch (AuthenticationFailed e) {
-            throw new NoSuccess(e);
-        } catch (AuthorizationFailed e) {
-            throw new NoSuccess(e);
-        } catch (IncorrectState e) {
-            throw new NoSuccess(e);
-        } catch (IncorrectURL e) {
-            throw new NoSuccess(e);
+        } catch (NotImplementedException e) {
+            throw new NoSuccessException(e);
+        } catch (AuthenticationFailedException e) {
+            throw new NoSuccessException(e);
+        } catch (AuthorizationFailedException e) {
+            throw new NoSuccessException(e);
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
+        } catch (IncorrectURLException e) {
+            throw new NoSuccessException(e);
         }
     }
 
-    public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         try {
             this.getEntry(parentAbsolutePath+"/"+fileName).remove(Flags.NONE.getValue());
-        } catch (IncorrectState e) {
-            throw new NoSuccess(e);
-        } catch (AuthorizationFailed e) {
-            throw new NoSuccess(e);
-        } catch (NotImplemented e) {
-            throw new NoSuccess(e);
-        } catch (AuthenticationFailed e) {
-            throw new NoSuccess(e);
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
+        } catch (AuthorizationFailedException e) {
+            throw new NoSuccessException(e);
+        } catch (NotImplementedException e) {
+            throw new NoSuccessException(e);
+        } catch (AuthenticationFailedException e) {
+            throw new NoSuccessException(e);
         }
     }
 
-    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        throw new NoSuccess("[INTERNAL ERROR] This method is not supposed to be used");
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+        throw new NoSuccessException("[INTERNAL ERROR] This method is not supposed to be used");
     }
 
-    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        throw new NoSuccess("[INTERNAL ERROR] This method is not supposed to be used");
+    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+        throw new NoSuccessException("[INTERNAL ERROR] This method is not supposed to be used");
     }
 
-    public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
-        throw new NoSuccess("[INTERNAL ERROR] This method is not supposed to be used");
+    public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
+        throw new NoSuccessException("[INTERNAL ERROR] This method is not supposed to be used");
     }
 
-    public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
-        throw new NoSuccess("[INTERNAL ERROR] This method is not supposed to be used");
+    public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+        throw new NoSuccessException("[INTERNAL ERROR] This method is not supposed to be used");
     }
 
-    private NSEntry getEntry(String absolutePath) throws NoSuccess {
+    private NSEntry getEntry(String absolutePath) throws NoSuccessException {
         try {
             return m_root.open(URLFactory.createURL(absolutePath), Flags.NONE.getValue());
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 
-    private static String getURLString(String scheme, String host, int port, String path) throws IncorrectURL {
+    private static String getURLString(String scheme, String host, int port, String path) throws IncorrectURLException {
         try {
             return new java.net.URI(scheme, null, host, port, path, null, "InMemoryProxy[0]").toString();
         } catch (URISyntaxException e) {
-            throw new IncorrectURL(e);
+            throw new IncorrectURLException(e);
         }
     }
 }

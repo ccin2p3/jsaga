@@ -1,8 +1,8 @@
 package org.ogf.saga.namespace;
 
-import org.ogf.saga.url.URL;
-import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.namespace.abstracts.AbstractNSCopyTest;
+import org.ogf.saga.url.URL;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -29,8 +29,8 @@ public class NSCopyFromTest extends AbstractNSCopyTest {
         NSEntry newFile = null;
         try {
             newFile = NSFactory.createNSEntry(m_session, target, FLAGS_BYPASSEXIST);
-        } catch(DoesNotExist e) {
-            fail("Unexpected DoesNotExist exception");
+        } catch(DoesNotExistException e) {
+            fail("Unexpected exception: "+ DoesNotExistException.class);
         }
         copyFrom(newFile, m_fileUrl2, Flags.NONE.getValue());
         checkCopied(target, DEFAULT_CONTENT_2);
@@ -42,7 +42,7 @@ public class NSCopyFromTest extends AbstractNSCopyTest {
         try {
             copyFrom(m_file, m_fileUrl2, Flags.NONE);
             fail("Expected AlreadyExist exception");
-        } catch(AlreadyExists e) {
+        } catch(AlreadyExistsException e) {
             checkCopied(target, DEFAULT_CONTENT);
         }
     }

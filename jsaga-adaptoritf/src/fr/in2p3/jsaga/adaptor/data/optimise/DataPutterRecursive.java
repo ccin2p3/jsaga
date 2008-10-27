@@ -24,9 +24,9 @@ public interface DataPutterRecursive extends DataWriterAdaptor {
      * @param absolutePath the target path.
      * @param additionalArgs adaptor specific arguments.
      * @param sourceDir the source directory.
-     * @throws AlreadyExists if <code>absolutePath</code> already exists.
+     * @throws AlreadyExistsException if <code>absolutePath</code> already exists.
      * @throws ParentDoesNotExist if <code>parentAbsolutePath</code> does not exist.
      */
     public void putFromDirectory(String absolutePath, String additionalArgs, File sourceDir)
-        throws PermissionDenied, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess;
+        throws PermissionDeniedException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException;
 }

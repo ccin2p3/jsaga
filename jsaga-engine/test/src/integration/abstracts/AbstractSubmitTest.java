@@ -34,8 +34,6 @@ public abstract class AbstractSubmitTest extends TestCase {
     public AbstractSubmitTest() throws Exception {
         super();
 
-        // SAGA bootstrap
-        System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
         // configure JSAGA engine
         System.setProperty("debug", "true");
         EngineProperties.setProperty(EngineProperties.JSAGA_UNIVERSE, "../test/resources/submit/jsaga-universe.xml");

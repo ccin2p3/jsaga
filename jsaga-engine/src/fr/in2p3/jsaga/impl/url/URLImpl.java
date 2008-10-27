@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.impl.url;
 
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.url.URL;
 
 import java.net.URI;
@@ -23,33 +23,53 @@ import java.net.URISyntaxException;
 public class URLImpl implements URL {
     private URI u;
     private FileAttributes m_cache;
+    private boolean m_mustRemoveSlash;
 
     /** MAY encode the URL */
-    URLImpl(String url, boolean encode) throws BadParameter {
+    URLImpl(String url, boolean encode) throws BadParameterException {
         if (encode) {
-            url = (url.startsWith("file://"))
-                    ? URLEncoder.encodePathOnly(url)
-                    : URLEncoder.encode(url);
+            if (url.startsWith("file://")) {
+                url = URLEncoder.encodePathOnly(url);
+            } else {
+                url = URLEncoder.encode(url);
+            }
         }
         try {
             u = new URI(url);
             this.fixFileURI();  //sreynaud
         } catch(URISyntaxException e) {
-            throw new BadParameter("syntax error in url", e);
+            throw new BadParameterException("syntax error in url", e);
         }
     }
 
-    /** Encode the URL */
-    URLImpl(URL base, String name) throws BadParameter {
+    /** Encode the relative path */
+    URLImpl(String relativePath) throws BadParameterException {
+        int colonPos = relativePath.indexOf(':');
+        int slashPos = relativePath.indexOf('/');
+        m_mustRemoveSlash = colonPos > -1 && (slashPos == -1 || colonPos < slashPos);
+        if (m_mustRemoveSlash) {
+            relativePath = URLEncoder.encodePathOnly("/"+relativePath);
+        } else {
+            relativePath = URLEncoder.encodePathOnly(relativePath);
+        }
+        try {
+            u = new URI(relativePath);
+        } catch (URISyntaxException e) {
+            throw new BadParameterException("syntax error in url", e);
+        }
+    }
+
+    /** Encode the relative path */
+    URLImpl(URL base, String relativePath) throws BadParameterException {
         this(   base,
-                URLEncoder.encodePathOnly(name),
+                URLEncoder.encodePathOnly(relativePath),
                 null,
                 null
         );
     }
 
     /** Encode the URL */
-    URLImpl(URL base, URL relativeUrl) throws BadParameter {
+    URLImpl(URL base, URL relativeUrl) throws BadParameterException {
         this(   base,
                 URLEncoder.encodePathOnly(relativeUrl.getPath()),
                 relativeUrl.getQuery()!=null ? relativeUrl.getQuery() : base.getQuery(),
@@ -77,7 +97,7 @@ public class URLImpl implements URL {
     }
 
     /** Encode the URL */
-    public void setString(String url) throws BadParameter {
+    public void setString(String url) throws BadParameterException {
         String encodedUrl = (url.startsWith("file://"))
                 ? URLEncoder.encodePathOnly(url)
                 : URLEncoder.encode(url);
@@ -85,25 +105,25 @@ public class URLImpl implements URL {
             u = new URI(encodedUrl);
             this.fixFileURI();  //sreynaud
         } catch(URISyntaxException e) {
-            throw new BadParameter("syntax error in url", e);
+            throw new BadParameterException("syntax error in url", e);
         }
     }
 
     /** Decode the URL */
     public String getString() {
-        return URLEncoder.decode(u);
+        return URLEncoder.decode(u, m_mustRemoveSlash);
     }
 
     public String getFragment() {
         return u.getFragment();
     }
 
-    public void setFragment(String fragment) throws BadParameter {
+    public void setFragment(String fragment) throws BadParameterException {
         try {
             u = new URI(u.getScheme(), u.getUserInfo(), u.getHost(),
                     u.getPort(), u.getPath(), u.getQuery(), fragment);
         } catch(URISyntaxException e) {
-            throw new BadParameter("syntax error in fragment", e);
+            throw new BadParameterException("syntax error in fragment", e);
         }
     }
 
@@ -114,12 +134,12 @@ public class URLImpl implements URL {
         return u.getHost();
     }
 
-    public void setHost(String host) throws BadParameter {
+    public void setHost(String host) throws BadParameterException {
         try {
             u = new URI(u.getScheme(), u.getUserInfo(), host,
                     u.getPort(), u.getPath(), u.getQuery(), u.getFragment());
         } catch(URISyntaxException e) {
-            throw new BadParameter("syntax error in host", e);
+            throw new BadParameterException("syntax error in host", e);
         }
     }
 
@@ -128,13 +148,13 @@ public class URLImpl implements URL {
             return this.getSchemeSpecificPart().getPath();  //sreynaud
         } else if (".".equals(u.getAuthority())) {
             return "."+u.getPath();                         //sreynaud
-        } else if (u.getPath().startsWith("/./")) {
+        } else if (u.getPath().startsWith("/./") || m_mustRemoveSlash) {
             return u.getPath().substring(1);                //sreynaud
         }
         return u.getPath();
     }
 
-    public void setPath(String path) throws BadParameter {
+    public void setPath(String path) throws BadParameterException {
         try {
             if (path.startsWith("./")) {
                 //sreynaud: set relative path
@@ -148,7 +168,7 @@ public class URLImpl implements URL {
                         u.getPort(), path, u.getQuery(), u.getFragment());
             }
         } catch(URISyntaxException e) {
-            throw new BadParameter("syntax error in path", e);
+            throw new BadParameterException("syntax error in path", e);
         }
     }
 
@@ -159,12 +179,12 @@ public class URLImpl implements URL {
         return u.getPort();
     }
 
-    public void setPort(int port) throws BadParameter {
+    public void setPort(int port) throws BadParameterException {
         try {
             u = new URI(u.getScheme(), u.getUserInfo(), u.getHost(),
                     port, u.getPath(), u.getQuery(), u.getFragment());
         } catch(URISyntaxException e) {
-            throw new BadParameter("syntax error in port", e);     // ???
+            throw new BadParameterException("syntax error in port", e);     // ???
         }
     }
 
@@ -175,12 +195,12 @@ public class URLImpl implements URL {
         return u.getQuery();
     }
 
-    public void setQuery(String query) throws BadParameter {
+    public void setQuery(String query) throws BadParameterException {
         try {
             u = new URI(u.getScheme(), u.getUserInfo(), u.getHost(),
                     u.getPort(), u.getPath(), query, u.getFragment());
         } catch(URISyntaxException e) {
-            throw new BadParameter("syntax error in query", e);
+            throw new BadParameterException("syntax error in query", e);
         }
     }
 
@@ -188,12 +208,12 @@ public class URLImpl implements URL {
         return u.getScheme();
     }
 
-    public void setScheme(String scheme) throws BadParameter {
+    public void setScheme(String scheme) throws BadParameterException {
         try {
             u = new URI(scheme, u.getUserInfo(), u.getHost(),
                     u.getPort(), u.getPath(), u.getQuery(), u.getFragment());
         } catch(URISyntaxException e) {
-            throw new BadParameter("syntax error in scheme", e);
+            throw new BadParameterException("syntax error in scheme", e);
         }
     }
 
@@ -204,29 +224,29 @@ public class URLImpl implements URL {
         return u.getUserInfo();
     }
 
-    public void setUserInfo(String userInfo) throws BadParameter {
+    public void setUserInfo(String userInfo) throws BadParameterException {
         try {
             u = new URI(u.getScheme(), userInfo, u.getHost(),
                     u.getPort(), u.getPath(), u.getQuery(), u.getFragment());
         } catch(URISyntaxException e) {
-            throw new BadParameter("syntax error in query", e);
+            throw new BadParameterException("syntax error in query", e);
         }
     }
 
-    public URL translate(String scheme) throws BadParameter, NoSuccess {
+    public URL translate(String scheme) throws BadParameterException, NoSuccessException {
         try {
             URI url = new URI(scheme, u.getUserInfo(), u.getHost(),
                     u.getPort(), u.getPath(), u.getQuery(), u.getFragment());
-            // Not quite correct: the SAGA specs say that NoSuccess should be
+            // Not quite correct: the SAGA specs say that NoSuccessException should be
             // thrown when the scheme is not supported. How to check this
             // here ???
             return new URLImpl(url);
         } catch(URISyntaxException e) {
-            throw new BadParameter("syntax error in scheme", e);
+            throw new BadParameterException("syntax error in scheme", e);
         }
     }
 
-    public URL resolve(URL url) throws NoSuccess {
+    public URL resolve(URL url) throws NoSuccessException {
         URLImpl urlimpl = (URLImpl) url;
         URI uri = u.resolve(urlimpl.u);
         if (uri == urlimpl.u) {

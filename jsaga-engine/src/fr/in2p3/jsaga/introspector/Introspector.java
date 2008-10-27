@@ -39,5 +39,5 @@ public interface Introspector extends Attributes {
      * @param key the sub-component key value.
      * @return the created introspector.
      */
-    public Introspector getChildIntrospector(String key) throws NotImplemented, DoesNotExist, NoSuccess;
+    public Introspector getChildIntrospector(String key) throws NotImplementedException, DoesNotExistException, NoSuccessException;
 }

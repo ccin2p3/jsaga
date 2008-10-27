@@ -12,7 +12,7 @@ import fr.in2p3.jsaga.engine.schema.config.*;
 import fr.in2p3.jsaga.engine.schema.config.types.AttributeSourceType;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.*;
-import org.ogf.saga.error.IncorrectState;
+import org.ogf.saga.error.IncorrectStateException;
 
 import java.io.*;
 import java.util.*;
@@ -96,7 +96,7 @@ public class AdaptorDescriptors {
         Default[] defaults;
         try {
             defaults = adaptor.getDefaults(new HashMap());
-        } catch (IncorrectState e) {
+        } catch (IncorrectStateException e) {
             defaults = null;
         }
         if (defaults != null) {

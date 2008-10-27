@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.adaptor.data.impl;
 
 import fr.in2p3.jsaga.adaptor.schema.data.emulator.*;
-import org.ogf.saga.error.DoesNotExist;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,19 +24,19 @@ public abstract class DataEmulatorConnectionAbstract {
 
     ////////////////////////////////////////// m_grid operations /////////////////////////////////////////
 
-    protected DataEmulatorConnectionAbstract() throws NoSuccess {
+    protected DataEmulatorConnectionAbstract() throws NoSuccessException {
         try {
             m_grid = DataEmulatorGrid.getInstance();
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 
-    public void commit() throws NoSuccess {
+    public void commit() throws NoSuccessException {
         try {
             m_grid.commit();
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 
@@ -48,7 +48,7 @@ public abstract class DataEmulatorConnectionAbstract {
     ////////////////////////////////////////// public methods /////////////////////////////////////////
 
     // add
-    public Directory addDirectory(String absolutePath) throws DoesNotExist {
+    public Directory addDirectory(String absolutePath) throws DoesNotExistException {
         return addDirectory(getParentDirectory(absolutePath), getEntryName(absolutePath));
     }
     public Directory addDirectory(DirectoryType parent, String name) {
@@ -57,7 +57,7 @@ public abstract class DataEmulatorConnectionAbstract {
         parent.addDirectory(dir);
         return dir;
     }
-    public File addFile(String absolutePath) throws DoesNotExist {
+    public File addFile(String absolutePath) throws DoesNotExistException {
         return addFile(getParentDirectory(absolutePath), getEntryName(absolutePath));
     }
     public File addFile(DirectoryType parent, String name) {
@@ -68,25 +68,25 @@ public abstract class DataEmulatorConnectionAbstract {
     }
 
     // remove
-    public void removeDirectory(String absolutePath) throws DoesNotExist, NoSuccess {
+    public void removeDirectory(String absolutePath) throws DoesNotExistException, NoSuccessException {
         removeDirectory(getParentDirectory(absolutePath), getEntryName(absolutePath));
     }
-    public void removeDirectory(DirectoryType parent, String name) throws DoesNotExist, NoSuccess {
+    public void removeDirectory(DirectoryType parent, String name) throws DoesNotExistException, NoSuccessException {
         Directory dir = getDirectory(parent, name);
         if (dir.getDirectoryCount()>0 || dir.getFileCount()>0) {
-            throw new NoSuccess("Directory is not empty: "+name);
+            throw new NoSuccessException("Directory is not empty: "+name);
         }
         parent.removeDirectory(dir);
     }
-    public void removeFile(String absolutePath) throws DoesNotExist {
+    public void removeFile(String absolutePath) throws DoesNotExistException {
         removeFile(getParentDirectory(absolutePath), getEntryName(absolutePath));
     }
-    public void removeFile(DirectoryType parent, String name) throws DoesNotExist {
+    public void removeFile(DirectoryType parent, String name) throws DoesNotExistException {
         parent.removeFile(getFile(parent, name));
     }
 
     // get
-    public DirectoryType getDirectory(String absolutePath) throws DoesNotExist {
+    public DirectoryType getDirectory(String absolutePath) throws DoesNotExistException {
         DirectoryType parent = getParentDirectory(absolutePath);
         String name = getEntryName(absolutePath);
         if (name != null) {
@@ -95,43 +95,43 @@ public abstract class DataEmulatorConnectionAbstract {
             return parent;
         }
     }
-    public Directory getDirectory(DirectoryType parent, String entryName) throws DoesNotExist {
+    public Directory getDirectory(DirectoryType parent, String entryName) throws DoesNotExistException {
         for (int i=0; i<parent.getDirectoryCount(); i++) {
             if (parent.getDirectory(i).getName().equals(entryName)) {
                 return parent.getDirectory(i);
             }
         }
-        throw new DoesNotExist("Directory does not exist");
+        throw new DoesNotExistException("Directory does not exist");
     }
-    public File getFile(String absolutePath) throws DoesNotExist {
+    public File getFile(String absolutePath) throws DoesNotExistException {
         return getFile(getParentDirectory(absolutePath), getEntryName(absolutePath));
     }
-    public File getFile(DirectoryType parent, String entryName) throws DoesNotExist {
+    public File getFile(DirectoryType parent, String entryName) throws DoesNotExistException {
         for (int i=0; i<parent.getFileCount(); i++) {
             if (parent.getFile(i).getName().equals(entryName)) {
                 return parent.getFile(i);
             }
         }
-        throw new DoesNotExist("File does not exist");
+        throw new DoesNotExistException("File does not exist");
     }
-    public EntryType getEntry(String absolutePath) throws DoesNotExist {
+    public EntryType getEntry(String absolutePath) throws DoesNotExistException {
         DirectoryType parentDir = getParentDirectory(absolutePath);
         String entryName = getEntryName(absolutePath);
         return getEntry(parentDir, entryName);
     }
-    public EntryType getEntry(DirectoryType parent, String entryName) throws DoesNotExist {
+    public EntryType getEntry(DirectoryType parent, String entryName) throws DoesNotExistException {
         if (entryName == null) {
             return parent;
         }
         try {
             return getFile(parent, entryName);
-        } catch(DoesNotExist e) {
+        } catch(DoesNotExistException e) {
             return getDirectory(parent, entryName);
         }
     }
 
     // list
-    public EntryType[] listEntries(String absolutePath) throws DoesNotExist {
+    public EntryType[] listEntries(String absolutePath) throws DoesNotExistException {
         EntryType entry = this.getEntry(absolutePath);
         if (entry instanceof DirectoryType) {
             return listEntries((DirectoryType)entry);
@@ -151,7 +151,7 @@ public abstract class DataEmulatorConnectionAbstract {
     }
 
     // list directories only
-    public DirectoryType[] listDirectories(String absolutePath) throws DoesNotExist {
+    public DirectoryType[] listDirectories(String absolutePath) throws DoesNotExistException {
         EntryType entry = this.getEntry(absolutePath);
         if (entry instanceof DirectoryType) {
             return listDirectories((DirectoryType)entry);
@@ -169,7 +169,7 @@ public abstract class DataEmulatorConnectionAbstract {
 
     ////////////////////////////////////////// friend methods /////////////////////////////////////////
 
-    public DirectoryType getParentDirectory(String absolutePath) throws DoesNotExist {
+    public DirectoryType getParentDirectory(String absolutePath) throws DoesNotExistException {
         String[] entryNames = toArray(absolutePath);
         DirectoryType parent = this.getServerRoot();
         for (int i=0; i<entryNames.length-1; i++) {

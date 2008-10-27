@@ -65,28 +65,28 @@ public class AttributeImpl<E> implements Attribute {
         }
     }
 
-    public void setValue(String value) throws NotImplemented, IncorrectState, PermissionDenied {
+    public void setValue(String value) throws NotImplementedException, IncorrectStateException, PermissionDeniedException {
         try {
             m_object = new AttributeSerializer<E>(m_type).fromString(value);
-        } catch (DoesNotExist e) {
-            throw new NotImplemented("INTERNAL ERROR: unexpected exception", e);
+        } catch (DoesNotExistException e) {
+            throw new NotImplementedException("INTERNAL ERROR: unexpected exception", e);
         }
     }
 
-    public String getValue() throws NotImplemented, IncorrectState {
+    public String getValue() throws NotImplementedException, IncorrectStateException {
         try {
             return new AttributeSerializer<E>(m_type).toString(m_object);
-        } catch (DoesNotExist e) {
-            throw new NotImplemented("INTERNAL ERROR: unexpected exception", e);
+        } catch (DoesNotExistException e) {
+            throw new NotImplementedException("INTERNAL ERROR: unexpected exception", e);
         }
     }
 
-    public void setValues(String[] values) throws IncorrectState {
-        throw new IncorrectState("Attribute "+m_key+" not vector");
+    public void setValues(String[] values) throws IncorrectStateException {
+        throw new IncorrectStateException("Attribute "+m_key+" not vector");
     }
 
-    public String[] getValues() throws IncorrectState {
-        throw new IncorrectState("Attribute "+m_key+" not vector");
+    public String[] getValues() throws IncorrectStateException {
+        throw new IncorrectStateException("Attribute "+m_key+" not vector");
     }
 
     public boolean equals(Object o) {

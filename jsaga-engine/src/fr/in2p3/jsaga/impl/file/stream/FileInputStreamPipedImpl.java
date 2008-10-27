@@ -4,9 +4,9 @@ import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderGetter;
 import fr.in2p3.jsaga.impl.url.URLHelper;
 import org.ogf.saga.SagaObject;
-import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.url.URL;
 
 import java.io.IOException;
 
@@ -27,7 +27,7 @@ public class FileInputStreamPipedImpl extends AbstractAsyncFileInputStreamImpl {
     private PipedInputStreamImpl m_inStream;
 
     /** constructor */
-    FileInputStreamPipedImpl(Session session, URL url, FileReaderGetter adaptor, boolean disconnectable) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    FileInputStreamPipedImpl(Session session, URL url, FileReaderGetter adaptor, boolean disconnectable) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session);
 
         // save connection
@@ -57,7 +57,7 @@ public class FileInputStreamPipedImpl extends AbstractAsyncFileInputStreamImpl {
         if (m_connection != null) {
             try {
                 m_connection.disconnect();
-            } catch (NoSuccess e) {
+            } catch (NoSuccessException e) {
                 throw new IOException(e.getMessage());
             }
         }

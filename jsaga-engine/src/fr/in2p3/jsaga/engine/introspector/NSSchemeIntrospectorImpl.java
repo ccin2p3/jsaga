@@ -22,7 +22,7 @@ import java.util.Set;
 public class NSSchemeIntrospectorImpl extends AbstractIntrospectorImpl implements Introspector {
     private Protocol m_config;
 
-    public NSSchemeIntrospectorImpl(Protocol config) throws NoSuccess {
+    public NSSchemeIntrospectorImpl(Protocol config) throws NoSuccessException {
         super(config.getScheme());
         m_config = config;
     }
@@ -58,7 +58,7 @@ public class NSSchemeIntrospectorImpl extends AbstractIntrospectorImpl implement
      * @param key the host
      * @return the created introspector
      */
-    public Introspector getChildIntrospector(String key) throws NotImplemented, DoesNotExist, NoSuccess {
+    public Introspector getChildIntrospector(String key) throws NotImplementedException, DoesNotExistException, NoSuccessException {
         return new NSHostPatternIntrospectorImpl(m_config, key);
     }
 }

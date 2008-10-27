@@ -3,8 +3,8 @@ package fr.in2p3.jsaga.engine.job.monitor.listen;
 import fr.in2p3.jsaga.adaptor.job.monitor.*;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorCallback;
 import fr.in2p3.jsaga.engine.job.monitor.request.JobStatusRequestor;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.Timeout;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.TimeoutException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +26,7 @@ public class FilteredJobStatusListener extends AbstractJobStatusListener impleme
     private Map m_subscribedJobs;
 
     /** constructor */
-    public FilteredJobStatusListener(ListenFilteredJob adaptor, JobStatusRequestor requestor) throws Timeout, NoSuccess {
+    public FilteredJobStatusListener(ListenFilteredJob adaptor, JobStatusRequestor requestor) throws TimeoutException, NoSuccessException {
         super(requestor);
         m_adaptor = adaptor;
         m_adaptor.subscribeFilteredJob(this);
@@ -39,11 +39,11 @@ public class FilteredJobStatusListener extends AbstractJobStatusListener impleme
         m_adaptor.unsubscribeFilteredJob();
     }
 
-    protected synchronized void doSubscribeJob(String nativeJobId, JobMonitorCallback callback) throws Timeout, NoSuccess {
+    protected synchronized void doSubscribeJob(String nativeJobId, JobMonitorCallback callback) throws TimeoutException, NoSuccessException {
         m_subscribedJobs.put(nativeJobId, callback);
     }
 
-    public synchronized void unsubscribeJob(String nativeJobId) throws Timeout, NoSuccess {
+    public synchronized void unsubscribeJob(String nativeJobId) throws TimeoutException, NoSuccessException {
         m_subscribedJobs.remove(nativeJobId);
     }
 

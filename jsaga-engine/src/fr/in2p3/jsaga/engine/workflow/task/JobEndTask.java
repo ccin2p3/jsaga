@@ -18,7 +18,7 @@ import org.ogf.saga.error.*;
  */
 public class JobEndTask extends DummyTask {
     /** constructor */
-    public JobEndTask(String jobName) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public JobEndTask(String jobName) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         super(name(jobName));
         // update XML status
         Task xmlStatus = super.getStateAsXML();

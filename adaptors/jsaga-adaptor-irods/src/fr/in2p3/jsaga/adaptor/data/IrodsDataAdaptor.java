@@ -43,12 +43,12 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
         return new UFile(IRODSENV);
     }
 
-	public BaseURL getBaseURL() throws IncorrectURL {
+	public BaseURL getBaseURL() throws IncorrectURLException {
         //todo: parse IRODSENV file
         return null;
     }
 	
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
 		EnvironmentVariables env = EnvironmentVariables.getInstance();
         return new Default[]{
 			new Default(IRODSENV, new File[]{
@@ -57,11 +57,11 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 		};
     }
 
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         // URL attributes
         parseValue(attributes);
         if (defaultStorageResource == null) {
-            throw new BadParameter("The default storage resource cannot be null");
+            throw new BadParameterException("The default storage resource cannot be null");
         }
 
 		try {
@@ -81,23 +81,23 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 			
 			fileSystem = FileFactory.newFileSystem(account);
 		} catch (IOException ioe) {
-			throw new AuthenticationFailed(ioe);
+			throw new AuthenticationFailedException(ioe);
         }
 	}
 
-    public void disconnect() throws NoSuccess {
+    public void disconnect() throws NoSuccessException {
         try {
 			((IRODSFileSystem)fileSystem).close();
 		} catch (IOException e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
         }
     }
 
-    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
-        throw new NoSuccess("Not implemented yet");
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+        throw new NoSuccessException("Not implemented yet");
     }
 
-    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
 		/*
 		GeneralFile[] files = FileFactory.newFile(fileSystem, absolutePath).listFiles();
 		FileAttributes[] fileAttributes = new FileAttributes[files.length];
@@ -167,12 +167,11 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 				ind++;
 			}
 			return fileAttributes;
-		} catch (IOException e) {throw new NoSuccess(e);}
+		} catch (IOException e) {throw new NoSuccessException(e);}
 
 		}
 	
-	public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess
-	{
+	public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
 		try {
 			String[] split = absolutePath.split(SEPARATOR);
 			String fileName = split[split.length-1];
@@ -190,30 +189,30 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 			
 			return bais;*/
        	} catch (java.lang.Exception e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
         }    
 	}
 	
-	public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+	public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
 		try {
 			IRODSFile generalFile =  (IRODSFile)FileFactory.newFile((IRODSFileSystem)fileSystem, parentAbsolutePath, fileName );
 			return new BufferedOutputStream(new IRODSFileOutputStream(generalFile));
        	} catch (java.lang.Exception e) {
-			throw new NoSuccess(e);
+			throw new NoSuccessException(e);
         }    
 	}
 	
-	public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, AlreadyExists, ParentDoesNotExist, Timeout, NoSuccess {
+	public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
 		IRODSFile irodsFile = new IRODSFile((IRODSFileSystem)fileSystem, parentAbsolutePath +SEPARATOR + directoryName);
 		irodsFile.mkdir();
 	}
 
-	public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+	public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
 		IRODSFile irodsFile = new IRODSFile((IRODSFileSystem)fileSystem, parentAbsolutePath +SEPARATOR + directoryName);
 		irodsFile.delete();
 	}
 
-	public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+	public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
 		IRODSFile irodsFile = new IRODSFile((IRODSFileSystem)fileSystem, parentAbsolutePath +SEPARATOR + fileName);
 		irodsFile.delete();
 	}

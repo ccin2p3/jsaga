@@ -1,21 +1,18 @@
 package fr.in2p3.jsaga.impl.namespace;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
-import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.impl.file.FileImpl;
 import fr.in2p3.jsaga.impl.file.copy.FileCopyFromTask;
 import fr.in2p3.jsaga.impl.file.copy.FileCopyTask;
 import fr.in2p3.jsaga.impl.permissions.AbstractDataPermissionsImpl;
-import fr.in2p3.jsaga.impl.task.GenericThreadedTask;
-import org.ogf.saga.url.URL;
+import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.NSEntry;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
-
-import java.lang.Exception;
+import org.ogf.saga.url.URL;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -31,224 +28,158 @@ import java.lang.Exception;
  */
 public abstract class AbstractAsyncNSEntryImpl extends AbstractDataPermissionsImpl implements NSEntry {
     /** constructor */
-    public AbstractAsyncNSEntryImpl(Session session, URL url, DataAdaptor adaptor) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    protected AbstractAsyncNSEntryImpl(Session session, URL url, DataAdaptor adaptor) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session, url, adaptor);
     }
 
-    public Task<URL> getURL(TaskMode mode) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractNSEntryImpl.class.getMethod("getURL", new Class[]{}),
-                    new Object[]{}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<NSEntry, URL> getURL(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<NSEntry,URL>().create(
+                mode, m_session, this,
+                "getURL",
+                new Class[]{},
+                new Object[]{});
     }
 
-    public Task<URL> getCWD(TaskMode mode) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractNSEntryImpl.class.getMethod("getCWD", new Class[]{}),
-                    new Object[]{}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<NSEntry, URL> getCWD(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<NSEntry,URL>().create(
+                mode, m_session, this,
+                "getCWD",
+                new Class[]{},
+                new Object[]{});
     }
 
-    public Task<URL> getName(TaskMode mode) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractNSEntryImpl.class.getMethod("getName", new Class[]{}),
-                    new Object[]{}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<NSEntry, URL> getName(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<NSEntry,URL>().create(
+                mode, m_session, this,
+                "getName",
+                new Class[]{},
+                new Object[]{});
     }
 
-    public Task<Boolean> isDir(TaskMode mode) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractNSEntryImpl.class.getMethod("isDir", new Class[]{}),
-                    new Object[]{}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<NSEntry, Boolean> isDir(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<NSEntry,Boolean>().create(
+                mode, m_session, this,
+                "isDir",
+                new Class[]{},
+                new Object[]{});
     }
 
-    public Task<Boolean> isEntry(TaskMode mode) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractNSEntryImpl.class.getMethod("isEntry", new Class[]{}),
-                    new Object[]{}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<NSEntry, Boolean> isEntry(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<NSEntry,Boolean>().create(
+                mode, m_session, this,
+                "isEntry",
+                new Class[]{},
+                new Object[]{});
     }
 
-    public Task<Boolean> isLink(TaskMode mode) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractNSEntryImpl.class.getMethod("isLink", new Class[]{}),
-                    new Object[]{}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<NSEntry, Boolean> isLink(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<NSEntry,Boolean>().create(
+                mode, m_session, this,
+                "isLink",
+                new Class[]{},
+                new Object[]{});
     }
 
-    public Task<URL> readLink(TaskMode mode) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractNSEntryImpl.class.getMethod("readLink", new Class[]{}),
-                    new Object[]{}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<NSEntry, URL> readLink(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<NSEntry,URL>().create(
+                mode, m_session, this,
+                "readLink",
+                new Class[]{},
+                new Object[]{});
     }
 
-    public Task copy(TaskMode mode, URL target, int flags) throws NotImplemented {
+    public Task<NSEntry, Void> copy(TaskMode mode, URL target, int flags) throws NotImplementedException {
         if (this instanceof FileImpl) {
-            FlagsBytes effectiveFlags = new FlagsBytes(flags);
-            return new FileCopyTask(m_session, (FileImpl) this, m_adaptor, target, effectiveFlags);
+            return new FileCopyTask<NSEntry,Void>(m_session, (FileImpl) this, target, flags);
         } else {
-            try {
-                return prepareTask(mode, new GenericThreadedTask(
-                        m_session,
-                        this,
-                        AbstractNSEntryImpl.class.getMethod("copy", new Class[]{URL.class, int.class}),
-                        new Object[]{target, flags}));
-            } catch (Exception e) {
-                throw new NotImplemented(e);
-            }
+            return new GenericThreadedTaskFactory<NSEntry,Void>().create(
+                    mode, m_session, this,
+                    "copy",
+                    new Class[]{URL.class, int.class},
+                    new Object[]{target, flags});
         }
     }
-    public Task copy(TaskMode mode, URL target) throws NotImplemented {
+    public Task<NSEntry, Void> copy(TaskMode mode, URL target) throws NotImplementedException {
         return this.copy(mode, target, Flags.NONE.getValue());
     }
 
-    public Task copyFrom(TaskMode mode, URL source, int flags) throws NotImplemented {
+    public Task<NSEntry, Void> copyFrom(TaskMode mode, URL source, int flags) throws NotImplementedException {
         if (this instanceof FileImpl) {
-            FlagsBytes effectiveFlags = new FlagsBytes(flags);
-            return new FileCopyFromTask(m_session, (FileImpl) this, m_adaptor, source, effectiveFlags);
+            return new FileCopyFromTask<NSEntry,Void>(m_session, (FileImpl) this, source, flags);
         } else {
-            try {
-                return prepareTask(mode, new GenericThreadedTask(
-                        m_session,
-                        this,
-                        AbstractNSEntryImpl.class.getMethod("copyFrom", new Class[]{URL.class, int.class}),
-                        new Object[]{source, flags}));
-            } catch (Exception e) {
-                throw new NotImplemented(e);
-            }
+            return new GenericThreadedTaskFactory<NSEntry,Void>().create(
+                    mode, m_session, this,
+                    "copyFrom",
+                    new Class[]{URL.class, int.class},
+                    new Object[]{source, flags});
         }
     }
-    public Task copyFrom(TaskMode mode, URL source) throws NotImplemented {
+    public Task<NSEntry, Void> copyFrom(TaskMode mode, URL source) throws NotImplementedException {
         return this.copyFrom(mode, source, Flags.NONE.getValue());
     }
 
-    public Task link(TaskMode mode, URL target, int flags) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractNSEntryImpl.class.getMethod("link", new Class[]{URL.class, int.class}),
-                    new Object[]{target, flags}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<NSEntry, Void> link(TaskMode mode, URL target, int flags) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<NSEntry,Void>().create(
+                mode, m_session, this,
+                "link",
+                new Class[]{URL.class, int.class},
+                new Object[]{target, flags});
     }
-    public Task link(TaskMode mode, URL target) throws NotImplemented {
+    public Task<NSEntry, Void> link(TaskMode mode, URL target) throws NotImplementedException {
         return this.link(mode, target, Flags.NONE.getValue());
     }
 
-    public Task move(TaskMode mode, URL target, int flags) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractNSEntryImpl.class.getMethod("move", new Class[]{URL.class, int.class}),
-                    new Object[]{target, flags}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<NSEntry, Void> move(TaskMode mode, URL target, int flags) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<NSEntry,Void>().create(
+                mode, m_session, this,
+                "move",
+                new Class[]{URL.class, int.class},
+                new Object[]{target, flags});
     }
-    public Task move(TaskMode mode, URL target) throws NotImplemented {
+    public Task<NSEntry, Void> move(TaskMode mode, URL target) throws NotImplementedException {
         return this.move(mode, target, Flags.NONE.getValue());
     }
 
-    public Task remove(TaskMode mode, int flags) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractNSEntryImpl.class.getMethod("remove", new Class[]{int.class}),
-                    new Object[]{flags}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<NSEntry, Void> remove(TaskMode mode, int flags) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<NSEntry,Void>().create(
+                mode, m_session, this,
+                "remove",
+                new Class[]{int.class},
+                new Object[]{flags});
     }
-    public Task remove(TaskMode mode) throws NotImplemented {
+    public Task<NSEntry, Void> remove(TaskMode mode) throws NotImplementedException {
         return this.remove(mode, Flags.NONE.getValue());
     }
 
-    public Task close(TaskMode mode) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractNSEntryImpl.class.getMethod("close", new Class[]{}),
-                    new Object[]{}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<NSEntry, Void> close(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<NSEntry,Void>().create(
+                mode, m_session, this,
+                "close",
+                new Class[]{},
+                new Object[]{});
     }
 
-    public Task close(TaskMode mode, float timeoutInSeconds) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractNSEntryImpl.class.getMethod("close", new Class[]{float.class}),
-                    new Object[]{timeoutInSeconds}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<NSEntry, Void> close(TaskMode mode, float timeoutInSeconds) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<NSEntry,Void>().create(
+                mode, m_session, this,
+                "close",
+                new Class[]{float.class},
+                new Object[]{timeoutInSeconds});
     }
 
-    public Task permissionsAllow(TaskMode mode, String id, int permissions, int flags) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractNSEntryImpl.class.getMethod("permissionsAllow", new Class[]{String.class, int.class, int.class}),
-                    new Object[]{id, permissions, flags}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<NSEntry, Void> permissionsAllow(TaskMode mode, String id, int permissions, int flags) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<NSEntry,Void>().create(
+                mode, m_session, this,
+                "permissionsAllow",
+                new Class[]{String.class, int.class, int.class},
+                new Object[]{id, permissions, flags});
     }
 
-    public Task permissionsDeny(TaskMode mode, String id, int permissions, int flags) throws NotImplemented {
-        try {
-            return prepareTask(mode, new GenericThreadedTask(
-                    m_session,
-                    this,
-                    AbstractNSEntryImpl.class.getMethod("permissionsDeny", new Class[]{String.class, int.class, int.class}),
-                    new Object[]{id, permissions, flags}));
-        } catch (Exception e) {
-            throw new NotImplemented(e);
-        }
+    public Task<NSEntry, Void> permissionsDeny(TaskMode mode, String id, int permissions, int flags) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<NSEntry,Void>().create(
+                mode, m_session, this,
+                "permissionsDeny",
+                new Class[]{String.class, int.class, int.class},
+                new Object[]{id, permissions, flags});
     }
 }

@@ -36,7 +36,7 @@ public class GlobusProxyFactory extends GlobusProxyFactoryAbstract {
     private String m_proxyFile = "";
     private String m_keyFile = null;
 
-    public GlobusProxyFactory(Map attributes, int oid, int certificateFormat) throws BadParameter, ParseException {
+    public GlobusProxyFactory(Map attributes, int oid, int certificateFormat) throws BadParameterException, ParseException {
         // required attributes
         super((String) attributes.get(Context.USERPASS)); // UserPass is ignored if key is not encrypted
         CoGProperties.getDefault().setCaCertLocations((String) attributes.get(Context.CERTREPOSITORY));
@@ -52,7 +52,7 @@ public class GlobusProxyFactory extends GlobusProxyFactoryAbstract {
                 m_keyFile = (String) attributes.get(GlobusContext.USERCERTKEY);
                 break;
             default:
-                throw new BadParameter("Invalid case, either PEM or PKCS12 certificates is supported");
+                throw new BadParameterException("Invalid case, either PEM or PKCS12 certificates is supported");
         }
         
         // optional attributes
@@ -82,7 +82,7 @@ public class GlobusProxyFactory extends GlobusProxyFactoryAbstract {
         }
     }
 
-    public GSSCredential createProxy() throws IncorrectState, NoSuccess {
+    public GSSCredential createProxy() throws IncorrectStateException, NoSuccessException {
         CertUtil.init();
 
         ProxyCertInfo proxyCertInfo = null;
@@ -112,22 +112,22 @@ public class GlobusProxyFactory extends GlobusProxyFactoryAbstract {
             final boolean GLOBUS_STYLE = false;
             super.createProxy(m_certFile, m_keyFile, VERIFY, GLOBUS_STYLE, m_proxyFile);
         } catch (NullPointerException e) {
-            throw new IncorrectState("Bad passphrase", e);
+            throw new IncorrectStateException("Bad passphrase", e);
         }
         try {
 			proxy.verify();
 		} catch (GlobusCredentialException e) {
             switch(e.getErrorCode()) {
                 case GlobusCredentialException.EXPIRED:
-                    throw new IncorrectState("Your certificate is expired", e);
+                    throw new IncorrectStateException("Your certificate is expired", e);
                 default:
-                    throw new NoSuccess("Proxy verification failed", e);
+                    throw new NoSuccessException("Proxy verification failed", e);
             }
 		}
         try {
             return new GlobusGSSCredentialImpl(proxy, GSSCredential.INITIATE_ONLY);
         } catch (GSSException e) {
-            throw new NoSuccess("Proxy convertion failed", e);
+            throw new NoSuccessException("Proxy convertion failed", e);
         }
     }
     

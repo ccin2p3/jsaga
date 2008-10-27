@@ -1,6 +1,6 @@
 package org.ogf.saga.namespace.abstracts;
 
-import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.NSFactory;
 
@@ -25,8 +25,8 @@ public abstract class AbstractNSEntryWriteTest extends AbstractNSEntryTest {
         m_file.remove(Flags.NONE.getValue());
         try {
             NSFactory.createNSEntry(m_session, m_fileUrl, Flags.NONE.getValue());
-            fail("Expected DoesNotExist exception");
-        } catch(DoesNotExist e) {
+            fail("Expected exception: "+ DoesNotExistException.class);
+        } catch(DoesNotExistException e) {
         }
     }
 }

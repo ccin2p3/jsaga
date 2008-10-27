@@ -2,15 +2,14 @@ package fr.in2p3.jsaga.impl.task;
 
 import fr.in2p3.jsaga.impl.monitoring.*;
 import org.apache.log4j.Logger;
-import org.ogf.saga.ObjectType;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
 import org.ogf.saga.task.Task;
 
-import java.lang.Exception;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -24,33 +23,32 @@ import java.util.concurrent.*;
 /**
  *
  */
-public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implements Task<E>, TaskCallback<E> {
+public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl implements Task<T,E>, TaskCallback<E> {
     // metrics
     private TaskStateMetricImpl<State> m_metric_TaskState;
     // internal
-    private Object m_object;
+    private T m_object;
     private E m_result;
-    protected org.ogf.saga.error.Exception m_exception;
+    protected SagaException m_exception;
     private boolean m_isWaitingFor;
     /** logger */
     private static Logger s_logger = Logger.getLogger(AbstractTaskImpl.class);
 
     /** constructor */
-    public AbstractTaskImpl(Session session, Object object, boolean create) throws NotImplemented {
+    public AbstractTaskImpl(Session session, T object, boolean create) throws NotImplementedException {
         super(session);
 
         // set metrics
-        m_metric_TaskState = (TaskStateMetricImpl<State>) this._addMetric(new TaskStateMetricImpl<State>(
-                this,
+        m_metric_TaskState = new TaskStateMetricFactoryImpl<State>(this).createAndRegister(
                 Task.TASK_STATE,
                 "fires on task state change, and has the literal value of the task enum.",
                 MetricMode.ReadOnly,
                 "1",
                 MetricType.Enum,
-                create ? State.NEW : null));
+                create ? State.NEW : null);
 
         // internal
-        m_object = (object!=null ? object : this);
+        m_object = object;
         m_result = null;
         m_exception = null;
         m_isWaitingFor = false;
@@ -67,16 +65,12 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
         return clone;
     }
 
-    public ObjectType getType() {
-        return ObjectType.TASK;
-    }
-
     //////////////////////////////////////////// abstract methods ////////////////////////////////////////////
 
     /**
      * start the task (e.g. start the thread, submit the job...) and returns immediatly
      */
-    protected abstract void doSubmit() throws NotImplemented, IncorrectState, Timeout, NoSuccess;
+    protected abstract void doSubmit() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException;
 
     /**
      * cancel the task (and update its state)
@@ -87,18 +81,18 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
      * query the task state
      * return the new state if it has been queried, else null
      */
-    protected abstract State queryState() throws NotImplemented, Timeout, NoSuccess;
+    protected abstract State queryState() throws NotImplementedException, TimeoutException, NoSuccessException;
 
     /**
      * start listening to changes of task state
      * @return true if the task is listening, else false
      */
-    public abstract boolean startListening() throws NotImplemented, IncorrectState, Timeout, NoSuccess;
+    public abstract boolean startListening() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException;
 
     /**
      * stop listening to changes of task state
      */
-    public abstract void stopListening() throws NotImplemented, Timeout, NoSuccess;
+    public abstract void stopListening() throws NotImplementedException, TimeoutException, NoSuccessException;
 
     public void setWaitingFor(boolean isWaitingFor) {
         m_isWaitingFor = isWaitingFor;
@@ -106,17 +100,17 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
 
     //////////////////////////////////////////// interface Task ////////////////////////////////////////////
 
-    public void run() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public void run() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (!this.isCancelled()) {
             this.doSubmit();
         }
     }
 
-    public void waitFor() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public void waitFor() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         this.waitFor(WAIT_FOREVER);
     }
 
-    public boolean waitFor(float timeoutInSeconds) throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public boolean waitFor(float timeoutInSeconds) throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         // returns immediatly if already finished
         if (this.isDone_LocalCheckOnly()) {
             return true;
@@ -129,7 +123,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
         /*int cookie;
         try {
             cookie = m_metric_TaskState.addCallback(new Callback(){
-                public boolean cb(Monitorable mt, Metric metric, Context ctx) throws NotImplemented, AuthorizationFailed {
+                public boolean cb(Monitorable mt, Metric metric, Context ctx) throws NotImplementedException, AuthorizationFailedException {
                     boolean stayRegistered;
                     MetricImpl<State> m = (MetricImpl<State>) metric;
                     switch(m.getValue()) {
@@ -146,9 +140,9 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
                 }
             });
         }
-        catch (AuthenticationFailed e) {throw new NoSuccess(e);}
-        catch (AuthorizationFailed e) {throw new NoSuccess(e);}
-        catch (PermissionDenied e) {throw new NoSuccess(e);}*/
+        catch (AuthenticationFailedException e) {throw new NoSuccessException(e);}
+        catch (AuthorizationFailedException e) {throw new NoSuccessException(e);}
+        catch (PermissionDeniedException e) {throw new NoSuccessException(e);}*/
 
         // loop until task is finished (done, canceled or failed)
         try {
@@ -178,10 +172,10 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
             try {
                 m_metric_TaskState.removeCallback(cookie);
             }
-            catch (BadParameter e2) {throw new NoSuccess(e);}
-            catch (AuthenticationFailed e2) {throw new NoSuccess(e);}
-            catch (AuthorizationFailed e2) {throw new NoSuccess(e);}
-            catch (PermissionDenied e2) {throw new NoSuccess(e);}
+            catch (BadParameterException e2) {throw new NoSuccessException(e);}
+            catch (AuthenticationFailedException e2) {throw new NoSuccessException(e);}
+            catch (AuthorizationFailedException e2) {throw new NoSuccessException(e);}
+            catch (PermissionDeniedException e2) {throw new NoSuccessException(e);}
         }*/
 
         // returns
@@ -189,10 +183,10 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
     }
 
     // exit immediatly
-    public synchronized void cancel() throws NotImplemented, IncorrectState, NoSuccess {
+    public synchronized void cancel() throws NotImplementedException, IncorrectStateException, NoSuccessException {
         switch(m_metric_TaskState.getValue(State.RUNNING)) {
             case NEW:
-                throw new IncorrectState("Can not cancel task in 'New' state", this); //as specified in SAGA
+                throw new IncorrectStateException("Can not cancel task in 'New' state", this); //as specified in SAGA
             case DONE:
             case CANCELED:
             case FAILED:
@@ -223,12 +217,12 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
     }
 
     // wait for task to be cancelled (or done, or failed)
-    public void cancel(float timeoutInSeconds) throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public void cancel(float timeoutInSeconds) throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         this.cancel();
         this.waitFor(timeoutInSeconds);
     }
 
-    public State getState() throws NotImplemented, Timeout, NoSuccess {
+    public State getState() throws NotImplementedException, TimeoutException, NoSuccessException {
         switch(m_metric_TaskState.getValue(State.RUNNING)) {
             case DONE:
             case CANCELED:
@@ -245,44 +239,44 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
         }
     }
 
-    public E getResult() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public E getResult() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         this.waitFor();
         switch(m_metric_TaskState.getValue(State.DONE)) {
             case NEW:
             case FAILED:
             case CANCELED:
-                throw new IncorrectState("Can not get result for task in state: "+ m_metric_TaskState.getValue().name());
+                throw new IncorrectStateException("Can not get result for task in state: "+ m_metric_TaskState.getValue().name());
             default:
                 return m_result;
         }
     }
 
-    public <T> T getObject() throws NotImplemented, Timeout, NoSuccess {
-        return (T) m_object;
+    public T getObject() throws NotImplementedException, TimeoutException, NoSuccessException {
+        return m_object;
     }
 
-    public void rethrow() throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    public void rethrow() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         switch(m_metric_TaskState.getValue(State.FAILED)) {
             case FAILED:
                 if (m_exception != null) {
                     try {throw m_exception;}
-                    catch(NotImplemented e) {throw e;}
-                    catch(IncorrectURL e) {throw e;}
-                    catch(AuthenticationFailed e) {throw e;}
-                    catch(AuthorizationFailed e) {throw e;}
-                    catch(PermissionDenied e) {throw e;}
-                    catch(BadParameter e) {throw e;}
-                    catch(IncorrectState e) {throw e;}
-                    catch(AlreadyExists e) {throw e;}
-                    catch(DoesNotExist e) {throw e;}
-                    catch(Timeout e) {throw e;}
-                    catch(NoSuccess e) {throw e;}
-                    catch(org.ogf.saga.error.Exception e) {throw new NoSuccess(m_exception);}
+                    catch(NotImplementedException e) {throw e;}
+                    catch(IncorrectURLException e) {throw e;}
+                    catch(AuthenticationFailedException e) {throw e;}
+                    catch(AuthorizationFailedException e) {throw e;}
+                    catch(PermissionDeniedException e) {throw e;}
+                    catch(BadParameterException e) {throw e;}
+                    catch(IncorrectStateException e) {throw e;}
+                    catch(AlreadyExistsException e) {throw e;}
+                    catch(DoesNotExistException e) {throw e;}
+                    catch(TimeoutException e) {throw e;}
+                    catch(NoSuccessException e) {throw e;}
+                    catch(SagaException e) {throw new NoSuccessException(m_exception);}
                 } else {
-                    throw new NoSuccess("task failed with unknown reason", this);
+                    throw new NoSuccessException("task failed with unknown reason", this);
                 }
             case CANCELED:
-                throw new NoSuccess("task canceled", this);
+                throw new NoSuccessException("task canceled", this);
         }
     }
 
@@ -303,7 +297,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
         m_result = result;
     }
 
-    public synchronized void setException(org.ogf.saga.error.Exception exception) {
+    public synchronized void setException(SagaException exception) {
         m_exception = exception;
     }
 
@@ -377,7 +371,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
     public E get() throws InterruptedException, ExecutionException {
         try {
             this.waitFor();
-        } catch (org.ogf.saga.error.Exception e) {
+        } catch (SagaException e) {
             throw new ExecutionException(e);
         }
         switch(m_metric_TaskState.getValue(State.DONE)) {
@@ -400,12 +394,12 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
      * @return the computed result
      * @throws InterruptedException if the current thread was interrupted while waiting
      * @throws ExecutionException if the computation threw an exception
-     * @throws TimeoutException if the wait timed out
+     * @throws java.util.concurrent.TimeoutException if the wait timed out
      */
-    public E get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+    public E get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, java.util.concurrent.TimeoutException {
         try {
             this.waitFor(unit.toSeconds(timeout));
-        } catch (org.ogf.saga.error.Exception e) {
+        } catch (SagaException e) {
             throw new ExecutionException(e);
         }
         switch(m_metric_TaskState.getValue(State.DONE)) {
@@ -416,7 +410,7 @@ public abstract class AbstractTaskImpl<E> extends AbstractMonitorableImpl implem
             case FAILED:
                 throw new ExecutionException(m_exception);
             default:
-                throw new TimeoutException("The wait timed out");
+                throw new java.util.concurrent.TimeoutException("The wait timed out");
         }
     }
 

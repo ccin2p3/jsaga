@@ -5,15 +5,16 @@ import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyDelegated;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
 import fr.in2p3.jsaga.engine.config.Configuration;
-import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
 import fr.in2p3.jsaga.engine.schema.config.Protocol;
 import fr.in2p3.jsaga.impl.logicalfile.LogicalFileImpl;
-import org.ogf.saga.url.URL;
+import fr.in2p3.jsaga.impl.namespace.FlagsHelper;
+import fr.in2p3.jsaga.impl.namespace.JSAGAFlags;
 import org.ogf.saga.error.*;
 import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.logicalfile.LogicalFileFactory;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.url.URL;
 
 import java.util.List;
 
@@ -35,14 +36,14 @@ public class LogicalFileCopyFrom {
     private DataAdaptor m_adaptor;
 
     /** constructor */
-    public LogicalFileCopyFrom(Session session, LogicalFileImpl targetFile, DataAdaptor adaptor) throws NotImplemented, BadParameter, IncorrectState, Timeout, NoSuccess {
+    public LogicalFileCopyFrom(Session session, LogicalFileImpl targetFile, DataAdaptor adaptor) throws NotImplementedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         m_session = session;
         m_targetFile = targetFile;
         m_adaptor = adaptor;
     }
 
-    public void copyFrom(URL effectiveSource, FlagsBytes effectiveFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
-        boolean overwrite = effectiveFlags.contains(Flags.OVERWRITE);
+    public void copyFrom(URL effectiveSource, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
+        boolean overwrite = Flags.OVERWRITE.isSet(flags);
         URL target = m_targetFile.getURL();
         if (m_adaptor instanceof DataCopyDelegated && target.getScheme().equals(effectiveSource.getScheme())) {
             try {
@@ -50,10 +51,10 @@ public class LogicalFileCopyFrom {
                         effectiveSource,
                         target,
                         overwrite, target.getQuery());
-            } catch (DoesNotExist doesNotExist) {
-                throw new DoesNotExist("Logical file does not exist: "+effectiveSource, doesNotExist.getCause());
-            } catch (AlreadyExists alreadyExists) {
-                throw new IncorrectState("Target entry already exists: "+target, alreadyExists);
+            } catch (DoesNotExistException doesNotExist) {
+                throw new DoesNotExistException("Logical file does not exist: "+effectiveSource, doesNotExist.getCause());
+            } catch (AlreadyExistsException alreadyExists) {
+                throw new IncorrectStateException("Target entry already exists: "+target, alreadyExists);
             }
         } else if (m_adaptor instanceof DataCopy && target.getScheme().equals(effectiveSource.getScheme())) {
             try {
@@ -61,27 +62,27 @@ public class LogicalFileCopyFrom {
                         effectiveSource.getHost(), effectiveSource.getPort(), effectiveSource.getPath(),
                         target.getPath(),
                         overwrite, target.getQuery());
-            } catch (DoesNotExist doesNotExist) {
-                throw new DoesNotExist("Logical file does not exist: "+effectiveSource, doesNotExist.getCause());
-            } catch (AlreadyExists alreadyExists) {
-                throw new IncorrectState("Target entry already exists: "+target, alreadyExists);
+            } catch (DoesNotExistException doesNotExist) {
+                throw new DoesNotExistException("Logical file does not exist: "+effectiveSource, doesNotExist.getCause());
+            } catch (AlreadyExistsException alreadyExists) {
+                throw new IncorrectStateException("Target entry already exists: "+target, alreadyExists);
             }
         } else if (m_adaptor instanceof LogicalWriter) {
             Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(effectiveSource.getScheme());
             if (descriptor.hasLogical() && descriptor.getLogical()) {
-                this.getFromLogicalFile(effectiveSource, effectiveFlags);
+                this.getFromLogicalFile(effectiveSource, flags);
             } else {
-                throw new BadParameter("Maybe what you want to do is to register to logical file the following location: "+effectiveSource);
+                throw new BadParameterException("Maybe what you want to do is to register to logical file the following location: "+effectiveSource);
             }
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+target.getScheme());
+            throw new NotImplementedException("Not supported for this protocol: "+target.getScheme());
         }
     }
 
 
-    private void getFromLogicalFile(URL source, FlagsBytes sourceFlags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
+    private void getFromLogicalFile(URL source, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
         // get location of source physical file
-        LogicalFile sourceLogicalFile = this.createSourceLogicalFile(source, sourceFlags);
+        LogicalFile sourceLogicalFile = this.createSourceLogicalFile(source, flags);
         try {
             List<URL> sourceLocations = sourceLogicalFile.listLocations();
             if (sourceLocations!=null && sourceLocations.size()>0) {
@@ -91,7 +92,7 @@ public class LogicalFileCopyFrom {
                     for (int i=0; targetLocations!=null && i<targetLocations.size(); i++) {
                         m_targetFile.removeLocation(targetLocations.get(i));
                     }
-                } catch(IncorrectState e) {
+                } catch(IncorrectStateException e) {
                     // ignore if target logical file does not exist
                 }
                 // add all source locations
@@ -104,12 +105,13 @@ public class LogicalFileCopyFrom {
         }
     }
 
-    private LogicalFile createSourceLogicalFile(URL source, FlagsBytes flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
-        int correctedFlags = flags.remove(Flags.OVERWRITE);
+    private LogicalFile createSourceLogicalFile(URL source, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
+        int correctedFlags = flags;
+        correctedFlags = new FlagsHelper(correctedFlags).substract(JSAGAFlags.PRESERVETIMES, Flags.OVERWRITE);
         try {
             return LogicalFileFactory.createLogicalFile(m_session, source, correctedFlags);
-        } catch (AlreadyExists e) {
-            throw new NoSuccess("Unexpected exception: AlreadyExists", e);
+        } catch (AlreadyExistsException e) {
+            throw new NoSuccessException("Unexpected exception", e);
         }
     }
 }

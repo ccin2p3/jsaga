@@ -26,11 +26,11 @@ public interface JobControlAdaptor extends JobAdaptor {
      * @return the identifier of the job in the grid
      * @throws BadResource if job service does not match job description
      */
-    public String submit(String jobDesc, boolean checkMatch) throws PermissionDenied, Timeout, NoSuccess, BadResource;
+    public String submit(String jobDesc, boolean checkMatch) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource;
 
     /**
      * cancel a job
      * @param nativeJobId the identifier of the job in the grid
      */
-    public void cancel(String nativeJobId) throws PermissionDenied, Timeout, NoSuccess;
+    public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException;
 }

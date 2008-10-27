@@ -1,10 +1,8 @@
 package org.ogf.saga.namespace;
 
-import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.abstracts.AbstractNSCopyTest;
-
-import java.lang.Exception;
+import org.ogf.saga.url.URL;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -27,13 +25,13 @@ public class NSCopyRecursiveTest extends AbstractNSCopyTest {
         URL target = createURL(m_subDirUrl2, DEFAULT_SUBDIRNAME);
         try {
             m_subDir.copy(m_subDirUrl2, Flags.NONE.getValue());
-            fail("Expected BadParameter exception");
-        } catch(BadParameter e) {
+            fail("Expected exception: "+ BadParameterException.class);
+        } catch(BadParameterException e) {
         }
         try {
             NSFactory.createNSDirectory(m_session, target, Flags.NONE.getValue());
-            fail("Expected DoesNotExist exception");
-        } catch(DoesNotExist e) {
+            fail("Expected exception: "+ DoesNotExistException.class);
+        } catch(DoesNotExistException e) {
         }
     }
 
@@ -47,13 +45,13 @@ public class NSCopyRecursiveTest extends AbstractNSCopyTest {
         URL target = createURL(m_dirUrl2, DEFAULT_SUBDIRNAME +DEFAULT_FILENAME);
         try {
             m_subDir.copy(m_dirUrl2, Flags.RECURSIVE.getValue());
-            fail("Expected AlreadyExists exception");
-        } catch(AlreadyExists e) {
+            fail("Expected exception: "+ AlreadyExistsException.class);
+        } catch(AlreadyExistsException e) {
         }
         try {
             NSFactory.createNSEntry(m_session, target, Flags.NONE.getValue());
-            fail("Expected DoesNotExist exception");
-        } catch(DoesNotExist e) {
+            fail("Expected exception: "+ DoesNotExistException.class);
+        } catch(DoesNotExistException e) {
         }
     }
 

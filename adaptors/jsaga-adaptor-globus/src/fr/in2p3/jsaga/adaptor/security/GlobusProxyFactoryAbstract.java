@@ -7,8 +7,8 @@ import org.globus.gsi.proxy.ext.GlobusProxyCertInfoExtension;
 import org.globus.gsi.proxy.ext.ProxyCertInfoExtension;
 import org.globus.tools.ProxyInit;
 import org.ietf.jgss.GSSCredential;
-import org.ogf.saga.error.IncorrectState;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -48,7 +48,7 @@ public abstract class GlobusProxyFactoryAbstract extends ProxyInit {
         userKey = null;
     }
 
-    public abstract GSSCredential createProxy() throws IncorrectState, NoSuccess;
+    public abstract GSSCredential createProxy() throws IncorrectStateException, NoSuccessException;
 
     public void init(String [] args) {}
 

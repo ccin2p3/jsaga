@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.helpers;
 
 import fr.in2p3.jsaga.impl.monitoring.MetricType;
-import org.ogf.saga.error.DoesNotExist;
-import org.ogf.saga.error.NotImplemented;
+import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.error.NotImplementedException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,7 +27,7 @@ public class AttributeSerializer<E> {
         m_type = type;
     }
 
-    public E fromString(String value) throws NotImplemented, DoesNotExist {
+    public E fromString(String value) throws NotImplementedException, DoesNotExistException {
         if (value!=null && !value.equals("")) {
             switch(m_type) {
                 case String:
@@ -35,7 +35,7 @@ public class AttributeSerializer<E> {
                 case Int:
                     return (E) Integer.valueOf(value);
                 case Enum:
-                    throw new NotImplemented("Metrics with type Enum must override method fromString");
+                    throw new NotImplementedException("Metrics with type Enum must override method fromString");
                 case Float:
                     return (E) Float.valueOf(value);
                 case Bool:
@@ -47,16 +47,16 @@ public class AttributeSerializer<E> {
                         throw new RuntimeException();
                     }
                 case Trigger:
-                    throw new DoesNotExist("Metrics with type Trigger have no value");
+                    throw new DoesNotExistException("Metrics with type Trigger have no value");
                 default:
-                    throw new NotImplemented("Metrics with unknown type must override method fromString");
+                    throw new NotImplementedException("Metrics with unknown type must override method fromString");
             }
         } else {
             return null;
         }
     }
 
-    public String toString(E value) throws DoesNotExist {
+    public String toString(E value) throws DoesNotExistException {
         if (value != null) {
             switch(m_type) {
                 case String:
@@ -72,7 +72,7 @@ public class AttributeSerializer<E> {
                 case Time:
                     return new SimpleDateFormat().format((Date) value);
                 case Trigger:
-                    throw new DoesNotExist("Metrics of type Trigger have no value");
+                    throw new DoesNotExistException("Metrics of type Trigger have no value");
                 default:
                     return value.toString();
             }
@@ -81,7 +81,7 @@ public class AttributeSerializer<E> {
         }
     }
 
-    public E fromStringArray(String[] values) throws NotImplemented, DoesNotExist {
+    public E fromStringArray(String[] values) throws NotImplementedException, DoesNotExistException {
         if (values!=null && values.length>0) {
             return this.fromString(values[0]);
         } else {
@@ -89,7 +89,7 @@ public class AttributeSerializer<E> {
         }
     }
 
-    public String[] toStringArray(E value) throws DoesNotExist {
+    public String[] toStringArray(E value) throws DoesNotExistException {
         if (value != null) {
             return new String[]{this.toString(value)};
         } else {

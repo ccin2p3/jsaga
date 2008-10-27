@@ -5,8 +5,8 @@ import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.apache.commons.cli.*;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.context.ContextFactory;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.NotImplemented;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 
@@ -33,8 +33,6 @@ public class ContextInfo extends AbstractCommand {
     public static void main(String[] args) throws Exception {
         ContextInfo command = new ContextInfo();
         CommandLine line = command.parse(args);
-
-        System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
         if (line.hasOption(OPT_HELP))
         {
             command.printHelpAndExit(null);
@@ -59,7 +57,7 @@ public class ContextInfo extends AbstractCommand {
             String id = command.m_nonOptionValues[0];
             fr.in2p3.jsaga.engine.schema.config.Context[] xmlContexts = Configuration.getInstance().getConfigurations().getContextCfg().listContextsArray(id);
             if (xmlContexts.length == 0) {
-                throw new BadParameter("Context type not found: "+id);
+                throw new BadParameterException("Context type not found: "+id);
             }
             for (int i=0; i<xmlContexts.length; i++) {
                 // set context
@@ -86,7 +84,7 @@ public class ContextInfo extends AbstractCommand {
             if (line.hasOption(OPT_ATTRIBUTE)) {
                 try {
                     System.out.println("  "+context.getAttribute(line.getOptionValue(OPT_ATTRIBUTE)));
-                } catch(NotImplemented e) {
+                } catch(NotImplementedException e) {
                     System.out.println("  Attribute not supported ["+e.getMessage()+"]");
                 }
             } else {

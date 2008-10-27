@@ -9,7 +9,6 @@ import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
 
-import java.lang.Exception;
 import java.util.*;
 
 /* ***************************************************
@@ -31,7 +30,7 @@ public abstract class AbstractWorkflowTaskImpl extends AbstractTaskImpl implemen
     private Task m_xmlStatus;
 
     /** constructor */
-    public AbstractWorkflowTaskImpl(Session session, String name) throws NotImplemented {
+    public AbstractWorkflowTaskImpl(Session session, String name) throws NotImplementedException {
         super(session, null, true);
         m_name = name;
         m_predecessors = new HashMap<String,WorkflowTask>();
@@ -49,7 +48,7 @@ public abstract class AbstractWorkflowTaskImpl extends AbstractTaskImpl implemen
 
     //////////////////////////////////////////////// interface Task ////////////////////////////////////////////////
 
-    public void run() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public void run() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         // run current task if predecessors are all DONE
         boolean areAllDone = (m_predecessors.size()>0);
         for (Iterator<WorkflowTask> it=m_predecessors.values().iterator(); areAllDone && it.hasNext();) {
@@ -78,7 +77,7 @@ public abstract class AbstractWorkflowTaskImpl extends AbstractTaskImpl implemen
                     try {
                         successor.run();
                     } catch (Exception e) {
-                        successor.setException(new NoSuccess(e));
+                        successor.setException(new NoSuccessException(e));
                         successor.setState(State.FAILED);
                     }
                 }
@@ -143,7 +142,7 @@ public abstract class AbstractWorkflowTaskImpl extends AbstractTaskImpl implemen
         }
     }
 
-    public Task getStateAsXML() throws NotImplemented, Timeout, NoSuccess {
+    public Task getStateAsXML() throws NotImplementedException, TimeoutException, NoSuccessException {
         return m_xmlStatus;
     }
 

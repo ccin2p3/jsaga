@@ -4,9 +4,9 @@ import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.impl.url.URLHelper;
 import org.ogf.saga.SagaObject;
-import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.url.URL;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,7 +28,7 @@ public class FileInputStreamImpl extends AbstractAsyncFileInputStreamImpl {
     private InputStream m_inStream;
 
     /** constructor */
-    FileInputStreamImpl(Session session, URL url, FileReaderStreamFactory adaptor, boolean disconnectable) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    FileInputStreamImpl(Session session, URL url, FileReaderStreamFactory adaptor, boolean disconnectable) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session);
 
         // save connection
@@ -40,11 +40,11 @@ public class FileInputStreamImpl extends AbstractAsyncFileInputStreamImpl {
             m_inStream = adaptor.getInputStream(
                     fileUrl.getPath(),
                     fileUrl.getQuery());
-        } catch(DoesNotExist e) {
-            throw new DoesNotExist("File does not exist: "+fileUrl, e.getCause());
+        } catch(DoesNotExistException e) {
+            throw new DoesNotExistException("File does not exist: "+fileUrl, e.getCause());
         }
         if (m_inStream == null) {
-            throw new NoSuccess("[ADAPTOR ERROR] Method getInputStream() must not return 'null'", this);
+            throw new NoSuccessException("[ADAPTOR ERROR] Method getInputStream() must not return 'null'", this);
         }
     }
 
@@ -64,7 +64,7 @@ public class FileInputStreamImpl extends AbstractAsyncFileInputStreamImpl {
         if (m_connection != null) {
             try {
                 m_connection.disconnect();
-            } catch (NoSuccess e) {
+            } catch (NoSuccessException e) {
                 throw new IOException(e.getMessage());
             }
         }

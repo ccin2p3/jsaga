@@ -33,7 +33,7 @@ public class GsiftpWinDataAdaptor extends Gsiftp2DataAdaptor {
     }
 
     /** override super.connect() because settings data channel authentication is not supported */
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         // connect
         super.connect(userInfo, host, port, basePath, attributes);
 
@@ -41,9 +41,9 @@ public class GsiftpWinDataAdaptor extends Gsiftp2DataAdaptor {
         try {
             m_client.setDataChannelAuthentication(DataChannelAuthentication.NONE);
         } catch (IOException e) {
-            throw new Timeout(e);
+            throw new TimeoutException(e);
         } catch (ServerException e) {
-            throw new AuthenticationFailed(e);
+            throw new AuthenticationFailedException(e);
         }
     }
 }

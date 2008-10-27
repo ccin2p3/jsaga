@@ -1,7 +1,7 @@
 package org.ogf.saga.context;
 
 import org.ogf.saga.AbstractTest;
-import org.ogf.saga.error.DoesNotExist;
+import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 
@@ -49,7 +49,7 @@ public class ContextDestroyTest extends AbstractTest {
                 return context;
             }
         }
-        throw new DoesNotExist("Context does not exist: "+m_contextId);
+        throw new DoesNotExistException("Context does not exist: "+m_contextId);
     }
 
     private static void destroy(Context context) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {

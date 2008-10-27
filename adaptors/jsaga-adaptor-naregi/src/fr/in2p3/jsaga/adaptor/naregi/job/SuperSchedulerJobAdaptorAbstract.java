@@ -47,7 +47,7 @@ public abstract class SuperSchedulerJobAdaptorAbstract implements SagaSecureAdap
         }
     }
 
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         // modify configuration of NAREGI API
         try {
             for (Iterator it=attributes.entrySet().iterator(); it.hasNext(); ) {
@@ -60,13 +60,13 @@ public abstract class SuperSchedulerJobAdaptorAbstract implements SagaSecureAdap
             String svr = ConfigManager.getProperty("Server");
             String env = ConfigManager.getProperty("ss.command.env");
             if (env==null || env.trim().equals("")) {
-                throw new NoSuccess("Missing required property: ss.command.env");
+                throw new NoSuccessException("Missing required property: ss.command.env");
             }
             env += ", LD_LIBRARY_PATH="+cmd+"/lib:"+cmd+"/libexec";
             env += ", BSC_CLIENT_SERVICE_URL=http://"+svr+":8080/wsrf/services/BpelWFServiceContainer2";
             ConfigManager.setProperty("ss.command.env", env);
         } catch (JobScheduleServiceException e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
 
         // create client
@@ -79,7 +79,7 @@ public abstract class SuperSchedulerJobAdaptorAbstract implements SagaSecureAdap
         }        
     }
 
-    public void disconnect() throws NoSuccess {
+    public void disconnect() throws NoSuccessException {
         m_jss = null;
     }
 }

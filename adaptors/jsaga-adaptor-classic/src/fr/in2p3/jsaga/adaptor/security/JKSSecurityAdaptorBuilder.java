@@ -4,8 +4,8 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityAdaptor;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.IncorrectState;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,14 +47,14 @@ public class JKSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
     					 new UOptional(Context.USERPASS)});
     }
 
-    public Default[] getDefaults(Map map) throws IncorrectState {
+    public Default[] getDefaults(Map map) throws IncorrectStateException {
         return new Default[]{
         		 new Default(KEYSTORE, new File[]{
                          new File(System.getProperty("user.home")+"/.keystore")}),
         };
     }
 
-    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectState, NoSuccess {
+    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectStateException, NoSuccessException {
     	
     	try {
     		// get required attributes
@@ -77,7 +77,7 @@ public class JKSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
 	    	if(attributes.containsKey(USER_ALIAS)) {
 	    		alias = (String) attributes.get(USER_ALIAS);
 	    		if(!keyStore.containsAlias(alias))
-	    			throw new NoSuccess("The keystore does not contain the '"+alias+"' alias");
+	    			throw new NoSuccessException("The keystore does not contain the '"+alias+"' alias");
 	    	}
 	    	else {
 	    		// only one key must be in the JKS
@@ -91,10 +91,10 @@ public class JKSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
 					}
 		    	}
 		    	if(numberOfPrivateKey == 0) {
-		    		throw new NoSuccess("The keystore does not contain private key.");
+		    		throw new NoSuccessException("The keystore does not contain private key.");
 		    	}
 		    	else if(numberOfPrivateKey > 1) {
-		    		throw new NoSuccess("The keystore contains more than one private key and '"+USER_ALIAS+"' is not defined");
+		    		throw new NoSuccessException("The keystore contains more than one private key and '"+USER_ALIAS+"' is not defined");
 		    	}
 	    	}
 	    	
@@ -121,7 +121,7 @@ public class JKSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
 	        return new JKSSecurityAdaptor(keyStore, keyStorePass, alias, userPass, certificates);
     	}
     	catch (Exception e) {
-    		throw new NoSuccess(e);
+    		throw new NoSuccessException(e);
     	}
     }
 }

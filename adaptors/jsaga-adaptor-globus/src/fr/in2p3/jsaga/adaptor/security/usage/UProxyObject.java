@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.adaptor.security.usage;
 
 import fr.in2p3.jsaga.adaptor.base.usage.UNoPrompt;
 import org.ietf.jgss.GSSCredential;
-import org.ogf.saga.error.IncorrectState;
+import org.ogf.saga.error.IncorrectStateException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -31,7 +31,7 @@ public class UProxyObject extends UNoPrompt {
     protected Object throwExceptionIfInvalid(Object value) throws Exception {
         GSSCredential cred = (GSSCredential) super.throwExceptionIfInvalid(value);
         if (cred.getRemainingLifetime() < m_minLifeTime) {
-            throw new IncorrectState("Proxy object remaining lifetime is not enougth: "+cred.getRemainingLifetime());
+            throw new IncorrectStateException("Proxy object remaining lifetime is not enougth: "+cred.getRemainingLifetime());
         }
         return cred;
     }

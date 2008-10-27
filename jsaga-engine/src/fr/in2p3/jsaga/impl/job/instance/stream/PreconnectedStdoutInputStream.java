@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.impl.job.instance.stream;
 
 import fr.in2p3.jsaga.impl.job.instance.JobImpl;
-import org.ogf.saga.error.DoesNotExist;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.io.*;
 
@@ -49,9 +49,9 @@ public class PreconnectedStdoutInputStream extends JobStdoutInputStream {
                 case FAILED:
                     return m_out.getInputStream();
                 case RUNNING:
-                    throw new NoSuccess("Not supported yet...");
+                    throw new NoSuccessException("Not supported yet...");
                 default:
-                    throw new DoesNotExist("Stdout is not available because job is neither finished nor running");
+                    throw new DoesNotExistException("Stdout is not available because job is neither finished nor running");
             }
         } catch (Exception e) {
             throw new IOException(e.getMessage());

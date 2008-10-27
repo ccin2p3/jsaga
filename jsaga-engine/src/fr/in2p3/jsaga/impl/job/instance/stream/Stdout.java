@@ -17,5 +17,5 @@ import java.io.InputStream;
  *
  */
 public abstract class Stdout extends InputStream {
-    public abstract void closeJobIOHandler() throws PermissionDenied, Timeout, NoSuccess;
+    public abstract void closeJobIOHandler() throws PermissionDeniedException, TimeoutException, NoSuccessException;
 }

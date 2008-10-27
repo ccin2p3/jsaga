@@ -3,7 +3,7 @@ package fr.in2p3.jsaga.engine.jobcollection.transform;
 import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.engine.jobcollection.preprocess.XMLDocument;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformerFactory;
-import org.ogf.saga.error.NoSuccess;
+import org.ogf.saga.error.NoSuccessException;
 import org.w3c.dom.Document;
 
 import java.io.File;
@@ -29,7 +29,7 @@ public class JobCollectionPreprocessor {
 
     private Document m_effectiveJobCollection;
 
-    public JobCollectionPreprocessor(Document jobCollecDesc, String collectionName) throws NoSuccess {
+    public JobCollectionPreprocessor(Document jobCollecDesc, String collectionName) throws NoSuccessException {
         // Set stylesheet parameters
         Map parameters = new HashMap();
         parameters.put("collectionName", collectionName);
@@ -46,7 +46,7 @@ public class JobCollectionPreprocessor {
             collectionContainer.save();
             m_effectiveJobCollection = collectionContainer.getAsDocument();
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 

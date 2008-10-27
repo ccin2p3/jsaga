@@ -1,14 +1,6 @@
 package org.ogf.saga.job;
 
-import org.ogf.saga.error.AuthenticationFailed;
-import org.ogf.saga.error.AuthorizationFailed;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.DoesNotExist;
-import org.ogf.saga.error.IncorrectState;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
-import org.ogf.saga.error.PermissionDenied;
-import org.ogf.saga.error.Timeout;
+import org.ogf.saga.error.*;
 
 
 public class StartJob extends Thread {
@@ -50,25 +42,25 @@ public class StartJob extends Thread {
 	        job.waitFor();
 	        
 	        if(!job.getState().toString().equals("DONE")) {
-	        	threadException = new NoSuccess("The job number '"+index+"' is not DONE :"+job.getState().toString());
+	        	threadException = new NoSuccessException("The job number '"+index+"' is not DONE :"+job.getState().toString());
 	        }
-		} catch (NotImplemented e) {
+		} catch (NotImplementedException e) {
 			threadException = e; 
-		} catch (IncorrectState e) {
+		} catch (IncorrectStateException e) {
 			threadException = e;
-		} catch (Timeout e) {
+		} catch (TimeoutException e) {
 			threadException = e;
-		} catch (NoSuccess e) {
+		} catch (NoSuccessException e) {
 			threadException = e;
-		} catch (AuthenticationFailed e) {
+		} catch (AuthenticationFailedException e) {
 			threadException = e;
-		} catch (AuthorizationFailed e) {
+		} catch (AuthorizationFailedException e) {
 			threadException = e;
-		} catch (PermissionDenied e) {
+		} catch (PermissionDeniedException e) {
 			threadException = e;
-		} catch (BadParameter e) {
+		} catch (BadParameterException e) {
 			threadException = e;
-		} catch (DoesNotExist e) {
+		} catch (DoesNotExistException e) {
 			threadException = e;
 		}
     }

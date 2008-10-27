@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.impl.task;
 
-import org.ogf.saga.ObjectType;
 import org.ogf.saga.error.*;
 import org.ogf.saga.task.State;
 
@@ -19,14 +18,14 @@ import java.util.TimerTask;
 /**
  *
  */
-public class TaskForTesting extends AbstractTaskImplWithAsyncAttributes<String> {
+public class TaskForTesting extends AbstractTaskImpl<Void,String> {
     private boolean m_notified;
     private long m_submitTime;
     private boolean m_isCancelled;
     private Timer m_timer;
 
     /** constructor */
-    public TaskForTesting(boolean notified) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public TaskForTesting(boolean notified) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         super(null, null, true);
         m_notified = notified;
         m_submitTime = 0;
@@ -34,11 +33,7 @@ public class TaskForTesting extends AbstractTaskImplWithAsyncAttributes<String> 
         m_timer = null;
     }
 
-    public ObjectType getType() {
-        return ObjectType.TASK;
-    }
-
-    protected void doSubmit() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    protected void doSubmit() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         m_submitTime = System.currentTimeMillis();
     }
 
@@ -47,7 +42,7 @@ public class TaskForTesting extends AbstractTaskImplWithAsyncAttributes<String> 
         this.setState(State.CANCELED);
     }
 
-    protected State queryState() throws NotImplemented, Timeout, NoSuccess {
+    protected State queryState() throws NotImplementedException, TimeoutException, NoSuccessException {
         if (!m_notified) {
             if (m_isCancelled) {
                 return State.CANCELED;
@@ -62,7 +57,7 @@ public class TaskForTesting extends AbstractTaskImplWithAsyncAttributes<String> 
         }
     }
 
-    public boolean startListening() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public boolean startListening() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_notified) {
             final TaskForTesting current = this;
             m_timer = new Timer();
@@ -76,7 +71,7 @@ public class TaskForTesting extends AbstractTaskImplWithAsyncAttributes<String> 
         return m_notified;
     }
 
-    public void stopListening() throws NotImplemented, Timeout, NoSuccess {
+    public void stopListening() throws NotImplementedException, TimeoutException, NoSuccessException {
         if (m_notified) {
             m_timer.cancel();
         }

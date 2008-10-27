@@ -1,58 +1,63 @@
 package org.ogf.saga.rpc;
 
 import org.ogf.saga.SagaObject;
-import org.ogf.saga.error.AuthenticationFailed;
-import org.ogf.saga.error.AuthorizationFailed;
-import org.ogf.saga.error.BadParameter;
-import org.ogf.saga.error.DoesNotExist;
-import org.ogf.saga.error.IncorrectState;
-import org.ogf.saga.error.IncorrectURL;
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
-import org.ogf.saga.error.PermissionDenied;
-import org.ogf.saga.error.Timeout;
+import org.ogf.saga.error.AuthenticationFailedException;
+import org.ogf.saga.error.AuthorizationFailedException;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.IncorrectURLException;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.PermissionDeniedException;
+import org.ogf.saga.error.TimeoutException;
 import org.ogf.saga.permissions.Permissions;
 import org.ogf.saga.task.Async;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
 
 /**
- * The <code>RPC</code> class represents a remote function handle
- * that can be called repeatedly.
+ * The <code>RPC</code> class represents a remote function handle that can be
+ * called repeatedly.
  */
-public interface RPC extends SagaObject, Async, Permissions {
+public interface RPC extends SagaObject, Async, Permissions<RPC> {
 
     /**
      * Calls the remote procedure.
-     * @param parameters arguments and results for the call.
-     * @exception IncorrectURL may be thrown here because the RPC server
-     *     that was specified to the factory may not have been contacted
-     *     before invoking the call.
-     * @exception NoSuccess is thrown for arbitrary backend failures, with
-     *     a descriptive error message.
+     * 
+     * @param parameters
+     *            arguments and results for the call.
+     * @exception IncorrectURLException
+     *                may be thrown here because the RPC server that was
+     *                specified to the factory may not have been contacted
+     *                before invoking the call.
+     * @exception NoSuccessException
+     *                is thrown for arbitrary backend failures, with a
+     *                descriptive error message.
      */
-    public void call(Parameter... parameters)
-        throws NotImplemented, IncorrectURL,
-            AuthenticationFailed, AuthorizationFailed,
-            PermissionDenied, BadParameter, IncorrectState, DoesNotExist,
-            Timeout, NoSuccess;
+    public void call(Parameter... parameters) throws NotImplementedException,
+            IncorrectURLException, AuthenticationFailedException,
+            AuthorizationFailedException, PermissionDeniedException,
+            BadParameterException, IncorrectStateException,
+            DoesNotExistException, TimeoutException, NoSuccessException;
 
     /**
-     * Non-blocking close of the RPC handle instance.
-     * Note for Java implementations: A finalizer could be used in case
-     * the application forgets to close.
+     * Non-blocking close of the RPC handle instance. Note for Java
+     * implementations: A finalizer could be used in case the application
+     * forgets to close.
      */
-    public void close()
-        throws NotImplemented, IncorrectState, NoSuccess;
+    public void close() throws NotImplementedException,
+            IncorrectStateException, NoSuccessException;
 
     /**
-     * Closes the RPC handle instance.
-     * Note for Java implementations: A finalizer could be used in case
-     * the application forgets to close.
-     * @param timeoutInSeconds seconds to wait.
+     * Closes the RPC handle instance. Note for Java implementations: A
+     * finalizer could be used in case the application forgets to close.
+     * 
+     * @param timeoutInSeconds
+     *            seconds to wait.
      */
-    public void close(float timeoutInSeconds)
-        throws NotImplemented, IncorrectState, NoSuccess;
+    public void close(float timeoutInSeconds) throws NotImplementedException,
+            IncorrectStateException, NoSuccessException;
 
     //
     // Task versions ...
@@ -60,33 +65,43 @@ public interface RPC extends SagaObject, Async, Permissions {
 
     /**
      * Creates a task for calling the remote procedure.
-     * @param mode the task mode.
-     * @param parameters arguments and results for the call.
+     * 
+     * @param mode
+     *            the task mode.
+     * @param parameters
+     *            arguments and results for the call.
      * @return the task.
-     * @exception NotImplemented is thrown when the task version of this
-     *     method is not implemented.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
      */
-    public Task call(TaskMode mode, Parameter... parameters)
-        throws NotImplemented;
+    public Task<RPC, Void> call(TaskMode mode, Parameter... parameters)
+            throws NotImplementedException;
 
     /**
      * Creates a task for closing the RPC handle instance.
-     * @param mode the task mode.
+     * 
+     * @param mode
+     *            the task mode.
      * @return the task.
-     * @exception NotImplemented is thrown when the task version of this
-     *     method is not implemented.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
      */
-    public Task close(TaskMode mode)
-        throws NotImplemented;
+    public Task<RPC, Void> close(TaskMode mode) throws NotImplementedException;
 
     /**
      * Creates a task for closing the RPC handle instance.
-     * @param mode the task mode.
-     * @param timeoutInSeconds seconds to wait.
+     * 
+     * @param mode
+     *            the task mode.
+     * @param timeoutInSeconds
+     *            seconds to wait.
      * @return the task.
-     * @exception NotImplemented is thrown when the task version of this
-     *     method is not implemented.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
      */
-    public Task close(TaskMode mode, float timeoutInSeconds)
-        throws NotImplemented;
+    public Task<RPC, Void> close(TaskMode mode, float timeoutInSeconds)
+            throws NotImplementedException;
 }

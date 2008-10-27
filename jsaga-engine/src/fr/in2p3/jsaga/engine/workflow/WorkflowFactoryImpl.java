@@ -19,7 +19,7 @@ import java.util.UUID;
  *
  */
 public class WorkflowFactoryImpl extends WorkflowFactory {
-    protected Workflow doCreateWorkflow() throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    protected Workflow doCreateWorkflow() throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         return new WorkflowImpl(null, UUID.randomUUID().toString());
     }
 }

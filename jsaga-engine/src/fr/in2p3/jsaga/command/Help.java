@@ -49,8 +49,6 @@ public class Help extends AbstractCommand {
     public static void main(String[] args) throws Exception {
         Help command = new Help();
         CommandLine line = command.parse(args);
-
-        System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
         EngineConfiguration config = Configuration.getInstance().getConfigurations();
         if (line.hasOption(OPT_HELP))
         {

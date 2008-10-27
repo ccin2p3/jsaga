@@ -2,12 +2,12 @@ package fr.in2p3.jsaga.command;
 
 import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
 import org.apache.commons.cli.*;
-import org.ogf.saga.url.URL;
-import org.ogf.saga.error.IncorrectState;
+import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.namespace.NSEntry;
 import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
 /* ***************************************************
@@ -38,8 +38,6 @@ public class NamespaceTest extends AbstractCommand {
     public static void main(String[] args) throws Exception {
         NamespaceTest command = new NamespaceTest();
         CommandLine line = command.parse(args);
-
-        System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
         if (line.hasOption(OPT_HELP))
         {
             command.printHelpAndExit(null);
@@ -58,19 +56,19 @@ public class NamespaceTest extends AbstractCommand {
             } else if (line.hasOption(OPT_ISFILE)) {
                 try {
                     success = entry.isEntry();
-                } catch(IncorrectState e) {
+                } catch(IncorrectStateException e) {
                     success = false;
                 }
             } else if (line.hasOption(OPT_ISDIRECTORY)) {
                 try {
                     success = entry.isDir();
-                } catch(IncorrectState e) {
+                } catch(IncorrectStateException e) {
                     success = false;
                 }
             } else if (line.hasOption(OPT_ISLINK)) {
                 try {
                     success = entry.isLink();
-                } catch(IncorrectState e) {
+                } catch(IncorrectStateException e) {
                     success = false;
                 }
             } else {

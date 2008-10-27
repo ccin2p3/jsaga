@@ -12,7 +12,6 @@ import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
-import java.lang.Exception;
 import java.util.*;
 
 /* ***************************************************
@@ -32,7 +31,7 @@ public class WorkflowImpl extends TaskContainerImpl implements Workflow {
     private fr.in2p3.jsaga.engine.schema.status.Workflow m_xmlStatus;
 
     /** constructor */
-    public WorkflowImpl(Session session, String workflowName) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public WorkflowImpl(Session session, String workflowName) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         super(session);
         m_workflowTasks = Collections.synchronizedMap(new HashMap<String,WorkflowTask>());
         // set XML status
@@ -53,18 +52,18 @@ public class WorkflowImpl extends TaskContainerImpl implements Workflow {
     }
 
     /** Override super.run() */
-    public void run() throws NotImplemented, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    public void run() throws NotImplementedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         WorkflowTask startTask = m_workflowTasks.get(StartTask.NAME);
         startTask.run();
     }
 
-    public void add(WorkflowTask newTask, String predecessorName, String successorName) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public void add(WorkflowTask newTask, String predecessorName, String successorName) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         String[] predecessorNamesArray = (predecessorName!=null ? new String[]{predecessorName} : null);
         String[] successorNamesArray = (successorName!=null ? new String[]{successorName} : null);
         this.add(newTask, predecessorNamesArray, successorNamesArray);
     }
 
-    private void add(WorkflowTask newTask, String[] predecessorNames, String[] successorNames) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    private void add(WorkflowTask newTask, String[] predecessorNames, String[] successorNames) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         // add task to workflow or retrieve task from workflow
         WorkflowTask task = m_workflowTasks.get(newTask.getName());
         if (task == null) {
@@ -77,7 +76,7 @@ public class WorkflowImpl extends TaskContainerImpl implements Workflow {
         for (int i=0; predecessorNames!=null && i<predecessorNames.length; i++) {
             WorkflowTask predecessor = m_workflowTasks.get(predecessorNames[i]);
             if (predecessor == null) {
-                throw new NoSuccess("Predecessor not found in workflow: "+predecessorNames[i]);
+                throw new NoSuccessException("Predecessor not found in workflow: "+predecessorNames[i]);
             }
             predecessor.addSuccessor(task);
             task.addPredecessor(predecessor);
@@ -91,7 +90,7 @@ public class WorkflowImpl extends TaskContainerImpl implements Workflow {
         for (int i=0; successorNames!=null && i<successorNames.length; i++) {
             WorkflowTask successor = m_workflowTasks.get(successorNames[i]);
             if (successor == null) {
-                throw new NoSuccess("Successor not found in workflow: "+successorNames[i]);
+                throw new NoSuccessException("Successor not found in workflow: "+successorNames[i]);
             }
             task.addSuccessor(successor);
             successor.addPredecessor(task);
@@ -100,12 +99,12 @@ public class WorkflowImpl extends TaskContainerImpl implements Workflow {
         // may run task
         try {
             task.run();
-        } catch (IncorrectState e) {
-            throw new NoSuccess(e);
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
         }
     }
 
-    public void remove(String name) throws NotImplemented, Timeout, NoSuccess {
+    public void remove(String name) throws NotImplementedException, TimeoutException, NoSuccessException {
         WorkflowTask task = m_workflowTasks.remove(name);
         if (task != null) {
             m_xmlStatus.removeTask(task.getStateAsXML());
@@ -113,16 +112,16 @@ public class WorkflowImpl extends TaskContainerImpl implements Workflow {
         }
     }
 
-    public WorkflowTask getTask(String name) throws NotImplemented, DoesNotExist, Timeout, NoSuccess {
+    public WorkflowTask getTask(String name) throws NotImplementedException, DoesNotExistException, TimeoutException, NoSuccessException {
         WorkflowTask task = m_workflowTasks.get(name);
         if (task != null) {
             return task;
         } else {
-            throw new DoesNotExist("Task not in workflow: "+name, this);
+            throw new DoesNotExistException("Task not in workflow: "+name, this);
         }
     }
 
-    public synchronized Document getStatesAsXML() throws NotImplemented, Timeout, NoSuccess {
+    public synchronized Document getStatesAsXML() throws NotImplementedException, TimeoutException, NoSuccessException {
         // workaround: if marshalling directly to DOM then namespaces are ignored
         try {
             // first marshall to byte array
@@ -133,7 +132,7 @@ public class WorkflowImpl extends TaskContainerImpl implements Workflow {
             factory.setNamespaceAware(true);
             return factory.newDocumentBuilder().parse(new ByteArrayInputStream(xml.toByteArray()));
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 

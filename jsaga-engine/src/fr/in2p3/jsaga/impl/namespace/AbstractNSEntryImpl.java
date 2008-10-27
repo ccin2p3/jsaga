@@ -8,16 +8,14 @@ import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
 import fr.in2p3.jsaga.adaptor.data.write.DataWriterTimes;
-import fr.in2p3.jsaga.engine.data.flags.FlagsBytes;
+import fr.in2p3.jsaga.impl.url.URLFactoryImpl;
 import fr.in2p3.jsaga.impl.url.URLHelper;
-import org.ogf.saga.ObjectType;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
-import org.ogf.saga.task.Task;
-import org.ogf.saga.task.TaskMode;
 import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 
 import java.util.Date;
 
@@ -34,52 +32,48 @@ import java.util.Date;
  *
  */
 public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl implements NSEntry {
+    protected int m_flags;
     private boolean m_disconnectable;
 
     /** constructor for factory */
-    public AbstractNSEntryImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    protected AbstractNSEntryImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session, url, adaptor);
-        this.init(flags);
+        m_flags = flags;
         m_disconnectable = true;
     }
 
     /** constructor for NSDirectory.open() */
-    public AbstractNSEntryImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    protected AbstractNSEntryImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(dir.m_session, _resolveRelativeUrl(dir.m_url, relativeUrl), dir.m_adaptor);
-        this.init(flags);
+        m_flags = flags;
         m_disconnectable = false;
     }
-    protected static URL _resolveRelativeUrl(URL baseUrl, URL relativeUrl) throws NotImplemented, IncorrectURL, BadParameter, NoSuccess {
+    protected static URL _resolveRelativeUrl(URL baseUrl, URL relativeUrl) throws NotImplementedException, IncorrectURLException, BadParameterException, NoSuccessException {
         if (relativeUrl==null) {
-            throw new IncorrectURL("URL must not be null");
+            throw new IncorrectURLException("URL must not be null");
         } else if (relativeUrl.getScheme()!=null && !relativeUrl.getScheme().equals(baseUrl.getScheme())) {
-            throw new IncorrectURL("You must not modify the scheme of the URL: "+ baseUrl.getScheme());
+            throw new IncorrectURLException("You must not modify the scheme of the URL: "+ baseUrl.getScheme());
         } else if (relativeUrl.getUserInfo()!=null && !relativeUrl.getUserInfo().equals(baseUrl.getUserInfo())) {
-            throw new IncorrectURL("You must not modify the user part of the URL: "+ baseUrl.getUserInfo());
+            throw new IncorrectURLException("You must not modify the user part of the URL: "+ baseUrl.getUserInfo());
         } else if (relativeUrl.getHost()!=null && !relativeUrl.getHost().equals(baseUrl.getHost())) {
-            throw new IncorrectURL("You must not modify the host of the URL: "+ baseUrl.getHost());
+            throw new IncorrectURLException("You must not modify the host of the URL: "+ baseUrl.getHost());
         }
         return URLHelper.createURL(baseUrl, relativeUrl);
     }
 
     /** constructor for NSEntry.openAbsolute() */
-    public AbstractNSEntryImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, DoesNotExist, Timeout, NoSuccess {
+    protected AbstractNSEntryImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(entry.m_session, _resolveAbsolutePath(entry.m_url, absolutePath), entry.m_adaptor);
-        this.init(flags);
+        m_flags = flags;
         m_disconnectable = false;
     }
-    private static URL _resolveAbsolutePath(URL baseUrl, String absolutePath) throws NotImplemented, IncorrectURL, BadParameter, NoSuccess {
+    private static URL _resolveAbsolutePath(URL baseUrl, String absolutePath) throws NotImplementedException, IncorrectURLException, BadParameterException, NoSuccessException {
         if (absolutePath==null) {
-            throw new IncorrectURL("URL must not be null");
+            throw new IncorrectURLException("URL must not be null");
         } else if (! absolutePath.startsWith("/")) {
-            throw new IncorrectURL("URL must contain an absolute path: "+ baseUrl.getPath());
+            throw new IncorrectURLException("URL must contain an absolute path: "+ baseUrl.getPath());
         }
         return URLHelper.createURL(baseUrl, absolutePath);
-    }
-
-    private void init(int flags) throws BadParameter {
-        FlagsBytes effectiveFlags = new FlagsBytes(flags);
-        effectiveFlags.checkAllowed(Flags.CREATE.or(Flags.EXCL.or(Flags.CREATEPARENTS)));
     }
 
     /** clone */
@@ -89,68 +83,53 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
         return clone;
     }
 
-    public ObjectType getType() {
-        return ObjectType.NSENTRY;
-    }
-
-    public URL getURL() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public URL getURL() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         return m_url;
     }
 
-    public URL getCWD() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public URL getCWD() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         try {
-            return m_url.resolve(org.ogf.saga.url.URLFactory.createURL("."));
-        } catch (BadParameter e) {
-            throw new NoSuccess(e);
+            return m_url.resolve(URLFactory.createURL("."));
+        } catch (BadParameterException e) {
+            throw new NoSuccessException(e);
         }
     }
 
-    public URL getName() throws NotImplemented, Timeout, NoSuccess {
+    public URL getName() throws NotImplementedException, TimeoutException, NoSuccessException {
         try {
-            String name = this._getEntryName();
-            if (name != null) {
-                if (name.matches("[A-Za-z]:")) {
-                    // windows drive
-                    return org.ogf.saga.url.URLFactory.createURL("/"+name);
-                } else {
-                    // entry name
-                    return org.ogf.saga.url.URLFactory.createURL(name);
-                }
-            } else {
-                return null;
-            }
-        } catch (BadParameter e) {
-            throw new NoSuccess(e);
+            return URLFactoryImpl.createRelativePath(this._getEntryName());
+        } catch (BadParameterException e) {
+            throw new NoSuccessException(e);
         }
     }
 
-    public boolean exists() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+    public boolean exists() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof DataReaderAdaptor) {
             return ((DataReaderAdaptor)m_adaptor).exists(
                     m_url.getPath(),
                     m_url.getQuery());
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
 
-    public boolean isDir() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    public boolean isDir() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         FileAttributes attrs = this._getFileAttributes();
         return (attrs.getType() == FileAttributes.DIRECTORY_TYPE);
     }
 
-    public boolean isEntry() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    public boolean isEntry() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         FileAttributes attrs = this._getFileAttributes();
         return (attrs.getType() == FileAttributes.FILE_TYPE);
     }
 
-    public boolean isLink() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    public boolean isLink() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof LinkAdaptor) {
             try {
                 return ((LinkAdaptor)m_adaptor).isLink(
                         m_url.getPath());
-            } catch (DoesNotExist doesNotExist) {
-                throw new IncorrectState("Link does not exist: "+ m_url, doesNotExist);
+            } catch (DoesNotExistException doesNotExist) {
+                throw new IncorrectStateException("Link does not exist: "+ m_url, doesNotExist);
             }
         } else {
             FileAttributes attrs = this._getFileAttributes();
@@ -158,32 +137,32 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
         }
     }
 
-    public URL readLink() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    public URL readLink() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof LinkAdaptor) {
             String absolutePath;
             try {
                 try {
                     absolutePath = ((LinkAdaptor)m_adaptor).readLink(
                             m_url.getPath());
-                } catch (DoesNotExist doesNotExist) {
-                    throw new IncorrectState("Link does not exist: "+ m_url, doesNotExist);
+                } catch (DoesNotExistException doesNotExist) {
+                    throw new IncorrectStateException("Link does not exist: "+ m_url, doesNotExist);
                 }
             } catch (NotLink notLink) {
-                throw new BadParameter("Not a link: "+ m_url, this);
+                throw new BadParameterException("Not a link: "+ m_url, this);
             }
             return URLHelper.createURL(m_url, absolutePath);
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
 
-    public abstract void copy(URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, AlreadyExists, Timeout, NoSuccess, IncorrectURL;
-    public void copy(URL target) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
+    public abstract void copy(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException;
+    public void copy(URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
         this.copy(target, Flags.NONE.getValue());
     }
 
-    public abstract void copyFrom(URL source, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess, IncorrectURL;
-    public void copyFrom(URL target) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
+    public abstract void copyFrom(URL source, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException;
+    public void copyFrom(URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
         this.copyFrom(target, Flags.NONE.getValue());
     }
 
@@ -192,32 +171,31 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
      * Note: RECURSIVE flag support is not implemented.
      * @param link the path to the link to create (may be absolute or relative to <code>m_url</code>).
      */
-    public void link(URL link, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
-        FlagsBytes effectiveFlags = new FlagsBytes(flags);
-        if (effectiveFlags.contains(Flags.DEREFERENCE)) {
-            this._dereferenceEntry().link(link, effectiveFlags.remove(Flags.DEREFERENCE));
-            return; //==========> EXIT
+    public void link(URL link, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+        new FlagsHelper(flags).allowed(Flags.DEREFERENCE, Flags.RECURSIVE, Flags.OVERWRITE, Flags.CREATEPARENTS);
+        if (Flags.RECURSIVE.isSet(flags)) {
+            throw new NotImplementedException("Support of RECURSIVE flags with method link() is not implemented by the SAGA engine", this);
         }
-        effectiveFlags.checkAllowed(Flags.RECURSIVE.or(Flags.DEREFERENCE.or(Flags.CREATEPARENTS.or(Flags.OVERWRITE))));
-        if (effectiveFlags.contains(Flags.RECURSIVE)) {
-            throw new NotImplemented("Support of RECURSIVE flags with method link() is not implemented by the SAGA engine", this);
+        if (Flags.DEREFERENCE.isSet(flags)) {
+            this._dereferenceEntry().link(link, flags - Flags.DEREFERENCE.getValue());
+            return; //==========> EXIT
         }
         URL effectiveLink = this._getEffectiveURL(link);
         if (m_adaptor instanceof LinkAdaptor) {
-            boolean overwrite = effectiveFlags.contains(Flags.OVERWRITE);
+            boolean overwrite = Flags.OVERWRITE.isSet(flags);
             try {
                 try {
                     ((LinkAdaptor)m_adaptor).link(
                             m_url.getPath(),
                             effectiveLink.getPath(),
                             overwrite);
-                } catch (DoesNotExist doesNotExist) {
-                    throw new IncorrectState("Entry does not exist: "+ m_url, doesNotExist);
-                } catch (AlreadyExists alreadyExists) {
-                    throw new AlreadyExists("Target entry already exists: "+effectiveLink, alreadyExists.getCause());
+                } catch (DoesNotExistException doesNotExist) {
+                    throw new IncorrectStateException("Entry does not exist: "+ m_url, doesNotExist);
+                } catch (AlreadyExistsException alreadyExists) {
+                    throw new AlreadyExistsException("Target entry already exists: "+effectiveLink, alreadyExists.getCause());
                 }
-            } catch(IncorrectState e) {
-                if (effectiveFlags.contains(Flags.CREATEPARENTS)) {
+            } catch(IncorrectStateException e) {
+                if (Flags.CREATEPARENTS.isSet(flags)) {
                     // make parent directories
                     this._makeParentDirs();
                     // create link
@@ -226,32 +204,31 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
                                 m_url.getPath(),
                                 effectiveLink.getPath(),
                                 overwrite);
-                    } catch (DoesNotExist doesNotExist) {
-                        throw new IncorrectState("Entry does not exist: "+ m_url, doesNotExist);
-                    } catch (AlreadyExists alreadyExists) {
-                        throw new AlreadyExists("Target entry already exists: "+effectiveLink, alreadyExists.getCause());
+                    } catch (DoesNotExistException doesNotExist) {
+                        throw new IncorrectStateException("Entry does not exist: "+ m_url, doesNotExist);
+                    } catch (AlreadyExistsException alreadyExists) {
+                        throw new AlreadyExistsException("Target entry already exists: "+effectiveLink, alreadyExists.getCause());
                     }
                 } else {
                     throw e;
                 }
             }
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme());
+            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme());
         }
     }
-    public void link(URL target) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
+    public void link(URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
         this.link(target, Flags.NONE.getValue());
     }
 
-    public void move(URL target, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, AlreadyExists, Timeout, NoSuccess, IncorrectURL {
-        FlagsBytes effectiveFlags = new FlagsBytes(flags);
-        if (effectiveFlags.contains(Flags.DEREFERENCE)) {
-            this._dereferenceEntry().move(target, effectiveFlags.remove(Flags.DEREFERENCE));
+    public void move(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+        new FlagsHelper(flags).allowed(Flags.DEREFERENCE, Flags.OVERWRITE, Flags.CREATEPARENTS);
+        if (Flags.DEREFERENCE.isSet(flags)) {
+            this._dereferenceEntry().move(target, flags - Flags.DEREFERENCE.getValue());
             return; //==========> EXIT
         }
-        effectiveFlags.checkAllowed(Flags.DEREFERENCE.or(Flags.CREATEPARENTS.or(Flags.OVERWRITE)));
-        boolean overwrite = effectiveFlags.contains(Flags.OVERWRITE);
         URL effectiveTarget = this._getEffectiveURL(target);
+        boolean overwrite = Flags.OVERWRITE.isSet(flags);
         if (m_adaptor instanceof DataRename
                 && m_url.getScheme().equals(effectiveTarget.getScheme())
                 && (m_url.getUserInfo()==null || m_url.getUserInfo().equals(effectiveTarget.getUserInfo()))
@@ -264,31 +241,30 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
                         effectiveTarget.getPath(),
                         overwrite,
                         m_url.getQuery());
-            } catch (DoesNotExist doesNotExist) {
-                throw new IncorrectState("File does not exist: "+ m_url, doesNotExist);
-            } catch (AlreadyExists alreadyExists) {
-                throw new AlreadyExists("Target entry already exists: "+effectiveTarget, alreadyExists.getCause());
+            } catch (DoesNotExistException doesNotExist) {
+                throw new IncorrectStateException("File does not exist: "+ m_url, doesNotExist);
+            } catch (AlreadyExistsException alreadyExists) {
+                throw new AlreadyExistsException("Target entry already exists: "+effectiveTarget, alreadyExists.getCause());
             }
         } else {
             this.copy(effectiveTarget, flags);
             this.remove(flags);
         }
     }
-    public void move(URL target) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess, IncorrectURL {
+    public void move(URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
         this.move(target, Flags.NONE.getValue());
     }
 
-    public void remove(int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
-        FlagsBytes effectiveFlags = new FlagsBytes(flags);
-        if (effectiveFlags.contains(Flags.DEREFERENCE)) {
+    public void remove(int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+        new FlagsHelper(flags).allowed(Flags.DEREFERENCE);
+        if (Flags.DEREFERENCE.isSet(flags)) {
             try {
-                this._dereferenceEntry().remove(flags);
-            } catch (IncorrectURL e) {
-                throw new NoSuccess(e);
+                this._dereferenceEntry().remove(flags - Flags.DEREFERENCE.getValue());
+            } catch (IncorrectURLException e) {
+                throw new NoSuccessException(e);
             }
             return; //==========> EXIT
         }
-        effectiveFlags.checkAllowed(Flags.DEREFERENCE.getValue());
         if (m_adaptor instanceof DataWriterAdaptor) {
             URL parent = this._getParentDirURL();
             String fileName = this._getEntryName();
@@ -297,49 +273,49 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
                         parent.getPath(),
                         fileName,
                         m_url.getQuery());
-            } catch (DoesNotExist doesNotExist) {
-                throw new IncorrectState("File does not exist: "+ m_url, doesNotExist);
+            } catch (DoesNotExistException doesNotExist) {
+                throw new IncorrectStateException("File does not exist: "+ m_url, doesNotExist);
             }
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+ m_url.getScheme());
+            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme());
         }
     }
-    public void remove() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    public void remove() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         this.remove(Flags.NONE.getValue());
     }
 
     private boolean m_disconnected = false;
-    public synchronized void close() throws NotImplemented, IncorrectState, NoSuccess {
+    public synchronized void close() throws NotImplementedException, IncorrectStateException, NoSuccessException {
         if (m_disconnectable && !m_disconnected) {
             m_adaptor.disconnect();
             m_disconnected = true;
         }
     }
 
-    public void close(float timeoutInSeconds) throws NotImplemented, IncorrectState, NoSuccess {
+    public void close(float timeoutInSeconds) throws NotImplementedException, IncorrectStateException, NoSuccessException {
         this.close();
     }
 
-    public void permissionsAllow(String id, int permissions, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, BadParameter, Timeout, NoSuccess {
+    public void permissionsAllow(String id, int permissions, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, TimeoutException, NoSuccessException {
         if (Flags.DEREFERENCE.isSet(flags)) {
             try {
-                this._dereferenceEntry().permissionsAllow(id, permissions);
-            } catch (IncorrectURL e) {
-                throw new NoSuccess(e);
+                this._dereferenceEntry().permissionsAllow(id, permissions, flags - Flags.DEREFERENCE.getValue());
+            } catch (IncorrectURLException e) {
+                throw new NoSuccessException(e);
             }
             return; //==========> EXIT
         }
         super.permissionsAllow(id, permissions);
     }
 
-    public void permissionsDeny(String id, int permissions, int flags) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, Timeout, NoSuccess {
+    public void permissionsDeny(String id, int permissions, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         if (Flags.DEREFERENCE.isSet(flags)) {
             try {
-                this._dereferenceEntry().permissionsDeny(id, permissions);
-            } catch (IncorrectURL e) {
-                throw new NoSuccess(e);
-            } catch (IncorrectState e) {
-                throw new NoSuccess(e);
+                this._dereferenceEntry().permissionsDeny(id, permissions, flags - Flags.DEREFERENCE.getValue());
+            } catch (IncorrectURLException e) {
+                throw new NoSuccessException(e);
+            } catch (IncorrectStateException e) {
+                throw new NoSuccessException(e);
             }
             return; //==========> EXIT
         }
@@ -352,71 +328,63 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
         super.finalize();
     }
 
-    public Task close(TaskMode mode) throws NotImplemented {
-        throw new NotImplemented("Not implemented by the SAGA engine", this);
-    }
-
-    public Task close(TaskMode mode, float timeoutInSeconds) throws NotImplemented {
-        throw new NotImplemented("Not implemented by the SAGA engine", this);
-    }
-
     /** deviation from SAGA specification */
-    public Date getLastModified() throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public Date getLastModified() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         try {
             FileAttributes attrs = this._getFileAttributes();
             if (attrs!=null && attrs.getLastModified()>0) {
                 return new Date(attrs.getLastModified());
             }
-        } catch (BadParameter e) {
-            throw new NoSuccess(e);
+        } catch (BadParameterException e) {
+            throw new NoSuccessException(e);
         }
-        throw new NotImplemented("Not supported for this protocol: "+m_url.getScheme(), this);
+        throw new NotImplementedException("Not supported for this protocol: "+m_url.getScheme(), this);
     }
 
     /** deviation from SAGA specification */
-    public void setLastModified(Date lastModified) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, PermissionDenied, IncorrectState, Timeout, NoSuccess {
+    public void setLastModified(Date lastModified) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof DataWriterTimes) {
             try {
                 ((DataWriterTimes)m_adaptor).setLastModified(
                         m_url.getPath(),
                         m_url.getQuery(),
                         lastModified.getTime());
-            } catch (DoesNotExist doesNotExist) {
-                throw new IncorrectState("Entry does not exist: "+m_url, doesNotExist);
+            } catch (DoesNotExistException doesNotExist) {
+                throw new IncorrectStateException("Entry does not exist: "+m_url, doesNotExist);
             }
         } else {
-            throw new NotImplemented("Not supported for this protocol: "+m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: "+m_url.getScheme(), this);
         }
     }
 
     ///////////////////////////////////////// protected methods /////////////////////////////////////////
 
-    public abstract NSDirectory openAbsoluteDir(String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess;
-    public abstract NSEntry openAbsolute(String absolutePath, int flags) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, DoesNotExist, Timeout, NoSuccess;
+    public abstract NSDirectory openAbsoluteDir(String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException;
+    public abstract NSEntry openAbsolute(String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException;
 
-    protected AbstractNSDirectoryImpl _dereferenceDir()  throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    protected AbstractNSDirectoryImpl _dereferenceDir()  throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         try {
             String absolutePath = this.readLink().getPath();
             return (AbstractNSDirectoryImpl) this.openAbsoluteDir(absolutePath, Flags.NONE.getValue());
-        } catch (AlreadyExists e) {
-            throw new IncorrectState(e);
-        } catch (DoesNotExist e) {
-            throw new IncorrectState(e);
+        } catch (AlreadyExistsException e) {
+            throw new IncorrectStateException(e);
+        } catch (DoesNotExistException e) {
+            throw new IncorrectStateException(e);
         }
     }
 
-    protected AbstractNSEntryImpl _dereferenceEntry()  throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, Timeout, NoSuccess {
+    protected AbstractNSEntryImpl _dereferenceEntry()  throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         try {
             String absolutePath = this.readLink().getPath();
             return (AbstractNSEntryImpl) this.openAbsolute(absolutePath, Flags.NONE.getValue());
-        } catch (AlreadyExists e) {
-            throw new IncorrectState(e);
-        } catch (DoesNotExist e) {
-            throw new IncorrectState(e);
+        } catch (AlreadyExistsException e) {
+            throw new IncorrectStateException(e);
+        } catch (DoesNotExistException e) {
+            throw new IncorrectStateException(e);
         }
     }
 
-    protected URL _getEffectiveURL(URL target) throws NotImplemented, BadParameter, IncorrectState, Timeout, NoSuccess {
+    protected URL _getEffectiveURL(URL target) throws NotImplementedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (target.getPath().endsWith("/")) {
             return URLHelper.createURL(target, this._getEntryName());
         } else {
@@ -424,46 +392,46 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
         }
     }
 
-    protected URL _getParentDirURL() throws NotImplemented, BadParameter, NoSuccess {
+    protected URL _getParentDirURL() throws NotImplementedException, BadParameterException, NoSuccessException {
         return URLHelper.getParentURL(m_url);
     }
-    protected String _getEntryName() throws NotImplemented {
+    protected String _getEntryName() throws NotImplementedException {
         return URLHelper.getName(m_url);
     }
 
-    protected void _makeParentDirs() throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, Timeout, NoSuccess {
+    protected void _makeParentDirs() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, TimeoutException, NoSuccessException {
         try {
             String parentAbsolutePath = this._getParentDirURL().getPath();
             this.openAbsoluteDir(parentAbsolutePath, Flags.CREATE.or(Flags.CREATEPARENTS));
-        } catch (DoesNotExist e) {
-            throw new NoSuccess(e);
-        } catch (IncorrectState e) {
-            throw new NoSuccess(e);
+        } catch (DoesNotExistException e) {
+            throw new NoSuccessException(e);
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
         }
     }
 
-    protected AbstractNSEntryImpl _getTargetEntry_checkPreserveTimes(URL target) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, AlreadyExists, Timeout, NoSuccess {
+    protected AbstractNSEntryImpl _getTargetEntry_checkPreserveTimes(URL target) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, TimeoutException, NoSuccessException {
         AbstractNSEntryImpl targetEntry;
         try {
             targetEntry = (AbstractNSEntryImpl) NSFactory.createNSEntry(m_session, target, JSAGAFlags.BYPASSEXIST.getValue());
-        } catch (DoesNotExist e) {
-            throw new NoSuccess("Unexpected exception", e);
+        } catch (DoesNotExistException e) {
+            throw new NoSuccessException("Unexpected exception", e);
         }
         if (! (targetEntry.m_adaptor instanceof DataWriterTimes) ) {
-            throw new NotImplemented("Flag PRESERVETIMES ("+JSAGAFlags.PRESERVETIMES+") not supported for protocol: "+target.getScheme());
+            throw new NotImplementedException("Flag PRESERVETIMES ("+JSAGAFlags.PRESERVETIMES+") not supported for protocol: "+target.getScheme());
         }
         return targetEntry;
     }
 
-    protected Date _getSourceTimes_checkPreserveTimes(URL source) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, IncorrectState, DoesNotExist, Timeout, NoSuccess {
+    protected Date _getSourceTimes_checkPreserveTimes(URL source) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (! (m_adaptor instanceof DataWriterTimes) ) {
-            throw new NotImplemented("Flag PRESERVETIMES ("+JSAGAFlags.PRESERVETIMES+") not supported for protocol: "+m_url.getScheme());
+            throw new NotImplementedException("Flag PRESERVETIMES ("+JSAGAFlags.PRESERVETIMES+") not supported for protocol: "+m_url.getScheme());
         }
         AbstractNSEntryImpl sourceEntry;
         try {
             sourceEntry = (AbstractNSEntryImpl) NSFactory.createNSEntry(m_session, source);
-        } catch(AlreadyExists e) {
-            throw new NoSuccess("Unexpected exception", e);
+        } catch(AlreadyExistsException e) {
+            throw new NoSuccessException("Unexpected exception", e);
         }
         return sourceEntry.getLastModified();
     }

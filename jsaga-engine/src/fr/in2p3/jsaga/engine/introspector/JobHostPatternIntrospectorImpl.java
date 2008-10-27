@@ -25,7 +25,7 @@ public class JobHostPatternIntrospectorImpl extends AbstractIntrospectorImpl imp
     private Execution m_config;
     private String m_host;
 
-    public JobHostPatternIntrospectorImpl(Execution config, String host) throws NoSuccess {
+    public JobHostPatternIntrospectorImpl(Execution config, String host) throws NoSuccessException {
         super(host);
         m_config = config;
         m_host = host;
@@ -36,7 +36,7 @@ public class JobHostPatternIntrospectorImpl extends AbstractIntrospectorImpl imp
     }
 
     /** @return services */
-    protected String[] getChildIntrospectorKeys() throws NoSuccess {
+    protected String[] getChildIntrospectorKeys() throws NoSuccessException {
         ServiceEngineConfigurationAbstract config = Configuration.getInstance().getConfigurations().getProtocolCfg();
         List<String> result = new ArrayList<String>();
         for (ServiceRef service : config.listServiceRefByHostname(m_config.getMapping(), m_host)) {
@@ -50,12 +50,12 @@ public class JobHostPatternIntrospectorImpl extends AbstractIntrospectorImpl imp
      * @param key the service
      * @return the created introspector
      */
-    public Introspector getChildIntrospector(String key) throws NotImplemented, DoesNotExist, NoSuccess {
+    public Introspector getChildIntrospector(String key) throws NotImplementedException, DoesNotExistException, NoSuccessException {
         for (JobService service : m_config.getJobService()) {
             if (service.getName().equals(key)) {
                 return new JobServiceIntrospectorImpl(service);
             }
         }
-        throw new DoesNotExist("Service not found: "+key);
+        throw new DoesNotExistException("Service not found: "+key);
     }
 }

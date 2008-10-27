@@ -1,10 +1,9 @@
 package org.ogf.saga.job;
 
-import org.ogf.saga.error.*;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.job.abstracts.AbstractJobTest;
 import org.ogf.saga.task.State;
-
-import java.lang.Exception;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -95,7 +94,7 @@ public class JobRunRequiredTest extends AbstractJobTest {
 	                State.CANCELED,
 	                job.getState());
         }
-        catch (NotImplemented notImplemented) {
+        catch (NotImplementedException notImplemented) {
         	System.err.println("WARNING : "+this.getName()+" not implemented in plugin");
         }
         finally {
@@ -124,9 +123,9 @@ public class JobRunRequiredTest extends AbstractJobTest {
             // wait for 2 seconds because cancel is an asynchronous method
             Thread.sleep(2000);
             
-            fail("Expected IncorrectState exception");
+            fail("Expected exception: "+ IncorrectStateException.class);
         }
-        catch (IncorrectState incorrectState) {
+        catch (IncorrectStateException incorrectState) {
         }
     }
     
@@ -157,7 +156,7 @@ public class JobRunRequiredTest extends AbstractJobTest {
             // check job for DONE status
             checkStatus(job.getState(), State.DONE);
         }
-        catch (IncorrectState incorrectState) {
+        catch (IncorrectStateException incorrectState) {
         }
     }
 }

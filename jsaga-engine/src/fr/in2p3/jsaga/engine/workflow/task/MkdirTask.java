@@ -11,8 +11,6 @@ import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
 import org.ogf.saga.url.URL;
 
-import java.lang.Exception;
-
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -30,7 +28,7 @@ public class MkdirTask extends AbstractWorkflowTaskImpl {
     private URL m_dir;
 
     /** constructor */
-    public MkdirTask(Session session, String dir, boolean keep) throws NotImplemented, BadParameter, Timeout, NoSuccess {
+    public MkdirTask(Session session, String dir, boolean keep) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         super(null, "mkdir_"+dir);
         // set URL
         m_session = session;
@@ -47,11 +45,11 @@ public class MkdirTask extends AbstractWorkflowTaskImpl {
 
     //////////////////////////////////////////// abstract methods ////////////////////////////////////////////
 
-    protected void doSubmit() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    protected void doSubmit() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         try {
             NSFactory.createNSDirectory(m_session, m_dir, Flags.CREATE.or(Flags.CREATEPARENTS));
         } catch (Exception e) {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
         super.setState(State.DONE);
     }
@@ -60,15 +58,15 @@ public class MkdirTask extends AbstractWorkflowTaskImpl {
         super.setState(State.CANCELED);
     }
 
-    protected State queryState() throws NotImplemented, Timeout, NoSuccess {
+    protected State queryState() throws NotImplementedException, TimeoutException, NoSuccessException {
         return super.getState_LocalCheckOnly();
     }
 
-    public boolean startListening() throws NotImplemented, IncorrectState, Timeout, NoSuccess {
+    public boolean startListening() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         return true;    // do nothing
     }
 
-    public void stopListening() throws NotImplemented, Timeout, NoSuccess {
+    public void stopListening() throws NotImplementedException, TimeoutException, NoSuccessException {
         // do nothing
     }
 }

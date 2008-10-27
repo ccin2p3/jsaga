@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.adaptor.security;
 
-import org.ogf.saga.error.NoSuccess;
-import org.ogf.saga.error.NotImplemented;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
 
 import java.io.PrintStream;
 
@@ -27,10 +27,10 @@ public interface SecurityAdaptor {
 
     /**
      * @return the value of the attribute (other than UserID)
-     * @throws NotImplemented if the attribute <code>key</code> is not supported by this adaptor
-     * @throws NoSuccess if the adaptor failed to get the value of attribute <code>key</code>
+     * @throws NotImplementedException if the attribute <code>key</code> is not supported by this adaptor
+     * @throws NoSuccessException if the adaptor failed to get the value of attribute <code>key</code>
      */
-    public String getAttribute(String key) throws NotImplemented, NoSuccess;
+    public String getAttribute(String key) throws NotImplementedException, NoSuccessException;
 
     /**
      * Close the context (implementation may be empty).

@@ -20,29 +20,29 @@ public interface LinkAdaptor extends DataAdaptor {
      * Tests this entry for being a link.
      * @param absolutePath the absolute path of the entry.
      * @return true if the entry is a link.
-     * @throws DoesNotExist if <code>absolutePath</code> does not exist.
+     * @throws DoesNotExistException if <code>absolutePath</code> does not exist.
      */
     public boolean isLink(String absolutePath)
-        throws PermissionDenied, DoesNotExist, Timeout, NoSuccess;
+        throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException;
 
     /**
      * Returns the absolute path of the link target. Resolves one link level
      * only.
      * @param absolutePath the absolute path of the entry.
      * @return the link target.
-     * @throws DoesNotExist if <code>absolutePath</code> does not exist.
+     * @throws DoesNotExistException if <code>absolutePath</code> does not exist.
      */
     public String readLink(String absolutePath)
-        throws NotLink, PermissionDenied, DoesNotExist, Timeout, NoSuccess;
+        throws NotLink, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException;
 
     /**
      * Creates a symbolic link.
      * @param sourceAbsolutePath the absolute path of the physical entry to link to.
      * @param linkAbsolutePath the absolute path of the link entry to create.
      * @param overwrite if true, then link entry is overwrited if it exists.
-     * @throws DoesNotExist if <code>sourceAbsolutePath</code> does not exist.
-     * @throws AlreadyExists if <code>linkAbsolutePath</code> already exists and <code>overwrite</code> is false.
+     * @throws DoesNotExistException if <code>sourceAbsolutePath</code> does not exist.
+     * @throws AlreadyExistsException if <code>linkAbsolutePath</code> already exists and <code>overwrite</code> is false.
      */
     public void link(String sourceAbsolutePath, String linkAbsolutePath, boolean overwrite)
-        throws PermissionDenied, DoesNotExist, AlreadyExists, Timeout, NoSuccess;
+        throws PermissionDeniedException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException;
 }

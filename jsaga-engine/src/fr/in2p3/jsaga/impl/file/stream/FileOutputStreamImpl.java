@@ -5,9 +5,9 @@ import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
 import fr.in2p3.jsaga.impl.url.URLHelper;
 import org.ogf.saga.SagaObject;
-import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.url.URL;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,7 +29,7 @@ public class FileOutputStreamImpl extends AbstractAsyncFileOutputStreamImpl {
     private OutputStream m_outStream;
 
     /** constructor */
-    FileOutputStreamImpl(Session session, URL url, FileWriterStreamFactory adaptor, boolean disconnectable, boolean append, boolean exclusive) throws NotImplemented, IncorrectURL, AuthenticationFailed, AuthorizationFailed, PermissionDenied, BadParameter, AlreadyExists, DoesNotExist, Timeout, NoSuccess {
+    FileOutputStreamImpl(Session session, URL url, FileWriterStreamFactory adaptor, boolean disconnectable, boolean append, boolean exclusive) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session);
 
         // save connection
@@ -40,7 +40,7 @@ public class FileOutputStreamImpl extends AbstractAsyncFileOutputStreamImpl {
         URL parent = URLHelper.getParentURL(fileUrl);
         String fileName = URLHelper.getName(fileUrl);
         if (exclusive && append) {
-            throw new BadParameter("Incompatible flags: EXCL and APPEND");
+            throw new BadParameterException("Incompatible flags: EXCL and APPEND");
         }
         try {
             m_outStream = adaptor.getOutputStream(
@@ -50,12 +50,12 @@ public class FileOutputStreamImpl extends AbstractAsyncFileOutputStreamImpl {
                     append,
                     fileUrl.getQuery());
         } catch(ParentDoesNotExist e) {
-            throw new DoesNotExist("Parent directory does not exist: "+parent, e.getCause());
-        } catch(AlreadyExists e) {
-            throw new AlreadyExists("File already exists: "+ fileUrl, e.getCause());
+            throw new DoesNotExistException("Parent directory does not exist: "+parent, e.getCause());
+        } catch(AlreadyExistsException e) {
+            throw new AlreadyExistsException("File already exists: "+ fileUrl, e.getCause());
         }
         if (m_outStream == null) {
-            throw new NoSuccess("[ADAPTOR ERROR] Method getOutputStream() must not return 'null'", this);
+            throw new NoSuccessException("[ADAPTOR ERROR] Method getOutputStream() must not return 'null'", this);
         }
     }
 
@@ -76,7 +76,7 @@ public class FileOutputStreamImpl extends AbstractAsyncFileOutputStreamImpl {
         if (m_connection != null) {
             try {
                 m_connection.disconnect();
-            } catch (NoSuccess e) {
+            } catch (NoSuccessException e) {
                 throw new IOException(e.getMessage());
             }
         }

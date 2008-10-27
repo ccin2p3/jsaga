@@ -2,14 +2,14 @@ package fr.in2p3.jsaga.command;
 
 import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
 import org.apache.commons.cli.*;
-import org.ogf.saga.url.URL;
-import org.ogf.saga.error.NotImplemented;
+import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.file.File;
 import org.ogf.saga.namespace.NSEntry;
 import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.permissions.Permission;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
 /* ***************************************************
@@ -41,8 +41,6 @@ public class NamespaceStat extends AbstractCommand {
     public static void main(String[] args) throws Exception {
         NamespaceStat command = new NamespaceStat();
         CommandLine line = command.parse(args);
-
-        System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
         if (line.hasOption(OPT_HELP))
         {
             command.printHelpAndExit(null);
@@ -111,7 +109,7 @@ public class NamespaceStat extends AbstractCommand {
             perms.append(entry.permissionsCheck("*", Permission.EXEC.getValue()) ? "x" : "-");
             perms.append(entry.permissionsCheck("*", Permission.OWNER.getValue()) ? "o" : "-");
             return perms.toString();
-        } catch(NotImplemented e) {
+        } catch(NotImplementedException e) {
             return "?";
         }
     }
@@ -119,7 +117,7 @@ public class NamespaceStat extends AbstractCommand {
     private static String getOwner(NSEntry entry) throws Exception {
         try {
             return entry.getOwner();
-        } catch(NotImplemented e) {
+        } catch(NotImplementedException e) {
             return "?";
         }
     }
@@ -127,7 +125,7 @@ public class NamespaceStat extends AbstractCommand {
     private static String getGroup(NSEntry entry) throws Exception {
         try {
             return entry.getGroup();
-        } catch(NotImplemented e) {
+        } catch(NotImplementedException e) {
             return "?";
         }
     }
@@ -135,7 +133,7 @@ public class NamespaceStat extends AbstractCommand {
     private static String getDate(NSEntry entry) throws Exception {
         try {
             return ((AbstractNSEntryImpl)entry).getLastModified().toString();
-        } catch(NotImplemented e) {
+        } catch(NotImplementedException e) {
             return "?";
         }
     }

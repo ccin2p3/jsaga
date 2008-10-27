@@ -4,12 +4,11 @@ import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
 import org.ogf.saga.error.*;
-import org.ogf.saga.url.URLFactory;
 import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.Exception;
 import java.util.*;
 
 /* ***************************************************
@@ -39,9 +38,6 @@ public abstract class AbstractTest extends TestCase {
     private Logger logger = Logger.getLogger(this.getClass());
 
     public AbstractTest() throws Exception {
-        // SAGA bootstrap
-        System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
-
         // set configuration files to use
         if (System.getProperty("jsaga.universe") == null) {
             java.net.URL universe = this.getResource("etc/jsaga-universe.xml");
@@ -103,7 +99,7 @@ public abstract class AbstractTest extends TestCase {
         }
     }
 
-    protected static URL createURL(URL base, String name) throws NotImplemented, NoSuccess, BadParameter {
+    protected static URL createURL(URL base, String name) throws NotImplementedException, NoSuccessException, BadParameterException {
         String basePath = base.getPath();
         String path = (basePath.endsWith("/") ? basePath+name : basePath+"/"+name);
         URL url = URLFactory.createURL(base.toString());

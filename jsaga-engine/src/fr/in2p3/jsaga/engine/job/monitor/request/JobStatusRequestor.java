@@ -25,7 +25,7 @@ public class JobStatusRequestor {
         m_adaptor = adaptor;
     }
 
-    public JobStatus getJobStatus(String nativeJobId) throws NotImplemented, Timeout, NoSuccess {
+    public JobStatus getJobStatus(String nativeJobId) throws NotImplementedException, TimeoutException, NoSuccessException {
         if (nativeJobId != null) {
             try {
                 if (m_adaptor instanceof QueryIndividualJob) {
@@ -43,10 +43,10 @@ public class JobStatusRequestor {
                     JobStatus[] statusArray = ((QueryFilteredJob) m_adaptor).getFilteredStatus(filters);
                     return findJobStatus(statusArray, nativeJobId);
                 } else {
-                    throw new NotImplemented("Querying job status not implemented for adaptor: "+ m_adaptor.getClass().getName());
+                    throw new NotImplementedException("Querying job status not implemented for adaptor: "+ m_adaptor.getClass().getName());
                 }
             } catch(RuntimeException e) {
-                throw new NoSuccess("Failed to get status for job: "+nativeJobId, e);
+                throw new NoSuccessException("Failed to get status for job: "+nativeJobId, e);
             }
         } else {
             return new JobStatus(nativeJobId, new Integer(0), "Unknown"){
@@ -56,12 +56,12 @@ public class JobStatusRequestor {
         }
     }
 
-    private static JobStatus findJobStatus(JobStatus[] array, String nativeJobId) throws NoSuccess {
+    private static JobStatus findJobStatus(JobStatus[] array, String nativeJobId) throws NoSuccessException {
         for (int i=0; array!=null && i<array.length; i++) {
             if (array[i].getNativeJobId().equals(nativeJobId)) {
                 return array[i];
             }
         }
-        throw new NoSuccess("Job not found: "+nativeJobId);
+        throw new NoSuccessException("Job not found: "+nativeJobId);
     }
 }

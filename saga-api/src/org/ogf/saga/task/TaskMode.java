@@ -7,18 +7,25 @@ package org.ogf.saga.task;
  */
 public enum TaskMode {
 
-    ASYNC (1),
-    TASK (2),
-    SYNC (3);
+    /** 
+     * The task is started in {@link State#RUNNING} state, that is, the {@link Task#run()} call
+     * is implicit.
+     */
+    ASYNC(1),
+    /** The task is started in {@link State#NEW} state. */
+    TASK(2),
+    /** The task is started in {@link State#RUNNING} state, and is waited for. */
+    SYNC(3);
 
     private int value;
 
-    TaskMode (int value) {
-        this.value = value; 
+    TaskMode(int value) {
+        this.value = value;
     }
 
     /**
      * Returns the integer value of this enumeration literal.
+     * 
      * @return the value.
      */
     public int getValue() {

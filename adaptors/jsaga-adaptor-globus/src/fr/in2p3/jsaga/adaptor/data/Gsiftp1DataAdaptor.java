@@ -36,12 +36,12 @@ public class Gsiftp1DataAdaptor extends GsiftpDataAdaptorAbstract {
     }
 
     /** setting protection level is not supported */
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return null;
     }
 
     /** MLSD command is not supported */
-    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         EntryPath path = new EntryPath(absolutePath);
         String entryName = path.getEntryName();
         FileAttributes[] list = this.listAttributes(path.getBaseDir(), additionalArgs);
@@ -50,11 +50,11 @@ public class Gsiftp1DataAdaptor extends GsiftpDataAdaptorAbstract {
                 return list[i];
             }
         }
-        throw new DoesNotExist("Entry does not exist: "+entryName);
+        throw new DoesNotExistException("Entry does not exist: "+entryName);
     }
 
     /** MLSD command is not supported */
-    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDenied, DoesNotExist, Timeout, NoSuccess {
+    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         Vector v;
         try {
             m_client.setMode(GridFTPSession.MODE_STREAM);
@@ -66,8 +66,8 @@ public class Gsiftp1DataAdaptor extends GsiftpDataAdaptorAbstract {
         } catch (Exception e) {
             try {
                 throw rethrowException(e);
-            } catch (BadParameter badParameter) {
-                throw new NoSuccess("Unexpected exception", e);
+            } catch (BadParameterException badParameter) {
+                throw new NoSuccessException("Unexpected exception", e);
             }
         }
         FileAttributes[] ret = new FileAttributes[v.size()];
@@ -78,16 +78,16 @@ public class Gsiftp1DataAdaptor extends GsiftpDataAdaptorAbstract {
         return ret;
     }
 
-    protected void rethrowParsedException(UnexpectedReplyCodeException e) throws DoesNotExist, AlreadyExists, PermissionDenied, NoSuccess {
+    protected void rethrowParsedException(UnexpectedReplyCodeException e) throws DoesNotExistException, AlreadyExistsException, PermissionDeniedException, NoSuccessException {
         String message = e.getReply().getMessage();
         if (message.indexOf("not a plain file") > -1) {
-            throw new DoesNotExist(e);
+            throw new DoesNotExistException(e);
         } else if (message.indexOf("exists") > -1) {
-            throw new AlreadyExists(e);
+            throw new AlreadyExistsException(e);
         } else if (message.indexOf("Permission denied") > -1) {
-            throw new PermissionDenied(e);
+            throw new PermissionDeniedException(e);
         } else {
-            throw new NoSuccess(e);
+            throw new NoSuccessException(e);
         }
     }
 }
