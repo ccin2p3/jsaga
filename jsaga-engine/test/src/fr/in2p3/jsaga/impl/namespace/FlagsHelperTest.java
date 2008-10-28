@@ -44,4 +44,16 @@ public class FlagsHelperTest extends TestCase {
         } catch(BadParameterException e) {
         }
     }
+
+    public void test_add() {
+        int flags = Flags.CREATE.or(Flags.READ);
+        int newFlags = new FlagsHelper(flags).add(Flags.READ, Flags.RECURSIVE);
+        assertEquals(Flags.CREATE.or(Flags.READ.or(Flags.RECURSIVE)), newFlags);
+    }
+
+    public void test_remove() {
+        int flags = Flags.CREATE.or(Flags.READ);
+        int newFlags = new FlagsHelper(flags).remove(Flags.ALLFILEFLAGS);
+        assertEquals(Flags.CREATE.getValue(), newFlags);
+    }
 }
