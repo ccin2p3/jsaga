@@ -28,10 +28,7 @@ public class FlagsHelper {
     }
     public void allowed(JSAGAFlags jsagaFlag, Flags... allowedFlags) throws BadParameterException {
         // set allowed flags
-        int allowed = (jsagaFlag!=null ? jsagaFlag.getValue() : Flags.NONE.getValue());
-        for (Flags flag : allowedFlags) {
-            allowed = flag.or(allowed);
-        }
+        int allowed = toInt(jsagaFlag, allowedFlags);
 
         // set forbidden flags
         int forbidden = ALL - allowed;
@@ -44,11 +41,11 @@ public class FlagsHelper {
     }
 
     public void required(Flags... requiredFlags) throws BadParameterException {
+        this.required(null, requiredFlags);
+    }
+    public void required(JSAGAFlags jsagaFlag, Flags... requiredFlags) throws BadParameterException {
         // set required flags
-        int required = Flags.NONE.getValue();
-        for (Flags flag : requiredFlags) {
-            required = flag.or(required);
-        }
+        int required = toInt(jsagaFlag, requiredFlags);
 
         // set unset flags
         int unset = ALL - m_flags;
@@ -64,31 +61,29 @@ public class FlagsHelper {
         return this.add(null, addedFlags);
     }
     public int add(JSAGAFlags jsagaFlag, Flags... addedFlags) {
-        int addition = m_flags;
-        if (jsagaFlag != null) {
-            addition = jsagaFlag.or(addition);
-        }
-        for (Flags flag : addedFlags) {
-            addition = flag.or(addition);
-        }
-        return addition;
+        // set added flags
+        int added = toInt(jsagaFlag, addedFlags);
+        
+        // return addition
+        return m_flags | added;
     }
 
-    public int substract(Flags... substractedFlags) {
-        return this.substract(null, substractedFlags);
+    public int remove(Flags... substractedFlags) {
+        return this.remove(null, substractedFlags);
     }
-    public int substract(JSAGAFlags jsagaFlag, Flags... substractedFlags) {
-        int substraction = m_flags;
-        if (jsagaFlag != null) {
-            if (jsagaFlag.isSet(substraction)) {
-                substraction -= jsagaFlag.getValue();
-            }
+    public int remove(JSAGAFlags jsagaFlag, Flags... substractedFlags) {
+        // set removed flags
+        int removed = toInt(jsagaFlag, substractedFlags);
+
+        // return substraction
+        return m_flags - (m_flags & removed);
+    }
+
+    private static int toInt(JSAGAFlags jsagaFlag, Flags... flags) {
+        int result = (jsagaFlag!=null ? jsagaFlag.getValue() : Flags.NONE.getValue());
+        for (Flags f : flags) {
+            result = f.or(result);
         }
-        for (Flags flag : substractedFlags) {
-            if (flag.isSet(substraction)) {
-                substraction -= flag.getValue();
-            }
-        }
-        return substraction;
+        return result;
     }
 }

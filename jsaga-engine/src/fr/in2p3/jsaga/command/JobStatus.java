@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.*;
 import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
@@ -68,7 +69,12 @@ public class JobStatus extends AbstractCommand {
             } else if (State.CANCELED.compareTo(state) == 0) {
                 System.out.println("Job canceled.");
             } else if (State.FAILED.compareTo(state) == 0) {
-                System.out.println("Job failed with "+job.getAttribute("ExitCode"));
+                try {
+                    String exitCode = job.getAttribute(Job.EXITCODE);
+                    System.out.println("Job failed with exit code: "+exitCode);
+                } catch(DoesNotExistException e) {
+                    System.out.println("Job failed.");
+                }
             } else {
                 throw new Exception("Unexpected state: "+ state);
             }
