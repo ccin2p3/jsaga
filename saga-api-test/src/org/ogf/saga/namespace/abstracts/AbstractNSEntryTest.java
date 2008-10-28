@@ -55,7 +55,7 @@ public abstract class AbstractNSEntryTest extends AbstractTest {
         super();
 
         // configure
-        URL baseUrl = URLFactory.createURL(getRequiredProperty(protocol, CONFIG_BASE_URL).replaceAll(" ", "%20"));
+        URL baseUrl = URLFactory.createURL(getRequiredProperty(protocol, CONFIG_BASE_URL));
         m_dirUrl = createURL(baseUrl, DEFAULT_DIRNAME);
         m_subDirUrl = createURL(m_dirUrl, DEFAULT_SUBDIRNAME);
         m_fileUrl = createURL(m_subDirUrl, DEFAULT_FILENAME);

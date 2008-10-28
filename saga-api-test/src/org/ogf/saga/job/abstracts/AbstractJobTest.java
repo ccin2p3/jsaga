@@ -52,7 +52,7 @@ public class AbstractJobTest extends AbstractTest {
         super();
 
         // configure
-        m_jobservice = URLFactory.createURL(getRequiredProperty(jobprotocol, CONFIG_JOBSERVICE_URL).replaceAll(" ", "%20"));
+        m_jobservice = URLFactory.createURL(getRequiredProperty(jobprotocol, CONFIG_JOBSERVICE_URL));
         m_session = SessionFactory.createSession(true);
         
         // init values
