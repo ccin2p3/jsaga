@@ -170,7 +170,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
             } else {
                 m_nativeJobId = m_controlAdaptor.submit(nativeJobDesc, s_checkMatch);
             }
-            String monitorUrl = m_monitorService.getURL().toString().replaceAll("%20", " ");
+            String monitorUrl = m_monitorService.getURL().getString();
             String sagaJobId = "["+monitorUrl+"]-["+m_nativeJobId+"]";
             m_attributes.m_JobId.setObject(sagaJobId);
         } catch (AuthorizationFailedException e) {
