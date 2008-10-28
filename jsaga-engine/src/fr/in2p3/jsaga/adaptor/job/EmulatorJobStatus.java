@@ -15,16 +15,12 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
  *
  */
 public class EmulatorJobStatus extends JobStatus {
-    private long m_submitTime;
-
-    public EmulatorJobStatus(String jobId, SubState state) {
-        super(jobId, state, state.toString());
-        m_submitTime = System.currentTimeMillis();
+    public EmulatorJobStatus(String jobId, SubState stateCode) {
+        super(jobId, stateCode, stateCode.toString());
     }
 
-    public EmulatorJobStatus(String jobId, SubState state, String cause) {
-        super(jobId, state, state.toString(), cause);
-        m_submitTime = System.currentTimeMillis();
+    public EmulatorJobStatus(String jobId, SubState stateCode, Exception exception) {
+        super(jobId, stateCode, stateCode.toString(), exception.getMessage());
     }
 
     public String getModel() {
@@ -33,9 +29,5 @@ public class EmulatorJobStatus extends JobStatus {
 
     public SubState getSubState() {
         return (SubState) m_nativeStateCode;
-    }
-
-    public long getElapsedTime() {
-        return System.currentTimeMillis() - m_submitTime;
     }
 }
