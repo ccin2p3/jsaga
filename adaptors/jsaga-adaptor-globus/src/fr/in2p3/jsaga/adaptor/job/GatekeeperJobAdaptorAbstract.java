@@ -70,14 +70,11 @@ public abstract class GatekeeperJobAdaptorAbstract implements SagaSecureAdaptor 
 	        } catch (GramException e) {
 	            switch(e.getErrorCode()) {
 	                case GRAMProtocolErrorConstants.ERROR_PROTOCOL_FAILED:
-                        String msg = e.getMessage();
-                        if (msg!=null && msg.contains("Caused by: ")) {
-                            msg = msg.substring(msg.lastIndexOf("Caused by: "));
-                            msg = msg.substring(0, msg.indexOf("]"));
-                            String dn=null; try{dn=m_credential.getName().toString();} catch(GSSException e1){}
-                            throw new AuthenticationFailedException(msg+" ("+dn+")");
+                        Throwable cause = e.getException();
+                        if (cause!=null && cause.getMessage()!=null && cause.getMessage().startsWith("Authentication failed")) {
+                            throw new AuthenticationFailedException(cause);
                         } else {
-                            throw new AuthenticationFailedException("Please check stack trace", e);
+                            throw new NoSuccessException(e);
                         }
                     case GRAMProtocolErrorConstants.ERROR_AUTHORIZATION:
 	                    throw new AuthorizationFailedException(e);
