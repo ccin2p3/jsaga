@@ -1,8 +1,7 @@
 package fr.in2p3.jsaga.impl.file;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
-import fr.in2p3.jsaga.impl.namespace.AbstractNSDirectoryImpl;
-import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
+import fr.in2p3.jsaga.impl.namespace.*;
 import fr.in2p3.jsaga.impl.url.URLHelper;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
@@ -10,8 +9,6 @@ import org.ogf.saga.file.*;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.url.URL;
-
-import java.util.Iterator;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -28,17 +25,17 @@ import java.util.Iterator;
 public class DirectoryImpl extends AbstractAsyncDirectoryImpl implements Directory {
     /** constructor for factory */
     public DirectoryImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(session, url, adaptor, flags);
+        super(session, url, adaptor, new FlagsHelper(flags).remove(Flags.ALLFILEFLAGS));
     }
 
     /** constructor for NSDirectory.open() */
     public DirectoryImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(dir, relativeUrl, flags);
+        super(dir, relativeUrl, new FlagsHelper(flags).remove(Flags.ALLFILEFLAGS));
     }
 
     /** constructor for NSEntry.openAbsolute() */
     public DirectoryImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(entry, absolutePath, flags);
+        super(entry, absolutePath, new FlagsHelper(flags).remove(Flags.ALLFILEFLAGS));
     }
 
     /** clone */

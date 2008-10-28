@@ -34,19 +34,19 @@ import java.util.*;
 public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements LogicalFile {
     /** constructor for factory */
     public LogicalFileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(session, URLHelper.toFileURL(url), adaptor, flags);
+        super(session, URLHelper.toFileURL(url), adaptor, new FlagsHelper(flags).remove(Flags.ALLLOGICALFILEFLAGS));
         this.init(flags);
     }
 
     /** constructor for NSDirectory.open() */
     public LogicalFileImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(dir, URLHelper.toFileURL(relativeUrl), flags);
+        super(dir, URLHelper.toFileURL(relativeUrl), new FlagsHelper(flags).remove(Flags.ALLLOGICALFILEFLAGS));
         this.init(flags);
     }
 
     /** constructor for NSEntry.openAbsolute() */
     public LogicalFileImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(entry, URLHelper.toFilePath(absolutePath), flags);
+        super(entry, URLHelper.toFilePath(absolutePath), new FlagsHelper(flags).remove(Flags.ALLLOGICALFILEFLAGS));
         this.init(flags);
     }
 

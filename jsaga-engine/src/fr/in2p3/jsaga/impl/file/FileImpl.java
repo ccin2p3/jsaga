@@ -36,19 +36,19 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
 
     /** constructor for factory */
     public FileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(session, URLHelper.toFileURL(url), adaptor, flags);
+        super(session, URLHelper.toFileURL(url), adaptor, new FlagsHelper(flags).remove(Flags.ALLFILEFLAGS));
         this.init(flags);
     }
 
     /** constructor for NSDirectory.open() */
     public FileImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(dir, URLHelper.toFileURL(relativeUrl), flags);
+        super(dir, URLHelper.toFileURL(relativeUrl), new FlagsHelper(flags).remove(Flags.ALLFILEFLAGS));
         this.init(flags);
     }
 
     /** constructor for NSEntry.openAbsolute() */
     public FileImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(entry, URLHelper.toFilePath(absolutePath), flags);
+        super(entry, URLHelper.toFilePath(absolutePath), new FlagsHelper(flags).remove(Flags.ALLFILEFLAGS));
         this.init(flags);
     }
 

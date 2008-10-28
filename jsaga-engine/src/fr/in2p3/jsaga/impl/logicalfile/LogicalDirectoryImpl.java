@@ -32,17 +32,17 @@ import java.util.regex.Pattern;
 public class LogicalDirectoryImpl extends AbstractAsyncLogicalDirectoryImpl implements LogicalDirectory {
     /** constructor for factory */
     public LogicalDirectoryImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(session, url, adaptor, flags);
+        super(session, url, adaptor, new FlagsHelper(flags).remove(Flags.ALLLOGICALFILEFLAGS));
     }
 
     /** constructor for NSDirectory.open() */
     public LogicalDirectoryImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(dir, relativeUrl, flags);
+        super(dir, relativeUrl, new FlagsHelper(flags).remove(Flags.ALLLOGICALFILEFLAGS));
     }
 
     /** constructor for NSEntry.openAbsolute() */
     public LogicalDirectoryImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(entry, absolutePath, flags);
+        super(entry, absolutePath, new FlagsHelper(flags).remove(Flags.ALLLOGICALFILEFLAGS));
     }
 
     /** clone */
