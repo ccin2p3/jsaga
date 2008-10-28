@@ -146,7 +146,7 @@ public class LogicalFileCopy {
     private LogicalFile createTargetLogicalFile(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
         int correctedFlags = flags;
         correctedFlags = new FlagsHelper(correctedFlags).add(Flags.WRITE, Flags.CREATE);
-        correctedFlags = new FlagsHelper(correctedFlags).substract(JSAGAFlags.PRESERVETIMES);
+        correctedFlags = new FlagsHelper(correctedFlags).remove(JSAGAFlags.PRESERVETIMES);
         if (Flags.OVERWRITE.isSet(correctedFlags)) {
             correctedFlags = correctedFlags - Flags.OVERWRITE.getValue();
         } else {

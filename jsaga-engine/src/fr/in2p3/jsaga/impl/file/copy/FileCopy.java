@@ -171,7 +171,7 @@ public class FileCopy {
         // set corrected flags
         int correctedFlags = flags;
         correctedFlags = new FlagsHelper(correctedFlags).add(Flags.WRITE, Flags.CREATE);
-        correctedFlags = new FlagsHelper(correctedFlags).substract(JSAGAFlags.PRESERVETIMES);
+        correctedFlags = new FlagsHelper(correctedFlags).remove(JSAGAFlags.PRESERVETIMES);
         if (Flags.OVERWRITE.isSet(correctedFlags)) {
             correctedFlags = correctedFlags - Flags.OVERWRITE.getValue();
         } else {

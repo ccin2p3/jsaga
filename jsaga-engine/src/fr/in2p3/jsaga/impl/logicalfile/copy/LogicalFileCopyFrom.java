@@ -107,7 +107,7 @@ public class LogicalFileCopyFrom {
 
     private LogicalFile createSourceLogicalFile(URL source, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
         int correctedFlags = flags;
-        correctedFlags = new FlagsHelper(correctedFlags).substract(JSAGAFlags.PRESERVETIMES, Flags.OVERWRITE);
+        correctedFlags = new FlagsHelper(correctedFlags).remove(JSAGAFlags.PRESERVETIMES, Flags.OVERWRITE);
         try {
             return LogicalFileFactory.createLogicalFile(m_session, source, correctedFlags);
         } catch (AlreadyExistsException e) {
