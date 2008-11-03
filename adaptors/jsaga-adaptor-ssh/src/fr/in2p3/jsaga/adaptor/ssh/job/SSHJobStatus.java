@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.adaptor.ssh.job;
 
+import com.jcraft.jsch.Channel;
 import fr.in2p3.jsaga.adaptor.job.SubState;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 
@@ -13,8 +14,8 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 * ***************************************************/
 
 public class SSHJobStatus extends JobStatus {
-    public SSHJobStatus(String jobId, int returnCode) {
-        super(jobId, returnCode, "unknown", returnCode);
+    public SSHJobStatus(String jobId, Channel channel) {
+        super(jobId, channel.isConnected(), "unknown", channel.getExitStatus());
     }
 
 	public String getModel() {
@@ -22,12 +23,13 @@ public class SSHJobStatus extends JobStatus {
     }
 
     public SubState getSubState() {
-    	// select status with exitCode
-    	if((Integer) m_nativeStateCode == 0)
-    		return SubState.DONE;
-    	else if((Integer) m_nativeStateCode == -1)
-    		return SubState.RUNNING_ACTIVE;
-    	else
-    		return SubState.FAILED_ERROR;
+        Boolean isConnected = (Boolean) m_nativeStateCode;
+        if (isConnected) {
+            return SubState.RUNNING_ACTIVE;
+        } else if (m_nativeCause != null) {
+            return SubState.FAILED_ERROR;
+        } else {
+            return SubState.DONE;
+        }
     }
 }

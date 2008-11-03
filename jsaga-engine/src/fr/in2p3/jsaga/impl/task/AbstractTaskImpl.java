@@ -94,10 +94,6 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
      */
     public abstract void stopListening() throws NotImplementedException, TimeoutException, NoSuccessException;
 
-    public void setWaitingFor(boolean isWaitingFor) {
-        m_isWaitingFor = isWaitingFor;
-    }
-
     //////////////////////////////////////////// interface Task ////////////////////////////////////////////
 
     public void run() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
@@ -416,11 +412,19 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
 
     //////////////////////////////////////////// internal methods ////////////////////////////////////////////
 
+    void setWaitingFor(boolean isWaitingFor) {
+        m_isWaitingFor = isWaitingFor;
+    }
+
+    boolean isWaitingFor() {
+        return m_isWaitingFor;
+    }
+
     protected State getState_LocalCheckOnly() {
         return m_metric_TaskState.getValue();
     }
 
-    private boolean isDone_LocalCheckOnly() {
+    boolean isDone_LocalCheckOnly() {
         switch(m_metric_TaskState.getValue()) {
             case DONE:
             case CANCELED:

@@ -3,12 +3,12 @@ package fr.in2p3.jsaga.impl.jobcollection;
 import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.engine.jobcollection.preprocess.XMLDocument;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformerFactory;
+import fr.in2p3.jsaga.impl.url.URLFactoryImpl;
 import org.apache.log4j.Logger;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.url.URL;
-import org.ogf.saga.url.URLFactory;
 
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
@@ -61,7 +61,7 @@ public class JobCollectionCleaner {
             for (Enumeration<String> e= (Enumeration<String>) toBeCleaned.propertyNames(); e.hasMoreElements(); ) {
                 String action = e.nextElement();
                 String urlString = toBeCleaned.getProperty(action);
-                URL url = URLFactory.createURL(urlString);
+                URL url = URLFactoryImpl.createUnencodedURL(urlString);
                 if (action.startsWith("delete.")) {
                     m_files.add(url);
                 } else if (action.startsWith("rmdir.")) {

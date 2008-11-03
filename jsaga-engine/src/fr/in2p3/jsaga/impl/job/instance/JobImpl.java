@@ -198,7 +198,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
 
     protected State queryState() throws NotImplementedException, TimeoutException, NoSuccessException {
         JobStatus status = m_monitorService.getState(m_nativeJobId);
-        // set job state (may cleanup job)
+        // set job state
         this.setJobState(status.getSagaState(), status.getStateDetail(), status.getSubState());
         // return task state (may trigger finish task)
         return status.getSagaState();
@@ -217,6 +217,15 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
             throw new RuntimeException("INTERNAL ERROR: JobID not initialized");
         }
         m_monitorService.stopListening(m_nativeJobId);
+
+        // terminate job
+        if (this.isFinalState()) {
+            try {
+                this.terminate();
+            } catch (Exception e) {
+                s_logger.warn("Failed to terminate job: "+m_nativeJobId, e);
+            }
+        }
     }
 
     ////////////////////////////////////// implementation of Job //////////////////////////////////////
@@ -342,7 +351,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
         }
     }
 
-    private void cleanup() throws NotImplementedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+    private void terminate() throws NotImplementedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         // close job output and error streams
         if (m_IOHandler != null) {  //if (isInteractive()) {
             if (m_controlAdaptor instanceof StreamableJobInteractiveGet || m_controlAdaptor instanceof StreamableJobBatch) {
@@ -356,9 +365,9 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
                 m_stderr.closeJobIOHandler();
             }
         }
+
         // cleanup job
         if (m_controlAdaptor instanceof CleanableJobAdaptor) {
-            m_monitorService.stopListening(m_nativeJobId);
             ((CleanableJobAdaptor)m_controlAdaptor).clean(m_nativeJobId);
         }
     }
@@ -374,7 +383,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     public void setState(State state, String stateDetail, SubState subState, SagaException cause) {
         // set cause of task state (do not trigger anything)
         super.setException(cause);
-        // set job state (may cleanup job)
+        // set job state
         this.setJobState(state, stateDetail, subState);
         // set task state (may finish task)
         super.setState(state);
@@ -382,24 +391,18 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
 
     private synchronized void setJobState(State state, String stateDetail, SubState subState) {
         // if not already in a final state
-        if (!isFinal(m_metrics.m_State.getValue(State.RUNNING))) {
+        if (! this.isFinalState()) {
             // update metrics
             m_metrics.m_State.setValue(state);
             m_metrics.m_StateDetail.setValue(stateDetail);
             m_metrics.m_SubState.setValue(subState.toString());
-
-            // cleanup job
-            if (isFinal(state)) {
-                try {
-                    this.cleanup();
-                } catch (Exception e) {
-                    s_logger.warn("Failed to cleanup job: "+m_nativeJobId, e);
-                }
-            }
         }
     }
 
-    private static boolean isFinal(State state) {
+    ////////////////////////////////////// private methods //////////////////////////////////////
+
+    private boolean isFinalState() {
+        State state = m_metrics.m_State.getValue(State.RUNNING);
         switch(state) {
             case DONE:
             case CANCELED:
@@ -409,8 +412,6 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
                 return false;
         }
     }
-
-    ////////////////////////////////////// private methods //////////////////////////////////////
 
     private boolean isInteractive() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         try {

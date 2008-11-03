@@ -39,7 +39,7 @@ public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryInd
 
     	try {    		
     		ChannelExec channel = (ChannelExec) SSHAdaptorAbstract.sessionMap.get(nativeJobId);
-    		return new SSHJobStatus(nativeJobId, channel.getExitStatus());
+    		return new SSHJobStatus(nativeJobId, channel);
 						
     	} catch (Exception e) {
     		throw new NoSuccessException(e);

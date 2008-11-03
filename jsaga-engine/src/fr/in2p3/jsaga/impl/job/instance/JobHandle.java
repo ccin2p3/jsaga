@@ -101,9 +101,6 @@ public class JobHandle extends AbstractAsyncJobImpl implements Job {
 
             // submit
             m_job.doSubmit();
-
-            // start listening
-            m_job.startListening();
         } else {
             // set as running
             m_isRunning = true;
@@ -149,10 +146,8 @@ public class JobHandle extends AbstractAsyncJobImpl implements Job {
             catch (AuthorizationFailedException e) {throw new NoSuccessException(e);}
             catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
-            return m_job.startListening();
-        } else {
-            return true;    // a job task is always listening (either with notification, or with polling)
         }
+        return true;    // a job task is always listening (either with notification, or with polling)
     }
 
     public void stopListening() throws NotImplementedException, TimeoutException, NoSuccessException {
@@ -165,7 +160,6 @@ public class JobHandle extends AbstractAsyncJobImpl implements Job {
             catch (AuthenticationFailedException e) {throw new NoSuccessException(e);}
             catch (AuthorizationFailedException e) {throw new NoSuccessException(e);}
             catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
-            m_job.stopListening();
         }
     }
 

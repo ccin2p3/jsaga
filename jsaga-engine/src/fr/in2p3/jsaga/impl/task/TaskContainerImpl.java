@@ -200,8 +200,10 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
         try {
             synchronized(m_tasks) {
                 for (AbstractTaskImpl task : m_tasks.values()) {
-                    boolean isListening = task.startListening();
-                    task.setWaitingFor(isListening);
+                    if (! task.isDone_LocalCheckOnly()) {
+                        boolean isListening = task.startListening();
+                        task.setWaitingFor(isListening);
+                    }
                 }
             }
         } catch(TimeoutException e) {
@@ -212,8 +214,10 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
         try {
             synchronized(m_tasks) {
                 for (AbstractTaskImpl task : m_tasks.values()) {
-                    task.stopListening();
-                    task.setWaitingFor(false);
+                    if (task.isWaitingFor()) {
+                        task.stopListening();
+                        task.setWaitingFor(false);
+                    }
                 }
             }
         } catch(TimeoutException e) {
