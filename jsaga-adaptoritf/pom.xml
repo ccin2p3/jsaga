@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga</groupId>
     <artifactId>jsaga-adaptoritf</artifactId>
-    <version>0.9.7</version>
+    <version>0.9.8-SNAPSHOT</version>
     <name>Interfaces for adaptors</name>
     <description>Set of mandatory and optional interfaces that adaptors have to implement
         in order to be integrated into the SAGA implementation: JSAGA.</description>
@@ -29,8 +29,4 @@
             <version>1.0</version>
         </dependency>
     </dependencies>
-
-  <scm>
-    <tag>jsaga-0_9_7</tag>
-  </scm>
 </project>
