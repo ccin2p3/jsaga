@@ -46,7 +46,7 @@ public class EngineProperties {
             s_prop.setProperty(JOB_DESCRIPTION_DEFAULT, "etc/jsaga-default.jsdl");
             s_prop.setProperty(JOB_MONITOR_POLL_PERIOD, "1000");
             s_prop.setProperty(JOB_MONITOR_ERROR_THRESHOLD, "3");
-            s_prop.setProperty(JOB_CONTROL_CHECK_AVAILABILITY, "true");
+            s_prop.setProperty(JOB_CONTROL_CHECK_AVAILABILITY, "false");
             s_prop.setProperty(JOB_CONTROL_CHECK_MATCH, "true");
 
             // load properties
