@@ -38,4 +38,8 @@
             </plugin>
         </plugins>
     </build>
+
+  <scm>
+    <tag>jsaga-0_9_7</tag>
+  </scm>
 </project>

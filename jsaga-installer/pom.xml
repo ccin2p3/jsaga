@@ -3,12 +3,12 @@
     <parent>
         <groupId>fr.in2p3.jsaga.aggregator</groupId>
         <artifactId>jsaga-adaptors</artifactId>
-        <version>0.9.7-SNAPSHOT</version>
+        <version>0.9.7</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga</groupId>
     <artifactId>jsaga-installer</artifactId>
-    <version>0.9.7-SNAPSHOT</version>
+    <version>0.9.7</version>
     <packaging>jar</packaging>
     <name>JSAGA Installer</name>
     <description>JSAGA is a Java implementation of the Simple API for Grid Applications (SAGA)</description>
@@ -245,21 +245,21 @@
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api-test</artifactId>
-            <version>0.9.7-SNAPSHOT</version>
+            <version>0.9.7</version>
         </dependency>
 
         <!-- core -->
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
-            <version>0.9.7-SNAPSHOT</version>
+            <version>0.9.7</version>
             <classifier>config</classifier>
             <type>zip</type>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
-            <version>0.9.7-SNAPSHOT</version>
+            <version>0.9.7</version>
         </dependency>
     </dependencies>
 </project>

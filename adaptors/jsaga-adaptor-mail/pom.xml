@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
     <artifactId>jsaga-adaptor-mail</artifactId>
-    <version>0.9.7-SNAPSHOT</version>
+    <version>0.9.7</version>
     <name>Placeholder</name>
     <description>This module does not do anything. It is just a placeholder needed for some tests...</description>
     <licenses>
@@ -21,19 +21,19 @@
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-adaptoritf</artifactId>
-            <version>0.9.7-SNAPSHOT</version>
+            <version>0.9.7</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api-test</artifactId>
-            <version>0.9.7-SNAPSHOT</version>
+            <version>0.9.7</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
-            <version>0.9.7-SNAPSHOT</version>
+            <version>0.9.7</version>
             <scope>test</scope>
         </dependency>
         <!-- adaptor specific -->
@@ -43,4 +43,8 @@
             <version>1.4</version>
         </dependency>
     </dependencies>
+
+  <scm>
+    <tag>jsaga-0_9_7</tag>
+  </scm>
 </project>

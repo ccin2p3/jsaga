@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
     <artifactId>jsaga-adaptor-srm</artifactId>
-    <version>0.9.7-SNAPSHOT</version>
+    <version>0.9.7</version>
     <name>Adaptors for SRM</name>
     <description>This module provides support for version 2.2 of the data management protocol SRM (Storage Resource Manager).
 UNDER DEVELOPMENT...</description>
@@ -40,26 +40,26 @@ UNDER DEVELOPMENT...</description>
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-adaptoritf</artifactId>
-            <version>0.9.7-SNAPSHOT</version>
+            <version>0.9.7</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api-test</artifactId>
-            <version>0.9.7-SNAPSHOT</version>
+            <version>0.9.7</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
-            <version>0.9.7-SNAPSHOT</version>
+            <version>0.9.7</version>
             <scope>test</scope>
         </dependency>
         <!-- adaptor specific -->
         <dependency><!-- for security context and gsiftp (WARNING: order of dependencies matters) -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-globus</artifactId>
-            <version>0.9.7-SNAPSHOT</version>
+            <version>0.9.7</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -75,4 +75,8 @@ UNDER DEVELOPMENT...</description>
             <scope>compile</scope>
         </dependency>
     </dependencies>
+
+  <scm>
+    <tag>jsaga-0_9_7</tag>
+  </scm>
 </project>

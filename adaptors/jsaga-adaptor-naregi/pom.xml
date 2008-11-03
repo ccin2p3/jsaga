@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
     <artifactId>jsaga-adaptor-naregi</artifactId>
-    <version>0.9.7-SNAPSHOT</version>
+    <version>0.9.7</version>
     <name>Adaptors for NAREGI</name>
     <description>This module provides support for NAREGI execution management technologies (Super Scheduler).
 NOT YET USABLE...
@@ -17,26 +17,26 @@ NOT YET USABLE...
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-adaptoritf</artifactId>
-            <version>0.9.7-SNAPSHOT</version>
+            <version>0.9.7</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api-test</artifactId>
-            <version>0.9.7-SNAPSHOT</version>
+            <version>0.9.7</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
-            <version>0.9.7-SNAPSHOT</version>
+            <version>0.9.7</version>
             <scope>test</scope>
         </dependency>
         <!-- adaptor specific -->
         <dependency><!-- for security context (WARNING: order of dependencies matters) -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-globus</artifactId>
-            <version>0.9.7-SNAPSHOT</version>
+            <version>0.9.7</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -45,4 +45,8 @@ NOT YET USABLE...
             <version>beta-2</version>
         </dependency>
     </dependencies>
+
+  <scm>
+    <tag>jsaga-0_9_7</tag>
+  </scm>
 </project>
