@@ -79,9 +79,16 @@ public class URLImpl implements URL {
 
     /** DO NOT encode the URL */
     private URLImpl(URL base, String relativePath, String query, String fragment) {
-        //bugfix: Windows drive letter is considered as hostname if URL is "file://C:/"
-        int i;for(i=0; i<relativePath.length() && relativePath.charAt(i)=='/'; i++);
-        if(i>1)relativePath="/"+relativePath.substring(i);
+        //workaround: Windows absolute paths must start with one and only one '/'
+        if (isWindowsAbsolutePath(base.getScheme(), relativePath)) {
+            relativePath = "/"+relativePath;
+        }
+
+        // remove redondant '/'
+        if (relativePath.startsWith("//")) {
+            int i;for(i=0; i<relativePath.length() && relativePath.charAt(i)=='/'; i++);
+            if(i>1)relativePath="/"+relativePath.substring(i);
+        }
 
         // resolve URI
         URI baseUri = ((URLImpl) base).u;
@@ -304,6 +311,13 @@ public class URLImpl implements URL {
     }
 
     ///////////////////////////////////////// private methods /////////////////////////////////////////
+
+    private boolean isWindowsAbsolutePath(String scheme, String relativePath) {
+        return ("file".equals(scheme) || "zip".equals(scheme))
+                && System.getProperty("os.name").startsWith("Windows")
+                && relativePath.length()>=2 && Character.isLetter(relativePath.charAt(0)) && relativePath.charAt(1)==':'
+                && (relativePath.length()==2 || (relativePath.length()>2 && relativePath.charAt(2)=='/'));
+    }
 
     private void fixFileURI() throws URISyntaxException {
         boolean isRelative = (u.getHost()==null && u.getAuthority()!=null && !u.getAuthority().equals("."));
