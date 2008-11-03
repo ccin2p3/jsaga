@@ -95,7 +95,7 @@ public class URLHelper {
                 name = null;
             }
         } else {
-            name = null;
+            name = "/";
         }
         return name;
     }
