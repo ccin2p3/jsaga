@@ -32,5 +32,11 @@ path.</pre>
                     the WallTimeLimit in the JSDL job description.</p>
             </answer>
         </faq>
+        <faq id="Interactive">
+            <question>Can I use the methods getStdin/getStdout/getStderr with the NAREGI-SS plug-in ?</question>
+            <answer>This will be implemented in a next release. However, in order to use these methods,
+                you will have to specify one and only one CandidateHost in job description.
+            </answer>
+        </faq>
     </part>
 </faqs>
