@@ -255,16 +255,17 @@ public class JobRunOptionalTest extends AbstractJobTest {
     	
     	// get job exception
 		int numberOfFailed = 0;
-		for (int i = 0; i < numberOfJobs; i++) {
+        SagaException lastException = null;
+        for (int i = 0; i < numberOfJobs; i++) {
     		if(newJob[i].getException() != null) {
     			numberOfFailed ++;
-			}
+                lastException = newJob[i].getException();
+            }
 		}
-		if(numberOfFailed > 1) 
-			throw new NoSuccessException(numberOfFailed + " jobs of "+numberOfJobs+" are failed.");
-		if(numberOfFailed > 0) 
-			throw new NoSuccessException(numberOfFailed + " job of "+numberOfJobs+" is failed.");
-		
+		if(numberOfFailed > 0) {
+            throw new NoSuccessException("Failed job(s): "+numberOfFailed+"/"+numberOfJobs, lastException);
+        }
+
     	assertEquals(
 	                0,
 	                numberOfFailed);

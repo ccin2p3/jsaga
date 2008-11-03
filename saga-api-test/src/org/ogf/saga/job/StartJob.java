@@ -6,7 +6,7 @@ import org.ogf.saga.error.*;
 public class StartJob extends Thread {
 
 	private JobService service ;
-	private Exception threadException;
+	private SagaException threadException;
 	private int index ;
 	private  boolean isLong;
 		
@@ -42,30 +42,15 @@ public class StartJob extends Thread {
 	        job.waitFor();
 	        
 	        if(!job.getState().toString().equals("DONE")) {
-	        	threadException = new NoSuccessException("The job number '"+index+"' is not DONE :"+job.getState().toString());
+                job.rethrow();
+                throw new NoSuccessException("The job number '"+index+"' is not DONE :"+job.getState().toString());
 	        }
-		} catch (NotImplementedException e) {
+		} catch (SagaException e) {
 			threadException = e; 
-		} catch (IncorrectStateException e) {
-			threadException = e;
-		} catch (TimeoutException e) {
-			threadException = e;
-		} catch (NoSuccessException e) {
-			threadException = e;
-		} catch (AuthenticationFailedException e) {
-			threadException = e;
-		} catch (AuthorizationFailedException e) {
-			threadException = e;
-		} catch (PermissionDeniedException e) {
-			threadException = e;
-		} catch (BadParameterException e) {
-			threadException = e;
-		} catch (DoesNotExistException e) {
-			threadException = e;
 		}
     }
     
-    public Exception getException () {
+    public SagaException getException () {
     	return threadException ;
     }
 }
