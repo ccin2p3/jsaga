@@ -18,17 +18,6 @@ import java.util.Map;
  */
 public interface LogicalReaderMetaData extends LogicalReader {
     /**
-     * Lists all the entries in the directory <code>logicalDir</code> with matching meta-data.
-     * @param logicalDir absolute path of the logical directory.
-     * @param keyValuePatterns map of meta-data keys to values of entries to be found.
-     * @param additionalArgs adaptor specific arguments
-     * @return attributes of the matching entries.
-     * @throws DoesNotExistException if <code>absolutePath</code> does not exist.
-     */
-    public FileAttributes[] listAttributes(String logicalDir, Map keyValuePatterns, String additionalArgs)
-        throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException;
-
-    /**
      * List the meta data of the logical entry.
      * @param logicalEntry absolute path of the logical entry.
      * @param additionalArgs adaptor specific arguments
@@ -39,14 +28,13 @@ public interface LogicalReaderMetaData extends LogicalReader {
         throws PermissionDeniedException, TimeoutException, NoSuccessException;
 
     /**
-     * Get a meta data from the logical entry.
-     * @param logicalEntry absolute path of the logical entry.
-     * @param name name of the metadata to get.
+     * Lists all the entries in the directory <code>logicalDir</code> with matching meta-data.
+     * @param logicalDir absolute path of the logical directory.
+     * @param keyValuePatterns map of meta-data keys to values of entries to be found.
      * @param additionalArgs adaptor specific arguments
-     * @return the meta data value.
-     * @throws NoSuccessException if <code>logicalEntry</code> does not exist.
-     * @throws DoesNotExistException if the meta data does not exist.
+     * @return attributes of the matching entries.
+     * @throws DoesNotExistException if <code>absolutePath</code> does not exist.
      */
-    public String getMetaData(String logicalEntry, String name, String additionalArgs)
-        throws PermissionDeniedException, TimeoutException, NoSuccessException, DoesNotExistException;
+    public FileAttributes[] listAttributes(String logicalDir, Map keyValuePatterns, String additionalArgs)
+        throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException;
 }

@@ -61,10 +61,10 @@ public abstract class AbstractNSDirectoryImplWithMetaData extends AbstractNSDire
 
     public String getAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof LogicalReaderMetaData) {
-            return ((LogicalReaderMetaData)m_adaptor).getMetaData(
+            Map<String,String> attributes = ((LogicalReaderMetaData)m_adaptor).listMetaData(
                     m_url.getPath(),
-                    key,
                     m_url.getQuery());
+            return attributes.get(key);
         } else {
             throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
