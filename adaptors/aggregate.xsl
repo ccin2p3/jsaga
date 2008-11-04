@@ -15,6 +15,7 @@
             <artifactId>jsaga-adaptors</artifactId>
             <version><xsl:value-of select="pom:version/text()"/></version>
             <packaging>pom</packaging>
+            <name>List of adaptors</name>
             <dependencies>
                 <xsl:apply-templates select="pom:modules/pom:module"/>
             </dependencies>
