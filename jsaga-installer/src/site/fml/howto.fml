@@ -144,13 +144,13 @@ rsync --progress -azC --force -e ssh --delete jsaga/ $REMOTE_BASE/jsaga/</pre>
                 <ul>
                     <li>Make a full snapshot
                         <pre>LOCAL_BASE=c:/grid.in2p3.fr
+export MAVEN_OPTS=-Xmx256m
 mvn deploy ; mvn site-deploy
 mv $LOCAL_BASE/application/ $LOCAL_BASE/jsaga-dev/</pre>
                         Or make a quick snapshot (jsaga-installer only)
                         <pre>LOCAL_BASE=c:/grid.in2p3.fr
 mvn install     # update maven local repository for building jsaga-installer
 cd jsaga-installer/
-export MAVEN_OPTS=-Xmx256m
 mvn deploy site-deploy
 mv $LOCAL_BASE/application/ $LOCAL_BASE/jsaga-dev/</pre>
                     </li>
