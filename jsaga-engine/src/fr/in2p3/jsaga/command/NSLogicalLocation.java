@@ -13,7 +13,7 @@ import org.ogf.saga.url.URLFactory;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   NamespaceLogical
+* File:   NSLogicalLocation
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
 * Date:   12 sept. 2007
 * ***************************************************
@@ -21,18 +21,18 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class NamespaceLogical extends AbstractCommand {
+public class NSLogicalLocation extends AbstractCommand {
     private static final String OPT_HELP = "h", LONGOPT_HELP = "help";
     private static final String OPT_REGISTER = "r", LONGOPT_REGISTER = "register";
     private static final String OPT_UNREGISTER = "u", LONGOPT_UNREGISTER = "unregister";
     private static final String OPT_LIST = "l", LONGOPT_LIST = "list";
 
-    public NamespaceLogical() {
-        super("jsaga-logical", new String[]{"Logical URL"}, new String[]{OPT_HELP, LONGOPT_HELP});
+    public NSLogicalLocation() {
+        super("jsaga-logical-location", new String[]{"Logical URL"}, new String[]{OPT_HELP, LONGOPT_HELP});
     }
 
     public static void main(String[] args) throws Exception {
-        NamespaceLogical command = new NamespaceLogical();
+        NSLogicalLocation command = new NSLogicalLocation();
         CommandLine line = command.parse(args);
         if (line.hasOption(OPT_HELP))
         {
