@@ -119,6 +119,7 @@ mv $LOCAL_BASE/application/ $LOCAL_BASE/build-tools/
 cd ../jsaga ; mvn -f pom-unreleased.xml deploy clean
 mvn install
 mvn validate release:prepare
+export MAVEN_OPTS=-Xmx256m
 mvn validate release:perform
 mv $LOCAL_BASE/application/ $LOCAL_BASE/jsaga/
 
@@ -149,6 +150,7 @@ mv $LOCAL_BASE/application/ $LOCAL_BASE/jsaga-dev/</pre>
                         <pre>LOCAL_BASE=c:/grid.in2p3.fr
 mvn install     # update maven local repository for building jsaga-installer
 cd jsaga-installer/
+export MAVEN_OPTS=-Xmx256m
 mvn deploy site-deploy
 mv $LOCAL_BASE/application/ $LOCAL_BASE/jsaga-dev/</pre>
                     </li>
