@@ -7,11 +7,12 @@ import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
 import fr.in2p3.jsaga.adaptor.base.usage.UFile;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
 import org.ogf.saga.error.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 
@@ -94,6 +95,7 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
     }
 
     public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+        //TODO: to be implemented
         throw new NoSuccessException("Not implemented yet");
     }
 
@@ -168,40 +170,8 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 			}
 			return fileAttributes;
 		} catch (IOException e) {throw new NoSuccessException(e);}
+    }
 
-		}
-	
-	public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-		try {
-			String[] split = absolutePath.split(SEPARATOR);
-			String fileName = split[split.length-1];
-			
-			String dir = absolutePath.substring(0,absolutePath.length()-fileName.length());
-			IRODSFile generalFile =  (IRODSFile)FileFactory.newFile(fileSystem, dir, fileName );
-			
-			return new BufferedInputStream(new IRODSFileInputStream(generalFile));
-			/*
-			GeneralRandomAccessFile generalRandomAccessFile = FileFactory.newRandomAccessFile( generalFile, "r" );
-			int filesize = (int)generalFile.length();
-			byte[] buffer = new byte[filesize];
-			generalRandomAccessFile.readFully(buffer);
-			ByteArrayInputStream bais = new ByteArrayInputStream(buffer); 
-			
-			return bais;*/
-       	} catch (java.lang.Exception e) {
-			throw new NoSuccessException(e);
-        }    
-	}
-	
-	public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
-		try {
-			IRODSFile generalFile =  (IRODSFile)FileFactory.newFile((IRODSFileSystem)fileSystem, parentAbsolutePath, fileName );
-			return new BufferedOutputStream(new IRODSFileOutputStream(generalFile));
-       	} catch (java.lang.Exception e) {
-			throw new NoSuccessException(e);
-        }    
-	}
-	
 	public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
 		IRODSFile irodsFile = new IRODSFile((IRODSFileSystem)fileSystem, parentAbsolutePath +SEPARATOR + directoryName);
 		irodsFile.mkdir();

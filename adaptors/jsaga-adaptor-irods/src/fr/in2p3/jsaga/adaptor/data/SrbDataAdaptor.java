@@ -9,7 +9,8 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
 import org.ogf.saga.error.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 
@@ -99,6 +100,7 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
     }
 
     public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+        //TODO: to be implemented
         throw new NoSuccessException("Not implemented yet");
     }
 
@@ -177,41 +179,6 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 		} catch (IOException e) {throw new NoSuccessException(e);}
 	}
 
-	public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-		try {
-			String[] split = absolutePath.split(SEPARATOR);
-			String fileName = split[split.length-1];
-			
-			String dir = absolutePath.substring(0,absolutePath.length()-fileName.length());
-			SRBFile generalFile =  (SRBFile)FileFactory.newFile(fileSystem, dir, fileName );
-			
-			return new BufferedInputStream(new SRBFileInputStream(generalFile));
-			/*
-			GeneralRandomAccessFile generalRandomAccessFile = FileFactory.newRandomAccessFile( generalFile, "r" );
-			int filesize = (int)generalFile.length();
-
-			byte[] buffer = new byte[filesize];
-			generalRandomAccessFile.readFully(buffer);
-			ByteArrayInputStream bais = new ByteArrayInputStream(buffer); 
-			
-			return bais;*/
-       	} catch (java.lang.Exception e) {
-			throw new NoSuccessException(e);
-        }    
-	}
-	
-	public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
-		try {
-			//String[] split = parentAbsolutePath.split(separator);
-			//String dir = parentAbsolutePath.substring(0,parentAbsolutePath.length()-fileName.length());
-			SRBFile generalFile =  (SRBFile)FileFactory.newFile((SRBFileSystem)fileSystem, parentAbsolutePath, fileName );
-			
-			return new BufferedOutputStream(new SRBFileOutputStream(generalFile));
-       	} catch (java.lang.Exception e) {
-			throw new NoSuccessException(e);
-        }    
-	}
-	
 	public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
 		SRBFile srbFile = new SRBFile((SRBFileSystem)fileSystem, parentAbsolutePath +SEPARATOR + directoryName);
 		srbFile.mkdir();

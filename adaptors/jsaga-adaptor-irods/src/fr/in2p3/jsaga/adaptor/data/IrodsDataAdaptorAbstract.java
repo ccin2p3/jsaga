@@ -2,8 +2,6 @@ package fr.in2p3.jsaga.adaptor.data;
 
 import edu.sdsc.grid.io.GeneralFileSystem;
 import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
-import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
-import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
@@ -11,7 +9,6 @@ import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.*;
 
 import java.util.*;
-import java.lang.Exception;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -25,7 +22,7 @@ import java.lang.Exception;
 /**
  *
  */
-public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor, FileReaderStreamFactory, FileWriterStreamFactory {
+public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
 	protected GeneralFileSystem fileSystem;
 	protected final static String SEPARATOR = "/";
 	protected final static String FILE = "file";
