@@ -13,6 +13,7 @@ import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -121,8 +122,24 @@ public class LogicalDirectoryImpl extends AbstractAsyncLogicalDirectoryImpl impl
                 matchingPath.add(current);
             }
         } else if (m_adaptor instanceof LogicalReaderMetaData) {
+            // filter by meta-data
+            FileAttributes[] childs;
+            try {
+                childs = ((LogicalReaderMetaData)m_adaptor).findAttributes(
+                        m_url.getPath(),
+                        keyValuePatterns,
+                        Flags.RECURSIVE.isSet(flags),
+                        m_url.getQuery());
+            } catch (DoesNotExistException doesNotExist) {
+                throw new IncorrectStateException("Logical directory does not exist: "+ m_url, doesNotExist);
+            }
+            // filter by entry name
             Pattern p = SAGAPattern.toRegexp(namePattern);
-            this._doFind(p, keyValuePatterns, flags, matchingPath, CURRENT_DIR_RELATIVE_PATH);
+            for (int i=0; i<childs.length; i++) {
+                if (p==null || p.matcher(childs[i].getNameOnly()).matches()) {
+                    matchingPath.add(URLFactory.createURL(childs[i].getName()));
+                }
+            }
         } else {
             throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
@@ -130,36 +147,6 @@ public class LogicalDirectoryImpl extends AbstractAsyncLogicalDirectoryImpl impl
     }
     public List<URL> find(String namePattern, String[] attrPattern) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         return this.find(namePattern, attrPattern, Flags.RECURSIVE.getValue());
-    }
-
-    private void _doFind(Pattern p, Map keyValuePatterns, int flags, List<URL> matchingPath, URL currentRelativePath) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
-        // for each child
-        FileAttributes[] childs;
-        try {
-            childs = ((LogicalReaderMetaData)m_adaptor).listAttributes(
-                    m_url.getPath(),
-                    keyValuePatterns,
-                    m_url.getQuery());
-        } catch (DoesNotExistException doesNotExist) {
-            throw new IncorrectStateException("Logical directory does not exist: "+ m_url, doesNotExist);
-        }
-        for (int i=0; i<childs.length; i++) {
-            if (p==null || p.matcher(childs[i].getName()).matches()) {
-                // add child relative path
-                URL childRelativePath = URLHelper.createURL(currentRelativePath, childs[i].getName());
-                matchingPath.add(childRelativePath);
-                // may recurse
-                if (Flags.RECURSIVE.isSet(flags) && childs[i].getType()==FileAttributes.DIRECTORY_TYPE) {
-                    LogicalDirectoryImpl childDir;
-                    try {
-                        childDir = (LogicalDirectoryImpl) this._openNSDir(childRelativePath);
-                    } catch (IncorrectURLException e) {
-                        throw new NoSuccessException(e);
-                    }
-                    childDir._doFind(p, keyValuePatterns, flags, matchingPath, childRelativePath);
-                }
-            }
-        }
     }
 
     public LogicalDirectory openLogicalDir(URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {

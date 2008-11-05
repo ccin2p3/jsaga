@@ -22,19 +22,21 @@ public interface LogicalWriter extends DataWriterAdaptor {
      * @param logicalEntry absolute path of the logical entry.
      * @param replicaEntry location to add to set.
      * @param additionalArgs adaptor specific arguments
+     * @throws BadParameterException if <code>logicalEntry</code> is a directory.
      * @throws IncorrectStateException if <code>logicalEntry</code> does not exist.
      */
     public void addLocation(String logicalEntry, URL replicaEntry, String additionalArgs)
-        throws PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException;
+        throws PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException;
 
     /**
      * Remove a replica location from the replica set.
      * @param logicalEntry absolute path of the logical entry.
      * @param replicaEntry replica to remove from set.
      * @param additionalArgs adaptor specific arguments
+     * @throws BadParameterException if <code>logicalEntry</code> is a directory.
      * @throws IncorrectStateException if <code>logicalEntry</code> does not exist.
      * @throws DoesNotExistException if the location is not in the set of replicas.
      */
     public void removeLocation(String logicalEntry, URL replicaEntry, String additionalArgs)
-        throws PermissionDeniedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException;
+        throws PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException;
 }

@@ -35,4 +35,9 @@ public class CatalogFileAttributes extends FileAttributes {
             m_size = -1;
         }
     }
+
+    public CatalogFileAttributes(EntryType entry, String relativePath) {
+        this(entry);
+        m_relativePath = relativePath;
+    }
 }

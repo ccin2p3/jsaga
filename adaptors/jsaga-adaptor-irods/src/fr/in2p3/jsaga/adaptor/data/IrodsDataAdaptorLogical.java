@@ -28,11 +28,11 @@ public class IrodsDataAdaptorLogical extends IrodsDataAdaptor implements Logical
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public FileAttributes[] listAttributes(String logicalDir, Map keyValuePatterns, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+    public FileAttributes[] findAttributes(String logicalDir, Map keyValuePatterns, boolean recursive, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         return new FileAttributes[0];  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public FileAttributes[] listAttributes(String logicalDir, BooleanExpr filter, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+    public FileAttributes[] findAttributes(String logicalDir, BooleanExpr filter, boolean recursive, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         return new FileAttributes[0];  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

@@ -20,6 +20,7 @@ public abstract class FileAttributes {
     public static final int DIRECTORY_TYPE = 2;
     public static final int LINK_TYPE = 3;
 
+    protected String m_relativePath = null;
     protected String m_name = null;
     protected int m_type = UNKNOWN_TYPE;
     protected long m_size = -1;
@@ -29,11 +30,12 @@ public abstract class FileAttributes {
     protected long m_lastModified = 0;
 
     public String getName() {
+        String name = (m_relativePath!=null ? m_relativePath : m_name);
         switch(m_type) {
             case DIRECTORY_TYPE:
-                return m_name+"/";
+                return name+"/";
             default:
-                return m_name;
+                return name;
         }
     }
 

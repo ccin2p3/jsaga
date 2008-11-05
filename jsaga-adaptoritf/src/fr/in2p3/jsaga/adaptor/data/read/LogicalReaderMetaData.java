@@ -31,10 +31,11 @@ public interface LogicalReaderMetaData extends LogicalReader {
      * Lists all the entries in the directory <code>logicalDir</code> with matching meta-data.
      * @param logicalDir absolute path of the logical directory.
      * @param keyValuePatterns map of meta-data keys to values of entries to be found.
-     * @param additionalArgs adaptor specific arguments
+     * @param recursive tell if search must be recursive or not.
+     * @param additionalArgs adaptor specific arguments.
      * @return attributes of the matching entries.
      * @throws DoesNotExistException if <code>absolutePath</code> does not exist.
      */
-    public FileAttributes[] listAttributes(String logicalDir, Map keyValuePatterns, String additionalArgs)
+    public FileAttributes[] findAttributes(String logicalDir, Map keyValuePatterns, boolean recursive, String additionalArgs)
         throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException;
 }

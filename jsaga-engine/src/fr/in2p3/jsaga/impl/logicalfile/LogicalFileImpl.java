@@ -195,6 +195,8 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
                     throw new NoSuccessException(e);
                 }
                 return list;
+            } catch (BadParameterException badParameter) {
+                throw new IncorrectStateException("Logical entry is not a file: "+m_url, badParameter);
             } catch (DoesNotExistException doesNotExist) {
                 throw new IncorrectStateException("Logical file does not exist: "+ m_url, doesNotExist);
             }

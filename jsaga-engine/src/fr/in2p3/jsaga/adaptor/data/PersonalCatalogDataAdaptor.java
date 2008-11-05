@@ -7,14 +7,14 @@ import fr.in2p3.jsaga.adaptor.data.impl.DataCatalogHandler;
 import fr.in2p3.jsaga.adaptor.data.link.LinkAdaptor;
 import fr.in2p3.jsaga.adaptor.data.link.NotLink;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
-import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
+import fr.in2p3.jsaga.adaptor.data.read.LogicalReaderMetaData;
+import fr.in2p3.jsaga.adaptor.data.write.LogicalWriterMetaData;
 import fr.in2p3.jsaga.adaptor.schema.data.catalog.*;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import org.ogf.saga.error.*;
 import org.ogf.saga.url.URL;
 
-import java.util.Map;
+import java.util.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  *
  */
-public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor {
+public class PersonalCatalogDataAdaptor implements LogicalReaderMetaData, LogicalWriterMetaData, LinkAdaptor {
     private DataCatalogHandler m_catalog;
 
     public String getType() {
@@ -102,20 +102,95 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
         if(Base.DEBUG) m_catalog.commit();
     }
 
-    public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-        DirectoryType parent = m_catalog.getDirectory(parentAbsolutePath);
-        m_catalog.removeFile(parent, fileName);
-        if(Base.DEBUG) m_catalog.commit();
-    }
-
     public String[] listLocations(String logicalEntry, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         File file = m_catalog.getFile(logicalEntry);
         return file.getReplica();
     }
 
-    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        EntryType entry = m_catalog.getEntry(absolutePath);
-        return new CatalogFileAttributes(entry);
+    public void setMetaData(String logicalEntry, String name, String value, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        EntryType entry;
+        try {
+            entry = m_catalog.getEntry(logicalEntry);
+        } catch (DoesNotExistException e) {
+            throw new NoSuccessException(e);
+        }
+        Metadata md = findMetadata(entry, name);
+        if (md != null) {
+            md.setName(name);
+            md.setValue(value);
+        } else {
+            md = new Metadata();
+            md.setName(name);
+            md.setValue(value);
+            entry.addMetadata(md);
+        }
+    }
+
+    public void removeMetaData(String logicalEntry, String name, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException, DoesNotExistException {
+        EntryType entry;
+        try {
+            entry = m_catalog.getEntry(logicalEntry);
+        } catch (DoesNotExistException e) {
+            throw new NoSuccessException(e);
+        }
+        Metadata md = findMetadata(entry, name);
+        if (md != null) {
+            entry.removeMetadata(md);
+        } else {
+            throw new DoesNotExistException("Meta-data '"+name+"' does not exist for entry: "+logicalEntry);
+        }
+    }
+
+    public Map listMetaData(String logicalEntry, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        EntryType entry;
+        try {
+            entry = m_catalog.getEntry(logicalEntry);
+        } catch (DoesNotExistException e) {
+            throw new NoSuccessException(e);
+        }
+        Map map = new HashMap();
+        for (int i=0; i<entry.getMetadataCount(); i++) {
+            Metadata md = entry.getMetadata(i);
+            map.put(md.getName(), md.getValue());
+        }
+        return map;
+    }
+
+    public FileAttributes[] findAttributes(String logicalDir, Map keyValuePatterns, boolean recursive, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+        List found = new ArrayList();
+        DirectoryType dir = m_catalog.getDirectory(logicalDir);
+        findAttributesRecursive(dir, keyValuePatterns, found, null, recursive);
+        return (FileAttributes[]) found.toArray(new FileAttributes[found.size()]);
+    }
+    private void findAttributesRecursive(DirectoryType dir, Map keyValuePatterns, List found, String relativePath, boolean recursive) {
+        for (int i=0; i<dir.getDirectoryCount(); i++) {
+            Directory childDir = dir.getDirectory(i);
+            String childRelativePath = (relativePath!=null ? relativePath+"/"+childDir.getName() : childDir.getName());
+            if (matchesAllPatterns(childDir, keyValuePatterns)) {
+                found.add(new CatalogFileAttributes(childDir, childRelativePath));
+            }
+            if (recursive) {
+                findAttributesRecursive(childDir, keyValuePatterns, found, childRelativePath, recursive);
+            }
+        }
+        for (int i=0; i<dir.getFileCount(); i++) {
+            File childFile = dir.getFile(i);
+            String childRelativePath = (relativePath!=null ? relativePath+"/"+childFile.getName() : childFile.getName());
+            if (matchesAllPatterns(childFile, keyValuePatterns)) {
+                found.add(new CatalogFileAttributes(childFile, childRelativePath));
+            }
+        }
+    }
+    private boolean matchesAllPatterns(EntryType entry, Map keyValuePatterns) {
+        boolean matchAllPatterns = (keyValuePatterns.size()>0);
+        for (Iterator it=keyValuePatterns.entrySet().iterator(); matchAllPatterns && it.hasNext(); ) {
+            Map.Entry e = (Map.Entry) it.next();
+            String key = (String) e.getKey();
+            String value = (String) e.getValue();
+            Metadata md = findMetadata(entry, key);
+            matchAllPatterns &= (md!=null && (value==null || value.equals(md.getValue())));
+        }
+        return matchAllPatterns;
     }
 
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
@@ -125,6 +200,11 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
             ret[i] = new CatalogFileAttributes(list[i]);
         }
         return ret;
+    }
+
+    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+        EntryType entry = m_catalog.getEntry(absolutePath);
+        return new CatalogFileAttributes(entry);
     }
 
     public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
@@ -146,6 +226,12 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
     public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         DirectoryType parent = m_catalog.getDirectory(parentAbsolutePath);
         m_catalog.removeDirectory(parent, directoryName);
+        if(Base.DEBUG) m_catalog.commit();
+    }
+
+    public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+        DirectoryType parent = m_catalog.getDirectory(parentAbsolutePath);
+        m_catalog.removeFile(parent, fileName);
         if(Base.DEBUG) m_catalog.commit();
     }
 
@@ -183,5 +269,15 @@ public class PersonalCatalogDataAdaptor implements LogicalReader, LogicalWriter,
             }
         }
         return false;
+    }
+
+    private Metadata findMetadata(EntryType entry, String name) {
+        for (int i=0; i<entry.getMetadataCount(); i++) {
+            Metadata md = entry.getMetadata(i);
+            if (md.getName().equals(name)) {
+                return md;
+            }
+        }
+        return null;
     }
 }
