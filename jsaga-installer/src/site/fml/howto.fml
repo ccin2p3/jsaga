@@ -43,9 +43,11 @@ sed -i pom.xml -e "s/CHANGEME/$VERSION/g"</pre>
                 <ul>
                     <li>From your build environment:
                         <pre>mvn integration-test -Dintegration-test=&lt;MyProtocolIntegrationTestSuite&gt;</pre>
+                        Errors are logged into build/surefire-reports/integration.&lt;MyProtocolIntegrationTestSuite&gt;.txt.
                     </li>
                     <li>From an installation of JSAGA:
                         <pre>junit-run-test integration.&lt;MyProtocolIntegrationTestSuite&gt;</pre>
+                        Errors are displayed on console.
                     </li>
                 </ul>
             </answer>
