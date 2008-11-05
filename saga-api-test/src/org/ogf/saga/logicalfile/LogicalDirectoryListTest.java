@@ -39,9 +39,8 @@ public class LogicalDirectoryListTest extends AbstractNSDirectoryListTest {
     }
 
     public void test_find_norecurse() throws Exception {
-        if (m_subDir instanceof LogicalDirectory) {
-            LogicalDirectory dir = (LogicalDirectory) m_subDir.openDir(URLFactory.createURL(".."), Flags.NONE.getValue());
-            List<URL> list = dir.find(DEFAULT_FILEPATTERN, null, Flags.NONE.getValue());
+        if (m_dir instanceof LogicalDirectory) {
+            List<URL> list = ((LogicalDirectory) m_dir).find(DEFAULT_FILEPATTERN, null, Flags.NONE.getValue());
             assertEquals(
                     0,
                     list.size());
@@ -51,9 +50,8 @@ public class LogicalDirectoryListTest extends AbstractNSDirectoryListTest {
     }
 
     public void test_find_recurse() throws Exception {
-        if (m_subDir instanceof LogicalDirectory) {
-            LogicalDirectory dir = (LogicalDirectory) m_subDir.openDir(URLFactory.createURL(".."), Flags.NONE.getValue());
-            List<URL> list = dir.find(DEFAULT_FILEPATTERN, null, Flags.RECURSIVE.getValue());
+        if (m_dir instanceof LogicalDirectory) {
+            List<URL> list = ((LogicalDirectory) m_dir).find(DEFAULT_FILEPATTERN, null, Flags.RECURSIVE.getValue());
             assertEquals(
                     1,
                     list.size());
