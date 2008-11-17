@@ -79,19 +79,19 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-escapexml-plugin</artifactId>
+                <artifactId>maven-aptinclude-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>example</id>
                         <phase>pre-site</phase>
                         <goals>
-                            <goal>escapexml</goal>
+                            <goal>include</goal>
                         </goals>
                         <configuration>
                             <title>Configuration example</title>
                             <description>Configuration used for integration tests of this module</description>
-                            <xmlFile>test/resources/etc/jsaga-universe.xml</xmlFile>
-                            <xdocFileName>example.xml</xdocFileName>
+                            <includeFile>test/resources/etc/jsaga-universe.xml</includeFile>
+                            <aptFileName>example.apt</aptFileName>
                         </configuration>
                     </execution>
                 </executions>
