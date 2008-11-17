@@ -9,9 +9,7 @@
     <artifactId>jsaga-adaptor-naregi</artifactId>
     <version>0.9.8-SNAPSHOT</version>
     <name>Adaptors for NAREGI</name>
-    <description>This module provides support for NAREGI execution management technologies (Super Scheduler).
-NOT YET USABLE...
-    </description>
+    <description>This module provides support for NAREGI execution management technologies (Super Scheduler).</description>
     <dependencies>
         <!-- common -->
         <dependency>

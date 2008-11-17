@@ -3,14 +3,10 @@
     <part id="naregi-ss">
         <title>NAREGI Super Scheduler</title>
         <faq id="post-install">
-            <question>Job submission fails with this error message, what should I do ?
-                <pre>Exception in thread "main" org.ogf.saga.error.NoSuccessException: NoSuccess: org.naregi.s
-s.service.client.JobScheduleServiceException: Unable to get SS command location
-path.</pre>
-            </question>
+            <question>Job submission fails with this message "Unable to get SS command location", what should I do ?</question>
             <answer>The NAREGI-SS plug-in requires a post-installation step. As a priviledged user,
                 run this command line:
-                <pre>post-install naregi | sh</pre>
+                <pre>jsaga-post-install.sh naregi | sh</pre>
             </answer>
         </faq>
         <faq id="security">
