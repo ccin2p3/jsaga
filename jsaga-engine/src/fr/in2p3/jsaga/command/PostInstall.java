@@ -33,6 +33,7 @@ public class PostInstall {
     private URL m_script;                   private static final String SCRIPT = "script";
     private String[] m_arguments;           private static final String ARGUMENTS = "arguments";
     private File[] m_postInstalledFiles;    private static final String POSTINSTALLED_FILES = "post-installed.files";
+    private DoesNotExistException m_exception;
 
     public static void main(String[] args) throws Exception {
         if (args.length > 1) {
@@ -55,14 +56,19 @@ public class PostInstall {
                             message = "To be post-installed";
                         }
                     } catch(Exception e) {
-                        message = e.getMessage();
+                        message = "ERROR ["+e.getMessage()+"]";
                     }
                     System.out.println(pi.m_scheme+"\t\t"+message);
                 }
                 break;
             case 1:
                 PostInstall pi = map.get(args[0]);
-                pi.dumpScript();
+                if (pi != null) {
+                    pi.dumpScript();
+                } else {
+                    System.err.println("Adaptor not found: "+args[0]);
+                    System.exit(1);
+                }
                 break;
         }
     }
@@ -79,8 +85,16 @@ public class PostInstall {
         m_preInstalledMessage = prop.getProperty(PREINSTALLED_MESSAGE);
         m_superUser = "true".equalsIgnoreCase(prop.getProperty(SUPER_USER));
         m_script = PostInstall.class.getClassLoader().getResource(prop.getProperty(SCRIPT));
-        m_arguments = evalAttributes(prop.getProperty(ARGUMENTS)).split(" ");
-        m_postInstalledFiles = toFilesArray(evalAttributes(prop.getProperty(POSTINSTALLED_FILES)));
+        try {
+            m_arguments = evalAttributes(prop.getProperty(ARGUMENTS)).split(" ");
+        } catch(DoesNotExistException e) {
+            m_exception = e;
+        }
+        try {
+            m_postInstalledFiles = toFilesArray(evalAttributes(prop.getProperty(POSTINSTALLED_FILES)));
+        } catch(DoesNotExistException e) {
+            m_exception = e;
+        }
     }
 
     ///////////////////////////////////////////// public ////////////////////////////////////////////
@@ -90,7 +104,9 @@ public class PostInstall {
      * @throws Exception if can not be post-installed
      */
     public boolean isPostInstalled() throws Exception {
-        if (exist(m_postInstalledFiles)) {
+        if (m_exception != null) {
+            throw m_exception;
+        } else if (exist(m_postInstalledFiles)) {
             return true;
         } else {
             // check if can be post-installed
@@ -112,7 +128,10 @@ public class PostInstall {
         }
     }
 
-    public void dumpScript() throws IOException {
+    public void dumpScript() throws DoesNotExistException, IOException {
+        if (m_exception != null) {
+            throw m_exception;
+        }
         String line;
         BufferedReader reader = new BufferedReader(new InputStreamReader(m_script.openStream()));
         while( (line=reader.readLine()) != null ) {
