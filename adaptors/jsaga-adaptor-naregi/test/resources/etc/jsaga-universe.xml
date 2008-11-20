@@ -23,4 +23,16 @@
             <attribute name="ss.command.location" value="${user.home}/naregi-SS"/>
         </job>
     </GRID>
+    <GRID name="NAREGI_MyProxy" contextType="NAREGI">
+        <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/naregi/certificates/"/>
+        <attribute name="UserID" value="naregiuser"/>
+        <job type="naregi">
+            <attribute name="Server" value="host119.ccvm.lan"/>
+            <attribute name="myproxy.server.host" value="host116.ccvm.lan"/>
+            <attribute name="myproxy.server.hostDN" value="/C=FR/O=naregi/OU=ccin2p3/CN=host/host116.ccvm.lan"/>
+            <attribute name="myproxy_plus.server.host" value="host119.ccvm.lan"/>
+            <attribute name="myproxy_plus.server.hostDN" value="/C=FR/O=naregi/OU=ccin2p3/CN=host/host119.ccvm.lan"/>
+            <attribute name="ss.command.location" value="${user.home}/naregi-SS"/>
+        </job>
+    </GRID>
 </UNIVERSE>
