@@ -1,9 +1,9 @@
 package fr.in2p3.jsaga.adaptor.naregi.job;
 
 import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
+import fr.in2p3.jsaga.adaptor.naregi.security.NaregiSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
 import org.ietf.jgss.GSSCredential;
 import org.naregi.ss.service.client.*;
 import org.ogf.saga.error.*;
@@ -35,15 +35,15 @@ public abstract class SuperSchedulerJobAdaptorAbstract implements SagaSecureAdap
     }
 
     public Class[] getSupportedSecurityAdaptorClasses() {
-        return new Class[]{GSSCredentialSecurityAdaptor.class, UserPassSecurityAdaptor.class};
+        return new Class[]{GSSCredentialSecurityAdaptor.class, NaregiSecurityAdaptor.class};
     }
 
     public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
         if (securityAdaptor instanceof GSSCredentialSecurityAdaptor) {
             m_credential = ((GSSCredentialSecurityAdaptor) securityAdaptor).getGSSCredential();
-        } else if (securityAdaptor instanceof UserPassSecurityAdaptor) {
-            m_account = ((UserPassSecurityAdaptor) securityAdaptor).getUserID();
-            m_passPhrase = ((UserPassSecurityAdaptor) securityAdaptor).getUserPass();
+        } else if (securityAdaptor instanceof NaregiSecurityAdaptor) {
+            m_account = ((NaregiSecurityAdaptor) securityAdaptor).getUserID();
+            m_passPhrase = ((NaregiSecurityAdaptor) securityAdaptor).getUserPass();
         }
     }
 
