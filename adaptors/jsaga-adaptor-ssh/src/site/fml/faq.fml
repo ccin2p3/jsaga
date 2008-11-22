@@ -24,8 +24,9 @@
             <answer>
                 <pre>ssh-host-config -y      # answers: ntsec tty
 net start sshd
-cat test/config/ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-ssh localhost -i test/config/ssh/id_rsa</pre>
+ssh-keygen -t rsa
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+ssh localhost -i ~/.ssh/id_rsa</pre>
             </answer>
         </faq>
     </part>
