@@ -32,7 +32,7 @@
         <!-- adaptor specific -->
         <dependency><!-- for security context (WARNING: order of dependencies matters) -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
-            <artifactId>jsaga-adaptor-globus</artifactId>
+            <artifactId>jsaga-adaptor-voms</artifactId>
             <version>0.9.8-SNAPSHOT</version>
             <scope>runtime</scope>
         </dependency>
