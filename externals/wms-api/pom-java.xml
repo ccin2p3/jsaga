@@ -91,12 +91,12 @@
         <dependency>
             <groupId>org.glite</groupId>
             <artifactId>glite-security-delegation-java</artifactId>
-            <version>3.1</version>
+            <version>1.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.glite</groupId>
             <artifactId>glite-security-trustmanager</artifactId>
-            <version>3.1</version>
+            <version>1.8.8</version>
         </dependency>
 		<dependency>
             <groupId>org.globus</groupId>

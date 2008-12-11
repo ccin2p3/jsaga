@@ -8,6 +8,6 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.glite</groupId>
     <artifactId>glite-security-delegation-java</artifactId>
-    <version>3.1</version>
+    <version>1.4.1</version>
     <name>Glite Security delegation</name>
 </project>
