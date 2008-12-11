@@ -20,7 +20,7 @@ import org.ogf.saga.url.URLFactory;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * TODO: implementer setAttribute, removeAttribute et listAttributes
  */
 public class NSLogicalMetaData extends AbstractCommand {
     private static final String OPT_HELP = "h", LONGOPT_HELP = "help";
