@@ -9,9 +9,9 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.glite</groupId>
   <artifactId>wms-api</artifactId>
-  <version>3.1</version>
+  <version>3.1</version><!-- WSDL 3.1.2 Version / API 3.1.0 Version -->
   <name>gLite-WMS API</name>
-  <description>Java API for the Workload Management System (WMS).</description>
+  <description>Java API for the Workload Management System (WMS) and Logging and Bookkeeping (LB).</description>
   <url>https://grid.ct.infn.it/twiki/bin/view/GILDA/ApiJavaWMProxy</url>
   <organization>
       <name>INFN</name>
@@ -35,6 +35,21 @@
             <artifactId>log4j</artifactId>
             <version>1.2.8</version>
         </dependency>
+        <dependency>
+            <groupId>org.glite</groupId>
+            <artifactId>glite-security-delegation-java</artifactId>
+            <version>3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glite</groupId>
+            <artifactId>glite-security-trustmanager</artifactId>
+            <version>3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glite</groupId>
+            <artifactId>glite-security-util-java</artifactId>
+            <version>3.1</version>
+        </dependency>
 		<dependency>
             <groupId>org.globus</groupId>
             <artifactId>cog-jglobus</artifactId>
@@ -46,6 +61,12 @@
             <artifactId>cog-axis</artifactId>
             <version>gt4</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glite</groupId>
+            <artifactId>glite-jdl-api-java</artifactId>
+            <version>3.1</version>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 </project>

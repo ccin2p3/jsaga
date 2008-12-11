@@ -1,38 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.glite</groupId>
-  <artifactId>wms-api</artifactId>
-  <version>3.1</version>
-  <packaging>pom</packaging>
-  <name>WMS external libraries</name>
-  <description>These are the external libraries for the WMS adaptors.</description>
-  	<build>
-		<directory>build</directory> 
-	    <plugins>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-					<executions>
-					    <execution>
-							<phase>package</phase>
-							<goals>
-								<goal>assembly</goal>
-	                        </goals>
-		                </execution>
-			        </executions>
-			        <configuration>
-						<descriptors>
-				            <descriptor>assembly.xml</descriptor>
-			          </descriptors>
-			        </configuration>
-		    </plugin>
-			<plugin>
+	<modelVersion>4.0.0</modelVersion>
+    <groupId>org.glite</groupId>
+    <artifactId>wms-api</artifactId>
+    <version>3.1</version>
+    <name>gLite-WMS API</name>
+    <!--
+        mvn -f pom-java.xml generate-sources
+        sed build/generated-sources/org/glite/wsdl/types/lb/GenericFault.java -e "s/GenericFault  implements/GenericFault extends org.apache.axis.AxisFault implements/" -i
+        mvn -f pom-java.xml package
+    -->
+    <build>
+		<directory>build</directory>
+        <outputDirectory>build/classes</outputDirectory>
+        <sourceDirectory>java</sourceDirectory>
+		<plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>axistools-maven-plugin</artifactId>
+                <!--<version>1.0</version>--><!-- axis 1.2.1 -->
+                <version>1.1</version><!-- axis 1.4 -->
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>wsdl2java</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirectory>${basedir}/resources/wsdl</sourceDirectory>
+                            <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
+                            <timestampDirectory>${project.build.directory}</timestampDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-file-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>copy-jar</id>
-                        <phase>install</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>copy</goal>
                         </goals>
@@ -47,8 +55,7 @@
                     </execution>
                 </executions>
             </plugin>
-			<!-- Commented because clean build directory is made by pom-java -->
-			<!-- <plugin>
+			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
 				<executions>
 					<execution>
@@ -66,14 +73,20 @@
 						</fileset>
 					</filesets>
 				</configuration>
-			</plugin> -->
+			</plugin>
 		</plugins>
-	</build>
-	<dependencies>
+    </build>
+    <dependencies>
         <dependency>
-            <groupId>org.glite</groupId>
-            <artifactId>glite-security-trustmanager</artifactId>
-            <version>3.1</version>
+            <groupId>axis</groupId>
+            <artifactId>axis</artifactId>
+            <version>1.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.8</version>
         </dependency>
         <dependency>
             <groupId>org.glite</groupId>
@@ -82,16 +95,20 @@
         </dependency>
         <dependency>
             <groupId>org.glite</groupId>
-            <artifactId>glite-security-util-java</artifactId>
+            <artifactId>glite-security-trustmanager</artifactId>
             <version>3.1</version>
         </dependency>
 		<dependency>
-            <groupId>org.glite</groupId>
-            <artifactId>glite-jdl-api-java</artifactId>
-            <version>3.1</version>
+            <groupId>org.globus</groupId>
+            <artifactId>cog-jglobus</artifactId>
+            <version>1.4</version>
+            <scope>compile</scope>
         </dependency>
-	</dependencies>
-	<modules>
-		<module>wms-lb-api</module>
-	</modules>
+        <dependency>
+            <groupId>org.globus</groupId>
+            <artifactId>cog-axis</artifactId>
+            <version>gt4</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 </project>
