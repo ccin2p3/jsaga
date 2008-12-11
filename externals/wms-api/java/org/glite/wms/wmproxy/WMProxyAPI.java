@@ -68,7 +68,7 @@ import org.apache.log4j.PropertyConfigurator;
 * </UL>
  *
  * @author Marco Sottilaro <marco.sottilaro@datamat.it>
- * @version $Id: WMProxyAPI.java,v 1.1 2008/03/07 11:06:05 demesy Exp $
+ * @version $Id: WMProxyAPI.java,v 1.1 2008/12/11 15:11:41 sreynaud Exp $
  *
  */
 

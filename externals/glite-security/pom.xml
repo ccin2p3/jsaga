@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <!-- declaration -->
   <parent>
@@ -6,16 +7,16 @@
     <version>current</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>test</groupId>
-  <artifactId>pre-java</artifactId>
+  <groupId>fr.in2p3.jsaga.aggregator</groupId>
+  <artifactId>glite-security</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>Glite libraries</name>
+  <name>gLite security libraries</name>
+
   <!-- aggregation -->
-  <modules>		
-		<module>glite-security-trustmanager</module>
-		<module>glite-security-delegation-java</module>
-		<module>glite-security-util-java</module>
-		<module>glite-jdl-api-java</module>
+  <modules>
+    <module>glite-security-delegation-java</module>
+    <module>glite-security-trustmanager</module>
+    <module>glite-security-util-java</module>
   </modules>
 </project>

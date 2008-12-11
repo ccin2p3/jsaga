@@ -34,6 +34,8 @@
     <module>puretls</module>
     <module>unicore6-api</module>
     <module>vomsjapi</module>
+    <module>glite-security</module>
+    <module>glite-jdl-api-java</module>
 	<module>wms-api</module>
     <module>wsgram-api</module>
 	<module>wss4j</module>
