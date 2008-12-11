@@ -8,6 +8,6 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.glite</groupId>
     <artifactId>glite-security-trustmanager</artifactId>
-    <version>1.8.8</version>
+    <version>1.8.16</version>
     <name>Glite Security trustmanager</name>
 </project>
