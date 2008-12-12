@@ -26,18 +26,6 @@
     </dependency>
     <dependency>
       <groupId>fr.in2p3.jsaga.adaptor</groupId>
-      <artifactId>jsaga-adaptor-voms</artifactId>
-      <version>0.9.8-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>fr.in2p3.jsaga.adaptor</groupId>
-      <artifactId>jsaga-adaptor-voms</artifactId>
-      <version>0.9.8-SNAPSHOT</version>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>fr.in2p3.jsaga.adaptor</groupId>
       <artifactId>jsaga-adaptor-srm</artifactId>
       <version>0.9.8-SNAPSHOT</version>
     </dependency>
@@ -68,6 +56,18 @@
     <dependency>
       <groupId>fr.in2p3.jsaga.adaptor</groupId>
       <artifactId>jsaga-adaptor-wsgram</artifactId>
+      <version>0.9.8-SNAPSHOT</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>fr.in2p3.jsaga.adaptor</groupId>
+      <artifactId>jsaga-adaptor-cream</artifactId>
+      <version>0.9.8-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>fr.in2p3.jsaga.adaptor</groupId>
+      <artifactId>jsaga-adaptor-cream</artifactId>
       <version>0.9.8-SNAPSHOT</version>
       <classifier>tests</classifier>
       <scope>test</scope>
@@ -152,6 +152,18 @@
     <dependency>
       <groupId>fr.in2p3.jsaga.adaptor</groupId>
       <artifactId>jsaga-adaptor-classic</artifactId>
+      <version>0.9.8-SNAPSHOT</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>fr.in2p3.jsaga.adaptor</groupId>
+      <artifactId>jsaga-adaptor-voms</artifactId>
+      <version>0.9.8-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>fr.in2p3.jsaga.adaptor</groupId>
+      <artifactId>jsaga-adaptor-voms</artifactId>
       <version>0.9.8-SNAPSHOT</version>
       <classifier>tests</classifier>
       <scope>test</scope>
