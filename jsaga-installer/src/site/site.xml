@@ -22,6 +22,8 @@
             <item name="Related Projects" href="projects.html"/>
         </menu>
         <menu name="User Documentation">
+            <item name="Quick Start Guide" href="quickstart.html"/>
+            <item name="Commands" href="commands.html"/>
             <item name="SAGA Specification" href="http://www.ogf.org/documents/GFD.90.pdf"/>
             <item name="SAGA Java Binding" href="saga-api/index.html"/>
             <item name="Deviations from SAGA" href="SAGA-delta.html"/>
