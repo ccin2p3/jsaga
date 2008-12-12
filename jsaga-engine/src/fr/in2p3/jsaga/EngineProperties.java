@@ -80,23 +80,19 @@ public class EngineProperties {
     }
 
     /**
-     * Get the stream corresponding to property <code>name</code>.
-     * The property value can be either an URL (System properties only)
-     * or a file path (Engine properties only).
+     * Get the URL corresponding to property <code>name</code>.
+     * The URL can be either a JAR resource (System properties only)
+     * or a local file path (Engine properties only).
      * @param name the name of the property
-     * @return the input stream
+     * @return the URL
      */
-    public static InputStream getRequiredStream(String name) throws ConfigurationException {
-        InputStream stream;
+    public static URL getRequiredURL(String name) throws ConfigurationException {
         String value = System.getProperty(name);
         if (value != null) {
             try {
-                URL url = new URL(value);
-                stream = url.openStream();
+                return new URL(value);
             } catch (MalformedURLException e) {
                 throw new ConfigurationException("Malformed URL: "+value, e);
-            } catch (IOException e) {
-                throw new ConfigurationException("Failed to open stream: "+value, e);
             }
         } else {
             String path = getProperty(name);
@@ -106,17 +102,19 @@ public class EngineProperties {
             } else {
                 file = new File(Base.JSAGA_HOME, path);
             }
+            if (! file.exists()) {
+                throw new ConfigurationException("File not found: "+file);
+            }
             try {
-                stream = new FileInputStream(file);
-            } catch (FileNotFoundException e) {
-                throw new ConfigurationException("File not found: "+file, e);
+                return file.toURL();
+            } catch (MalformedURLException e) {
+                throw new ConfigurationException("Malformed URL: "+file, e);
             }
         }
-        return stream;
     }
-    public static InputStream getStream(String name) {
+    public static URL getURL(String name) throws ConfigurationException {
         try {
-            return getRequiredStream(name);
+            return getRequiredURL(name);
         } catch (ConfigurationException e) {
             return null;
         }

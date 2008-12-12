@@ -22,6 +22,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
+import java.net.URL;
 import java.util.Properties;
 
 /* ***************************************************
@@ -57,6 +58,8 @@ public class Configuration {
         if (_instance == null) {
             try {
                 _instance = new Configuration();
+            } catch (ConfigurationException e) {
+                throw e;
             } catch (Exception e) {
                 throw new ConfigurationException(e);
             }
@@ -74,9 +77,10 @@ public class Configuration {
         System.setProperty("javax.xml.transform.TransformerFactory",
                 "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl");
 
-        // configure log4j
-        InputStream log4jCfgStream = EngineProperties.getStream(EngineProperties.LOG4J_CONFIGURATION);
-        if (log4jCfgStream != null) {
+        // may configure log4j
+        URL log4jCfgURL = EngineProperties.getURL(EngineProperties.LOG4J_CONFIGURATION);
+        if (log4jCfgURL != null) {
+            InputStream log4jCfgStream = log4jCfgURL.openStream();
             Properties prop = new Properties();
             prop.load(log4jCfgStream);
             log4jCfgStream.close();
@@ -92,7 +96,8 @@ public class Configuration {
         boolean sameDescMD5 = MD5Digester.isSame(new File(baseDir, ADAPTOR_DESCRIPTORS +".md5"), descBytes);
 
         // xinclude
-        InputStream jsagaCfgStream = EngineProperties.getRequiredStream(EngineProperties.JSAGA_UNIVERSE);
+        URL jsagaCfgURL = EngineProperties.getRequiredURL(EngineProperties.JSAGA_UNIVERSE);
+        InputStream jsagaCfgStream = jsagaCfgURL.openStream();
         byte[] data = new XMLFileParser(null).xinclude(jsagaCfgStream);
         boolean sameConfigMD5 = MD5Digester.isSame(new File(baseDir, XI_RAW_CONFIG+".md5"), data);
 
