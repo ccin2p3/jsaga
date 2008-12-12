@@ -1,0 +1,59 @@
+Quick Start Guide
+
+* Overview
+
+    * {{{download.html}Download and install}} JSAGA.
+
+    * Some plug-ins may require a post-installation step (see FAQ of {{{adaptors.html}plug-ins}}).
+
+    * Configure the needed plug-ins (see configuration examples of {{{adaptors.html}plug-ins}}).
+
+    * Use the {{{commands.html}command line interfaces}} provided with JSAGA (see examples below),
+      or use the {{{saga-api/apidocs/index.html}SAGA API}}
+      (see {{{jsaga-engine/xref/fr/in2p3/jsaga/command/package-summary.html}code examples}}).
+
+* Security context
+
+    * List supported security context types (with attributes to be set):
+
+---
+bin/jsaga-help -s missing
+---
+
+    * Example: create a VOMS proxy
+
+---
+bin/jsaga-context-init VOMS
+---
+
+* Data management
+
+    * List supported data management protocols (with supported contexts):
+
+---
+bin/jsaga-help -d context
+---
+
+    * Example: list entries of local root directory
+
+---
+bin/jsaga-ls -l file:///
+---
+
+* Execution management
+
+    * List supported execution management technologies (with supported contexts):
+
+---
+bin/jsaga-help -j context
+---
+
+    * Example: get the coordinated universal time of the local host
+
+---
+bin/jsaga-job-run -r local://localhost -Executable date -Arguments --utc
+---
+
+* Job collection management
+
+    TODO...
