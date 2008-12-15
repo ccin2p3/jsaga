@@ -26,8 +26,8 @@ public class Base {
 
     public static final File JSAGA_VAR = new File(JSAGA_HOME, "var");
     static {
-        if(!JSAGA_VAR.exists()) {
-            JSAGA_VAR.mkdir();
+        if(!JSAGA_VAR.exists() && !JSAGA_VAR.mkdir()) {
+            throw new RuntimeException("Failed to create directory: "+JSAGA_VAR);
         }
     }
 
