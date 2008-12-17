@@ -74,6 +74,7 @@ public class JobStatus extends AbstractCommand {
                     System.out.println("Job failed with exit code: "+exitCode);
                 } catch(DoesNotExistException e) {
                     System.out.println("Job failed.");
+                    job.rethrow();
                 }
             } else {
                 throw new Exception("Unexpected state: "+ state);

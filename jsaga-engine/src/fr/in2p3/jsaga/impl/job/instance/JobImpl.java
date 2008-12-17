@@ -199,7 +199,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     protected State queryState() throws NotImplementedException, TimeoutException, NoSuccessException {
         JobStatus status = m_monitorService.getState(m_nativeJobId);
         // set job state
-        this.setJobState(status.getSagaState(), status.getStateDetail(), status.getSubState());
+        this.setJobState(status.getSagaState(), status.getStateDetail(), status.getSubState(), status.getCause());
         // return task state (may trigger finish task)
         return status.getSagaState();
     }
@@ -380,18 +380,26 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
 
     ////////////////////////////////////// implementation of JobMonitorCallback //////////////////////////////////////
 
+    /**
+     * Set job and task state (may finish task)
+     */
     public void setState(State state, String stateDetail, SubState subState, SagaException cause) {
-        // set cause of task state (do not trigger anything)
-        super.setException(cause);
         // set job state
-        this.setJobState(state, stateDetail, subState);
+        this.setJobState(state, stateDetail, subState, cause);
         // set task state (may finish task)
         super.setState(state);
     }
 
-    private synchronized void setJobState(State state, String stateDetail, SubState subState) {
+    /**
+     * Set job state only
+     */
+    private synchronized void setJobState(State state, String stateDetail, SubState subState, SagaException cause) {
         // if not already in a final state
         if (! this.isFinalState()) {
+            // update cause
+            if (cause != null) {
+                super.setException(cause);
+            }
             // update metrics
             m_metrics.m_State.setValue(state);
             m_metrics.m_StateDetail.setValue(stateDetail);
