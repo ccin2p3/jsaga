@@ -8,7 +8,6 @@ import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 
 /* ***************************************************
@@ -54,12 +53,11 @@ public abstract class AbstractTest extends TestCase {
 
         // load test config
         java.net.URL test = this.getResource("saga-test.properties");
-        InputStream stream = test.openStream();
-        if (stream == null) {
+        if (test == null) {
             throw new Exception("Resource not found: saga-test.properties");
         }
         m_properties = new Properties();
-        m_properties.load(stream);
+        m_properties.load(test.openStream());
     }
 
     /** Implicitly invoked before executing each test method */
