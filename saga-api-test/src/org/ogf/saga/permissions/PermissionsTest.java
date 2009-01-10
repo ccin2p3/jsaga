@@ -12,7 +12,7 @@ package org.ogf.saga.permissions;
 /**
  *
  */
-public class PermissionsTest {
+public abstract class PermissionsTest {
     public void test_enablePermissions() {
     }
 

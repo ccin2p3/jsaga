@@ -16,8 +16,8 @@ import org.ogf.saga.url.URL;
 /**
  *
  */
-public class NSMoveTest extends AbstractNSCopyTest {
-    public NSMoveTest(String protocol, String targetProtocol) throws Exception {
+public abstract class NSMoveTest extends AbstractNSCopyTest {
+    protected NSMoveTest(String protocol, String targetProtocol) throws Exception {
         super(protocol, targetProtocol);
     }
 

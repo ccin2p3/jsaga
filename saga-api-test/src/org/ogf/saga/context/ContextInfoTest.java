@@ -16,8 +16,8 @@ import org.ogf.saga.session.SessionFactory;
 /**
  *
  */
-public class ContextInfoTest extends AbstractTest {
-    public ContextInfoTest() throws Exception {
+public abstract class ContextInfoTest extends AbstractTest {
+    protected ContextInfoTest() throws Exception {
         super();
     }
 

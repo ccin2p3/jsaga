@@ -14,11 +14,11 @@ import org.ogf.saga.job.abstracts.AbstractJobTest;
 /**
  *
  */
-public class JobDescriptionTest extends AbstractJobTest {
+public abstract class JobDescriptionTest extends AbstractJobTest {
     private JobService m_jobTranslator;
     private JobDescription m_jobDescription;
 
-    public JobDescriptionTest(String jobprotocol) throws Exception {
+    protected JobDescriptionTest(String jobprotocol) throws Exception {
         super(jobprotocol);
         m_jobTranslator = JobFactory.createJobService(m_session, m_jobservice);
     }

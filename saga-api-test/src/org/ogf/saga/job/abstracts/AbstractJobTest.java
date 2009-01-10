@@ -26,7 +26,7 @@ import java.util.Date;
 * ***************************************************
 * Description:                                      */
 
-public class AbstractJobTest extends AbstractTest {
+public abstract class AbstractJobTest extends AbstractTest {
 	
 	// values
 	protected String SIMPLE_JOB_BINARY 			= "simpleJobBinary";
@@ -48,7 +48,7 @@ public class AbstractJobTest extends AbstractTest {
     protected URL m_jobservice;
     protected Session m_session;
 
-    public AbstractJobTest(String jobprotocol) throws Exception {
+    protected AbstractJobTest(String jobprotocol) throws Exception {
         super();
 
         // configure

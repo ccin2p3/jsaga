@@ -14,8 +14,8 @@ import org.ogf.saga.namespace.abstracts.AbstractNSCopyTest;
 /**
  *
  */
-public class IntegrationClean extends AbstractNSCopyTest {
-    public IntegrationClean(String protocol, String targetProtocol) throws Exception {
+public abstract class IntegrationClean extends AbstractNSCopyTest {
+    protected IntegrationClean(String protocol, String targetProtocol) throws Exception {
         super(protocol, targetProtocol);
     }
 

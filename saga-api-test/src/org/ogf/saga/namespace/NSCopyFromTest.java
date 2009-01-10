@@ -19,8 +19,8 @@ import java.lang.reflect.Method;
 /**
  *
  */
-public class NSCopyFromTest extends AbstractNSCopyTest {
-    public NSCopyFromTest(String protocol, String targetProtocol) throws Exception {
+public abstract class NSCopyFromTest extends AbstractNSCopyTest {
+    protected NSCopyFromTest(String protocol, String targetProtocol) throws Exception {
         super(protocol, targetProtocol);
     }
 

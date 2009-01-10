@@ -17,11 +17,11 @@ import java.io.*;
 * ***************************************************
 * Description: 
 * This test suite is made to be test  
-* interactive jobs									 */
-
-public class JobRunInteractiveTest extends AbstractJobTest {
+* interactive jobs
+*/
+public abstract class JobRunInteractiveTest extends AbstractJobTest {
 	
-	public JobRunInteractiveTest(String jobprotocol) throws Exception {
+	protected JobRunInteractiveTest(String jobprotocol) throws Exception {
         super(jobprotocol);
     }
 

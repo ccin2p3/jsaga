@@ -16,8 +16,8 @@ import org.ogf.saga.url.URL;
 /**
  *
  */
-public class NSCopyTest extends AbstractNSCopyTest {
-    public NSCopyTest(String protocol, String targetProtocol) throws Exception {
+public abstract class NSCopyTest extends AbstractNSCopyTest {
+    protected NSCopyTest(String protocol, String targetProtocol) throws Exception {
         super(protocol, targetProtocol);
     }
 

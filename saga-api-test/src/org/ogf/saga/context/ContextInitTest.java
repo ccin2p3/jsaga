@@ -16,7 +16,7 @@ import javax.swing.*;
 /**
  *
  */
-public class ContextInitTest extends AbstractTest {
+public abstract class ContextInitTest extends AbstractTest {
     private String m_contextId;
     private boolean m_hasUserPass;
 

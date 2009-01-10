@@ -19,11 +19,11 @@ import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
 /**
  *
  */
-public class FileWriteTest extends AbstractNSEntryTest {
+public abstract class FileWriteTest extends AbstractNSEntryTest {
     // test data
     private static final String DEFAULT_CONTENT2 = "Another text !";
 
-    public FileWriteTest(String protocol) throws Exception {
+    protected FileWriteTest(String protocol) throws Exception {
         super(protocol);
     }
 

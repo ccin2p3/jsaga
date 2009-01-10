@@ -18,7 +18,7 @@ import java.util.List;
 /**
  *
  */
-public class LogicalDirectoryMetaDataTest extends AbstractNSDirectoryTest {
+public abstract class LogicalDirectoryMetaDataTest extends AbstractNSDirectoryTest {
     private static final String METADATA_KEY = "myKey";
     private static final String METADATA_VALUE = "myValue";
     private static final String[] METADATA_FILTER = new String[]{METADATA_KEY+"="+METADATA_VALUE};
@@ -27,7 +27,7 @@ public class LogicalDirectoryMetaDataTest extends AbstractNSDirectoryTest {
     private LogicalDirectory m_subDir;
     private LogicalFile m_file;
 
-    public LogicalDirectoryMetaDataTest(String protocol) throws Exception {
+    protected LogicalDirectoryMetaDataTest(String protocol) throws Exception {
         super(protocol);
     }
 

@@ -14,8 +14,8 @@ import org.ogf.saga.namespace.abstracts.AbstractNSDirectoryMakeTest;
 /**
  *
  */
-public class LogicalDirectoryMakeTest extends AbstractNSDirectoryMakeTest {
-    public LogicalDirectoryMakeTest(String protocol) throws Exception {
+public abstract class LogicalDirectoryMakeTest extends AbstractNSDirectoryMakeTest {
+    protected LogicalDirectoryMakeTest(String protocol) throws Exception {
         super(protocol);
     }
 }

@@ -20,7 +20,7 @@ import java.lang.reflect.Method;
 /**
  *
  */
-public class ContextDestroyTest extends AbstractTest {
+public abstract class ContextDestroyTest extends AbstractTest {
     private String m_contextId;
 
     protected ContextDestroyTest(String contextId) throws Exception {

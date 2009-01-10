@@ -14,8 +14,8 @@ import org.ogf.saga.namespace.abstracts.AbstractNSDirectoryListTest;
 /**
  *
  */
-public class DirectoryListTest extends AbstractNSDirectoryListTest {
-    public DirectoryListTest(String protocol) throws Exception {
+public abstract class DirectoryListTest extends AbstractNSDirectoryListTest {
+    protected DirectoryListTest(String protocol) throws Exception {
         super(protocol);
     }
 }

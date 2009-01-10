@@ -16,8 +16,8 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class LogicalDirectoryTest extends AbstractNSDirectoryTest {
-    public LogicalDirectoryTest(String protocol) throws Exception {
+public abstract class LogicalDirectoryTest extends AbstractNSDirectoryTest {
+    protected LogicalDirectoryTest(String protocol) throws Exception {
         super(protocol);
     }
 

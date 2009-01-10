@@ -18,8 +18,8 @@ import org.ogf.saga.namespace.abstracts.AbstractNSEntryReadTest;
 /**
  *
  */
-public class FileReadTest extends AbstractNSEntryReadTest {
-    public FileReadTest(String protocol) throws Exception {
+public abstract class FileReadTest extends AbstractNSEntryReadTest {
+    protected FileReadTest(String protocol) throws Exception {
         super(protocol);
     }
 

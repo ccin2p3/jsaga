@@ -16,8 +16,8 @@ import org.ogf.saga.url.URL;
 /**
  *
  */
-public class NSCopyRecursiveTest extends AbstractNSCopyTest {
-    public NSCopyRecursiveTest(String protocol, String targetProtocol) throws Exception {
+public abstract class NSCopyRecursiveTest extends AbstractNSCopyTest {
+    protected NSCopyRecursiveTest(String protocol, String targetProtocol) throws Exception {
         super(protocol, targetProtocol);
     }
 

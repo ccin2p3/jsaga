@@ -16,11 +16,10 @@ import java.util.List;
 * ***************************************************
 * Description: 
 * This test suite is made to be test advanced functions
-* 											          */
-
-public class JobRunOptionalTest extends AbstractJobTest {
+*/
+public abstract class JobRunOptionalTest extends AbstractJobTest {
 	
-	public JobRunOptionalTest(String jobprotocol) throws Exception {
+	protected JobRunOptionalTest(String jobprotocol) throws Exception {
         super(jobprotocol);
     }
 

@@ -14,12 +14,11 @@ import org.ogf.saga.task.State;
 * ***************************************************
 * Description: 
 * This test suite is made to be sure that the plug-in 
-* transmits well the requested attributes          */
+* transmits well the requested attributes
+*/
+public abstract class JobRunWithPrequisiteTest extends AbstractJobTest {
 
-public class JobRunWithPrequisiteTest extends AbstractJobTest {
-	
-		
-	public JobRunWithPrequisiteTest(String jobprotocol) throws Exception {
+	protected JobRunWithPrequisiteTest(String jobprotocol) throws Exception {
         super(jobprotocol);
     }
 

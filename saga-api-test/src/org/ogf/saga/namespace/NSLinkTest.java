@@ -15,7 +15,7 @@ import org.ogf.saga.url.URL;
 /**
  *
  */
-public class NSLinkTest extends AbstractNSEntryTest {
+public abstract class NSLinkTest extends AbstractNSEntryTest {
     // test data
     private static final String DEFAULT_LINKNAME = "link.txt";
     private static final String DEFAULT_LINKNAME_2 = "link2.txt";
@@ -27,7 +27,7 @@ public class NSLinkTest extends AbstractNSEntryTest {
     // setup
     private NSEntry m_link;
 
-    public NSLinkTest(String protocol) throws Exception {
+    protected NSLinkTest(String protocol) throws Exception {
         super(protocol);
         m_linkUrl = createURL(m_dirUrl, DEFAULT_LINKNAME);
         m_linkUrl2 = createURL(m_dirUrl, DEFAULT_LINKNAME_2);

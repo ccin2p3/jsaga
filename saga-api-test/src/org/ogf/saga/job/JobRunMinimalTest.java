@@ -17,9 +17,9 @@ import org.ogf.saga.task.State;
 /**
  *
  */
-public class JobRunMinimalTest extends AbstractJobTest {
+public abstract class JobRunMinimalTest extends AbstractJobTest {
     
-    public JobRunMinimalTest(String jobprotocol) throws Exception {
+    protected JobRunMinimalTest(String jobprotocol) throws Exception {
         super(jobprotocol);
     }
 
