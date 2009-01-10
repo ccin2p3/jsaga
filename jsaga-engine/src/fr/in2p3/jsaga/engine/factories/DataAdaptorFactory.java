@@ -104,16 +104,14 @@ public class DataAdaptorFactory extends ServiceAdaptorFactory {
             }
         }
 
-        // set filled URL
-        FilledURL filledUrl = new FilledURL(url, config);
-        
         // get attributes from config
         Map attributes = new HashMap();
-        for (int i=0; i<config.getAttributeCount(); i++) {
-            attributes.put(config.getAttribute(i).getName(), config.getAttribute(i).getValue());
-        }
-        filledUrl.setAttributes(attributes);
+        AttributesBuilder.updateAttributes(attributes, config);
 
+        // get attributes from filled URL
+        FilledURL filledUrl = new FilledURL(url, config);
+        filledUrl.setAttributes(attributes);
+        
         // connect
         dataAdaptor.connect(filledUrl.getUserInfo(), filledUrl.getHost(), filledUrl.getPort(), filledUrl.getPath(), attributes);
         return dataAdaptor;

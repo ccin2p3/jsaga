@@ -119,11 +119,10 @@ public class JobMonitorAdaptorFactory extends ServiceAdaptorFactory {
             }
         }
 
-        // get attributes from config
+        // get attributes from config and URL
         Map attributes = new HashMap();
-        for (int i=0; i<config.getAttributeCount(); i++) {
-            attributes.put(config.getAttribute(i).getName(), config.getAttribute(i).getValue());
-        }
+        AttributesBuilder.updateAttributes(attributes, config);
+        AttributesBuilder.updateAttributes(attributes, url);
 
         // connect
         int port = (url.getPort()>0 ? url.getPort() : monitorAdaptor.getDefaultPort());

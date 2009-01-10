@@ -104,11 +104,10 @@ public class JobAdaptorFactory extends ServiceAdaptorFactory {
             }
         }
 
-        // get attributes from config
+        // get attributes from config and URL
         Map attributes = new HashMap();
-        for (int i=0; i<config.getAttributeCount(); i++) {
-            attributes.put(config.getAttribute(i).getName(), config.getAttribute(i).getValue());
-        }
+        AttributesBuilder.updateAttributes(attributes, config);
+        AttributesBuilder.updateAttributes(attributes, url);
         if (config.getMonitorService()!=null && config.getMonitorService().getUrl()!=null) {
             URL monitorURL = URLFactory.createURL(config.getMonitorService().getUrl());
             attributes.put(JobControlAdaptor.MONITOR_SERVICE_URL, monitorURL);
