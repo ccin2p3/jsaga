@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.naregi.security;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptorBuilder;
@@ -8,6 +9,7 @@ import org.ogf.saga.context.Context;
 import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
 
+import java.io.File;
 import java.util.Map;
 
 /* ***************************************************
@@ -34,12 +36,20 @@ public class NaregiSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
     public Usage getUsage() {
         return new UAnd(new Usage[]{
                 new U(Context.USERID),
-                new U(Context.USERPASS)
+                new U(Context.USERPASS),
+                new UFile(Context.CERTREPOSITORY)
         });
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-        return null;
+        EnvironmentVariables env = EnvironmentVariables.getInstance();
+        return new Default[]{
+                new Default(Context.CERTREPOSITORY, new File[]{
+                        new File(env.getProperty("CADIR")+""),
+                        new File(env.getProperty("X509_CERT_DIR")+""),
+                        new File(System.getProperty("user.home")+"/.globus/certificates/"),
+                        new File("/etc/grid-security/certificates/")})
+        };
     }
 
     public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectStateException, NoSuccessException {
