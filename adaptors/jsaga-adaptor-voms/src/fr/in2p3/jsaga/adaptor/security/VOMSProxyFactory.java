@@ -42,7 +42,15 @@ public class VOMSProxyFactory {
     private VOMSProxyInit m_proxyInit;
     private VOMSRequestOptions m_requestOptions;
 
+    /** constructor for creating VOMS proxies */
     public VOMSProxyFactory(Map attributes, int certificateFormat) throws BadParameterException, ParseException, URISyntaxException {
+        this(attributes, certificateFormat, null);
+    }
+    /** constructor for signing VOMS proxies */
+    public VOMSProxyFactory(Map attributes, GSSCredential cred) throws BadParameterException, ParseException, URISyntaxException {
+        this(attributes, CERTIFICATE_PEM, cred);
+    }
+    private VOMSProxyFactory(Map attributes, int certificateFormat, GSSCredential cred) throws BadParameterException, ParseException, URISyntaxException {
         // required attributes
         System.setProperty("X509_CERT_DIR", (String) attributes.get(Context.CERTREPOSITORY));
         System.setProperty("CADIR", (String) attributes.get(Context.CERTREPOSITORY));
@@ -70,9 +78,17 @@ public class VOMSProxyFactory {
         server.setPort(uri.getPort());
         server.setHostDn(uri.getPath());
         server.setVoName((String) attributes.get(Context.USERVO));
-        m_proxyInit = !"".equals(attributes.get(Context.USERPASS))
-                ? VOMSProxyInit.instance((String) attributes.get(Context.USERPASS))
-                : VOMSProxyInit.instance();
+        if (cred != null) {
+            if (cred instanceof GlobusGSSCredentialImpl) {
+                m_proxyInit = VOMSProxyInit.instance(((GlobusGSSCredentialImpl)cred).getGlobusCredential());
+            } else {
+                throw new BadParameterException("Not a globus proxy");
+            }
+        } else if (!"".equals(attributes.get(Context.USERPASS))) {
+            m_proxyInit = VOMSProxyInit.instance((String) attributes.get(Context.USERPASS));
+        } else {
+            m_proxyInit = VOMSProxyInit.instance();
+        }
         m_proxyInit.addVomsServer(server);
         m_proxyInit.setProxyOutputFile((String) attributes.get(Context.USERPROXY));
         m_requestOptions = new VOMSRequestOptions();

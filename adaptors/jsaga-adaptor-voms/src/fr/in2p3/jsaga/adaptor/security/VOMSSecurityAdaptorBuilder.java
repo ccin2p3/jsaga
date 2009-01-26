@@ -34,10 +34,10 @@ import java.util.Map;
  *
  */
 public class VOMSSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuilder {
-    private static final int USAGE_INIT_PKCS12 = 1;
-    private static final int USAGE_INIT_PEM = 2;
-    private static final int USAGE_MEMORY = 3;
-    private static final int USAGE_LOAD = 4;
+    protected static final int USAGE_INIT_PKCS12 = 1;
+    protected static final int USAGE_INIT_PEM = 2;
+    protected static final int USAGE_MEMORY = 3;
+    protected static final int USAGE_LOAD = 4;
 
     public String getType() {
         return "VOMS";
@@ -173,7 +173,7 @@ public class VOMSSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuild
             throw new NoSuccessException(e);
         }
     }
-    private SecurityAdaptor createSecurityAdaptor(GSSCredential cred) throws IncorrectStateException {
+    protected SecurityAdaptor createSecurityAdaptor(GSSCredential cred) throws IncorrectStateException {
         // check if proxy contains extension
         /*GlobusCredential globusProxy = ((GlobusGSSCredentialImpl)cred).getGlobusCredential();        
         if(hasNonCriticalExtensions(cred)) {
@@ -216,7 +216,7 @@ public class VOMSSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuild
         Util.destroy(proxyFile);
     }
 
-    private static GSSCredential load(File proxyFile) throws IOException, GSSException {
+    protected static GSSCredential load(File proxyFile) throws IOException, GSSException {
         byte [] proxyBytes = new byte[(int) proxyFile.length()];
         FileInputStream in = new FileInputStream(proxyFile);
         in.read(proxyBytes);
