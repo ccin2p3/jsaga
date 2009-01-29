@@ -1,9 +1,9 @@
 package fr.in2p3.jsaga.adaptor.security;
 
 import fr.in2p3.jsaga.adaptor.base.usage.UDuration;
-import org.glite.security.voms.VOMSAttribute;
-import org.glite.security.voms.VOMSValidator;
-import org.glite.security.voms.contact.*;
+import org.glite.voms.VOMSAttribute;
+import org.glite.voms.VOMSValidator;
+import org.glite.voms.contact.*;
 import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.ietf.jgss.GSSCredential;
