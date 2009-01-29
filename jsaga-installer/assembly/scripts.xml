@@ -1,5 +1,6 @@
 <scripts>
     <script>jsaga-help</script>
+    <script>jsaga-post-install</script>
 
     <script>jsaga-context-info</script>
     <script>jsaga-context-init</script>
@@ -15,12 +16,15 @@
     <script>jsaga-cat</script>
     <script>jsaga-cp</script>
     <script>jsaga-ls</script>
-    <script>jsaga-logical</script>
     <script>jsaga-mkdir</script>
     <script>jsaga-mv</script>
     <script>jsaga-rm</script>
     <script>jsaga-rmdir</script>
+    <script>jsaga-stat</script>
     <script>jsaga-test</script>
+    <script>jsaga-logical-find</script>
+    <script>jsaga-logical-location</script>
+    <script>jsaga-logical-metadata</script>
 
     <script>junit-run-test</script>
 </scripts>
