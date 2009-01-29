@@ -37,6 +37,8 @@
     <module>glite-security</module>
     <module>glite-jdl-api-java</module>
 	<module>wms-api</module>
+    <module>glite-ce-cream-api-java</module>
+    <module>glite-ce-delegation</module>
     <module>wsgram-api</module>
 	<module>wss4j</module>
 	<module>xmlsec</module>

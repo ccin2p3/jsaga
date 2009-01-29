@@ -15,7 +15,11 @@
 
   <!-- aggregation -->
   <modules>
+    <module>bcpg</module>
+    <module>bcpg-jdk14</module>
+    <module>glite-security-authz-framework-java</module>
     <module>glite-security-delegation-java</module>
+    <module>glite-security-delegation-service-java</module>
     <module>glite-security-trustmanager</module>
     <module>glite-security-util-java</module>
   </modules>
