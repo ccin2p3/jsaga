@@ -108,20 +108,25 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements J
     }
 
     public String submit(String jobDesc, boolean checkMatch) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
-        String uniqId = "generated1234/";  //todo: add paramater "uniqId" to both submit() and XSL
-
-        // prepare submission
+        String uniqId = "generated1234";  //todo: add paramater "uniqId" to both submit() and XSL
+        String stagingDir = "/tmp/"+uniqId;
         if (jobDesc.contains("StdOutput") || jobDesc.contains("StdError")) {
-            String stagingDir = "/tmp/"+uniqId;
-            try {
-                GridFTPClient client = new GridFTPClient(m_creamStub.getURI().getHost(), 2811);
-                client.authenticate(m_credential);
-                client.makeDir(stagingDir);
-            } catch (Exception e) {
-                throw new NoSuccessException("Failed to create staging directory: "+stagingDir, e);
-            }
+            this.doPrepareStaging(stagingDir);
         }
+        return this.doSubmit(jobDesc);
+    }
 
+    private GridFTPClient doPrepareStaging(String stagingDir) throws NoSuccessException {
+        try {
+            GridFTPClient client = new GridFTPClient(m_creamStub.getURI().getHost(), 2811);
+            client.authenticate(m_credential);
+            client.makeDir(stagingDir);
+            return client;
+        } catch (Exception e) {
+            throw new NoSuccessException("Failed to create staging directory: "+stagingDir, e);
+        }
+    }
+    private String doSubmit(String jobDesc) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         // create job description
         JobDescription jd = new JobDescription();
         jd.setJDL(jobDesc);
