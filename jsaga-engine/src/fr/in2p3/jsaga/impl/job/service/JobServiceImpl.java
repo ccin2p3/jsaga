@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.impl.job.service;
 
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
 import fr.in2p3.jsaga.helpers.XMLFileParser;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformer;
@@ -15,6 +16,7 @@ import org.ogf.saga.url.URL;
 import org.w3c.dom.Element;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 /* ***************************************************
@@ -81,7 +83,16 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
     }
 
     public List<String> list() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
-        throw new NotImplementedException("Not implemented yet..."); //todo: implement method list()
+        if (m_controlAdaptor instanceof ListableJobAdaptor) {
+            String[] array = ((ListableJobAdaptor)m_controlAdaptor).list();
+            List<String> list = new ArrayList<String>();
+            for (int i=0; array!=null && i<array.length; i++) {
+                list.add(array[i]);
+            }
+            return list;
+        } else {
+            throw new NotImplementedException("Not implemented yet..."); //todo: implement default behavior for method list()
+        }
     }
 
     public Job getJob(String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
