@@ -1,12 +1,17 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
+import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.glite.ce.creamapi.ws.cream2.CREAMPort;
 import org.glite.ce.creamapi.ws.cream2.types.*;
+import org.globus.ftp.GridFTPClient;
 import org.ogf.saga.error.*;
 
+import java.io.File;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,12 +30,32 @@ import java.util.regex.Pattern;
 /**
  *
  */
-public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements JobControlAdaptor {
+public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements JobControlAdaptor, ListableJobAdaptor {
+    // parameters configured
+    private static final String SSL_CA_FILES = "sslCAFiles";
+
+    // parameters extracted from URI
+    private static final String HOST_NAME = "HostName";
     private static final String BATCH_SYSTEM = "BatchSystem";
     private static final String QUEUE_NAME = "QueueName";
 
     private Map m_parameters;
     private String m_delegProxy;
+
+    /** override super.getUsage() */
+    public Usage getUsage() {
+        return new UAnd(new Usage[]{
+                super.getUsage(),
+                new U(SSL_CA_FILES),
+        });
+    }
+
+    /** override super.getDefaults() */
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
+        return new Default[]{
+                new Default(SSL_CA_FILES, new File(new File(new File(System.getProperty("user.home"),".globus"),"certificates"),"*.0").getAbsolutePath())
+        };
+    }
 
     public String[] getSupportedSandboxProtocols() {
         return new String[]{"gsiftp"};
@@ -53,10 +78,14 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements J
         // set delegationId and create stub for CREAM service
         super.connect(userInfo, host, port, basePath, attributes);
 
+        // set SSL_CA_FILES
+        System.setProperty("sslCAFiles", (String) attributes.get(SSL_CA_FILES));
+
         // extract parameters from basePath
         Matcher m = Pattern.compile("/cream-(.*)-(.*)").matcher(basePath);
         if (m.matches()) {
             m_parameters = new HashMap(2);
+            m_parameters.put(HOST_NAME, host);
             m_parameters.put(BATCH_SYSTEM, m.group(1));
             m_parameters.put(QUEUE_NAME, m.group(2));
         } else {
@@ -79,6 +108,20 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements J
     }
 
     public String submit(String jobDesc, boolean checkMatch) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
+        String uniqId = "generated1234/";  //todo: add paramater "uniqId" to both submit() and XSL
+
+        // prepare submission
+        if (jobDesc.contains("StdOutput") || jobDesc.contains("StdError")) {
+            String stagingDir = "/tmp/"+uniqId;
+            try {
+                GridFTPClient client = new GridFTPClient(m_creamStub.getURI().getHost(), 2811);
+                client.authenticate(m_credential);
+                client.makeDir(stagingDir);
+            } catch (Exception e) {
+                throw new NoSuccessException("Failed to create staging directory: "+stagingDir, e);
+            }
+        }
+
         // create job description
         JobDescription jd = new JobDescription();
         jd.setJDL(jobDesc);
@@ -171,6 +214,24 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements J
                         : fault.getClass().getName();
                 throw new NoSuccessException(message, fault);
             }
+        }
+    }
+
+    public String[] list() throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        JobId[] resultArray;
+        try {
+            resultArray = m_creamStub.getStub().jobList();
+        } catch (RemoteException e) {
+            throw new TimeoutException(e);
+        }
+        if (resultArray != null) {
+            String[] jobIds = new String[resultArray.length];
+            for (int i=0; i<resultArray.length; i++) {
+                jobIds[i] = resultArray[i].getId();
+            }
+            return jobIds;
+        } else {
+            throw new NoSuccessException("Failed to list jobs");
         }
     }
 }

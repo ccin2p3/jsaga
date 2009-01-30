@@ -31,9 +31,6 @@ public class DelegationStub {
     private Delegation m_stub;
 
     public DelegationStub(String host, int port) throws BadParameterException, NoSuccessException {
-        //todo: find another way to set this
-        System.setProperty("sslCAFiles", "E:/User Settings/.globus/certificates/*.0");
-
         // set endpoint
         URL epr;
         try {

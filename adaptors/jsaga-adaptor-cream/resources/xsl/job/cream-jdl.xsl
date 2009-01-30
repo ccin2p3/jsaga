@@ -6,6 +6,12 @@
                 xmlns:spmd="http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd"
                 xmlns:ext="http://www.in2p3.fr/jsdl-extension">
     <xsl:output method="text"/>
+
+    <!-- JSAGA parameters -->
+    <xsl:param name="UniqId" select="'generated1234'"/>
+
+    <!-- Adaptor-specific parameters -->
+    <xsl:param name="HostName"/>
     <xsl:param name="BatchSystem"/>
     <xsl:param name="QueueName"/>
 
@@ -33,29 +39,39 @@
                 </xsl:for-each>";<xsl:text/>
 		</xsl:if>
 
-        <!-- other -->
+        <!-- environment -->
         <xsl:if test="count(jsdl:Application/posix:POSIXApplication/posix:Environment) > 0">
   Environment = {<xsl:text/>
-      		<xsl:for-each
-               select="jsdl:Application/posix:POSIXApplication/posix:Environment">
-               	<xsl:if test="contains(text(),' ')">
-               		<xsl:message terminate="yes">Unsupported space in environment value : <xsl:value-of select="text()"/></xsl:message>
-               	</xsl:if>
-               	<xsl:if test="position() = 1">
-  "<xsl:text/><xsl:value-of select="@name"/>=<xsl:value-of select="text()"/>"<xsl:text/>
-               	</xsl:if>
-                <xsl:if test="position() > 1">
-  , "<xsl:value-of select="@name"/>=<xsl:value-of select="text()"/>"<xsl:text/>
+            <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Environment">
+                <xsl:if test="contains(text(),' ')">
+                    <xsl:message terminate="yes">Unsupported space in environment value : <xsl:value-of select="text()"/></xsl:message>
                 </xsl:if>
-            </xsl:for-each>
-  };<xsl:text/>
+                <xsl:text>"</xsl:text>
+                <xsl:if test="position()>1">, </xsl:if>
+                <xsl:value-of select="@name"/>=<xsl:value-of select="text()"/>
+                <xsl:text>"</xsl:text>
+            </xsl:for-each>};<xsl:text/>
           </xsl:if>
 
-        <!-- todo: to be generated -->
-  StdOutput     = "stdout.txt";
-  StdError      = "stderr.txt";
-  OutputSandbox = {"stdout.txt","stderr.txt"};
-  OutputSandboxDestURI = {"gsiftp://ccgridvmli20.in2p3.fr/tmp/stdout.txt", "gsiftp://ccgridvmli20.in2p3.fr/tmp/stderr.txt"};
+        <!-- streams -->
+        <xsl:for-each select="jsdl:Application/posix:POSIXApplication">
+            <xsl:for-each select="posix:Output">
+  StdOutput = "<xsl:value-of select="text()"/>";<xsl:text/>
+            </xsl:for-each>
+            <xsl:for-each select="posix:Error">
+  StdError = "<xsl:value-of select="text()"/>";<xsl:text/>
+            </xsl:for-each>
+            <xsl:if test="posix:Output | posix:Error">
+  OutputSandbox = {<xsl:text/>
+                <xsl:for-each select="posix:Output | posix:Error">
+                    <xsl:text>"</xsl:text>
+                    <xsl:if test="position()>1">, </xsl:if>
+                    <xsl:value-of select="text()"/>
+                    <xsl:text>"</xsl:text>
+                </xsl:for-each>};
+  OutputSandboxBaseDestURI = "gsiftp://<xsl:value-of select="$HostName"/>/tmp/<xsl:value-of select="$UniqId"/>/";
+            </xsl:if>
+        </xsl:for-each>
 
 <!--  Requirements -->
   Requirements = true <xsl:text/>

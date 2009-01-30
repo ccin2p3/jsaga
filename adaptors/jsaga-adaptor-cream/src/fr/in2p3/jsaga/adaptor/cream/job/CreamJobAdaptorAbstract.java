@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.adaptor.cream.job;
 
 import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
@@ -47,7 +48,7 @@ public class CreamJobAdaptorAbstract implements SagaSecureAdaptor {
     }
 
     public Usage getUsage() {
-        return null;    // no usage
+        return new UOptional(DELEGATION_ID);
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
@@ -55,6 +56,7 @@ public class CreamJobAdaptorAbstract implements SagaSecureAdaptor {
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+        // set DELEGATION_ID
         if (attributes.containsKey(DELEGATION_ID)) {
             m_delegationId = (String) attributes.get(DELEGATION_ID);
         } else {
