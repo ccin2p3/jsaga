@@ -107,8 +107,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements J
         super.disconnect();
     }
 
-    public String submit(String jobDesc, boolean checkMatch) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
-        String uniqId = "generated1234";  //todo: add paramater "uniqId" to both submit() and XSL
+    public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
         String stagingDir = "/tmp/"+uniqId;
         if (jobDesc.contains("StdOutput") || jobDesc.contains("StdError")) {
             this.doPrepareStaging(stagingDir);

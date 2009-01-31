@@ -23,10 +23,11 @@ public interface JobControlAdaptor extends JobAdaptor {
      * submit a job
      * @param jobDesc the job description in the language supported by the targeted grid
      * @param checkMatch if true then explicitly checks if job description matches job service before submitting job
+     * @param uniqId a identifier unique to this job (not the job identifier, which is not generated yet)
      * @return the identifier of the job in the grid
      * @throws BadResource if job service does not match job description
      */
-    public String submit(String jobDesc, boolean checkMatch) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource;
+    public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource;
 
     /**
      * cancel a job

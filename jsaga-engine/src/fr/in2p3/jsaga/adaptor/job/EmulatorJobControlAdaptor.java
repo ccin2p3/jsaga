@@ -38,7 +38,7 @@ public class EmulatorJobControlAdaptor extends EmulatorJobAdaptorAbstract implem
         return new EmulatorJobMonitorAdaptor();
     }
 
-    public String submit(String jobDesc, boolean checkMatch) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+    public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         // create id
         String nativeJobId = UUID.randomUUID().toString();
 
@@ -77,8 +77,8 @@ public class EmulatorJobControlAdaptor extends EmulatorJobAdaptorAbstract implem
         return nativeJobId;
     }
 
-    public JobIOHandler submit(String jobDesc, boolean checkMatch, InputStream stdin) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-        final String nativeJobId = this.submit(jobDesc, checkMatch);
+    public JobIOHandler submit(String jobDesc, boolean checkMatch, String uniqId, InputStream stdin) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        final String nativeJobId = this.submit(jobDesc, checkMatch, uniqId);
         return new JobIOGetter() {
             private String m_nativeJobId = nativeJobId;
             private InputStream m_stdout = new ByteArrayInputStream("output\n".getBytes());

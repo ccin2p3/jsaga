@@ -64,7 +64,7 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
         m_parameters = attributes;
     }
 
-	public String submit(String commandLine, boolean checkMatch)
+	public String submit(String commandLine, boolean checkMatch, String uniqId)
 			throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		try {
 

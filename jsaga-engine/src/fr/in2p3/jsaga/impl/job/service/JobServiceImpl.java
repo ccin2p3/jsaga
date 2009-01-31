@@ -16,8 +16,7 @@ import org.ogf.saga.url.URL;
 import org.w3c.dom.Element;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -54,6 +53,10 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
     }
 
     public Job createJob(JobDescription jobDesc) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+        // create uniqId
+        String uniqId = ""+Math.abs(this.hashCode());
+
+        // get JSDL
         Element jsdlDOM;
         if (jobDesc instanceof AbstractJobDescriptionImpl) {
             jsdlDOM = ((AbstractJobDescriptionImpl) jobDesc).getJSDL();
@@ -66,7 +69,16 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
         String nativeJobDesc;
         try {
             if (stylesheet != null) {
-                XSLTransformer transformer = XSLTransformerFactory.getInstance().getCached(stylesheet, m_controlAdaptor.getTranslatorParameters());
+                // set parameters
+                Map parameters = new HashMap();
+                Map p = m_controlAdaptor.getTranslatorParameters();
+                if (p != null) {
+                    parameters.putAll(p);
+                }
+                parameters.put("UniqId", uniqId);
+
+                // translate
+                XSLTransformer transformer = XSLTransformerFactory.getInstance().getCached(stylesheet, parameters);
                 byte[] bytes = transformer.transform(jsdlDOM);
                 nativeJobDesc = new String(bytes);
             } else {
@@ -79,7 +91,7 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
         }
 
         // returns
-        return new JobImpl(m_session, jobDesc, nativeJobDesc, m_controlAdaptor, m_monitorService);
+        return new JobImpl(m_session, jobDesc, nativeJobDesc, uniqId, m_controlAdaptor, m_monitorService);
     }
 
     public List<String> list() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {

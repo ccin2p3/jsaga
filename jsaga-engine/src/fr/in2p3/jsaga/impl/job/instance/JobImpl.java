@@ -44,6 +44,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     private JobAttributes m_attributes;
     private JobMetrics m_metrics;
     private JobDescription m_jobDescription;
+    private String m_uniqId;
     private String m_nativeJobId;
     private JobIOHandler m_IOHandler;
     private Stdin m_stdin;
@@ -51,10 +52,11 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     private Stdout m_stderr;
 
     /** constructor for submission */
-    public JobImpl(Session session, JobDescription jobDesc, String nativeJobDesc, JobControlAdaptor controlAdaptor, JobMonitorService monitorService) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+    public JobImpl(Session session, JobDescription jobDesc, String nativeJobDesc, String uniqId, JobControlAdaptor controlAdaptor, JobMonitorService monitorService) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         this(session, controlAdaptor, monitorService, true);
         m_attributes.m_NativeJobDescription.setObject(nativeJobDesc);
         m_jobDescription = jobDesc;
+        m_uniqId = uniqId;
         m_nativeJobId = null;
         m_IOHandler = null;
         m_stdin = null;
@@ -66,6 +68,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     public JobImpl(Session session, String nativeJobId, JobControlAdaptor controlAdaptor, JobMonitorService monitorService) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         this(session, controlAdaptor, monitorService, false);
         m_jobDescription = null;
+        m_uniqId = null;
         m_nativeJobId = nativeJobId;
         m_IOHandler = null;
         m_stdin = null;
@@ -90,6 +93,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
         clone.m_controlAdaptor = m_controlAdaptor;
         clone.m_monitorService = m_monitorService;
         clone.m_jobDescription = m_jobDescription;
+        clone.m_uniqId = m_uniqId;
         clone.m_nativeJobId = m_nativeJobId;
         clone.m_IOHandler = m_IOHandler;
         clone.m_stdin = m_stdin;
@@ -159,7 +163,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
                     }
 
                     // submit
-                    m_IOHandler = ((StreamableJobBatch)m_controlAdaptor).submit(nativeJobDesc, s_checkMatch, stdin);
+                    m_IOHandler = ((StreamableJobBatch)m_controlAdaptor).submit(nativeJobDesc, s_checkMatch, m_uniqId, stdin);
                     if (m_IOHandler == null) {
                         throw new NotImplementedException("ADAPTOR ERROR: Method submit() must not return null: "+m_controlAdaptor.getClass().getName());
                     }
@@ -168,7 +172,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
                     throw new NotImplementedException("Interactive jobs are not supported by this adaptor: "+m_controlAdaptor.getClass().getName());
                 }
             } else {
-                m_nativeJobId = m_controlAdaptor.submit(nativeJobDesc, s_checkMatch);
+                m_nativeJobId = m_controlAdaptor.submit(nativeJobDesc, s_checkMatch, m_uniqId);
             }
             String monitorUrl = m_monitorService.getURL().getString();
             String sagaJobId = "["+monitorUrl+"]-["+m_nativeJobId+"]";

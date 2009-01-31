@@ -83,7 +83,7 @@ public class GatekeeperJobControlAdaptor extends GatekeeperJobAdaptorAbstract im
         m_parameters = null;
     }
 
-    public String submit(String jobDesc, boolean checkMatch)  throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
+    public String submit(String jobDesc, boolean checkMatch, String uniqId)  throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
     	RslNode rslTree;
         try {
         	rslTree = RSLParser.parse(jobDesc);

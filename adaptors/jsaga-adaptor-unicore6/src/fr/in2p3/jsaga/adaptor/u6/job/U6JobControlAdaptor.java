@@ -306,7 +306,7 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract
 		}
     }
     
-    public JobIOHandler submit(String jobDesc, boolean checkMatch, InputStream inputStream)
+    public JobIOHandler submit(String jobDesc, boolean checkMatch, String uniqId, InputStream inputStream)
     		throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		try {
 			// create target
@@ -366,7 +366,7 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract
 		}
 	}
 
-    public String submit(String jobDesc, boolean checkMatch)  
+    public String submit(String jobDesc, boolean checkMatch, String uniqId)
     		throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
     	try {
         	TargetSystemInfo targetSystemInfo = findTargetSystem();        

@@ -219,7 +219,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         m_client = null;
     }
     
-    public String submit(String jobDesc, boolean checkMatch) 
+    public String submit(String jobDesc, boolean checkMatch, String uniqId)
     	throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
     	try {
     		
@@ -250,7 +250,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 
 
 	public JobIOHandler submit(String jobDesc, boolean checkMatch,
-			InputStream stdin) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+                               String uniqId, InputStream stdin) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		
 		try {
 			

@@ -21,8 +21,8 @@ public interface StreamableJobBatch extends StreamableJobAdaptor {
      * submit an interactive job
      * @param jobDesc the job description in the language supported by the targeted grid
      * @param checkMatch if true then check if job description matches job service before submitting job
-     * @param stdin the job standard input stream
-     * @return the job input/output streams handler
+     * @param uniqId a identifier unique to this job (not the job identifier, which is not generated yet)
+     * @param stdin the job standard input stream @return the job input/output streams handler
      */
-    public JobIOHandler submit(String jobDesc, boolean checkMatch, InputStream stdin) throws PermissionDeniedException, TimeoutException, NoSuccessException;
+    public JobIOHandler submit(String jobDesc, boolean checkMatch, String uniqId, InputStream stdin) throws PermissionDeniedException, TimeoutException, NoSuccessException;
 }

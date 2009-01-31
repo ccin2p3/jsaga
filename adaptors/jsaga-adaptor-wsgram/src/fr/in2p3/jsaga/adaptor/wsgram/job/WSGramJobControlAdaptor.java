@@ -51,7 +51,7 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
         return new WSGramJobMonitorAdaptor();
     }
 
-    public String submit(String jobDesc, boolean checkMatch) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+    public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
     	try {
     		// parse and create
 			try {

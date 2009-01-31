@@ -57,7 +57,7 @@ public class SuperSchedulerJobControlAdaptor extends SuperSchedulerJobAdaptorAbs
         return new SuperSchedulerJobMonitorAdaptor();
     }
 
-    public String submit(String jobDesc, boolean checkMatch) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
+    public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         Document doc;
         try {

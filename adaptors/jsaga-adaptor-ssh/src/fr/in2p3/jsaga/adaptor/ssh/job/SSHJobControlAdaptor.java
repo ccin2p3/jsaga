@@ -52,7 +52,7 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 		return new SSHJobMonitorAdaptor();
 	}
 
-	public String submit(String commandLine, boolean checkMatch)
+	public String submit(String commandLine, boolean checkMatch, String uniqId)
 			throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		try {
 

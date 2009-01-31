@@ -8,7 +8,7 @@
     <xsl:output method="text"/>
 
     <!-- JSAGA parameters -->
-    <xsl:param name="UniqId" select="'generated1234'"/>
+    <xsl:param name="UniqId" select="'staging'"/>
 
     <!-- Adaptor-specific parameters -->
     <xsl:param name="HostName"/>
