@@ -49,6 +49,9 @@
                 </jsdl:JobIdentification>
                 <jsdl:Application>
                     <posix:POSIXApplication>
+                        <xsl:if test="translate(Interactive/@value,'TRUE','true') = 'true'">
+                            <xsl:attribute name="name">interactive</xsl:attribute> 
+                        </xsl:if>
                         <xsl:for-each select="Executable/@value">
                             <posix:Executable>
                                 <xsl:call-template name="FILESYSTEM_NAME"/>

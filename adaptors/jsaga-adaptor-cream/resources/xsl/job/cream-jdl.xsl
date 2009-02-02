@@ -55,22 +55,32 @@
 
         <!-- streams -->
         <xsl:for-each select="jsdl:Application/posix:POSIXApplication">
-            <xsl:for-each select="posix:Output">
-  StdOutput = "<xsl:value-of select="text()"/>";<xsl:text/>
-            </xsl:for-each>
-            <xsl:for-each select="posix:Error">
-  StdError = "<xsl:value-of select="text()"/>";<xsl:text/>
-            </xsl:for-each>
-            <xsl:if test="posix:Output | posix:Error">
-  OutputSandbox = {<xsl:text/>
-                <xsl:for-each select="posix:Output | posix:Error">
-                    <xsl:text>"</xsl:text>
-                    <xsl:if test="position()>1">, </xsl:if>
-                    <xsl:value-of select="text()"/>
-                    <xsl:text>"</xsl:text>
-                </xsl:for-each>};
+            <xsl:choose>
+                <xsl:when test="@name='interactive'">
+  StdOutput = "OutputInteractive.txt";
+  StdError = "ErrorInteractive.txt";
+  OutputSandbox = {"OutputInteractive.txt","ErrorInteractive.txt"};
   OutputSandboxBaseDestURI = "gsiftp://<xsl:value-of select="$HostName"/>/tmp/<xsl:value-of select="$UniqId"/>/";
-            </xsl:if>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:for-each select="posix:Output">
+  StdOutput = "<xsl:value-of select="text()"/>";<xsl:text/>
+                    </xsl:for-each>
+                    <xsl:for-each select="posix:Error">
+  StdError = "<xsl:value-of select="text()"/>";<xsl:text/>
+                    </xsl:for-each>
+                    <xsl:if test="posix:Output | posix:Error">
+  OutputSandbox = {<xsl:text/>
+                        <xsl:for-each select="posix:Output | posix:Error">
+                            <xsl:text>"</xsl:text>
+                            <xsl:if test="position()>1">, </xsl:if>
+                            <xsl:value-of select="text()"/>
+                            <xsl:text>"</xsl:text>
+                        </xsl:for-each>};
+  OutputSandboxBaseDestURI = "gsiftp://<xsl:value-of select="$HostName"/>/tmp/<xsl:value-of select="$UniqId"/>/";
+                    </xsl:if>
+                </xsl:otherwise>
+            </xsl:choose>
         </xsl:for-each>
 
 <!--  Requirements -->

@@ -3,7 +3,8 @@ package fr.in2p3.jsaga.adaptor.cream.job;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
-import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
 import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.glite.ce.creamapi.ws.cream2.CREAMPort;
@@ -12,6 +13,7 @@ import org.globus.ftp.GridFTPClient;
 import org.ogf.saga.error.*;
 
 import java.io.File;
+import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +32,7 @@ import java.util.regex.Pattern;
 /**
  *
  */
-public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements JobControlAdaptor, ListableJobAdaptor {
+public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements StreamableJobBatch, ListableJobAdaptor {
     // parameters configured
     private static final String SSL_CA_FILES = "sslCAFiles";
 
@@ -113,6 +115,13 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements J
             this.doPrepareStaging(stagingDir);
         }
         return this.doSubmit(jobDesc);
+    }
+
+    public JobIOHandler submit(String jobDesc, boolean checkMatch, String uniqId, InputStream stdin) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        String stagingDir = "/tmp/"+uniqId;
+        GridFTPClient stagingClient = this.doPrepareStaging(stagingDir);
+        String jobId = this.doSubmit(jobDesc);
+        return new CreamJobIOHandler(stagingClient, stagingDir, jobId);
     }
 
     private GridFTPClient doPrepareStaging(String stagingDir) throws NoSuccessException {
