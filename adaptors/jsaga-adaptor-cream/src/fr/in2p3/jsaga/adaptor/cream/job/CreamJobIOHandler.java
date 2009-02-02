@@ -39,6 +39,12 @@ public class CreamJobIOHandler implements JobIOSetter {
     }
 
     public void setStderr(OutputStream err) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        // workaround: sleep between setStdout and setStderr
+        try {
+            Thread.currentThread().sleep(500);
+        } catch (InterruptedException e) {
+            throw new NoSuccessException(e);
+        }
         this.getToStream(m_stagingDir+"/"+ERROR_FILENAME, err);
     }
 
