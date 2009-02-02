@@ -54,7 +54,7 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
 
     public Job createJob(JobDescription jobDesc) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         // create uniqId
-        String uniqId = ""+Math.abs(this.hashCode());
+        String uniqId = ""+System.currentTimeMillis();
 
         // get JSDL
         Element jsdlDOM;

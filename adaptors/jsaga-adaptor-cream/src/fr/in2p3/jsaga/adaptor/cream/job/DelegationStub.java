@@ -99,10 +99,19 @@ public class DelegationStub {
             throw new AuthenticationFailedException(e);
         }
 
-        // sign delegated proxy
         if (pkcs10 != null) {
+            // set delegation lifetime
+            Calendar delegationLifeTime = Calendar.getInstance();
+            delegationLifeTime.setTimeInMillis(globusProxy.getTimeLeft()*1000);
+            int hours = delegationLifeTime.get(Calendar.HOUR) - 1;
+            if (hours < 0) {
+                throw new AuthenticationFailedException("Proxy is expired or about to expire: "+globusProxy.getIdentity());
+            }
+
+            // sign delegated proxy
             try {
                 GrDProxyGenerator proxyGenerator = new GrDProxyGenerator();
+                proxyGenerator.setLifetime(hours);                 
                 byte[] x509Cert = proxyGenerator.x509MakeProxyCert(
                         pkcs10.getBytes(),
                         GrDPX509Util.getFilesBytes(m_proxyFile),
