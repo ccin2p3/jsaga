@@ -93,8 +93,8 @@ public class URLImpl implements URL {
         // resolve URI
         URI baseUri = ((URLImpl) base).u;
         String relativeUri = relativePath
-                + (query!=null ? "?"+query : "")
-                + (fragment!=null ? "#"+fragment : "");
+                + concatIfNotNull('?', new String[]{query, baseUri.getQuery()})
+                + concatIfNotNull('#', new String[]{fragment, baseUri.getFragment()});
         u = baseUri.resolve(relativeUri);
     }
 
@@ -337,5 +337,14 @@ public class URLImpl implements URL {
         } catch (URISyntaxException e) {
             return u;
         }
+    }
+
+    private static String concatIfNotNull(char prefix, String[] suffix) {
+        for (int i=0; suffix!=null && i<suffix.length; i++) {
+            if (suffix[i] != null) {
+                return prefix + suffix[i];
+            }
+        }
+        return "";
     }
 }
