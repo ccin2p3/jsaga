@@ -61,7 +61,8 @@ public class CreamJobAdaptorAbstract implements SagaSecureAdaptor {
             m_delegationId = (String) attributes.get(DELEGATION_ID);
         } else {
             try {
-                m_delegationId = m_credential.getName().toString();
+                String dn = m_credential.getName().toString();
+                m_delegationId = "delegation-"+Math.abs(dn.hashCode());
             } catch (GSSException e) {
                 throw new NoSuccessException(e);
             }
