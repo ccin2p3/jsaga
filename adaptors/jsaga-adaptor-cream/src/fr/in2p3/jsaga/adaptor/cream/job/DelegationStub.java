@@ -53,6 +53,10 @@ public class DelegationStub {
         }
     }
 
+    public Delegation getStub() {
+        return m_stub;
+    }
+
     /**
      * Renew delegation, or create a new delegation if it does not exist.
      * @return null if delegation is renewed, or proxy if delegation is created
