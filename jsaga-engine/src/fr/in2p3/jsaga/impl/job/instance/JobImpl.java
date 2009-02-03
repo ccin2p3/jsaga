@@ -222,12 +222,31 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
         }
         m_monitorService.stopListening(m_nativeJobId);
 
-        // terminate job
-        if (this.isFinalState()) {
+        // close job output and error streams
+        boolean isDone = (State.DONE.compareTo(m_metrics.m_State.getValue()) == 0);
+        if (isDone && m_IOHandler!=null) {  //if job is done and interactive
+            if (m_controlAdaptor instanceof StreamableJobInteractiveGet || m_controlAdaptor instanceof StreamableJobBatch) {
+                try {
+                    if (m_stdout == null) {
+                        m_stdout = new JobStdoutInputStream(this, m_IOHandler);
+                    }
+                    m_stdout.closeJobIOHandler();
+                    if (m_stderr == null) {
+                        m_stderr = new JobStderrInputStream(this, m_IOHandler);
+                    }
+                    m_stderr.closeJobIOHandler();
+                } catch (Exception e) {
+                    s_logger.warn("Failed to get job output/error streams: "+m_nativeJobId, e);
+                }
+            }
+        }
+
+        // cleanup job
+        if (this.isFinalState() && m_controlAdaptor instanceof CleanableJobAdaptor) {
             try {
-                this.terminate();
-            } catch (Exception e) {
-                s_logger.warn("Failed to terminate job: "+m_nativeJobId, e);
+                ((CleanableJobAdaptor)m_controlAdaptor).clean(m_nativeJobId);
+            } catch (PermissionDeniedException e) {
+                s_logger.warn("Failed to cleanup job: "+m_nativeJobId, e);
             }
         }
     }
@@ -352,27 +371,6 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
             }
         } else {
             throw new NotImplementedException("Signal is not supported by this adaptor: "+m_controlAdaptor.getClass().getName());
-        }
-    }
-
-    private void terminate() throws NotImplementedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        // close job output and error streams
-        if (m_IOHandler != null) {  //if (isInteractive()) {
-            if (m_controlAdaptor instanceof StreamableJobInteractiveGet || m_controlAdaptor instanceof StreamableJobBatch) {
-                if (m_stdout == null) {
-                    m_stdout = new JobStdoutInputStream(this, m_IOHandler);
-                }
-                m_stdout.closeJobIOHandler();
-                if (m_stderr == null) {
-                    m_stderr = new JobStderrInputStream(this, m_IOHandler);
-                }
-                m_stderr.closeJobIOHandler();
-            }
-        }
-
-        // cleanup job
-        if (m_controlAdaptor instanceof CleanableJobAdaptor) {
-            ((CleanableJobAdaptor)m_controlAdaptor).clean(m_nativeJobId);
         }
     }
 
