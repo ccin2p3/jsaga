@@ -57,10 +57,10 @@
         <xsl:for-each select="jsdl:Application/posix:POSIXApplication">
             <xsl:choose>
                 <xsl:when test="@name='interactive'">
-  StdOutput = "OutputInteractive.txt";
-  StdError = "ErrorInteractive.txt";
-  OutputSandbox = {"OutputInteractive.txt","ErrorInteractive.txt"};
-  OutputSandboxBaseDestURI = "gsiftp://<xsl:value-of select="$HostName"/>/tmp/<xsl:value-of select="$UniqId"/>/";
+  StdOutput = "<xsl:value-of select="$UniqId"/>-output.txt";
+  StdError = "<xsl:value-of select="$UniqId"/>-error.txt";
+  OutputSandbox = {"<xsl:value-of select="$UniqId"/>-output.txt","<xsl:value-of select="$UniqId"/>-error.txt"};
+  OutputSandboxBaseDestURI = "gsiftp://<xsl:value-of select="$HostName"/>/tmp/";
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:for-each select="posix:Output">

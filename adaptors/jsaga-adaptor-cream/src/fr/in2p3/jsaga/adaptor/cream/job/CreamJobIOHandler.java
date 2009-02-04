@@ -20,22 +20,22 @@ import java.io.OutputStream;
  *
  */
 public class CreamJobIOHandler implements JobIOSetter {
-    private static final String INPUT_FILENAME = "InputInteractive.txt";
-    private static final String OUTPUT_FILENAME = "OutputInteractive.txt";
-    private static final String ERROR_FILENAME = "ErrorInteractive.txt";
+    public static final String INPUT_SUFFIX = "input.txt";
+    public static final String OUTPUT_SUFFIX = "output.txt";
+    public static final String ERROR_SUFFIX = "error.txt";
 
     private GridFTPClient m_stagingClient;
-    private String m_stagingDir;
+    private String m_stagingPrefix;
     private String m_jobId;
 
-    public CreamJobIOHandler(GridFTPClient stagingClient, String stagingDir, String jobId) {
+    public CreamJobIOHandler(GridFTPClient stagingClient, String stagingPrefix, String jobId) {
         m_stagingClient = stagingClient;
-        m_stagingDir = stagingDir;
+        m_stagingPrefix = stagingPrefix;
         m_jobId = jobId;
     }
 
     public void setStdout(OutputStream out) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-        this.getToStream(m_stagingDir+"/"+OUTPUT_FILENAME, out);
+        this.getToStream(m_stagingPrefix+"-"+OUTPUT_SUFFIX, out);
     }
 
     public void setStderr(OutputStream err) throws PermissionDeniedException, TimeoutException, NoSuccessException {
@@ -45,7 +45,7 @@ public class CreamJobIOHandler implements JobIOSetter {
         } catch (InterruptedException e) {
             throw new NoSuccessException(e);
         }
-        this.getToStream(m_stagingDir+"/"+ERROR_FILENAME, err);
+        this.getToStream(m_stagingPrefix+"-"+ERROR_SUFFIX, err);
     }
 
     public String getJobId() {

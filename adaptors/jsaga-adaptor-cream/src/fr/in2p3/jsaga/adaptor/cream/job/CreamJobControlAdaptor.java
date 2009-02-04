@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.adaptor.cream.job;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
 import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
@@ -32,7 +33,7 @@ import java.util.regex.Pattern;
 /**
  *
  */
-public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements StreamableJobBatch, ListableJobAdaptor {
+public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements StreamableJobBatch, CleanableJobAdaptor, ListableJobAdaptor {
     // parameters configured
     private static final String SSL_CA_FILES = "sslCAFiles";
 
@@ -112,26 +113,31 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
         String stagingDir = "/tmp/"+uniqId;
         if (jobDesc.contains("StdOutput") || jobDesc.contains("StdError")) {
-            this.doPrepareStaging(stagingDir);
+            GridFTPClient stagingClient = this.getStagingClient();
+            try {
+                stagingClient.makeDir(stagingDir);
+            } catch (Exception e) {
+                throw new NoSuccessException("Failed to create staging directory: "+stagingDir, e);
+            }
         }
         return this.doSubmit(jobDesc);
     }
 
+    private String m_stagingPrefix;
     public JobIOHandler submit(String jobDesc, boolean checkMatch, String uniqId, InputStream stdin) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-        String stagingDir = "/tmp/"+uniqId;
-        GridFTPClient stagingClient = this.doPrepareStaging(stagingDir);
+        m_stagingPrefix = "/tmp/"+uniqId;
+        GridFTPClient stagingClient = this.getStagingClient();
         String jobId = this.doSubmit(jobDesc);
-        return new CreamJobIOHandler(stagingClient, stagingDir, jobId);
+        return new CreamJobIOHandler(stagingClient, m_stagingPrefix, jobId);
     }
 
-    private GridFTPClient doPrepareStaging(String stagingDir) throws NoSuccessException {
+    private GridFTPClient getStagingClient() throws NoSuccessException {
         try {
             GridFTPClient client = new GridFTPClient(m_creamStub.getURI().getHost(), 2811);
             client.authenticate(m_credential);
-            client.makeDir(stagingDir);
             return client;
         } catch (Exception e) {
-            throw new NoSuccessException("Failed to create staging directory: "+stagingDir, e);
+            throw new NoSuccessException("Failed to connect to GridFTP server: "+m_creamStub.getURI().getHost(), e);
         }
     }
     private String doSubmit(String jobDesc) throws PermissionDeniedException, TimeoutException, NoSuccessException {
@@ -245,6 +251,19 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
             return jobIds;
         } else {
             throw new NoSuccessException("Failed to list jobs");
+        }
+    }
+
+    public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        if (m_stagingPrefix != null) {
+            try {
+                GridFTPClient client = new GridFTPClient(m_creamStub.getURI().getHost(), 2811);
+                client.authenticate(m_credential);
+                client.deleteFile(m_stagingPrefix+"-"+CreamJobIOHandler.OUTPUT_SUFFIX);
+                client.deleteFile(m_stagingPrefix+"-"+CreamJobIOHandler.ERROR_SUFFIX);
+            } catch (Exception e) {
+                throw new NoSuccessException("Failed to cleanup job: "+nativeJobId, e);
+            }
         }
     }
 }
