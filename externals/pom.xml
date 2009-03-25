@@ -36,7 +36,8 @@
     <module>vomsjapi</module>
     <module>glite-security</module>
     <module>glite-jdl-api-java</module>
-	<module>wms-api</module>
+    <module>glite-wms-wmproxy-api-java</module>
+    <module>glite-lb-api-java</module>
     <module>glite-ce-cream-api-java</module>
     <module>glite-ce-delegation</module>
     <module>wsgram-api</module>

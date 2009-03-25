@@ -3,10 +3,7 @@ package fr.in2p3.jsaga.adaptor.wms.job;
 import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
-import fr.in2p3.jsaga.adaptor.base.usage.U;
-import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
-import fr.in2p3.jsaga.adaptor.base.usage.UFile;
-import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
@@ -14,45 +11,21 @@ import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
-
 import org.apache.axis.AxisProperties;
 import org.apache.axis.configuration.EngineConfigurationFactoryDefault;
 import org.apache.log4j.Logger;
 import org.glite.jdl.AdParser;
 import org.glite.jdl.JobAdException;
-import org.glite.wms.wmproxy.AuthenticationFaultException;
-import org.glite.wms.wmproxy.AuthorizationFaultException;
-import org.glite.wms.wmproxy.CredentialException;
-import org.glite.wms.wmproxy.InvalidArgumentFaultException;
-import org.glite.wms.wmproxy.JobUnknownFaultException;
-import org.glite.wms.wmproxy.NoSuitableResourcesFaultException;
-import org.glite.wms.wmproxy.OperationNotAllowedFaultException;
-import org.glite.wms.wmproxy.ServiceException;
-import org.glite.wms.wmproxy.ServiceURLException;
-import org.glite.wms.wmproxy.StringAndLongList;
-import org.glite.wms.wmproxy.StringAndLongType;
-import org.glite.wms.wmproxy.StringList;
-import org.glite.wms.wmproxy.WMProxyAPI;
+import org.glite.wms.wmproxy.*;
 import org.globus.ftp.GridFTPClient;
 import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.util.GlobusURL;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.AuthenticationFailedException;
-import org.ogf.saga.error.AuthorizationFailedException;
-import org.ogf.saga.error.BadParameterException;
-import org.ogf.saga.error.IncorrectStateException;
-import org.ogf.saga.error.NoSuccessException;
-import org.ogf.saga.error.NotImplementedException;
-import org.ogf.saga.error.PermissionDeniedException;
-import org.ogf.saga.error.TimeoutException;
+import org.ogf.saga.error.*;
 import org.ogf.saga.url.URL;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Map;
 
 
@@ -180,7 +153,9 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 	    	m_client = new WMProxyAPI (m_wmsServerUrl, m_tmpProxyFile.getAbsolutePath(), caLoc);
 	    	String proxy = m_client.getProxyReq (m_delegationId);
             m_client.grstPutProxy(m_delegationId, proxy);
-	    	
+        } catch (ServerOverloadedFaultException e) {
+            disconnect();
+            throw new NoSuccessException(e);
         } catch (ServiceException e) {
         	disconnect();
         	throw new NoSuccessException(e);
@@ -202,6 +177,9 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 		if("true".equalsIgnoreCase((String) attributes.get(JobAdaptor.CHECK_AVAILABILITY))) {
             try {
             	m_client.getVersion();
+            } catch (ServerOverloadedFaultException e) {
+                disconnect();
+                throw new NoSuccessException(e);
 			} catch (AuthenticationFaultException e) {
 				disconnect();
 				throw new AuthenticationFailedException(e);
@@ -234,6 +212,8 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             if(logger.isDebugEnabled())
             	logger.debug("Id for job:"+jobId);
 	    	return jobId;
+        } catch (ServerOverloadedFaultException e) {
+            throw new NoSuccessException(e);
     	} catch (ServiceException e) {
 			throw new NoSuccessException(e);
 		} catch (AuthorizationFaultException e) {
@@ -330,8 +310,9 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 		}
 	}
 
-    private void checkJDLAndMAtch(String jobDesc, boolean checkMatch,
-			WMProxyAPI m_client2) throws NoSuccessException, AuthorizationFaultException, AuthenticationFaultException, InvalidArgumentFaultException, NoSuitableResourcesFaultException, ServiceException {
+    private void checkJDLAndMAtch(String jobDesc, boolean checkMatch, WMProxyAPI m_client2)
+            throws NoSuccessException, AuthorizationFaultException, AuthenticationFaultException, InvalidArgumentFaultException, NoSuitableResourcesFaultException, ServiceException, ServerOverloadedFaultException
+    {
 		// parse JDL
 		try {
 			AdParser.parseJdl(jobDesc);
@@ -358,6 +339,8 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     	try {
 	    	// cancel
 	    	m_client.jobCancel(nativeJobId);
+        } catch (ServerOverloadedFaultException e) {
+            throw new NoSuccessException(e);
     	} catch (ServiceException e) {
     		throw new NoSuccessException(e);
 		} catch (AuthorizationFaultException e) {

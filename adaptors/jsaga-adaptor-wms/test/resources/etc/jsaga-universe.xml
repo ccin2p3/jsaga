@@ -7,6 +7,13 @@
         <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/voms_cred.txt"/>
         <attribute name="UserVO" value="dteam"/>
 
-        <job type="wms"/>
-	</GRID>
+        <SITE name="wms@fr">
+            <domain name="in2p3.fr">
+                <host prefix="lapp-wms01"/>
+            </domain>
+            <job type="wms">
+                <monitorService url="wms://lapp-lb01.in2p3.fr"/>
+            </job>
+        </SITE>
+    </GRID>
 </UNIVERSE>

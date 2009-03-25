@@ -1,28 +1,14 @@
 package fr.in2p3.jsaga.adaptor.wms.job;
 
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOGetter;
-
-import org.glite.wms.wmproxy.AuthenticationFaultException;
-import org.glite.wms.wmproxy.AuthorizationFaultException;
-import org.glite.wms.wmproxy.InvalidArgumentFaultException;
-import org.glite.wms.wmproxy.JobUnknownFaultException;
-import org.glite.wms.wmproxy.OperationNotAllowedFaultException;
-import org.glite.wms.wmproxy.ServiceException;
-import org.glite.wms.wmproxy.StringAndLongList;
-import org.glite.wms.wmproxy.StringAndLongType;
-import org.glite.wms.wmproxy.WMProxyAPI;
+import org.glite.wms.wmproxy.*;
 import org.globus.io.urlcopy.UrlCopy;
 import org.globus.io.urlcopy.UrlCopyException;
 import org.globus.util.GlobusURL;
 import org.ietf.jgss.GSSCredential;
-import org.ogf.saga.error.NoSuccessException;
-import org.ogf.saga.error.PermissionDeniedException;
-import org.ogf.saga.error.TimeoutException;
+import org.ogf.saga.error.*;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.MalformedURLException;
 
 
@@ -129,6 +115,8 @@ public class WMSJobIOHandler implements JobIOGetter {
 			throw new NoSuccessException(e);
 		} catch (ServiceException e) {
 			throw new NoSuccessException(e);
+        } catch (ServerOverloadedFaultException e) {
+            throw new NoSuccessException(e);
 		}
 	}
 }
