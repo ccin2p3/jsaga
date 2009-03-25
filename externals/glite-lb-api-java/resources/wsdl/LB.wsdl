@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:lb="http://glite.org/wsdl/services/lb" xmlns:lbe="http://glite.org/wsdl/elements/lb" xmlns:lbt="http://glite.org/wsdl/types/lb" name="LoggingAndBookkeeping" targetNamespace="http://glite.org/wsdl/services/lb">
-  <documentation>CVS revision:  $Header: /cvs/gridpub/jsaga/externals/glite-lb-api-java/resources/wsdl/LB.wsdl,v 1.1 2009/03/25 17:42:13 sreynaud Exp $  
+  <documentation>CVS revision:  Header: /cvs/glite/org.glite.lb.ws-interface/src/LB.xml,v 1.5 2006/06/09 13:49:32 valtri Exp
 
 	</documentation>
   <wsdl:import namespace="http://glite.org/wsdl/services/lb" location="LBTypes.wsdl"/>
