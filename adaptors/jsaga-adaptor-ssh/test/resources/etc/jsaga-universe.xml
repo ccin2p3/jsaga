@@ -3,5 +3,6 @@
     <GRID contextType="SSH">
         <attribute name="UserKey" value="${user.home}/.jsaga/contexts/ssh/id_rsa"/>
         <job type="ssh"/>
+        <data type="sftp"/>
     </GRID>
 </UNIVERSE>
