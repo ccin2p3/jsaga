@@ -5,6 +5,8 @@ import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
 import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
+import fr.in2p3.jsaga.impl.file.FileImpl;
+import fr.in2p3.jsaga.impl.file.copy.DirectoryCopyTask;
 import fr.in2p3.jsaga.impl.url.URLHelper;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.*;
@@ -47,6 +49,9 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
 
     /** override super.copy() */
     public void copy(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+        this._copyAndMonitor(target, flags, null);
+    }
+    public void _copyAndMonitor(URL target, int flags, DirectoryCopyTask progressMonitor) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
         new FlagsHelper(flags).allowed(JSAGAFlags.PRESERVETIMES, Flags.DEREFERENCE, Flags.RECURSIVE, Flags.OVERWRITE, Flags.CREATEPARENTS);
         new FlagsHelper(flags).required(Flags.RECURSIVE);
         if (Flags.DEREFERENCE.isSet(flags)) {
@@ -61,11 +66,16 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             FileAttributes[] sourceChilds = this._listAttributes(m_url.getPath());
             for (int i=0; i<sourceChilds.length; i++) {
                 NSEntry sourceChildEntry = this._openNS(sourceChilds[i]);
-                if (sourceChildEntry instanceof NSDirectory) {
-                    sourceChildEntry.copy(effectiveTarget, flags);
+                if (sourceChildEntry instanceof AbstractNSDirectoryImpl) {
+                    ((AbstractNSDirectoryImpl)sourceChildEntry)._copyAndMonitor(effectiveTarget, flags, progressMonitor);
                 } else {
-                    // remove RECURSIVE flag (always set for NSDirectory.copy())
-                    sourceChildEntry.copy(effectiveTarget, flags - Flags.RECURSIVE.getValue());
+                    // remove RECURSIVE flag (which is always set for NSDirectory.copy())
+                    int childFlags = flags - Flags.RECURSIVE.getValue();
+                    if (sourceChildEntry instanceof FileImpl) {
+                        ((FileImpl)sourceChildEntry)._copyAndMonitor(effectiveTarget, childFlags, progressMonitor);
+                    } else {
+                        sourceChildEntry.copy(effectiveTarget, childFlags);
+                    }
                 }
             }
         } else {

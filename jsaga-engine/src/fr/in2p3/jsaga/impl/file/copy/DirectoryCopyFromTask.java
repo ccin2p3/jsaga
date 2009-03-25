@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.impl.file.copy;
 
-import fr.in2p3.jsaga.impl.file.FileImpl;
+import fr.in2p3.jsaga.impl.file.DirectoryImpl;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.url.URL;
@@ -9,24 +9,24 @@ import org.ogf.saga.url.URL;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   FileCopyFromTask
+* File:   DirectoryCopyFromTask
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   9 juil. 2008
+* Date:   21 févr. 2009
 * ***************************************************
 * Description:                                      */
 /**
  *
  */
-public class FileCopyFromTask<T,E> extends AbstractCopyFromTask<T,E> {
-    private FileImpl m_targetFile;
+public class DirectoryCopyFromTask<T,E> extends AbstractCopyFromTask<T,E> {
+    private DirectoryImpl m_targetDir;
 
     /** constructor */
-    public FileCopyFromTask(Session session, FileImpl targetFile, URL source, int flags) throws NotImplementedException {
-        super(session, source, flags);
-        m_targetFile = targetFile;
+    public DirectoryCopyFromTask(Session session, DirectoryImpl targetDir, URL target, int flags) throws NotImplementedException {
+        super(session, target, flags);
+        m_targetDir = targetDir;
     }
 
     public void doCopyFrom(URL source, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
-        m_targetFile._copyFromAndMonitor(source, flags, this);
+        m_targetDir.copyFrom(source, flags);
     }
 }
