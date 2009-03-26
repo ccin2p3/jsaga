@@ -56,17 +56,18 @@ public class JobMonitorAdaptorFactory extends ServiceAdaptorFactory {
 
     /**
      * Create a new instance of job monitor adaptor for URL <code>url</code> and connect to service.
-     * @param url the URL of the service
+     * @param controlURL the URL of the control service
+     * @param monitorURL the URL of the monitor service
      * @param session the security session
      * @return the job monitor adaptor instance
      */
-    public JobMonitorAdaptor getJobMonitorAdaptor(URL url, Session session) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
-        if (url==null || url.getScheme()==null) {
-            throw new IncorrectURLException("Invalid entry name: "+url);
+    public JobMonitorAdaptor getJobMonitorAdaptor(URL controlURL, URL monitorURL, Session session) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+        if (monitorURL==null || monitorURL.getScheme()==null) {
+            throw new IncorrectURLException("Invalid entry name: "+monitorURL);
         }
 
         // get config
-        JobService jobServiceConfig = m_configuration.findJobService(url);
+        JobService jobServiceConfig = m_configuration.findJobService(controlURL);
         MonitorService config = jobServiceConfig.getMonitorService();
 
         // create instance
@@ -85,10 +86,10 @@ public class JobMonitorAdaptorFactory extends ServiceAdaptorFactory {
             if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(monitorAdaptor.getSupportedSecurityAdaptorClasses())) {
                 throw new ConfigurationException("INTERNAL ERROR: effective-config may be inconsistent");
             }
-        } else if (url.getFragment() != null) {
-            context = super.findContext(session, url.getFragment());
+        } else if (monitorURL.getFragment() != null) {
+            context = super.findContext(session, monitorURL.getFragment());
             if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(monitorAdaptor.getSupportedSecurityAdaptorClasses())) {
-                throw new NoSuccessException("Security context not found: "+url.getFragment());
+                throw new NoSuccessException("Security context not found: "+monitorURL.getFragment());
             }
         } else if (jobServiceConfig.getSupportedContextTypeCount() > 0) {
             context = super.findContext(session, jobServiceConfig.getSupportedContextType());
@@ -115,18 +116,18 @@ public class JobMonitorAdaptorFactory extends ServiceAdaptorFactory {
             } else if (SecurityAdaptorDescriptor.isSupportedNoContext(monitorAdaptor.getSupportedSecurityAdaptorClasses())) {
                 monitorAdaptor.setSecurityAdaptor(null);
             } else {
-                throw new AuthenticationFailedException("Security context class '"+ securityAdaptor.getClass().getName() +"' not supported for protocol: "+url.getScheme());
+                throw new AuthenticationFailedException("Security context class '"+ securityAdaptor.getClass().getName() +"' not supported for protocol: "+monitorURL.getScheme());
             }
         }
 
         // get attributes from config and URL
         Map attributes = new HashMap();
         AttributesBuilder.updateAttributes(attributes, config);
-        AttributesBuilder.updateAttributes(attributes, url);
+        AttributesBuilder.updateAttributes(attributes, monitorURL);
 
         // connect
-        int port = (url.getPort()>0 ? url.getPort() : monitorAdaptor.getDefaultPort());
-        monitorAdaptor.connect(url.getUserInfo(), url.getHost(), port, url.getPath(), attributes);
+        int port = (monitorURL.getPort()>0 ? monitorURL.getPort() : monitorAdaptor.getDefaultPort());
+        monitorAdaptor.connect(monitorURL.getUserInfo(), monitorURL.getHost(), port, monitorURL.getPath(), attributes);
         return monitorAdaptor;
     }
 }

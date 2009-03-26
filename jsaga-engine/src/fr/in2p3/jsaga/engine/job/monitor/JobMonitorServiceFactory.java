@@ -34,7 +34,7 @@ public class JobMonitorServiceFactory {
         URL monitorURL = m_adaptorFactory.getJobMonitorURL(controlURL);
         JobMonitorService service = m_services.get(monitorURL);
         if (service == null) {
-            JobMonitorAdaptor adaptor = m_adaptorFactory.getJobMonitorAdaptor(monitorURL, session);
+            JobMonitorAdaptor adaptor = m_adaptorFactory.getJobMonitorAdaptor(controlURL, monitorURL, session);
             service = new JobMonitorService(monitorURL, adaptor);
             m_services.put(monitorURL, service);
         }
