@@ -1,12 +1,8 @@
 package fr.in2p3.jsaga.impl.logicalfile;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
-import fr.in2p3.jsaga.adaptor.data.read.LogicalReaderMetaData;
-import fr.in2p3.jsaga.adaptor.data.write.LogicalWriterMetaData;
-import fr.in2p3.jsaga.helpers.SAGAPatternFinder;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSDirectoryImpl;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
-import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
 import org.ogf.saga.attributes.AsyncAttributes;
 import org.ogf.saga.error.*;
 import org.ogf.saga.logicalfile.LogicalFile;
@@ -14,8 +10,6 @@ import org.ogf.saga.session.Session;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
 import org.ogf.saga.url.URL;
-
-import java.util.Map;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -30,166 +24,115 @@ import java.util.Map;
  *
  */
 public abstract class AbstractNSEntryImplWithMetaData extends AbstractNSEntryImpl implements LogicalFile, AsyncAttributes<LogicalFile> {
+    private MetaDataAttributesImpl<LogicalFile> m_metadatas;
+
     /** constructor for factory */
     protected AbstractNSEntryImplWithMetaData(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session, url, adaptor, flags);
+        m_metadatas = new MetaDataAttributesImpl<LogicalFile>(m_session, this, m_url, m_adaptor);
     }
 
     /** constructor for NSDirectory.open() */
     protected AbstractNSEntryImplWithMetaData(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(dir, relativeUrl, flags);
+        m_metadatas = new MetaDataAttributesImpl<LogicalFile>(m_session, this, m_url, m_adaptor);
     }
 
     /** constructor for NSEntry.openAbsolute() */
     protected AbstractNSEntryImplWithMetaData(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(entry, absolutePath, flags);
+        m_metadatas = new MetaDataAttributesImpl<LogicalFile>(m_session, this, m_url, m_adaptor);
     }
 
     ////////////////////////////////////// interface Attributes //////////////////////////////////////
 
     public void setAttribute(String key, String value) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-        if (m_adaptor instanceof LogicalWriterMetaData) {
-            ((LogicalWriterMetaData)m_adaptor).setMetaData(
-                    m_url.getPath(),
-                    key,
-                    value,
-                    m_url.getQuery());
-        } else {
-            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
-        }
+        m_metadatas.setAttribute(key, value);
     }
 
     public String getAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
-        if (m_adaptor instanceof LogicalReaderMetaData) {
-            Map<String,String> attributes = ((LogicalReaderMetaData)m_adaptor).listMetaData(
-                    m_url.getPath(),
-                    m_url.getQuery());
-            return attributes.get(key);
-        } else {
-            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
-        }
+        return m_metadatas.getAttribute(key);
     }
 
     public void setVectorAttribute(String key, String[] values) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-        throw new NotImplementedException("Not implemented");
+        m_metadatas.setVectorAttribute(key, values);
     }
 
     public String[] getVectorAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
-        throw new NotImplementedException("Not implemented");
+        return m_metadatas.getVectorAttribute(key);
     }
 
     public void removeAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        if (m_adaptor instanceof LogicalWriterMetaData) {
-            ((LogicalWriterMetaData)m_adaptor).removeMetaData(
-                    m_url.getPath(),
-                    key,
-                    m_url.getQuery());
-        } else {
-            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
-        }
+        m_metadatas.removeAttribute(key);
     }
 
     public String[] listAttributes() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
-        if (m_adaptor instanceof LogicalReaderMetaData) {
-            Map<String,String> attributes = ((LogicalReaderMetaData)m_adaptor).listMetaData(
-                    m_url.getPath(),
-                    m_url.getQuery());
-            return attributes.keySet().toArray(new String[attributes.size()]);
-        } else {
-            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
-        }
+        return m_metadatas.listAttributes();
     }
 
     public String[] findAttributes(String... patterns) throws NotImplementedException, BadParameterException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
-        if (m_adaptor instanceof LogicalReaderMetaData) {
-            Map<String,String> attributes = ((LogicalReaderMetaData)m_adaptor).listMetaData(
-                    m_url.getPath(),
-                    m_url.getQuery());
-            return new SAGAPatternFinder(attributes).findKey(patterns);
-        } else {
-            throw new NotImplementedException("Not supported for this protocol: "+m_url.getScheme(), this);
-        }
+        return m_metadatas.findAttributes(patterns);
     }
 
     public boolean isReadOnlyAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        throw new NotImplementedException("Not implemented");
+        return m_metadatas.isReadOnlyAttribute(key);
     }
 
     public boolean isWritableAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        throw new NotImplementedException("Not implemented");
+        return m_metadatas.isWritableAttribute(key);
     }
 
     public boolean isRemovableAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        throw new NotImplementedException("Not implemented");
+        return m_metadatas.isRemovableAttribute(key);
     }
 
     public boolean isVectorAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        throw new NotImplementedException("Not implemented");
+        return m_metadatas.isVectorAttribute(key);
     }
 
     ////////////////////////////////////// interface AsyncAttributes //////////////////////////////////////
 
     public Task<LogicalFile, Void> setAttribute(TaskMode mode, String key, String value) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<LogicalFile,Void>().create(
-                mode, m_session, this,
-                "setAttribute",
-                new Class[]{String.class, String.class},
-                new Object[]{key, value});
+        return m_metadatas.setAttribute(mode, key, value);
     }
 
     public Task<LogicalFile, String> getAttribute(TaskMode mode, String key) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<LogicalFile,String>().create(
-                mode, m_session, this,
-                "getAttribute",
-                new Class[]{String.class},
-                new Object[]{key});
+        return m_metadatas.getAttribute(mode, key);
     }
 
     public Task<LogicalFile, Void> setVectorAttribute(TaskMode mode, String key, String[] values) throws NotImplementedException {
-        throw new NotImplementedException("Not implemented");
+        return m_metadatas.setVectorAttribute(mode, key, values);
     }
 
     public Task<LogicalFile, String[]> getVectorAttribute(TaskMode mode, String key) throws NotImplementedException {
-        throw new NotImplementedException("Not implemented");
+        return m_metadatas.getVectorAttribute(mode, key);
     }
 
     public Task<LogicalFile, Void> removeAttribute(TaskMode mode, String key) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<LogicalFile,Void>().create(
-                mode, m_session, this,
-                "removeAttribute",
-                new Class[]{String.class},
-                new Object[]{key});
+        return m_metadatas.removeAttribute(mode, key);
     }
 
     public Task<LogicalFile, String[]> listAttributes(TaskMode mode) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<LogicalFile,String[]>().create(
-                mode, m_session, this,
-                "listAttributes",
-                new Class[]{},
-                new Object[]{});
+        return m_metadatas.listAttributes(mode);
     }
 
     public Task<LogicalFile, String[]> findAttributes(TaskMode mode, String... patterns) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<LogicalFile,String[]>().create(
-                mode, m_session, this,
-                "findAttributes",
-                new Class[]{String[].class},
-                new Object[]{patterns});
+        return m_metadatas.findAttributes(mode, patterns);
     }
 
     public Task<LogicalFile, Boolean> isReadOnlyAttribute(TaskMode mode, String key) throws NotImplementedException {
-        throw new NotImplementedException("Not implemented");
+        return m_metadatas.isReadOnlyAttribute(mode, key);
     }
 
     public Task<LogicalFile, Boolean> isWritableAttribute(TaskMode mode, String key) throws NotImplementedException {
-        throw new NotImplementedException("Not implemented");
+        return m_metadatas.isWritableAttribute(mode, key);
     }
 
     public Task<LogicalFile, Boolean> isRemovableAttribute(TaskMode mode, String key) throws NotImplementedException {
-        throw new NotImplementedException("Not implemented");
+        return m_metadatas.isRemovableAttribute(mode, key);
     }
 
     public Task<LogicalFile, Boolean> isVectorAttribute(TaskMode mode, String key) throws NotImplementedException {
-        throw new NotImplementedException("Not implemented");
+        return m_metadatas.isVectorAttribute(mode, key);
     }
 }

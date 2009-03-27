@@ -97,7 +97,7 @@ public class PersonalCatalogDataAdaptor implements LogicalReaderMetaData, Logica
         File file = m_catalog.getFile(logicalEntry);
         // remove replica location
         if (! file.removeReplica(replicaEntry.toString())) {
-            throw new DoesNotExistException("Replica location no registered");
+            throw new DoesNotExistException("Replica location not registered");
         }
         if(Base.DEBUG) m_catalog.commit();
     }

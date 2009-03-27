@@ -23,6 +23,7 @@ import org.ogf.saga.url.URLFactory;
  */
 public class NSLogicalLocation extends AbstractCommand {
     private static final String OPT_HELP = "h", LONGOPT_HELP = "help";
+    private static final String OPT_CREATE = "c", LONGOPT_CREATE = "create";
     private static final String OPT_REGISTER = "r", LONGOPT_REGISTER = "register";
     private static final String OPT_UNREGISTER = "u", LONGOPT_UNREGISTER = "unregister";
     private static final String OPT_LIST = "l", LONGOPT_LIST = "list";
@@ -40,14 +41,22 @@ public class NSLogicalLocation extends AbstractCommand {
         }
         else if (line.hasOption(OPT_REGISTER))
         {
-            LogicalFile file = command.getLogicalFile();
+            LogicalFile file;
+            if (line.hasOption(OPT_CREATE)) {
+                file = command.getLogicalFile(Flags.CREATE.or(Flags.EXCL));
+            } else {
+                file = command.getLogicalFile();
+            }
             file.addLocation(URLFactory.createURL(line.getOptionValue(OPT_REGISTER)));
             file.close();
         }
         else if (line.hasOption(OPT_UNREGISTER))
         {
             LogicalFile file = command.getLogicalFile();
-            file.removeLocation(URLFactory.createURL(line.getOptionValue(OPT_REGISTER)));
+            file.removeLocation(URLFactory.createURL(line.getOptionValue(OPT_UNREGISTER)));
+            if (file.listLocations().size() == 0) {
+                file.remove();
+            }
             file.close();
         }
         else if (line.hasOption(OPT_LIST))
@@ -61,9 +70,12 @@ public class NSLogicalLocation extends AbstractCommand {
     }
 
     private LogicalFile getLogicalFile() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException, AlreadyExistsException {
+        return this.getLogicalFile(Flags.NONE.getValue());
+    }
+    private LogicalFile getLogicalFile(int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException, AlreadyExistsException {
         URL logicalUrl = URLFactory.createURL(m_nonOptionValues[0]);
         Session session = SessionFactory.createSession(true);
-        NSEntry entry = NSFactory.createNSEntry(session, logicalUrl, Flags.NONE.getValue());
+        NSEntry entry = NSFactory.createNSEntry(session, logicalUrl, flags);
         if (entry instanceof LogicalFile) {
             LogicalFile file = (LogicalFile) entry;
             return file;
@@ -97,6 +109,11 @@ public class NSLogicalLocation extends AbstractCommand {
                     .create(OPT_LIST));
         }
         opt.addOptionGroup(group);
+
+        // optionan
+        opt.addOption(OptionBuilder.withDescription("Create logical file")
+                .withLongOpt(LONGOPT_CREATE)
+                .create(OPT_CREATE));
 
         return opt;
     }

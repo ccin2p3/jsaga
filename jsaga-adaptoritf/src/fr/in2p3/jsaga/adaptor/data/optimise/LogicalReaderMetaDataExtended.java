@@ -30,4 +30,14 @@ public interface LogicalReaderMetaDataExtended extends LogicalReaderMetaData {
      */
     public FileAttributes[] findAttributes(String logicalDir, BooleanExpr filter, boolean recursive, String additionalArgs)
         throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException;
+
+    /**
+     * Recursively list the names of the metadata from <code>baseLogicalDir</code>.
+     * @param baseLogicalDir absolute path to the base directory.
+     * @param additionalArgs adaptor specific arguments
+     * @return a list of metadata names
+     * @throws NoSuccessException if <code>baseLogicalDir</code> does not exist.
+     */
+    public String[] listMetadataNames(String baseLogicalDir, String additionalArgs)
+        throws PermissionDeniedException, TimeoutException, NoSuccessException;
 }

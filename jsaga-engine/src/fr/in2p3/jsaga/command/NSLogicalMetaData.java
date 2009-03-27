@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.command;
 
+import fr.in2p3.jsaga.impl.logicalfile.LogicalDirectoryImpl;
 import org.apache.commons.cli.*;
 import org.ogf.saga.attributes.Attributes;
 import org.ogf.saga.logicalfile.LogicalFileFactory;
@@ -20,11 +21,15 @@ import org.ogf.saga.url.URLFactory;
 * ***************************************************
 * Description:                                      */
 /**
- * TODO: implementer setAttribute, removeAttribute et listAttributes
+ *
  */
 public class NSLogicalMetaData extends AbstractCommand {
     private static final String OPT_HELP = "h", LONGOPT_HELP = "help";
-    private static final String OPT_ATTTRIBUTE = "a", LONGOPT_ATTRIBUTE = "attribute";
+    private static final String OPT_GET = "g", LONGOPT_GET = "get";
+    private static final String OPT_SET = "s", LONGOPT_SET = "set";
+    private static final String OPT_REMOVE = "r", LONGOPT_REMOVE = "remove";
+    private static final String OPT_LIST = "l", LONGOPT_LIST = "list";
+    private static final String OPT_LIST_ALL_KEYS = "a", LONGOPT_LIST_ALL_KEYS = "list-all-keys";
 
     public NSLogicalMetaData() {
         super("jsaga-logical-metadata", new String[]{"URL"}, new String[]{OPT_HELP, LONGOPT_HELP});
@@ -42,12 +47,6 @@ public class NSLogicalMetaData extends AbstractCommand {
             // get URL and pattern from arguments
             String arg = command.m_nonOptionValues[0];
             URL url = URLFactory.createURL(arg);
-            String key;
-            if (line.hasOption(OPT_ATTTRIBUTE)) {
-                key = line.getOptionValue(OPT_ATTTRIBUTE);
-            } else {
-                key = null;
-            }
 
             // open connection
             Session session = SessionFactory.createSession(true);
@@ -58,13 +57,27 @@ public class NSLogicalMetaData extends AbstractCommand {
                 entry = LogicalFileFactory.createLogicalFile(session, url, Flags.NONE.getValue());
             }
 
-            // get meta-data(s)
-            if (key != null) {
+            // operation
+            if (line.hasOption(OPT_GET)) {
+                String key = line.getOptionValue(OPT_GET);
                 System.out.println(entry.getAttribute(key));
-            } else {
+            } else if (line.hasOption(OPT_SET)) {
+                String[] array = line.getOptionValues(OPT_SET);
+                String key = array[0];
+                String value = array[1];
+                entry.setAttribute(key, value);
+            } else if (line.hasOption(OPT_REMOVE)) {
+                String key = line.getOptionValue(OPT_REMOVE);
+                entry.removeAttribute(key);
+            } else if (line.hasOption(OPT_LIST)) {
                 String[] keys = entry.listAttributes();
                 for (int i=0; i<keys.length; i++) {
                     System.out.println(keys[i]+" = "+entry.getAttribute(keys[i]));
+                }
+            } else if (line.hasOption(OPT_LIST_ALL_KEYS)) {
+                String[] keys = ((LogicalDirectoryImpl)entry).listAttributesRecursive();
+                for (int i=0; i<keys.length; i++) {
+                    System.out.println(keys[i]);
                 }
             }
 
@@ -75,14 +88,38 @@ public class NSLogicalMetaData extends AbstractCommand {
 
     protected Options createOptions() {
         Options opt = new Options();
-        opt.addOption(OptionBuilder.withDescription("Display this help and exit")
-                .withLongOpt(LONGOPT_HELP)
-                .create(OPT_HELP));
-        opt.addOption(OptionBuilder.withDescription("Get value of specified attribute <key>")
-                .hasArg()
-                .withArgName("key")
-                .withLongOpt(LONGOPT_ATTRIBUTE)
-                .create(OPT_ATTTRIBUTE));
+
+        // command group
+        OptionGroup group = new OptionGroup();
+        group.setRequired(true);
+        {
+            group.addOption(OptionBuilder.withDescription("Display this help and exit")
+                    .withLongOpt(LONGOPT_HELP)
+                    .create(OPT_HELP));
+            group.addOption(OptionBuilder.withDescription("Get meta-data <key>")
+                    .hasArg()
+                    .withArgName("key")
+                    .withLongOpt(LONGOPT_GET)
+                    .create(OPT_GET));
+            group.addOption(OptionBuilder.withDescription("Set meta-data <key> with value <value>")
+                    .hasArgs(2)
+                    .withArgName("key value")
+                    .withLongOpt(LONGOPT_SET)
+                    .create(OPT_SET));
+            group.addOption(OptionBuilder.withDescription("Remove meta-data <key>")
+                    .hasArg()
+                    .withArgName("key")
+                    .withLongOpt(LONGOPT_REMOVE)
+                    .create(OPT_REMOVE));
+            group.addOption(OptionBuilder.withDescription("List meta-data <key>-<value> pairs")
+                    .withLongOpt(LONGOPT_LIST)
+                    .create(OPT_LIST));
+            group.addOption(OptionBuilder.withDescription("List all meta-data keys")
+                    .withLongOpt(LONGOPT_LIST_ALL_KEYS)
+                    .create(OPT_LIST_ALL_KEYS));
+        }
+        opt.addOptionGroup(group);
+        
         return opt;
     }
 }

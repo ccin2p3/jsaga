@@ -35,4 +35,8 @@ public class IrodsDataAdaptorLogical extends IrodsDataAdaptor implements Logical
     public FileAttributes[] findAttributes(String logicalDir, BooleanExpr filter, boolean recursive, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         return new FileAttributes[0];  //To change body of implemented methods use File | Settings | File Templates.
     }
+
+    public String[] listMetadataNames(String baseLogicalDir, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        return new String[0];  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }
