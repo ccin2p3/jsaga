@@ -18,6 +18,11 @@ import org.ogf.saga.namespace.*;
  *
  */
 public class IrodsIntegrationTestSuite extends TestSuite {
+    /** create test suite */
+    public static Test suite() throws Exception {return new IrodsIntegrationTestSuite();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(IrodsIntegrationTestSuite.class);}}
+
     // test IRODS as a protocol for physical entries
     public static class IrodsNSEntryTest extends NSEntryTest {
         public IrodsNSEntryTest() throws Exception {super("irods");}
@@ -71,33 +76,4 @@ public class IrodsIntegrationTestSuite extends TestSuite {
         public IrodsLogicalFileWriteTest() throws Exception {super("irods");}
     }
 */
-
-    public IrodsIntegrationTestSuite() throws Exception {
-        super();
-        // test SRB as a protocol for physical entries
-        this.addTestSuite(IrodsNSEntryTest.class);
-		this.addTestSuite(IrodsDirectoryListTest.class);
-        this.addTestSuite(IrodsDirectoryMakeTest.class);
-        this.addTestSuite(IrodsDirectoryTest.class);
-        this.addTestSuite(IrodsFileReadTest.class);
-        this.addTestSuite(IrodsFileWriteTest.class);
-        this.addTestSuite(Irods_to_EmulatorNSCopyTest.class);
-        this.addTestSuite(Irods_to_EmulatorNSCopyFromTest.class);
-        this.addTestSuite(Irods_to_EmulatorNSCopyRecursiveTest.class);
-        this.addTestSuite(Irods_to_EmulatorNSMoveTest.class);
-
-/*
-        // test SRB as a protocol for logical entries
-        this.addTestSuite(IrodsLogicalDirectoryListTest.class);
-        this.addTestSuite(IrodsLogicalDirectoryMakeTest.class);
-        this.addTestSuite(IrodsLogicalDirectoryMetaDataTest.class);
-        this.addTestSuite(IrodsLogicalDirectoryTest.class);
-        this.addTestSuite(IrodsLogicalFileReadTest.class);
-        this.addTestSuite(IrodsLogicalFileWriteTest.class);
-*/
-    }
-
-    public static Test suite() throws Exception {
-        return new IrodsIntegrationTestSuite();
-    }
 }

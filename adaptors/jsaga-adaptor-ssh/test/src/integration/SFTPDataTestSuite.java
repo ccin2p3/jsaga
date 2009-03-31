@@ -15,7 +15,12 @@ import org.ogf.saga.namespace.*;
 ****************************************************/
 
 public class SFTPDataTestSuite extends TestSuite {
-    // test cases
+    /** create test suite */
+    public static Test suite() throws Exception {return new SFTPDataTestSuite();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(SFTPDataTestSuite.class);}}
+
+    /** test cases */
     public static class SFTPNSEntryTest extends NSEntryTest {
         public SFTPNSEntryTest() throws Exception {super("sftp");}
     }
@@ -57,24 +62,5 @@ public class SFTPDataTestSuite extends TestSuite {
     }
     public static class SFTP_to_EmulatorNSMoveTest extends NSMoveTest {
         public SFTP_to_EmulatorNSMoveTest() throws Exception {super("sftp", "test");}
-    }
-
-    public SFTPDataTestSuite() throws Exception {
-        super();
-        // test cases
-        this.addTestSuite(SFTPNSEntryTest.class);
-        this.addTestSuite(SFTPDirectoryListTest.class);
-        this.addTestSuite(SFTPDirectoryMakeTest.class);
-        this.addTestSuite(SFTPDirectoryTest.class);
-        this.addTestSuite(SFTPFileReadTest.class);
-        this.addTestSuite(SFTPFileWriteTest.class);
-        this.addTestSuite(SFTPNSCopyTest.class);
-        this.addTestSuite(SFTPNSCopyFromTest.class);
-        this.addTestSuite(SFTPNSCopyRecursiveTest.class);
-        this.addTestSuite(SFTPNSMoveTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new SFTPDataTestSuite();
     }
 }

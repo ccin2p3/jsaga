@@ -17,6 +17,10 @@ import org.ogf.saga.job.*;
  *
  */
 public class GlobusExecutionTestSuiteForWindows extends TestSuite {
+    /** create test suite */
+    public static Test suite() throws Exception {return new GlobusExecutionTestSuiteForWindows();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(GlobusExecutionTestSuiteForWindows.class);}}
 
     // test cases
     public static class GlobusJobDescriptionTest extends JobDescriptionTest {
@@ -62,20 +66,5 @@ public class GlobusExecutionTestSuiteForWindows extends TestSuite {
     // test cases
     public static class GlobusJobRunInteractiveTest extends JobRunInteractiveTest {
         public GlobusJobRunInteractiveTest() throws Exception {super("gatekeeper-windows");}
-    }
-
-    public GlobusExecutionTestSuiteForWindows() throws Exception {
-        super();
-        // test cases
-        this.addTestSuite(GlobusJobDescriptionTest.class);
-        this.addTestSuite(GlobusJobRunMinimalTest.class);
-        this.addTestSuite(GlobusJobRunRequiredTest.class);
-        this.addTestSuite(GlobusJobRunOptionalTest.class);
-        this.addTestSuite(GlobusJobRunDescriptionTest.class);
-        this.addTestSuite(GlobusJobRunInteractiveTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new GlobusExecutionTestSuiteForWindows();
     }
 }

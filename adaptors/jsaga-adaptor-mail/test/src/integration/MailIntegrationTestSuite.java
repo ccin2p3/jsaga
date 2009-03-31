@@ -17,17 +17,14 @@ import org.ogf.saga.namespace.NSEntryTest;
  *
  */
 public class MailIntegrationTestSuite extends TestSuite {
+    /** create test suite */
+    public static Test suite() throws Exception {return new MailIntegrationTestSuite();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(MailIntegrationTestSuite.class);}}
+
+    /** test cases */
     public static class MailNSEntryTest extends NSEntryTest {
         public MailNSEntryTest() throws Exception {super("mail");}
         public void test_unexisting() { super.ignore("not yet implemented"); }
-    }
-
-    public MailIntegrationTestSuite() throws Exception {
-        super();
-        this.addTestSuite(MailNSEntryTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new MailIntegrationTestSuite();
     }
 }

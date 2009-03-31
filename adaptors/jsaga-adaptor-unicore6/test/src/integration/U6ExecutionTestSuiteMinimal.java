@@ -2,7 +2,7 @@ package integration;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import org.ogf.saga.job.*;
+import org.ogf.saga.job.JobRunMinimalTest;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -17,19 +17,13 @@ import org.ogf.saga.job.*;
  *
  */
 public class U6ExecutionTestSuiteMinimal extends TestSuite {
+    /** create test suite */
+    public static Test suite() throws Exception {return new U6ExecutionTestSuiteMinimal();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(U6ExecutionTestSuiteMinimal.class);}}
 
-    // test cases
+    /** test cases */
     public static class U6JobRunMinimalTest extends JobRunMinimalTest {
         public U6JobRunMinimalTest() throws Exception {super("unicore6");}
-     }
-    
-    public U6ExecutionTestSuiteMinimal() throws Exception {
-        super();
-        // test cases
-        this.addTestSuite(U6JobRunMinimalTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new U6ExecutionTestSuiteMinimal();
     }
 }

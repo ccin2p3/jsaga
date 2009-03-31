@@ -17,6 +17,10 @@ import org.ogf.saga.job.*;
  *
  */
 public class GlobusExecutionTestSuite extends TestSuite {
+    /** create test suite */
+    public static Test suite() throws Exception {return new GlobusExecutionTestSuite();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(GlobusExecutionTestSuite.class);}}
 
     // test cases
     public static class GlobusJobDescriptionTest extends JobDescriptionTest {
@@ -54,19 +58,5 @@ public class GlobusExecutionTestSuite extends TestSuite {
     public static class GlobusJobRunDescriptionTest extends JobRunDescriptionTest {
         public GlobusJobRunDescriptionTest() throws Exception {super("gatekeeper");}
         public void test_run_inWorkingDirectory() { super.ignore("Unexpected error: The job manager failed to open stdout"); } 
-    }
-
-    public GlobusExecutionTestSuite() throws Exception {
-        super();
-        // test cases
-        this.addTestSuite(GlobusJobRunMinimalTest.class);
-        this.addTestSuite(GlobusJobDescriptionTest.class);
-        this.addTestSuite(GlobusJobRunRequiredTest.class);
-        this.addTestSuite(GlobusJobRunOptionalTest.class);
-        this.addTestSuite(GlobusJobRunDescriptionTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new GlobusExecutionTestSuite();
     }
 }

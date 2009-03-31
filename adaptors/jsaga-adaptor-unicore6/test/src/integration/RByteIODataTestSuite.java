@@ -18,7 +18,12 @@ import org.ogf.saga.namespace.*;
  *
  */
 public class RByteIODataTestSuite extends TestSuite {
-    // test cases
+    /** create test suite */
+    public static Test suite() throws Exception {return new RByteIODataTestSuite();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(RByteIODataTestSuite.class);}}
+
+    /** test cases */
     public static class RByteIONSEntryTest extends NSEntryTest {
         public RByteIONSEntryTest() throws Exception {super("rbyteio");}
     }
@@ -61,24 +66,5 @@ public class RByteIODataTestSuite extends TestSuite {
     }
     public static class RByteIO_to_EmulatorNSMoveTest extends NSMoveTest {
         public RByteIO_to_EmulatorNSMoveTest() throws Exception {super("rbyteio", "test");}
-    }
-
-    public RByteIODataTestSuite() throws Exception {
-        super();
-        // test cases
-        this.addTestSuite(RByteIONSEntryTest.class);
-        this.addTestSuite(RByteIODirectoryListTest.class);
-        this.addTestSuite(RByteIODirectoryMakeTest.class);
-        this.addTestSuite(RByteIODirectoryTest.class);
-        this.addTestSuite(RByteIOFileReadTest.class);
-        this.addTestSuite(RByteIOFileWriteTest.class);
-        this.addTestSuite(RByteIONSCopyTest.class);
-        this.addTestSuite(RByteIONSCopyFromTest.class);
-        this.addTestSuite(RByteIONSCopyRecursiveTest.class);
-        this.addTestSuite(RByteIONSMoveTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new RByteIODataTestSuite();
     }
 }

@@ -17,18 +17,13 @@ import org.ogf.saga.job.JobListTest;
  *
  */
 public class CreamExecutionListJobs extends TestSuite {
-    // test cases
+    /** create test suite */
+    public static Test suite() throws Exception {return new CreamExecutionTestSuite();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(CreamExecutionTestSuite.class);}}
+
+    /** test cases */
     public static class CreamJobListTest extends JobListTest {
         public CreamJobListTest() throws Exception {super("cream");}
-    }
-
-    public CreamExecutionListJobs() throws Exception {
-        super();
-        // test cases
-        this.addTestSuite(CreamJobListTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new CreamExecutionListJobs();
     }
 }

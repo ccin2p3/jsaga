@@ -17,6 +17,10 @@ import org.ogf.saga.job.*;
  *
  */
 public class WSGramExecutionTestSuite extends TestSuite {
+    /** create test suite */
+    public static Test suite() throws Exception {return new WSGramExecutionTestSuite();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(WSGramExecutionTestSuite.class);}}
 
     // test cases
     public static class WSGramJobDescriptionTest extends JobDescriptionTest {
@@ -53,19 +57,5 @@ public class WSGramExecutionTestSuite extends TestSuite {
  	// test cases
     public static class WSGramJobRunDescriptionTest extends JobRunDescriptionTest {
         public WSGramJobRunDescriptionTest() throws Exception {super("wsgram");}
-    }
-
-    public WSGramExecutionTestSuite() throws Exception {
-        super();
-        // test cases
-        this.addTestSuite(WSGramJobDescriptionTest.class);
-        this.addTestSuite(WSGramJobRunMinimalTest.class);
-        this.addTestSuite(WSGramJobRunRequiredTest.class);
-        this.addTestSuite(WSGramJobRunOptionalTest.class);
-        this.addTestSuite(WSGramJobRunDescriptionTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new WSGramExecutionTestSuite();
     }
 }

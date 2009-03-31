@@ -1,9 +1,8 @@
 package integration;
 
-import org.ogf.saga.job.JobRunWithPrequisiteTest;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import org.ogf.saga.job.JobRunWithPrequisiteTest;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -15,19 +14,14 @@ import junit.framework.TestSuite;
 ****************************************************/
 
 public class SSHExecutionTestSuiteWithPrerequisite extends TestSuite {
-    // test cases
+    /** create test suite */
+    public static Test suite() throws Exception {return new SSHExecutionTestSuiteWithPrerequisite();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(SSHExecutionTestSuiteWithPrerequisite.class);}}
+
+    /** test cases */
     public static class SSHJobRunWithPrequisiteTest extends JobRunWithPrequisiteTest {
         public SSHJobRunWithPrequisiteTest() throws Exception {super("ssh");}         
         public void test_run_MPI() { super.ignore("not supported"); }
      }
-
-    public SSHExecutionTestSuiteWithPrerequisite() throws Exception {
-        super();
-        // test cases
-        this.addTestSuite(SSHJobRunWithPrequisiteTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new SSHExecutionTestSuiteWithPrerequisite();
-    }
 }

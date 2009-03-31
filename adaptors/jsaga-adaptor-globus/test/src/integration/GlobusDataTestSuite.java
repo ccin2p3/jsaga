@@ -18,7 +18,12 @@ import org.ogf.saga.namespace.*;
  *
  */
 public class GlobusDataTestSuite extends TestSuite {
-    // test cases
+    /** create test suite */
+    public static Test suite() throws Exception {return new GlobusDataTestSuite();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(GlobusDataTestSuite.class);}}
+
+    /** test cases */
     public static class GsiftpNSEntryTest extends NSEntryTest {
         public GsiftpNSEntryTest() throws Exception {super("gsiftp");}
     }
@@ -60,30 +65,5 @@ public class GlobusDataTestSuite extends TestSuite {
     }
     public static class Gsiftp_to_EmulatorNSMoveTest extends NSMoveTest {
         public Gsiftp_to_EmulatorNSMoveTest() throws Exception {super("gsiftp", "test");}
-    }
-
-    public GlobusDataTestSuite() throws Exception {
-        super();
-        // test cases
-        this.addTestSuite(GsiftpNSEntryTest.class);
-        this.addTestSuite(GsiftpDirectoryListTest.class);
-        this.addTestSuite(GsiftpDirectoryMakeTest.class);
-        this.addTestSuite(GsiftpDirectoryTest.class);
-        this.addTestSuite(GsiftpFileReadTest.class);
-        this.addTestSuite(GsiftpFileWriteTest.class);
-
-        this.addTestSuite(GsiftpNSCopyTest.class);
-        this.addTestSuite(GsiftpNSCopyFromTest.class);
-        this.addTestSuite(GsiftpNSCopyRecursiveTest.class);
-        this.addTestSuite(GsiftpNSMoveTest.class);
-
-        this.addTestSuite(Gsiftp_to_EmulatorNSCopyTest.class);
-        this.addTestSuite(Gsiftp_to_EmulatorNSCopyFromTest.class);
-        this.addTestSuite(Gsiftp_to_EmulatorNSCopyRecursiveTest.class);
-        this.addTestSuite(Gsiftp_to_EmulatorNSMoveTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new GlobusDataTestSuite();
     }
 }

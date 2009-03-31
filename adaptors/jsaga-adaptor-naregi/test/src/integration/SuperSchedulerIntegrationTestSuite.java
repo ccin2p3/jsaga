@@ -17,16 +17,13 @@ import org.ogf.saga.job.JobRunMinimalTest;
  *
  */
 public class SuperSchedulerIntegrationTestSuite extends TestSuite {
+    /** create test suite */
+    public static Test suite() throws Exception {return new SuperSchedulerIntegrationTestSuite();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(SuperSchedulerIntegrationTestSuite.class);}}
+
+    /** test cases */
     public static class SuperSchedulerJobRunMinimalTest extends JobRunMinimalTest {
         public SuperSchedulerJobRunMinimalTest() throws Exception {super("naregi");}
-    }
-
-    public SuperSchedulerIntegrationTestSuite() throws Exception {
-        super();
-        this.addTestSuite(SuperSchedulerJobRunMinimalTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new SuperSchedulerIntegrationTestSuite();
     }
 }

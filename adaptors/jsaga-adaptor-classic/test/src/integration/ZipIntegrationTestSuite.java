@@ -18,20 +18,28 @@ import org.ogf.saga.namespace.*;
  *
  */
 public class ZipIntegrationTestSuite extends TestSuite {
+    /** create test suite */
+    public static Test suite() throws Exception {return new ZipIntegrationTestSuite();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(ZipIntegrationTestSuite.class);}}
+
+    /** test cases */
     public static class ZipNSEntryTest extends NSEntryTest {
         public ZipNSEntryTest() throws Exception {super("zip");}
     }
     public static class ZipDirectoryListTest extends DirectoryListTest {
         public ZipDirectoryListTest() throws Exception {super("zip");}
     }
-    public static class ZipDirectoryMakeTest extends DirectoryMakeTest {
-        public ZipDirectoryMakeTest() throws Exception {super("zip");}
-    }
     public static class ZipDirectoryTest extends DirectoryTest {
         public ZipDirectoryTest() throws Exception {super("zip");}
     }
     public static class ZipFileReadTest extends FileReadTest {
         public ZipFileReadTest() throws Exception {super("zip");}
+    }
+    //TODO: uncomment these test cases when they will be supported
+/*
+    public static class ZipDirectoryMakeTest extends DirectoryMakeTest {
+        public ZipDirectoryMakeTest() throws Exception {super("zip");}
     }
     public static class ZipFileWriteTest extends FileWriteTest {
         public ZipFileWriteTest() throws Exception {super("zip");}
@@ -45,33 +53,14 @@ public class ZipIntegrationTestSuite extends TestSuite {
     public static class ZipNSMoveTest extends NSMoveTest {
         public ZipNSMoveTest() throws Exception {super("zip", "zip");}
     }
+    public static class Zip_to_EmulatorNSMoveTest extends NSMoveTest {
+        public Zip_to_EmulatorNSMoveTest() throws Exception {super("zip", "test");}
+    }
+*/
     public static class Zip_to_EmulatorNSCopyTest extends NSCopyTest {
         public Zip_to_EmulatorNSCopyTest() throws Exception {super("zip", "test");}
     }
     public static class Zip_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
         public Zip_to_EmulatorNSCopyRecursiveTest() throws Exception {super("zip", "test");}
-    }
-    public static class Zip_to_EmulatorNSMoveTest extends NSMoveTest {
-        public Zip_to_EmulatorNSMoveTest() throws Exception {super("zip", "test");}
-    }
-
-    public ZipIntegrationTestSuite() throws Exception {
-        super();
-        this.addTestSuite(ZipNSEntryTest.class);
-        this.addTestSuite(ZipDirectoryListTest.class);
-//        this.addTestSuite(ZipDirectoryMakeTest.class);
-        this.addTestSuite(ZipDirectoryTest.class);
-        this.addTestSuite(ZipFileReadTest.class);
-//        this.addTestSuite(ZipFileWriteTest.class);
-//        this.addTestSuite(ZipNSCopyTest.class);
-//        this.addTestSuite(ZipNSCopyRecursiveTest.class);
-//        this.addTestSuite(ZipNSMoveTest.class);
-        this.addTestSuite(Zip_to_EmulatorNSCopyTest.class);
-        this.addTestSuite(Zip_to_EmulatorNSCopyRecursiveTest.class);
-//        this.addTestSuite(Zip_to_EmulatorNSMoveTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new ZipIntegrationTestSuite();
     }
 }

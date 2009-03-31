@@ -17,18 +17,13 @@ import org.ogf.saga.job.JobRunMinimalTest;
  *
  */
 public class CreamExecutionTestSuite extends TestSuite {
-    // test cases
+    /** create test suite */
+    public static Test suite() throws Exception {return new CreamExecutionTestSuite();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(CreamExecutionTestSuite.class);}}
+
+    /** test cases */
     public static class CreamJobRunMinimalTest extends JobRunMinimalTest {
         public CreamJobRunMinimalTest() throws Exception {super("cream");}
-    }
-
-    public CreamExecutionTestSuite() throws Exception {
-        super();
-        // test cases
-        this.addTestSuite(CreamJobRunMinimalTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new CreamExecutionTestSuite();
     }
 }

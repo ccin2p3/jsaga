@@ -18,6 +18,12 @@ import org.ogf.saga.namespace.*;
  *
  */
 public class SRMIntegrationTestSuite extends TestSuite {
+    /** create test suite */
+    public static Test suite() throws Exception {return new SRMIntegrationTestSuite();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(SRMIntegrationTestSuite.class);}}
+
+    /** test cases */
     public static class SRMNSEntryTest extends NSEntryTest {
         public SRMNSEntryTest() throws Exception {super("srm");}
     }
@@ -59,29 +65,5 @@ public class SRMIntegrationTestSuite extends TestSuite {
     }
     public static class SRM_to_EmulatorNSMoveTest extends NSMoveTest {
         public SRM_to_EmulatorNSMoveTest() throws Exception {super("srm", "test");}
-    }
-
-    public SRMIntegrationTestSuite() throws Exception {
-        super();
-        this.addTestSuite(SRMNSEntryTest.class);
-        this.addTestSuite(SRMLogicalDirectoryListTest.class);
-        this.addTestSuite(SRMLogicalDirectoryMakeTest.class);
-        this.addTestSuite(SRMLogicalDirectoryTest.class);
-        this.addTestSuite(SRMLogicalFileReadTest.class);
-        this.addTestSuite(SRMLogicalFileWriteTest.class);
-
-        this.addTestSuite(SRMNSCopyTest.class);
-        this.addTestSuite(SRMNSCopyFromTest.class);
-        this.addTestSuite(SRMNSCopyRecursiveTest.class);
-        this.addTestSuite(SRMNSMoveTest.class);
-
-        this.addTestSuite(SRM_to_EmulatorNSCopyTest.class);
-        this.addTestSuite(SRM_to_EmulatorNSCopyFromTest.class);
-        this.addTestSuite(SRM_to_EmulatorNSCopyRecursiveTest.class);
-        this.addTestSuite(SRM_to_EmulatorNSMoveTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new SRMIntegrationTestSuite();
     }
 }

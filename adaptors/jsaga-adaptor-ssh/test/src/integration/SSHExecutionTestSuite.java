@@ -14,6 +14,10 @@ import org.ogf.saga.job.*;
 ****************************************************/
 
 public class SSHExecutionTestSuite extends TestSuite {
+    /** create test suite */
+    public static Test suite() throws Exception {return new SSHExecutionTestSuite();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(SSHExecutionTestSuite.class);}}
 
     // test cases
     public static class SSHJobDescriptionTest extends JobDescriptionTest {
@@ -67,20 +71,5 @@ public class SSHExecutionTestSuite extends TestSuite {
     // test cases
     public static class SSHJobRunInteractiveTest extends JobRunInteractiveTest {
         public SSHJobRunInteractiveTest() throws Exception {super("ssh");}
-    }
-
-    public SSHExecutionTestSuite() throws Exception {
-        super();
-        // test cases
-        this.addTestSuite(SSHJobDescriptionTest.class);
-        this.addTestSuite(SSHJobRunMinimalTest.class);
-        this.addTestSuite(SSHJobRunRequiredTest.class);
-        this.addTestSuite(SSHJobRunOptionalTest.class);
-        this.addTestSuite(SSHJobRunDescriptionTest.class);
-        this.addTestSuite(SSHJobRunInteractiveTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new SSHExecutionTestSuite();
     }
 }

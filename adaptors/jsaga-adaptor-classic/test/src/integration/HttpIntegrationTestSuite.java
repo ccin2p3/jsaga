@@ -18,6 +18,12 @@ import org.ogf.saga.namespace.*;
  *
  */
 public class HttpIntegrationTestSuite extends TestSuite {
+    /** create test suite */
+    public static Test suite() throws Exception {return new HttpIntegrationTestSuite();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(HttpIntegrationTestSuite.class);}}
+
+    /** test cases */
     public static class HttpNSEntryTest extends NSEntryTest {
         public HttpNSEntryTest() throws Exception {super("http");}
     }
@@ -35,19 +41,5 @@ public class HttpIntegrationTestSuite extends TestSuite {
     }
     public static class Http_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
         public Http_to_EmulatorNSCopyRecursiveTest() throws Exception {super("http", "test");}
-    }
-
-    public HttpIntegrationTestSuite() throws Exception {
-        super();
-        this.addTestSuite(HttpNSEntryTest.class);
-        this.addTestSuite(HttpDirectoryListTest.class);
-        this.addTestSuite(HttpDirectoryTest.class);
-        this.addTestSuite(HttpFileReadTest.class);
-        this.addTestSuite(Http_to_EmulatorNSCopyTest.class);
-        this.addTestSuite(Http_to_EmulatorNSCopyRecursiveTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new HttpIntegrationTestSuite();
     }
 }

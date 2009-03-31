@@ -2,7 +2,7 @@ package integration;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import org.ogf.saga.job.*;
+import org.ogf.saga.job.JobRunMinimalTest;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -14,19 +14,13 @@ import org.ogf.saga.job.*;
 ****************************************************/
 
 public class SSHExecutionTestSuiteMinimal extends TestSuite {
+    /** create test suite */
+    public static Test suite() throws Exception {return new SSHExecutionTestSuiteMinimal();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(SSHExecutionTestSuiteMinimal.class);}}
 
-    // test cases
+    /** test cases */
     public static class SSHJobRunMinimalTest extends JobRunMinimalTest {
         public SSHJobRunMinimalTest() throws Exception {super("ssh");}
      }
-    
-    public SSHExecutionTestSuiteMinimal() throws Exception {
-        super();
-        // test cases
-        this.addTestSuite(SSHJobRunMinimalTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new SSHExecutionTestSuiteMinimal();
-    }
 }

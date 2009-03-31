@@ -17,6 +17,10 @@ import org.ogf.saga.job.*;
  *
  */
 public class U6ExecutionTestSuite extends TestSuite {
+    /** create test suite */
+    public static Test suite() throws Exception {return new U6ExecutionTestSuite();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(U6ExecutionTestSuite.class);}}
 
     // test cases
     public static class U6JobDescriptionTest extends JobDescriptionTest {
@@ -52,20 +56,5 @@ public class U6ExecutionTestSuite extends TestSuite {
     // test cases
     public static class U6JobRunInteractiveTest extends JobRunInteractiveTest {
         public U6JobRunInteractiveTest() throws Exception {super("unicore6");}
-    }
-    
-    public U6ExecutionTestSuite() throws Exception {
-        super();
-        // test cases
-        this.addTestSuite(U6JobDescriptionTest.class);
-        this.addTestSuite(U6JobRunMinimalTest.class);
-        this.addTestSuite(U6JobRunRequiredTest.class);
-        this.addTestSuite(U6JobRunOptionalTest.class);
-        this.addTestSuite(U6JobRunDescriptionTest.class);
-        this.addTestSuite(U6JobRunInteractiveTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new U6ExecutionTestSuite();
     }
 }

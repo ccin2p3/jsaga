@@ -1,9 +1,9 @@
 package integration;
 
-import junit.framework.TestSuite;
 import junit.framework.Test;
-import org.ogf.saga.namespace.*;
+import junit.framework.TestSuite;
 import org.ogf.saga.file.*;
+import org.ogf.saga.namespace.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -18,6 +18,12 @@ import org.ogf.saga.file.*;
  *
  */
 public class HttpsIntegrationTestSuite extends TestSuite {
+    /** create test suite */
+    public static Test suite() throws Exception {return new HttpsIntegrationTestSuite();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(HttpsIntegrationTestSuite.class);}}
+
+    /** test cases */
     public static class HttpsNSEntryTest extends NSEntryTest {
         public HttpsNSEntryTest() throws Exception {super("https");}
     }
@@ -35,19 +41,5 @@ public class HttpsIntegrationTestSuite extends TestSuite {
     }
     public static class Https_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
         public Https_to_EmulatorNSCopyRecursiveTest() throws Exception {super("https", "test");}
-    }
-
-    public HttpsIntegrationTestSuite() throws Exception {
-        super();
-        this.addTestSuite(HttpsNSEntryTest.class);
-        this.addTestSuite(HttpsDirectoryListTest.class);
-        this.addTestSuite(HttpsDirectoryTest.class);
-        this.addTestSuite(HttpsFileReadTest.class);
-        this.addTestSuite(Https_to_EmulatorNSCopyTest.class);
-        this.addTestSuite(Https_to_EmulatorNSCopyRecursiveTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new HttpsIntegrationTestSuite();
     }
 }

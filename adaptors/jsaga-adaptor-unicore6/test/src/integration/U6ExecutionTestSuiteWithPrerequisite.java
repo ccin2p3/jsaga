@@ -1,9 +1,8 @@
 package integration;
 
-import org.ogf.saga.job.JobRunWithPrequisiteTest;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import org.ogf.saga.job.JobRunWithPrequisiteTest;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -18,18 +17,13 @@ import junit.framework.TestSuite;
  *
  */
 public class U6ExecutionTestSuiteWithPrerequisite extends TestSuite {
-    // test cases
+    /** create test suite */
+    public static Test suite() throws Exception {return new U6ExecutionTestSuiteWithPrerequisite();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(U6ExecutionTestSuiteWithPrerequisite.class);}}
+
+    /** test cases */
     public static class U6JobRunWithPrequisiteTest extends JobRunWithPrequisiteTest {
         public U6JobRunWithPrequisiteTest() throws Exception {super("unicore6");}
      }
-
-    public U6ExecutionTestSuiteWithPrerequisite() throws Exception {
-        super();
-        // test cases
-        this.addTestSuite(U6JobRunWithPrequisiteTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new U6ExecutionTestSuiteWithPrerequisite();
-    }
 }

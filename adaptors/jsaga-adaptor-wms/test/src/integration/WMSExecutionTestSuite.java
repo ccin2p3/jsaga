@@ -17,6 +17,10 @@ import org.ogf.saga.job.*;
  *
  */
 public class WMSExecutionTestSuite extends TestSuite {
+    /** create test suite */
+    public static Test suite() throws Exception {return new WMSExecutionTestSuite();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(WMSExecutionTestSuite.class);}}
 
     // test cases
     public static class WMSJobDescriptionTest extends JobDescriptionTest {
@@ -59,19 +63,5 @@ public class WMSExecutionTestSuite extends TestSuite {
         public WMSJobRunDescriptionTest() throws Exception {super("wms");}
         public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
         public void test_run_inWorkingDirectory() { super.ignore("not supported"); }
-    }
-
-    public WMSExecutionTestSuite() throws Exception {
-        super();
-        // test cases
-        this.addTestSuite(WMSJobDescriptionTest.class);
-        this.addTestSuite(WMSJobRunMinimalTest.class);
-        this.addTestSuite(WMSJobRunRequiredTest.class);
-        this.addTestSuite(WMSJobRunOptionalTest.class);
-        this.addTestSuite(WMSJobRunDescriptionTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new WMSExecutionTestSuite();
     }
 }

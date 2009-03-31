@@ -1,9 +1,8 @@
 package integration;
 
-import org.ogf.saga.job.JobRunWithPrequisiteTest;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import org.ogf.saga.job.JobRunWithPrequisiteTest;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -18,18 +17,13 @@ import junit.framework.TestSuite;
  *
  */
 public class WSGramExecutionTestSuiteWithPrerequisite extends TestSuite {
-    // test cases
+    /** create test suite */
+    public static Test suite() throws Exception {return new WSGramExecutionTestSuiteWithPrerequisite();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(WSGramExecutionTestSuiteWithPrerequisite.class);}}
+
+    /** test cases */
     public static class WSGramJobRunWithPrequisiteTest extends JobRunWithPrequisiteTest {
         public WSGramJobRunWithPrequisiteTest() throws Exception {super("wsgram");}
-    }
-
-    public WSGramExecutionTestSuiteWithPrerequisite() throws Exception {
-        super();
-        // test cases
-        this.addTestSuite(WSGramJobRunWithPrequisiteTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new WSGramExecutionTestSuiteWithPrerequisite();
     }
 }

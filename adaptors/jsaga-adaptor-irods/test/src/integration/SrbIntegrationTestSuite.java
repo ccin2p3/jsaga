@@ -18,6 +18,11 @@ import org.ogf.saga.namespace.*;
  *
  */
 public class SrbIntegrationTestSuite extends TestSuite {
+    /** create test suite */
+    public static Test suite() throws Exception {return new SrbIntegrationTestSuite();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(SrbIntegrationTestSuite.class);}}
+
     // test SRB as a protocol for physical entries
     public static class SrbNSEntryTest extends NSEntryTest {
         public SrbNSEntryTest() throws Exception {super("srb");}
@@ -71,33 +76,4 @@ public class SrbIntegrationTestSuite extends TestSuite {
         public SrbLogicalFileWriteTest() throws Exception {super("srb");}
     }
 */
-
-    public SrbIntegrationTestSuite() throws Exception {
-        super();
-        // test SRB as a protocol for physical entries
-        this.addTestSuite(SrbNSEntryTest.class);
-		this.addTestSuite(SrbDirectoryListTest.class);
-        this.addTestSuite(SrbDirectoryMakeTest.class);
-        this.addTestSuite(SrbDirectoryTest.class);
-        this.addTestSuite(SrbFileReadTest.class);
-        this.addTestSuite(SrbFileWriteTest.class);
-        this.addTestSuite(Srb_to_EmulatorNSCopyTest.class);
-        this.addTestSuite(Srb_to_EmulatorNSCopyFromTest.class);
-        this.addTestSuite(Srb_to_EmulatorNSCopyRecursiveTest.class);
-        this.addTestSuite(Srb_to_EmulatorNSMoveTest.class);
-
-/*
-        // test SRB as a protocol for logical entries
-        this.addTestSuite(SrbLogicalDirectoryListTest.class);
-        this.addTestSuite(SrbLogicalDirectoryMakeTest.class);
-        this.addTestSuite(SrbLogicalDirectoryMetaDataTest.class);
-        this.addTestSuite(SrbLogicalDirectoryTest.class);
-        this.addTestSuite(SrbLogicalFileReadTest.class);
-        this.addTestSuite(SrbLogicalFileWriteTest.class);
-*/
-    }
-
-    public static Test suite() throws Exception {
-        return new SrbIntegrationTestSuite();
-    }
 }

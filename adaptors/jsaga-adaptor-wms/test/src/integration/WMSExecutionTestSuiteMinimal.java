@@ -2,7 +2,7 @@ package integration;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import org.ogf.saga.job.*;
+import org.ogf.saga.job.JobRunMinimalTest;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -17,19 +17,13 @@ import org.ogf.saga.job.*;
  *
  */
 public class WMSExecutionTestSuiteMinimal extends TestSuite {
+    /** create test suite */
+    public static Test suite() throws Exception {return new WMSExecutionTestSuiteMinimal();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(WMSExecutionTestSuiteMinimal.class);}}
 
-    // test cases
+    /** test cases */
     public static class WMSJobRunMinimalTest extends JobRunMinimalTest {
         public WMSJobRunMinimalTest() throws Exception {super("wms");}
-    }
-    
-    public WMSExecutionTestSuiteMinimal() throws Exception {
-        super();
-        // test cases
-        this.addTestSuite(WMSJobRunMinimalTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new WMSExecutionTestSuiteMinimal();
     }
 }

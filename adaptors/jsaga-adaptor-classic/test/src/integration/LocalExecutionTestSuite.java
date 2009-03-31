@@ -14,6 +14,10 @@ import org.ogf.saga.job.*;
 ****************************************************/
 
 public class LocalExecutionTestSuite extends TestSuite {
+    /** create test suite */
+    public static Test suite() throws Exception {return new LocalExecutionTestSuite();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(LocalExecutionTestSuite.class);}}
 
     // test cases
     public static class LocalJobDescriptionTest extends JobDescriptionTest {
@@ -67,20 +71,5 @@ public class LocalExecutionTestSuite extends TestSuite {
     // test cases
     public static class LocalJobRunInteractiveTest extends JobRunInteractiveTest {
         public LocalJobRunInteractiveTest() throws Exception {super("local");}
-    }
-
-    public LocalExecutionTestSuite() throws Exception {
-        super();
-        // test cases
-        this.addTestSuite(LocalJobDescriptionTest.class);
-        this.addTestSuite(LocalJobRunMinimalTest.class);
-        this.addTestSuite(LocalJobRunRequiredTest.class);
-        this.addTestSuite(LocalJobRunOptionalTest.class);
-        this.addTestSuite(LocalJobRunDescriptionTest.class);
-        this.addTestSuite(LocalJobRunInteractiveTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new LocalExecutionTestSuite();
     }
 }
