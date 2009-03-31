@@ -1,7 +1,6 @@
 package integration;
 
 import junit.framework.Test;
-import junit.framework.TestSuite;
 import org.ogf.saga.file.*;
 import org.ogf.saga.namespace.*;
 
@@ -17,7 +16,13 @@ import org.ogf.saga.namespace.*;
 /**
  *
  */
-public class FileIntegrationTestSuite extends TestSuite {
+public class FileIntegrationTestSuite extends JSAGATestSuite {
+    /** create test suite */
+    public static Test suite() throws Exception {return new FileIntegrationTestSuite();}
+    /** index of test cases */
+    public static class index extends IndexTest {public index(){super(FileIntegrationTestSuite.class);}}
+
+    /** test cases */
     public static class FileNSEntryTest extends NSEntryTest {
         public FileNSEntryTest() throws Exception {super("file");}
     }
@@ -53,25 +58,5 @@ public class FileIntegrationTestSuite extends TestSuite {
     }
     public static class File_to_EmulatorNSMoveTest extends NSMoveTest {
         public File_to_EmulatorNSMoveTest() throws Exception {super("file", "test");}
-    }
-
-    public FileIntegrationTestSuite() throws Exception {
-        super();
-        this.addTestSuite(FileNSEntryTest.class);
-        this.addTestSuite(FileDirectoryListTest.class);
-        this.addTestSuite(FileDirectoryMakeTest.class);
-        this.addTestSuite(FileDirectoryTest.class);
-        this.addTestSuite(FileFileReadTest.class);
-        this.addTestSuite(FileFileWriteTest.class);
-        this.addTestSuite(FileNSCopyTest.class);
-        this.addTestSuite(FileNSCopyRecursiveTest.class);
-        this.addTestSuite(FileNSMoveTest.class);
-        this.addTestSuite(File_to_EmulatorNSCopyTest.class);
-        this.addTestSuite(File_to_EmulatorNSCopyRecursiveTest.class);
-        this.addTestSuite(File_to_EmulatorNSMoveTest.class);
-    }
-
-    public static Test suite() throws Exception {
-        return new FileIntegrationTestSuite();
     }
 }

@@ -42,11 +42,11 @@ sed -i pom.xml -e "s/CHANGEME/$VERSION/g"</pre>
             <answer>
                 <ul>
                     <li>From your build environment:
-                        <pre>mvn integration-test -Dintegration-test=&lt;MyProtocolIntegrationTestSuite&gt;</pre>
-                        <p>Errors are logged into build/surefire-reports/integration.&lt;MyProtocolIntegrationTestSuite&gt;.txt</p>
+                        <pre>mvn integration-test -Dtest=&lt;integration.MyProtocolIntegrationTestSuite\$SubTest1&gt;</pre>
+                        <p>Errors are logged into build/surefire-reports/&lt;integration.MyProtocolIntegrationTestSuite$SubTest1&gt;.txt</p>
                     </li>
                     <li>From an installation of JSAGA:
-                        <pre>junit-run-test integration.&lt;MyProtocolIntegrationTestSuite&gt;</pre>
+                        <pre>junit-run-test &lt;integration.MyProtocolIntegrationTestSuite&gt;</pre>
                         <p>Errors are displayed on console.</p>
                     </li>
                 </ul>
