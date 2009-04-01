@@ -41,12 +41,18 @@ sed -i pom.xml -e "s/CHANGEME/$VERSION/g"</pre>
             <question>How to run integration tests ?</question>
             <answer>
                 <ul>
-                    <li>From your build environment:
-                        <pre>mvn integration-test -Dtest=&lt;integration.MyProtocolIntegrationTestSuite\$SubTest1&gt;</pre>
-                        <p>Errors are logged into build/surefire-reports/&lt;integration.MyProtocolIntegrationTestSuite$SubTest1&gt;.txt</p>
+                    <li><b>From your build environment:</b>
+                        <p>Most adaptors allow for listing available tests:</p>
+                        <pre>mvn integration-test -Dtest=index
+mvn integration-test -Dtest={integration.MyProtocolIntegrationTestSuite}\$index</pre>
+                        <p>To run {SubTest1} only, enter:</p>
+                        <pre>mvn integration-test -Dtest={integration.MyProtocolIntegrationTestSuite\$SubTest1}</pre>
+                        <p>Errors are logged into build/surefire-reports/{integration.MyProtocolIntegrationTestSuite$SubTest1}.txt</p>
+                        <p><i>Note: On Unix-like operating systems, the '$' must be escaped ('\$').</i></p>
                     </li>
-                    <li>From an installation of JSAGA:
-                        <pre>junit-run-test &lt;integration.MyProtocolIntegrationTestSuite&gt;</pre>
+                    <li><b>From an installation of JSAGA:</b>
+                        <p>To run {MyProtocolIntegrationTestSuite}, enter:</p>
+                        <pre>junit-run-test {integration.MyProtocolIntegrationTestSuite}</pre>
                         <p>Errors are displayed on console.</p>
                     </li>
                 </ul>
@@ -87,7 +93,7 @@ and JNI header files for linux)
                     <li>Build from latest source code
                         <pre>mvn scm:bootstrap [-Dmaven.scm.cvs.java.cvs_rsh=_path/to/ssh_]</pre>
                         Or build an old release
-                        <pre>TAG=&lt;release_tag&gt;
+                        <pre>TAG={release_tag}
 mvn scm:bootstrap -DscmVersionType=tag -DscmVersion=$TAG -Dgoals=deploy,site-deploy \
                  [-Dmaven.scm.cvs.java.cvs_rsh=_path/to/ssh_]</pre>
                     </li>
@@ -108,7 +114,7 @@ cd jsaga-adaptorpom ; mvn uninstall:all</pre>
                     </li>
                     <li>Start an SSH agent (required for "mvn validate release:*")
                         <pre>eval `ssh-agent`
-ssh-add &lt;path_to_cvs_key&gt;</pre>
+ssh-add {path_to_cvs_key}</pre>
                     </li>
                     <li>Commit every changes to CVS repository
                         <br/>
