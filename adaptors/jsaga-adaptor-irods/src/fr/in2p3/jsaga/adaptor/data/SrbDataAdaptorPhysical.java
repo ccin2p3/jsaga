@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.data;
 
-import edu.sdsc.grid.io.FileFactory;
+import edu.sdsc.grid.io.*;
 import edu.sdsc.grid.io.srb.*;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
@@ -30,29 +30,41 @@ public class SrbDataAdaptorPhysical extends SrbDataAdaptor implements FileReader
 			SRBFile generalFile =  (SRBFile)FileFactory.newFile(fileSystem, dir, fileName );
 
 			return new BufferedInputStream(new SRBFileInputStream(generalFile));
-			/*
-			GeneralRandomAccessFile generalRandomAccessFile = FileFactory.newRandomAccessFile( generalFile, "r" );
-			int filesize = (int)generalFile.length();
-
-			byte[] buffer = new byte[filesize];
-			generalRandomAccessFile.readFully(buffer);
-			ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
-
-			return bais;*/
-       	} catch (java.lang.Exception e) {
+       	} catch (SRBException e) {
+			if (e.getType() == -3201) {
+				throw new DoesNotExistException(e);
+			} else {
+				throw new NoSuccessException(e);
+			}	
+		} catch (IOException e) {
 			throw new NoSuccessException(e);
-        }
+		}
 	}
 
 	public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
+		
+		GeneralFile parentFile =  FileFactory.newFile(fileSystem, parentAbsolutePath);
+		if (!parentFile.exists()) {throw new ParentDoesNotExist(parentAbsolutePath);}
+		
+		SRBFile generalFile =  (SRBFile)FileFactory.newFile((SRBFileSystem)fileSystem, parentAbsolutePath, fileName );
+		
 		try {
-			//String[] split = parentAbsolutePath.split(separator);
-			//String dir = parentAbsolutePath.substring(0,parentAbsolutePath.length()-fileName.length());
-			SRBFile generalFile =  (SRBFile)FileFactory.newFile((SRBFileSystem)fileSystem, parentAbsolutePath, fileName );
-
-			return new BufferedOutputStream(new SRBFileOutputStream(generalFile));
-       	} catch (java.lang.Exception e) {
-			throw new NoSuccessException(e);
-        }
+			if (!generalFile.createNewFile()) {
+				if (exclusive) {
+					throw new AlreadyExistsException("File already exist");
+				} else if (append) {
+					GeneralRandomAccessFile randomAccessFile = FileFactory.newRandomAccessFile( generalFile, "rw" );
+					randomAccessFile.seek( generalFile.length() );
+					return new BufferedOutputStream(new IrodsAppendedOutputStream(randomAccessFile));
+				} else {
+					generalFile.delete(true);
+					return new BufferedOutputStream(new SRBFileOutputStream(generalFile));   //overwrite
+				}
+			} else {
+				return new BufferedOutputStream(new SRBFileOutputStream(generalFile));
+			}
+         } catch (IOException e) {
+             throw new NoSuccessException("Failed to create file: "+fileName, e);
+         }
 	}
 }

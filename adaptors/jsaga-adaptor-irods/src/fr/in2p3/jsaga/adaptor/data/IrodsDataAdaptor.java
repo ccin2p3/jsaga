@@ -4,16 +4,16 @@ import edu.sdsc.grid.io.*;
 import edu.sdsc.grid.io.irods.*;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
-import fr.in2p3.jsaga.adaptor.base.usage.UFile;
-import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
+import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
+import java.util.*;
 
 
 /* ***************************************************
@@ -30,18 +30,17 @@ import java.util.Map;
  */
 public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 	private static final String IRODSENV ="IrodsEnv";
+	private static final String USERID=Context.USERID;
 
     public String getType() {
         return "irods";
     }
 
-    /** TODO: remove this method when GSI will be supported */
-    public Class[] getSupportedSecurityAdaptorClasses() {
-        return new Class[]{UserPassSecurityAdaptor.class};
-    }
-
 	public Usage getUsage() {
-        return new UFile(IRODSENV);
+        return new UAnd(new Usage[]{
+				new UFile(IRODSENV),
+                new UOptional(USERID)
+        });
     }
 
 	public BaseURL getBaseURL() throws IncorrectURLException {
@@ -61,17 +60,21 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         // URL attributes
         parseValue(attributes);
-        if (defaultStorageResource == null) {
-            throw new BadParameterException("The default storage resource cannot be null");
-        }
+        //if (defaultStorageResource == null) {
+        //    throw new BadParameterException("The default storage resource cannot be null");
+        //}
 
 		try {
 			IRODSAccount account = null;
 			
 			if (securityAdaptor instanceof GSSCredentialSecurityAdaptor) { 
 				cert = ((GSSCredentialSecurityAdaptor)securityAdaptor).getGSSCredential();
-				account = new IRODSAccount(host, port, userName, passWord, basePath, mcatZone, defaultStorageResource);
-				account.setAuthenticationScheme("GSI");
+				String login = (String) attributes.get(USERID);
+				if (login == null) {
+					throw new BadParameterException("Missing required attribute: "+USERID);
+				}
+				account = new IRODSAccount(host, port, login, passWord, basePath, mcatZone, defaultStorageResource);
+				account.setGSSCredential(cert);
 			} else {
 				if (host == null) {
 					account = new IRODSAccount();
@@ -92,11 +95,6 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 		} catch (IOException e) {
 			throw new NoSuccessException(e);
         }
-    }
-
-    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        //TODO: to be implemented
-        throw new NoSuccessException("Not implemented yet");
     }
 
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
@@ -187,4 +185,39 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 		irodsFile.delete();
 	}
 	
+	
+	void parseValue(Map attributes) throws NoSuccessException {
+		
+		try {
+			userName = securityAdaptor.getUserID();
+		} catch (Exception e) {
+			throw new NoSuccessException(e);
+		}
+			
+		if (securityAdaptor instanceof UserPassSecurityAdaptor) {
+            passWord = ((UserPassSecurityAdaptor)securityAdaptor).getUserPass();
+		} else if (securityAdaptor instanceof GSSCredentialSecurityAdaptor) {
+            passWord = null;
+        }
+		
+		// Parsing for defaultResource
+		Set set = attributes.entrySet();
+		Iterator iterator = set.iterator();
+
+        while (iterator.hasNext()) {
+            Map.Entry me = (Map.Entry) iterator.next();
+            String key = ((String)me.getKey()).toLowerCase();
+            String value =(String)me.getValue();
+			
+            if (key.equals(DEFAULTRESOURCE)) {
+                defaultStorageResource = value;
+            } else if (key.equals(DOMAIN)) {
+				mdasDomainName  = value;
+			} else if (key.equals(ZONE)) {
+				mcatZone  = value;
+			}
+			
+        }
+    }
+
 }

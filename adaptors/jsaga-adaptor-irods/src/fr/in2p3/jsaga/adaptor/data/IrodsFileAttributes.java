@@ -44,7 +44,7 @@ public class IrodsFileAttributes extends FileAttributes {
 		{
             m_size = Long.parseLong((String)file.getValue(file.getFieldIndex(IRODSMetaDataSet.SIZE)));
         } else {
-            m_size = -1;
+            m_size = 0;
         }
 
         // set permission

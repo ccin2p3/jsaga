@@ -7,11 +7,12 @@ import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
 import org.ogf.saga.error.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
+import java.util.*;
 
 
 /* ***************************************************
@@ -99,11 +100,6 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
         }
     }
 
-    public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        //TODO: to be implemented
-        throw new NoSuccessException("Not implemented yet");
-    }
-
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
 		/* methode offcielle
 		GeneralFile[] files = FileFactory.newFile(fileSystem, absolutePath).listFiles();
@@ -113,6 +109,7 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 		}
 		return fileAttributes;
 		*/
+
 		boolean listDir = true;
 		boolean listFile = true;
 		
@@ -127,7 +124,7 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 			 
 			if (listDir) {
 				MetaDataCondition conditionsDir[] = new MetaDataCondition[1];
-				MetaDataSelect selectsDir[] ={	MetaDataSet.newSelection(SRBMetaDataSet.DIRECTORY_NAME) };
+				MetaDataSelect selectsDir[] ={MetaDataSet.newSelection(SRBMetaDataSet.DIRECTORY_NAME)};
 				conditionsDir[0] = SRBMetaDataSet.newCondition(SRBMetaDataSet.PARENT_DIRECTORY_NAME,MetaDataCondition.EQUAL, absolutePath);
 				rlDir = fileSystem.query(conditionsDir, selectsDir);
 			}
@@ -180,17 +177,75 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 	}
 
 	public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
-		SRBFile srbFile = new SRBFile((SRBFileSystem)fileSystem, parentAbsolutePath +SEPARATOR + directoryName);
-		srbFile.mkdir();
+		GeneralFile parentFile =  FileFactory.newFile(fileSystem, parentAbsolutePath);
+		if (!parentFile.exists()) {throw new ParentDoesNotExist(parentAbsolutePath);}
+	
+		GeneralFile generalFile =  FileFactory.newFile(fileSystem, parentAbsolutePath +SEPARATOR + directoryName);
+		if (generalFile.exists()) {throw new AlreadyExistsException(parentAbsolutePath+SEPARATOR + directoryName);}
+
+		generalFile.mkdir();
 	}
 
 	public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
 		SRBFile srbFile = new SRBFile((SRBFileSystem)fileSystem, parentAbsolutePath +SEPARATOR + directoryName);
-		srbFile.delete(! m_useTrash);
+		boolean  bool= srbFile.delete(true); 
+		if (!bool) {throw new NoSuccessException("Directory not empty");}
+		/*
+		if (!m_useTrash) {
+			// test si rien dessous
+			String[] fileList = srbFile.list();
+			
+			if (fileList.length>0) {
+				throw new NoSuccessException("Directory not empty");
+			} else {
+				// si non
+				srbFile.delete(true); 
+			}
+		
+		} else {
+			boolean  bool= srbFile.delete(false); 
+			if (!bool) {throw new NoSuccessException("Directory not empty");}
+		}
+		*/
 	}
 
 	public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
 		SRBFile srbFile = new SRBFile((SRBFileSystem)fileSystem, parentAbsolutePath +SEPARATOR + fileName);
 		srbFile.delete(! m_useTrash);
 	}
+	
+	
+	void parseValue(Map attributes) throws NoSuccessException {
+	
+		if (securityAdaptor instanceof UserPassSecurityAdaptor) {
+            try {
+                userName = securityAdaptor.getUserID();
+            } catch (Exception e) {
+                throw new NoSuccessException(e);
+            }
+            passWord = ((UserPassSecurityAdaptor)securityAdaptor).getUserPass();
+		} else if (securityAdaptor instanceof GSSCredentialSecurityAdaptor) {
+			userName = null;
+            passWord = null;
+        }
+		
+		// Parsing for defaultResource
+		Set set = attributes.entrySet();
+		Iterator iterator = set.iterator();
+
+        while (iterator.hasNext()) {
+            Map.Entry me = (Map.Entry) iterator.next();
+            String key = ((String)me.getKey()).toLowerCase();
+            String value =(String)me.getValue();
+			
+            if (key.equals(DEFAULTRESOURCE)) {
+                defaultStorageResource = value;
+            } else if (key.equals(DOMAIN)) {
+				mdasDomainName  = value;
+			} else if (key.equals(ZONE)) {
+				mcatZone  = value;
+			}
+			
+        }
+    }
 }

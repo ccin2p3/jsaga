@@ -22,11 +22,16 @@ import java.util.Date;
  *
  */
 public class SrbFileAttributes extends FileAttributes {
+	private static final SimpleDateFormat dateStandard = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss");
 
     public SrbFileAttributes(MetaDataRecordList collection, MetaDataRecordList file) throws DoesNotExistException {
         // set name
 		if (collection != null) {
 			m_name = (String) collection.getValue(collection.getFieldIndex(SRBMetaDataSet.DIRECTORY_NAME));
+			
+			String [] split = m_name.split("/");
+			m_name =split[split.length-1];
+			
 		} else {
 			m_name = (String) file.getValue(file.getFieldIndex(SRBMetaDataSet.FILE_NAME));
 		}
@@ -46,7 +51,7 @@ public class SrbFileAttributes extends FileAttributes {
         if (file != null) {
             m_size = Long.parseLong((String)file.getValue(file.getFieldIndex(SRBMetaDataSet.SIZE)));
         } else {
-            m_size = -1;
+            m_size = 0;
         }
 
         // set permission
@@ -56,7 +61,6 @@ public class SrbFileAttributes extends FileAttributes {
 		if (file != null) {
 			try
 			{
-				SimpleDateFormat dateStandard = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss");
 				Date date = dateStandard.parse((String) file.getValue(file.getFieldIndex(SRBMetaDataSet.FILE_LAST_ACCESS_TIMESTAMP)));
 				m_lastModified = date.getTime();
 			} catch (Exception e){}
