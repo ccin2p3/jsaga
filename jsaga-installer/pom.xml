@@ -239,6 +239,7 @@
                 <artifactId>maven-statistic-plugin</artifactId>
                 <configuration>
                     <root>..</root>
+                    <disableLOC>true</disableLOC>
                 </configuration>
             </plugin>
         </plugins>
