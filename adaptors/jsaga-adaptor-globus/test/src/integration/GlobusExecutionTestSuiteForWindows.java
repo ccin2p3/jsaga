@@ -1,7 +1,6 @@
 package integration;
 
 import junit.framework.Test;
-import junit.framework.TestSuite;
 import org.ogf.saga.job.*;
 
 /* ***************************************************
@@ -16,7 +15,7 @@ import org.ogf.saga.job.*;
 /**
  *
  */
-public class GlobusExecutionTestSuiteForWindows extends TestSuite {
+public class GlobusExecutionTestSuiteForWindows extends JSAGATestSuite {
     /** create test suite */
     public static Test suite() throws Exception {return new GlobusExecutionTestSuiteForWindows();}
     /** index of test cases */

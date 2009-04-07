@@ -1,7 +1,6 @@
 package integration;
 
 import junit.framework.Test;
-import junit.framework.TestSuite;
 import org.ogf.saga.job.*;
 
 /* ***************************************************
@@ -13,7 +12,7 @@ import org.ogf.saga.job.*;
 * Date:   15 avril 2008
 ****************************************************/
 
-public class LocalExecutionTestSuite extends TestSuite {
+public class LocalExecutionTestSuite extends JSAGATestSuite {
     /** create test suite */
     public static Test suite() throws Exception {return new LocalExecutionTestSuite();}
     /** index of test cases */

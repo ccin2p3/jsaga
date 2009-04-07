@@ -1,7 +1,6 @@
 package integration;
 
 import junit.framework.Test;
-import junit.framework.TestSuite;
 import org.ogf.saga.file.*;
 import org.ogf.saga.namespace.*;
 
@@ -17,7 +16,7 @@ import org.ogf.saga.namespace.*;
 /**
  *
  */
-public class ZipIntegrationTestSuite extends TestSuite {
+public class ZipIntegrationTestSuite extends JSAGATestSuite {
     /** create test suite */
     public static Test suite() throws Exception {return new ZipIntegrationTestSuite();}
     /** index of test cases */

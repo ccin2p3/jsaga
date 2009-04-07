@@ -1,7 +1,6 @@
 package integration;
 
 import junit.framework.Test;
-import junit.framework.TestSuite;
 import org.ogf.saga.job.JobRunMinimalTest;
 
 /* ***************************************************
@@ -13,7 +12,7 @@ import org.ogf.saga.job.JobRunMinimalTest;
 * Date:   15 avril 2008
 ****************************************************/
 
-public class SSHExecutionTestSuiteMinimal extends TestSuite {
+public class SSHExecutionTestSuiteMinimal extends JSAGATestSuite {
     /** create test suite */
     public static Test suite() throws Exception {return new SSHExecutionTestSuiteMinimal();}
     /** index of test cases */

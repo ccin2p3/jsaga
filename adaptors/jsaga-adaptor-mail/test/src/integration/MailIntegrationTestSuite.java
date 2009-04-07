@@ -1,7 +1,6 @@
 package integration;
 
 import junit.framework.Test;
-import junit.framework.TestSuite;
 import org.ogf.saga.namespace.NSEntryTest;
 
 /* ***************************************************
@@ -16,7 +15,7 @@ import org.ogf.saga.namespace.NSEntryTest;
 /**
  *
  */
-public class MailIntegrationTestSuite extends TestSuite {
+public class MailIntegrationTestSuite extends JSAGATestSuite {
     /** create test suite */
     public static Test suite() throws Exception {return new MailIntegrationTestSuite();}
     /** index of test cases */

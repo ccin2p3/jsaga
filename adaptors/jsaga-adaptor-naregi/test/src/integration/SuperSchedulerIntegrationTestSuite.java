@@ -1,7 +1,6 @@
 package integration;
 
 import junit.framework.Test;
-import junit.framework.TestSuite;
 import org.ogf.saga.job.JobRunMinimalTest;
 
 /* ***************************************************
@@ -16,7 +15,7 @@ import org.ogf.saga.job.JobRunMinimalTest;
 /**
  *
  */
-public class SuperSchedulerIntegrationTestSuite extends TestSuite {
+public class SuperSchedulerIntegrationTestSuite extends JSAGATestSuite {
     /** create test suite */
     public static Test suite() throws Exception {return new SuperSchedulerIntegrationTestSuite();}
     /** index of test cases */

@@ -1,7 +1,6 @@
 package integration;
 
 import junit.framework.Test;
-import junit.framework.TestSuite;
 import org.ogf.saga.job.JobRunInteractiveTest;
 
 /* ***************************************************
@@ -16,7 +15,7 @@ import org.ogf.saga.job.JobRunInteractiveTest;
 /**
  *
  */
-public class GlobusExecutionTestSuiteInteractive extends TestSuite {
+public class GlobusExecutionTestSuiteInteractive extends JSAGATestSuite {
     /** create test suite */
     public static Test suite() throws Exception {return new GlobusExecutionTestSuiteInteractive();}
     /** index of test cases */

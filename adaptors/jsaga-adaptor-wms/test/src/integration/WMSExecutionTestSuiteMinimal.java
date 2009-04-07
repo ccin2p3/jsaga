@@ -1,7 +1,6 @@
 package integration;
 
 import junit.framework.Test;
-import junit.framework.TestSuite;
 import org.ogf.saga.job.JobRunMinimalTest;
 
 /* ***************************************************
@@ -16,7 +15,7 @@ import org.ogf.saga.job.JobRunMinimalTest;
 /**
  *
  */
-public class WMSExecutionTestSuiteMinimal extends TestSuite {
+public class WMSExecutionTestSuiteMinimal extends JSAGATestSuite {
     /** create test suite */
     public static Test suite() throws Exception {return new WMSExecutionTestSuiteMinimal();}
     /** index of test cases */

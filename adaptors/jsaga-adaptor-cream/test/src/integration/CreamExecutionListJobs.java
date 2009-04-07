@@ -1,7 +1,6 @@
 package integration;
 
 import junit.framework.Test;
-import junit.framework.TestSuite;
 import org.ogf.saga.job.JobListTest;
 
 /* ***************************************************
@@ -16,7 +15,7 @@ import org.ogf.saga.job.JobListTest;
 /**
  *
  */
-public class CreamExecutionListJobs extends TestSuite {
+public class CreamExecutionListJobs extends JSAGATestSuite {
     /** create test suite */
     public static Test suite() throws Exception {return new CreamExecutionTestSuite();}
     /** index of test cases */

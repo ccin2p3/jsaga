@@ -1,7 +1,6 @@
 package integration;
 
 import junit.framework.Test;
-import junit.framework.TestSuite;
 import org.ogf.saga.file.*;
 import org.ogf.saga.namespace.*;
 
@@ -14,7 +13,7 @@ import org.ogf.saga.namespace.*;
 * Date:   15 avril 2008
 ****************************************************/
 
-public class SFTPDataTestSuite extends TestSuite {
+public class SFTPDataTestSuite extends JSAGATestSuite {
     /** create test suite */
     public static Test suite() throws Exception {return new SFTPDataTestSuite();}
     /** index of test cases */

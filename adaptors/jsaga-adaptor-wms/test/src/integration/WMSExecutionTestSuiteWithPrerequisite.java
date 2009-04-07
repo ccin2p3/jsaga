@@ -1,7 +1,6 @@
 package integration;
 
 import junit.framework.Test;
-import junit.framework.TestSuite;
 import org.ogf.saga.job.JobRunWithPrequisiteTest;
 
 /* ***************************************************
@@ -16,7 +15,7 @@ import org.ogf.saga.job.JobRunWithPrequisiteTest;
 /**
  *
  */
-public class WMSExecutionTestSuiteWithPrerequisite extends TestSuite {
+public class WMSExecutionTestSuiteWithPrerequisite extends JSAGATestSuite {
     /** create test suite */
     public static Test suite() throws Exception {return new WMSExecutionTestSuiteWithPrerequisite();}
     /** index of test cases */

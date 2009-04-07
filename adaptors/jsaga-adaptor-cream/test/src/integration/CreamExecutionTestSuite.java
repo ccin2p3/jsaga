@@ -16,7 +16,7 @@ import org.ogf.saga.job.JobRunMinimalTest;
 /**
  *
  */
-public class CreamExecutionTestSuite extends TestSuite {
+public class CreamExecutionTestSuite extends JSAGATestSuite {
     /** create test suite */
     public static Test suite() throws Exception {return new CreamExecutionTestSuite();}
     /** index of test cases */
