@@ -71,6 +71,8 @@ public class SRM22FileAttributes extends FileAttributes {
         }
 
         // set last modified
-        m_lastModified = entry.getLastModificationTime().getTimeInMillis();
+        if (entry.getLastModificationTime() != null) {
+            m_lastModified = entry.getLastModificationTime().getTimeInMillis();
+        }
     }
 }
