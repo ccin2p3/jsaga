@@ -1,7 +1,7 @@
 package integration;
 
 import junit.framework.Test;
-import org.ogf.saga.logicalfile.*;
+import org.ogf.saga.file.*;
 import org.ogf.saga.namespace.*;
 
 /* ***************************************************
@@ -26,20 +26,20 @@ public class SRMIntegrationTestSuite extends JSAGATestSuite {
     public static class SRMNSEntryTest extends NSEntryTest {
         public SRMNSEntryTest() throws Exception {super("srm");}
     }
-    public static class SRMLogicalDirectoryListTest extends LogicalDirectoryListTest {
-        public SRMLogicalDirectoryListTest() throws Exception {super("srm");}
+    public static class SRMDirectoryListTest extends DirectoryListTest {
+        public SRMDirectoryListTest() throws Exception {super("srm");}
     }
-    public static class SRMLogicalDirectoryMakeTest extends LogicalDirectoryMakeTest {
-        public SRMLogicalDirectoryMakeTest() throws Exception {super("srm");}
+    public static class SRMDirectoryMakeTest extends DirectoryMakeTest {
+        public SRMDirectoryMakeTest() throws Exception {super("srm");}
     }
-    public static class SRMLogicalDirectoryTest extends LogicalDirectoryTest {
-        public SRMLogicalDirectoryTest() throws Exception {super("srm");}
+    public static class SRMDirectoryTest extends DirectoryTest {
+        public SRMDirectoryTest() throws Exception {super("srm");}
     }
-    public static class SRMLogicalFileReadTest extends LogicalFileReadTest {
-        public SRMLogicalFileReadTest() throws Exception {super("srm");}
+    public static class SRMFileReadTest extends FileReadTest {
+        public SRMFileReadTest() throws Exception {super("srm");}
     }
-    public static class SRMLogicalFileWriteTest extends LogicalFileWriteTest {
-        public SRMLogicalFileWriteTest() throws Exception {super("srm");}
+    public static class SRMFileWriteTest extends FileWriteTest {
+        public SRMFileWriteTest() throws Exception {super("srm");}
     }
     public static class SRMNSCopyTest extends NSCopyTest {
         public SRMNSCopyTest() throws Exception {super("srm", "srm");}
