@@ -43,7 +43,7 @@ sed -i pom.xml -e "s/CHANGEME/$VERSION/g"</pre>
                 <ul>
                     <li><b>From your build environment:</b>
                         <p>Most adaptors allow for listing available tests:</p>
-                        <pre>mvn integration-test -Dtest=index
+                        <pre>ls test/src/integration/
 mvn integration-test -Dtest={integration.MyProtocolIntegrationTestSuite}\$index</pre>
                         <p>To run {SubTest1} only, enter:</p>
                         <pre>mvn integration-test -Dtest={integration.MyProtocolIntegrationTestSuite\$SubTest1}</pre>

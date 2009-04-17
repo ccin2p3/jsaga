@@ -2,6 +2,15 @@ Deviations from SAGA specifications
 
 * Security management
 
+    * If several valid context candidates are available for a given URL, then instead of trying all the contexts,
+      an AmbiguityException (extends NoSuccessException) is thrown. This avoid the risk of...
+
+        * creating files with unexpected owner.
+
+        * submitting jobs that fail at runtime because of unexpected user.
+
+        * locking the account because of too many failed connection attempts.
+
     * Methods
 
         * toString(): overrided to dump a description of the security context instance.
