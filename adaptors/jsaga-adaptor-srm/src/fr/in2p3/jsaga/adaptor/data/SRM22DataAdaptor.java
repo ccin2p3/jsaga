@@ -108,8 +108,10 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
     public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         org.apache.axis.types.URI logicalUri = this.toSrmURI(absolutePath);
         SrmPrepareToGetRequest request = new SrmPrepareToGetRequest();
+        // dirOption is not supported by DPM
+        TDirOption dirOption = null;    //new TDirOption(false, Boolean.FALSE, new Integer(0));
         request.setArrayOfFileRequests(new ArrayOfTGetFileRequest(new TGetFileRequest[]{
-                new TGetFileRequest(logicalUri, new TDirOption(false, Boolean.FALSE, new Integer(0)))}));
+                new TGetFileRequest(logicalUri, dirOption)}));
         request.setTransferParameters(new TTransferParameters(
                 TAccessPattern.TRANSFER_MODE, TConnectionType.WAN, null, new ArrayOfString(m_transferProtocols)));
         java.net.URI transferUrl;
@@ -148,6 +150,18 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             TReturnStatus detailedStatus = (fileStatus!=null ? fileStatus.getStatus() : null);
             if (status.getStatusCode().equals(TStatusCode.SRM_SUCCESS)) {
                 if (detailedStatus!=null && detailedStatus.getStatusCode().equals(TStatusCode.SRM_FILE_PINNED)) {
+                    org.apache.axis.types.URI tUri = fileStatus.getTransferURL();
+                    try {
+                        //todo: remove this workaround when the bug will be fixed in DPM
+                        if (tUri.getPath()!=null && tUri.getPath().indexOf(':')>-1) {
+                            tUri.setPath(tUri.getPath().substring(tUri.getPath().indexOf(':')+1));
+                        }
+                        if (tUri.getPort() == -1) {
+                            tUri.setPort(2811);
+                        }
+                    } catch (org.apache.axis.types.URI.MalformedURIException e) {
+                        throw new NoSuccessException("INTERNAL ERROR: failed to correct transfer URI: "+tUri);
+                    }
                     transferUrl = new java.net.URI(fileStatus.getTransferURL().toString());
                 } else {
                     throw new NoSuccessException("Request successful but file is not pinned");
@@ -466,7 +480,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
 
     private org.apache.axis.types.URI toSrmURI(String absolutePath) throws NoSuccessException {
         try {
-            return new org.apache.axis.types.URI("srm", null, m_host, m_port, absolutePath, null, null);
+            return new org.apache.axis.types.URI("srm", null, m_host, m_port, SERVICE_PATH, "SFN="+absolutePath, null);
         } catch (org.apache.axis.types.URI.MalformedURIException e) {
             throw new NoSuccessException(e);
         }
