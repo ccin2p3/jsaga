@@ -77,7 +77,7 @@ UNDER DEVELOPMENT...</description>
         <dependency><!-- needed for registering httpg protocol -->
             <groupId>org.globus</groupId>
             <artifactId>cog-url</artifactId>
-            <version>gt4</version>
+            <version>1.4</version>
             <scope>runtime</scope>
         </dependency>
     </dependencies>
