@@ -22,8 +22,18 @@ import java.io.InputStream;
 public class SagaInputStream extends InputStream {
     private File m_file;
 
-    public SagaInputStream(File file) {
+    // for releasing SRM file
+    private String m_token;
+    private String m_srmPath;
+    private StreamCallback m_callback;
+
+    public SagaInputStream(File file, String token, String srmPath, StreamCallback callback) {
         m_file = file;
+
+        // for releasing SRM file
+        m_token = token;
+        m_srmPath = srmPath;
+        m_callback = callback;
     }
 
     public int read() throws IOException {
@@ -49,7 +59,11 @@ public class SagaInputStream extends InputStream {
 
     public void close() throws IOException {
         try {
+            // close stream
             m_file.close();
+
+            // release SRM file
+            m_callback.freeInputStream(m_token, m_srmPath);
         } catch (Exception e) {
             throw new IOException(e.getMessage());
         }

@@ -10,8 +10,6 @@ import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityAdaptor;
 import org.ietf.jgss.GSSCredential;
-import org.ogf.saga.url.URL;
-import org.ogf.saga.url.URLFactory;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.context.ContextFactory;
 import org.ogf.saga.error.*;
@@ -19,6 +17,8 @@ import org.ogf.saga.file.File;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -44,6 +44,11 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
     private Session m_session;
     private URL m_rootUrl;
 
+    // for releasing SRM file
+    private String m_token;
+    private String m_srmPath;
+    private StreamCallback m_callback;
+
     public String getType() {return null;}
     public Usage getUsage() {return null;}
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {return null;}
@@ -51,7 +56,7 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
     public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {}
     public BaseURL getBaseURL() throws IncorrectURLException {return null;}
 
-    public SagaDataAdaptor(URI url, GSSCredential cred) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+    public SagaDataAdaptor(URI url, GSSCredential cred, String token, String srmPath, StreamCallback callback) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         try {
             Context context = ContextFactory.createContext();
             context.setAttribute("Type", "InMemoryProxy");
@@ -60,6 +65,11 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
             m_session.addContext(context);
             m_rootUrl = URLFactory.createURL(url.resolve(".").toString());
             m_rootUrl.setFragment("InMemoryProxy");
+
+            // for releasing SRM file
+            m_token = token;
+            m_srmPath = srmPath;
+            m_callback = callback;
         } catch (NotImplementedException e) {
             throw new NoSuccessException(e);
         } catch (AuthenticationFailedException e) {
@@ -106,7 +116,7 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
             throw new NoSuccessException(e);
         }
         if (entry instanceof File) {
-            return new SagaInputStream((File) entry);
+            return new SagaInputStream((File) entry, m_token, m_srmPath, m_callback);
         } else {
             throw new NoSuccessException("Tranfer URL is not a file");
         }
@@ -116,13 +126,15 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         NSEntry entry;
         try {
             URL url = this.toURL(parentAbsolutePath+"/"+fileName);
-            int flags = (exclusive ? Flags.EXCL : Flags.NONE).or(append ? Flags.APPEND : Flags.NONE);
+            int flags = Flags.WRITE
+                    .or((exclusive ? Flags.EXCL : Flags.NONE)
+                    .or(append ? Flags.APPEND : Flags.NONE));
             entry = NSFactory.createNSEntry(m_session, url, flags);
         } catch (Exception e) {
             throw new NoSuccessException(e);
         }
         if (entry instanceof File) {
-            return new SagaOutputStream((File) entry);
+            return new SagaOutputStream((File) entry, m_token, m_srmPath, m_callback);
         } else {
             throw new NoSuccessException("Tranfer URL is not a file");
         }

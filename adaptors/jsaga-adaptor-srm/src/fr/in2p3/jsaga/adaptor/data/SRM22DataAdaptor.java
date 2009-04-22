@@ -3,18 +3,17 @@ package fr.in2p3.jsaga.adaptor.data;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
+import org.apache.axis.AxisFault;
 import org.apache.axis.client.Stub;
 import org.globus.axis.gsi.GSIConstants;
 import org.ogf.saga.error.*;
 import org.ogf.srm22.*;
 
 import javax.xml.rpc.ServiceException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.rmi.RemoteException;
-import java.util.*;
+import java.util.Map;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -28,17 +27,16 @@ import java.util.*;
 /**
  * TODO: implement DataCopy when it will be supported also by DPM
  */
-public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileReaderStreamFactory, FileWriterStreamFactory {
+public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileReaderStreamFactory, FileWriterStreamFactory, StreamCallback
+//todo: uncomment this when mixed adaptors (i.e. both physical and logical) will be supported by engine
+//        , LogicalReader
+{
     private static final String SERVICE_PROTOCOL = "httpg";
     private static final String SERVICE_PATH = "/srm/managerv2";
     private ISRM m_stub;
-    private List m_readFiles;
-    private List m_writenFiles;
 
     public SRM22DataAdaptor() {
         m_stub = null;
-        m_readFiles = new ArrayList();
-        m_writenFiles = new ArrayList();
     }
 
     public String getType() {
@@ -63,26 +61,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
     }
 
     public void disconnect() throws NoSuccessException {
-        try {
-            for (Iterator it=m_readFiles.iterator(); it.hasNext(); ) {
-                Map.Entry entry = (Map.Entry) it.next();
-                String token = (String) entry.getKey();
-                String absolutePath = (String) entry.getValue();
-                this.closeInputStream(token, absolutePath);
-            }
-            for (Iterator it=m_writenFiles.iterator(); it.hasNext(); ) {
-                Map.Entry entry = (Map.Entry) it.next();
-                String token = (String) entry.getKey();
-                String absolutePath = (String) entry.getValue();
-                this.closeOutputStream(token, absolutePath);
-            }
-        } catch (PermissionDeniedException e) {
-            throw new NoSuccessException(e);
-        } catch (DoesNotExistException e) {
-            throw new NoSuccessException(e);
-        } catch (TimeoutException e) {
-            throw new NoSuccessException(e);
-        }
+        // do nothing
     }
 
     protected void ping() throws BadParameterException, NoSuccessException {
@@ -105,7 +84,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         }
     }
 
-    public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+    private SRMResponse srmPrepareToGet(String absolutePath) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         org.apache.axis.types.URI logicalUri = this.toSrmURI(absolutePath);
         SrmPrepareToGetRequest request = new SrmPrepareToGetRequest();
         // dirOption is not supported by DPM
@@ -114,7 +93,6 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
                 new TGetFileRequest(logicalUri, dirOption)}));
         request.setTransferParameters(new TTransferParameters(
                 TAccessPattern.TRANSFER_MODE, TConnectionType.WAN, null, new ArrayOfString(m_transferProtocols)));
-        java.net.URI transferUrl;
         try {
             // send request
             SrmPrepareToGetResponse response = m_stub.srmPrepareToGet(request);
@@ -150,19 +128,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             TReturnStatus detailedStatus = (fileStatus!=null ? fileStatus.getStatus() : null);
             if (status.getStatusCode().equals(TStatusCode.SRM_SUCCESS)) {
                 if (detailedStatus!=null && detailedStatus.getStatusCode().equals(TStatusCode.SRM_FILE_PINNED)) {
-                    org.apache.axis.types.URI tUri = fileStatus.getTransferURL();
-                    try {
-                        //todo: remove this workaround when the bug will be fixed in DPM
-                        if (tUri.getPath()!=null && tUri.getPath().indexOf(':')>-1) {
-                            tUri.setPath(tUri.getPath().substring(tUri.getPath().indexOf(':')+1));
-                        }
-                        if (tUri.getPort() == -1) {
-                            tUri.setPort(2811);
-                        }
-                    } catch (org.apache.axis.types.URI.MalformedURIException e) {
-                        throw new NoSuccessException("INTERNAL ERROR: failed to correct transfer URI: "+tUri);
-                    }
-                    transferUrl = new java.net.URI(fileStatus.getTransferURL().toString());
+                    return new SRMResponse(token, fileStatus.getTransferURL());
                 } else {
                     throw new NoSuccessException("Request successful but file is not pinned");
                 }
@@ -180,14 +146,27 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             }
         } catch (RemoteException e) {
             throw new TimeoutException(e);
-        } catch (URISyntaxException e) {
-            throw new NoSuccessException(e);
         }
+    }
+    public String[] listLocations(String logicalEntry, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+        // send srmPrepareToGet message
+        SRMResponse srmResponse = this.srmPrepareToGet(logicalEntry);
+        java.net.URI transferUrl = srmResponse.getTransferUrl();
+
+        // returns
+        return new String[]{transferUrl.toString()};
+    }
+    public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+        // send srmPrepareToPGet message
+        SRMResponse srmResponse = this.srmPrepareToGet(absolutePath);
+        String token = srmResponse.getToken();
+        java.net.URI transferUrl = srmResponse.getTransferUrl();
+
         // connect to transfer server
-        SagaDataAdaptor adaptor = new SagaDataAdaptor(transferUrl, m_credential);
+        SagaDataAdaptor adaptor = new SagaDataAdaptor(transferUrl, m_credential, token, absolutePath, this);
         return adaptor.getInputStream(transferUrl.getPath(), null);
     }
-    private void closeInputStream(String token, String absolutePath) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+    public void freeInputStream(String token, String absolutePath) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         org.apache.axis.types.URI logicalUri = toSrmURI(absolutePath);
         SrmReleaseFilesRequest request = new SrmReleaseFilesRequest();
         request.setRequestToken(token);
@@ -224,13 +203,12 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         }
     }
 
-    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
-        org.apache.axis.types.URI logicalUri = this.toSrmURI(parentAbsolutePath+"/"+fileName);
+    private SRMResponse srmPrepareToPut(String absolutePath) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
+        org.apache.axis.types.URI logicalUri = this.toSrmURI(absolutePath);
         SrmPrepareToPutRequest request = new SrmPrepareToPutRequest();
         request.setArrayOfFileRequests(new ArrayOfTPutFileRequest(new TPutFileRequest[]{new TPutFileRequest(logicalUri, null)}));
         request.setTransferParameters(new TTransferParameters(
                 TAccessPattern.TRANSFER_MODE, TConnectionType.WAN, null, new ArrayOfString(m_transferProtocols)));
-        java.net.URI transferUrl;
         try {
             // send request
             SrmPrepareToPutResponse response = m_stub.srmPrepareToPut(request);
@@ -266,7 +244,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             TReturnStatus detailedStatus = (fileStatus!=null ? fileStatus.getStatus() : null);
             if (status.getStatusCode().equals(TStatusCode.SRM_SUCCESS)) {
                 if (detailedStatus!=null && detailedStatus.getStatusCode().equals(TStatusCode.SRM_SPACE_AVAILABLE)) {
-                    transferUrl = new java.net.URI(fileStatus.getTransferURL().toString());
+                    return new SRMResponse(token, fileStatus.getTransferURL());
                 } else {
                     throw new NoSuccessException("Request successful but space is not available");
                 }
@@ -278,19 +256,25 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
                         rethrowException(status);
                     }
                 } catch (DoesNotExistException e2) {
-                    throw new NoSuccessException(e2);
+                    throw new ParentDoesNotExist(e2);
                 }
                 throw new NoSuccessException("INTERNAL ERROR: an exception should have been raised");
             }
         } catch (RemoteException e) {
             throw new TimeoutException(e);
-        } catch (URISyntaxException e) {
-            throw new NoSuccessException(e);
         }
+    }
+    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
+        // send srmPrepareToPut message
+        String absolutePath = parentAbsolutePath+"/"+fileName;
+        SRMResponse srmResponse = this.srmPrepareToPut(absolutePath);
+        String token = srmResponse.getToken();
+        java.net.URI transferUrl = srmResponse.getTransferUrl();
+        
         // connect to transfer server
         SagaDataAdaptor adaptor;
         try {
-            adaptor = new SagaDataAdaptor(transferUrl, m_credential);
+            adaptor = new SagaDataAdaptor(transferUrl, m_credential, token, absolutePath, this);
         } catch (DoesNotExistException e) {
             throw new ParentDoesNotExist("Parent directory does not exist");
         }
@@ -299,7 +283,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         String transferFileName = (pos>-1 ? transferUrl.getPath().substring(pos+1) : transferUrl.getPath());
         return adaptor.getOutputStream(transferParentPath, transferFileName, exclusive, append, null);
     }
-    private void closeOutputStream(String token, String absolutePath) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+    public void freeOutputStream(String token, String absolutePath) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         org.apache.axis.types.URI logicalUri = toSrmURI(absolutePath);
         SrmPutDoneRequest request = new SrmPutDoneRequest();
         request.setRequestToken(token);
@@ -342,16 +326,18 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
 
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         TMetaDataPathDetail metadata = this.getMetaData(absolutePath);
-        TMetaDataPathDetail[] list = metadata.getArrayOfSubPaths().getPathDetailArray();
-        if (list != null) {
-            FileAttributes[] files = new FileAttributes[list.length];
-            for (int i=0; list!=null && i<list.length; i++) {
-                files[i] = new SRM22FileAttributes(list[i]);
+        ArrayOfTMetaDataPathDetail detail = metadata.getArrayOfSubPaths();
+        if (detail != null) {   // check for DPM
+            TMetaDataPathDetail[] list = detail.getPathDetailArray();
+            if (list != null) { // check for dCache
+                FileAttributes[] files = new FileAttributes[list.length];
+                for (int i=0; list!=null && i<list.length; i++) {
+                    files[i] = new SRM22FileAttributes(list[i]);
+                }
+                return files;
             }
-            return files;
-        } else {
-            return new FileAttributes[0];
         }
+        return new FileAttributes[0];
     }
 
     public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
@@ -445,6 +431,12 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         try {
             // send request
             response = m_stub.srmLs(request);
+        } catch (AxisFault e) {
+            if (EOFException.class.getName().equals(e.getFaultString())) {
+                throw new PermissionDeniedException(e.getCause());
+            } else {
+                throw new TimeoutException(e);
+            }
         } catch (RemoteException e) {
             throw new TimeoutException(e);
         }
@@ -486,7 +478,6 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         }
     }
 
-    //todo: convert missing parent directory error to ParentDoesNotExist exception
     private void rethrowException(TReturnStatus status) throws PermissionDeniedException, BadParameterException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException {
         TStatusCode code = status.getStatusCode();
         String explanation = status.getExplanation();
