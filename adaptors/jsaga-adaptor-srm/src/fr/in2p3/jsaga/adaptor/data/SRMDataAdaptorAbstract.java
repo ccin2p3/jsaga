@@ -76,6 +76,6 @@ public abstract class SRMDataAdaptorAbstract implements DataAdaptor {
     }
 
     public BaseURL getBaseURL() throws IncorrectURLException {
-        return new BaseURL(8443);
+        return new BaseURL(8446);
     }
 }
