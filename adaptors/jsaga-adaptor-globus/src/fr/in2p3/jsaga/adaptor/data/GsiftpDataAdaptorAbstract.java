@@ -18,7 +18,6 @@ import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.*;
 
 import java.io.*;
-import java.lang.Exception;
 import java.util.Map;
 
 /* ***************************************************
@@ -103,7 +102,19 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
 
     public boolean exists(String absolutePath, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         try {
-            return m_client.exists(absolutePath);
+            boolean exists = m_client.exists(absolutePath);
+
+            //workaround: if permission is denied, throw an exception instead of returning false
+            if (exists) {
+                return true;
+            } else {
+                try {
+                    this.getAttributes(absolutePath, additionalArgs);   //may throw a PermissionDenied exception
+                    return true;
+                } catch (DoesNotExistException e) {
+                    return false;
+                }
+            }
         } catch (Exception e) {
             try {
                 throw rethrowException(e);
@@ -280,7 +291,14 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
     private NoSuccessException rethrowExceptionFull(Exception exception) throws PermissionDeniedException, BadParameterException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException {
         try {
             throw exception;
-        } catch (IllegalArgumentException e) {
+        }
+        catch (PermissionDeniedException e) {throw e;}
+        catch (BadParameterException e) {throw e;}
+        catch (DoesNotExistException e) {throw e;}
+        catch (AlreadyExistsException e) {throw e;}
+        catch (TimeoutException e) {throw e;}
+        catch (NoSuccessException e) {throw e;}
+        catch (IllegalArgumentException e) {
             throw new BadParameterException(e);
         } catch (IOException e) {
             throw new TimeoutException(e);
