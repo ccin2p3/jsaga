@@ -3,7 +3,8 @@ package fr.in2p3.jsaga.command;
 import org.apache.commons.cli.*;
 import org.ogf.saga.error.*;
 import org.ogf.saga.logicalfile.LogicalFile;
-import org.ogf.saga.namespace.*;
+import org.ogf.saga.logicalfile.LogicalFileFactory;
+import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.url.URL;
@@ -75,13 +76,7 @@ public class NSLogicalLocation extends AbstractCommand {
     private LogicalFile getLogicalFile(int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectStateException, AlreadyExistsException {
         URL logicalUrl = URLFactory.createURL(m_nonOptionValues[0]);
         Session session = SessionFactory.createSession(true);
-        NSEntry entry = NSFactory.createNSEntry(session, logicalUrl, flags);
-        if (entry instanceof LogicalFile) {
-            LogicalFile file = (LogicalFile) entry;
-            return file;
-        } else {
-            throw new BadParameterException("Provided URL is not a logical file: "+logicalUrl);
-        }
+        return LogicalFileFactory.createLogicalFile(session, logicalUrl, flags);
     }
 
     protected Options createOptions() {
