@@ -44,9 +44,17 @@ public class FileOutputStreamPipedImpl extends AbstractAsyncFileOutputStreamImpl
             if (exclusive && a.exists(fileUrl.getPath(), fileUrl.getQuery())) {
                 // need to check existence explicitely, else exception is never thrown
                 throw new AlreadyExistsException("File already exists: "+fileUrl);
-            } else if (!a.exists(parent.getPath(), parent.getQuery())) {
+            } else {
                 // need to check existence explicitely, else exception is thrown to late (when writing bytes)
-                throw new DoesNotExistException("Parent directory does not exist: "+parent);
+                boolean parentExists;
+                try {
+                    parentExists = a.exists(parent.getPath(), parent.getQuery());
+                } catch (PermissionDeniedException e) {
+                    parentExists = true;
+                }
+                if (!parentExists) {
+                    throw new DoesNotExistException("Parent directory does not exist: "+parent);
+                }
             }
         }
         m_outStream = new PipedOutputStreamImpl(
