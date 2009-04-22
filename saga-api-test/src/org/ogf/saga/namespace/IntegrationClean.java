@@ -1,5 +1,7 @@
 package org.ogf.saga.namespace;
 
+import org.apache.log4j.Logger;
+import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.namespace.abstracts.AbstractNSCopyTest;
 
 /* ***************************************************
@@ -24,7 +26,12 @@ public abstract class IntegrationClean extends AbstractNSCopyTest {
         m_toBeRemoved = true;
         m_dir = NSFactory.createNSDirectory(m_session, m_dirUrl, Flags.NONE.getValue());
         if (m_dirUrl2 != null) {
-            m_dir2 = NSFactory.createNSDirectory(m_session, m_dirUrl2, Flags.NONE.getValue());
+            try {
+                m_dir2 = NSFactory.createNSDirectory(m_session, m_dirUrl2, Flags.NONE.getValue());
+            } catch (DoesNotExistException e) {
+                Logger.getLogger(this.getClass()).warn("Directory does not exist: "+m_dirUrl2, e);
+                m_dir2 = null;
+            }
         }
     }
 
