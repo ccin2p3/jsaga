@@ -146,10 +146,13 @@ public class FileCopy {
                     }
                     readlen = in.read(data,0, data.length);
                 }
+                // close stream
+                out.close();
             } catch (IOException e) {
                 throw new TimeoutException(e);
             } finally {
                 try {
+                    // close connection
                     targetFile.close();
                 } catch (Exception e) {
                     closingException = new IOException(e.getClass().getName()+": "+e.getMessage());
