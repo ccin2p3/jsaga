@@ -1,7 +1,6 @@
 package fr.in2p3.jsaga.engine.factories;
 
 import fr.in2p3.jsaga.engine.config.AmbiguityException;
-import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.config.bean.ContextEngineConfiguration;
 import fr.in2p3.jsaga.helpers.StringArray;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
@@ -62,14 +61,13 @@ public class ServiceAdaptorFactory {
         for (Iterator<String> it=contextRefCandidates.iterator(); it.hasNext(); ) {
             String contextRef = it.next();
             ContextImpl context = this.findContext(session, contextRef);
-            if (context == null) {
-                throw new ConfigurationException("INTERNAL ERROR: effective-config may be inconsistent");
-            }
-            try {
-                context.getAdaptor();
-                contextCandidates.add(context);
-            } catch(SagaException e) {
-                // ignore invalid contexts
+            if (context != null) {
+                try {
+                    context.getAdaptor();
+                    contextCandidates.add(context);
+                } catch(SagaException e) {
+                    // ignore invalid contexts
+                }
             }
         }
 

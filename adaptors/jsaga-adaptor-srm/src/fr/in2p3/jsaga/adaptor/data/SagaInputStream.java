@@ -63,7 +63,10 @@ public class SagaInputStream extends InputStream {
             m_file.close();
 
             // release SRM file
-            m_callback.freeInputStream(m_token, m_srmPath);
+            if (m_callback != null) {
+                m_callback.freeInputStream(m_token, m_srmPath);
+                m_callback = null;
+            }
         } catch (Exception e) {
             throw new IOException(e.getMessage());
         }
