@@ -21,6 +21,7 @@ import java.util.Properties;
  */
 public class EngineProperties {
     public static final String JSAGA_UNIVERSE = "jsaga.universe";
+    public static final String JSAGA_UNIVERSE_CREATE_IF_MISSING = "jsaga.universe.create.if.missing";
     public static final String JSAGA_UNIVERSE_ENABLE_CACHE = "jsaga.universe.enable.cache";
     public static final String JSAGA_UNIVERSE_IGNORE_MISSING_ADAPTOR = "jsaga.universe.ignore.missing.adaptor";
     public static final String LOG4J_CONFIGURATION = "log4j.configuration";
@@ -39,6 +40,7 @@ public class EngineProperties {
             // set default properties
             s_prop = new Properties();
             s_prop.setProperty(JSAGA_UNIVERSE, "etc/jsaga-universe.xml");
+            s_prop.setProperty(JSAGA_UNIVERSE_CREATE_IF_MISSING, "false");
             s_prop.setProperty(JSAGA_UNIVERSE_ENABLE_CACHE, "true");
             s_prop.setProperty(JSAGA_UNIVERSE_IGNORE_MISSING_ADAPTOR, "true");
             s_prop.setProperty(LOG4J_CONFIGURATION, "etc/log4j.properties");
@@ -70,12 +72,23 @@ public class EngineProperties {
         getProperties().setProperty(name, value);
     }
 
-    public static String getProperty(String name) {
+    private static String getEngineProperty(String name) {
         String value = getProperties().getProperty(name);
         if (value != null) {
             return value;
         } else {
             throw new RuntimeException("[INTERNAL ERROR] Engine property not found: "+name);
+        }
+    }
+
+    public static String getProperty(String name) {
+        // try with system property
+        String value = System.getProperty(name);
+        if (value != null) {
+            return value;
+        } else {
+            // try with engine property
+            return EngineProperties.getEngineProperty(name);
         }
     }
 
@@ -87,6 +100,7 @@ public class EngineProperties {
      * @return the URL
      */
     public static URL getRequiredURL(String name) throws ConfigurationException {
+        // try with system property
         String value = System.getProperty(name);
         if (value != null) {
             try {
@@ -95,7 +109,8 @@ public class EngineProperties {
                 throw new ConfigurationException("Malformed URL: "+value, e);
             }
         } else {
-            String path = getProperty(name);
+            // try with engine property
+            String path = EngineProperties.getEngineProperty(name);
             File file;
             if (new File(path).isAbsolute()) {
                 file = new File(path);
