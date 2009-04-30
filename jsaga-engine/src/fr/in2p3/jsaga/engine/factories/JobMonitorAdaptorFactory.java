@@ -91,6 +91,8 @@ public class JobMonitorAdaptorFactory extends ServiceAdaptorFactory {
             if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(monitorAdaptor.getSupportedSecurityAdaptorClasses())) {
                 throw new NoSuccessException("Security context not found: "+monitorURL.getFragment());
             }
+        } else if (session.listContexts().length == 1) {
+            context = (ContextImpl) session.listContexts()[0];
         } else if (jobServiceConfig.getSupportedContextTypeCount() > 0) {
             context = super.findContext(session, jobServiceConfig.getSupportedContextType());
             if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(monitorAdaptor.getSupportedSecurityAdaptorClasses())) {
@@ -109,7 +111,7 @@ public class JobMonitorAdaptorFactory extends ServiceAdaptorFactory {
             try {
                 securityAdaptor = context.getAdaptor();
             } catch (IncorrectStateException e) {
-                throw new NoSuccessException("Bad security context: "+super.getContextType(context), e);
+                throw new NoSuccessException("Invalid security context: "+super.getContextType(context), e);
             }
             if (SecurityAdaptorDescriptor.isSupported(securityAdaptor.getClass(), monitorAdaptor.getSupportedSecurityAdaptorClasses())) {
                 monitorAdaptor.setSecurityAdaptor(securityAdaptor);

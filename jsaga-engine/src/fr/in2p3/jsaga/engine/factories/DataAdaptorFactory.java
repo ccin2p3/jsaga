@@ -75,6 +75,8 @@ public class DataAdaptorFactory extends ServiceAdaptorFactory {
             if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(dataAdaptor.getSupportedSecurityAdaptorClasses())) {
                 throw new NoSuccessException("Security context not found: "+url.getFragment());
             }
+        } else if (session.listContexts().length == 1) {
+            context = (ContextImpl) session.listContexts()[0];
         } else if (config.getSupportedContextTypeCount() > 0) {
             context = super.findContext(session, config.getSupportedContextType());
             if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(dataAdaptor.getSupportedSecurityAdaptorClasses())) {
@@ -93,7 +95,7 @@ public class DataAdaptorFactory extends ServiceAdaptorFactory {
             try {
                 securityAdaptor = context.getAdaptor();
             } catch (IncorrectStateException e) {
-                throw new NoSuccessException("Bad security context: "+super.getContextType(context), e);
+                throw new NoSuccessException("Invalid security context: "+super.getContextType(context), e);
             }
             if (SecurityAdaptorDescriptor.isSupported(securityAdaptor.getClass(), dataAdaptor.getSupportedSecurityAdaptorClasses())) {
                 dataAdaptor.setSecurityAdaptor(securityAdaptor);
