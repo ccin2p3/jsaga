@@ -102,7 +102,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     	if(attributes.containsKey(MONITOR_SERVICE_URL)) {
     		// LB server name get in config
     		URL lbUrl = (URL) attributes.get(MONITOR_SERVICE_URL);
-            m_lbServerUrl = lbUrl.getHost() + ":" + (lbUrl.getPort()>0 ? lbUrl.getPort() : attributes.get(MONITOR_PORT));
+            m_lbServerUrl = lbUrl.getHost() + ":" + (lbUrl.getPort()>0 ? ""+lbUrl.getPort() : attributes.get(MONITOR_PORT));
     	} else {
             // LB server will be extracted from jobid
             m_lbServerUrl = null;
