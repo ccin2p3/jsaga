@@ -35,6 +35,10 @@ public class URLImpl implements URL {
             }
         }
         try {
+            // fix absolute path
+            while (url.startsWith("//")) {
+                url = url.substring(1); // prevent URI to consider root dir as a host
+            }
             u = new URI(url);
             this.fixFileURI();  //sreynaud
         } catch(URISyntaxException e) {
