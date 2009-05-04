@@ -53,8 +53,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 	private WMProxyAPI m_client;
     private String m_delegationId = "myId";
     private String m_wmsServerUrl;
-    private String m_lbServerHost;
-    private int m_lbPort;
+    private String m_lbServerUrl;
     
     public String getType() {
         return "wms";
@@ -102,16 +101,13 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     	m_wmsServerUrl = "https://"+host+":"+port+basePath;
     	if(attributes.containsKey(MONITOR_SERVICE_URL)) {
     		// LB server name get in config
-    		m_lbServerHost = ((URL) attributes.get(MONITOR_SERVICE_URL)).getHost();
-    	}
-    	else {
-    		// LB And WMS on the same server
-    		m_lbServerHost = host;
-    	}
-    	
-    	// get port
-    	m_lbPort = Integer.parseInt((String) attributes.get(MONITOR_PORT));
-    	
+    		URL lbUrl = (URL) attributes.get(MONITOR_SERVICE_URL);
+            m_lbServerUrl = lbUrl.getHost() + ":" + (lbUrl.getPort()>0 ? lbUrl.getPort() : attributes.get(MONITOR_PORT));
+    	} else {
+            // LB server will be extracted from jobid
+            m_lbServerUrl = null;
+        }
+
     	// get certificate directory : This solution is temporary
     	String caLoc = (String)attributes.get(Context.CERTREPOSITORY);
     	
@@ -200,9 +196,10 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     public String submit(String jobDesc, boolean checkMatch, String uniqId)
     	throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
     	try {
-    		
-    		//Add LB Address in JDL
-			jobDesc += "LBAddress=\""+m_lbServerHost+":"+m_lbPort+"\";";
+            // put lbServerUrl in JDL
+    		if (m_lbServerUrl != null) {
+			    jobDesc += "LBAddress=\""+m_lbServerUrl+"\";";
+            }
 			
 			// parse JDL and Check Matching
 			checkJDLAndMAtch(jobDesc, checkMatch, m_client);
@@ -211,6 +208,11 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     		String jobId = m_client.jobSubmit(jobDesc, m_delegationId).getId();
             if(logger.isDebugEnabled())
             	logger.debug("Id for job:"+jobId);
+
+            // set lbServerUrl from jobId
+            if (m_lbServerUrl == null) {
+                WMSJobMonitorAdaptor.setLBServerUrl(m_wmsServerUrl, jobId);
+            }
 	    	return jobId;
         } catch (ServerOverloadedFaultException e) {
             throw new NoSuccessException(e);
@@ -233,8 +235,10 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
                                String uniqId, InputStream stdin) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		
 		try {
-			
-			jobDesc += "LBAddress=\""+m_lbServerHost+":"+m_lbPort+"\";";
+            // put lbServerUrl in JDL
+			if (m_lbServerUrl != null) {
+			    jobDesc += "LBAddress=\""+m_lbServerUrl+"\";";
+            }
 						
 			// add stdout/stderr
 			stdoutFile = File.createTempFile("stdout", ".txt");
@@ -295,12 +299,19 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 				// register job
 				jobId = m_client.jobRegister(jobDesc, m_delegationId).getId();
 			}
+
+            // set lbServerUrl from jobId
+            if (m_lbServerUrl == null) {
+                WMSJobMonitorAdaptor.setLBServerUrl(m_wmsServerUrl, jobId);
+            }
 			
 			// start job
             m_client.jobStart(jobId);
             if(logger.isDebugEnabled())
             	logger.debug("Id for job:"+jobId);
 			return new WMSJobIOHandler(jobId, m_client, m_credential, stdoutFile.getAbsolutePath(), stderrFile.getAbsolutePath());
+        } catch (NoSuccessException e) {
+            throw e;
 		} catch (AuthorizationFaultException e) {
 			throw new PermissionDeniedException(e);
 		} catch (AuthenticationFaultException e) {

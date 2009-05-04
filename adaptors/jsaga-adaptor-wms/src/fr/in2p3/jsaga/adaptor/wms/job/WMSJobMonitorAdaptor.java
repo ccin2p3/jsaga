@@ -39,6 +39,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.Map;
+import java.util.HashMap;
 
 import javax.xml.rpc.ServiceException;
 
@@ -52,9 +53,24 @@ import javax.xml.rpc.ServiceException;
 * ***************************************************/
 
 public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements QueryIndividualJob, QueryFilteredJob {
+    private static Map s_registry = new HashMap();
 
 	private int m_lbPort;
 	private String m_lbHost;
+
+    static void setLBServerUrl(String wmsServerUrl, String jobId) throws NoSuccessException {
+        WMSJobMonitorAdaptor adaptor = (WMSJobMonitorAdaptor) s_registry.get(wmsServerUrl);
+        if (adaptor != null) {
+            try {
+                URL jobIdUrl = new URL(jobId);
+                adaptor.m_lbHost = jobIdUrl.getHost();
+                // jobIdUrl port can not be used for invoking web service, keep default port...
+//                adaptor.m_lbPort = jobIdUrl.getPort();
+            } catch (MalformedURLException e) {
+                throw new NoSuccessException("[INTERNAL ERROR] Bad job-id URL: "+jobId);
+            }
+        }
+    }
 
 	// Should never be invoked 
 	public int getDefaultPort() {
@@ -76,8 +92,13 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
   
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     	m_lbHost = host;
-    	if(attributes.containsKey(MONITOR_PORT))
-    		m_lbPort = Integer.parseInt((String) attributes.get(MONITOR_PORT));
+        m_lbPort = Integer.parseInt((String) attributes.get(MONITOR_PORT));
+
+        // register
+        String wmsServerUrl = "https://"+host+":"+port+basePath;
+        if (! s_registry.containsKey(wmsServerUrl)) {
+            s_registry.put(wmsServerUrl, this);
+        }
     }
 
     public void disconnect() throws NoSuccessException {
