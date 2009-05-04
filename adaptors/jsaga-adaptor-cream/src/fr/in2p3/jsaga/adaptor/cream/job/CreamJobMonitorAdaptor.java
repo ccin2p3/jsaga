@@ -6,6 +6,7 @@ import org.apache.axis.types.URI;
 import org.glite.ce.creamapi.ws.cream2.CREAMPort;
 import org.glite.ce.creamapi.ws.cream2.types.*;
 import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
 
 import java.rmi.RemoteException;
@@ -61,25 +62,24 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
         JobStatus[] jsArray = new JobStatus[resultArray.length];
         for (int i=0; resultArray!=null && i<resultArray.length; i++) {
             // rethrow exception
-            BaseFaultType fault = null;
-            if (resultArray[i].getDateMismatchFault() != null) {
-                fault = resultArray[i].getDateMismatchFault();
-            } else if (resultArray[i].getDelegationIdMismatchFault() != null) {
-                fault = resultArray[i].getDelegationIdMismatchFault();
-            } else if (resultArray[i].getGenericFault() != null) {
-                fault = resultArray[i].getGenericFault();
-            } else if (resultArray[i].getJobStatusInvalidFault() != null) {
-                fault = resultArray[i].getJobStatusInvalidFault();
-            } else if (resultArray[i].getJobUnknownFault() != null) {
-                fault = resultArray[i].getJobUnknownFault();
-            } else if (resultArray[i].getLeaseIdMismatchFault() != null) {
-                fault = resultArray[i].getLeaseIdMismatchFault();
-            }
-            if (fault != null) {
-                String message = fault.getFaultCause()!=null && !fault.getFaultCause().equals("N/A")
-                        ? fault.getFaultCause()
-                        : fault.getClass().getName();
-                throw new NoSuccessException(message, fault);
+            try {
+                if (resultArray[i].getDateMismatchFault()!=null) {
+                    throw resultArray[i].getDateMismatchFault();
+                } else if (resultArray[i].getDelegationIdMismatchFault()!=null) {
+                    throw resultArray[i].getDelegationIdMismatchFault();
+                } else if (resultArray[i].getGenericFault()!=null) {
+                    throw resultArray[i].getGenericFault();
+                } else if (resultArray[i].getJobStatusInvalidFault()!=null) {
+                    throw resultArray[i].getJobStatusInvalidFault();
+                } else if (resultArray[i].getJobUnknownFault()!=null) {
+                    throw resultArray[i].getJobUnknownFault();
+                } else if (resultArray[i].getLeaseIdMismatchFault()!=null) {
+                    throw resultArray[i].getLeaseIdMismatchFault();
+                }
+            } catch (DelegationIdMismatchFault fault) {
+                throw new NoSuccessException(new PermissionDeniedException(getMessage(fault), fault));
+            } catch (BaseFaultType fault) {
+                throw new NoSuccessException(getMessage(fault), fault);
             }
 
             // extract last status from job info
@@ -103,5 +103,14 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
             }
         }
         return jsArray;
+    }
+    private static String getMessage(BaseFaultType fault) {
+        if (fault.getDescription()!=null && !fault.getDescription().equals("")) {
+            return fault.getDescription();
+        } else if (fault.getFaultCause()!=null && !fault.getFaultCause().equals("N/A")) {
+            return fault.getFaultCause();
+        } else {
+            return fault.getClass().getName();
+        }
     }
 }
