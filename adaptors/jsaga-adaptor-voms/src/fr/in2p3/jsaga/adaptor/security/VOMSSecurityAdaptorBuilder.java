@@ -57,11 +57,7 @@ public class VOMSSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuild
                                 }),
                                 new UFilePath(Context.USERPROXY), new UHidden(Context.USERPASS),
                                 new U(Context.SERVER), new U(Context.USERVO), new UOptional(VOMSContext.USERFQAN),
-                                new UDuration(Context.LIFETIME) {
-                                    protected Object throwExceptionIfInvalid(Object value) throws Exception {
-                                        return (value!=null ? super.throwExceptionIfInvalid(value) : null);
-                                    }
-                                },
+                                new UDuration(Context.LIFETIME),
                                 new UOptional(VOMSContext.DELEGATION) {
                                     protected Object throwExceptionIfInvalid(Object value) throws Exception {
                                         if (super.throwExceptionIfInvalid(value) != null) {

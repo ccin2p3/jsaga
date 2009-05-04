@@ -56,11 +56,7 @@ public abstract class GlobusSecurityAdaptorBuilder implements ExpirableSecurityA
                                         new UAnd(USAGE_INIT_PEM, new Usage[]{new UFile(Context.USERCERT), new UFile(Context.USERKEY)})
                                 }),
                                 new UFilePath(Context.USERPROXY), new UHidden(Context.USERPASS),
-                                new UDuration(Context.LIFETIME) {
-                                    protected Object throwExceptionIfInvalid(Object value) throws Exception {
-                                        return (value!=null ? super.throwExceptionIfInvalid(value) : null);
-                                    }
-                                },
+                                new UDuration(Context.LIFETIME),
                                 new UOptional(GlobusContext.DELEGATION) {
                                     protected Object throwExceptionIfInvalid(Object value) throws Exception {
                                         if (super.throwExceptionIfInvalid(value) != null) {
