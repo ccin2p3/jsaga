@@ -110,6 +110,9 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 
     	// get certificate directory : This solution is temporary
     	String caLoc = (String)attributes.get(Context.CERTREPOSITORY);
+        if (caLoc == null) {
+            throw new NoSuccessException("Missing required configuration attribute in element <job>: "+Context.CERTREPOSITORY);
+        }
     	
         // save proxy file
     	try {
