@@ -122,26 +122,26 @@ public abstract class GlobusSecurityAdaptorBuilder implements ExpirableSecurityA
                 {
                     GlobusProxyFactory factory = new GlobusProxyFactory(attributes, this.getGlobusType(), GlobusProxyFactory.CERTIFICATE_PKCS12);
                     GSSCredential cred = factory.createProxy();
-                    return this.createSecurityAdaptor(cred);
+                    return this.createSecurityAdaptor(cred, attributes);
                 }
                 case USAGE_INIT_PEM:
                 {
                     GlobusProxyFactory factory = new GlobusProxyFactory(attributes, this.getGlobusType(), GlobusProxyFactory.CERTIFICATE_PEM);
                     GSSCredential cred = factory.createProxy();
-                    return this.createSecurityAdaptor(cred);
+                    return this.createSecurityAdaptor(cred, attributes);
                 }
                 case USAGE_MEMORY:
                 {
                     String base64 = (String) attributes.get(GlobusContext.USERPROXYOBJECT);
                     GSSCredential cred = InMemoryProxySecurityAdaptor.toGSSCredential(base64);
-                    return this.createSecurityAdaptor(cred);
+                    return this.createSecurityAdaptor(cred, attributes);
                 }
                 case USAGE_LOAD:
                 {
                     CoGProperties.getDefault().setCaCertLocations((String) attributes.get(Context.CERTREPOSITORY));
                     File proxyFile = new File((String) attributes.get(Context.USERPROXY));
                     GSSCredential cred = load(proxyFile);
-                    return this.createSecurityAdaptor(cred);
+                    return this.createSecurityAdaptor(cred, attributes);
                 }
                 default:
                     throw new NoSuccessException("INTERNAL ERROR: unexpected exception");
@@ -154,9 +154,10 @@ public abstract class GlobusSecurityAdaptorBuilder implements ExpirableSecurityA
             throw new NoSuccessException(e);
         }
     }
-    private SecurityAdaptor createSecurityAdaptor(GSSCredential cred) throws IncorrectStateException {
+    private SecurityAdaptor createSecurityAdaptor(GSSCredential cred, Map attributes) throws IncorrectStateException {
         if (this.checkType(cred) && !hasNonCriticalExtensions(cred)) {
-            return new GlobusSecurityAdaptor(cred);
+            File certRepository = new File((String) attributes.get(Context.CERTREPOSITORY));
+            return new GlobusSecurityAdaptor(cred, certRepository);
         } else {
             throw new IncorrectStateException("Security context is not of type: "+this.getType());
         }

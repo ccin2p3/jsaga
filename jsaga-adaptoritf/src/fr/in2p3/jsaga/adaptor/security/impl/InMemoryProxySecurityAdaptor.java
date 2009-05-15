@@ -20,8 +20,8 @@ import java.io.*;
  *
  */
 public class InMemoryProxySecurityAdaptor extends GSSCredentialSecurityAdaptor {
-    public InMemoryProxySecurityAdaptor(String base64) throws NoSuccessException {
-        super(toGSSCredential(base64));
+    public InMemoryProxySecurityAdaptor(String base64, File certRepository) throws NoSuccessException {
+        super(toGSSCredential(base64), certRepository);
     }
 
     /** override super.getAttribute() */

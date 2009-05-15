@@ -12,6 +12,7 @@ import org.ogf.saga.context.Context;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 
+import java.io.File;
 import java.io.PrintStream;
 import java.text.ParseException;
 import java.util.Iterator;
@@ -30,8 +31,8 @@ import java.util.Vector;
  *
  */
 public class VOMSSecurityAdaptor extends GSSCredentialSecurityAdaptor implements SecurityAdaptor {
-    public VOMSSecurityAdaptor(GSSCredential proxy) {
-        super(proxy);
+    public VOMSSecurityAdaptor(GSSCredential proxy, File certRepository) {
+        super(proxy, certRepository);
     }
 
     /** override super.getAttribute() */

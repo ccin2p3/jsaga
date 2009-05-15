@@ -7,6 +7,7 @@ import org.ogf.saga.context.Context;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 
+import java.io.File;
 import java.io.PrintStream;
 
 /* ***************************************************
@@ -23,13 +24,19 @@ import java.io.PrintStream;
  */
 public abstract class GSSCredentialSecurityAdaptor implements SecurityAdaptor {
     protected GSSCredential m_proxy;
+    protected File m_certRepository;
 
-    public GSSCredentialSecurityAdaptor(GSSCredential proxy) {
+    public GSSCredentialSecurityAdaptor(GSSCredential proxy, File certRepository) {
         m_proxy = proxy;
+        m_certRepository = certRepository;
     }
 
     public GSSCredential getGSSCredential() {
         return m_proxy;
+    }
+
+    public File getCertRepository() {
+        return m_certRepository;
     }
 
     public String getUserID() throws Exception {

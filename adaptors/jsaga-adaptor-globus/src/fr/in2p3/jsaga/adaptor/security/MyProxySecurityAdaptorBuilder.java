@@ -6,6 +6,7 @@ import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.usage.UProxyFile;
 import fr.in2p3.jsaga.adaptor.security.usage.UProxyObject;
+import org.globus.common.CoGProperties;
 import org.globus.myproxy.MyProxy;
 import org.globus.myproxy.MyProxyException;
 import org.globus.util.Util;
@@ -155,6 +156,7 @@ public class MyProxySecurityAdaptorBuilder implements ExpirableSecurityAdaptorBu
                 }
                 case USAGE_LOCAL_LOAD:
                 {
+                    CoGProperties.getDefault().setCaCertLocations((String) attributes.get(Context.CERTREPOSITORY));
                     GSSCredential cred = load(new File((String) attributes.get(Context.USERPROXY)));
                     return this.createSecurityAdaptor(cred, attributes);
                 }
@@ -196,10 +198,11 @@ public class MyProxySecurityAdaptorBuilder implements ExpirableSecurityAdaptorBu
         }
     }
     private SecurityAdaptor createSecurityAdaptor(GSSCredential cred, Map attributes) throws IncorrectStateException {
+        File certRepository = new File((String) attributes.get(Context.CERTREPOSITORY));
         String server = (String) attributes.get(Context.SERVER);
         String userId = (String) attributes.get(Context.USERID);
         String myProxyPass = (String) attributes.get(GlobusContext.MYPROXYPASS);
-        return new MyProxySecurityAdaptor(cred, server, userId, myProxyPass);
+        return new MyProxySecurityAdaptor(cred, certRepository, server, userId, myProxyPass);
     }
 
     public void destroySecurityAdaptor(Map attributes, String contextId) throws Exception {

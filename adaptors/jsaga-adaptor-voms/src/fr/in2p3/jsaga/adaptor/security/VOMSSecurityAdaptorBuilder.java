@@ -14,10 +14,11 @@ import org.gridforum.jgss.ExtendedGSSManager;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.*;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NoSuccessException;
 
 import java.io.*;
-import java.lang.Exception;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 
@@ -138,25 +139,25 @@ public class VOMSSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuild
                 case USAGE_INIT_PKCS12:
                 {
                     GSSCredential cred = new VOMSProxyFactory(attributes, VOMSProxyFactory.CERTIFICATE_PKCS12).createProxy();
-                    return this.createSecurityAdaptor(cred);
+                    return this.createSecurityAdaptor(cred, attributes);
                 }
                 case USAGE_INIT_PEM:
                 {
                     GSSCredential cred = new VOMSProxyFactory(attributes, VOMSProxyFactory.CERTIFICATE_PEM).createProxy();
-                    return this.createSecurityAdaptor(cred);
+                    return this.createSecurityAdaptor(cred, attributes);
                 }
                 case USAGE_MEMORY:
                 {
                     String base64 = (String) attributes.get(VOMSContext.USERPROXYOBJECT);
                     GSSCredential cred = InMemoryProxySecurityAdaptor.toGSSCredential(base64);
-                    return this.createSecurityAdaptor(cred);
+                    return this.createSecurityAdaptor(cred, attributes);
                 }
                 case USAGE_LOAD:
                 {
                     CoGProperties.getDefault().setCaCertLocations((String) attributes.get(Context.CERTREPOSITORY));
                     File proxyFile = new File((String) attributes.get(Context.USERPROXY));
                     GSSCredential cred = load(proxyFile);
-                    return this.createSecurityAdaptor(cred);
+                    return this.createSecurityAdaptor(cred, attributes);
                 }
                 default:
                     throw new NoSuccessException("INTERNAL ERROR: unexpected exception");
@@ -169,7 +170,7 @@ public class VOMSSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuild
             throw new NoSuccessException(e);
         }
     }
-    protected SecurityAdaptor createSecurityAdaptor(GSSCredential cred) throws IncorrectStateException {
+    protected SecurityAdaptor createSecurityAdaptor(GSSCredential cred, Map attributes) throws IncorrectStateException {
         // check if proxy contains extension
         /*GlobusCredential globusProxy = ((GlobusGSSCredentialImpl)cred).getGlobusCredential();        
         if(hasNonCriticalExtensions(cred)) {
@@ -200,8 +201,9 @@ public class VOMSSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuild
 	    		System.out.println("Is a GlobusRFC820 proxy");    		
 	    	}
     	}*/
+        File certRepository = new File((String) attributes.get(Context.CERTREPOSITORY));
         if (hasNonCriticalExtensions(cred)) {
-            return new VOMSSecurityAdaptor(cred);
+            return new VOMSSecurityAdaptor(cred, certRepository);
         } else {
             throw new IncorrectStateException("Security context is not of type: "+this.getType());
         }

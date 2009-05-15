@@ -9,9 +9,13 @@ import org.gridforum.jgss.ExtendedGSSCredential;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.*;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NoSuccessException;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.Map;
@@ -135,7 +139,7 @@ public class VOMSMyProxySecurityAdaptorBuilder extends VOMSSecurityAdaptorBuilde
                     Util.destroy(tempFile);
 
                     // returns
-                    return new VOMSMyProxySecurityAdaptor(cred);
+                    return this.createSecurityAdaptor(cred, attributes);
                 }
                 case USAGE_MEMORY:
                 case USAGE_LOAD:
@@ -147,14 +151,14 @@ public class VOMSMyProxySecurityAdaptorBuilder extends VOMSSecurityAdaptorBuilde
                 {
                     GSSCredential cred = renewCredential(null, attributes);
 //                    GSSCredential resignedCred = new VOMSProxyFactory(attributes, cred).createProxy();
-                    return new VOMSMyProxySecurityAdaptor(cred);
+                    return this.createSecurityAdaptor(cred, attributes);
                 }
                 case USAGE_RENEW_LOAD_WITH_PASSPHRASE:
                 {
                     GSSCredential cred = renewCredential(null, attributes);
 //                    GSSCredential resignedCred = new VOMSProxyFactory(attributes, cred).createProxy();
                     save(new File((String) attributes.get(Context.USERPROXY)), cred);
-                    return new VOMSMyProxySecurityAdaptor(cred);
+                    return this.createSecurityAdaptor(cred, attributes);
                 }
 /*
                 case USAGE_RENEW_MEMORY_WITH_PROXY:
@@ -182,8 +186,9 @@ public class VOMSMyProxySecurityAdaptorBuilder extends VOMSSecurityAdaptorBuilde
             throw new NoSuccessException(e);
         }
     }
-    protected SecurityAdaptor createSecurityAdaptor(GSSCredential cred) {
-        return new VOMSMyProxySecurityAdaptor(cred);
+    protected SecurityAdaptor createSecurityAdaptor(GSSCredential cred, Map attributes) {
+        File certRepository = new File((String) attributes.get(Context.CERTREPOSITORY));
+        return new VOMSMyProxySecurityAdaptor(cred, certRepository);
     }
 
     public void destroySecurityAdaptor(Map attributes, String contextId) throws Exception {

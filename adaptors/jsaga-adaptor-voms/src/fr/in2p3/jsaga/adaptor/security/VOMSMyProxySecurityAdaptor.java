@@ -2,6 +2,8 @@ package fr.in2p3.jsaga.adaptor.security;
 
 import org.ietf.jgss.GSSCredential;
 
+import java.io.File;
+
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -15,7 +17,7 @@ import org.ietf.jgss.GSSCredential;
  *
  */
 public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor {
-    public VOMSMyProxySecurityAdaptor(GSSCredential proxy) {
-        super(proxy);
+    public VOMSMyProxySecurityAdaptor(GSSCredential proxy, File certRepository) {
+        super(proxy, certRepository);
     }
 }

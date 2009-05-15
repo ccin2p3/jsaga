@@ -7,6 +7,7 @@ import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.util.Util;
 import org.ietf.jgss.GSSCredential;
 
+import java.io.File;
 import java.io.PrintStream;
 
 /* ***************************************************
@@ -22,8 +23,8 @@ import java.io.PrintStream;
  *
  */
 public class GlobusSecurityAdaptor extends GSSCredentialSecurityAdaptor implements SecurityAdaptor {
-    public GlobusSecurityAdaptor(GSSCredential proxy) {
-        super(proxy);
+    public GlobusSecurityAdaptor(GSSCredential proxy, File certRepository) {
+        super(proxy, certRepository);
     }
 
     /** override super.dump() */

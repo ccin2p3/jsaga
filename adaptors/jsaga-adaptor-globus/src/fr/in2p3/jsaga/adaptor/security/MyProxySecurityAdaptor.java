@@ -6,6 +6,7 @@ import org.globus.myproxy.MyProxy;
 import org.globus.util.Util;
 import org.ietf.jgss.GSSCredential;
 
+import java.io.File;
 import java.io.PrintStream;
 
 /* ***************************************************
@@ -25,8 +26,8 @@ public class MyProxySecurityAdaptor extends GSSCredentialSecurityAdaptor impleme
     private String m_userId;
     private String m_myProxyPass;
 
-    public MyProxySecurityAdaptor(GSSCredential proxy, String server, String userId, String myProxyPass) {
-        super(proxy);
+    public MyProxySecurityAdaptor(GSSCredential proxy, File certRepository, String server, String userId, String myProxyPass) {
+        super(proxy, certRepository);
         m_server = server;
         m_userId = userId;
         m_myProxyPass = myProxyPass;
