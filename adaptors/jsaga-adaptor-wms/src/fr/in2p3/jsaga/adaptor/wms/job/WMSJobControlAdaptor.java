@@ -2,8 +2,8 @@ package fr.in2p3.jsaga.adaptor.wms.job;
 
 import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
-import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
-import fr.in2p3.jsaga.adaptor.base.usage.*;
+import fr.in2p3.jsaga.adaptor.base.usage.U;
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
@@ -64,20 +64,11 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     }
     
     public Usage getUsage() {
-        return new UAnd(new Usage[]{
-        		new UFile(Context.CERTREPOSITORY),
-        		new U(MONITOR_PORT)}); 
+        return new U(MONITOR_PORT);
     }
     
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-    	EnvironmentVariables env = EnvironmentVariables.getInstance();
-        return new Default[]{
-        		new Default(MONITOR_PORT, "9000"),
-                new Default(Context.CERTREPOSITORY, new File[]{
-                        new File(env.getProperty("X509_CERT_DIR")+""),
-                        new File(System.getProperty("user.home")+"/.globus/certificates/"),
-                        new File("/etc/grid-security/certificates/")})
-                };
+        return new Default[]{new Default(MONITOR_PORT, "9000")};
     }
 
     public String[] getSupportedSandboxProtocols() {
@@ -108,10 +99,11 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             m_lbServerUrl = null;
         }
 
-    	// get certificate directory : This solution is temporary
-    	String caLoc = (String)attributes.get(Context.CERTREPOSITORY);
-        if (caLoc == null) {
-            throw new NoSuccessException("Missing required configuration attribute in element <job>: "+Context.CERTREPOSITORY);
+    	// get certificate directory
+        if (m_certRepository == null) {
+            throw new NoSuccessException("Configuration attribute not found in context: "+Context.CERTREPOSITORY);
+        } else if (!m_certRepository.isDirectory()) {
+            throw new NoSuccessException("Directory not found: "+m_certRepository);
         }
     	
         // save proxy file
@@ -149,7 +141,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         	AxisProperties.setProperty(EngineConfigurationFactoryDefault.OPTION_CLIENT_CONFIG_FILE,clientConfigFile);
 
 	        // create WMP Client
-	    	m_client = new WMProxyAPI (m_wmsServerUrl, m_tmpProxyFile.getAbsolutePath(), caLoc);
+	    	m_client = new WMProxyAPI (m_wmsServerUrl, m_tmpProxyFile.getAbsolutePath(), m_certRepository.getAbsolutePath());
 	    	String proxy = m_client.getProxyReq (m_delegationId);
             m_client.grstPutProxy(m_delegationId, proxy);
         } catch (ServerOverloadedFaultException e) {
