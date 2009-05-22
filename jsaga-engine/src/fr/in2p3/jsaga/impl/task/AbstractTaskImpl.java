@@ -179,7 +179,7 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
     }
 
     // exit immediatly
-    public synchronized void cancel() throws NotImplementedException, IncorrectStateException, NoSuccessException {
+    public synchronized void cancel() throws IncorrectStateException, TimeoutException, NoSuccessException {
         switch(m_metric_TaskState.getValue(State.RUNNING)) {
             case NEW:
                 throw new IncorrectStateException("Can not cancel task in 'New' state", this); //as specified in SAGA
