@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.impl.attributes;
 
 import fr.in2p3.jsaga.helpers.SAGAPattern;
-import fr.in2p3.jsaga.helpers.cloner.ObjectCloner;
+import fr.in2p3.jsaga.helpers.cloner.AttributeCloner;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.attributes.Attributes;
@@ -42,7 +42,7 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
     /** clone */
     public SagaObject clone() throws CloneNotSupportedException {
         AbstractAttributesImpl clone = (AbstractAttributesImpl) super.clone();
-        clone.m_attributes = new ObjectCloner<String,Attribute>().cloneMap(m_attributes);
+        clone.m_attributes = new AttributeCloner<String>().cloneMap(m_attributes);
         clone.m_isExtensible = m_isExtensible;
         return clone;
     }

@@ -24,4 +24,5 @@ public interface Attribute extends Cloneable {
     public String[] getValues() throws NotImplementedException, IncorrectStateException;
 
     public boolean equals(Object o);
+    public Attribute clone() throws CloneNotSupportedException;
 }

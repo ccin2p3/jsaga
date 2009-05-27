@@ -34,7 +34,7 @@ public abstract class AttributeAbstract implements Attribute {
     }
 
     /** clone */
-    public Object clone() throws CloneNotSupportedException {
+    public AttributeAbstract clone() throws CloneNotSupportedException {
         AttributeAbstract clone = (AttributeAbstract) super.clone();
         clone.m_key = m_key;
         clone.m_isSupported = m_isSupported;

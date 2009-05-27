@@ -34,7 +34,7 @@ public class AttributeVector extends AttributeAbstract {
     }
 
     /** clone */
-    public Object clone() throws CloneNotSupportedException {
+    public AttributeVector clone() throws CloneNotSupportedException {
         AttributeVector clone = (AttributeVector) super.clone();
         clone.m_values = new String[m_values.length];
         System.arraycopy(m_values, 0, clone.m_values, 0, m_values.length);

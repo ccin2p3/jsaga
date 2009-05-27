@@ -34,7 +34,7 @@ public class AttributeScalar extends AttributeAbstract {
     }
 
     /** clone */
-    public Object clone() throws CloneNotSupportedException {
+    public AttributeScalar clone() throws CloneNotSupportedException {
         AttributeScalar clone = (AttributeScalar) super.clone();
         clone.m_value = m_value;
         return clone;

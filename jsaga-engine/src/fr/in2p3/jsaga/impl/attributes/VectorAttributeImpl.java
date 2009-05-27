@@ -32,7 +32,7 @@ public class VectorAttributeImpl<E> implements Attribute {
     }
 
     /** clone */
-    public Object clone() throws CloneNotSupportedException {
+    public VectorAttributeImpl clone() throws CloneNotSupportedException {
         VectorAttributeImpl clone = (VectorAttributeImpl) super.clone();
         clone.m_key = m_key;
         clone.m_objects = m_objects;
