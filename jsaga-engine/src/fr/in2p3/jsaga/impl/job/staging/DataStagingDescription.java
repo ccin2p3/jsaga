@@ -25,12 +25,21 @@ public class DataStagingDescription {
         try {
             String[] fileTransfer = jobDesc.getVectorAttribute(JobDescription.FILETRANSFER);
             m_stagingList = new DataStagingList(fileTransfer);
+        } catch (DoesNotExistException e) {
+            m_stagingList = new DataStagingList(new String[]{});
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
+        }
+    }
 
+    public JobDescription modifyJobDescription(JobDescription jobDesc) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+        try {
             if (m_stagingList.needsStdin()) {
                 // check
                 if (hasAttribute(jobDesc, JobDescription.INTERACTIVE) && "true".equalsIgnoreCase(jobDesc.getAttribute(JobDescription.INTERACTIVE))) {
                     throw new BadParameterException("Option "+JobDescription.FILETRANSFER+" can not be used with option "+JobDescription.INTERACTIVE);
                 }
+/* todo: remove this code when INPUT/OUTPUT/ERROR will be managed as described in JSDL specification
                 if (hasAttribute(jobDesc, JobDescription.INPUT)) {
                     throw new BadParameterException("Option "+JobDescription.FILETRANSFER+" can not be used with option "+JobDescription.INPUT);
                 }
@@ -42,21 +51,34 @@ public class DataStagingDescription {
                         throw new BadParameterException("Option "+JobDescription.FILETRANSFER+" can not be used with option "+JobDescription.ERROR);
                     }
                 }
+*/
 
-                // update jobDesc
+                // save old jobDesc attributes
                 m_executable = jobDesc.getAttribute(JobDescription.EXECUTABLE);
-                jobDesc.setAttribute(JobDescription.EXECUTABLE, "/bin/sh");
                 m_arguments = jobDesc.getVectorAttribute(JobDescription.ARGUMENTS);
-                jobDesc.removeAttribute(JobDescription.ARGUMENTS);
-                jobDesc.setAttribute(JobDescription.INTERACTIVE, "true");
+
+                // clone jobDesc
+                JobDescription newJobDesc = (JobDescription) jobDesc.clone();
+
+                // modify newJobDesc
+                newJobDesc.setAttribute(JobDescription.EXECUTABLE, "/bin/sh");
+                newJobDesc.removeAttribute(JobDescription.ARGUMENTS);
+                newJobDesc.setAttribute(JobDescription.INTERACTIVE, "true");
 
                 // uncomment this to enable debugging job wrapper script
-//                jobDesc.setAttribute(JobDescription.EXECUTABLE, "/usr/bin/cat");
-//                jobDesc.setVectorAttribute(JobDescription.ARGUMENTS, new String[]{"> /tmp/job-wrapper.sh"});
+//                newJobDesc.setAttribute(JobDescription.EXECUTABLE, "/usr/bin/cat");
+//                newJobDesc.setVectorAttribute(JobDescription.ARGUMENTS, new String[]{"> /tmp/job-wrapper.sh"});
+
+                // returns
+                return newJobDesc;
+            } else {
+                return jobDesc;
             }
         } catch (IncorrectStateException e) {
             throw new NoSuccessException(e);
         } catch (DoesNotExistException e) {
+            throw new NoSuccessException(e);
+        } catch (CloneNotSupportedException e) {
             throw new NoSuccessException(e);
         }
     }

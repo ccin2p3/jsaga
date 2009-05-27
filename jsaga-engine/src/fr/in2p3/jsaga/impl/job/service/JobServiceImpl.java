@@ -59,6 +59,7 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
 
         // may modify jobDesc
         DataStagingDescription stagingDesc = new DataStagingDescription(jobDesc);
+        jobDesc = stagingDesc.modifyJobDescription(jobDesc);
 
         // get JSDL
         Element jsdlDOM;
