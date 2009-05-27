@@ -8,6 +8,7 @@ import fr.in2p3.jsaga.helpers.xslt.XSLTransformer;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformerFactory;
 import fr.in2p3.jsaga.impl.job.description.AbstractJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.job.instance.JobImpl;
+import fr.in2p3.jsaga.impl.job.staging.DataStagingDescription;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
@@ -56,6 +57,9 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
         // create uniqId
         String uniqId = ""+System.currentTimeMillis();
 
+        // may modify jobDesc
+        DataStagingDescription stagingDesc = new DataStagingDescription(jobDesc);
+
         // get JSDL
         Element jsdlDOM;
         if (jobDesc instanceof AbstractJobDescriptionImpl) {
@@ -91,7 +95,7 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
         }
 
         // returns
-        return new JobImpl(m_session, jobDesc, nativeJobDesc, uniqId, m_controlAdaptor, m_monitorService);
+        return new JobImpl(m_session, nativeJobDesc, jobDesc, stagingDesc, uniqId, m_controlAdaptor, m_monitorService);
     }
 
     public List<String> list() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {

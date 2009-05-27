@@ -9,6 +9,7 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorCallback;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
 import fr.in2p3.jsaga.impl.job.instance.stream.*;
+import fr.in2p3.jsaga.impl.job.staging.DataStagingDescription;
 import org.apache.log4j.Logger;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
@@ -44,6 +45,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     private JobAttributes m_attributes;
     private JobMetrics m_metrics;
     private JobDescription m_jobDescription;
+    private DataStagingDescription m_stagingDescription;
     private String m_uniqId;
     private String m_nativeJobId;
     private JobIOHandler m_IOHandler;
@@ -52,10 +54,11 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     private Stdout m_stderr;
 
     /** constructor for submission */
-    public JobImpl(Session session, JobDescription jobDesc, String nativeJobDesc, String uniqId, JobControlAdaptor controlAdaptor, JobMonitorService monitorService) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+    public JobImpl(Session session, String nativeJobDesc, JobDescription jobDesc, DataStagingDescription stagingDesc, String uniqId, JobControlAdaptor controlAdaptor, JobMonitorService monitorService) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         this(session, controlAdaptor, monitorService, true);
         m_attributes.m_NativeJobDescription.setObject(nativeJobDesc);
         m_jobDescription = jobDesc;
+        m_stagingDescription = stagingDesc;
         m_uniqId = uniqId;
         m_nativeJobId = null;
         m_IOHandler = null;
@@ -67,7 +70,9 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     /** constructor for control and monitoring only */
     public JobImpl(Session session, String nativeJobId, JobControlAdaptor controlAdaptor, JobMonitorService monitorService) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         this(session, controlAdaptor, monitorService, false);
+        m_attributes.m_NativeJobDescription.setObject(null);
         m_jobDescription = null;
+        m_stagingDescription = null;
         m_uniqId = null;
         m_nativeJobId = nativeJobId;
         m_IOHandler = null;
@@ -93,6 +98,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
         clone.m_controlAdaptor = m_controlAdaptor;
         clone.m_monitorService = m_monitorService;
         clone.m_jobDescription = m_jobDescription;
+        clone.m_stagingDescription = m_stagingDescription;
         clone.m_uniqId = m_uniqId;
         clone.m_nativeJobId = m_nativeJobId;
         clone.m_IOHandler = m_IOHandler;
@@ -107,6 +113,10 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     private static boolean s_checkMatch = EngineProperties.getBoolean(EngineProperties.JOB_CONTROL_CHECK_MATCH);
     protected void doSubmit() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         try {
+            // pre-staging
+            m_stagingDescription.preStaging(this);
+
+            // submit
             String nativeJobDesc = m_attributes.m_NativeJobDescription.getObject();
             if (this.isInteractive()) {
                 if (m_controlAdaptor instanceof StreamableJobInteractiveGet) {
@@ -185,6 +195,8 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
             throw new NoSuccessException(e);
         } catch (DoesNotExistException e) {
             throw new NoSuccessException(e);
+        } catch (BadParameterException e) {
+            throw new NoSuccessException(e);
         }
     }
 
@@ -239,6 +251,31 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
                     s_logger.warn("Failed to get job output/error streams: "+m_nativeJobId, e);
                 }
             }
+        }
+
+        // staging
+        try {
+            // post-staging
+            if (isDone) {
+                m_stagingDescription.postStaging(this);
+            }
+
+            // cleanup staged files
+            if (this.isFinalState()) {
+                m_stagingDescription.cleanup(this);
+            }
+        } catch (AuthenticationFailedException e) {
+            throw new NoSuccessException(e);
+        } catch (AuthorizationFailedException e) {
+            throw new NoSuccessException(e);
+        } catch (PermissionDeniedException e) {
+            throw new NoSuccessException(e);
+        } catch (BadParameterException e) {
+            throw new NoSuccessException(e);
+        } catch (DoesNotExistException e) {
+            throw new NoSuccessException(e);
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
         }
 
         // cleanup job
