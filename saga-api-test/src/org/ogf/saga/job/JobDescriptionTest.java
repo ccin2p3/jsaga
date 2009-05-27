@@ -62,6 +62,7 @@ public abstract class JobDescriptionTest extends AbstractJobTest {
         this.change(JobDescription.ERROR, "stderr2.txt");
     }
     public void test_fileTransfer() throws Exception {
+        m_jobDescription.setVectorAttribute(JobDescription.FILETRANSFER, new String[]{"myfile>myf", "file1<f1"});
         this.change(JobDescription.FILETRANSFER, new String[]{"myfile>myf", "file2<f2"});
     }
     public void test_cleanup() throws Exception {
@@ -105,7 +106,7 @@ public abstract class JobDescriptionTest extends AbstractJobTest {
         m_jobDescription.setAttribute(JobDescription.INPUT, "stdin1.txt");
         m_jobDescription.setAttribute(JobDescription.OUTPUT, "stdout1.txt");
         m_jobDescription.setAttribute(JobDescription.ERROR, "stderr1.txt");
-        m_jobDescription.setVectorAttribute(JobDescription.FILETRANSFER, new String[]{"myfile>myf", "file1<f1"});
+        // JobDescription.FILETRANSFER ignored because it modifies job description
         m_jobDescription.setAttribute(JobDescription.CLEANUP, JobDescription.FALSE);
         // JobDescription.JOBSTARTTIME is not supported by JSAGA
         m_jobDescription.setAttribute(JobDescription.TOTALCPUTIME, "60");
