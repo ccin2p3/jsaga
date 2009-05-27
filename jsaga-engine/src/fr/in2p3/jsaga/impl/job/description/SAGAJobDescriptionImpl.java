@@ -3,10 +3,10 @@ package fr.in2p3.jsaga.impl.job.description;
 import fr.in2p3.jsaga.adaptor.language.SAGALanguageAdaptor;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformer;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformerFactory;
-import org.ogf.saga.SagaObject;
-import org.ogf.saga.error.*;
+import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.job.JobDescription;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -28,82 +28,46 @@ public class SAGAJobDescriptionImpl extends AbstractJobDescriptionImpl implement
         s_adaptor.initParser();
     }
 
-    private Document m_document;
-    private Element m_root;
-
-    /** constructor */
-    public SAGAJobDescriptionImpl() throws Exception {
-        super();
-        m_document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-        m_root = m_document.createElement("attributes");
-        m_document.appendChild(m_root);
-    }
-
-    /** clone */
-    public SagaObject clone() throws CloneNotSupportedException {
-        SAGAJobDescriptionImpl clone = (SAGAJobDescriptionImpl) super.clone();
-        clone.m_document = (Document) m_document.cloneNode(true);
-        clone.m_root = (Element) clone.m_document.getFirstChild();
-        return clone;
-    }
-
-    /** override super.setAttribute() */
-    public void setAttribute(String key, String value) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-        if (s_adaptor.isProperty(key)) {
-            Element attribute = this.createAttribute(key);
-            attribute.setAttribute("value", value);
-            super.setAttribute(key, value);
-        } else if (s_adaptor.isVectoryProperty(key)) {
-            throw new IncorrectStateException("Attempt to set a vector attribute with method setAttribute: "+key);
-        } else {
-            throw new BadParameterException("Unexpected attribute name: "+key);
-        }
-    }
-
-    /** override super.setVectorAttribute() */
-    public void setVectorAttribute(String key, String[] values) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-        if (s_adaptor.isVectoryProperty(key)) {
-            Element vectorAttribute = this.createAttribute(key);
-            for (int i=0; i<values.length; i++) {
-                Element item = m_document.createElement("value");
-                item.appendChild(m_document.createTextNode(values[i]));
-                vectorAttribute.appendChild(item);
-            }
-            super.setVectorAttribute(key, values);
-        } else if (s_adaptor.isProperty(key)) {
-            throw new IncorrectStateException("Attempt to set a scalar attribute with method setVectorAttribute: "+key);
-        } else {
-            throw new BadParameterException("Unexpected attribute name: "+key);
-        }
-    }
-
     public Document getAsDocument() throws NoSuccessException {
+        // build DOM
+        Document document;
+        try {
+            document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            Element root = document.createElement("attributes");
+            document.appendChild(root);
+            String[] attributeNames = super.listAttributes();
+            for (int i=0; i<attributeNames.length; i++) {
+                String key = attributeNames[i];
+                Element elem = document.createElement(key);
+                if (super.isVectorAttribute(key)) {
+                    String[] values = super.getVectorAttribute(key);
+                    Element item = document.createElement("value");
+                    for (int v=0; v<values.length; v++) {
+                        item.appendChild(document.createTextNode(values[v]));
+                    }
+                    elem.appendChild(item);
+                } else {
+                    String value = super.getAttribute(key);
+                    elem.setAttribute("value", value);
+                }
+                root.appendChild(elem);
+            }
+        } catch (NoSuccessException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new NoSuccessException(e);
+        }
+
+        // transform to JSDL
         String stylesheet = s_adaptor.getTranslator();
         if (stylesheet == null) {
             throw new NoSuccessException("[INTERNAL ERROR] Stylesheet is null");
         }
         try {
             XSLTransformer t = XSLTransformerFactory.getInstance().getCached(stylesheet);
-            return t.transformToDOM(m_document);
+            return t.transformToDOM(document);
         } catch (Exception e) {
             throw new NoSuccessException(e);
-        }
-    }
-
-    private Element createAttribute(String key) throws NoSuccessException {
-        Element attribute;
-        NodeList list = m_root.getElementsByTagName(key);
-        switch(list.getLength()) {
-            case 0:
-                attribute = m_document.createElement(key);
-                m_root.appendChild(attribute);
-                return attribute;
-            case 1:
-                attribute = m_document.createElement(key);
-                m_root.replaceChild(attribute, list.item(0));
-                return attribute;
-            default:
-                throw new NoSuccessException("[INTERNAL ERROR] Unexpected exception", this);
         }
     }
 }

@@ -121,6 +121,17 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
         this.close();
     }
 
+    /** override super.remove() in order to close opened input and output streams */
+    public void remove(int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+        if (m_outStream != null) {
+            try {m_outStream.close();} catch (IOException e) {/*ignore*/}
+        }
+        if (m_inStream != null) {
+            try {m_inStream.close();} catch (IOException e) {/*ignore*/}
+        }
+        super.remove(flags);
+    }
+
     /** implements super.copy() */
     public void copy(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
         this._copyAndMonitor(target, flags, null);
