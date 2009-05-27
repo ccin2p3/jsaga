@@ -66,6 +66,7 @@ public abstract class JobDescriptionTest extends AbstractJobTest {
         this.change(JobDescription.FILETRANSFER, new String[]{"myfile>myf", "file2<f2"});
     }
     public void test_cleanup() throws Exception {
+        m_jobDescription.setVectorAttribute(JobDescription.FILETRANSFER, new String[]{"myfile>myf", "file1<f1"});
     	this.change(JobDescription.CLEANUP, JobDescription.TRUE);
     }
     public void test_totalCPUTime() throws Exception {
