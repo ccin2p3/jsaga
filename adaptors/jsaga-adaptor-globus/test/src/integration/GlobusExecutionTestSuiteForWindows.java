@@ -43,7 +43,12 @@ public class GlobusExecutionTestSuiteForWindows extends JSAGATestSuite {
         public GlobusJobRunRequiredTest() throws Exception {super("gatekeeper-windows");}
         public void test_run_error() { super.ignore("personal gatekeeper return always DONE"); }
     }
-    
+
+    // test cases
+    public static class GlobusJobRunSandboxTest extends JobRunSandboxTest {
+        public GlobusJobRunSandboxTest() throws Exception {super("gatekeeper-windows");}
+    }
+
     // test cases
     public static class GlobusJobRunOptionalTest extends JobRunOptionalTest {
         public GlobusJobRunOptionalTest() throws Exception {super("gatekeeper-windows");}

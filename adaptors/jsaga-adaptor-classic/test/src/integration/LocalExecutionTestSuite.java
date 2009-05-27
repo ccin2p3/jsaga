@@ -48,6 +48,11 @@ public class LocalExecutionTestSuite extends JSAGATestSuite {
     public static class LocalJobRunRequiredTest extends JobRunRequiredTest {
         public LocalJobRunRequiredTest() throws Exception {super("local");}
     }
+
+    // test cases
+    public static class LocalJobRunSandboxTest extends JobRunSandboxTest {
+        public LocalJobRunSandboxTest() throws Exception {super("local");}
+    }
     
     // test cases
     public static class LocalJobRunOptionalTest extends JobRunOptionalTest {

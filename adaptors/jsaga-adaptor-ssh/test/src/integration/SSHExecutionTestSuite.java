@@ -48,6 +48,11 @@ public class SSHExecutionTestSuite extends JSAGATestSuite {
     public static class SSHJobRunRequiredTest extends JobRunRequiredTest {
         public SSHJobRunRequiredTest() throws Exception {super("ssh");}
     }
+
+    // test cases
+    public static class SSHJobRunSandboxTest extends JobRunSandboxTest {
+        public SSHJobRunSandboxTest() throws Exception {super("ssh");}
+    }
     
     // test cases
     public static class SSHJobRunOptionalTest extends JobRunOptionalTest {
