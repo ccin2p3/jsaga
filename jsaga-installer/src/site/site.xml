@@ -14,7 +14,7 @@
             <item name="CC-IN2P3" href="http://cc.in2p3.fr"/>
         </links>
         <menu name="JSAGA">
-            <item name="Project Home" href="index.html"/>
+            <item name="Project Home" href="http://grid.in2p3.fr/jsaga/"/>
             <item name="Adaptors" href="adaptors.html"/>
             <item name="Presentations" href="presentations.html"/>
             <item name="Download" href="download.html"/>
