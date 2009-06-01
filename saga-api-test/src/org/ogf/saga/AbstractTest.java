@@ -44,6 +44,12 @@ public abstract class AbstractTest extends TestCase {
                 System.setProperty("jsaga.universe", universe.toString());
             }
         }
+        if (System.getProperty("jsaga.timeout") == null) {
+            java.net.URL timeout = this.getResource("etc/jsaga-timeout.properties");
+            if (timeout != null) {
+                System.setProperty("jsaga.timeout", timeout.toString());
+            }
+        }
         if (System.getProperty("log4j.configuration") == null) {
             java.net.URL log4j = this.getResource("etc/log4j.properties");
             if (log4j != null) {

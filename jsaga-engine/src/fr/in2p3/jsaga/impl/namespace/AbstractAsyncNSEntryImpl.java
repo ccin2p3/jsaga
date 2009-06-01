@@ -4,7 +4,6 @@ import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.impl.file.DirectoryImpl;
 import fr.in2p3.jsaga.impl.file.FileImpl;
 import fr.in2p3.jsaga.impl.file.copy.*;
-import fr.in2p3.jsaga.impl.permissions.AbstractDataPermissionsImpl;
 import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.Flags;
@@ -26,16 +25,28 @@ import org.ogf.saga.url.URL;
 /**
  *
  */
-public abstract class AbstractAsyncNSEntryImpl extends AbstractDataPermissionsImpl implements NSEntry {
-    /** constructor */
-    protected AbstractAsyncNSEntryImpl(Session session, URL url, DataAdaptor adaptor) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(session, url, adaptor);
+public abstract class AbstractAsyncNSEntryImpl extends AbstractSyncNSEntryImpl implements NSEntry {
+    /** constructor for factory */
+    protected AbstractAsyncNSEntryImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+        super(session, url, adaptor, flags);
     }
+
+    /** constructor for NSDirectory.open() */
+    protected AbstractAsyncNSEntryImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+        super(dir, relativeUrl, flags);
+    }
+
+    /** constructor for NSEntry.openAbsolute() */
+    protected AbstractAsyncNSEntryImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+        super(entry, absolutePath, flags);
+    }
+
+    //////////////////////////////////////////// interface NSEntry ////////////////////////////////////////////
 
     public Task<NSEntry, URL> getURL(TaskMode mode) throws NotImplementedException {
         return new GenericThreadedTaskFactory<NSEntry,URL>().create(
                 mode, m_session, this,
-                "getURL",
+                "getURLSync",
                 new Class[]{},
                 new Object[]{});
     }
@@ -43,7 +54,7 @@ public abstract class AbstractAsyncNSEntryImpl extends AbstractDataPermissionsIm
     public Task<NSEntry, URL> getCWD(TaskMode mode) throws NotImplementedException {
         return new GenericThreadedTaskFactory<NSEntry,URL>().create(
                 mode, m_session, this,
-                "getCWD",
+                "getCWDSync",
                 new Class[]{},
                 new Object[]{});
     }
@@ -51,7 +62,7 @@ public abstract class AbstractAsyncNSEntryImpl extends AbstractDataPermissionsIm
     public Task<NSEntry, URL> getName(TaskMode mode) throws NotImplementedException {
         return new GenericThreadedTaskFactory<NSEntry,URL>().create(
                 mode, m_session, this,
-                "getName",
+                "getNameSync",
                 new Class[]{},
                 new Object[]{});
     }
@@ -59,7 +70,7 @@ public abstract class AbstractAsyncNSEntryImpl extends AbstractDataPermissionsIm
     public Task<NSEntry, Boolean> isDir(TaskMode mode) throws NotImplementedException {
         return new GenericThreadedTaskFactory<NSEntry,Boolean>().create(
                 mode, m_session, this,
-                "isDir",
+                "isDirSync",
                 new Class[]{},
                 new Object[]{});
     }
@@ -67,7 +78,7 @@ public abstract class AbstractAsyncNSEntryImpl extends AbstractDataPermissionsIm
     public Task<NSEntry, Boolean> isEntry(TaskMode mode) throws NotImplementedException {
         return new GenericThreadedTaskFactory<NSEntry,Boolean>().create(
                 mode, m_session, this,
-                "isEntry",
+                "isEntrySync",
                 new Class[]{},
                 new Object[]{});
     }
@@ -75,7 +86,7 @@ public abstract class AbstractAsyncNSEntryImpl extends AbstractDataPermissionsIm
     public Task<NSEntry, Boolean> isLink(TaskMode mode) throws NotImplementedException {
         return new GenericThreadedTaskFactory<NSEntry,Boolean>().create(
                 mode, m_session, this,
-                "isLink",
+                "isLinkSync",
                 new Class[]{},
                 new Object[]{});
     }
@@ -83,20 +94,20 @@ public abstract class AbstractAsyncNSEntryImpl extends AbstractDataPermissionsIm
     public Task<NSEntry, URL> readLink(TaskMode mode) throws NotImplementedException {
         return new GenericThreadedTaskFactory<NSEntry,URL>().create(
                 mode, m_session, this,
-                "readLink",
+                "readLinkSync",
                 new Class[]{},
                 new Object[]{});
     }
 
     public Task<NSEntry, Void> copy(TaskMode mode, URL target, int flags) throws NotImplementedException {
         if (this instanceof FileImpl) {
-            return new FileCopyTask<NSEntry,Void>(m_session, (FileImpl) this, target, flags);
+            return new FileCopyTask<NSEntry,Void>(mode, m_session, (FileImpl) this, target, flags);
         } else if (this instanceof DirectoryImpl) {
-            return new DirectoryCopyTask<NSEntry,Void>(m_session, (DirectoryImpl) this, target, flags);
+            return new DirectoryCopyTask<NSEntry,Void>(mode, m_session, (DirectoryImpl) this, target, flags);
         } else {
             return new GenericThreadedTaskFactory<NSEntry,Void>().create(
                     mode, m_session, this,
-                    "copy",
+                    "copySync",
                     new Class[]{URL.class, int.class},
                     new Object[]{target, flags});
         }
@@ -107,13 +118,13 @@ public abstract class AbstractAsyncNSEntryImpl extends AbstractDataPermissionsIm
 
     public Task<NSEntry, Void> copyFrom(TaskMode mode, URL source, int flags) throws NotImplementedException {
         if (this instanceof FileImpl) {
-            return new FileCopyFromTask<NSEntry,Void>(m_session, (FileImpl) this, source, flags);
+            return new FileCopyFromTask<NSEntry,Void>(mode, m_session, (FileImpl) this, source, flags);
         } else if (this instanceof DirectoryImpl) {
-            return new DirectoryCopyFromTask<NSEntry,Void>(m_session, (DirectoryImpl) this, source, flags);
+            return new DirectoryCopyFromTask<NSEntry,Void>(mode, m_session, (DirectoryImpl) this, source, flags);
         } else {
             return new GenericThreadedTaskFactory<NSEntry,Void>().create(
                     mode, m_session, this,
-                    "copyFrom",
+                    "copyFromSync",
                     new Class[]{URL.class, int.class},
                     new Object[]{source, flags});
         }
@@ -125,7 +136,7 @@ public abstract class AbstractAsyncNSEntryImpl extends AbstractDataPermissionsIm
     public Task<NSEntry, Void> link(TaskMode mode, URL target, int flags) throws NotImplementedException {
         return new GenericThreadedTaskFactory<NSEntry,Void>().create(
                 mode, m_session, this,
-                "link",
+                "linkSync",
                 new Class[]{URL.class, int.class},
                 new Object[]{target, flags});
     }
@@ -136,7 +147,7 @@ public abstract class AbstractAsyncNSEntryImpl extends AbstractDataPermissionsIm
     public Task<NSEntry, Void> move(TaskMode mode, URL target, int flags) throws NotImplementedException {
         return new GenericThreadedTaskFactory<NSEntry,Void>().create(
                 mode, m_session, this,
-                "move",
+                "moveSync",
                 new Class[]{URL.class, int.class},
                 new Object[]{target, flags});
     }
@@ -147,7 +158,7 @@ public abstract class AbstractAsyncNSEntryImpl extends AbstractDataPermissionsIm
     public Task<NSEntry, Void> remove(TaskMode mode, int flags) throws NotImplementedException {
         return new GenericThreadedTaskFactory<NSEntry,Void>().create(
                 mode, m_session, this,
-                "remove",
+                "removeSync",
                 new Class[]{int.class},
                 new Object[]{flags});
     }
@@ -174,7 +185,7 @@ public abstract class AbstractAsyncNSEntryImpl extends AbstractDataPermissionsIm
     public Task<NSEntry, Void> permissionsAllow(TaskMode mode, String id, int permissions, int flags) throws NotImplementedException {
         return new GenericThreadedTaskFactory<NSEntry,Void>().create(
                 mode, m_session, this,
-                "permissionsAllow",
+                "permissionsAllowSync",
                 new Class[]{String.class, int.class, int.class},
                 new Object[]{id, permissions, flags});
     }
@@ -182,7 +193,7 @@ public abstract class AbstractAsyncNSEntryImpl extends AbstractDataPermissionsIm
     public Task<NSEntry, Void> permissionsDeny(TaskMode mode, String id, int permissions, int flags) throws NotImplementedException {
         return new GenericThreadedTaskFactory<NSEntry,Void>().create(
                 mode, m_session, this,
-                "permissionsDeny",
+                "permissionsDenySync",
                 new Class[]{String.class, int.class, int.class},
                 new Object[]{id, permissions, flags});
     }

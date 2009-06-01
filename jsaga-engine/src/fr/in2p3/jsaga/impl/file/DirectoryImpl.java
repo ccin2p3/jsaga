@@ -1,13 +1,12 @@
 package fr.in2p3.jsaga.impl.file;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
-import fr.in2p3.jsaga.impl.namespace.*;
-import fr.in2p3.jsaga.impl.url.URLHelper;
-import org.ogf.saga.SagaObject;
+import fr.in2p3.jsaga.impl.namespace.AbstractNSDirectoryImpl;
+import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
 import org.ogf.saga.error.*;
 import org.ogf.saga.file.*;
-import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.task.TaskMode;
 import org.ogf.saga.url.URL;
 
 /* ***************************************************
@@ -25,107 +24,123 @@ import org.ogf.saga.url.URL;
 public class DirectoryImpl extends AbstractAsyncDirectoryImpl implements Directory {
     /** constructor for factory */
     public DirectoryImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(session, url, adaptor, new FlagsHelper(flags).remove(Flags.ALLFILEFLAGS));
+        super(session, url, adaptor, flags);
     }
 
     /** constructor for NSDirectory.open() */
     public DirectoryImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(dir, relativeUrl, new FlagsHelper(flags).remove(Flags.ALLFILEFLAGS));
+        super(dir, relativeUrl, flags);
     }
 
     /** constructor for NSEntry.openAbsolute() */
     public DirectoryImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(entry, absolutePath, new FlagsHelper(flags).remove(Flags.ALLFILEFLAGS));
+        super(entry, absolutePath, flags);
     }
 
-    /** clone */
-    public SagaObject clone() throws CloneNotSupportedException {
-        return super.clone();
-    }
-
-    /////////////////////////////// class AbstractNSEntryImpl ///////////////////////////////
-
-    public NSDirectory openAbsoluteDir(String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        return new DirectoryImpl(this, absolutePath, flags);
-    }
-
-    public NSEntry openAbsolute(String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        if (URLHelper.isDirectory(absolutePath)) {
-            return new DirectoryImpl(this, absolutePath, flags);
-        } else {
-            return new FileImpl(this, absolutePath, flags);
-        }
-    }
-
-    /////////////////////////////////// interface NSEntry ///////////////////////////////////
-
-    public NSDirectory openDir(URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        return this.openDirectory(name, flags);
-    }
-    public NSDirectory openDir(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        return this.openDirectory(name);
-    }
-
-    public NSEntry open(URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        if (URLHelper.isDirectory(name)) {
-            return this.openDirectory(name, flags);
-        } else {
-            return this.openFile(name, flags);
-        }
-    }
-    public NSEntry open(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        if (URLHelper.isDirectory(name)) {
-            return this.openDirectory(name);
-        } else {
-            return this.openFile(name);
-        }
-    }
-
-    /////////////////////////////////// interface Directory ///////////////////////////////////
+    ////////////////////////////////////////// interface Directory //////////////////////////////////////////
 
     public long getSize(URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
-        try {
-            return this.openFile(name, flags).getSize();
-        } catch (AlreadyExistsException alreadyExists) {
-            throw new IncorrectStateException("Entry already exists: "+ name, alreadyExists);
+        float timeout = this.getTimeout("getSize");
+        if (timeout == WAIT_FOREVER) {
+            return super.getSizeSync(name, flags);
+        } else {
+            try {
+                return (Long) getResult(super.getSize(TaskMode.ASYNC, name, flags), timeout);
+            }
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
         }
     }
+
     public long getSize(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
-        return this.getSize(name, Flags.NONE.getValue());
+        float timeout = this.getTimeout("getSize");
+        if (timeout == WAIT_FOREVER) {
+            return super.getSizeSync(name);
+        } else {
+            try {
+                return (Long) getResult(super.getSize(TaskMode.ASYNC, name), timeout);
+            }
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+        }
     }
 
-    public boolean isFile(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
-        return super.isEntry(name);
+    public boolean isFile(URL name) throws NotImplementedException, IncorrectURLException, DoesNotExistException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("isFile");
+        if (timeout == WAIT_FOREVER) {
+            return super.isFileSync(name);
+        } else {
+            try {
+                return (Boolean) getResult(super.isFile(TaskMode.ASYNC, name), timeout);
+            }
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+        }
     }
 
-    public Directory openDirectory(URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        return new DirectoryImpl(this, relativeUrl, flags);
-    }
-    public Directory openDirectory(URL relativeUrl) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        return new DirectoryImpl(this, relativeUrl, Flags.READ.getValue());
-    }
-
-    public File openFile(URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        return new FileImpl(this, relativeUrl, flags);
-    }
-    public File openFile(URL relativeUrl) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        return new FileImpl(this, relativeUrl, Flags.READ.getValue());
+    public Directory openDirectory(URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("openDirectory");
+        if (timeout == WAIT_FOREVER) {
+            return super.openDirectory(name, flags);
+        } else {
+            throw new NotImplementedException("Configuring user timeout is not supported for method: openDirectory");
+        }
     }
 
-    public FileInputStream openFileInputStream(URL relativeUrl) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        URL url = _resolveRelativeUrl(m_url, relativeUrl);
-        return FileFactoryImpl.openFileInputStream(m_session, url, m_adaptor);
+    public Directory openDirectory(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("openDirectory");
+        if (timeout == WAIT_FOREVER) {
+            return super.openDirectory(name);
+        } else {
+            throw new NotImplementedException("Configuring user timeout is not supported for method: openDirectory");
+        }
     }
 
-    public FileOutputStream openFileOutputStream(URL relativeUrl) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        URL url = _resolveRelativeUrl(m_url, relativeUrl);
-        boolean exclusive = false;
-        boolean append = false;
-        return FileFactoryImpl.openFileOutputStream(m_session, url, m_adaptor, append, exclusive);
+    public File openFile(URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("openFile");
+        if (timeout == WAIT_FOREVER) {
+            return super.openFile(name, flags);
+        } else {
+            throw new NotImplementedException("Configuring user timeout is not supported for method: openFile");
+        }
     }
-    public FileOutputStream openFileOutputStream(URL relativeUrl, boolean append) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        URL url = _resolveRelativeUrl(m_url, relativeUrl);
-        boolean exclusive = false;
-        return FileFactoryImpl.openFileOutputStream(m_session, url, m_adaptor, append, exclusive);
+
+    public File openFile(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("openFile");
+        if (timeout == WAIT_FOREVER) {
+            return super.openFile(name);
+        } else {
+            throw new NotImplementedException("Configuring user timeout is not supported for method: openFile");
+        }
+    }
+
+    public FileInputStream openFileInputStream(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("openFileInputStream");
+        if (timeout == WAIT_FOREVER) {
+            return super.openFileInputStreamSync(name);
+        } else {
+            return (FileInputStream) getResult(super.openFileInputStream(TaskMode.ASYNC, name), timeout);
+        }
+    }
+
+    public FileOutputStream openFileOutputStream(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("openFileOutputStream");
+        if (timeout == WAIT_FOREVER) {
+            return super.openFileOutputStreamSync(name);
+        } else {
+            return (FileOutputStream) getResult(super.openFileOutputStream(TaskMode.ASYNC, name), timeout);
+        }
+    }
+
+    public FileOutputStream openFileOutputStream(URL name, boolean append) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("openFileOutputStream");
+        if (timeout == WAIT_FOREVER) {
+            return super.openFileOutputStreamSync(name, append);
+        } else {
+            return (FileOutputStream) getResult(super.openFileOutputStream(TaskMode.ASYNC, name, append), timeout);
+        }
+    }
+
+    ////////////////////////////////////////// private methods //////////////////////////////////////////
+
+    private float getTimeout(String methodName) throws NoSuccessException {
+        return getTimeout(Directory.class, methodName, m_url.getScheme());
     }
 }

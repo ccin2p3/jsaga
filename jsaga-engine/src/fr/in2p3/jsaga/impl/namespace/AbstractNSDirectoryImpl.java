@@ -1,21 +1,14 @@
 package fr.in2p3.jsaga.impl.namespace;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
-import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
-import fr.in2p3.jsaga.adaptor.data.optimise.DataFilteredList;
-import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
-import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
-import fr.in2p3.jsaga.helpers.SAGAPattern;
-import fr.in2p3.jsaga.impl.url.*;
 import org.ogf.saga.error.*;
-import org.ogf.saga.namespace.*;
+import org.ogf.saga.namespace.NSDirectory;
+import org.ogf.saga.namespace.NSEntry;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.task.TaskMode;
 import org.ogf.saga.url.URL;
-import org.ogf.saga.url.URLFactory;
 
-import java.util.*;
-import java.util.regex.Pattern;
+import java.util.List;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -32,407 +25,587 @@ import java.util.regex.Pattern;
 public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryImpl implements NSDirectory {
     /** constructor for factory */
     protected AbstractNSDirectoryImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(session, URLHelper.toDirectoryURL(url), adaptor, flags);
-        this.init(flags);
+        super(session, url, adaptor, flags);
     }
 
     /** constructor for NSDirectory.open() */
     protected AbstractNSDirectoryImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(dir, URLHelper.toDirectoryURL(relativeUrl), flags);
-        this.init(flags);
+        super(dir, relativeUrl, flags);
     }
 
     /** constructor for NSEntry.openAbsolute() */
     protected AbstractNSDirectoryImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(entry, URLHelper.toDirectoryPath(absolutePath), flags);
-        this.init(flags);
+        super(entry, absolutePath, flags);
     }
 
-    private void init(int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        new FlagsHelper(flags).allowed(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS);
-        if (Flags.CREATE.isSet(flags)) {
-            if (m_adaptor instanceof DataWriterAdaptor) {
-                if ("/".equals(m_url.getPath())) {
-                    if (Flags.EXCL.isSet(flags)) {
-                        throw new AlreadyExistsException("Not allowed to create root directory: "+ m_url.toString(), this);
-                    } else {
-                        return;
-                    }
-                }
-                URL parent = super._getParentDirURL();
-                String directoryName = super._getEntryName();
-                try {
-                    // try to make current directory
-                    ((DataWriterAdaptor)m_adaptor).makeDir(parent.getPath(), directoryName, m_url.getQuery());
-                } catch(ParentDoesNotExist e) {
-                    // make parent directories, then retry
-                    if (Flags.CREATEPARENTS.isSet(flags)) {
-                        this._makeParentDirs();
-                        try {
-                            ((DataWriterAdaptor)m_adaptor).makeDir(parent.getPath(), directoryName, m_url.getQuery());
-                        } catch (ParentDoesNotExist e2) {
-                            throw new DoesNotExistException("Failed to create parent directory: "+parent, e.getCause());
-                        }
-                    } else {
-                        throw new DoesNotExistException("Parent directory does not exist: "+parent, e.getCause());
-                    }
-                } catch(AlreadyExistsException e) {
-                    if (Flags.EXCL.isSet(flags)) {
-                        throw new AlreadyExistsException("Entry already exists: "+ m_url, e.getCause());
-                    }
-                }
-            } else {
-                throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme());
-            }
-        } else if (Flags.CREATEPARENTS.isSet(flags)) {
-            this._makeParentDirs();
-        } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !((URLImpl)m_url).hasCache() && m_adaptor instanceof DataReaderAdaptor) {
-            boolean exists = ((DataReaderAdaptor)m_adaptor).exists(m_url.getPath(), m_url.getQuery());
-            if (! exists) {
-                throw new DoesNotExistException("Directory does not exist: "+ m_url);
-            }
-        }
-    }
+    ////////////////////////////////////////// interface NSDirectory //////////////////////////////////////////
 
     public void changeDir(URL dir) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
-        if (dir.getScheme()!=null || dir.getUserInfo()!=null || dir.getHost()!=null) {
-            throw new IncorrectURLException("Was expecting a absolute/relative path instead of: "+dir.toString());
-        }
-        m_url = _resolveRelativeUrl(m_url, dir);
-    }
-
-    public Iterator<URL> iterator() {
-        try {
-            return this.list().iterator();
-        } catch (SagaException e) {
-            throw new RuntimeException(e);
+        float timeout = this.getTimeout("changeDir");
+        if (timeout == WAIT_FOREVER) {
+            super.changeDirSync(dir);
+        } else {
+            throw new NotImplementedException("Configuring user timeout is not supported for method: changeDir");
         }
     }
 
     public List<URL> list(String pattern, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
-        return this._list(pattern, flags);
-    }
-    public List<URL> list(String pattern) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
-        return this.list(pattern, Flags.NONE.getValue());
+        float timeout = this.getTimeout("list");
+        if (timeout == WAIT_FOREVER) {
+            return super.listSync(pattern, flags);
+        } else {
+            try {
+                return (List<URL>) getResult(super.list(TaskMode.ASYNC, pattern, flags), timeout);
+            }
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+        }
     }
 
     public List<URL> list(int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
-        return this._list(null, flags);
+        float timeout = this.getTimeout("list");
+        if (timeout == WAIT_FOREVER) {
+            return super.listSync(flags);
+        } else {
+            try {
+                return (List<URL>) getResult(super.list(TaskMode.ASYNC, flags), timeout);
+            }
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+        }
     }
+
+    public List<URL> list(String pattern) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
+        float timeout = this.getTimeout("list");
+        if (timeout == WAIT_FOREVER) {
+            return super.listSync(pattern);
+        } else {
+            try {
+                return (List<URL>) getResult(super.list(TaskMode.ASYNC, pattern), timeout);
+            }
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+        }
+    }
+
     public List<URL> list() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
-        return this.list(Flags.NONE.getValue());
-    }
-
-    private List<URL> _list(String pattern, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
-        new FlagsHelper(flags).allowed(Flags.DEREFERENCE);
-        if (Flags.DEREFERENCE.isSet(flags)) {
-            return this._dereferenceDir()._list(pattern, flags - Flags.DEREFERENCE.getValue());
-        }
-
-        // get list
-        FileAttributes[] childs;
-        try {
-            if (m_adaptor instanceof DataFilteredList && pattern.endsWith("/")) {
-                childs = ((DataFilteredList)m_adaptor).listDirectories(
-                        m_url.getPath(),
-                        m_url.getQuery());
-            } else if (m_adaptor instanceof DataReaderAdaptor) {
-                childs = ((DataReaderAdaptor)m_adaptor).listAttributes(
-                        m_url.getPath(),
-                        m_url.getQuery());
-            } else {
-                throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
+        float timeout = this.getTimeout("list");
+        if (timeout == WAIT_FOREVER) {
+            return super.listSync();
+        } else {
+            try {
+                return (List<URL>) getResult(super.list(TaskMode.ASYNC), timeout);
             }
-        } catch (DoesNotExistException e) {
-            throw new IncorrectStateException("Directory does not exist: "+m_url, e);
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         }
-
-        // filter
-        Pattern p = SAGAPattern.toRegexp(pattern);
-        List<URL> matchingNames = new ArrayList<URL>();
-        for (int i=0; i<childs.length; i++) {
-            if (p==null || p.matcher(childs[i].getName()).matches()) {
-                URL childUrl = URLFactoryImpl.createRelativePath(childs[i].getName());
-                ((URLImpl)childUrl).setCache(childs[i]);
-                matchingNames.add(childUrl);
-            }
-        }
-        return matchingNames;
     }
 
     public List<URL> find(String pattern, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
-        new FlagsHelper(flags).allowed(Flags.DEREFERENCE, Flags.RECURSIVE);
-        if (Flags.DEREFERENCE.isSet(flags)) {
-            try {
-                return this._dereferenceDir().find(pattern, flags - Flags.DEREFERENCE.getValue());
-            } catch (IncorrectURLException e) {
-                throw new NoSuccessException(e);
-            }
-        }
-
-        // search
-        List<URL> matchingPath = new ArrayList<URL>();
-        if (m_adaptor instanceof DataReaderAdaptor) {
-            Pattern p = SAGAPattern.toRegexp(pattern);
-            this._doFind(p, flags, matchingPath, CURRENT_DIR_RELATIVE_PATH);
+        float timeout = this.getTimeout("find");
+        if (timeout == WAIT_FOREVER) {
+            return super.findSync(pattern, flags);
         } else {
-            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
+            try {
+                return (List<URL>) getResult(super.find(TaskMode.ASYNC, pattern, flags), timeout);
+            }
+            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         }
-        return matchingPath;
-    }
-    public List<URL> find(String pattern) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
-        return this.find(pattern, Flags.RECURSIVE.getValue());
     }
 
-    private void _doFind(Pattern p, int flags, List<URL> matchingPath, URL currentRelativePath) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
-        // for each child
-        FileAttributes[] childs = this._listAttributes(m_url.getPath());
-        for (int i=0; i<childs.length; i++) {
-            // set child relative path
-            URL childRelativePath = URLHelper.createURL(currentRelativePath, childs[i].getName());
-            // add child relative path to matching list
-            if (p==null || p.matcher(childs[i].getName()).matches()) {
-                matchingPath.add(childRelativePath);
+    public List<URL> find(String pattern) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("find");
+        if (timeout == WAIT_FOREVER) {
+            return super.findSync(pattern);
+        } else {
+            try {
+                return (List<URL>) getResult(super.find(TaskMode.ASYNC, pattern), timeout);
             }
-            // may recurse
-            if (Flags.RECURSIVE.isSet(flags) && childs[i].getType()==FileAttributes.DIRECTORY_TYPE) {
-                AbstractNSDirectoryImpl childDir;
-                try {
-                    childDir = (AbstractNSDirectoryImpl) this._openNSDir(childRelativePath);
-                } catch (IncorrectURLException e) {
-                    throw new NoSuccessException(e);
-                }
-                childDir._doFind(p, flags, matchingPath, childRelativePath);
-            }
+            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         }
     }
 
     public boolean exists(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
-        return ((AbstractNSEntryImpl)this._openNSEntry(name)).exists();
-    }
-
-    public boolean isDir(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, DoesNotExistException {
-        return this._openNSEntryWithDoesNotExist(name).isDir();
-    }
-
-    public boolean isEntry(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, DoesNotExistException {
-        return this._openNSEntryWithDoesNotExist(name).isEntry();
-    }
-
-    public boolean isLink(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, DoesNotExistException {
-        return this._openNSEntryWithDoesNotExist(name).isLink();
-    }
-
-    public URL readLink(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, DoesNotExistException {
-        return this._openNSEntryWithDoesNotExist(name).readLink();
-    }
-
-    private String[] m_entriesCache = null;
-    public int getNumEntries() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
-        if (m_adaptor instanceof DataReaderAdaptor) {
-            m_entriesCache = this._listNames(m_url.getPath());
-            return m_entriesCache.length;
+        float timeout = this.getTimeout("exists");
+        if (timeout == WAIT_FOREVER) {
+            return super.existsSync(name);
         } else {
-            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
+            try {
+                return (Boolean) getResult(super.exists(TaskMode.ASYNC, name), timeout);
+            }
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+        }
+    }
+
+    public boolean isDir(URL name) throws NotImplementedException, IncorrectURLException, DoesNotExistException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("isDir");
+        if (timeout == WAIT_FOREVER) {
+            return super.isDirSync(name);
+        } else {
+            try {
+                return (Boolean) getResult(super.isDir(TaskMode.ASYNC, name), timeout);
+            }
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+        }
+    }
+
+    public boolean isEntry(URL name) throws NotImplementedException, IncorrectURLException, DoesNotExistException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("isEntry");
+        if (timeout == WAIT_FOREVER) {
+            return super.isEntrySync(name);
+        } else {
+            try {
+                return (Boolean) getResult(super.isEntry(TaskMode.ASYNC, name), timeout);
+            }
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+        }
+    }
+
+    public boolean isLink(URL name) throws NotImplementedException, IncorrectURLException, DoesNotExistException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("isLink");
+        if (timeout == WAIT_FOREVER) {
+            return super.isLinkSync(name);
+        } else {
+            try {
+                return (Boolean) getResult(super.isLink(TaskMode.ASYNC, name), timeout);
+            }
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+        }
+    }
+
+    public URL readLink(URL name) throws NotImplementedException, IncorrectURLException, DoesNotExistException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("readLink");
+        if (timeout == WAIT_FOREVER) {
+            return super.readLinkSync(name);
+        } else {
+            try {
+                return (URL) getResult(super.readLink(TaskMode.ASYNC, name), timeout);
+            }
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+        }
+    }
+
+    public int getNumEntries() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("getNumEntries");
+        if (timeout == WAIT_FOREVER) {
+            return super.getNumEntriesSync();
+        } else {
+            try {
+                return (Integer) getResult(super.getNumEntries(TaskMode.ASYNC), timeout);
+            }
+            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (BadParameterException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         }
     }
 
     public URL getEntry(int entry) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
-        if (m_adaptor instanceof DataReaderAdaptor) {
-            if (m_entriesCache == null) {
-                m_entriesCache = this._listNames(m_url.getPath());
-            }
-            if (entry < m_entriesCache.length) {
-                try {
-                    return URLFactory.createURL(m_entriesCache[entry]);
-                } catch (BadParameterException e) {
-                    throw new NoSuccessException(e);
-                }
-            } else {
-                throw new DoesNotExistException("Invalid index: "+entry, this);
-            }
+        float timeout = this.getTimeout("getEntry");
+        if (timeout == WAIT_FOREVER) {
+            return super.getEntrySync(entry);
         } else {
-            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
+            try {
+                return (URL) getResult(super.getEntry(TaskMode.ASYNC, entry), timeout);
+            }
+            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (BadParameterException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
         }
     }
 
     public void copy(URL source, URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        this._openNSEntry(source).copy(target, flags);
-    }
-    public void copy(URL source, URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        this.copy(source, target, Flags.NONE.getValue());
-    }
-
-    public void copy(String sourcePattern, URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        if (SAGAPattern.hasWildcard(sourcePattern)) {
-            for (URL source : this.list(sourcePattern)) {
-                this._openNSEntry(source).copy(target, flags);
-            }
+        float timeout = this.getTimeout("copy");
+        if (timeout == WAIT_FOREVER) {
+            super.copySync(source, target, flags);
         } else {
-            URL source = URLFactory.createURL(sourcePattern);
-            this._openNSEntry(source).copy(target, flags);
+            getResult(super.copy(TaskMode.ASYNC, source, target, flags), timeout);
         }
     }
-    public void copy(String sourcePattern, URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        this.copy(sourcePattern, target, Flags.NONE.getValue());
+
+    public void copy(URL source, URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("copy");
+        if (timeout == WAIT_FOREVER) {
+            super.copySync(source, target);
+        } else {
+            getResult(super.copy(TaskMode.ASYNC, source, target), timeout);
+        }
+    }
+
+    public void copy(String source, URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("copy");
+        if (timeout == WAIT_FOREVER) {
+            super.copySync(source, target, flags);
+        } else {
+            getResult(super.copy(TaskMode.ASYNC, source, target, flags), timeout);
+        }
+    }
+
+    public void copy(String source, URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("copy");
+        if (timeout == WAIT_FOREVER) {
+            super.copySync(source, target);
+        } else {
+            getResult(super.copy(TaskMode.ASYNC, source, target), timeout);
+        }
     }
 
     public void link(URL source, URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        this._openNSEntry(source).link(target, flags);
-    }
-    public void link(URL source, URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        this.link(source, target, Flags.NONE.getValue());
-    }
-
-    public void link(String sourcePattern, URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        if (SAGAPattern.hasWildcard(sourcePattern)) {
-            for (URL source : this.list(sourcePattern)) {
-                this._openNSEntry(source);
-            }
+        float timeout = this.getTimeout("link");
+        if (timeout == WAIT_FOREVER) {
+            super.linkSync(source, target, flags);
         } else {
-            URL source = URLFactory.createURL(sourcePattern);
-            this._openNSEntry(source).link(target, flags);
+            getResult(super.link(TaskMode.ASYNC, source, target, flags), timeout);
         }
     }
-    public void link(String sourcePattern, URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        this.link(sourcePattern, target, Flags.NONE.getValue());
+
+    public void link(URL source, URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("link");
+        if (timeout == WAIT_FOREVER) {
+            super.linkSync(source, target);
+        } else {
+            getResult(super.link(TaskMode.ASYNC, source, target), timeout);
+        }
+    }
+
+    public void link(String source, URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("link");
+        if (timeout == WAIT_FOREVER) {
+            super.linkSync(source, target, flags);
+        } else {
+            getResult(super.link(TaskMode.ASYNC, source, target, flags), timeout);
+        }
+    }
+
+    public void link(String source, URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("link");
+        if (timeout == WAIT_FOREVER) {
+            super.linkSync(source, target);
+        } else {
+            getResult(super.link(TaskMode.ASYNC, source, target), timeout);
+        }
     }
 
     public void move(URL source, URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        this._openNSEntry(source).move(target, flags);
-    }
-    public void move(URL source, URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        this.move(source, target, Flags.NONE.getValue());
-    }
-    
-    public void move(String sourcePattern, URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        if (SAGAPattern.hasWildcard(sourcePattern)) {
-            for (URL source : this.list(sourcePattern)) {
-                this._openNSEntry(source);
-            }
+        float timeout = this.getTimeout("move");
+        if (timeout == WAIT_FOREVER) {
+            super.moveSync(source, target, flags);
         } else {
-            URL source = URLFactory.createURL(sourcePattern);
-            this._openNSEntry(source).move(target, flags);
+            getResult(super.move(TaskMode.ASYNC, source, target, flags), timeout);
         }
     }
-    public void move(String sourcePattern, URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        this.move(sourcePattern, target, Flags.NONE.getValue());
+
+    public void move(URL source, URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("move");
+        if (timeout == WAIT_FOREVER) {
+            super.moveSync(source, target);
+        } else {
+            getResult(super.move(TaskMode.ASYNC, source, target), timeout);
+        }
+    }
+
+    public void move(String source, URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("move");
+        if (timeout == WAIT_FOREVER) {
+            super.moveSync(source, target, flags);
+        } else {
+            getResult(super.move(TaskMode.ASYNC, source, target, flags), timeout);
+        }
+    }
+
+    public void move(String source, URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("move");
+        if (timeout == WAIT_FOREVER) {
+            super.moveSync(source, target);
+        } else {
+            getResult(super.move(TaskMode.ASYNC, source, target), timeout);
+        }
     }
 
     public void remove(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
-        this._openNSEntry(target).remove(flags);
-    }
-    public void remove(URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
-        this.remove(target, Flags.NONE.getValue());
-    }
-    
-    public void remove(String targetPattern, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
-        if (SAGAPattern.hasWildcard(targetPattern)) {
-            for (URL target : this.list(targetPattern)) {
-                this._openNSEntry(target).remove(flags);
-            }
+        float timeout = this.getTimeout("remove");
+        if (timeout == WAIT_FOREVER) {
+            super.removeSync(target, flags);
         } else {
-            URL target = URLFactory.createURL(targetPattern);
-            this._openNSEntry(target).remove(flags);
+            try {
+                getResult(super.remove(TaskMode.ASYNC, target, flags), timeout);
+            }
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
         }
     }
-    public void remove(String targetPattern) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
-        this.remove(targetPattern, Flags.NONE.getValue());
+
+    public void remove(URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("remove");
+        if (timeout == WAIT_FOREVER) {
+            super.removeSync(target);
+        } else {
+            try {
+                getResult(super.remove(TaskMode.ASYNC, target), timeout);
+            }
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+        }
+    }
+
+    public void remove(String target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("remove");
+        if (timeout == WAIT_FOREVER) {
+            super.removeSync(target, flags);
+        } else {
+            try {
+                getResult(super.remove(TaskMode.ASYNC, target, flags), timeout);
+            }
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+        }
+    }
+
+    public void remove(String target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("remove");
+        if (timeout == WAIT_FOREVER) {
+            super.removeSync(target);
+        } else {
+            try {
+                getResult(super.remove(TaskMode.ASYNC, target), timeout);
+            }
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+        }
     }
 
     public void makeDir(URL target, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        int makeDirFlags = Flags.CREATE.or(flags);
-        NSFactory.createNSDirectory(m_session, target, makeDirFlags);
+        float timeout = this.getTimeout("makeDir");
+        if (timeout == WAIT_FOREVER) {
+            super.makeDirSync(target, flags);
+        } else {
+            getResult(super.makeDir(TaskMode.ASYNC, target, flags), timeout);
+        }
     }
+
     public void makeDir(URL target) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        this.makeDir(target, Flags.NONE.getValue());
-    }
-
-    public void permissionsAllow(URL target, String id, int permissions, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, TimeoutException, NoSuccessException {
-        this._openNSEntry(target, flags).permissionsAllow(id, permissions);
-    }
-    public void permissionsAllow(URL target, String id, int permissions) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, TimeoutException, NoSuccessException {
-        this.permissionsAllow(target, id, permissions, Flags.NONE.getValue());
-    }
-
-    public void permissionsAllow(String targetPattern, String id, int permissions, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, TimeoutException, NoSuccessException {
-        if (SAGAPattern.hasWildcard(targetPattern)) {
-            try {
-                for (URL target : this.list(targetPattern)) {
-                    this._openNSEntry(target, flags).permissionsAllow(id, permissions);
-                }
-            } catch(IncorrectURLException e) {throw new NoSuccessException(e);}
+        float timeout = this.getTimeout("makeDir");
+        if (timeout == WAIT_FOREVER) {
+            super.makeDirSync(target);
         } else {
-            URL target = URLFactory.createURL(targetPattern);
-            this._openNSEntry(target, flags).permissionsAllow(id, permissions);
+            getResult(super.makeDir(TaskMode.ASYNC, target), timeout);
         }
     }
-    public void permissionsAllow(String targetPattern, String id, int permissions) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, TimeoutException, NoSuccessException {
-        this.permissionsAllow(targetPattern, id, permissions, Flags.NONE.getValue());
-    }
 
-    public void permissionsDeny(URL target, String id, int permissions, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
-        this._openNSEntry(target, flags).permissionsDeny(id, permissions);
-    }
-    public void permissionsDeny(URL target, String id, int permissions) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
-        this.permissionsDeny(target, id, permissions, Flags.NONE.getValue());
-    }
-    
-    public void permissionsDeny(String targetPattern, String id, int permissions, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
-        if (SAGAPattern.hasWildcard(targetPattern)) {
-            try {
-                for (URL target : this.list(targetPattern)) {
-                    this._openNSEntry(target, flags).permissionsDeny(id, permissions);
-                }
-            } catch(IncorrectURLException e) {throw new NoSuccessException(e);
-            } catch(IncorrectStateException e) {throw new NoSuccessException(e);}
+    public NSDirectory openDir(URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("openDir");
+        if (timeout == WAIT_FOREVER) {
+            return this.openDir(name, flags);
         } else {
-            URL target = URLFactory.createURL(targetPattern);
-            this._openNSEntry(target, flags).permissionsDeny(id, permissions);
-        }
-    }
-    public void permissionsDeny(String targetPattern, String id, int permissions) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
-        this.permissionsDeny(targetPattern, id, permissions, Flags.NONE.getValue());
-    }
-
-    ///////////////////////////////////////// protected methods /////////////////////////////////////////
-
-    protected static URL CURRENT_DIR_RELATIVE_PATH;
-    static {
-        try {
-            CURRENT_DIR_RELATIVE_PATH = URLFactory.createURL("./");
-        } catch (Exception e) {
-            e.printStackTrace();
+            throw new NotImplementedException("Configuring user timeout is not supported for method: openDir");
         }
     }
 
-    private String[] _listNames(String absolutePath) throws NotImplementedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
-        FileAttributes[] files = this._listAttributes(absolutePath);
-        String[] filenames = new String[files.length];
-        for (int i=0; i<files.length; i++) {
-            filenames[i] = files[i].getName();
+    public NSDirectory openDir(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("openDir");
+        if (timeout == WAIT_FOREVER) {
+            return this.openDir(name);
+        } else {
+            throw new NotImplementedException("Configuring user timeout is not supported for method: openDir");
         }
-        return filenames;
     }
 
-    private NSEntry _openNSEntry(URL name, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
-        try {
+    public NSEntry open(URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("open");
+        if (timeout == WAIT_FOREVER) {
             return this.open(name, flags);
-        } catch (IncorrectURLException e) {
-            throw new NoSuccessException(e);
-        } catch (IncorrectStateException e) {
-            throw new NoSuccessException(e);
-        } catch (DoesNotExistException e) {
-            throw new NoSuccessException(e);
-        } catch (AlreadyExistsException e) {
-            throw new NoSuccessException(e);
+        } else {
+            throw new NotImplementedException("Configuring user timeout is not supported for method: open");
         }
     }
-    private NSEntry _openNSEntryWithDoesNotExist(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
-        try {
-            return this.open(name, Flags.NONE.getValue());
-        } catch (AlreadyExistsException e) {
-            throw new IncorrectStateException(e);
+
+    public NSEntry open(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("open");
+        if (timeout == WAIT_FOREVER) {
+            return this.open(name);
+        } else {
+            throw new NotImplementedException("Configuring user timeout is not supported for method: open");
         }
+    }
+
+    public void permissionsAllow(URL target, String id, int permissions, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("permissionsAllow");
+        if (timeout == WAIT_FOREVER) {
+            super.permissionsAllowSync(target, id, permissions, flags);
+        } else {
+            try {
+                getResult(super.permissionsAllow(TaskMode.ASYNC, target, id, permissions, flags), timeout);
+            }
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+        }
+    }
+
+    public void permissionsAllow(URL target, String id, int permissions) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, IncorrectStateException, BadParameterException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("permissionsAllow");
+        if (timeout == WAIT_FOREVER) {
+            super.permissionsAllowSync(target, id, permissions);
+        } else {
+            try {
+                getResult(super.permissionsAllow(TaskMode.ASYNC, target, id, permissions), timeout);
+            }
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+        }
+    }
+
+    public void permissionsAllow(String target, String id, int permissions, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("permissionsAllow");
+        if (timeout == WAIT_FOREVER) {
+            super.permissionsAllowSync(target, id, permissions, flags);
+        } else {
+            try {
+                getResult(super.permissionsAllow(TaskMode.ASYNC, target, id, permissions, flags), timeout);
+            }
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+        }
+    }
+
+    public void permissionsAllow(String target, String id, int permissions) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, IncorrectStateException, BadParameterException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("permissionsAllow");
+        if (timeout == WAIT_FOREVER) {
+            super.permissionsAllowSync(target, id, permissions);
+        } else {
+            try {
+                getResult(super.permissionsAllow(TaskMode.ASYNC, target, id, permissions), timeout);
+            }
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+        }
+    }
+
+    public void permissionsDeny(URL target, String id, int permissions, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("permissionsDeny");
+        if (timeout == WAIT_FOREVER) {
+            super.permissionsDenySync(target, id, permissions, flags);
+        } else {
+            try {
+                getResult(super.permissionsDeny(TaskMode.ASYNC, target, id, permissions, flags), timeout);
+            }
+            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+        }
+    }
+
+    public void permissionsDeny(URL target, String id, int permissions) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("permissionsDeny");
+        if (timeout == WAIT_FOREVER) {
+            super.permissionsDenySync(target, id, permissions);
+        } else {
+            try {
+                getResult(super.permissionsDeny(TaskMode.ASYNC, target, id, permissions), timeout);
+            }
+            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+        }
+    }
+
+    public void permissionsDeny(String target, String id, int permissions, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("permissionsDeny");
+        if (timeout == WAIT_FOREVER) {
+            super.permissionsDenySync(target, id, permissions, flags);
+        } else {
+            try {
+                getResult(super.permissionsDeny(TaskMode.ASYNC, target, id, permissions, flags), timeout);
+            }
+            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+        }
+    }
+
+    public void permissionsDeny(String target, String id, int permissions) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("permissionsDeny");
+        if (timeout == WAIT_FOREVER) {
+            super.permissionsDenySync(target, id, permissions);
+        } else {
+            try {
+                getResult(super.permissionsDeny(TaskMode.ASYNC, target, id, permissions), timeout);
+            }
+            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+        }
+    }
+
+    /////////////////////////////////////// override some methods of NSEntry ///////////////////////////////////////
+
+    /** override super.getCWD() */
+    public URL getCWD() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("getCWD");
+        if (timeout == WAIT_FOREVER) {
+            return super.getCWDSync();
+        } else {
+            try {
+                return (URL) getResult(super.getCWD(TaskMode.ASYNC), timeout);
+            }
+            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (AuthenticationFailedException e) {throw new NoSuccessException(e);}
+            catch (AuthorizationFailedException e) {throw new NoSuccessException(e);}
+            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
+            catch (BadParameterException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+        }
+    }
+
+    /** override super.copy() */
+    public void copy(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+        float timeout = this.getTimeout("copy");
+        if (timeout == WAIT_FOREVER) {
+            super.copySync(target, flags);
+        } else {
+            getResult(super.copy(TaskMode.ASYNC, target, flags), timeout);
+        }
+    }
+
+    /** override super.copyFrom() */
+    public void copyFrom(URL source, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+        float timeout = this.getTimeout("copyFrom");
+        if (timeout == WAIT_FOREVER) {
+            super.copyFromSync(source, flags);
+        } else {
+            getResult(super.copyFrom(TaskMode.ASYNC, source, flags), timeout);
+        }
+    }
+
+    /** override super.move() */
+    public void move(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+        float timeout = this.getTimeout("move");
+        if (timeout == WAIT_FOREVER) {
+            super.moveSync(target, flags);
+        } else {
+            getResult(super.move(TaskMode.ASYNC, target, flags), timeout);
+        }
+    }
+
+    /** override super.remove() */
+    public void remove(int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("remove");
+        if (timeout == WAIT_FOREVER) {
+            super.removeSync(flags);
+        } else {
+            try {
+                getResult(super.remove(TaskMode.ASYNC, flags), timeout);
+            }
+            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+        }
+    }
+
+    ////////////////////////////////////////// private methods //////////////////////////////////////////
+
+    private float getTimeout(String methodName) throws NoSuccessException {
+        return getTimeout(NSDirectory.class, methodName, m_url.getScheme());
     }
 }

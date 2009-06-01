@@ -7,7 +7,7 @@ import fr.in2p3.jsaga.adaptor.data.read.FileReader;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderGetter;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.schema.config.Protocol;
-import fr.in2p3.jsaga.impl.file.FileImpl;
+import fr.in2p3.jsaga.impl.file.AbstractSyncFileImpl;
 import fr.in2p3.jsaga.impl.namespace.FlagsHelper;
 import fr.in2p3.jsaga.impl.namespace.JSAGAFlags;
 import org.ogf.saga.error.*;
@@ -34,11 +34,11 @@ import java.io.IOException;
 public class FileCopy {
     private static final int DEFAULT_BUFFER_SIZE = 16384;
     private Session m_session;
-    private FileImpl m_sourceFile;
+    private AbstractSyncFileImpl m_sourceFile;
     private DataAdaptor m_adaptor;
 
     /** constructor */
-    public FileCopy(Session session, FileImpl sourceFile, DataAdaptor adaptor) throws NotImplementedException {
+    public FileCopy(Session session, AbstractSyncFileImpl sourceFile, DataAdaptor adaptor) throws NotImplementedException {
         m_session = session;
         m_sourceFile = sourceFile;
         m_adaptor = adaptor;
@@ -76,14 +76,14 @@ public class FileCopy {
                 throw new AlreadyExistsException("Target entry already exists: "+effectiveTarget, alreadyExists.getCause());
             }
         } else if (m_adaptor instanceof FileReaderGetter && !source.getScheme().equals(effectiveTarget.getScheme())) {
-            FileImpl targetFile = this.createTargetFile(effectiveTarget, flags);
+            AbstractSyncFileImpl targetFile = this.createTargetFile(effectiveTarget, flags);
             try {
                 ((FileReaderGetter)m_adaptor).getToStream(
                         source.getPath(),
                         source.getQuery(),
                         targetFile.getFileOutputStream());
             } catch (DoesNotExistException doesNotExist) {
-                targetFile.remove();
+                targetFile.removeSync();
                 throw new IncorrectStateException("Source file does not exist: "+source, doesNotExist);
             } finally {
                 targetFile.close();
@@ -125,7 +125,7 @@ public class FileCopy {
 
         // open target file and copy
         try {
-            FileImpl targetFile = this.createTargetFile(target, flags);
+            AbstractSyncFileImpl targetFile = this.createTargetFile(target, flags);
             try {
                 FileOutputStream out = targetFile.getFileOutputStream();
                 while (readlen > 0) {
@@ -170,7 +170,7 @@ public class FileCopy {
         }
     }
 
-    private FileImpl createTargetFile(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+    private AbstractSyncFileImpl createTargetFile(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
         // set corrected flags
         int correctedFlags = flags;
         correctedFlags = new FlagsHelper(correctedFlags).add(Flags.WRITE, Flags.CREATE);
@@ -181,7 +181,7 @@ public class FileCopy {
             correctedFlags = correctedFlags + Flags.EXCL.getValue();
         }
         try {
-            return (FileImpl) FileFactory.createFile(m_session, target, correctedFlags);
+            return (AbstractSyncFileImpl) FileFactory.createFile(m_session, target, correctedFlags);
         } catch (DoesNotExistException e) {
             throw new NoSuccessException("Unexpected exception", e);
         } catch (AlreadyExistsException alreadyExists) {

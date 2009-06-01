@@ -6,8 +6,7 @@ import org.ogf.saga.error.*;
 import org.ogf.saga.job.Job;
 import org.ogf.saga.job.JobDescription;
 import org.ogf.saga.session.Session;
-import org.ogf.saga.task.Task;
-import org.ogf.saga.task.TaskMode;
+import org.ogf.saga.task.*;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,6 +28,26 @@ public abstract class AbstractAsyncJobImpl extends AbstractJobPermissionsImpl im
     public AbstractAsyncJobImpl(Session session, boolean create) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         super(session, create);
     }
+
+    //////////////////////////////////////////// interface Task ////////////////////////////////////////////
+
+    public Task<Job, Void> run(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<Job,Void>().create(
+                mode, m_session, this,
+                "run",
+                new Class[]{},
+                new Object[]{});
+    }
+
+    public Task<Job, State> getState(TaskMode mode) throws NotImplementedException {
+        return new GenericThreadedTaskFactory<Job,State>().create(
+                mode, m_session, this,
+                "getState",
+                new Class[]{},
+                new Object[]{});
+    }
+
+    //////////////////////////////////////////// interface Job ////////////////////////////////////////////
 
     public Task<Job, JobDescription> getJobDescription(TaskMode mode) throws NotImplementedException {
         return new GenericThreadedTaskFactory<Job,JobDescription>().create(

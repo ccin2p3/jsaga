@@ -1,8 +1,11 @@
 package fr.in2p3.jsaga.impl;
 
+import fr.in2p3.jsaga.EngineProperties;
+import fr.in2p3.jsaga.engine.config.TimeoutConfiguration;
 import org.ogf.saga.SagaObject;
-import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.task.Task;
 
 import java.util.UUID;
 
@@ -54,5 +57,31 @@ public abstract class AbstractSagaObjectImpl implements SagaObject {
 
     public String getId() {
         return m_uuid.toString();
+    }
+
+    //////////////////////////////////////////// protected methods ////////////////////////////////////////////
+
+    public static float getTimeout(Class itf, String methodName, String protocolScheme) throws NoSuccessException {
+        return TimeoutConfiguration.getInstance().getTimeout(itf, methodName, protocolScheme);
+    }
+
+    public static Object getResult(Task task, float timeout)
+            throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException,
+            BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException,
+            TimeoutException, NoSuccessException
+    {
+        task.waitFor(timeout);
+        switch(task.getState()) {
+            case DONE:
+                return task.getResult();
+            case CANCELED:
+            case FAILED:
+                task.rethrow();
+                throw new NoSuccessException("[INTERNAL ERROR] Task failed");
+            default:
+                try{task.cancel();} catch(Exception e){/*ignore*/}
+                throw new TimeoutException("User timeout occured. If this happens too often, modify configuration file: "+EngineProperties.getURL(EngineProperties.JSAGA_TIMEOUT));
+        }
     }
 }

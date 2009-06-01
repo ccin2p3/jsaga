@@ -26,26 +26,28 @@ import java.util.List;
 /**
  *
  */
-public abstract class AbstractAsyncFileImpl extends AbstractNSEntryImplWithStream implements File {
+public abstract class AbstractAsyncFileImpl extends AbstractSyncFileImpl implements File {
     /** constructor for factory */
-    protected AbstractAsyncFileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+    protected AbstractAsyncFileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session, url, adaptor, flags);
     }
 
     /** constructor for NSDirectory.open() */
-    protected AbstractAsyncFileImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+    protected AbstractAsyncFileImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(dir, relativeUrl, flags);
     }
 
     /** constructor for NSEntry.openAbsolute() */
-    protected AbstractAsyncFileImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+    protected AbstractAsyncFileImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(entry, absolutePath, flags);
     }
+
+    //////////////////////////////////////////// interface File ////////////////////////////////////////////
 
     public Task<File, Long> getSize(TaskMode mode) throws NotImplementedException {
         return new GenericThreadedTaskFactory<File,Long>().create(
                 mode, m_session, this,
-                "getSize",
+                "getSizeSync",
                 new Class[]{},
                 new Object[]{});
     }
@@ -53,7 +55,7 @@ public abstract class AbstractAsyncFileImpl extends AbstractNSEntryImplWithStrea
     public Task<File, Integer> read(TaskMode mode, Buffer buffer, int offset, int len) throws NotImplementedException {
         return new GenericThreadedTaskFactory<File,Integer>().create(
                 mode, m_session, this,
-                "read",
+                "readSync",
                 new Class[]{Buffer.class, int.class, int.class},
                 new Object[]{buffer, offset, len});
     }
@@ -68,7 +70,7 @@ public abstract class AbstractAsyncFileImpl extends AbstractNSEntryImplWithStrea
     public Task<File, Integer> write(TaskMode mode, Buffer buffer, int offset, int len) throws NotImplementedException {
         return new GenericThreadedTaskFactory<File,Integer>().create(
                 mode, m_session, this,
-                "write",
+                "writeSync",
                 new Class[]{Buffer.class, int.class, int.class},
                 new Object[]{buffer, offset, len});
     }
@@ -83,7 +85,7 @@ public abstract class AbstractAsyncFileImpl extends AbstractNSEntryImplWithStrea
     public Task<File, Long> seek(TaskMode mode, long offset, SeekMode whence) throws NotImplementedException {
         return new GenericThreadedTaskFactory<File,Long>().create(
                 mode, m_session, this,
-                "seek",
+                "seekSync",
                 new Class[]{long.class, SeekMode.class},
                 new Object[]{offset, whence});
     }
@@ -91,7 +93,7 @@ public abstract class AbstractAsyncFileImpl extends AbstractNSEntryImplWithStrea
     public Task<File, Void> readV(TaskMode mode, IOVec[] iovecs) throws NotImplementedException {
         return new GenericThreadedTaskFactory<File,Void>().create(
                 mode, m_session, this,
-                "readV",
+                "readVSync",
                 new Class[]{IOVec[].class},
                 new Object[]{iovecs});
     }
@@ -99,7 +101,7 @@ public abstract class AbstractAsyncFileImpl extends AbstractNSEntryImplWithStrea
     public Task<File, Void> writeV(TaskMode mode, IOVec[] iovecs) throws NotImplementedException {
         return new GenericThreadedTaskFactory<File,Void>().create(
                 mode, m_session, this,
-                "writeV",
+                "writeVSync",
                 new Class[]{IOVec[].class},
                 new Object[]{iovecs});
     }
@@ -107,7 +109,7 @@ public abstract class AbstractAsyncFileImpl extends AbstractNSEntryImplWithStrea
     public Task<File, Integer> sizeP(TaskMode mode, String pattern) throws NotImplementedException {
         return new GenericThreadedTaskFactory<File,Integer>().create(
                 mode, m_session, this,
-                "sizeP",
+                "sizePSync",
                 new Class[]{String.class},
                 new Object[]{pattern});
     }
@@ -115,7 +117,7 @@ public abstract class AbstractAsyncFileImpl extends AbstractNSEntryImplWithStrea
     public Task<File, Integer> readP(TaskMode mode, String pattern, Buffer buffer) throws NotImplementedException {
         return new GenericThreadedTaskFactory<File,Integer>().create(
                 mode, m_session, this,
-                "readP",
+                "readPSync",
                 new Class[]{String.class, Buffer.class},
                 new Object[]{pattern, buffer});
     }
@@ -123,7 +125,7 @@ public abstract class AbstractAsyncFileImpl extends AbstractNSEntryImplWithStrea
     public Task<File, Integer> writeP(TaskMode mode, String pattern, Buffer buffer) throws NotImplementedException {
         return new GenericThreadedTaskFactory<File,Integer>().create(
                 mode, m_session, this,
-                "writeP",
+                "writePSync",
                 new Class[]{String.class, Buffer.class},
                 new Object[]{pattern, buffer});
     }
@@ -131,7 +133,7 @@ public abstract class AbstractAsyncFileImpl extends AbstractNSEntryImplWithStrea
     public Task<File, List<String>> modesE(TaskMode mode) throws NotImplementedException {
         return new GenericThreadedTaskFactory<File,List<String>>().create(
                 mode, m_session, this,
-                "modesE",
+                "modesESync",
                 new Class[]{},
                 new Object[]{});
     }
@@ -139,7 +141,7 @@ public abstract class AbstractAsyncFileImpl extends AbstractNSEntryImplWithStrea
     public Task<File, Integer> sizeE(TaskMode mode, String emode, String spec) throws NotImplementedException {
         return new GenericThreadedTaskFactory<File,Integer>().create(
                 mode, m_session, this,
-                "sizeE",
+                "sizeESync",
                 new Class[]{String.class, String.class},
                 new Object[]{emode, spec});
     }
@@ -147,7 +149,7 @@ public abstract class AbstractAsyncFileImpl extends AbstractNSEntryImplWithStrea
     public Task<File, Integer> readE(TaskMode mode, String emode, String spec, Buffer buffer) throws NotImplementedException {
         return new GenericThreadedTaskFactory<File,Integer>().create(
                 mode, m_session, this,
-                "readE",
+                "readESync",
                 new Class[]{String.class, String.class, Buffer.class},
                 new Object[]{emode, spec, buffer});
     }
@@ -155,7 +157,7 @@ public abstract class AbstractAsyncFileImpl extends AbstractNSEntryImplWithStrea
     public Task<File, Integer> writeE(TaskMode mode, String emode, String spec, Buffer buffer) throws NotImplementedException {
         return new GenericThreadedTaskFactory<File,Integer>().create(
                 mode, m_session, this,
-                "writeE",
+                "writeESync",
                 new Class[]{String.class, String.class, Buffer.class},
                 new Object[]{emode, spec, buffer});
     }

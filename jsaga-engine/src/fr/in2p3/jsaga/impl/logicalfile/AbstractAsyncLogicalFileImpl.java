@@ -26,26 +26,26 @@ import java.util.List;
 /**
  *
  */
-public abstract class AbstractAsyncLogicalFileImpl extends AbstractNSEntryImplWithMetaData implements LogicalFile {
+public abstract class AbstractAsyncLogicalFileImpl extends AbstractSyncLogicalFileImpl implements LogicalFile {
     /** constructor for factory */
-    protected AbstractAsyncLogicalFileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+    protected AbstractAsyncLogicalFileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session, url, adaptor, flags);
     }
 
     /** constructor for NSDirectory.open() */
-    protected AbstractAsyncLogicalFileImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+    protected AbstractAsyncLogicalFileImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(dir, relativeUrl, flags);
     }
 
     /** constructor for NSEntry.openAbsolute() */
-    protected AbstractAsyncLogicalFileImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+    protected AbstractAsyncLogicalFileImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(entry, absolutePath, flags);
     }
 
     public Task<LogicalFile, Void> addLocation(TaskMode mode, URL name) throws NotImplementedException {
         return new GenericThreadedTaskFactory<LogicalFile,Void>().create(
                 mode, m_session, this,
-                "addLocation",
+                "addLocationSync",
                 new Class[]{URL.class},
                 new Object[]{name});
     }
@@ -53,7 +53,7 @@ public abstract class AbstractAsyncLogicalFileImpl extends AbstractNSEntryImplWi
     public Task<LogicalFile, Void> removeLocation(TaskMode mode, URL name) throws NotImplementedException {
         return new GenericThreadedTaskFactory<LogicalFile,Void>().create(
                 mode, m_session, this,
-                "removeLocation",
+                "removeLocationSync",
                 new Class[]{URL.class},
                 new Object[]{name});
     }
@@ -61,7 +61,7 @@ public abstract class AbstractAsyncLogicalFileImpl extends AbstractNSEntryImplWi
     public Task<LogicalFile, Void> updateLocation(TaskMode mode, URL nameOld, URL nameNew) throws NotImplementedException {
         return new GenericThreadedTaskFactory<LogicalFile,Void>().create(
                 mode, m_session, this,
-                "updateLocation",
+                "updateLocationSync",
                 new Class[]{URL.class, URL.class},
                 new Object[]{nameOld, nameNew});
     }
@@ -69,7 +69,7 @@ public abstract class AbstractAsyncLogicalFileImpl extends AbstractNSEntryImplWi
     public Task<LogicalFile, List<URL>> listLocations(TaskMode mode) throws NotImplementedException {
         return new GenericThreadedTaskFactory<LogicalFile,List<URL>>().create(
                 mode, m_session, this,
-                "listLocations",
+                "listLocationsSync",
                 new Class[]{},
                 new Object[]{});
     }
@@ -77,7 +77,7 @@ public abstract class AbstractAsyncLogicalFileImpl extends AbstractNSEntryImplWi
     public Task<LogicalFile, Void> replicate(TaskMode mode, URL name, int flags) throws NotImplementedException {
         return new GenericThreadedTaskFactory<LogicalFile,Void>().create(
                 mode, m_session, this,
-                "replicate",
+                "replicateSync",
                 new Class[]{URL.class, int.class},
                 new Object[]{name, flags});
     }

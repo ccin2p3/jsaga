@@ -1,8 +1,9 @@
 package fr.in2p3.jsaga.impl.file.copy;
 
-import fr.in2p3.jsaga.impl.file.DirectoryImpl;
+import fr.in2p3.jsaga.impl.file.AbstractSyncDirectoryImpl;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.task.TaskMode;
 import org.ogf.saga.url.URL;
 
 /* ***************************************************
@@ -18,15 +19,15 @@ import org.ogf.saga.url.URL;
  *
  */
 public class DirectoryCopyFromTask<T,E> extends AbstractCopyFromTask<T,E> {
-    private DirectoryImpl m_targetDir;
+    private AbstractSyncDirectoryImpl m_targetDir;
 
     /** constructor */
-    public DirectoryCopyFromTask(Session session, DirectoryImpl targetDir, URL target, int flags) throws NotImplementedException {
-        super(session, target, flags);
+    public DirectoryCopyFromTask(TaskMode mode, Session session, AbstractSyncDirectoryImpl targetDir, URL target, int flags) throws NotImplementedException {
+        super(mode, session, target, flags);
         m_targetDir = targetDir;
     }
 
     public void doCopyFrom(URL source, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
-        m_targetDir.copyFrom(source, flags);
+        m_targetDir.copyFromSync(source, flags);
     }
 }

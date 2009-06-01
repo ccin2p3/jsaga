@@ -1,13 +1,8 @@
 package fr.in2p3.jsaga.impl.file;
 
-import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
-import fr.in2p3.jsaga.adaptor.data.read.FileReader;
-import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
-import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
-import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
 import fr.in2p3.jsaga.engine.factories.DataAdaptorFactory;
-import fr.in2p3.jsaga.impl.file.stream.FileStreamFactoryImpl;
-import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
+import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
+import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
 import org.ogf.saga.file.*;
 import org.ogf.saga.session.Session;
@@ -27,101 +22,73 @@ import org.ogf.saga.url.URL;
 /**
  *
  */
-public class FileFactoryImpl extends FileFactory {
-    private DataAdaptorFactory m_adaptorFactory;
-
+public class FileFactoryImpl extends AbstractAsyncFileFactoryImpl {
     public FileFactoryImpl(DataAdaptorFactory adaptorFactory) {
-        m_adaptorFactory = adaptorFactory;
+        super(adaptorFactory);
     }
 
-    protected IOVec doCreateIOVec(byte[] data, int lenIn) throws BadParameterException {
-        throw new BadParameterException("Not implemented by the SAGA engine");
-    }
-
-    protected IOVec doCreateIOVec(int size, int lenIn) throws BadParameterException, NoSuccessException {
-        throw new BadParameterException("Not implemented by the SAGA engine");
-    }
-
-    protected IOVec doCreateIOVec(byte[] data) throws BadParameterException, NoSuccessException {
-        throw new BadParameterException("Not implemented by the SAGA engine");
-    }
-
-    protected IOVec doCreateIOVec(int size) throws BadParameterException, NoSuccessException {
-        throw new BadParameterException("Not implemented by the SAGA engine");
-    }
+    ///////////////////////////////////////// interface FileFactory /////////////////////////////////////////
 
     protected File doCreateFile(Session session, URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session);
-        boolean isPhysical = adaptor instanceof FileReader || adaptor instanceof FileWriter;
-        boolean isLogical = adaptor instanceof LogicalReader || adaptor instanceof LogicalWriter;
-        if (isPhysical || !isLogical) {
-            return new FileImpl(session, name, adaptor, flags);
+        float timeout = this.getTimeout("createFile", name);
+        if (timeout == SagaObject.WAIT_FOREVER) {
+            return super.doCreateFileSync(session, name, flags);
         } else {
-            throw new BadParameterException("Not a physical file URL: "+name);
+            try {
+                return (File) this.getResult(createFile(TaskMode.ASYNC, session, name, flags), timeout);
+            }
+            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
         }
     }
 
     protected FileInputStream doCreateFileInputStream(Session session, URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session);
-        boolean disconnectable = true;
-        return FileStreamFactoryImpl.newFileInputStream(session, name, adaptor, disconnectable);
-    }
-    public static FileInputStream openFileInputStream(Session session, URL name, DataAdaptor adaptor) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-        boolean disconnectable = false;
-        return FileStreamFactoryImpl.newFileInputStream(session, name, adaptor, disconnectable);
-    }
-
-    protected FileOutputStream doCreateFileOutputStream(Session session, URL name, boolean append) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session);
-        boolean disconnectable = true;
-        boolean exclusive = false;
-        return FileStreamFactoryImpl.newFileOutputStream(session, name, adaptor, disconnectable, append, exclusive);
-    }
-    public static FileOutputStream openFileOutputStream(Session session, URL name, DataAdaptor adaptor, boolean append, boolean exclusive) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        boolean disconnectable = false;
-        return FileStreamFactoryImpl.newFileOutputStream(session, name, adaptor, disconnectable, append, exclusive);
-    }
-
-    protected Directory doCreateDirectory(Session session, URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session);
-        boolean isPhysical = adaptor instanceof FileReader || adaptor instanceof FileWriter;
-        boolean isLogical = adaptor instanceof LogicalReader || adaptor instanceof LogicalWriter;
-        if (isPhysical || !isLogical) {
-            return new DirectoryImpl(session, name, adaptor, flags);
+        float timeout = this.getTimeout("createFileInputStream", name);
+        if (timeout == SagaObject.WAIT_FOREVER) {
+            return super.doCreateFileInputStreamSync(session, name);
         } else {
-            throw new BadParameterException("Not a physical directory URL: "+name);
+            try {
+                return (FileInputStream) this.getResult(createFileInputStream(TaskMode.ASYNC, session, name), timeout);
+            }
+            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
         }
     }
 
-    protected Task<FileFactory, File> doCreateFile(TaskMode mode, Session session, URL name, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<FileFactory,File>().create(
-                mode, null, this,
-                "doCreateFile",
-                new Class[]{Session.class, URL.class, int.class},
-                new Object[]{session, name, flags});
+    protected FileOutputStream doCreateFileOutputStream(Session session, URL name, boolean append) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("createFileOutputStream", name);
+        if (timeout == SagaObject.WAIT_FOREVER) {
+            return super.doCreateFileOutputStreamSync(session, name, append);
+        } else {
+            try {
+                return (FileOutputStream) this.getResult(createFileOutputStream(TaskMode.ASYNC, session, name, append), timeout);
+            }
+            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
+        }
     }
 
-    protected Task<FileFactory, FileInputStream> doCreateFileInputStream(TaskMode mode, Session session, URL name) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<FileFactory,FileInputStream>().create(
-                mode, null, this,
-                "doCreateFileInputStream",
-                new Class[]{Session.class, URL.class},
-                new Object[]{session, name});
+    protected Directory doCreateDirectory(Session session, URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("createDirectory", name);
+        if (timeout == SagaObject.WAIT_FOREVER) {
+            return super.doCreateDirectorySync(session, name, flags);
+        } else {
+            try {
+                return (Directory) this.getResult(createDirectory(TaskMode.ASYNC, session, name, flags), timeout);
+            }
+            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
+        }
     }
 
-    protected Task<FileFactory, FileOutputStream> doCreateFileOutputStream(TaskMode mode, Session session, URL name, boolean append) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<FileFactory,FileOutputStream>().create(
-                mode, null, this,
-                "doCreateFileOutputStream",
-                new Class[]{Session.class, URL.class, boolean.class},
-                new Object[]{session, name, append});
+    ////////////////////////////////////////// private methods //////////////////////////////////////////
+
+    private float getTimeout(String methodName, URL url) throws NoSuccessException {
+        return AbstractSagaObjectImpl.getTimeout(FileFactory.class, methodName, url.getScheme());
     }
 
-    protected Task<FileFactory, Directory> doCreateDirectory(TaskMode mode, Session session, URL name, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<FileFactory,Directory>().create(
-                mode, null, this,
-                "doCreateDirectory",
-                new Class[]{Session.class, URL.class, int.class},
-                new Object[]{session, name, flags});
+    private Object getResult(Task task, float timeout)
+            throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException,
+            BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException,
+            TimeoutException, NoSuccessException
+    {
+        return AbstractSagaObjectImpl.getResult(task, timeout);
     }
 }

@@ -24,6 +24,7 @@ public class EngineProperties {
     public static final String JSAGA_UNIVERSE_CREATE_IF_MISSING = "jsaga.universe.create.if.missing";
     public static final String JSAGA_UNIVERSE_ENABLE_CACHE = "jsaga.universe.enable.cache";
     public static final String JSAGA_UNIVERSE_IGNORE_MISSING_ADAPTOR = "jsaga.universe.ignore.missing.adaptor";
+    public static final String JSAGA_TIMEOUT = "jsaga.timeout";
     public static final String LOG4J_CONFIGURATION = "log4j.configuration";
     public static final String DATA_COPY_BUFFER_SIZE = "data.copy.buffer.size";
     public static final String JOB_DESCRIPTION_DEFAULT = "job.description.default";
@@ -43,6 +44,7 @@ public class EngineProperties {
             s_prop.setProperty(JSAGA_UNIVERSE_CREATE_IF_MISSING, "false");
             s_prop.setProperty(JSAGA_UNIVERSE_ENABLE_CACHE, "true");
             s_prop.setProperty(JSAGA_UNIVERSE_IGNORE_MISSING_ADAPTOR, "true");
+            s_prop.setProperty(JSAGA_TIMEOUT, "etc/jsaga-timeout.properties");
             s_prop.setProperty(LOG4J_CONFIGURATION, "etc/log4j.properties");
             s_prop.setProperty(DATA_COPY_BUFFER_SIZE, "16384");
             s_prop.setProperty(JOB_DESCRIPTION_DEFAULT, "etc/jsaga-default.jsdl");

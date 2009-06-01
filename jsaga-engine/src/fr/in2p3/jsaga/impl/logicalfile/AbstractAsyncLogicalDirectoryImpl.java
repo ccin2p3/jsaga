@@ -28,7 +28,7 @@ import java.util.List;
 /**
  *
  */
-public abstract class AbstractAsyncLogicalDirectoryImpl extends AbstractNSDirectoryImplWithMetaData implements LogicalDirectory {
+public abstract class AbstractAsyncLogicalDirectoryImpl extends AbstractSyncLogicalDirectoryImpl implements LogicalDirectory {
     /** constructor for factory */
     protected AbstractAsyncLogicalDirectoryImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session, url, adaptor, flags);
@@ -47,7 +47,7 @@ public abstract class AbstractAsyncLogicalDirectoryImpl extends AbstractNSDirect
     public Task<NSDirectory, Boolean> isFile(TaskMode mode, URL name) throws NotImplementedException {
         return new GenericThreadedTaskFactory<NSDirectory,Boolean>().create(
                 mode, m_session, this,
-                "isFile",
+                "isFileSync",
                 new Class[]{URL.class},
                 new Object[]{name});
     }
@@ -55,7 +55,7 @@ public abstract class AbstractAsyncLogicalDirectoryImpl extends AbstractNSDirect
     public Task<LogicalDirectory, List<URL>> find(TaskMode mode, String namePattern, String[] attrPattern, int flags) throws NotImplementedException {
         return new GenericThreadedTaskFactory<LogicalDirectory,List<URL>>().create(
                 mode, m_session, this,
-                "find",
+                "findSync",
                 new Class[]{String.class, String[].class, int.class},
                 new Object[]{namePattern, attrPattern, flags});
     }

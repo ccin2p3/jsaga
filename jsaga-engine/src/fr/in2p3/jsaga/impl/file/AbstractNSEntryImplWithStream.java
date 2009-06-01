@@ -3,9 +3,9 @@ package fr.in2p3.jsaga.impl.file;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSDirectoryImpl;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
+import fr.in2p3.jsaga.sync.file.SyncFile;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
-import org.ogf.saga.file.File;
 import org.ogf.saga.file.FileOutputStream;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.url.URL;
@@ -24,7 +24,7 @@ import java.io.IOException;
 /**
  *
  */
-public abstract class AbstractNSEntryImplWithStream extends AbstractNSEntryImpl implements File {
+public abstract class AbstractNSEntryImplWithStream extends AbstractNSEntryImpl implements SyncFile {
     protected FileOutputStream m_outStream;
 
     /** constructor for factory */

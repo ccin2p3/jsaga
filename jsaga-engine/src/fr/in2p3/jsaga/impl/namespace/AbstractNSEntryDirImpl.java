@@ -8,6 +8,8 @@ import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
 import fr.in2p3.jsaga.impl.file.FileImpl;
 import fr.in2p3.jsaga.impl.file.copy.DirectoryCopyTask;
 import fr.in2p3.jsaga.impl.url.URLHelper;
+import fr.in2p3.jsaga.sync.namespace.SyncNSDirectory;
+import fr.in2p3.jsaga.sync.namespace.SyncNSEntry;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
@@ -26,7 +28,7 @@ import org.ogf.saga.url.URLFactory;
 /**
  * This class override some methods of AbstractNSEntryImpl for directories
  */
-public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl implements NSDirectory {
+public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl implements SyncNSDirectory {
     /** constructor for factory */
     protected AbstractNSEntryDirImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session, url, adaptor, flags);
@@ -42,20 +44,22 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         super(entry, absolutePath, flags);
     }
 
-    /** override super.getCWD() */
-    public URL getCWD() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
+    ////////////////////////////////////// override methods of SyncNSEntry //////////////////////////////////////
+
+    /** override super.getCWDSync() */
+    public URL getCWDSync() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         return m_url.normalize();
     }
 
-    /** override super.copy() */
-    public void copy(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+    /** override super.copySync() */
+    public void copySync(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
         this._copyAndMonitor(target, flags, null);
     }
     public void _copyAndMonitor(URL target, int flags, DirectoryCopyTask progressMonitor) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
         new FlagsHelper(flags).allowed(JSAGAFlags.PRESERVETIMES, Flags.DEREFERENCE, Flags.RECURSIVE, Flags.OVERWRITE, Flags.CREATEPARENTS);
         new FlagsHelper(flags).required(Flags.RECURSIVE);
         if (Flags.DEREFERENCE.isSet(flags)) {
-            this._dereferenceDir().copy(target, flags - Flags.DEREFERENCE.getValue());
+            this._dereferenceDir().copySync(target, flags - Flags.DEREFERENCE.getValue());
             return; //==========> EXIT
         }
         URL effectiveTarget = this._getEffectiveURL(target);
@@ -65,16 +69,16 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             // copy source childs
             FileAttributes[] sourceChilds = this._listAttributes(m_url.getPath());
             for (int i=0; i<sourceChilds.length; i++) {
-                NSEntry sourceChildEntry = this._openNS(sourceChilds[i]);
-                if (sourceChildEntry instanceof AbstractNSDirectoryImpl) {
-                    ((AbstractNSDirectoryImpl)sourceChildEntry)._copyAndMonitor(effectiveTarget, flags, progressMonitor);
+                SyncNSEntry sourceChildEntry = this._openNS(sourceChilds[i]);
+                if (sourceChildEntry instanceof AbstractSyncNSDirectoryImpl) {
+                    ((AbstractSyncNSDirectoryImpl)sourceChildEntry)._copyAndMonitor(effectiveTarget, flags, progressMonitor);
                 } else {
                     // remove RECURSIVE flag (which is always set for NSDirectory.copy())
                     int childFlags = flags - Flags.RECURSIVE.getValue();
                     if (sourceChildEntry instanceof FileImpl) {
                         ((FileImpl)sourceChildEntry)._copyAndMonitor(effectiveTarget, childFlags, progressMonitor);
                     } else {
-                        sourceChildEntry.copy(effectiveTarget, childFlags);
+                        sourceChildEntry.copySync(effectiveTarget, childFlags);
                     }
                 }
             }
@@ -83,12 +87,12 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         }
     }
 
-    /** override super.copyFrom() */
-    public void copyFrom(URL source, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
+    /** override super.copyFromSync() */
+    public void copyFromSync(URL source, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
         new FlagsHelper(flags).allowed(JSAGAFlags.PRESERVETIMES, Flags.DEREFERENCE, Flags.RECURSIVE, Flags.OVERWRITE);
         new FlagsHelper(flags).required(Flags.RECURSIVE);
         if (Flags.DEREFERENCE.isSet(flags)) {
-            this._dereferenceDir().copyFrom(source, flags - Flags.DEREFERENCE.getValue());
+            this._dereferenceDir().copyFromSync(source, flags - Flags.DEREFERENCE.getValue());
             return; //==========> EXIT
         }
         if (m_adaptor instanceof DataWriterAdaptor) {
@@ -103,12 +107,12 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         }
     }
 
-    /** override super.move() */
-    public void move(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+    /** override super.moveSync() */
+    public void moveSync(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
         new FlagsHelper(flags).allowed(Flags.DEREFERENCE, Flags.RECURSIVE, Flags.OVERWRITE, Flags.CREATEPARENTS);
         new FlagsHelper(flags).required(Flags.RECURSIVE);
         if (Flags.DEREFERENCE.isSet(flags)) {
-            this._dereferenceDir().move(target, flags - Flags.DEREFERENCE.getValue());
+            this._dereferenceDir().moveSync(target, flags - Flags.DEREFERENCE.getValue());
             return; //==========> EXIT
         }
         URL effectiveTarget = this._getEffectiveURL(target);
@@ -137,30 +141,30 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             FileAttributes[] sourceChilds = this._listAttributes(m_url.getPath());
             for (int i=0; i<sourceChilds.length; i++) {
                 URL remoteChild = URLHelper.createURL(effectiveTarget, sourceChilds[i].getName());
-                NSEntry entry = this._openNS(sourceChilds[i]);
-                if (entry instanceof NSDirectory) {
-                    entry.move(remoteChild, flags);
+                SyncNSEntry entry = this._openNS(sourceChilds[i]);
+                if (entry instanceof SyncNSDirectory) {
+                    entry.moveSync(remoteChild, flags);
                 } else {
                     // remove RECURSIVE flag (always set for NSDirectory.move())
-                    entry.move(remoteChild, flags - Flags.RECURSIVE.getValue());
+                    entry.moveSync(remoteChild, flags - Flags.RECURSIVE.getValue());
                 }
             }
             // remove source directory
-            this.remove(flags);
+            this.removeSync(flags);
         } else {
             throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
 
     /**
-     * override super.remove()
+     * override super.removeSync()
      * <br>Note: does not throw a BadParamater exception when RECURSIVE flag is not set, unless directory has some descendants.
      */
-    public void remove(int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+    public void removeSync(int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         new FlagsHelper(flags).allowed(Flags.DEREFERENCE, Flags.RECURSIVE);
         if (Flags.DEREFERENCE.isSet(flags)) {
             try {
-                this._dereferenceDir().remove(flags - Flags.DEREFERENCE.getValue());
+                this._dereferenceDir().removeSync(flags - Flags.DEREFERENCE.getValue());
             } catch (IncorrectURLException e) {
                 throw new NoSuccessException(e);
             }
@@ -171,17 +175,17 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             if (Flags.RECURSIVE.isSet(flags)) {
                 FileAttributes[] sourceChilds = this._listAttributes(m_url.getPath());
                 for (int i=0; i<sourceChilds.length; i++) {
-                    NSEntry entry;
+                    SyncNSEntry entry;
                     try {
                         entry = this._openNS(sourceChilds[i]);
                     } catch (IncorrectURLException e) {
                         throw new NoSuccessException(e);
                     }
-                    if (entry instanceof NSDirectory) {
-                        entry.remove(flags);
+                    if (entry instanceof SyncNSDirectory) {
+                        entry.removeSync(flags);
                     } else {
                         // remove RECURSIVE flag (always set here)
-                        entry.remove(flags - Flags.RECURSIVE.getValue());
+                        entry.removeSync(flags - Flags.RECURSIVE.getValue());
                     }
                 }
             }
@@ -200,6 +204,13 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
+
+    ////////////////////////////////////// interface NSDirectory //////////////////////////////////////
+
+    public abstract NSDirectory openDir(URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException;
+    public abstract NSDirectory openDir(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException;
+    public abstract NSEntry open(URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException;
+    public abstract NSEntry open(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException;
 
     ///////////////////////////////////////// protected methods /////////////////////////////////////////
 
@@ -227,7 +238,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
     }
 
     //does not throw DoesNotExistException because it would mean "parent directory does not exist"
-    protected NSEntry _openNS(FileAttributes attr) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
+    protected SyncNSEntry _openNS(FileAttributes attr) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
         switch(attr.getType()) {
             case FileAttributes.DIRECTORY_TYPE:
                 return this._openNSDir(URLFactory.createURL(attr.getName()));
@@ -236,8 +247,8 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
                 return this._openNSEntry(URLFactory.createURL(attr.getName()));
             case FileAttributes.UNKNOWN_TYPE:
             default:
-                NSEntry entry = this._openNSEntry(URLFactory.createURL(attr.getName()));
-                if (entry.isDir()) {
+                SyncNSEntry entry = this._openNSEntry(URLFactory.createURL(attr.getName()));
+                if (entry.isDirSync()) {
                     return this._openNSDir(URLFactory.createURL(attr.getName()));
                 } else {
                     return entry;
@@ -246,9 +257,9 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
     }
 
     //does not throw DoesNotExistException because it would mean "parent directory does not exist"
-    protected NSDirectory _openNSDir(URL name) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
+    protected SyncNSDirectory _openNSDir(URL name) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
         try {
-            return this.openDir(name, Flags.NONE.getValue());
+            return (SyncNSDirectory) this.openDir(name, Flags.NONE.getValue());
         } catch (DoesNotExistException e) {
             throw new IncorrectStateException(e);
         } catch (AlreadyExistsException e) {
@@ -257,9 +268,9 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
     }
 
     //does not throw DoesNotExistException because it would mean "parent directory does not exist"
-    protected NSEntry _openNSEntry(URL name) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
+    protected SyncNSEntry _openNSEntry(URL name) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
         try {
-            return this.open(name, Flags.NONE.getValue());
+            return (SyncNSEntry) this.open(name, Flags.NONE.getValue());
         } catch (DoesNotExistException e) {
             throw new IncorrectStateException(e);
         } catch (AlreadyExistsException e) {

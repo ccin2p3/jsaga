@@ -7,7 +7,7 @@ import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyDelegated;
 import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.schema.config.Protocol;
-import fr.in2p3.jsaga.impl.logicalfile.LogicalFileImpl;
+import fr.in2p3.jsaga.impl.logicalfile.AbstractSyncLogicalFileImpl;
 import fr.in2p3.jsaga.impl.namespace.FlagsHelper;
 import fr.in2p3.jsaga.impl.namespace.JSAGAFlags;
 import org.ogf.saga.error.*;
@@ -34,11 +34,11 @@ import java.util.List;
  */
 public class LogicalFileCopy {
     private Session m_session;
-    private LogicalFileImpl m_sourceFile;
+    private AbstractSyncLogicalFileImpl m_sourceFile;
     private DataAdaptor m_adaptor;
 
     /** constructor */
-    public LogicalFileCopy(Session session, LogicalFileImpl sourceFile, DataAdaptor adaptor) throws NotImplementedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+    public LogicalFileCopy(Session session, AbstractSyncLogicalFileImpl sourceFile, DataAdaptor adaptor) throws NotImplementedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         m_session = session;
         m_sourceFile = sourceFile;
         m_adaptor = adaptor;
@@ -85,7 +85,7 @@ public class LogicalFileCopy {
 
     private void putToPhysicalFile(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
         // get location of source entry (may be logical or physical
-        List<URL> sourceLocations = m_sourceFile.listLocations();
+        List<URL> sourceLocations = m_sourceFile.listLocationsSync();
         if (sourceLocations!=null && sourceLocations.size()>0) {
             // open source entry
             URL source = sourceLocations.get(0);
@@ -103,7 +103,7 @@ public class LogicalFileCopy {
 
     private void putToLogicalFile(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
         // get location of source physical file
-        List<URL> sourceLocations = m_sourceFile.listLocations();
+        List<URL> sourceLocations = m_sourceFile.listLocationsSync();
         if (sourceLocations!=null && sourceLocations.size()>0) {
             // open target logical file
             LogicalFile targetLogicalFile = this.createTargetLogicalFile(target, flags);

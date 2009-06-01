@@ -27,7 +27,7 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
     // metrics
     private TaskStateMetricImpl<State> m_metric_TaskState;
     // internal
-    private T m_object;
+    protected T m_object;
     private E m_result;
     protected SagaException m_exception;
     private boolean m_isWaitingFor;
@@ -152,7 +152,7 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
                 endTime = -1;
             } else {
                 forever = false;
-                endTime = System.currentTimeMillis() + (long) timeoutInSeconds*1000;
+                endTime = System.currentTimeMillis() + (long) (timeoutInSeconds*1000f);
             }
             // read notified status, else query status
             while(!this.isDone() && (forever || System.currentTimeMillis()<endTime)) {

@@ -24,7 +24,7 @@ import org.ogf.saga.url.URL;
 /**
  *
  */
-public abstract class AbstractAsyncDirectoryImpl extends AbstractNSDirectoryImpl implements Directory {
+public abstract class AbstractAsyncDirectoryImpl extends AbstractSyncDirectoryImpl implements Directory {
     /** constructor for factory */
     protected AbstractAsyncDirectoryImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session, url, adaptor, flags);
@@ -40,10 +40,12 @@ public abstract class AbstractAsyncDirectoryImpl extends AbstractNSDirectoryImpl
         super(entry, absolutePath, flags);
     }
 
+    ////////////////////////////////////////// interface Directory //////////////////////////////////////////
+
     public Task<Directory, Long> getSize(TaskMode mode, URL name, int flags) throws NotImplementedException {
         return new GenericThreadedTaskFactory<Directory,Long>().create(
                 mode, m_session, this,
-                "getSize",
+                "getSizeSync",
                 new Class[]{URL.class, int.class},
                 new Object[]{name, flags});
     }
@@ -54,7 +56,7 @@ public abstract class AbstractAsyncDirectoryImpl extends AbstractNSDirectoryImpl
     public Task<Directory, Boolean> isFile(TaskMode mode, URL name) throws NotImplementedException {
         return new GenericThreadedTaskFactory<Directory,Boolean>().create(
                 mode, m_session, this,
-                "isFile",
+                "isFileSync",
                 new Class[]{URL.class},
                 new Object[]{name});
     }
@@ -84,7 +86,7 @@ public abstract class AbstractAsyncDirectoryImpl extends AbstractNSDirectoryImpl
     public Task<Directory, FileInputStream> openFileInputStream(TaskMode mode, URL name) throws NotImplementedException {
         return new GenericThreadedTaskFactory<Directory,FileInputStream>().create(
                 mode, m_session, this,
-                "openFileInputStream",
+                "openFileInputStreamSync",
                 new Class[]{URL.class},
                 new Object[]{name});
     }
@@ -92,7 +94,7 @@ public abstract class AbstractAsyncDirectoryImpl extends AbstractNSDirectoryImpl
     public Task<Directory, FileOutputStream> openFileOutputStream(TaskMode mode, URL name, boolean append) throws NotImplementedException {
         return new GenericThreadedTaskFactory<Directory,FileOutputStream>().create(
                 mode, m_session, this,
-                "openFileOutputStream",
+                "openFileOutputStreamSync",
                 new Class[]{URL.class, boolean.class},
                 new Object[]{name, append});
     }

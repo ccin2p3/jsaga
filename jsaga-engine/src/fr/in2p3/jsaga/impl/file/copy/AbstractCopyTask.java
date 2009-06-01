@@ -5,8 +5,7 @@ import fr.in2p3.jsaga.impl.task.AbstractTaskImplWithAsyncAttributes;
 import org.ogf.saga.attributes.AsyncAttributes;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
-import org.ogf.saga.task.State;
-import org.ogf.saga.task.Task;
+import org.ogf.saga.task.*;
 import org.ogf.saga.url.URL;
 
 /* ***************************************************
@@ -31,7 +30,7 @@ public abstract class AbstractCopyTask<T,E> extends AbstractTaskImplWithAsyncAtt
     private MetricImpl<Long> m_metric_Progress;
 
     /** constructor */
-    public AbstractCopyTask(Session session, URL target, int flags) throws NotImplementedException {
+    public AbstractCopyTask(TaskMode mode, Session session, URL target, int flags) throws NotImplementedException {
         super(session, true);
         // internal
         m_target = target;
@@ -45,6 +44,25 @@ public abstract class AbstractCopyTask<T,E> extends AbstractTaskImplWithAsyncAtt
                 "bytes",
                 MetricType.Int,
                 0L);
+        try {
+            switch(mode) {
+                case TASK:
+                    break;
+                case ASYNC:
+                    this.run();
+                    break;
+                case SYNC:
+                    this.run();
+                    this.waitFor();
+                    break;
+                default:
+                    throw new NotImplementedException("INTERNAL ERROR: unexpected exception");
+            }
+        } catch (NotImplementedException e) {
+            throw e;
+        } catch (SagaException e) {
+            throw new NotImplementedException(e);
+        }
     }
 
     void increment(long writtenBytes) {

@@ -6,7 +6,7 @@ import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyDelegated;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.schema.config.Protocol;
-import fr.in2p3.jsaga.impl.logicalfile.LogicalFileImpl;
+import fr.in2p3.jsaga.impl.logicalfile.AbstractSyncLogicalFileImpl;
 import fr.in2p3.jsaga.impl.namespace.FlagsHelper;
 import fr.in2p3.jsaga.impl.namespace.JSAGAFlags;
 import org.ogf.saga.error.*;
@@ -32,11 +32,11 @@ import java.util.List;
  */
 public class LogicalFileCopyFrom {
     private Session m_session;
-    private LogicalFileImpl m_targetFile;
+    private AbstractSyncLogicalFileImpl m_targetFile;
     private DataAdaptor m_adaptor;
 
     /** constructor */
-    public LogicalFileCopyFrom(Session session, LogicalFileImpl targetFile, DataAdaptor adaptor) throws NotImplementedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+    public LogicalFileCopyFrom(Session session, AbstractSyncLogicalFileImpl targetFile, DataAdaptor adaptor) throws NotImplementedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         m_session = session;
         m_targetFile = targetFile;
         m_adaptor = adaptor;
@@ -88,16 +88,16 @@ public class LogicalFileCopyFrom {
             if (sourceLocations!=null && sourceLocations.size()>0) {
                 // remove all target locations
                 try {
-                    List<URL> targetLocations = m_targetFile.listLocations();
+                    List<URL> targetLocations = m_targetFile.listLocationsSync();
                     for (int i=0; targetLocations!=null && i<targetLocations.size(); i++) {
-                        m_targetFile.removeLocation(targetLocations.get(i));
+                        m_targetFile.removeLocationSync(targetLocations.get(i));
                     }
                 } catch(IncorrectStateException e) {
                     // ignore if target logical file does not exist
                 }
                 // add all source locations
                 for (int i=0; sourceLocations!=null && i<sourceLocations.size(); i++) {
-                    m_targetFile.addLocation(sourceLocations.get(i));
+                    m_targetFile.addLocationSync(sourceLocations.get(i));
                 }
             }
         } finally {
