@@ -1,12 +1,8 @@
 package fr.in2p3.jsaga.impl.logicalfile;
 
-import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
-import fr.in2p3.jsaga.adaptor.data.read.FileReader;
-import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
-import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
-import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
 import fr.in2p3.jsaga.engine.factories.DataAdaptorFactory;
-import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
+import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
+import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
 import org.ogf.saga.logicalfile.*;
 import org.ogf.saga.session.Session;
@@ -26,48 +22,49 @@ import org.ogf.saga.url.URL;
 /**
  *
  */
-public class LogicalFileFactoryImpl extends LogicalFileFactory {
-    private DataAdaptorFactory m_adaptorFactory;
-
+public class LogicalFileFactoryImpl extends AbstractAsyncLogicalFileFactoryImpl {
     public LogicalFileFactoryImpl(DataAdaptorFactory adaptorFactory) {
-        m_adaptorFactory = adaptorFactory;
+        super(adaptorFactory);
     }
 
+    ///////////////////////////////////// interface LogicalFileFactory /////////////////////////////////////
+
     protected LogicalFile doCreateLogicalFile(Session session, URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session);
-        boolean isLogical = adaptor instanceof LogicalReader || adaptor instanceof LogicalWriter;
-        boolean isPhysical = adaptor instanceof FileReader || adaptor instanceof FileWriter;
-        if (isLogical || !isPhysical) {
-            return new LogicalFileImpl(session, name, adaptor, flags);
+        float timeout = this.getTimeout("createLogicalFile", name);
+        if (timeout == SagaObject.WAIT_FOREVER) {
+            return super.doCreateLogicalFileSync(session, name, flags);
         } else {
-            throw new BadParameterException("Not a logical file URL: "+name);
+            try {
+                return (LogicalFile) this.getResult(createLogicalFile(TaskMode.ASYNC, session, name, flags), timeout);
+            }
+            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
         }
     }
 
     protected LogicalDirectory doCreateLogicalDirectory(Session session, URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session);
-        boolean isLogical = adaptor instanceof LogicalReader || adaptor instanceof LogicalWriter;
-        boolean isPhysical = adaptor instanceof FileReader || adaptor instanceof FileWriter;
-        if (isLogical || !isPhysical) {
-            return new LogicalDirectoryImpl(session, name, adaptor, flags);
+        float timeout = this.getTimeout("createLogicalDirectory", name);
+        if (timeout == SagaObject.WAIT_FOREVER) {
+            return super.doCreateLogicalDirectorySync(session, name, flags);
         } else {
-            throw new BadParameterException("Not a logical directory URL: "+name);
+            try {
+                return (LogicalDirectory) this.getResult(createLogicalDirectory(TaskMode.ASYNC, session, name, flags), timeout);
+            }
+            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
         }
     }
 
-    protected Task<LogicalFileFactory, LogicalFile> doCreateLogicalFile(TaskMode mode, Session session, URL name, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<LogicalFileFactory,LogicalFile>().create(
-                mode, null, this,
-                "doCreateLogicalFile",
-                new Class[]{Session.class, URL.class, int.class},
-                new Object[]{session, name, flags});
+    ////////////////////////////////////////// private methods //////////////////////////////////////////
+
+    private float getTimeout(String methodName, URL url) throws NoSuccessException {
+        return AbstractSagaObjectImpl.getTimeout(LogicalFileFactory.class, methodName, url.getScheme());
     }
 
-    protected Task<LogicalFileFactory, LogicalDirectory> doCreateLogicalDirectory(TaskMode mode, Session session, URL name, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<LogicalFileFactory,LogicalDirectory>().create(
-                mode, null, this,
-                "doCreateLogicalDirectory",
-                new Class[]{Session.class, URL.class, int.class},
-                new Object[]{session, name, flags});
+    private Object getResult(Task task, float timeout)
+            throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException,
+            BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException,
+            TimeoutException, NoSuccessException
+    {
+        return AbstractSagaObjectImpl.getResult(task, timeout);
     }
 }

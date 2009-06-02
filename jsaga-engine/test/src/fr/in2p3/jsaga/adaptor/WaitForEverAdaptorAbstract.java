@@ -24,10 +24,6 @@ import java.util.Map;
 public abstract class WaitForEverAdaptorAbstract implements SagaSecureAdaptor {
     private static boolean s_isHanging = false;
 
-    public String getType() {
-        return "waitforever";
-    }
-
     public Usage getUsage() {
         return null;
     }

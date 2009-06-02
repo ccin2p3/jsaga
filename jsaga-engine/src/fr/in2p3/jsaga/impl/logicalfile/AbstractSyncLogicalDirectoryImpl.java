@@ -99,7 +99,7 @@ public abstract class AbstractSyncLogicalDirectoryImpl extends AbstractNSDirecto
     /////////////////////////////// interface LogicalDirectory ///////////////////////////////
 
     public boolean isFileSync(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
-        return super.isEntry(name);
+        return super.isEntrySync(name);
     }
 
     /** search in meta-data */

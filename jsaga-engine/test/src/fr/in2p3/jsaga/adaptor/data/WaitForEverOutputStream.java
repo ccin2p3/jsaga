@@ -17,6 +17,6 @@ import java.io.OutputStream;
  */
 public class WaitForEverOutputStream extends OutputStream {
     public void write(int i) throws IOException {
-        WaitForEverDataAdaptor.hang();
+        WaitForEverDataAdaptorAbstract.hang();
     }
 }

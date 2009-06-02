@@ -17,7 +17,7 @@ import java.io.InputStream;
  */
 public class WaitForEverInputStream extends InputStream {
     public int read() throws IOException {
-        WaitForEverDataAdaptor.hang();
+        WaitForEverDataAdaptorAbstract.hang();
         return 0;
     }
 }

@@ -20,6 +20,10 @@ import java.util.Map;
  *
  */
 public class WaitForEverJobAdaptor extends WaitForEverAdaptorAbstract implements JobControlAdaptor, QueryIndividualJob {
+    public String getType() {
+        return "waitforever";
+    }
+
     public String[] getSupportedSandboxProtocols() {
         return null;
     }

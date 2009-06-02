@@ -7,6 +7,7 @@ import org.ogf.saga.error.*;
 import org.ogf.saga.logicalfile.LogicalDirectory;
 import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.session.Session;
+import org.ogf.saga.task.TaskMode;
 import org.ogf.saga.url.URL;
 
 import java.util.List;
@@ -39,16 +40,46 @@ public class LogicalDirectoryImpl extends AbstractAsyncLogicalDirectoryImpl impl
         super(entry, absolutePath, flags);
     }
 
+    /////////////////////////////////////// interface LogicalDirectory ///////////////////////////////////////
+
     public boolean isFile(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, IncorrectStateException, TimeoutException, NoSuccessException {
-        return super.isFileSync(name);
+        float timeout = this.getTimeout("isFile");
+        if (timeout == WAIT_FOREVER) {
+            return super.isFileSync(name);
+        } else {
+            try {
+                return (Boolean) getResult(super.isFile(TaskMode.ASYNC, name), timeout);
+            }
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+        }
     }
 
     public List<URL> find(String namePattern, String[] attrPattern, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
-        return super.findSync(namePattern, attrPattern, flags);
+        float timeout = this.getTimeout("find");
+        if (timeout == WAIT_FOREVER) {
+            return super.findSync(namePattern, attrPattern, flags);
+        } else {
+            try {
+                return (List<URL>) getResult(super.find(TaskMode.ASYNC, namePattern, attrPattern, flags), timeout);
+            }
+            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+        }
     }
 
     public List<URL> find(String namePattern, String[] attrPattern) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
-        return super.findSync(namePattern, attrPattern);
+        float timeout = this.getTimeout("find");
+        if (timeout == WAIT_FOREVER) {
+            return super.findSync(namePattern, attrPattern);
+        } else {
+            try {
+                return (List<URL>) getResult(super.find(TaskMode.ASYNC, namePattern, attrPattern), timeout);
+            }
+            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+        }
     }
 
     public LogicalDirectory openLogicalDir(URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
