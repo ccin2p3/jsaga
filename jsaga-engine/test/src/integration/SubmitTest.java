@@ -34,6 +34,10 @@ public class SubmitTest extends AbstractSubmitTest {
                 URLFactory.createURL("test://emulator")});
     }
 
+    /**
+     * fixme: requires plugin to support protocol "file"
+     * fr.in2p3.jsaga.adaptor.job.local.LocalJobControlAdaptor#getSupportedSandboxProtocols() {return new String[]{"file"};}
+     */
     public void test_staging() throws Exception {
 //        super.checkSubmit(new URL[]{URLFactory.createURL("gatekeeper://localhost:2119/CN=Sylvain Reynaud/E=sreynaud@in2p3.fr")});
 //        super.checkSubmit(new URL[]{URLFactory.createURL("ssh://localhost:22")});
@@ -44,6 +48,7 @@ public class SubmitTest extends AbstractSubmitTest {
         assertTrue(file.getSize() > 0);
     }
 
+    /** fixme: does not work [IncorrectState: Can not listen to job in 'New' state] */
     public void test_sandbox() throws Exception {
         super.checkSubmit(new URL[]{URLFactory.createURL("local:/")});
         URL expected = URLFactory.createURL("file://./jsaga-engine/config/var/"+this.getName()+".txt");
