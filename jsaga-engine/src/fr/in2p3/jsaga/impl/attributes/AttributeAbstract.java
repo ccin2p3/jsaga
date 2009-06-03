@@ -101,7 +101,15 @@ public abstract class AttributeAbstract implements Attribute {
     }
 
     protected static String[] toVector(String value) {
-        return (""+value).split(",");
+        if (value != null) {
+            String[] values = value.split(",");
+            for (int i=0; i<values.length; i++) {
+                values[i] = values[i].trim();
+            }
+            return values;
+        } else {
+            return null;
+        }
     }
     protected static String toScalar(String[] values) {
         return StringArray.arrayToString(values, ",");

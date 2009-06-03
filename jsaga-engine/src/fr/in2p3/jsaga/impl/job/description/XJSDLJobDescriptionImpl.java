@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl.job.description;
 
+import fr.in2p3.jsaga.adaptor.language.SAGALanguageAdaptor;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformer;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformerFactory;
 import org.ogf.saga.SagaObject;
@@ -51,11 +52,23 @@ public class XJSDLJobDescriptionImpl extends AbstractJobDescriptionImpl implemen
         } catch (Exception e) {
             throw new NoSuccessException(e);
         }
+
+        SAGALanguageAdaptor sagaProperties = new SAGALanguageAdaptor();
+        try {
+            sagaProperties.initParser();
+        } catch (Exception e) {
+            throw new NoSuccessException(e);
+        }
+
         for (Iterator it=prop.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry entry = (Map.Entry) it.next();
             String name = (String) entry.getKey();
             String value = (String) entry.getValue();
-            super._addReadOnlyAttribute(name, value);
+            if (sagaProperties.isVectoryProperty(name)) {
+                super._addVectorAttribute(name, value);
+            } else {
+                super._addAttribute(name, value);
+            }
         }
     }
 

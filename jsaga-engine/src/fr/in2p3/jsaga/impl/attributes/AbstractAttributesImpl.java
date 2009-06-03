@@ -194,6 +194,12 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
         return attribute;
     }
 
+    protected void _addAttribute(String key, String value) {
+        m_attributes.put(key, new AttributeScalar(key, value));
+    }
+    protected void _addVectorAttribute(String key, String values) {
+        m_attributes.put(key, new AttributeVector(key, values));
+    }
     protected void _addUnsupportedAttribute(String key) {
         m_attributes.put(key, new AttributeScalar(key, false, false, null));
     }
