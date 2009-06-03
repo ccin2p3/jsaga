@@ -61,6 +61,7 @@ public abstract class JobDescriptionTest extends AbstractJobTest {
     public void test_error() throws Exception {
         this.change(JobDescription.ERROR, "stderr2.txt");
     }
+    /** WARNING: attribute FileTransfer is removed from job description when staging is done by engine instead of plugin */
     public void test_fileTransfer() throws Exception {
         m_jobDescription.setVectorAttribute(JobDescription.FILETRANSFER, new String[]{"myfile>myf", "file1<f1"});
         this.change(JobDescription.FILETRANSFER, new String[]{"myfile>myf", "file2<f2"});
