@@ -16,7 +16,7 @@ import integration.abstracts.AbstractSubmitTest;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * depends on module jsaga-adaptor-classic
  */
 public class SubmitTest extends AbstractSubmitTest {
     public SubmitTest() throws Exception {
