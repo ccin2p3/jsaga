@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.language;
 
 import fr.in2p3.jsaga.adaptor.language.abstracts.AbstractLanguageAdaptorProperties;
+import fr.in2p3.jsaga.impl.attributes.Attribute;
 import org.ogf.saga.job.JobDescription;
 
 /* ***************************************************
@@ -50,8 +51,10 @@ public class SAGALanguageAdaptor extends AbstractLanguageAdaptorProperties imple
     }
 
     public void initParser() {
-        super._initParser(REQUIRED_PROPERTY_NAMES, OPTIONAL_PROPERTY_NAMES,
-                REQUIRED_VECTOR_PROPERTY_NAMES, OPTIONAL_VECTOR_PROPERTY_NAMES, ",");
+        super._initParser(
+                REQUIRED_PROPERTY_NAMES, OPTIONAL_PROPERTY_NAMES,
+                REQUIRED_VECTOR_PROPERTY_NAMES, OPTIONAL_VECTOR_PROPERTY_NAMES,
+                Attribute.SEPARATOR);
     }
 
     public String getTranslator() {

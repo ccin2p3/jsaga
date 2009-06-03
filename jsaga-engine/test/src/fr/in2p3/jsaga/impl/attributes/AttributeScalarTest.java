@@ -19,7 +19,7 @@ import org.ogf.saga.error.NotImplementedException;
 public class AttributeScalarTest extends TestCase {
     public void testConstructor() throws NotImplementedException, IncorrectStateException {
         assertEquals(
-                "val1,val2",
+                "val1"+Attribute.SEPARATOR+"val2",
                 new AttributeScalar("key", new String[]{"val1", "val2"}).getValue()
         );
     }

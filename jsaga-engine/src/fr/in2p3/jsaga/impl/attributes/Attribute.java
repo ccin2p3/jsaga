@@ -15,6 +15,9 @@ import org.ogf.saga.error.*;
  *
  */
 public interface Attribute extends Cloneable {
+    /** using ';' instead of ',' because ',' can be used in file paths */
+    public static final String SEPARATOR = ";";
+
     public String getKey();
     public boolean isReadOnly();
 

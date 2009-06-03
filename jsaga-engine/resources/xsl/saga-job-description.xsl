@@ -6,6 +6,7 @@
                 xmlns:spmd="http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd"
                 xmlns:ext="http://www.in2p3.fr/jsdl-extension">
     <xsl:output method="text"/>
+    <xsl:variable name="ATTRIBUTE_SEPARATOR">;</xsl:variable>
 
     <xsl:template match="/"># SAGA attributes<xsl:apply-templates/></xsl:template>
 
@@ -25,9 +26,9 @@ Output=<xsl:value-of select="text()"/></xsl:template>
     <xsl:template match="posix:Error">
 Error=<xsl:value-of select="text()"/></xsl:template>
     <xsl:template match="posix:Argument[1]">
-Arguments=<xsl:value-of select="text()"/></xsl:template><xsl:template match="posix:Argument[position()>1]">,<xsl:value-of select="text()"/></xsl:template>
+Arguments=<xsl:value-of select="text()"/></xsl:template><xsl:template match="posix:Argument[position()>1]"><xsl:value-of select="$ATTRIBUTE_SEPARATOR"/><xsl:value-of select="text()"/></xsl:template>
     <xsl:template match="posix:Environment[1]">
-Environment=<xsl:value-of select="text()"/></xsl:template><xsl:template match="posix:Environment[position()>1]">,<xsl:value-of select="text()"/></xsl:template>
+Environment=<xsl:value-of select="text()"/></xsl:template><xsl:template match="posix:Environment[position()>1]"><xsl:value-of select="$ATTRIBUTE_SEPARATOR"/><xsl:value-of select="text()"/></xsl:template>
 
     <xsl:template match="spmd:NumberOfProcesses">
 NumberOfProcesses=<xsl:value-of select="text()"/></xsl:template>
@@ -47,16 +48,16 @@ TotalCPUTime=<xsl:value-of select="text()"/></xsl:template>
     <xsl:template match="jsdl:TotalPhysicalMemory/jsdl:UpperBoundedRange">
 TotalPhysicalMemory=<xsl:value-of select="text()"/></xsl:template>
     <xsl:template match="jsdl:CPUArchitectureName[1]">
-CPUArchitecture=<xsl:value-of select="text()"/></xsl:template><xsl:template match="jsdl:CPUArchitectureName[position()>1]">,<xsl:value-of select="text()"/></xsl:template>
+CPUArchitecture=<xsl:value-of select="text()"/></xsl:template><xsl:template match="jsdl:CPUArchitectureName[position()>1]"><xsl:value-of select="$ATTRIBUTE_SEPARATOR"/><xsl:value-of select="text()"/></xsl:template>
     <xsl:template match="jsdl:OperatingSystemName[1]">
-OperatingSystemType=<xsl:value-of select="text()"/></xsl:template><xsl:template match="jsdl:OperatingSystemName[position()>1]">,<xsl:value-of select="text()"/></xsl:template>
+OperatingSystemType=<xsl:value-of select="text()"/></xsl:template><xsl:template match="jsdl:OperatingSystemName[position()>1]"><xsl:value-of select="$ATTRIBUTE_SEPARATOR"/><xsl:value-of select="text()"/></xsl:template>
     <xsl:template match="jsdl:HostName[1]">
-CandidateHosts=<xsl:value-of select="text()"/></xsl:template><xsl:template match="jsdl:HostName[position()>1]">,<xsl:value-of select="text()"/></xsl:template>
+CandidateHosts=<xsl:value-of select="text()"/></xsl:template><xsl:template match="jsdl:HostName[position()>1]"><xsl:value-of select="$ATTRIBUTE_SEPARATOR"/><xsl:value-of select="text()"/></xsl:template>
 
     <xsl:template match="jsdl:DeleteOnTermination[1]">
 Cleanup=<xsl:value-of select="text()"/></xsl:template>
     <xsl:template match="jsdl:DataStaging[1]">
-FileTransfer=<xsl:call-template name="STAGING"/></xsl:template><xsl:template match="jsdl:DataStaging[position()>1]">,<xsl:call-template name="STAGING"/></xsl:template>
+FileTransfer=<xsl:call-template name="STAGING"/></xsl:template><xsl:template match="jsdl:DataStaging[position()>1]"><xsl:value-of select="$ATTRIBUTE_SEPARATOR"/><xsl:call-template name="STAGING"/></xsl:template>
 
     <xsl:template name="STAGING">
         <xsl:variable name="op">

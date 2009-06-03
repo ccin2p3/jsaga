@@ -20,7 +20,7 @@ public class AttributeVectorTest extends TestCase {
     public void testConstructor() throws NotImplementedException, IncorrectStateException {
         assertEquals(
                 "val2",
-                new AttributeVector("key", "val1,val2").getValues()[1]
+                new AttributeVector("key", "val1"+Attribute.SEPARATOR+"val2").getValues()[1]
         );
     }
 }

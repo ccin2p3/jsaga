@@ -102,7 +102,7 @@ public abstract class AttributeAbstract implements Attribute {
 
     protected static String[] toVector(String value) {
         if (value != null) {
-            String[] values = value.split(",");
+            String[] values = value.split(SEPARATOR);
             for (int i=0; i<values.length; i++) {
                 values[i] = values[i].trim();
             }
@@ -112,6 +112,6 @@ public abstract class AttributeAbstract implements Attribute {
         }
     }
     protected static String toScalar(String[] values) {
-        return StringArray.arrayToString(values, ",");
+        return StringArray.arrayToString(values, SEPARATOR);
     }
 }

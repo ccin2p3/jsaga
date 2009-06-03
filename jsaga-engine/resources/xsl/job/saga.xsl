@@ -6,6 +6,7 @@
                 xmlns:spmd="http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd"
                 xmlns:ext="http://www.in2p3.fr/jsdl-extension">
     <xsl:output method="text"/>
+    <xsl:variable name="ATTRIBUTE_SEPARATOR">;</xsl:variable>
 
     <!-- entry point (MUST BE RELATIVE) -->
 	 <xsl:template match="jsdl:JobDefinition">
@@ -113,6 +114,6 @@
             </xsl:when>
         </xsl:choose>
         <xsl:value-of select="jsdl:FileName/text()"/>
-        <xsl:text>, </xsl:text>
+        <xsl:value-of select="$ATTRIBUTE_SEPARATOR"/>
     </xsl:template>
 </xsl:stylesheet>
