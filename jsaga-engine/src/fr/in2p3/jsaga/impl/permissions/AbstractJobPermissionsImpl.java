@@ -20,7 +20,7 @@ import org.ogf.saga.task.TaskMode;
 /**
  *
  */
-public abstract class AbstractJobPermissionsImpl extends AbstractTaskImplWithAsyncAttributes<Void,Void,Job> implements Permissions<Job>, Job {
+public abstract class AbstractJobPermissionsImpl extends AbstractTaskImplWithAsyncAttributes<Void,Void,Job> implements Permissions<Job> {
     /** constructor */
     public AbstractJobPermissionsImpl(Session session, boolean create) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         super(session, create);
