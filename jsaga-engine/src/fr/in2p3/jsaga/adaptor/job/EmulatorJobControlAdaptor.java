@@ -23,8 +23,13 @@ import java.util.*;
  *
  */
 public class EmulatorJobControlAdaptor extends EmulatorJobAdaptorAbstract implements JobControlAdaptor, CleanableJobAdaptor, StreamableJobBatch {
-    public int getDefaultPort() {return 1234;}
-    public String[] getSupportedSandboxProtocols() {return null;}
+    public int getDefaultPort() {
+        return 1234;
+    }
+
+    public String[] getSupportedSandboxProtocols() {
+        return new String[]{"file"};
+    }
 
     public String getTranslator() {
         return "xsl/job/saga.xsl";

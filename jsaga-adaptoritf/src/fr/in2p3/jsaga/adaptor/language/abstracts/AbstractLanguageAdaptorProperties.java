@@ -25,6 +25,8 @@ import java.util.*;
  *
  */
 public abstract class AbstractLanguageAdaptorProperties implements LanguageAdaptor {
+    private static final String DEFAULT_SEPARATOR = ",";
+
     private Set m_requiredNames;
     private Set m_propertyNames;
     private Set m_vectorPropertyNames;
@@ -45,7 +47,7 @@ public abstract class AbstractLanguageAdaptorProperties implements LanguageAdapt
         addAll(m_vectorPropertyNames, requiredVectorPropertyNames);
         addAll(m_vectorPropertyNames, optionalVectorPropertyNames);
 
-        m_vectoryPropertySeparator = (vectorPropertySeparator!=null ? vectorPropertySeparator : ",");
+        m_vectoryPropertySeparator = (vectorPropertySeparator!=null ? vectorPropertySeparator : DEFAULT_SEPARATOR);
     }
 
     public Document parseJobDescription(InputStream jobDescStream) throws BadParameterException, NoSuccessException {
