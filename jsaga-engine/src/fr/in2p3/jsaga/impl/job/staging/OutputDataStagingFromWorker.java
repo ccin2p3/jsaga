@@ -23,12 +23,9 @@ import java.io.*;
 /**
  *
  */
-public class OutputDataStagingFromWorker extends AbstractDataStaging {
-    private String m_workerPath;
-
+public class OutputDataStagingFromWorker extends AbstractDataStagingWorker {
     protected OutputDataStagingFromWorker(URL localURL, String workerPath, boolean append) {
-        super(localURL, append);
-        m_workerPath = workerPath;
+        super(localURL, workerPath, append);
     }
 
     public void preStaging(PrintStream stdin) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {

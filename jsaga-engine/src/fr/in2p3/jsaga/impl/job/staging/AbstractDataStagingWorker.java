@@ -6,26 +6,23 @@ import org.ogf.saga.url.URL;
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************
- * File:   AbstractDataStaging
+ * File:   AbstractDataStagingWorker
  * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
- * Date:   20 mai 2009
+ * Date:   3 juin 2009
  * ***************************************************
  * Description:                                      */
 /**
  *
  */
-public abstract class AbstractDataStaging {
-    protected URL m_localURL;
-    protected boolean m_append;
+public abstract class AbstractDataStagingWorker extends AbstractDataStaging {
+    protected String m_workerPath;
 
-    protected AbstractDataStaging(URL localURL, boolean append) {
-        m_localURL = localURL;
-        m_append = append;
+    protected AbstractDataStagingWorker(URL localURL, String workerPath, boolean append) {
+        super(localURL, append);
+        m_workerPath = workerPath;
     }
 
-    public String getLocalProtocol() {
-        return m_localURL.getScheme();
+    public String getWorkerProtocol() {
+        return "file";
     }
-
-    public abstract String getWorkerProtocol();
 }

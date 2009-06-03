@@ -3,15 +3,10 @@ package fr.in2p3.jsaga.impl.job.staging;
 import fr.in2p3.jsaga.helpers.StringArray;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.Job;
-import org.ogf.saga.job.JobDescription;
-import org.ogf.saga.url.URL;
-import org.ogf.saga.url.URLFactory;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -26,56 +21,29 @@ import java.util.regex.Pattern;
  *
  */
 public class DataStagingList {
-    private static final Pattern PATTERN = Pattern.compile("([^<>]*) *(>>|>|<<|<) *([^<>]*)");
-
     private List<InputDataStagingToRemote> m_inputToRemote;
     private List<InputDataStagingToWorker> m_inputToWorker;
     private List<OutputDataStagingFromRemote> m_outputFromRemote;
     private List<OutputDataStagingFromWorker> m_outputFromWorker;
 
-    public DataStagingList(String[] fileTransferArray) throws NotImplementedException, BadParameterException, NoSuccessException {
+    public DataStagingList() throws NotImplementedException, BadParameterException, NoSuccessException {
         m_inputToRemote = new ArrayList<InputDataStagingToRemote>();
         m_inputToWorker = new ArrayList<InputDataStagingToWorker>();
         m_outputFromRemote = new ArrayList<OutputDataStagingFromRemote>();
         m_outputFromWorker = new ArrayList<OutputDataStagingFromWorker>();
-        for (String fileTransfer : fileTransferArray) {
-            Matcher m = PATTERN.matcher(fileTransfer);
-            if (m.matches() && m.groupCount()==3) {
-                String local = m.group(1).trim();
-                String operator = m.group(2).trim();
-                String worker = m.group(3).trim();
+    }
 
-                // set localURL
-                URL localURL;
-                if (isURL(local)) {
-                    localURL = URLFactory.createURL(local);
-                } else if (new File(local).isAbsolute()) {
-                    localURL = URLFactory.createURL(new File(local).toURI().toString());
-                } else {
-                    localURL = URLFactory.createURL("file://./" + local.replaceAll("\\\\", "/"));
-                }
-
-                // create DataStaging
-                if (">>".equals(operator) || ">".equals(operator)) {
-                    boolean append = ">>".equals(operator);
-                    if (isURL(worker)) {
-                        m_inputToRemote.add(new InputDataStagingToRemote(localURL, URLFactory.createURL(worker), append));
-                    } else {
-                        m_inputToWorker.add(new InputDataStagingToWorker(localURL, worker, append));
-                    }
-                } else if ("<<".equals(operator) || "<".equals(operator)) {
-                    boolean append = "<<".equals(operator);
-                    if (isURL(worker)) {
-                        m_outputFromRemote.add(new OutputDataStagingFromRemote(localURL, URLFactory.createURL(worker), append));
-                    } else {
-                        m_outputFromWorker.add(new OutputDataStagingFromWorker(localURL, worker, append));
-                    }
-                } else {
-                    throw new BadParameterException("[INTERNAL ERROR] Unexpected operator: " + operator);
-                }
-            } else {
-                throw new BadParameterException("Syntax error in attribute " + JobDescription.FILETRANSFER + ": " + fileTransfer);
-            }
+    public void add(AbstractDataStaging dataStaging) throws BadParameterException {
+        if (dataStaging instanceof InputDataStagingToRemote) {
+            m_inputToRemote.add((InputDataStagingToRemote) dataStaging);
+        } else if (dataStaging instanceof InputDataStagingToWorker) {
+            m_inputToWorker.add((InputDataStagingToWorker) dataStaging);
+        } else if (dataStaging instanceof OutputDataStagingFromRemote) {
+            m_outputFromRemote.add((OutputDataStagingFromRemote) dataStaging);
+        } else if (dataStaging instanceof OutputDataStagingFromWorker) {
+            m_outputFromWorker.add((OutputDataStagingFromWorker) dataStaging);
+        } else {
+            throw new BadParameterException("[INTERNAL ERROR] Unexpected class: "+dataStaging.getClass());
         }
     }
 

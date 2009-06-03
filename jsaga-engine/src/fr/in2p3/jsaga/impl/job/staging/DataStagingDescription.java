@@ -4,6 +4,8 @@ import org.ogf.saga.error.*;
 import org.ogf.saga.job.Job;
 import org.ogf.saga.job.JobDescription;
 
+import java.util.*;
+
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
@@ -21,12 +23,38 @@ public class DataStagingDescription {
     private String m_executable;
     private String[] m_arguments;
 
-    public DataStagingDescription(JobDescription jobDesc) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+    public DataStagingDescription(JobDescription jobDesc, String[] supportedProtocolsArray) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+        // get supported protocols
+        Set<String> supportedProtocols = new HashSet<String>();
+        for (int i=0; supportedProtocolsArray!=null && i<supportedProtocolsArray.length; i++) {
+            supportedProtocols.add(supportedProtocolsArray[i]);
+        }
+
         try {
+            // get fileTransfer
             String[] fileTransfer = jobDesc.getVectorAttribute(JobDescription.FILETRANSFER);
-            m_stagingList = new DataStagingList(fileTransfer);
+
+            // split fileTransfer into pluginStagingList and stagingList
+            List<String> pluginStagingList = new ArrayList<String>();
+            m_stagingList = new DataStagingList();
+            for (String ft : fileTransfer) {
+                AbstractDataStaging dataStaging = DataStagingFactory.create(ft);
+                if (supportedProtocols.contains(dataStaging.getLocalProtocol()) && supportedProtocols.contains(dataStaging.getWorkerProtocol())) {
+                    pluginStagingList.add(ft);
+                } else {
+                    m_stagingList.add(dataStaging);
+                }
+            }
+
+            // modify job description
+            if (pluginStagingList.size() == 0) {
+                jobDesc.removeAttribute(JobDescription.FILETRANSFER);
+            } else if (pluginStagingList.size() < fileTransfer.length) {
+                String[] pluginStagingArray = pluginStagingList.toArray(new String[pluginStagingList.size()]);
+                jobDesc.setVectorAttribute(JobDescription.FILETRANSFER, pluginStagingArray);
+            }
         } catch (DoesNotExistException e) {
-            m_stagingList = new DataStagingList(new String[]{});
+            // ignore
         } catch (IncorrectStateException e) {
             throw new NoSuccessException(e);
         }
@@ -55,14 +83,20 @@ public class DataStagingDescription {
 
                 // save old jobDesc attributes
                 m_executable = jobDesc.getAttribute(JobDescription.EXECUTABLE);
-                m_arguments = jobDesc.getVectorAttribute(JobDescription.ARGUMENTS);
+                try {
+                    m_arguments = jobDesc.getVectorAttribute(JobDescription.ARGUMENTS);
+                } catch (DoesNotExistException e) {
+                    m_arguments = null;
+                }
 
                 // clone jobDesc
                 JobDescription newJobDesc = (JobDescription) jobDesc.clone();
 
                 // modify newJobDesc
                 newJobDesc.setAttribute(JobDescription.EXECUTABLE, "/bin/sh");
-                newJobDesc.removeAttribute(JobDescription.ARGUMENTS);
+                if (m_arguments != null) {
+                    newJobDesc.removeAttribute(JobDescription.ARGUMENTS);
+                }
                 newJobDesc.setAttribute(JobDescription.INTERACTIVE, "true");
 
                 // uncomment this to enable debugging job wrapper script

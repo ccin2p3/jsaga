@@ -27,6 +27,10 @@ public abstract class AbstractDataStagingRemote extends AbstractDataStaging {
         m_workerURL = workerURL;
     }
 
+    public String getWorkerProtocol() {
+        return m_workerURL.getScheme();
+    }
+
     protected void copy(Session session, URL sourceUrl, URL targetUrl) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         int append = (m_append ? Flags.APPEND : Flags.NONE).getValue();
         try {

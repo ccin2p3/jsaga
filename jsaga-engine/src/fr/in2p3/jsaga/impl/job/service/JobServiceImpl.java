@@ -58,7 +58,7 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
         String uniqId = ""+System.currentTimeMillis();
 
         // may modify jobDesc
-        DataStagingDescription stagingDesc = new DataStagingDescription(jobDesc);
+        DataStagingDescription stagingDesc = new DataStagingDescription(jobDesc, m_controlAdaptor.getSupportedSandboxProtocols());
         jobDesc = stagingDesc.modifyJobDescription(jobDesc);
 
         // get JSDL
