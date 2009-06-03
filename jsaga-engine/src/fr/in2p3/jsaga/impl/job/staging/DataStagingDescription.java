@@ -30,13 +30,14 @@ public class DataStagingDescription {
             supportedProtocols.add(supportedProtocolsArray[i]);
         }
 
+        // init
+        List<String> pluginStagingList = new ArrayList<String>();
+        m_stagingList = new DataStagingList();
         try {
             // get fileTransfer
             String[] fileTransfer = jobDesc.getVectorAttribute(JobDescription.FILETRANSFER);
 
             // split fileTransfer into pluginStagingList and stagingList
-            List<String> pluginStagingList = new ArrayList<String>();
-            m_stagingList = new DataStagingList();
             for (String ft : fileTransfer) {
                 AbstractDataStaging dataStaging = DataStagingFactory.create(ft);
                 if (supportedProtocols.contains(dataStaging.getLocalProtocol()) && supportedProtocols.contains(dataStaging.getWorkerProtocol())) {
