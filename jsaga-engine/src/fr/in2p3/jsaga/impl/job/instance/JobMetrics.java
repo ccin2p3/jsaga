@@ -26,7 +26,7 @@ public class JobMetrics {
     MetricImpl<String> m_SubState;
 
     /** constructor */
-    JobMetrics(JobImpl job) throws NotImplementedException {
+    JobMetrics(AbstractSyncJobImpl job) throws NotImplementedException {
         m_State = new TaskStateMetricFactoryImpl<State>(job).createAndRegister(
                 Job.JOB_STATE,
                 "fires on state changes of the job, and has the literal value of the job state enum.",
@@ -42,7 +42,7 @@ public class JobMetrics {
                 MetricType.String,
                 "Unknown:Unknown");
         m_SubState = new TaskStateMetricFactoryImpl<String>(job).createAndRegister(
-                JobImpl.JOB_SUBSTATE,
+                AbstractSyncJobImpl.JOB_SUBSTATE,
                 "fires on sub-state changes of the job (deviation from SAGA specification)",
                 MetricMode.ReadOnly,
                 "1",

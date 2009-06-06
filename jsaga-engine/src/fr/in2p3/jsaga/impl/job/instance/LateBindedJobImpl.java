@@ -4,14 +4,14 @@ import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.schema.jsdl.extension.Resource;
 import fr.in2p3.jsaga.impl.job.description.XJSDLJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.monitoring.MetricImpl;
+import fr.in2p3.jsaga.impl.permissions.AbstractJobPermissionsImpl;
 import fr.in2p3.jsaga.jobcollection.LateBindedJob;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
 import org.ogf.saga.monitoring.*;
 import org.ogf.saga.session.Session;
-import org.ogf.saga.task.State;
-import org.ogf.saga.task.Task;
+import org.ogf.saga.task.*;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
@@ -30,7 +30,7 @@ import java.io.OutputStream;
 /**
  *
  */
-public class LateBindedJobImpl extends AbstractAsyncJobImpl implements LateBindedJob {
+public class LateBindedJobImpl extends AbstractJobPermissionsImpl implements LateBindedJob {
     protected JobHandle m_jobHandle;
     private XJSDLJobDescriptionImpl m_jobDesc;
     private URL m_resourceManager;
@@ -74,7 +74,7 @@ public class LateBindedJobImpl extends AbstractAsyncJobImpl implements LateBinde
 
         // create job
         JobService jobService = JobFactory.createJobService(m_session, m_resourceManager);
-        JobImpl job = (JobImpl) jobService.createJob(m_jobDesc);
+        AbstractSyncJobImpl job = (AbstractSyncJobImpl) jobService.createJob(m_jobDesc);
         m_jobHandle.setJob(job);
     }
     protected boolean isAllocated() {
@@ -161,5 +161,33 @@ public class LateBindedJobImpl extends AbstractAsyncJobImpl implements LateBinde
     }
     public void signal(int signum) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         m_jobHandle.signal(signum);
+    }
+
+    public Task<Job, JobDescription> getJobDescription(TaskMode mode) throws NotImplementedException {
+        return m_jobHandle.getJobDescription(mode);
+    }
+    public Task<Job, OutputStream> getStdin(TaskMode mode) throws NotImplementedException {
+        return m_jobHandle.getStdin(mode);
+    }
+    public Task<Job, InputStream> getStdout(TaskMode mode) throws NotImplementedException {
+        return m_jobHandle.getStdout(mode);
+    }
+    public Task<Job, InputStream> getStderr(TaskMode mode) throws NotImplementedException {
+        return m_jobHandle.getStderr(mode);
+    }
+    public Task<Job, Void> suspend(TaskMode mode) throws NotImplementedException {
+        return m_jobHandle.suspend(mode);
+    }
+    public Task<Job, Void> resume(TaskMode mode) throws NotImplementedException {
+        return m_jobHandle.resume(mode);
+    }
+    public Task<Job, Void> checkpoint(TaskMode mode) throws NotImplementedException {
+        return m_jobHandle.checkpoint(mode);
+    }
+    public Task<Job, Void> migrate(TaskMode mode, JobDescription jd) throws NotImplementedException {
+        return m_jobHandle.migrate(mode, jd);
+    }
+    public Task<Job, Void> signal(TaskMode mode, int signum) throws NotImplementedException {
+        return m_jobHandle.signal(mode, signum);
     }
 }

@@ -1,115 +1,41 @@
 package fr.in2p3.jsaga.impl.job.instance;
 
-import fr.in2p3.jsaga.EngineProperties;
-import fr.in2p3.jsaga.adaptor.job.SubState;
-import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.advanced.*;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.*;
-import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
-import fr.in2p3.jsaga.engine.job.monitor.JobMonitorCallback;
-import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
-import fr.in2p3.jsaga.impl.job.instance.stream.*;
 import fr.in2p3.jsaga.impl.job.service.AbstractSyncJobServiceImpl;
 import fr.in2p3.jsaga.impl.job.staging.DataStagingDescription;
-import org.apache.log4j.Logger;
-import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.Job;
 import org.ogf.saga.job.JobDescription;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
 import org.ogf.saga.task.TaskMode;
-import org.ogf.saga.url.URL;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /* ***************************************************
-* *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
-* ***             http://cc.in2p3.fr/             ***
-* ***************************************************
-* File:   JobImpl
-* Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   26 oct. 2007
-* ***************************************************
-* Description:                                      */
+ * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
+ * ***             http://cc.in2p3.fr/             ***
+ * ***************************************************
+ * File:   JobImpl
+ * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
+ * Date:   5 juin 2009
+ * ***************************************************
+ * Description:                                      */
 /**
  *
  */
-public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCallback {
-    /** Job attribute (deviation from SAGA specification) */
-    public static final String NATIVEJOBDESCRIPTION = "NativeJobDescription";
-    /** Job metric (deviation from SAGA specification) */
-    public static final String JOB_SUBSTATE = "job.sub_state";
-    /** logger */
-    private static Logger s_logger = Logger.getLogger(JobImpl.class);
-
-    private URL m_resourceManager;
-    private JobControlAdaptor m_controlAdaptor;
-    private JobMonitorService m_monitorService;
-    private JobAttributes m_attributes;
-    private JobMetrics m_metrics;
-    private JobDescription m_jobDescription;
-    private DataStagingDescription m_stagingDescription;
-    private String m_uniqId;
-    private String m_nativeJobId;
-    private JobIOHandler m_IOHandler;
-    private Stdin m_stdin;
-    private Stdout m_stdout;
-    private Stdout m_stderr;
-
+public class JobImpl extends AbstractAsyncJobImpl implements Job {
     /** constructor for submission */
     public JobImpl(Session session, String nativeJobDesc, JobDescription jobDesc, DataStagingDescription stagingDesc, String uniqId, AbstractSyncJobServiceImpl service) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
-        this(session, service, true);
-        m_attributes.m_NativeJobDescription.setObject(nativeJobDesc);
-        m_jobDescription = jobDesc;
-        m_stagingDescription = stagingDesc;
-        m_uniqId = uniqId;
-        m_nativeJobId = null;
+        super(session, nativeJobDesc, jobDesc, stagingDesc, uniqId, service);
     }
 
     /** constructor for control and monitoring only */
     public JobImpl(Session session, String nativeJobId, AbstractSyncJobServiceImpl service) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
-        this(session, service, false);
-        m_attributes.m_NativeJobDescription.setObject(null);
-        m_jobDescription = null;
-        m_stagingDescription = null;
-        m_uniqId = null;
-        m_nativeJobId = nativeJobId;
+        super(session, nativeJobId, service);
     }
 
-    /** common to all contructors */
-    private JobImpl(Session session, AbstractSyncJobServiceImpl service, boolean create) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
-        super(session, create);
-        m_attributes = new JobAttributes(this);
-        m_metrics = new JobMetrics(this);
-        m_resourceManager = service.m_resourceManager;
-        m_controlAdaptor = service.m_controlAdaptor;
-        m_monitorService = service.m_monitorService;
-        m_IOHandler = null;
-        m_stdin = null;
-        m_stdout = null;
-        m_stderr = null;
-    }
-
-    /** clone */
-    public SagaObject clone() throws CloneNotSupportedException {
-        JobImpl clone = (JobImpl) super.clone();
-        clone.m_attributes = m_attributes.clone();
-        clone.m_metrics = m_metrics.clone();
-        clone.m_controlAdaptor = m_controlAdaptor;
-        clone.m_monitorService = m_monitorService;
-        clone.m_jobDescription = m_jobDescription;
-        clone.m_stagingDescription = m_stagingDescription;
-        clone.m_uniqId = m_uniqId;
-        clone.m_nativeJobId = m_nativeJobId;
-        clone.m_IOHandler = m_IOHandler;
-        clone.m_stdin = m_stdin;
-        clone.m_stdout = m_stdout;
-        clone.m_stderr = m_stderr;
-        return clone;
-    }
-
-    ////////////////////////////////////////// override AbstractTaskImpl ///////////////////////////////////////////
+    ////////////////////////////////////////// interface Task ///////////////////////////////////////////
 
     public void run() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         float timeout = this.getTimeout("run");
@@ -166,365 +92,136 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
         }
     }
 
-    ////////////////////////////////////// implementation of AbstractTaskImpl //////////////////////////////////////
-
-    private static boolean s_checkMatch = EngineProperties.getBoolean(EngineProperties.JOB_CONTROL_CHECK_MATCH);
-    protected void doSubmit() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
-        try {
-            // pre-staging
-            m_stagingDescription.preStaging(this);
-
-            // submit
-            String nativeJobDesc = m_attributes.m_NativeJobDescription.getObject();
-            if (this.isInteractive()) {
-                if (m_controlAdaptor instanceof StreamableJobInteractiveGet) {
-                    // submit
-                    JobIOGetterInteractive ioHandler = ((StreamableJobInteractiveGet)m_controlAdaptor).submitInteractive(nativeJobDesc, s_checkMatch);
-                    if (ioHandler == null) {
-                        throw new NotImplementedException("ADAPTOR ERROR: Method submitInteractive() must not return null: "+m_controlAdaptor.getClass().getName());
-                    }
-
-                    // set stdin
-                    if (m_stdin == null) {
-                        m_stdin = new JobStdinOutputStream(this);
-                    }
-                    m_stdin.openJobIOHandler(ioHandler);
-
-                    // set stdout and stderr
-                    if (m_stdout == null) {
-                        m_stdout = new GetterInputStream(ioHandler.getStdout());
-                    }
-                    if (m_stderr == null) {
-                        m_stderr = new GetterInputStream(ioHandler.getStderr());
-                    }
-
-                    m_IOHandler = ioHandler;
-                    m_nativeJobId = m_IOHandler.getJobId();
-                } else if (m_controlAdaptor instanceof StreamableJobInteractiveSet) {
-                    // set stdin
-                    InputStream stdin = null;
-                    if (m_stdin != null) {
-                        stdin = ((PostconnectedStdinOutputStream)m_stdin).getInputStreamContainer();
-                    }
-
-                    // set stdout and stderr
-                    if (m_stdout == null) {
-                        m_stdout = new PreconnectedStdoutInputStream(this);
-                    }
-                    OutputStream stdout = ((PreconnectedStdoutInputStream)m_stdout).getOutputStreamContainer();
-                    if (m_stderr == null) {
-                        m_stderr = new PreconnectedStderrInputStream(this);
-                    }
-                    OutputStream stderr = ((PreconnectedStderrInputStream)m_stderr).getOutputStreamContainer();
-
-                    // submit
-                    m_nativeJobId = ((StreamableJobInteractiveSet)m_controlAdaptor).submitInteractive(
-                            nativeJobDesc, s_checkMatch,
-                            stdin, stdout, stderr);
-                } else if (m_controlAdaptor instanceof StreamableJobBatch) {
-                    // set stdin
-                    InputStream stdin;
-                    if (m_stdin!=null && m_stdin.getBuffer().length>0) {
-                        stdin = new ByteArrayInputStream(m_stdin.getBuffer());
-                    } else {
-                        stdin = null;
-                    }
-
-                    // submit
-                    m_IOHandler = ((StreamableJobBatch)m_controlAdaptor).submit(nativeJobDesc, s_checkMatch, m_uniqId, stdin);
-                    if (m_IOHandler == null) {
-                        throw new NotImplementedException("ADAPTOR ERROR: Method submit() must not return null: "+m_controlAdaptor.getClass().getName());
-                    }
-                    m_nativeJobId = m_IOHandler.getJobId();
-                } else {
-                    throw new NotImplementedException("Interactive jobs are not supported by this adaptor: "+m_controlAdaptor.getClass().getName());
-                }
-            } else {
-                m_nativeJobId = m_controlAdaptor.submit(nativeJobDesc, s_checkMatch, m_uniqId);
-            }
-            String monitorUrl = m_monitorService.getURL().getString();
-            String sagaJobId = "["+monitorUrl+"]-["+m_nativeJobId+"]";
-            m_attributes.m_JobId.setObject(sagaJobId);
-        } catch (AuthorizationFailedException e) {
-            throw new NoSuccessException(e);
-        } catch (AuthenticationFailedException e) {
-            throw new NoSuccessException(e);
-        } catch (PermissionDeniedException e) {
-            throw new NoSuccessException(e);
-        } catch (DoesNotExistException e) {
-            throw new NoSuccessException(e);
-        } catch (BadParameterException e) {
-            throw new NoSuccessException(e);
-        }
-    }
-
-    protected void doCancel() {
-        if (m_nativeJobId == null) {
-            throw new RuntimeException("INTERNAL ERROR: JobID not initialized");
-        }
-        try {
-            m_controlAdaptor.cancel(m_nativeJobId);
-            this.setState(State.CANCELED, "Canceled by user", SubState.CANCELED, new IncorrectStateException("Canceled by user"));
-        } catch (SagaException e) {
-            // do nothing (failed to cancel task)
-        }
-    }
-
-    protected State queryState() throws NotImplementedException, TimeoutException, NoSuccessException {
-        JobStatus status = m_monitorService.getState(m_nativeJobId);
-        // set job state
-        this.setJobState(status.getSagaState(), status.getStateDetail(), status.getSubState(), status.getCause());
-        // return task state (may trigger finish task)
-        return status.getSagaState();
-    }
-
-    public boolean startListening() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
-        if (m_nativeJobId == null) {
-            throw new IncorrectStateException("Can not listen to job in 'New' state", this);
-        }
-        m_monitorService.startListening(m_nativeJobId, this);
-        return true;    // a job task is always listening (either with notification, or with polling)
-    }
-
-    public void stopListening() throws NotImplementedException, TimeoutException, NoSuccessException {
-        if (m_nativeJobId == null) {
-            throw new RuntimeException("INTERNAL ERROR: JobID not initialized");
-        }
-        m_monitorService.stopListening(m_nativeJobId);
-
-        // close job output and error streams
-        boolean isDone = (State.DONE.compareTo(m_metrics.m_State.getValue()) == 0);
-        if (isDone && m_IOHandler!=null) {  //if job is done and interactive
-            if (m_controlAdaptor instanceof StreamableJobInteractiveGet || m_controlAdaptor instanceof StreamableJobBatch) {
-                try {
-                    if (m_stdout == null) {
-                        m_stdout = new JobStdoutInputStream(this, m_IOHandler);
-                    }
-                    m_stdout.closeJobIOHandler();
-                    if (m_stderr == null) {
-                        m_stderr = new JobStderrInputStream(this, m_IOHandler);
-                    }
-                    m_stderr.closeJobIOHandler();
-                } catch (Exception e) {
-                    s_logger.warn("Failed to get job output/error streams: "+m_nativeJobId, e);
-                }
-            }
-        }
-
-        // staging
-        try {
-            // post-staging
-            if (isDone) {
-                m_stagingDescription.postStaging(this);
-            }
-
-            // cleanup staged files
-            if (this.isFinalState()) {
-                m_stagingDescription.cleanup(this);
-            }
-        } catch (AuthenticationFailedException e) {
-            throw new NoSuccessException(e);
-        } catch (AuthorizationFailedException e) {
-            throw new NoSuccessException(e);
-        } catch (PermissionDeniedException e) {
-            throw new NoSuccessException(e);
-        } catch (BadParameterException e) {
-            throw new NoSuccessException(e);
-        } catch (DoesNotExistException e) {
-            throw new NoSuccessException(e);
-        } catch (IncorrectStateException e) {
-            throw new NoSuccessException(e);
-        }
-
-        // cleanup job
-        if (this.isFinalState() && m_controlAdaptor instanceof CleanableJobAdaptor) {
-            try {
-                ((CleanableJobAdaptor)m_controlAdaptor).clean(m_nativeJobId);
-            } catch (PermissionDeniedException e) {
-                s_logger.warn("Failed to cleanup job: "+m_nativeJobId, e);
-            }
-        }
-    }
-
-    ////////////////////////////////////// implementation of Job //////////////////////////////////////
+    //////////////////////////////////////////// interface Job ////////////////////////////////////////////
 
     public JobDescription getJobDescription() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        return m_jobDescription;
+        float timeout = this.getTimeout("getJobDescription");
+        if (timeout == WAIT_FOREVER) {
+            return super.getJobDescriptionSync();
+        } else {
+            try {
+                return (JobDescription) getResult(super.getJobDescription(TaskMode.ASYNC), timeout);
+            }
+            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (BadParameterException e) {throw new NoSuccessException(e);}
+            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+        }
     }
 
     public OutputStream getStdin() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
-        if (this.isInteractive()) {
-            if (m_stdin == null) {
-                if (m_controlAdaptor instanceof StreamableJobInteractiveSet) {
-                    m_stdin = new PostconnectedStdinOutputStream(this);
-                } else {
-                    m_stdin = new JobStdinOutputStream(this);
-                }
-            }
-            return m_stdin;
+        float timeout = this.getTimeout("getStdin");
+        if (timeout == WAIT_FOREVER) {
+            return super.getStdinSync();
         } else {
-            throw new IncorrectStateException("Method getStdin() is allowed on interactive jobs only", this);
+            try {
+                return (OutputStream) getResult(super.getStdin(TaskMode.ASYNC), timeout);
+            }
+            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
         }
     }
 
     public InputStream getStdout() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
-        if (this.isInteractive()) {
-            if (m_stdout == null) {
-                m_stdout = new JobStdoutInputStream(this, m_IOHandler);
-            }
-            return m_stdout;
+        float timeout = this.getTimeout("getStdout");
+        if (timeout == WAIT_FOREVER) {
+            return super.getStdoutSync();
         } else {
-            throw new IncorrectStateException("Method getStdout() is allowed on interactive jobs only", this);
+            try {
+                return (InputStream) getResult(super.getStdout(TaskMode.ASYNC), timeout);
+            }
+            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
         }
     }
 
     public InputStream getStderr() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
-        if (this.isInteractive()) {
-            if (m_stderr == null) {
-                m_stderr = new JobStderrInputStream(this, m_IOHandler);
-            }
-            return m_stderr;
+        float timeout = this.getTimeout("getStderr");
+        if (timeout == WAIT_FOREVER) {
+            return super.getStderrSync();
         } else {
-            throw new IncorrectStateException("Method getStderr() is allowed on interactive jobs only", this);
+            try {
+                return (InputStream) getResult(super.getStderr(TaskMode.ASYNC), timeout);
+            }
+            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
         }
     }
 
     public void suspend() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
-        if (m_nativeJobId == null) {
-            throw new IncorrectStateException("Can not suspend job in 'New' state", this);
-        }
-        if (m_controlAdaptor instanceof HoldableJobAdaptor && m_controlAdaptor instanceof SuspendableJobAdaptor) {
-            if (! ((HoldableJobAdaptor)m_controlAdaptor).hold(m_nativeJobId)) {
-                if (! ((SuspendableJobAdaptor)m_controlAdaptor).suspend(m_nativeJobId)) {
-                    throw new NoSuccessException("Failed to hold/suspend job because it is neither queued nor active: "+m_nativeJobId);
-                }
-            }
-        } else if (m_controlAdaptor instanceof HoldableJobAdaptor) {
-            if (! ((HoldableJobAdaptor)m_controlAdaptor).hold(m_nativeJobId)) {
-                throw new NoSuccessException("Failed to hold job because it is not queued: "+m_nativeJobId);
-            }
-        } else if (m_controlAdaptor instanceof SuspendableJobAdaptor) {
-            if (! ((SuspendableJobAdaptor)m_controlAdaptor).suspend(m_nativeJobId)) {
-                throw new NoSuccessException("Failed to suspend job because if is not active: "+m_nativeJobId);
-            }
+        float timeout = this.getTimeout("suspend");
+        if (timeout == WAIT_FOREVER) {
+            super.suspendSync();
         } else {
-            throw new NotImplementedException("Suspend is not supported by this adaptor: "+m_controlAdaptor.getClass().getName());
+            try {
+                getResult(super.suspend(TaskMode.ASYNC), timeout);
+            }
+            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (BadParameterException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         }
     }
 
     public void resume() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
-        if (m_nativeJobId == null) {
-            throw new IncorrectStateException("Can not resume job in 'New' state", this);
-        }
-        if (m_controlAdaptor instanceof HoldableJobAdaptor && m_controlAdaptor instanceof SuspendableJobAdaptor) {
-            if (! ((HoldableJobAdaptor)m_controlAdaptor).release(m_nativeJobId)) {
-                if (! ((SuspendableJobAdaptor)m_controlAdaptor).resume(m_nativeJobId)) {
-                    throw new NoSuccessException("Failed to release/resume job because it is neither held nor suspended: "+m_nativeJobId);
-                }
-            }
-        } else if (m_controlAdaptor instanceof HoldableJobAdaptor) {
-            if (! ((HoldableJobAdaptor)m_controlAdaptor).release(m_nativeJobId)) {
-                throw new NoSuccessException("Failed to release job because it is not held: "+m_nativeJobId);
-            }
-        } else if (m_controlAdaptor instanceof SuspendableJobAdaptor) {
-            if (! ((SuspendableJobAdaptor)m_controlAdaptor).resume(m_nativeJobId)) {
-                throw new NoSuccessException("Failed to resume job because if is not suspended: "+m_nativeJobId);
-            }
+        float timeout = this.getTimeout("resume");
+        if (timeout == WAIT_FOREVER) {
+            super.resumeSync();
         } else {
-            throw new NotImplementedException("Resume is not supported by this adaptor: "+m_controlAdaptor.getClass().getName());
+            try {
+                getResult(super.resume(TaskMode.ASYNC), timeout);
+            }
+            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (BadParameterException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         }
     }
 
     public void checkpoint() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
-        if (m_nativeJobId == null) {
-            throw new IncorrectStateException("Can not checkpoint job in 'New' state", this);
-        }
-        if (m_controlAdaptor instanceof CheckpointableJobAdaptor) {
-            if (! ((CheckpointableJobAdaptor)m_controlAdaptor).checkpoint(m_nativeJobId)) {
-                throw new NoSuccessException("Failed to checkpoint job: "+m_nativeJobId);
-            }
+        float timeout = this.getTimeout("checkpoint");
+        if (timeout == WAIT_FOREVER) {
+            super.checkpointSync();
         } else {
-            throw new NotImplementedException("Checkpoint is not supported by this adaptor: "+m_controlAdaptor.getClass().getName());
+            try {
+                getResult(super.checkpoint(TaskMode.ASYNC), timeout);
+            }
+            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (BadParameterException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         }
     }
 
     public void migrate(JobDescription jd) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
-        if (m_nativeJobId == null) {
-            throw new IncorrectStateException("Can not migrate job in 'New' state", this);
+        float timeout = this.getTimeout("migrate");
+        if (timeout == WAIT_FOREVER) {
+            super.migrateSync(jd);
+        } else {
+            try {
+                getResult(super.migrate(TaskMode.ASYNC, jd), timeout);
+            }
+            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         }
-        throw new NotImplementedException("Not implemented yet..."); //todo: implement method migrate()
-//        if (super.cancel(true)) {   //synchronous cancel (not the SAGA cancel)
     }
 
     public void signal(int signum) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
-        if (m_nativeJobId == null) {
-            throw new IncorrectStateException("Can not send signal to job in 'New' state", this);
-        }
-        if (m_controlAdaptor instanceof SignalableJobAdaptor) {
-            if (! ((SignalableJobAdaptor)m_controlAdaptor).signal(m_nativeJobId, signum)) {
-                throw new NoSuccessException("Failed to signal job: "+m_nativeJobId);
-            }
+        float timeout = this.getTimeout("signal");
+        if (timeout == WAIT_FOREVER) {
+            super.signalSync(signum);
         } else {
-            throw new NotImplementedException("Signal is not supported by this adaptor: "+m_controlAdaptor.getClass().getName());
-        }
-    }
-
-    /////////////////////////////////////////// implementation of JobImpl ////////////////////////////////////////////
-
-    public State getJobState() {
-        return m_metrics.m_State.getValue();
-    }
-
-    ////////////////////////////////////// implementation of JobMonitorCallback //////////////////////////////////////
-
-    /**
-     * Set job and task state (may finish task)
-     */
-    public void setState(State state, String stateDetail, SubState subState, SagaException cause) {
-        // set job state
-        this.setJobState(state, stateDetail, subState, cause);
-        // set task state (may finish task)
-        super.setState(state);
-    }
-
-    /**
-     * Set job state only
-     */
-    private synchronized void setJobState(State state, String stateDetail, SubState subState, SagaException cause) {
-        // if not already in a final state
-        if (! this.isFinalState()) {
-            // update cause
-            if (cause != null) {
-                super.setException(cause);
+            try {
+                getResult(super.signal(TaskMode.ASYNC, signum), timeout);
             }
-            // update metrics
-            m_metrics.m_State.setValue(state);
-            m_metrics.m_StateDetail.setValue(stateDetail);
-            m_metrics.m_SubState.setValue(subState.toString());
+            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         }
     }
 
     ////////////////////////////////////// private methods //////////////////////////////////////
-
-    private boolean isFinalState() {
-        State state = m_metrics.m_State.getValue(State.RUNNING);
-        switch(state) {
-            case DONE:
-            case CANCELED:
-            case FAILED:
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    private boolean isInteractive() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
-        try {
-            return "true".equalsIgnoreCase(m_jobDescription.getAttribute(JobDescription.INTERACTIVE));
-        } catch (DoesNotExistException e) {
-            return false;
-        }
-    }
 
     private float getTimeout(String methodName) throws NoSuccessException {
         return getTimeout(Job.class, methodName, m_resourceManager.getScheme());

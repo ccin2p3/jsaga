@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.impl.job.instance.stream;
 
-import fr.in2p3.jsaga.impl.job.instance.JobImpl;
+import fr.in2p3.jsaga.impl.job.instance.AbstractSyncJobImpl;
 import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.error.NoSuccessException;
 
@@ -22,7 +22,7 @@ public class PreconnectedStdoutInputStream extends JobStdoutInputStream {
     private OutputStreamContainer m_out;
 
     /** constructor for StreamableJobInteractiveSet */
-    public PreconnectedStdoutInputStream(JobImpl job) {
+    public PreconnectedStdoutInputStream(AbstractSyncJobImpl job) {
         super(job);
         m_out = new OutputStreamContainer();
     }

@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.impl.job.instance.stream;
 
-import fr.in2p3.jsaga.impl.job.instance.JobImpl;
+import fr.in2p3.jsaga.impl.job.instance.AbstractSyncJobImpl;
 import org.ogf.saga.error.*;
 
 import java.io.*;
@@ -21,7 +21,7 @@ public class PostconnectedStdinOutputStream extends JobStdinOutputStream {
     private InputStreamContainer m_in;
 
     /** constructor for StreamableJobInteractiveSet */
-    public PostconnectedStdinOutputStream(JobImpl job) throws TimeoutException, DoesNotExistException, NoSuccessException, NotImplementedException {
+    public PostconnectedStdinOutputStream(AbstractSyncJobImpl job) throws TimeoutException, DoesNotExistException, NoSuccessException, NotImplementedException {
         super(job);
         m_in = new InputStreamContainer();
     }

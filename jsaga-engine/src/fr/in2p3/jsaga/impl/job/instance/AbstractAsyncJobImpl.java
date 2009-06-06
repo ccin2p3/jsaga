@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.impl.job.instance;
 
-import fr.in2p3.jsaga.impl.permissions.AbstractJobPermissionsImpl;
+import fr.in2p3.jsaga.impl.job.service.AbstractSyncJobServiceImpl;
+import fr.in2p3.jsaga.impl.job.staging.DataStagingDescription;
 import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.Job;
@@ -24,18 +25,23 @@ import java.io.OutputStream;
 /**
  *
  */
-public abstract class AbstractAsyncJobImpl extends AbstractJobPermissionsImpl implements Job {
-    /** constructor */
-    public AbstractAsyncJobImpl(Session session, boolean create) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
-        super(session, create);
+public abstract class AbstractAsyncJobImpl extends AbstractSyncJobImpl implements Job {
+    /** constructor for submission */
+    protected AbstractAsyncJobImpl(Session session, String nativeJobDesc, JobDescription jobDesc, DataStagingDescription stagingDesc, String uniqId, AbstractSyncJobServiceImpl service) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+        super(session, nativeJobDesc, jobDesc, stagingDesc, uniqId, service);
     }
 
+    /** constructor for control and monitoring only */
+    protected AbstractAsyncJobImpl(Session session, String nativeJobId, AbstractSyncJobServiceImpl service) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
+        super(session, nativeJobId, service);
+    }
+    
     //////////////////////////////////////////// interface Job ////////////////////////////////////////////
 
     public Task<Job, JobDescription> getJobDescription(TaskMode mode) throws NotImplementedException {
         return new GenericThreadedTaskFactory<Job,JobDescription>().create(
                 mode, m_session, this,
-                "getJobDescription",
+                "getJobDescriptionSync",
                 new Class[]{},
                 new Object[]{});
     }
@@ -43,7 +49,7 @@ public abstract class AbstractAsyncJobImpl extends AbstractJobPermissionsImpl im
     public Task<Job, OutputStream> getStdin(TaskMode mode) throws NotImplementedException {
         return new GenericThreadedTaskFactory<Job,OutputStream>().create(
                 mode, m_session, this,
-                "getStdin",
+                "getStdinSync",
                 new Class[]{},
                 new Object[]{});
     }
@@ -51,7 +57,7 @@ public abstract class AbstractAsyncJobImpl extends AbstractJobPermissionsImpl im
     public Task<Job, InputStream> getStdout(TaskMode mode) throws NotImplementedException {
         return new GenericThreadedTaskFactory<Job,InputStream>().create(
                 mode, m_session, this,
-                "getStdout",
+                "getStdoutSync",
                 new Class[]{},
                 new Object[]{});
     }
@@ -59,7 +65,7 @@ public abstract class AbstractAsyncJobImpl extends AbstractJobPermissionsImpl im
     public Task<Job, InputStream> getStderr(TaskMode mode) throws NotImplementedException {
         return new GenericThreadedTaskFactory<Job,InputStream>().create(
                 mode, m_session, this,
-                "getStderr",
+                "getStderrSync",
                 new Class[]{},
                 new Object[]{});
     }
@@ -67,7 +73,7 @@ public abstract class AbstractAsyncJobImpl extends AbstractJobPermissionsImpl im
     public Task<Job, Void> suspend(TaskMode mode) throws NotImplementedException {
         return new GenericThreadedTaskFactory<Job,Void>().create(
                 mode, m_session, this,
-                "suspend",
+                "suspendSync",
                 new Class[]{},
                 new Object[]{});
     }
@@ -75,7 +81,7 @@ public abstract class AbstractAsyncJobImpl extends AbstractJobPermissionsImpl im
     public Task<Job, Void> resume(TaskMode mode) throws NotImplementedException {
         return new GenericThreadedTaskFactory<Job,Void>().create(
                 mode, m_session, this,
-                "resume",
+                "resumeSync",
                 new Class[]{},
                 new Object[]{});
     }
@@ -83,7 +89,7 @@ public abstract class AbstractAsyncJobImpl extends AbstractJobPermissionsImpl im
     public Task<Job, Void> checkpoint(TaskMode mode) throws NotImplementedException {
         return new GenericThreadedTaskFactory<Job,Void>().create(
                 mode, m_session, this,
-                "checkpoint",
+                "checkpointSync",
                 new Class[]{},
                 new Object[]{});
     }
@@ -91,7 +97,7 @@ public abstract class AbstractAsyncJobImpl extends AbstractJobPermissionsImpl im
     public Task<Job, Void> migrate(TaskMode mode, JobDescription jd) throws NotImplementedException {
         return new GenericThreadedTaskFactory<Job,Void>().create(
                 mode, m_session, this,
-                "migrate",
+                "migrateSync",
                 new Class[]{JobDescription.class},
                 new Object[]{jd});
     }
@@ -99,7 +105,7 @@ public abstract class AbstractAsyncJobImpl extends AbstractJobPermissionsImpl im
     public Task<Job, Void> signal(TaskMode mode, int signum) throws NotImplementedException {
         return new GenericThreadedTaskFactory<Job,Void>().create(
                 mode, m_session, this,
-                "signal",
+                "signalSync",
                 new Class[]{int.class},
                 new Object[]{signum});
     }

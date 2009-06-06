@@ -1,14 +1,14 @@
 package fr.in2p3.jsaga.impl.job.instance;
 
 import fr.in2p3.jsaga.impl.monitoring.MetricImpl;
+import fr.in2p3.jsaga.impl.permissions.AbstractJobPermissionsImpl;
 import fr.in2p3.jsaga.impl.task.TaskCallback;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
 import org.ogf.saga.monitoring.*;
 import org.ogf.saga.session.Session;
-import org.ogf.saga.task.State;
-import org.ogf.saga.task.Task;
+import org.ogf.saga.task.*;
 import org.ogf.saga.url.URL;
 
 import java.io.*;
@@ -25,8 +25,8 @@ import java.io.*;
 /**
  *
  */
-public class JobHandle extends AbstractAsyncJobImpl implements Job {
-    private JobImpl m_job;
+public class JobHandle extends AbstractJobPermissionsImpl implements Job {
+    private AbstractSyncJobImpl m_job;
     private File m_inputFile;
     private TaskCallback m_jobRunTask;
 
@@ -41,14 +41,14 @@ public class JobHandle extends AbstractAsyncJobImpl implements Job {
     /** constructor for control and monitoring only */
     public JobHandle(Session session, URL rm, String nativeJobId) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session, false);
-        m_job = (JobImpl) JobFactory.createJobService(m_session, rm).getJob(nativeJobId);
+        m_job = (AbstractSyncJobImpl) JobFactory.createJobService(m_session, rm).getJob(nativeJobId);
         m_inputFile = null;
         m_jobRunTask = null;
     }
 
     ////////////////////////////////////////// JobHandler specific method //////////////////////////////////////////
 
-    public void setJob(JobImpl job) throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
+    public void setJob(AbstractSyncJobImpl job) throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         m_job = job;
         if (m_isRunning) {
             this.doSubmit();
@@ -84,9 +84,9 @@ public class JobHandle extends AbstractAsyncJobImpl implements Job {
             // send input stream to job
             if (m_inputFile != null) {
                 try {
-                    m_job.getJobDescription().setAttribute(JobDescription.INTERACTIVE, "true");
+                    m_job.getJobDescriptionSync().setAttribute(JobDescription.INTERACTIVE, "true");
                     FileInputStream in = new FileInputStream(m_inputFile);
-                    OutputStream out = m_job.getStdin();
+                    OutputStream out = m_job.getStdinSync();
                     int len;
                     byte[] buffer = new byte[1024];
                     while ( (len=in.read(buffer)) > -1 ) {
@@ -166,74 +166,80 @@ public class JobHandle extends AbstractAsyncJobImpl implements Job {
     ////////////////////////////////////// implementation of Job //////////////////////////////////////
 
     public JobDescription getJobDescription() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        if (m_job != null) {
-            return m_job.getJobDescription();
-        } else {
-            throw new NoSuccessException("No resource has been allocated yet", this);
+        try {
+            return this.getSyncJob().getJobDescriptionSync();
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
         }
     }
-
     public OutputStream getStdin() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
-        if (m_job != null) {
-            return m_job.getStdin();
-        } else {
-            throw new IncorrectStateException("No resource has been allocated yet", this);
-        }
+        return this.getSyncJob().getStdinSync();
     }
-
     public InputStream getStdout() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
-        if (m_job != null) {
-            return m_job.getStdout();
-        } else {
-            throw new IncorrectStateException("No resource has been allocated yet", this);
-        }
+        return this.getSyncJob().getStdoutSync();
     }
-
     public InputStream getStderr() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
-        if (m_job != null) {
-            return m_job.getStderr();
-        } else {
-            throw new IncorrectStateException("No resource has been allocated yet", this);
-        }
+        return this.getSyncJob().getStderrSync();
     }
-
     public void suspend() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
-        if (m_job != null) {
-            m_job.suspend();
-        } else {
-            throw new IncorrectStateException("No resource has been allocated yet", this);
-        }
+        this.getSyncJob().suspendSync();
     }
-
     public void resume() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
-        if (m_job != null) {
-            m_job.resume();
-        } else {
-            throw new IncorrectStateException("No resource has been allocated yet", this);
-        }
+        this.getSyncJob().resumeSync();
     }
-
     public void checkpoint() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
-        if (m_job != null) {
-            m_job.checkpoint();
-        } else {
-            throw new IncorrectStateException("No resource has been allocated yet", this);
-        }
+        this.getSyncJob().checkpointSync();
     }
-
     public void migrate(JobDescription jd) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+        this.getSyncJob().migrateSync(jd);
+    }
+    public void signal(int signum) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+        this.getSyncJob().signalSync(signum);
+    }
+
+    public Task<Job, JobDescription> getJobDescription(TaskMode mode) throws NotImplementedException {
+        return this.getAsyncJob().getJobDescription(mode);
+    }
+    public Task<Job, OutputStream> getStdin(TaskMode mode) throws NotImplementedException {
+        return this.getAsyncJob().getStdin(mode);
+    }
+    public Task<Job, InputStream> getStdout(TaskMode mode) throws NotImplementedException {
+        return this.getAsyncJob().getStdout(mode);
+    }
+    public Task<Job, InputStream> getStderr(TaskMode mode) throws NotImplementedException {
+        return this.getAsyncJob().getStderr(mode);
+    }
+    public Task<Job, Void> suspend(TaskMode mode) throws NotImplementedException {
+        return this.getAsyncJob().suspend(mode);
+    }
+    public Task<Job, Void> resume(TaskMode mode) throws NotImplementedException {
+        return this.getAsyncJob().resume(mode);
+    }
+    public Task<Job, Void> checkpoint(TaskMode mode) throws NotImplementedException {
+        return this.getAsyncJob().checkpoint(mode);
+    }
+    public Task<Job, Void> migrate(TaskMode mode, JobDescription jd) throws NotImplementedException {
+        return this.getAsyncJob().migrate(mode, jd);
+    }
+    public Task<Job, Void> signal(TaskMode mode, int signum) throws NotImplementedException {
+        return this.getAsyncJob().signal(mode, signum);
+    }
+
+    ///////////////////////////////////////// private methods /////////////////////////////////////////
+
+    private AbstractSyncJobImpl getSyncJob() throws IncorrectStateException {
         if (m_job != null) {
-            m_job.migrate(jd);
+            return m_job;
         } else {
             throw new IncorrectStateException("No resource has been allocated yet", this);
         }
     }
 
-    public void signal(int signum) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+    private AbstractAsyncJobImpl getAsyncJob() throws NotImplementedException {
         if (m_job != null) {
-            m_job.signal(signum);
+            return (AbstractAsyncJobImpl) m_job;
         } else {
-            throw new IncorrectStateException("No resource has been allocated yet", this);
+            throw new NotImplementedException("No resource has been allocated yet", this);
         }
     }
 }

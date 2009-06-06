@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.impl.job.instance.stream;
 
 import fr.in2p3.jsaga.adaptor.job.control.interactive.*;
-import fr.in2p3.jsaga.impl.job.instance.JobImpl;
+import fr.in2p3.jsaga.impl.job.instance.AbstractSyncJobImpl;
 import org.ogf.saga.error.*;
 
 import java.io.*;
@@ -19,10 +19,10 @@ import java.io.*;
  *
  */
 public class JobStderrInputStream extends Stdout {
-    protected JobImpl m_job;
+    protected AbstractSyncJobImpl m_job;
     private JobIOHandler m_ioHandler;
 
-    public JobStderrInputStream(JobImpl job, JobIOHandler ioHandler) throws NotImplementedException, DoesNotExistException, TimeoutException, NoSuccessException {
+    public JobStderrInputStream(AbstractSyncJobImpl job, JobIOHandler ioHandler) throws NotImplementedException, DoesNotExistException, TimeoutException, NoSuccessException {
         m_job = job;
         m_ioHandler = ioHandler;
         switch(m_job.getJobState()) {
@@ -38,7 +38,7 @@ public class JobStderrInputStream extends Stdout {
     }
 
     /** constructor for StreamableJobInteractiveSet */
-    protected JobStderrInputStream(JobImpl job) {
+    protected JobStderrInputStream(AbstractSyncJobImpl job) {
         m_job = job;
     }
 

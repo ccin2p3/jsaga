@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.impl.job.instance.stream;
 
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.*;
-import fr.in2p3.jsaga.impl.job.instance.JobImpl;
+import fr.in2p3.jsaga.impl.job.instance.AbstractSyncJobImpl;
 import org.ogf.saga.error.*;
 
 /* ***************************************************
@@ -18,7 +18,7 @@ import org.ogf.saga.error.*;
  * TODO: not used yet...
  */
 public class StreamFactory {
-    public static Stdin createStdin(JobImpl job, JobControlAdaptor adaptor) throws NotImplementedException, DoesNotExistException, TimeoutException, NoSuccessException {
+    public static Stdin createStdin(AbstractSyncJobImpl job, JobControlAdaptor adaptor) throws NotImplementedException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (adaptor instanceof StreamableJobInteractiveSet) {
             return new PostconnectedStdinOutputStream(job);
         } else {
@@ -26,7 +26,7 @@ public class StreamFactory {
         }
     }
 
-    public static Stdout createStdout(JobImpl job, JobControlAdaptor adaptor, JobIOHandler ioHandler) throws NotImplementedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+    public static Stdout createStdout(AbstractSyncJobImpl job, JobControlAdaptor adaptor, JobIOHandler ioHandler) throws NotImplementedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (adaptor instanceof StreamableJobInteractiveGet) {
             return new GetterInputStream(((JobIOGetterInteractive)ioHandler).getStdout());
         } else if (adaptor instanceof StreamableJobInteractiveSet) {
@@ -38,7 +38,7 @@ public class StreamFactory {
         }
     }
 
-    public static Stdout createStderr(JobImpl job, JobControlAdaptor adaptor, JobIOHandler ioHandler) throws NotImplementedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+    public static Stdout createStderr(AbstractSyncJobImpl job, JobControlAdaptor adaptor, JobIOHandler ioHandler) throws NotImplementedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (adaptor instanceof StreamableJobInteractiveGet) {
             return new GetterInputStream(((JobIOGetterInteractive)ioHandler).getStderr());
         } else if (adaptor instanceof StreamableJobInteractiveSet) {

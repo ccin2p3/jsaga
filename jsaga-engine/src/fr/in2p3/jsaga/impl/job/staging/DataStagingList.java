@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.impl.job.staging;
 
 import fr.in2p3.jsaga.helpers.StringArray;
+import fr.in2p3.jsaga.impl.job.instance.AbstractSyncJobImpl;
 import org.ogf.saga.error.*;
-import org.ogf.saga.job.Job;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -55,11 +55,11 @@ public class DataStagingList {
         return !m_outputFromWorker.isEmpty();
     }
 
-    public void preStaging(Job job, String executable, String[] arguments) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+    public void preStaging(AbstractSyncJobImpl job, String executable, String[] arguments) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         // may create script
         if (this.needsStdin()) {
             // open
-            PrintStream stdin = new UnixPrintStream(job.getStdin());
+            PrintStream stdin = new UnixPrintStream(job.getStdinSync());
 
             // copy template to script
             InputStream template = DataStagingList.class.getClassLoader().getResourceAsStream("bash/template.sh");
@@ -107,11 +107,11 @@ public class DataStagingList {
         }
     }
 
-    public void postStaging(Job job) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+    public void postStaging(AbstractSyncJobImpl job) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         // may retrieve output files from stdout
         if (this.needsStdout()) {
             // open
-            BufferedReader stdout = new BufferedReader(new InputStreamReader(job.getStdout()));
+            BufferedReader stdout = new BufferedReader(new InputStreamReader(job.getStdoutSync()));
 
             // for each outputFromWorker
             for (OutputDataStagingFromWorker staging : m_outputFromWorker) {
@@ -128,7 +128,7 @@ public class DataStagingList {
         }
     }
 
-    public void cleanup(Job job) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+    public void cleanup(AbstractSyncJobImpl job) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         // for each inputToRemote
         for (InputDataStagingToRemote staging : m_inputToRemote) {
             staging.cleanup(job.getSession());

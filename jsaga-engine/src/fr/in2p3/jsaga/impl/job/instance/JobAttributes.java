@@ -28,7 +28,7 @@ public class JobAttributes implements Cloneable {
     AttributeImpl<String> m_NativeJobDescription;
 
     /** constructor */
-    JobAttributes(JobImpl job) {
+    JobAttributes(AbstractSyncJobImpl job) {
         m_JobId = job._addAttribute(new AttributeImpl<String>(
                 Job.JOBID,
                 "SAGA representation of the job identifier",
@@ -54,7 +54,7 @@ public class JobAttributes implements Cloneable {
                 MetricType.Time,
                 null));
         m_NativeJobDescription = job._addAttribute(new AttributeImpl<String>(
-                JobImpl.NATIVEJOBDESCRIPTION,
+                AbstractSyncJobImpl.NATIVEJOBDESCRIPTION,
                 "job description understood by the job service (deviation from SAGA specification)",
                 MetricMode.ReadOnly,
                 MetricType.String,
