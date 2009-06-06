@@ -37,9 +37,9 @@ public abstract class AbstractSyncJobServiceImpl extends AbstractSagaObjectImpl 
     protected static final String DEFAULT_HOST = "";
     protected static final boolean DEFAULT_INTERACTIVE = false;
 
-    protected URL m_resourceManager;
-    private JobControlAdaptor m_controlAdaptor;
-    private JobMonitorService m_monitorService;
+    public URL m_resourceManager;
+    public JobControlAdaptor m_controlAdaptor;
+    public JobMonitorService m_monitorService;
 
     /** constructor */
     public AbstractSyncJobServiceImpl(Session session, URL rm, JobControlAdaptor controlAdaptor, JobMonitorService monitorService) {
@@ -101,7 +101,7 @@ public abstract class AbstractSyncJobServiceImpl extends AbstractSagaObjectImpl 
         }
 
         // returns
-        return new JobImpl(m_session, nativeJobDesc, jobDesc, stagingDesc, uniqId, m_controlAdaptor, m_monitorService);
+        return new JobImpl(m_session, nativeJobDesc, jobDesc, stagingDesc, uniqId, this);
     }
 
     public Job runJobSync(String commandLine, String host, boolean interactive) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
@@ -146,7 +146,7 @@ public abstract class AbstractSyncJobServiceImpl extends AbstractSagaObjectImpl 
     }
 
     public Job getJobSync(String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-        return new JobImpl(m_session, nativeJobId, m_controlAdaptor, m_monitorService);
+        return new JobImpl(m_session, nativeJobId, this);
     }
 
     public JobSelf getSelfSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {

@@ -9,6 +9,7 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorCallback;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
 import fr.in2p3.jsaga.impl.job.instance.stream.*;
+import fr.in2p3.jsaga.impl.job.service.AbstractSyncJobServiceImpl;
 import fr.in2p3.jsaga.impl.job.staging.DataStagingDescription;
 import org.apache.log4j.Logger;
 import org.ogf.saga.SagaObject;
@@ -18,6 +19,7 @@ import org.ogf.saga.job.JobDescription;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
 import org.ogf.saga.task.TaskMode;
+import org.ogf.saga.url.URL;
 
 import java.io.*;
 
@@ -41,6 +43,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     /** logger */
     private static Logger s_logger = Logger.getLogger(JobImpl.class);
 
+    private URL m_resourceManager;
     private JobControlAdaptor m_controlAdaptor;
     private JobMonitorService m_monitorService;
     private JobAttributes m_attributes;
@@ -55,40 +58,37 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     private Stdout m_stderr;
 
     /** constructor for submission */
-    public JobImpl(Session session, String nativeJobDesc, JobDescription jobDesc, DataStagingDescription stagingDesc, String uniqId, JobControlAdaptor controlAdaptor, JobMonitorService monitorService) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
-        this(session, controlAdaptor, monitorService, true);
+    public JobImpl(Session session, String nativeJobDesc, JobDescription jobDesc, DataStagingDescription stagingDesc, String uniqId, AbstractSyncJobServiceImpl service) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+        this(session, service, true);
         m_attributes.m_NativeJobDescription.setObject(nativeJobDesc);
         m_jobDescription = jobDesc;
         m_stagingDescription = stagingDesc;
         m_uniqId = uniqId;
         m_nativeJobId = null;
-        m_IOHandler = null;
-        m_stdin = null;
-        m_stdout = null;
-        m_stderr = null;
     }
 
     /** constructor for control and monitoring only */
-    public JobImpl(Session session, String nativeJobId, JobControlAdaptor controlAdaptor, JobMonitorService monitorService) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
-        this(session, controlAdaptor, monitorService, false);
+    public JobImpl(Session session, String nativeJobId, AbstractSyncJobServiceImpl service) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
+        this(session, service, false);
         m_attributes.m_NativeJobDescription.setObject(null);
         m_jobDescription = null;
         m_stagingDescription = null;
         m_uniqId = null;
         m_nativeJobId = nativeJobId;
+    }
+
+    /** common to all contructors */
+    private JobImpl(Session session, AbstractSyncJobServiceImpl service, boolean create) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
+        super(session, create);
+        m_attributes = new JobAttributes(this);
+        m_metrics = new JobMetrics(this);
+        m_resourceManager = service.m_resourceManager;
+        m_controlAdaptor = service.m_controlAdaptor;
+        m_monitorService = service.m_monitorService;
         m_IOHandler = null;
         m_stdin = null;
         m_stdout = null;
         m_stderr = null;
-    }
-
-    /** common to all contructors */
-    private JobImpl(Session session, JobControlAdaptor controlAdaptor, JobMonitorService monitorService, boolean create) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
-        super(session, create);
-        m_attributes = new JobAttributes(this);
-        m_metrics = new JobMetrics(this);
-        m_controlAdaptor = controlAdaptor;
-        m_monitorService = monitorService;
     }
 
     /** clone */
@@ -527,6 +527,6 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
     }
 
     private float getTimeout(String methodName) throws NoSuccessException {
-        return getTimeout(Job.class, methodName, "unknown://");
+        return getTimeout(Job.class, methodName, m_resourceManager.getScheme());
     }
 }
