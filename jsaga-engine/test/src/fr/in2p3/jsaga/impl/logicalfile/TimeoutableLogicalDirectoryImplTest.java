@@ -57,7 +57,7 @@ public class TimeoutableLogicalDirectoryImplTest extends AbstractTest {
     public void test_openLogicalDir() throws Exception {
         try {
             m_directory.openLogicalDir(URLFactory.createURL(m_url));
-            fail("Expected exception: "+ TimeoutException.class);
+            fail("Expected exception: "+ NotImplementedException.class);
         } catch (NotImplementedException e) {
             s_logger.info(e.getMessage());
         }
@@ -67,7 +67,7 @@ public class TimeoutableLogicalDirectoryImplTest extends AbstractTest {
     public void test_openLogicalFile() throws Exception {
         try {
             m_directory.openLogicalFile(URLFactory.createURL(m_url+"file"));
-            fail("Expected exception: "+ TimeoutException.class);
+            fail("Expected exception: "+ NotImplementedException.class);
         } catch (NotImplementedException e) {
             s_logger.info(e.getMessage());
         }

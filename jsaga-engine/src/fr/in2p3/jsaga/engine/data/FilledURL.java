@@ -98,14 +98,13 @@ public class FilledURL {
         }
     }
     private static void setAttributes(String query, Map attributes) {
-        int unnamed = 1;
         String[] pairs = query.split("&");
         for (int i=0; i<pairs.length; i++) {
             int pos = pairs[i].indexOf("=");
             if (pos > 0) {
                 attributes.put(pairs[i].substring(0, pos), pairs[i].substring(pos+1));
             } else {
-                attributes.put("unnamed"+(unnamed++), pairs[i]);
+                attributes.put(pairs[i], null);
             }
         }
     }

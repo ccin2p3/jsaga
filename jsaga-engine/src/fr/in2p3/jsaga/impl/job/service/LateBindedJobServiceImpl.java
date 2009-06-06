@@ -20,10 +20,10 @@ import java.util.List;
 /**
  *
  */
-public class LateBindedJobServiceImpl extends AbstractAsyncJobServiceImpl implements JobService {
+public class LateBindedJobServiceImpl extends JobServiceImpl implements JobService {
     /** constructor */
     public LateBindedJobServiceImpl(Session session) {
-        super(session);
+        super(session, null, null, null);
     }
 
     public Job createJob(JobDescription jd) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {

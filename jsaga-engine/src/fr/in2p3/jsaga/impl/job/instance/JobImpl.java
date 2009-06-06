@@ -17,6 +17,7 @@ import org.ogf.saga.job.Job;
 import org.ogf.saga.job.JobDescription;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
+import org.ogf.saga.task.TaskMode;
 
 import java.io.*;
 
@@ -106,6 +107,63 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
         clone.m_stdout = m_stdout;
         clone.m_stderr = m_stderr;
         return clone;
+    }
+
+    ////////////////////////////////////////// override AbstractTaskImpl ///////////////////////////////////////////
+
+    public void run() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("run");
+        if (timeout == WAIT_FOREVER) {
+            super.run();
+        } else {
+            try {
+                getResult(super.run(TaskMode.ASYNC), timeout);
+            }
+            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (AuthenticationFailedException e) {throw new NoSuccessException(e);}
+            catch (AuthorizationFailedException e) {throw new NoSuccessException(e);}
+            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
+            catch (BadParameterException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+        }
+    }
+
+    public void cancel() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("cancel");
+        if (timeout == WAIT_FOREVER) {
+            super.cancel();
+        } else {
+            try {
+                getResult(super.cancel(TaskMode.ASYNC), timeout);
+            }
+            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (AuthenticationFailedException e) {throw new NoSuccessException(e);}
+            catch (AuthorizationFailedException e) {throw new NoSuccessException(e);}
+            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
+            catch (BadParameterException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+        }
+    }
+
+    public State getState() throws NotImplementedException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("getState");
+        if (timeout == WAIT_FOREVER) {
+            return super.getState();
+        } else {
+            try {
+                return (State) getResult(super.getState(TaskMode.ASYNC), timeout);
+            }
+            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (AuthenticationFailedException e) {throw new NoSuccessException(e);}
+            catch (AuthorizationFailedException e) {throw new NoSuccessException(e);}
+            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
+            catch (BadParameterException e) {throw new NoSuccessException(e);}
+            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+        }
     }
 
     ////////////////////////////////////// implementation of AbstractTaskImpl //////////////////////////////////////
@@ -466,5 +524,9 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job, JobMonitorCall
         } catch (DoesNotExistException e) {
             return false;
         }
+    }
+
+    private float getTimeout(String methodName) throws NoSuccessException {
+        return getTimeout(Job.class, methodName, "unknown://");
     }
 }

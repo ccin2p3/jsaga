@@ -69,7 +69,7 @@ public abstract class WaitForEverAdaptorAbstract implements SagaSecureAdaptor {
         return ret;
     }
     protected static void mayHang(Map attributes) {
-        if ("hangatconnect".equals(attributes.get("unnamed1"))) {
+        if (attributes.containsKey("hangatconnect")) {
             hang();
         }
     }

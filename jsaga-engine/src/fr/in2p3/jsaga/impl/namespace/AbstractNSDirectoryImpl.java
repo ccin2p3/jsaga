@@ -41,12 +41,8 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
     ////////////////////////////////////////// interface NSDirectory //////////////////////////////////////////
 
     public void changeDir(URL dir) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
-        float timeout = this.getTimeout("changeDir");
-        if (timeout == WAIT_FOREVER) {
-            super.changeDirSync(dir);
-        } else {
-            throw new NotImplementedException("Configuring user timeout is not supported for method: changeDir");
-        }
+        // can not hang...
+        super.changeDirSync(dir);
     }
 
     public List<URL> list(String pattern, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {

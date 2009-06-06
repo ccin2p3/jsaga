@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.adaptor.job;
 
 import fr.in2p3.jsaga.adaptor.WaitForEverAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.*;
 import org.ogf.saga.error.*;
 
@@ -19,16 +20,18 @@ import java.util.Map;
 /**
  *
  */
-public class WaitForEverJobAdaptor extends WaitForEverAdaptorAbstract implements JobControlAdaptor, QueryIndividualJob {
+public class WaitForEverJobAdaptor extends WaitForEverAdaptorAbstract implements JobControlAdaptor, QueryIndividualJob, ListableJobAdaptor {
     public String getType() {
         return "waitforever";
     }
+
+    /////////////////////////////////////////// interface JobAdaptor ///////////////////////////////////////////
 
     public String[] getSupportedSandboxProtocols() {
         return null;
     }
     public String getTranslator() {
-        return null;
+        return "xsl/job/hang.xsl";
     }
     public Map getTranslatorParameters() {
         return null;
@@ -40,8 +43,10 @@ public class WaitForEverJobAdaptor extends WaitForEverAdaptorAbstract implements
         return this;
     }
 
+    //////////////////////////////////////// interface JobControlAdaptor ////////////////////////////////////////
+
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
-        hang();
+        mayHang(jobDesc);
         return "myjobid";
     }
 
@@ -49,11 +54,20 @@ public class WaitForEverJobAdaptor extends WaitForEverAdaptorAbstract implements
         hang();
     }
 
+    //////////////////////////////////////// interface QueryIndividualJob ////////////////////////////////////////
+
     public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
         hang();
         return new JobStatus(nativeJobId, null, null){
             public String getModel() {return "hang";}
-            public SubState getSubState() {return SubState.DONE;}
+            public SubState getSubState() {return SubState.RUNNING_ACTIVE;}
         };
+    }
+
+    //////////////////////////////////////// interface ListableJobAdaptor ////////////////////////////////////////
+
+    public String[] list() throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        hang();
+        return new String[0];
     }
 }

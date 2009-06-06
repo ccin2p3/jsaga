@@ -50,7 +50,7 @@ public class TimeoutableDirectoryImplTest extends AbstractTest {
     public void test_openDirectory() throws Exception {
         try {
             m_directory.openDirectory(URLFactory.createURL(m_urlDir), Flags.CREATE.getValue());
-            fail("Expected exception: "+ TimeoutException.class);
+            fail("Expected exception: "+ NotImplementedException.class);
         } catch (NotImplementedException e) {
             s_logger.info(e.getMessage());
         }
@@ -60,7 +60,7 @@ public class TimeoutableDirectoryImplTest extends AbstractTest {
     public void test_openFile() throws Exception {
         try {
             m_directory.openFile(URLFactory.createURL(m_urlFile), Flags.READ.getValue());
-            fail("Expected exception: "+ TimeoutException.class);
+            fail("Expected exception: "+ NotImplementedException.class);
         } catch (NotImplementedException e) {
             s_logger.info(e.getMessage());
         }

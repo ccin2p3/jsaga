@@ -43,12 +43,8 @@ public class TimeoutableAbstractNSDirectoryImplTest extends AbstractTest {
     }
 
     public void test_changeDir() throws Exception {
-        try {
-            m_directory.changeDir(URLFactory.createURL("new_directory/"));
-            fail("Expected exception: "+NotImplementedException.class);
-        } catch (NotImplementedException e) {
-            s_logger.info(e.getMessage());
-        }
+        // can not hang...
+        m_directory.changeDir(URLFactory.createURL("new_directory/"));
     }
 
     public void test_list() throws Exception {

@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.impl.permissions;
 
-import fr.in2p3.jsaga.impl.task.AbstractTaskImplWithAsyncAttributes;
+import fr.in2p3.jsaga.impl.task.AbstractAsyncTaskImpl;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.Job;
 import org.ogf.saga.permissions.Permissions;
@@ -20,7 +20,7 @@ import org.ogf.saga.task.TaskMode;
 /**
  *
  */
-public abstract class AbstractJobPermissionsImpl extends AbstractTaskImplWithAsyncAttributes<Void,Void,Job> implements Permissions<Job> {
+public abstract class AbstractJobPermissionsImpl extends AbstractAsyncTaskImpl<Job> implements Permissions<Job> {
     /** constructor */
     public AbstractJobPermissionsImpl(Session session, boolean create) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         super(session, create);

@@ -1,16 +1,12 @@
 package fr.in2p3.jsaga.impl.job;
 
-import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.engine.factories.JobAdaptorFactory;
 import fr.in2p3.jsaga.engine.factories.JobMonitorAdaptorFactory;
-import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
-import fr.in2p3.jsaga.engine.job.monitor.JobMonitorServiceFactory;
-import fr.in2p3.jsaga.impl.job.description.SAGAJobDescriptionImpl;
-import fr.in2p3.jsaga.impl.job.service.JobServiceImpl;
-import fr.in2p3.jsaga.impl.job.service.LateBindedJobServiceImpl;
-import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
+import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
+import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
-import org.ogf.saga.job.*;
+import org.ogf.saga.job.JobFactory;
+import org.ogf.saga.job.JobService;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
@@ -28,49 +24,38 @@ import org.ogf.saga.url.URL;
 /**
  *
  */
-public class JobFactoryImpl extends JobFactory {
-    private JobAdaptorFactory m_adaptorFactory;
-    private JobMonitorServiceFactory m_monitorServiceFactory;
-
+public class JobFactoryImpl extends AbstractAsyncJobFactoryImpl {
     public JobFactoryImpl(JobAdaptorFactory adaptorFactory, JobMonitorAdaptorFactory monitorAdaptorFactory) {
-        m_adaptorFactory = adaptorFactory;
-        m_monitorServiceFactory = new JobMonitorServiceFactory(monitorAdaptorFactory);
+        super(adaptorFactory, monitorAdaptorFactory);
     }
 
-    protected JobDescription doCreateJobDescription() throws NotImplementedException {
-        try {
-            return new SAGAJobDescriptionImpl();
-        } catch (Exception e) {
-            throw new NotImplementedException("INTERNAL ERROR: Unexpected exception");
-        }
-    }
-
-    //NOTICE: resource discovery should NOT be done here because it should depend on the job description
     protected JobService doCreateJobService(Session session, URL rm) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
-        if (rm!=null && !rm.toString().equals("")) {
-            JobControlAdaptor controlAdaptor;
-            try {
-                controlAdaptor = m_adaptorFactory.getJobControlAdaptor(rm, session);
-            } catch (BadParameterException e) {
-                throw new NoSuccessException(e);
-            }
-            JobMonitorService monitorService;
-            try {
-                monitorService = m_monitorServiceFactory.getJobMonitorService(rm, session);
-            } catch (BadParameterException e) {
-                throw new NoSuccessException(e);
-            }
-            return new JobServiceImpl(session, rm, controlAdaptor, monitorService);
+        float timeout = this.getTimeout("createJobService", rm);
+        if (timeout == SagaObject.WAIT_FOREVER) {
+            return this.doCreateJobServiceSync(session, rm);
         } else {
-            return new LateBindedJobServiceImpl(session);
+            try {
+                return (JobService) this.getResult(createJobService(TaskMode.ASYNC, session, rm), timeout);
+            }
+            catch (BadParameterException e) {throw new NoSuccessException(e);}
+            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         }
     }
 
-    protected Task<JobFactory, JobService> doCreateJobService(TaskMode mode, Session session, URL rm) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<JobFactory,JobService>().create(
-                mode, null, this,
-                "doCreateJobService",
-                new Class[]{Session.class, URL.class},
-                new Object[]{session, rm});
+    ////////////////////////////////////////// private methods //////////////////////////////////////////
+
+    private float getTimeout(String methodName, URL rm) throws NoSuccessException {
+        return AbstractSagaObjectImpl.getTimeout(JobFactory.class, methodName, rm.getScheme());
+    }
+
+    private Object getResult(Task task, float timeout)
+            throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException,
+            BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException,
+            TimeoutException, NoSuccessException
+    {
+        return AbstractSagaObjectImpl.getResult(task, timeout);
     }
 }
