@@ -110,42 +110,18 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job {
     }
 
     public OutputStream getStdin() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
-        float timeout = this.getTimeout("getStdin");
-        if (timeout == WAIT_FOREVER) {
-            return super.getStdinSync();
-        } else {
-            try {
-                return (OutputStream) getResult(super.getStdin(TaskMode.ASYNC), timeout);
-            }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-        }
+        // can not hang...
+        return super.getStdinSync();
     }
 
     public InputStream getStdout() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
-        float timeout = this.getTimeout("getStdout");
-        if (timeout == WAIT_FOREVER) {
-            return super.getStdoutSync();
-        } else {
-            try {
-                return (InputStream) getResult(super.getStdout(TaskMode.ASYNC), timeout);
-            }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-        }
+        // can not hang...
+        return super.getStdoutSync();
     }
 
     public InputStream getStderr() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
-        float timeout = this.getTimeout("getStderr");
-        if (timeout == WAIT_FOREVER) {
-            return super.getStderrSync();
-        } else {
-            try {
-                return (InputStream) getResult(super.getStderr(TaskMode.ASYNC), timeout);
-            }
-            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
-            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
-        }
+        // can not hang...
+        return super.getStderrSync();
     }
 
     public void suspend() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {

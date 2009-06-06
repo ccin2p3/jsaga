@@ -2,10 +2,13 @@ package fr.in2p3.jsaga.adaptor.job;
 
 import fr.in2p3.jsaga.adaptor.WaitForEverAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.*;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobInteractiveSet;
 import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.*;
 import org.ogf.saga.error.*;
 
+import java.io.*;
 import java.util.Map;
 
 /* ***************************************************
@@ -20,7 +23,10 @@ import java.util.Map;
 /**
  *
  */
-public class WaitForEverJobAdaptor extends WaitForEverAdaptorAbstract implements JobControlAdaptor, QueryIndividualJob, ListableJobAdaptor {
+public class WaitForEverJobAdaptor extends WaitForEverAdaptorAbstract
+        implements JobControlAdaptor, QueryIndividualJob, ListableJobAdaptor, StreamableJobInteractiveSet,
+        SuspendableJobAdaptor, CheckpointableJobAdaptor, SignalableJobAdaptor
+{
     public String getType() {
         return "waitforever";
     }
@@ -41,6 +47,13 @@ public class WaitForEverJobAdaptor extends WaitForEverAdaptorAbstract implements
     }
     public JobMonitorAdaptor getDefaultJobMonitor() {
         return this;
+    }
+
+    //////////////////////////////////////// interface Streamable* ////////////////////////////////////////
+
+    public String submitInteractive(String jobDesc, boolean checkMatch, InputStream stdin, OutputStream stdout, OutputStream stderr) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        mayHang(jobDesc);
+        return "myjobid";
     }
 
     //////////////////////////////////////// interface JobControlAdaptor ////////////////////////////////////////
@@ -69,5 +82,31 @@ public class WaitForEverJobAdaptor extends WaitForEverAdaptorAbstract implements
     public String[] list() throws PermissionDeniedException, TimeoutException, NoSuccessException {
         hang();
         return new String[0];
+    }
+
+    ////////////////////////////////////// interface SuspendableJobAdaptor //////////////////////////////////////
+
+    public boolean suspend(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        hang();
+        return true;
+    }
+
+    public boolean resume(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        hang();
+        return true;
+    }
+
+    ///////////////////////////////////// interface CheckpointableJobAdaptor /////////////////////////////////////
+
+    public boolean checkpoint(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        hang();
+        return true;
+    }
+
+    /////////////////////////////////////// interface SignalableJobAdaptor ///////////////////////////////////////
+
+    public boolean signal(String nativeJobId, int signum) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        hang();
+        return true;
     }
 }

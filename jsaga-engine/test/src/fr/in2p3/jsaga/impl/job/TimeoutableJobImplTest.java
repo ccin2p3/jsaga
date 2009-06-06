@@ -35,6 +35,7 @@ public class TimeoutableJobImplTest extends AbstractTest {
         JobService service = JobFactory.createJobService(emptySession, url);
         JobDescription description = JobFactory.createJobDescription();
         description.setAttribute(JobDescription.EXECUTABLE, "/usr/bin/ls");
+        description.setAttribute(JobDescription.INTERACTIVE, "true");
         m_job = service.createJob(description);
         m_job.run();
     }
@@ -52,32 +53,19 @@ public class TimeoutableJobImplTest extends AbstractTest {
         }
     }
 
-/*
     public void test_getStdin() throws Exception {
-        try {
-            m_job.getStdin();
-            fail("Expected exception: "+ TimeoutException.class);
-        } catch (TimeoutException e) {
-            assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
-        }
+        // hang on getState()
+        try{m_job.getStdin();} catch(TimeoutException e){}
     }
 
     public void test_getStdout() throws Exception {
-        try {
-            m_job.getStdout();
-            fail("Expected exception: "+ TimeoutException.class);
-        } catch (TimeoutException e) {
-            assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
-        }
+        // can not hang...
+        m_job.getStdout();
     }
 
     public void test_getStderr() throws Exception {
-        try {
-            m_job.getStderr();
-            fail("Expected exception: "+ TimeoutException.class);
-        } catch (TimeoutException e) {
-            assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
-        }
+        // can not hang...
+        m_job.getStderr();
     }
 
     public void test_suspend() throws Exception {
@@ -107,6 +95,7 @@ public class TimeoutableJobImplTest extends AbstractTest {
         }
     }
 
+/*
     public void test_migrate() throws Exception {
         try {
             JobDescription description = JobFactory.createJobDescription();
@@ -117,6 +106,7 @@ public class TimeoutableJobImplTest extends AbstractTest {
             assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
         }
     }
+*/
 
     public void test_signal() throws Exception {
         try {
@@ -126,5 +116,4 @@ public class TimeoutableJobImplTest extends AbstractTest {
             assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
         }
     }
-*/
 }
