@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl.task;
 
+import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.*;
@@ -16,7 +17,7 @@ import org.ogf.saga.task.*;
 /**
  *
  */
-public abstract class AbstractAsyncTaskImpl<A> extends AbstractTaskImplWithAsyncAttributes<Void,Void,A> {
+public abstract class AbstractAsyncTaskImpl<A extends SagaObject> extends AbstractTaskImplWithAsyncAttributes<Void,Void,A> {
     /** constructor */
     protected AbstractAsyncTaskImpl(Session session, boolean create) throws NotImplementedException {
         super(session, create);

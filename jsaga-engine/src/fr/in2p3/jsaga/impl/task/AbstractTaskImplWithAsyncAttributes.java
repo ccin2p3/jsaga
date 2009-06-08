@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.impl.task;
 
 import fr.in2p3.jsaga.impl.attributes.AbstractAsyncAttributesImpl;
 import fr.in2p3.jsaga.impl.attributes.AttributeImpl;
+import org.ogf.saga.SagaObject;
 import org.ogf.saga.attributes.AsyncAttributes;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
@@ -20,7 +21,7 @@ import org.ogf.saga.task.TaskMode;
 /**
  *
  */
-public abstract class AbstractTaskImplWithAsyncAttributes<T,E,A> extends AbstractTaskImpl<T,E> implements AsyncAttributes<A> {
+public abstract class AbstractTaskImplWithAsyncAttributes<T,E,A extends SagaObject> extends AbstractTaskImpl<T,E> implements AsyncAttributes<A> {
     private AbstractAsyncAttributesImpl<A> m_attributes;
 
     /** constructor */

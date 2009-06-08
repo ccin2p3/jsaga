@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.impl.file.copy;
 
 import fr.in2p3.jsaga.impl.file.AbstractSyncFileImpl;
+import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.TaskMode;
@@ -18,7 +19,7 @@ import org.ogf.saga.url.URL;
 /**
  *
  */
-public class FileCopyFromTask<T,E> extends AbstractCopyFromTask<T,E> {
+public class FileCopyFromTask<T extends SagaObject,E> extends AbstractCopyFromTask<T,E> {
     private AbstractSyncFileImpl m_targetFile;
 
     /** constructor */

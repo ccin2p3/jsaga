@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.impl.file.copy;
 
 import fr.in2p3.jsaga.impl.monitoring.*;
 import fr.in2p3.jsaga.impl.task.AbstractTaskImplWithAsyncAttributes;
+import org.ogf.saga.SagaObject;
 import org.ogf.saga.attributes.AsyncAttributes;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
@@ -20,7 +21,7 @@ import org.ogf.saga.url.URL;
 /**
  *
  */
-public abstract class AbstractCopyFromTask<T,E> extends AbstractTaskImplWithAsyncAttributes<T,E,T> implements Task<T,E>, AsyncAttributes<T> {
+public abstract class AbstractCopyFromTask<T extends SagaObject,E> extends AbstractTaskImplWithAsyncAttributes<T,E,T> implements Task<T,E>, AsyncAttributes<T> {
     // internal
     private URL m_source;
     private int m_flags;

@@ -17,15 +17,13 @@ import org.ogf.saga.task.*;
  *
  */
 public abstract class AbstractThreadedTask<T extends SagaObject,E> extends AbstractTaskImpl<T,E> implements Task<T,E> {
-    protected Object[] args;
     private Thread m_thread;
 
     /** constructor */
-    public AbstractThreadedTask(TaskMode mode, Object... arguments) throws NotImplementedException {
+    public AbstractThreadedTask(TaskMode mode) throws NotImplementedException {
         super(null, null, true);
 
         // set thread
-        args = arguments;
         m_thread = new Thread(new Runnable(){
             public void run() {
                 AbstractThreadedTask.super.setState(State.RUNNING);
