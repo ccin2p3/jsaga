@@ -12,4 +12,21 @@
             </answer>
         </faq>
     </part>
+    <part id="execution">
+        <title>Execution management</title>
+        <faq id="failure">
+            <question>It fails with this error message:
+                <pre>AuthenticationFailed: No client transport named 'https' found!</pre>
+            </question>
+            <answer>Re-install JSAGA without the SRM plug-in</answer>
+        </faq>
+        <faq id="log4j">
+            <question>How to get rid of this error message:
+                <pre>org.glite.security.util.FileEndingIterator : Error while reading directory null</pre>
+            </question>
+            <answer>Add this line to your LOG4J configuration file ($JSAGA_HOME/etc/log4j.properties by default):
+                <pre>log4j.logger.org.glite.security.util.FileEndingIterator=FATAL</pre>
+            </answer>
+        </faq>
+    </part>
 </faqs>
