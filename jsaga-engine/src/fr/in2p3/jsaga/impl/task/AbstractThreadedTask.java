@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.impl.task;
 
-import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
 import org.ogf.saga.task.*;
 
@@ -16,7 +15,7 @@ import org.ogf.saga.task.*;
 /**
  *
  */
-public abstract class AbstractThreadedTask<T extends SagaObject,E> extends AbstractTaskImpl<T,E> implements Task<T,E> {
+public abstract class AbstractThreadedTask<T,E> extends AbstractTaskImpl<T,E> implements Task<T,E> {
     private Thread m_thread;
 
     /** constructor */

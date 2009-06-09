@@ -1,8 +1,9 @@
 package fr.in2p3.jsaga.impl.attributes;
 
-import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
+import fr.in2p3.jsaga.impl.task.AbstractThreadedTask;
 import org.ogf.saga.attributes.AsyncAttributes;
-import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.attributes.Attributes;
+import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
@@ -19,7 +20,7 @@ import org.ogf.saga.task.TaskMode;
 /**
  *
  */
-public abstract class AbstractAsyncAttributesImpl<T> extends AbstractAttributesImpl implements AsyncAttributes<T> {
+public abstract class AbstractAsyncAttributesImpl<T extends Attributes> extends AbstractAttributesImpl implements AsyncAttributes<T> {
     private T m_object;
 
     public AbstractAsyncAttributesImpl(Session session, T object) {
@@ -27,91 +28,94 @@ public abstract class AbstractAsyncAttributesImpl<T> extends AbstractAttributesI
         m_object = object;
     }
 
-    public Task<T, Void> setAttribute(TaskMode mode, String key, String value) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<T,Void>().create(
-                mode, m_session, m_object,
-                "setAttribute",
-                new Class[]{String.class, String.class},
-                new Object[]{key, value});
+    public Task<T, Void> setAttribute(TaskMode mode, final String key, final String value) throws NotImplementedException {
+        return new AbstractThreadedTask<T,Void>(mode){
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                m_object.setAttribute(key, value);
+                return null;
+            }
+        };
     }
 
-    public Task<T, String> getAttribute(TaskMode mode, String key) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<T,String>().create(
-                mode, m_session, m_object,
-                "getAttribute",
-                new Class[]{String.class},
-                new Object[]{key});
+    public Task<T, String> getAttribute(TaskMode mode, final String key) throws NotImplementedException {
+        return new AbstractThreadedTask<T,String>(mode) {
+            public String invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return m_object.getAttribute(key);
+            }
+        };
     }
 
-    public Task<T, Void> setVectorAttribute(TaskMode mode, String key, String[] values) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<T,Void>().create(
-                mode, m_session, m_object,
-                "setVectorAttribute",
-                new Class[]{String.class, String[].class},
-                new Object[]{key, values});
+    public Task<T, Void> setVectorAttribute(TaskMode mode, final String key, final String[] values) throws NotImplementedException {
+        return new AbstractThreadedTask<T,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                m_object.setVectorAttribute(key, values);
+                return null;
+            }
+        };
     }
 
-    public Task<T, String[]> getVectorAttribute(TaskMode mode, String key) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<T,String[]>().create(
-                mode, m_session, m_object,
-                "getVectorAttribute",
-                new Class[]{String.class},
-                new Object[]{key});
+    public Task<T, String[]> getVectorAttribute(TaskMode mode, final String key) throws NotImplementedException {
+        return new AbstractThreadedTask<T,String[]>(mode) {
+            public String[] invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return m_object.getVectorAttribute(key);
+            }
+        };
     }
 
-    public Task<T, Void> removeAttribute(TaskMode mode, String key) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<T,Void>().create(
-                mode, m_session, m_object,
-                "removeAttribute",
-                new Class[]{String.class},
-                new Object[]{key});
+    public Task<T, Void> removeAttribute(TaskMode mode, final String key) throws NotImplementedException {
+        return new AbstractThreadedTask<T,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                m_object.removeAttribute(key);
+                return null;
+            }
+        };
     }
 
     public Task<T, String[]> listAttributes(TaskMode mode) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<T,String[]>().create(
-                mode, m_session, m_object,
-                "listAttributes",
-                new Class[]{},
-                new Object[]{});
+        return new AbstractThreadedTask<T,String[]>(mode) {
+            public String[] invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return m_object.listAttributes();
+            }
+        };
     }
 
-    public Task<T, String[]> findAttributes(TaskMode mode, String... patterns) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<T,String[]>().create(
-                mode, m_session, m_object,
-                "findAttributes",
-                new Class[]{String[].class},
-                new Object[]{patterns});
+    public Task<T, String[]> findAttributes(TaskMode mode, final String... patterns) throws NotImplementedException {
+        return new AbstractThreadedTask<T,String[]>(mode) {
+            public String[] invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return m_object.findAttributes(patterns);
+            }
+        };
     }
 
-    public Task<T, Boolean> isReadOnlyAttribute(TaskMode mode, String key) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<T,Boolean>().create(
-                mode, m_session, m_object,
-                "isReadOnlyAttribute",
-                new Class[]{String.class},
-                new Object[]{key});
+    public Task<T, Boolean> isReadOnlyAttribute(TaskMode mode, final String key) throws NotImplementedException {
+        return new AbstractThreadedTask<T,Boolean>(mode) {
+            public Boolean invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return m_object.isReadOnlyAttribute(key);
+            }
+        };
     }
 
-    public Task<T, Boolean> isWritableAttribute(TaskMode mode, String key) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<T,Boolean>().create(
-                mode, m_session, m_object,
-                "isWritableAttribute",
-                new Class[]{String.class},
-                new Object[]{key});
+    public Task<T, Boolean> isWritableAttribute(TaskMode mode, final String key) throws NotImplementedException {
+        return new AbstractThreadedTask<T,Boolean>(mode) {
+            public Boolean invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return m_object.isWritableAttribute(key);
+            }
+        };
     }
 
-    public Task<T, Boolean> isRemovableAttribute(TaskMode mode, String key) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<T,Boolean>().create(
-                mode, m_session, m_object,
-                "isRemovableAttribute",
-                new Class[]{String.class},
-                new Object[]{key});
+    public Task<T, Boolean> isRemovableAttribute(TaskMode mode, final String key) throws NotImplementedException {
+        return new AbstractThreadedTask<T,Boolean>(mode) {
+            public Boolean invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return m_object.isRemovableAttribute(key);
+            }
+        };
     }
 
-    public Task<T, Boolean> isVectorAttribute(TaskMode mode, String key) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<T,Boolean>().create(
-                mode, m_session, m_object,
-                "isVectorAttribute",
-                new Class[]{String.class},
-                new Object[]{key});
+    public Task<T, Boolean> isVectorAttribute(TaskMode mode, final String key) throws NotImplementedException {
+        return new AbstractThreadedTask<T,Boolean>(mode) {
+            public Boolean invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return m_object.isVectorAttribute(key);
+            }
+        };
     }
 }

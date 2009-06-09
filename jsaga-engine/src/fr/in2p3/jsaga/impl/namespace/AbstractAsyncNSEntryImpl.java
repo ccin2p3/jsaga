@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.impl.namespace;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
-import fr.in2p3.jsaga.impl.file.DirectoryImpl;
-import fr.in2p3.jsaga.impl.file.FileImpl;
+import fr.in2p3.jsaga.impl.file.AbstractSyncDirectoryImpl;
+import fr.in2p3.jsaga.impl.file.AbstractSyncFileImpl;
 import fr.in2p3.jsaga.impl.file.copy.*;
 import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
 import org.ogf.saga.error.*;
@@ -100,10 +100,10 @@ public abstract class AbstractAsyncNSEntryImpl extends AbstractSyncNSEntryImpl i
     }
 
     public Task<NSEntry, Void> copy(TaskMode mode, URL target, int flags) throws NotImplementedException {
-        if (this instanceof FileImpl) {
-            return new FileCopyTask<NSEntry,Void>(mode, m_session, (FileImpl) this, target, flags);
-        } else if (this instanceof DirectoryImpl) {
-            return new DirectoryCopyTask<NSEntry,Void>(mode, m_session, (DirectoryImpl) this, target, flags);
+        if (this instanceof AbstractSyncFileImpl) {
+            return new FileCopyTask<NSEntry,Void>(mode, m_session, (AbstractSyncFileImpl) this, target, flags);
+        } else if (this instanceof AbstractSyncDirectoryImpl) {
+            return new DirectoryCopyTask<NSEntry,Void>(mode, m_session, (AbstractSyncDirectoryImpl) this, target, flags);
         } else {
             return new GenericThreadedTaskFactory<NSEntry,Void>().create(
                     mode, m_session, this,
@@ -117,10 +117,10 @@ public abstract class AbstractAsyncNSEntryImpl extends AbstractSyncNSEntryImpl i
     }
 
     public Task<NSEntry, Void> copyFrom(TaskMode mode, URL source, int flags) throws NotImplementedException {
-        if (this instanceof FileImpl) {
-            return new FileCopyFromTask<NSEntry,Void>(mode, m_session, (FileImpl) this, source, flags);
-        } else if (this instanceof DirectoryImpl) {
-            return new DirectoryCopyFromTask<NSEntry,Void>(mode, m_session, (DirectoryImpl) this, source, flags);
+        if (this instanceof AbstractSyncFileImpl) {
+            return new FileCopyFromTask<NSEntry,Void>(mode, m_session, (AbstractSyncFileImpl) this, source, flags);
+        } else if (this instanceof AbstractSyncDirectoryImpl) {
+            return new DirectoryCopyFromTask<NSEntry,Void>(mode, m_session, (AbstractSyncDirectoryImpl) this, source, flags);
         } else {
             return new GenericThreadedTaskFactory<NSEntry,Void>().create(
                     mode, m_session, this,
