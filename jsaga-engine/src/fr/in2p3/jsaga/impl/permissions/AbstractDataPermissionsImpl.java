@@ -6,7 +6,7 @@ import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
-import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
+import fr.in2p3.jsaga.impl.task.AbstractThreadedTask;
 import fr.in2p3.jsaga.impl.url.URLImpl;
 import fr.in2p3.jsaga.sync.namespace.SyncNSEntry;
 import org.ogf.saga.SagaObject;
@@ -133,44 +133,46 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
 
     //////////////////////////////////////////// Asynchronous ////////////////////////////////////////////
 
-    public Task<NSEntry, Void> permissionsAllow(TaskMode mode, String id, int permissions) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSEntry,Void>().create(
-                mode, m_session, (NSEntry) this,
-                "permissionsAllow",
-                new Class[]{String.class, int.class},
-                new Object[]{id, permissions});
+    public Task<NSEntry, Void> permissionsAllow(TaskMode mode, final String id, final int permissions) throws NotImplementedException {
+        return new AbstractThreadedTask<NSEntry,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractDataPermissionsImpl.this.permissionsAllow(id, permissions);
+                return null;
+            }
+        };
     }
 
-    public Task<NSEntry, Void> permissionsDeny(TaskMode mode, String id, int permissions) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSEntry,Void>().create(
-                mode, m_session, (NSEntry) this,
-                "permissionsDeny",
-                new Class[]{String.class, int.class},
-                new Object[]{id, permissions});
+    public Task<NSEntry, Void> permissionsDeny(TaskMode mode, final String id, final int permissions) throws NotImplementedException {
+        return new AbstractThreadedTask<NSEntry,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractDataPermissionsImpl.this.permissionsDeny(id, permissions);
+                return null;
+            }
+        };
     }
 
-    public Task<NSEntry, Boolean> permissionsCheck(TaskMode mode, String id, int permissions) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSEntry,Boolean>().create(
-                mode, m_session, (NSEntry) this,
-                "permissionsCheck",
-                new Class[]{String.class, int.class},
-                new Object[]{id, permissions});
+    public Task<NSEntry, Boolean> permissionsCheck(TaskMode mode, final String id, final int permissions) throws NotImplementedException {
+        return new AbstractThreadedTask<NSEntry,Boolean>(mode) {
+            public Boolean invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractDataPermissionsImpl.this.permissionsCheck(id, permissions);
+            }
+        };
     }
 
     public Task<NSEntry, String> getOwner(TaskMode mode) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSEntry,String>().create(
-                mode, m_session, (NSEntry) this,
-                "getOwner",
-                new Class[]{},
-                new Object[]{});
+        return new AbstractThreadedTask<NSEntry,String>(mode) {
+            public String invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractDataPermissionsImpl.this.getOwner();
+            }
+        };
     }
 
     public Task<NSEntry, String> getGroup(TaskMode mode) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSEntry,String>().create(
-                mode, m_session, (NSEntry) this,
-                "getGroup",
-                new Class[]{},
-                new Object[]{});
+        return new AbstractThreadedTask<NSEntry,String>(mode) {
+            public String invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractDataPermissionsImpl.this.getGroup();
+            }
+        };
     }
 
     protected FileAttributes _getFileAttributes() throws NotImplementedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {

@@ -3,10 +3,9 @@ package fr.in2p3.jsaga.impl.file;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSDirectoryImpl;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
-import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
+import fr.in2p3.jsaga.impl.task.AbstractThreadedTask;
 import org.ogf.saga.error.*;
 import org.ogf.saga.file.*;
-import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
@@ -42,63 +41,79 @@ public abstract class AbstractAsyncDirectoryImpl extends AbstractSyncDirectoryIm
 
     ////////////////////////////////////////// interface Directory //////////////////////////////////////////
 
-    public Task<Directory, Long> getSize(TaskMode mode, URL name, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<Directory,Long>().create(
-                mode, m_session, this,
-                "getSizeSync",
-                new Class[]{URL.class, int.class},
-                new Object[]{name, flags});
+    public Task<Directory, Long> getSize(TaskMode mode, final URL name, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<Directory,Long>(mode) {
+            public Long invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncDirectoryImpl.super.getSizeSync(name, flags);
+            }
+        };
     }
-    public Task<Directory, Long> getSize(TaskMode mode, URL name) throws NotImplementedException {
-        return this.getSize(mode, name, Flags.NONE.getValue());
-    }
-
-    public Task<Directory, Boolean> isFile(TaskMode mode, URL name) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<Directory,Boolean>().create(
-                mode, m_session, this,
-                "isFileSync",
-                new Class[]{URL.class},
-                new Object[]{name});
+    public Task<Directory, Long> getSize(TaskMode mode, final URL name) throws NotImplementedException {
+        return new AbstractThreadedTask<Directory,Long>(mode) {
+            public Long invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncDirectoryImpl.super.getSizeSync(name);
+            }
+        };
     }
 
-    public Task<Directory, Directory> openDirectory(TaskMode mode, URL name, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<Directory,Directory>().create(
-                mode, m_session, this,
-                "openDirectory",
-                new Class[]{URL.class, int.class},
-                new Object[]{name, flags});
-    }
-    public Task<Directory, Directory> openDirectory(TaskMode mode, URL name) throws NotImplementedException {
-        return this.openDirectory(mode, name, Flags.READ.getValue());
+    public Task<Directory, Boolean> isFile(TaskMode mode, final URL name) throws NotImplementedException {
+        return new AbstractThreadedTask<Directory,Boolean>(mode) {
+            public Boolean invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncDirectoryImpl.super.isFileSync(name);
+            }
+        };
     }
 
-    public Task<Directory, File> openFile(TaskMode mode, URL name, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<Directory,File>().create(
-                mode, m_session, this,
-                "openFile",
-                new Class[]{URL.class, int.class},
-                new Object[]{name, flags});
+    public Task<Directory, Directory> openDirectory(TaskMode mode, final URL name, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<Directory,Directory>(mode) {
+            public Directory invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncDirectoryImpl.super.openDirectory(name, flags);
+            }
+        };
     }
-    public Task<Directory, File> openFile(TaskMode mode, URL name) throws NotImplementedException {
-        return this.openFile(mode, name, Flags.READ.getValue());
-    }
-
-    public Task<Directory, FileInputStream> openFileInputStream(TaskMode mode, URL name) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<Directory,FileInputStream>().create(
-                mode, m_session, this,
-                "openFileInputStreamSync",
-                new Class[]{URL.class},
-                new Object[]{name});
+    public Task<Directory, Directory> openDirectory(TaskMode mode, final URL name) throws NotImplementedException {
+        return new AbstractThreadedTask<Directory,Directory>(mode) {
+            public Directory invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncDirectoryImpl.super.openDirectory(name);
+            }
+        };
     }
 
-    public Task<Directory, FileOutputStream> openFileOutputStream(TaskMode mode, URL name, boolean append) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<Directory,FileOutputStream>().create(
-                mode, m_session, this,
-                "openFileOutputStreamSync",
-                new Class[]{URL.class, boolean.class},
-                new Object[]{name, append});
+    public Task<Directory, File> openFile(TaskMode mode, final URL name, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<Directory,File>(mode) {
+            public File invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncDirectoryImpl.super.openFile(name, flags);
+            }
+        };
     }
-    public Task<Directory, FileOutputStream> openFileOutputStream(TaskMode mode, URL name) throws NotImplementedException {
-        return this.openFileOutputStream(mode, name, false);
+    public Task<Directory, File> openFile(TaskMode mode, final URL name) throws NotImplementedException {
+        return new AbstractThreadedTask<Directory,File>(mode) {
+            public File invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncDirectoryImpl.super.openFile(name);
+            }
+        };
+    }
+
+    public Task<Directory, FileInputStream> openFileInputStream(TaskMode mode, final URL name) throws NotImplementedException {
+        return new AbstractThreadedTask<Directory,FileInputStream>(mode) {
+            public FileInputStream invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncDirectoryImpl.super.openFileInputStreamSync(name);
+            }
+        };
+    }
+
+    public Task<Directory, FileOutputStream> openFileOutputStream(TaskMode mode, final URL name, final boolean append) throws NotImplementedException {
+        return new AbstractThreadedTask<Directory,FileOutputStream>(mode) {
+            public FileOutputStream invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncDirectoryImpl.super.openFileOutputStreamSync(name, append);
+            }
+        };
+    }
+    public Task<Directory, FileOutputStream> openFileOutputStream(TaskMode mode, final URL name) throws NotImplementedException {
+        return new AbstractThreadedTask<Directory,FileOutputStream>(mode) {
+            public FileOutputStream invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncDirectoryImpl.super.openFileOutputStreamSync(name);
+            }
+        };
     }
 }

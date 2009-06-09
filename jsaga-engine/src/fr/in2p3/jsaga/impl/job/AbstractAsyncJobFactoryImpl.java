@@ -2,8 +2,8 @@ package fr.in2p3.jsaga.impl.job;
 
 import fr.in2p3.jsaga.engine.factories.JobAdaptorFactory;
 import fr.in2p3.jsaga.engine.factories.JobMonitorAdaptorFactory;
-import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
-import org.ogf.saga.error.NotImplementedException;
+import fr.in2p3.jsaga.impl.task.AbstractThreadedTask;
+import org.ogf.saga.error.*;
 import org.ogf.saga.job.JobFactory;
 import org.ogf.saga.job.JobService;
 import org.ogf.saga.session.Session;
@@ -28,11 +28,11 @@ public abstract class AbstractAsyncJobFactoryImpl extends AbstractSyncJobFactory
         super(adaptorFactory, monitorAdaptorFactory);
     }
 
-    protected Task<JobFactory, JobService> doCreateJobService(TaskMode mode, Session session, URL rm) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<JobFactory,JobService>().create(
-                mode, null, this,
-                "doCreateJobServiceSync",
-                new Class[]{Session.class, URL.class},
-                new Object[]{session, rm});
+    protected Task<JobFactory, JobService> doCreateJobService(TaskMode mode, final Session session, final URL rm) throws NotImplementedException {
+        return new AbstractThreadedTask<JobFactory,JobService>(mode) {
+            public JobService invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncJobFactoryImpl.super.doCreateJobServiceSync(session, rm);
+            }
+        };
     }
 }

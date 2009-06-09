@@ -1,14 +1,14 @@
 package fr.in2p3.jsaga.impl.file.stream;
 
-import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
+import fr.in2p3.jsaga.impl.task.AbstractThreadedTask;
 import org.ogf.saga.SagaObject;
-import org.ogf.saga.error.DoesNotExistException;
-import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.*;
 import org.ogf.saga.file.FileOutputStream;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
 
+import java.io.IOException;
 import java.util.UUID;
 
 /* ***************************************************
@@ -57,35 +57,55 @@ public abstract class AbstractAsyncFileOutputStreamImpl extends FileOutputStream
 
     ///////////////////////////////// interface FileInputStream /////////////////////////////////
 
-    public Task<FileOutputStream, Void> write(TaskMode mode, int b) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<FileOutputStream,Void>().create(
-                mode, m_session, this,
-                "write",
-                new Class[]{int.class},
-                new Object[]{b});
+    public Task<FileOutputStream, Void> write(TaskMode mode, final int b) throws NotImplementedException {
+        return new AbstractThreadedTask<FileOutputStream,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                try {
+                    AbstractAsyncFileOutputStreamImpl.this.write(b);
+                    return null;
+                } catch (IOException e) {
+                    throw new NoSuccessException(e);
+                }
+            }
+        };
     }
 
-    public Task<FileOutputStream, Void> write(TaskMode mode, byte[] buf, int off, int len) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<FileOutputStream,Void>().create(
-                mode, m_session, this,
-                "write",
-                new Class[]{byte[].class, int.class, int.class},
-                new Object[]{buf, off, len});
+    public Task<FileOutputStream, Void> write(TaskMode mode, final byte[] buf, final int off, final int len) throws NotImplementedException {
+        return new AbstractThreadedTask<FileOutputStream,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                try {
+                    AbstractAsyncFileOutputStreamImpl.this.write(buf, off, len);
+                    return null;
+                } catch (IOException e) {
+                    throw new NoSuccessException(e);
+                }
+            }
+        };
     }
 
     public Task<FileOutputStream, Void> flush(TaskMode mode) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<FileOutputStream,Void>().create(
-                mode, m_session, this,
-                "flush",
-                new Class[]{},
-                new Object[]{});
+        return new AbstractThreadedTask<FileOutputStream,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                try {
+                    AbstractAsyncFileOutputStreamImpl.this.flush();
+                    return null;
+                } catch (IOException e) {
+                    throw new NoSuccessException(e);
+                }
+            }
+        };
     }
 
     public Task<FileOutputStream, Void> close(TaskMode mode) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<FileOutputStream,Void>().create(
-                mode, m_session, this,
-                "close",
-                new Class[]{},
-                new Object[]{});
+        return new AbstractThreadedTask<FileOutputStream,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                try {
+                    AbstractAsyncFileOutputStreamImpl.this.close();
+                    return null;
+                } catch (IOException e) {
+                    throw new NoSuccessException(e);
+                }
+            }
+        };
     }
 }

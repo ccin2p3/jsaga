@@ -1,14 +1,14 @@
 package fr.in2p3.jsaga.impl.file.stream;
 
-import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
+import fr.in2p3.jsaga.impl.task.AbstractThreadedTask;
 import org.ogf.saga.SagaObject;
-import org.ogf.saga.error.DoesNotExistException;
-import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.*;
 import org.ogf.saga.file.FileInputStream;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
 
+import java.io.IOException;
 import java.util.UUID;
 
 /* ***************************************************
@@ -58,66 +58,93 @@ public abstract class AbstractAsyncFileInputStreamImpl extends FileInputStream {
     ///////////////////////////////// interface FileInputStream /////////////////////////////////
 
     public Task<FileInputStream, Integer> read(TaskMode mode) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<FileInputStream,Integer>().create(
-                mode, m_session, this,
-                "read",
-                new Class[]{},
-                new Object[]{});
+        return new AbstractThreadedTask<FileInputStream,Integer>(mode) {
+            public Integer invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                try {
+                    return AbstractAsyncFileInputStreamImpl.this.read();
+                } catch (IOException e) {
+                    throw new NoSuccessException(e);
+                }
+            }
+        };
     }
 
-    public Task<FileInputStream, Integer> read(TaskMode mode, byte[] buf, int off, int len) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<FileInputStream,Integer>().create(
-                mode, m_session, this,
-                "read",
-                new Class[]{byte[].class, int.class, int.class},
-                new Object[]{buf, off, len});
+    public Task<FileInputStream, Integer> read(TaskMode mode, final byte[] buf, final int off, final int len) throws NotImplementedException {
+        return new AbstractThreadedTask<FileInputStream,Integer>(mode) {
+            public Integer invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                try {
+                    return AbstractAsyncFileInputStreamImpl.this.read(buf, off, len);
+                } catch (IOException e) {
+                    throw new NoSuccessException(e);
+                }
+            }
+        };
     }
 
-    public Task<FileInputStream, Long> skip(TaskMode mode, long n) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<FileInputStream,Long>().create(
-                mode, m_session, this,
-                "skip",
-                new Class[]{long.class},
-                new Object[]{n});
+    public Task<FileInputStream, Long> skip(TaskMode mode, final long n) throws NotImplementedException {
+        return new AbstractThreadedTask<FileInputStream,Long>(mode) {
+            public Long invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                try {
+                    return AbstractAsyncFileInputStreamImpl.this.skip(n);
+                } catch (IOException e) {
+                    throw new NoSuccessException(e);
+                }
+            }
+        };
     }
 
     public Task<FileInputStream, Integer> available(TaskMode mode) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<FileInputStream,Integer>().create(
-                mode, m_session, this,
-                "available",
-                new Class[]{},
-                new Object[]{});
+        return new AbstractThreadedTask<FileInputStream,Integer>(mode) {
+            public Integer invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                try {
+                    return AbstractAsyncFileInputStreamImpl.this.available();
+                } catch (IOException e) {
+                    throw new NoSuccessException(e);
+                }
+            }
+        };
     }
 
     public Task<FileInputStream, Void> close(TaskMode mode) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<FileInputStream,Void>().create(
-                mode, m_session, this,
-                "close",
-                new Class[]{},
-                new Object[]{});
+        return new AbstractThreadedTask<FileInputStream,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                try {
+                    AbstractAsyncFileInputStreamImpl.this.close();
+                    return null;
+                } catch (IOException e) {
+                    throw new NoSuccessException(e);
+                }
+            }
+        };
     }
 
-    public Task<FileInputStream, Void> mark(TaskMode mode, int readlimit) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<FileInputStream,Void>().create(
-                mode, m_session, this,
-                "mark",
-                new Class[]{int.class},
-                new Object[]{readlimit});
+    public Task<FileInputStream, Void> mark(TaskMode mode, final int readlimit) throws NotImplementedException {
+        return new AbstractThreadedTask<FileInputStream,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncFileInputStreamImpl.this.mark(readlimit);
+                return null;
+            }
+        };
     }
 
     public Task<FileInputStream, Void> reset(TaskMode mode) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<FileInputStream,Void>().create(
-                mode, m_session, this,
-                "reset",
-                new Class[]{},
-                new Object[]{});
+        return new AbstractThreadedTask<FileInputStream,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                try {
+                    AbstractAsyncFileInputStreamImpl.this.reset();
+                    return null;
+                } catch (IOException e) {
+                    throw new NoSuccessException(e);
+                }
+            }
+        };
     }
 
     public Task<FileInputStream, Boolean> markSupported(TaskMode mode) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<FileInputStream,Boolean>().create(
-                mode, m_session, this,
-                "markSupported",
-                new Class[]{},
-                new Object[]{});
+        return new AbstractThreadedTask<FileInputStream,Boolean>(mode) {
+            public Boolean invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncFileInputStreamImpl.this.markSupported();
+            }
+        };
     }
 }

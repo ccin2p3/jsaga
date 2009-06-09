@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.impl.logicalfile;
 
 import fr.in2p3.jsaga.engine.factories.DataAdaptorFactory;
-import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
-import org.ogf.saga.error.NotImplementedException;
+import fr.in2p3.jsaga.impl.task.AbstractThreadedTask;
+import org.ogf.saga.error.*;
 import org.ogf.saga.logicalfile.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.Task;
@@ -26,19 +26,19 @@ public abstract class AbstractAsyncLogicalFileFactoryImpl extends AbstractSyncLo
         super(adaptorFactory);
     }
 
-    protected Task<LogicalFileFactory, LogicalFile> doCreateLogicalFile(TaskMode mode, Session session, URL name, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<LogicalFileFactory,LogicalFile>().create(
-                mode, null, this,
-                "doCreateLogicalFileSync",
-                new Class[]{Session.class, URL.class, int.class},
-                new Object[]{session, name, flags});
+    protected Task<LogicalFileFactory, LogicalFile> doCreateLogicalFile(TaskMode mode, final Session session, final URL name, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<LogicalFileFactory,LogicalFile>(mode) {
+            public LogicalFile invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncLogicalFileFactoryImpl.super.doCreateLogicalFileSync(session, name, flags);
+            }
+        };
     }
 
-    protected Task<LogicalFileFactory, LogicalDirectory> doCreateLogicalDirectory(TaskMode mode, Session session, URL name, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<LogicalFileFactory,LogicalDirectory>().create(
-                mode, null, this,
-                "doCreateLogicalDirectorySync",
-                new Class[]{Session.class, URL.class, int.class},
-                new Object[]{session, name, flags});
+    protected Task<LogicalFileFactory, LogicalDirectory> doCreateLogicalDirectory(TaskMode mode, final Session session, final URL name, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<LogicalFileFactory,LogicalDirectory>(mode) {
+            public LogicalDirectory invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncLogicalFileFactoryImpl.super.doCreateLogicalDirectorySync(session, name, flags);
+            }
+        };
     }
 }

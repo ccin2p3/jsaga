@@ -3,10 +3,9 @@ package fr.in2p3.jsaga.impl.logicalfile;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSDirectoryImpl;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
-import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
+import fr.in2p3.jsaga.impl.task.AbstractThreadedTask;
 import org.ogf.saga.error.*;
 import org.ogf.saga.logicalfile.LogicalFile;
-import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
@@ -42,46 +41,57 @@ public abstract class AbstractAsyncLogicalFileImpl extends AbstractSyncLogicalFi
         super(entry, absolutePath, flags);
     }
 
-    public Task<LogicalFile, Void> addLocation(TaskMode mode, URL name) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<LogicalFile,Void>().create(
-                mode, m_session, this,
-                "addLocationSync",
-                new Class[]{URL.class},
-                new Object[]{name});
+    //////////////////////////////////////// interface LogicalFile ////////////////////////////////////////
+
+    public Task<LogicalFile, Void> addLocation(TaskMode mode, final URL name) throws NotImplementedException {
+        return new AbstractThreadedTask<LogicalFile,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncLogicalFileImpl.super.addLocationSync(name);
+                return null;
+            }
+        };
     }
 
-    public Task<LogicalFile, Void> removeLocation(TaskMode mode, URL name) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<LogicalFile,Void>().create(
-                mode, m_session, this,
-                "removeLocationSync",
-                new Class[]{URL.class},
-                new Object[]{name});
+    public Task<LogicalFile, Void> removeLocation(TaskMode mode, final URL name) throws NotImplementedException {
+        return new AbstractThreadedTask<LogicalFile,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncLogicalFileImpl.super.removeLocationSync(name);
+                return null;
+            }
+        };
     }
 
-    public Task<LogicalFile, Void> updateLocation(TaskMode mode, URL nameOld, URL nameNew) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<LogicalFile,Void>().create(
-                mode, m_session, this,
-                "updateLocationSync",
-                new Class[]{URL.class, URL.class},
-                new Object[]{nameOld, nameNew});
+    public Task<LogicalFile, Void> updateLocation(TaskMode mode, final URL nameOld, final URL nameNew) throws NotImplementedException {
+        return new AbstractThreadedTask<LogicalFile,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncLogicalFileImpl.super.updateLocationSync(nameOld, nameNew);
+                return null;
+            }
+        };
     }
 
     public Task<LogicalFile, List<URL>> listLocations(TaskMode mode) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<LogicalFile,List<URL>>().create(
-                mode, m_session, this,
-                "listLocationsSync",
-                new Class[]{},
-                new Object[]{});
+        return new AbstractThreadedTask<LogicalFile,List<URL>>(mode) {
+            public List<URL> invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncLogicalFileImpl.super.listLocationsSync();
+            }
+        };
     }
 
-    public Task<LogicalFile, Void> replicate(TaskMode mode, URL name, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<LogicalFile,Void>().create(
-                mode, m_session, this,
-                "replicateSync",
-                new Class[]{URL.class, int.class},
-                new Object[]{name, flags});
+    public Task<LogicalFile, Void> replicate(TaskMode mode, final URL name, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<LogicalFile,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncLogicalFileImpl.super.replicateSync(name, flags);
+                return null;
+            }
+        };
     }
-    public Task<LogicalFile, Void> replicate(TaskMode mode, URL name) throws NotImplementedException {
-        return this.replicate(mode, name, Flags.NONE.getValue());
+    public Task<LogicalFile, Void> replicate(TaskMode mode, final URL name) throws NotImplementedException {
+        return new AbstractThreadedTask<LogicalFile,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncLogicalFileImpl.super.replicateSync(name);
+                return null;
+            }
+        };
     }
 }

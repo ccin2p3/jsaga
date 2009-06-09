@@ -4,7 +4,7 @@ import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.LogicalReaderMetaData;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriterMetaData;
 import fr.in2p3.jsaga.helpers.SAGAPatternFinder;
-import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
+import fr.in2p3.jsaga.impl.task.AbstractThreadedTask;
 import org.ogf.saga.attributes.AsyncAttributes;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.NSEntry;
@@ -140,20 +140,21 @@ public class MetaDataAttributesImpl<T extends NSEntry> implements AsyncAttribute
 
     ////////////////////////////////////// interface AsyncAttributes //////////////////////////////////////
 
-    public Task<T, Void> setAttribute(TaskMode mode, String key, String value) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<T,Void>().create(
-                mode, m_session, m_object,
-                "setAttribute",
-                new Class[]{String.class, String.class},
-                new Object[]{key, value});
+    public Task<T, Void> setAttribute(TaskMode mode, final String key, final String value) throws NotImplementedException {
+        return new AbstractThreadedTask<T,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                MetaDataAttributesImpl.this.setAttribute(key, value);
+                return null;
+            }
+        };
     }
 
-    public Task<T, String> getAttribute(TaskMode mode, String key) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<T,String>().create(
-                mode, m_session, m_object,
-                "getAttribute",
-                new Class[]{String.class},
-                new Object[]{key});
+    public Task<T, String> getAttribute(TaskMode mode, final String key) throws NotImplementedException {
+        return new AbstractThreadedTask<T,String>(mode) {
+            public String invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return MetaDataAttributesImpl.this.getAttribute(key);
+            }
+        };
     }
 
     public Task<T, Void> setVectorAttribute(TaskMode mode, String key, String[] values) throws NotImplementedException {
@@ -164,28 +165,29 @@ public class MetaDataAttributesImpl<T extends NSEntry> implements AsyncAttribute
         throw new NotImplementedException("Not implemented");
     }
 
-    public Task<T, Void> removeAttribute(TaskMode mode, String key) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<T,Void>().create(
-                mode, m_session, m_object,
-                "removeAttribute",
-                new Class[]{String.class},
-                new Object[]{key});
+    public Task<T, Void> removeAttribute(TaskMode mode, final String key) throws NotImplementedException {
+        return new AbstractThreadedTask<T,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                MetaDataAttributesImpl.this.removeAttribute(key);
+                return null;
+            }
+        };
     }
 
     public Task<T, String[]> listAttributes(TaskMode mode) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<T,String[]>().create(
-                mode, m_session, m_object,
-                "listAttributes",
-                new Class[]{},
-                new Object[]{});
+        return new AbstractThreadedTask<T,String[]>(mode) {
+            public String[] invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return MetaDataAttributesImpl.this.listAttributes();
+            }
+        };
     }
 
-    public Task<T, String[]> findAttributes(TaskMode mode, String... patterns) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<T,String[]>().create(
-                mode, m_session, m_object,
-                "findAttributes",
-                new Class[]{String[].class},
-                new Object[]{patterns});
+    public Task<T, String[]> findAttributes(TaskMode mode, final String... patterns) throws NotImplementedException {
+        return new AbstractThreadedTask<T,String[]>(mode) {
+            public String[] invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return MetaDataAttributesImpl.this.findAttributes(patterns);
+            }
+        };
     }
 
     public Task<T, Boolean> isReadOnlyAttribute(TaskMode mode, String key) throws NotImplementedException {

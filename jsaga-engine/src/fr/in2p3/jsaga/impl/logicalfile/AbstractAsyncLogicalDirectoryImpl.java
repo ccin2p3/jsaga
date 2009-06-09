@@ -3,11 +3,10 @@ package fr.in2p3.jsaga.impl.logicalfile;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSDirectoryImpl;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
-import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
+import fr.in2p3.jsaga.impl.task.AbstractThreadedTask;
 import org.ogf.saga.error.*;
 import org.ogf.saga.logicalfile.LogicalDirectory;
 import org.ogf.saga.logicalfile.LogicalFile;
-import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.NSDirectory;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.Task;
@@ -44,44 +43,58 @@ public abstract class AbstractAsyncLogicalDirectoryImpl extends AbstractSyncLogi
         super(entry, absolutePath, flags);
     }
 
-    public Task<NSDirectory, Boolean> isFile(TaskMode mode, URL name) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,Boolean>().create(
-                mode, m_session, this,
-                "isFileSync",
-                new Class[]{URL.class},
-                new Object[]{name});
+    /////////////////////////////////////// interface LogicalDirectory ///////////////////////////////////////
+
+    public Task<NSDirectory, Boolean> isFile(TaskMode mode, final URL name) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Boolean>(mode) {
+            public Boolean invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncLogicalDirectoryImpl.super.isFileSync(name);
+            }
+        };
     }
 
-    public Task<LogicalDirectory, List<URL>> find(TaskMode mode, String namePattern, String[] attrPattern, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<LogicalDirectory,List<URL>>().create(
-                mode, m_session, this,
-                "findSync",
-                new Class[]{String.class, String[].class, int.class},
-                new Object[]{namePattern, attrPattern, flags});
+    public Task<LogicalDirectory, List<URL>> find(TaskMode mode, final String namePattern, final String[] attrPattern, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<LogicalDirectory,List<URL>>(mode) {
+            public List<URL> invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncLogicalDirectoryImpl.super.findSync(namePattern, attrPattern, flags);
+            }
+        };
     }
-    public Task<LogicalDirectory, List<URL>> find(TaskMode mode, String namePattern, String[] attrPattern) throws NotImplementedException {
-        return this.find(mode, namePattern, attrPattern, Flags.RECURSIVE.getValue());
-    }
-
-    public Task<LogicalDirectory, LogicalDirectory> openLogicalDir(TaskMode mode, URL name, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<LogicalDirectory,LogicalDirectory>().create(
-                mode, m_session, this,
-                "openLogicalDir",
-                new Class[]{URL.class, int.class},
-                new Object[]{name, flags});
-    }
-    public Task<LogicalDirectory, LogicalDirectory> openLogicalDir(TaskMode mode, URL name) throws NotImplementedException {
-        return this.openLogicalDir(mode, name, Flags.READ.getValue());
+    public Task<LogicalDirectory, List<URL>> find(TaskMode mode, final String namePattern, final String[] attrPattern) throws NotImplementedException {
+        return new AbstractThreadedTask<LogicalDirectory,List<URL>>(mode) {
+            public List<URL> invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncLogicalDirectoryImpl.super.findSync(namePattern, attrPattern);
+            }
+        };
     }
 
-    public Task<LogicalDirectory, LogicalFile> openLogicalFile(TaskMode mode, URL name, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<LogicalDirectory,LogicalFile>().create(
-                mode, m_session, this,
-                "openLogicalFile",
-                new Class[]{URL.class, int.class},
-                new Object[]{name, flags});
+    public Task<LogicalDirectory, LogicalDirectory> openLogicalDir(TaskMode mode, final URL name, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<LogicalDirectory,LogicalDirectory>(mode) {
+            public LogicalDirectory invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncLogicalDirectoryImpl.super.openLogicalDir(name, flags);
+            }
+        };
     }
-    public Task<LogicalDirectory, LogicalFile> openLogicalFile(TaskMode mode, URL name) throws NotImplementedException {
-        return this.openLogicalFile(mode, name, Flags.READ.getValue());
+    public Task<LogicalDirectory, LogicalDirectory> openLogicalDir(TaskMode mode, final URL name) throws NotImplementedException {
+        return new AbstractThreadedTask<LogicalDirectory,LogicalDirectory>(mode) {
+            public LogicalDirectory invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncLogicalDirectoryImpl.super.openLogicalDir(name);
+            }
+        };
+    }
+
+    public Task<LogicalDirectory, LogicalFile> openLogicalFile(TaskMode mode, final URL name, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<LogicalDirectory,LogicalFile>(mode) {
+            public LogicalFile invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncLogicalDirectoryImpl.super.openLogicalFile(name, flags);
+            }
+        };
+    }
+    public Task<LogicalDirectory, LogicalFile> openLogicalFile(TaskMode mode, final URL name) throws NotImplementedException {
+        return new AbstractThreadedTask<LogicalDirectory,LogicalFile>(mode) {
+            public LogicalFile invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncLogicalDirectoryImpl.super.openLogicalFile(name);
+            }
+        };
     }
 }

@@ -1,9 +1,10 @@
 package fr.in2p3.jsaga.impl.namespace;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
-import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
+import fr.in2p3.jsaga.impl.task.AbstractThreadedTask;
 import org.ogf.saga.error.*;
-import org.ogf.saga.namespace.*;
+import org.ogf.saga.namespace.NSDirectory;
+import org.ogf.saga.namespace.NSEntry;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.task.TaskMode;
@@ -41,303 +42,405 @@ public abstract class AbstractAsyncNSDirectoryImpl extends AbstractSyncNSDirecto
 
     ////////////////////////////////////////// interface NSDirectory //////////////////////////////////////////
 
-    public Task<NSDirectory, Void> changeDir(TaskMode mode, URL dir) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,Void>().create(
-                mode, m_session, this,
-                "changeDirSync",
-                new Class[]{URL.class},
-                new Object[]{dir});
+    public Task<NSDirectory, Void> changeDir(TaskMode mode, final URL dir) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.changeDirSync(dir);
+                return null;
+            }
+        };
     }
 
-    public Task<NSDirectory, List<URL>> list(TaskMode mode, String pattern, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,List<URL>>().create(
-                mode, m_session, this,
-                "listSync",
-                new Class[]{String.class, int.class},
-                new Object[]{pattern, flags});
+    public Task<NSDirectory, List<URL>> list(TaskMode mode, final String pattern, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,List<URL>>(mode) {
+            public List<URL> invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncNSDirectoryImpl.super.listSync(pattern, flags);
+            }
+        };
     }
-    public Task<NSDirectory, List<URL>> list(TaskMode mode, String pattern) throws NotImplementedException {
-        return this.list(mode, pattern, Flags.NONE.getValue());
+    public Task<NSDirectory, List<URL>> list(TaskMode mode, final String pattern) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,List<URL>>(mode) {
+            public List<URL> invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncNSDirectoryImpl.super.listSync(pattern);
+            }
+        };
     }
 
-    public Task<NSDirectory, List<URL>> list(TaskMode mode, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,List<URL>>().create(
-                mode, m_session, this,
-                "listSync",
-                new Class[]{int.class},
-                new Object[]{flags});
+    public Task<NSDirectory, List<URL>> list(TaskMode mode, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,List<URL>>(mode) {
+            public List<URL> invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncNSDirectoryImpl.super.listSync(flags);
+            }
+        };
     }
     public Task<NSDirectory, List<URL>> list(TaskMode mode) throws NotImplementedException {
-        return this.list(mode, Flags.NONE.getValue());
+        return new AbstractThreadedTask<NSDirectory,List<URL>>(mode) {
+            public List<URL> invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncNSDirectoryImpl.super.listSync();
+            }
+        };
     }
 
-    public Task<NSDirectory, List<URL>> find(TaskMode mode, String pattern, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,List<URL>>().create(
-                mode, m_session, this,
-                "findSync",
-                new Class[]{String.class, int.class},
-                new Object[]{pattern, flags});
+    public Task<NSDirectory, List<URL>> find(TaskMode mode, final String pattern, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,List<URL>>(mode) {
+            public List<URL> invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncNSDirectoryImpl.super.findSync(pattern, flags);
+            }
+        };
     }
-    public Task<NSDirectory, List<URL>> find(TaskMode mode, String pattern) throws NotImplementedException {
-        return this.find(mode, pattern, Flags.RECURSIVE.getValue());
-    }
-
-    public Task<NSDirectory, Boolean> exists(TaskMode mode, URL name) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,Boolean>().create(
-                mode, m_session, this,
-                "existsSync",
-                new Class[]{URL.class},
-                new Object[]{name});
+    public Task<NSDirectory, List<URL>> find(TaskMode mode, final String pattern) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,List<URL>>(mode) {
+            public List<URL> invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncNSDirectoryImpl.super.findSync(pattern);
+            }
+        };
     }
 
-    public Task<NSDirectory, Boolean> isDir(TaskMode mode, URL name) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,Boolean>().create(
-                mode, m_session, this,
-                "isDirSync",
-                new Class[]{URL.class},
-                new Object[]{name});
+    public Task<NSDirectory, Boolean> exists(TaskMode mode, final URL name) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Boolean>(mode) {
+            public Boolean invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncNSDirectoryImpl.super.existsSync(name);
+            }
+        };
     }
 
-    public Task<NSDirectory, Boolean> isEntry(TaskMode mode, URL name) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,Boolean>().create(
-                mode, m_session, this,
-                "isEntrySync",
-                new Class[]{URL.class},
-                new Object[]{name});
+    public Task<NSDirectory, Boolean> isDir(TaskMode mode, final URL name) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Boolean>(mode) {
+            public Boolean invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncNSDirectoryImpl.super.isDirSync(name);
+            }
+        };
     }
 
-    public Task<NSDirectory, Boolean> isLink(TaskMode mode, URL name) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,Boolean>().create(
-                mode, m_session, this,
-                "isLinkSync",
-                new Class[]{URL.class},
-                new Object[]{name});
+    public Task<NSDirectory, Boolean> isEntry(TaskMode mode, final URL name) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Boolean>(mode) {
+            public Boolean invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncNSDirectoryImpl.super.isEntrySync(name);
+            }
+        };
     }
 
-    public Task<NSDirectory, URL> readLink(TaskMode mode, URL name) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,URL>().create(
-                mode, m_session, this,
-                "readLinkSync",
-                new Class[]{URL.class},
-                new Object[]{name});
+    public Task<NSDirectory, Boolean> isLink(TaskMode mode, final URL name) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Boolean>(mode) {
+            public Boolean invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncNSDirectoryImpl.super.isLinkSync(name);
+            }
+        };
+    }
+
+    public Task<NSDirectory, URL> readLink(TaskMode mode, final URL name) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,URL>(mode) {
+            public URL invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncNSDirectoryImpl.super.readLinkSync(name);
+            }
+        };
     }
 
     public Task<NSDirectory, Integer> getNumEntries(TaskMode mode) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,Integer>().create(
-                mode, m_session, this,
-                "getNumEntriesSync",
-                new Class[]{},
-                new Object[]{});
+        return new AbstractThreadedTask<NSDirectory,Integer>(mode) {
+            public Integer invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncNSDirectoryImpl.super.getNumEntriesSync();
+            }
+        };
     }
 
-    public Task<NSDirectory, URL> getEntry(TaskMode mode, int entry) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,URL>().create(
-                mode, m_session, this,
-                "getEntrySync",
-                new Class[]{int.class},
-                new Object[]{entry});
+    public Task<NSDirectory, URL> getEntry(TaskMode mode, final int entry) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,URL>(mode) {
+            public URL invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncNSDirectoryImpl.super.getEntrySync(entry);
+            }
+        };
     }
 
-    public Task<NSDirectory, Void> copy(TaskMode mode, URL source, URL target, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,Void>().create(
-                mode, m_session, this,
-                "copySync",
-                new Class[]{URL.class, URL.class, int.class},
-                new Object[]{source, target, flags});
+    public Task<NSDirectory, Void> copy(TaskMode mode, final URL source, final URL target, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.copySync(source, target, flags);
+                return null;
+            }
+        };
     }
-    public Task<NSDirectory, Void> copy(TaskMode mode, URL source, URL target) throws NotImplementedException {
-        return this.copy(mode, source, target, Flags.NONE.getValue());
-    }
-
-    public Task<NSDirectory, Void> copy(TaskMode mode, String sourcePattern, URL target, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,Void>().create(
-                mode, m_session, this,
-                "copySync",
-                new Class[]{String.class, URL.class, int.class},
-                new Object[]{sourcePattern, target, flags});
-    }
-    public Task<NSDirectory, Void> copy(TaskMode mode, String sourcePattern, URL target) throws NotImplementedException {
-        return this.copy(mode, sourcePattern, target, Flags.NONE.getValue());
+    public Task<NSDirectory, Void> copy(TaskMode mode, final URL source, final URL target) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.copySync(source, target);
+                return null;
+            }
+        };
     }
 
-    public Task<NSDirectory, Void> link(TaskMode mode, URL source, URL target, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,Void>().create(
-                mode, m_session, this,
-                "linkSync",
-                new Class[]{URL.class, URL.class, int.class},
-                new Object[]{source, target, flags});
+    public Task<NSDirectory, Void> copy(TaskMode mode, final String sourcePattern, final URL target, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.copySync(sourcePattern, target, flags);
+                return null;
+            }
+        };
     }
-    public Task<NSDirectory, Void> link(TaskMode mode, URL source, URL target) throws NotImplementedException {
-        return this.link(mode, source, target, Flags.NONE.getValue());
-    }
-
-    public Task<NSDirectory, Void> link(TaskMode mode, String sourcePattern, URL target, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,Void>().create(
-                mode, m_session, this,
-                "linkSync",
-                new Class[]{String.class, URL.class, int.class},
-                new Object[]{sourcePattern, target, flags});
-    }
-    public Task<NSDirectory, Void> link(TaskMode mode, String sourcePattern, URL target) throws NotImplementedException {
-        return this.link(mode, sourcePattern, target, Flags.NONE.getValue());
+    public Task<NSDirectory, Void> copy(TaskMode mode, final String sourcePattern, final URL target) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.copySync(sourcePattern, target);
+                return null;
+            }
+        };
     }
 
-    public Task<NSDirectory, Void> move(TaskMode mode, URL source, URL target, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,Void>().create(
-                mode, m_session, this,
-                "moveSync",
-                new Class[]{URL.class, URL.class, int.class},
-                new Object[]{source, target, flags});
+    public Task<NSDirectory, Void> link(TaskMode mode, final URL source, final URL target, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.linkSync(source, target, flags);
+                return null;
+            }
+        };
     }
-    public Task<NSDirectory, Void> move(TaskMode mode, URL source, URL target) throws NotImplementedException {
-        return this.move(mode, source, target, Flags.NONE.getValue());
-    }
-
-    public Task<NSDirectory, Void> move(TaskMode mode, String sourcePattern, URL target, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,Void>().create(
-                mode, m_session, this,
-                "moveSync",
-                new Class[]{String.class, URL.class, int.class},
-                new Object[]{sourcePattern, target, flags});
-    }
-    public Task<NSDirectory, Void> move(TaskMode mode, String sourcePattern, URL target) throws NotImplementedException {
-        return this.move(mode, sourcePattern, target, Flags.NONE.getValue());
+    public Task<NSDirectory, Void> link(TaskMode mode, final URL source, final URL target) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.linkSync(source, target);
+                return null;
+            }
+        };
     }
 
-    public Task<NSDirectory, Void> remove(TaskMode mode, URL target, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,Void>().create(
-                mode, m_session, this,
-                "removeSync",
-                new Class[]{URL.class, int.class},
-                new Object[]{target, flags});
+    public Task<NSDirectory, Void> link(TaskMode mode, final String sourcePattern, final URL target, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.linkSync(sourcePattern, target, flags);
+                return null;
+            }
+        };
     }
-    public Task<NSDirectory, Void> remove(TaskMode mode, URL target) throws NotImplementedException {
-        return this.remove(mode, target, Flags.NONE.getValue());
-    }
-
-    public Task<NSDirectory, Void> remove(TaskMode mode, String targetPattern, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,Void>().create(
-                mode, m_session, this,
-                "removeSync",
-                new Class[]{String.class, int.class},
-                new Object[]{targetPattern, flags});
-    }
-    public Task<NSDirectory, Void> remove(TaskMode mode, String targetPattern) throws NotImplementedException {
-        return this.remove(mode, targetPattern, Flags.NONE.getValue());
+    public Task<NSDirectory, Void> link(TaskMode mode, final String sourcePattern, final URL target) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.linkSync(sourcePattern, target);
+                return null;
+            }
+        };
     }
 
-    public Task<NSDirectory, Void> makeDir(TaskMode mode, URL target, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,Void>().create(
-                mode, m_session, this,
-                "makeDirSync",
-                new Class[]{URL.class, int.class},
-                new Object[]{target, flags});
+    public Task<NSDirectory, Void> move(TaskMode mode, final URL source, final URL target, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.moveSync(source, target, flags);
+                return null;
+            }
+        };
     }
-    public Task<NSDirectory, Void> makeDir(TaskMode mode, URL target) throws NotImplementedException {
-        return this.makeDir(mode, target, Flags.NONE.getValue());
-    }
-
-    public Task<NSDirectory, NSDirectory> openDir(TaskMode mode, URL name, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,NSDirectory>().create(
-                mode, m_session, this,
-                "openDir",
-                new Class[]{URL.class, int.class},
-                new Object[]{name, flags});
-    }
-    public Task<NSDirectory, NSDirectory> openDir(TaskMode mode, URL name) throws NotImplementedException {
-        return this.openDir(mode, name, Flags.NONE.getValue());
+    public Task<NSDirectory, Void> move(TaskMode mode, final URL source, final URL target) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.moveSync(source, target);
+                return null;
+            }
+        };
     }
 
-    public Task<NSDirectory, NSEntry> open(TaskMode mode, URL name, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,NSEntry>().create(
-                mode, m_session, this,
-                "open",
-                new Class[]{URL.class, int.class},
-                new Object[]{name, flags});
+    public Task<NSDirectory, Void> move(TaskMode mode, final String sourcePattern, final URL target, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.moveSync(sourcePattern, target, flags);
+                return null;
+            }
+        };
     }
-    public Task<NSDirectory, NSEntry> open(TaskMode mode, URL name) throws NotImplementedException {
-        return this.open(mode, name, Flags.NONE.getValue());
-    }
-
-    public Task<NSDirectory, Void> permissionsAllow(TaskMode mode, URL target, String id, int permissions, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,Void>().create(
-                mode, m_session, this,
-                "permissionsAllowSync",
-                new Class[]{URL.class, String.class, int.class, int.class},
-                new Object[]{target, id, permissions, flags});
-    }
-    public Task<NSDirectory, Void> permissionsAllow(TaskMode mode, URL target, String id, int permissions) throws NotImplementedException {
-        return this.permissionsAllow(mode, target, id, permissions, Flags.NONE.getValue());
+    public Task<NSDirectory, Void> move(TaskMode mode, final String sourcePattern, final URL target) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.moveSync(sourcePattern, target);
+                return null;
+            }
+        };
     }
 
-    public Task<NSDirectory, Void> permissionsAllow(TaskMode mode, String targetPattern, String id, int permissions, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,Void>().create(
-                mode, m_session, this,
-                "permissionsAllowSync",
-                new Class[]{String.class, String.class, int.class, int.class},
-                new Object[]{targetPattern, id, permissions, flags});
+    public Task<NSDirectory, Void> remove(TaskMode mode, final URL target, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.removeSync(target, flags);
+                return null;
+            }
+        };
     }
-    public Task<NSDirectory, Void> permissionsAllow(TaskMode mode, String targetPattern, String id, int permissions) throws NotImplementedException {
-        return this.permissionsAllow(mode, targetPattern, id, permissions, Flags.NONE.getValue());
-    }
-
-    public Task<NSDirectory, Void> permissionsDeny(TaskMode mode, URL target, String id, int permissions, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,Void>().create(
-                mode, m_session, this,
-                "permissionsDenySync",
-                new Class[]{URL.class, String.class, int.class, int.class},
-                new Object[]{target, id, permissions, flags});
-    }
-    public Task<NSDirectory, Void> permissionsDeny(TaskMode mode, URL target, String id, int permissions) throws NotImplementedException {
-        return this.permissionsDeny(mode, target, id, permissions, Flags.NONE.getValue());
+    public Task<NSDirectory, Void> remove(TaskMode mode, final URL target) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.removeSync(target);
+                return null;
+            }
+        };
     }
 
-    public Task<NSDirectory, Void> permissionsDeny(TaskMode mode, String targetPattern, String id, int permissions, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSDirectory,Void>().create(
-                mode, m_session, this,
-                "permissionsDenySync",
-                new Class[]{String.class, String.class, int.class, int.class},
-                new Object[]{targetPattern, id, permissions, flags});
+    public Task<NSDirectory, Void> remove(TaskMode mode, final String targetPattern, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.removeSync(targetPattern, flags);
+                return null;
+            }
+        };
     }
-    public Task<NSDirectory, Void> permissionsDeny(TaskMode mode, String targetPattern, String id, int permissions) throws NotImplementedException {
-        return this.permissionsDeny(mode, targetPattern, id, permissions, Flags.NONE.getValue());
+    public Task<NSDirectory, Void> remove(TaskMode mode, final String targetPattern) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.removeSync(targetPattern);
+                return null;
+            }
+        };
+    }
+
+    public Task<NSDirectory, Void> makeDir(TaskMode mode, final URL target, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.makeDirSync(target, flags);
+                return null;
+            }
+        };
+    }
+    public Task<NSDirectory, Void> makeDir(TaskMode mode, final URL target) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.makeDirSync(target);
+                return null;
+            }
+        };
+    }
+
+    public Task<NSDirectory, NSDirectory> openDir(TaskMode mode, final URL name, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,NSDirectory>(mode) {
+            public NSDirectory invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncNSDirectoryImpl.this.openDir(name, flags);
+            }
+        };
+    }
+    public Task<NSDirectory, NSDirectory> openDir(TaskMode mode, final URL name) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,NSDirectory>(mode) {
+            public NSDirectory invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncNSDirectoryImpl.this.openDir(name);
+            }
+        };
+    }
+
+    public Task<NSDirectory, NSEntry> open(TaskMode mode, final URL name, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,NSEntry>(mode) {
+            public NSEntry invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncNSDirectoryImpl.this.open(name, flags);
+            }
+        };
+    }
+    public Task<NSDirectory, NSEntry> open(TaskMode mode, final URL name) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,NSEntry>(mode) {
+            public NSEntry invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncNSDirectoryImpl.this.open(name);
+            }
+        };
+    }
+
+    public Task<NSDirectory, Void> permissionsAllow(TaskMode mode, final URL target, final String id, final int permissions, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.permissionsAllowSync(target, id, permissions, flags);
+                return null;
+            }
+        };
+    }
+    public Task<NSDirectory, Void> permissionsAllow(TaskMode mode, final URL target, final String id, final int permissions) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.permissionsAllowSync(target, id, permissions);
+                return null;
+            }
+        };
+    }
+
+    public Task<NSDirectory, Void> permissionsAllow(TaskMode mode, final String targetPattern, final String id, final int permissions, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.permissionsAllowSync(targetPattern, id, permissions, flags);
+                return null;
+            }
+        };
+    }
+    public Task<NSDirectory, Void> permissionsAllow(TaskMode mode, final String targetPattern, final String id, final int permissions) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.permissionsAllowSync(targetPattern, id, permissions);
+                return null;
+            }
+        };
+    }
+
+    public Task<NSDirectory, Void> permissionsDeny(TaskMode mode, final URL target, final String id, final int permissions, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.permissionsDenySync(target, id, permissions, flags);
+                return null;
+            }
+        };
+    }
+    public Task<NSDirectory, Void> permissionsDeny(TaskMode mode, final URL target, final String id, final int permissions) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.permissionsDenySync(target, id, permissions);
+                return null;
+            }
+        };
+    }
+
+    public Task<NSDirectory, Void> permissionsDeny(TaskMode mode, final String targetPattern, final String id, final int permissions, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.permissionsDenySync(targetPattern, id, permissions, flags);
+                return null;
+            }
+        };
+    }
+    public Task<NSDirectory, Void> permissionsDeny(TaskMode mode, final String targetPattern, final String id, final int permissions) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.permissionsDenySync(targetPattern, id, permissions);
+                return null;
+            }
+        };
     }
 
     /////////////////////////////////////// override some methods of NSEntry ///////////////////////////////////////
 
     /** override super.getCWD() */
     public Task<NSEntry, URL> getCWD(TaskMode mode) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSEntry,URL>().create(
-                mode, m_session, this,
-                "getCWDSync",
-                new Class[]{},
-                new Object[]{});
+        return new AbstractThreadedTask<NSEntry,URL>(mode) {
+            public URL invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncNSDirectoryImpl.super.getCWDSync();
+            }
+        };
     }
 
     /** override super.copy() */
-    public Task<NSEntry, Void> copy(TaskMode mode, URL target, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSEntry,Void>().create(
-                mode, m_session, this,
-                "copySync",
-                new Class[]{URL.class, int.class},
-                new Object[]{target, flags});
+    public Task<NSEntry, Void> copy(TaskMode mode, final URL target, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<NSEntry,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.copySync(target, flags);
+                return null;
+            }
+        };
     }
 
     /** override super.move() */
-    public Task<NSEntry, Void> move(TaskMode mode, URL target, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSEntry,Void>().create(
-                mode, m_session, this,
-                "moveSync",
-                new Class[]{URL.class, int.class},
-                new Object[]{target, flags});
+    public Task<NSEntry, Void> move(TaskMode mode, final URL target, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<NSEntry,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.moveSync(target, flags);
+                return null;
+            }
+        };
     }
 
     /** override super.remove() */
-    public Task<NSEntry, Void> remove(TaskMode mode, int flags) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<NSEntry,Void>().create(
-                mode, m_session, this,
-                "removeSync",
-                new Class[]{int.class},
-                new Object[]{flags});
+    public Task<NSEntry, Void> remove(TaskMode mode, final int flags) throws NotImplementedException {
+        return new AbstractThreadedTask<NSEntry,Void>(mode) {
+            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                AbstractAsyncNSDirectoryImpl.super.removeSync(flags);
+                return null;
+            }
+        };
     }
 }

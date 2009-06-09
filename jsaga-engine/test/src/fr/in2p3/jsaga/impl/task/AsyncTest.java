@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.impl.task;
 
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import org.ogf.saga.SagaObject;
-import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.*;
 import org.ogf.saga.task.*;
 
 /* ***************************************************
@@ -23,11 +23,11 @@ public class AsyncTest extends AbstractSagaObjectImpl implements SagaObject, Asy
         return "Hello "+name+" !";
     }
 
-    public Task<AsyncTest, String> getHello(TaskMode mode, String name) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<AsyncTest,String>().create(
-                mode, m_session, this,
-                "getHello",
-                new Class[]{String.class},
-                new Object[]{name});
+    public Task<AsyncTest, String> getHello(TaskMode mode, final String name) throws NotImplementedException {
+        return new AbstractThreadedTask<AsyncTest,String>(mode) {
+            public String invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AsyncTest.this.getHello(name);
+            }
+        };
     }
 }

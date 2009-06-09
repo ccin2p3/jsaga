@@ -2,8 +2,8 @@ package fr.in2p3.jsaga.impl.job.service;
 
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
-import fr.in2p3.jsaga.impl.task.GenericThreadedTaskFactory;
-import org.ogf.saga.error.NotImplementedException;
+import fr.in2p3.jsaga.impl.task.AbstractThreadedTask;
+import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.Task;
@@ -30,52 +30,52 @@ public abstract class AbstractAsyncJobServiceImpl extends AbstractSyncJobService
         super(session, rm, controlAdaptor, monitorService);
     }
 
-    public Task<JobService, Job> createJob(TaskMode mode, JobDescription jd) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<JobService,Job>().create(
-                mode, m_session, this,
-                "createJobSync",
-                new Class[]{JobDescription.class},
-                new Object[]{jd});
+    public Task<JobService, Job> createJob(TaskMode mode, final JobDescription jd) throws NotImplementedException {
+        return new AbstractThreadedTask<JobService,Job>(mode) {
+            public Job invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncJobServiceImpl.super.createJobSync(jd);
+            }
+        };
     }
 
     public Task<JobService, List<String>> list(TaskMode mode) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<JobService,List<String>>().create(
-                mode, m_session, this,
-                "listSync",
-                new Class[]{},
-                new Object[]{});
+        return new AbstractThreadedTask<JobService,List<String>>(mode) {
+            public List<String> invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncJobServiceImpl.super.listSync();
+            }
+        };
     }
 
-    public Task<JobService, Job> getJob(TaskMode mode, String jobId) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<JobService,Job>().create(
-                mode, m_session, this,
-                "getJobSync",
-                new Class[]{String.class},
-                new Object[]{jobId});
+    public Task<JobService, Job> getJob(TaskMode mode, final String jobId) throws NotImplementedException {
+        return new AbstractThreadedTask<JobService,Job>(mode) {
+            public Job invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncJobServiceImpl.super.getJobSync(jobId);
+            }
+        };
     }
 
     public Task<JobService, JobSelf> getSelf(TaskMode mode) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<JobService,JobSelf>().create(
-                mode, m_session, this,
-                "getSelfSync",
-                new Class[]{},
-                new Object[]{});
+        return new AbstractThreadedTask<JobService,JobSelf>(mode) {
+            public JobSelf invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncJobServiceImpl.super.getSelfSync();
+            }
+        };
     }
 
-    public Task<JobService, Job> runJob(TaskMode mode, String commandLine, String host, boolean interactive) throws NotImplementedException {
-        return new GenericThreadedTaskFactory<JobService,Job>().create(
-                mode, m_session, this,
-                "runJobSync",
-                new Class[]{String.class, String.class, boolean.class},
-                new Object[]{commandLine, host, interactive});
+    public Task<JobService, Job> runJob(TaskMode mode, final String commandLine, final String host, final boolean interactive) throws NotImplementedException {
+        return new AbstractThreadedTask<JobService,Job>(mode) {
+            public Job invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncJobServiceImpl.super.runJobSync(commandLine, host, interactive);
+            }
+        };
     }
-    public Task<JobService, Job> runJob(TaskMode mode, String commandLine, String host) throws NotImplementedException {
+    public Task<JobService, Job> runJob(TaskMode mode, final String commandLine, final String host) throws NotImplementedException {
         return this.runJob(mode, commandLine, host, DEFAULT_INTERACTIVE);
     }
-    public Task<JobService, Job> runJob(TaskMode mode, String commandLine, boolean interactive) throws NotImplementedException {
+    public Task<JobService, Job> runJob(TaskMode mode, final String commandLine, final boolean interactive) throws NotImplementedException {
         return this.runJob(mode, commandLine, DEFAULT_HOST, interactive);
     }
-    public Task<JobService, Job> runJob(TaskMode mode, String commandLine) throws NotImplementedException {
+    public Task<JobService, Job> runJob(TaskMode mode, final String commandLine) throws NotImplementedException {
         return this.runJob(mode, commandLine, DEFAULT_HOST, DEFAULT_INTERACTIVE);
     }
 }
