@@ -81,7 +81,7 @@ public abstract class AbstractSagaObjectImpl implements SagaObject {
                 throw new NoSuccessException("[INTERNAL ERROR] Task failed");
             default:
                 try{task.cancel();} catch(Exception e){/*ignore*/}
-                throw new TimeoutException("User timeout occured. If this happens too often, modify configuration file: "+EngineProperties.getURL(EngineProperties.JSAGA_TIMEOUT));
+                throw new TimeoutException("User timeout occured after "+timeout+" seconds. If this happens too often, modify configuration file: "+EngineProperties.getURL(EngineProperties.JSAGA_TIMEOUT));
         }
     }
 }
