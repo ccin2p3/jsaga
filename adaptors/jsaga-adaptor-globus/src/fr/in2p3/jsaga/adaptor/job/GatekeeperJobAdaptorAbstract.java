@@ -29,10 +29,6 @@ public abstract class GatekeeperJobAdaptorAbstract implements SagaSecureAdaptor 
     protected static final String IP_ADDRESS = "IPAddress";
     protected static final String TCP_PORT_RANGE = "TcpPortRange";
 
-    public String getType() {
-        return "gatekeeper";
-    }
-    
     public Class[] getSupportedSecurityAdaptorClasses() {
         return new Class[]{GSSCredentialSecurityAdaptor.class};
     }
