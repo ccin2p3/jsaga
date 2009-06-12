@@ -164,7 +164,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         java.net.URI transferUrl = srmResponse.getTransferUrl();
 
         // connect to transfer server
-        SagaDataAdaptor adaptor = new SagaDataAdaptor(transferUrl, m_credential, token, absolutePath, this);
+        SagaDataAdaptor adaptor = new SagaDataAdaptor(transferUrl, m_credential, m_certRepository, token, absolutePath, this);
         return adaptor.getInputStream(transferUrl.getPath(), null);
     }
     public void freeInputStream(String token, String absolutePath) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
@@ -275,7 +275,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         // connect to transfer server
         SagaDataAdaptor adaptor;
         try {
-            adaptor = new SagaDataAdaptor(transferUrl, m_credential, token, absolutePath, this);
+            adaptor = new SagaDataAdaptor(transferUrl, m_credential, m_certRepository, token, absolutePath, this);
         } catch (DoesNotExistException e) {
             throw new ParentDoesNotExist("Parent directory does not exist");
         }

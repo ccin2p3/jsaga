@@ -13,6 +13,7 @@ import org.globus.axis.transport.HTTPSSender;
 import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.*;
 
+import java.io.File;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -32,6 +33,7 @@ public abstract class SRMDataAdaptorAbstract implements DataAdaptor {
     private static final String TRANSFER_PROTOCOLS = "TransferProtocols";    
     protected static SimpleProvider s_provider;
     protected GSSCredential m_credential;
+    protected File m_certRepository;
     protected String m_host;
     protected int m_port;
     protected String[] m_transferProtocols;
@@ -72,7 +74,9 @@ public abstract class SRMDataAdaptorAbstract implements DataAdaptor {
     }
 
     public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
-        m_credential = ((GSSCredentialSecurityAdaptor) securityAdaptor).getGSSCredential();
+        GSSCredentialSecurityAdaptor proxyAdaptor = (GSSCredentialSecurityAdaptor) securityAdaptor;
+        m_credential = proxyAdaptor.getGSSCredential();
+        m_certRepository = proxyAdaptor.getCertRepository();
     }
 
     public BaseURL getBaseURL() throws IncorrectURLException {

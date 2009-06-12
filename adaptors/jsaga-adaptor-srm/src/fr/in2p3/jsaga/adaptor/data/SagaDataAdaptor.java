@@ -56,11 +56,12 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
     public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {}
     public BaseURL getBaseURL() throws IncorrectURLException {return null;}
 
-    public SagaDataAdaptor(URI url, GSSCredential cred, String token, String srmPath, StreamCallback callback) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+    public SagaDataAdaptor(URI url, GSSCredential cred, java.io.File certRepository, String token, String srmPath, StreamCallback callback) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         try {
             Context context = ContextFactory.createContext();
-            context.setAttribute("Type", "InMemoryProxy");
-            context.setAttribute("UserProxy", InMemoryProxySecurityAdaptor.toBase64(cred));
+            context.setAttribute(Context.TYPE, "InMemoryProxy");
+            context.setAttribute(Context.USERPROXY, InMemoryProxySecurityAdaptor.toBase64(cred));
+            context.setAttribute(Context.CERTREPOSITORY, certRepository.getAbsolutePath());
             m_session = SessionFactory.createSession(false);
             m_session.addContext(context);
             m_rootUrl = URLFactory.createURL(url.resolve(".").toString());
