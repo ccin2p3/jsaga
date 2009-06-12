@@ -41,7 +41,9 @@ public class SRM22FileAttributes extends FileAttributes {
         }
 
         // set size
-        m_size = entry.getSize().intValue();
+        if (entry.getSize() != null) {
+            m_size = entry.getSize().intValue();
+        }
 
         // set permission
         if (entry.getOwnerPermission() != null) {
