@@ -30,11 +30,11 @@ public class SRM22FileAttributes extends FileAttributes {
 
         // set type
         TFileType type = entry.getType();
-        if (type.equals(TFileType.FILE)) {
+        if (TFileType.FILE.equals(type)) {
             m_type = FileAttributes.FILE_TYPE;
-        } else if (type.equals(TFileType.DIRECTORY)) {
+        } else if (TFileType.DIRECTORY.equals(type)) {
             m_type = FileAttributes.DIRECTORY_TYPE;
-        } else if (type.equals(TFileType.LINK)) {
+        } else if (TFileType.LINK.equals(type)) {
             m_type = FileAttributes.LINK_TYPE;
         } else {
             m_type = FileAttributes.UNKNOWN_TYPE;
@@ -46,21 +46,21 @@ public class SRM22FileAttributes extends FileAttributes {
         // set permission
         if (entry.getOwnerPermission() != null) {
             TPermissionMode perm = entry.getOwnerPermission().getMode();
-            if (perm.equals(TPermissionMode.NONE)) {
+            if (TPermissionMode.NONE.equals(perm)) {
                 m_permission = PermissionBytes.NONE;
-            } else if (perm.equals(TPermissionMode.X)) {
+            } else if (TPermissionMode.X.equals(perm)) {
                 m_permission = PermissionBytes.EXEC;
-            } else if (perm.equals(TPermissionMode.W)) {
+            } else if (TPermissionMode.W.equals(perm)) {
                 m_permission = PermissionBytes.WRITE;
-            } else if (perm.equals(TPermissionMode.R)) {
+            } else if (TPermissionMode.R.equals(perm)) {
                 m_permission = PermissionBytes.READ;
-            } else if (perm.equals(TPermissionMode.WX)) {
+            } else if (TPermissionMode.WX.equals(perm)) {
                 m_permission = PermissionBytes.WRITE.or(PermissionBytes.EXEC);
-            } else if (perm.equals(TPermissionMode.RX)) {
+            } else if (TPermissionMode.RX.equals(perm)) {
                 m_permission = PermissionBytes.READ.or(PermissionBytes.EXEC);
-            } else if (perm.equals(TPermissionMode.RW)) {
+            } else if (TPermissionMode.RW.equals(perm)) {
                 m_permission = PermissionBytes.READ.or(PermissionBytes.WRITE);
-            } else if (perm.equals(TPermissionMode.RWX)) {
+            } else if (TPermissionMode.RWX.equals(perm)) {
                 m_permission = PermissionBytes.READ.or(PermissionBytes.WRITE).or(PermissionBytes.EXEC);
             }
         }
