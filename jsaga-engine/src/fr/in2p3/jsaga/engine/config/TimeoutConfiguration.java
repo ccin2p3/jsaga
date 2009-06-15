@@ -42,7 +42,7 @@ public class TimeoutConfiguration {
                 m_timeout.load(timeoutCfgStream);
                 timeoutCfgStream.close();
             } catch (IOException e) {
-                throw new ConfigurationException("Failed to load configuration file: "+timeoutCfgURL);
+                throw new ConfigurationException("Failed to load configuration file: "+timeoutCfgURL, e);
             }
         }
     }

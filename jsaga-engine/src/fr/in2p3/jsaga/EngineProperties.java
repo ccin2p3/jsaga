@@ -21,7 +21,6 @@ import java.util.Properties;
  */
 public class EngineProperties {
     public static final String JSAGA_UNIVERSE = "jsaga.universe";
-    public static final String JSAGA_UNIVERSE_CREATE_IF_MISSING = "jsaga.universe.create.if.missing";
     public static final String JSAGA_UNIVERSE_ENABLE_CACHE = "jsaga.universe.enable.cache";
     public static final String JSAGA_UNIVERSE_IGNORE_MISSING_ADAPTOR = "jsaga.universe.ignore.missing.adaptor";
     public static final String JSAGA_TIMEOUT = "jsaga.timeout";
@@ -40,14 +39,13 @@ public class EngineProperties {
         if (s_prop == null) {
             // set default properties
             s_prop = new Properties();
-            s_prop.setProperty(JSAGA_UNIVERSE, "etc/jsaga-universe.xml");
-            s_prop.setProperty(JSAGA_UNIVERSE_CREATE_IF_MISSING, "false");
+            //s_prop.setProperty(JSAGA_UNIVERSE, "etc/jsaga-universe.xml");
             s_prop.setProperty(JSAGA_UNIVERSE_ENABLE_CACHE, "true");
             s_prop.setProperty(JSAGA_UNIVERSE_IGNORE_MISSING_ADAPTOR, "true");
-            s_prop.setProperty(JSAGA_TIMEOUT, "etc/jsaga-timeout.properties");
-            s_prop.setProperty(LOG4J_CONFIGURATION, "etc/log4j.properties");
+            //s_prop.setProperty(JSAGA_TIMEOUT, "etc/jsaga-timeout.properties");
+            //s_prop.setProperty(LOG4J_CONFIGURATION, "etc/log4j.properties");
             s_prop.setProperty(DATA_COPY_BUFFER_SIZE, "16384");
-            s_prop.setProperty(JOB_DESCRIPTION_DEFAULT, "etc/jsaga-default.jsdl");
+            //s_prop.setProperty(JOB_DESCRIPTION_DEFAULT, "etc/jsaga-default.jsdl");
             s_prop.setProperty(JOB_MONITOR_POLL_PERIOD, "1000");
             s_prop.setProperty(JOB_MONITOR_ERROR_THRESHOLD, "3");
             s_prop.setProperty(JOB_CONTROL_CHECK_AVAILABILITY, "false");
@@ -101,7 +99,7 @@ public class EngineProperties {
      * @param name the name of the property
      * @return the URL
      */
-    public static URL getRequiredURL(String name) throws ConfigurationException {
+    public static URL getURL(String name) throws ConfigurationException {
         // try with system property
         String value = System.getProperty(name);
         if (value != null) {
@@ -113,27 +111,24 @@ public class EngineProperties {
         } else {
             // try with engine property
             String path = EngineProperties.getEngineProperty(name);
-            File file;
-            if (new File(path).isAbsolute()) {
-                file = new File(path);
+            if (path != null) {
+                File file;
+                if (new File(path).isAbsolute()) {
+                    file = new File(path);
+                } else {
+                    file = new File(Base.JSAGA_HOME, path);
+                }
+                if (! file.exists()) {
+                    throw new ConfigurationException("File not found: "+file);
+                }
+                try {
+                    return file.toURL();
+                } catch (MalformedURLException e) {
+                    throw new ConfigurationException("Malformed URL: "+file, e);
+                }
             } else {
-                file = new File(Base.JSAGA_HOME, path);
+                return null;
             }
-            if (! file.exists()) {
-                throw new ConfigurationException("File not found: "+file);
-            }
-            try {
-                return file.toURL();
-            } catch (MalformedURLException e) {
-                throw new ConfigurationException("Malformed URL: "+file, e);
-            }
-        }
-    }
-    public static URL getURL(String name) throws ConfigurationException {
-        try {
-            return getRequiredURL(name);
-        } catch (ConfigurationException e) {
-            return null;
         }
     }
 

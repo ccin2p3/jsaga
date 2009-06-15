@@ -96,19 +96,13 @@ public class Configuration {
         boolean sameDescMD5 = MD5Digester.isSame(new File(baseDir, ADAPTOR_DESCRIPTORS +".md5"), descBytes);
 
         // load config (jsaga-universe)
-        URL jsagaCfgURL;
-        try {
-            jsagaCfgURL = EngineProperties.getRequiredURL(EngineProperties.JSAGA_UNIVERSE);
-        } catch (ConfigurationException e) {
-            if (EngineProperties.getBoolean(EngineProperties.JSAGA_UNIVERSE_CREATE_IF_MISSING)) {
-                File emptyCfg = new File(Base.JSAGA_VAR, "jsaga-universe.xml");
-                OutputStream out = new FileOutputStream(emptyCfg);
-                out.write("<UNIVERSE name='empty' xmlns='http://www.in2p3.fr/jsaga'/>".getBytes());
-                out.close();
-                jsagaCfgURL = emptyCfg.toURL();
-            } else {
-                throw e;
-            }
+        URL jsagaCfgURL = EngineProperties.getURL(EngineProperties.JSAGA_UNIVERSE);
+        if (jsagaCfgURL == null) {
+            File emptyCfg = new File(Base.JSAGA_VAR, "jsaga-universe.xml");
+            OutputStream out = new FileOutputStream(emptyCfg);
+            out.write("<UNIVERSE name='empty' xmlns='http://www.in2p3.fr/jsaga'/>".getBytes());
+            out.close();
+            jsagaCfgURL = emptyCfg.toURL();
         }
 
         // xinclude
