@@ -29,6 +29,7 @@ import java.util.Date;
 public abstract class AbstractJobTest extends AbstractTest {
 	
 	// values
+    protected String CANDIDATE_HOST             = "candidate.host";
 	protected String SIMPLE_JOB_BINARY 			= "simpleJobBinary";
 	protected String MAX_QUEUING_TIME 			= "maxQueuingTime";
 	protected String LONG_JOB_BINARY  			= "longJobBinary";
@@ -46,6 +47,7 @@ public abstract class AbstractJobTest extends AbstractTest {
 
     // configuration
     protected URL m_jobservice;
+    protected String m_candidateHost;
     protected Session m_session;
 
     protected AbstractJobTest(String jobprotocol) throws Exception {
@@ -53,6 +55,7 @@ public abstract class AbstractJobTest extends AbstractTest {
 
         // configure
         m_jobservice = URLFactory.createURL(getRequiredProperty(jobprotocol, CONFIG_JOBSERVICE_URL));
+        m_candidateHost = super.getOptionalProperty(jobprotocol, CANDIDATE_HOST);
         m_session = SessionFactory.createSession(true);
         
         // init values
@@ -101,6 +104,9 @@ public abstract class AbstractJobTest extends AbstractTest {
         desc.setAttribute(JobDescription.EXECUTABLE, executable);
         desc.setAttribute(JobDescription.OUTPUT, "stdout.txt");
         desc.setAttribute(JobDescription.ERROR, "stderr.txt");
+        if (m_candidateHost != null) {
+            desc.setVectorAttribute(JobDescription.CANDIDATEHOSTS, new String[]{m_candidateHost});
+        }
         if(attributes != null) {
         	for (int i = 0; i < attributes.length; i++) {
         		desc.setAttribute(attributes[i].getKey(), attributes[i].getValue());
