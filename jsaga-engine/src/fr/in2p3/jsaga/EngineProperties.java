@@ -49,7 +49,7 @@ public class EngineProperties {
             s_prop.setProperty(JOB_MONITOR_POLL_PERIOD, "1000");
             s_prop.setProperty(JOB_MONITOR_ERROR_THRESHOLD, "3");
             s_prop.setProperty(JOB_CONTROL_CHECK_AVAILABILITY, "false");
-            s_prop.setProperty(JOB_CONTROL_CHECK_MATCH, "true");
+            s_prop.setProperty(JOB_CONTROL_CHECK_MATCH, "false");
 
             // load properties
             File file = new File(Base.JSAGA_HOME, "etc/jsaga-config.properties");
