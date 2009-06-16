@@ -49,7 +49,14 @@ Requirements = true <xsl:text/>
 &amp;&amp; other.GlueHostMainMemoryRAMSize >= <xsl:value-of select="."/> <xsl:text/>
 		</xsl:for-each>
  		<xsl:for-each select="jsdl:Resources/jsdl:CandidateHosts/jsdl:HostName/text()">
+             <xsl:choose>
+                 <xsl:when test="contains(.,'/')">
+&amp;&amp; other.GlueCEUniqueID == "<xsl:value-of select="."/>" <xsl:text/>
+                 </xsl:when>
+                 <xsl:otherwise>
 &amp;&amp; other.GlueCEInfoHostName == "<xsl:value-of select="."/>" <xsl:text/>
+                 </xsl:otherwise>
+             </xsl:choose>
 		</xsl:for-each>
 		<xsl:for-each select="jsdl:Application/spmd:SPMDApplication/spmd:ProcessesPerHost/text()">
 &amp;&amp; other.GlueCEInfoTotalCPUs >= <xsl:value-of select="."/> <xsl:text/>
