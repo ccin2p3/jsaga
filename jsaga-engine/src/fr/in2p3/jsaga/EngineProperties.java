@@ -110,7 +110,7 @@ public class EngineProperties {
             }
         } else {
             // try with engine property
-            String path = EngineProperties.getEngineProperty(name);
+            String path = getProperties().getProperty(name);
             if (path != null) {
                 File file;
                 if (new File(path).isAbsolute()) {
