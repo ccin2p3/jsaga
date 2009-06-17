@@ -22,10 +22,7 @@
             <data type="gsiftp" deactivated="true"/>
         </GRID>
         <GRID name="default" contextType="Globus">
-            <domain name="in2p3.fr">
-                <host prefix="ccgridvmli08"/>
-            </domain>
-            <job type="gatekeeper"/>
+            <job type="lcgce"/>
         </GRID>
         <data type="gsiftp"/>
     </UNIVERSE>
