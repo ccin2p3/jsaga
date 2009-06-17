@@ -72,7 +72,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     }
 
     public String[] getSupportedSandboxProtocols() {
-        return null;    // no sandbox management
+        return new String[]{"file","gsiftp"};    // no sandbox management
     }
 
     public String getTranslator() {
