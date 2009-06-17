@@ -165,39 +165,39 @@
                     <jsdl:DataStaging>
                         <xsl:choose>
                             <xsl:when test="contains(.,'>>')">
-                                <jsdl:FileName><xsl:value-of select="substring-after(.,'>>')"/></jsdl:FileName>
+                                <jsdl:FileName><xsl:value-of select="normalize-space(substring-after(.,'>>'))"/></jsdl:FileName>
                                 <jsdl:FilesystemName>WorkingDirectory</jsdl:FilesystemName>
                                 <jsdl:CreationFlag>Append</jsdl:CreationFlag>
                                 <xsl:call-template name="CLEANUP"/>
                                 <jsdl:Source>
-                                    <jsdl:URI><xsl:value-of select="substring-before(.,'>>')"/></jsdl:URI>
+                                    <jsdl:URI><xsl:value-of select="normalize-space(substring-before(.,'>>'))"/></jsdl:URI>
                                 </jsdl:Source>
                             </xsl:when>
                             <xsl:when test="contains(.,'>')">
-                                <jsdl:FileName><xsl:value-of select="substring-after(.,'>')"/></jsdl:FileName>
+                                <jsdl:FileName><xsl:value-of select="normalize-space(substring-after(.,'>'))"/></jsdl:FileName>
                                 <jsdl:FilesystemName>WorkingDirectory</jsdl:FilesystemName>
                                 <jsdl:CreationFlag>Overwrite</jsdl:CreationFlag>
                                 <xsl:call-template name="CLEANUP"/>
                                 <jsdl:Source>
-                                    <jsdl:URI><xsl:value-of select="substring-before(.,'>')"/></jsdl:URI>
+                                    <jsdl:URI><xsl:value-of select="normalize-space(substring-before(.,'>'))"/></jsdl:URI>
                                 </jsdl:Source>
                             </xsl:when>
                             <xsl:when test="contains(.,'&lt;&lt;')">
-                                <jsdl:FileName><xsl:value-of select="substring-after(.,'&lt;&lt;')"/></jsdl:FileName>
+                                <jsdl:FileName><xsl:value-of select="normalize-space(substring-after(.,'&lt;&lt;'))"/></jsdl:FileName>
                                 <jsdl:FilesystemName>WorkingDirectory</jsdl:FilesystemName>
                                 <jsdl:CreationFlag>Append</jsdl:CreationFlag>
                                 <xsl:call-template name="CLEANUP"/>
                                 <jsdl:Target>
-                                    <jsdl:URI><xsl:value-of select="substring-before(.,'&lt;&lt;')"/></jsdl:URI>
+                                    <jsdl:URI><xsl:value-of select="normalize-space(substring-before(.,'&lt;&lt;'))"/></jsdl:URI>
                                 </jsdl:Target>
                             </xsl:when>
                             <xsl:when test="contains(.,'&lt;')">
-                                <jsdl:FileName><xsl:value-of select="substring-after(.,'&lt;')"/></jsdl:FileName>
+                                <jsdl:FileName><xsl:value-of select="normalize-space(substring-after(.,'&lt;'))"/></jsdl:FileName>
                                 <jsdl:FilesystemName>WorkingDirectory</jsdl:FilesystemName>
                                 <jsdl:CreationFlag>Overwrite</jsdl:CreationFlag>
                                 <xsl:call-template name="CLEANUP"/>
                                 <jsdl:Target>
-                                    <jsdl:URI><xsl:value-of select="substring-before(.,'&lt;')"/></jsdl:URI>
+                                    <jsdl:URI><xsl:value-of select="normalize-space(substring-before(.,'&lt;'))"/></jsdl:URI>
                                 </jsdl:Target>
                             </xsl:when>
                             <xsl:otherwise>
