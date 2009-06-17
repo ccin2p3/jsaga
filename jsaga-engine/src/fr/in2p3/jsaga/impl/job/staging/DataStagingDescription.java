@@ -40,7 +40,7 @@ public class DataStagingDescription {
             // split fileTransfer into pluginStagingList and stagingList
             for (String ft : fileTransfer) {
                 AbstractDataStaging dataStaging = DataStagingFactory.create(ft);
-                if (supportedProtocols.contains(dataStaging.getLocalProtocol()) && supportedProtocols.contains(dataStaging.getWorkerProtocol())) {
+                if (supportedProtocols.contains(dataStaging.getLocalProtocol())) {
                     pluginStagingList.add(ft);
                 } else {
                     m_stagingList.add(dataStaging);
