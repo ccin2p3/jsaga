@@ -41,11 +41,11 @@ public class SAGAJobDescriptionImpl extends AbstractJobDescriptionImpl implement
                 Element elem = document.createElement(key);
                 if (super.isVectorAttribute(key)) {
                     String[] values = super.getVectorAttribute(key);
-                    Element item = document.createElement("value");
                     for (int v=0; v<values.length; v++) {
+                        Element item = document.createElement("value");
                         item.appendChild(document.createTextNode(values[v]));
+                        elem.appendChild(item);
                     }
-                    elem.appendChild(item);
                 } else {
                     String value = super.getAttribute(key);
                     elem.setAttribute("value", value);
