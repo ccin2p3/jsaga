@@ -87,9 +87,48 @@ NodeNumber = <xsl:value-of select="."/>;<xsl:text/>
             	</xsl:otherwise>
         	</xsl:choose>
         </xsl:for-each>
+
+        <xsl:if test="count(jsdl:DataStaging[jsdl:Source/jsdl:URI]) > 0">
+InputSandbox = {<xsl:apply-templates select="jsdl:DataStaging/jsdl:Source/jsdl:URI"/>};
+        </xsl:if>
+        <xsl:if test="count(jsdl:DataStaging[jsdl:Target/jsdl:URI]) > 0">
+OutputSandbox = {<xsl:apply-templates select="jsdl:DataStaging/jsdl:Target/jsdl:URI"/>};
+        </xsl:if>
+    </xsl:template>
+
+
+    <xsl:template match="jsdl:URI">
+        <!-- check file not renamed -->
+        <xsl:variable name="filename">
+            <xsl:call-template name="FILENAME"><xsl:with-param name="uri" select="text()"/></xsl:call-template>
+        </xsl:variable>
+        <xsl:if test="$filename != jsdl:FileName/text()">
+            <xsl:message terminate="yes">Renaming file is not supported: <xsl:value-of
+                    select="$filename"/> / <xsl:value-of select="jsdl:FileName/text()"/></xsl:message>
+        </xsl:if>
+        <!-- add URI -->
+        <xsl:if test="position() > 1">
+            <xsl:text>, </xsl:text>
+        </xsl:if>
+        <xsl:text>"</xsl:text><xsl:value-of select="text()"/><xsl:text>"</xsl:text>
     </xsl:template>
 
     <xsl:template match="ext:Extension"># Extension:
 <xsl:value-of select="text()"/>
+    </xsl:template>
+
+
+    <xsl:template name="FILENAME">
+        <xsl:param name="uri"/>
+        <xsl:choose>
+            <xsl:when test="contains($uri,'/')">
+                <xsl:call-template name="FILENAME">
+                    <xsl:with-param name="uri" select="substring-after($uri,'/')"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$uri"/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 </xsl:stylesheet>
