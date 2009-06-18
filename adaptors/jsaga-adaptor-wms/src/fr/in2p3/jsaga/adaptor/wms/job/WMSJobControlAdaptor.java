@@ -20,6 +20,8 @@ import org.glite.wms.wmproxy.*;
 import org.globus.ftp.GridFTPClient;
 import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
+import org.globus.io.urlcopy.UrlCopy;
+import org.globus.io.urlcopy.UrlCopyException;
 import org.globus.util.GlobusURL;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
@@ -27,6 +29,7 @@ import org.ogf.saga.url.URL;
 
 import java.io.*;
 import java.util.Map;
+import java.util.Properties;
 
 
 /* ***************************************************
@@ -54,6 +57,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     private String m_delegationId = "myId";
     private String m_wmsServerUrl;
     private String m_lbServerUrl;
+    private boolean m_isInteractive;
     
     public String getType() {
         return "wms";
@@ -190,6 +194,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     
     public String submit(String jobDesc, boolean checkMatch, String uniqId)
     	throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
+        m_isInteractive = false;
     	try {
             // put lbServerUrl in JDL
     		if (m_lbServerUrl != null) {
@@ -198,37 +203,86 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 			
 			// parse JDL and Check Matching
 			checkJDLAndMAtch(jobDesc, checkMatch, m_client);
-			
-    		// submit
-    		String jobId = m_client.jobSubmit(jobDesc, m_delegationId).getId();
-            if(logger.isDebugEnabled())
-            	logger.debug("Id for job:"+jobId);
 
-            // set lbServerUrl from jobId
-            if (m_lbServerUrl == null) {
-                WMSJobMonitorAdaptor.setLBServerUrl(m_wmsServerUrl, jobId);
+            String jobId;
+            if (jobDesc.contains("InputSandbox")) {
+                // get input files from jobDesc
+                Properties prop = new Properties();
+                try {
+                    prop.load(new ByteArrayInputStream(jobDesc.getBytes()));
+                } catch (IOException e) {
+                    throw new NoSuccessException("Unable to parse native job description: "+jobDesc);
+                }
+                String inSbx = prop.getProperty("InputSandbox");
+                inSbx = inSbx.substring(1, inSbx.length()-2).replaceAll("\"", "");
+                String[] array = inSbx.split(", ");
+                File[] inputFiles = new File[array.length];
+                for (int i=0; i<array.length; i++) {
+                    inputFiles[i] = new File(array[i]);
+                    if (! inputFiles[i].exists()) {
+                        throw new NoSuccessException("File not found: "+inputFiles[i]);
+                    }
+                }
+
+                // register job
+                jobId = m_client.jobRegister(jobDesc, m_delegationId).getId();
+                if(logger.isDebugEnabled())
+                    logger.debug("Id for job:"+jobId);
+
+                // upload input files to the sandbox associated to the registered job
+                StringList list = m_client.getSandboxDestURI(jobId, "gsiftp");
+                if(list == null  || list.getItem() == null || list.getItem().length < 1) {
+                    throw new NoSuccessException("Unable to find a sandbox dest uri");
+                }
+                for (int i=0; i<inputFiles.length; i++) {
+                    File inputFile = inputFiles[i];
+                    try {
+                        String[] uriList = list.getItem();
+                        GlobusURL to = new GlobusURL(uriList[0]+"/"+inputFile.getName());
+                        GridFTPClient test = new GridFTPClient(to.getHost(), to.getPort());
+                        test.authenticate(m_credential);
+                        test.put(inputFile, "/"+to.getPath(), true);
+                    } catch(Exception e) {
+                        throw new NoSuccessException("Unable to stage input file: "+inputFile,e);
+                    }
+                }
+
+                // set lbServerUrl from jobId
+                if (m_lbServerUrl == null) {
+                    WMSJobMonitorAdaptor.setLBServerUrl(m_wmsServerUrl, jobId);
+                }
+
+                // start job
+                m_client.jobStart(jobId);
+            } else {
+                // submit
+                jobId = m_client.jobSubmit(jobDesc, m_delegationId).getId();
+                if(logger.isDebugEnabled())
+                    logger.debug("Id for job:"+jobId);
+
+                // set lbServerUrl from jobId
+                if (m_lbServerUrl == null) {
+                    WMSJobMonitorAdaptor.setLBServerUrl(m_wmsServerUrl, jobId);
+                }
+
             }
 	    	return jobId;
-        } catch (ServerOverloadedFaultException e) {
-            throw new NoSuccessException(e);
-    	} catch (ServiceException e) {
-			throw new NoSuccessException(e);
+        } catch (NoSuccessException e) {
+            throw e;
 		} catch (AuthorizationFaultException e) {
 			throw new PermissionDeniedException(e);
 		} catch (AuthenticationFaultException e) {
 			throw new PermissionDeniedException(e);
-		} catch (InvalidArgumentFaultException e) {
+		} catch (Exception e) {
 			throw new NoSuccessException(e);
-		} catch (NoSuitableResourcesFaultException e) {
-			throw new NoSuccessException(e);
-		}
+        }
     }
     
 
 
 	public JobIOHandler submit(String jobDesc, boolean checkMatch,
                                String uniqId, InputStream stdin) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		
+		m_isInteractive = true;
 		try {
             // put lbServerUrl in JDL
 			if (m_lbServerUrl != null) {
@@ -365,27 +419,45 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException,
             NoSuccessException {
         try  {
-	    	// purge
-        	try {
-        		m_client.jobPurge(nativeJobId);
-        	}
-        	catch(Exception  e) {
-        	}
-	    	if(stdoutFile != null &&
-	    			stdoutFile.exists()) {
-	    		stdoutFile.delete();
-				// fixme: file not deleted!
-	    	}
-	    	if(stderrFile != null &&
-	    			stderrFile.exists()) {
-	    		stderrFile.delete();
-				// fixme: file not deleted!
-			}
-			if(m_tmpProxyFile != null &&
-					m_tmpProxyFile.exists()) {
-				m_tmpProxyFile.delete();
-				// fixme: file not deleted!
-			}
+            if (m_isInteractive) {
+                if(stdoutFile != null && stdoutFile.exists()) {
+                    stdoutFile.delete(); // fixme: file not deleted!
+                }
+                if(stderrFile != null && stderrFile.exists()) {
+                    stderrFile.delete(); // fixme: file not deleted!
+                }
+                if(m_tmpProxyFile != null && m_tmpProxyFile.exists()) {
+                    m_tmpProxyFile.delete(); // fixme: file not deleted!
+                }
+            } else {
+                //Use the "gsiftp" transfer protocols to retrieve the list of files produced by the jobs.
+                StringAndLongList result = m_client.getOutputFileList(nativeJobId, "gsiftp");
+                if ( result != null )
+                {
+                    //Retrieve the file(s) from the WMProxy Server.
+                    StringAndLongType[] list = result.getFile();
+                    for (int i=0; list!=null && i<list.length ; i++){
+                        String from = list[i].getName();
+                        String filename = new File(from).getName();
+                        String to = new File(filename).toURI().toString().replaceFirst("file:", "file://");
+                        UrlCopy uCopy = new UrlCopy();
+                        uCopy.setDestinationCredentials(m_credential);
+                        uCopy.setSourceCredentials(m_credential);
+                        uCopy.setDestinationUrl(new GlobusURL(to));
+                        uCopy.setSourceUrl(new GlobusURL(from));
+                        try {
+                            uCopy.copy();
+                        } catch (UrlCopyException e) {
+                            throw new NoSuccessException("Failed to download output: "+from);
+                        }
+                    }
+                }
+            }
+
+            // purge
+            try {
+                m_client.jobPurge(nativeJobId);
+            } catch(Exception  e) {/*ignore*/}
         } catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
