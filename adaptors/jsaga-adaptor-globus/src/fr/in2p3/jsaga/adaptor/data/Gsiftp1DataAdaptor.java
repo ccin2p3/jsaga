@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.data;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.helpers.EntryPath;
@@ -9,7 +10,6 @@ import org.globus.ftp.GridFTPSession;
 import org.globus.ftp.exception.UnexpectedReplyCodeException;
 import org.ogf.saga.error.*;
 
-import java.lang.Exception;
 import java.util.Map;
 import java.util.Vector;
 
@@ -32,7 +32,7 @@ public class Gsiftp1DataAdaptor extends GsiftpDataAdaptorAbstract {
 
     /** setting protection level is not supported */
     public Usage getUsage() {
-        return null;
+        return new UOptional(TCP_BUFFER_SIZE);
     }
 
     /** setting protection level is not supported */

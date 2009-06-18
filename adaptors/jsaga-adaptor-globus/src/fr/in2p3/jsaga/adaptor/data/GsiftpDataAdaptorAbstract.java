@@ -33,6 +33,9 @@ import java.util.Map;
  *
  */
 public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, FileWriterPutter, DataCopy, DataRename {
+    protected static final String TCP_BUFFER_SIZE = "TCPBufferSize";
+    protected int m_TCPBufferSize;
+
     protected GSSCredential m_credential;
     protected GridFTPClient m_client;
 
@@ -55,6 +58,16 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+        // configure
+        if (attributes.containsKey(TCP_BUFFER_SIZE)) {
+            try {
+                m_TCPBufferSize = Integer.parseInt((String) attributes.get(TCP_BUFFER_SIZE));
+            } catch (NumberFormatException e) {
+                throw new BadParameterException("Bad value for configuration attribute: "+TCP_BUFFER_SIZE, e);
+            }
+        }
+
+        // open connection
         try {
             m_client = new GridFTPClient(host, port);
             m_client.setAuthorization(HostAuthorization.getInstance());
@@ -130,6 +143,10 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
         final boolean autoFlush = false;
         final boolean ignoreOffset = true;
         try {
+            if (m_TCPBufferSize > 0) {
+                m_client.setTCPBufferSize(m_TCPBufferSize);
+            }
+
             m_client.setType(GridFTPSession.TYPE_IMAGE);
             m_client.setMode(GridFTPSession.MODE_STREAM); //MODE_EBLOCK induce error: "451 refusing to store with active mode"
             m_client.setPassive();
@@ -146,6 +163,10 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
     public void putFromStream(String absolutePath, boolean append, String additionalArgs, InputStream stream) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         final int DEFAULT_BUFFER_SIZE = 16384;
         try {
+            if (m_TCPBufferSize > 0) {
+                m_client.setTCPBufferSize(m_TCPBufferSize);
+            }
+
             m_client.setType(GridFTPSession.TYPE_IMAGE);
             m_client.setMode(GridFTPSession.MODE_EBLOCK);
             m_client.setPassive();

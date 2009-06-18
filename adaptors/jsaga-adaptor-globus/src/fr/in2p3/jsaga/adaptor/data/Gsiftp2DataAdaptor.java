@@ -1,8 +1,7 @@
 package fr.in2p3.jsaga.adaptor.data;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
-import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
-import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import org.globus.ftp.GridFTPSession;
 import org.globus.ftp.MlsxEntry;
@@ -11,7 +10,6 @@ import org.globus.ftp.exception.UnexpectedReplyCodeException;
 import org.ogf.saga.error.*;
 
 import java.io.IOException;
-import java.lang.Exception;
 import java.util.*;
 
 /* ***************************************************
@@ -34,7 +32,10 @@ public class Gsiftp2DataAdaptor extends GsiftpDataAdaptorAbstract {
     }
 
     public Usage getUsage() {
-        return new UOptional(PROTECTION);
+        return new UOr(new U[]{
+                new UOptional(TCP_BUFFER_SIZE),
+                new UOptional(PROTECTION)
+        });
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
