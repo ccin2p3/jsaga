@@ -92,12 +92,13 @@ NodeNumber = <xsl:value-of select="."/>;<xsl:text/>
 InputSandbox = {<xsl:apply-templates select="jsdl:DataStaging/jsdl:Source/jsdl:URI"/>};
         </xsl:if>
         <xsl:if test="count(jsdl:DataStaging[jsdl:Target/jsdl:URI]) > 0">
-OutputSandbox = {<xsl:apply-templates select="jsdl:DataStaging/jsdl:Target/jsdl:URI"/>};
+OutputSandbox = {<xsl:apply-templates select="jsdl:DataStaging[jsdl:Target/jsdl:URI]/jsdl:FileName"/>};
+OutputSandboxDestURI = {<xsl:apply-templates select="jsdl:DataStaging/jsdl:Target/jsdl:URI"/>};
         </xsl:if>
     </xsl:template>
 
 
-    <xsl:template match="jsdl:URI">
+    <xsl:template match="jsdl:Source/jsdl:URI">
         <!-- check file not renamed -->
         <xsl:variable name="filename">
             <xsl:call-template name="FILENAME"><xsl:with-param name="uri" select="text()"/></xsl:call-template>
@@ -107,16 +108,28 @@ OutputSandbox = {<xsl:apply-templates select="jsdl:DataStaging/jsdl:Target/jsdl:
                     select="$filename"/> / <xsl:value-of select="jsdl:FileName/text()"/></xsl:message>
         </xsl:if>
         <!-- add URI -->
-        <xsl:if test="position() > 1">
-            <xsl:text>, </xsl:text>
-        </xsl:if>
-        <xsl:text>"</xsl:text><xsl:value-of select="text()"/><xsl:text>"</xsl:text>
+        <xsl:call-template name="VALUE_OF_TEXT"/>
+    </xsl:template>
+    <xsl:template match="jsdl:DataStaging[jsdl:Target/jsdl:URI]/jsdl:FileName">
+        <!-- add FileName -->
+        <xsl:call-template name="VALUE_OF_TEXT"/>
+    </xsl:template>
+    <xsl:template match="jsdl:Target/jsdl:URI">
+        <!-- add URI -->
+        <xsl:call-template name="VALUE_OF_TEXT"/>
     </xsl:template>
 
     <xsl:template match="ext:Extension"># Extension:
 <xsl:value-of select="text()"/>
     </xsl:template>
 
+
+    <xsl:template name="VALUE_OF_TEXT">
+        <xsl:if test="position() > 1">
+            <xsl:text>, </xsl:text>
+        </xsl:if>
+        <xsl:text>"</xsl:text><xsl:value-of select="text()"/><xsl:text>"</xsl:text>
+    </xsl:template>
 
     <xsl:template name="FILENAME">
         <xsl:param name="uri"/>
