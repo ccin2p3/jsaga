@@ -28,8 +28,11 @@ import org.ogf.saga.error.*;
 import org.ogf.saga.url.URL;
 
 import java.io.*;
+import java.net.MalformedURLException;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /* ***************************************************
@@ -438,17 +441,20 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
                     StringAndLongType[] list = result.getFile();
                     for (int i=0; list!=null && i<list.length ; i++){
                         String from = list[i].getName();
-                        String filename = new File(from).getName();
-                        String to = new File(filename).toURI().toString().replaceFirst("file:", "file://");
+                        File to = new File(new File(from).getName());
+                        GlobusURL fromURL = createGlobusURL(from);
+                        GlobusURL toURL = createGlobusURL(to);
+
                         UrlCopy uCopy = new UrlCopy();
                         uCopy.setDestinationCredentials(m_credential);
                         uCopy.setSourceCredentials(m_credential);
-                        uCopy.setDestinationUrl(new GlobusURL(to));
-                        uCopy.setSourceUrl(new GlobusURL(from));
+                        uCopy.setDestinationUrl(toURL);
+                        uCopy.setSourceUrl(fromURL);
                         try {
+                            logger.info("Download output to: "+to);
                             uCopy.copy();
                         } catch (UrlCopyException e) {
-                            throw new NoSuccessException("Failed to download output: "+from);
+                            throw new NoSuccessException("Failed to download output: "+from, e);
                         }
                     }
                 }
@@ -462,4 +468,29 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 			throw new NoSuccessException(e);
 		}
 	}
+
+    private static GlobusURL createGlobusURL(String url) throws NoSuccessException {
+        Matcher m = Pattern.compile("(\\w+)://([\\w-.]+(:\\d+)?)(/.*)").matcher(url);
+        if (!m.matches() || m.groupCount()!=4) {
+            throw new NoSuccessException("Malformed URL: "+url);
+        }
+        String scheme = m.group(1);
+        String host = m.group(2);
+        String path = m.group(4);
+        // path must start with '//'
+        String fixedUrl = scheme+"://"+host+"/"+path;
+        try {
+            return new GlobusURL(fixedUrl);
+        } catch (MalformedURLException e) {
+            throw new NoSuccessException("Malformed URL: "+fixedUrl);
+        }
+    }
+
+    private static GlobusURL createGlobusURL(File file) throws NoSuccessException {
+        try {
+            return new GlobusURL(file.toURL());
+        } catch (MalformedURLException e) {
+            throw new NoSuccessException("[INTERNAL ERROR] Unexpected exception", e);
+        }
+    }
 }
