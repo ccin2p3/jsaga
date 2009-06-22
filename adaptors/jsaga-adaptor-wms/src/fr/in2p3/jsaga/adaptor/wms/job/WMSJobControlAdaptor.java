@@ -451,7 +451,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
                         uCopy.setDestinationUrl(toURL);
                         uCopy.setSourceUrl(fromURL);
                         try {
-                            logger.info("Download output to: "+to);
+                            logger.info("Downloading output: "+from);
                             uCopy.copy();
                         } catch (UrlCopyException e) {
                             throw new NoSuccessException("Failed to download output: "+from, e);
