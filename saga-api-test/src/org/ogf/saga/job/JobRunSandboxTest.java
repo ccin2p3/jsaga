@@ -25,7 +25,7 @@ import java.util.UUID;
  *
  */
 public abstract class JobRunSandboxTest extends AbstractJobTest {
-    private static final String SCRIPT_CONTENT = "#!/bin/sh\n/usr/bin/cat ${1##file:/} | /usr/bin/tr 'ou' 'ui' > ${2##file:/}";
+    private static final String SCRIPT_CONTENT = "#!/bin/sh\n/bin/cat ${1##file:/} | /usr/bin/tr 'ou' 'ui' > ${2##file:/}";
     private static final String INPUT_CONTENT = "coucou";
     private static final String OUTPUT_CONTENT = "cuicui";
     private static final File TMP = new File(System.getProperty("java.io.tmpdir"));
