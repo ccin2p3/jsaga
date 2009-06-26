@@ -40,12 +40,14 @@ public class SagaInputStream extends InputStream {
         try {
             Buffer buffer = BufferFactory.createBuffer(1);
             if (m_file.read(buffer, 1) == 1) {
-                return buffer.getData()[0];
+                byte b = buffer.getData()[0];
+                return (int) b & 0x000000FF;
+            } else {
+                return -1;
             }
         } catch (Exception e) {
             throw new IOException(e.getMessage());
         }
-        throw new IOException();
     }
 
     public int read(byte[] bytes, int off, int len) throws IOException {
