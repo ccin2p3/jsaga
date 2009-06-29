@@ -21,7 +21,10 @@
             <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/pkcs12_cred.txt"/>
             <data type="gsiftp" deactivated="true"/>
         </GRID>
-        <GRID name="default" contextType="Globus">
+        <GRID name="dteam" contextType="VOMS">
+            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/voms_cred.txt"/>
+            <domain name="in2p3.fr"/>
+            <data type="gsiftp"/>
             <job type="lcgce"/>
         </GRID>
         <data type="gsiftp"/>
