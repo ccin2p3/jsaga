@@ -107,6 +107,10 @@ public class Gsiftp2DataAdaptor extends GsiftpDataAdaptorAbstract {
         List files = new ArrayList();
         for (int i=0; i<v.size(); i++) {
             MlsxEntry entry = (MlsxEntry) v.get(i);
+            if (absolutePath.equals(entry.getFileName())) {
+                // ignore this entry: absolutePath
+                continue;
+            }
             try {
                 files.add(new Gsiftp2FileAttributes(entry));
             } catch(DoesNotExistException e) {
