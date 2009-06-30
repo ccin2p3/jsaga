@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
     <artifactId>jsaga-adaptor-srm</artifactId>
-    <version>0.9.8-SNAPSHOT</version>
+    <version>0.9.8</version>
     <name>Adaptors for SRM</name>
     <description>This module provides support for version 2.2 of the data management protocol SRM (Storage Resource Manager).</description>
     <build>
@@ -39,19 +39,19 @@
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-adaptoritf</artifactId>
-            <version>0.9.8-SNAPSHOT</version>
+            <version>0.9.8</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api-test</artifactId>
-            <version>0.9.8-SNAPSHOT</version>
+            <version>0.9.8</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
-            <version>0.9.8-SNAPSHOT</version>
+            <version>0.9.8</version>
             <scope>test</scope>
         </dependency>
 
@@ -59,13 +59,13 @@
         <dependency><!-- needed for security context -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-voms</artifactId>
-            <version>0.9.8-SNAPSHOT</version>
+            <version>0.9.8</version>
             <scope>runtime</scope>
         </dependency>
         <dependency><!-- needed for gsiftp (WARNING: order of dependencies matters) -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-globus</artifactId>
-            <version>0.9.8-SNAPSHOT</version>
+            <version>0.9.8</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -87,4 +87,8 @@
             <scope>runtime</scope>
         </dependency>
     </dependencies>
+
+  <scm>
+    <tag>jsaga-0_9_8</tag>
+  </scm>
 </project>
