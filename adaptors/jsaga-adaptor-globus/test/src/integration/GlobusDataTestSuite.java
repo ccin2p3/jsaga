@@ -23,6 +23,9 @@ public class GlobusDataTestSuite extends JSAGATestSuite {
     public static class index extends IndexTest {public index(){super(GlobusDataTestSuite.class);}}
 
     /** test cases */
+    public static class GsiftpNSSetUpTest extends NSSetUpTest {
+        public GsiftpNSSetUpTest() throws Exception {super("gsiftp");}
+    }
     public static class GsiftpNSEntryTest extends NSEntryTest {
         public GsiftpNSEntryTest() throws Exception {super("gsiftp");}
     }
