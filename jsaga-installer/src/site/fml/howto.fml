@@ -109,7 +109,7 @@ mvn scm:bootstrap -DscmVersionType=tag -DscmVersion=$TAG -Dgoals=deploy,site-dep
                     </li>
                     <li>Cleanup
                         <pre>cd ../build-tools ; mvn clean
-cd ../jsaga ; mvn clean -Dall
+cd ../jsaga ; mvn -f pom-unreleased.xml clean ; mvn clean
 cd jsaga-adaptorpom ; mvn uninstall:all</pre>
                     </li>
                     <li>Start an SSH agent (required for "mvn validate release:*")
