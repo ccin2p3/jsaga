@@ -22,7 +22,6 @@
 
   <!-- aggregation -->
   <modules>
-    <module>saga-api</module>
     <module>saga-api-test</module>
     <module>jsaga-adaptoritf</module>
     <module>jsaga-engine</module>
@@ -30,18 +29,4 @@
     <module>jsaga-adaptors</module>
     <module>jsaga-installer</module>
   </modules>
-    <profiles>
-        <profile>
-            <activation>
-                <property>
-                    <name>all</name>
-                </property>
-            </activation>
-            <modules>
-                <!-- unreleased projects -->
-                <module>jsaga-adaptorpom</module>
-                <module>maven-archetype-jsaga</module>
-            </modules>
-        </profile>
-    </profiles>
 </project>
