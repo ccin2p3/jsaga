@@ -5,8 +5,8 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import fr.in2p3.jsaga.adaptor.data.read.FileReaderGetter;
-import fr.in2p3.jsaga.adaptor.data.write.FileWriterPutter;
+import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
+import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
 import org.globus.common.ChainedIOException;
@@ -32,9 +32,13 @@ import java.util.Map;
 /**
  *
  */
-public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, FileWriterPutter, DataCopy, DataRename {
+public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
+//    FileReaderGetter, FileWriterPutter
+        FileReaderStreamFactory, FileWriterStreamFactory
+{
     protected static final String TCP_BUFFER_SIZE = "TCPBufferSize";
     protected int m_TCPBufferSize;
+    protected boolean m_DataChannelAuthentication;
 
     protected GSSCredential m_credential;
     protected GridFTPClient m_client;
@@ -59,50 +63,17 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         // configure
-        if (attributes.containsKey(TCP_BUFFER_SIZE)) {
+        if (attributes!=null && attributes.containsKey(TCP_BUFFER_SIZE)) {
             try {
                 m_TCPBufferSize = Integer.parseInt((String) attributes.get(TCP_BUFFER_SIZE));
             } catch (NumberFormatException e) {
                 throw new BadParameterException("Bad value for configuration attribute: "+TCP_BUFFER_SIZE, e);
             }
         }
+        m_DataChannelAuthentication = true;
 
         // open connection
-        try {
-            m_client = new GridFTPClient(host, port);
-            m_client.setAuthorization(HostAuthorization.getInstance());
-            m_client.authenticate(m_credential);
-        } catch (ChainedIOException e) {
-            try {
-                throw e.getException();
-            } catch (GlobusGSSException gssException) {
-                throw new AuthenticationFailedException(gssException);
-            } catch (Throwable throwable) {
-                throw new TimeoutException(throwable);
-            }
-        } catch (IOException e) {
-            if (e.getMessage()!=null && e.getMessage().indexOf("Authentication") > -1) {
-                throw new AuthenticationFailedException(e);
-            } else {
-                throw new TimeoutException(e);
-            }
-        } catch (ServerException e) {
-            switch(e.getCode()) {
-                case ServerException.SERVER_REFUSED:
-                    try {
-                        throw e.getRootCause();
-                    } catch (UnexpectedReplyCodeException unexpectedReplyCode) {
-                        switch(unexpectedReplyCode.getReply().getCode()) {
-                            case 530:
-                                throw new AuthorizationFailedException(unexpectedReplyCode);
-                            default:
-                                throw new NoSuccessException(unexpectedReplyCode);
-                        }
-                    } catch (Exception e1) {
-                        throw new NoSuccessException(e1);
-                    }
-            }
-        }
+        m_client = createConnection(m_credential, host, port, m_DataChannelAuthentication);
     }
 
     public void disconnect() throws NoSuccessException {
@@ -139,6 +110,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
         }
     }
 
+    /** not used (too slow) */
     public void getToStream(String absolutePath, String additionalArgs, OutputStream stream) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         final boolean autoFlush = false;
         final boolean ignoreOffset = true;
@@ -160,6 +132,7 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
         }
     }
 
+    /** not used (too slow) */
     public void putFromStream(String absolutePath, boolean append, String additionalArgs, InputStream stream) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         final int DEFAULT_BUFFER_SIZE = 16384;
         try {
@@ -176,6 +149,50 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
                 new DataSourceStream(stream, DEFAULT_BUFFER_SIZE),
                     null,
                     append);
+        } catch (Exception e) {
+            try {
+                throw rethrowExceptionFull(e);
+            } catch (DoesNotExistException e2) {
+                throw new ParentDoesNotExist(e);
+            }
+        }
+    }
+
+    public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+        // create input stream
+        try {
+            return new GsiftpInputStream(m_client, absolutePath);
+        } catch (Exception e) {
+            throw rethrowException(e);
+        }
+    }
+
+    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
+        String absolutePath = parentAbsolutePath+"/"+fileName;
+
+        // test existence
+        if (exclusive) {
+            boolean exists;
+            try {
+                exists = m_client.exists(absolutePath);
+            } catch (Exception e) {
+                try {
+                    throw rethrowExceptionFull(e);
+                } catch (DoesNotExistException e1) {
+                    throw new ParentDoesNotExist(e);
+                }
+            }
+            if (exists) {
+                throw new AlreadyExistsException("File already exists: "+fileName);
+            }
+        }
+
+        // create new connection (else test setUp hangs)
+        GridFTPClient tmpConnection = createConnection(m_credential, m_client, m_DataChannelAuthentication);
+
+        // create output stream
+        try {
+            return new GsiftpOutputStream(tmpConnection, absolutePath, append);
         } catch (Exception e) {
             try {
                 throw rethrowExceptionFull(e);
@@ -298,6 +315,67 @@ public abstract class GsiftpDataAdaptorAbstract implements FileReaderGetter, Fil
             m_client.deleteDir(parentAbsolutePath+"/"+directoryName);
         } catch (Exception e) {
             throw rethrowException(e);
+        }
+    }
+
+    private static GridFTPClient createConnection(GSSCredential cred, GridFTPClient client, boolean reqDCAU) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        try {
+            return createConnection(cred, client.getHost(), client.getPort(), reqDCAU);
+        } catch (AuthenticationFailedException e) {
+            throw new PermissionDeniedException(e);
+        } catch (AuthorizationFailedException e) {
+            throw new PermissionDeniedException(e);
+        }
+    }
+    private static GridFTPClient createConnection(GSSCredential cred, String host, int port, boolean reqDCAU) throws AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {
+        try {
+            GridFTPClient client = new GridFTPClient(host, port);
+            client.setAuthorization(HostAuthorization.getInstance());
+            client.authenticate(cred);
+
+            // may disable data channel authentication
+            if (client.isFeatureSupported("DCAU")) {
+                if (! reqDCAU) {
+                    client.setDataChannelAuthentication(DataChannelAuthentication.NONE);
+                }
+            } else {
+                client.setLocalNoDataChannelAuthentication();
+            }
+
+            // returns
+            return client;
+        } catch (ChainedIOException e) {
+            try {
+                throw e.getException();
+            } catch (GlobusGSSException gssException) {
+                throw new AuthenticationFailedException(gssException);
+            } catch (Throwable throwable) {
+                throw new TimeoutException(throwable);
+            }
+        } catch (IOException e) {
+            if (e.getMessage()!=null && e.getMessage().indexOf("Authentication") > -1) {
+                throw new AuthenticationFailedException(e);
+            } else {
+                throw new TimeoutException(e);
+            }
+        } catch (ServerException e) {
+            switch(e.getCode()) {
+                case ServerException.SERVER_REFUSED:
+                    try {
+                        throw e.getRootCause();
+                    } catch (UnexpectedReplyCodeException unexpectedReplyCode) {
+                        switch(unexpectedReplyCode.getReply().getCode()) {
+                            case 530:
+                                throw new AuthorizationFailedException(unexpectedReplyCode);
+                            default:
+                                throw new NoSuccessException(unexpectedReplyCode);
+                        }
+                    } catch (Exception e1) {
+                        throw new NoSuccessException(e1);
+                    }
+                default:
+                    throw new NoSuccessException(e);
+            }
         }
     }
 

@@ -5,8 +5,8 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import fr.in2p3.jsaga.adaptor.data.read.FileReaderGetter;
-import fr.in2p3.jsaga.adaptor.data.write.FileWriterPutter;
+import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
+import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import org.globus.ftp.FeatureList;
 import org.globus.ftp.exception.ServerException;
@@ -27,7 +27,10 @@ import java.util.Map;
 /**
  *
  */
-public class GsiftpDataAdaptor implements FileReaderGetter, FileWriterPutter, DataCopy, DataRename {
+public class GsiftpDataAdaptor implements DataCopy, DataRename,
+//    FileReaderGetter, FileWriterPutter
+        FileReaderStreamFactory, FileWriterStreamFactory
+{
     private GsiftpDataAdaptorAbstract m_adaptor;
 
     public GsiftpDataAdaptor() {
@@ -105,12 +108,22 @@ public class GsiftpDataAdaptor implements FileReaderGetter, FileWriterPutter, Da
         return m_adaptor.exists(absolutePath, additionalArgs);
     }
 
+    /** not used (too slow) */
     public void getToStream(String absolutePath, String additionalArgs, OutputStream stream) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         m_adaptor.getToStream(absolutePath, additionalArgs, stream);
     }
 
+    /** not used (too slow) */
     public void putFromStream(String absolutePath, boolean append, String additionalArgs, InputStream stream) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         m_adaptor.putFromStream(absolutePath, append, additionalArgs, stream);
+    }
+
+    public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+        return m_adaptor.getInputStream(absolutePath, additionalArgs);
+    }
+
+    public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
+        return m_adaptor.getOutputStream(parentAbsolutePath, fileName, exclusive, append, additionalArgs);
     }
 
     public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, ParentDoesNotExist, TimeoutException, NoSuccessException {
