@@ -3,6 +3,10 @@
         <title>JSAGA Release Notes</title>
     </properties>
     <body>
+        <release version="0.9.8" date="2009-06-30">
+            <action dev="sreynaud" type="add">Added a per method/protocol configurable timeout.</action>
+            <action dev="sreynaud" type="fix">Bugfixes and improvments on plug-ins.</action>
+        </release>
         <release version="0.9.7" date="2008-11-03" description="Interface stabilized: SAGA Java Binding v1.0">
             <action dev="sreynaud" type="update">Integrated version 1.0 of the reference Java Binding.</action>
             <action dev="sreynaud" type="add">Added initial adaptor for NAREGI Super Scheduler.</action>
