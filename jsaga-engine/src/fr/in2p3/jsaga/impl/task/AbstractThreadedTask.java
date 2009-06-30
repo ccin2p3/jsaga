@@ -30,8 +30,8 @@ public abstract class AbstractThreadedTask<T,E> extends AbstractTaskImpl<T,E> im
                     E result = AbstractThreadedTask.this.invoke();
                     AbstractThreadedTask.super.setResult(result);
                     AbstractThreadedTask.super.setState(State.DONE);
-                } catch (Exception e) {
-                    AbstractThreadedTask.super.setException(new NoSuccessException(e));
+                } catch (SagaException e) {
+                    AbstractThreadedTask.super.setException(e);
                     AbstractThreadedTask.super.setState(State.FAILED);
                 }
             }
