@@ -7,33 +7,33 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.in2p3.jsaga.adaptor</groupId>
   <artifactId>jsaga-adaptor-wms</artifactId>
-  <version>0.9.8</version>
+  <version>0.9.9-SNAPSHOT</version>
   <name>Adaptors for gLite-WMS</name>
   <description>This module provides support for WMS (Workload Management System) execution management technology.</description>
   <dependencies>
 		<dependency>
 		  <groupId>fr.in2p3.jsaga</groupId>
 		  <artifactId>jsaga-adaptoritf</artifactId>
-		  <version>0.9.8</version>
+		  <version>0.9.9-SNAPSHOT</version>
 		  <scope>provided</scope>
 		</dependency>
 		<dependency>
 		  <groupId>org.ogf.saga</groupId>
 		  <artifactId>saga-api-test</artifactId>
-		  <version>0.9.8</version>
+		  <version>0.9.9-SNAPSHOT</version>
 		  <scope>test</scope>
 		</dependency>
 		<dependency>
 		  <groupId>fr.in2p3.jsaga</groupId>
 		  <artifactId>jsaga-engine</artifactId>
-		  <version>0.9.8</version>
+		  <version>0.9.9-SNAPSHOT</version>
 		  <scope>test</scope>
 		</dependency>
         <!-- adaptor specific -->
         <dependency><!-- for security context (WARNING: order of dependencies matters) -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-voms</artifactId>
-            <version>0.9.8</version>
+            <version>0.9.9-SNAPSHOT</version>
             <scope>runtime</scope>
         </dependency>
 		<dependency>
@@ -59,8 +59,4 @@
 			 <scope>compile</scope>
         </dependency>
   </dependencies>
-
-  <scm>
-    <tag>jsaga-0_9_8</tag>
-  </scm>
 </project>

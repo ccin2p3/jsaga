@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ogf.saga</groupId>
     <artifactId>saga-api-test</artifactId>
-    <version>0.9.8</version>
+    <version>0.9.9-SNAPSHOT</version>
     <name>The integration test suite for adaptors</name>
     <description>This module contains a generic test-suite for validating SAGA implementations.
         It is used for validating both the JSAGA engine and its adaptors.
@@ -46,8 +46,4 @@
             <version>3.8.2</version>
         </dependency>
     </dependencies>
-
-  <scm>
-    <tag>jsaga-0_9_8</tag>
-  </scm>
 </project>

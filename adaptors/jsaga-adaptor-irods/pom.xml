@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
     <artifactId>jsaga-adaptor-irods</artifactId>
-    <version>0.9.8</version>
+    <version>0.9.9-SNAPSHOT</version>
     <name>Adaptors for iRODS and SRB</name>
     <description>This module provides support for iRODS and SRB data management protocols.</description>
     <dependencies>
@@ -15,26 +15,26 @@
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-adaptoritf</artifactId>
-            <version>0.9.8</version>
+            <version>0.9.9-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api-test</artifactId>
-            <version>0.9.8</version>
+            <version>0.9.9-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
-            <version>0.9.8</version>
+            <version>0.9.9-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <!-- adaptor specific -->
         <dependency><!-- for security context (WARNING: order of dependencies matters) -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-globus</artifactId>
-            <version>0.9.8</version>
+            <version>0.9.9-SNAPSHOT</version>
             <scope>runtime</scope>
         </dependency>
 		<dependency>
@@ -43,8 +43,4 @@
 			<version>2.0.4</version>
 		</dependency>
     </dependencies>
-
-  <scm>
-    <tag>jsaga-0_9_8</tag>
-  </scm>
 </project>

@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga</groupId>
     <artifactId>jsaga-engine</artifactId>
-    <version>0.9.8</version>
+    <version>0.9.9-SNAPSHOT</version>
     <name>JSAGA Engine</name>
     <description>This is an implementation of the SAGA interface.</description>
     <licenses>
@@ -109,14 +109,14 @@
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api-test</artifactId>
-            <version>0.9.8</version>
+            <version>0.9.9-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <!-- JSAGA modules -->
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-adaptoritf</artifactId>
-            <version>0.9.8</version>
+            <version>0.9.9-SNAPSHOT</version>
         </dependency>
         <!-- external dependencies -->
         <dependency>
@@ -143,8 +143,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-  <scm>
-    <tag>jsaga-0_9_8</tag>
-  </scm>
 </project>
