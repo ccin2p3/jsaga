@@ -5,8 +5,6 @@ import org.globus.ftp.GridFTPClient;
 import org.globus.ftp.Session;
 import org.globus.ftp.exception.FTPException;
 import org.globus.io.streams.FTPOutputStream;
-import org.ogf.saga.error.NoSuccessException;
-import org.ogf.saga.error.TimeoutException;
 
 import java.io.IOException;
 
@@ -23,16 +21,10 @@ import java.io.IOException;
  *
  */
 public class GsiftpOutputStream extends FTPOutputStream {
-    public GsiftpOutputStream(GridFTPClient client, String file, boolean append) throws TimeoutException, NoSuccessException {
+    public GsiftpOutputStream(GridFTPClient client, String file, boolean append) throws IOException, FTPException {
         super.ftp = client;
         boolean passive = true;
-        try {
-            super.put(passive, Session.TYPE_IMAGE, file, append);
-        } catch (IOException e) {
-            throw new TimeoutException(e);
-        } catch (FTPException e) {
-            throw new NoSuccessException(e);
-        }
+        super.put(passive, Session.TYPE_IMAGE, file, append);
     }
 
     /** override super.close() to prevent it from closing the connection */
