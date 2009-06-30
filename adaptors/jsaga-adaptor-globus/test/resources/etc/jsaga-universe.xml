@@ -24,8 +24,8 @@
         <GRID name="dteam" contextType="VOMS">
             <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/voms_cred.txt"/>
             <domain name="in2p3.fr"/>
-            <data type="gsiftp"/>
             <job type="lcgce"/>
+            <data type="gsiftp"/>
         </GRID>
         <data type="gsiftp"/>
     </UNIVERSE>
