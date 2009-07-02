@@ -32,9 +32,7 @@ import java.util.Map;
 /**
  *
  */
-public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
-//    FileReaderGetter, FileWriterPutter
-        FileReaderStreamFactory, FileWriterStreamFactory
+public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename, FileReaderStreamFactory, FileWriterStreamFactory
 {
     protected static final String TCP_BUFFER_SIZE = "TCPBufferSize";
     protected int m_TCPBufferSize;
@@ -73,7 +71,7 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
         m_DataChannelAuthentication = true;
 
         // open connection
-        m_client = createConnection(m_credential, host, port, m_DataChannelAuthentication);
+        m_client = createConnection(m_credential, host, port, m_TCPBufferSize, m_DataChannelAuthentication);
     }
 
     public void disconnect() throws NoSuccessException {
@@ -110,54 +108,6 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
         }
     }
 
-    /** not used (too slow) */
-    public void getToStream(String absolutePath, String additionalArgs, OutputStream stream) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-        final boolean autoFlush = false;
-        final boolean ignoreOffset = true;
-        try {
-            if (m_TCPBufferSize > 0) {
-                m_client.setTCPBufferSize(m_TCPBufferSize);
-            }
-
-            m_client.setType(GridFTPSession.TYPE_IMAGE);
-            m_client.setMode(GridFTPSession.MODE_STREAM); //MODE_EBLOCK induce error: "451 refusing to store with active mode"
-            m_client.setPassive();
-            m_client.setLocalActive();
-            m_client.get(
-                    absolutePath,
-                    new DataSinkStream(stream, autoFlush, ignoreOffset),
-                    null);
-        } catch (Exception e) {
-            throw rethrowException(e);
-        }
-    }
-
-    /** not used (too slow) */
-    public void putFromStream(String absolutePath, boolean append, String additionalArgs, InputStream stream) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
-        final int DEFAULT_BUFFER_SIZE = 16384;
-        try {
-            if (m_TCPBufferSize > 0) {
-                m_client.setTCPBufferSize(m_TCPBufferSize);
-            }
-
-            m_client.setType(GridFTPSession.TYPE_IMAGE);
-            m_client.setMode(GridFTPSession.MODE_EBLOCK);
-            m_client.setPassive();
-            m_client.setLocalActive();
-            m_client.put(
-                absolutePath,
-                new DataSourceStream(stream, DEFAULT_BUFFER_SIZE),
-                    null,
-                    append);
-        } catch (Exception e) {
-            try {
-                throw rethrowExceptionFull(e);
-            } catch (DoesNotExistException e2) {
-                throw new ParentDoesNotExist(e);
-            }
-        }
-    }
-
     public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         // create input stream
         try {
@@ -188,7 +138,7 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
         }
 
         // create new connection (else test setUp hangs)
-        GridFTPClient tmpConnection = createConnection(m_credential, m_client, m_DataChannelAuthentication);
+        GridFTPClient tmpConnection = createConnection(m_credential, m_client, m_TCPBufferSize, m_DataChannelAuthentication);
 
         // create output stream
         try {
@@ -318,20 +268,25 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
         }
     }
 
-    private static GridFTPClient createConnection(GSSCredential cred, GridFTPClient client, boolean reqDCAU) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+    private static GridFTPClient createConnection(GSSCredential cred, GridFTPClient client, int tcpBufferSize, boolean reqDCAU) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         try {
-            return createConnection(cred, client.getHost(), client.getPort(), reqDCAU);
+            return createConnection(cred, client.getHost(), client.getPort(), tcpBufferSize, reqDCAU);
         } catch (AuthenticationFailedException e) {
             throw new PermissionDeniedException(e);
         } catch (AuthorizationFailedException e) {
             throw new PermissionDeniedException(e);
         }
     }
-    private static GridFTPClient createConnection(GSSCredential cred, String host, int port, boolean reqDCAU) throws AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {
+    private static GridFTPClient createConnection(GSSCredential cred, String host, int port, int tcpBufferSize, boolean reqDCAU) throws AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {
         try {
             GridFTPClient client = new GridFTPClient(host, port);
             client.setAuthorization(HostAuthorization.getInstance());
             client.authenticate(cred);
+
+            // may change TCP buffer size
+            if (tcpBufferSize > 0) {
+                client.setTCPBufferSize(tcpBufferSize);
+            }
 
             // may disable data channel authentication
             if (client.isFeatureSupported("DCAU")) {
@@ -387,7 +342,7 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
         }
     }
 
-    private NoSuccessException rethrowExceptionFull(Exception exception) throws PermissionDeniedException, BadParameterException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException {
+    NoSuccessException rethrowExceptionFull(Exception exception) throws PermissionDeniedException, BadParameterException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException {
         try {
             throw exception;
         }
