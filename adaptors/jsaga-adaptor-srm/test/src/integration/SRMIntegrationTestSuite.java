@@ -23,6 +23,9 @@ public class SRMIntegrationTestSuite extends JSAGATestSuite {
     public static class index extends IndexTest {public index(){super(SRMIntegrationTestSuite.class);}}
 
     /** test cases */
+    public static class SRMNSSetUpTest extends NSSetUpTest {
+        public SRMNSSetUpTest() throws Exception {super("srm");}
+    }
     public static class SRMNSEntryTest extends NSEntryTest {
         public SRMNSEntryTest() throws Exception {super("srm");}
     }
