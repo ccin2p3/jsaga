@@ -250,9 +250,9 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
                     }
                 }
 
-                // set lbServerUrl from jobId
+                // set LB from jobId
                 if (m_lbServerUrl == null) {
-                    WMSJobMonitorAdaptor.setLBServerUrl(m_wmsServerUrl, jobId);
+                    WMStoLB.getInstance().setLBHost(m_wmsServerUrl, jobId);
                 }
 
                 // start job
@@ -263,9 +263,9 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
                 if(logger.isDebugEnabled())
                     logger.debug("Id for job:"+jobId);
 
-                // set lbServerUrl from jobId
+                // set LB from jobId
                 if (m_lbServerUrl == null) {
-                    WMSJobMonitorAdaptor.setLBServerUrl(m_wmsServerUrl, jobId);
+                    WMStoLB.getInstance().setLBHost(m_wmsServerUrl, jobId);
                 }
 
             }
@@ -352,9 +352,9 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 				jobId = m_client.jobRegister(jobDesc, m_delegationId).getId();
 			}
 
-            // set lbServerUrl from jobId
+            // set LB from jobId
             if (m_lbServerUrl == null) {
-                WMSJobMonitorAdaptor.setLBServerUrl(m_wmsServerUrl, jobId);
+                WMStoLB.getInstance().setLBHost(m_wmsServerUrl, jobId);
             }
 			
 			// start job
