@@ -179,6 +179,7 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
     }
 
     // exit immediatly
+    private static final int NB_CANCEL_TRY = 10;
     public synchronized void cancel() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         switch(m_metric_TaskState.getValue(State.RUNNING)) {
             case NEW:
@@ -197,7 +198,7 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
                     new Thread(new Runnable() {
                         public void run() {
                             try {
-                                while(!AbstractTaskImpl.this.isDone_LocalCheckOnly()) {
+                                for (int i=0; !AbstractTaskImpl.this.isDone_LocalCheckOnly() && i<NB_CANCEL_TRY; i++) {
                                     Thread.currentThread().sleep(60000);
                                     AbstractTaskImpl.this.doCancel();
                                 }
@@ -425,7 +426,7 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
     }
 
     boolean isDone_LocalCheckOnly() {
-        switch(m_metric_TaskState.getValue()) {
+        switch(m_metric_TaskState.getValue(State.RUNNING)) {
             case DONE:
             case CANCELED:
             case FAILED:
