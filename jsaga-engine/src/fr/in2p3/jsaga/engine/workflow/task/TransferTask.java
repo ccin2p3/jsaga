@@ -71,7 +71,7 @@ public class TransferTask extends AbstractWorkflowTaskImpl {
     }
 
     protected State queryState() throws NotImplementedException, TimeoutException, NoSuccessException {
-        return super.getState_LocalCheckOnly();
+        return super.getState_fromCache();
     }
 
     public boolean startListening() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {

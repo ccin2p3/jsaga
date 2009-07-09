@@ -451,7 +451,12 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     ////////////////////////////////////// private methods //////////////////////////////////////
 
     private boolean isFinalState() {
-        State state = m_metrics.m_State.getValue(State.RUNNING);
+        // do not use getState_fromCache() because it may lead to infinite recursion
+        State state = m_metrics.m_State.getValue();
+        if (state == null)
+            state = State.RUNNING;
+
+        // if state is terminal
         switch(state) {
             case DONE:
             case CANCELED:

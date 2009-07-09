@@ -108,7 +108,7 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
 
     public boolean waitFor(float timeoutInSeconds) throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         // returns immediatly if already finished
-        if (this.isDone_LocalCheckOnly()) {
+        if (this.isDone_fromCache()) {
             return true;
         }
 
@@ -175,13 +175,13 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
         }*/
 
         // returns
-        return this.isDone_LocalCheckOnly();
+        return this.isDone_fromCache();
     }
 
     // exit immediatly
-    private static final int NB_CANCEL_TRY = 10;
+    private static final int NB_CANCEL_TRY = 3;
     public synchronized void cancel() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
-        switch(m_metric_TaskState.getValue(State.RUNNING)) {
+        switch (this.getState_fromCache(State.RUNNING)) {
             case NEW:
                 throw new IncorrectStateException("Can not cancel task in 'New' state", this); //as specified in SAGA
             case DONE:
@@ -192,13 +192,13 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
             case RUNNING:
                 // try to cancel synchronously
                 this.doCancel();
-                if (!this.isDone_LocalCheckOnly()) {
+                if (!this.isDone_fromCache()) {
                     // try to cancel asynchronously (every minutes)
                     s_logger.warn("Failed to cancel synchronously, trying asynchronously...");
                     new Thread(new Runnable() {
                         public void run() {
                             try {
-                                for (int i=0; !AbstractTaskImpl.this.isDone_LocalCheckOnly() && i<NB_CANCEL_TRY; i++) {
+                                for (int i=0; !AbstractTaskImpl.this.isDone_fromCache() && i<NB_CANCEL_TRY; i++) {
                                     Thread.currentThread().sleep(60000);
                                     AbstractTaskImpl.this.doCancel();
                                 }
@@ -220,11 +220,17 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
     }
 
     public State getState() throws NotImplementedException, TimeoutException, NoSuccessException {
-        switch(m_metric_TaskState.getValue(State.RUNNING)) {
+        // do not use getState_fromCache() because it may lead to infinite recursion
+        State oldState = m_metric_TaskState.getValue();
+        if (oldState == null)
+            oldState = State.RUNNING;
+
+        // if oldState is terminal
+        switch(oldState) {
             case DONE:
             case CANCELED:
             case FAILED:
-                return m_metric_TaskState.getValue();
+                return oldState;
             default:
                 if (!m_isWaitingFor && !m_metric_TaskState.isListening()) {
                     State state = this.queryState();
@@ -238,11 +244,11 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
 
     public E getResult() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         this.waitFor();
-        switch(m_metric_TaskState.getValue(State.DONE)) {
+        switch (this.getState_fromCache(State.DONE)) {
             case NEW:
             case FAILED:
             case CANCELED:
-                throw new IncorrectStateException("Can not get result for task in state: "+ m_metric_TaskState.getValue().name());
+                throw new IncorrectStateException("Can not get result for task in state: "+this.getState_fromCache().name());
             default:
                 return m_result;
         }
@@ -253,7 +259,7 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
     }
 
     public void rethrow() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        switch(m_metric_TaskState.getValue(State.FAILED)) {
+        switch (this.getState_fromCache()) {
             case FAILED:
                 if (m_exception != null) {
                     try {throw m_exception;}
@@ -280,7 +286,13 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
     //////////////////////////////////////////// interface TaskCallback ////////////////////////////////////////////
 
     public synchronized void setState(State state) {
-        switch(m_metric_TaskState.getValue(State.RUNNING)) {
+        // do not use getState_fromCache() because it may lead to infinite recursion
+        State oldState = m_metric_TaskState.getValue();
+        if (oldState == null)
+            oldState = State.RUNNING;
+
+        // if oldState is terminal
+        switch(oldState) {
             case DONE:
             case CANCELED:
             case FAILED:
@@ -311,7 +323,7 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
      * @return false if the task could not be cancelled, typically because it has already completed normally; true otherwise
      */
     public boolean cancel(boolean mayInterruptIfRunning) {
-        switch(m_metric_TaskState.getValue(State.RUNNING)) {
+        switch (this.getState_fromCache(State.RUNNING)) {
             case NEW:
                 this.setState(State.CANCELED);   //as specified in java.util.concurrent
                 return true;
@@ -322,7 +334,8 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
             case RUNNING:
                 if (mayInterruptIfRunning) {
                     this.doCancel();
-                    return m_metric_TaskState.getValue() == State.CANCELED;
+                    State state = this.getState_fromCache();
+                    return State.CANCELED.equals(state);
                 }
         }
         return false;
@@ -333,7 +346,8 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
      * @return true if task was cancelled before it completed
      */
     public boolean isCancelled() {
-        return m_metric_TaskState.getValue() == State.CANCELED;
+        State state = this.getState_fromCache();
+        return State.CANCELED.equals(state);
     }
 
     /**
@@ -371,7 +385,7 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
         } catch (SagaException e) {
             throw new ExecutionException(e);
         }
-        switch(m_metric_TaskState.getValue(State.DONE)) {
+        switch (this.getState_fromCache(State.DONE)) {
             case DONE:
                 return m_result;
             case CANCELED:
@@ -399,7 +413,7 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
         } catch (SagaException e) {
             throw new ExecutionException(e);
         }
-        switch(m_metric_TaskState.getValue(State.DONE)) {
+        switch (this.getState_fromCache(State.DONE)) {
             case DONE:
                 return m_result;
             case CANCELED:
@@ -421,18 +435,36 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
         return m_isWaitingFor;
     }
 
-    protected State getState_LocalCheckOnly() {
-        return m_metric_TaskState.getValue();
-    }
-
-    boolean isDone_LocalCheckOnly() {
-        switch(m_metric_TaskState.getValue(State.RUNNING)) {
+    boolean isDone_fromCache() {
+        switch(this.getState_fromCache()) {
             case DONE:
             case CANCELED:
             case FAILED:
                 return true;
             default:
                 return false;
+        }
+    }
+
+    protected State getState_fromCache() {
+        return getState_fromCache(null);
+    }
+    protected State getState_fromCache(State defaultState) {
+        State state = m_metric_TaskState.getValue();
+        if (state != null) {
+            // returns cached state
+            return state;
+        } else if (defaultState != null) {
+            // returns default state
+            return defaultState;
+        } else {
+            // returns queried state
+            try {
+                return this.getState();
+            } catch (Exception e) {
+                s_logger.error("Failed to query state", e);
+                return null;
+            }
         }
     }
 }

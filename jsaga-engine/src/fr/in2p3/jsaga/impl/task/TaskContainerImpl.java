@@ -200,7 +200,7 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
         try {
             synchronized(m_tasks) {
                 for (AbstractTaskImpl task : m_tasks.values()) {
-                    if (! task.isDone_LocalCheckOnly()) {
+                    if (! task.isDone_fromCache()) {
                         boolean isListening = task.startListening();
                         task.setWaitingFor(isListening);
                     }

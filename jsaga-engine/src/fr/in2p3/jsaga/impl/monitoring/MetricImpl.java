@@ -86,15 +86,6 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
     }
 
     /**
-     * The SAGA engine implementation SHOULD use this method instead of method getAttribute.
-     * @param defaultValue the default value
-     * @return the current value if not null, else return the default value
-     */
-    public E getValue(E defaultValue) {
-        return m_value!=null ? m_value : defaultValue;
-    }
-
-    /**
      * ReadWrite metrics MAY override this method if default behavior does not suit to your needs
      * @param value the value as a string
      * @return the value object
