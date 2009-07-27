@@ -116,6 +116,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     protected void doSubmit() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         try {
             // pre-staging
+            m_metrics.m_SubState.setValue(SubState.RUNNING_PRE_STAGING.toString());
             m_stagingDescription.preStaging(this);
 
             // submit

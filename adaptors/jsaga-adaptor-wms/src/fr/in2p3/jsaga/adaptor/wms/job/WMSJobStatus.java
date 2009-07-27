@@ -34,26 +34,40 @@ public class WMSJobStatus extends JobStatus {
 
     public SubState getSubState() {
     	String jobState = ((StatName) m_nativeStateCode).getValue();
-    	if(jobState.equals(StatName._RUNNING)) {
+
+        if(jobState.equals(StatName._SUBMITTED)) {
+            // The job has been submitted by the user but not yet processed by the Network Server
+            return SubState.RUNNING_SUBMITTED; }
+        else if(jobState.equals(StatName._WAITING)) {
+            // The job has been accepted by the Network Server but not yet processed by the Workload Manager
+            return SubState.RUNNING_SUBMITTED; }
+        else if(jobState.equals(StatName._READY)) {
+            // The job has been assigned to a Computing Element but not yet transferred to it
+            return SubState.RUNNING_SUBMITTED; }
+
+		else if(jobState.equals(StatName._SCHEDULED)) {
+            // The job is waiting in the Computing Element's queue
+			return SubState.RUNNING_QUEUED; }
+    	else if(jobState.equals(StatName._RUNNING)) {
+            // The job is running
             return SubState.RUNNING_ACTIVE; }
+        else if(jobState.equals(StatName._DONE)) {
+            // The job has finished, but Output Sandbox has not been transfered yet...
+            return SubState.RUNNING_POST_STAGING; }
+
     	else if(jobState.equals(StatName._ABORTED))  {
+            // The job has been aborted by the WMS (e.g. because it was too long, or the proxy certificated expired, etc.)
     		return SubState.FAILED_ABORTED; }
     	else if(jobState.equals(StatName._CANCELLED)) {
+            // The job has been cancelled by the user
     		return SubState.CANCELED; }
 		else if(jobState.equals(StatName._CLEARED)) {
-			return SubState.DONE; }
-		else if(jobState.equals(StatName._DONE)) {
+            // The Output Sandbox has been transferred to the User Interface
 			return SubState.DONE; }
 		else if(jobState.equals(StatName._PURGED)) {
+            // ???
 			return SubState.DONE; }
-		else if(jobState.equals(StatName._READY)) {
-			return SubState.SUBMITTED; }
-		else if(jobState.equals(StatName._SCHEDULED)) {
-			return SubState.RUNNING_QUEUED; }
-		else if(jobState.equals(StatName._SUBMITTED)) {
-			return SubState.SUBMITTED; }
-		else if(jobState.equals(StatName._WAITING)) {
-			return SubState.SUBMITTED; }
+
 		else {
 			if(jobState.equals(StatName._UNKNOWN)) 
 				System.err.println("Invalid state : UNKNOWN");

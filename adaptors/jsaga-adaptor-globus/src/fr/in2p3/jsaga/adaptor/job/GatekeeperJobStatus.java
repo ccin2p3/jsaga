@@ -35,7 +35,7 @@ public class GatekeeperJobStatus extends JobStatus {
         
         switch(((Integer)m_nativeStateCode).intValue()) {
             case GRAMConstants.STATUS_UNSUBMITTED:
-                return SubState.SUBMITTED;
+                return SubState.RUNNING_SUBMITTED;
 
             case GRAMConstants.STATUS_PENDING:
             case GRAMConstants.STATUS_STAGE_IN:

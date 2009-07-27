@@ -47,7 +47,7 @@ public class JobMetrics {
                 MetricMode.ReadOnly,
                 "1",
                 MetricType.String,
-                SubState.SUBMITTED.toString());
+                SubState.NEW_CREATED.toString());
     }
 
     /** clone */

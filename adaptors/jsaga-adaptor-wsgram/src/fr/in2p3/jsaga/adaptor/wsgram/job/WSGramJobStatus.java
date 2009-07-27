@@ -33,7 +33,7 @@ public class WSGramJobStatus extends JobStatus {
     public SubState getSubState() {
     	String jobState = ((StateEnumeration) m_nativeStateCode).getValue();
     	if(jobState.equals(StateEnumeration._Unsubmitted))
-            return SubState.SUBMITTED;
+            return SubState.RUNNING_SUBMITTED;
     	else if(jobState.equals(StateEnumeration._Pending))
     		return SubState.RUNNING_QUEUED;
     	else if(jobState.equals(StateEnumeration._StageIn))

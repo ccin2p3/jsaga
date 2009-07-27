@@ -51,7 +51,7 @@ public class JobStatusRequestor {
         } else {
             return new JobStatus(nativeJobId, new Integer(0), "Unknown"){
                 public String getModel() {return "Unknown";}
-                public SubState getSubState() {return SubState.SUBMITTED;}
+                public SubState getSubState() {return SubState.NEW_CREATED;}
             };
         }
     }

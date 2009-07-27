@@ -48,7 +48,7 @@ public class CreamJobStatus extends JobStatus {
     public SubState getSubState() {
         String name = (String) m_nativeStateCode;
         if (REGISTERED.equals(name)) {
-            return SubState.SUBMITTED;
+            return SubState.RUNNING_SUBMITTED;
         } else if (PENDING.equals(name) || IDLE.equals(name) || RUNNING.equals(name)) {
             return SubState.RUNNING_QUEUED;
         } else if (REALLY_RUNNING.equals(name)) {

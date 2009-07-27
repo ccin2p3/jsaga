@@ -15,15 +15,21 @@ import org.ogf.saga.task.State;
  *
  */
 public class SubState {
-    private static final int SUBMIT=0;  public static final SubState SUBMITTED=new SubState(SUBMIT, "SUBMITTED");
-    private static final int RUNN_Q=1;  public static final SubState RUNNING_QUEUED=new SubState(RUNN_Q, "RUNNING_QUEUED");
-    private static final int RUNN_A=2;  public static final SubState RUNNING_ACTIVE=new SubState(RUNN_A, "RUNNING_ACTIVE");
-    private static final int _DONE_=3;  public static final SubState DONE=new SubState(_DONE_, "DONE");
-    private static final int CANCEL=4;  public static final SubState CANCELED=new SubState(CANCEL, "CANCELED");
-    private static final int FAIL_E=5;  public static final SubState FAILED_ERROR=new SubState(FAIL_E, "FAILED_ERROR");
-    private static final int FAIL_A=6;  public static final SubState FAILED_ABORTED=new SubState(FAIL_A, "FAILED_ABORTED");
-    private static final int SUSP_Q=7;  public static final SubState SUSPENDED_QUEUED=new SubState(SUSP_Q, "SUSPENDED_QUEUED");
-    private static final int SUSP_A=8;  public static final SubState SUSPENDED_ACTIVE=new SubState(SUSP_A, "SUSPENDED_ACTIVE");
+    private static final int CREATE=10; public static final SubState NEW_CREATED=new SubState(CREATE, "NEW_CREATED");
+
+    private static final int R__PRE=20; public static final SubState RUNNING_PRE_STAGING =new SubState(R__PRE, "RUNNING_PRE_STAGING");
+    private static final int RUNN_S=21; public static final SubState RUNNING_SUBMITTED=new SubState(RUNN_S, "RUNNING_SUBMITTED");
+    private static final int RUNN_Q=22; public static final SubState RUNNING_QUEUED=new SubState(RUNN_Q, "RUNNING_QUEUED");
+    private static final int RUNN_A=23; public static final SubState RUNNING_ACTIVE=new SubState(RUNN_A, "RUNNING_ACTIVE");
+    private static final int R_POST=24; public static final SubState RUNNING_POST_STAGING=new SubState(R_POST, "RUNNING_POST_STAGING");
+
+    private static final int _DONE_=30; public static final SubState DONE=new SubState(_DONE_, "DONE");
+    private static final int CANCEL=40; public static final SubState CANCELED=new SubState(CANCEL, "CANCELED");
+    private static final int FAIL_E=50; public static final SubState FAILED_ERROR=new SubState(FAIL_E, "FAILED_ERROR");
+    private static final int FAIL_A=51; public static final SubState FAILED_ABORTED=new SubState(FAIL_A, "FAILED_ABORTED");
+
+    private static final int SUSP_Q=60; public static final SubState SUSPENDED_QUEUED=new SubState(SUSP_Q, "SUSPENDED_QUEUED");
+    private static final int SUSP_A=61; public static final SubState SUSPENDED_ACTIVE=new SubState(SUSP_A, "SUSPENDED_ACTIVE");
 
     private int value;
     private String label;
@@ -51,12 +57,21 @@ public class SubState {
 
     public State toSagaState() {
         switch(value) {
-            case SUBMIT:
+            case CREATE:
                 return State.NEW;
+
+            case R__PRE:
+                return State.RUNNING;
+            case RUNN_S:
+                return State.RUNNING;
             case RUNN_Q:
                 return State.RUNNING;
             case RUNN_A:
                 return State.RUNNING;
+            case R_POST:
+                //fixme: should return RUNNING instead of DONE
+                return State.DONE;
+
             case _DONE_:
                 return State.DONE;
             case CANCEL:
@@ -65,6 +80,7 @@ public class SubState {
                 return State.FAILED;
             case FAIL_A:
                 return State.FAILED;
+
             case SUSP_Q:
                 return State.SUSPENDED;
             case SUSP_A:

@@ -39,7 +39,7 @@ public class U6JobStatus extends JobStatus {
 	    	else if(jobState.isQueued())
 	    		return SubState.RUNNING_QUEUED;
 	    	else if(jobState.isReady())
-	            return SubState.SUBMITTED;
+	            return SubState.RUNNING_SUBMITTED;
 			else if(jobState.isRunning())
 				return SubState.RUNNING_ACTIVE;
 			else if(jobState.isStagingIn())
