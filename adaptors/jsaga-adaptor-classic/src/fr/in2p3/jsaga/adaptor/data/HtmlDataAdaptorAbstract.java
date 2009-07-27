@@ -3,15 +3,11 @@ package fr.in2p3.jsaga.adaptor.data;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import org.ogf.saga.error.*;
-import org.w3c.dom.*;
-import org.xml.sax.SAXParseException;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
-import java.lang.Exception;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Map;
+import java.util.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -51,26 +47,21 @@ public abstract class HtmlDataAdaptorAbstract implements FileReaderStreamFactory
                 throw new PermissionDeniedException("Not allowed to list this directory");
             }
 
-            // convert to XML
-            String xml = raw
-                    .substring(raw.indexOf('\n')+1)
-                    .replaceAll("<hr>","")
-                    .replaceAll("> <a ","/> <a ");
-            InputStream xmlStream = new ByteArrayInputStream(xml.getBytes());
-            Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(xmlStream);
-            Element pre = (Element) doc.getElementsByTagName("pre").item(0);
-            NodeList images = pre.getElementsByTagName("img");
-
-            // convert to attributes list
-            int nbEntries = images.getLength() - 2;
-            FileAttributes[] list = new FileAttributes[nbEntries];
-            for (int i=0; i<nbEntries; i++) {
-                Element img = (Element) images.item(i+2);
-                list[i] = new HtmlFileAttributes(img);
+            // extract href
+            List list = new ArrayList();
+            String[] array = raw.split("href=\"");
+            for (int i=1; i<array.length; i++) {
+                String entryName = array[i].substring(0, array[i].indexOf('"'));
+                boolean isDir = false;
+                while (entryName.endsWith("/")) {
+                    isDir = true;
+                    entryName = entryName.substring(0, entryName.length() - 1);
+                }
+                if (!entryName.contains("/") && !entryName.contains("?") && !entryName.contains("#")) {
+                    list.add(new HtmlFileAttributes(entryName, isDir));
+                }
             }
-            return list;
-        } catch (SAXParseException e) {
-            throw new PermissionDeniedException(e);
+            return (FileAttributes[]) list.toArray(new FileAttributes[list.size()]);
         } catch (BadParameterException e) {
             throw new NoSuccessException(e);
         } catch (Exception e) {
