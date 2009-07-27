@@ -2,8 +2,7 @@ package fr.in2p3.jsaga.adaptor.wms.job;
 
 import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
-import fr.in2p3.jsaga.adaptor.base.usage.U;
-import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
@@ -50,18 +49,20 @@ import java.util.regex.Pattern;
  */
 public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract 
 		implements JobControlAdaptor, CleanableJobAdaptor, StreamableJobBatch {
+    private static final String GLUE_CE_STATE_STATUS = "GlueCEStateStatus";
 
 	private Logger logger = Logger.getLogger(WMSJobControlAdaptor.class);
 	
 	private String clientConfigFile = Base.JSAGA_VAR+ File.separator+ "client-config-wms.wsdd";
 	private File m_tmpProxyFile,  stdoutFile, stderrFile;
 	
+    private Map m_parameters;
 	private WMProxyAPI m_client;
     private String m_delegationId = "myId";
     private String m_wmsServerUrl;
     private String m_lbServerUrl;
     private boolean m_isInteractive;
-    
+
     public String getType() {
         return "wms";
     }
@@ -71,11 +72,17 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     }
     
     public Usage getUsage() {
-        return new U(MONITOR_PORT);
+        return new UOr(new U[]{
+                new U(MONITOR_PORT),
+                new U(GLUE_CE_STATE_STATUS)
+        });
     }
     
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-        return new Default[]{new Default(MONITOR_PORT, "9000")};
+        return new Default[]{
+                new Default(MONITOR_PORT, "9000"),
+                new Default(GLUE_CE_STATE_STATUS, "Production")
+        };
     }
 
     public String[] getSupportedSandboxProtocols() {
@@ -87,7 +94,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     }
 
     public Map getTranslatorParameters() {
-        return null;
+        return m_parameters;
     }
 
     public JobMonitorAdaptor getDefaultJobMonitor() {
@@ -95,6 +102,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+        m_parameters = attributes;
 
     	m_wmsServerUrl = "https://"+host+":"+port+basePath;
     	if(attributes.containsKey(MONITOR_SERVICE_URL)) {
@@ -190,6 +198,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     }	
 
 	public void disconnect() throws NoSuccessException {
+        m_parameters = null;
         m_wmsServerUrl = null;
         m_credential = null;
         m_client = null;

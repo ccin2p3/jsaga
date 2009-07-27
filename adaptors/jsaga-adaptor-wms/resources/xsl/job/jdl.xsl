@@ -6,6 +6,7 @@
                 xmlns:spmd="http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd"
                 xmlns:ext="http://www.in2p3.fr/jsdl-extension">
     <xsl:output method="text"/>
+    <xsl:param name="GlueCEStateStatus"/>
     
     <!-- entry point (MUST BE RELATIVE) -->
     <xsl:template match="jsdl:JobDefinition">
@@ -45,6 +46,9 @@ Environment = {<xsl:text/>
           		
 <!--  Requirements -->
 Requirements = true <xsl:text/>
+        <xsl:if test="$GlueCEStateStatus">
+&amp;&amp; other.GlueCEStateStatus == "<xsl:value-of select="$GlueCEStateStatus"/>" <xsl:text/>
+        </xsl:if>
 		<xsl:for-each select="jsdl:Resources/jsdl:TotalPhysicalMemory/jsdl:UpperBoundedRange/text()">
 &amp;&amp; other.GlueHostMainMemoryRAMSize >= <xsl:value-of select="."/> <xsl:text/>
 		</xsl:for-each>
