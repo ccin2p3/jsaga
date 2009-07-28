@@ -52,9 +52,11 @@ public class EnvironmentVariables {
         BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
         while ((line=reader.readLine()) != null) {
             int pos = line.indexOf('=');
-            String key = line.substring(0, pos);
-            String value = line.substring(pos + 1);
-            m_env.setProperty(key, value);
+            if (pos > 0) {
+                String key = line.substring(0, pos);
+                String value = line.substring(pos + 1);
+                m_env.setProperty(key, value);
+            }
         }
     }
 
