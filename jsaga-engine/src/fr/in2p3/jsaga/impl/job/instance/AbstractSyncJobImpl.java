@@ -215,8 +215,11 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         }
     }
 
+    JobStatus queryJobInfo() throws NotImplementedException, TimeoutException, NoSuccessException {
+        return m_monitorService.getState(m_nativeJobId);
+    }
     protected State queryState() throws NotImplementedException, TimeoutException, NoSuccessException {
-        JobStatus status = m_monitorService.getState(m_nativeJobId);
+        JobStatus status = this.queryJobInfo();
         // set job state
         this.setJobState(status.getSagaState(), status.getStateDetail(), status.getSubState(), status.getCause());
         // return task state (may trigger finish task)

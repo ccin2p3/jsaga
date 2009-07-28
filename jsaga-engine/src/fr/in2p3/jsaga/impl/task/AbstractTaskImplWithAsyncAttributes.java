@@ -1,7 +1,6 @@
 package fr.in2p3.jsaga.impl.task;
 
-import fr.in2p3.jsaga.impl.attributes.AbstractAsyncAttributesImpl;
-import fr.in2p3.jsaga.impl.attributes.AttributeImpl;
+import fr.in2p3.jsaga.impl.attributes.*;
 import org.ogf.saga.attributes.AsyncAttributes;
 import org.ogf.saga.attributes.Attributes;
 import org.ogf.saga.error.*;
@@ -122,5 +121,9 @@ public abstract class AbstractTaskImplWithAsyncAttributes<T,E,A extends Attribut
 
     public AttributeImpl _addAttribute(AttributeImpl attribute) {
         return m_attributes._addAttribute(attribute);
+    }
+
+    public VectorAttributeImpl _addVectorAttribute(VectorAttributeImpl vectorAttribute) {
+        return m_attributes._addVectorAttribute(vectorAttribute);
     }
 }

@@ -32,8 +32,8 @@ public class VectorAttributeImpl<E> implements Attribute {
     }
 
     /** clone */
-    public VectorAttributeImpl clone() throws CloneNotSupportedException {
-        VectorAttributeImpl clone = (VectorAttributeImpl) super.clone();
+    public VectorAttributeImpl<E> clone() throws CloneNotSupportedException {
+        VectorAttributeImpl<E> clone = (VectorAttributeImpl<E>) super.clone();
         clone.m_key = m_key;
         clone.m_objects = m_objects;
         clone.m_mode = m_mode;

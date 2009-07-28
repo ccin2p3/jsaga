@@ -87,7 +87,10 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	        if(jobState == null) {
 	            throw new NoSuccessException("Unable to get status for job:"+nativeJobId);
 	        }
-	        return new WMSJobStatus(nativeJobId,jobState.getState(), jobState.getState().getValue());
+	        JobInfo attr = new WMSJobStatus(nativeJobId,jobState.getState(), jobState.getState().getValue());
+            attr.setExecutionHosts(new String[]{jobState.getCeNode()});
+            attr.setExitCode(jobState.getExitCode());
+            return attr;
     	}
     	catch (MalformedURLException e) {
     		throw new NoSuccessException(e);

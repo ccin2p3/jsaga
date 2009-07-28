@@ -193,6 +193,10 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
         m_attributes.put(attribute.getKey(), attribute);
         return attribute;
     }
+    public VectorAttributeImpl _addVectorAttribute(VectorAttributeImpl vectorAttribute) {
+        m_attributes.put(vectorAttribute.getKey(), vectorAttribute);
+        return vectorAttribute;
+    }
 
     protected void _addAttribute(String key, String value) {
         m_attributes.put(key, new AttributeScalar(key, value));
