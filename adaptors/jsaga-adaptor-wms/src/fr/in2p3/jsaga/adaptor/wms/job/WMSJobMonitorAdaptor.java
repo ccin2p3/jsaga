@@ -89,7 +89,7 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	        }
 	        JobInfo attr = new WMSJobStatus(nativeJobId,jobState.getState(), jobState.getState().getValue());
             attr.setExecutionHosts(new String[]{jobState.getCeNode()});
-            attr.setExitCode(jobState.getExitCode());
+            attr.setExitCode(new Integer(jobState.getExitCode()));
             return attr;
     	}
     	catch (MalformedURLException e) {
