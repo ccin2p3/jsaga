@@ -21,7 +21,7 @@ public interface LogicalReaderMetaData extends LogicalReader {
      * List the meta data of the logical entry.
      * @param logicalEntry absolute path of the logical entry.
      * @param additionalArgs adaptor specific arguments
-     * @return a key-value map containing the meta data
+     * @return a String to String[] map containing the meta data
      * @throws NoSuccessException if <code>absolutePath</code> does not exist.
      */
     public Map listMetaData(String logicalEntry, String additionalArgs)

@@ -19,11 +19,11 @@ public interface LogicalWriterMetaData extends LogicalWriter {
      * Set/add a meta data to the logical entry.
      * @param logicalEntry absolute path of the logical entry.
      * @param name name of the metadata.
-     * @param value value of the metadata.
+     * @param values values of the metadata.
      * @param additionalArgs adaptor specific arguments
      * @throws NoSuccessException if <code>logicalEntry</code> does not exist.
      */
-    public void setMetaData(String logicalEntry, String name, String value, String additionalArgs)
+    public void setMetaData(String logicalEntry, String name, String[] values, String additionalArgs)
         throws PermissionDeniedException, TimeoutException, NoSuccessException;
 
     /**

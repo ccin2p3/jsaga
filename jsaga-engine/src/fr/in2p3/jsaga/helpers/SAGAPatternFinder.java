@@ -18,15 +18,15 @@ import java.util.regex.Pattern;
  */
 public class SAGAPatternFinder {
     private static final Pattern PATTERN = Pattern.compile("([^=]*)(=(.*))?");
-    private Map<String,String> m_attributes;
+    private Map<String,String[]> m_attributes;
 
-    public SAGAPatternFinder(Map<String,String> attributes) {
+    public SAGAPatternFinder(Map<String,String[]> attributes) {
         m_attributes = attributes;
     }
 
     public String[] findKey(String... valuePatterns) {
         List<String> foundKeys = new ArrayList<String>();
-        for (Map.Entry<String,String> attribute : m_attributes.entrySet()) {
+        for (Map.Entry<String,String[]> attribute : m_attributes.entrySet()) {
             if (matches(attribute, valuePatterns)) {
                 foundKeys.add(attribute.getKey());
             }
@@ -34,7 +34,7 @@ public class SAGAPatternFinder {
         return foundKeys.toArray(new String[foundKeys.size()]);
     }
 
-    private static boolean matches(Map.Entry<String,String> attribute, String... patterns) {
+    private static boolean matches(Map.Entry<String,String[]> attribute, String... patterns) {
         for (String pattern : patterns) {
             Matcher matcher = PATTERN.matcher(pattern);
             if (matcher.matches()) {
@@ -49,8 +49,11 @@ public class SAGAPatternFinder {
                         if (valueRegexp == null) {
                             return true;    //found
                         } else {
-                            if (valueRegexp.matcher(attribute.getValue()).matches()) {
-                                return true;    //found
+                            String[] values = attribute.getValue();
+                            for (int i=0; i<values.length; i++) {
+                                if (valueRegexp.matcher(values[i]).matches()) {
+                                    return true;    //found
+                                }
                             }
                         }
                     }

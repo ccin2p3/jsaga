@@ -33,7 +33,7 @@ public class MetaDataAttributesImpl<T extends NSEntry> implements AsyncAttribute
     private URL m_url;
     private DataAdaptor m_adaptor;
 
-    private Map<String,String> m_cache;
+    private Map<String,String[]> m_cache;
     private long m_cacheTimestamp;
 
     public MetaDataAttributesImpl(Session session, T object, URL url, DataAdaptor adaptor) {
@@ -56,11 +56,27 @@ public class MetaDataAttributesImpl<T extends NSEntry> implements AsyncAttribute
     //////////////////////////////////////// interface Attributes /////////////////////////////////////////
 
     public synchronized void setAttribute(String key, String value) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+        this.setVectorAttribute(key, new String[]{value});
+    }
+
+    public synchronized String getAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
+        String[] values = this.getVectorAttribute(key);
+        switch (values.length) {
+            case 0:
+                throw new DoesNotExistException("Metadata does not exist: "+key);
+            case 1:
+                return values[0];
+            default:
+                throw new IncorrectStateException("Attribute is not scalar: "+key);
+        }
+    }
+
+    public synchronized void setVectorAttribute(String key, String[] values) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof LogicalWriterMetaData) {
             ((LogicalWriterMetaData)m_adaptor).setMetaData(
                     m_url.getPath(),
                     key,
-                    value,
+                    values,
                     m_url.getQuery());
             this._invalidateCache();
         } else {
@@ -68,28 +84,20 @@ public class MetaDataAttributesImpl<T extends NSEntry> implements AsyncAttribute
         }
     }
 
-    public synchronized String getAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
+    public synchronized String[] getVectorAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof LogicalReaderMetaData) {
             if (m_cache==null || System.currentTimeMillis() - m_cacheTimestamp > 10000) {
                 this._refreshCache();
             }
-            String value = m_cache.get(key);
-            if (value != null) {
-                return value;
+            String[] values = m_cache.get(key);
+            if (values!=null && values.length>0) {
+                return values;
             } else {
                 throw new DoesNotExistException("Metadata does not exist: "+key);
             }
         } else {
             throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), m_object);
         }
-    }
-
-    public synchronized void setVectorAttribute(String key, String[] values) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-        throw new NotImplementedException("Not implemented");
-    }
-
-    public synchronized String[] getVectorAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
-        throw new NotImplementedException("Not implemented");
     }
 
     public synchronized void removeAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {

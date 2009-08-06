@@ -107,7 +107,7 @@ public class PersonalCatalogDataAdaptor implements LogicalReaderMetaData, Logica
         return file.getReplica();
     }
 
-    public void setMetaData(String logicalEntry, String name, String value, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+    public void setMetaData(String logicalEntry, String name, String[] values, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         EntryType entry;
         try {
             entry = m_catalog.getEntry(logicalEntry);
@@ -117,11 +117,11 @@ public class PersonalCatalogDataAdaptor implements LogicalReaderMetaData, Logica
         Metadata md = findMetadata(entry, name);
         if (md != null) {
             md.setName(name);
-            md.setValue(value);
+            md.setValue(values);
         } else {
             md = new Metadata();
             md.setName(name);
-            md.setValue(value);
+            md.setValue(values);
             entry.addMetadata(md);
         }
     }
@@ -188,9 +188,16 @@ public class PersonalCatalogDataAdaptor implements LogicalReaderMetaData, Logica
             String key = (String) e.getKey();
             String value = (String) e.getValue();
             Metadata md = findMetadata(entry, key);
-            matchAllPatterns &= (md!=null && (value==null || value.equals(md.getValue())));
+            matchAllPatterns &= (md!=null && (value==null || toSet(md.getValue()).contains(value)));
         }
         return matchAllPatterns;
+    }
+    private Set toSet(String[] values) {
+        Set<String> set = new HashSet<String>();
+        for (int i=0; values!=null && i<values.length; i++) {
+            set.add(values[i]);
+        }
+        return set;
     }
 
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {

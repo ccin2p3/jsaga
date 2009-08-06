@@ -8,8 +8,10 @@
     <complexType name="EntryType">
         <sequence>
             <element name="metadata" minOccurs="0" maxOccurs="unbounded"><complexType>
+                <sequence>
+                    <element name="value" type="string" minOccurs="1" maxOccurs="unbounded"/>
+                </sequence>
                 <attribute name="name" type="string" use="required"/>
-                <attribute name="value" type="string" use="required"/>
             </complexType></element>
         </sequence>
         <attribute name="name" type="string" use="required"/>
