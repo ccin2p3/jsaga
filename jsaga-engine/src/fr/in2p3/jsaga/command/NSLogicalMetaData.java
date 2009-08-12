@@ -60,7 +60,14 @@ public class NSLogicalMetaData extends AbstractCommand {
             // operation
             if (line.hasOption(OPT_GET)) {
                 String key = line.getOptionValue(OPT_GET);
-                System.out.println(entry.getAttribute(key));
+                if (entry.isVectorAttribute(key)) {
+                    String[] values = entry.getVectorAttribute(key);
+                    for (int v=0; v<values.length; v++) {
+                        System.out.println(values[v]);
+                    }
+                } else {
+                    System.out.println(entry.getAttribute(key));
+                }
             } else if (line.hasOption(OPT_SET)) {
                 String[] array = line.getOptionValues(OPT_SET);
                 String key = array[0];
@@ -81,20 +88,14 @@ public class NSLogicalMetaData extends AbstractCommand {
             } else if (line.hasOption(OPT_LIST)) {
                 String[] keys = entry.listAttributes();
                 for (int i=0; i<keys.length; i++) {
+                    System.out.print(keys[i]+" = ");
                     if (entry.isVectorAttribute(keys[i])) {
                         String[] values = entry.getVectorAttribute(keys[i]);
                         for (int v=0; v<values.length; v++) {
-                            if (v == 0) {
-                                System.out.print(keys[i]);
-                                System.out.print(" = ");
-                            } else {
-                                for(int indent=0; indent<keys[i].length(); indent++) System.out.print(' ');
-                                System.out.print("   ");
-                            }
-                            System.out.println(values[v]);
+                            System.out.println(indent(v==0 ? 0 : keys[i].length()+3) + values[v]);
                         }
                     } else {
-                        System.out.println(keys[i]+" = "+entry.getAttribute(keys[i]));
+                        System.out.println(entry.getAttribute(keys[i]));
                     }
                 }
             } else if (line.hasOption(OPT_LIST_ALL_KEYS)) {
@@ -107,6 +108,14 @@ public class NSLogicalMetaData extends AbstractCommand {
             // close connection
             ((NSEntry)entry).close();
         }
+    }
+
+    private static String indent(int indent) {
+        StringBuffer buffer = new StringBuffer();
+        for (int i=0; i<indent; i++) {
+            buffer.append(' ');
+        }
+        return buffer.toString();
     }
 
     protected Options createOptions() {
