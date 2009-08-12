@@ -143,7 +143,20 @@ public class MetaDataAttributesImpl<T extends NSEntry> implements AsyncAttribute
     }
 
     public synchronized boolean isVectorAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        throw new NotImplementedException("Not implemented");
+        String[] values;
+        try {
+            values = this.getVectorAttribute(key);
+        } catch (IncorrectStateException e) {
+            throw new NoSuccessException(e);
+        }
+        switch (values.length) {
+            case 0:
+                throw new DoesNotExistException("Metadata does not exist: "+key);
+            case 1:
+                return false;
+            default:
+                return true;
+        }
     }
 
     ////////////////////////////////////// interface AsyncAttributes //////////////////////////////////////

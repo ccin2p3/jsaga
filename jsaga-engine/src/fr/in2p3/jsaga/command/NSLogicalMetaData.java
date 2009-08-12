@@ -64,15 +64,38 @@ public class NSLogicalMetaData extends AbstractCommand {
             } else if (line.hasOption(OPT_SET)) {
                 String[] array = line.getOptionValues(OPT_SET);
                 String key = array[0];
-                String value = array[1];
-                entry.setAttribute(key, value);
+                String[] values = array[1].split(",");
+                switch (values.length) {
+                    case 0:
+                        throw new Exception("Option "+OPT_SET+" requires at least 2 arguments: <key> <value>*");
+                    case 1:
+                        entry.setAttribute(key, values[0]);
+                        break;
+                    default:
+                        entry.setVectorAttribute(key, values);
+                        break;
+                }
             } else if (line.hasOption(OPT_REMOVE)) {
                 String key = line.getOptionValue(OPT_REMOVE);
                 entry.removeAttribute(key);
             } else if (line.hasOption(OPT_LIST)) {
                 String[] keys = entry.listAttributes();
                 for (int i=0; i<keys.length; i++) {
-                    System.out.println(keys[i]+" = "+entry.getAttribute(keys[i]));
+                    if (entry.isVectorAttribute(keys[i])) {
+                        String[] values = entry.getVectorAttribute(keys[i]);
+                        for (int v=0; v<values.length; v++) {
+                            if (v == 0) {
+                                System.out.print(keys[i]);
+                                System.out.print(" = ");
+                            } else {
+                                for(int indent=0; indent<keys[i].length(); indent++) System.out.print(' ');
+                                System.out.print("   ");
+                            }
+                            System.out.println(values[v]);
+                        }
+                    } else {
+                        System.out.println(keys[i]+" = "+entry.getAttribute(keys[i]));
+                    }
                 }
             } else if (line.hasOption(OPT_LIST_ALL_KEYS)) {
                 String[] keys = ((LogicalDirectoryImpl)entry).listAttributesRecursive();
@@ -101,9 +124,9 @@ public class NSLogicalMetaData extends AbstractCommand {
                     .withArgName("key")
                     .withLongOpt(LONGOPT_GET)
                     .create(OPT_GET));
-            group.addOption(OptionBuilder.withDescription("Set meta-data <key> with value <value>")
+            group.addOption(OptionBuilder.withDescription("Set meta-data <key> with comma-separated values (spaces not allowed)")
                     .hasArgs(2)
-                    .withArgName("key value")
+                    .withArgName("key values")
                     .withLongOpt(LONGOPT_SET)
                     .create(OPT_SET));
             group.addOption(OptionBuilder.withDescription("Remove meta-data <key>")
