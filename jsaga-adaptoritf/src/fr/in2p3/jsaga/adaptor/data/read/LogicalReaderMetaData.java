@@ -31,6 +31,7 @@ public interface LogicalReaderMetaData extends LogicalReader {
      * Lists all the entries in the directory <code>logicalDir</code> with matching meta-data.
      * @param logicalDir absolute path of the logical directory.
      * @param keyValuePatterns map of meta-data keys to values of entries to be found.
+     *        Patterns are case-sensitive. Accepted wild-cards are '*' and '?'.
      * @param recursive tell if search must be recursive or not.
      * @param additionalArgs adaptor specific arguments.
      * @return attributes of the matching entries.
