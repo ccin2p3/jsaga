@@ -48,7 +48,7 @@ public class MetaDataAttributesImpl<T extends NSEntry> implements AsyncAttribute
     }
     private void _refreshCache() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
         m_cache = ((LogicalReaderMetaData)m_adaptor).listMetaData(
-                m_url.getPath(),
+                getNormalizedPath(),
                 m_url.getQuery());
         m_cacheTimestamp = System.currentTimeMillis();
     }
@@ -74,7 +74,7 @@ public class MetaDataAttributesImpl<T extends NSEntry> implements AsyncAttribute
     public synchronized void setVectorAttribute(String key, String[] values) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof LogicalWriterMetaData) {
             ((LogicalWriterMetaData)m_adaptor).setMetaData(
-                    m_url.getPath(),
+                    getNormalizedPath(),
                     key,
                     values,
                     m_url.getQuery());
@@ -103,7 +103,7 @@ public class MetaDataAttributesImpl<T extends NSEntry> implements AsyncAttribute
     public synchronized void removeAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof LogicalWriterMetaData) {
             ((LogicalWriterMetaData)m_adaptor).removeMetaData(
-                    m_url.getPath(),
+                    getNormalizedPath(),
                     key,
                     m_url.getQuery());
             this._invalidateCache();
@@ -225,5 +225,19 @@ public class MetaDataAttributesImpl<T extends NSEntry> implements AsyncAttribute
 
     public Task<T, Boolean> isVectorAttribute(TaskMode mode, String key) throws NotImplementedException {
         throw new NotImplementedException("Not implemented");
+    }
+
+    ////////////////////////////////////// private methods //////////////////////////////////////
+
+    private String getNormalizedPath() {
+        String path = m_url.getPath();
+        while (path.endsWith("/")) {
+            path = path.substring(0, path.length()-1);
+        }
+        if (path.equals("")) {
+            return "/";
+        } else {
+            return path;
+        }
     }
 }
