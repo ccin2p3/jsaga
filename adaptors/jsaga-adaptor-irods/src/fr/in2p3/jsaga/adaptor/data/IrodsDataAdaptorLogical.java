@@ -32,7 +32,7 @@ public class IrodsDataAdaptorLogical extends IrodsDataAdaptor implements Logical
         return null;
     }
 
-    public FileAttributes[] findAttributes(String logicalDir, BooleanExpr filter, boolean recursive, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+    public FileAttributes[] findAttributes(String logicalDir, String namePattern, BooleanExpr filter, boolean recursive, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         return null;
     }
 

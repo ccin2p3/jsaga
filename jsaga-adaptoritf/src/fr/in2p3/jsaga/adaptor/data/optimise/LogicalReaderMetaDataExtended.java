@@ -21,6 +21,7 @@ public interface LogicalReaderMetaDataExtended extends LogicalReaderMetaData {
     /**
      * Lists entries in the directory <code>logicalDir</code>, filtered with <code>filter</code>.
      * @param logicalDir absolute path of the logical directory.
+     * @param namePattern a pattern matching the name of the entries.
      * @param filter boolean expression for filtering with meta-data.
      * @param recursive tell if search must be recursive or not.
      * @param additionalArgs adaptor specific arguments.
@@ -28,7 +29,7 @@ public interface LogicalReaderMetaDataExtended extends LogicalReaderMetaData {
      * @throws BadParameterException if <code>logicalDir</code> is not a directory.
      * @throws DoesNotExistException if <code>logicalDir</code> does not exist.
      */
-    public FileAttributes[] findAttributes(String logicalDir, BooleanExpr filter, boolean recursive, String additionalArgs)
+    public FileAttributes[] findAttributes(String logicalDir, String namePattern, BooleanExpr filter, boolean recursive, String additionalArgs)
         throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException;
 
     /**
