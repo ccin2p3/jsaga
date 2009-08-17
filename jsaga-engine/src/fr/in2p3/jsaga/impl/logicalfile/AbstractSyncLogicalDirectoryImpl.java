@@ -133,7 +133,7 @@ public abstract class AbstractSyncLogicalDirectoryImpl extends AbstractNSDirecto
             FileAttributes[] childs;
             try {
                 childs = ((LogicalReaderMetaData)m_adaptor).findAttributes(
-                        m_url.getPath(),
+                        MetaDataAttributesImpl.getNormalizedPath(m_url),
                         keyValuePatterns,
                         Flags.RECURSIVE.isSet(flags),
                         m_url.getQuery());

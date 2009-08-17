@@ -48,7 +48,7 @@ public class MetaDataAttributesImpl<T extends NSEntry> implements AsyncAttribute
     }
     private void _refreshCache() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
         m_cache = ((LogicalReaderMetaData)m_adaptor).listMetaData(
-                getNormalizedPath(),
+                getNormalizedPath(m_url),
                 m_url.getQuery());
         m_cacheTimestamp = System.currentTimeMillis();
     }
@@ -74,7 +74,7 @@ public class MetaDataAttributesImpl<T extends NSEntry> implements AsyncAttribute
     public synchronized void setVectorAttribute(String key, String[] values) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof LogicalWriterMetaData) {
             ((LogicalWriterMetaData)m_adaptor).setMetaData(
-                    getNormalizedPath(),
+                    getNormalizedPath(m_url),
                     key,
                     values,
                     m_url.getQuery());
@@ -103,7 +103,7 @@ public class MetaDataAttributesImpl<T extends NSEntry> implements AsyncAttribute
     public synchronized void removeAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof LogicalWriterMetaData) {
             ((LogicalWriterMetaData)m_adaptor).removeMetaData(
-                    getNormalizedPath(),
+                    getNormalizedPath(m_url),
                     key,
                     m_url.getQuery());
             this._invalidateCache();
@@ -229,8 +229,8 @@ public class MetaDataAttributesImpl<T extends NSEntry> implements AsyncAttribute
 
     ////////////////////////////////////// private methods //////////////////////////////////////
 
-    private String getNormalizedPath() {
-        String path = m_url.getPath();
+    static String getNormalizedPath(URL url) {
+        String path = url.getPath();
         while (path.endsWith("/")) {
             path = path.substring(0, path.length()-1);
         }
