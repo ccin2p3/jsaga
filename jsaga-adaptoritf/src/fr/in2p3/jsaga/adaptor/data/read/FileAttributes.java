@@ -20,8 +20,12 @@ public abstract class FileAttributes {
     public static final int DIRECTORY_TYPE = 2;
     public static final int LINK_TYPE = 3;
 
+    /** to be set only by method findAttributes() */
     protected String m_relativePath = null;
+
+    /** to be always set */
     protected String m_name = null;
+
     protected int m_type = UNKNOWN_TYPE;
     protected long m_size = -1;
     protected PermissionBytes m_permission = PermissionBytes.UNKNOWN;
