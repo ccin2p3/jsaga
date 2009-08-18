@@ -157,8 +157,7 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
         List<URL> matchingNames = new ArrayList<URL>();
         for (int i=0; i<childs.length; i++) {
             if (p==null || p.matcher(childs[i].getName()).matches()) {
-                URL childUrl = URLFactoryImpl.createRelativePath(childs[i].getName());
-                ((URLImpl)childUrl).setCache(childs[i]);
+                URL childUrl = URLFactoryImpl.createURLWithCache(childs[i]);
                 matchingNames.add(childUrl);
             }
         }

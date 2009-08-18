@@ -5,6 +5,7 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.LogicalReaderMetaData;
 import fr.in2p3.jsaga.helpers.SAGAPattern;
 import fr.in2p3.jsaga.impl.namespace.*;
+import fr.in2p3.jsaga.impl.url.URLFactoryImpl;
 import fr.in2p3.jsaga.impl.url.URLHelper;
 import fr.in2p3.jsaga.sync.logicalfile.SyncLogicalDirectory;
 import org.ogf.saga.SagaObject;
@@ -14,7 +15,6 @@ import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.namespace.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.url.URL;
-import org.ogf.saga.url.URLFactory;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -144,7 +144,8 @@ public abstract class AbstractSyncLogicalDirectoryImpl extends AbstractNSDirecto
             Pattern p = SAGAPattern.toRegexp(namePattern);
             for (int i=0; i<childs.length; i++) {
                 if (p==null || p.matcher(childs[i].getNameOnly()).matches()) {
-                    matchingPath.add(URLFactory.createURL(childs[i].getName()));
+                    URL childUrl = URLFactoryImpl.createURLWithCache(childs[i]);
+                    matchingPath.add(childUrl);
                 }
             }
         } else {

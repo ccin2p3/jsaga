@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl.url;
 
+import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import org.ogf.saga.error.*;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
@@ -27,5 +28,9 @@ public class URLFactoryImpl extends URLFactory {
 
     public static URL createRelativePath(String relativePath) throws BadParameterException {
         return new URLImpl(relativePath);
+    }
+
+    public static URL createURLWithCache(FileAttributes cache) throws BadParameterException {
+        return new URLImpl(cache);
     }
 }
