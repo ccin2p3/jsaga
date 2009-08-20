@@ -140,8 +140,8 @@ public abstract class AbstractNSDirectoryImplWithMetaData extends AbstractNSDire
     ////////////////////////////////////// LogicialDirectoryImpl //////////////////////////////////////
 
     public String[] listAttributesRecursive() throws NotImplementedException, PermissionDeniedException, TimeoutException, NoSuccessException {
-        if (m_metadatas instanceof LogicalReaderMetaDataExtended) {
-            return ((LogicalReaderMetaDataExtended) m_metadatas).listMetadataNames(
+        if (m_adaptor instanceof LogicalReaderMetaDataExtended) {
+            return ((LogicalReaderMetaDataExtended) m_adaptor).listMetadataNames(
                     MetaDataAttributesImpl.getNormalizedPath(m_url),
                     m_url.getQuery());
         } else {
