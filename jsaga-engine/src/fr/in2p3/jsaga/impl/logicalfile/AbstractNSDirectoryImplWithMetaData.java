@@ -142,7 +142,7 @@ public abstract class AbstractNSDirectoryImplWithMetaData extends AbstractNSDire
     public String[] listAttributesRecursive() throws NotImplementedException, PermissionDeniedException, TimeoutException, NoSuccessException {
         if (m_metadatas instanceof LogicalReaderMetaDataExtended) {
             return ((LogicalReaderMetaDataExtended) m_metadatas).listMetadataNames(
-                    m_url.getPath(),
+                    MetaDataAttributesImpl.getNormalizedPath(m_url),
                     m_url.getQuery());
         } else {
             throw new NotImplementedException("Method listAttributesRecursive() is not supported for this protocol: "+m_url.getScheme());
