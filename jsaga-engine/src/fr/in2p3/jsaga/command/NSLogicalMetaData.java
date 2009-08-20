@@ -3,6 +3,8 @@ package fr.in2p3.jsaga.command;
 import fr.in2p3.jsaga.impl.logicalfile.LogicalDirectoryImpl;
 import org.apache.commons.cli.*;
 import org.ogf.saga.attributes.Attributes;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.logicalfile.LogicalFileFactory;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.NSEntry;
@@ -99,6 +101,9 @@ public class NSLogicalMetaData extends AbstractCommand {
                     }
                 }
             } else if (line.hasOption(OPT_LIST_ALL_KEYS)) {
+                if (entry instanceof LogicalFile) {
+                    throw new BadParameterException("Option -"+OPT_LIST_ALL_KEYS+" requires path to end with a '/'");
+                }
                 String[] keys = ((LogicalDirectoryImpl)entry).listAttributesRecursive();
                 for (int i=0; i<keys.length; i++) {
                     System.out.println(keys[i]);
