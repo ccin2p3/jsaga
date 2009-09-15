@@ -226,7 +226,7 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     /**
      * This method is specific to JSAGA implementation.
      */
-    public SecurityAdaptor getAdaptor() throws NotImplementedException, IncorrectStateException, NoSuccessException {
+    public synchronized SecurityAdaptor getAdaptor() throws NotImplementedException, IncorrectStateException, NoSuccessException {
         if (m_adaptorBuilder == null) {
             throw new IncorrectStateException("Attribute MUST be set before using context: "+Context.TYPE, this);
         }
