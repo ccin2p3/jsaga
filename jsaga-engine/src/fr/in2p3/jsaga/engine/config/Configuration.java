@@ -54,6 +54,16 @@ public class Configuration {
     private AdaptorDescriptors m_descriptors;
     private EngineConfiguration m_configurations;
 
+    public static synchronized void reload() throws ConfigurationException {
+        try {
+            _instance = new Configuration();
+        } catch (ConfigurationException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ConfigurationException(e);
+        }
+    }
+
     public static synchronized Configuration getInstance() throws ConfigurationException {
         if (_instance == null) {
             try {
