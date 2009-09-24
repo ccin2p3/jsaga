@@ -133,9 +133,12 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	        stub.queryJobs(queryConditions, jobFlags, jobNativeIdResult, jobStatusResult);
 	        
 	        if(jobNativeIdResult != null && jobNativeIdResult.value != null) {
-	        	WMSJobStatus[] filterJobs = new WMSJobStatus[jobNativeIdResult.value.length];	
+	        	JobInfo[] filterJobs = new WMSJobStatus[jobNativeIdResult.value.length];	
 	        	for (int i = 0; i < filterJobs.length; i++) {
-	        		filterJobs[i] = new WMSJobStatus(jobNativeIdResult.value[i], jobStatusResult.value[i].getState(), jobStatusResult.value[i].getState().getValue());
+                    org.glite.wsdl.types.lb.JobStatus jobState = jobStatusResult.value[i];
+	        		filterJobs[i] = new WMSJobStatus(jobNativeIdResult.value[i], jobState.getState(), jobState.getState().getValue());
+                    filterJobs[i].setExecutionHosts(new String[]{jobState.getCeNode()});
+                    filterJobs[i].setExitCode(new Integer(jobState.getExitCode()));
 				}
 		        return filterJobs;
 	        }
