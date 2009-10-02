@@ -1,8 +1,7 @@
 package fr.in2p3.jsaga.impl.attributes;
 
 import junit.framework.TestCase;
-import org.ogf.saga.error.IncorrectStateException;
-import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -17,7 +16,7 @@ import org.ogf.saga.error.NotImplementedException;
  *
  */
 public class AttributeVectorTest extends TestCase {
-    public void testConstructor() throws NotImplementedException, IncorrectStateException {
+    public void testConstructor() throws NotImplementedException, IncorrectStateException, NoSuccessException {
         assertEquals(
                 "val2",
                 new AttributeVector("key", "val1"+Attribute.SEPARATOR+"val2").getValues()[1]

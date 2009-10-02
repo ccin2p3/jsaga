@@ -1,8 +1,7 @@
 package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.*;
-import org.ogf.saga.error.BadParameterException;
-import org.ogf.saga.error.SagaException;
+import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
@@ -59,16 +58,34 @@ public class JobInfo extends AbstractCommand {
 
             // dump info
             System.out.println("State:         "+job.getState().toString());
-            System.out.println("Exit code:     "+job.getAttribute(Job.EXITCODE));
+            System.out.println("Exit code:     "+getAttribute(job, Job.EXITCODE));
             System.out.println("State reason:  "+getCause(job));
-            System.out.println("Created time:  "+job.getAttribute(Job.CREATED));
-            System.out.println("Started time:  "+job.getAttribute(Job.STARTED));
-            System.out.println("Finished time: "+job.getAttribute(Job.FINISHED));
+            System.out.println("Created time:  "+getAttribute(job, Job.CREATED));
+            System.out.println("Started time:  "+getAttribute(job, Job.STARTED));
+            System.out.println("Finished time: "+getAttribute(job, Job.FINISHED));
             System.out.println("Execution hosts:");
-            String[] hosts = job.getVectorAttribute(Job.EXECUTIONHOSTS);
+            String[] hosts = getVectorAttribute(job, Job.EXECUTIONHOSTS);
             for (int i=0; i<hosts.length; i++) {
                 System.out.println("\t"+hosts[i]);
             }
+        }
+    }
+    private static String getAttribute(Job job, String key) throws SagaException {
+        try {
+            return job.getAttribute(key);
+        } catch (IncorrectStateException e) {
+            return "[not initialized yet]";
+        } catch (NotImplementedException e) {
+            return "[not supported for this backend]";
+        }
+    }
+    private static String[] getVectorAttribute(Job job, String key) throws SagaException {
+        try {
+            return job.getVectorAttribute(key);
+        } catch (IncorrectStateException e) {
+            return new String[]{"[not initialized yet]"};
+        } catch (NotImplementedException e) {
+            return new String[]{"[not supported for this backend]"};
         }
     }
     private static String getCause(Job job) {

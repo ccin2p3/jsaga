@@ -90,7 +90,7 @@ public class VectorAttributeImpl<E> implements Attribute {
         }
     }
 
-    public String[] getValues() throws NotImplementedException, IncorrectStateException {
+    public String[] getValues() throws NotImplementedException, IncorrectStateException, NoSuccessException {
         AttributeSerializer<E> serializer = new AttributeSerializer<E>(m_type);
         String[] values = new String[m_objects!=null ? m_objects.length : 0];
         for (int i=0; i<values.length; i++) {

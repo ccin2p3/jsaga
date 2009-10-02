@@ -22,9 +22,9 @@ public interface Attribute extends Cloneable {
     public boolean isReadOnly();
 
     public void setValue(String value) throws NotImplementedException, IncorrectStateException, PermissionDeniedException;
-    public String getValue() throws NotImplementedException, IncorrectStateException;
+    public String getValue() throws NotImplementedException, IncorrectStateException, NoSuccessException;
     public void setValues(String[] values) throws NotImplementedException, IncorrectStateException, PermissionDeniedException;
-    public String[] getValues() throws NotImplementedException, IncorrectStateException;
+    public String[] getValues() throws NotImplementedException, IncorrectStateException, NoSuccessException;
 
     public boolean equals(Object o);
     public Attribute clone() throws CloneNotSupportedException;

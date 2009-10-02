@@ -73,7 +73,7 @@ public class AttributeImpl<E> implements Attribute {
         }
     }
 
-    public String getValue() throws NotImplementedException, IncorrectStateException {
+    public String getValue() throws NotImplementedException, IncorrectStateException, NoSuccessException {
         try {
             return new AttributeSerializer<E>(m_type).toString(m_object);
         } catch (DoesNotExistException e) {

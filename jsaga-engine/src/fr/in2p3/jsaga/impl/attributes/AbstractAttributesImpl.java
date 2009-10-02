@@ -213,7 +213,7 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
     public void _addReadOnlyAttribute(String key, String[] constantValues) {
         m_attributes.put(key, new AttributeVector(key, true, true, constantValues));
     }
-    protected Map _getAttributesMap() throws NotImplementedException, IncorrectStateException {
+    protected Map _getAttributesMap() throws NotImplementedException, IncorrectStateException, NoSuccessException {
         Map<String,String> map = new HashMap<String,String>();
         for (Map.Entry<String, Attribute> entry : m_attributes.entrySet()) {
             String key = entry.getKey();
@@ -230,7 +230,7 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
     /**
      * To be used with fixed keys only
      */
-    protected String _getOptionalAttribute(String key) throws NotImplementedException, IncorrectStateException {
+    protected String _getOptionalAttribute(String key) throws NotImplementedException, IncorrectStateException, NoSuccessException {
         Attribute attribute = m_attributes.get(key);
         if (attribute != null) {
             return attribute.getValue();

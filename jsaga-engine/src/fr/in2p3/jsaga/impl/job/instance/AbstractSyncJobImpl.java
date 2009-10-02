@@ -5,7 +5,7 @@ import fr.in2p3.jsaga.adaptor.job.SubState;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.*;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.*;
-import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
+import fr.in2p3.jsaga.adaptor.job.monitor.*;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorCallback;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
 import fr.in2p3.jsaga.impl.job.instance.stream.*;
@@ -215,11 +215,8 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         }
     }
 
-    JobStatus queryJobInfo() throws NotImplementedException, TimeoutException, NoSuccessException {
-        return m_monitorService.getState(m_nativeJobId);
-    }
     protected State queryState() throws NotImplementedException, TimeoutException, NoSuccessException {
-        JobStatus status = this.queryJobInfo();
+        JobStatus status = m_monitorService.getState(m_nativeJobId);
         // set job state
         this.setJobState(status.getSagaState(), status.getStateDetail(), status.getSubState(), status.getCause());
         // return task state (may trigger finish task)
@@ -449,6 +446,21 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             m_metrics.m_State.setValue(state);
             m_metrics.m_StateDetail.setValue(stateDetail);
             m_metrics.m_SubState.setValue(subState.toString());
+        }
+    }
+
+    /////////////////////////////////////// friend methods //////////////////////////////////////
+
+    String getNativeJobId() {
+        return m_nativeJobId;
+    }
+
+    JobInfoAdaptor getJobInfoAdaptor() throws NotImplementedException {
+        JobMonitorAdaptor monitorAdaptor = m_monitorService.getAdaptor();
+        if (monitorAdaptor instanceof JobInfoAdaptor) {
+            return (JobInfoAdaptor) monitorAdaptor;
+        } else {
+            throw new NotImplementedException("Job attribute not supported by this adaptor: "+m_resourceManager.getScheme());
         }
     }
 

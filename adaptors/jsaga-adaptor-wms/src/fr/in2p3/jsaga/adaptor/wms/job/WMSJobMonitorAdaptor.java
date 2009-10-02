@@ -23,7 +23,7 @@ import javax.xml.rpc.ServiceException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
-import java.util.Map;
+import java.util.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -34,7 +34,7 @@ import java.util.Map;
 * Date:   18 fev. 2008
 * ***************************************************/
 
-public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements QueryIndividualJob, QueryFilteredJob, ListableJobAdaptor {
+public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements QueryIndividualJob, QueryFilteredJob, ListableJobAdaptor, JobInfoAdaptor {
     private String m_wmsServerUrl;
     private String m_lbHost;
 	private int m_lbPort;
@@ -74,9 +74,43 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	 * Get one job status
 	 */
     public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
-    	
-    	try {
+        org.glite.wsdl.types.lb.JobStatus jobInfo = this.getJobInfo(nativeJobId);
+        return new WMSJobStatus(nativeJobId, jobInfo.getState(), jobInfo.getState().getValue());
+    }
+    
+    public Integer getExitCode(String nativeJobId) throws NotImplementedException, NoSuccessException {
+        return this.getJobInfo(nativeJobId).getExitCode();
+    }
 
+    public Date getCreated(String nativeJobId) throws NotImplementedException, NoSuccessException {
+        StateEnterTimesItem[] times = this.getJobInfo(nativeJobId).getStateEnterTimes();
+        return this.find(times, StatName.SUBMITTED);
+    }
+    public Date getStarted(String nativeJobId) throws NotImplementedException, NoSuccessException {
+        StateEnterTimesItem[] times = this.getJobInfo(nativeJobId).getStateEnterTimes();
+        return this.find(times, StatName.RUNNING);
+    }
+    public Date getFinished(String nativeJobId) throws NotImplementedException, NoSuccessException {
+        StateEnterTimesItem[] times = this.getJobInfo(nativeJobId).getStateEnterTimes();
+        Date date = this.find(times, StatName.DONE);
+        if (date == null) {
+            date = this.find(times, StatName.CLEARED);
+        }
+        if (date == null) {
+            date = this.find(times, StatName.ABORTED);
+        }
+        if (date == null) {
+            date = this.find(times, StatName.CANCELLED);
+        }
+        return date;
+    }
+
+    public String[] getExecutionHosts(String nativeJobId) throws NotImplementedException, NoSuccessException {
+        return new String[]{this.getJobInfo(nativeJobId).getCeNode()};
+    }
+
+    private org.glite.wsdl.types.lb.JobStatus getJobInfo(String nativeJobId) throws NoSuccessException {
+    	try {
     		// get stub
 	        LoggingAndBookkeepingPortType stub = getLBStub(m_credential);
 	        
@@ -84,14 +118,11 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	        JobFlagsValue[] jobFlagsValue = new JobFlagsValue[1];
 	        jobFlagsValue[0] = JobFlagsValue.CLASSADS;
 	        JobFlags jobFlags = new JobFlags(jobFlagsValue);
-	        org.glite.wsdl.types.lb.JobStatus jobState = stub.jobStatus(nativeJobId,jobFlags );
-	        if(jobState == null) {
-	            throw new NoSuccessException("Unable to get status for job:"+nativeJobId);
+	        org.glite.wsdl.types.lb.JobStatus jobInfo = stub.jobStatus(nativeJobId,jobFlags );
+	        if(jobInfo == null) {
+	            throw new NoSuccessException("Unable to get information about job: "+nativeJobId);
 	        }
-	        JobInfo attr = new WMSJobStatus(nativeJobId,jobState.getState(), jobState.getState().getValue());
-            attr.setExecutionHosts(new String[]{jobState.getCeNode()});
-            attr.setExitCode(new Integer(jobState.getExitCode()));
-            return attr;
+            return jobInfo;
     	}
     	catch (MalformedURLException e) {
     		throw new NoSuccessException(e);
@@ -102,6 +133,19 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 		} catch (RemoteException e) {
 			throw new NoSuccessException(e);
 		}
+    }
+    private Date find(StateEnterTimesItem[] times, StatName state) throws NoSuccessException {
+        for (int i=0; times!=null && i<times.length; i++) {
+            if (times[i].getState().equals(state)) {
+                Calendar cal = times[i].getTime();
+                if (cal !=null) {
+                    return cal.getTime();
+                } else {
+                    return null;
+                }
+            }
+        }
+        return null;
     }
 
 	/**
@@ -134,12 +178,10 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	        stub.queryJobs(queryConditions, jobFlags, jobNativeIdResult, jobStatusResult);
 	        
 	        if(jobNativeIdResult != null && jobNativeIdResult.value != null) {
-	        	JobInfo[] filterJobs = new WMSJobStatus[jobNativeIdResult.value.length];	
+	        	JobStatus[] filterJobs = new WMSJobStatus[jobNativeIdResult.value.length];
 	        	for (int i = 0; i < filterJobs.length; i++) {
                     org.glite.wsdl.types.lb.JobStatus jobState = jobStatusResult.value[i];
 	        		filterJobs[i] = new WMSJobStatus(jobNativeIdResult.value[i], jobState.getState(), jobState.getState().getValue());
-                    filterJobs[i].setExecutionHosts(new String[]{jobState.getCeNode()});
-                    filterJobs[i].setExitCode(new Integer(jobState.getExitCode()));
 				}
 		        return filterJobs;
 	        }
@@ -213,5 +255,4 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
         LoggingAndBookkeepingLocator loc = new LoggingAndBookkeepingLocatorClient(provider, m_credential);
         return loc.getLoggingAndBookkeeping(lbURL);
 	}
-
 }

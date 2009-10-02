@@ -1,7 +1,5 @@
 package fr.in2p3.jsaga.impl.job.instance;
 
-import fr.in2p3.jsaga.adaptor.job.monitor.JobInfo;
-import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.impl.attributes.AttributeImpl;
 import fr.in2p3.jsaga.impl.attributes.VectorAttributeImpl;
 import fr.in2p3.jsaga.impl.monitoring.MetricMode;
@@ -47,23 +45,12 @@ public class JobAttributes implements Cloneable {
                 MetricMode.ReadOnly,
                 MetricType.String,
                 null) {
-            public String[] getValues() throws NotImplementedException, IncorrectStateException {
-                try {
-                    JobStatus result = job.queryJobInfo();
-                    if (result instanceof JobInfo) {
-                        JobInfo jobInfo = (JobInfo) result;
-                        if (jobInfo.getExecutionHosts() != null) {
-                            return jobInfo.getExecutionHosts();
-                        } else {
-                            throw new IncorrectStateException("Attribute may not be initialized yet: "+Job.EXECUTIONHOSTS);
-                        }
-                    } else {
-                        throw new NotImplementedException("Plug-in '"+job.m_resourceManager.getScheme()+"' does not support this attribute: "+Job.EXECUTIONHOSTS);
-                    }
-                } catch (TimeoutException e) {
-                    throw new IncorrectStateException(e);
-                } catch (NoSuccessException e) {
-                    throw new IncorrectStateException(e);
+            public String[] getValues() throws NotImplementedException, IncorrectStateException, NoSuccessException {
+                String[] result = job.getJobInfoAdaptor().getExecutionHosts(job.getNativeJobId());
+                if (result != null) {
+                    return result;
+                } else {
+                    throw new IncorrectStateException("Attribute may not be initialized yet: "+Job.EXECUTIONHOSTS);
                 }
             }
         });
@@ -72,42 +59,58 @@ public class JobAttributes implements Cloneable {
                 "time stamp of the job creation in the resource manager",
                 MetricMode.ReadOnly,
                 MetricType.Time,
-                new Date(System.currentTimeMillis())));
+                new Date(System.currentTimeMillis())) {
+            public String getValue() throws NotImplementedException, IncorrectStateException, NoSuccessException {
+                Date result = job.getJobInfoAdaptor().getCreated(job.getNativeJobId());
+                if (result != null) {
+                    return result.toString();
+                } else {
+                    throw new IncorrectStateException("Attribute may not be initialized yet: "+Job.CREATED);
+                }
+            }
+        });
         m_Started = job._addAttribute(new AttributeImpl<Date>(
                 Job.STARTED,
                 "time stamp indicating when the job started running",
                 MetricMode.ReadOnly,
                 MetricType.Time,
-                null));
+                null) {
+            public String getValue() throws NotImplementedException, IncorrectStateException, NoSuccessException {
+                Date result = job.getJobInfoAdaptor().getStarted(job.getNativeJobId());
+                if (result != null) {
+                    return result.toString();
+                } else {
+                    throw new IncorrectStateException("Attribute may not be initialized yet: "+Job.STARTED);
+                }
+            }
+        });
         m_Finished = job._addAttribute(new AttributeImpl<Date>(
                 Job.FINISHED,
                 "time stamp indicating when the job completed",
                 MetricMode.ReadOnly,
                 MetricType.Time,
-                null));
+                null) {
+            public String getValue() throws NotImplementedException, IncorrectStateException, NoSuccessException {
+                Date result = job.getJobInfoAdaptor().getFinished(job.getNativeJobId());
+                if (result != null) {
+                    return result.toString();
+                } else {
+                    throw new IncorrectStateException("Attribute may not be initialized yet: "+Job.FINISHED);
+                }
+            }
+        });
         m_ExitCode = job._addAttribute(new AttributeImpl<Integer>(
                 Job.EXITCODE,
                 "process exit code",
                 MetricMode.ReadOnly,
                 MetricType.Int,
                 null) {
-            public String getValue() throws NotImplementedException, IncorrectStateException {
-                try {
-                    JobStatus result = job.queryJobInfo();
-                    if (result instanceof JobInfo) {
-                        JobInfo jobInfo = (JobInfo) result;
-                        if (jobInfo.getExitCode() != null) {
-                            return ""+jobInfo.getExitCode();
-                        } else {
-                            throw new IncorrectStateException("Attribute may not be initialized yet: "+Job.EXITCODE);
-                        }
-                    } else {
-                        throw new NotImplementedException("Plug-in '"+job.m_resourceManager.getScheme()+"' does not support this attribute: "+Job.EXITCODE);
-                    }
-                } catch (TimeoutException e) {
-                    throw new IncorrectStateException(e);
-                } catch (NoSuccessException e) {
-                    throw new IncorrectStateException(e);
+            public String getValue() throws NotImplementedException, IncorrectStateException, NoSuccessException {
+                Integer result = job.getJobInfoAdaptor().getExitCode(job.getNativeJobId());
+                if (result != null) {
+                    return result.toString();
+                } else {
+                    throw new IncorrectStateException("Attribute may not be initialized yet: "+Job.EXITCODE);
                 }
             }
         });

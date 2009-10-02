@@ -1,8 +1,7 @@
 package fr.in2p3.jsaga.adaptor.wms.job;
 
 import fr.in2p3.jsaga.adaptor.job.SubState;
-import fr.in2p3.jsaga.adaptor.job.monitor.JobInfo;
-
+import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import org.apache.log4j.Logger;
 import org.glite.wsdl.types.lb.StatName;
 
@@ -18,7 +17,7 @@ import org.glite.wsdl.types.lb.StatName;
 /**
  *
  */
-public class WMSJobStatus extends JobInfo {
+public class WMSJobStatus extends JobStatus {
 	
 	private Logger logger = Logger.getLogger(WMSJobStatus.class);
 	
