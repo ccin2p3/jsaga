@@ -59,7 +59,7 @@ public class JobInfo extends AbstractCommand {
             // dump info
             System.out.println("State:         "+job.getState().toString());
             System.out.println("Exit code:     "+getAttribute(job, Job.EXITCODE));
-            System.out.println("State reason:  "+getCause(job));
+            System.out.println("Failure cause: "+ getFailureCause(job));
             System.out.println("Created time:  "+getAttribute(job, Job.CREATED));
             System.out.println("Started time:  "+getAttribute(job, Job.STARTED));
             System.out.println("Finished time: "+getAttribute(job, Job.FINISHED));
@@ -88,7 +88,7 @@ public class JobInfo extends AbstractCommand {
             return new String[]{"[not supported for this backend]"};
         }
     }
-    private static String getCause(Job job) {
+    private static String getFailureCause(Job job) {
         try {
             job.rethrow();
             return null;
