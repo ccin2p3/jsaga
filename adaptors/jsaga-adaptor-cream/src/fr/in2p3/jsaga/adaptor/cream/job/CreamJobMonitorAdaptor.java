@@ -1,13 +1,12 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
+import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryListJob;
 import org.apache.axis.types.URI;
 import org.glite.ce.creamapi.ws.cream2.CREAMPort;
 import org.glite.ce.creamapi.ws.cream2.types.*;
-import org.ogf.saga.error.NoSuccessException;
-import org.ogf.saga.error.PermissionDeniedException;
-import org.ogf.saga.error.TimeoutException;
+import org.ogf.saga.error.*;
 
 import java.rmi.RemoteException;
 
@@ -23,7 +22,7 @@ import java.rmi.RemoteException;
 /**
  *
  */
-public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements QueryListJob {
+public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements QueryListJob, ListableJobAdaptor {
 //        , QueryFilteredJob {
     public JobStatus[] getStatusList(String[] nativeJobIdArray) throws TimeoutException, NoSuccessException {
         URI creamUri = m_creamStub.getURI();
@@ -111,6 +110,24 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
             return fault.getFaultCause();
         } else {
             return fault.getClass().getName();
+        }
+    }
+
+    public String[] list() throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        JobId[] resultArray;
+        try {
+            resultArray = m_creamStub.getStub().jobList();
+        } catch (RemoteException e) {
+            throw new TimeoutException(e);
+        }
+        if (resultArray != null) {
+            String[] jobIds = new String[resultArray.length];
+            for (int i=0; i<resultArray.length; i++) {
+                jobIds[i] = resultArray[i].getId();
+            }
+            return jobIds;
+        } else {
+            throw new NoSuccessException("Failed to list jobs");
         }
     }
 }

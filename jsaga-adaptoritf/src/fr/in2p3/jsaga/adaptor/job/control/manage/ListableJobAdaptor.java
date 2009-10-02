@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.job.control.manage;
 
-import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.ogf.saga.error.*;
 
 /* ***************************************************
@@ -15,7 +15,7 @@ import org.ogf.saga.error.*;
 /**
  *
  */
-public interface ListableJobAdaptor extends JobControlAdaptor {
+public interface ListableJobAdaptor extends JobMonitorAdaptor {
     /**
      * Obtains the list of jobs that are currently known to the resource manager.
      * @return a list of job identifications.

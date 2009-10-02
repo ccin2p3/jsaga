@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.impl.job.service;
 
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
 import fr.in2p3.jsaga.helpers.XMLFileParser;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformer;
@@ -133,8 +134,9 @@ public abstract class AbstractSyncJobServiceImpl extends AbstractSagaObjectImpl 
     }
 
     public List<String> listSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
-        if (m_controlAdaptor instanceof ListableJobAdaptor) {
-            String[] array = ((ListableJobAdaptor)m_controlAdaptor).list();
+        JobMonitorAdaptor monitorAdaptor = m_monitorService.getAdaptor();
+        if (monitorAdaptor instanceof ListableJobAdaptor) {
+            String[] array = ((ListableJobAdaptor)monitorAdaptor).list();
             List<String> list = new ArrayList<String>();
             for (int i=0; array!=null && i<array.length; i++) {
                 list.add(array[i]);

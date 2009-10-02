@@ -6,7 +6,6 @@ import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
-import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.glite.ce.creamapi.ws.cream2.CREAMPort;
 import org.glite.ce.creamapi.ws.cream2.types.*;
@@ -33,7 +32,7 @@ import java.util.regex.Pattern;
 /**
  *
  */
-public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements StreamableJobBatch, CleanableJobAdaptor, ListableJobAdaptor {
+public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements StreamableJobBatch, CleanableJobAdaptor {
     // parameters configured
     private static final String SSL_CA_FILES = "sslCAFiles";
 
@@ -233,24 +232,6 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
                         : fault.getClass().getName();
                 throw new NoSuccessException(message, fault);
             }
-        }
-    }
-
-    public String[] list() throws PermissionDeniedException, TimeoutException, NoSuccessException {
-        JobId[] resultArray;
-        try {
-            resultArray = m_creamStub.getStub().jobList();
-        } catch (RemoteException e) {
-            throw new TimeoutException(e);
-        }
-        if (resultArray != null) {
-            String[] jobIds = new String[resultArray.length];
-            for (int i=0; i<resultArray.length; i++) {
-                jobIds[i] = resultArray[i].getId();
-            }
-            return jobIds;
-        } else {
-            throw new NoSuccessException("Failed to list jobs");
         }
     }
 

@@ -22,6 +22,7 @@ import org.ogf.saga.url.URL;
  */
 public class JobMonitorService {
     private URL m_url;
+    private JobMonitorAdaptor m_adaptor;
     private JobStatusRequestor m_requestor;
     private JobRegistry m_registry;
 
@@ -29,6 +30,7 @@ public class JobMonitorService {
     public JobMonitorService(URL url, JobMonitorAdaptor adaptor) throws NotImplementedException, TimeoutException, NoSuccessException {
         // set URL
         m_url = url;
+        m_adaptor = adaptor;
 
         // set requestor
         m_requestor = new JobStatusRequestor(adaptor);
@@ -51,6 +53,10 @@ public class JobMonitorService {
 
     public URL getURL() {
         return m_url;
+    }
+
+    public JobMonitorAdaptor getAdaptor() {
+        return m_adaptor;
     }
 
     public JobStatus getState(String nativeJobId) throws NotImplementedException, TimeoutException, NoSuccessException {
