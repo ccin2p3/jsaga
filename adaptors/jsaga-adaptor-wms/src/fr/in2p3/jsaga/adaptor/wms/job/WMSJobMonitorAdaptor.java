@@ -79,7 +79,7 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
     }
     
     public Integer getExitCode(String nativeJobId) throws NotImplementedException, NoSuccessException {
-        return this.getJobInfo(nativeJobId).getExitCode();
+        return new Integer(this.getJobInfo(nativeJobId).getExitCode());
     }
 
     public Date getCreated(String nativeJobId) throws NotImplementedException, NoSuccessException {
