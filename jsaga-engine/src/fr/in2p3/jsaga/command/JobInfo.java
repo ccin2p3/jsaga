@@ -64,6 +64,11 @@ public class JobInfo extends AbstractCommand {
             System.out.println("Created time:  "+job.getAttribute(Job.CREATED));
             System.out.println("Started time:  "+job.getAttribute(Job.STARTED));
             System.out.println("Finished time: "+job.getAttribute(Job.FINISHED));
+            System.out.println("Execution hosts:");
+            String[] hosts = job.getVectorAttribute(Job.EXECUTIONHOSTS);
+            for (int i=0; i<hosts.length; i++) {
+                System.out.println("\t"+hosts[i]);
+            }
         }
     }
     private static String getCause(Job job) {
