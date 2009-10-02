@@ -2,8 +2,9 @@ package fr.in2p3.jsaga.adaptor.wms.job;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
-import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
+import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.*;
+import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import holders.StringArrayHolder;
 import org.apache.axis.SimpleTargetedChain;
 import org.apache.axis.configuration.SimpleProvider;
@@ -33,7 +34,7 @@ import java.util.Map;
 * Date:   18 fev. 2008
 * ***************************************************/
 
-public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements QueryIndividualJob, QueryFilteredJob {
+public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements QueryIndividualJob, QueryFilteredJob, ListableJobAdaptor {
     private String m_wmsServerUrl;
     private String m_lbHost;
 	private int m_lbPort;
@@ -148,6 +149,43 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
     		throw new NoSuccessException(e);
     	}
 	}
+
+    public String[] list() throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        try {
+            // get stub
+            LoggingAndBookkeepingPortType stub = getLBStub(m_credential);
+
+            // get list of jobids
+            JobFlagsValue[] jobFlagsValue = new JobFlagsValue[1];
+            jobFlagsValue[0] = JobFlagsValue.CLASSADS;
+            JobFlags jobFlags = new JobFlags(jobFlagsValue);
+
+            JobStatusArrayHolder jobStatusResult = new JobStatusArrayHolder();
+            StringArrayHolder jobNativeIdResult = new StringArrayHolder();
+
+            QueryConditions[] queryConditions = new  QueryConditions[1];
+            queryConditions[0] = new QueryConditions();
+            queryConditions[0].setAttr(QueryAttr.JOBID);
+
+            QueryRecord[] qR = new QueryRecord[1];
+            QueryRecValue value1 = new QueryRecValue();
+            value1.setC("https://"+m_lbHost+"/");
+            qR[0] = new QueryRecord(QueryOp.UNEQUAL, value1, null );
+            queryConditions[0].setRecord(qR);
+            // Cannot use stub.userJobs() because not yet implemented (version > 1.8 needed)
+            stub.queryJobs(queryConditions, jobFlags, jobNativeIdResult, jobStatusResult);
+
+            return jobNativeIdResult.value;
+        } catch (MalformedURLException e) {
+            throw new NoSuccessException(e);
+        } catch (ServiceException e) {
+            throw new NoSuccessException(e);
+        } catch (GenericFault e) {
+            throw new NoSuccessException(e);
+        } catch (RemoteException e) {
+            throw new NoSuccessException(e);
+        }
+    }
 
 	private LoggingAndBookkeepingPortType getLBStub(GSSCredential m_credential) throws MalformedURLException, ServiceException, NoSuccessException {
         // set LB url
