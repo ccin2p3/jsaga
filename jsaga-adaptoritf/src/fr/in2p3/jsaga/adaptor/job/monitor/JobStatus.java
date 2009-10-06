@@ -32,7 +32,7 @@ public abstract class JobStatus {
     public JobStatus(String jobId, Object stateCode, String stateString, String cause) {
         this(jobId, stateCode, stateString);
         if (cause != null) {
-            m_nativeCause = new NoSuccessException("Job '"+jobId+"': "+cause);
+            m_nativeCause = new NoSuccessException(cause);
         }
     }
     public JobStatus(String jobId, Object stateCode, String stateString) {

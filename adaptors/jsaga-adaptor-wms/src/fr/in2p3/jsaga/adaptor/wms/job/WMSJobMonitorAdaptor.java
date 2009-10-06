@@ -75,7 +75,7 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	 */
     public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
         org.glite.wsdl.types.lb.JobStatus jobInfo = this.getJobInfo(nativeJobId);
-        return new WMSJobStatus(nativeJobId, jobInfo.getState(), jobInfo.getState().getValue());
+        return new WMSJobStatus(nativeJobId, jobInfo);
     }
     
     public Integer getExitCode(String nativeJobId) throws NotImplementedException, NoSuccessException {
@@ -180,8 +180,8 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	        if(jobNativeIdResult != null && jobNativeIdResult.value != null) {
 	        	JobStatus[] filterJobs = new WMSJobStatus[jobNativeIdResult.value.length];
 	        	for (int i = 0; i < filterJobs.length; i++) {
-                    org.glite.wsdl.types.lb.JobStatus jobState = jobStatusResult.value[i];
-	        		filterJobs[i] = new WMSJobStatus(jobNativeIdResult.value[i], jobState.getState(), jobState.getState().getValue());
+                    org.glite.wsdl.types.lb.JobStatus jobInfo = jobStatusResult.value[i];
+	        		filterJobs[i] = new WMSJobStatus(jobNativeIdResult.value[i], jobInfo);
 				}
 		        return filterJobs;
 	        }

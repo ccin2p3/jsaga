@@ -18,13 +18,12 @@ import org.glite.wsdl.types.lb.StatName;
  *
  */
 public class WMSJobStatus extends JobStatus {
-	
-	private Logger logger = Logger.getLogger(WMSJobStatus.class);
-	
-    public WMSJobStatus(String jobId, StatName state, String stateString) {
-        super(jobId, state, stateString);
-        if(logger.isDebugEnabled())
-        	logger.debug("Status for job '"+jobId+"':"+stateString);
+	private static Logger s_logger = Logger.getLogger(WMSJobStatus.class);
+
+    public WMSJobStatus(String jobId, org.glite.wsdl.types.lb.JobStatus jobInfo) {
+        super(jobId, jobInfo.getState(), jobInfo.getState().getValue(), jobInfo.getReason());
+        if(s_logger.isDebugEnabled())
+        	s_logger.debug("Status for job '"+jobId+"':"+jobInfo.getState().getValue());
     }
     
     public String getModel() {
