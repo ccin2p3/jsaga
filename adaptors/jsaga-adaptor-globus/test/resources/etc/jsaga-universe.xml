@@ -31,8 +31,8 @@
         <data type="gsiftp"/>
     </UNIVERSE>
     <GRID name="EGEE" contextType="MyProxy">
-        <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/globus/certificates/"/>
-        <attribute name="Server" value="cclcgproxli01.in2p3.fr:7512"/>
+        <attribute name="CertRepository" value="${user.home}/.globus/certificates/"/>
+        <attribute name="Server" value="myproxy.cern.ch:7512"/>
         <attribute name="MyProxyPass" value="tototo"/>
         <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/myproxy_cred.txt"/>
     </GRID>
