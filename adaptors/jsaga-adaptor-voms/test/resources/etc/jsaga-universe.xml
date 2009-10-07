@@ -21,8 +21,8 @@
         <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
         <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/vomsmyproxy_cred.txt"/>
         <attribute name="UserVO" value="dteam"/>
-        <attribute name="MyProxyServer" value="cclcgproxli01.in2p3.fr:7512"/>
-        <attribute name="MyProxyUserID" value="test"/>
+        <attribute name="MyProxyServer" value="myproxy.cern.ch:7512"/>
+        <attribute name="MyProxyUserID" value="jsaga"/>
         <attribute name="MyProxyPass" value="tototo"/>
     </GRID>
 </UNIVERSE>
