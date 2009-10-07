@@ -2,9 +2,11 @@ package fr.in2p3.jsaga.adaptor.security;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
+import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityAdaptor;
 import org.globus.myproxy.MyProxy;
 import org.globus.myproxy.MyProxyException;
 import org.globus.util.Util;
+import org.globus.common.CoGProperties;
 import org.gridforum.jgss.ExtendedGSSCredential;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
@@ -33,8 +35,8 @@ import java.util.Map;
  *
  */
 public class VOMSMyProxySecurityAdaptorBuilder extends VOMSSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuilder {
-    private static final int USAGE_RENEW_MEMORY_WITH_PASSPHRASE = 5; // 1 to 4 reserved by super class
-    private static final int USAGE_RENEW_LOAD_WITH_PASSPHRASE = 6;
+    private static final int USAGE_GET_DELEGATED_MEMORY = 5; // 1 to 4 reserved by super class
+    private static final int USAGE_GET_DELEGATED_LOAD = 6;
     private static final int DEFAULT_STORED_PROXY_LIFETIME = 7*12*3600;
     private static final int DEFAULT_DELEGATED_PROXY_LIFETIME = 12*3600;
 
@@ -85,25 +87,19 @@ public class VOMSMyProxySecurityAdaptorBuilder extends VOMSSecurityAdaptorBuilde
                                 }
                         }),
 
-                        // get proxy from server with passphrase
-                        new UAnd(USAGE_RENEW_MEMORY_WITH_PASSPHRASE, new Usage[]{
+                        // get delegated proxy from server
+                        new UAnd(USAGE_GET_DELEGATED_MEMORY, new Usage[]{
                                 new UNoPrompt(VOMSContext.USERPROXYOBJECT),
                                 new UDuration(VOMSContext.DELEGATIONLIFETIME)
                         }),
-                        new UAnd(USAGE_RENEW_LOAD_WITH_PASSPHRASE, new Usage[]{
-                                new U(Context.USERPROXY),
+                        new UAnd(USAGE_GET_DELEGATED_LOAD, new Usage[]{
+                                new UFile(Context.USERPROXY),
                                 new UDuration(VOMSContext.DELEGATIONLIFETIME)
                         }),
 
                         // local proxy
                         new UNoPrompt(USAGE_MEMORY, VOMSContext.USERPROXYOBJECT),
                         new UFile(USAGE_LOAD, Context.USERPROXY)
-
-                        // get proxy from server with old proxy
-/*
-                        new UProxyObject(USAGE_RENEW_MEMORY_WITH_PROXY, GlobusContext.USERPROXYOBJECT, MIN_LIFETIME_FOR_RENEW),
-                        new UProxyFile(USAGE_RENEW_LOAD_WITH_PROXY, Context.USERPROXY, MIN_LIFETIME_FOR_RENEW)
-*/
                 }),
                 new UFile(Context.CERTREPOSITORY),
                 new UFile(VOMSContext.VOMSDIR),
@@ -124,19 +120,18 @@ public class VOMSMyProxySecurityAdaptorBuilder extends VOMSSecurityAdaptorBuilde
                 case USAGE_INIT_PEM:
                 {
                     // create local temporary proxy
-                    String tempFile = File.createTempFile("vomsmyproxy", "txt").getAbsolutePath();
-                    String oldUserProxy = (String) attributes.put(Context.USERPROXY, tempFile);
+                    //String tempFile = File.createTempFile("vomsmyproxy", "txt").getAbsolutePath();
+                    //attributes.put(Context.USERPROXY, tempFile);
                     String oldLifeTime = (String) attributes.put(Context.LIFETIME, "PT12H");
                     VOMSSecurityAdaptor adaptor = (VOMSSecurityAdaptor) super.createSecurityAdaptor(usage, attributes, contextId);
-                    attributes.put(Context.USERPROXY, oldUserProxy);
                     attributes.put(Context.LIFETIME, oldLifeTime);
                     GSSCredential cred = adaptor.getGSSCredential();
 
                     // send it to MyProxy server
                     storeCredential(cred, attributes);
 
-                    // destroy local temporary proxy
-                    Util.destroy(tempFile);
+                    // destroy local temporary proxy (requires anonymous to be authorized by server's default trusted_retrievers policy)
+                    //Util.destroy(tempFile);
 
                     // returns
                     return this.createSecurityAdaptor(cred, attributes);
@@ -147,34 +142,28 @@ public class VOMSMyProxySecurityAdaptorBuilder extends VOMSSecurityAdaptorBuilde
                     // creates a VOMSMyProxySecurityAdaptor
                     return super.createSecurityAdaptor(usage, attributes, contextId);
                 }
-                case USAGE_RENEW_MEMORY_WITH_PASSPHRASE:
+                case USAGE_GET_DELEGATED_MEMORY:
                 {
-                    GSSCredential cred = renewCredential(null, attributes);
+                    // get old proxy (required unless anonymous is authorized by server's default trusted_retrievers policy)
+                    GSSCredential oldCred = InMemoryProxySecurityAdaptor.toGSSCredential((String) attributes.get(VOMSContext.USERPROXYOBJECT));
+
+                    // get delegated proxy
+                    GSSCredential cred = getDelegatedCredential(oldCred, attributes);
 //                    GSSCredential resignedCred = new VOMSProxyFactory(attributes, cred).createProxy();
                     return this.createSecurityAdaptor(cred, attributes);
                 }
-                case USAGE_RENEW_LOAD_WITH_PASSPHRASE:
+                case USAGE_GET_DELEGATED_LOAD:
                 {
-                    GSSCredential cred = renewCredential(null, attributes);
-//                    GSSCredential resignedCred = new VOMSProxyFactory(attributes, cred).createProxy();
-                    save(new File((String) attributes.get(Context.USERPROXY)), cred);
-                    return this.createSecurityAdaptor(cred, attributes);
-                }
-/*
-                case USAGE_RENEW_MEMORY_WITH_PROXY:
-                {
-                    GSSCredential oldCred = (GSSCredential) attributes.get(GlobusContext.USERPROXYOBJECT);
-                    GSSCredential cred = renewCredential(oldCred, attributes);
-                    return new VOMSMyProxySecurityAdaptor(cred);
-                }
-                case USAGE_RENEW_LOAD_WITH_PROXY:
-                {
+                    // get old proxy (required unless anonymous is authorized by server's default trusted_retrievers policy)
+                    CoGProperties.getDefault().setCaCertLocations((String) attributes.get(Context.CERTREPOSITORY));
                     GSSCredential oldCred = load(new File((String) attributes.get(Context.USERPROXY)));
-                    GSSCredential cred = renewCredential(oldCred, attributes);
+
+                    // get delegated proxy
+                    GSSCredential cred = getDelegatedCredential(oldCred, attributes);
+//                    GSSCredential resignedCred = new VOMSProxyFactory(attributes, cred).createProxy();
                     save(new File((String) attributes.get(Context.USERPROXY)), cred);
-                    return new VOMSMyProxySecurityAdaptor(cred);
+                    return this.createSecurityAdaptor(cred, attributes);
                 }
-*/
                 default:
                     throw new NoSuccessException("INTERNAL ERROR: unexpected exception");
             }
@@ -228,7 +217,7 @@ public class VOMSMyProxySecurityAdaptorBuilder extends VOMSSecurityAdaptorBuilde
         MyProxy server = getServer((String) attributes.get(VOMSContext.MYPROXYSERVER));
         server.put(newCred, myProxyUserId, myProxyPass, storedLifetime);
     }
-    private static GSSCredential renewCredential(GSSCredential oldCred, Map attributes) throws ParseException, URISyntaxException, MyProxyException {
+    private static GSSCredential getDelegatedCredential(GSSCredential oldCred, Map attributes) throws ParseException, URISyntaxException, MyProxyException {
         String myProxyUserId = (String) attributes.get(VOMSContext.MYPROXYUSERID);
         String myProxyPass = (String) attributes.get(VOMSContext.MYPROXYPASS);
         int delegatedLifetime = attributes.containsKey(Context.LIFETIME)

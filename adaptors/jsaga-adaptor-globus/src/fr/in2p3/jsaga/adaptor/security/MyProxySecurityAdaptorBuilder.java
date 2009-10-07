@@ -40,10 +40,8 @@ public class MyProxySecurityAdaptorBuilder implements ExpirableSecurityAdaptorBu
     private static final int USAGE_INIT_PEM = 2;
     private static final int USAGE_LOCAL_MEMORY = 3;
     private static final int USAGE_LOCAL_LOAD = 4;
-    private static final int USAGE_RENEW_MEMORY_WITH_PASSPHRASE = 5;
-    private static final int USAGE_RENEW_LOAD_WITH_PASSPHRASE = 6;
-//    private static final int USAGE_RENEW_MEMORY_WITH_PROXY = 7;
-//    private static final int USAGE_RENEW_LOAD_WITH_PROXY = 8;
+    private static final int USAGE_GET_DELEGATED_MEMORY = 5;
+    private static final int USAGE_GET_DELEGATED_LOAD = 6;
 
     private static final int MIN_LIFETIME_FOR_USING = 3*3600;   // 3 hours
 //    private static final int MIN_LIFETIME_FOR_RENEW = 30*60;    // 30 minutes
@@ -68,25 +66,19 @@ public class MyProxySecurityAdaptorBuilder implements ExpirableSecurityAdaptorBu
                                 new UDuration(Context.LIFETIME),
                         }),
 
-                        // get proxy from server with passphrase
-                        new UAnd(USAGE_RENEW_MEMORY_WITH_PASSPHRASE, new Usage[]{
+                        // get delegated proxy from server
+                        new UAnd(USAGE_GET_DELEGATED_MEMORY, new Usage[]{
                                 new UNoPrompt(GlobusContext.USERPROXYOBJECT),
                                 new UDuration(GlobusContext.DELEGATIONLIFETIME)
                         }),
-                        new UAnd(USAGE_RENEW_LOAD_WITH_PASSPHRASE, new Usage[]{
-                                new U(Context.USERPROXY),
+                        new UAnd(USAGE_GET_DELEGATED_LOAD, new Usage[]{
+                                new UFile(Context.USERPROXY),
                                 new UDuration(GlobusContext.DELEGATIONLIFETIME)
                         }),
 
                         // local proxy
                         new UProxyObject(USAGE_LOCAL_MEMORY, GlobusContext.USERPROXYOBJECT, MIN_LIFETIME_FOR_USING),
                         new UProxyFile(USAGE_LOCAL_LOAD, Context.USERPROXY, MIN_LIFETIME_FOR_USING),
-
-                        // get proxy from server with old proxy
-/*
-                        new UProxyObject(USAGE_RENEW_MEMORY_WITH_PROXY, GlobusContext.USERPROXYOBJECT, MIN_LIFETIME_FOR_RENEW),
-                        new UProxyFile(USAGE_RENEW_LOAD_WITH_PROXY, Context.USERPROXY, MIN_LIFETIME_FOR_RENEW)
-*/
                 }),
                 new U(Context.SERVER),
                 new U(Context.USERID),
@@ -130,8 +122,8 @@ public class MyProxySecurityAdaptorBuilder implements ExpirableSecurityAdaptorBu
                 case USAGE_INIT_PEM:
                 {
                     // create local temporary proxy
-                    String tempFile = File.createTempFile("myproxy", "txt").getAbsolutePath();
-                    attributes.put(Context.USERPROXY, tempFile);
+                    //String tempFile = File.createTempFile("myproxy", "txt").getAbsolutePath();
+                    //attributes.put(Context.USERPROXY, tempFile);
                     GSSCredential cred = new GlobusProxyFactory(attributes, GlobusProxyFactory.OID_OLD, GlobusProxyFactory.CERTIFICATE_PEM).createProxy();
 
                     // send it to MyProxy server
@@ -143,8 +135,8 @@ public class MyProxySecurityAdaptorBuilder implements ExpirableSecurityAdaptorBu
                     MyProxy server = getServer(attributes);
                     server.put(cred, userId, myProxyPass, storedLifetime);
 
-                    // destroy local temporary proxy
-                    Util.destroy(tempFile);
+                    // destroy local temporary proxy (requires anonymous to be authorized by server's default trusted_retrievers policy)
+                    //Util.destroy(tempFile);
 
                     // returns
                     return this.createSecurityAdaptor(cred, attributes);
@@ -160,32 +152,26 @@ public class MyProxySecurityAdaptorBuilder implements ExpirableSecurityAdaptorBu
                     GSSCredential cred = load(new File((String) attributes.get(Context.USERPROXY)));
                     return this.createSecurityAdaptor(cred, attributes);
                 }
-                case USAGE_RENEW_MEMORY_WITH_PASSPHRASE:
+                case USAGE_GET_DELEGATED_MEMORY:
                 {
-                    GSSCredential cred = renewCredential(null, attributes);
+                    // get old proxy (required unless anonymous is authorized by server's default trusted_retrievers policy)
+                    GSSCredential oldCred = InMemoryProxySecurityAdaptor.toGSSCredential((String) attributes.get(GlobusContext.USERPROXYOBJECT));
+
+                    // get delegated proxy
+                    GSSCredential cred = getDelegatedCredential(oldCred, attributes);
                     return this.createSecurityAdaptor(cred, attributes);
                 }
-                case USAGE_RENEW_LOAD_WITH_PASSPHRASE:
+                case USAGE_GET_DELEGATED_LOAD:
                 {
-                    GSSCredential cred = renewCredential(null, attributes);
-                    save(new File((String) attributes.get(Context.USERPROXY)), cred);
-                    return this.createSecurityAdaptor(cred, attributes);
-                }
-/*
-                case USAGE_RENEW_MEMORY_WITH_PROXY:
-                {
-                    GSSCredential oldCred = (GSSCredential) attributes.get(GlobusContext.USERPROXYOBJECT);
-                    GSSCredential cred = renewCredential(oldCred, attributes);
-                    return this.createSecurityAdaptor(cred, attributes);
-                }
-                case USAGE_RENEW_LOAD_WITH_PROXY:
-                {
+                    // get old proxy (required unless anonymous is authorized by server's default trusted_retrievers policy)
+                    CoGProperties.getDefault().setCaCertLocations((String) attributes.get(Context.CERTREPOSITORY));
                     GSSCredential oldCred = load(new File((String) attributes.get(Context.USERPROXY)));
-                    GSSCredential cred = renewCredential(oldCred, attributes);
+
+                    // get delegated proxy
+                    GSSCredential cred = getDelegatedCredential(oldCred, attributes);
                     save(new File((String) attributes.get(Context.USERPROXY)), cred);
                     return this.createSecurityAdaptor(cred, attributes);
                 }
-*/
                 default:
                     throw new NoSuccessException("INTERNAL ERROR: unexpected exception");
             }
@@ -217,7 +203,7 @@ public class MyProxySecurityAdaptorBuilder implements ExpirableSecurityAdaptorBu
         Util.destroy((String) attributes.get(Context.USERPROXY));
     }
 
-    private static GSSCredential renewCredential(GSSCredential oldCred, Map attributes) throws ParseException, URISyntaxException, MyProxyException {
+    private static GSSCredential getDelegatedCredential(GSSCredential oldCred, Map attributes) throws ParseException, URISyntaxException, MyProxyException {
         String userId = (String) attributes.get(Context.USERID);
         String myProxyPass = (String) attributes.get(GlobusContext.MYPROXYPASS);
         int delegatedLifetime = attributes.containsKey(Context.LIFETIME)
