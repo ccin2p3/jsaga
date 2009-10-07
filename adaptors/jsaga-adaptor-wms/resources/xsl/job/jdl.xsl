@@ -92,24 +92,48 @@ NodeNumber = <xsl:value-of select="."/>;<xsl:text/>
         	</xsl:choose>
         </xsl:for-each>
 
+        <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Input">
+StdInput = "<xsl:value-of select="text()"/>";
+        </xsl:for-each>
+        <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Output">
+StdOutput = "<xsl:value-of select="text()"/>";
+        </xsl:for-each>
+        <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Error">
+StdError = "<xsl:value-of select="text()"/>";
+        </xsl:for-each>
+
         <xsl:if test="count(jsdl:DataStaging[jsdl:Source/jsdl:URI]) > 0">
-InputSandbox = {<xsl:apply-templates select="jsdl:DataStaging/jsdl:Source/jsdl:URI"/>};
+InputSandbox = {<xsl:apply-templates select="jsdl:Application/posix:POSIXApplication/posix:Input
+                                           | jsdl:DataStaging/jsdl:Source/jsdl:URI"/>};
         </xsl:if>
-        <xsl:if test="count(jsdl:DataStaging[jsdl:Target/jsdl:URI]) > 0">
-OutputSandbox = {<xsl:apply-templates select="jsdl:DataStaging[jsdl:Target/jsdl:URI]/jsdl:FileName"/>};
-OutputSandboxDestURI = {<xsl:apply-templates select="jsdl:DataStaging/jsdl:Target/jsdl:URI"/>};
+
+        <xsl:variable name="outputs" select="jsdl:Application/posix:POSIXApplication/posix:Output
+                                           | jsdl:Application/posix:POSIXApplication/posix:Error
+                                           | jsdl:DataStaging[jsdl:Target/jsdl:URI]"/>
+        <xsl:if test="count($outputs) > 0">
+OutputSandbox = {<xsl:apply-templates select="jsdl:Application/posix:POSIXApplication/posix:Output
+                                           | jsdl:Application/posix:POSIXApplication/posix:Error
+                                           | jsdl:DataStaging[jsdl:Target/jsdl:URI]/jsdl:FileName"/>};
+OutputSandboxDestURI = {<xsl:apply-templates select="jsdl:Application/posix:POSIXApplication/posix:Output
+                                           | jsdl:Application/posix:POSIXApplication/posix:Error
+                                           | jsdl:DataStaging/jsdl:Target/jsdl:URI"/>};
         </xsl:if>
     </xsl:template>
 
+    <xsl:template match="posix:Input | posix:Output | posix:Error">
+        <!-- add path -->
+        <xsl:call-template name="VALUE_OF_TEXT"/>
+    </xsl:template>
 
     <xsl:template match="jsdl:Source/jsdl:URI">
         <!-- check file not renamed -->
-        <xsl:variable name="filename">
+        <xsl:variable name="sourceFilename">
             <xsl:call-template name="FILENAME"><xsl:with-param name="uri" select="text()"/></xsl:call-template>
         </xsl:variable>
-        <xsl:if test="$filename != jsdl:FileName/text()">
+        <xsl:variable name="targetFilename" select="ancestor::jsdl:DataStaging/jsdl:FileName/text()"/>
+        <xsl:if test="$sourceFilename != $targetFilename">
             <xsl:message terminate="yes">Renaming file is not supported: <xsl:value-of
-                    select="$filename"/> / <xsl:value-of select="jsdl:FileName/text()"/></xsl:message>
+                    select="$sourceFilename"/> / <xsl:value-of select="$targetFilename"/></xsl:message>
         </xsl:if>
         <!-- add URI -->
         <xsl:call-template name="VALUE_OF_TEXT"/>
