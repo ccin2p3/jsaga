@@ -267,17 +267,11 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             if (this.isFinalState()) {
                 m_stagingDescription.cleanup(this);
             }
-        } catch (AuthenticationFailedException e) {
-            throw new NoSuccessException(e);
-        } catch (AuthorizationFailedException e) {
-            throw new NoSuccessException(e);
-        } catch (PermissionDeniedException e) {
-            throw new NoSuccessException(e);
-        } catch (BadParameterException e) {
-            throw new NoSuccessException(e);
-        } catch (DoesNotExistException e) {
-            throw new NoSuccessException(e);
-        } catch (IncorrectStateException e) {
+        }
+        catch (NotImplementedException e) {throw e;}
+        catch (TimeoutException e) {throw e;}
+        catch (NoSuccessException e) {throw e;}
+        catch (SagaException e) {
             throw new NoSuccessException(e);
         }
 
@@ -285,9 +279,22 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         if (this.isFinalState() && m_controlAdaptor instanceof CleanableJobAdaptor) {
             try {
                 ((CleanableJobAdaptor)m_controlAdaptor).clean(m_nativeJobId);
-            } catch (PermissionDeniedException e) {
+            } catch (SagaException e) {
                 s_logger.warn("Failed to cleanup job: "+m_nativeJobId, e);
             }
+        }
+    }
+
+    public void cleanup() throws NotImplementedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
+        State state = this.getState();
+        if (! this.isFinalState()) {
+            throw new IncorrectStateException("Can not cleanup unfinished job: "+state, this);
+        }
+
+        if (m_controlAdaptor instanceof CleanableJobAdaptor) {
+            ((CleanableJobAdaptor)m_controlAdaptor).clean(m_nativeJobId);
+        } else {
+            throw new NotImplementedException("Cleanup is not supported by this adaptor: "+m_controlAdaptor.getClass().getName());
         }
     }
 
