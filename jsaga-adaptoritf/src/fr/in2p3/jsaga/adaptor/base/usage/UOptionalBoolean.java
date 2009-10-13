@@ -19,7 +19,7 @@ public class UOptionalBoolean extends UOptional {
 
     protected Object throwExceptionIfInvalid(Object value) throws Exception {
         if (value != null) {
-            return Boolean.parseBoolean((String) value);
+            return Boolean.valueOf((String) value);
         } else {
             return null;
         }

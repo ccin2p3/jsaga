@@ -19,7 +19,7 @@ public class UOptionalInteger extends UOptional {
 
     protected Object throwExceptionIfInvalid(Object value) throws Exception {
         if (value != null) {
-            return Integer.parseInt((String) value);
+            return Integer.valueOf((String) value);
         } else {
             return null;
         }
