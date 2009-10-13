@@ -107,18 +107,18 @@ NodeNumber = <xsl:value-of select="."/>;<xsl:text/>
         </xsl:for-each>
 
         <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Input">
-StdInput = "<xsl:value-of select="text()"/>";
+StdInput = "<xsl:value-of select="text()"/>";<xsl:text/>
         </xsl:for-each>
         <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Output">
-StdOutput = "<xsl:value-of select="text()"/>";
+StdOutput = "<xsl:value-of select="text()"/>";<xsl:text/>
         </xsl:for-each>
         <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Error">
-StdError = "<xsl:value-of select="text()"/>";
+StdError = "<xsl:value-of select="text()"/>";<xsl:text/>
         </xsl:for-each>
 
         <xsl:if test="count(jsdl:DataStaging[jsdl:Source/jsdl:URI]) > 0">
 InputSandbox = {<xsl:apply-templates select="jsdl:Application/posix:POSIXApplication/posix:Input
-                                           | jsdl:DataStaging/jsdl:Source/jsdl:URI"/>};
+                                           | jsdl:DataStaging/jsdl:Source/jsdl:URI"/>};<xsl:text/>
         </xsl:if>
 
         <xsl:variable name="outputs" select="jsdl:Application/posix:POSIXApplication/posix:Output
@@ -130,7 +130,7 @@ OutputSandbox = {<xsl:apply-templates select="jsdl:Application/posix:POSIXApplic
                                            | jsdl:DataStaging[jsdl:Target/jsdl:URI]/jsdl:FileName"/>};
 OutputSandboxDestURI = {<xsl:apply-templates select="jsdl:Application/posix:POSIXApplication/posix:Output
                                            | jsdl:Application/posix:POSIXApplication/posix:Error
-                                           | jsdl:DataStaging/jsdl:Target/jsdl:URI"/>};
+                                           | jsdl:DataStaging/jsdl:Target/jsdl:URI"/>};<xsl:text/>
         </xsl:if>
 
         <xsl:if test="$virtualorganisation">
