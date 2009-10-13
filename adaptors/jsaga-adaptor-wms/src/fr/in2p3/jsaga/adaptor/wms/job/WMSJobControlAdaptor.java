@@ -49,7 +49,7 @@ import java.util.regex.Pattern;
  */
 public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract 
 		implements JobControlAdaptor, CleanableJobAdaptor, StreamableJobBatch {
-    private static final String GLUE_CE_STATE_STATUS = "GlueCEStateStatus";
+    private static final String DEFAULT_JDL_FILE = "DefaultJdlFile";
 
 	private Logger logger = Logger.getLogger(WMSJobControlAdaptor.class);
 	
@@ -74,14 +74,28 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     public Usage getUsage() {
         return new UOr(new U[]{
                 new U(MONITOR_PORT),
-                new U(GLUE_CE_STATE_STATUS)
+                new UOptional(DEFAULT_JDL_FILE),
+                // JDL attributes
+                new UOptional("requirements"),
+                new UOptional("rank"),
+                new UOptional("virtualorganisation"),
+                new UOptionalInteger("RetryCount"),
+                new UOptionalInteger("ShallowRetryCount"),
+                new UOptional("OutputStorage"),
+                new UOptional("ErrorStorage"),
+                new UOptionalBoolean("AllowZippedISB"),
+                new UOptionalBoolean("PerusalFileEnable"),
+                new UOptional("ListenerStorage"),
+                new UOptional("MyProxyServer")
         });
     }
     
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return new Default[]{
                 new Default(MONITOR_PORT, "9000"),
-                new Default(GLUE_CE_STATE_STATUS, "Production")
+                // JDL attributes
+                new Default("requirements", "(other.GlueCEStateStatus==\"Production\")"),
+                new Default("rank", "(-other.GlueCEStateEstimatedResponseTime)")
         };
     }
 
@@ -103,6 +117,15 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         m_parameters = attributes;
+        if (attributes.containsKey(DEFAULT_JDL_FILE)) {
+            File defaultJdlFile = new File((String) attributes.get(DEFAULT_JDL_FILE));
+            try {
+                // may override jsaga-universe.xml attributes
+                new DefaultJDL(defaultJdlFile).fill(m_parameters);
+            } catch (FileNotFoundException e) {
+                throw new BadParameterException(e);
+            }
+        }
 
     	m_wmsServerUrl = "https://"+host+":"+port+basePath;
     	if(attributes.containsKey(MONITOR_SERVICE_URL)) {

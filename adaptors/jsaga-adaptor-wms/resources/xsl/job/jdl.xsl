@@ -6,8 +6,20 @@
                 xmlns:spmd="http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd"
                 xmlns:ext="http://www.in2p3.fr/jsdl-extension">
     <xsl:output method="text"/>
-    <xsl:param name="GlueCEStateStatus"/>
-    
+
+    <!-- JDL attributes -->
+    <xsl:param name="requirements"/>
+    <xsl:param name="rank"/>
+    <xsl:param name="virtualorganisation"/>
+    <xsl:param name="RetryCount"/>
+    <xsl:param name="ShallowRetryCount"/>
+    <xsl:param name="OutputStorage"/>
+    <xsl:param name="ErrorStorage"/>
+    <xsl:param name="AllowZippedISB"/>
+    <xsl:param name="PerusalFileEnable"/>
+    <xsl:param name="ListenerStorage"/>
+    <xsl:param name="MyProxyServer"/>
+
     <!-- entry point (MUST BE RELATIVE) -->
     <xsl:template match="jsdl:JobDefinition">
         <xsl:apply-templates select="jsdl:JobDescription"/>
@@ -16,8 +28,6 @@
 
     <xsl:template match="jsdl:JobDescription">
 Type = "Job";<xsl:text/>
-<!-- Rank = other.GlueCEStateFreeCPUs;<xsl:text/>  -->
-Rank = -other.GlueCEStateEstimatedResponseTime ;<xsl:text/>
         <!-- executable and arguments -->
 Executable = "<xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Executable/text()"/>";<xsl:text/>
         <xsl:if test="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
@@ -46,8 +56,8 @@ Environment = {<xsl:text/>
           		
 <!--  Requirements -->
 Requirements = true <xsl:text/>
-        <xsl:if test="$GlueCEStateStatus">
-&amp;&amp; other.GlueCEStateStatus == "<xsl:value-of select="$GlueCEStateStatus"/>" <xsl:text/>
+        <xsl:if test="$requirements">
+&amp;&amp; <xsl:value-of select="$requirements"/> <xsl:text/>
         </xsl:if>
 		<xsl:for-each select="jsdl:Resources/jsdl:TotalPhysicalMemory/jsdl:UpperBoundedRange/text()">
 &amp;&amp; other.GlueHostMainMemoryRAMSize >= <xsl:value-of select="."/> <xsl:text/>
@@ -75,6 +85,12 @@ Requirements = true <xsl:text/>
 		<xsl:for-each select="jsdl:Resources/jsdl:OperatingSystem/jsdl:OperatingSystemType/jsdl:OperatingSystemName/text()">
 &amp;&amp;  other.OperatingSystemName == "<xsl:value-of select="."/>" <xsl:text/>
 		</xsl:for-each>   -->
+<xsl:text/>;
+
+Rank = true <xsl:text/>
+        <xsl:if test="$rank">
+&amp;&amp; <xsl:value-of select="$rank"/> <xsl:text/>
+        </xsl:if>
 <xsl:text/>;
 
         <!-- TODO : To test when input sandbox will work -->
@@ -117,6 +133,34 @@ OutputSandbox = {<xsl:apply-templates select="jsdl:Application/posix:POSIXApplic
 OutputSandboxDestURI = {<xsl:apply-templates select="jsdl:Application/posix:POSIXApplication/posix:Output
                                            | jsdl:Application/posix:POSIXApplication/posix:Error
                                            | jsdl:DataStaging/jsdl:Target/jsdl:URI"/>};
+        </xsl:if>
+
+        <xsl:if test="$virtualorganisation">
+virtualorganisation = "<xsl:value-of select="$virtualorganisation"/>";<xsl:text/>
+        </xsl:if>
+        <xsl:if test="$RetryCount">
+RetryCount = <xsl:value-of select="$RetryCount"/>;<xsl:text/>
+        </xsl:if>
+        <xsl:if test="$ShallowRetryCount">
+ShallowRetryCount = <xsl:value-of select="$ShallowRetryCount"/>;<xsl:text/>
+        </xsl:if>
+        <xsl:if test="$OutputStorage">
+OutputStorage = "<xsl:value-of select="$OutputStorage"/>";<xsl:text/>
+        </xsl:if>
+        <xsl:if test="$ErrorStorage">
+ErrorStorage = "<xsl:value-of select="$ErrorStorage"/>";<xsl:text/>
+        </xsl:if>
+        <xsl:if test="$AllowZippedISB">
+AllowZippedISB = <xsl:value-of select="$AllowZippedISB"/>;<xsl:text/>
+        </xsl:if>
+        <xsl:if test="$PerusalFileEnable">
+PerusalFileEnable = <xsl:value-of select="$PerusalFileEnable"/>;<xsl:text/>
+        </xsl:if>
+        <xsl:if test="$ListenerStorage">
+ListenerStorage = "<xsl:value-of select="$ListenerStorage"/>";<xsl:text/>
+        </xsl:if>
+        <xsl:if test="$MyProxyServer">
+MyProxyServer = "<xsl:value-of select="$MyProxyServer"/>";<xsl:text/>
         </xsl:if>
     </xsl:template>
 
