@@ -87,11 +87,9 @@ Requirements = true <xsl:text/>
 		</xsl:for-each>   -->
 <xsl:text/>;
 
-Rank = true <xsl:text/>
         <xsl:if test="$rank">
-&amp;&amp; <xsl:value-of select="$rank"/> <xsl:text/>
+Rank = <xsl:value-of select="$rank"/>;<xsl:text/>
         </xsl:if>
-<xsl:text/>;
 
         <!-- TODO : To test when input sandbox will work -->
         <xsl:for-each select="jsdl:Application/spmd:SPMDApplication/spmd:SPMDVariation/text()[not(. = 'None')]">        
