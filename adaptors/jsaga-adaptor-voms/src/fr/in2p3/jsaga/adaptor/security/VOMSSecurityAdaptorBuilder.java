@@ -5,6 +5,7 @@ import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityAdaptor;
 import org.bouncycastle.jce.provider.X509CertificateObject;
+import org.glite.voms.contact.VOMSException;
 import org.globus.common.CoGProperties;
 import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
@@ -14,9 +15,7 @@ import org.gridforum.jgss.ExtendedGSSManager;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.BadParameterException;
-import org.ogf.saga.error.IncorrectStateException;
-import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.*;
 
 import java.io.*;
 import java.security.cert.X509Certificate;
@@ -133,7 +132,7 @@ public class VOMSSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuild
         }
     }
 
-    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectStateException, NoSuccessException {
+    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectStateException, TimeoutException, NoSuccessException {
         try {
             switch(usage) {
                 case USAGE_INIT_PKCS12:
@@ -166,6 +165,13 @@ public class VOMSSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuild
             throw e;
         } catch(NoSuccessException e) {
             throw e;
+        } catch(VOMSException e) {
+            String msg = e.getMessage();
+            if (msg!=null && msg.endsWith("Connection timed out: connect")) {
+                throw new TimeoutException(e);
+            } else {
+                throw new NoSuccessException(e);
+            }
         } catch(Exception e) {
             throw new NoSuccessException(e);
         }

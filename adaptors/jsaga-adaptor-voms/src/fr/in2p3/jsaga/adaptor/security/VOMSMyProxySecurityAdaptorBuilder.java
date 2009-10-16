@@ -3,21 +3,17 @@ package fr.in2p3.jsaga.adaptor.security;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityAdaptor;
+import org.globus.common.CoGProperties;
 import org.globus.myproxy.MyProxy;
 import org.globus.myproxy.MyProxyException;
 import org.globus.util.Util;
-import org.globus.common.CoGProperties;
 import org.gridforum.jgss.ExtendedGSSCredential;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.BadParameterException;
-import org.ogf.saga.error.IncorrectStateException;
-import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.*;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.Map;
@@ -113,7 +109,7 @@ public class VOMSMyProxySecurityAdaptorBuilder extends VOMSSecurityAdaptorBuilde
         return super.getDefaults(attributes);
     }
 
-    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectStateException, NoSuccessException {
+    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectStateException, TimeoutException, NoSuccessException {
         try {
             switch(usage) {
                 case USAGE_INIT_PKCS12:
