@@ -7,8 +7,11 @@
     <script>jsaga-context-destroy</script>
 
     <script>jsaga-job-cancel</script>
+    <script>jsaga-job-info</script>
+    <script>jsaga-job-list</script>
     <script>jsaga-job-run</script>
     <script>jsaga-job-status</script>
+    <script>jsaga-job-get-output_WMS</script>
 
     <script>jsaga-jobcollection-run</script>
     <script>jsaga-jobcollection-status</script>
