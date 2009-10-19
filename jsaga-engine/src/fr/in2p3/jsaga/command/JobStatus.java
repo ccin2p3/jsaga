@@ -65,7 +65,7 @@ public class JobStatus extends AbstractCommand {
             } else if (State.SUSPENDED.compareTo(state) == 0) {
                 System.out.println("Job is suspended.");
             } else if (State.DONE.compareTo(state) == 0) {
-                System.out.println("Job completed successfully.");
+                System.out.println("Job done.");
             } else if (State.CANCELED.compareTo(state) == 0) {
                 System.out.println("Job canceled.");
             } else if (State.FAILED.compareTo(state) == 0) {
