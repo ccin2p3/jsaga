@@ -20,4 +20,4 @@ Post-installation on Unix-based O.S. (Linux, Solaris and Mac OS X):
       export JSAGA_HOME=$INSTALL_PATH
 
   [2] Update the PATH environment variable (optional):
-      export PATH=$PATH:JSAGA_HOME/bin
+      export PATH=$PATH:$JSAGA_HOME/bin
