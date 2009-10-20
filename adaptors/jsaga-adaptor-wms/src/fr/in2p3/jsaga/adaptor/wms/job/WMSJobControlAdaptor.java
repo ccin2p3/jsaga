@@ -55,6 +55,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 	
 	private String clientConfigFile = Base.JSAGA_VAR+ File.separator+ "client-config-wms.wsdd";
 	private File m_tmpProxyFile,  stdoutFile, stderrFile;
+    private File m_sandboxDir;
 	
     private Map m_parameters;
 	private WMProxyAPI m_client;
@@ -82,7 +83,6 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
                 new UOptionalInteger("RetryCount"),
                 new UOptionalInteger("ShallowRetryCount"),
                 new UOptional("OutputStorage"),
-                new UOptional("ErrorStorage"),
                 new UOptionalBoolean("AllowZippedISB"),
                 new UOptionalBoolean("PerusalFileEnable"),
                 new UOptional("ListenerStorage"),
@@ -95,7 +95,8 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
                 new Default(MONITOR_PORT, "9000"),
                 // JDL attributes
                 new Default("requirements", "(other.GlueCEStateStatus==\"Production\")"),
-                new Default("rank", "(-other.GlueCEStateEstimatedResponseTime)")
+                new Default("rank", "(-other.GlueCEStateEstimatedResponseTime)"),
+                new Default("OutputStorage", new File[]{new File(System.getProperty("java.io.tmpdir"))})
         };
     }
 
@@ -124,6 +125,14 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
                 new DefaultJDL(defaultJdlFile).fill(m_parameters);
             } catch (FileNotFoundException e) {
                 throw new BadParameterException(e);
+            }
+        }
+
+        m_sandboxDir = new File(System.getProperty("java.io.tmpdir"));
+        if (attributes.containsKey("OutputStorage")) {
+            m_sandboxDir = new File((String) attributes.get("OutputStorage"));
+            if (!m_sandboxDir.exists() && !m_sandboxDir.mkdirs()) {
+                throw new NoSuccessException("Failed to create OutputStorage directory: "+m_sandboxDir);
             }
         }
 
@@ -473,7 +482,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
                     StringAndLongType[] list = result.getFile();
                     for (int i=0; list!=null && i<list.length ; i++){
                         String from = list[i].getName();
-                        File to = new File(new File(from).getName());
+                        File to = new File(m_sandboxDir, new File(from).getName());
                         GlobusURL fromURL = createGlobusURL(from);
                         GlobusURL toURL = createGlobusURL(to);
 

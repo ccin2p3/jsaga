@@ -16,6 +16,7 @@
             <attribute name="RetryCount" value="0"/>
             <attribute name="PerusalFileEnable" value="false"/>
             <attribute name="MyProxyServer" value="myproxy.cern.ch"/>
+            <attribute name="OutputStorage" value="${java.io.tmpdir}/sandbox"/>
         </job>
     </GRID>
 </UNIVERSE>
