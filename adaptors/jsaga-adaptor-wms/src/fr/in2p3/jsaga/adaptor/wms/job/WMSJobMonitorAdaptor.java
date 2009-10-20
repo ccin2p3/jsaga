@@ -138,7 +138,7 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
         for (int i=0; times!=null && i<times.length; i++) {
             if (times[i].getState().equals(state)) {
                 Calendar cal = times[i].getTime();
-                if (cal !=null) {
+                if (cal!=null && cal.getTimeInMillis()>0) {
                     return cal.getTime();
                 } else {
                     return null;
