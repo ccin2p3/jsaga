@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.data;
 
-import edu.sdsc.grid.io.FileFactory;
+import edu.sdsc.grid.io.*;
 import edu.sdsc.grid.io.irods.*;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
@@ -22,33 +22,48 @@ import java.io.*;
  */
 public class IrodsDataAdaptorPhysical extends IrodsDataAdaptor implements FileReaderStreamFactory, FileWriterStreamFactory {
 	public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+		String[] split = absolutePath.split(SEPARATOR);
+		String fileName = split[split.length-1];
+
+		String dir = absolutePath.substring(0,absolutePath.length()-fileName.length());
+		IRODSFile generalFile =  (IRODSFile)FileFactory.newFile(fileSystem, dir, fileName );
+
 		try {
-			String[] split = absolutePath.split(SEPARATOR);
-			String fileName = split[split.length-1];
-
-			String dir = absolutePath.substring(0,absolutePath.length()-fileName.length());
-			IRODSFile generalFile =  (IRODSFile)FileFactory.newFile(fileSystem, dir, fileName );
-
 			return new BufferedInputStream(new IRODSFileInputStream(generalFile));
-			/*
-			GeneralRandomAccessFile generalRandomAccessFile = FileFactory.newRandomAccessFile( generalFile, "r" );
-			int filesize = (int)generalFile.length();
-			byte[] buffer = new byte[filesize];
-			generalRandomAccessFile.readFully(buffer);
-			ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
-
-			return bais;*/
-       	} catch (java.lang.Exception e) {
+       	} catch (java.lang.NullPointerException e) {
+			if (!generalFile.exists()) {
+				throw new DoesNotExistException(e);
+			} else {
+				throw new NoSuccessException(e);
+			}
+		} catch (java.lang.Exception e) {
 			throw new NoSuccessException(e);
         }
 	}
 
 	public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
+		GeneralFile parentFile =  FileFactory.newFile(fileSystem, parentAbsolutePath);
+		if (!parentFile.exists()) {throw new ParentDoesNotExist(parentAbsolutePath);}
+		
+		IRODSFile generalFile =  (IRODSFile)FileFactory.newFile((IRODSFileSystem)fileSystem, parentAbsolutePath, fileName );
+		
 		try {
-			IRODSFile generalFile =  (IRODSFile)FileFactory.newFile((IRODSFileSystem)fileSystem, parentAbsolutePath, fileName );
-			return new BufferedOutputStream(new IRODSFileOutputStream(generalFile));
-       	} catch (java.lang.Exception e) {
-			throw new NoSuccessException(e);
-        }
+			if (!generalFile.createNewFile()) {
+				if (exclusive) {
+					throw new AlreadyExistsException("File already exist");
+				} else if (append) {
+					GeneralRandomAccessFile randomAccessFile = FileFactory.newRandomAccessFile( generalFile, "rw" );
+					randomAccessFile.seek( generalFile.length() );
+					return new BufferedOutputStream(new IrodsAppendedOutputStream(randomAccessFile));
+				} else {
+					generalFile.delete();
+					return new BufferedOutputStream(new IRODSFileOutputStream(generalFile));   //overwrite
+				}
+			} else {
+				return new BufferedOutputStream(new IRODSFileOutputStream(generalFile));
+			}
+         } catch (IOException e) {
+             throw new NoSuccessException("Failed to create file: "+fileName, e);
+         }
 	}
 }

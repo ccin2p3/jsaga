@@ -99,12 +99,23 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
 		/*
+		try {
 		GeneralFile[] files = FileFactory.newFile(fileSystem, absolutePath).listFiles();
-		FileAttributes[] fileAttributes = new FileAttributes[files.length];
+		
 		for (int i=0; i<files.length;i++) {
-			fileAttributes[i] = new IrodsFileAttributes(files[i]);
+			System.out.println("files:"+files[i].getName() );
+			System.out.println("getCanonicalFile:"+files[i].getCanonicalFile() );
+			System.out.println("getCanonicalPath() :"+files[i].getCanonicalPath());
+			System.out.println("	toURI() () () :"+files[i].toURI());
+			System.out.println("	toURL() () () :"+files[i].toURL());
+			
+			for ( int k = 0; k < files[i].getName().length(); ++k ){
+				char c = files[i].getName().charAt(k);
+				int j = (int) c;
+				System.out.println("ASCII OF "+c +" = " + j + ".");
+			}
 		}
-		return fileAttributes;
+		} catch (Exception e) {}
 */
 
 		boolean listDir = true;
@@ -170,14 +181,11 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 		} catch (IOException e) {throw new NoSuccessException(e);}
     }
 
-	public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
-		IRODSFile irodsFile = new IRODSFile((IRODSFileSystem)fileSystem, parentAbsolutePath +SEPARATOR + directoryName);
-		irodsFile.mkdir();
-	}
-
 	public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-		IRODSFile irodsFile = new IRODSFile((IRODSFileSystem)fileSystem, parentAbsolutePath +SEPARATOR + directoryName);
-		irodsFile.delete();
+		IRODSFile irodsFile = new IRODSFile((IRODSFileSystem)fileSystem, parentAbsolutePath + directoryName+SEPARATOR);
+		boolean  bool= irodsFile.delete(); 
+		FileAttributes[] test = listAttributes( parentAbsolutePath + directoryName+SEPARATOR,additionalArgs);
+		if (!bool) {throw new NoSuccessException("Directory not empty"+test.length);}
 	}
 
 	public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
@@ -215,8 +223,10 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 				mdasDomainName  = value;
 			} else if (key.equals(ZONE)) {
 				mcatZone  = value;
+			} else if (key.equals(METADATAVALUE)) {
+				metadataValue = value;
 			}
-			
+
         }
     }
 

@@ -74,7 +74,7 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
         try {
 			// connect to server
 			SRBAccount account = null;
-			
+
 			if (securityAdaptor instanceof GSSCredentialSecurityAdaptor) { 
 				cert = ((GSSCredentialSecurityAdaptor)securityAdaptor).getGSSCredential();
 				account = new SRBAccount(host, port, cert, basePath, defaultStorageResource, SRBAccount.GSI_AUTH);
@@ -110,18 +110,19 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 		return fileAttributes;
 		*/
 
+		// URL attributes for optimized request to SRB 
 		boolean listDir = true;
 		boolean listFile = true;
 		
 		if (additionalArgs != null && additionalArgs.equals(DIR)) { listFile=false;}
 		if (additionalArgs != null && additionalArgs.equals(FILE)) { listDir=false;}
 		
-		absolutePath = absolutePath.substring(0,absolutePath.length()-1);
+		//absolutePath = absolutePath.substring(0,absolutePath.length()-1);
 		
 		try {
 			// Select for directories
 			MetaDataRecordList[] rlDir = null;
-			 
+
 			if (listDir) {
 				MetaDataCondition conditionsDir[] = new MetaDataCondition[1];
 				MetaDataSelect selectsDir[] ={MetaDataSet.newSelection(SRBMetaDataSet.DIRECTORY_NAME)};
@@ -160,54 +161,29 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 			}
 
 			int ind=0;
+			boolean findAtttributes = false;
 			FileAttributes[] fileAttributes = new FileAttributes[dir+file-root];
 			for (int i = 0; i < dir; i++) {
 				String m_name = (String) rlDir[i].getValue(rlDir[i].getFieldIndex(SRBMetaDataSet.DIRECTORY_NAME));
 				if (!m_name.equals(SEPARATOR)) {
-					fileAttributes[ind] = new SrbFileAttributes(rlDir[i],null);
+					fileAttributes[ind] = new SrbFileAttributes(absolutePath, rlDir[i],null,findAtttributes);
 					ind++;
 				}
 			}
 			for (int i = 0; i < file; i++) {
-				fileAttributes[ind] = new SrbFileAttributes(null,rlFile[i]);
+				fileAttributes[ind] = new SrbFileAttributes(absolutePath, null,rlFile[i],findAtttributes);
 				ind++;
 			}
 			return fileAttributes;
 		} catch (IOException e) {throw new NoSuccessException(e);}
 	}
 
-	public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
-		GeneralFile parentFile =  FileFactory.newFile(fileSystem, parentAbsolutePath);
-		if (!parentFile.exists()) {throw new ParentDoesNotExist(parentAbsolutePath);}
 	
-		GeneralFile generalFile =  FileFactory.newFile(fileSystem, parentAbsolutePath +SEPARATOR + directoryName);
-		if (generalFile.exists()) {throw new AlreadyExistsException(parentAbsolutePath+SEPARATOR + directoryName);}
-
-		generalFile.mkdir();
-	}
-
 	public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
 		SRBFile srbFile = new SRBFile((SRBFileSystem)fileSystem, parentAbsolutePath +SEPARATOR + directoryName);
 		boolean  bool= srbFile.delete(true); 
 		if (!bool) {throw new NoSuccessException("Directory not empty");}
-		/*
-		if (!m_useTrash) {
-			// test si rien dessous
-			String[] fileList = srbFile.list();
-			
-			if (fileList.length>0) {
-				throw new NoSuccessException("Directory not empty");
-			} else {
-				// si non
-				srbFile.delete(true); 
 			}
-		
-		} else {
-			boolean  bool= srbFile.delete(false); 
-			if (!bool) {throw new NoSuccessException("Directory not empty");}
-		}
-		*/
-	}
 
 	public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
 		SRBFile srbFile = new SRBFile((SRBFileSystem)fileSystem, parentAbsolutePath +SEPARATOR + fileName);
@@ -244,8 +220,10 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 				mdasDomainName  = value;
 			} else if (key.equals(ZONE)) {
 				mcatZone  = value;
+			} else if (key.equals(METADATAVALUE)) {
+				metadataValue = value;
 			}
-			
+
         }
     }
 }

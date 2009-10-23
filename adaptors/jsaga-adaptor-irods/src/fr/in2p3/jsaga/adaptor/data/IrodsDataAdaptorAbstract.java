@@ -27,8 +27,8 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
 	protected final static String FILE = "file";
 	protected final static String DIR = "dir";
 	protected final static String DOT =  "\\.";
-	protected final static String DEFAULTRESOURCE	= "defaultresource", DOMAIN="domain", ZONE="zone";
-	protected String userName, passWord, mdasDomainName, mcatZone, defaultStorageResource;
+	protected final static String DEFAULTRESOURCE	= "defaultresource", DOMAIN="domain", ZONE="zone", METADATAVALUE="metadatavalue";
+	protected String srbHost, srbPort, userName, passWord, mdasDomainName, mcatZone, defaultStorageResource, metadataValue;
 	protected SecurityAdaptor securityAdaptor;
 	protected GSSCredential cert;
 
@@ -49,4 +49,14 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
 		GeneralFile generalFile =  FileFactory.newFile(fileSystem, absolutePath);
 		return new GeneralFileAttributes(generalFile);
     }
+
+	public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
+		GeneralFile parentFile =  FileFactory.newFile(fileSystem, parentAbsolutePath);
+		if (!parentFile.exists()) {throw new ParentDoesNotExist(parentAbsolutePath);}
+	
+		GeneralFile generalFile =  FileFactory.newFile(fileSystem, parentAbsolutePath +SEPARATOR + directoryName);
+		if (generalFile.exists()) {throw new AlreadyExistsException(parentAbsolutePath+SEPARATOR + directoryName);}
+
+		generalFile.mkdir();
+	}
 }

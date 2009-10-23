@@ -23,19 +23,35 @@ import java.util.Date;
  */
 public class SrbFileAttributes extends FileAttributes {
 	private static final SimpleDateFormat dateStandard = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss");
+	private static final String SLASH="/";
 
-    public SrbFileAttributes(MetaDataRecordList collection, MetaDataRecordList file) throws DoesNotExistException {
+    public SrbFileAttributes(String basePath, MetaDataRecordList collection, MetaDataRecordList file, boolean findAttributes) throws DoesNotExistException {
         // set name
 		if (collection != null) {
+			if (findAttributes) {
+				m_relativePath = (String) collection.getValue(collection.getFieldIndex(SRBMetaDataSet.DIRECTORY_NAME));
+			}
 			m_name = (String) collection.getValue(collection.getFieldIndex(SRBMetaDataSet.DIRECTORY_NAME));
 			
-			String [] split = m_name.split("/");
+			String [] split = m_name.split(SLASH);
 			m_name =split[split.length-1];
-			
 		} else {
 			m_name = (String) file.getValue(file.getFieldIndex(SRBMetaDataSet.FILE_NAME));
+			if (findAttributes) {
+				m_relativePath = file.getValue(file.getFieldIndex(SRBMetaDataSet.DIRECTORY_NAME))
+				+SLASH+file.getValue(file.getFieldIndex(SRBMetaDataSet.FILE_NAME));
+			}
 		}
-
+		
+		// m_relativePath is mandatory in case of findAttributes
+		if (findAttributes) {
+			if (!m_relativePath.equals(basePath)) {
+				m_relativePath = m_relativePath.substring(basePath.length()+1,m_relativePath.length());
+			} else {
+				m_relativePath = ".";
+			}
+		}
+		
 		if (m_name ==null || m_name.equals(".") || m_name.equals("..")) {
 			throw new DoesNotExistException("Ignore this entry");
 		}

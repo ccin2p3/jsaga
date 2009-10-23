@@ -24,6 +24,9 @@ public class IrodsFileAttributes extends FileAttributes {
         // set name
 		if (collection != null) {
 			m_name = (String) collection.getValue(collection.getFieldIndex(IRODSMetaDataSet.DIRECTORY_NAME));
+			
+			String [] split = m_name.split("/");
+			m_name =split[split.length-1];
 		} else {
 			m_name = (String) file.getValue(file.getFieldIndex(IRODSMetaDataSet.FILE_NAME));
 		}
