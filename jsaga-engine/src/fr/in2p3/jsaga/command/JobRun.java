@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.*;
+import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
@@ -10,6 +11,8 @@ import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
 import java.io.*;
+import java.util.Iterator;
+import java.util.Properties;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -28,6 +31,7 @@ public class JobRun extends AbstractCommand {
     // required arguments
     private static final String OPT_RESOURCE = "r", LONGOPT_RESOURCE = "resource";
     // optional arguments
+    private static final String OPT_FILE = "f", LONGOPT_FILE = "file";
     private static final String OPT_DESCRIPTION = "d", LONGOPT_DESCRIPTION = "description";
     private static final String OPT_BATCH = "b", LONGOPT_BATCH = "batch";
     // attribute names missing in interface JobDescription
@@ -48,7 +52,22 @@ public class JobRun extends AbstractCommand {
         {
             // get arguments
             URL serviceURL = URLFactory.createURL(line.getOptionValue(OPT_RESOURCE));
-            JobDescription desc = createJobDescription(line);
+            String file = line.getOptionValue(OPT_FILE);
+
+            // create the job description
+            Properties prop = new Properties();
+            if (file != null) {
+                prop.load(new FileInputStream(file));
+            }
+            for (Iterator it=line.iterator(); it.hasNext(); ) {
+                Option opt = (Option) it.next();
+                if (opt.getValue() != null) {
+                    prop.setProperty(opt.getOpt(), opt.getValue());
+                } else {
+                    prop.setProperty(opt.getOpt(), Boolean.toString(true));
+                }
+            }
+            JobDescription desc = createJobDescription(prop);
             if (!line.hasOption(OPT_BATCH)) {
                 desc.setAttribute(JobDescription.INTERACTIVE, "true");
             }
@@ -113,6 +132,11 @@ public class JobRun extends AbstractCommand {
                 .create(OPT_RESOURCE));
 
         // optional arguments
+        opt.addOption(OptionBuilder.withDescription("read job description from file <path>")
+                .hasArg()
+                .withArgName("path")
+                .withLongOpt(LONGOPT_FILE)
+                .create(OPT_FILE));
         opt.addOption(OptionBuilder.withDescription("generate the job description in the targeted grid language " +
                 "and exit (do not submit the job)")
                 .withLongOpt(LONGOPT_DESCRIPTION)
@@ -155,48 +179,52 @@ public class JobRun extends AbstractCommand {
         return OptionBuilder.withDescription(description);
     }
 
-    private static JobDescription createJobDescription(CommandLine line) throws Exception {
+    private static JobDescription createJobDescription(Properties prop) throws Exception {
         JobDescription desc = JobFactory.createJobDescription();
-        setOptional(desc, line, JOBNAME);
-        setRequired(desc, line, JobDescription.EXECUTABLE);
-        setOptMulti(desc, line, JobDescription.ARGUMENTS);
-        setOptional(desc, line, JobDescription.SPMDVARIATION);
-        setOptional(desc, line, JobDescription.TOTALCPUCOUNT);
-        setOptional(desc, line, JobDescription.NUMBEROFPROCESSES);
-        setOptional(desc, line, JobDescription.PROCESSESPERHOST);
-        setOptional(desc, line, JobDescription.THREADSPERPROCESS);
-        setOptMulti(desc, line, JobDescription.ENVIRONMENT);
-        setOptional(desc, line, JobDescription.WORKINGDIRECTORY);
-        setOptNoArg(desc, line, JobDescription.INTERACTIVE);
-        setOptional(desc, line, JobDescription.INPUT);
-        setOptional(desc, line, JobDescription.OUTPUT);
-        setOptional(desc, line, JobDescription.ERROR);
-        setOptMulti(desc, line, JobDescription.FILETRANSFER);
-        setOptional(desc, line, JobDescription.CLEANUP);
-        setOptional(desc, line, JobDescription.JOBSTARTTIME);
-        setOptional(desc, line, JobDescription.TOTALCPUTIME);
-        setOptional(desc, line, JobDescription.TOTALPHYSICALMEMORY);
-        setOptional(desc, line, JobDescription.CPUARCHITECTURE);
-        setOptional(desc, line, JobDescription.OPERATINGSYSTEMTYPE);
-        setOptMulti(desc, line, JobDescription.CANDIDATEHOSTS);
-        setOptional(desc, line, JobDescription.QUEUE);
-        setOptMulti(desc, line, JobDescription.JOBCONTACT);
+        setOptional(desc, prop, JOBNAME);
+        setRequired(desc, prop, JobDescription.EXECUTABLE);
+        setOptMulti(desc, prop, JobDescription.ARGUMENTS);
+        setOptional(desc, prop, JobDescription.SPMDVARIATION);
+        setOptional(desc, prop, JobDescription.TOTALCPUCOUNT);
+        setOptional(desc, prop, JobDescription.NUMBEROFPROCESSES);
+        setOptional(desc, prop, JobDescription.PROCESSESPERHOST);
+        setOptional(desc, prop, JobDescription.THREADSPERPROCESS);
+        setOptMulti(desc, prop, JobDescription.ENVIRONMENT);
+        setOptional(desc, prop, JobDescription.WORKINGDIRECTORY);
+        setOptional(desc, prop, JobDescription.INTERACTIVE);
+        setOptional(desc, prop, JobDescription.INPUT);
+        setOptional(desc, prop, JobDescription.OUTPUT);
+        setOptional(desc, prop, JobDescription.ERROR);
+        setOptMulti(desc, prop, JobDescription.FILETRANSFER);
+        setOptional(desc, prop, JobDescription.CLEANUP);
+        setOptional(desc, prop, JobDescription.JOBSTARTTIME);
+        setOptional(desc, prop, JobDescription.TOTALCPUTIME);
+        setOptional(desc, prop, JobDescription.TOTALPHYSICALMEMORY);
+        setOptional(desc, prop, JobDescription.CPUARCHITECTURE);
+        setOptional(desc, prop, JobDescription.OPERATINGSYSTEMTYPE);
+        setOptMulti(desc, prop, JobDescription.CANDIDATEHOSTS);
+        setOptional(desc, prop, JobDescription.QUEUE);
+        setOptMulti(desc, prop, JobDescription.JOBCONTACT);
         return desc;
     }
-    private static void setRequired(JobDescription desc, CommandLine line, String name) throws Exception {
-        desc.setAttribute(name, line.getOptionValue(name));
-    }
-    private static void setOptNoArg(JobDescription desc, CommandLine line, String name) throws Exception {
-        desc.setAttribute(name, Boolean.toString(line.hasOption(name)));
-    }
-    private static void setOptional(JobDescription desc, CommandLine line, String name) throws Exception {
-        if (line.hasOption(name)) {
-            desc.setAttribute(name, line.getOptionValue(name));
+    private static void setRequired(JobDescription desc, Properties prop, String name) throws Exception {
+        String value = prop.getProperty(name);
+        if (value != null) {
+            desc.setAttribute(name, value);
+        } else {
+            throw new BadParameterException("Missing required attribute: "+name);
         }
     }
-    private static void setOptMulti(JobDescription desc, CommandLine line, String name) throws Exception {
-        if (line.hasOption(name)) {
-            desc.setVectorAttribute(name, line.getOptionValues(name));
+    private static void setOptional(JobDescription desc, Properties prop, String name) throws Exception {
+        String value = prop.getProperty(name);
+        if (value != null) {
+            desc.setAttribute(name, value);
+        }
+    }
+    private static void setOptMulti(JobDescription desc, Properties prop, String name) throws Exception {
+        String values = prop.getProperty(name);
+        if (values != null) {
+            desc.setVectorAttribute(name, values.split(" "));
         }
     }
 
