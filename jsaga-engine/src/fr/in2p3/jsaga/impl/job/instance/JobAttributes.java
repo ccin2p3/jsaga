@@ -46,6 +46,7 @@ public class JobAttributes implements Cloneable {
                 MetricType.String,
                 null) {
             public String[] getValues() throws NotImplementedException, IncorrectStateException, NoSuccessException {
+                if(job.getNativeJobId()==null) throw new IncorrectStateException("Job has not been submitted");
                 String[] result = job.getJobInfoAdaptor().getExecutionHosts(job.getNativeJobId());
                 if (result != null) {
                     return result;
@@ -61,6 +62,7 @@ public class JobAttributes implements Cloneable {
                 MetricType.Time,
                 new Date(System.currentTimeMillis())) {
             public String getValue() throws NotImplementedException, IncorrectStateException, NoSuccessException {
+                if(job.getNativeJobId()==null) throw new IncorrectStateException("Job has not been submitted");
                 Date result = job.getJobInfoAdaptor().getCreated(job.getNativeJobId());
                 if (result != null) {
                     return result.toString();
@@ -76,6 +78,7 @@ public class JobAttributes implements Cloneable {
                 MetricType.Time,
                 null) {
             public String getValue() throws NotImplementedException, IncorrectStateException, NoSuccessException {
+                if(job.getNativeJobId()==null) throw new IncorrectStateException("Job has not been submitted");
                 Date result = job.getJobInfoAdaptor().getStarted(job.getNativeJobId());
                 if (result != null) {
                     return result.toString();
@@ -91,6 +94,7 @@ public class JobAttributes implements Cloneable {
                 MetricType.Time,
                 null) {
             public String getValue() throws NotImplementedException, IncorrectStateException, NoSuccessException {
+                if(job.getNativeJobId()==null) throw new IncorrectStateException("Job has not been submitted");
                 Date result = job.getJobInfoAdaptor().getFinished(job.getNativeJobId());
                 if (result != null) {
                     return result.toString();
@@ -106,6 +110,7 @@ public class JobAttributes implements Cloneable {
                 MetricType.Int,
                 null) {
             public String getValue() throws NotImplementedException, IncorrectStateException, NoSuccessException {
+                if(job.getNativeJobId()==null) throw new IncorrectStateException("Job has not been submitted");
                 Integer result = job.getJobInfoAdaptor().getExitCode(job.getNativeJobId());
                 if (result != null) {
                     return result.toString();
