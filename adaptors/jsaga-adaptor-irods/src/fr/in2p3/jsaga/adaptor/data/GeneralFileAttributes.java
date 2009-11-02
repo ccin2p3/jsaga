@@ -28,7 +28,7 @@ public class GeneralFileAttributes extends FileAttributes {
 		} else  {
 			m_type = FileAttributes.FILE_TYPE;
 		} 
-	
+
         // set size
         if (generalFile.isFile()) {
             m_size = generalFile.length() ;
@@ -37,7 +37,6 @@ public class GeneralFileAttributes extends FileAttributes {
         }
 
         // set permission
-    
         if (generalFile.canRead()) {
 			m_permission = m_permission.or(PermissionBytes.READ);
         }
@@ -46,6 +45,6 @@ public class GeneralFileAttributes extends FileAttributes {
 		}
 	
         // set last modified
-		m_lastModified = generalFile.lastModified() ;
+		m_lastModified = generalFile.lastModified();
 	}
 }
