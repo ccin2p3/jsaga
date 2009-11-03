@@ -180,12 +180,12 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 			for (int i = 0; i < dir; i++) {
 				String m_name = (String) rlDir[i].getValue(rlDir[i].getFieldIndex(SRBMetaDataSet.DIRECTORY_NAME));
 				if (!m_name.equals(SEPARATOR)) {
-					fileAttributes[ind] = new SrbFileAttributes(absolutePath, rlDir[i],null,findAtttributes);
+					fileAttributes[ind] = new SrbFileAttributesOptimized(absolutePath, rlDir[i],null,findAtttributes);
 					ind++;
 				}
 			}
 			for (int i = 0; i < file; i++) {
-				fileAttributes[ind] = new SrbFileAttributes(absolutePath, null,rlFile[i],findAtttributes);
+				fileAttributes[ind] = new SrbFileAttributesOptimized(absolutePath, null,rlFile[i],findAtttributes);
 				ind++;
 			}
 			return fileAttributes;

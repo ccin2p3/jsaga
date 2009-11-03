@@ -164,13 +164,13 @@ public class  IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 			for (int i = 0; i < dir; i++) {
 				String m_name = (String) rlDir[i].getValue(rlDir[i].getFieldIndex(IRODSMetaDataSet.DIRECTORY_NAME));
 				if (!m_name.equals(SEPARATOR)) {
-					fileAttributes[ind] = new IrodsFileAttributes(rlDir[i],null);
+					fileAttributes[ind] = new IrodsFileAttributesOptimized(rlDir[i],null);
 					ind++;
 				}
 			}
 			
 			for (int i = 0; i < file; i++) {
-				fileAttributes[ind] = new IrodsFileAttributes(null,rlFile[i]);
+				fileAttributes[ind] = new IrodsFileAttributesOptimized(null,rlFile[i]);
 				ind++;
 			}
 			return fileAttributes;

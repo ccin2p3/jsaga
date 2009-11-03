@@ -157,14 +157,14 @@ public class SrbDataAdaptorLogical extends SrbDataAdaptor implements LogicalRead
 			for (int i = 0; i < dir; i++) {
 				String m_name = (String) rlDir[i].getValue(rlDir[i].getFieldIndex(SRBMetaDataSet.DIRECTORY_NAME));
 				if (!m_name.equals(SEPARATOR)) {
-					// Construct SrbFileAttributes from the result of the request 
-					fileAttributes[ind] = new SrbFileAttributes(logicalDir, rlDir[i],null,findAtttributes);
+					// Construct SrbFileAttributesOptimized from the result of the request
+					fileAttributes[ind] = new SrbFileAttributesOptimized(logicalDir, rlDir[i],null,findAtttributes);
 					ind++;
 				}
 			}
 
 			for (int i = 0; i < file; i++) {
-				fileAttributes[ind] = new SrbFileAttributes(logicalDir, null,rlFile[i],findAtttributes);
+				fileAttributes[ind] = new SrbFileAttributesOptimized(logicalDir, null,rlFile[i],findAtttributes);
 				ind++;
 			}
 			return fileAttributes;

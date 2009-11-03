@@ -13,7 +13,7 @@ import java.util.Date;
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************
- * File:   SrbFileAttributes
+ * File:   SrbFileAttributesOptimized
  * Author: Pascal Calvat (pcalvat@cc.in2p3.fr)
  * Date:   13 may 2008
  * ***************************************************
@@ -21,11 +21,11 @@ import java.util.Date;
 /**
  *
  */
-public class SrbFileAttributes extends FileAttributes {
+public class SrbFileAttributesOptimized extends FileAttributes {
 	private static final SimpleDateFormat dateStandard = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss");
 	private static final String SLASH="/";
 
-    public SrbFileAttributes(String basePath, MetaDataRecordList collection, MetaDataRecordList file, boolean findAttributes) throws DoesNotExistException {
+    public SrbFileAttributesOptimized(String basePath, MetaDataRecordList collection, MetaDataRecordList file, boolean findAttributes) throws DoesNotExistException {
         // set name
 		if (collection != null) {
 			if (findAttributes) {

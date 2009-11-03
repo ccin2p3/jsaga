@@ -10,7 +10,7 @@ import org.ogf.saga.error.DoesNotExistException;
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************
- * File:   IrodsFileAttributes
+ * File:   IrodsFileAttributesOptimized
  * Author: Pascal Calvat (pcalvat@cc.in2p3.fr)
  * Date:   13 may 2008
  * ***************************************************
@@ -18,9 +18,9 @@ import org.ogf.saga.error.DoesNotExistException;
 /**
  *
  */
-public class IrodsFileAttributes extends FileAttributes {
+public class IrodsFileAttributesOptimized extends FileAttributes {
 
-    public IrodsFileAttributes(MetaDataRecordList collection, MetaDataRecordList file) throws DoesNotExistException {
+    public IrodsFileAttributesOptimized(MetaDataRecordList collection, MetaDataRecordList file) throws DoesNotExistException {
         // set name
 		if (collection != null) {
 			m_name = (String) collection.getValue(collection.getFieldIndex(IRODSMetaDataSet.DIRECTORY_NAME));

@@ -134,12 +134,12 @@ public class IrodsDataAdaptorLogical extends IrodsDataAdaptor implements Logical
 
 			for (int i = 0; i < dir; i++) {
 				//name =(String) rlMetadataNames[i].getValue(rlDir[i].getFieldIndex(IRODSMetaDataSet.META_DATA_ATTR_NAME));
-				fileAttributes[ind] = new IrodsFileAttributes( rlDir[i],null);
+				fileAttributes[ind] = new IrodsFileAttributesOptimized( rlDir[i],null);
 				ind++;
 			}
 
 			for (int i = 0; i < file; i++) {
-				fileAttributes[ind] = new IrodsFileAttributes(null,rlFile[i]);
+				fileAttributes[ind] = new IrodsFileAttributesOptimized(null,rlFile[i]);
 				ind++;
 			}
 			return fileAttributes;
