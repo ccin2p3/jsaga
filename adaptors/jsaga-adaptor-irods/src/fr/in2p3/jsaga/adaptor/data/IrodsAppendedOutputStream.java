@@ -9,7 +9,7 @@ import java.io.OutputStream;
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************
- * File:   IrodsFileAttributes
+ * File:   IrodsAppendedOutputStream
  * Author: Pascal Calvat (pcalvat@cc.in2p3.fr)
  * Date:   13 may 2008
  * ***************************************************

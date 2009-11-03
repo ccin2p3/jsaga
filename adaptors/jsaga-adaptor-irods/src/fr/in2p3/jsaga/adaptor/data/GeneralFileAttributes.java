@@ -8,7 +8,7 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************
- * File:   IrodsFileAttributes
+ * File:   GeneralFileAttributes
  * Author: Pascal Calvat (pcalvat@cc.in2p3.fr)
  * Date:   13 may 2008
  * ***************************************************
