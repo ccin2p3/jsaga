@@ -473,7 +473,8 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
 
     private org.apache.axis.types.URI toSrmURI(String absolutePath) throws NoSuccessException {
         try {
-            return new org.apache.axis.types.URI("srm", null, m_host, m_port, SERVICE_PATH, "SFN="+absolutePath, null);
+            String encodedPath = PathEncoder.encode(absolutePath);
+            return new org.apache.axis.types.URI("srm", null, m_host, m_port, SERVICE_PATH, "SFN="+encodedPath, null);
         } catch (org.apache.axis.types.URI.MalformedURIException e) {
             throw new NoSuccessException(e);
         }
