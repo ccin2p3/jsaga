@@ -24,7 +24,7 @@ public class IrodsFileAttributes extends FileAttributes {
         // set name
 		if (collection != null) {
 			m_name = (String) collection.getValue(collection.getFieldIndex(IRODSMetaDataSet.DIRECTORY_NAME));
-			
+
 			String [] split = m_name.split("/");
 			m_name =split[split.length-1];
 		} else {
@@ -35,16 +35,15 @@ public class IrodsFileAttributes extends FileAttributes {
 			throw new DoesNotExistException("Ignore this entry");
 		}
 
-        // set type        
+        // set type
 		if (collection != null) {
 			m_type = FileAttributes.DIRECTORY_TYPE;
 		} else  {
 			m_type = FileAttributes.FILE_TYPE;
-		} 
-	
+		}
+
         // set size
-        if (file != null)
-		{
+        if (file != null) {
             m_size = Long.parseLong((String)file.getValue(file.getFieldIndex(IRODSMetaDataSet.SIZE)));
         } else {
             m_size = 0;

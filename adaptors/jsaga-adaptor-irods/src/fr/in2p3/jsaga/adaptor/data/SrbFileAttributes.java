@@ -32,7 +32,7 @@ public class SrbFileAttributes extends FileAttributes {
 				m_relativePath = (String) collection.getValue(collection.getFieldIndex(SRBMetaDataSet.DIRECTORY_NAME));
 			}
 			m_name = (String) collection.getValue(collection.getFieldIndex(SRBMetaDataSet.DIRECTORY_NAME));
-			
+
 			String [] split = m_name.split(SLASH);
 			m_name =split[split.length-1];
 		} else {
@@ -42,7 +42,7 @@ public class SrbFileAttributes extends FileAttributes {
 				+SLASH+file.getValue(file.getFieldIndex(SRBMetaDataSet.FILE_NAME));
 			}
 		}
-		
+
 		// m_relativePath is mandatory in case of findAttributes
 		if (findAttributes) {
 			if (!m_relativePath.equals(basePath)) {
@@ -51,18 +51,18 @@ public class SrbFileAttributes extends FileAttributes {
 				m_relativePath = ".";
 			}
 		}
-		
+
 		if (m_name ==null || m_name.equals(".") || m_name.equals("..")) {
 			throw new DoesNotExistException("Ignore this entry");
 		}
 
-        // set type        
+        // set type
 		if (collection != null) {
 			m_type = FileAttributes.DIRECTORY_TYPE;
 		} else  {
 			m_type = FileAttributes.FILE_TYPE;
-		} 
-	
+		}
+
         // set size
         if (file != null) {
             m_size = Long.parseLong((String)file.getValue(file.getFieldIndex(SRBMetaDataSet.SIZE)));
