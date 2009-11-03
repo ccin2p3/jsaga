@@ -30,7 +30,6 @@ public class SrbDataAdaptorLogical extends SrbDataAdaptor implements LogicalRead
         return "srbl";
     }
 
-
     public String[] listLocations(String logicalEntry, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         return new String[0];  //To change body of implemented methods use File | Settings | File Templates.
     }
@@ -190,8 +189,6 @@ public class SrbDataAdaptorLogical extends SrbDataAdaptor implements LogicalRead
 			for (int i=0;i<values.length;i++) {
 				definableMetaDataValues[i][0] = name;
 				definableMetaDataValues[i][1] = values[i];
-				System.out.println("definableMetaDataValues[i][0]:"+definableMetaDataValues[i][0]);
-				System.out.println("definableMetaDataValues[i][1]:"+definableMetaDataValues[i][1]);
 			}
 
 			String fieldName = null;

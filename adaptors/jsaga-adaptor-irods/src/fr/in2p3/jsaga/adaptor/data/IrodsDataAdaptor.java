@@ -28,13 +28,17 @@ import java.util.*;
 /**
  *
  */
-public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
+public class  IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 	private static final String IRODSENV ="IrodsEnv";
 	private static final String USERID=Context.USERID;
 
     public String getType() {
         return "irods";
     }
+
+	protected boolean isClassic(){
+		return false;
+	}		
 
 	public Usage getUsage() {
         return new UAnd(new Usage[]{
@@ -59,7 +63,7 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         // URL attributes
-        parseValue(attributes);
+        parseValue(attributes, userInfo);
         //if (defaultStorageResource == null) {
         //    throw new BadParameterException("The default storage resource cannot be null");
         //}
@@ -69,11 +73,11 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 			
 			if (securityAdaptor instanceof GSSCredentialSecurityAdaptor) { 
 				cert = ((GSSCredentialSecurityAdaptor)securityAdaptor).getGSSCredential();
-				String login = (String) attributes.get(USERID);
-				if (login == null) {
+				
+				if (userName == null) {
 					throw new BadParameterException("Missing required attribute: "+USERID);
 				}
-				account = new IRODSAccount(host, port, login, passWord, basePath, mcatZone, defaultStorageResource);
+				account = new IRODSAccount(host, port, userName, passWord, basePath, mcatZone, defaultStorageResource);
 				account.setGSSCredential(cert);
 			} else {
 				if (host == null) {
@@ -97,30 +101,22 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
         }
     }
 
-    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-		/*
+	private FileAttributes[] listAttributesClassic(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+		// methode offcielle	
 		try {
-		GeneralFile[] files = FileFactory.newFile(fileSystem, absolutePath).listFiles();
-		
-		for (int i=0; i<files.length;i++) {
-			System.out.println("files:"+files[i].getName() );
-			System.out.println("getCanonicalFile:"+files[i].getCanonicalFile() );
-			System.out.println("getCanonicalPath() :"+files[i].getCanonicalPath());
-			System.out.println("	toURI() () () :"+files[i].toURI());
-			System.out.println("	toURL() () () :"+files[i].toURL());
-			
-			for ( int k = 0; k < files[i].getName().length(); ++k ){
-				char c = files[i].getName().charAt(k);
-				int j = (int) c;
-				System.out.println("ASCII OF "+c +" = " + j + ".");
+			GeneralFile[] files = FileFactory.newFile(fileSystem, absolutePath).listFiles();
+			FileAttributes[] fileAttributes = new FileAttributes[files.length];
+			for (int i=0; i<files.length;i++) {
+				fileAttributes[i] = new GeneralFileAttributes(files[i]);
 			}
-		}
-		} catch (Exception e) {}
-*/
+			return fileAttributes;
+		} catch (Exception e) {throw new NoSuccessException(e);}
+	}
 
+	private FileAttributes[] listAttributesOptimized(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
 		boolean listDir = true;
 		boolean listFile = true;
-		
+
 		if (additionalArgs != null && additionalArgs.equals(DIR)) { listFile=false;}
 		if (additionalArgs != null && additionalArgs.equals(FILE)) { listDir=false;}
 		
@@ -181,6 +177,14 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 		} catch (IOException e) {throw new NoSuccessException(e);}
     }
 
+    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+		if (this.isClassic()) {
+			return this.listAttributesClassic(absolutePath, additionalArgs);
+		} else {
+			return this.listAttributesOptimized(absolutePath, additionalArgs);
+		}
+    }
+
 	public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
 		IRODSFile irodsFile = new IRODSFile((IRODSFileSystem)fileSystem, parentAbsolutePath + directoryName+SEPARATOR);
 		boolean  bool= irodsFile.delete(); 
@@ -194,14 +198,28 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 	}
 	
 	
-	void parseValue(Map attributes) throws NoSuccessException {
+	void parseValue(Map attributes, String userInfo) throws NoSuccessException {
 		
 		try {
-			userName = securityAdaptor.getUserID();
+			if (securityAdaptor instanceof GSSCredentialSecurityAdaptor) { 
+				userName =  (String) attributes.get(USERID);
+			} else {
+				userName = securityAdaptor.getUserID();
+			}
+			
+			if (userInfo!=null) {
+				int pos =userInfo.indexOf(":");
+				if (pos<0) {
+					userName = userInfo;
+				} else {
+					userName = userInfo.substring(0, pos); 
+					passWord = userInfo.substring(pos+1, userInfo.length());
+				}
+			}
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
-			
+
 		if (securityAdaptor instanceof UserPassSecurityAdaptor) {
             passWord = ((UserPassSecurityAdaptor)securityAdaptor).getUserPass();
 		} else if (securityAdaptor instanceof GSSCredentialSecurityAdaptor) {
@@ -226,7 +244,6 @@ public class IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 			} else if (key.equals(METADATAVALUE)) {
 				metadataValue = value;
 			}
-
         }
     }
 

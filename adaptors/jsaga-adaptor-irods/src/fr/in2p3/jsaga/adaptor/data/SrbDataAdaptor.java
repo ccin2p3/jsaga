@@ -37,6 +37,10 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
         return "srb";
     }
 
+	protected boolean isClassic(){
+		return false;
+	}		
+
     public Usage getUsage() {
         return new UAnd(new Usage[]{
                 new UFile(MDASENV),
@@ -101,28 +105,38 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
     }
 
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-		/* methode offcielle
-		GeneralFile[] files = FileFactory.newFile(fileSystem, absolutePath).listFiles();
-		FileAttributes[] fileAttributes = new FileAttributes[files.length];
-		for (int i=0; i<files.length;i++) {
-			fileAttributes[i] = new IrodsFileAttributes(files[i]);
+		if (this.isClassic()) {
+			return this.listAttributesClassic(absolutePath, additionalArgs);
+		} else {
+			return this.listAttributesOptimized(absolutePath, additionalArgs);
 		}
-		return fileAttributes;
-		*/
+    }
 
-		// URL attributes for optimized request to SRB 
+	private FileAttributes[] listAttributesClassic(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+		//methode offcielle	
+		try {
+			GeneralFile[] files = FileFactory.newFile(fileSystem, absolutePath).listFiles();
+			FileAttributes[] fileAttributes = new FileAttributes[files.length];
+			for (int i=0; i<files.length;i++) {
+				fileAttributes[i] = new GeneralFileAttributes(files[i]);
+			}
+			return fileAttributes;
+		} catch (Exception e) {throw new NoSuccessException(e);}
+	}	
+
+ 	private FileAttributes[] listAttributesOptimized(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+		// URL attributes for optimized request to SRB
 		boolean listDir = true;
 		boolean listFile = true;
 		
 		if (additionalArgs != null && additionalArgs.equals(DIR)) { listFile=false;}
 		if (additionalArgs != null && additionalArgs.equals(FILE)) { listDir=false;}
 		
-		//absolutePath = absolutePath.substring(0,absolutePath.length()-1);
+		absolutePath = absolutePath.substring(0,absolutePath.length()-1);
 		
 		try {
 			// Select for directories
 			MetaDataRecordList[] rlDir = null;
-
 			if (listDir) {
 				MetaDataCondition conditionsDir[] = new MetaDataCondition[1];
 				MetaDataSelect selectsDir[] ={MetaDataSet.newSelection(SRBMetaDataSet.DIRECTORY_NAME)};
@@ -183,7 +197,7 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 		SRBFile srbFile = new SRBFile((SRBFileSystem)fileSystem, parentAbsolutePath +SEPARATOR + directoryName);
 		boolean  bool= srbFile.delete(true); 
 		if (!bool) {throw new NoSuccessException("Directory not empty");}
-			}
+	}
 
 	public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
 		SRBFile srbFile = new SRBFile((SRBFileSystem)fileSystem, parentAbsolutePath +SEPARATOR + fileName);
@@ -219,11 +233,10 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
             } else if (key.equals(DOMAIN)) {
 				mdasDomainName  = value;
 			} else if (key.equals(ZONE)) {
-				mcatZone  = value;
+				mcatZone = value;
 			} else if (key.equals(METADATAVALUE)) {
 				metadataValue = value;
 			}
-
         }
     }
 }

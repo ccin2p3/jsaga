@@ -105,7 +105,8 @@ public class IrodsDataAdaptorLogical extends IrodsDataAdaptor implements Logical
 			
 			MetaDataSelect[] selects = new MetaDataSelect[] {
 				MetaDataSet.newSelection( IRODSMetaDataSet.DIRECTORY_NAME ), 
-				MetaDataSet.newSelection( IRODSMetaDataSet.FILE_NAME)};
+				MetaDataSet.newSelection( IRODSMetaDataSet.FILE_NAME),
+				MetaDataSet.newSelection( IRODSMetaDataSet.SIZE)};
 			
 			rlFile= fileSystem.query( conditions, selects);
 			
