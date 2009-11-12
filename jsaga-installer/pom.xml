@@ -145,19 +145,6 @@
                             <fileNameReplacement>dependencies-graph</fileNameReplacement>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>export-web-pages</id>
-                        <phase>post-site</phase>
-                        <goals>
-                            <goal>transform</goal>
-                        </goals>
-                        <configuration>
-                            <xslFile>src/site/xsl/export.xsl</xslFile>
-                            <srcDir>${project.build.directory}/site</srcDir>
-                            <srcIncludes>index.html, download.html, presentations.html</srcIncludes>
-                            <destDir>${project.build.directory}/site/export</destDir>
-                        </configuration>
-                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -171,6 +158,25 @@
                         </goals>
                         <configuration>
                             <dotFile>${project.build.directory}/dependencies-graph</dotFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-htmlextract-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>post-site</phase>
+                        <goals>
+                            <goal>extract</goal>
+                        </goals>
+                        <configuration>
+                            <htmls>
+                                <html>${project.build.directory}/site/index.html</html>
+                                <html>${project.build.directory}/site/download.html</html>
+                                <html>${project.build.directory}/site/presentations.html</html>
+                            </htmls>
                         </configuration>
                     </execution>
                 </executions>
