@@ -5,5 +5,10 @@
         <data type="srb" base="srb://ccsrb01.in2p3.fr:5591/?defaultResource=MammoDisk&amp;domain=ccin2p3">
             <attribute name="UseTrash" value="false"/>
         </data>
+        <data type="irods" base="irods://ccirods01.in2p3.fr:5596/">
+            <attribute name="DefaultResource" value="lyon1"/>
+            <attribute name="UserID" value="calvat"/>
+            <attribute name="Zone" value="tempZone"/>
+        </data>
     </GRID>
 </UNIVERSE>
