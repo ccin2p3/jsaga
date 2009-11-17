@@ -6,6 +6,7 @@ import edu.sdsc.grid.io.irods.IRODSMetaDataSet;
 import fr.in2p3.jsaga.adaptor.data.optimise.LogicalReaderMetaDataExtended;
 import fr.in2p3.jsaga.adaptor.data.optimise.expr.BooleanExpr;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
+import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriterMetaData;
 import org.ogf.saga.error.*;
 import org.ogf.saga.url.URL;
@@ -25,9 +26,9 @@ import java.util.*;
 /**
  *
  */
-public class IrodsDataAdaptorLogical extends IrodsDataAdaptor implements LogicalReaderMetaDataExtended, LogicalWriterMetaData {
+public class IrodsDataAdaptorLogical extends IrodsDataAdaptor implements LogicalReaderMetaDataExtended, LogicalWriterMetaData, LogicalReader {
     public String[] listLocations(String logicalEntry, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        return new String[0];  //To change body of implemented methods use File | Settings | File Templates.
+        throw new NoSuccessException("not yet implemented");
     }
 	
 	public String getType() {
