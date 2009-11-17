@@ -25,6 +25,7 @@ import org.ogf.saga.url.URL;
  *
  */
 public abstract class AbstractSyncLogicalFileFactoryImpl extends LogicalFileFactory implements SyncLogicalFileFactory {
+    private final static boolean PLUGIN_TYPE = DataAdaptorFactory.LOGICAL;
     private DataAdaptorFactory m_adaptorFactory;
 
     public AbstractSyncLogicalFileFactoryImpl(DataAdaptorFactory adaptorFactory) {
@@ -32,7 +33,7 @@ public abstract class AbstractSyncLogicalFileFactoryImpl extends LogicalFileFact
     }
 
     public LogicalFile doCreateLogicalFileSync(Session session, URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session);
+        DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session, PLUGIN_TYPE);
         boolean isLogical = adaptor instanceof LogicalReader || adaptor instanceof LogicalWriter;
         boolean isPhysical = adaptor instanceof FileReader || adaptor instanceof FileWriter;
         if (isLogical || !isPhysical) {
@@ -43,7 +44,7 @@ public abstract class AbstractSyncLogicalFileFactoryImpl extends LogicalFileFact
     }
 
     public LogicalDirectory doCreateLogicalDirectorySync(Session session, URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session);
+        DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session, PLUGIN_TYPE);
         boolean isLogical = adaptor instanceof LogicalReader || adaptor instanceof LogicalWriter;
         boolean isPhysical = adaptor instanceof FileReader || adaptor instanceof FileWriter;
         if (isLogical || !isPhysical) {

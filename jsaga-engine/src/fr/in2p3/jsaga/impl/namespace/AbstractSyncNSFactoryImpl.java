@@ -29,6 +29,7 @@ import org.ogf.saga.url.URL;
  *
  */
 public abstract class AbstractSyncNSFactoryImpl extends NSFactory implements SyncNSFactory {
+    private static final boolean PLUGIN_TYPE = DataAdaptorFactory.PHYSICAL;
     private DataAdaptorFactory m_adaptorFactory;
 
     public AbstractSyncNSFactoryImpl(DataAdaptorFactory adaptorFactory) {
@@ -54,7 +55,7 @@ public abstract class AbstractSyncNSFactoryImpl extends NSFactory implements Syn
      * <br> - support the CREATEPARENTS flag (from specification of method makeDir).
      */
     public NSDirectory doCreateNSDirectorySync(Session session, URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session);
+        DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session, PLUGIN_TYPE);
         boolean isPhysical = adaptor instanceof FileReader || adaptor instanceof FileWriter;
         boolean isLogical = adaptor instanceof LogicalReader || adaptor instanceof LogicalWriter;
         if (isPhysical || !isLogical) {
@@ -70,7 +71,7 @@ public abstract class AbstractSyncNSFactoryImpl extends NSFactory implements Syn
      * <br> - support the CREATEPARENTS flag (from specification of method makeDir).
      */
     private NSEntry doCreateNSFileSync(Session session, URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session);
+        DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session, PLUGIN_TYPE);
         boolean isPhysical = adaptor instanceof FileReader || adaptor instanceof FileWriter;
         boolean isLogical = adaptor instanceof LogicalReader || adaptor instanceof LogicalWriter;
         if (isPhysical || !isLogical) {

@@ -6,6 +6,7 @@ import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyDelegated;
 import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
 import fr.in2p3.jsaga.engine.config.Configuration;
+import fr.in2p3.jsaga.engine.factories.DataAdaptorFactory;
 import fr.in2p3.jsaga.engine.schema.config.Protocol;
 import fr.in2p3.jsaga.impl.logicalfile.AbstractSyncLogicalFileImpl;
 import fr.in2p3.jsaga.impl.namespace.FlagsHelper;
@@ -72,7 +73,8 @@ public class LogicalFileCopy {
                 throw new AlreadyExistsException("Target entry already exists: "+effectiveTarget, alreadyExists.getCause());
             }
         } else if (m_adaptor instanceof LogicalReader) {
-            Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(effectiveTarget.getScheme());
+            Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(
+                    effectiveTarget.getScheme(), DataAdaptorFactory.LOGICAL);
             if (descriptor.hasLogical() && descriptor.getLogical()) {
                 this.putToLogicalFile(effectiveTarget, flags);
             } else {

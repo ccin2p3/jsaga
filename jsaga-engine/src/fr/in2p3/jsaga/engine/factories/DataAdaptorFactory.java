@@ -30,6 +30,9 @@ import java.util.Map;
  * Create and manage data adaptors
  */
 public class DataAdaptorFactory extends ServiceAdaptorFactory {
+    public static final boolean PHYSICAL = false;
+    public static final boolean LOGICAL = true;
+    
     private DataAdaptorDescriptor m_descriptor;
     private ProtocolEngineConfiguration m_configuration;
 
@@ -46,13 +49,13 @@ public class DataAdaptorFactory extends ServiceAdaptorFactory {
      * @param session the security session
      * @return the data adaptor instance
      */
-    public DataAdaptor getDataAdaptor(URL url, Session session) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+    public DataAdaptor getDataAdaptor(URL url, Session session, boolean isLogical) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (url==null || url.getScheme()==null) {
             throw new IncorrectURLException("Invalid entry name");
         }
 
         // get config
-        DataService config = m_configuration.findDataService(url);
+        DataService config = m_configuration.findDataService(url, isLogical);
 
         // create instance
         Class clazz = m_descriptor.getClass(config.getType());

@@ -6,6 +6,7 @@ import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyDelegated;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterPutter;
 import fr.in2p3.jsaga.engine.config.Configuration;
+import fr.in2p3.jsaga.engine.factories.DataAdaptorFactory;
 import fr.in2p3.jsaga.engine.schema.config.Protocol;
 import fr.in2p3.jsaga.impl.file.AbstractSyncFileImpl;
 import fr.in2p3.jsaga.impl.logicalfile.AbstractSyncLogicalFileImpl;
@@ -91,7 +92,8 @@ public class FileCopyFrom {
                 sourceFile.close();
             }
         } else if (m_adaptor instanceof FileWriter) {
-            Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(effectiveSource.getScheme());
+            Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(
+                    effectiveSource.getScheme(), DataAdaptorFactory.PHYSICAL);
             if (descriptor.hasLogical() && descriptor.getLogical()) {
                 this.getFromLogicalFile(effectiveSource, flags);
             } else {

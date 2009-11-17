@@ -6,6 +6,7 @@ import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyDelegated;
 import fr.in2p3.jsaga.adaptor.data.read.FileReader;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderGetter;
 import fr.in2p3.jsaga.engine.config.Configuration;
+import fr.in2p3.jsaga.engine.factories.DataAdaptorFactory;
 import fr.in2p3.jsaga.engine.schema.config.Protocol;
 import fr.in2p3.jsaga.impl.file.AbstractSyncFileImpl;
 import fr.in2p3.jsaga.impl.namespace.FlagsHelper;
@@ -89,7 +90,8 @@ public class FileCopy {
                 targetFile.close();
             }
         } else if (m_adaptor instanceof FileReader) {
-            Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(effectiveTarget.getScheme());
+            Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(
+                    effectiveTarget.getScheme(), DataAdaptorFactory.PHYSICAL);
             if (descriptor.hasLogical() && descriptor.getLogical()) {
                 throw new BadParameterException("Maybe what you want to do is to register to logical file the following location: "+source.toString());
             } else {

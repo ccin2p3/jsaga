@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.engine.data;
 
 import fr.in2p3.jsaga.adaptor.data.BaseURL;
 import fr.in2p3.jsaga.engine.config.Configuration;
+import fr.in2p3.jsaga.engine.factories.DataAdaptorFactory;
 import fr.in2p3.jsaga.engine.schema.config.DataService;
 import org.ogf.saga.error.*;
 import org.ogf.saga.url.URL;
@@ -32,7 +33,8 @@ public class FilledURL {
     }
     
     public FilledURL(URL url) throws NotImplementedException, NoSuccessException {
-        this(url, Configuration.getInstance().getConfigurations().getProtocolCfg().findDataService(url));
+        this(url, Configuration.getInstance().getConfigurations().getProtocolCfg().findDataService(
+                url, DataAdaptorFactory.PHYSICAL));
     }
 
     public FilledURL(URL url, DataService config) throws NotImplementedException, NoSuccessException {

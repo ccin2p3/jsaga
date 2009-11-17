@@ -30,9 +30,9 @@ public class ProtocolEngineConfiguration extends ServiceEngineConfigurationAbstr
         return m_protocol;
     }
 
-    public DataService findDataService(URL url) throws NotImplementedException, NoSuccessException {
+    public DataService findDataService(URL url, boolean isLogical) throws NotImplementedException, NoSuccessException {
         if (url != null) {
-            Protocol protocol = findProtocol(url.getScheme());
+            Protocol protocol = findProtocol(url.getScheme(), isLogical);
             if (url.getFragment() != null) {
                 String serviceRef = url.getFragment();
                 DataService service = this.findDataServiceByServiceRef(protocol, serviceRef);
@@ -71,10 +71,15 @@ public class ProtocolEngineConfiguration extends ServiceEngineConfigurationAbstr
         }
     }
 
-    public Protocol findProtocol(String scheme) throws NoSuccessException {
+    public Protocol findProtocol(String scheme, boolean requiresLogical) throws NoSuccessException {
         for (int p=0; p<m_protocol.length; p++) {
             Protocol protocol = m_protocol[p];
-            if (protocol.getScheme().equals(scheme) || StringArray.arrayContains(protocol.getSchemeAlias(), scheme)) {
+            boolean isLogical = protocol.hasLogical() && protocol.getLogical();
+            if (    ((requiresLogical&&isLogical) || (!requiresLogical&&!isLogical))
+                            &&
+                    (protocol.getScheme().equals(scheme) || StringArray.arrayContains(protocol.getSchemeAlias(), scheme))
+               )
+            {
                 return protocol;
             }
         }
