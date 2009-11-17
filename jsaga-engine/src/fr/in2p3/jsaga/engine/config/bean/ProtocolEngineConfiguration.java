@@ -7,6 +7,9 @@ import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.url.URL;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -72,18 +75,39 @@ public class ProtocolEngineConfiguration extends ServiceEngineConfigurationAbstr
     }
 
     public Protocol findProtocol(String scheme, boolean requiresLogical) throws NoSuccessException {
+        List<Protocol> candidates = new ArrayList<Protocol>();
         for (int p=0; p<m_protocol.length; p++) {
             Protocol protocol = m_protocol[p];
-            boolean isLogical = protocol.hasLogical() && protocol.getLogical();
-            if (    ((requiresLogical&&isLogical) || (!requiresLogical&&!isLogical))
-                            &&
-                    (protocol.getScheme().equals(scheme) || StringArray.arrayContains(protocol.getSchemeAlias(), scheme))
-               )
-            {
-                return protocol;
+            if (protocol.getScheme().equals(scheme) || StringArray.arrayContains(protocol.getSchemeAlias(), scheme)) {
+                candidates.add(protocol);
             }
         }
-        throw new NoSuccessException("Protocol not found: "+scheme);
+        switch (candidates.size()) {
+            case 0:
+                throw new NoSuccessException("Protocol not found: "+scheme);
+            case 1:
+                return candidates.get(0);
+            case 2:
+                Protocol physical=null, logical=null;
+                for (int p=0; p<candidates.size(); p++) {
+                    Protocol protocol = candidates.get(p);
+                    boolean isLogical = protocol.hasLogical() && protocol.getLogical();
+                    if (isLogical && logical==null) {
+                        logical = protocol;
+                    } else if (!isLogical && physical==null) {
+                        physical = protocol;
+                    } else {
+                        throw new NoSuccessException("Too many physical/logical implementations matching protocol: "+scheme);
+                    }
+                }
+                if (requiresLogical) {
+                    return logical;
+                } else {
+                    return physical;
+                }
+            default:
+                throw new NoSuccessException("Too many implementations matching protocol: "+scheme);
+        }
     }
 
     private DataService findDataServiceByServiceRef(Protocol protocol, String serviceRef) {
