@@ -87,26 +87,21 @@ public class ProtocolEngineConfiguration extends ServiceEngineConfigurationAbstr
                 throw new NoSuccessException("Protocol not found: "+scheme);
             case 1:
                 return candidates.get(0);
-            case 2:
-                Protocol physical=null, logical=null;
+            default:
                 for (int p=0; p<candidates.size(); p++) {
                     Protocol protocol = candidates.get(p);
                     boolean isLogical = protocol.hasLogical() && protocol.getLogical();
-                    if (isLogical && logical==null) {
-                        logical = protocol;
-                    } else if (!isLogical && physical==null) {
-                        physical = protocol;
-                    } else {
-                        throw new NoSuccessException("Too many physical/logical implementations matching protocol: "+scheme);
+                    if (isLogical && requiresLogical) {
+                        return protocol;
+                    } else if (!isLogical && !requiresLogical) {
+                        return protocol;
                     }
                 }
                 if (requiresLogical) {
-                    return logical;
+                    throw new NoSuccessException("No logical protocol found for scheme: "+scheme);
                 } else {
-                    return physical;
+                    throw new NoSuccessException("No physical protocol found for scheme: "+scheme);
                 }
-            default:
-                throw new NoSuccessException("Too many implementations matching protocol: "+scheme);
         }
     }
 
