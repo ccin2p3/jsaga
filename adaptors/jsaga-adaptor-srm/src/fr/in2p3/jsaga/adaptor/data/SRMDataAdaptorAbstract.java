@@ -6,10 +6,9 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
 import org.apache.axis.SimpleTargetedChain;
+import org.apache.axis.client.Call;
 import org.apache.axis.configuration.SimpleProvider;
-import org.apache.axis.transport.http.HTTPSender;
 import org.globus.axis.transport.GSIHTTPSender;
-import org.globus.axis.transport.HTTPSSender;
 import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.*;
 
@@ -41,9 +40,9 @@ public abstract class SRMDataAdaptorAbstract implements DataAdaptor {
     static {
         s_provider = new SimpleProvider();
         s_provider.deployTransport("httpg", new SimpleTargetedChain(new GSIHTTPSender()));
-        s_provider.deployTransport("https", new SimpleTargetedChain(new HTTPSSender()));
-        s_provider.deployTransport("http", new SimpleTargetedChain(new HTTPSender()));
-        org.globus.axis.util.Util.registerTransport();
+        Call.initialize();
+        Call.addTransportPackage("org.globus.net.protocol");
+        Call.setTransportForProtocol("httpg", org.globus.axis.transport.GSIHTTPTransport.class);
     }
 
     protected abstract void ping() throws BadParameterException, NoSuccessException;
