@@ -1,6 +1,10 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
 import org.apache.axis.types.URI;
+import org.apache.axis.configuration.SimpleProvider;
+import org.apache.axis.SimpleTargetedChain;
+import org.apache.axis.client.Call;
+import org.apache.axis.transport.http.HTTPSender;
 import org.glite.ce.creamapi.ws.cream2.CREAMLocator;
 import org.glite.ce.creamapi.ws.cream2.CREAMPort;
 import org.ogf.saga.error.BadParameterException;
@@ -41,6 +45,10 @@ public class CreamStub {
                 System.setProperty("axis.socketSecureFactory", "org.glite.security.trustmanager.axis.AXISSocketFactory");
                 System.setProperty("gridProxyFile", proxyFile.getAbsolutePath());
             }
+
+            // workaround: reset protocol implementations mapping because it may be modified by SRM classes
+            Call.initialize();
+            
             CREAMLocator creamLocator = new CREAMLocator();
             m_stub = creamLocator.getCREAM2(m_url);
         } catch (ServiceException e) {
