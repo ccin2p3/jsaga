@@ -19,8 +19,9 @@
                 <maven.scm.cvs.java.cvs_rsh>/bin/ssh</maven.scm.cvs.java.cvs_rsh>
 
                 <!-- Software Deployment -->
-                <site.upload.root>scp://ccali.in2p3.fr/afs/in2p3.fr/home/throng/ccin2p3/grid/www/grid/${application}</site.upload.root>
-                <repository.upload.root>scp://ccali.in2p3.fr/afs/in2p3.fr/home/throng/ccin2p3/grid/www/grid/maven2</repository.upload.root>
+                <upload.root>/tmp/build</upload.root>
+                <site.upload.root>file://${upload.root}/application</site.upload.root>
+                <repository.upload.root>file://${upload.root}//maven2</repository.upload.root>
             </properties>
             <repositories>
                 <repository>
