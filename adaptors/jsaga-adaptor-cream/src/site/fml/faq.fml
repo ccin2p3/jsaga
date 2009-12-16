@@ -14,7 +14,13 @@
     </part>
     <part id="execution">
         <title>Execution management</title>
-        <faq id="failure">
+        <faq id="identity_reading_failed">
+            <question>It fails with this error message:
+                <pre>Identity reading failed: null</pre>
+            </question>
+            <answer>Fix access permissions on your certificate</answer>
+        </faq>
+        <faq id="transport_not_found">
             <question>It fails with this error message:
                 <pre>AuthenticationFailed: No client transport named 'https' found!</pre>
             </question>
