@@ -44,14 +44,14 @@ Download JSAGA
 
     JSAGA is distributed in several formats for your convenience.
 
-    * Graphical Installer: {{{../maven2/fr/in2p3/jsaga/jsaga-installer/${project.version}/jsaga-installer-${project.version}.jar}jsaga-installer-${project.version}.jar}}
+    * Graphical Installer: {{{/maven2/fr/in2p3/jsaga/jsaga-installer/${project.version}/jsaga-installer-${project.version}.jar}jsaga-installer-${project.version}.jar}}
 
-    * ZIP binaries package: {{{../maven2/fr/in2p3/jsaga/jsaga-installer/${project.version}/jsaga-installer-${project.version}-bin.zip}jsaga-installer-${project.version}-bin.zip}}
+    * ZIP binaries package: {{{/maven2/fr/in2p3/jsaga/jsaga-installer/${project.version}/jsaga-installer-${project.version}-bin.zip}jsaga-installer-${project.version}-bin.zip}}
 
-    * TAR-GZ binaries package: {{{../maven2/fr/in2p3/jsaga/jsaga-installer/${project.version}/jsaga-installer-${project.version}-bin.tar.gz}jsaga-installer-${project.version}-bin.tar.gz}}
+    * TAR-GZ binaries package: {{{/maven2/fr/in2p3/jsaga/jsaga-installer/${project.version}/jsaga-installer-${project.version}-bin.tar.gz}jsaga-installer-${project.version}-bin.tar.gz}}
 
     See {{{changes-report.html}release notes}}.
 
 * Previous Releases
 
-    Previous releases of JSAGA can be downloaded from the {{{http://grid.in2p3.fr/archives/jsaga/}archives}}.
+    Previous releases of JSAGA can be downloaded from the {{{/software/archives/jsaga/}archives}}.
