@@ -9,6 +9,7 @@ import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityAdaptor;
+import org.apache.log4j.Logger;
 import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.context.ContextFactory;
@@ -41,6 +42,8 @@ import java.util.Map;
  *
  */
 public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStreamFactory, DataCopy, DataRename {
+    private static Logger s_logger = Logger.getLogger(SagaDataAdaptor.class);
+
     private Session m_session;
     private URL m_rootUrl;
 
@@ -109,6 +112,8 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
             throw new NoSuccessException(e);
         } catch (IncorrectStateException e) {
             throw new NoSuccessException(e);
+        } finally {
+            closeEntry(entry);
         }
     }
 
@@ -124,6 +129,7 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         if (entry instanceof File) {
             return new SagaInputStream((File) entry, m_token, m_srmPath, m_callback);
         } else {
+            closeEntry(entry);
             throw new NoSuccessException("Tranfer URL is not a file");
         }
     }
@@ -142,24 +148,33 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         if (entry instanceof File) {
             return new SagaOutputStream((File) entry, m_token, m_srmPath, m_callback);
         } else {
+            closeEntry(entry);
             throw new NoSuccessException("Tranfer URL is not a file");
         }
     }
 
     public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, ParentDoesNotExist, TimeoutException, NoSuccessException {
+        URL targetUrl;
         try {
             String protocol = m_rootUrl.getScheme();
-            URL targetUrl = URLFactory.createURL(getURLString(protocol, targetHost, targetPort, targetAbsolutePath));
+            targetUrl = URLFactory.createURL(getURLString(protocol, targetHost, targetPort, targetAbsolutePath));
+        } catch (NotImplementedException e) {
+            throw new NoSuccessException(e);
+        } catch (IncorrectURLException e) {
+            throw new NoSuccessException(e);
+        }
+        NSEntry entry = this.getEntry(sourceAbsolutePath);
+        try {
             int flags = (overwrite ? Flags.OVERWRITE : Flags.NONE).getValue();
-            this.getEntry(sourceAbsolutePath).copy(
-                    targetUrl,
-                    flags);
+            entry.copy(targetUrl, flags);
         } catch (NotImplementedException e) {
             throw new NoSuccessException(e);
         } catch (IncorrectStateException e) {
             throw new NoSuccessException(e);
         } catch (IncorrectURLException e) {
             throw new NoSuccessException(e);
+        } finally {
+            closeEntry(entry);
         }
     }
 
@@ -185,13 +200,16 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
             throw new NoSuccessException(e);
         } catch (InvocationTargetException e) {
             throw new NoSuccessException(e);
+        } finally {
+            closeEntry(entry);
         }
     }
 
     public void rename(String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException {
+        NSEntry entry = this.getEntry(sourceAbsolutePath);
         try {
             int flags = (overwrite ? Flags.OVERWRITE : Flags.NONE).getValue();
-            this.getEntry(sourceAbsolutePath).move(
+            entry.move(
                     URLFactory.createURL(targetAbsolutePath),
                     flags);
         } catch (NotImplementedException e) {
@@ -204,12 +222,15 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
             throw new NoSuccessException(e);
         } catch (IncorrectURLException e) {
             throw new NoSuccessException(e);
+        } finally {
+            closeEntry(entry);
         }
     }
 
     public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+        NSEntry entry = this.getEntry(parentAbsolutePath+"/"+fileName);
         try {
-            this.getEntry(parentAbsolutePath+"/"+fileName).remove(Flags.NONE.getValue());
+            entry.remove(Flags.NONE.getValue());
         } catch (IncorrectStateException e) {
             throw new NoSuccessException(e);
         } catch (AuthorizationFailedException e) {
@@ -218,6 +239,8 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
             throw new NoSuccessException(e);
         } catch (AuthenticationFailedException e) {
             throw new NoSuccessException(e);
+        } finally {
+            closeEntry(entry);
         }
     }
 
@@ -244,6 +267,15 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
             return NSFactory.createNSEntry(m_session, url, flags);
         } catch (Exception e) {
             throw new NoSuccessException(e);
+        }
+    }
+    private void closeEntry(NSEntry entry) {
+        if (entry != null) {
+            try {
+                entry.close();
+            } catch (SagaException e) {
+                s_logger.warn("Failed to close entry");
+            }
         }
     }
 
