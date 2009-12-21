@@ -280,14 +280,16 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
                 }
                 for (int i=0; i<inputFiles.length; i++) {
                     File inputFile = inputFiles[i];
+                    String[] uriList = list.getItem();
+                    GlobusURL to = new GlobusURL(uriList[0]+"/"+inputFile.getName());
+                    GridFTPClient test = new GridFTPClient(to.getHost(), to.getPort());
                     try {
-                        String[] uriList = list.getItem();
-                        GlobusURL to = new GlobusURL(uriList[0]+"/"+inputFile.getName());
-                        GridFTPClient test = new GridFTPClient(to.getHost(), to.getPort());
                         test.authenticate(m_credential);
                         test.put(inputFile, "/"+to.getPath(), true);
                     } catch(Exception e) {
                         throw new NoSuccessException("Unable to stage input file: "+inputFile,e);
+                    } finally {
+                        test.close();
                     }
                 }
 
@@ -369,10 +371,10 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 					throw new NoSuccessException("Unable to find a input sandbox uri to put stdin file");
 				}				
 				
+                String[] uriList = list.getItem();
+                GlobusURL to = new GlobusURL(uriList[0]+"/"+stdinFile.getName());
+                GridFTPClient test = new GridFTPClient(to.getHost(), to.getPort());
 				try {
-					String[] uriList = list.getItem();
-					GlobusURL to = new GlobusURL(uriList[0]+"/"+stdinFile.getName());
-		            GridFTPClient test = new GridFTPClient(to.getHost(), to.getPort());
 		            test.authenticate(m_credential);
 		            test.put(stdinFile, "/"+to.getPath(), true);
 				}
@@ -380,6 +382,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 					throw new NoSuccessException("Unable to upload stdin file to input sandbox",e);
 				}
 				finally {
+                    test.close();
 					// clean stdin tmp file
 					stdinFile.delete();
 				}
