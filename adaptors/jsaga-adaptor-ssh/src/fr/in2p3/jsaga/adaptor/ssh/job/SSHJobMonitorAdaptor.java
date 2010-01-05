@@ -39,6 +39,9 @@ public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryInd
 
     	try {    		
     		ChannelExec channel = (ChannelExec) SSHAdaptorAbstract.sessionMap.get(nativeJobId);
+            if (channel == null) {
+                throw new NoSuccessException("Job id not found in current JVM: "+nativeJobId);
+            }
     		return new SSHJobStatus(nativeJobId, channel);
 						
     	} catch (Exception e) {

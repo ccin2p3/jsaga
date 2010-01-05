@@ -133,6 +133,9 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException,
             NoSuccessException {
 		ChannelExec channel = (ChannelExec) SSHAdaptorAbstract.sessionMap.get(nativeJobId);
+        if (channel == null) {
+            throw new NoSuccessException("Job id not found in current JVM: "+nativeJobId);
+        }
 		channel.disconnect();
 		SSHAdaptorAbstract.sessionMap.remove(channel);
 	}
