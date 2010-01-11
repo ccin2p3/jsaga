@@ -1,10 +1,10 @@
 JSAGA
 
- JSAGA is a Java implementation of the Simple API for Grid Applications
- ({{{http://www.ogf.org/documents/GFD.90.pdf}SAGA}}) specification from
- the Open Grid Forum ({{{http://www.ogf.org/}OGF}}). SAGA provides a
- uniform interface to heterogeneous grid middleware for security, data
- management and execution management.
+ {{{http://grid.in2p3.fr/jsaga/}JSAGA}} is a Java implementation of the
+ Simple API for Grid Applications ({{{http://www.ogf.org/documents/GFD.90.pdf}SAGA}})
+ specification from the Open Grid Forum ({{{http://www.ogf.org/}OGF}}).
+ SAGA provides a uniform interface to heterogeneous grid middleware for
+ security, data management and execution management.
 
  But JSAGA does not only hide heterogeneity between middleware, it also
  hides heterogeneity between grid infrastructures. Indeed, heterogeneity
