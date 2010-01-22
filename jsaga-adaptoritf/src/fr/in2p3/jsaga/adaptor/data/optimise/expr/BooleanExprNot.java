@@ -12,5 +12,14 @@ package fr.in2p3.jsaga.adaptor.data.optimise.expr;
 /**
  *
  */
-public class BooleanExprNot {
+public class BooleanExprNot implements BooleanExpr {
+    private BooleanExpr m_expr;
+
+    public BooleanExprNot(BooleanExpr expr) {
+        m_expr = expr;
+    }
+
+    public BooleanExpr get() {
+        return m_expr;
+    }
 }

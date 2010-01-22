@@ -12,5 +12,5 @@ package fr.in2p3.jsaga.adaptor.data.optimise.expr;
 /**
  *
  */
-public class BooleanExprAnd {
+public class BooleanExprAnd extends BooleanExprCond {
 }
