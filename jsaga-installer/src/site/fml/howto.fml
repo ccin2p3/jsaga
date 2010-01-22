@@ -7,7 +7,7 @@
             <answer>
                 <ul>
                     <li>Install <a href="http://java.sun.com/j2se/1.5/download.html">JDK 1.5</a> (or above)</li>
-                    <li>Install <a href="http://maven.apache.org/download.html">Maven 2.0</a> (or above)</li>
+                    <li>Install <a href="http://archive.apache.org/dist/maven/binaries/">Maven 2.0.9</a></li>
                 </ul>
             </answer>
         </faq>
@@ -72,7 +72,7 @@ mkdir -p dir2/subdir ; echo "Content of file 2 on base2.url..." > dir2/subdir/fi
             <answer>
                 <ul>
                     <li>Install <a href="http://java.sun.com/j2se/1.5/download.html">JDK 1.5</a> (or above)</li>
-                    <li>Install <a href="http://maven.apache.org/download.html">Maven 2.0.9</a> (or above)</li>
+                    <li>Install <a href="http://archive.apache.org/dist/maven/binaries/">Maven 2.0.9</a></li>
                     <!-- maven releases prior to 2.0.9 have undeterministic ordering of dependencies -->
                     <li>Optional: releasing JSAGA requires SSH to be installed</li>
                     <li>Optional: some adaptors requires gcc compiler to be installed
