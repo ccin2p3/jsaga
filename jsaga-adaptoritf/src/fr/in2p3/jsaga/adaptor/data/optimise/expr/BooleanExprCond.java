@@ -16,10 +16,10 @@ import java.util.List;
  *
  */
 public abstract class BooleanExprCond implements BooleanExpr {
-    private List<BooleanExpr> m_list;
+    private List m_list;
 
     public BooleanExprCond() {
-        m_list = new ArrayList<BooleanExpr>();
+        m_list = new ArrayList();
     }
 
     public void add(BooleanExpr expr) {
@@ -31,10 +31,10 @@ public abstract class BooleanExprCond implements BooleanExpr {
     }
 
     public BooleanExpr get(int i) {
-        return m_list.get(i);
+        return (BooleanExpr) m_list.get(i);
     }
 
     public BooleanExpr[] get() {
-        return m_list.toArray(new BooleanExpr[m_list.size()]);
+        return (BooleanExpr[]) m_list.toArray(new BooleanExpr[m_list.size()]);
     }
 }
