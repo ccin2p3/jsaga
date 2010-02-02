@@ -1,8 +1,7 @@
 package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.*;
-import org.ogf.saga.error.BadParameterException;
-import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
@@ -75,7 +74,7 @@ public class JobRun extends AbstractCommand {
             // create the job
             Session session = SessionFactory.createSession(true);
             JobService service = JobFactory.createJobService(session, serviceURL);
-            Job job = service.createJob(desc);
+            final Job job = service.createJob(desc);
 
             if (line.hasOption(OPT_DESCRIPTION)) {
                 // dump job description
@@ -89,25 +88,44 @@ public class JobRun extends AbstractCommand {
                     String jobId = job.getAttribute(Job.JOBID);
                     System.out.println(jobId);
                 } else {
+                    // add shutdown hook
+                    Thread hook = new Thread(){
+                        public void run() {
+                            // cancel the job
+                            try {
+                                System.out.println("Canceling job: "+job.getAttribute(Job.JOBID));
+                                job.cancel();
+                            } catch (SagaException e) {
+                                e.printStackTrace();
+                            }
+                            // give it a change to display final job state
+                            try {sleep(1000);} catch(InterruptedException e){e.printStackTrace();}
+                        }
+                    };
+                    Runtime.getRuntime().addShutdownHook(hook);
+
                     // wait
                     job.waitFor();
 
                     // display final state
                     State state = job.getState();
-                    if (State.DONE.compareTo(state) == 0) {
-                        copyStream(job.getStdout(), System.out);
-                    } else if (State.CANCELED.compareTo(state) == 0) {
+                    if (State.CANCELED.compareTo(state) == 0) {
                         System.out.println("Job canceled.");
-                    } else if (State.FAILED.compareTo(state) == 0) {
-                        try {
-                            String exitCode = job.getAttribute(Job.EXITCODE);
-                            System.out.println("Job failed with exit code: "+exitCode);
-                        } catch(DoesNotExistException e) {
-                            System.out.println("Job failed.");
-                            job.rethrow();
-                        }
                     } else {
-                        throw new Exception("Unexpected state: "+ state);
+                        Runtime.getRuntime().removeShutdownHook(hook);
+                        if (State.DONE.compareTo(state) == 0) {
+                            copyStream(job.getStdout(), System.out);
+                        } else if (State.FAILED.compareTo(state) == 0) {
+                            try {
+                                String exitCode = job.getAttribute(Job.EXITCODE);
+                                System.out.println("Job failed with exit code: "+exitCode);
+                            } catch(DoesNotExistException e) {
+                                System.out.println("Job failed.");
+                                job.rethrow();
+                            }
+                        } else {
+                            throw new Exception("Unexpected state: "+ state);
+                        }
                     }
                 }
             }
