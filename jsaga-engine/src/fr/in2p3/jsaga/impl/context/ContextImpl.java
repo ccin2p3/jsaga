@@ -6,6 +6,7 @@ import fr.in2p3.jsaga.adaptor.security.*;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.factories.SecurityAdaptorBuilderFactory;
 import fr.in2p3.jsaga.impl.attributes.AbstractAttributesImpl;
+import fr.in2p3.jsaga.impl.job.service.JobServiceImpl;
 import org.apache.log4j.Logger;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.context.Context;
@@ -13,7 +14,7 @@ import org.ogf.saga.error.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.util.Map;
+import java.util.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -32,6 +33,7 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     private ContextAttributes m_attributes;
     private SecurityAdaptorBuilder m_adaptorBuilder;
     private SecurityAdaptor m_adaptor;
+    private WeakHashMap<JobServiceImpl,Map> m_jobServices;
 
     /** constructor */
     public ContextImpl(String type) throws NotImplementedException, IncorrectStateException, NoSuccessException {
@@ -45,6 +47,7 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
             m_adaptorBuilder = null;
         }
         m_adaptor = null;
+        m_jobServices = new WeakHashMap<JobServiceImpl,Map>();
     }
 
     /** clone */
@@ -53,6 +56,7 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
         clone.m_attributes = m_attributes;
         clone.m_adaptorBuilder = m_adaptorBuilder;
         clone.m_adaptor = m_adaptor;
+        clone.m_jobServices = m_jobServices;
         return clone;
     }
 
@@ -251,7 +255,19 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
             if (m_adaptor == null) {
                 throw new NotImplementedException("[INTERNAL ERROR] Method createSecurityAdaptor should never return 'null'");
             }
+
+            // reset the job services using this context
+            Map<JobServiceImpl,Map> jobServices = new HashMap<JobServiceImpl,Map>();
+            jobServices.putAll(m_jobServices);
+            new Thread(new JobServiceReset(jobServices, m_adaptor)).start();
         }
         return m_adaptor;
+    }
+
+    /**
+     * This method is specific to JSAGA implementation.
+     */
+    public synchronized void registerJobService(JobServiceImpl jobService, Map attributes) {
+        m_jobServices.put(jobService, attributes);
     }
 }

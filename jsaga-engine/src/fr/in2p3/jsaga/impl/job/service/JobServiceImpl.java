@@ -1,6 +1,10 @@
 package fr.in2p3.jsaga.impl.job.service;
 
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import fr.in2p3.jsaga.engine.factories.JobAdaptorFactory;
+import fr.in2p3.jsaga.engine.factories.JobMonitorAdaptorFactory;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
@@ -9,6 +13,7 @@ import org.ogf.saga.task.TaskMode;
 import org.ogf.saga.url.URL;
 
 import java.util.List;
+import java.util.Map;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -30,7 +35,7 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
 
     ///////////////////////////////////////// interface JobService /////////////////////////////////////////
 
-    public Job createJob(JobDescription jd) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+    public synchronized Job createJob(JobDescription jd) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         // can not hang...
         return super.createJobSync(jd);
     }
@@ -79,6 +84,24 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
     }
 
     ////////////////////////////////////////// private methods //////////////////////////////////////////
+
+    public synchronized void resetAdaptors(SecurityAdaptor security, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+        m_monitorService.startReset();
+        try {
+            // reset control adaptor
+            JobAdaptorFactory.disconnect(m_controlAdaptor);
+            JobAdaptorFactory.connect(m_controlAdaptor, security, m_resourceManager, attributes);
+
+            // reset monitor adaptor
+            JobMonitorAdaptor monitorAdaptor = m_monitorService.getAdaptor();
+            URL monitorURL = m_monitorService.getURL();
+            Map monitorAttributes = m_monitorService.getAttributes();
+            JobMonitorAdaptorFactory.disconnect(monitorAdaptor);
+            JobMonitorAdaptorFactory.connect(monitorAdaptor, security, monitorURL, monitorAttributes);
+        } finally {
+            m_monitorService.stopReset();
+        }
+    }
 
     private float getTimeout(String methodName) throws NoSuccessException {
         return getTimeout(JobService.class, methodName, m_resourceManager.getScheme());

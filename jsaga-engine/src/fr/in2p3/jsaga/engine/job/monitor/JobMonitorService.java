@@ -8,6 +8,8 @@ import fr.in2p3.jsaga.engine.job.monitor.request.JobStatusRequestor;
 import org.ogf.saga.error.*;
 import org.ogf.saga.url.URL;
 
+import java.util.Map;
+
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -23,14 +25,16 @@ import org.ogf.saga.url.URL;
 public class JobMonitorService {
     private URL m_url;
     private JobMonitorAdaptor m_adaptor;
+    private Map m_attributes;
+
     private JobStatusRequestor m_requestor;
     private JobRegistry m_registry;
 
     /** constructor */
-    public JobMonitorService(URL url, JobMonitorAdaptor adaptor) throws NotImplementedException, TimeoutException, NoSuccessException {
-        // set URL
+    public JobMonitorService(URL url, JobMonitorAdaptor adaptor, Map attributes) throws NotImplementedException, TimeoutException, NoSuccessException {
         m_url = url;
         m_adaptor = adaptor;
+        m_attributes = attributes;
 
         // set requestor
         m_requestor = new JobStatusRequestor(adaptor);
@@ -59,6 +63,10 @@ public class JobMonitorService {
         return m_adaptor;
     }
 
+    public Map getAttributes() {
+        return m_attributes;
+    }
+
     public JobStatus getState(String nativeJobId) throws NotImplementedException, TimeoutException, NoSuccessException {
         return m_requestor.getJobStatus(nativeJobId);
     }
@@ -69,5 +77,14 @@ public class JobMonitorService {
 
     public void stopListening(String nativeJobId) throws NotImplementedException, TimeoutException, NoSuccessException {
         m_registry.unsubscribeJob(nativeJobId);
+    }
+
+    private boolean m_isReseting = false;
+    public synchronized void startReset() {m_isReseting = true;}
+    public synchronized void stopReset() {m_isReseting = false;}
+    public synchronized void checkState() throws TimeoutException {
+        if (m_isReseting) {
+            throw new TimeoutException("Currently reconnecting to job service, please retry later...");
+        }
     }
 }

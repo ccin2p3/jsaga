@@ -114,6 +114,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
 
     private static boolean s_checkMatch = EngineProperties.getBoolean(EngineProperties.JOB_CONTROL_CHECK_MATCH);
     protected void doSubmit() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
+        m_monitorService.checkState();
         try {
             // pre-staging
             m_metrics.m_SubState.setValue(SubState.RUNNING_PRE_STAGING.toString());
@@ -204,6 +205,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     }
 
     protected void doCancel() {
+        try{m_monitorService.checkState();} catch(TimeoutException e){throw new RuntimeException(e);}
         if (m_nativeJobId == null) {
             throw new RuntimeException("INTERNAL ERROR: JobID not initialized");
         }
@@ -216,6 +218,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     }
 
     protected State queryState() throws NotImplementedException, TimeoutException, NoSuccessException {
+        m_monitorService.checkState();
         JobStatus status = m_monitorService.getState(m_nativeJobId);
         // set job state
         this.setJobState(status.getSagaState(), status.getStateDetail(), status.getSubState(), status.getCause());
@@ -224,6 +227,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     }
 
     public boolean startListening() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
+        m_monitorService.checkState();
         if (m_nativeJobId == null) {
             throw new IncorrectStateException("Can not listen to job in 'New' state", this);
         }
@@ -232,6 +236,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     }
 
     public void stopListening() throws NotImplementedException, TimeoutException, NoSuccessException {
+        m_monitorService.checkState();
         if (m_nativeJobId == null) {
             throw new RuntimeException("INTERNAL ERROR: JobID not initialized");
         }
@@ -286,6 +291,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     }
 
     public void cleanup() throws NotImplementedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
+        m_monitorService.checkState();
         State state = this.getState();
         if (! this.isFinalState()) {
             throw new IncorrectStateException("Can not cleanup unfinished job: "+state, this);
@@ -305,6 +311,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     }
 
     public OutputStream getStdinSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+        m_monitorService.checkState();
         if (this.isInteractive()) {
             if (m_stdin == null) {
                 if (m_controlAdaptor instanceof StreamableJobInteractiveSet) {
@@ -320,6 +327,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     }
 
     public InputStream getStdoutSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+        m_monitorService.checkState();
         if (this.isInteractive()) {
             if (m_stdout == null) {
                 m_stdout = new JobStdoutInputStream(this, m_IOHandler);
@@ -331,6 +339,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     }
 
     public InputStream getStderrSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+        m_monitorService.checkState();
         if (this.isInteractive()) {
             if (m_stderr == null) {
                 m_stderr = new JobStderrInputStream(this, m_IOHandler);
@@ -342,6 +351,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     }
 
     public void suspendSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
+        m_monitorService.checkState();
         if (m_nativeJobId == null) {
             throw new IncorrectStateException("Can not suspend job in 'New' state", this);
         }
@@ -365,6 +375,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     }
 
     public void resumeSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
+        m_monitorService.checkState();
         if (m_nativeJobId == null) {
             throw new IncorrectStateException("Can not resume job in 'New' state", this);
         }
@@ -388,6 +399,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     }
 
     public void checkpointSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
+        m_monitorService.checkState();
         if (m_nativeJobId == null) {
             throw new IncorrectStateException("Can not checkpoint job in 'New' state", this);
         }
@@ -401,6 +413,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     }
 
     public void migrateSync(JobDescription jd) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+        m_monitorService.checkState();
         if (m_nativeJobId == null) {
             throw new IncorrectStateException("Can not migrate job in 'New' state", this);
         }
@@ -409,6 +422,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     }
 
     public void signalSync(int signum) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+        m_monitorService.checkState();
         if (m_nativeJobId == null) {
             throw new IncorrectStateException("Can not send signal to job in 'New' state", this);
         }

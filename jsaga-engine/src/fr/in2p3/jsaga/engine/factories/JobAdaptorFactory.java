@@ -39,30 +39,27 @@ public class JobAdaptorFactory extends ServiceAdaptorFactory {
         m_configuration = configuration.getConfigurations().getJobserviceCfg();
     }
 
-    /**
-     * Create a new instance of job control adaptor for URL <code>url</code> and connect to service.
-     * todo: cache job adaptor instances with "scheme://userInfo@host:port"
-     * @param url the URL of the service
-     * @param session the security session
-     * @return the job control adaptor instance
-     */
-    public JobControlAdaptor getJobControlAdaptor(URL url, Session session) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+    public JobService getConfig(URL url) throws NotImplementedException, IncorrectURLException, NoSuccessException {
+        // check URL
         if (url==null || url.getScheme()==null) {
             throw new IncorrectURLException("Invalid entry name: "+url);
         }
 
         // get config
-        JobService config = m_configuration.findJobService(url);
+        return m_configuration.findJobService(url);
+    }
 
+    public JobControlAdaptor getJobControlAdaptor(JobService config) throws NoSuccessException {
         // create instance
         Class clazz = m_descriptor.getClass(config.getType());
-        JobControlAdaptor jobAdaptor;
         try {
-            jobAdaptor = (JobControlAdaptor) clazz.newInstance();
+            return (JobControlAdaptor) clazz.newInstance();
         } catch (Exception e) {
             throw new NoSuccessException(e);
         }
+    }
 
+    public ContextImpl getContextImpl(URL url, JobControlAdaptor jobAdaptor, JobService config, Session session) throws NotImplementedException, NoSuccessException {
         // get security context
         ContextImpl context;
         if (config.getContextRef() != null) {
@@ -88,36 +85,60 @@ public class JobAdaptorFactory extends ServiceAdaptorFactory {
                 throw new NoSuccessException("None of the supported security context is found");
             }
         }
+        return context;
+    }
 
+    public Map getAttributes(URL url, JobService config) throws NotImplementedException, NoSuccessException {
+        try {
+            // get attributes from config and URL
+            Map attributes = new HashMap();
+            AttributesBuilder.updateAttributes(attributes, config);
+            AttributesBuilder.updateAttributes(attributes, url);
+            if (config.getMonitorService()!=null && config.getMonitorService().getUrl()!=null) {
+                URL monitorURL = URLFactory.createURL(config.getMonitorService().getUrl());
+                attributes.put(JobControlAdaptor.MONITOR_SERVICE_URL, monitorURL);
+            }
+            return attributes;
+        } catch (BadParameterException e) {
+            throw new NoSuccessException(e);
+        }
+    }
+
+    public void connect(URL url, JobControlAdaptor jobAdaptor, Map attributes, ContextImpl context) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         // set security adaptor
+        SecurityAdaptor securityAdaptor;
         if (context != null) {
-            SecurityAdaptor securityAdaptor;
+            SecurityAdaptor candidate;
             try {
-                securityAdaptor = context.getAdaptor();
+                candidate = context.getAdaptor();
             } catch (IncorrectStateException e) {
                 throw new NoSuccessException("Invalid security context: "+super.getContextType(context), e);
             }
-            if (SecurityAdaptorDescriptor.isSupported(securityAdaptor.getClass(), jobAdaptor.getSupportedSecurityAdaptorClasses())) {
-                jobAdaptor.setSecurityAdaptor(securityAdaptor);
+            if (SecurityAdaptorDescriptor.isSupported(candidate.getClass(), jobAdaptor.getSupportedSecurityAdaptorClasses())) {
+                securityAdaptor = candidate;
             } else if (SecurityAdaptorDescriptor.isSupportedNoContext(jobAdaptor.getSupportedSecurityAdaptorClasses())) {
-                jobAdaptor.setSecurityAdaptor(null);
+                securityAdaptor = null;
             } else {
-                throw new AuthenticationFailedException("Security context class '"+ securityAdaptor.getClass().getName() +"' not supported for protocol: "+url.getScheme());
+                throw new AuthenticationFailedException("Security context class '"+candidate.getClass().getName()+"' not supported for protocol: "+url.getScheme());
             }
-        }
-
-        // get attributes from config and URL
-        Map attributes = new HashMap();
-        AttributesBuilder.updateAttributes(attributes, config);
-        AttributesBuilder.updateAttributes(attributes, url);
-        if (config.getMonitorService()!=null && config.getMonitorService().getUrl()!=null) {
-            URL monitorURL = URLFactory.createURL(config.getMonitorService().getUrl());
-            attributes.put(JobControlAdaptor.MONITOR_SERVICE_URL, monitorURL);
+        } else {
+            securityAdaptor = null;
         }
 
         // connect
-        int port = (url.getPort()>0 ? url.getPort() : jobAdaptor.getDefaultPort());
-        jobAdaptor.connect(url.getUserInfo(), url.getHost(), port, url.getPath(), attributes);
-        return jobAdaptor;
+        connect(jobAdaptor, securityAdaptor, url, attributes);
+    }
+
+    public static void connect(JobControlAdaptor jobAdaptor, SecurityAdaptor securityAdaptor, URL url, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+        jobAdaptor.setSecurityAdaptor(securityAdaptor);
+        jobAdaptor.connect(
+                url.getUserInfo(),
+                url.getHost(),
+                url.getPort()>0 ? url.getPort() : jobAdaptor.getDefaultPort(),
+                url.getPath(),
+                attributes);
+    }
+    public static void disconnect(JobControlAdaptor jobAdaptor) throws NoSuccessException {
+        jobAdaptor.disconnect();
     }
 }
