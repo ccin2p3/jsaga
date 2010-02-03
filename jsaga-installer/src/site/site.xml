@@ -31,6 +31,7 @@
             <item name="JSDL Specification" href="http://www.ogf.org/documents/GFD.56.pdf"/>
             <item name="FAQ" href="faq.html"/>
             <item name="Wiki" href="https://forge.in2p3.fr/wiki/jsaga"/>
+            <item name="Forum" href="https://forge.in2p3.fr/projects/jsaga/boards/show/11"/>
         </menu>
         <menu name="Contributor Documentation">
             <item name="Adaptors API" href="jsaga-adaptoritf/index.html"/>
@@ -39,6 +40,7 @@
             <item name="Dependencies Graph" href="dependencies-graph.html"/>
             <item name="Dependencies Tree" href="dependencies-tree.html"/>
             <item name="How To" href="howto.html"/>
+            <item name="Forum" href="https://forge.in2p3.fr/projects/jsaga/boards/show/12"/>
         </menu>
         <menu name="Project Documentation" ref="reports"/>
         <menu name="Links">
