@@ -17,9 +17,9 @@ import org.ogf.saga.job.JobListTest;
  */
 public class CreamExecutionListJobs extends JSAGATestSuite {
     /** create test suite */
-    public static Test suite() throws Exception {return new CreamExecutionTestSuite();}
+    public static Test suite() throws Exception {return new CreamExecutionListJobs();}
     /** index of test cases */
-    public static class index extends IndexTest {public index(){super(CreamExecutionTestSuite.class);}}
+    public static class index extends IndexTest {public index(){super(CreamExecutionListJobs.class);}}
 
     /** test cases */
     public static class CreamJobListTest extends JobListTest {
