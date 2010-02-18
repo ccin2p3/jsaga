@@ -39,7 +39,8 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-        return new Default[]{new Default(SHELLPATH, "/bin/sh")};
+        //NOTE: sh may be more restrictive than bash
+        return new Default[]{new Default(SHELLPATH, "/bin/bash")};
     }
 
     public String[] getSupportedSandboxProtocols() {
