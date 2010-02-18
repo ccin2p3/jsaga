@@ -119,7 +119,7 @@ public class JobRun extends AbstractCommand {
                             try {
                                 String exitCode = job.getAttribute(Job.EXITCODE);
                                 System.out.println("Job failed with exit code: "+exitCode);
-                            } catch(DoesNotExistException e) {
+                            } catch(SagaException e) {
                                 System.out.println("Job failed.");
                                 job.rethrow();
                             }
