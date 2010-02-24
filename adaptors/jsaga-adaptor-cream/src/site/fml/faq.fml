@@ -20,12 +20,6 @@
             </question>
             <answer>Fix access permissions on your certificate</answer>
         </faq>
-        <faq id="transport_not_found">
-            <question>It fails with this error message:
-                <pre>AuthenticationFailed: No client transport named 'https' found!</pre>
-            </question>
-            <answer>Re-install JSAGA without the SRM plug-in</answer>
-        </faq>
         <faq id="log4j">
             <question>How to get rid of this error message:
                 <pre>org.glite.security.util.FileEndingIterator : Error while reading directory null</pre>
