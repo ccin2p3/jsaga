@@ -28,5 +28,9 @@
                 <pre>log4j.logger.org.glite.security.util.FileEndingIterator=FATAL</pre>
             </answer>
         </faq>
+        <faq id="lifetime"><!-- fixme -->
+            <question>What is the minimum lifetime of the proxy ?</question>
+            <answer>Because of a current limitation (to be fixed) of the plug-in, the minimum lifetime is 13 hours.</answer>
+        </faq>
     </part>
 </faqs>
