@@ -150,11 +150,6 @@ public class JobRun extends AbstractCommand {
                 .create(OPT_RESOURCE));
 
         // optional arguments
-        opt.addOption(OptionBuilder.withDescription("read job description from file <path>")
-                .hasArg()
-                .withArgName("path")
-                .withLongOpt(LONGOPT_FILE)
-                .create(OPT_FILE));
         opt.addOption(OptionBuilder.withDescription("generate the job description in the targeted grid language " +
                 "and exit (do not submit the job)")
                 .withLongOpt(LONGOPT_DESCRIPTION)
@@ -164,9 +159,19 @@ public class JobRun extends AbstractCommand {
                 .withLongOpt(LONGOPT_BATCH)
                 .create(OPT_BATCH));
 
+        // required group
+        OptionGroup group = new OptionGroup();
+        group.addOption(OptionBuilder.withDescription("read job description from file <path>")
+                .hasArg()
+                .withArgName("path")
+                .withLongOpt(LONGOPT_FILE)
+                .create(OPT_FILE));
+        group.addOption(o("command to execute").hasArg().create(JobDescription.EXECUTABLE));
+        group.setRequired(true);
+        opt.addOptionGroup(group);
+
         // job description
         opt.addOption(o("job name to be attached to the job submission").hasArg().create(JOBNAME));
-        opt.addOption(o("command to execute").isRequired(true).hasArg().create(JobDescription.EXECUTABLE));
         opt.addOption(o("positional parameters for the command").hasArgs().create(JobDescription.ARGUMENTS));
         opt.addOption(o("SPMD job type and startup mechanism").hasArg().create(JobDescription.SPMDVARIATION));
         opt.addOption(o("total number of cpus requested for this job").hasArg().create(JobDescription.TOTALCPUCOUNT));
