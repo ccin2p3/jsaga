@@ -28,6 +28,13 @@
             <job type="lcgce"/>
             <data type="gsiftp"/>
         </GRID>
+        <GRID name="DGrid" contextType="Globus">
+            <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/d-grid/certificates/"/>
+            <attribute name="UserCert" value="${user.home}/.jsaga/contexts/d-grid/usercert.pem"/>
+            <attribute name="UserKey" value="${user.home}/.jsaga/contexts/d-grid/userkey.pem"/>
+            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/dgrid_cred.txt"/>
+            <domain name="de"/>
+        </GRID>
         <data type="gsiftp"/>
     </UNIVERSE>
     <GRID name="EGEE" contextType="MyProxy">
