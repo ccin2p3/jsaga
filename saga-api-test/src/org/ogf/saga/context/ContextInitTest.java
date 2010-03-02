@@ -58,6 +58,7 @@ public abstract class ContextInitTest extends AbstractTest {
                     System.out.println(prompt);
                     BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
                     userpass = in.readLine();
+                    System.out.println("Continuing...");
                 }
                 if (userpass==null || userpass.trim().length()==0) {
                     fail("Test aborted by tester");
