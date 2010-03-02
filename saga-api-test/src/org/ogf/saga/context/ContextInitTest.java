@@ -51,9 +51,11 @@ public abstract class ContextInitTest extends AbstractTest {
             String userpass = super.getOptionalProperty(m_contextId, Context.USERPASS);
             if (userpass == null) {
                 // prompt for UserPass
+                final String prompt = "Please enter UserPass (WARNING: clear text!)";
                 try {
-                    userpass = JOptionPane.showInputDialog("Please enter UserPass (WARNING: clear text!)");
+                    userpass = JOptionPane.showInputDialog(prompt);
                 } catch (HeadlessException e) {
+                    System.out.println(prompt);
                     BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
                     userpass = in.readLine();
                 }
