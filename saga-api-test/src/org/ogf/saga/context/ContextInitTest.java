@@ -3,6 +3,9 @@ package org.ogf.saga.context;
 import org.ogf.saga.AbstractTest;
 
 import javax.swing.*;
+import java.awt.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -48,7 +51,12 @@ public abstract class ContextInitTest extends AbstractTest {
             String userpass = super.getOptionalProperty(m_contextId, Context.USERPASS);
             if (userpass == null) {
                 // prompt for UserPass
-                userpass = JOptionPane.showInputDialog("Please enter UserPass (WARNING: clear text!)");
+                try {
+                    userpass = JOptionPane.showInputDialog("Please enter UserPass (WARNING: clear text!)");
+                } catch (HeadlessException e) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+                    userpass = in.readLine();
+                }
                 if (userpass==null || userpass.trim().length()==0) {
                     fail("Test aborted by tester");
                 }
