@@ -1,2 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<UNIVERSE name="World" xmlns="http://www.in2p3.fr/jsaga"/>
+<UNIVERSE name="World" xmlns="http://www.in2p3.fr/jsaga">
+    <GRID name="DGrid" contextType="Globus">
+        <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/d-grid/certificates/"/>
+        <attribute name="UserCert" value="${user.home}/.jsaga/contexts/d-grid/usercert.pem"/>
+        <attribute name="UserKey" value="${user.home}/.jsaga/contexts/d-grid/userkey.pem"/>
+        <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/dgrid_cred.txt"/>
+        <domain name="de"/>
+    </GRID>
+</UNIVERSE>
