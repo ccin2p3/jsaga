@@ -16,6 +16,6 @@ import org.ogf.saga.context.ContextInitTest;
  */
 public class GlobusContextInit extends ContextInitTest {
     public GlobusContextInit() throws Exception {
-        super("Test_Globus");
+        super("DGrid");
     }
 }
