@@ -4,8 +4,6 @@ import org.ogf.saga.AbstractTest;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -55,10 +53,10 @@ public abstract class ContextInitTest extends AbstractTest {
                 try {
                     userpass = JOptionPane.showInputDialog(prompt);
                 } catch (HeadlessException e) {
-                    System.out.println(prompt);
-                    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-                    userpass = in.readLine();
-                    System.out.println("Continuing...");
+                    userpass = System.getProperty("userpass");
+                    if (userpass == null) {
+                        throw e;
+                    }
                 }
                 if (userpass==null || userpass.trim().length()==0) {
                     fail("Test aborted by tester");
