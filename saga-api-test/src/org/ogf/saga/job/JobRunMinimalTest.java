@@ -1,5 +1,6 @@
 package org.ogf.saga.job;
 
+import org.apache.log4j.Logger;
 import org.ogf.saga.job.abstracts.AbstractJobTest;
 import org.ogf.saga.task.State;
 
@@ -18,6 +19,7 @@ import org.ogf.saga.task.State;
  *
  */
 public abstract class JobRunMinimalTest extends AbstractJobTest {
+    private Logger logger = Logger.getLogger(this.getClass());
     
     protected JobRunMinimalTest(String jobprotocol) throws Exception {
         super(jobprotocol);
@@ -33,9 +35,11 @@ public abstract class JobRunMinimalTest extends AbstractJobTest {
     	
         // submit
         Job job = runJob(desc);
+        logger.info(job.getAttribute(Job.JOBID));   // for detecting hang in run()
 
         // wait for the END
         job.waitFor();
+        logger.info("Job finished.");               // for detecting hang in waitFor()
 
         // check job status
         assertEquals(
