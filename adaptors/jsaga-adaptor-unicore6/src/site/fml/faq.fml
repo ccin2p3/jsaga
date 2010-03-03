@@ -15,7 +15,7 @@
     <part id="execution">
         <title>Execution management</title>
         <faq id="windows">
-            <question>How to install Unicore 6.1.0 on Windows ? (or how to fix "No factory available for 'Bash shell'" ?)</question>
+            <question>How to install Unicore 6.1.0 on Windows ?</question>
             <answer>
                 <ul>
                     <li>Install cygwin</li>
@@ -38,6 +38,10 @@
                     </li>
                 </ul>
             </answer>
+        </faq>
+        <faq id="no-bash-shell">
+            <question>What should I do with error message: "No factory available for 'Bash shell'" ?</question>
+            <answer>Unicore 6.2+ running on Windows is not supported (workaround for 6.1 does not work anymore).</answer>
         </faq>
     </part>
 </faqs>
