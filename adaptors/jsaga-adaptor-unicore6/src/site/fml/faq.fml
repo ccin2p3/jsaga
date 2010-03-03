@@ -15,26 +15,26 @@
     <part id="execution">
         <title>Execution management</title>
         <faq id="windows">
-            <question>How to install Unicore 6.1.0 on Windows ?</question>
+            <question>How to install Unicore 6.1.0 on Windows ? (or how to fix "No factory available for 'Bash shell'" ?)</question>
             <answer>
                 <ul>
                     <li>Install cygwin</li>
                     <li>Install the core server bundle of Unicore 6.1.0</li>
                     <li>Edit file "unicorex/conf/simpleidb" to set path to cygwin bash
-                        <pre><![CDATA[<!-- DO NOT REMOVE (workaround for fml) -->  &lt;!-- Bash shell --&gt;
-  &lt;idb:IDBApplication&gt;
-    &lt;idb:ApplicationName&gt;Bash shell&lt;/idb:ApplicationName&gt;
-    &lt;idb:ApplicationVersion&gt;3.1.16&lt;/idb:ApplicationVersion&gt;
-    &lt;jsdl:POSIXApplication xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix"&gt;
-      &lt;!-- To comment : &lt;jsdl:Executable&gt;/bin/bash&lt;/jsdl:Executable&gt; --&gt;
-      &lt;!-- Set path to cygwin bash : --&gt;
-      &lt;jsdl:Executable&gt;C:\cygwin\bin\bash&lt;/jsdl:Executable&gt;
-      &lt;jsdl:Argument&gt;--debugger$DEBUG?&lt;/jsdl:Argument&gt;
-      &lt;jsdl:Argument&gt;-v$VERBOSE?&lt;/jsdl:Argument&gt;
-      &lt;jsdl:Argument&gt;$ARGUMENTS?&lt;/jsdl:Argument&gt;
-      &lt;jsdl:Argument&gt;$SOURCE?&lt;/jsdl:Argument&gt;
-    &lt;/jsdl:POSIXApplication&gt;
-  &lt;/idb:IDBApplication&gt;]]></pre>
+                        <pre><![CDATA[<!-- DO NOT REMOVE (workaround for fml) -->  <!-- Bash shell -->
+  <idb:IDBApplication>
+    <idb:ApplicationName>Bash shell</idb:ApplicationName>
+    <idb:ApplicationVersion>3.1.16</idb:ApplicationVersion>
+    <jsdl:POSIXApplication xmlns:jsdl="http://schemas.ggf.org/jsdl/2005/11/jsdl-posix">
+      <!-- To comment : <jsdl:Executable>/bin/bash</jsdl:Executable> -->
+      <!-- Set path to cygwin bash : -->
+      <jsdl:Executable>C:\cygwin\bin\bash</jsdl:Executable>
+      <jsdl:Argument>--debugger$DEBUG?</jsdl:Argument>
+      <jsdl:Argument>-v$VERBOSE?</jsdl:Argument>
+      <jsdl:Argument>$ARGUMENTS?</jsdl:Argument>
+      <jsdl:Argument>$SOURCE?</jsdl:Argument>
+    </jsdl:POSIXApplication>
+  </idb:IDBApplication>]]></pre>
                     </li>
                 </ul>
             </answer>

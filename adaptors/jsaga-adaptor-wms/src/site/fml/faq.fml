@@ -25,17 +25,17 @@
         <faq id="jdl">
             <question>How can I pass JDL atttributes that are not supported by JSDL ?</question>
             <answer>Put unsupported attributes into a &lt;Extension&gt; element.
-                <pre><![CDATA[<!-- DO NOT REMOVE (workaround for fml) -->&lt;JobDefinition xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl"&gt;
-    &lt;!-- Your job description here... --&gt;
-    &lt;ext:Extension language="JDL" xmlns:ext="http://www.in2p3.fr/jsdl-extension"&gt;
+                <pre><![CDATA[<!-- DO NOT REMOVE (workaround for fml) --><JobDefinition xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl">
+    <!-- Your job description here... -->
+    <ext:Extension language="JDL" xmlns:ext="http://www.in2p3.fr/jsdl-extension">
 MyProxyServer = "skurut.cesnet.cz";
 UserTags = [
     color = "red";
     position = "12";
     prodId = "cms_1234";
 ];
-    &lt;/ext:Extension&gt;
-&lt;/JobDefinition&gt;]]></pre>
+    </ext:Extension>
+</JobDefinition>]]></pre>
             </answer>
         </faq>
     </part>
