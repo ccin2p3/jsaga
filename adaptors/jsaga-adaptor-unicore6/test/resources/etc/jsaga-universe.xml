@@ -2,7 +2,7 @@
 <UNIVERSE name="World" xmlns="http://www.in2p3.fr/jsaga">
     <GRID name="Demo_User" contextType="JKS">
         <attribute name="Keystore" value="${user.home}/.jsaga/contexts/unicore6/demouser.jks"/>
-        <attribute name="KeystorePass" value="demouser"/>
+        <attribute name="KeystorePass" value="the!user"/>
     </GRID>
     <GRID name="DGrid" contextType="Globus">
         <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/d-grid/certificates/"/>
