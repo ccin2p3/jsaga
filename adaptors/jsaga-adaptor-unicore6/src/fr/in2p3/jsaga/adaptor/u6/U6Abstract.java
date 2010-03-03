@@ -101,7 +101,12 @@ public class U6Abstract {
     		}
     		
     		RegistryClient registry = m_securityManager.getRegistryClient(m_serverUrl);
-			List<TargetSystemFactoryClient> targetSystemFactories = registry.getTargetSystemFactories();
+			List<TargetSystemFactoryClient> targetSystemFactories;
+            try {
+                targetSystemFactories = registry.getTargetSystemFactories();
+            } catch (NullPointerException e) {
+                throw new NoSuccessException("Server not found: "+m_serverUrl, e);
+            }
 	        
         	// Loop through all the available target system factories and
 	        for (TargetSystemFactoryClient targetSystemFactory : targetSystemFactories) {
