@@ -41,6 +41,7 @@ public class WSGramExecutionTestSuite extends JSAGATestSuite {
     // test cases
     public static class WSGramJobRunRequiredTest extends JobRunRequiredTest {
         public WSGramJobRunRequiredTest() throws Exception {super("wsgram");}
+        public void test_run_error() { super.ignore("not supported (final state is DONE instead of FAILED)"); }
      }
     
     // test cases
