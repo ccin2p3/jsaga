@@ -34,6 +34,11 @@
             <attribute name="UserKey" value="${user.home}/.jsaga/contexts/d-grid/userkey.pem"/>
             <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/dgrid_cred.txt"/>
             <domain name="de"/>
+            <job type="lcgce"/>
+            <job type="gatekeeper">
+                <!--<attribute name="IPAddress" value="134.158.71.193"/>-->
+                <attribute name="TcpPortRange" value="30000,31000"/>
+            </job>
         </GRID>
         <data type="gsiftp"/>
     </UNIVERSE>
