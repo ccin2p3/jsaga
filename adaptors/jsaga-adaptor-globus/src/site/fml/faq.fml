@@ -34,13 +34,13 @@ if test $? -eq 0 ; then mv userkey.new userkey.pem ; fi</pre>
                 <pre>HASH=`openssl x509 -hash -noout -in ca.crt`
 mv ca.crt $HASH.0
 chmod 664 $HASH.0</pre>
-                <pre>DN=`openssl x509 -noout -subject -in $HASH.0 | cut -c 10-`
-cat &lt;&lt; EOF &gt; $HASH.signing_policy
+                <pre><![CDATA[DN=`openssl x509 -noout -subject -in $HASH.0 | cut -c 10-`
+cat << EOF > $HASH.signing_policy
 access_id_CA      X509          '$DN'
 pos_rights        globus        CA:sign
 cond_subjects     globus        '"/*"'
 EOF
-chmod 664 $HASH.signing_policy</pre>
+chmod 664 $HASH.signing_policy]]></pre>
             </answer>
         </faq>
     </part>
