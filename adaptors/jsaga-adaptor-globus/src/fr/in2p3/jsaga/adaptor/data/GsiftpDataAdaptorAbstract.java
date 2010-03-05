@@ -16,6 +16,7 @@ import org.globus.gsi.gssapi.GlobusGSSException;
 import org.globus.gsi.gssapi.auth.HostAuthorization;
 import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.*;
+import org.ogf.saga.error.NotImplementedException;
 
 import java.io.*;
 import java.util.Map;
@@ -154,7 +155,14 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
 
     public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite, String additionalArgs) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         // connect to peer server
-        GsiftpDataAdaptorAbstract targetAdaptor = new Gsiftp1DataAdaptor();
+        GsiftpDataAdaptorAbstract targetAdaptor;
+        String type = this.getType();
+        if ("gsiftp-v1".equals(type))           targetAdaptor = new Gsiftp1DataAdaptor();
+        else if ("gsiftp-v2".equals(type))      targetAdaptor = new Gsiftp2DataAdaptor();
+        else if ("gsiftp-win".equals(type))     targetAdaptor = new GsiftpWinDataAdaptor();
+        else if ("gsiftp-dcache".equals(type))  targetAdaptor = new GsiftpDCacheDataAdaptor();
+        else if ("gsiftp-dpm".equals(type))     throw new NoSuccessException("Third-party transfer not implemented for protocol: "+type);
+        else                                    throw new NoSuccessException("[INTERNAL ERROR] Unexpected protocol: "+type);
         targetAdaptor.m_credential = m_credential;
         targetAdaptor.connect(null, targetHost, targetPort, null, null);
 
