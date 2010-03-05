@@ -44,4 +44,13 @@ chmod 664 $HASH.signing_policy</pre>
             </answer>
         </faq>
     </part>
+    <part id="job">
+        <title>Globus Gatekeeper</title>
+        <faq id="hang">
+            <question>My job is done but waitFor hangs.</question>
+            <answer>Open firewall ports range "40000,45000" or configure attribute "TcpPortRange" to a range of opened ports.
+                If you can not open ports, you can still use the "lcgce" plug-in instead, but with some limitations.
+            </answer>
+        </faq>
+    </part>
 </faqs>
