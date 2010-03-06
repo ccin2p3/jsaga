@@ -20,7 +20,7 @@
         <DataStaging name="OUTPUT">
             <FileName>file2.txt</FileName>
             <CreationFlag>overwrite</CreationFlag>
-            <Target><URI>file://./jsaga-engine/config/var/test_sandbox.txt</URI></Target>
+            <Target><URI>file://./test_sandbox.txt</URI></Target>
             <ext:Sandbox>true</ext:Sandbox>
         </DataStaging>
     </JobDescription>

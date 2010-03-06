@@ -44,7 +44,7 @@ public class PasswordEncrypterSingleton extends PasswordAbstract {
         m_key = new SecretKeySpec(rawKey, ALGORITHM);
 
         // store it
-        File keystoreFile = PasswordAbstract.getFile();
+        File keystoreFile = PasswordAbstract.KEYSTORE_FILE;
         m_keystore.setKeyEntry(keyalias, m_key, m_keypass, null);
         m_keystore.store(new FileOutputStream(keystoreFile), m_storepass);
     }

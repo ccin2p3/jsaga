@@ -10,7 +10,6 @@
             <outputDirectory/>
             <directory>config</directory>
             <excludes>
-                <exclude>var/**</exclude>
                 <exclude>bin/template.bat</exclude>
                 <exclude>bin/template.sh</exclude>
             </excludes>

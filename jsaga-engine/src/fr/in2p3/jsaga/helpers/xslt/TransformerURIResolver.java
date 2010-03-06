@@ -28,6 +28,8 @@ public class TransformerURIResolver implements URIResolver {
             } catch (Exception e) {
                 throw new TransformerException(e);
             }
+        } else if (href.startsWith("var/")) {
+            return new StreamSource(new File(Base.JSAGA_VAR, href.substring(4)));
         } else {
             return new StreamSource(new File(Base.JSAGA_HOME, href));
         }

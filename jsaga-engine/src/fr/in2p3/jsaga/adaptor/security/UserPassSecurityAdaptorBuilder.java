@@ -74,7 +74,7 @@ public class UserPassSecurityAdaptorBuilder implements ExpirableSecurityAdaptorB
                     int expiryDate = PasswordEncrypterSingleton.getExpiryDate(lifetime);
 
                     // write to user properties file
-                    File propFile = FilePropertiesAttributesParser.getFile();
+                    File propFile = FilePropertiesAttributesParser.FILE;
                     Properties prop = new Properties();
                     if (propFile.exists()) {
                         prop.load(new FileInputStream(propFile));
@@ -121,7 +121,7 @@ public class UserPassSecurityAdaptorBuilder implements ExpirableSecurityAdaptorB
     }
 
     public void destroySecurityAdaptor(Map attributes, String contextId) throws Exception {
-        File propFile = FilePropertiesAttributesParser.getFile();
+        File propFile = FilePropertiesAttributesParser.FILE;
         Properties prop = new Properties();
         prop.load(new FileInputStream(propFile));
         prop.remove(contextId+"."+USERPASSCRYPTED);

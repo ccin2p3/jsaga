@@ -17,7 +17,7 @@
         <DataStaging name="OUTPUT">
             <FileName>file2.txt</FileName>
             <CreationFlag>overwrite</CreationFlag>
-            <Target><URI>file://./jsaga-engine/config/var/test_staging.txt</URI></Target>
+            <Target><URI>file://./test_staging.txt</URI></Target>
         </DataStaging>
     </JobDescription>
 </JobDefinition>

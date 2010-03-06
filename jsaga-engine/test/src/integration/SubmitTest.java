@@ -42,7 +42,7 @@ public class SubmitTest extends AbstractSubmitTest {
 //        super.checkSubmit(new URL[]{URLFactory.createURL("gatekeeper://localhost:2119/CN=Sylvain Reynaud/E=sreynaud@in2p3.fr")});
 //        super.checkSubmit(new URL[]{URLFactory.createURL("ssh://localhost:22")});
         super.checkSubmit(new URL[]{URLFactory.createURL("local:/")});
-        URL expected = URLFactory.createURL("file://./jsaga-engine/config/var/"+this.getName()+".txt");
+        URL expected = URLFactory.createURL("file://./"+this.getName()+".txt");
         File file = FileFactory.createFile(expected);
         assertTrue(file.isEntry());
         assertTrue(file.getSize() > 0);
@@ -51,7 +51,7 @@ public class SubmitTest extends AbstractSubmitTest {
     /** fixme: does not work [IncorrectState: Can not listen to job in 'New' state] */
     public void test_sandbox() throws Exception {
         super.checkSubmit(new URL[]{URLFactory.createURL("local:/")});
-        URL expected = URLFactory.createURL("file://./jsaga-engine/config/var/"+this.getName()+".txt");
+        URL expected = URLFactory.createURL("file://./"+this.getName()+".txt");
         File file = FileFactory.createFile(expected);
         assertTrue(file.isEntry());
         assertTrue(file.getSize() > 0);
