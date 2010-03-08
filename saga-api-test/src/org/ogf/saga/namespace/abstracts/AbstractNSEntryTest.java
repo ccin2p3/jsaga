@@ -74,6 +74,7 @@ public abstract class AbstractNSEntryTest extends AbstractTest {
         super.setUp();
         try {
             // read-write protocol
+            m_toBeRemoved = true;
             m_dir = NSFactory.createNSDirectory(m_session, m_dirUrl, FLAGS_DIR);
             m_file = m_dir.open(m_fileUrl, FLAGS_FILE);
             if (m_file instanceof File) {
@@ -86,13 +87,12 @@ public abstract class AbstractNSEntryTest extends AbstractTest {
                 ((LogicalFile)m_file).addLocation(m_physicalFileUrl);
             }
             m_file.close();
-            m_toBeRemoved = true;
         } catch(NotImplementedException e) {
             // read-only protocol
+            m_toBeRemoved = false;
             try {
                 m_dir = NSFactory.createNSDirectory(m_session, m_dirUrl, Flags.NONE.getValue());
                 m_file = m_dir.open(m_fileUrl, Flags.NONE.getValue());
-                m_toBeRemoved = false;
             } catch(DoesNotExistException e2) {
                 throw new DoesNotExistException("Please create the expected files and directories for test suite (http://grid.in2p3.fr/jsaga-dev/faq.html#create-test-entries)", e2);
             }
