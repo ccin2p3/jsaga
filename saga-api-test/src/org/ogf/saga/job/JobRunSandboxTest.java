@@ -162,22 +162,22 @@ public abstract class JobRunSandboxTest extends AbstractJobTest {
             InputStream in = new FileInputStream(file);
             int len = in.read(buffer);
             in.close();
-            if (len > -1) {
-                return new String(buffer, 0, len);
-            } else {
-                throw new Exception("File is empty: "+file);
-            }
+
+            // check not empty
+            boolean isNotEmpty = (len > -1);
+            assertTrue("File is empty: "+file, isNotEmpty);
+            return new String(buffer, 0, len);
         } else if (location instanceof URI) {
             URI uri = (URI) location;
             Buffer buffer = BufferFactory.createBuffer(BUFFER_SIZE);
             org.ogf.saga.file.File file = FileFactory.createFile(m_session, URLFactory.createURL(uri.toString()), Flags.READ.getValue());
             int len = file.read(buffer);
             file.close();
-            if (len > -1) {
-                return new String(buffer.getData(), 0, len);
-            } else {
-                throw new Exception("File is empty: "+uri);
-            }
+
+            // check not empty
+            boolean isNotEmpty = (len > -1);
+            assertTrue("File is empty: "+uri, isNotEmpty);
+            return new String(buffer.getData(), 0, len);
         } else {
             throw new Exception("Unexpected class: "+location.getClass());
         }
