@@ -16,7 +16,9 @@
             <attribute name="RetryCount" value="0"/>
             <attribute name="PerusalFileEnable" value="false"/>
             <attribute name="MyProxyServer" value="myproxy.cern.ch"/>
-            <attribute name="OutputStorage" value="${java.io.tmpdir}/sandbox"/>
+
+            <!-- WARNING: attribute OutputStorage is suppported but it is incompatible with SAGA -->
+            <!--<attribute name="OutputStorage" value="${java.io.tmpdir}/sandbox"/>-->
         </job>
     </GRID>
 </UNIVERSE>
