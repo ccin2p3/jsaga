@@ -22,6 +22,7 @@ public class DataStagingDescription {
     private DataStagingList m_stagingList;
     private String m_executable;
     private String[] m_arguments;
+    private StringBuffer m_redirections;
 
     public DataStagingDescription(JobDescription jobDesc, String[] supportedProtocolsArray) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         // get supported protocols
@@ -68,37 +69,44 @@ public class DataStagingDescription {
                 if (hasAttribute(jobDesc, JobDescription.INTERACTIVE) && "true".equalsIgnoreCase(jobDesc.getAttribute(JobDescription.INTERACTIVE))) {
                     throw new BadParameterException("Option "+JobDescription.FILETRANSFER+" can not be used with option "+JobDescription.INTERACTIVE);
                 }
-/* todo: remove this code when INPUT/OUTPUT/ERROR will be managed as described in JSDL specification
-                if (hasAttribute(jobDesc, JobDescription.INPUT)) {
-                    throw new BadParameterException("Option "+JobDescription.FILETRANSFER+" can not be used with option "+JobDescription.INPUT);
-                }
-                if (m_stagingList.needsStdout()) {
-                    if (hasAttribute(jobDesc, JobDescription.OUTPUT)) {
-                        throw new BadParameterException("Option "+JobDescription.FILETRANSFER+" can not be used with option "+JobDescription.OUTPUT);
-                    }
-                    if (hasAttribute(jobDesc, JobDescription.ERROR)) {
-                        throw new BadParameterException("Option "+JobDescription.FILETRANSFER+" can not be used with option "+JobDescription.ERROR);
-                    }
-                }
-*/
 
-                // save old jobDesc attributes
+                // clone jobDesc and modify clone
+                JobDescription newJobDesc = (JobDescription) jobDesc.clone();
+                newJobDesc.setAttribute(JobDescription.INTERACTIVE, "true");
+
                 m_executable = jobDesc.getAttribute(JobDescription.EXECUTABLE);
+                newJobDesc.setAttribute(JobDescription.EXECUTABLE, "/bin/sh");
                 try {
                     m_arguments = jobDesc.getVectorAttribute(JobDescription.ARGUMENTS);
+                    newJobDesc.removeAttribute(JobDescription.ARGUMENTS);
                 } catch (DoesNotExistException e) {
                     m_arguments = null;
                 }
-
-                // clone jobDesc
-                JobDescription newJobDesc = (JobDescription) jobDesc.clone();
-
-                // modify newJobDesc
-                newJobDesc.setAttribute(JobDescription.EXECUTABLE, "/bin/sh");
-                if (m_arguments != null) {
-                    newJobDesc.removeAttribute(JobDescription.ARGUMENTS);
+                m_redirections = new StringBuffer();
+                try {
+                    String input = jobDesc.getAttribute(JobDescription.INPUT);
+                    newJobDesc.removeAttribute(JobDescription.INPUT);
+                    m_redirections.append(" <");
+                    m_redirections.append(input);
+                } catch (DoesNotExistException e) {
+                    // ignore
                 }
-                newJobDesc.setAttribute(JobDescription.INTERACTIVE, "true");
+                try {
+                    String output = jobDesc.getAttribute(JobDescription.OUTPUT);
+                    newJobDesc.removeAttribute(JobDescription.OUTPUT);
+                    m_redirections.append(" >");
+                    m_redirections.append(output);
+                } catch (DoesNotExistException e) {
+                    // ignore
+                }
+                try {
+                    String error = jobDesc.getAttribute(JobDescription.ERROR);
+                    newJobDesc.removeAttribute(JobDescription.ERROR);
+                    m_redirections.append(" 2>");
+                    m_redirections.append(error);
+                } catch (DoesNotExistException e) {
+                    // ignore
+                }
 
                 // uncomment this to enable debugging job wrapper script
 //                newJobDesc.setAttribute(JobDescription.EXECUTABLE, "/usr/bin/cat");
@@ -119,7 +127,7 @@ public class DataStagingDescription {
     }
 
     public void preStaging(AbstractSyncJobImpl job) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
-        m_stagingList.preStaging(job, m_executable, m_arguments);
+        m_stagingList.preStaging(job, m_executable, m_arguments, m_redirections.toString());
     }
 
     public void postStaging(AbstractSyncJobImpl job) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {

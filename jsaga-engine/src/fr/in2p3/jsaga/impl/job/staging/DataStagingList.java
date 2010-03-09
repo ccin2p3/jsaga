@@ -55,7 +55,7 @@ public class DataStagingList {
         return !m_outputFromWorker.isEmpty();
     }
 
-    public void preStaging(AbstractSyncJobImpl job, String executable, String[] arguments) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+    public void preStaging(AbstractSyncJobImpl job, String executable, String[] arguments, String redirections) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         // may create script
         if (this.needsStdin()) {
             // open
@@ -81,7 +81,7 @@ public class DataStagingList {
 
             // invoke command
             stdin.println("set -- "+StringArray.arrayToString(arguments, " "));
-            stdin.println(executable+" $*");
+            stdin.println(executable+" $*"+redirections);
             stdin.println();
 
             // for each outputFromWorker
