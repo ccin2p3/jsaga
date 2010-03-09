@@ -64,6 +64,7 @@ public class DataStagingDescription {
 
     public JobDescription modifyJobDescription(JobDescription jobDesc) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         try {
+            m_redirections = new StringBuffer();
             if (m_stagingList.needsStdin()) {
                 // check
                 if (hasAttribute(jobDesc, JobDescription.INTERACTIVE) && "true".equalsIgnoreCase(jobDesc.getAttribute(JobDescription.INTERACTIVE))) {
@@ -82,7 +83,6 @@ public class DataStagingDescription {
                 } catch (DoesNotExistException e) {
                     m_arguments = null;
                 }
-                m_redirections = new StringBuffer();
                 try {
                     String input = jobDesc.getAttribute(JobDescription.INPUT);
                     newJobDesc.removeAttribute(JobDescription.INPUT);
