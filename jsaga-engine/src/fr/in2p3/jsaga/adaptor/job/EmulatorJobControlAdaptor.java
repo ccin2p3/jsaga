@@ -47,12 +47,10 @@ public class EmulatorJobControlAdaptor extends EmulatorJobAdaptorAbstract implem
         // create id
         String nativeJobId = UUID.randomUUID().toString();
 
-        // get total CPU time
-        String totalCPUTime;
+        // parse job description
+        Properties prop = new Properties();
         try {
-            Properties prop = new Properties();
             prop.load(new ByteArrayInputStream(jobDesc.getBytes()));
-            totalCPUTime = prop.getProperty(JobDescription.TOTALCPUTIME);
         } catch (IOException e) {
             throw new NoSuccessException(e);
         }
@@ -60,6 +58,7 @@ public class EmulatorJobControlAdaptor extends EmulatorJobAdaptorAbstract implem
         // set end time
         long endTime;
         try {
+            String totalCPUTime = prop.getProperty(JobDescription.TOTALCPUTIME);
             long duration = Long.parseLong(totalCPUTime) * 1000;
             endTime = System.currentTimeMillis() + duration;
         } catch (NumberFormatException e) {
