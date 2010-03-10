@@ -10,8 +10,7 @@ import fr.in2p3.jsaga.helpers.xslt.XSLTransformerFactory;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import fr.in2p3.jsaga.impl.job.description.AbstractJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.job.instance.JobImpl;
-import fr.in2p3.jsaga.impl.job.staging.mgr.DataStagingManager;
-import fr.in2p3.jsaga.impl.job.staging.mgr.DataStagingManagerFactory;
+import fr.in2p3.jsaga.impl.job.staging.mgr.*;
 import fr.in2p3.jsaga.sync.job.SyncJobService;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
@@ -65,7 +64,7 @@ public abstract class AbstractSyncJobServiceImpl extends AbstractSagaObjectImpl 
         String uniqId = ""+System.currentTimeMillis();
 
         // may modify jobDesc
-        DataStagingManager stagingMgr = DataStagingManagerFactory.create(m_controlAdaptor, jobDesc);
+        DataStagingManager stagingMgr = DataStagingManagerFactory.create(m_controlAdaptor, jobDesc, uniqId);
         jobDesc = stagingMgr.modifyJobDescription(jobDesc);
 
         // get JSDL
@@ -88,6 +87,12 @@ public abstract class AbstractSyncJobServiceImpl extends AbstractSagaObjectImpl 
                     parameters.putAll(p);
                 }
                 parameters.put("UniqId", uniqId);
+                if (stagingMgr instanceof DataStagingManagerDelegated) {
+                    URL intermediaryURL = ((DataStagingManagerDelegated)stagingMgr).getIntermediaryURL();
+                    if (intermediaryURL != null) {
+                        parameters.put("IntermediaryURL", intermediaryURL.toString());
+                    }
+                }
 
                 // translate
                 XSLTransformer transformer = XSLTransformerFactory.getInstance().getCached(stylesheet, parameters);

@@ -59,6 +59,10 @@ public class OutputDataStagingFromWorker extends AbstractDataStagingWorker {
         stdin.println("rm -f "+m_workerPath);
     }
 
+    public boolean isInput() {
+        return OUTPUT;
+    }
+
     private static byte[] uudecode(BufferedReader reader) throws NoSuccessException {
         try {
             for (String line; (line=reader.readLine())!=null && !line.startsWith("begin-base64"); );

@@ -24,4 +24,8 @@ public class OutputDataStagingFromRemote extends AbstractDataStagingRemote {
     public void postStaging(Session session) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         super.copy(session, m_workerURL, m_localURL);
     }
+
+    public boolean isInput() {
+        return OUTPUT;
+    }
 }

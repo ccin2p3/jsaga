@@ -15,6 +15,9 @@ import org.ogf.saga.url.URL;
  *
  */
 public abstract class AbstractDataStaging {
+    protected static final boolean INPUT = true;
+    protected static final boolean OUTPUT = false;
+
     protected URL m_localURL;
     protected boolean m_append;
 
@@ -23,9 +26,14 @@ public abstract class AbstractDataStaging {
         m_append = append;
     }
 
+    public boolean isSubdirOf(URL baseURL) {
+        return m_localURL.toString().startsWith(baseURL.toString()+"/");
+    }
+
     public String getLocalProtocol() {
         return m_localURL.getScheme();
     }
 
     public abstract String getWorkerProtocol();
+    public abstract boolean isInput();
 }

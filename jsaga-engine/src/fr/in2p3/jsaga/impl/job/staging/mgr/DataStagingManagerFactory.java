@@ -19,7 +19,7 @@ import org.ogf.saga.job.JobDescription;
  *
  */
 public class DataStagingManagerFactory {
-    public static DataStagingManager create(JobControlAdaptor adaptor, JobDescription jobDesc) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+    public static DataStagingManager create(JobControlAdaptor adaptor, JobDescription jobDesc, String uniqId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         // get FileTransfer
         String[] fileTransfer;
         try {
@@ -32,7 +32,7 @@ public class DataStagingManagerFactory {
 
         // create data staging manager
         if (adaptor instanceof StagingJobAdaptor) {
-            return new DataStagingManagerDelegated(fileTransfer, (StagingJobAdaptor) adaptor);
+            return new DataStagingManagerDelegated(fileTransfer, (StagingJobAdaptor) adaptor, uniqId);
         } else if (adaptor instanceof StreamableJobAdaptor) {
             return new DataStagingManagerThroughStream(fileTransfer);
         } else {

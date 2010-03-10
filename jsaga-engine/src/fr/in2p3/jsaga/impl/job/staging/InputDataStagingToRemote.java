@@ -24,4 +24,8 @@ public class InputDataStagingToRemote extends AbstractDataStagingRemote {
     public void preStaging(Session session) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         super.copy(session, m_localURL, m_workerURL);
     }
+
+    public boolean isInput() {
+        return INPUT;
+    }
 }

@@ -76,6 +76,10 @@ public class InputDataStagingToWorker extends AbstractDataStagingWorker {
         stdin.println("rm -f "+m_workerPath);
     }
 
+    public boolean isInput() {
+        return INPUT;
+    }
+
     private static String encode(byte[] decoded) throws NoSuccessException {
         String encoded = new BASE64Encoder().encodeBuffer(decoded);
         return encoded.replaceAll("\r\n", "\n");
