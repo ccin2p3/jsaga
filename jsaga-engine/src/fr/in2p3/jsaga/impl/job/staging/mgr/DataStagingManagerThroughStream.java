@@ -65,7 +65,7 @@ public class DataStagingManagerThroughStream implements DataStagingManager {
             // clone jobDesc and modify clone
             JobDescription newJobDesc = (JobDescription) jobDesc.clone();
 
-            // remove transfers managed by engine from FileTransfer
+            // remove FileTransfer because it is not supported by plugin
             try {
                 newJobDesc.removeAttribute(JobDescription.FILETRANSFER);
             } catch (DoesNotExistException e) {
