@@ -4,6 +4,7 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.StagingJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
@@ -32,7 +33,7 @@ import java.util.regex.Pattern;
 /**
  *
  */
-public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements StreamableJobBatch, CleanableJobAdaptor {
+public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements StagingJobAdaptor, StreamableJobBatch, CleanableJobAdaptor {
     // parameters configured
     private static final String SSL_CA_FILES = "sslCAFiles";
 
@@ -109,37 +110,25 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         super.disconnect();
     }
 
-    public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
-        String stagingDir = "/tmp/"+uniqId;
-        if (jobDesc.contains("StdOutput") || jobDesc.contains("StdError")) {
-            GridFTPClient stagingClient = this.getStagingClient();
-            try {
-                stagingClient.makeDir(stagingDir);
-            } catch (Exception e) {
-                throw new NoSuccessException("Failed to create staging directory: "+stagingDir, e);
-            }
-        }
-        return this.doSubmit(jobDesc);
-    }
-
     private String m_stagingPrefix;
     public JobIOHandler submit(String jobDesc, boolean checkMatch, String uniqId, InputStream stdin) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         m_stagingPrefix = "/tmp/"+uniqId;
-        GridFTPClient stagingClient = this.getStagingClient();
-        String jobId = this.doSubmit(jobDesc);
-        return new CreamJobIOHandler(stagingClient, m_stagingPrefix, jobId);
-    }
 
-    private GridFTPClient getStagingClient() throws NoSuccessException {
+        // connect to gsiftp
+        GridFTPClient stagingClient;
         try {
-            GridFTPClient client = new GridFTPClient(m_creamStub.getURI().getHost(), 2811);
-            client.authenticate(m_credential);
-            return client;
+            stagingClient = new GridFTPClient(m_creamStub.getURI().getHost(), 2811);
+            stagingClient.authenticate(m_credential);
         } catch (Exception e) {
             throw new NoSuccessException("Failed to connect to GridFTP server: "+m_creamStub.getURI().getHost(), e);
         }
+
+        // submit
+        String jobId = this.submit(jobDesc, checkMatch, uniqId);
+        return new CreamJobIOHandler(stagingClient, m_stagingPrefix, jobId);
     }
-    private String doSubmit(String jobDesc) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+
+    public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
         // create job description
         JobDescription jd = new JobDescription();
         jd.setJDL(jobDesc);
@@ -233,6 +222,23 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
                 throw new NoSuccessException(message, fault);
             }
         }
+    }
+
+    public String[] getStagingProtocols() {
+        return new String[]{"gsiftp"};
+    }
+
+    public int getStagingSourceURIMode() {
+        return INTERMEDIARY_URI;
+    }
+
+    public int getStagingTargetURIMode() {
+        return ANY_URI;
+    }
+
+    public String getStagingIntermediaryBaseURL() {
+        String hostname = (String) m_parameters.get(HOST_NAME);
+        return "gsiftp://"+hostname+":2811/tmp";
     }
 
     public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {

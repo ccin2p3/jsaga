@@ -8,7 +8,8 @@
     <xsl:output method="text"/>
 
     <!-- JSAGA parameters -->
-    <xsl:param name="UniqId" select="'staging'"/>
+    <xsl:param name="UniqId">staging</xsl:param>
+    <xsl:param name="IntermediaryURL">uri://</xsl:param>
 
     <!-- Adaptor-specific parameters -->
     <xsl:param name="HostName"/>
@@ -63,25 +64,45 @@
   OutputSandboxBaseDestURI = "gsiftp://<xsl:value-of select="$HostName"/>/tmp/";
                 </xsl:when>
                 <xsl:otherwise>
+                    <xsl:for-each select="posix:Input">
+  StdInput = "<xsl:value-of select="text()"/>";<xsl:text/>
+                    </xsl:for-each>
                     <xsl:for-each select="posix:Output">
   StdOutput = "<xsl:value-of select="text()"/>";<xsl:text/>
                     </xsl:for-each>
                     <xsl:for-each select="posix:Error">
   StdError = "<xsl:value-of select="text()"/>";<xsl:text/>
                     </xsl:for-each>
-                    <xsl:if test="posix:Output | posix:Error">
-  OutputSandbox = {<xsl:text/>
-                        <xsl:for-each select="posix:Output | posix:Error">
-                            <xsl:text>"</xsl:text>
-                            <xsl:if test="position()>1">, </xsl:if>
-                            <xsl:value-of select="text()"/>
-                            <xsl:text>"</xsl:text>
-                        </xsl:for-each>};
-  OutputSandboxBaseDestURI = "gsiftp://<xsl:value-of select="$HostName"/>/tmp/<xsl:value-of select="$UniqId"/>/";
-                    </xsl:if>
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:for-each>
+        <xsl:if test="jsdl:DataStaging[jsdl:Source/jsdl:URI]">
+  InputSandbox = {<xsl:text/>
+            <xsl:for-each select="jsdl:DataStaging[jsdl:Source/jsdl:URI]/jsdl:FileName">
+                <xsl:text>"</xsl:text>
+                <xsl:if test="position()>1">, </xsl:if>
+                <xsl:value-of select="text()"/>
+                <xsl:text>"</xsl:text>
+            </xsl:for-each>};
+  InputSandboxBaseURI = "<xsl:value-of select="$IntermediaryURL"/>/";
+        </xsl:if>
+        <xsl:if test="jsdl:DataStaging[jsdl:Target/jsdl:URI]">
+  OutputSandbox = {<xsl:text/>
+            <xsl:for-each select="jsdl:DataStaging[jsdl:Target/jsdl:URI]/jsdl:FileName">
+                <xsl:text>"</xsl:text>
+                <xsl:if test="position()>1">, </xsl:if>
+                <xsl:value-of select="text()"/>
+                <xsl:text>"</xsl:text>
+            </xsl:for-each>};
+  OutputSandboxDestURI = {<xsl:text/>
+            <xsl:for-each select="jsdl:DataStaging/jsdl:Target/jsdl:URI">
+                <xsl:text>"</xsl:text>
+                <xsl:if test="position()>1">,
+                </xsl:if>
+                <xsl:value-of select="text()"/>
+                <xsl:text>"</xsl:text>
+            </xsl:for-each>};
+        </xsl:if>
 
 <!--  Requirements -->
   Requirements = true <xsl:text/>
