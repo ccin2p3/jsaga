@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.impl.job.instance;
 
 import fr.in2p3.jsaga.impl.job.service.AbstractSyncJobServiceImpl;
-import fr.in2p3.jsaga.impl.job.staging.DataStagingDescription;
+import fr.in2p3.jsaga.impl.job.staging.mgr.DataStagingManager;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.Job;
 import org.ogf.saga.job.JobDescription;
@@ -26,8 +26,8 @@ import java.io.OutputStream;
  */
 public class JobImpl extends AbstractAsyncJobImpl implements Job {
     /** constructor for submission */
-    public JobImpl(Session session, String nativeJobDesc, JobDescription jobDesc, DataStagingDescription stagingDesc, String uniqId, AbstractSyncJobServiceImpl service) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
-        super(session, nativeJobDesc, jobDesc, stagingDesc, uniqId, service);
+    public JobImpl(Session session, String nativeJobDesc, JobDescription jobDesc, DataStagingManager stagingMgr, String uniqId, AbstractSyncJobServiceImpl service) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+        super(session, nativeJobDesc, jobDesc, stagingMgr, uniqId, service);
     }
 
     /** constructor for control and monitoring only */

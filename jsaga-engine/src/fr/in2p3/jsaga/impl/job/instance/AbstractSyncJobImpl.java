@@ -10,7 +10,7 @@ import fr.in2p3.jsaga.engine.job.monitor.JobMonitorCallback;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
 import fr.in2p3.jsaga.impl.job.instance.stream.*;
 import fr.in2p3.jsaga.impl.job.service.AbstractSyncJobServiceImpl;
-import fr.in2p3.jsaga.impl.job.staging.DataStagingDescription;
+import fr.in2p3.jsaga.impl.job.staging.mgr.DataStagingManager;
 import fr.in2p3.jsaga.impl.permissions.AbstractJobPermissionsImpl;
 import fr.in2p3.jsaga.sync.job.SyncJob;
 import org.apache.log4j.Logger;
@@ -49,7 +49,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     private JobAttributes m_attributes;
     private JobMetrics m_metrics;
     private JobDescription m_jobDescription;
-    private DataStagingDescription m_stagingDescription;
+    private DataStagingManager m_stagingMgr;
     private String m_uniqId;
     private String m_nativeJobId;
     private JobIOHandler m_IOHandler;
@@ -58,11 +58,11 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     private Stdout m_stderr;
 
     /** constructor for submission */
-    protected AbstractSyncJobImpl(Session session, String nativeJobDesc, JobDescription jobDesc, DataStagingDescription stagingDesc, String uniqId, AbstractSyncJobServiceImpl service) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+    protected AbstractSyncJobImpl(Session session, String nativeJobDesc, JobDescription jobDesc, DataStagingManager stagingMgr, String uniqId, AbstractSyncJobServiceImpl service) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         this(session, service, true);
         m_attributes.m_NativeJobDescription.setObject(nativeJobDesc);
         m_jobDescription = jobDesc;
-        m_stagingDescription = stagingDesc;
+        m_stagingMgr = stagingMgr;
         m_uniqId = uniqId;
         m_nativeJobId = null;
     }
@@ -72,7 +72,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         this(session, service, false);
         m_attributes.m_NativeJobDescription.setObject(null);
         m_jobDescription = null;
-        m_stagingDescription = null;
+        m_stagingMgr = null;
         m_uniqId = null;
         m_nativeJobId = nativeJobId;
     }
@@ -100,7 +100,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         clone.m_controlAdaptor = m_controlAdaptor;
         clone.m_monitorService = m_monitorService;
         clone.m_jobDescription = m_jobDescription;
-        clone.m_stagingDescription = m_stagingDescription;
+        clone.m_stagingMgr = m_stagingMgr;
         clone.m_uniqId = m_uniqId;
         clone.m_nativeJobId = m_nativeJobId;
         clone.m_IOHandler = m_IOHandler;
@@ -118,7 +118,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         try {
             // pre-staging
             m_metrics.m_SubState.setValue(SubState.RUNNING_PRE_STAGING.toString());
-            m_stagingDescription.preStaging(this);
+            m_stagingMgr.preStaging(this);
 
             // submit
             String nativeJobDesc = m_attributes.m_NativeJobDescription.getObject();
@@ -265,12 +265,12 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         try {
             // post-staging
             if (isDone) {
-                m_stagingDescription.postStaging(this);
+                m_stagingMgr.postStaging(this);
             }
 
             // cleanup staged files
             if (this.isFinalState()) {
-                m_stagingDescription.cleanup(this);
+                m_stagingMgr.cleanup(this);
             }
         }
         catch (NotImplementedException e) {throw e;}

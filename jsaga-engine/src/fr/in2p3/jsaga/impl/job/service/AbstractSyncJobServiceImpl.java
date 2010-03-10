@@ -10,7 +10,8 @@ import fr.in2p3.jsaga.helpers.xslt.XSLTransformerFactory;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import fr.in2p3.jsaga.impl.job.description.AbstractJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.job.instance.JobImpl;
-import fr.in2p3.jsaga.impl.job.staging.DataStagingDescription;
+import fr.in2p3.jsaga.impl.job.staging.mgr.DataStagingManager;
+import fr.in2p3.jsaga.impl.job.staging.mgr.DataStagingManagerFactory;
 import fr.in2p3.jsaga.sync.job.SyncJobService;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
@@ -64,8 +65,8 @@ public abstract class AbstractSyncJobServiceImpl extends AbstractSagaObjectImpl 
         String uniqId = ""+System.currentTimeMillis();
 
         // may modify jobDesc
-        DataStagingDescription stagingDesc = new DataStagingDescription(jobDesc, m_controlAdaptor.getSupportedSandboxProtocols());
-        jobDesc = stagingDesc.modifyJobDescription(jobDesc);
+        DataStagingManager stagingMgr = DataStagingManagerFactory.create(m_controlAdaptor, jobDesc);
+        jobDesc = stagingMgr.modifyJobDescription(jobDesc);
 
         // get JSDL
         Element jsdlDOM;
@@ -102,7 +103,7 @@ public abstract class AbstractSyncJobServiceImpl extends AbstractSagaObjectImpl 
         }
 
         // returns
-        return new JobImpl(m_session, nativeJobDesc, jobDesc, stagingDesc, uniqId, this);
+        return new JobImpl(m_session, nativeJobDesc, jobDesc, stagingMgr, uniqId, this);
     }
 
     public Job runJobSync(String commandLine, String host, boolean interactive) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
