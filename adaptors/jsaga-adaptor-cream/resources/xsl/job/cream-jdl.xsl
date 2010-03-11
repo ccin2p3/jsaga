@@ -57,6 +57,7 @@
         <!-- streams -->
         <xsl:for-each select="jsdl:Application/posix:POSIXApplication">
             <xsl:choose>
+                <!-- TODO: enable Interactive + FileTransfer simultaneously -->
                 <xsl:when test="@name='interactive'">
   StdOutput = "<xsl:value-of select="$UniqId"/>-output.txt";
   StdError = "<xsl:value-of select="$UniqId"/>-error.txt";
