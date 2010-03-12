@@ -55,16 +55,14 @@
           </xsl:if>
 
         <!-- streams -->
-        <xsl:for-each select="jsdl:Application/posix:POSIXApplication">
-            <xsl:choose>
-                <!-- TODO: enable Interactive + FileTransfer simultaneously -->
-                <xsl:when test="@name='interactive'">
+        <xsl:variable name="isInteractive" select="jsdl:Application/posix:POSIXApplication/@name='interactive'"/>
+        <xsl:choose>
+            <xsl:when test="$isInteractive">
   StdOutput = "<xsl:value-of select="$UniqId"/>-output.txt";
   StdError = "<xsl:value-of select="$UniqId"/>-error.txt";
-  OutputSandbox = {"<xsl:value-of select="$UniqId"/>-output.txt","<xsl:value-of select="$UniqId"/>-error.txt"};
-  OutputSandboxBaseDestURI = "gsiftp://<xsl:value-of select="$HostName"/>/tmp/";
-                </xsl:when>
-                <xsl:otherwise>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:for-each select="jsdl:Application/posix:POSIXApplication">
                     <xsl:for-each select="posix:Input">
   StdInput = "<xsl:value-of select="text()"/>";<xsl:text/>
                     </xsl:for-each>
@@ -74,34 +72,36 @@
                     <xsl:for-each select="posix:Error">
   StdError = "<xsl:value-of select="text()"/>";<xsl:text/>
                     </xsl:for-each>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:for-each>
+                </xsl:for-each>
+            </xsl:otherwise>
+        </xsl:choose>
+
         <xsl:if test="jsdl:DataStaging[jsdl:Source/jsdl:URI]">
   InputSandbox = {<xsl:text/>
-            <xsl:for-each select="jsdl:DataStaging[jsdl:Source/jsdl:URI]/jsdl:FileName">
-                <xsl:text>"</xsl:text>
-                <xsl:if test="position()>1">, </xsl:if>
-                <xsl:value-of select="text()"/>
-                <xsl:text>"</xsl:text>
+            <xsl:for-each select="jsdl:DataStaging/jsdl:Source/jsdl:URI">
+                <xsl:if test="position()>1">,</xsl:if>
+                "<xsl:value-of select="text()"/>"<xsl:text/>
             </xsl:for-each>};
-  InputSandboxBaseURI = "<xsl:value-of select="$IntermediaryURL"/>/";
         </xsl:if>
-        <xsl:if test="jsdl:DataStaging[jsdl:Target/jsdl:URI]">
+
+        <xsl:if test="jsdl:DataStaging[jsdl:Target/jsdl:URI] or $isInteractive">
   OutputSandbox = {<xsl:text/>
+            <xsl:if test="$isInteractive">
+                "<xsl:value-of select="$UniqId"/>-output.txt",
+                "<xsl:value-of select="$UniqId"/>-error.txt"<xsl:text/>
+            </xsl:if>
             <xsl:for-each select="jsdl:DataStaging[jsdl:Target/jsdl:URI]/jsdl:FileName">
-                <xsl:text>"</xsl:text>
-                <xsl:if test="position()>1">, </xsl:if>
-                <xsl:value-of select="text()"/>
-                <xsl:text>"</xsl:text>
+                <xsl:if test="position()>1 or $isInteractive">,</xsl:if>
+                "<xsl:value-of select="text()"/>"<xsl:text/>
             </xsl:for-each>};
   OutputSandboxDestURI = {<xsl:text/>
+            <xsl:if test="$isInteractive">
+                "gsiftp://<xsl:value-of select="$HostName"/>/tmp/<xsl:value-of select="$UniqId"/>-output.txt",
+                "gsiftp://<xsl:value-of select="$HostName"/>/tmp/<xsl:value-of select="$UniqId"/>-error.txt"<xsl:text/>
+            </xsl:if>
             <xsl:for-each select="jsdl:DataStaging/jsdl:Target/jsdl:URI">
-                <xsl:text>"</xsl:text>
-                <xsl:if test="position()>1">,
-                </xsl:if>
-                <xsl:value-of select="text()"/>
-                <xsl:text>"</xsl:text>
+                <xsl:if test="position()>1 or $isInteractive">,</xsl:if>
+                "<xsl:value-of select="text()"/>"<xsl:text/>
             </xsl:for-each>};
         </xsl:if>
 
