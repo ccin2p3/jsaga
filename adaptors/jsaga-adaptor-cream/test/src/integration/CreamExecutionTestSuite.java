@@ -1,8 +1,8 @@
 package integration;
 
 import junit.framework.Test;
-import junit.framework.TestSuite;
 import org.ogf.saga.job.JobRunMinimalTest;
+import org.ogf.saga.job.JobRunSandboxTest;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -25,5 +25,9 @@ public class CreamExecutionTestSuite extends JSAGATestSuite {
     /** test cases */
     public static class CreamJobRunMinimalTest extends JobRunMinimalTest {
         public CreamJobRunMinimalTest() throws Exception {super("cream");}
+    }
+
+    public static class CreamJobRunSandboxTest extends JobRunSandboxTest {
+        public CreamJobRunSandboxTest() throws Exception {super("cream");}
     }
 }
