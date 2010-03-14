@@ -4,7 +4,7 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.advanced.StagingJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.SandboxJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
 /**
  *
  */
-public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements StagingJobAdaptor, StreamableJobBatch, CleanableJobAdaptor {
+public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements SandboxJobAdaptor, StreamableJobBatch, CleanableJobAdaptor {
     // parameters configured
     private static final String SSL_CA_FILES = "sslCAFiles";
 
@@ -132,7 +132,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         // create job description
         JobDescription jd = new JobDescription();
         jd.setJDL(jobDesc);
-        jd.setAutoStart(true);
+        jd.setAutoStart(false);
         jd.setDelegationId(m_delegationId);
 /*
         // put new delegated proxy for current job
@@ -150,25 +150,8 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
             throw new NoSuccessException(e);
         }
 
-        // rethrow exception
-        for (int i=0; resultArray!=null && i<resultArray.length; i++) {
-            BaseFaultType fault = null;
-            if(resultArray[i].getDelegationProxyFault() != null) {
-                fault = resultArray[i].getDelegationProxyFault();
-            } else if(resultArray[i].getDelegationIdMismatchFault() != null) {
-                fault = resultArray[i].getDelegationIdMismatchFault();
-            } else if(resultArray[i].getGenericFault() != null) {
-                fault = resultArray[i].getGenericFault();
-            } else if(resultArray[i].getLeaseIdMismatchFault() != null) {
-                fault = resultArray[i].getLeaseIdMismatchFault();
-            }
-            if (fault != null) {
-                String message = fault.getFaultCause()!=null && !fault.getFaultCause().equals("N/A")
-                        ? fault.getFaultCause()
-                        : fault.getClass().getName();
-                throw new NoSuccessException(message, fault);
-            }
-        }
+        // rethrow exception if any fault in result
+        CreamExceptionFactory.rethrow(resultArray);
 
         // return jobid
         if (resultArray.length == 1) {
@@ -182,13 +165,62 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         }
     }
 
+    public String getInputSandboxBaseURL(String nativeJobId) throws TimeoutException, NoSuccessException {
+        JobInfo jobInfo = this.getJobInfo(nativeJobId);
+        return jobInfo.getCREAMInputSandboxURI();
+    }
+    public String getOutputSandboxBaseURL(String nativeJobId) throws TimeoutException, NoSuccessException {
+        JobInfo jobInfo = this.getJobInfo(nativeJobId);
+        return jobInfo.getCREAMOutputSandboxURI();
+    }
+    private JobInfo getJobInfo(String nativeJobId) throws TimeoutException, NoSuccessException {
+        JobFilter filter = this.getJobFilter(nativeJobId);
+
+        // get job info
+        CREAMPort stub = m_creamStub.getStub();
+        JobInfoResult resultArray[];
+        try {
+            resultArray = stub.jobInfo(filter);
+        } catch (RemoteException e) {
+            throw new TimeoutException(e);
+        }
+
+        // rethrow exception if any fault in result
+        CreamExceptionFactory.rethrow(resultArray);
+
+        // return job info
+        if (resultArray.length == 1) {
+            JobInfo jobInfo = resultArray[0].getJobInfo();
+            if (jobInfo == null) {
+                throw new NoSuccessException("Null job information");
+            }
+            return jobInfo;
+        } else {
+            throw new NoSuccessException("Unexpected content of response message ["+resultArray.length+"]");
+        }
+    }
+
+    public String start(String nativeJobId) throws TimeoutException, NoSuccessException {
+        JobFilter filter = this.getJobFilter(nativeJobId);
+
+        // cancel job
+        CREAMPort stub = m_creamStub.getStub();
+        Result[] resultArray;
+        try {
+            resultArray = stub.jobStart(filter);
+        } catch (RemoteException e) {
+            throw new TimeoutException(e);
+        }
+
+        // rethrow exception if any fault in result
+        CreamExceptionFactory.rethrow(resultArray);
+
+        // returns
+        return nativeJobId;
+    }
+
     public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-        JobId jobId = new JobId();
-        jobId.setCreamURL(m_creamStub.getURI());
-        jobId.setId(nativeJobId);
-        JobFilter filter = new JobFilter();
-        filter.setDelegationId(m_delegationId);
-        filter.setJobId(new JobId[]{jobId});
+        JobFilter filter = this.getJobFilter(nativeJobId);
 
         // cancel job
         CREAMPort stub = m_creamStub.getStub();
@@ -199,29 +231,8 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
             throw new TimeoutException(e);
         }
 
-        // rethrow exception
-        for (int i=0; resultArray!=null && i<resultArray.length; i++) {
-            BaseFaultType fault = null;
-            if (resultArray[i].getDateMismatchFault() != null) {
-                fault = resultArray[i].getDateMismatchFault();
-            } else if (resultArray[i].getDelegationIdMismatchFault() != null) {
-                fault = resultArray[i].getDelegationIdMismatchFault();
-            } else if (resultArray[i].getGenericFault() != null) {
-                fault = resultArray[i].getGenericFault();
-            } else if (resultArray[i].getJobStatusInvalidFault() != null) {
-                fault = resultArray[i].getJobStatusInvalidFault();
-            } else if (resultArray[i].getJobUnknownFault() != null) {
-                fault = resultArray[i].getJobUnknownFault();
-            } else if (resultArray[i].getLeaseIdMismatchFault() != null) {
-                fault = resultArray[i].getLeaseIdMismatchFault();
-            }
-            if (fault != null) {
-                String message = fault.getFaultCause()!=null && !fault.getFaultCause().equals("N/A")
-                        ? fault.getFaultCause()
-                        : fault.getClass().getName();
-                throw new NoSuccessException(message, fault);
-            }
-        }
+        // rethrow exception if any fault in result
+        CreamExceptionFactory.rethrow(resultArray);
     }
 
     public String[] getStagingProtocols() {
@@ -244,5 +255,29 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
                 throw new NoSuccessException("Failed to cleanup job: "+nativeJobId, e);
             }
         }
+
+        JobFilter filter = this.getJobFilter(nativeJobId);
+
+        // cancel job
+        CREAMPort stub = m_creamStub.getStub();
+        Result[] resultArray;
+        try {
+            resultArray = stub.jobPurge(filter);
+        } catch (RemoteException e) {
+            throw new TimeoutException(e);
+        }
+
+        // rethrow exception if any fault in result
+        CreamExceptionFactory.rethrow(resultArray);
+    }
+
+    private JobFilter getJobFilter(String nativeJobId) throws NoSuccessException {
+        JobId jobId = new JobId();
+        jobId.setCreamURL(m_creamStub.getURI());
+        jobId.setId(nativeJobId);
+        JobFilter filter = new JobFilter();
+        filter.setDelegationId(m_delegationId);
+        filter.setJobId(new JobId[]{jobId});
+        return filter;
     }
 }

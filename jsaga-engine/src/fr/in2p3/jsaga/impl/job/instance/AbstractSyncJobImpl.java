@@ -202,6 +202,10 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         } catch (BadParameterException e) {
             throw new NoSuccessException(e);
         }
+
+        if (m_controlAdaptor instanceof SandboxJobAdaptor) {
+            ((SandboxJobAdaptor)m_controlAdaptor).start(m_nativeJobId);
+        }
     }
 
     protected void doCancel() {
