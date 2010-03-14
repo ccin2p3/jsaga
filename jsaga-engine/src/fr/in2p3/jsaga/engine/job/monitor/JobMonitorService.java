@@ -5,6 +5,7 @@ import fr.in2p3.jsaga.engine.job.monitor.listen.FilteredJobStatusListener;
 import fr.in2p3.jsaga.engine.job.monitor.listen.IndividualJobStatusListener;
 import fr.in2p3.jsaga.engine.job.monitor.poll.*;
 import fr.in2p3.jsaga.engine.job.monitor.request.JobStatusRequestor;
+import org.apache.log4j.Logger;
 import org.ogf.saga.error.*;
 import org.ogf.saga.url.URL;
 
@@ -26,6 +27,7 @@ public class JobMonitorService {
     private URL m_url;
     private JobMonitorAdaptor m_adaptor;
     private Map m_attributes;
+    private Logger m_stateLogger;
 
     private JobStatusRequestor m_requestor;
     private JobRegistry m_registry;
@@ -35,10 +37,11 @@ public class JobMonitorService {
         m_url = url;
         m_adaptor = adaptor;
         m_attributes = attributes;
+        m_stateLogger = Logger.getLogger(adaptor.getClass());
 
         // set requestor
         m_requestor = new JobStatusRequestor(adaptor);
-        
+
         // set registry (listeners first, then pollers)
         if (adaptor instanceof ListenFilteredJob) {
             m_registry = new FilteredJobStatusListener((ListenFilteredJob)adaptor, m_requestor);
@@ -65,6 +68,10 @@ public class JobMonitorService {
 
     public Map getAttributes() {
         return m_attributes;
+    }
+
+    public Logger getStateLogger() {
+        return m_stateLogger;
     }
 
     public JobStatus getState(String nativeJobId) throws NotImplementedException, TimeoutException, NoSuccessException {

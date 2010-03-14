@@ -447,6 +447,10 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
      * Set job and task state (may finish task)
      */
     public void setState(State state, String stateDetail, SubState subState, SagaException cause) {
+        // log
+        if (! stateDetail.equals(m_metrics.m_StateDetail.getValue())) {
+            m_monitorService.getStateLogger().debug("State changed to "+stateDetail+" for job "+m_attributes.m_JobId.getObject());
+        }
         // set job state
         this.setJobState(state, stateDetail, subState, cause);
         // set task state (may finish task)
