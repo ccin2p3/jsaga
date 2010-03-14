@@ -47,8 +47,9 @@ import java.util.regex.Pattern;
  * TODO : Support of space in environment value
  * TODO : Test MPI jobs
  */
-public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract 
+public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 		implements JobControlAdaptor, CleanableJobAdaptor, StreamableJobBatch {
+    private static final String HOST_NAME = "HostName";
     private static final String DEFAULT_JDL_FILE = "DefaultJdlFile";
 
 	private Logger logger = Logger.getLogger(WMSJobControlAdaptor.class);
@@ -95,8 +96,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
                 new Default(MONITOR_PORT, "9000"),
                 // JDL attributes
                 new Default("requirements", "(other.GlueCEStateStatus==\"Production\")"),
-                new Default("rank", "(-other.GlueCEStateEstimatedResponseTime)"),
-                new Default("OutputStorage", new File[]{new File(System.getProperty("java.io.tmpdir"))})
+                new Default("rank", "(-other.GlueCEStateEstimatedResponseTime)")
         };
     }
 
@@ -118,6 +118,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         m_parameters = attributes;
+        m_parameters.put(HOST_NAME, host);
         if (attributes.containsKey(DEFAULT_JDL_FILE)) {
             File defaultJdlFile = new File((String) attributes.get(DEFAULT_JDL_FILE));
             try {
@@ -270,8 +271,6 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 
                 // register job
                 jobId = m_client.jobRegister(jobDesc, m_delegationId).getId();
-                if(logger.isDebugEnabled())
-                    logger.debug("Id for job:"+jobId);
 
                 // upload input files to the sandbox associated to the registered job
                 StringList list = m_client.getSandboxDestURI(jobId, "gsiftp");
@@ -303,8 +302,6 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             } else {
                 // submit
                 jobId = m_client.jobSubmit(jobDesc, m_delegationId).getId();
-                if(logger.isDebugEnabled())
-                    logger.debug("Id for job:"+jobId);
 
                 // set LB from jobId
                 if (m_lbServerUrl == null) {
@@ -403,8 +400,6 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 			
 			// start job
             m_client.jobStart(jobId);
-            if(logger.isDebugEnabled())
-            	logger.debug("Id for job:"+jobId);
 			return new WMSJobIOHandler(jobId, m_client, m_credential, stdoutFile.getAbsolutePath(), stderrFile.getAbsolutePath());
         } catch (NoSuccessException e) {
             throw e;
