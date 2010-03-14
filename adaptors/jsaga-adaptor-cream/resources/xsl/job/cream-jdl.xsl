@@ -64,12 +64,21 @@
             <xsl:otherwise>
                 <xsl:for-each select="jsdl:Application/posix:POSIXApplication">
                     <xsl:for-each select="posix:Input">
+                        <xsl:if test="starts-with(text(),'/')">
+                            <xsl:message terminate="no">Absolute path in attribute Input means for JDL that file is already available on the worker node</xsl:message>
+                        </xsl:if>
   StdInput = "<xsl:value-of select="text()"/>";<xsl:text/>
                     </xsl:for-each>
                     <xsl:for-each select="posix:Output">
+                        <xsl:if test="starts-with(text(),'/')">
+                            <xsl:message terminate="yes">Absolute path in attribute Output is not supported by JDL</xsl:message>
+                        </xsl:if>
   StdOutput = "<xsl:value-of select="text()"/>";<xsl:text/>
                     </xsl:for-each>
                     <xsl:for-each select="posix:Error">
+                        <xsl:if test="starts-with(text(),'/')">
+                            <xsl:message terminate="yes">Absolute path in attribute Error is not supported by JDL</xsl:message>
+                        </xsl:if>
   StdError = "<xsl:value-of select="text()"/>";<xsl:text/>
                     </xsl:for-each>
                 </xsl:for-each>
