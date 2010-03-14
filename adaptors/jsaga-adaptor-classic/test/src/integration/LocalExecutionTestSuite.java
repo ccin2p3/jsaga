@@ -52,6 +52,20 @@ public class LocalExecutionTestSuite extends JSAGATestSuite {
     // test cases
     public static class LocalJobRunSandboxTest extends JobRunSandboxTest {
         public LocalJobRunSandboxTest() throws Exception {super("local");}
+
+        // additional tests to/from remote
+        public void test_input_local_to_remote() throws Exception {
+            super.runJobInput(true, getLocal("input"), getRemote("input"));
+        }
+        public void test_input_remote_to_remote() throws Exception {
+            super.runJobInput(true, getRemote("input_source"), getRemote("input_target"));
+        }
+        public void test_output_local_from_remote() throws Exception {
+            super.runJobOutput(true, getLocal("output"), getRemote("output"));
+        }
+        public void test_output_remote_from_remote() throws Exception {
+            super.runJobOutput(true, getRemote("output"), getRemote("output_target"));
+        }
     }
     
     // test cases
