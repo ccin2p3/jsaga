@@ -225,7 +225,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     }
 
     public String[] getStagingProtocols() {
-        return new String[]{"gsiftp"};
+        return new String[]{"gsiftp", "srm"};
     }
 
     public int getStagingSourceURIMode() {
