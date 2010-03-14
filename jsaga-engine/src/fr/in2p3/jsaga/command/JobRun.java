@@ -1,7 +1,8 @@
 package fr.in2p3.jsaga.command;
 
 import org.apache.commons.cli.*;
-import org.ogf.saga.error.*;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.SagaException;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
@@ -67,7 +68,8 @@ public class JobRun extends AbstractCommand {
                 }
             }
             JobDescription desc = createJobDescription(prop);
-            if (!line.hasOption(OPT_BATCH)) {
+            boolean isStreamRedirected = prop.containsKey(JobDescription.INPUT) || prop.containsKey(JobDescription.OUTPUT) || prop.containsKey(JobDescription.ERROR);
+            if (!line.hasOption(OPT_BATCH) && !isStreamRedirected) {
                 desc.setAttribute(JobDescription.INTERACTIVE, "true");
             }
 
@@ -114,7 +116,15 @@ public class JobRun extends AbstractCommand {
                     } else {
                         Runtime.getRuntime().removeShutdownHook(hook);
                         if (State.DONE.compareTo(state) == 0) {
-                            copyStream(job.getStdout(), System.out);
+                            try {
+                                if ("true".equalsIgnoreCase(desc.getAttribute(JobDescription.INTERACTIVE))) {
+                                    copyStream(job.getStdout(), System.out);
+                                } else {
+                                    System.out.println("Job done.");
+                                }
+                            } catch(SagaException e) {
+                                System.out.println("Job done.");
+                            }
                         } else if (State.FAILED.compareTo(state) == 0) {
                             try {
                                 String exitCode = job.getAttribute(Job.EXITCODE);
