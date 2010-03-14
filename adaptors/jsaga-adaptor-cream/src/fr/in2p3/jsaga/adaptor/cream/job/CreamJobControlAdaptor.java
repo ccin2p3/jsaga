@@ -228,14 +228,6 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         return new String[]{"gsiftp", "srm"};
     }
 
-    public int getStagingSourceURIMode() {
-        return INTERMEDIARY_URI;
-    }
-
-    public int getStagingTargetURIMode() {
-        return ANY_URI;
-    }
-
     public String getStagingIntermediaryBaseURL() {
         String hostname = (String) m_parameters.get(HOST_NAME);
         return "gsiftp://"+hostname+":2811/tmp";
