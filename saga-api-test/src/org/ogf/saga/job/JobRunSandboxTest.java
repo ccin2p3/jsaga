@@ -58,12 +58,6 @@ public abstract class JobRunSandboxTest extends AbstractJobTest {
     public void test_input_remote_to_worker() throws Exception {
         this.runJobInput(true, getRemote("input"), getWorker("input"));
     }
-    public void test_input_local_to_remote() throws Exception {
-        this.runJobInput(true, getLocal("input"), getRemote("input"));
-    }
-    public void test_input_remote_to_remote() throws Exception {
-        this.runJobInput(true, getRemote("input_source"), getRemote("input_target"));
-    }
 
     public void test_output_local_from_worker() throws Exception {
         this.runJobOutput(true, getLocal("output"), getWorker("output"));
@@ -71,29 +65,23 @@ public abstract class JobRunSandboxTest extends AbstractJobTest {
     public void test_output_remote_from_worker() throws Exception {
         this.runJobOutput(true, getRemote("output"), getWorker("output"));
     }
-    public void test_output_local_from_remote() throws Exception {
-        this.runJobOutput(true, getLocal("output"), getRemote("output"));
-    }
-    public void test_output_remote_from_remote() throws Exception {
-        this.runJobOutput(true, getRemote("output"), getRemote("output_target"));
-    }
 
     //////////////////////////////////////////// private methods ////////////////////////////////////////////
 
-    private File getLocal(String suffix) {
+    protected File getLocal(String suffix) {
         return new File(TMP, "local-"+m_uuid+"."+suffix);
     }
-    private URI getRemote(String suffix) {
+    protected URI getRemote(String suffix) {
         return new File(TMP, "remote-"+m_uuid+"."+suffix).toURI();
     }
     private String getWorker(String suffix) {
-        return "/tmp/worker-"+m_uuid+"."+suffix;
+        return "worker-"+m_uuid+"."+suffix;
     }
 
-    private void runJobInput(boolean explicitRedirect, Object localInput, Object workerInput) throws Exception {
+    protected void runJobInput(boolean explicitRedirect, Object localInput, Object workerInput) throws Exception {
         this.runJob(explicitRedirect, getLocal("sh"), getWorker("sh"), localInput, workerInput, getLocal("output"), getWorker("output"));
     }
-    private void runJobOutput(boolean explicitRedirect, Object localOutput, Object workerOutput) throws Exception {
+    protected void runJobOutput(boolean explicitRedirect, Object localOutput, Object workerOutput) throws Exception {
         this.runJob(explicitRedirect, getLocal("sh"), getWorker("sh"), getLocal("input"), getWorker("input"), localOutput, workerOutput);
     }
     private void runJob(boolean explicitRedirect, File localScript, String workerScript, Object localInput, Object workerInput, Object localOutput, Object workerOutput) throws Exception {
@@ -122,6 +110,7 @@ public abstract class JobRunSandboxTest extends AbstractJobTest {
         JobService service = JobFactory.createJobService(m_session, m_jobservice);
         Job job = service.createJob(desc);
         job.run();
+        System.out.println(job.getAttribute(Job.JOBID));
 
         // wait
         job.waitFor();
