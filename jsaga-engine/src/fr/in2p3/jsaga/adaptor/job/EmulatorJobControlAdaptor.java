@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.adaptor.job;
 
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.StagingJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.*;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.ogf.saga.error.*;
@@ -22,7 +23,7 @@ import java.util.*;
 /**
  *
  */
-public class EmulatorJobControlAdaptor extends EmulatorJobAdaptorAbstract implements JobControlAdaptor, CleanableJobAdaptor, StreamableJobBatch {
+public class EmulatorJobControlAdaptor extends EmulatorJobAdaptorAbstract implements StagingJobAdaptor, CleanableJobAdaptor, StreamableJobBatch {
     public int getDefaultPort() {
         return 1234;
     }
@@ -111,5 +112,13 @@ public class EmulatorJobControlAdaptor extends EmulatorJobAdaptorAbstract implem
         if (! job.delete()) {
             throw new PermissionDeniedException("Failed to cleanup job: "+nativeJobId);
         }
+    }
+
+    public String[] getStagingProtocols() {
+        return new String[]{"file"};
+    }
+
+    public String getStagingIntermediaryBaseURL() {
+        return "test://emulator1.test.org:1234/";
     }
 }
