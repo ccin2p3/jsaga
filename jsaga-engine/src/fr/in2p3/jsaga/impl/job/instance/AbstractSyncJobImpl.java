@@ -11,6 +11,7 @@ import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
 import fr.in2p3.jsaga.impl.job.instance.stream.*;
 import fr.in2p3.jsaga.impl.job.service.AbstractSyncJobServiceImpl;
 import fr.in2p3.jsaga.impl.job.staging.mgr.DataStagingManager;
+import fr.in2p3.jsaga.impl.job.staging.mgr.DataStagingManagerThroughSandbox;
 import fr.in2p3.jsaga.impl.permissions.AbstractJobPermissionsImpl;
 import fr.in2p3.jsaga.sync.job.SyncJob;
 import org.apache.log4j.Logger;
@@ -191,6 +192,10 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             String monitorUrl = m_monitorService.getURL().getString();
             String sagaJobId = "["+monitorUrl+"]-["+m_nativeJobId+"]";
             m_attributes.m_JobId.setObject(sagaJobId);
+
+            if (m_stagingMgr instanceof DataStagingManagerThroughSandbox) {
+                ((DataStagingManagerThroughSandbox)m_stagingMgr).preStaging(this, m_nativeJobId);
+            }
         } catch (AuthorizationFailedException e) {
             throw new NoSuccessException(e);
         } catch (AuthenticationFailedException e) {
@@ -289,11 +294,11 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         try {
             // post-staging
             if (isDone) {
-                m_stagingMgr.postStaging(this);
+                m_stagingMgr.postStaging(this, m_nativeJobId);
             }
 
             // cleanup staged files
-            m_stagingMgr.cleanup(this);
+            m_stagingMgr.cleanup(this, m_nativeJobId);
         } catch (AuthenticationFailedException e) {
             throw new NoSuccessException(e);
         } catch (AuthorizationFailedException e) {
@@ -494,6 +499,14 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             return (JobInfoAdaptor) monitorAdaptor;
         } else {
             throw new NotImplementedException("Job attribute not supported by this adaptor: "+m_resourceManager.getScheme());
+        }
+    }
+
+    public SandboxJobAdaptor getSandboxJobAdaptor() throws NotImplementedException {
+        if (m_controlAdaptor instanceof SandboxJobAdaptor) {
+            return (SandboxJobAdaptor) m_controlAdaptor;
+        } else {
+            throw new NotImplementedException("Job sandbox not supported by this adaptor: "+m_resourceManager.getScheme());
         }
     }
 

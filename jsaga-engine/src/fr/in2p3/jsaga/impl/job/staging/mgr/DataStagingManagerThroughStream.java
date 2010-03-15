@@ -190,7 +190,7 @@ public class DataStagingManagerThroughStream implements DataStagingManager {
         }
     }
 
-    public void postStaging(AbstractSyncJobImpl job) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+    public void postStaging(AbstractSyncJobImpl job, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         // may retrieve output files from stdout
         if (this.needsStdout()) {
             // open
@@ -211,7 +211,7 @@ public class DataStagingManagerThroughStream implements DataStagingManager {
         }
     }
 
-    public void cleanup(AbstractSyncJobImpl job) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+    public void cleanup(AbstractSyncJobImpl job, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         // for each inputToRemote
         for (InputDataStagingToRemote staging : m_inputToRemote) {
             staging.cleanup(job.getSession());

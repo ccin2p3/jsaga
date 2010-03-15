@@ -53,18 +53,10 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
         // do nothing
     }
 
-    public void postStaging(AbstractSyncJobImpl job) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
-        // do nothing
-    }
-
-    public void cleanup(AbstractSyncJobImpl job) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
-        // do nothing
-    }
-
-    public void preStaging(Session session, SandboxJobAdaptor adaptor, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+    public void preStaging(AbstractSyncJobImpl job, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         // create intermediary directory
         try {
-            m_intermediaryDirectory = FileFactory.createDirectory(session, m_intermediaryURL, Flags.CREATE.getValue());
+            m_intermediaryDirectory = FileFactory.createDirectory(job.getSession(), m_intermediaryURL, Flags.CREATE.getValue());
         } catch (IncorrectURLException e) {
             throw new NoSuccessException(e);
         } catch (AlreadyExistsException e) {
@@ -72,27 +64,27 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
         }
 
         // for each input file
-        for (SandboxTransfer transfer : adaptor.getInputSandboxTransfer(nativeJobId)) {
-            transfer(session, transfer);
+        for (SandboxTransfer transfer : job.getSandboxJobAdaptor().getInputSandboxTransfer(nativeJobId)) {
+            transfer(job.getSession(), transfer);
         }
     }
 
-    public void postStaging(Session session, SandboxJobAdaptor adaptor, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+    public void postStaging(AbstractSyncJobImpl job, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         // for each output file
-        for (SandboxTransfer transfer : adaptor.getOutputSandboxTransfer(nativeJobId)) {
-            transfer(session, transfer);
+        for (SandboxTransfer transfer : job.getSandboxJobAdaptor().getOutputSandboxTransfer(nativeJobId)) {
+            transfer(job.getSession(), transfer);
         }
     }
 
-    public void cleanup(Session session, SandboxJobAdaptor adaptor, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+    public void cleanup(AbstractSyncJobImpl job, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         // for each input file
-        for (SandboxTransfer transfer : adaptor.getInputSandboxTransfer(nativeJobId)) {
-            remove(session, transfer.getTo());
+        for (SandboxTransfer transfer : job.getSandboxJobAdaptor().getInputSandboxTransfer(nativeJobId)) {
+            remove(job.getSession(), transfer.getTo());
         }
 
         // for each output file
-        for (SandboxTransfer transfer : adaptor.getOutputSandboxTransfer(nativeJobId)) {
-            remove(session, transfer.getFrom());
+        for (SandboxTransfer transfer : job.getSandboxJobAdaptor().getOutputSandboxTransfer(nativeJobId)) {
+            remove(job.getSession(), transfer.getFrom());
         }
 
         // remove base directory
