@@ -1,13 +1,13 @@
 package fr.in2p3.jsaga.impl.job.staging.mgr;
 
-import fr.in2p3.jsaga.adaptor.job.control.advanced.StagingJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.SandboxJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.SandboxTransfer;
 import fr.in2p3.jsaga.impl.job.instance.AbstractSyncJobImpl;
-import fr.in2p3.jsaga.impl.job.staging.*;
 import org.ogf.saga.error.*;
-import org.ogf.saga.file.Directory;
-import org.ogf.saga.file.FileFactory;
+import org.ogf.saga.file.*;
 import org.ogf.saga.job.JobDescription;
 import org.ogf.saga.namespace.Flags;
+import org.ogf.saga.session.Session;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
@@ -26,51 +26,15 @@ import java.util.*;
  *
  */
 public class DataStagingManagerThroughSandbox implements DataStagingManager {
-    // managed by plugin
-    private List<String> m_managedByPlugin;
-
-    // managed by engine
-    private List<InputDataStagingToRemote> m_inputToRemote;
-    private List<OutputDataStagingFromRemote> m_outputFromRemote;
-
     // info
     private Set<String> m_supportedProtocols;
     private URL m_intermediaryURL;
     private Directory m_intermediaryDirectory;
 
-    public DataStagingManagerThroughSandbox(String[] fileTransfer, StagingJobAdaptor adaptor, String uniqId) throws NotImplementedException, BadParameterException, NoSuccessException {
-        // create
-        m_managedByPlugin = new ArrayList<String>();
-        m_inputToRemote = new ArrayList<InputDataStagingToRemote>();
-        m_outputFromRemote = new ArrayList<OutputDataStagingFromRemote>();
-
+    public DataStagingManagerThroughSandbox(SandboxJobAdaptor adaptor, String uniqId) throws NotImplementedException, BadParameterException, NoSuccessException {
         // get protocols and intermediary
         m_supportedProtocols = new HashSet<String>(Arrays.asList(adaptor.getStagingProtocols()));
         m_intermediaryURL = URLFactory.createURL(adaptor.getStagingIntermediaryBaseURL()+"/"+uniqId+"/");
-
-        // init
-        for (String ft : fileTransfer) {
-            AbstractDataStaging dataStaging = DataStagingFactory.create(ft, m_intermediaryURL);
-            if (m_supportedProtocols.contains(dataStaging.getLocalProtocol())) {
-                m_managedByPlugin.add(ft);
-            } else {
-                if (dataStaging instanceof InputDataStagingToIntermediary) {
-                    m_inputToRemote.add((InputDataStagingToRemote) dataStaging);
-                    String postStaging = ((InputDataStagingToIntermediary) dataStaging).getFileTransferForPlugin();
-                    m_managedByPlugin.add(postStaging);
-                } else if (dataStaging instanceof InputDataStagingToRemote) {
-                    m_inputToRemote.add((InputDataStagingToRemote) dataStaging);
-                } else if (dataStaging instanceof OutputDataStagingFromIntermediary) {
-                    m_outputFromRemote.add((OutputDataStagingFromRemote) dataStaging);
-                    String preStaging = ((OutputDataStagingFromIntermediary) dataStaging).getFileTransferForPlugin();
-                    m_managedByPlugin.add(preStaging);
-                } else if (dataStaging instanceof OutputDataStagingFromRemote) {
-                    m_outputFromRemote.add((OutputDataStagingFromRemote) dataStaging);
-                } else {
-                    throw new BadParameterException("[INTERNAL ERROR] Unexpected class: "+dataStaging.getClass());
-                }
-            }
-        }
     }
 
     public Set<String> getSupportedProtocols() {
@@ -82,66 +46,86 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
     }
 
     public JobDescription modifyJobDescription(final JobDescription jobDesc) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
-        try {
-            // clone jobDesc and modify clone
-            JobDescription newJobDesc = (JobDescription) jobDesc.clone();
-
-            // replace FileTransfer
-            try {
-                String[] managedByPlugin = m_managedByPlugin.toArray(new String[m_managedByPlugin.size()]);
-                if (managedByPlugin.length > 0) {
-                    newJobDesc.setVectorAttribute(JobDescription.FILETRANSFER, managedByPlugin);
-                }
-            } catch (DoesNotExistException e) {
-                // ignore
-            }
-
-            // returns
-            return newJobDesc;
-        } catch (IncorrectStateException e) {
-            throw new NoSuccessException(e);
-        } catch (CloneNotSupportedException e) {
-            throw new NoSuccessException(e);
-        }
+        return jobDesc;
     }
 
     public void preStaging(AbstractSyncJobImpl job) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+        // do nothing
+    }
+
+    public void postStaging(AbstractSyncJobImpl job) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+        // do nothing
+    }
+
+    public void cleanup(AbstractSyncJobImpl job) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+        // do nothing
+    }
+
+    public void preStaging(Session session, SandboxJobAdaptor adaptor, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         // create intermediary directory
         try {
-            m_intermediaryDirectory = FileFactory.createDirectory(job.getSession(), m_intermediaryURL, Flags.CREATE.getValue());
+            m_intermediaryDirectory = FileFactory.createDirectory(session, m_intermediaryURL, Flags.CREATE.getValue());
         } catch (IncorrectURLException e) {
             throw new NoSuccessException(e);
         } catch (AlreadyExistsException e) {
             throw new NoSuccessException(e);
         }
 
-        // for each inputToRemote
-        for (InputDataStagingToRemote staging : m_inputToRemote) {
-            staging.preStaging(job.getSession());
+        // for each input file
+        for (SandboxTransfer transfer : adaptor.getInputSandboxTransfer(nativeJobId)) {
+            transfer(session, transfer);
         }
     }
 
-    public void postStaging(AbstractSyncJobImpl job) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
-        // for each outputFromRemote
-        for (OutputDataStagingFromRemote staging : m_outputFromRemote) {
-            staging.postStaging(job.getSession());
+    public void postStaging(Session session, SandboxJobAdaptor adaptor, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+        // for each output file
+        for (SandboxTransfer transfer : adaptor.getOutputSandboxTransfer(nativeJobId)) {
+            transfer(session, transfer);
         }
     }
 
-    public void cleanup(AbstractSyncJobImpl job) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
-        // for each inputToRemote
-        for (InputDataStagingToRemote staging : m_inputToRemote) {
-            staging.cleanup(job.getSession());
+    public void cleanup(Session session, SandboxJobAdaptor adaptor, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+        // for each input file
+        for (SandboxTransfer transfer : adaptor.getInputSandboxTransfer(nativeJobId)) {
+            remove(session, transfer.getTo());
         }
 
-        // for each outputFromRemote
-        for (OutputDataStagingFromRemote staging : m_outputFromRemote) {
-            staging.cleanup(job.getSession());
+        // for each output file
+        for (SandboxTransfer transfer : adaptor.getOutputSandboxTransfer(nativeJobId)) {
+            remove(session, transfer.getFrom());
         }
 
         // remove base directory
         if (m_intermediaryDirectory != null) {
-            m_intermediaryDirectory.remove(Flags.RECURSIVE.getValue());
+            m_intermediaryDirectory.remove(Flags.NONE.getValue());
+        }
+    }
+
+    private static void transfer(Session session, SandboxTransfer transfer) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+        int append = (transfer.isAppend() ? Flags.APPEND : Flags.NONE).getValue();
+        try {
+            URL from = URLFactory.createURL(transfer.getFrom());
+            URL to = URLFactory.createURL(transfer.getTo());
+            File file = FileFactory.createFile(session, from, Flags.NONE.getValue());
+            file.copy(to, append);
+            file.close();
+        } catch (AlreadyExistsException e) {
+            throw new NoSuccessException(e);
+        } catch (IncorrectURLException e) {
+            throw new NoSuccessException(e);
+        }
+    }
+
+    private static void remove(Session session, String url) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+        try {
+            URL urlToRemove = URLFactory.createURL(url);
+            File file = FileFactory.createFile(session, urlToRemove, Flags.NONE.getValue());
+            file.remove();
+            file.close();
+        } catch (AlreadyExistsException e) {
+            throw new NoSuccessException(e);
+        } catch (IncorrectURLException e) {
+            throw new NoSuccessException(e);
         }
     }
 }
