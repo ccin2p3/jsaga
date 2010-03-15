@@ -311,7 +311,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         }
         return jobDesc;
     }
-    private static String getStringValue(Properties jobDesc, String key) throws NoSuccessException {
+    private static String getValue(Properties jobDesc, String key) throws NoSuccessException {
         String value = jobDesc.getProperty(key);
         if (value!=null && value.endsWith(";")) {
             return value.substring(0, value.length()-1);
@@ -319,8 +319,16 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
             throw new NoSuccessException("Failed to parse JDL attribute: "+value);
         }
     }
+    private static String getStringValue(Properties jobDesc, String key) throws NoSuccessException {
+        String value = getValue(jobDesc, key);
+        if (value!=null && value.startsWith("\"") && value.endsWith("\"")) {
+            return value.substring(1, value.length()-1);
+        } else {
+            throw new NoSuccessException("Failed to parse JDL attribute: "+value);
+        }
+    }
     private static int getIntValue(Properties jobDesc, String key) throws NoSuccessException {
-        String value = getStringValue(jobDesc, key);
+        String value = getValue(jobDesc, key);
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
@@ -328,7 +336,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         }
     }
     private static boolean getBooleanValue(Properties jobDesc, String key) throws NoSuccessException {
-        String value = getStringValue(jobDesc, key);
+        String value = getValue(jobDesc, key);
         return Boolean.parseBoolean(value);
     }
 }
