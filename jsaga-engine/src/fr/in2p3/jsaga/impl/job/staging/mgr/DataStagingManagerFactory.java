@@ -32,7 +32,7 @@ public class DataStagingManagerFactory {
 
         // create data staging manager
         if (adaptor instanceof StagingJobAdaptor) {
-            return new DataStagingManagerDelegated(fileTransfer, (StagingJobAdaptor) adaptor, uniqId);
+            return new DataStagingManagerThroughSandbox(fileTransfer, (StagingJobAdaptor) adaptor, uniqId);
         } else if (adaptor instanceof StreamableJobAdaptor) {
             return new DataStagingManagerThroughStream(fileTransfer);
         } else {
