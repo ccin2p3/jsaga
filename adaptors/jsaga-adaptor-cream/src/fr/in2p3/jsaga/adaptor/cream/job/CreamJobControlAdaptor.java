@@ -164,7 +164,8 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 
     public SandboxTransfer[] getInputSandboxTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {
         JobInfo jobInfo = this.getJobInfo(nativeJobId);
-        String baseUri = jobInfo.getCREAMInputSandboxURI();
+        //String baseUri = jobInfo.getCREAMInputSandboxURI();
+        String baseUri = this.getStagingIntermediaryBaseURL()+"/"+nativeJobId;
         Properties jobDesc = parseJobDescription(jobInfo.getJDL());
         int transfersLength = getIntValue(jobDesc, "InputSandboxPreStaging");
         SandboxTransfer[] transfers = new SandboxTransfer[transfersLength];
@@ -179,7 +180,8 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 
     public SandboxTransfer[] getOutputSandboxTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {
         JobInfo jobInfo = this.getJobInfo(nativeJobId);
-        String baseUri = jobInfo.getCREAMOutputSandboxURI();
+        //String baseUri = jobInfo.getCREAMOutputSandboxURI();
+        String baseUri = this.getStagingIntermediaryBaseURL()+"/"+nativeJobId;
         Properties jobDesc = parseJobDescription(jobInfo.getJDL());
         int transfersLength = getIntValue(jobDesc, "OutputSandboxPostStaging");
         SandboxTransfer[] transfers = new SandboxTransfer[transfersLength];
@@ -312,7 +314,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     private static String getStringValue(Properties jobDesc, String key) throws NoSuccessException {
         String value = jobDesc.getProperty(key);
         if (value!=null && value.endsWith(";")) {
-            return value.substring(0, value.length()-2);
+            return value.substring(0, value.length()-1);
         } else {
             throw new NoSuccessException("Failed to parse JDL attribute: "+value);
         }
