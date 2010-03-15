@@ -91,7 +91,7 @@
                 not(contains($SupportedProtocols,concat('/',substring-before(jsdl:Source/jsdl:URI/text(),'://'),'/')))]"/>
   InputSandboxPreStaging = <xsl:value-of select="count($UnsupportedURI)"/>;<xsl:text/>
             <xsl:for-each select="$UnsupportedURI">
-  InputSandboxPreStaging_<xsl:value-of select="position()-1"/>_From = "<xsl:value-of select="jsdl:Source/jsdl:URI/text()"/>";<xsl:text/>
+  InputSandboxPreStaging_<xsl:value-of select="position()-1"/>_From = "<xsl:value-of select="translate(jsdl:Source/jsdl:URI/text(),'\','/')"/>";<xsl:text/>
   InputSandboxPreStaging_<xsl:value-of select="position()-1"/>_To = "<xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="jsdl:FileName/text()"/>";<xsl:text/>
   InputSandboxPreStaging_<xsl:value-of select="position()-1"/>_Append = "<xsl:value-of select="string(jsdl:CreationFlag/text()='append')"/>";<xsl:text/>
             </xsl:for-each>
@@ -117,7 +117,7 @@
   OutputSandboxPostStaging = <xsl:value-of select="count($UnsupportedURI)"/>;<xsl:text/>
             <xsl:for-each select="$UnsupportedURI">
   OutputSandboxPostStaging_<xsl:value-of select="position()-1"/>_From = "<xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="jsdl:FileName/text()"/>";<xsl:text/>
-  OutputSandboxPostStaging_<xsl:value-of select="position()-1"/>_To = "<xsl:value-of select="jsdl:Target/jsdl:URI/text()"/>";<xsl:text/>
+  OutputSandboxPostStaging_<xsl:value-of select="position()-1"/>_To = "<xsl:value-of select="translate(jsdl:Target/jsdl:URI/text(),'\','/')"/>";<xsl:text/>
   OutputSandboxPostStaging_<xsl:value-of select="position()-1"/>_Append = "<xsl:value-of select="string(jsdl:CreationFlag/text()='append')"/>";<xsl:text/>
             </xsl:for-each>
   OutputSandbox = {<xsl:text/>
