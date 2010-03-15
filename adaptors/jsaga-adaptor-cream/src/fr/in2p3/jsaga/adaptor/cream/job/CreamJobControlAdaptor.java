@@ -3,8 +3,7 @@ package fr.in2p3.jsaga.adaptor.cream.job;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
-import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.advanced.SandboxJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.*;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
@@ -13,11 +12,9 @@ import org.glite.ce.creamapi.ws.cream2.types.*;
 import org.globus.ftp.GridFTPClient;
 import org.ogf.saga.error.*;
 
-import java.io.File;
-import java.io.InputStream;
+import java.io.*;
 import java.rmi.RemoteException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -165,14 +162,36 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         }
     }
 
-    public String getInputSandboxBaseURL(String nativeJobId) throws TimeoutException, NoSuccessException {
+    public SandboxTransfer[] getInputSandboxTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {
         JobInfo jobInfo = this.getJobInfo(nativeJobId);
-        return jobInfo.getCREAMInputSandboxURI();
+        String baseUri = jobInfo.getCREAMInputSandboxURI();
+        Properties jobDesc = parseJobDescription(jobInfo.getJDL());
+        int transfersLength = getIntValue(jobDesc, "InputSandboxPreStaging");
+        SandboxTransfer[] transfers = new SandboxTransfer[transfersLength];
+        for (int i=0; i<transfersLength; i++) {
+            transfers[i] = new SandboxTransfer(
+                    getStringValue(jobDesc, "InputSandboxPreStaging_"+i+"_From"),
+                    baseUri+"/"+getStringValue(jobDesc, "InputSandboxPreStaging_"+i+"_To"),
+                    getBooleanValue(jobDesc, "InputSandboxPreStaging_"+i+"_Append"));
+        }
+        return transfers;
     }
-    public String getOutputSandboxBaseURL(String nativeJobId) throws TimeoutException, NoSuccessException {
+
+    public SandboxTransfer[] getOutputSandboxTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {
         JobInfo jobInfo = this.getJobInfo(nativeJobId);
-        return jobInfo.getCREAMOutputSandboxURI();
+        String baseUri = jobInfo.getCREAMOutputSandboxURI();
+        Properties jobDesc = parseJobDescription(jobInfo.getJDL());
+        int transfersLength = getIntValue(jobDesc, "OutputSandboxPostStaging");
+        SandboxTransfer[] transfers = new SandboxTransfer[transfersLength];
+        for (int i=0; i<transfersLength; i++) {
+            transfers[i] = new SandboxTransfer(
+                    baseUri+"/"+getStringValue(jobDesc, "OutputSandboxPostStaging_"+i+"_From"),
+                    getStringValue(jobDesc, "OutputSandboxPostStaging_"+i+"_To"),
+                    getBooleanValue(jobDesc, "OutputSandboxPostStaging_"+i+"_Append"));
+        }
+        return transfers;
     }
+
     private JobInfo getJobInfo(String nativeJobId) throws TimeoutException, NoSuccessException {
         JobFilter filter = this.getJobFilter(nativeJobId);
 
@@ -279,5 +298,35 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         filter.setDelegationId(m_delegationId);
         filter.setJobId(new JobId[]{jobId});
         return filter;
+    }
+
+    private static Properties parseJobDescription(String jdl) throws NoSuccessException {
+        Properties jobDesc = new Properties();
+        try {
+            jobDesc.load(new ByteArrayInputStream(jdl.getBytes()));
+        } catch (IOException e) {
+            throw new NoSuccessException("Failed to retrieve JDL", e);
+        }
+        return jobDesc;
+    }
+    private static String getStringValue(Properties jobDesc, String key) throws NoSuccessException {
+        String value = jobDesc.getProperty(key);
+        if (value!=null && value.endsWith(";")) {
+            return value.substring(0, value.length()-2);
+        } else {
+            throw new NoSuccessException("Failed to parse JDL attribute: "+value);
+        }
+    }
+    private static int getIntValue(Properties jobDesc, String key) throws NoSuccessException {
+        String value = getStringValue(jobDesc, key);
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            throw new NoSuccessException("Failed to parse JDL attribute: "+value, e);
+        }
+    }
+    private static boolean getBooleanValue(Properties jobDesc, String key) throws NoSuccessException {
+        String value = getStringValue(jobDesc, key);
+        return Boolean.parseBoolean(value);
     }
 }
