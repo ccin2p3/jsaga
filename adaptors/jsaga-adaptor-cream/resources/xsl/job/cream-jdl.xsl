@@ -93,6 +93,7 @@
             <xsl:for-each select="$UnsupportedURI">
   InputSandbox_PreStaging.<xsl:value-of select="position()-1"/>.From = <xsl:value-of select="jsdl:Source/jsdl:URI/text()"/>;<xsl:text/>
   InputSandbox_PreStaging.<xsl:value-of select="position()-1"/>.To = <xsl:value-of select="jsdl:FileName/text()"/>;<xsl:text/>
+  InputSandbox_PreStaging.<xsl:value-of select="position()-1"/>.Append = <xsl:value-of select="string(jsdl:CreationFlag/text()='append')"/>
             </xsl:for-each>
   InputSandbox = {<xsl:text/>
             <xsl:for-each select="jsdl:DataStaging[jsdl:Source]">
@@ -117,6 +118,7 @@
             <xsl:for-each select="$UnsupportedURI">
   OutputSandbox_PostStaging.<xsl:value-of select="position()-1"/>.From = <xsl:value-of select="jsdl:FileName/text()"/>;<xsl:text/>
   OutputSandbox_PostStaging.<xsl:value-of select="position()-1"/>.To = <xsl:value-of select="jsdl:Target/jsdl:URI/text()"/>;<xsl:text/>
+  OutputSandbox_PostStaging.<xsl:value-of select="position()-1"/>.Append = <xsl:value-of select="string(jsdl:CreationFlag/text()='append')"/>
             </xsl:for-each>
   OutputSandbox = {<xsl:text/>
             <xsl:if test="$isInteractive">
