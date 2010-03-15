@@ -20,23 +20,23 @@ import org.ogf.saga.job.JobDescription;
  */
 public class DataStagingManagerFactory {
     public static DataStagingManager create(JobControlAdaptor adaptor, JobDescription jobDesc, String uniqId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
-        // get FileTransfer
-        String[] fileTransfer;
         try {
-            fileTransfer = jobDesc.getVectorAttribute(JobDescription.FILETRANSFER);
+            // get FileTransfer
+            String[] fileTransfer = jobDesc.getVectorAttribute(JobDescription.FILETRANSFER);
+
+            // create data staging manager
+            if (adaptor instanceof SandboxJobAdaptor) {
+                return new DataStagingManagerThroughSandbox((SandboxJobAdaptor) adaptor, uniqId);
+            } else if (adaptor instanceof StreamableJobAdaptor) {
+                return new DataStagingManagerThroughStream(fileTransfer);
+            } else {
+                throw new NotImplementedException("Adaptor can not handle attribute FileTransfer: "+adaptor.getClass());
+            }
         } catch (DoesNotExistException e) {
-            fileTransfer = new String[]{};
+            // create data staging manager
+            return new DataStagingManagerDummy();
         } catch (IncorrectStateException e) {
             throw new NoSuccessException(e);
-        }
-
-        // create data staging manager
-        if (adaptor instanceof SandboxJobAdaptor) {
-            return new DataStagingManagerThroughSandbox((SandboxJobAdaptor) adaptor, uniqId);
-        } else if (adaptor instanceof StreamableJobAdaptor) {
-            return new DataStagingManagerThroughStream(fileTransfer);
-        } else {
-            throw new NotImplementedException("Adaptor can not handle attribute FileTransfer: "+adaptor.getClass());
         }
     }
 }
