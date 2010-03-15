@@ -10,6 +10,7 @@
     <!-- JSAGA parameters -->
     <xsl:param name="UniqId">staging</xsl:param>
     <xsl:param name="IntermediaryURL">uri://</xsl:param>
+    <xsl:param name="SupportedProtocols">/p1/p2/p3/</xsl:param>
 
     <!-- Adaptor-specific parameters -->
     <xsl:param name="HostName"/>
@@ -85,21 +86,44 @@
             </xsl:otherwise>
         </xsl:choose>
 
-        <xsl:if test="jsdl:DataStaging[jsdl:Source/jsdl:URI]">
+        <xsl:if test="jsdl:DataStaging[jsdl:Source]">
+            <xsl:variable name="UnsupportedURI" select="jsdl:DataStaging[jsdl:Source][
+                not(contains($SupportedProtocols,concat('/',substring-before(jsdl:Source/jsdl:URI/text(),'://'),'/')))]"/>
+  InputSandbox_PreStaging = <xsl:value-of select="count($UnsupportedURI)"/>;<xsl:text/>
+            <xsl:for-each select="$UnsupportedURI">
+  InputSandbox_PreStaging.<xsl:value-of select="position()-1"/>.From = <xsl:value-of select="jsdl:Source/jsdl:URI/text()"/>;<xsl:text/>
+  InputSandbox_PreStaging.<xsl:value-of select="position()-1"/>.To = <xsl:value-of select="jsdl:FileName/text()"/>;<xsl:text/>
+            </xsl:for-each>
   InputSandbox = {<xsl:text/>
-            <xsl:for-each select="jsdl:DataStaging/jsdl:Source/jsdl:URI">
+            <xsl:for-each select="jsdl:DataStaging[jsdl:Source]">
                 <xsl:if test="position()>1">,</xsl:if>
-                "<xsl:value-of select="text()"/>"<xsl:text/>
+                "<xsl:text/>
+                <xsl:choose>
+                    <xsl:when test="contains($SupportedProtocols,concat('/',substring-before(jsdl:Source/jsdl:URI/text(),'://'),'/'))">
+                        <xsl:value-of select="jsdl:Source/jsdl:URI/text()"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="jsdl:FileName/text()"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <xsl:text>"</xsl:text>
             </xsl:for-each>};
         </xsl:if>
 
-        <xsl:if test="jsdl:DataStaging[jsdl:Target/jsdl:URI] or $isInteractive">
+        <xsl:if test="jsdl:DataStaging[jsdl:Target] or $isInteractive">
+            <xsl:variable name="UnsupportedURI" select="jsdl:DataStaging[jsdl:Target][
+                not(contains($SupportedProtocols,concat('/',substring-before(jsdl:Target/jsdl:URI/text(),'://'),'/')))]"/>
+  OutputSandbox_PostStaging = <xsl:value-of select="count($UnsupportedURI)"/>;<xsl:text/>
+            <xsl:for-each select="$UnsupportedURI">
+  OutputSandbox_PostStaging.<xsl:value-of select="position()-1"/>.From = <xsl:value-of select="jsdl:FileName/text()"/>;<xsl:text/>
+  OutputSandbox_PostStaging.<xsl:value-of select="position()-1"/>.To = <xsl:value-of select="jsdl:Target/jsdl:URI/text()"/>;<xsl:text/>
+            </xsl:for-each>
   OutputSandbox = {<xsl:text/>
             <xsl:if test="$isInteractive">
                 "<xsl:value-of select="$UniqId"/>-output.txt",
                 "<xsl:value-of select="$UniqId"/>-error.txt"<xsl:text/>
             </xsl:if>
-            <xsl:for-each select="jsdl:DataStaging[jsdl:Target/jsdl:URI]/jsdl:FileName">
+            <xsl:for-each select="jsdl:DataStaging[jsdl:Target]/jsdl:FileName">
                 <xsl:if test="position()>1 or $isInteractive">,</xsl:if>
                 "<xsl:value-of select="text()"/>"<xsl:text/>
             </xsl:for-each>};
@@ -108,9 +132,18 @@
                 "gsiftp://<xsl:value-of select="$HostName"/>/tmp/<xsl:value-of select="$UniqId"/>-output.txt",
                 "gsiftp://<xsl:value-of select="$HostName"/>/tmp/<xsl:value-of select="$UniqId"/>-error.txt"<xsl:text/>
             </xsl:if>
-            <xsl:for-each select="jsdl:DataStaging/jsdl:Target/jsdl:URI">
+            <xsl:for-each select="jsdl:DataStaging[jsdl:Target]">
                 <xsl:if test="position()>1 or $isInteractive">,</xsl:if>
-                "<xsl:value-of select="text()"/>"<xsl:text/>
+                "<xsl:text/>
+                <xsl:choose>
+                    <xsl:when test="contains($SupportedProtocols,concat('/',substring-before(jsdl:Target/jsdl:URI/text(),'://'),'/'))">
+                        <xsl:value-of select="jsdl:Target/jsdl:URI/text()"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="jsdl:FileName/text()"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <xsl:text>"</xsl:text>
             </xsl:for-each>};
         </xsl:if>
 
