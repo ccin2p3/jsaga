@@ -265,29 +265,9 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             }
         }
 
-        // staging
-        try {
-            // post-staging
-            if (isDone) {
-                m_stagingMgr.postStaging(this);
-            }
-
-            // cleanup staged files
-            if (this.isFinalState()) {
-                m_stagingMgr.cleanup(this);
-            }
-        }
-        catch (NotImplementedException e) {throw e;}
-        catch (TimeoutException e) {throw e;}
-        catch (NoSuccessException e) {throw e;}
-        catch (SagaException e) {
-            throw new NoSuccessException(e);
-        }
-
-        // cleanup job
-        if (this.isFinalState() && m_controlAdaptor instanceof CleanableJobAdaptor) {
+        if (this.isFinalState()) {
             try {
-                ((CleanableJobAdaptor)m_controlAdaptor).clean(m_nativeJobId);
+                this.doCleanup();
             } catch (SagaException e) {
                 s_logger.warn("Failed to cleanup job: "+m_nativeJobId, e);
             }
@@ -296,11 +276,35 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
 
     public void cleanup() throws NotImplementedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         m_monitorService.checkState();
-        State state = this.getState();
-        if (! this.isFinalState()) {
+        State state = this.getState();  // force state refresh
+        if (this.isFinalState()) {
+            this.doCleanup();
+        } else {
             throw new IncorrectStateException("Can not cleanup unfinished job: "+state, this);
         }
+    }
 
+    private void doCleanup() throws NotImplementedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
+        boolean isDone = (State.DONE.compareTo(m_metrics.m_State.getValue()) == 0);
+        try {
+            // post-staging
+            if (isDone) {
+                m_stagingMgr.postStaging(this);
+            }
+
+            // cleanup staged files
+            m_stagingMgr.cleanup(this);
+        } catch (AuthenticationFailedException e) {
+            throw new NoSuccessException(e);
+        } catch (AuthorizationFailedException e) {
+            throw new NoSuccessException(e);
+        } catch (BadParameterException e) {
+            throw new NoSuccessException(e);
+        } catch (DoesNotExistException e) {
+            throw new NoSuccessException(e);
+        }
+
+        // cleanup job
         if (m_controlAdaptor instanceof CleanableJobAdaptor) {
             ((CleanableJobAdaptor)m_controlAdaptor).clean(m_nativeJobId);
         } else {
