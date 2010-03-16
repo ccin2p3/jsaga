@@ -73,6 +73,8 @@ public class JobAdaptorDescriptor {
             String[] supportedContextTypes = securityDesc.getSupportedContextTypes(adaptor.getSupportedSecurityAdaptorClasses());
             service.setSupportedContextType(supportedContextTypes);
         }
+        FileStaging staging = new FileStaging();
+        service.setFileStaging(staging);
         JobMonitorAdaptor monitorAdaptor = adaptor.getDefaultJobMonitor();
         if (monitorAdaptor != null) {
             MonitorService monitor = new MonitorService();
