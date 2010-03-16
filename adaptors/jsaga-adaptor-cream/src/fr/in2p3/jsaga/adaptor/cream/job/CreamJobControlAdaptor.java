@@ -164,15 +164,15 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 
     public SandboxTransfer[] getInputSandboxTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {
         JobInfo jobInfo = this.getJobInfo(nativeJobId);
-        //String baseUri = jobInfo.getCREAMInputSandboxURI();
-        String baseUri = this.getStagingIntermediaryBaseURL()+"/"+nativeJobId;
+        //String baseUri = jobInfo.getCREAMInputSandboxURI()+"/";
+        String baseUri = "";
         Properties jobDesc = parseJobDescription(jobInfo.getJDL());
         int transfersLength = getIntValue(jobDesc, "InputSandboxPreStaging");
         SandboxTransfer[] transfers = new SandboxTransfer[transfersLength];
         for (int i=0; i<transfersLength; i++) {
             transfers[i] = new SandboxTransfer(
                     getStringValue(jobDesc, "InputSandboxPreStaging_"+i+"_From"),
-                    baseUri+"/"+getStringValue(jobDesc, "InputSandboxPreStaging_"+i+"_To"),
+                    baseUri+getStringValue(jobDesc, "InputSandboxPreStaging_"+i+"_To"),
                     getBooleanValue(jobDesc, "InputSandboxPreStaging_"+i+"_Append"));
         }
         return transfers;
@@ -180,14 +180,14 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 
     public SandboxTransfer[] getOutputSandboxTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {
         JobInfo jobInfo = this.getJobInfo(nativeJobId);
-        //String baseUri = jobInfo.getCREAMOutputSandboxURI();
-        String baseUri = this.getStagingIntermediaryBaseURL()+"/"+nativeJobId;
+        //String baseUri = jobInfo.getCREAMOutputSandboxURI()+"/";
+        String baseUri = "";
         Properties jobDesc = parseJobDescription(jobInfo.getJDL());
         int transfersLength = getIntValue(jobDesc, "OutputSandboxPostStaging");
         SandboxTransfer[] transfers = new SandboxTransfer[transfersLength];
         for (int i=0; i<transfersLength; i++) {
             transfers[i] = new SandboxTransfer(
-                    baseUri+"/"+getStringValue(jobDesc, "OutputSandboxPostStaging_"+i+"_From"),
+                    baseUri+getStringValue(jobDesc, "OutputSandboxPostStaging_"+i+"_From"),
                     getStringValue(jobDesc, "OutputSandboxPostStaging_"+i+"_To"),
                     getBooleanValue(jobDesc, "OutputSandboxPostStaging_"+i+"_Append"));
         }
