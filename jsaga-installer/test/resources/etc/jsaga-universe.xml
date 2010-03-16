@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<UNIVERSE name="World" xmlns="http://www.in2p3.fr/jsaga">
+    <GRID name="EGEE_dteam" contextType="VOMS">
+        <!-- get defaults from gLite-UI environment and configuration files -->
+        <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
+        <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/dteam_cred.txt"/>
+        <attribute name="LifeTime" value="PT13H"/>
+        <job type="cream"/>
+        <data type="gsiftp"/>
+        <data type="srm"/>
+        <data type="irods" base="irods://ccirods01.in2p3.fr:5596/">
+            <attribute name="DefaultResource" value="demoResc2"/>
+            <attribute name="UserID" value="sreynaud"/>
+            <attribute name="Zone" value="tempZone"/>
+        </data>
+        <data type="irodsl" base="irodsl://ccirods01.in2p3.fr:5596/">
+            <attribute name="DefaultResource" value="demoResc2"/>
+            <attribute name="UserID" value="sreynaud"/>
+            <attribute name="Zone" value="tempZone"/>
+            <schemeAlias>irods</schemeAlias>
+        </data>
+    </GRID>
+
+    <GRID name="EGEE_rhonealpes" contextType="VOMS">
+        <attribute name="Server" value="voms://cclcgvomsli01.in2p3.fr:15011/O=GRID-FR/C=FR/O=CNRS/OU=CC-LYON/CN=cclcgvomsli01.in2p3.fr"/>
+        <attribute name="UserVO" value="vo.rhone-alpes.idgrilles.fr"/>
+        <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
+        <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/ra_cred.txt"/>
+        <job type="wms">
+            <attribute name="RetryCount" value="0"/>
+            <attribute name="PerusalFileEnable" value="false"/>
+        </job>
+    </GRID>
+
+    <GRID name="DGrid" contextType="Globus">
+        <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/d-grid/certificates/"/>
+        <attribute name="UserCert" value="${user.home}/.jsaga/contexts/d-grid/usercert.pem"/>
+        <attribute name="UserKey" value="${user.home}/.jsaga/contexts/d-grid/userkey.pem"/>
+        <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/dgrid_cred.txt"/>
+        <domain name="de"/>
+        <data type="gsiftp"/>
+    </GRID>
+
+    <GRID name="Test" contextType="Globus">
+        <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/globus/certificates/"/>
+        <attribute name="UserCert" value="${user.home}/.jsaga/contexts/globus/usercert.pem"/>
+        <attribute name="UserKey" value="${user.home}/.jsaga/contexts/globus/userkey.pem"/>
+        <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/globus_cred.txt"/>
+        <attribute name="UserPass" value="toto"/>
+        <domain>
+            <host prefix="localhost"/>
+        </domain>
+        <job type="gatekeeper">
+            <attribute name="ShellPath" value="F:\cygwin\bin\sh.exe"/>
+        </job>
+    </GRID>
+
+    <GRID contextType="X509">
+        <attribute name="UserCert" value="${user.home}/.jsaga/contexts/https/mycert.p12"/>
+        <attribute name="UserPass" value="toto"/>
+        <data type="https"/>
+    </GRID>
+
+    <GRID contextType="SSH">
+        <attribute name="UserKey" value="${user.home}/.jsaga/contexts/ssh/id_rsa"/>
+        <attribute name="UserPass" value="N/A"/>
+        <job type="ssh"/>
+        <data type="sftp"/>
+    </GRID>
+
+    <GRID name="SRB_ctx" contextType="UserPass">
+        <attribute name="UserID" value="sreynaud"/>
+        <attribute name="UserPass"/>
+        <attribute name="LifeTime" value="PT12H"/>
+        <data type="srb" base="srb://ccsrb01.in2p3.fr:5591/?defaultResource=MammoDisk&amp;domain=ccin2p3">
+            <attribute name="UseTrash" value="false"/>
+        </data>
+    </GRID>
+
+    <GRID contextType="InMemoryProxy" deactivated="true"/>
+    <GRID contextType="JKS" deactivated="true"/>
+    <GRID contextType="MyProxy" deactivated="true"/>
+    <GRID contextType="GlobusLegacy" deactivated="true"/>
+    <GRID contextType="GlobusRFC820" deactivated="true"/>
+    <GRID contextType="NAREGI" deactivated="true"/>
+    <GRID contextType="VOMSMyProxy" deactivated="true"/>
+</UNIVERSE>
