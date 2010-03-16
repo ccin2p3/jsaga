@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <UNIVERSE name="World" xmlns="http://www.in2p3.fr/jsaga">
+<!-- Uncomment this if JSAGA is not running on a gLite-UI -->
+<!--
     <GRID contextType="VOMS">
         <attribute name="Server" value="voms://lcg-voms.cern.ch:15004/DC=ch/DC=cern/OU=computers/CN=lcg-voms.cern.ch"/>
         <attribute name="VomsDir" value="etc/vomsdir"/>
@@ -7,4 +9,5 @@
     <GRID contextType="MyProxy" deactivated="true">
         <attribute name="Server" value="cclcgproxli01.in2p3.fr:7512"/>
     </GRID>
+-->
 </UNIVERSE>
