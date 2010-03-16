@@ -45,7 +45,7 @@ public class DataStagingManagerThroughStream implements DataStagingManager {
 
         // init
         for (String ft : fileTransfer) {
-            AbstractDataStaging dataStaging = DataStagingFactory.create(ft, null);
+            AbstractDataStaging dataStaging = DataStagingFactory.create(ft);
             if (dataStaging instanceof InputDataStagingToRemote) {
                 m_inputToRemote.add((InputDataStagingToRemote) dataStaging);
             } else if (dataStaging instanceof InputDataStagingToWorker) {

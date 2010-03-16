@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 public class DataStagingFactory {
     private static final Pattern PATTERN = Pattern.compile("([^<>]*) *(>>|>|<<|<) *([^<>]*)");
 
-    public static AbstractDataStaging create(String fileTransfer, URL intermediaryURL) throws NotImplementedException, BadParameterException, NoSuccessException {
+    public static AbstractDataStaging create(String fileTransfer) throws NotImplementedException, BadParameterException, NoSuccessException {
         Matcher m = PATTERN.matcher(fileTransfer);
         if (m.matches() && m.groupCount()==3) {
             String local = m.group(1).trim();
@@ -46,8 +46,6 @@ public class DataStagingFactory {
                 boolean append = ">>".equals(operator);
                 if (isURL(worker)) {
                     return new InputDataStagingToRemote(localURL, URLFactory.createURL(worker), append);
-                } else if (intermediaryURL != null) {
-                    return new InputDataStagingToIntermediary(localURL, URLFactory.createURL(worker), append, intermediaryURL);
                 } else {
                     return new InputDataStagingToWorker(localURL, worker, append);
                 }
@@ -55,8 +53,6 @@ public class DataStagingFactory {
                 boolean append = "<<".equals(operator);
                 if (isURL(worker)) {
                     return new OutputDataStagingFromRemote(localURL, URLFactory.createURL(worker), append);
-                } else if (intermediaryURL != null) {
-                    return new OutputDataStagingFromIntermediary(localURL, URLFactory.createURL(worker), append, intermediaryURL);
                 } else {
                     return new OutputDataStagingFromWorker(localURL, worker, append);
                 }
