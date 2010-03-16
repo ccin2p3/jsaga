@@ -193,8 +193,14 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             String sagaJobId = "["+monitorUrl+"]-["+m_nativeJobId+"]";
             m_attributes.m_JobId.setObject(sagaJobId);
 
+            // pre-staging
             if (m_stagingMgr instanceof DataStagingManagerThroughSandbox) {
                 ((DataStagingManagerThroughSandbox)m_stagingMgr).preStaging(this, m_nativeJobId);
+            }
+
+            // start job
+            if (m_controlAdaptor instanceof SandboxJobAdaptor) {
+                ((SandboxJobAdaptor)m_controlAdaptor).start(m_nativeJobId);
             }
         } catch (AuthorizationFailedException e) {
             throw new NoSuccessException(e);
@@ -206,10 +212,6 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             throw new NoSuccessException(e);
         } catch (BadParameterException e) {
             throw new NoSuccessException(e);
-        }
-
-        if (m_controlAdaptor instanceof SandboxJobAdaptor) {
-            ((SandboxJobAdaptor)m_controlAdaptor).start(m_nativeJobId);
         }
     }
 
