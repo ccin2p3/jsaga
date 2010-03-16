@@ -10,12 +10,14 @@
     <!-- JSAGA parameters -->
     <xsl:param name="UniqId">staging</xsl:param>
     <xsl:param name="IntermediaryURL">uri://</xsl:param>
-    <xsl:param name="SupportedProtocols">/p1/p2/p3/</xsl:param>
 
     <!-- Adaptor-specific parameters -->
     <xsl:param name="HostName"/>
     <xsl:param name="BatchSystem"/>
     <xsl:param name="QueueName"/>
+
+    <!-- constants -->
+    <xsl:variable name="SupportedProtocols">/gsiftp/</xsl:variable>
 
     <!-- entry point (MUST BE RELATIVE) -->
     <xsl:template match="jsdl:JobDefinition">

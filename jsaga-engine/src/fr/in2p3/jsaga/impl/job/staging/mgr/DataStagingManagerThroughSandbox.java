@@ -11,8 +11,6 @@ import org.ogf.saga.session.Session;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
-import java.util.*;
-
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
@@ -27,18 +25,11 @@ import java.util.*;
  */
 public class DataStagingManagerThroughSandbox implements DataStagingManager {
     // info
-    private Set<String> m_supportedProtocols;
     private URL m_intermediaryURL;
     private Directory m_intermediaryDirectory;
 
     public DataStagingManagerThroughSandbox(SandboxJobAdaptor adaptor, String uniqId) throws NotImplementedException, BadParameterException, NoSuccessException {
-        // get protocols and intermediary
-        m_supportedProtocols = new HashSet<String>(Arrays.asList(adaptor.getStagingProtocols()));
-        m_intermediaryURL = URLFactory.createURL(adaptor.getStagingIntermediaryBaseURL()+"/"+uniqId+"/");
-    }
-
-    public Set<String> getSupportedProtocols() {
-        return m_supportedProtocols;
+        m_intermediaryURL = URLFactory.createURL(adaptor.getSandboxBaseURL()+"/"+uniqId+"/");
     }
 
     public URL getIntermediaryURL() {

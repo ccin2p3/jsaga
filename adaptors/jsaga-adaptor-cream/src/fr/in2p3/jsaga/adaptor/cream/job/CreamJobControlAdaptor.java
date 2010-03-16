@@ -256,11 +256,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         CreamExceptionFactory.rethrow(resultArray);
     }
 
-    public String[] getStagingProtocols() {
-        return new String[]{"gsiftp"};
-    }
-
-    public String getStagingIntermediaryBaseURL() {
+    public String getSandboxBaseURL() {
         String hostname = (String) m_parameters.get(HOST_NAME);
         return "gsiftp://"+hostname+":2811/tmp";
     }

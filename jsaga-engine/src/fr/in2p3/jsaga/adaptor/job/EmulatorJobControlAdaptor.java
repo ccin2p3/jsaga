@@ -1,8 +1,6 @@
 package fr.in2p3.jsaga.adaptor.job;
 
-import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.advanced.StagingJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.*;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.*;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.ogf.saga.error.*;
@@ -23,7 +21,7 @@ import java.util.*;
 /**
  *
  */
-public class EmulatorJobControlAdaptor extends EmulatorJobAdaptorAbstract implements StagingJobAdaptor, CleanableJobAdaptor, StreamableJobBatch {
+public class EmulatorJobControlAdaptor extends EmulatorJobAdaptorAbstract implements SandboxJobAdaptor, CleanableJobAdaptor, StreamableJobBatch {
     public int getDefaultPort() {
         return 1234;
     }
@@ -114,11 +112,19 @@ public class EmulatorJobControlAdaptor extends EmulatorJobAdaptorAbstract implem
         }
     }
 
-    public String[] getStagingProtocols() {
-        return new String[]{"file"};
+    public String getSandboxBaseURL() {
+        return "test://emulator1.test.org:1234/";
     }
 
-    public String getStagingIntermediaryBaseURL() {
-        return "test://emulator1.test.org:1234/";
+    public SandboxTransfer[] getInputSandboxTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {
+        return new SandboxTransfer[]{};
+    }
+
+    public SandboxTransfer[] getOutputSandboxTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {
+        return new SandboxTransfer[]{};
+    }
+
+    public String start(String nativeJobId) throws TimeoutException, NoSuccessException {
+        return nativeJobId;
     }
 }

@@ -88,14 +88,6 @@ public abstract class AbstractSyncJobServiceImpl extends AbstractSagaObjectImpl 
                 }
                 parameters.put("UniqId", uniqId);
                 if (stagingMgr instanceof DataStagingManagerThroughSandbox) {
-                    Set<String> supportedProtocols = ((DataStagingManagerThroughSandbox)stagingMgr).getSupportedProtocols();
-                    if (supportedProtocols!=null && !supportedProtocols.isEmpty()) {
-                        StringBuffer buffer = new StringBuffer("/");
-                        for (String protocol : supportedProtocols) {
-                            buffer.append(protocol).append('/');
-                        }
-                        parameters.put("SupportedProtocols", buffer.toString());
-                    }
                     URL intermediaryURL = ((DataStagingManagerThroughSandbox)stagingMgr).getIntermediaryURL();
                     if (intermediaryURL != null) {
                         parameters.put("IntermediaryURL", intermediaryURL.toString());
