@@ -51,7 +51,7 @@ public class DataAdaptorFactory extends ServiceAdaptorFactory {
      */
     public DataAdaptor getDataAdaptor(URL url, Session session, boolean isLogical) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (url==null || url.getScheme()==null) {
-            throw new IncorrectURLException("Invalid entry name");
+            throw new IncorrectURLException("No protocol found in URL: "+url);
         }
 
         // get config
