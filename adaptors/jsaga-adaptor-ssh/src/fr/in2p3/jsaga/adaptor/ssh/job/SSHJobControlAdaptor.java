@@ -36,10 +36,6 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 		return "ssh";
 	}
 
-	public String[] getSupportedSandboxProtocols() {
-		return null; // no sandbox management
-	}
-
 	public String getTranslator() {
 		return "xsl/job/ssh.xsl";
 	}

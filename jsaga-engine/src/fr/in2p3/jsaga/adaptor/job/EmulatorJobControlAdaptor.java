@@ -26,10 +26,6 @@ public class EmulatorJobControlAdaptor extends EmulatorJobAdaptorAbstract implem
         return 1234;
     }
 
-    public String[] getSupportedSandboxProtocols() {
-        return new String[]{"file"};
-    }
-
     public String getTranslator() {
         return "xsl/job/saga.xsl";
     }

@@ -86,10 +86,6 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         };
     }
 
-    public String[] getSupportedSandboxProtocols() {
-        return new String[]{"file","gsiftp"};    // no sandbox management
-    }
-
     public String getTranslator() {
         return "xsl/job/jdl.xsl";
     }

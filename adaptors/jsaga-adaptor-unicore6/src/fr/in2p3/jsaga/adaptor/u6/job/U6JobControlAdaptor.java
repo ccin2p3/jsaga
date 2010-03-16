@@ -87,10 +87,6 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract
     			new Default(DEFAULT_CPU_TIME, "3600")};
     }
     
-    public String[] getSupportedSandboxProtocols() {
-        return null;    // no sandbox management
-    }
-
     public String getTranslator() {
         return "xsl/job/jsdl.xsl";
     }

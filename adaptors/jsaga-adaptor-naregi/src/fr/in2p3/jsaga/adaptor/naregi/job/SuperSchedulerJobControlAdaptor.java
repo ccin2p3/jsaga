@@ -37,10 +37,6 @@ public class SuperSchedulerJobControlAdaptor extends SuperSchedulerJobAdaptorAbs
         return null;
     }
 
-    public String[] getSupportedSandboxProtocols() {
-        return null;    // no sandbox management
-    }
-
     public String getTranslator() {
         return "xsl/job/wfml.xsl";
     }

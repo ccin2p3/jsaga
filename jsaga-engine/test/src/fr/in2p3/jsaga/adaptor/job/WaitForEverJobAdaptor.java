@@ -33,9 +33,6 @@ public class WaitForEverJobAdaptor extends WaitForEverAdaptorAbstract
 
     /////////////////////////////////////////// interface JobAdaptor ///////////////////////////////////////////
 
-    public String[] getSupportedSandboxProtocols() {
-        return null;
-    }
     public String getTranslator() {
         return "xsl/job/hang.xsl";
     }

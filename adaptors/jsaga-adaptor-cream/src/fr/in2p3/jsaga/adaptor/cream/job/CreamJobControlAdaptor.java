@@ -57,10 +57,6 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         };
     }
 
-    public String[] getSupportedSandboxProtocols() {
-        return new String[]{"gsiftp"};
-    }
-
     public String getTranslator() {
         return "xsl/job/cream-jdl.xsl";
     }

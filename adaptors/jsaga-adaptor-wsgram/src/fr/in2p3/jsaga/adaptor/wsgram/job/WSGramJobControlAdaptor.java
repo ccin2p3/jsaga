@@ -33,12 +33,6 @@ import java.util.Map;
  * TODO : during cleanup, remove proxy saved in server in $HOME/.globus/gram_proxy...
  */
 public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements JobControlAdaptor, CleanableJobAdaptor {
-
-
-    public String[] getSupportedSandboxProtocols() {
-        return null;    // no sandbox management
-    }
-
     public String getTranslator() {
         return "xsl/job/rsl-2.0.xsl";
     }

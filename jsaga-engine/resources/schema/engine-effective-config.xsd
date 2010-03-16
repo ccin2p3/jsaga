@@ -121,9 +121,6 @@
                     <element name="supportedContextType" minOccurs="0" maxOccurs="unbounded" type="string"/><!-- from adaptor descriptor -->
                     <element name="fileStaging"><complexType>
                         <sequence>
-                            <element name="supportedProtocolScheme" minOccurs="0" maxOccurs="unbounded" type="string"><!-- from adaptor descriptor -->
-                                <annotation><documentation>If exist, then file staging can be delegated to job service for this protocol</documentation></annotation>
-                            </element>
                             <element name="workerProtocolScheme" minOccurs="0" maxOccurs="unbounded"><complexType><simpleContent><extension base="string">
                                 <attribute name="read" type="boolean" use="required"/>
                                 <attribute name="write" type="boolean" use="required"/>

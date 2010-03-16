@@ -44,10 +44,6 @@ public class LCGCEJobControlAdaptor extends GatekeeperJobAdaptorAbstract impleme
         return null;
     }
 
-    public String[] getSupportedSandboxProtocols() {
-        return null;    // no sandbox management
-    }
-
     public String getTranslator() {
         return "xsl/job/rsl-1.0.xsl";
     }

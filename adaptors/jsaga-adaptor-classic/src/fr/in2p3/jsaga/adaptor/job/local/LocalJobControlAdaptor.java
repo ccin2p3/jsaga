@@ -43,10 +43,6 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
         return new Default[]{new Default(SHELLPATH, "/bin/bash")};
     }
 
-    public String[] getSupportedSandboxProtocols() {
-		return null; // no sandbox management
-	}
-
 	public String getTranslator() {
 		return "xsl/job/sh.xsl";
 	}
