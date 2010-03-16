@@ -11,7 +11,7 @@
     <script>jsaga-job-list</script>
     <script>jsaga-job-run</script>
     <script>jsaga-job-status</script>
-    <script>jsaga-job-get-output_WMS</script>
+    <script>jsaga-job-get-output</script>
 
     <script>jsaga-jobcollection-run</script>
     <script>jsaga-jobcollection-status</script>

@@ -272,24 +272,24 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
 
         if (this.isFinalState()) {
             try {
-                this.doCleanup();
+                this.doPostStagingAndCleanup();
             } catch (SagaException e) {
                 s_logger.warn("Failed to cleanup job: "+m_nativeJobId, e);
             }
         }
     }
 
-    public void cleanup() throws NotImplementedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
+    public void postStagingAndCleanup() throws NotImplementedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         m_monitorService.checkState();
         State state = this.getState();  // force state refresh
         if (this.isFinalState()) {
-            this.doCleanup();
+            this.doPostStagingAndCleanup();
         } else {
             throw new IncorrectStateException("Can not cleanup unfinished job: "+state, this);
         }
     }
 
-    private void doCleanup() throws NotImplementedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
+    private void doPostStagingAndCleanup() throws NotImplementedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         boolean isDone = (State.DONE.compareTo(m_metrics.m_State.getValue()) == 0);
         try {
             // post-staging
