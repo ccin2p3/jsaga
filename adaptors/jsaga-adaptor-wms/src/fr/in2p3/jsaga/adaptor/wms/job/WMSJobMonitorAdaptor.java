@@ -35,6 +35,7 @@ import java.util.*;
 * ***************************************************/
 
 public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements QueryIndividualJob, QueryFilteredJob, ListableJobAdaptor, JobInfoAdaptor {
+    public static final String MONITOR_PORT = "MonitorPort";
     private String m_wmsServerUrl;
     private String m_lbHost;
 	private int m_lbPort;

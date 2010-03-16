@@ -20,8 +20,6 @@ import java.io.File;
  *
  */
 public abstract class WMSJobAdaptorAbstract implements SagaSecureAdaptor {
-	
-	public static final String MONITOR_PORT = "MonitorPort";	
     protected GSSCredential m_credential;
     protected File m_certRepository;
         

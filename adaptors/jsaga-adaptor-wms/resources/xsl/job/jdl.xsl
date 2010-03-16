@@ -14,6 +14,7 @@
     <!-- Adaptor-specific parameters -->
     <xsl:param name="HostName"/>
     <!-- JDL attributes -->
+    <xsl:param name="LBAddress"/>
     <xsl:param name="requirements"/>
     <xsl:param name="rank"/>
     <xsl:param name="virtualorganisation"/>
@@ -209,6 +210,9 @@ NodeNumber = <xsl:value-of select="."/>;<xsl:text/>
             </xsl:for-each>};
         </xsl:if>
 
+        <xsl:if test="$LBAddress">
+LBAddress = "<xsl:value-of select="$LBAddress"/>";<xsl:text/>
+        </xsl:if>
         <xsl:if test="$virtualorganisation">
 virtualorganisation = "<xsl:value-of select="$virtualorganisation"/>";<xsl:text/>
         </xsl:if>

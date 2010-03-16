@@ -19,7 +19,6 @@ import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
-import org.ogf.saga.url.URL;
 
 import java.io.*;
 import java.util.Map;
@@ -52,7 +51,6 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     private String m_delegationId = "myId";
     private String m_wmsServerHost;
     private String m_wmsServerUrl;
-    private String m_lbServerUrl;
 
     public String getType() {
         return "wms";
@@ -64,9 +62,9 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     
     public Usage getUsage() {
         return new UOr(new U[]{
-                new U(MONITOR_PORT),
                 new UOptional(DEFAULT_JDL_FILE),
                 // JDL attributes
+                new UOptional("LBAddress"),
                 new UOptional("requirements"),
                 new UOptional("rank"),
                 new UOptional("virtualorganisation"),
@@ -82,7 +80,6 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return new Default[]{
-                new Default(MONITOR_PORT, "9000"),
                 // JDL attributes
                 new Default("requirements", "(other.GlueCEStateStatus==\"Production\")"),
                 new Default("rank", "(-other.GlueCEStateEstimatedResponseTime)")
@@ -118,16 +115,9 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             }
         }
 
+        // set WMS url
         m_wmsServerHost = host;
     	m_wmsServerUrl = "https://"+host+":"+port+basePath;
-    	if(attributes.containsKey(MONITOR_SERVICE_URL)) {
-    		// LB server name get in config
-    		URL lbUrl = (URL) attributes.get(MONITOR_SERVICE_URL);
-            m_lbServerUrl = lbUrl.getHost() + ":" + (lbUrl.getPort()>0 ? ""+lbUrl.getPort() : attributes.get(MONITOR_PORT));
-    	} else {
-            // LB server will be extracted from jobid
-            m_lbServerUrl = null;
-        }
 
     	// get certificate directory
         if (m_certRepository == null) {
@@ -221,11 +211,6 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
     	try {
-            // put lbServerUrl in JDL
-    		if (m_lbServerUrl != null) {
-			    jobDesc += "LBAddress=\""+m_lbServerUrl+"\";";
-            }
-			
 			// parse JDL and Check Matching
 			checkJDLAndMAtch(jobDesc, checkMatch, m_client);
 
@@ -233,7 +218,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             String nativeJobId = m_client.jobRegister(jobDesc, m_delegationId).getId();
 
             // set LB from nativeJobId
-            if (m_lbServerUrl == null) {
+            if (! m_parameters.containsKey("LBAddress")) {
                 WMStoLB.getInstance().setLBHost(m_wmsServerUrl, nativeJobId);
             }
 	    	return nativeJobId;
