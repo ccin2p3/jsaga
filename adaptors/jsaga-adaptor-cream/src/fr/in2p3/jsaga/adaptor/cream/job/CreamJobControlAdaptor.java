@@ -162,6 +162,11 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         }
     }
 
+    public String getSandboxBaseURL() {
+        String hostname = (String) m_parameters.get(HOST_NAME);
+        return "gsiftp://"+hostname+":2811/tmp";
+    }
+
     public SandboxTransfer[] getInputSandboxTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {
         JobInfo jobInfo = this.getJobInfo(nativeJobId);
         //String baseUri = jobInfo.getCREAMInputSandboxURI()+"/";
@@ -254,11 +259,6 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 
         // rethrow exception if any fault in result
         CreamExceptionFactory.rethrow(resultArray);
-    }
-
-    public String getSandboxBaseURL() {
-        String hostname = (String) m_parameters.get(HOST_NAME);
-        return "gsiftp://"+hostname+":2811/tmp";
     }
 
     public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
