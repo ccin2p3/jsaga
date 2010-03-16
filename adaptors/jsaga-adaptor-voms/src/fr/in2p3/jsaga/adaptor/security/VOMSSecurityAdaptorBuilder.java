@@ -117,6 +117,8 @@ public class VOMSSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuild
                         new File(env.getProperty("X509_VOMS_DIR")+""),
                         new File(System.getProperty("user.home")+"/.globus/vomsdir/"),
                         new File("/etc/grid-security/vomsdir/")}),
+                new Default(Context.SERVER, new VomsesFile().getDefaultServer()),
+                new Default(Context.USERVO, new VomsesFile().getDefaultVO()),
                 new Default(Context.LIFETIME, "PT12H")
         };
     }
