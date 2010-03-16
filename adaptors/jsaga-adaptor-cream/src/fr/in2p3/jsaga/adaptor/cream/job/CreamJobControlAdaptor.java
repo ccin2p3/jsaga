@@ -309,8 +309,8 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     }
     private static String getValue(Properties jobDesc, String key) throws NoSuccessException {
         String value = jobDesc.getProperty(key);
-        if (value!=null && value.endsWith(";")) {
-            return value.substring(0, value.length()-1);
+        if (value!=null && value.trim().endsWith(";")) {
+            return value.trim().substring(0, value.length()-1);
         } else {
             throw new NoSuccessException("Failed to parse JDL attribute: "+value);
         }
