@@ -43,6 +43,11 @@ public class WMSExecutionTestSuite extends JSAGATestSuite {
     }
     
     // test cases
+    public static class WMSJobRunSandboxTest extends JobRunSandboxTest {
+        public WMSJobRunSandboxTest() throws Exception {super("wms");}
+    }
+
+    // test cases
     public static class WMSJobRunRequiredTest extends JobRunRequiredTest {
         public WMSJobRunRequiredTest() throws Exception {super("wms");}
     }

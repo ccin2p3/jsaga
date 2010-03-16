@@ -1,15 +1,11 @@
 package fr.in2p3.jsaga.adaptor.wms.job;
 
-import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOGetter;
-import org.glite.wms.wmproxy.*;
-import org.globus.io.urlcopy.UrlCopy;
-import org.globus.io.urlcopy.UrlCopyException;
-import org.globus.util.GlobusURL;
-import org.ietf.jgss.GSSCredential;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOSetter;
+import org.globus.ftp.*;
 import org.ogf.saga.error.*;
 
-import java.io.*;
-import java.net.MalformedURLException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 
 /* ***************************************************
@@ -21,102 +17,70 @@ import java.net.MalformedURLException;
 * Date:   13 mai 2008
 * ***************************************************/
 
-public class WMSJobIOHandler implements JobIOGetter {
+public class WMSJobIOHandler implements JobIOSetter {
+    public static final String INPUT_SUFFIX = "input.txt";
+    public static final String OUTPUT_SUFFIX = "output.txt";
+    public static final String ERROR_SUFFIX = "error.txt";
 
-	private String jobId ;
-	private WMProxyAPI m_client;
-	private GSSCredential m_credential;
-	private String stdoutFile, stderrFile;
+    private GridFTPClient m_stagingClient;
+    private String m_stagingPrefix;
+    private String m_jobId;
 
-	public WMSJobIOHandler(String jobId, 
-			WMProxyAPI m_client,
-			GSSCredential m_credential,
-			String stdoutFile,
-			String stderrFile) {
-		this.jobId = jobId;
-		this.m_client = m_client;
-		this.m_credential = m_credential;
-		this.stdoutFile = stdoutFile;
-		this.stderrFile = stderrFile;
-	}
+    public WMSJobIOHandler(GridFTPClient stagingClient, String stagingPrefix, String jobId) {
+        m_stagingClient = stagingClient;
+        m_stagingPrefix = stagingPrefix;
+        m_jobId = jobId;
+    }
 
-	public String getJobId() {
-		return jobId;
-	}
+    public void setStdout(OutputStream out) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        this.getToStream(m_stagingPrefix+"-"+OUTPUT_SUFFIX, out);
+    }
 
-	public InputStream getStderr() throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		try {
-			getSandboxFile(stderrFile);
-			return new FileInputStream(stderrFile);
-		} catch (FileNotFoundException e) {
-			throw new NoSuccessException(e);
-		}
-	}
-
-	public InputStream getStdout() throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		try {
-			getSandboxFile(stdoutFile);
-			return new FileInputStream(stdoutFile);
-		} catch (FileNotFoundException e) {
-			throw new NoSuccessException(e);
-		}
-	}
-	
-	private void getSandboxFile(String file) throws NoSuccessException, PermissionDeniedException {
-		
-		try {
-			//Use the "gsiftp" transfer protocols to retrieve the list of files produced by the jobs.
-	        StringAndLongList result = m_client.getOutputFileList(jobId, "gsiftp");
-	        if ( result != null ) 
-	        {
-	            // list of files+their size
-	            StringAndLongType[] list = (StringAndLongType[]) result.getFile();            
-	            if (list != null) {
-	                for (int i=0; i<list.length ; i++){
-	                	if(list[i].getName().endsWith(new File(file).getName())) {
-		                    // Creation of the "fromURL" link from where download the file(s).
-		                    String port = list[i].getName().substring(list[i].getName().lastIndexOf(":")+1,list[i].getName().length());
-		                    port = port.substring(0, port.indexOf("/"));                        
-		                    int pos = (list[i].getName()).indexOf(port);
-		                    int length = (list[i].getName()).length();                      
-		                    String front = (list[i].getName()).substring(0 , pos);
-		                    String rear = (list[i].getName()).substring(pos + 4 , length);                      
-		                    String fromURL = front + port + "/" + rear;
-		                    
-		                    String toURL = "file:///" + file;	                        
-	                        //Retrieve the file(s) from the WMProxy Server.
-	                        GlobusURL from = new GlobusURL(fromURL);
-	                        GlobusURL to = new GlobusURL(toURL);
-	                        
-	                        UrlCopy uCopy = new UrlCopy();
-	                        uCopy.setDestinationCredentials(m_credential);
-	                        uCopy.setSourceCredentials(m_credential);
-	                        uCopy.setDestinationUrl(to);
-	                        uCopy.setSourceUrl(from);
-	                        uCopy.setUseThirdPartyCopy(true);
-	                        uCopy.copy();
-	                    }
-	                }
-	            }
-	        }
-		} catch( UrlCopyException e) {
-			throw new NoSuccessException(e);
-		} catch (MalformedURLException e) {
-			throw new NoSuccessException(e);
-		} catch (AuthorizationFaultException e) {
-			throw new PermissionDeniedException(e);
-		} catch (AuthenticationFaultException e) {
-			throw new PermissionDeniedException(e);
-		} catch (OperationNotAllowedFaultException e) {
-			throw new PermissionDeniedException(e);
-		} catch (InvalidArgumentFaultException e) {
-			throw new NoSuccessException(e);
-		} catch (JobUnknownFaultException e) {
-			throw new NoSuccessException(e);
-		} catch (ServiceException e) {
-			throw new NoSuccessException(e);
-        } catch (ServerOverloadedFaultException e) {
+    public void setStderr(OutputStream err) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        // workaround: sleep between setStdout and setStderr
+        try {
+            Thread.currentThread().sleep(500);
+        } catch (InterruptedException e) {
             throw new NoSuccessException(e);
-		}
-	}
+        }
+        this.getToStream(m_stagingPrefix+"-"+ERROR_SUFFIX, err);
+    }
+
+    public String getJobId() {
+        return m_jobId;
+    }
+
+    private void getToStream(String absolutePath, OutputStream stream) throws NoSuccessException {
+        final boolean autoFlush = false;
+        final boolean ignoreOffset = true;
+        try {
+            m_stagingClient.setType(GridFTPSession.TYPE_IMAGE);
+            m_stagingClient.setMode(GridFTPSession.MODE_STREAM);
+            m_stagingClient.setPassive();
+            m_stagingClient.setLocalActive();
+            m_stagingClient.get(
+                    absolutePath,
+                    new DataSinkStream(stream, autoFlush, ignoreOffset),
+                    null);
+        } catch (Exception e) {
+            throw new NoSuccessException("Failed to read file: "+absolutePath, e);
+        }
+    }
+
+    private void putFromStream(String absolutePath, boolean append, InputStream stream) throws NoSuccessException {
+        final int DEFAULT_BUFFER_SIZE = 16384;
+        try {
+            m_stagingClient.setType(GridFTPSession.TYPE_IMAGE);
+            m_stagingClient.setMode(GridFTPSession.MODE_EBLOCK);
+            m_stagingClient.setPassive();
+            m_stagingClient.setLocalActive();
+            m_stagingClient.put(
+                absolutePath,
+                new DataSourceStream(stream, DEFAULT_BUFFER_SIZE),
+                    null,
+                    append);
+        } catch (Exception e) {
+            throw new NoSuccessException("Failed to write file: "+absolutePath, e);
+        }
+    }
 }

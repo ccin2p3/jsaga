@@ -5,33 +5,25 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.*;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.apache.axis.AxisProperties;
 import org.apache.axis.configuration.EngineConfigurationFactoryDefault;
-import org.apache.log4j.Logger;
 import org.glite.jdl.AdParser;
 import org.glite.jdl.JobAdException;
 import org.glite.wms.wmproxy.*;
 import org.globus.ftp.GridFTPClient;
 import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
-import org.globus.io.urlcopy.UrlCopy;
-import org.globus.io.urlcopy.UrlCopyException;
-import org.globus.util.GlobusURL;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 import org.ogf.saga.url.URL;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.util.Map;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 /* ***************************************************
@@ -48,22 +40,19 @@ import java.util.regex.Pattern;
  * TODO : Test MPI jobs
  */
 public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
-		implements JobControlAdaptor, CleanableJobAdaptor, StreamableJobBatch {
+		implements SandboxJobAdaptor, CleanableJobAdaptor, StreamableJobBatch {
     private static final String HOST_NAME = "HostName";
     private static final String DEFAULT_JDL_FILE = "DefaultJdlFile";
 
-	private Logger logger = Logger.getLogger(WMSJobControlAdaptor.class);
-	
 	private String clientConfigFile = Base.JSAGA_VAR+ File.separator+ "client-config-wms.wsdd";
-	private File m_tmpProxyFile,  stdoutFile, stderrFile;
-    private File m_sandboxDir;
+	private File m_tmpProxyFile;
 	
     private Map m_parameters;
 	private WMProxyAPI m_client;
     private String m_delegationId = "myId";
+    private String m_wmsServerHost;
     private String m_wmsServerUrl;
     private String m_lbServerUrl;
-    private boolean m_isInteractive;
 
     public String getType() {
         return "wms";
@@ -129,14 +118,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             }
         }
 
-        m_sandboxDir = new File(System.getProperty("java.io.tmpdir"));
-        if (attributes.containsKey("OutputStorage")) {
-            m_sandboxDir = new File((String) attributes.get("OutputStorage"));
-            if (!m_sandboxDir.exists() && !m_sandboxDir.mkdirs()) {
-                throw new NoSuccessException("Failed to create OutputStorage directory: "+m_sandboxDir);
-            }
-        }
-
+        m_wmsServerHost = host;
     	m_wmsServerUrl = "https://"+host+":"+port+basePath;
     	if(attributes.containsKey(MONITOR_SERVICE_URL)) {
     		// LB server name get in config
@@ -237,9 +219,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         m_client = null;
     }
     
-    public String submit(String jobDesc, boolean checkMatch, String uniqId)
-    	throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
-        m_isInteractive = false;
+    public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
     	try {
             // put lbServerUrl in JDL
     		if (m_lbServerUrl != null) {
@@ -249,168 +229,37 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 			// parse JDL and Check Matching
 			checkJDLAndMAtch(jobDesc, checkMatch, m_client);
 
-            String jobId;
-            if (jobDesc.contains("InputSandbox")) {
-                // get input files from jobDesc
-                Properties prop = new Properties();
-                try {
-                    prop.load(new ByteArrayInputStream(jobDesc.getBytes()));
-                } catch (IOException e) {
-                    throw new NoSuccessException("Unable to parse native job description: "+jobDesc);
-                }
-                String inSbx = prop.getProperty("InputSandbox");
-                inSbx = inSbx.substring(1, inSbx.length()-2).replaceAll("\"", "");
-                String[] array = inSbx.split(", ");
-                File[] inputFiles = new File[array.length];
-                for (int i=0; i<array.length; i++) {
-                    inputFiles[i] = new File(array[i]);
-                    if (! inputFiles[i].exists()) {
-                        throw new NoSuccessException("File not found: "+inputFiles[i]);
-                    }
-                }
+            // register job
+            String nativeJobId = m_client.jobRegister(jobDesc, m_delegationId).getId();
 
-                // register job
-                jobId = m_client.jobRegister(jobDesc, m_delegationId).getId();
-
-                // upload input files to the sandbox associated to the registered job
-                StringList list = m_client.getSandboxDestURI(jobId, "gsiftp");
-                if(list == null  || list.getItem() == null || list.getItem().length < 1) {
-                    throw new NoSuccessException("Unable to find a sandbox dest uri");
-                }
-                for (int i=0; i<inputFiles.length; i++) {
-                    File inputFile = inputFiles[i];
-                    String[] uriList = list.getItem();
-                    GlobusURL to = new GlobusURL(uriList[0]+"/"+inputFile.getName());
-                    GridFTPClient test = new GridFTPClient(to.getHost(), to.getPort());
-                    try {
-                        test.authenticate(m_credential);
-                        test.put(inputFile, "/"+to.getPath(), true);
-                    } catch(Exception e) {
-                        throw new NoSuccessException("Unable to stage input file: "+inputFile,e);
-                    } finally {
-                        test.close();
-                    }
-                }
-
-                // set LB from jobId
-                if (m_lbServerUrl == null) {
-                    WMStoLB.getInstance().setLBHost(m_wmsServerUrl, jobId);
-                }
-
-                // start job
-                m_client.jobStart(jobId);
-            } else {
-                // submit
-                jobId = m_client.jobSubmit(jobDesc, m_delegationId).getId();
-
-                // set LB from jobId
-                if (m_lbServerUrl == null) {
-                    WMStoLB.getInstance().setLBHost(m_wmsServerUrl, jobId);
-                }
-
+            // set LB from nativeJobId
+            if (m_lbServerUrl == null) {
+                WMStoLB.getInstance().setLBHost(m_wmsServerUrl, nativeJobId);
             }
-	    	return jobId;
-        } catch (NoSuccessException e) {
-            throw e;
-		} catch (AuthorizationFaultException e) {
-			throw new PermissionDeniedException(e);
-		} catch (AuthenticationFaultException e) {
-			throw new PermissionDeniedException(e);
-		} catch (Exception e) {
-			throw new NoSuccessException(e);
+	    	return nativeJobId;
+        } catch (BaseException e) {
+            rethrow(e);
+            return null;    // dead code
         }
     }
     
+    private String m_stagingPrefix;
+	public JobIOHandler submit(String jobDesc, boolean checkMatch, String uniqId, InputStream stdin) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        m_stagingPrefix = "/tmp/"+uniqId;
 
+        // connect to gsiftp
+        GridFTPClient stagingClient;
+        try {
+            stagingClient = new GridFTPClient(m_wmsServerHost, 2811);
+            stagingClient.authenticate(m_credential);
+        } catch (Exception e) {
+            throw new NoSuccessException("Failed to connect to GridFTP server: "+m_wmsServerHost, e);
+        }
 
-	public JobIOHandler submit(String jobDesc, boolean checkMatch,
-                               String uniqId, InputStream stdin) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		m_isInteractive = true;
-		try {
-            // put lbServerUrl in JDL
-			if (m_lbServerUrl != null) {
-			    jobDesc += "LBAddress=\""+m_lbServerUrl+"\";";
-            }
-						
-			// add stdout/stderr
-			stdoutFile = File.createTempFile("stdout", ".txt");
-			stderrFile = File.createTempFile("stderr", ".txt");
-			
-			jobDesc += "StdOutput=\""+stdoutFile.getName()+"\";";
-			jobDesc += "StdError=\""+stderrFile.getName()+"\";";
-			jobDesc += "OutputSandbox={\""+stdoutFile.getName()+"\",\""+stderrFile.getName()+"\"};";
-
-			String jobId = null;
-			
-			if(stdin != null ) {
-				// add stdin
-				File stdinFile = File.createTempFile("stdin", ".in");
-				jobDesc += "InputSandbox={\""+stdinFile.getName()+"\"};";
-				jobDesc += "StdInput=\""+stdinFile.getName()+"\";";			
-			
-				// parse JDL and Check Matching
-				checkJDLAndMAtch(jobDesc, checkMatch, m_client);
-
-				// register job
-				jobId = m_client.jobRegister(jobDesc, m_delegationId).getId();
-
-				// create stdin tmp file
-				FileOutputStream fos = new FileOutputStream(stdinFile);
-				byte buf[]=new byte[1024];
-			    int len;
-			    while((len=stdin.read(buf))>0)
-			    	fos.write(buf,0,len);
-			    fos.close();
-			    
-			    // upload input file to the sandbox associated to the registered job 
-				StringList list = m_client.getSandboxDestURI(jobId, "gsiftp");
-				if(list == null  || list.getItem() == null || list.getItem().length < 1) {
-					throw new NoSuccessException("Unable to find a input sandbox uri to put stdin file");
-				}				
-				
-                String[] uriList = list.getItem();
-                GlobusURL to = new GlobusURL(uriList[0]+"/"+stdinFile.getName());
-                GridFTPClient test = new GridFTPClient(to.getHost(), to.getPort());
-				try {
-		            test.authenticate(m_credential);
-		            test.put(stdinFile, "/"+to.getPath(), true);
-				}
-				catch(Exception e) {
-					throw new NoSuccessException("Unable to upload stdin file to input sandbox",e);
-				}
-				finally {
-                    test.close();
-					// clean stdin tmp file
-					stdinFile.delete();
-				}
-
-			}
-			else {
-				// parse JDL and Check Matching
-				checkJDLAndMAtch(jobDesc, checkMatch, m_client);
-
-				// register job
-				jobId = m_client.jobRegister(jobDesc, m_delegationId).getId();
-			}
-
-            // set LB from jobId
-            if (m_lbServerUrl == null) {
-                WMStoLB.getInstance().setLBHost(m_wmsServerUrl, jobId);
-            }
-			
-			// start job
-            m_client.jobStart(jobId);
-			return new WMSJobIOHandler(jobId, m_client, m_credential, stdoutFile.getAbsolutePath(), stderrFile.getAbsolutePath());
-        } catch (NoSuccessException e) {
-            throw e;
-		} catch (AuthorizationFaultException e) {
-			throw new PermissionDeniedException(e);
-		} catch (AuthenticationFaultException e) {
-			throw new PermissionDeniedException(e);
-		} catch(Exception e) {
-			throw new NoSuccessException(e);
-		}
-	}
+        // submit
+        String jobId = this.submit(jobDesc, checkMatch, uniqId);
+        return new WMSJobIOHandler(stagingClient, m_stagingPrefix, jobId);
+    }
 
     private void checkJDLAndMAtch(String jobDesc, boolean checkMatch, WMProxyAPI m_client2)
             throws NoSuccessException, AuthorizationFaultException, AuthenticationFaultException, InvalidArgumentFaultException, NoSuitableResourcesFaultException, ServiceException, ServerOverloadedFaultException
@@ -437,99 +286,173 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 
 	}
 
+    public String getSandboxBaseURL() {
+        String hostname = (String) m_parameters.get(HOST_NAME);
+        return "gsiftp://"+hostname+":2811/tmp";
+    }
+
+    public SandboxTransfer[] getInputSandboxTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+/*
+        StringList result = null;
+        try {
+            result = m_client.getSandboxDestURI(nativeJobId, "gsiftp");
+        } catch (BaseException e) {
+            rethrow(e);
+        }
+        if(result==null  || result.getItem()==null || result.getItem().length<1) {
+            throw new NoSuccessException("Unable to find sandbox dest uri");
+        }
+*/
+        String jdl = null;
+        try {
+            jdl = m_client.getJDL(nativeJobId, JdlType.ORIGINAL);
+        } catch (BaseException e) {
+            rethrow(e);
+        }
+        String baseUri = "";
+        Properties jobDesc = parseJobDescription(jdl);
+        int transfersLength = getIntValue(jobDesc, "InputSandboxPreStaging");
+        SandboxTransfer[] transfers = new SandboxTransfer[transfersLength];
+        for (int i=0; i<transfersLength; i++) {
+            transfers[i] = new SandboxTransfer(
+                    getStringValue(jobDesc, "InputSandboxPreStaging_"+i+"_From"),
+                    baseUri+getStringValue(jobDesc, "InputSandboxPreStaging_"+i+"_To"),
+                    getBooleanValue(jobDesc, "InputSandboxPreStaging_"+i+"_Append"));
+        }
+        return transfers;
+    }
+
+    public SandboxTransfer[] getOutputSandboxTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+/*
+        StringAndLongList result = null;
+        try {
+            result = m_client.getOutputFileList(nativeJobId, "gsiftp");
+        } catch (BaseException e) {
+            rethrow(e);
+        }
+        if (result==null || result.getFile()==null || result.getFile().length<1) {
+            throw new NoSuccessException("Unable to find output file list");
+        }
+*/
+        String jdl = null;
+        try {
+            jdl = m_client.getJDL(nativeJobId, JdlType.ORIGINAL);
+        } catch (BaseException e) {
+            rethrow(e);
+        }
+        String baseUri = "";
+        Properties jobDesc = parseJobDescription(jdl);
+        int transfersLength = getIntValue(jobDesc, "OutputSandboxPostStaging");
+        SandboxTransfer[] transfers = new SandboxTransfer[transfersLength];
+        for (int i=0; i<transfersLength; i++) {
+            transfers[i] = new SandboxTransfer(
+                    baseUri+getStringValue(jobDesc, "OutputSandboxPostStaging_"+i+"_From"),
+                    getStringValue(jobDesc, "OutputSandboxPostStaging_"+i+"_To"),
+                    getBooleanValue(jobDesc, "OutputSandboxPostStaging_"+i+"_Append"));
+        }
+        return transfers;
+    }
+
+    public String start(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        try {
+            m_client.jobStart(nativeJobId);
+        } catch (BaseException e) {
+            rethrow(e);
+        }
+        return nativeJobId;
+    }
+
 	public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
     	try {
-	    	// cancel
 	    	m_client.jobCancel(nativeJobId);
-        } catch (ServerOverloadedFaultException e) {
-            throw new NoSuccessException(e);
-    	} catch (ServiceException e) {
-    		throw new NoSuccessException(e);
-		} catch (AuthorizationFaultException e) {
-			throw new PermissionDeniedException(e);
-		} catch (AuthenticationFaultException e) {
-			throw new PermissionDeniedException(e);
-		} catch (OperationNotAllowedFaultException e) {
-			throw new PermissionDeniedException(e);
-		} catch (InvalidArgumentFaultException e) {
-			throw new NoSuccessException(e);
-		} catch (JobUnknownFaultException e) {
-			throw new NoSuccessException(e);
+        } catch (BaseException e) {
+            rethrow(e);
 		}
     }
 
-	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException,
-            NoSuccessException {
-        try  {
-            if (m_isInteractive) {
-                if(stdoutFile != null && stdoutFile.exists()) {
-                    stdoutFile.delete(); // fixme: file not deleted!
-                }
-                if(stderrFile != null && stderrFile.exists()) {
-                    stderrFile.delete(); // fixme: file not deleted!
-                }
-                if(m_tmpProxyFile != null && m_tmpProxyFile.exists()) {
-                    m_tmpProxyFile.delete(); // fixme: file not deleted!
-                }
-            } else {
-                //Use the "gsiftp" transfer protocols to retrieve the list of files produced by the jobs.
-                StringAndLongList result = m_client.getOutputFileList(nativeJobId, "gsiftp");
-                if ( result != null )
-                {
-                    //Retrieve the file(s) from the WMProxy Server.
-                    StringAndLongType[] list = result.getFile();
-                    for (int i=0; list!=null && i<list.length ; i++){
-                        String from = list[i].getName();
-                        File to = new File(m_sandboxDir, new File(from).getName());
-                        GlobusURL fromURL = createGlobusURL(from);
-                        GlobusURL toURL = createGlobusURL(to);
+	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        if(m_tmpProxyFile != null && m_tmpProxyFile.exists()) {
+            m_tmpProxyFile.delete(); // warning: file not deleted (deletion managed by JVM)
+        }
 
-                        UrlCopy uCopy = new UrlCopy();
-                        uCopy.setDestinationCredentials(m_credential);
-                        uCopy.setSourceCredentials(m_credential);
-                        uCopy.setDestinationUrl(toURL);
-                        uCopy.setSourceUrl(fromURL);
-                        try {
-                            logger.info("Downloading output: "+from);
-                            uCopy.copy();
-                        } catch (UrlCopyException e) {
-                            throw new NoSuccessException("Failed to download output: "+from, e);
-                        }
-                    }
-                }
-            }
-
-            // purge
+        if (m_stagingPrefix != null) {
             try {
-                m_client.jobPurge(nativeJobId);
-            } catch(Exception  e) {/*ignore*/}
-        } catch (Exception e) {
-			throw new NoSuccessException(e);
-		}
+                GridFTPClient client = new GridFTPClient(m_wmsServerHost, 2811);
+                client.authenticate(m_credential);
+                client.deleteFile(m_stagingPrefix+"-"+WMSJobIOHandler.OUTPUT_SUFFIX);
+                client.deleteFile(m_stagingPrefix+"-"+WMSJobIOHandler.ERROR_SUFFIX);
+            } catch (Exception e) {
+                throw new NoSuccessException("Failed to cleanup job: "+nativeJobId, e);
+            }
+        }
+
+        // purge job
+        try {
+            m_client.jobPurge(nativeJobId);
+        } catch(BaseException  e) {
+            rethrow(e);
+        }
 	}
 
-    private static GlobusURL createGlobusURL(String url) throws NoSuccessException {
-        Matcher m = Pattern.compile("(\\w+)://([\\w-.]+(:\\d+)?)(/.*)").matcher(url);
-        if (!m.matches() || m.groupCount()!=4) {
-            throw new NoSuccessException("Malformed URL: "+url);
-        }
-        String scheme = m.group(1);
-        String host = m.group(2);
-        String path = m.group(4);
-        // path must start with '//'
-        String fixedUrl = scheme+"://"+host+"/"+path;
+    private static void rethrow(BaseException exception) throws PermissionDeniedException, NoSuccessException {
         try {
-            return new GlobusURL(fixedUrl);
-        } catch (MalformedURLException e) {
-            throw new NoSuccessException("Malformed URL: "+fixedUrl);
+            throw exception;
+        } catch (AuthorizationFaultException e) {
+            throw new PermissionDeniedException(e);
+        } catch (AuthenticationFaultException e) {
+            throw new PermissionDeniedException(e);
+        } catch (OperationNotAllowedFaultException e) {
+            throw new PermissionDeniedException(e);
+        } catch (InvalidArgumentFaultException e) {
+            throw new NoSuccessException(e);
+        } catch (JobUnknownFaultException e) {
+            throw new NoSuccessException(e);
+        } catch (ServiceException e) {
+            throw new NoSuccessException(e);
+        } catch (ServerOverloadedFaultException e) {
+            throw new NoSuccessException(e);
+        } catch (BaseException e) {
+            throw new NoSuccessException(e);
         }
     }
 
-    private static GlobusURL createGlobusURL(File file) throws NoSuccessException {
+    private static Properties parseJobDescription(String jdl) throws NoSuccessException {
+        Properties jobDesc = new Properties();
         try {
-            return new GlobusURL(file.toURL());
-        } catch (MalformedURLException e) {
-            throw new NoSuccessException("[INTERNAL ERROR] Unexpected exception", e);
+            jobDesc.load(new ByteArrayInputStream(jdl.getBytes()));
+        } catch (IOException e) {
+            throw new NoSuccessException("Failed to retrieve JDL", e);
         }
+        return jobDesc;
+    }
+    private static String getValue(Properties jobDesc, String key) throws NoSuccessException {
+        String value = jobDesc.getProperty(key);
+        if (value!=null) {
+            String trimmed = value.trim();
+            if (trimmed.endsWith(";")) {
+                return trimmed.substring(0, trimmed.length()-1);
+            }
+        }
+        throw new NoSuccessException("Failed to parse JDL attribute: "+value);
+    }
+    private static String getStringValue(Properties jobDesc, String key) throws NoSuccessException {
+        String value = getValue(jobDesc, key);
+        if (value!=null && value.startsWith("\"") && value.endsWith("\"")) {
+            return value.substring(1, value.length()-1);
+        } else {
+            throw new NoSuccessException("Failed to parse JDL attribute: "+value);
+        }
+    }
+    private static int getIntValue(Properties jobDesc, String key) throws NoSuccessException {
+        String value = getValue(jobDesc, key);
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            throw new NoSuccessException("Failed to parse JDL attribute: "+value, e);
+        }
+    }
+    private static boolean getBooleanValue(Properties jobDesc, String key) throws NoSuccessException {
+        String value = getValue(jobDesc, key);
+        return Boolean.parseBoolean(value);
     }
 }
