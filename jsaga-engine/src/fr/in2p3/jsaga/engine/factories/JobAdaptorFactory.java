@@ -12,7 +12,6 @@ import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.url.URL;
-import org.ogf.saga.url.URLFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -94,10 +93,6 @@ public class JobAdaptorFactory extends ServiceAdaptorFactory {
             Map attributes = new HashMap();
             AttributesBuilder.updateAttributes(attributes, config);
             AttributesBuilder.updateAttributes(attributes, url);
-            if (config.getMonitorService()!=null && config.getMonitorService().getUrl()!=null) {
-                URL monitorURL = URLFactory.createURL(config.getMonitorService().getUrl());
-                attributes.put(JobControlAdaptor.MONITOR_SERVICE_URL, monitorURL);
-            }
             return attributes;
         } catch (BadParameterException e) {
             throw new NoSuccessException(e);

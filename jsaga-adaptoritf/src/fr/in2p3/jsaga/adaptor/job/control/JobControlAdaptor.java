@@ -17,8 +17,6 @@ import org.ogf.saga.error.*;
  *
  */
 public interface JobControlAdaptor extends JobAdaptor {
-    public static final String MONITOR_SERVICE_URL = "MonitorServiceUrl";
-
     /**
      * submit a job
      * @param jobDesc the job description in the language supported by the targeted grid
