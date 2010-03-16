@@ -46,7 +46,6 @@
         <attribute name="UserCert" value="${user.home}/.jsaga/contexts/globus/usercert.pem"/>
         <attribute name="UserKey" value="${user.home}/.jsaga/contexts/globus/userkey.pem"/>
         <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/globus_cred.txt"/>
-        <attribute name="UserPass" value="toto"/>
         <domain>
             <host prefix="localhost"/>
         </domain>
