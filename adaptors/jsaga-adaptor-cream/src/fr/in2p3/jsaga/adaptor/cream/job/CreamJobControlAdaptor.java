@@ -275,7 +275,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 
         JobFilter filter = this.getJobFilter(nativeJobId);
 
-        // cancel job
+        // purge job
         CREAMPort stub = m_creamStub.getStub();
         Result[] resultArray;
         try {
