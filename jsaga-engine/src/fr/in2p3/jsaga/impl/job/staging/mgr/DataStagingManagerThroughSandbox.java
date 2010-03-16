@@ -96,8 +96,8 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
     private static void transfer(Session session, SandboxTransfer transfer) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         int append = (transfer.isAppend() ? Flags.APPEND : Flags.NONE).getValue();
         try {
-            URL from = URLFactory.createURL(transfer.getFrom());
-            URL to = URLFactory.createURL(transfer.getTo());
+            URL from = URLFactory.createURL(pathToURL(transfer.getFrom()));
+            URL to = URLFactory.createURL(pathToURL(transfer.getTo()));
             File file = FileFactory.createFile(session, from, Flags.NONE.getValue());
             file.copy(to, append);
             file.close();
@@ -105,6 +105,19 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
             throw new NoSuccessException(e);
         } catch (IncorrectURLException e) {
             throw new NoSuccessException(e);
+        }
+    }
+    private static String pathToURL(String path) {
+        boolean isLinuxPath = path.startsWith("/");
+        boolean isWindowsPath = (path.length()>2
+                && Character.isLetter(path.charAt(0))
+                && path.charAt(1)==':'
+                && (path.charAt(2)=='\\' || path.charAt(2)=='/')
+                && path.charAt(3)!='/');
+        if (isLinuxPath || isWindowsPath) {
+            return new java.io.File(path).toURI().toString();
+        } else {
+            return path;
         }
     }
 
