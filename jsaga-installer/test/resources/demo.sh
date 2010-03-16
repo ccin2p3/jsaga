@@ -10,7 +10,7 @@
 
 ./bin/jsaga-job-run.bat
 ./bin/jsaga-job-run.bat -Executable /bin/hostname -r local://localhost
-cat job-resources.txt | while read url ; do echo $url ; ./bin/jsaga-job-run.bat -Executable /bin/hostname -r $url ; done
+cat job-resources.txt | while read url ; do echo $url ; ./bin/jsaga-job-run.bat -Executable /bin/hostname -r "$url" ; done
 
 ./bin/jsaga-ls.bat -l file://c:/
 cat data-resources.txt | while read url ; do echo $url ; ./bin/jsaga-ls.bat -l $url ; done
