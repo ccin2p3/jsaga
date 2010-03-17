@@ -33,6 +33,7 @@ public class JobRun extends AbstractCommand {
     // optional arguments
     private static final String OPT_FILE = "f", LONGOPT_FILE = "file";
     private static final String OPT_DESCRIPTION = "d", LONGOPT_DESCRIPTION = "description";
+    private static final String OPT_JOBID = "i", LONGOPT_JOBID = "jobid";
     private static final String OPT_BATCH = "b", LONGOPT_BATCH = "batch";
     // attribute names missing in interface JobDescription
     private static final String JOBNAME = "JobName";
@@ -86,10 +87,14 @@ public class JobRun extends AbstractCommand {
                 // submit
                 job.run();
 
-                if (line.hasOption(OPT_BATCH)) {
+                // print job identier
+                if (line.hasOption(OPT_JOBID) || line.hasOption(OPT_BATCH)) {
                     String jobId = job.getAttribute(Job.JOBID);
                     System.out.println(jobId);
-                } else {
+                }
+
+                // monitor
+                if (! line.hasOption(OPT_BATCH)) {
                     // add shutdown hook
                     Thread hook = new Thread(){
                         public void run() {
@@ -164,21 +169,30 @@ public class JobRun extends AbstractCommand {
                 "and exit (do not submit the job)")
                 .withLongOpt(LONGOPT_DESCRIPTION)
                 .create(OPT_DESCRIPTION));
-        opt.addOption(OptionBuilder.withDescription("exit immediatly after having submitted the job, " +
-                "and print the job ID on the standard output.")
+
+        // optional group
+        OptionGroup optGroup = new OptionGroup();
+        optGroup.addOption(OptionBuilder.withDescription("print the job identifier as soon as it is submitted, " +
+                "and wait for it to be finished")
+                .withLongOpt(LONGOPT_JOBID)
+                .create(OPT_JOBID));
+        optGroup.addOption(OptionBuilder.withDescription("print the job identifier as soon as it is submitted, " +
+                "and exit immediatly.")
                 .withLongOpt(LONGOPT_BATCH)
                 .create(OPT_BATCH));
+        optGroup.setRequired(false);
+        opt.addOptionGroup(optGroup);
 
         // required group
-        OptionGroup group = new OptionGroup();
-        group.addOption(OptionBuilder.withDescription("read job description from file <path>")
+        OptionGroup reqGroup = new OptionGroup();
+        reqGroup.addOption(OptionBuilder.withDescription("read job description from file <path>")
                 .hasArg()
                 .withArgName("path")
                 .withLongOpt(LONGOPT_FILE)
                 .create(OPT_FILE));
-        group.addOption(o("command to execute").hasArg().create(JobDescription.EXECUTABLE));
-        group.setRequired(true);
-        opt.addOptionGroup(group);
+        reqGroup.addOption(o("command to execute").hasArg().create(JobDescription.EXECUTABLE));
+        reqGroup.setRequired(true);
+        opt.addOptionGroup(reqGroup);
 
         // job description
         opt.addOption(o("job name to be attached to the job submission").hasArg().create(JOBNAME));
