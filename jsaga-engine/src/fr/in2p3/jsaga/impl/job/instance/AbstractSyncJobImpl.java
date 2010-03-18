@@ -5,6 +5,8 @@ import fr.in2p3.jsaga.adaptor.job.SubState;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.*;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.*;
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
 import fr.in2p3.jsaga.adaptor.job.monitor.*;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorCallback;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
@@ -199,8 +201,8 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             }
 
             // start job
-            if (m_controlAdaptor instanceof SandboxJobAdaptor) {
-                ((SandboxJobAdaptor)m_controlAdaptor).start(m_nativeJobId);
+            if (m_controlAdaptor instanceof StagingJobAdaptorTwoPhase) {
+                ((StagingJobAdaptorTwoPhase)m_controlAdaptor).start(m_nativeJobId);
             }
         } catch (AuthorizationFailedException e) {
             throw new NoSuccessException(e);
@@ -504,9 +506,9 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         }
     }
 
-    public SandboxJobAdaptor getSandboxJobAdaptor() throws NotImplementedException {
-        if (m_controlAdaptor instanceof SandboxJobAdaptor) {
-            return (SandboxJobAdaptor) m_controlAdaptor;
+    public StagingJobAdaptor getStagingJobAdaptor() throws NotImplementedException {
+        if (m_controlAdaptor instanceof StagingJobAdaptor) {
+            return (StagingJobAdaptor) m_controlAdaptor;
         } else {
             throw new NotImplementedException("Job sandbox not supported by this adaptor: "+m_resourceManager.getScheme());
         }

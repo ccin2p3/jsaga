@@ -5,9 +5,11 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.advanced.*;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.apache.axis.AxisProperties;
 import org.apache.axis.configuration.EngineConfigurationFactoryDefault;
@@ -39,7 +41,7 @@ import java.util.Properties;
  * TODO : Test MPI jobs
  */
 public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
-		implements SandboxJobAdaptor, CleanableJobAdaptor, StreamableJobBatch {
+		implements StagingJobAdaptorTwoPhase, CleanableJobAdaptor, StreamableJobBatch {
     private static final String HOST_NAME = "HostName";
     private static final String DEFAULT_JDL_FILE = "DefaultJdlFile";
 
@@ -267,12 +269,12 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 
 	}
 
-    public String getSandboxBaseURL() {
+    public String getStagingBaseURL() {
         String hostname = (String) m_parameters.get(HOST_NAME);
         return "gsiftp://"+hostname+":2811/tmp";
     }
 
-    public SandboxTransfer[] getInputSandboxTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+    public StagingTransfer[] getInputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 /*
         StringList result = null;
         try {
@@ -293,9 +295,9 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         String baseUri = "";
         Properties jobDesc = parseJobDescription(jdl);
         int transfersLength = getIntValue(jobDesc, "InputSandboxPreStaging");
-        SandboxTransfer[] transfers = new SandboxTransfer[transfersLength];
+        StagingTransfer[] transfers = new StagingTransfer[transfersLength];
         for (int i=0; i<transfersLength; i++) {
-            transfers[i] = new SandboxTransfer(
+            transfers[i] = new StagingTransfer(
                     getStringValue(jobDesc, "InputSandboxPreStaging_"+i+"_From"),
                     baseUri+getStringValue(jobDesc, "InputSandboxPreStaging_"+i+"_To"),
                     getBooleanValue(jobDesc, "InputSandboxPreStaging_"+i+"_Append"));
@@ -303,7 +305,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         return transfers;
     }
 
-    public SandboxTransfer[] getOutputSandboxTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+    public StagingTransfer[] getOutputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 /*
         StringAndLongList result = null;
         try {
@@ -324,9 +326,9 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         String baseUri = "";
         Properties jobDesc = parseJobDescription(jdl);
         int transfersLength = getIntValue(jobDesc, "OutputSandboxPostStaging");
-        SandboxTransfer[] transfers = new SandboxTransfer[transfersLength];
+        StagingTransfer[] transfers = new StagingTransfer[transfersLength];
         for (int i=0; i<transfersLength; i++) {
-            transfers[i] = new SandboxTransfer(
+            transfers[i] = new StagingTransfer(
                     baseUri+getStringValue(jobDesc, "OutputSandboxPostStaging_"+i+"_From"),
                     getStringValue(jobDesc, "OutputSandboxPostStaging_"+i+"_To"),
                     getBooleanValue(jobDesc, "OutputSandboxPostStaging_"+i+"_Append"));
@@ -334,13 +336,12 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         return transfers;
     }
 
-    public String start(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+    public void start(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         try {
             m_client.jobStart(nativeJobId);
         } catch (BaseException e) {
             rethrow(e);
         }
-        return nativeJobId;
     }
 
 	public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {

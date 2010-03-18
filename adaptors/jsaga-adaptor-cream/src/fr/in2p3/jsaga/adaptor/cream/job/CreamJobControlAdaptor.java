@@ -3,9 +3,11 @@ package fr.in2p3.jsaga.adaptor.cream.job;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
-import fr.in2p3.jsaga.adaptor.job.control.advanced.*;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.glite.ce.creamapi.ws.cream2.CREAMPort;
 import org.glite.ce.creamapi.ws.cream2.types.*;
@@ -30,7 +32,7 @@ import java.util.regex.Pattern;
 /**
  *
  */
-public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements SandboxJobAdaptor, StreamableJobBatch, CleanableJobAdaptor {
+public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements StagingJobAdaptorTwoPhase, StreamableJobBatch, CleanableJobAdaptor {
     // parameters configured
     private static final String SSL_CA_FILES = "sslCAFiles";
 
@@ -158,20 +160,20 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         }
     }
 
-    public String getSandboxBaseURL() {
+    public String getStagingBaseURL() {
         String hostname = (String) m_parameters.get(HOST_NAME);
         return "gsiftp://"+hostname+":2811/tmp";
     }
 
-    public SandboxTransfer[] getInputSandboxTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {
+    public StagingTransfer[] getInputStagingTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {
         JobInfo jobInfo = this.getJobInfo(nativeJobId);
         //String baseUri = jobInfo.getCREAMInputSandboxURI()+"/";
         String baseUri = "";
         Properties jobDesc = parseJobDescription(jobInfo.getJDL());
         int transfersLength = getIntValue(jobDesc, "InputSandboxPreStaging");
-        SandboxTransfer[] transfers = new SandboxTransfer[transfersLength];
+        StagingTransfer[] transfers = new StagingTransfer[transfersLength];
         for (int i=0; i<transfersLength; i++) {
-            transfers[i] = new SandboxTransfer(
+            transfers[i] = new StagingTransfer(
                     getStringValue(jobDesc, "InputSandboxPreStaging_"+i+"_From"),
                     baseUri+getStringValue(jobDesc, "InputSandboxPreStaging_"+i+"_To"),
                     getBooleanValue(jobDesc, "InputSandboxPreStaging_"+i+"_Append"));
@@ -179,15 +181,15 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         return transfers;
     }
 
-    public SandboxTransfer[] getOutputSandboxTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {
+    public StagingTransfer[] getOutputStagingTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {
         JobInfo jobInfo = this.getJobInfo(nativeJobId);
         //String baseUri = jobInfo.getCREAMOutputSandboxURI()+"/";
         String baseUri = "";
         Properties jobDesc = parseJobDescription(jobInfo.getJDL());
         int transfersLength = getIntValue(jobDesc, "OutputSandboxPostStaging");
-        SandboxTransfer[] transfers = new SandboxTransfer[transfersLength];
+        StagingTransfer[] transfers = new StagingTransfer[transfersLength];
         for (int i=0; i<transfersLength; i++) {
-            transfers[i] = new SandboxTransfer(
+            transfers[i] = new StagingTransfer(
                     baseUri+getStringValue(jobDesc, "OutputSandboxPostStaging_"+i+"_From"),
                     getStringValue(jobDesc, "OutputSandboxPostStaging_"+i+"_To"),
                     getBooleanValue(jobDesc, "OutputSandboxPostStaging_"+i+"_Append"));
@@ -222,7 +224,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         }
     }
 
-    public String start(String nativeJobId) throws TimeoutException, NoSuccessException {
+    public void start(String nativeJobId) throws TimeoutException, NoSuccessException {
         JobFilter filter = this.getJobFilter(nativeJobId);
 
         // cancel job
@@ -236,9 +238,6 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 
         // rethrow exception if any fault in result
         CreamExceptionFactory.rethrow(resultArray);
-
-        // returns
-        return nativeJobId;
     }
 
     public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {

@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.impl.job.staging.mgr;
 
-import fr.in2p3.jsaga.adaptor.job.control.advanced.SandboxJobAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.advanced.SandboxTransfer;
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.impl.job.instance.AbstractSyncJobImpl;
 import org.ogf.saga.error.*;
 import org.ogf.saga.file.*;
@@ -28,8 +28,8 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
     private URL m_intermediaryURL;
     private Directory m_intermediaryDirectory;
 
-    public DataStagingManagerThroughSandbox(SandboxJobAdaptor adaptor, String uniqId) throws NotImplementedException, BadParameterException, NoSuccessException {
-        m_intermediaryURL = URLFactory.createURL(adaptor.getSandboxBaseURL()+"/"+uniqId+"/");
+    public DataStagingManagerThroughSandbox(StagingJobAdaptor adaptor, String uniqId) throws NotImplementedException, BadParameterException, NoSuccessException {
+        m_intermediaryURL = URLFactory.createURL(adaptor.getStagingBaseURL()+"/"+uniqId+"/");
     }
 
     public URL getIntermediaryURL() {
@@ -55,26 +55,26 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
         }
 
         // for each input file
-        for (SandboxTransfer transfer : job.getSandboxJobAdaptor().getInputSandboxTransfer(nativeJobId)) {
+        for (StagingTransfer transfer : job.getStagingJobAdaptor().getInputStagingTransfer(nativeJobId)) {
             transfer(job.getSession(), transfer);
         }
     }
 
     public void postStaging(AbstractSyncJobImpl job, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         // for each output file
-        for (SandboxTransfer transfer : job.getSandboxJobAdaptor().getOutputSandboxTransfer(nativeJobId)) {
+        for (StagingTransfer transfer : job.getStagingJobAdaptor().getOutputStagingTransfer(nativeJobId)) {
             transfer(job.getSession(), transfer);
         }
     }
 
     public void cleanup(AbstractSyncJobImpl job, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         // for each input file
-        for (SandboxTransfer transfer : job.getSandboxJobAdaptor().getInputSandboxTransfer(nativeJobId)) {
+        for (StagingTransfer transfer : job.getStagingJobAdaptor().getInputStagingTransfer(nativeJobId)) {
             remove(job.getSession(), transfer.getTo());
         }
 
         // for each output file
-        for (SandboxTransfer transfer : job.getSandboxJobAdaptor().getOutputSandboxTransfer(nativeJobId)) {
+        for (StagingTransfer transfer : job.getStagingJobAdaptor().getOutputStagingTransfer(nativeJobId)) {
             remove(job.getSession(), transfer.getFrom());
         }
 
@@ -84,7 +84,7 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
         }
     }
 
-    private static void transfer(Session session, SandboxTransfer transfer) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+    private static void transfer(Session session, StagingTransfer transfer) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         int append = (transfer.isAppend() ? Flags.APPEND : Flags.NONE).getValue();
         try {
             URL from = URLFactory.createURL(pathToURL(transfer.getFrom()));

@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.impl.job.staging.mgr;
 
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.advanced.SandboxJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptor;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.JobDescription;
 
@@ -25,8 +25,8 @@ public class DataStagingManagerFactory {
             String[] fileTransfer = jobDesc.getVectorAttribute(JobDescription.FILETRANSFER);
 
             // create data staging manager
-            if (adaptor instanceof SandboxJobAdaptor) {
-                return new DataStagingManagerThroughSandbox((SandboxJobAdaptor) adaptor, uniqId);
+            if (adaptor instanceof StagingJobAdaptor) {
+                return new DataStagingManagerThroughSandbox((StagingJobAdaptor) adaptor, uniqId);
             } else if (adaptor instanceof StreamableJobAdaptor) {
                 return new DataStagingManagerThroughStream(fileTransfer);
             } else {
