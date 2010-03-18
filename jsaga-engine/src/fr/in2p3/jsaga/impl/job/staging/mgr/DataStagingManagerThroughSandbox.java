@@ -24,11 +24,14 @@ import org.ogf.saga.url.URLFactory;
  *
  */
 public class DataStagingManagerThroughSandbox implements DataStagingManager {
+    protected StagingJobAdaptor m_adaptor;
+
     // info
     private URL m_intermediaryURL;
     private Directory m_intermediaryDirectory;
 
     public DataStagingManagerThroughSandbox(StagingJobAdaptor adaptor, String uniqId) throws NotImplementedException, BadParameterException, NoSuccessException {
+        m_adaptor = adaptor;
         m_intermediaryURL = URLFactory.createURL(adaptor.getStagingBaseURL()+"/"+uniqId+"/");
     }
 
@@ -40,11 +43,7 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
         return jobDesc;
     }
 
-    public void preStaging(AbstractSyncJobImpl job) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
-        // do nothing
-    }
-
-    public void preStaging(AbstractSyncJobImpl job, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+    protected void preStaging(AbstractSyncJobImpl job) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         // create intermediary directory
         try {
             m_intermediaryDirectory = FileFactory.createDirectory(job.getSession(), m_intermediaryURL, Flags.CREATE.getValue());
@@ -53,28 +52,23 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
         } catch (AlreadyExistsException e) {
             throw new NoSuccessException(e);
         }
-
-        // for each input file
-        for (StagingTransfer transfer : job.getStagingJobAdaptor().getInputStagingTransfer(nativeJobId)) {
-            transfer(job.getSession(), transfer);
-        }
     }
 
     public void postStaging(AbstractSyncJobImpl job, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         // for each output file
-        for (StagingTransfer transfer : job.getStagingJobAdaptor().getOutputStagingTransfer(nativeJobId)) {
+        for (StagingTransfer transfer : m_adaptor.getOutputStagingTransfer(nativeJobId)) {
             transfer(job.getSession(), transfer);
         }
     }
 
     public void cleanup(AbstractSyncJobImpl job, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         // for each input file
-        for (StagingTransfer transfer : job.getStagingJobAdaptor().getInputStagingTransfer(nativeJobId)) {
+        for (StagingTransfer transfer : m_adaptor.getInputStagingTransfer(nativeJobId)) {
             remove(job.getSession(), transfer.getTo());
         }
 
         // for each output file
-        for (StagingTransfer transfer : job.getStagingJobAdaptor().getOutputStagingTransfer(nativeJobId)) {
+        for (StagingTransfer transfer : m_adaptor.getOutputStagingTransfer(nativeJobId)) {
             remove(job.getSession(), transfer.getFrom());
         }
 
@@ -84,7 +78,7 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
         }
     }
 
-    private static void transfer(Session session, StagingTransfer transfer) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+    protected static void transfer(Session session, StagingTransfer transfer) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         int append = (transfer.isAppend() ? Flags.APPEND : Flags.NONE).getValue();
         try {
             URL from = URLFactory.createURL(pathToURL(transfer.getFrom()));

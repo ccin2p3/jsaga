@@ -5,15 +5,13 @@ import fr.in2p3.jsaga.adaptor.job.SubState;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.*;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.*;
-import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
 import fr.in2p3.jsaga.adaptor.job.monitor.*;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorCallback;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
 import fr.in2p3.jsaga.impl.job.instance.stream.*;
 import fr.in2p3.jsaga.impl.job.service.AbstractSyncJobServiceImpl;
-import fr.in2p3.jsaga.impl.job.staging.mgr.DataStagingManager;
-import fr.in2p3.jsaga.impl.job.staging.mgr.DataStagingManagerThroughSandbox;
+import fr.in2p3.jsaga.impl.job.staging.mgr.*;
 import fr.in2p3.jsaga.impl.permissions.AbstractJobPermissionsImpl;
 import fr.in2p3.jsaga.sync.job.SyncJob;
 import org.apache.log4j.Logger;
@@ -119,12 +117,18 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     protected void doSubmit() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         m_monitorService.checkState();
         try {
-            // pre-staging
+            // get native job description
+            String nativeJobDesc = m_attributes.m_NativeJobDescription.getObject();
+
+            // pre-staging (before job submit)
             m_metrics.m_SubState.setValue(SubState.RUNNING_PRE_STAGING.toString());
-            m_stagingMgr.preStaging(this);
+            if (m_stagingMgr instanceof DataStagingManagerThroughStream) {
+                ((DataStagingManagerThroughStream)m_stagingMgr).preStaging(this);
+            } else if (m_stagingMgr instanceof DataStagingManagerThroughSandboxOnePhase) {
+                ((DataStagingManagerThroughSandboxOnePhase)m_stagingMgr).preStaging(this, nativeJobDesc, m_uniqId);
+            }
 
             // submit
-            String nativeJobDesc = m_attributes.m_NativeJobDescription.getObject();
             if (this.isInteractive()) {
                 if (m_controlAdaptor instanceof StreamableJobInteractiveGet) {
                     // submit
@@ -195,9 +199,9 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             String sagaJobId = "["+monitorUrl+"]-["+m_nativeJobId+"]";
             m_attributes.m_JobId.setObject(sagaJobId);
 
-            // pre-staging
-            if (m_stagingMgr instanceof DataStagingManagerThroughSandbox) {
-                ((DataStagingManagerThroughSandbox)m_stagingMgr).preStaging(this, m_nativeJobId);
+            // pre-staging (after job register)
+            if (m_stagingMgr instanceof DataStagingManagerThroughSandboxTwoPhase) {
+                ((DataStagingManagerThroughSandboxTwoPhase)m_stagingMgr).preStaging(this, m_nativeJobId);
             }
 
             // start job
@@ -503,14 +507,6 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             return (JobInfoAdaptor) monitorAdaptor;
         } else {
             throw new NotImplementedException("Job attribute not supported by this adaptor: "+m_resourceManager.getScheme());
-        }
-    }
-
-    public StagingJobAdaptor getStagingJobAdaptor() throws NotImplementedException {
-        if (m_controlAdaptor instanceof StagingJobAdaptor) {
-            return (StagingJobAdaptor) m_controlAdaptor;
-        } else {
-            throw new NotImplementedException("Job sandbox not supported by this adaptor: "+m_resourceManager.getScheme());
         }
     }
 

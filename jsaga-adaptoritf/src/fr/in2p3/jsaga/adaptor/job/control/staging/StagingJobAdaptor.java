@@ -15,7 +15,7 @@ import org.ogf.saga.error.*;
 /**
  *
  */
-public interface StagingJobAdaptor extends JobControlAdaptor {
+public abstract interface StagingJobAdaptor extends JobControlAdaptor {
     /**
      * Get the base URL where to copy job input/output files.
      * Protocol must be one of the supported protocols.
