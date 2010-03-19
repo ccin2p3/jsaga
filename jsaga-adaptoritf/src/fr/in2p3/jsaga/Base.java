@@ -25,7 +25,10 @@ public class Base {
                             : new File("."));
 
     public static final File JSAGA_USER = new File(System.getProperty("user.home"), ".jsaga/");
-    public static final File JSAGA_VAR = new File(JSAGA_USER, "var/");
+    public static final File JSAGA_VAR =
+            System.getProperty("JSAGA_VAR")!=null
+                    ? new File(System.getProperty("JSAGA_VAR"))
+                    : new File(JSAGA_USER, "var/");
     static {
         if (!JSAGA_USER.exists() && JSAGA_USER.mkdir()) {
             throw new RuntimeException("Failed to create directory: "+JSAGA_USER);
