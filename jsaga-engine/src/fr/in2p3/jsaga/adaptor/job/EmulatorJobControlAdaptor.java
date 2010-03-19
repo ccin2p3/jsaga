@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.adaptor.job;
 
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.*;
-import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorOnePhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.ogf.saga.error.*;
@@ -23,7 +23,7 @@ import java.util.*;
 /**
  *
  */
-public class EmulatorJobControlAdaptor extends EmulatorJobAdaptorAbstract implements StagingJobAdaptor, CleanableJobAdaptor, StreamableJobBatch {
+public class EmulatorJobControlAdaptor extends EmulatorJobAdaptorAbstract implements StagingJobAdaptorOnePhase, CleanableJobAdaptor, StreamableJobBatch {
     public int getDefaultPort() {
         return 1234;
     }
@@ -112,6 +112,10 @@ public class EmulatorJobControlAdaptor extends EmulatorJobAdaptorAbstract implem
 
     public String getStagingBaseURL() {
         return "test://emulator1.test.org:1234/";
+    }
+
+    public StagingTransfer[] getInputStagingTransfer(String nativeJobDescription, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        return new StagingTransfer[]{};
     }
 
     public StagingTransfer[] getInputStagingTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {
