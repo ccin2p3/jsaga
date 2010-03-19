@@ -13,19 +13,22 @@
     </xsl:template>
     
     <xsl:template match="jsdl:JobDescription">
-    	<xsl:if test="jsdl:Application/posix:POSIXApplication/posix:Environment">
-	    	<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Environment">
+        <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Environment">
 <xsl:text>export </xsl:text><xsl:value-of select="@name"/>=\"<xsl:value-of select="text()"/><xsl:text>\";</xsl:text>
-	    	</xsl:for-each>
-	    </xsl:if>
+        </xsl:for-each>
 		<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:WorkingDirectory/text()">
 <xsl:text>if [[ !( -d </xsl:text><xsl:value-of select="."/><xsl:text> ) ]] ;  then exit 1; fi; cd </xsl:text><xsl:value-of select="."/><xsl:text> ;</xsl:text>
 		</xsl:for-each>
 <xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Executable/text()"/><xsl:text/>
-		<xsl:if test="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
-			<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
-				 <xsl:text> </xsl:text><xsl:value-of select="."/><xsl:text/>
-            </xsl:for-each>
-		</xsl:if>
+        <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
+             <xsl:text> </xsl:text><xsl:value-of select="."/><xsl:text/>
+        </xsl:for-each>
+        <!-- needed when job attribute FileTransfer is not set -->
+		<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Output/text()">
+            <xsl:text> &gt;</xsl:text><xsl:value-of select="."/><xsl:text/>
+		</xsl:for-each>
+		<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Error/text()">
+            <xsl:text> 2&gt;</xsl:text><xsl:value-of select="."/><xsl:text/>
+		</xsl:for-each>
 	</xsl:template>
 </xsl:stylesheet>
