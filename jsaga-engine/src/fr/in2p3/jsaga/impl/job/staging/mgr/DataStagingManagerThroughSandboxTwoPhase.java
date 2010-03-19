@@ -17,7 +17,7 @@ import org.ogf.saga.error.*;
  *
  */
 public class DataStagingManagerThroughSandboxTwoPhase extends DataStagingManagerThroughSandbox {
-    public DataStagingManagerThroughSandboxTwoPhase(StagingJobAdaptor adaptor, String uniqId) throws NotImplementedException, BadParameterException, NoSuccessException {
+    public DataStagingManagerThroughSandboxTwoPhase(StagingJobAdaptorTwoPhase adaptor, String uniqId) throws NotImplementedException, BadParameterException, NoSuccessException {
         super(adaptor, uniqId);
     }
 
