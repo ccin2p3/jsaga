@@ -33,15 +33,12 @@
         </xsl:for-each>
 
         <!-- other -->
-      	<xsl:if test="jsdl:Application/posix:POSIXApplication/posix:Environment">
-       		<xsl:for-each
-                select="jsdl:Application/posix:POSIXApplication/posix:Environment">
-                <environment>
-                	<name><xsl:value-of select="@name"/></name>
-                	<value><xsl:value-of select="text()"/></value>
-                </environment>
-            </xsl:for-each>
-        </xsl:if>
+        <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Environment">
+            <environment>
+                <name><xsl:value-of select="@name"/></name>
+                <value><xsl:value-of select="text()"/></value>
+            </environment>
+        </xsl:for-each>
 		<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:WorkingDirectory/text()">
             <directory><xsl:value-of select="."/></directory>
         </xsl:for-each>
