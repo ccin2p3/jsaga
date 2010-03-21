@@ -45,25 +45,41 @@ public abstract class JobRunSandboxTest extends AbstractJobTest {
         m_uuid = null;
     }
 
-    public void test_input_local_to_worker_implicit() throws Exception {
-        this.runJobInput(false, getLocal("input"), getWorker("input"));
-    }
-    public void test_output_local_from_worker_implicit() throws Exception {
-        this.runJobOutput(false, getLocal("output"), getWorker("output"));
+    public void test_remove_input_explicit() throws Exception {
+        this.runJobExplicit(getRemote("input"), getWorker("input"), getLocal("output"), getWorker("output"));
     }
 
-    public void test_input_local_to_worker() throws Exception {
-        this.runJobInput(true, getLocal("input"), getWorker("input"));
-    }
-    public void test_input_remote_to_worker() throws Exception {
-        this.runJobInput(true, getRemote("input"), getWorker("input"));
+    public void test_remote_output_explicit() throws Exception {
+        this.runJobExplicit(getLocal("input"), getWorker("input"), getRemote("output"), getWorker("output"));
     }
 
-    public void test_output_local_from_worker() throws Exception {
-        this.runJobOutput(true, getLocal("output"), getWorker("output"));
+    public void test_input_output_explicit() throws Exception {
+        this.runJobExplicit(getLocal("input"), getWorker("input"), getLocal("output"), getWorker("output"));
     }
-    public void test_output_remote_from_worker() throws Exception {
-        this.runJobOutput(true, getRemote("output"), getWorker("output"));
+
+    public void test_input_output_implicit() throws Exception {
+        this.runJobImplicit(getLocal("input"), getWorker("input"), getLocal("output"), getWorker("output"));
+    }
+
+    public void test_output_only_implicit() throws Exception {
+        Object localOutput = getLocal("output");
+        Object workerOutput = getWorker("output");
+
+        // create job
+        JobDescription desc = JobFactory.createJobDescription();
+        desc.setAttribute(JobDescription.EXECUTABLE, "/bin/echo");
+        desc.setVectorAttribute(JobDescription.ARGUMENTS, new String[]{"cuicui"});
+        desc.setVectorAttribute(JobDescription.FILETRANSFER, new String[]{
+                localOutput+" < "+workerOutput
+        });
+        desc.setAttribute(JobDescription.OUTPUT, workerOutput.toString());
+
+        // run job
+        String outputContent = this.runAndGetOutput(desc, localOutput);
+        assertEquals(OUTPUT_CONTENT, outputContent.trim());
+
+        // cleanup
+        this.cleanup(localOutput);
     }
 
     //////////////////////////////////////////// private methods ////////////////////////////////////////////
@@ -74,15 +90,15 @@ public abstract class JobRunSandboxTest extends AbstractJobTest {
     protected URI getRemote(String suffix) {
         return new File(TMP, "remote-"+m_uuid+"."+suffix).toURI();
     }
-    private String getWorker(String suffix) {
+    protected String getWorker(String suffix) {
         return "worker-"+m_uuid+"."+suffix;
     }
 
-    protected void runJobInput(boolean explicitRedirect, Object localInput, Object workerInput) throws Exception {
-        this.runJob(explicitRedirect, getLocal("sh"), getWorker("sh"), localInput, workerInput, getLocal("output"), getWorker("output"));
+    protected void runJobExplicit(Object localInput, Object workerInput, Object localOutput, Object workerOutput) throws Exception {
+        this.runJob(true, getLocal("sh"), getWorker("sh"), localInput, workerInput, localOutput, workerOutput);
     }
-    protected void runJobOutput(boolean explicitRedirect, Object localOutput, Object workerOutput) throws Exception {
-        this.runJob(explicitRedirect, getLocal("sh"), getWorker("sh"), getLocal("input"), getWorker("input"), localOutput, workerOutput);
+    protected void runJobImplicit(Object localInput, Object workerInput, Object localOutput, Object workerOutput) throws Exception {
+        this.runJob(false, getLocal("sh"), getWorker("sh"), localInput, workerInput, localOutput, workerOutput);
     }
     private void runJob(boolean explicitRedirect, File localScript, String workerScript, Object localInput, Object workerInput, Object localOutput, Object workerOutput) throws Exception {
         // prepare
@@ -96,7 +112,6 @@ public abstract class JobRunSandboxTest extends AbstractJobTest {
                 localInput+" > "+workerInput,
                 localOutput+" < "+workerOutput
         });
-
         if (explicitRedirect) {
             this.put(localScript, SCRIPT_EXPLICIT.getBytes());
             desc.setVectorAttribute(JobDescription.ARGUMENTS, new String[]{workerInput.toString(), workerOutput.toString()});
@@ -106,6 +121,17 @@ public abstract class JobRunSandboxTest extends AbstractJobTest {
             desc.setAttribute(JobDescription.OUTPUT, workerOutput.toString());
         }
 
+        // run job
+        String outputContent = this.runAndGetOutput(desc, localOutput);
+        assertEquals(OUTPUT_CONTENT, outputContent);
+
+        // cleanup
+        this.cleanup(localScript);
+        this.cleanup(localInput);
+        this.cleanup(localOutput);
+    }
+
+    private String runAndGetOutput(JobDescription desc, Object localOutput) throws Exception {
         // submit
         JobService service = JobFactory.createJobService(m_session, m_jobservice);
         Job job = service.createJob(desc);
@@ -132,14 +158,8 @@ public abstract class JobRunSandboxTest extends AbstractJobTest {
         // check job status
         assertEquals(State.DONE.getValue(), job.getState().getValue());
 
-        // check job output
-        String outputContent = this.get(localOutput);
-        assertEquals(OUTPUT_CONTENT, outputContent);
-
-        // cleanup
-        this.cleanup(localScript);
-        this.cleanup(localInput);
-        this.cleanup(localOutput);
+        // return job output content
+        return this.get(localOutput);
     }
 
     private void put(Object location, byte[] content) throws Exception {

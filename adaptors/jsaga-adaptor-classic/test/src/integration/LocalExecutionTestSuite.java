@@ -55,16 +55,16 @@ public class LocalExecutionTestSuite extends JSAGATestSuite {
 
         // additional tests to/from remote
         public void test_input_local_to_remote() throws Exception {
-            super.runJobInput(true, getLocal("input"), getRemote("input"));
+            super.runJobExplicit(getLocal("input"), getRemote("input"), getLocal("output"), getWorker("output"));
         }
         public void test_input_remote_to_remote() throws Exception {
-            super.runJobInput(true, getRemote("input_source"), getRemote("input_target"));
+            super.runJobExplicit(getRemote("input"), getRemote("i_target"), getLocal("output"), getWorker("output"));
         }
         public void test_output_local_from_remote() throws Exception {
-            super.runJobOutput(true, getLocal("output"), getRemote("output"));
+            super.runJobExplicit(getLocal("input"), getWorker("input"), getLocal("output"), getRemote("output"));
         }
         public void test_output_remote_from_remote() throws Exception {
-            super.runJobOutput(true, getRemote("output"), getRemote("output_target"));
+            super.runJobExplicit(getLocal("input"), getWorker("input"), getRemote("output"), getRemote("o_target"));
         }
     }
     
