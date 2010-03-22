@@ -11,5 +11,21 @@
                 please contact us so that we can fill out this FAQ.
             </answer>
         </faq>
+        <faq id="url">
+            <question>What is the URL syntax understood by this plug-in ?</question>
+            <answer>The URL must be:
+                <pre><![CDATA[wsgram://<HOSTNAME>:8443/<LRMS>
+Where:
+    <HOSTNAME> is the name of the host running the WS-GRAM service,
+    <LRMS> is the scheduler to use (must be available on targeted site): Fork, PBS, LSF, Condor, SGE...
+]]></pre>
+            </answer>
+        </faq>
+        <faq id="other">
+            <question>Is there another FAQ about this plug-in ?</question>
+            <answer>Please also check the FAQ of the
+                <a href="../jsaga-adaptor-globus/faq.html">Globus pre-WS adaptor</a>.
+            </answer>
+        </faq>
     </part>
 </faqs>
