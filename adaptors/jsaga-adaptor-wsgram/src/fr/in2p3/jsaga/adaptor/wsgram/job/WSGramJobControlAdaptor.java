@@ -1,11 +1,14 @@
 package fr.in2p3.jsaga.adaptor.wsgram.job;
 
-import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorOnePhase;
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
-
+import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.addressing.EndpointReferenceType;
 import org.globus.exec.client.GramJob;
+import org.globus.exec.generated.ExtensionsType;
+import org.globus.exec.generated.JobDescriptionType;
 import org.globus.exec.utils.client.ManagedJobFactoryClientHelper;
 import org.globus.exec.utils.rsl.RSLHelper;
 import org.globus.exec.utils.rsl.RSLParseException;
@@ -13,10 +16,10 @@ import org.globus.gram.GramException;
 import org.globus.gram.internal.GRAMProtocolErrorConstants;
 import org.globus.wsrf.impl.security.authorization.Authorization;
 import org.ietf.jgss.GSSException;
-import org.ogf.saga.error.NoSuccessException;
-import org.ogf.saga.error.PermissionDeniedException;
-import org.ogf.saga.error.TimeoutException;
+import org.ogf.saga.error.*;
 
+import javax.xml.namespace.QName;
+import java.util.Iterator;
 import java.util.Map;
 
 
@@ -32,7 +35,7 @@ import java.util.Map;
  * TODO : setProtection
  * TODO : during cleanup, remove proxy saved in server in $HOME/.globus/gram_proxy...
  */
-public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements JobControlAdaptor, CleanableJobAdaptor {
+public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements StagingJobAdaptorOnePhase, CleanableJobAdaptor {
     public String getTranslator() {
         return "xsl/job/rsl-2.0.xsl";
     }
@@ -92,6 +95,45 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
 		}
     }
 
+    public String getStagingBaseURL() {
+        return "gsiftp://"+m_serverHost+":2811/tmp";
+    }
+
+    public StagingTransfer[] getInputStagingTransfer(String nativeJobDescription, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        JobDescriptionType jobDesc;
+        try {
+            jobDesc = RSLHelper.readRSL(nativeJobDescription);
+        } catch(RSLParseException e){
+            throw new NoSuccessException(e);
+        }
+        MessageElement preStageIn = getExtensions(jobDesc)[0];
+        return toStagingTransferArray(preStageIn);
+    }
+
+    public StagingTransfer[] getInputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        GramJob job = super.getGramJobById(nativeJobId);
+        JobDescriptionType jobDesc;
+        try {
+            jobDesc = job.getDescription();
+        } catch (Exception e) {
+            throw new NoSuccessException(e);
+        }
+        MessageElement preStageIn = getExtensions(jobDesc)[0];
+        return toStagingTransferArray(preStageIn);
+    }
+
+    public StagingTransfer[] getOutputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        GramJob job = super.getGramJobById(nativeJobId);
+        JobDescriptionType jobDesc;
+        try {
+            jobDesc = job.getDescription();
+        } catch (Exception e) {
+            throw new NoSuccessException(e);
+        }
+        MessageElement postStageOut = getExtensions(jobDesc)[1];
+        return toStagingTransferArray(postStageOut);
+    }
+
     public void cancel(String nativeJobHandle) throws PermissionDeniedException, TimeoutException, NoSuccessException {
     	GramJob job = super.getGramJobById(nativeJobHandle);        
     	try {
@@ -130,4 +172,46 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
        	 	throw new NoSuccessException(e);
 		}
 	}
+
+    private static MessageElement[] getExtensions(JobDescriptionType jobDesc) throws NoSuccessException {
+        ExtensionsType ext = jobDesc.getExtensions();
+        if (ext!=null && ext.get_any().length==2) {
+            return ext.get_any();
+        } else {
+            throw new NoSuccessException("Failed to retrieve extensions");
+        }
+    }
+    private static StagingTransfer[] toStagingTransferArray(MessageElement elem) {
+        StagingTransfer[] transfers = new StagingTransfer[elem.getLength()];
+        Iterator it = elem.getChildElements();
+        for (int i=0; it.hasNext(); i++) {
+            MessageElement child = (MessageElement) it.next();
+            transfers[i] = new StagingTransfer(
+                    getStringValue(child, "sourceUrl"),
+                    getStringValue(child, "destinationUrl"),
+                    getBooleanValue(child, "append"));
+        }
+        return transfers;
+    }
+    private static String getStringValue(MessageElement elem, String key) {
+        MessageElement child = elem.getChildElement(new QName("", key));
+        if (child != null) {
+            try {
+                return child.getValue();
+            } catch (Exception e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+    private static boolean getBooleanValue(MessageElement elem, String key) {
+        String value = getStringValue(elem, key);
+        if (value != null) {
+            return "true".equalsIgnoreCase(value);
+        } else {
+            return false;
+        }
+    }
 }

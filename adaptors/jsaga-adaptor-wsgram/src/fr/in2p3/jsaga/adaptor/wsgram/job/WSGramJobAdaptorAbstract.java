@@ -62,7 +62,7 @@ import javax.xml.rpc.ServiceException;
 public abstract class WSGramJobAdaptorAbstract implements SagaSecureAdaptor {
 	
     protected GSSCredential m_credential;
-    protected String m_serverUrl, m_serverBatch = "Fork";
+    protected String m_serverHost, m_serverUrl, m_serverBatch = "Fork";
     private static final String IP_ADDRESS = "IPAddress";
     
     public String getType() {
@@ -95,6 +95,7 @@ public abstract class WSGramJobAdaptorAbstract implements SagaSecureAdaptor {
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+        m_serverHost = host;
     	m_serverUrl = "https://"+host+":"+port;
     	if(basePath != null &&
     			!basePath.equals("") && 

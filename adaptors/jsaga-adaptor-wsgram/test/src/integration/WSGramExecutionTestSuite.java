@@ -37,6 +37,11 @@ public class WSGramExecutionTestSuite extends JSAGATestSuite {
     public static class WSGramJobRunMinimalTest extends JobRunMinimalTest {
         public WSGramJobRunMinimalTest() throws Exception {super("wsgram");}
     }
+
+    // test cases
+    public static class WSGramJobRunSandboxTest extends JobRunSandboxTest {
+        public WSGramJobRunSandboxTest() throws Exception {super("wsgram");}
+    }
     
     // test cases
     public static class WSGramJobRunRequiredTest extends JobRunRequiredTest {

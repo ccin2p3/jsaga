@@ -7,6 +7,13 @@
                 xmlns:ext="http://www.in2p3.fr/jsdl-extension">
     <xsl:output method="xml"/>
 
+    <!-- JSAGA parameters -->
+    <xsl:param name="UniqId">staging</xsl:param>
+    <xsl:param name="IntermediaryURL">uri://</xsl:param>
+
+    <!-- constants -->
+    <xsl:variable name="SupportedProtocols">/gsiftp/</xsl:variable>
+
     <!-- entry point (MUST BE RELATIVE) -->
     <xsl:template match="jsdl:JobDefinition">
         <job>
@@ -31,6 +38,83 @@
         <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Input/text()">
             <stdin><xsl:value-of select="."/></stdin>
         </xsl:for-each>
+
+        <!-- data staging -->
+        <xsl:if test="jsdl:DataStaging">
+            <xsl:if test="jsdl:DataStaging[jsdl:Source]">
+                <fileStageIn>
+                    <xsl:for-each select="jsdl:DataStaging[jsdl:Source]">
+                        <transfer>
+                            <sourceUrl>
+                                <xsl:choose>
+                                    <xsl:when test="contains($SupportedProtocols,concat('/',substring-before(jsdl:Source/jsdl:URI/text(),'://'),'/'))">
+                                        <xsl:value-of select="jsdl:Source/jsdl:URI/text()"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="jsdl:FileName/text()"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </sourceUrl>
+                            <destinationUrl>file:///${GLOBUS_USER_HOME}/<xsl:value-of select="jsdl:FileName/text()"/></destinationUrl>
+                        </transfer>
+                    </xsl:for-each>
+                </fileStageIn>
+            </xsl:if>
+            <xsl:if test="jsdl:DataStaging[jsdl:Target]">
+                <fileStageOut>
+                    <xsl:for-each select="jsdl:DataStaging[jsdl:Target]">
+                        <transfer>
+                            <sourceUrl>file:///${GLOBUS_USER_HOME}/<xsl:value-of select="jsdl:FileName/text()"/></sourceUrl>
+                            <destinationUrl>
+                                <xsl:choose>
+                                    <xsl:when test="contains($SupportedProtocols,concat('/',substring-before(jsdl:Target/jsdl:URI/text(),'://'),'/'))">
+                                        <xsl:value-of select="jsdl:Target/jsdl:URI/text()"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="jsdl:FileName/text()"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </destinationUrl>
+                        </transfer>
+                    </xsl:for-each>
+                </fileStageOut>
+            </xsl:if>
+
+            <extensions>
+                <preStageIn>
+                    <xsl:variable name="UnsupportedURI" select="jsdl:DataStaging[jsdl:Source][
+                        not(contains($SupportedProtocols,concat('/',substring-before(jsdl:Source/jsdl:URI/text(),'://'),'/')))]"/>
+                    <xsl:for-each select="$UnsupportedURI">
+                        <transfer>
+                            <sourceUrl><xsl:value-of select="translate(jsdl:Source/jsdl:URI/text(),'\','/')"/></sourceUrl>
+                            <destinationUrl><xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="jsdl:FileName/text()"/></destinationUrl>
+                            <append><xsl:value-of select="string(jsdl:CreationFlag/text()='append')"/></append>
+                        </transfer>
+                    </xsl:for-each>
+                </preStageIn>
+                <postStageOut>
+                    <xsl:variable name="UnsupportedURI" select="jsdl:DataStaging[jsdl:Target][
+                        not(contains($SupportedProtocols,concat('/',substring-before(jsdl:Target/jsdl:URI/text(),'://'),'/')))]"/>
+                    <xsl:for-each select="$UnsupportedURI">
+                        <transfer>
+                            <sourceUrl><xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="jsdl:FileName/text()"/></sourceUrl>
+                            <destinationUrl><xsl:value-of select="translate(jsdl:Target/jsdl:URI/text(),'\','/')"/></destinationUrl>
+                            <append><xsl:value-of select="string(jsdl:CreationFlag/text()='append')"/></append>
+                        </transfer>
+                    </xsl:for-each>
+                </postStageOut>
+            </extensions>
+
+            <xsl:if test="jsdl:DataStaging[jsdl:DeleteOnTermination='true']">
+                <fileCleanUp>
+                    <xsl:for-each select="jsdl:DataStaging[jsdl:DeleteOnTermination='true']">
+                        <deletion>
+                            <file>file:///${GLOBUS_USER_HOME}/<xsl:value-of select="jsdl:FileName/text()"/></file>
+                        </deletion>
+                    </xsl:for-each>
+                </fileCleanUp>
+            </xsl:if>
+        </xsl:if>
 
         <!-- other -->
         <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Environment">

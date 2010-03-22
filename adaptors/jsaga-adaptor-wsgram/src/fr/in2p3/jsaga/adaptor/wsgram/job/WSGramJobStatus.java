@@ -27,7 +27,7 @@ public class WSGramJobStatus extends JobStatus {
     }
     
     public String getModel() {
-        return "TODO";
+        return "WS-GRAM";
     }
 
     public SubState getSubState() {
