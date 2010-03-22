@@ -93,16 +93,15 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
         }
     }
     private static String pathToURL(String path) {
-        boolean isLinuxPath = path.startsWith("/");
-        boolean isWindowsPath = (path.length()>2
+        boolean isWindowsAbsolutePath = (path.length()>2
                 && Character.isLetter(path.charAt(0))
                 && path.charAt(1)==':'
                 && (path.charAt(2)=='\\' || path.charAt(2)=='/')
                 && path.charAt(3)!='/');
-        if (isLinuxPath || isWindowsPath) {
-            return new java.io.File(path).toURI().toString();
-        } else {
+        if (path.contains("://") && !isWindowsAbsolutePath) {
             return path;
+        } else {
+            return new java.io.File(path).toURI().toString();
         }
     }
 
