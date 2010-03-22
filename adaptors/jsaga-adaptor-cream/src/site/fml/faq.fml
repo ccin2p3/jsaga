@@ -14,6 +14,19 @@
     </part>
     <part id="execution">
         <title>Execution management</title>
+        <faq id="url">
+            <question>What is the URL syntax understood by this plug-in ?</question>
+            <answer>The URL must be:
+                <pre><![CDATA[cream://<HOSTNAME>[:<PORT>]/cream-<SCHEDULER>-<QUEUE>[?delegationId=<DELEGATION>]
+Where:
+    <HOSTNAME> is the name of the host running the gLite-CREAM service,
+    <PORT> is 8443 by default,
+    <SCHEDULER> is the scheduler available on targeted site: pbs, lsf, sge, bqs...
+    <QUEUE> is the name of the job queue (e.g. short, long, a_vo_name...),
+    <DELEGATION> is the identifier of your delegated proxy (optional).
+]]></pre>
+            </answer>
+        </faq>
         <faq id="identity_reading_failed">
             <question>It fails with this error message:
                 <pre>Identity reading failed: null</pre>
