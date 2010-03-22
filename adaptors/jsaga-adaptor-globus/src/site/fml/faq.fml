@@ -52,5 +52,16 @@ chmod 664 $HASH.signing_policy]]></pre>
                 If you can not open ports, you can still use the "lcgce" plug-in instead, but with some limitations.
             </answer>
         </faq>
+        <faq id="url">
+            <question>What is the URL syntax understood by this plug-in ?</question>
+            <answer>The URL must be:
+                <pre><![CDATA[gatekeeper://<HOSTNAME>[:<PORT>]/jobmanager-<SCHEDULER>
+Where:
+    <HOSTNAME> is the name of the host running the Gatekeeper server,
+    <PORT> is 2119 by default,
+    <SCHEDULER> is the scheduler to use (must be available on targeted site): fork, pbs, lsf, condor, sge...
+]]></pre>
+            </answer>
+        </faq>
     </part>
 </faqs>
