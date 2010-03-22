@@ -34,5 +34,15 @@
                 you will have to specify one and only one CandidateHost in job description.
             </answer>
         </faq>
+        <faq id="url">
+            <question>What is the URL syntax understood by this plug-in ?</question>
+            <answer>The URL must be:
+                <pre><![CDATA[naregi://<HOSTNAME>[:<PORT>]
+Where:
+    <HOSTNAME> is the name of the host running the NAREGI Super-Scheduler service,
+    <PORT> is 8080 by default.
+]]></pre>
+            </answer>
+        </faq>
     </part>
 </faqs>

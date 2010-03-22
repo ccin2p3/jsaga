@@ -38,5 +38,15 @@ UserTags = [
 </JobDefinition>]]></pre>
             </answer>
         </faq>
+        <faq id="url">
+            <question>What is the URL syntax understood by this plug-in ?</question>
+            <answer>The URL must be:
+                <pre><![CDATA[wms://<HOSTNAME>[:<PORT>]/glite_wms_wmproxy_server        
+Where:
+    <HOSTNAME> is the name of the host running the WMS server,
+    <PORT> is 7443 by default.
+]]></pre>
+            </answer>
+        </faq>
     </part>
 </faqs>

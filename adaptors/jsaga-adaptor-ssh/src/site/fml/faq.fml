@@ -30,4 +30,17 @@ ssh localhost -i ~/.ssh/id_rsa</pre>
             </answer>
         </faq>
     </part>
+    <part id="execution">
+        <title>Execution management</title>
+        <faq id="url">
+            <question>What is the URL syntax understood by this plug-in ?</question>
+            <answer>The URL must be:
+                <pre><![CDATA[ssh://<HOSTNAME>[:<PORT>]/
+Where:
+    <HOSTNAME> is the name of the host running the SSH daemon,
+    <PORT> is 22 by default.
+]]></pre>
+            </answer>
+        </faq>
+    </part>
 </faqs>

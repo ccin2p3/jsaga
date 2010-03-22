@@ -59,4 +59,13 @@ keytool -import -alias 1 -file myCA.der</pre></li>
             </answer>
         </faq>
     </part>
+    <part id="execution">
+        <title>Execution management</title>
+        <faq id="url">
+            <question>What is the URL syntax understood by this plug-in ?</question>
+            <answer>The URL must be:
+                <pre><![CDATA[local://localhost]]></pre>
+            </answer>
+        </faq>
+    </part>
 </faqs>

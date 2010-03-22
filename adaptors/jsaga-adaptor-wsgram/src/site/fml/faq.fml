@@ -14,11 +14,11 @@
         <faq id="url">
             <question>What is the URL syntax understood by this plug-in ?</question>
             <answer>The URL must be:
-                <pre><![CDATA[wsgram://<HOSTNAME>[:<PORT>]/<LRMS>
+                <pre><![CDATA[wsgram://<HOSTNAME>[:<PORT>]/<SCHEDULER>
 Where:
     <HOSTNAME> is the name of the host running the WS-GRAM service,
     <PORT> is 8443 by default,
-    <LRMS> is the scheduler to use (must be available on targeted site): Fork, PBS, LSF, Condor, SGE...
+    <SCHEDULER> is the scheduler to use (must be available on targeted site): Fork, PBS, LSF, Condor, SGE...
 ]]></pre>
             </answer>
         </faq>

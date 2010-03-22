@@ -43,5 +43,16 @@
             <question>What should I do with error message: "No factory available for 'Bash shell'" ?</question>
             <answer>Unicore 6.2+ running on Windows is not supported (workaround for 6.1 does not work anymore).</answer>
         </faq>
+        <faq id="url">
+            <question>What is the URL syntax understood by this plug-in ?</question>
+            <answer>The URL must be:
+                <pre><![CDATA[unicore6://<HOSTNAME>[:<PORT>]/<SITENAME>/services/Registry
+Where:
+    <HOSTNAME> is the name of the host running the Unicore 6 service,
+    <PORT> is 8080 by default,
+    <SITENAME> is the name of the site (e.g. DEMO-SITE).
+]]></pre>
+            </answer>
+        </faq>
     </part>
 </faqs>
