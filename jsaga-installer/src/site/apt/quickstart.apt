@@ -4,8 +4,6 @@ Quick Start Guide
 
     * {{{download.html}Download and install}} JSAGA.
 
-    * Some plug-ins may require a post-installation step (see FAQ of {{{adaptors.html}plug-ins}}).
-
     * Configure the needed plug-ins (see configuration examples of {{{adaptors.html}plug-ins}}).
 
     * Use the {{{commands.html}command line interfaces}} provided with JSAGA (see examples below),
@@ -53,7 +51,3 @@ bin/jsaga-help -j context
 ---
 bin/jsaga-job-run -r local://localhost -Executable date -Arguments --utc
 ---
-
-* Job collection management
-
-    TODO...
