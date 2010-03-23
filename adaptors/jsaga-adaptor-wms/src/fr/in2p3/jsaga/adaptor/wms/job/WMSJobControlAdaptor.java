@@ -274,6 +274,17 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         return "gsiftp://"+hostname+":2811/tmp";
     }
 
+    public String getStagingDirectory(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        String jdl = null;
+        try {
+            jdl = m_client.getJDL(nativeJobId, JdlType.ORIGINAL);
+        } catch (BaseException e) {
+            rethrow(e);
+        }
+        Properties jobDesc = parseJobDescription(jdl);
+        return getStringValue_IfExists(jobDesc, "SandboxDirectory");
+    }
+
     public StagingTransfer[] getInputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 /*
         StringList result = null;
@@ -426,6 +437,18 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             return value.substring(1, value.length()-1);
         } else {
             throw new NoSuccessException("Failed to parse JDL attribute: "+value);
+        }
+    }
+    private static String getStringValue_IfExists(Properties jobDesc, String key) throws NoSuccessException {
+        String value = getValue(jobDesc, key);
+        if (value!=null) {
+            if (value.startsWith("\"") && value.endsWith("\"")) {
+                return value.substring(1, value.length()-1);
+            } else {
+                throw new NoSuccessException("Failed to parse JDL attribute: "+value);
+            }
+        } else {
+            return null;
         }
     }
     private static int getIntValue_IfExists(Properties jobDesc, String key) throws NoSuccessException {

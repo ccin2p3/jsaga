@@ -81,6 +81,7 @@
             </xsl:if>
 
             <extensions>
+                <stageDirectory><xsl:value-of select="$IntermediaryURL"/></stageDirectory>
                 <preStageIn>
                     <xsl:variable name="UnsupportedURI" select="jsdl:DataStaging[jsdl:Source][
                         not(contains($SupportedProtocols,concat('/',substring-before(jsdl:Source/jsdl:URI/text(),'://'),'/')))]"/>

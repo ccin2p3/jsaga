@@ -36,6 +36,11 @@ import java.util.Map;
  * TODO : during cleanup, remove proxy saved in server in $HOME/.globus/gram_proxy...
  */
 public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements StagingJobAdaptorOnePhase, CleanableJobAdaptor {
+    private static final int STAGE_DIRECTORY = 0;
+    private static final int PRE_STAGE_IN = 1;
+    private static final int POST_STAGE_OUT = 2;
+    private static final int _NB_EXTENSIONS_ = 3;
+
     public String getTranslator() {
         return "xsl/job/rsl-2.0.xsl";
     }
@@ -99,6 +104,17 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
         return "gsiftp://"+m_serverHost+":2811/tmp";
     }
 
+    public String getStagingDirectory(String nativeJobDescription, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        JobDescriptionType jobDesc;
+        try {
+            jobDesc = RSLHelper.readRSL(nativeJobDescription);
+        } catch(RSLParseException e){
+            throw new NoSuccessException(e);
+        }
+        MessageElement stageDirectory = getExtensions(jobDesc)[STAGE_DIRECTORY];
+        return stageDirectory.getValue();
+    }
+
     public StagingTransfer[] getInputStagingTransfer(String nativeJobDescription, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         JobDescriptionType jobDesc;
         try {
@@ -106,8 +122,20 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
         } catch(RSLParseException e){
             throw new NoSuccessException(e);
         }
-        MessageElement preStageIn = getExtensions(jobDesc)[0];
+        MessageElement preStageIn = getExtensions(jobDesc)[PRE_STAGE_IN];
         return toStagingTransferArray(preStageIn);
+    }
+
+    public String getStagingDirectory(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        GramJob job = super.getGramJobById(nativeJobId);
+        JobDescriptionType jobDesc;
+        try {
+            jobDesc = job.getDescription();
+        } catch (Exception e) {
+            throw new NoSuccessException(e);
+        }
+        MessageElement stageDirectory = getExtensions(jobDesc)[STAGE_DIRECTORY];
+        return stageDirectory.getValue();
     }
 
     public StagingTransfer[] getInputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
@@ -118,7 +146,7 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
         } catch (Exception e) {
             throw new NoSuccessException(e);
         }
-        MessageElement preStageIn = getExtensions(jobDesc)[0];
+        MessageElement preStageIn = getExtensions(jobDesc)[PRE_STAGE_IN];
         return toStagingTransferArray(preStageIn);
     }
 
@@ -130,7 +158,7 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
         } catch (Exception e) {
             throw new NoSuccessException(e);
         }
-        MessageElement postStageOut = getExtensions(jobDesc)[1];
+        MessageElement postStageOut = getExtensions(jobDesc)[POST_STAGE_OUT];
         return toStagingTransferArray(postStageOut);
     }
 
@@ -175,7 +203,7 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
 
     private static MessageElement[] getExtensions(JobDescriptionType jobDesc) throws NoSuccessException {
         ExtensionsType ext = jobDesc.getExtensions();
-        if (ext!=null && ext.get_any().length==2) {
+        if (ext!=null && ext.get_any().length==_NB_EXTENSIONS_) {
             return ext.get_any();
         } else {
             throw new NoSuccessException("Failed to retrieve extensions");

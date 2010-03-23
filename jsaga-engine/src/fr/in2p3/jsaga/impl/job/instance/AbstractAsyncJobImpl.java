@@ -32,8 +32,8 @@ public abstract class AbstractAsyncJobImpl extends AbstractSyncJobImpl implement
     }
 
     /** constructor for control and monitoring only */
-    protected AbstractAsyncJobImpl(Session session, String nativeJobId, AbstractSyncJobServiceImpl service) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
-        super(session, nativeJobId, service);
+    protected AbstractAsyncJobImpl(Session session, String nativeJobId, DataStagingManager stagingMgr, AbstractSyncJobServiceImpl service) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
+        super(session, nativeJobId, stagingMgr, service);
     }
     
     //////////////////////////////////////////// interface Job ////////////////////////////////////////////

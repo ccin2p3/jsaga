@@ -165,6 +165,12 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         return "gsiftp://"+hostname+":2811/tmp";
     }
 
+    public String getStagingDirectory(String nativeJobId) throws TimeoutException, NoSuccessException {
+        JobInfo jobInfo = this.getJobInfo(nativeJobId);
+        Properties jobDesc = parseJobDescription(jobInfo.getJDL());
+        return getStringValue_IfExists(jobDesc, "SandboxDirectory");
+    }
+
     public StagingTransfer[] getInputStagingTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {
         JobInfo jobInfo = this.getJobInfo(nativeJobId);
         //String baseUri = jobInfo.getCREAMInputSandboxURI()+"/";
@@ -321,6 +327,18 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
             return value.substring(1, value.length()-1);
         } else {
             throw new NoSuccessException("Failed to parse JDL attribute: "+value);
+        }
+    }
+    private static String getStringValue_IfExists(Properties jobDesc, String key) throws NoSuccessException {
+        String value = getValue(jobDesc, key);
+        if (value!=null) {
+            if (value.startsWith("\"") && value.endsWith("\"")) {
+                return value.substring(1, value.length()-1);
+            } else {
+                throw new NoSuccessException("Failed to parse JDL attribute: "+value);
+            }
+        } else {
+            return null;
         }
     }
     private static int getIntValue_IfExists(Properties jobDesc, String key) throws NoSuccessException {

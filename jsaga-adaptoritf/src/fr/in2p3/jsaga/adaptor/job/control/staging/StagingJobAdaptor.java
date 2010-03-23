@@ -24,6 +24,14 @@ public abstract interface StagingJobAdaptor extends JobControlAdaptor {
     public String getStagingBaseURL();
 
     /**
+     * Get the URL of the directory where to copy job input/output files.
+     * Protocol must be one of the supported protocols.
+     * @param nativeJobId the identifier of the job in the grid
+     * @return the staging directory URL
+     */
+    public String getStagingDirectory(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException;
+
+    /**
      * Get pre-staging operations to perform before starting the job.
      * @param nativeJobId the identifier of the job in the grid
      * @return list of transfers that are not managed by the adaptor

@@ -42,4 +42,17 @@ public class DataStagingManagerFactory {
             throw new NoSuccessException(e);
         }
     }
+
+    public static DataStagingManager create(JobControlAdaptor adaptor) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+        String uniqId = null;   //todo: remove this
+
+        // create data staging manager
+        if (adaptor instanceof StagingJobAdaptorOnePhase) {
+            return new DataStagingManagerThroughSandboxOnePhase((StagingJobAdaptorOnePhase) adaptor, uniqId);
+        } else if (adaptor instanceof StagingJobAdaptorTwoPhase) {
+            return new DataStagingManagerThroughSandboxTwoPhase((StagingJobAdaptorTwoPhase) adaptor, uniqId);
+        } else {
+            return new DataStagingManagerDummy();
+        }
+    }
 }

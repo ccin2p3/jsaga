@@ -114,8 +114,16 @@ public class EmulatorJobControlAdaptor extends EmulatorJobAdaptorAbstract implem
         return "test://emulator1.test.org:1234/";
     }
 
+    public String getStagingDirectory(String nativeJobDescription, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        return null;
+    }
+
     public StagingTransfer[] getInputStagingTransfer(String nativeJobDescription, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         return new StagingTransfer[]{};
+    }
+
+    public String getStagingDirectory(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        return null;
     }
 
     public StagingTransfer[] getInputStagingTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {

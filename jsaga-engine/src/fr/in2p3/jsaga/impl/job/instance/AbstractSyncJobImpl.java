@@ -69,11 +69,11 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     }
 
     /** constructor for control and monitoring only */
-    protected AbstractSyncJobImpl(Session session, String nativeJobId, AbstractSyncJobServiceImpl service) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
+    protected AbstractSyncJobImpl(Session session, String nativeJobId, DataStagingManager stagingMgr, AbstractSyncJobServiceImpl service) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         this(session, service, false);
         m_attributes.m_NativeJobDescription.setObject(null);
         m_jobDescription = null;
-        m_stagingMgr = null;
+        m_stagingMgr = stagingMgr;
         m_uniqId = null;
         m_nativeJobId = nativeJobId;
     }

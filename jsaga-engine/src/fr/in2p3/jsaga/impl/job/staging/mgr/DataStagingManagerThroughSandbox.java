@@ -28,7 +28,6 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
 
     // info
     private URL m_intermediaryURL;
-    private Directory m_intermediaryDirectory;
 
     public DataStagingManagerThroughSandbox(StagingJobAdaptor adaptor, String uniqId) throws NotImplementedException, BadParameterException, NoSuccessException {
         m_adaptor = adaptor;
@@ -41,17 +40,6 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
 
     public JobDescription modifyJobDescription(final JobDescription jobDesc) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         return jobDesc;
-    }
-
-    protected void preStaging(AbstractSyncJobImpl job) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
-        // create intermediary directory
-        try {
-            m_intermediaryDirectory = FileFactory.createDirectory(job.getSession(), m_intermediaryURL, Flags.CREATE.getValue());
-        } catch (IncorrectURLException e) {
-            throw new NoSuccessException(e);
-        } catch (AlreadyExistsException e) {
-            throw new NoSuccessException(e);
-        }
     }
 
     public void postStaging(AbstractSyncJobImpl job, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
@@ -73,8 +61,17 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
         }
 
         // remove base directory
-        if (m_intermediaryDirectory != null) {
-            m_intermediaryDirectory.remove(Flags.NONE.getValue());
+        String stagingDir = m_adaptor.getStagingDirectory(nativeJobId);
+        if (stagingDir != null) {
+            URL url = URLFactory.createURL(stagingDir);
+            try {
+                Directory dir = FileFactory.createDirectory(job.getSession(), url);
+                dir.remove(Flags.NONE.getValue());
+            } catch (IncorrectURLException e) {
+                throw new NoSuccessException(e);
+            } catch (AlreadyExistsException e) {
+                throw new NoSuccessException(e);
+            }
         }
     }
 

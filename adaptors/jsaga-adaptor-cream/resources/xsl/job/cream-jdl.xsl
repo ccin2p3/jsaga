@@ -88,6 +88,10 @@
             </xsl:otherwise>
         </xsl:choose>
 
+        <xsl:if test="jsdl:DataStaging">
+  SandboxDirectory = "<xsl:value-of select="$IntermediaryURL"/>";<xsl:text/>
+        </xsl:if>
+
         <xsl:if test="jsdl:DataStaging[jsdl:Source]">
             <xsl:variable name="UnsupportedURI" select="jsdl:DataStaging[jsdl:Source][
                 not(contains($SupportedProtocols,concat('/',substring-before(jsdl:Source/jsdl:URI/text(),'://'),'/')))]"/>

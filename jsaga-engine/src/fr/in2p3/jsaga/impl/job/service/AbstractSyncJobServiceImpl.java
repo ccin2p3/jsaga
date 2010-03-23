@@ -154,7 +154,8 @@ public abstract class AbstractSyncJobServiceImpl extends AbstractSagaObjectImpl 
     }
 
     public Job getJobSync(String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-        return new JobImpl(m_session, nativeJobId, this);
+        DataStagingManager stagingMgr = DataStagingManagerFactory.create(m_controlAdaptor);
+        return new JobImpl(m_session, nativeJobId, stagingMgr, this);
     }
 
     public JobSelf getSelfSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
