@@ -413,9 +413,12 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             String trimmed = value.trim();
             if (trimmed.endsWith(";")) {
                 return trimmed.substring(0, trimmed.length()-1);
+            } else {
+                throw new NoSuccessException("Failed to parse JDL attribute: "+value);
             }
+        } else {
+            return null;
         }
-        throw new NoSuccessException("Failed to parse JDL attribute: "+value);
     }
     private static String getStringValue(Properties jobDesc, String key) throws NoSuccessException {
         String value = getValue(jobDesc, key);
@@ -439,6 +442,10 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     }
     private static boolean getBooleanValue(Properties jobDesc, String key) throws NoSuccessException {
         String value = getValue(jobDesc, key);
-        return Boolean.parseBoolean(value);
+        if (value!=null) {
+            return Boolean.parseBoolean(value);
+        } else {
+            throw new NoSuccessException("Failed to parse JDL attribute: "+value);
+        }
     }
 }
