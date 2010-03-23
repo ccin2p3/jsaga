@@ -139,7 +139,6 @@
             </extension></complexContent></complexType></element>
         </sequence>
         <attribute name="scheme" type="string" use="required"/><!-- from adaptor descriptor -->
-        <attribute name="bulk" type="boolean" use="required"/><!-- from adaptor descriptor -->
     </complexType></element>
 
     <!-- root type -->

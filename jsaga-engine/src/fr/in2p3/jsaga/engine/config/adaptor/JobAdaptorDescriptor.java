@@ -3,7 +3,6 @@ package fr.in2p3.jsaga.engine.config.adaptor;
 import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.BulkJobSubmit;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.engine.schema.config.*;
 import fr.in2p3.jsaga.engine.schema.config.types.AttributeSourceType;
@@ -62,7 +61,6 @@ public class JobAdaptorDescriptor {
     private static Execution toXML(JobAdaptor adaptor, SecurityAdaptorDescriptor securityDesc) {
         Execution execution = new Execution();
         execution.setScheme(adaptor.getType()); // default identifier
-        execution.setBulk(adaptor instanceof BulkJobSubmit);
 
         // add default job service
         JobService service = new JobService();
