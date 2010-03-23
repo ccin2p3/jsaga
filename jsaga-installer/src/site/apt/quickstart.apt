@@ -52,18 +52,22 @@ bin/jsaga-help -j context
 
 ---
 URL=local://localhost
-bin/jsaga-job-run -Executable date -Arguments --utc -r $URL
+bin/jsaga-job-run -Executable /bin/date -Arguments --utc -r $URL
 ---
 
     * Example: get the woker node host name in output file
 
 ---
+URL=local://localhost
+
+# don't forget to escape special characters to prevent them from being interpreted by your shell
+bin/jsaga-job-run -Executable /bin/hostname -Output output.txt -FileTransfer 'result.txt\<output.txt'
+
+# or create a job description file
 cat << EOF > job.txt
 Executable /bin/hostname
 Output output.txt
 FileTransfer result.txt<output.txt
 EOF
-
-URL=local://localhost
 bin/jsaga-job-run -f job.txt -r $URL
 ---
