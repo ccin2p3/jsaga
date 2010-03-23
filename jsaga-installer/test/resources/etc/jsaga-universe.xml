@@ -3,7 +3,8 @@
     <GRID name="EGEE_dteam" contextType="VOMS">
         <!-- get defaults from gLite-UI environment and configuration files -->
         <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
-        <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/dteam_cred.txt"/>
+        <!-- todo: uncomment this when it will be supported by CREAM adaptor -->
+        <!--<attribute name="UserProxy" value="${user.home}/.jsaga/tmp/dteam_cred.txt"/>-->
         <attribute name="LifeTime" value="PT13H"/>
         <job type="cream"/>
         <data type="gsiftp"/>
