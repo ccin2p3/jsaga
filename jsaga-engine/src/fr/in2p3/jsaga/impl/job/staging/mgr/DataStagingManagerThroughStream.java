@@ -172,12 +172,14 @@ public class DataStagingManagerThroughStream implements DataStagingManager {
                 staging.preStaging(stdin);
             }
 
-            // cleanup
-            for (InputDataStagingToWorker staging : m_inputToWorker) {
-                staging.cleanup(stdin);
-            }
-            for (OutputDataStagingFromWorker staging : m_outputFromWorker) {
-                staging.cleanup(stdin);
+            // cleanup on worker
+            if (isCleanup(job.getJobDescriptionSync())) {
+                for (InputDataStagingToWorker staging : m_inputToWorker) {
+                    staging.cleanup(stdin);
+                }
+                for (OutputDataStagingFromWorker staging : m_outputFromWorker) {
+                    staging.cleanup(stdin);
+                }
             }
 
             // close
@@ -229,6 +231,24 @@ public class DataStagingManagerThroughStream implements DataStagingManager {
 
     private boolean needsStdout() {
         return !m_outputFromWorker.isEmpty();
+    }
+
+    private static boolean isCleanup(JobDescription jobDesc) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+        final boolean CLEANUP_DEFAULT = true;
+        try {
+            String cleanup = jobDesc.getAttribute(JobDescription.CLEANUP);
+            if ("False".equalsIgnoreCase(cleanup)) {
+                return false;
+            } else if ("True".equalsIgnoreCase(cleanup)) {
+                return true;
+            } else if ("Default".equalsIgnoreCase(cleanup)) {
+                return CLEANUP_DEFAULT;
+            } else {
+                throw new BadParameterException("Attribute '"+JobDescription.CLEANUP+"' has unexpected value: "+cleanup);
+            }
+        } catch (DoesNotExistException e) {
+            return CLEANUP_DEFAULT;
+        }
     }
 
     private static boolean isURL(String file) {
