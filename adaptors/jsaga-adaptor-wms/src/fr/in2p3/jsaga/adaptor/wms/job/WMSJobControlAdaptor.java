@@ -294,7 +294,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         }
         String baseUri = "";
         Properties jobDesc = parseJobDescription(jdl);
-        int transfersLength = getIntValue(jobDesc, "InputSandboxPreStaging");
+        int transfersLength = getIntValue_IfExists(jobDesc, "InputSandboxPreStaging");
         StagingTransfer[] transfers = new StagingTransfer[transfersLength];
         for (int i=0; i<transfersLength; i++) {
             transfers[i] = new StagingTransfer(
@@ -325,7 +325,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         }
         String baseUri = "";
         Properties jobDesc = parseJobDescription(jdl);
-        int transfersLength = getIntValue(jobDesc, "OutputSandboxPostStaging");
+        int transfersLength = getIntValue_IfExists(jobDesc, "OutputSandboxPostStaging");
         StagingTransfer[] transfers = new StagingTransfer[transfersLength];
         for (int i=0; i<transfersLength; i++) {
             transfers[i] = new StagingTransfer(
@@ -425,12 +425,16 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             throw new NoSuccessException("Failed to parse JDL attribute: "+value);
         }
     }
-    private static int getIntValue(Properties jobDesc, String key) throws NoSuccessException {
+    private static int getIntValue_IfExists(Properties jobDesc, String key) throws NoSuccessException {
         String value = getValue(jobDesc, key);
-        try {
-            return Integer.parseInt(value);
-        } catch (NumberFormatException e) {
-            throw new NoSuccessException("Failed to parse JDL attribute: "+value, e);
+        if (value!=null) {
+            try {
+                return Integer.parseInt(value);
+            } catch (NumberFormatException e) {
+                throw new NoSuccessException("Failed to parse JDL attribute: "+value, e);
+            }
+        } else {
+            return 0;
         }
     }
     private static boolean getBooleanValue(Properties jobDesc, String key) throws NoSuccessException {
