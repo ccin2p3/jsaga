@@ -45,7 +45,7 @@ public abstract class JobRunSandboxTest extends AbstractJobTest {
         m_uuid = null;
     }
 
-    public void test_remove_input_explicit() throws Exception {
+    public void test_remote_input_explicit() throws Exception {
         this.runJobExplicit(getRemote("input"), getWorker("input"), getLocal("output"), getWorker("output"));
     }
 
