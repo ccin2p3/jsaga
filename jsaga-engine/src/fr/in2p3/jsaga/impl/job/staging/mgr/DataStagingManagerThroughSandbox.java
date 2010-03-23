@@ -95,9 +95,11 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
                 && path.charAt(1)==':'
                 && (path.charAt(2)=='\\' || path.charAt(2)=='/')
                 && path.charAt(3)!='/');
-        if (path.contains("://") && !isWindowsAbsolutePath) {
+        if (path.contains(":/") && !isWindowsAbsolutePath) {
+            // returns URI
             return path;
         } else {
+            // convert path to URI
             return new java.io.File(path).toURI().toString();
         }
     }
