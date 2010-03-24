@@ -13,9 +13,6 @@
     <script>jsaga-job-status</script>
     <script>jsaga-job-get-output</script>
 
-    <script>jsaga-jobcollection-run</script>
-    <script>jsaga-jobcollection-status</script>
-
     <script>jsaga-cat</script>
     <script>jsaga-cp</script>
     <script>jsaga-ls</script>
