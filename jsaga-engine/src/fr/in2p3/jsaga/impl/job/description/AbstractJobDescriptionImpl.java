@@ -3,7 +3,8 @@ package fr.in2p3.jsaga.impl.job.description;
 import fr.in2p3.jsaga.impl.attributes.AbstractAttributesImpl;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.job.JobDescription;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -25,16 +26,17 @@ public abstract class AbstractJobDescriptionImpl extends AbstractAttributesImpl 
 
     public abstract Document getAsDocument() throws NoSuccessException;
 
-    public Element getJSDL() throws NoSuccessException {
+    public Document getJSDL() throws NoSuccessException {
         Document jobDesc = this.getAsDocument();
-        NodeList list = jobDesc.getElementsByTagNameNS("http://schemas.ggf.org/jsdl/2005/11/jsdl", "JobDefinition");
-        switch(list.getLength()) {
-            case 0:
-                throw new NoSuccessException("[INTERNAL ERROR] Job description contains no JSDL element");
-            case 1:
-                return (Element) list.item(0);
-            default:
-                throw new NoSuccessException("[INTERNAL ERROR] Job description contains several JSDL elements");
-        }        
+
+        // check it is JSDL
+        Element root = jobDesc.getDocumentElement();
+        if ("http://schemas.ggf.org/jsdl/2005/11/jsdl".equals(root.getNamespaceURI()) &&
+            "JobDefinition".equals(root.getLocalName()))
+        {
+            return jobDesc;
+        } else {
+            throw new NoSuccessException("[INTERNAL ERROR] Job description is not a JSDL document: "+root.getLocalName());
+        }
     }
 }

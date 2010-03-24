@@ -18,7 +18,7 @@ import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.url.URL;
-import org.w3c.dom.Element;
+import org.w3c.dom.Document;
 
 import java.io.ByteArrayOutputStream;
 import java.util.*;
@@ -69,7 +69,7 @@ public abstract class AbstractSyncJobServiceImpl extends AbstractSagaObjectImpl 
         jobDesc = stagingMgr.modifyJobDescription(jobDesc);
 
         // get JSDL
-        Element jsdlDOM;
+        Document jsdlDOM;
         if (jobDesc instanceof AbstractJobDescriptionImpl) {
             jsdlDOM = ((AbstractJobDescriptionImpl) jobDesc).getJSDL();
         } else {

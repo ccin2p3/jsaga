@@ -16,17 +16,7 @@
     </xsl:variable>
 
     <xsl:template match="/">
-        <ext:JobCollection>
-            <ext:JobCollectionDescription>
-                <ext:JobCollectionIdentification>
-                    <ext:JobCollectionName><xsl:value-of select="$id"/></ext:JobCollectionName>
-                </ext:JobCollectionIdentification>
-                <ext:Parametric start="1" step="1" count="1"/>
-            </ext:JobCollectionDescription>
-            <ext:Job>
-                <xsl:apply-templates select="attributes"/>
-            </ext:Job>
-        </ext:JobCollection>
+        <xsl:apply-templates select="attributes"/>
     </xsl:template>
 
     <xsl:template match="attributes">

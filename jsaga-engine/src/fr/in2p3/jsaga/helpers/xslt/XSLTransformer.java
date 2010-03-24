@@ -35,6 +35,10 @@ public class XSLTransformer {
         m_debugFile = debugFile;
     }
 
+    public byte[] transform(Document xmlInput) throws TransformerException, IOException {
+        return transform(new DOMSource(xmlInput));
+    }
+    
     public byte[] transform(Element xmlInput) throws TransformerException, IOException {
         return transform(new DOMSource(xmlInput));
     }
