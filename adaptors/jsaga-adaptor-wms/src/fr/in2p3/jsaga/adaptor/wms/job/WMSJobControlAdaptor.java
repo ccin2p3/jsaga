@@ -42,7 +42,6 @@ import java.util.Properties;
  */
 public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 		implements StagingJobAdaptorTwoPhase, CleanableJobAdaptor, StreamableJobBatch {
-    private static final String HOST_NAME = "HostName";
     private static final String DEFAULT_JDL_FILE = "DefaultJdlFile";
 
 	private String clientConfigFile = Base.JSAGA_VAR+ File.separator+ "client-config-wms.wsdd";
@@ -102,7 +101,6 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         m_parameters = attributes;
-        m_parameters.put(HOST_NAME, host);
         if (attributes.containsKey(DEFAULT_JDL_FILE)) {
             File defaultJdlFile = new File((String) attributes.get(DEFAULT_JDL_FILE));
             try {
@@ -268,11 +266,6 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 		}
 
 	}
-
-    public String getStagingBaseURL() {
-        String hostname = (String) m_parameters.get(HOST_NAME);
-        return "gsiftp://"+hostname+":2811/tmp";
-    }
 
     public String getStagingDirectory(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         String jdl = null;

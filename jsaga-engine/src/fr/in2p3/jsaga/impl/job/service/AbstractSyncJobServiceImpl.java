@@ -10,7 +10,8 @@ import fr.in2p3.jsaga.helpers.xslt.XSLTransformerFactory;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import fr.in2p3.jsaga.impl.job.description.AbstractJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.job.instance.JobImpl;
-import fr.in2p3.jsaga.impl.job.staging.mgr.*;
+import fr.in2p3.jsaga.impl.job.staging.mgr.DataStagingManager;
+import fr.in2p3.jsaga.impl.job.staging.mgr.DataStagingManagerFactory;
 import fr.in2p3.jsaga.sync.job.SyncJobService;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
@@ -86,13 +87,10 @@ public abstract class AbstractSyncJobServiceImpl extends AbstractSagaObjectImpl 
                 if (p != null) {
                     parameters.putAll(p);
                 }
-                parameters.put("UniqId", uniqId);
-                if (stagingMgr instanceof DataStagingManagerThroughSandbox) {
-                    URL intermediaryURL = ((DataStagingManagerThroughSandbox)stagingMgr).getIntermediaryURL();
-                    if (intermediaryURL != null) {
-                        parameters.put("IntermediaryURL", intermediaryURL.toString());
-                    }
+                if (m_resourceManager!=null && m_resourceManager.getHost()!=null) {
+                    parameters.put("HostName", m_resourceManager.getHost());
                 }
+                parameters.put("UniqId", uniqId);
 
                 // translate
                 XSLTransformer transformer = XSLTransformerFactory.getInstance().getCached(stylesheet, parameters);

@@ -26,16 +26,8 @@ import org.ogf.saga.url.URLFactory;
 public class DataStagingManagerThroughSandbox implements DataStagingManager {
     protected StagingJobAdaptor m_adaptor;
 
-    // info
-    private URL m_intermediaryURL;
-
     public DataStagingManagerThroughSandbox(StagingJobAdaptor adaptor, String uniqId) throws NotImplementedException, BadParameterException, NoSuccessException {
         m_adaptor = adaptor;
-        m_intermediaryURL = URLFactory.createURL(adaptor.getStagingBaseURL()+"/"+uniqId+"/");
-    }
-
-    public URL getIntermediaryURL() {
-        return m_intermediaryURL;
     }
 
     public JobDescription modifyJobDescription(final JobDescription jobDesc) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {

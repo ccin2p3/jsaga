@@ -17,13 +17,6 @@ import org.ogf.saga.error.*;
  */
 public abstract interface StagingJobAdaptor extends JobControlAdaptor {
     /**
-     * Get the base URL where to copy job input/output files.
-     * Protocol must be one of the supported protocols.
-     * @return the base URL
-     */
-    public String getStagingBaseURL();
-
-    /**
      * Get the URL of the directory where to copy job input/output files.
      * Protocol must be one of the supported protocols.
      * @param nativeJobId the identifier of the job in the grid

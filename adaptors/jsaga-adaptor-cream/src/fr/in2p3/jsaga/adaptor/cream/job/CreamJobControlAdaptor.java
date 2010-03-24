@@ -37,7 +37,6 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     private static final String SSL_CA_FILES = "sslCAFiles";
 
     // parameters extracted from URI
-    private static final String HOST_NAME = "HostName";
     private static final String BATCH_SYSTEM = "BatchSystem";
     private static final String QUEUE_NAME = "QueueName";
 
@@ -83,7 +82,6 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         Matcher m = Pattern.compile("/cream-(.*)-(.*)").matcher(basePath);
         if (m.matches()) {
             m_parameters = new HashMap(2);
-            m_parameters.put(HOST_NAME, host);
             m_parameters.put(BATCH_SYSTEM, m.group(1));
             m_parameters.put(QUEUE_NAME, m.group(2));
         } else {
@@ -158,11 +156,6 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         } else {
             throw new NoSuccessException("Unexpected content of response message ["+resultArray.length+"]");
         }
-    }
-
-    public String getStagingBaseURL() {
-        String hostname = (String) m_parameters.get(HOST_NAME);
-        return "gsiftp://"+hostname+":2811/tmp";
     }
 
     public String getStagingDirectory(String nativeJobId) throws TimeoutException, NoSuccessException {

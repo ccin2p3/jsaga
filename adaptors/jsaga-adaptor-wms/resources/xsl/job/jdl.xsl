@@ -8,12 +8,10 @@
     <xsl:output method="text"/>
 
     <!-- JSAGA parameters -->
+    <xsl:param name="HostName">host</xsl:param>
     <xsl:param name="UniqId">staging</xsl:param>
-    <xsl:param name="IntermediaryURL">uri://</xsl:param>
 
-    <!-- Adaptor-specific parameters -->
-    <xsl:param name="HostName"/>
-    <!-- JDL attributes -->
+    <!-- Adaptor-specific parameters (JDL attributes) -->
     <xsl:param name="LBAddress"/>
     <xsl:param name="requirements"/>
     <xsl:param name="rank"/>
@@ -29,6 +27,9 @@
 
     <!-- constants -->
     <xsl:variable name="SupportedProtocols">/gsiftp/</xsl:variable>
+    <xsl:variable name="IntermediaryURL">
+        <xsl:text/>gsiftp://<xsl:value-of select="$HostName"/>:2811/tmp/<xsl:value-of select="$UniqId"/>
+    </xsl:variable>
 
     <!-- entry point (MUST BE RELATIVE) -->
     <xsl:template match="jsdl:JobDefinition">

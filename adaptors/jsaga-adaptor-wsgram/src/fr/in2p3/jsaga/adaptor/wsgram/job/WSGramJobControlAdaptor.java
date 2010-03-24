@@ -100,10 +100,6 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
 		}
     }
 
-    public String getStagingBaseURL() {
-        return "gsiftp://"+m_serverHost+":2811/tmp";
-    }
-
     public String getStagingDirectory(String nativeJobDescription, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         JobDescriptionType jobDesc;
         try {

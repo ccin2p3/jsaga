@@ -110,10 +110,6 @@ public class EmulatorJobControlAdaptor extends EmulatorJobAdaptorAbstract implem
         }
     }
 
-    public String getStagingBaseURL() {
-        return "test://emulator1.test.org:1234/";
-    }
-
     public String getStagingDirectory(String nativeJobDescription, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         return null;
     }
