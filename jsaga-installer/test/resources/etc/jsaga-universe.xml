@@ -78,7 +78,11 @@
         </data>
     </GRID>
 
-    <GRID contextType="InMemoryProxy" deactivated="true"/>
+    <GRID contextType="InMemoryProxy">
+        <data type="gsiftp-dpm"/>
+    </GRID>
+
+    
     <GRID contextType="JKS" deactivated="true"/>
     <GRID contextType="MyProxy" deactivated="true"/>
     <GRID contextType="GlobusLegacy" deactivated="true"/>
