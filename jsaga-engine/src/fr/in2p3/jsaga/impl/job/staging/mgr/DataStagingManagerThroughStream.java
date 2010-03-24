@@ -163,7 +163,9 @@ public class DataStagingManagerThroughStream implements DataStagingManager {
 
             // invoke command
             stdin.println("PATH=.:$PATH");
-            stdin.println("set -- "+ StringArray.arrayToString(m_arguments, " "));
+            if (m_arguments != null) {
+                stdin.println("set -- "+ StringArray.arrayToString(m_arguments, " "));
+            }
             stdin.println(m_executable+" $*"+m_redirections.toString());
             stdin.println();
 
