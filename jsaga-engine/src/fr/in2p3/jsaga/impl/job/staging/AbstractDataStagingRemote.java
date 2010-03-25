@@ -32,7 +32,7 @@ public abstract class AbstractDataStagingRemote extends AbstractDataStaging {
     }
 
     protected void copy(Session session, URL sourceUrl, URL targetUrl) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
-        int append = (m_append ? Flags.APPEND : Flags.NONE).getValue();
+        int append = (m_append ? Flags.APPEND : Flags.OVERWRITE).getValue();
         try {
             File file = FileFactory.createFile(session, sourceUrl, Flags.NONE.getValue());
             file.copy(targetUrl, append);
