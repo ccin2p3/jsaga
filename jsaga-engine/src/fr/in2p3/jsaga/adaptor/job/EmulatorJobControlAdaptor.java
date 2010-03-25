@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.adaptor.job;
 
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
-import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorJSDL;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.*;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorOnePhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
@@ -36,7 +36,7 @@ public class EmulatorJobControlAdaptor extends EmulatorJobAdaptorAbstract implem
     }
 
     public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
-        return new JobDescriptionTranslatorJSDL();
+        return new JobDescriptionTranslatorXSLT("xsl/job/saga.xsl");
     }
 
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
