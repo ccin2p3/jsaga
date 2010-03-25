@@ -1,21 +1,18 @@
 package fr.in2p3.jsaga.adaptor.ssh.job;
 
-import java.util.Map;
-import java.util.UUID;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import org.ogf.saga.error.NoSuccessException;
-import org.ogf.saga.error.PermissionDeniedException;
-import org.ogf.saga.error.TimeoutException;
-
 import com.jcraft.jsch.ChannelExec;
-
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobInteractiveSet;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.adaptor.ssh.SSHAdaptorAbstract;
+import org.ogf.saga.error.*;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.UUID;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -36,19 +33,15 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 		return "ssh";
 	}
 
-	public String getTranslator() {
-		return "xsl/job/ssh.xsl";
-	}
-
-	public Map getTranslatorParameters() {
-		return null;
-	}
-
 	public JobMonitorAdaptor getDefaultJobMonitor() {
 		return new SSHJobMonitorAdaptor();
 	}
 
-	public String submit(String commandLine, boolean checkMatch, String uniqId)
+    public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
+        return new JobDescriptionTranslatorXSLT("xsl/job/ssh.xsl");
+    }
+
+    public String submit(String commandLine, boolean checkMatch, String uniqId)
 			throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		try {
 

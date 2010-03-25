@@ -5,13 +5,14 @@ import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOGetterInteractive;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobInteractiveGet;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.ogf.saga.error.*;
 
 import java.io.IOException;
-import java.lang.Exception;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,7 +33,6 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 
 	private static final String SHELLPATH = "ShellPath";
     private String m_shellPath;
-    private Map m_parameters;
 
 	public Usage getUsage() {
         return new UOptional(SHELLPATH);
@@ -43,14 +43,6 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
         return new Default[]{new Default(SHELLPATH, "/bin/bash")};
     }
 
-	public String getTranslator() {
-		return "xsl/job/sh.xsl";
-	}
-
-	public Map getTranslatorParameters() {
-		return m_parameters;
-	}
-
 	public JobMonitorAdaptor getDefaultJobMonitor() {
 		return new LocalJobMonitorAdaptor();
 	}
@@ -58,10 +50,15 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     	super.connect(userInfo, host, port, basePath, attributes);
         m_shellPath = (String) attributes.get(SHELLPATH);
-        m_parameters = attributes;
     }
 
-	public String submit(String commandLine, boolean checkMatch, String uniqId)
+    public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
+        JobDescriptionTranslator translator = new JobDescriptionTranslatorXSLT("xsl/job/sh.xsl");
+        translator.setAttribute(SHELLPATH, m_shellPath);
+        return translator;
+    }
+
+    public String submit(String commandLine, boolean checkMatch, String uniqId)
 			throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		try {
 

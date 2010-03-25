@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.impl.job.service;
 
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
 import fr.in2p3.jsaga.impl.task.AbstractThreadedTask;
 import org.ogf.saga.error.*;
@@ -26,8 +27,8 @@ import java.util.List;
  */
 public abstract class AbstractAsyncJobServiceImpl extends AbstractSyncJobServiceImpl implements JobService {
     /** constructor */
-    public AbstractAsyncJobServiceImpl(Session session, URL rm, JobControlAdaptor controlAdaptor, JobMonitorService monitorService) {
-        super(session, rm, controlAdaptor, monitorService);
+    public AbstractAsyncJobServiceImpl(Session session, URL rm, JobControlAdaptor controlAdaptor, JobMonitorService monitorService, JobDescriptionTranslator translator) {
+        super(session, rm, controlAdaptor, monitorService, translator);
     }
 
     public Task<JobService, Job> createJob(TaskMode mode, final JobDescription jd) throws NotImplementedException {

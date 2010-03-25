@@ -1,12 +1,10 @@
 package fr.in2p3.jsaga.impl.job.service;
 
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
-import fr.in2p3.jsaga.helpers.XMLFileParser;
-import fr.in2p3.jsaga.helpers.xslt.XSLTransformer;
-import fr.in2p3.jsaga.helpers.xslt.XSLTransformerFactory;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import fr.in2p3.jsaga.impl.job.description.AbstractJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.job.instance.JobImpl;
@@ -20,8 +18,8 @@ import org.ogf.saga.session.Session;
 import org.ogf.saga.url.URL;
 import org.w3c.dom.Document;
 
-import java.io.ByteArrayOutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -42,13 +40,15 @@ public abstract class AbstractSyncJobServiceImpl extends AbstractSagaObjectImpl 
     public URL m_resourceManager;
     public JobControlAdaptor m_controlAdaptor;
     public JobMonitorService m_monitorService;
+    private JobDescriptionTranslator m_translator;
 
     /** constructor */
-    public AbstractSyncJobServiceImpl(Session session, URL rm, JobControlAdaptor controlAdaptor, JobMonitorService monitorService) {
+    public AbstractSyncJobServiceImpl(Session session, URL rm, JobControlAdaptor controlAdaptor, JobMonitorService monitorService, JobDescriptionTranslator translator) {
         super(session);
         m_resourceManager = rm;
         m_controlAdaptor = controlAdaptor;
         m_monitorService = monitorService;
+        m_translator = translator;
     }
 
     /** clone */
@@ -57,6 +57,7 @@ public abstract class AbstractSyncJobServiceImpl extends AbstractSagaObjectImpl 
         clone.m_resourceManager = m_resourceManager;
         clone.m_controlAdaptor = m_controlAdaptor;
         clone.m_monitorService = m_monitorService;
+        clone.m_translator = m_translator;
         return clone;
     }
 
@@ -77,33 +78,7 @@ public abstract class AbstractSyncJobServiceImpl extends AbstractSagaObjectImpl 
         }
 
         // translate from JSDL
-        String stylesheet = m_controlAdaptor.getTranslator();
-        String nativeJobDesc;
-        try {
-            if (stylesheet != null) {
-                // set parameters
-                Map parameters = new HashMap();
-                Map p = m_controlAdaptor.getTranslatorParameters();
-                if (p != null) {
-                    parameters.putAll(p);
-                }
-                if (m_resourceManager!=null && m_resourceManager.getHost()!=null) {
-                    parameters.put("HostName", m_resourceManager.getHost());
-                }
-                parameters.put("UniqId", uniqId);
-
-                // translate
-                XSLTransformer transformer = XSLTransformerFactory.getInstance().getCached(stylesheet, parameters);
-                byte[] bytes = transformer.transform(jsdlDOM);
-                nativeJobDesc = new String(bytes);
-            } else {
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                XMLFileParser.dump(jsdlDOM, out);
-                nativeJobDesc = out.toString();
-            }
-        } catch (Exception e) {
-            throw new NoSuccessException(e);
-        }
+        String nativeJobDesc = m_translator.translate(jsdlDOM, uniqId);
 
         // returns
         return new JobImpl(m_session, nativeJobDesc, jobDesc, stagingMgr, uniqId, this);

@@ -4,6 +4,8 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
@@ -16,7 +18,8 @@ import org.ogf.saga.error.*;
 
 import java.io.*;
 import java.rmi.RemoteException;
-import java.util.*;
+import java.util.Map;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,8 +42,9 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     // parameters extracted from URI
     private static final String BATCH_SYSTEM = "BatchSystem";
     private static final String QUEUE_NAME = "QueueName";
+    private String m_batchSystem;
+    private String m_queueName;
 
-    private Map m_parameters;
     private String m_delegProxy;
 
     /** override super.getUsage() */
@@ -58,14 +62,6 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         };
     }
 
-    public String getTranslator() {
-        return "xsl/job/cream-jdl.xsl";
-    }
-
-    public Map getTranslatorParameters() {
-        return m_parameters;
-    }
-
     public JobMonitorAdaptor getDefaultJobMonitor() {
         // use CREAM portType as default monitoring service (instead of CEMon portType)
         return new CreamJobMonitorAdaptor();
@@ -81,9 +77,8 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         // extract parameters from basePath
         Matcher m = Pattern.compile("/cream-(.*)-(.*)").matcher(basePath);
         if (m.matches()) {
-            m_parameters = new HashMap(2);
-            m_parameters.put(BATCH_SYSTEM, m.group(1));
-            m_parameters.put(QUEUE_NAME, m.group(2));
+            m_batchSystem = m.group(1);
+            m_queueName = m.group(2);
         } else {
             throw new BadParameterException("Path must be on the form: /cream-<lrms>-<queue>");
         }
@@ -98,9 +93,15 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     }
 
     public void disconnect() throws NoSuccessException {
-        m_parameters.clear();
         m_delegProxy = null;
         super.disconnect();
+    }
+
+    public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
+        JobDescriptionTranslator translator = new JobDescriptionTranslatorXSLT("xsl/job/cream-jdl.xsl");
+        translator.setAttribute(BATCH_SYSTEM, m_batchSystem);
+        translator.setAttribute(QUEUE_NAME, m_queueName);
+        return translator;
     }
 
     private String m_stagingPrefix;

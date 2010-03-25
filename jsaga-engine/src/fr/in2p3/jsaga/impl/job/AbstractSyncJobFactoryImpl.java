@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.impl.job;
 
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.engine.factories.JobAdaptorFactory;
 import fr.in2p3.jsaga.engine.factories.JobMonitorAdaptorFactory;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
@@ -58,7 +59,7 @@ public abstract class AbstractSyncJobFactoryImpl extends JobFactory implements S
             // get attributes
             Map attributes = m_adaptorFactory.getAttributes(rm, config);
 
-            // connect to control/monitor services
+            // connect to control/monitor services (may also update attributes)
             JobMonitorService monitorService;
             try {
                 m_adaptorFactory.connect(rm, controlAdaptor, attributes, context);
@@ -67,8 +68,18 @@ public abstract class AbstractSyncJobFactoryImpl extends JobFactory implements S
                 throw new NoSuccessException(e);
             }
 
+            // initialize translator
+            JobDescriptionTranslator translator = controlAdaptor.getJobDescriptionTranslator();
+            if (rm.getHost()!=null) {
+                translator.setAttribute(JobDescriptionTranslator.HOSTNAME, rm.getHost());
+            }
+            for (Object o : attributes.entrySet()) {
+                Map.Entry attr = (Map.Entry) o;
+                translator.setAttribute(attr.getKey().toString(), attr.getValue().toString());
+            }
+
             // create JobService
-            JobServiceImpl jobService = new JobServiceImpl(session, rm, controlAdaptor, monitorService);
+            JobServiceImpl jobService = new JobServiceImpl(session, rm, controlAdaptor, monitorService, translator);
 
             // register
             if (context != null) {

@@ -6,6 +6,8 @@ import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
@@ -47,11 +49,11 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 	private String clientConfigFile = Base.JSAGA_VAR+ File.separator+ "client-config-wms.wsdd";
 	private File m_tmpProxyFile;
 	
-    private Map m_parameters;
 	private WMProxyAPI m_client;
     private String m_delegationId = "myId";
     private String m_wmsServerHost;
     private String m_wmsServerUrl;
+    private String m_LBAddress;
 
     public String getType() {
         return "wms";
@@ -87,25 +89,16 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         };
     }
 
-    public String getTranslator() {
-        return "xsl/job/jdl.xsl";
-    }
-
-    public Map getTranslatorParameters() {
-        return m_parameters;
-    }
-
     public JobMonitorAdaptor getDefaultJobMonitor() {
         return new WMSJobMonitorAdaptor();
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
-        m_parameters = attributes;
         if (attributes.containsKey(DEFAULT_JDL_FILE)) {
             File defaultJdlFile = new File((String) attributes.get(DEFAULT_JDL_FILE));
             try {
                 // may override jsaga-universe.xml attributes
-                new DefaultJDL(defaultJdlFile).fill(m_parameters);
+                new DefaultJDL(defaultJdlFile).fill(attributes);
             } catch (FileNotFoundException e) {
                 throw new BadParameterException(e);
             }
@@ -114,6 +107,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         // set WMS url
         m_wmsServerHost = host;
     	m_wmsServerUrl = "https://"+host+":"+port+basePath;
+        m_LBAddress = (String) attributes.get("LBAddress");
 
     	// get certificate directory
         if (m_certRepository == null) {
@@ -199,12 +193,15 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     }	
 
 	public void disconnect() throws NoSuccessException {
-        m_parameters = null;
         m_wmsServerUrl = null;
         m_credential = null;
         m_client = null;
     }
-    
+
+    public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
+        return new JobDescriptionTranslatorXSLT("xsl/job/jdl.xsl");
+    }
+
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
     	try {
 			// parse JDL and Check Matching
@@ -214,7 +211,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             String nativeJobId = m_client.jobRegister(jobDesc, m_delegationId).getId();
 
             // set LB from nativeJobId
-            if (! m_parameters.containsKey("LBAddress")) {
+            if (m_LBAddress == null) {
                 WMStoLB.getInstance().setLBHost(m_wmsServerUrl, nativeJobId);
             }
 	    	return nativeJobId;

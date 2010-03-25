@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.impl.job.service;
 
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.engine.factories.JobAdaptorFactory;
@@ -29,8 +30,8 @@ import java.util.Map;
  */
 public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobService {
     /** constructor */
-    public JobServiceImpl(Session session, URL rm, JobControlAdaptor controlAdaptor, JobMonitorService monitorService) {
-        super(session, rm, controlAdaptor, monitorService);
+    public JobServiceImpl(Session session, URL rm, JobControlAdaptor controlAdaptor, JobMonitorService monitorService, JobDescriptionTranslator translator) {
+        super(session, rm, controlAdaptor, monitorService, translator);
     }
 
     ///////////////////////////////////////// interface JobService /////////////////////////////////////////

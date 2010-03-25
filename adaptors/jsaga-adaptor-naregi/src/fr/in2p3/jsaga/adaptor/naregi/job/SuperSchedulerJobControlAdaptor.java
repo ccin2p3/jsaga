@@ -5,6 +5,8 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.naregi.ss.service.client.JobScheduleServiceException;
 import org.ogf.saga.error.*;
@@ -13,7 +15,6 @@ import org.w3c.dom.Document;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
-import java.lang.Exception;
 import java.util.Map;
 
 /* ***************************************************
@@ -37,20 +38,16 @@ public class SuperSchedulerJobControlAdaptor extends SuperSchedulerJobAdaptorAbs
         return null;
     }
 
-    public String getTranslator() {
-        return "xsl/job/wfml.xsl";
-    }
-
-    public Map getTranslatorParameters() {
-        return null;    // no parameter
-    }
-
     public int getDefaultPort() {
         return 0;       // no default port
     }
 
     public JobMonitorAdaptor getDefaultJobMonitor() {
         return new SuperSchedulerJobMonitorAdaptor();
+    }
+
+    public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
+        return new JobDescriptionTranslatorXSLT("xsl/job/wfml.xsl");
     }
 
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {

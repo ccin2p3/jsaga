@@ -3,8 +3,6 @@ package fr.in2p3.jsaga.adaptor.job;
 import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
-import java.util.Map;
-
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
@@ -19,16 +17,6 @@ import java.util.Map;
  */
 public interface JobAdaptor extends SagaSecureAdaptor {
     public static final String CHECK_AVAILABILITY = "CheckAvailability";
-
-    /**
-     * @return the path to the stylesheet to transform the JSDL document to the native job description stream
-     */
-    public String getTranslator();
-
-    /**
-     * @return the array of stylesheet parameters
-     */
-    public Map getTranslatorParameters();
 
     /**
      * @return the default server port.

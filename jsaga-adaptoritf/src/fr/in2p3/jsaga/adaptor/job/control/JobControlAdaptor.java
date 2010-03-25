@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.adaptor.job.control;
 
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import org.ogf.saga.error.*;
 
 /* ***************************************************
@@ -17,6 +18,16 @@ import org.ogf.saga.error.*;
  *
  */
 public interface JobControlAdaptor extends JobAdaptor {
+    /**
+     * Although you have the possibility to implement your own job description translator,
+     * we highly recommand to re-use existing translator in order to keep your code easy to maintain.
+     * @return a job description translator
+     * @throws NoSuccessException if fails to create the translator
+     * @see fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorJSDL
+     * @see fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT
+     */
+    public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException;
+
     /**
      * submit a job
      * @param jobDesc the job description in the language supported by the targeted grid

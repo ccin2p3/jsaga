@@ -1,6 +1,8 @@
 package fr.in2p3.jsaga.adaptor.wsgram.job;
 
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorOnePhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
@@ -20,7 +22,6 @@ import org.ogf.saga.error.*;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
-import java.util.Map;
 
 
 /* ***************************************************
@@ -41,16 +42,12 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
     private static final int POST_STAGE_OUT = 2;
     private static final int _NB_EXTENSIONS_ = 3;
 
-    public String getTranslator() {
-        return "xsl/job/rsl-2.0.xsl";
-    }
-
-    public Map getTranslatorParameters() {
-        return null;
-    }
-
     public JobMonitorAdaptor getDefaultJobMonitor() {
         return new WSGramJobMonitorAdaptor();
+    }
+
+    public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
+        return new JobDescriptionTranslatorXSLT("xsl/job/rsl-2.0.xsl");
     }
 
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException {

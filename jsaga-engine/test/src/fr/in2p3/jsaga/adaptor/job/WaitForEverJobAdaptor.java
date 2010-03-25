@@ -3,13 +3,15 @@ package fr.in2p3.jsaga.adaptor.job;
 import fr.in2p3.jsaga.adaptor.WaitForEverAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.*;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobInteractiveSet;
 import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.*;
 import org.ogf.saga.error.*;
 
-import java.io.*;
-import java.util.Map;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -33,12 +35,6 @@ public class WaitForEverJobAdaptor extends WaitForEverAdaptorAbstract
 
     /////////////////////////////////////////// interface JobAdaptor ///////////////////////////////////////////
 
-    public String getTranslator() {
-        return "xsl/job/hang.xsl";
-    }
-    public Map getTranslatorParameters() {
-        return null;
-    }
     public int getDefaultPort() {
         return 0;
     }
@@ -54,6 +50,10 @@ public class WaitForEverJobAdaptor extends WaitForEverAdaptorAbstract
     }
 
     //////////////////////////////////////// interface JobControlAdaptor ////////////////////////////////////////
+
+    public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
+        return new JobDescriptionTranslatorXSLT("xsl/job/hang.xsl");
+    }
 
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
         mayHang(jobDesc);

@@ -1,64 +1,40 @@
 package fr.in2p3.jsaga.adaptor.u6.job;
 
-import fr.in2p3.jsaga.adaptor.base.defaults.Default;
-import fr.in2p3.jsaga.adaptor.base.usage.U;
-import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
-import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.job.BadResource;
-import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
-import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
-import fr.in2p3.jsaga.adaptor.u6.TargetSystemInfo;
-
-import org.ggf.schemas.jsdl.x2005.x11.jsdl.JobDefinitionType;
-import org.ggf.schemas.jsdl.x2005.x11.jsdl.RangeValueType;
-import org.ggf.schemas.jsdl.x2005.x11.jsdlPosix.ArgumentType;
-import org.ggf.schemas.jsdl.x2005.x11.jsdlPosix.EnvironmentType;
-import org.ogf.saga.error.AuthenticationFailedException;
-import org.ogf.saga.error.AuthorizationFailedException;
-import org.ogf.saga.error.BadParameterException;
-import org.ogf.saga.error.IncorrectStateException;
-import org.ogf.saga.error.NoSuccessException;
-import org.ogf.saga.error.NotImplementedException;
-import org.ogf.saga.error.PermissionDeniedException;
-import org.ogf.saga.error.TimeoutException;
-import org.unigrids.x2006.x04.services.tss.TargetSystemPropertiesDocument;
-import org.w3c.dom.Element;
-
 import com.intel.gpe.client2.common.i18n.Messages;
 import com.intel.gpe.client2.common.i18n.MessagesKeys;
 import com.intel.gpe.client2.common.requests.PutFilesRequest;
 import com.intel.gpe.client2.common.transfers.byteio.RandomByteIOFileImportImpl;
 import com.intel.gpe.client2.providers.FileProvider;
 import com.intel.gpe.client2.transfers.FileImport;
-import com.intel.gpe.clients.api.JobClient;
-import com.intel.gpe.clients.api.JobType;
-import com.intel.gpe.clients.api.StorageClient;
-import com.intel.gpe.clients.api.exceptions.GPEFileTransferProtocolNotSupportedException;
-import com.intel.gpe.clients.api.exceptions.GPEJobNotAbortedException;
-import com.intel.gpe.clients.api.exceptions.GPEMiddlewareRemoteException;
-import com.intel.gpe.clients.api.exceptions.GPEMiddlewareServiceException;
-import com.intel.gpe.clients.api.exceptions.GPEResourceUnknownException;
-import com.intel.gpe.clients.api.exceptions.GPESecurityException;
-import com.intel.gpe.clients.api.exceptions.GPEWrongJobTypeException;
+import com.intel.gpe.clients.api.*;
+import com.intel.gpe.clients.api.exceptions.*;
 import com.intel.gpe.clients.api.jsdl.gpe.GPEJob;
 import com.intel.gpe.clients.impl.jms.AtomicJobClientImpl;
 import com.intel.gpe.clients.impl.jms.GPEJobImpl;
 import com.intel.gpe.gridbeans.GPEFile;
 import com.intel.gpe.gridbeans.LocalGPEFile;
 import com.intel.gpe.util.sets.Pair;
+import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.*;
+import fr.in2p3.jsaga.adaptor.job.BadResource;
+import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorJSDL;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
+import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
+import fr.in2p3.jsaga.adaptor.u6.TargetSystemInfo;
+import org.ggf.schemas.jsdl.x2005.x11.jsdl.JobDefinitionType;
+import org.ggf.schemas.jsdl.x2005.x11.jsdl.RangeValueType;
+import org.ggf.schemas.jsdl.x2005.x11.jsdlPosix.ArgumentType;
+import org.ggf.schemas.jsdl.x2005.x11.jsdlPosix.EnvironmentType;
+import org.ogf.saga.error.*;
+import org.unigrids.x2006.x04.services.tss.TargetSystemPropertiesDocument;
+import org.w3c.dom.Element;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.io.*;
+import java.util.*;
 
 
 /* ***************************************************
@@ -87,14 +63,6 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract
     			new Default(DEFAULT_CPU_TIME, "3600")};
     }
     
-    public String getTranslator() {
-        return "xsl/job/jsdl.xsl";
-    }
-
-    public Map getTranslatorParameters() {
-    	return null;
-    } 
-
     public JobMonitorAdaptor getDefaultJobMonitor() {
         return new U6JobMonitorAdaptor();
     }
@@ -111,6 +79,10 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract
 		}
     }
     
+    public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
+        return new JobDescriptionTranslatorJSDL();
+    }
+
     public JobClient createJob(GPEJobImpl jobJsdl , boolean checkMatch, String scriptFilename, TargetSystemInfo targetSystemInfo) 
     	throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
     	try {

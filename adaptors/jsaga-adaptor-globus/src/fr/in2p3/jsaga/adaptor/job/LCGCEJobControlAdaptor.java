@@ -4,6 +4,8 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.apache.log4j.Logger;
 import org.globus.gram.*;
@@ -29,7 +31,6 @@ import java.util.Map;
  */
 public class LCGCEJobControlAdaptor extends GatekeeperJobAdaptorAbstract implements JobControlAdaptor, CleanableJobAdaptor {
     private Logger logger = Logger.getLogger(LCGCEJobControlAdaptor.class);
-    private Map m_parameters;
     private boolean twoPhaseUsed = false;
 
     public String getType() {
@@ -44,26 +45,20 @@ public class LCGCEJobControlAdaptor extends GatekeeperJobAdaptorAbstract impleme
         return null;
     }
 
-    public String getTranslator() {
-        return "xsl/job/rsl-1.0.xsl";
-    }
-
-    public Map getTranslatorParameters() {
-        return m_parameters;
-    }
-
     public JobMonitorAdaptor getDefaultJobMonitor() {
         return new LCGCEJobMonitorAdaptor();
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         super.connect(userInfo, host, port, basePath, attributes);
-        m_parameters = attributes;
     }
 
     public void disconnect() throws NoSuccessException {
         super.disconnect();
-        m_parameters = null;
+    }
+
+    public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
+        return new JobDescriptionTranslatorXSLT("xsl/job/rsl-1.0.xsl");
     }
 
     public String submit(String jobDesc, boolean checkMatch, String uniqId)  throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
