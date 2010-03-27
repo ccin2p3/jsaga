@@ -104,7 +104,10 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             // wait for physical file to be staged
             TReturnStatus status = response.getReturnStatus();
             TGetRequestFileStatus fileStatus = null;
-            if (response.getArrayOfFileStatuses()!=null && response.getArrayOfFileStatuses().getStatusArray().length>0) {
+            if (response.getArrayOfFileStatuses()!=null &&
+                response.getArrayOfFileStatuses().getStatusArray()!=null &&
+                response.getArrayOfFileStatuses().getStatusArray().length>0)
+            {
                 fileStatus = response.getArrayOfFileStatuses().getStatusArray(0);
             }
             long period = 1000;     // 1 second
@@ -181,7 +184,10 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             throw new TimeoutException(e);
         }
         TSURLReturnStatus fileStatus = null;
-        if (response.getArrayOfFileStatuses()!=null && response.getArrayOfFileStatuses().getStatusArray().length>0) {
+        if (response.getArrayOfFileStatuses()!=null &&
+            response.getArrayOfFileStatuses().getStatusArray()!=null &&
+            response.getArrayOfFileStatuses().getStatusArray().length>0)
+        {
             fileStatus = response.getArrayOfFileStatuses().getStatusArray(0);
         }
 
@@ -220,7 +226,10 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             // wait for physical space to be ready
             TReturnStatus status = response.getReturnStatus();
             TPutRequestFileStatus fileStatus = null;
-            if (response.getArrayOfFileStatuses()!=null && response.getArrayOfFileStatuses().getStatusArray().length>0) {
+            if (response.getArrayOfFileStatuses()!=null &&
+                response.getArrayOfFileStatuses().getStatusArray()!=null &&
+                response.getArrayOfFileStatuses().getStatusArray().length>0)
+            {
                 fileStatus = response.getArrayOfFileStatuses().getStatusArray(0);
             }
             long period = 1000;     // 1 second
@@ -297,7 +306,10 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             throw new TimeoutException(e);
         }
         TSURLReturnStatus fileStatus = null;
-        if (response.getArrayOfFileStatuses()!=null && response.getArrayOfFileStatuses().getStatusArray().length>0) {
+        if (response.getArrayOfFileStatuses()!=null &&
+            response.getArrayOfFileStatuses().getStatusArray()!=null &&
+            response.getArrayOfFileStatuses().getStatusArray().length>0)
+        {
             fileStatus = response.getArrayOfFileStatuses().getStatusArray(0);
         }
 
@@ -400,7 +412,10 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             throw new NoSuccessException(e);
         }
         TSURLReturnStatus fileStatus = null;
-        if (response.getArrayOfFileStatuses()!=null && response.getArrayOfFileStatuses().getStatusArray().length>0) {
+        if (response.getArrayOfFileStatuses()!=null &&
+            response.getArrayOfFileStatuses().getStatusArray()!=null &&
+            response.getArrayOfFileStatuses().getStatusArray().length>0)
+        {
             fileStatus = response.getArrayOfFileStatuses().getStatusArray(0);
         }
 
