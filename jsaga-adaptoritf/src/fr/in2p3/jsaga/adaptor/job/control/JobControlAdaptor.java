@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.adaptor.job.control;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
+import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.ogf.saga.error.*;
 
 /* ***************************************************
@@ -27,6 +28,12 @@ public interface JobControlAdaptor extends JobAdaptor {
      * @see fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT
      */
     public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException;
+
+    /**
+     * Create an instance of the default job monitor adaptor
+     * @return a job monitor adaptor instance
+     */
+    public JobMonitorAdaptor getDefaultJobMonitor();
 
     /**
      * submit a job

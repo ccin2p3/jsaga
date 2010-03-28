@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.engine.config.adaptor;
 import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.engine.schema.config.*;
 import fr.in2p3.jsaga.engine.schema.config.types.AttributeSourceType;
@@ -33,7 +34,7 @@ public class JobAdaptorDescriptor {
         m_usages = new HashMap();
         m_xml = new Execution[adaptorClasses.length];
         for (int i=0; i<adaptorClasses.length; i++) {
-            JobAdaptor adaptor = (JobAdaptor) adaptorClasses[i].newInstance();
+            JobControlAdaptor adaptor = (JobControlAdaptor) adaptorClasses[i].newInstance();
 
             // type
             m_classes.put(adaptor.getType(), adaptorClasses[i]);
@@ -58,7 +59,7 @@ public class JobAdaptorDescriptor {
         return (Usage) m_usages.get(type);
     }
 
-    private static Execution toXML(JobAdaptor adaptor, SecurityAdaptorDescriptor securityDesc) {
+    private static Execution toXML(JobControlAdaptor adaptor, SecurityAdaptorDescriptor securityDesc) {
         Execution execution = new Execution();
         execution.setScheme(adaptor.getType()); // default identifier
 
