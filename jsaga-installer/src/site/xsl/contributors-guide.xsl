@@ -29,6 +29,7 @@
                 <p>All the adaptors implement the <code>fr.in2p3.jsaga.adaptor.base.SagaBaseAdaptor</code> interface.
                     All the data and job adaptors also implement the <code>fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor</code> interface.
                 </p>
+                <xsl:apply-templates select="jelclass[@type='SagaBaseAdaptor' or @type='SagaSecureAdaptor']"/>
             </section>
             <section name="Developing a security adaptor">
                 <p>A security adaptor must implement the <code>fr.in2p3.jsaga.adaptor.security.SecurityAdaptorBuilder</code> interface.
@@ -98,6 +99,53 @@
                 </subsection>
             </section>
         </body></document>
+    </xsl:template>
+
+    <xsl:template match="jelclass">
+        <table>
+            <tr>
+                <th>Interface <xsl:value-of select="@type"/></th>
+            </tr>
+            <xsl:apply-templates select="methods/method"/>
+        </table>
+        <br/>
+    </xsl:template>
+    <xsl:template match="method">
+        <tr>
+            <td>
+                <b><xsl:value-of select="@name"/></b>:
+                <xsl:value-of select="comment/description/text()"/>
+                <xsl:if test="@returncomment"><br/>
+                    Returns <xsl:value-of select="@returncomment"/>
+                </xsl:if>
+                <ul>
+                    <xsl:apply-templates select="params/param"/>
+                </ul>
+            </td>
+            <td><xsl:apply-templates select="exceptions"/></td>
+        </tr>
+    </xsl:template>
+    <xsl:template match="param">
+        <li>
+            <i><xsl:value-of select="@name"/></i>
+            <xsl:if test="@comment">:
+                <xsl:value-of select="@comment"/>
+            </xsl:if>
+        </li>
+    </xsl:template>
+    <xsl:template match="exceptions">
+        Exceptions:
+        <ul>
+            <xsl:apply-templates select="exception"/>
+        </ul>
+    </xsl:template>
+    <xsl:template match="exception">
+        <li>
+            <i><xsl:value-of select="@type"/></i>
+            <xsl:if test="@comment">:
+                <xsl:value-of select="@comment"/>
+            </xsl:if>
+        </li>
     </xsl:template>
 
     <xsl:template name="jelclass">
