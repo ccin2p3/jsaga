@@ -18,11 +18,11 @@ import org.ogf.saga.error.*;
  */
 public interface DataFilteredList extends DataReaderAdaptor {
     /**
-     * Lists the directories under <code>absolutePath</code>, files and links are ignored.
+     * Lists the directories under absolutePath, files and links are ignored.
      * @param absolutePath the directory containing entries to list.
      * @param additionalArgs adaptor specific arguments
      * @return the entry attributes.
-     * @throws DoesNotExistException if <code>absolutePath</code> does not exist.
+     * @throws DoesNotExistException if absolutePath does not exist.
      */
     public FileAttributes[] listDirectories(String absolutePath, String additionalArgs)
         throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException;

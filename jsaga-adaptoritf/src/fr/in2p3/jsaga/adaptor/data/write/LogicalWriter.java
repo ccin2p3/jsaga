@@ -18,12 +18,12 @@ import org.ogf.saga.error.*;
 public interface LogicalWriter extends DataWriterAdaptor {
     /**
      * Add a replica location to the replica set.
-     * Note: does never throw an <code>AlreadyExistsException</code> exception!
+     * Note: does never throw an AlreadyExistsException exception!
      * @param logicalEntry absolute path of the logical entry.
      * @param replicaEntry location to add to set.
      * @param additionalArgs adaptor specific arguments
-     * @throws BadParameterException if <code>logicalEntry</code> is a directory.
-     * @throws IncorrectStateException if <code>logicalEntry</code> does not exist.
+     * @throws BadParameterException if logicalEntry is a directory.
+     * @throws IncorrectStateException if logicalEntry does not exist.
      */
     public void addLocation(String logicalEntry, URL replicaEntry, String additionalArgs)
         throws PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException;
@@ -33,8 +33,8 @@ public interface LogicalWriter extends DataWriterAdaptor {
      * @param logicalEntry absolute path of the logical entry.
      * @param replicaEntry replica to remove from set.
      * @param additionalArgs adaptor specific arguments
-     * @throws BadParameterException if <code>logicalEntry</code> is a directory.
-     * @throws IncorrectStateException if <code>logicalEntry</code> does not exist.
+     * @throws BadParameterException if logicalEntry is a directory.
+     * @throws IncorrectStateException if logicalEntry does not exist.
      * @throws DoesNotExistException if the location is not in the set of replicas.
      */
     public void removeLocation(String logicalEntry, URL replicaEntry, String additionalArgs)

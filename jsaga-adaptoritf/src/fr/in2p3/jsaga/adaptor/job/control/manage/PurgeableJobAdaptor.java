@@ -22,7 +22,7 @@ public interface PurgeableJobAdaptor extends JobControlAdaptor {
     public void purge() throws PermissionDeniedException, TimeoutException, NoSuccessException;
 
     /**
-     * Purge the list of jobs included in <code>nativeJobIdArray</code>.
+     * Purge the list of jobs included in nativeJobIdArray.
      * @param nativeJobIdArray a list of job identifications.
      */
 //    public void purge(String[] nativeJobIdArray) throws PermissionDeniedException, TimeoutException, NoSuccessException;

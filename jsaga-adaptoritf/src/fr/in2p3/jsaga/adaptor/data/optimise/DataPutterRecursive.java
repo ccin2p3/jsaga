@@ -20,12 +20,12 @@ import java.io.File;
  */
 public interface DataPutterRecursive extends DataWriterAdaptor {
     /**
-     * Put content of <code>sourceDir</code> to <code>absolutePath</code>.
+     * Put content of sourceDir to absolutePath.
      * @param absolutePath the target path.
      * @param additionalArgs adaptor specific arguments.
      * @param sourceDir the source directory.
-     * @throws AlreadyExistsException if <code>absolutePath</code> already exists.
-     * @throws ParentDoesNotExist if <code>parentAbsolutePath</code> does not exist.
+     * @throws AlreadyExistsException if absolutePath already exists.
+     * @throws ParentDoesNotExist if parentAbsolutePath does not exist.
      */
     public void putFromDirectory(String absolutePath, String additionalArgs, File sourceDir)
         throws PermissionDeniedException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException;

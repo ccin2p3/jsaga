@@ -19,14 +19,14 @@ import java.io.InputStream;
  */
 public interface FileWriterPutter extends FileWriter {
     /**
-     * Put content of stream to <code>absolutePath</code>.
+     * Put content of stream to absolutePath.
      * @param absolutePath the path of the file to put.
      * @param append if true, append stream at the end of file.
      * @param additionalArgs adaptor specific arguments
      * @param stream the input stream.
-     * @throws BadParameterException if <code>absolutePath</code> is not a file.
-     * @throws AlreadyExistsException if <code>absolutePath</code> already exists and <code>append</code> is false.
-     * @throws ParentDoesNotExist if <code>parentAbsolutePath</code> does not exist.
+     * @throws BadParameterException if absolutePath is not a file.
+     * @throws AlreadyExistsException if absolutePath already exists and append is false.
+     * @throws ParentDoesNotExist if parentAbsolutePath does not exist.
      */
     public void putFromStream(String absolutePath, boolean append, String additionalArgs, InputStream stream)
         throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException;

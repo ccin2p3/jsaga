@@ -21,8 +21,8 @@ public interface LogicalWriterMetaData extends LogicalWriter {
      * @param name name of the metadata.
      * @param values values of the metadata.
      * @param additionalArgs adaptor specific arguments
-     * @throws BadParameterException if <code>values</code> contains unsupported characters.
-     * @throws NoSuccessException if <code>logicalEntry</code> does not exist.
+     * @throws BadParameterException if values contains unsupported characters.
+     * @throws NoSuccessException if logicalEntry does not exist.
      */
     public void setMetaData(String logicalEntry, String name, String[] values, String additionalArgs)
         throws PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException;
@@ -32,7 +32,7 @@ public interface LogicalWriterMetaData extends LogicalWriter {
      * @param logicalEntry absolute path of the logical entry.
      * @param name name of the metadata to remove.
      * @param additionalArgs adaptor specific arguments
-     * @throws NoSuccessException if <code>logicalEntry</code> does not exist.
+     * @throws NoSuccessException if logicalEntry does not exist.
      * @throws DoesNotExistException if the meta data does not exist.
      */
     public void removeMetaData(String logicalEntry, String name, String additionalArgs)

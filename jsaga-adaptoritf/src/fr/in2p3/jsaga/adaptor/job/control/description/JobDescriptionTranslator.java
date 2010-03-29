@@ -21,7 +21,7 @@ import org.w3c.dom.Document;
 public interface JobDescriptionTranslator {
     /**
      * Identifier for attribute HostName (host name of the scheduler managing the job).
-     * Value of this attribute will be set through method <code>setAttribute()</code>.
+     * Value of this attribute will be set through method setAttribute().
      */
     public static final String HOSTNAME = "HostName";
 

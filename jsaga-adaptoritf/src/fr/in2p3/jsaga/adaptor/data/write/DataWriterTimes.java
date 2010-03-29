@@ -16,11 +16,11 @@ import org.ogf.saga.error.*;
  */
 public interface DataWriterTimes extends DataWriterAdaptor {
     /**
-     * Set the last modification time of the file <code>absolutePath</code>.
+     * Set the last modification time of the file absolutePath.
      * @param absolutePath the file.
      * @param additionalArgs adaptor specific arguments.
      * @param lastModified the last modification time.
-     * @throws DoesNotExistException if <code>absolutePath</code> does not exist.
+     * @throws DoesNotExistException if absolutePath does not exist.
      */
     public void setLastModified(String absolutePath, String additionalArgs, long lastModified)
         throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException;

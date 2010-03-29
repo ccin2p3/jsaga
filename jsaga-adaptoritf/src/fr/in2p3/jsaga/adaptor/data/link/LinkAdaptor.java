@@ -20,7 +20,7 @@ public interface LinkAdaptor extends DataAdaptor {
      * Tests this entry for being a link.
      * @param absolutePath the absolute path of the entry.
      * @return true if the entry is a link.
-     * @throws DoesNotExistException if <code>absolutePath</code> does not exist.
+     * @throws DoesNotExistException if absolutePath does not exist.
      */
     public boolean isLink(String absolutePath)
         throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException;
@@ -30,7 +30,7 @@ public interface LinkAdaptor extends DataAdaptor {
      * only.
      * @param absolutePath the absolute path of the entry.
      * @return the link target.
-     * @throws DoesNotExistException if <code>absolutePath</code> does not exist.
+     * @throws DoesNotExistException if absolutePath does not exist.
      */
     public String readLink(String absolutePath)
         throws NotLink, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException;
@@ -40,8 +40,8 @@ public interface LinkAdaptor extends DataAdaptor {
      * @param sourceAbsolutePath the absolute path of the physical entry to link to.
      * @param linkAbsolutePath the absolute path of the link entry to create.
      * @param overwrite if true, then link entry is overwrited if it exists.
-     * @throws DoesNotExistException if <code>sourceAbsolutePath</code> does not exist.
-     * @throws AlreadyExistsException if <code>linkAbsolutePath</code> already exists and <code>overwrite</code> is false.
+     * @throws DoesNotExistException if sourceAbsolutePath does not exist.
+     * @throws AlreadyExistsException if linkAbsolutePath already exists and overwrite is false.
      */
     public void link(String sourceAbsolutePath, String linkAbsolutePath, boolean overwrite)
         throws PermissionDeniedException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException;

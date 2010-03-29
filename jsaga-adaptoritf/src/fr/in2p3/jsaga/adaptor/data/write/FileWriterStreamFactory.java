@@ -19,16 +19,16 @@ import java.io.OutputStream;
  */
 public interface FileWriterStreamFactory extends FileWriter {
     /**
-     * Get an output stream for the file <code>fileName</code>.
+     * Get an output stream for the file fileName.
      * @param parentAbsolutePath the parent directory.
      * @param fileName the file to write to.
      * @param exclusive if true, throw exception if file already exist.
      * @param append if true, append stream at the end of file.
      * @param additionalArgs adaptor specific arguments
      * @return an output stream.
-     * @throws BadParameterException if <code>parentAbsolutePath</code> is not a directory.
-     * @throws AlreadyExistsException if <code>fileName</code> already exists and <code>exclusive</code> and <code>append</code> are both false.
-     * @throws ParentDoesNotExist if <code>parentAbsolutePath</code> does not exist.
+     * @throws BadParameterException if parentAbsolutePath is not a directory.
+     * @throws AlreadyExistsException if fileName already exists and exclusive and append are both false.
+     * @throws ParentDoesNotExist if parentAbsolutePath does not exist.
      */
     public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs)
         throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException;

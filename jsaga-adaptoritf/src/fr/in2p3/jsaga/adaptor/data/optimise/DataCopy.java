@@ -25,10 +25,10 @@ public interface DataCopy extends DataAdaptor {
      * @param targetAbsolutePath the path of the file to copy to.
      * @param overwrite if true, then target is overwrited if it exists.
      * @param additionalArgs adaptor specific arguments
-     * @throws BadParameterException if <code>sourceAbsolutePath</code> is not a file.
-     * @throws AlreadyExistsException if <code>targetAbsolutePath</code> already exists and <code>overwrite</code> is false.
-     * @throws DoesNotExistException if <code>sourceAbsolutePath</code> does not exist.
-     * @throws ParentDoesNotExist if parent of <code>targetAbsolutePath</code> does not exist.
+     * @throws BadParameterException if sourceAbsolutePath is not a file.
+     * @throws AlreadyExistsException if targetAbsolutePath already exists and overwrite is false.
+     * @throws DoesNotExistException if sourceAbsolutePath does not exist.
+     * @throws ParentDoesNotExist if parent of targetAbsolutePath does not exist.
      */
     public void copy(String sourceAbsolutePath, String targetHost, int targetPort, String targetAbsolutePath, boolean overwrite, String additionalArgs)
         throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, ParentDoesNotExist, TimeoutException, NoSuccessException;
@@ -41,9 +41,9 @@ public interface DataCopy extends DataAdaptor {
      * @param targetAbsolutePath the path of the file to copy to.
      * @param overwrite if true, then target is overwrited if it exists.
      * @param additionalArgs adaptor specific arguments
-     * @throws BadParameterException if <code>sourceAbsolutePath</code> is not a file.
-     * @throws AlreadyExistsException if <code>targetAbsolutePath</code> already exists and <code>overwrite</code> is false.
-     * @throws DoesNotExistException if <code>sourceAbsolutePath</code> does not exist.
+     * @throws BadParameterException if sourceAbsolutePath is not a file.
+     * @throws AlreadyExistsException if targetAbsolutePath already exists and overwrite is false.
+     * @throws DoesNotExistException if sourceAbsolutePath does not exist.
      */
     public void copyFrom(String sourceHost, int sourcePort, String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs)
         throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException;

@@ -27,8 +27,8 @@ public interface SecurityAdaptor {
 
     /**
      * @return the value of the attribute (other than UserID)
-     * @throws NotImplementedException if the attribute <code>key</code> is not supported by this adaptor
-     * @throws NoSuccessException if the adaptor failed to get the value of attribute <code>key</code>
+     * @throws NotImplementedException if the attribute key is not supported by this adaptor
+     * @throws NoSuccessException if the adaptor failed to get the value of attribute key
      */
     public String getAttribute(String key) throws NotImplementedException, NoSuccessException;
 

@@ -17,13 +17,13 @@ import org.ogf.saga.error.*;
  */
 public interface DataRename extends DataAdaptor {
     /**
-     * Rename entry <code>sourceAbsolutePath</code> to <code>targetAbsolutePath</code>.
+     * Rename entry sourceAbsolutePath to targetAbsolutePath.
      * @param sourceAbsolutePath the entry to rename.
      * @param targetAbsolutePath the new path of the entry.
      * @param overwrite if true, the target is overwrited if it exists.
      * @param additionalArgs adaptor specific arguments
-     * @throws AlreadyExistsException if <code>targetAbsolutePath</code> already exists and <code>overwrite</code> is false.
-     * @throws DoesNotExistException if <code>sourceAbsolutePath</code> does not exist.
+     * @throws AlreadyExistsException if targetAbsolutePath already exists and overwrite is false.
+     * @throws DoesNotExistException if sourceAbsolutePath does not exist.
      */
     public void rename(String sourceAbsolutePath, String targetAbsolutePath, boolean overwrite, String additionalArgs)
         throws PermissionDeniedException, BadParameterException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException;

@@ -30,7 +30,7 @@ public interface SagaSecureAdaptor extends SagaBaseAdaptor {
     public void setSecurityAdaptor(SecurityAdaptor securityAdaptor);
 
     /**
-     * Connect to the server and initialize the connection with the provided <code>attributes</code>.
+     * Connect to the server and initialize the connection with the provided attributes.
      * @param userInfo the user login
      * @param host the server
      * @param port the port

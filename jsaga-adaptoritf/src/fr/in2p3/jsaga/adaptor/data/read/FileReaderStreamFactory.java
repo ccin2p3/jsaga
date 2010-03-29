@@ -18,12 +18,12 @@ import java.io.InputStream;
  */
 public interface FileReaderStreamFactory extends FileReader {
     /**
-     * Get an input stream for the file <code>absolutePath</code>.
+     * Get an input stream for the file absolutePath.
      * @param absolutePath the file to read from.
      * @param additionalArgs adaptor specific arguments
      * @return an input stream.
-     * @throws BadParameterException if <code>absolutePath</code> is not a file.
-     * @throws DoesNotExistException if <code>absolutePath</code> does not exist.
+     * @throws BadParameterException if absolutePath is not a file.
+     * @throws DoesNotExistException if absolutePath does not exist.
      */
     public InputStream getInputStream(String absolutePath, String additionalArgs)
         throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException;
