@@ -241,6 +241,15 @@
 
                     <p>A job monitor adaptor <b>must</b> implement at least one of the monitoring interfaces.
                         It <b>may</b> implement several if they are natively supported by the targeted scheduler.
+                        Monitoring interfaces are:
+                        <ul>
+                            <li><code>QueryIndividualJob</code>: Query status for a single job</li>
+                            <li><code>QueryListJob</code>: Query status for a list of jobs</li>
+                            <li><code>QueryFilteredJob</code>: Query status for jobs maching a filter expression</li>
+                            <li><code>ListenIndividualJob</code>: Listen to status changes for a single job</li>
+                            <!--<li><code>ListenListJob</code>: Listen to status changes for a list of jobs</li>-->
+                            <li><code>ListenFilteredJob</code>: Listen to status changes for jobs matching a filter expression</li>
+                        </ul>
                     </p>
                     <xsl:apply-templates select="jelclass[
                             @type='QueryIndividualJob' or @type='QueryListJob' or @type='QueryFilteredJob' or
@@ -255,6 +264,83 @@
                         optional interface.
                     </p>
                     <xsl:apply-templates select="jelclass[@type='JobInfoAdaptor']"/>
+                </subsection>
+
+                <subsection name="Job control adaptor optional features">
+                    <h4>Job data (staging and I/O streams)</h4>
+
+                    <p>A job control adaptor <b>may</b> implement a data staging optional interface,
+                        in order to stage job input/output files.
+                        Data staging interfaces are:
+                        <ul>
+                            <li><code>StagingJobAdaptorOnePhase</code>: Implement this interface if job is registered and started in one phase.</li>
+                            <li><code>StagingJobAdaptorTwoPhase</code>: Implement this interface if job is registered and started in two phases.</li>
+                        </ul>
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='StagingJobAdaptor' or
+                            @type='StagingJobAdaptorOnePhase' or @type='StagingJobAdaptorTwoPhase']"/>
+
+                    <p>The data staging interfaces create arrays of StagingTransfer instances.
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='StagingTransfer']"/>
+
+                    <p>A job control adaptor <b>may</b> implement one (and only one) of the streamable
+                        job optional interfaces, in order to transfer job input/output streams.
+                        These interfaces can be implemented even if the targeted scheduler
+                        does not support interactive jobs.
+                        Streamable job interfaces are:
+                        <ul>
+                            <li><code>StreamableJobBatch</code>, which creates either a <code>JobIOGetter</code>
+                                or a <code>JobIOSetter</code> instance</li>
+                            <li><code>StreamableJobInteractiveGet</code>, which creates a <code>JobIOGetterInteractive</code>
+                                instance</li>
+                            <li><code>StreamableJobInteractiveSet</code></li>
+                        </ul>
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='StreamableJobBatch' or
+                            @type='StreamableJobInteractiveGet' or @type='StreamableJobInteractiveSet']"/>
+
+
+                    <h4>Job management</h4>
+
+                    <p>A job control adaptor <b>may</b> implement the <code>ListableJobAdaptor</code> interface
+                        in order to list user jobs known by the targeted scheduler service.
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='ListableJobAdaptor']"/>
+
+                    <p>A job control adaptor <b>may</b> implement the <code>PurgeableJobAdaptor</code> interface
+                        in order to purge jobs that are in a final state.
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='PurgeableJobAdaptor']"/>
+
+
+                    <h4>Job optional features</h4>
+
+                    <p>A job control adaptor <b>may</b> implement the <code>CheckpointableJobAdaptor</code> interface
+                        in order to checkpoint running jobs.
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='CheckpointableJobAdaptor']"/>
+
+                    <p>A job control adaptor <b>may</b> implement the <code>CleanableJobAdaptor</code> interface
+                        in order to clean data and files generated for the job when it is completed
+                        and when its output files are retrieved.
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='CleanableJobAdaptor']"/>
+
+                    <p>A job control adaptor <b>may</b> implement the <code>HoldableJobAdaptor</code> interface
+                        in order to hold/release the job when it is queued.
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='HoldableJobAdaptor']"/>
+
+                    <p>A job control adaptor <b>may</b> implement the <code>SignalableJobAdaptor</code> interface
+                        in order to send a signal to a running job.
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='SignalableJobAdaptor']"/>
+
+                    <p>A job control adaptor <b>may</b> implement the <code>SuspendableJobAdaptor</code> interface
+                        in order to suspend/resume the job when it is running.
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='SuspendableJobAdaptor']"/>
                 </subsection>
             </section>
         </body></document>
