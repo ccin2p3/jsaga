@@ -37,11 +37,11 @@
 
 
             <section name="Common interfaces">
-                <p>All the adaptors implement the <code>fr.in2p3.jsaga.adaptor.Adaptor</code> interface.
+                <p>All the adaptors implement the <code>Adaptor</code> interface.
                 </p>
                 <xsl:apply-templates select="jelclass[@type='Adaptor']"/>
                 
-                <p>All the data and job adaptors also implement the <code>fr.in2p3.jsaga.adaptor.ClientAdaptor</code> interface.
+                <p>All the data and job adaptors also implement the <code>ClientAdaptor</code> interface.
                 </p>
                 <xsl:apply-templates select="jelclass[@type='ClientAdaptor']"/>
             </section>
@@ -55,17 +55,17 @@
                     </xsl:for-each>
                 </pre>
 
-                <p>A security adaptor <b>must</b> implement the <code>fr.in2p3.jsaga.adaptor.security.SecurityAdaptor</code> interface.
+                <p>A security adaptor <b>must</b> implement the <code>SecurityAdaptor</code> interface.
                 </p>
                 <xsl:apply-templates select="jelclass[@type='SecurityAdaptor']"/>
 
                 <p>If your security adaptor creates expirable credentials, it should also implement
-                    the <code>fr.in2p3.jsaga.adaptor.security.ExpirableSecurityAdaptor</code> interface.
+                    the <code>ExpirableSecurityAdaptor</code> interface.
                 </p>
                 <xsl:apply-templates select="jelclass[@type='ExpirableSecurityAdaptor']"/>
 
-                <p>A security adaptor creates SecurityCredential instances. A security credential <b>must</b>
-                    implement the <code>fr.in2p3.jsaga.adaptor.security.SecurityCredential</code> interface.
+                <p>A security adaptor creates security credentials. A security credential <b>must</b>
+                    implement the <code>SecurityCredential</code> interface.
                 </p>
                 <xsl:apply-templates select="jelclass[@type='SecurityCredential']"/>
             </section>
@@ -73,11 +73,16 @@
 
             <section name="Developing a data adaptor">
                 <p>A data adaptor is either a physical file adaptor, or a logical file adaptor.
-                    It <b>must</b> implement the <code>fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor</code>
-                    <b>and/or</b> the <code>fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor</code> interfaces.
+                    It <b>must</b> implement the <code>DataReaderAdaptor</code> <b>and/or</b>
+                    the <code>DataWriterAdaptor</code> interfaces.
                 </p>
                 <xsl:apply-templates select="jelclass[@type='DataAdaptor'
                                 or @type='DataReaderAdaptor' or @type='DataWriterAdaptor']"/>
+
+                <p>A data reader adaptor creates file attributes container. A file attributes container <b>must</b>
+                    extend the <code>FileAttributes</code> abstract class.
+                </p>
+                <xsl:apply-templates select="jelclass[@type='FileAttributes']"/>
 
                 <subsection name="Developing a physical file adator">
                     <p>A physical file adaptor uses either stream methods or get/put methods.
@@ -95,8 +100,8 @@
                     </pre>
 
                     <p>A physical file adaptor that uses stream methods <b>must</b> implement
-                        the <code>fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory</code>
-                        <b>and/or</b> the <code>fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory</code> interfaces.
+                        the <code>FileReaderStreamFactory</code> <b>and/or</b>
+                        the <code>FileWriterStreamFactory</code> interfaces.
                     </p>
                     <xsl:apply-templates select="jelclass[@type='FileReaderStreamFactory' or @type='FileWriterStreamFactory']"/>
 
@@ -112,11 +117,12 @@
                     </pre>
 
                     <p>A physical file adaptor that uses get/put methods <b>must</b> implement
-                        the <code>fr.in2p3.jsaga.adaptor.data.read.FileReaderGetter</code>
-                        <b>and/or</b> the <code>fr.in2p3.jsaga.adaptor.data.write.FileWriterPutter</code> interfaces.
+                        the <code>FileReaderGetter</code> <b>and/or</b>
+                        the <code>FileWriterPutter</code> interfaces.
                     </p>
                     <xsl:apply-templates select="jelclass[@type='FileReaderGetter' or @type='FileWriterPutter']"/>
                 </subsection>
+
                 <subsection name="Developing a logical file adator">
                     <i>Copy-paste required methods to your adaptor class, and implement them.</i>
                     <pre>
@@ -128,10 +134,55 @@
                         </xsl:for-each>
                     </pre>
 
-                    <p>A logical file adaptor <b>must</b> implement the <code>fr.in2p3.jsaga.adaptor.data.read.LogicalReader</code>
-                        <b>and/or</b> the <code>fr.in2p3.jsaga.adaptor.data.write.LogicalWriter</code> interfaces.
+                    <p>A logical file adaptor <b>must</b> implement the <code>LogicalReader</code> <b>and/or</b>
+                        the <code>LogicalWriter</code> interfaces.
                     </p>
                     <xsl:apply-templates select="jelclass[@type='LogicalReader' or @type='LogicalWriter']"/>
+
+                    <p>A logical file adaptor <b>may</b> implement the <code>LogicalReaderMetaDataExtended</code>
+                        optional interface, but this is <b>not recommended</b> because this feature can not be used
+                        through the SAGA API.
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='LogicalReaderMetaDataExtended']"/>
+                </subsection>
+
+                <subsection name="Data adaptor optional features">
+                    <p>A data adaptor <b>may</b> implement the <code>DataWriterTimes</code>
+                        optional interface in order to support preservation of last modification date when copying files.
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='DataWriterTimes']"/>
+
+                    <p>A data adaptor <b>may</b> implement the <code>LinkAdaptor</code>
+                        optional interface in order to support links.
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='LinkAdaptor']"/>
+
+                    <p>A data adaptor <b>may</b> implement the <code>PermissionAdaptor</code>
+                        optional interface in order to support permissions management.
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='PermissionAdaptor']"/>
+                </subsection>
+
+                <subsection name="Data adaptor optional optimisations">
+                    <p>A data adaptor <b>may</b> implement the <code>DataCopy</code>
+                        optional interface in order to optimise data transfer (e.g. use third-party transfer).
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='DataCopy']"/>
+
+                    <p>[NOT YET SUPPORTED] A data adaptor <b>may</b> implement the <code>DataCopyDelegated</code>
+                        optional interface in order to delegate data transfer (e.g. to a third-party service such as gLite FTS or Globus RFT).
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='DataCopyDelegated']"/>
+
+                    <p>A data adaptor <b>may</b> implement the <code>DataRename</code>
+                        optional interface in order to optimize file renaming or moving (i.e. avoid copying data).
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='DataRename']"/>
+
+                    <p>A data adaptor <b>may</b> implement the <code>DataFilteredList</code>
+                        optional interface in order to optimize entries listing with wildcards (i.e. interpret wildcards on server-side).
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='DataFilteredList']"/>
                 </subsection>
             </section>
 
@@ -141,7 +192,7 @@
                     the job control adaptor and the job monitor adaptor.
                     This increases flexibility (advanced user can use an alternative monitoring implementation),
                     and enforces development of adaptors that support offline monitoring.
-                    Both classes <b>must</b> implement the <code>fr.in2p3.jsaga.adaptor.job.JobAdaptor</code> interface.
+                    Both classes <b>must</b> implement the <code>JobAdaptor</code> interface.
                 </p>
                 <xsl:apply-templates select="jelclass[@type='JobAdaptor']"/>
                 
@@ -154,10 +205,26 @@
                         </xsl:for-each>
                     </pre>
 
-                    <p>A job control adaptor <b>must</b> implement the <code>fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor</code> interface.
+                    <p>A job control adaptor <b>must</b> implement the <code>JobControlAdaptor</code> interface.
                     </p>
                     <xsl:apply-templates select="jelclass[@type='JobControlAdaptor']"/>
+
+                    <p>A job control adaptor creates a job description translator. A job description translator
+                        <b>must</b> implement the <code>JobDescriptionTranslator</code>
+                        interface.
+                        Two reusable implementations are provided:
+                        <ul>
+                            <li><code>JobDescriptionTranslatorJSDL</code>
+                                can be used when the language supported by targeted scheduler is JSDL.</li>
+                            <li><code>JobDescriptionTranslatorXSLT</code>
+                                can be used for any other job adaptor.</li>
+                        </ul>
+                        Although you have the possibility to implement your own job description translator, it is <b>recommended</b>
+                        to use the JobDescriptionTranslatorXSLT in order to keep your code easy to maintain.
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='JobDescriptionTranslator']"/>
                 </subsection>
+
                 <subsection name="Developing a job monitor adaptor">
                     <i>Copy-paste required methods to your adaptor class, and implement them.</i>
                     <pre>
@@ -166,10 +233,28 @@
                             <xsl:call-template name="jelclass"/>
                         </xsl:for-each>
                     </pre>
+
+                    <p>A job monitor adaptor <b>must</b> implement the <code>JobMonitorAdaptor</code>
+                        interface.
+                    </p>
                     <xsl:apply-templates select="jelclass[@type='JobMonitorAdaptor']"/>
 
-                    <p>A job monitor adaptor <b>must</b> implement the <code>fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor</code> interface.
+                    <p>A job monitor adaptor <b>must</b> implement at least one of the monitoring interfaces.
+                        It <b>may</b> implement several if they are natively supported by the targeted scheduler.
                     </p>
+                    <xsl:apply-templates select="jelclass[
+                            @type='QueryIndividualJob' or @type='QueryListJob' or @type='QueryFilteredJob' or
+                            @type='ListenIndividualJob' or @type='ListenListJob' or @type='ListenFilteredJob']"/>
+
+                    <p>Monitoring interfaces create job status objects. A job status object <b>must</b>
+                        extend the <code>JobStatus</code> abstract class.
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='JobStatus']"/>
+
+                    <p>A job monitor adaptor <b>may</b> implement the <code>JobInfoAdaptor</code>
+                        optional interface.
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='JobInfoAdaptor']"/>
                 </subsection>
             </section>
         </body></document>
@@ -178,7 +263,7 @@
     <xsl:template match="jelclass">
         <table>
             <tr>
-                <th>Interface <xsl:value-of select="@type"/></th>
+                <th><xsl:value-of select="@fulltype"/></th>
             </tr>
             <xsl:apply-templates select="methods/method"/>
         </table>
