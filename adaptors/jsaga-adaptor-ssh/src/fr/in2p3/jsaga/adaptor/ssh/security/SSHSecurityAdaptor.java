@@ -1,11 +1,17 @@
 package fr.in2p3.jsaga.adaptor.ssh.security;
 
+import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.*;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
-import org.ogf.saga.context.Context;
-import org.ogf.saga.error.NoSuccessException;
-import org.ogf.saga.error.NotImplementedException;
 
-import java.io.PrintStream;
+import org.ogf.saga.context.Context;
+import org.ogf.saga.error.*;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.lang.Exception;
+import java.util.Map;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -17,74 +23,101 @@ import java.io.PrintStream;
 * ***************************************************/
 
 public class SSHSecurityAdaptor implements SecurityAdaptor {
+
+	public static final String USER_PUBLICKEY = "UserPublicKey";
 	
-	private byte[] privateKey;
-	private byte[] publicKey;
-	private String password;
-	private String userId;
+	public String getType() {
+    	return "SSH";
+    }
 	
-    public SSHSecurityAdaptor(byte[] privateKey, byte[] publicKey, String password, String userId) throws NoSuccessException {
-    	this.privateKey = privateKey;
-    	this.publicKey = publicKey;
-    	this.password = password;
-    	this.userId = userId;
+    public Class getSecurityCredentialClass() {
+        return SSHSecurityCredential.class;
     }
 
-    public void dump(PrintStream out) throws Exception {
-    	   
-    	// get Certificate Type
-    	String type = "Unknown";
-    	int len= privateKey.length;
-        int i=0;
-		while (i < len) {
-			if (privateKey[i] == 'B' && privateKey[i + 1] == 'E'
-					&& privateKey[i + 2] == 'G' && privateKey[i + 3] == 'I') {
-				i += 6;
-				if (privateKey[i] == 'D' && privateKey[i + 1] == 'S'
-						&& privateKey[i + 2] == 'A') {
-					type = "DSA";
-				} else if (privateKey[i] == 'R' && privateKey[i + 1] == 'S'
-						&& privateKey[i + 2] == 'A') {
-					type = "RSA";
-				} else {
+    public Usage getUsage() {
+    	return new UAnd(
+   			 new Usage[]{
+   					 new UFile(Context.USERKEY),
+   					 new UOptional(USER_PUBLICKEY),
+   					 new U(Context.USERID),
+   					 new UOptional(Context.USERPASS)});
+    }
 
+    public Default[] getDefaults(Map map) throws IncorrectStateException {
+    	return new Default[]{
+       		new Default(Context.USERKEY, new File[]{
+                        new File(System.getProperty("user.home")+"/.ssh/id_rsa"),
+                        new File(System.getProperty("user.home")+"/.ssh/id_dsa")}), 
+            new Default(USER_PUBLICKEY, new File[]{
+            		new File(System.getProperty("user.home")+"/.ssh/id_rsa.pub"),
+            		new File(System.getProperty("user.home")+"/.ssh/id_dsa.pub")}),
+    		new Default(Context.USERID,
+    				System.getProperty("user.name"))
+       };
+    }
+    
+    public SecurityCredential createSecurityCredential(int usage, Map attributes, String contextId) throws IncorrectStateException, NoSuccessException {
+        try {
+        	// load private key
+        	String privateKeyPath = (String) attributes.get(Context.USERKEY);
+			byte[] privateKey = null;
+			FileInputStream fisPrivateKey = null;
+			try {
+				fisPrivateKey = new FileInputStream(privateKeyPath);
+				privateKey = new byte[(int) (new File(privateKeyPath).length())];
+				int len = 0;
+				while (true) {
+					int i = fisPrivateKey.read(privateKey, len, privateKey.length - len);
+					if (i <= 0)
+						break;
+					len += i;
 				}
-				break;
+				fisPrivateKey.close();
+			} catch (Exception e) {
+				try {
+					if (fisPrivateKey != null)
+						fisPrivateKey.close();
+				} catch (Exception ee) {
+				}
+				throw e;
 			}
-			i++;
-		}
-      	System.out.println("User: "+getUserID());
-      	System.out.println("Key type: "+type);
-    }
-    
-    public String getUserID() throws NoSuccessException {
-        return userId;
-    }
-    
-    public String getUserPass() {
-        return password;
-    }
 
-    public String getAttribute(String key) throws NotImplementedException, NoSuccessException {
-        if (Context.LIFETIME.equals(key)) {
-            return ""+INFINITE_LIFETIME;
-        } else {
-            throw new NotImplementedException("Attribute not supported: "+key);
+			
+			// load public key
+			byte[] publicKey = null;
+			if (attributes.containsKey(USER_PUBLICKEY)) {
+	        	String publicKeyPath = (String) attributes.get(USER_PUBLICKEY);
+				FileInputStream fisPublicKey = null;
+				try {
+					fisPublicKey = new FileInputStream(publicKeyPath);
+					publicKey = new byte[(int) (new File(publicKeyPath).length())];
+					int len = 0;
+					while (true) {
+						int i = fisPublicKey.read(publicKey, len, publicKey.length - len);
+						if (i <= 0)
+							break;
+						len += i;
+					}
+					fisPublicKey.close();
+				} catch (Exception e) {
+					try {
+						if (fisPublicKey != null)
+							fisPublicKey.close();
+					} catch (Exception ee) {
+					}
+					throw e;
+				}
+			}
+			
+			// get UserPass
+			String userPass = null;
+			if (attributes.containsKey(Context.USERPASS)) {
+				userPass = (String) attributes.get(Context.USERPASS);
+			}
+						
+		    return new SSHSecurityCredential(privateKey, publicKey, userPass, (String) attributes.get(Context.USERID));
+        } catch(Exception e) {
+            throw new NoSuccessException(e);
         }
     }
-
-    public void close() throws Exception {
-    }
-
-	public byte[] getPrivateKey() {
-		return privateKey;
-	}
-
-	public byte[] getPublicKey() {
-		return publicKey;
-	}
-
-	public String getUserId() {
-		return userId;
-	}
 }

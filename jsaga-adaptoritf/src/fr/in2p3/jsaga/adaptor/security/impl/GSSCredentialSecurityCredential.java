@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.security.impl;
 
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.context.Context;
@@ -14,7 +14,7 @@ import java.io.PrintStream;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   GSSCredentialSecurityAdaptor
+* File:   GSSCredentialSecurityCredential
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
 * Date:   21 sept. 2007
 * ***************************************************
@@ -22,11 +22,11 @@ import java.io.PrintStream;
 /**
  *
  */
-public abstract class GSSCredentialSecurityAdaptor implements SecurityAdaptor {
+public abstract class GSSCredentialSecurityCredential implements SecurityCredential {
     protected GSSCredential m_proxy;
     protected File m_certRepository;
 
-    public GSSCredentialSecurityAdaptor(GSSCredential proxy, File certRepository) {
+    public GSSCredentialSecurityCredential(GSSCredential proxy, File certRepository) {
         m_proxy = proxy;
         m_certRepository = certRepository;
     }

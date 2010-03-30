@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.adaptor.wms.job;
 
 import fr.in2p3.jsaga.adaptor.ClientAdaptor;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 import org.ietf.jgss.GSSCredential;
 
 import java.io.File;
@@ -23,13 +23,13 @@ public abstract class WMSJobAdaptorAbstract implements ClientAdaptor {
     protected GSSCredential m_credential;
     protected File m_certRepository;
         
-    public Class[] getSupportedSecurityAdaptorClasses() {
-        return new Class[]{GSSCredentialSecurityAdaptor.class};
+    public Class[] getSupportedSecurityCredentialClasses() {
+        return new Class[]{GSSCredentialSecurityCredential.class};
     }
 
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
-        GSSCredentialSecurityAdaptor proxyAdaptor = (GSSCredentialSecurityAdaptor) securityAdaptor;
+    public void setSecurityCredential(SecurityCredential credential) {
+        GSSCredentialSecurityCredential proxyAdaptor = (GSSCredentialSecurityCredential) credential;
         m_credential = proxyAdaptor.getGSSCredential();
         m_certRepository = proxyAdaptor.getCertRepository();
-    }    
+    }
 }

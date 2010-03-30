@@ -9,7 +9,7 @@ import org.ietf.jgss.GSSCredential;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   GlobusSecurityAdaptorBuilderExtendedLegacy
+* File:   GlobusSecurityAdaptorExtended
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
 * Date:   8 oct. 2007
 * ***************************************************
@@ -17,19 +17,19 @@ import org.ietf.jgss.GSSCredential;
 /**
  *
  */
-public class GlobusSecurityAdaptorBuilderExtendedLegacy extends GlobusSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuilder {
+public class GlobusSecurityAdaptorExtended extends GlobusSecurityAdaptor implements ExpirableSecurityAdaptor {
     public String getType() {
-        return "GlobusLegacy";
+        return "Globus";
     }
 
     protected int getGlobusType() {
-        return GlobusProxyFactory.OID_OLD;
+        return GlobusProxyFactory.OID_GLOBUS;
     }
 
     protected boolean checkType(GSSCredential proxy) {
         if (proxy instanceof GlobusGSSCredentialImpl) {
             GlobusCredential globusProxy = ((GlobusGSSCredentialImpl)proxy).getGlobusCredential();
-            return CertUtil.isGsi2Proxy(globusProxy.getProxyType());
+            return CertUtil.isGsi3Proxy(globusProxy.getProxyType());
         } else {
             return false;
         }

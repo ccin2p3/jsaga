@@ -4,7 +4,7 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.*;
 import fr.in2p3.jsaga.engine.config.Configuration;
-import fr.in2p3.jsaga.engine.factories.SecurityAdaptorBuilderFactory;
+import fr.in2p3.jsaga.engine.factories.SecurityAdaptorFactory;
 import fr.in2p3.jsaga.impl.attributes.AbstractAttributesImpl;
 import fr.in2p3.jsaga.impl.job.service.JobServiceImpl;
 import org.apache.log4j.Logger;
@@ -31,8 +31,8 @@ import java.util.*;
 public class ContextImpl extends AbstractAttributesImpl implements Context {
     private static Logger s_logger = Logger.getLogger(ContextImpl.class);
     private ContextAttributes m_attributes;
-    private SecurityAdaptorBuilder m_adaptorBuilder;
     private SecurityAdaptor m_adaptor;
+    private SecurityCredential m_credential;
     private WeakHashMap<JobServiceImpl,Map> m_jobServices;
 
     /** constructor */
@@ -41,12 +41,12 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
         m_attributes = new ContextAttributes(this);
         if (type!=null && !type.equals("")) {
             m_attributes.m_type.setObject(type);
-            m_adaptorBuilder = SecurityAdaptorBuilderFactory.getInstance().getSecurityAdaptorBuilder(type);
+            m_adaptor = SecurityAdaptorFactory.getInstance().getSecurityAdaptor(type);
             this.setDefaults();
         } else {
-            m_adaptorBuilder = null;
+            m_adaptor = null;
         }
-        m_adaptor = null;
+        m_credential = null;
         m_jobServices = new WeakHashMap<JobServiceImpl,Map>();
     }
 
@@ -54,8 +54,8 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     public SagaObject clone() throws CloneNotSupportedException {
         ContextImpl clone = (ContextImpl) super.clone();
         clone.m_attributes = m_attributes;
-        clone.m_adaptorBuilder = m_adaptorBuilder;
         clone.m_adaptor = m_adaptor;
+        clone.m_credential = m_credential;
         clone.m_jobServices = m_jobServices;
         return clone;
     }
@@ -67,12 +67,12 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
         // set attribute
         if (Context.TYPE.equals(key)) {
             m_attributes.m_type.setObject(value);
-            m_adaptorBuilder = SecurityAdaptorBuilderFactory.getInstance().getSecurityAdaptorBuilder(value);
+            m_adaptor = SecurityAdaptorFactory.getInstance().getSecurityAdaptor(value);
         } else {
             super.setAttribute(key, value);
         }
         // reset adaptor
-        m_adaptor = null;
+        m_credential = null;
     }
 
     /** override super.getAttribute() */
@@ -80,17 +80,17 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
         if (Context.TYPE.equals(key)) {
             return super.getAttribute(key);
         } else {
-            // get adaptor
-            SecurityAdaptor adaptor = this.getAdaptor();
+            // get credential
+            SecurityCredential credential = this.getCredential();
             // get attribute
             if (Context.USERID.equals(key)) {
                 try {
-                    return adaptor.getUserID();
+                    return credential.getUserID();
                 } catch (Exception e) {
                     throw new NoSuccessException(e);
                 }
             } else {
-                String value = adaptor.getAttribute(key);
+                String value = credential.getAttribute(key);
                 if (value != null) {
                     return value;
                 } else {
@@ -109,7 +109,7 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
             super.setVectorAttribute(key, values);
         }
         // reset adaptor
-        m_adaptor = null;
+        m_credential = null;
     }
 
     /** override super.getVectorAttribute() */
@@ -117,14 +117,14 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
         if (Context.TYPE.equals(key)) {
             return super.getVectorAttribute(key);
         } else {
-            // get adaptor
-            SecurityAdaptor adaptor = this.getAdaptor();
+            // get credential
+            SecurityCredential credential = this.getCredential();
             // get attribute
             try {
                 if (Context.USERID.equals(key)) {
                     throw new IncorrectStateException("Operation getVectorAttribute not allowed on scalar attribute: "+key, this);
                 } else {
-                    String value = adaptor.getAttribute(key);
+                    String value = credential.getAttribute(key);
                     if (value != null) {
                         throw new IncorrectStateException("Operation getVectorAttribute not allowed on scalar attribute: "+key, this);
                     } else {
@@ -140,7 +140,7 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     ///////////////////////////////////////// implementation /////////////////////////////////////////
 
     public void setDefaults() throws NotImplementedException, IncorrectStateException, NoSuccessException {
-        if (m_attributes.m_type.getObject().equals("Unknown") || m_adaptorBuilder==null) {
+        if (m_attributes.m_type.getObject().equals("Unknown") || m_adaptor==null) {
             throw new IncorrectStateException("Attribute MUST be set before setting defaults: "+Context.TYPE, this);
         }
 
@@ -159,7 +159,7 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
             }
 
             // set default attributes, for which value depends on defined attributes
-            Default[] defaults = m_adaptorBuilder.getDefaults(super._getAttributesMap());
+            Default[] defaults = m_adaptor.getDefaults(super._getAttributesMap());
             for (int i=0; defaults!=null && i<defaults.length; i++) {
                 Default attr = defaults[i];
                 if (! super._containsAttributeKey(attr.getName())) {
@@ -171,21 +171,21 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
         }
 
         // reset adaptor
-        m_adaptor = null;
+        m_credential = null;
     }
 
     /**
      * @see org.ogf.saga.session.Session
      */
     public void close() {
-        if (m_adaptor != null) {
+        if (m_credential!= null) {
             try {
-                m_adaptor.close();
+                m_credential.close();
             } catch (Exception e) {
                 s_logger.warn("Failed to close security adaptor", e);
             }
             // reset adaptor
-            m_adaptor = null;
+            m_credential = null;
         }
     }
 
@@ -193,19 +193,19 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
      * This method is specific to JSAGA implementation.
      */
     public void destroy() throws IncorrectStateException, NoSuccessException {
-        if (m_adaptorBuilder == null) {
+        if (m_adaptor== null) {
             throw new IncorrectStateException("Attribute MUST be set before destroying context: "+Context.TYPE, this);
         }
-        if (m_adaptorBuilder instanceof ExpirableSecurityAdaptorBuilder) {
+        if (m_adaptor instanceof ExpirableSecurityAdaptor) {
             try {
-                ((ExpirableSecurityAdaptorBuilder) m_adaptorBuilder).destroySecurityAdaptor(
+                ((ExpirableSecurityAdaptor) m_adaptor).destroySecurityAdaptor(
                         super._getAttributesMap(), m_attributes.m_type.getObject());
             } catch (Exception e) {
                 throw new NoSuccessException(e);
             }
         }
         // reset adaptor
-        m_adaptor = null;
+        m_credential = null;
     }
 
     /**
@@ -214,9 +214,9 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     public String toString() {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(stream);
-        if (m_adaptor != null) {
+        if (m_credential!= null) {
             try {
-                m_adaptor.dump(out);
+                m_credential.dump(out);
             } catch (Exception e) {
                 e.printStackTrace(out);
             }
@@ -230,14 +230,14 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     /**
      * This method is specific to JSAGA implementation.
      */
-    public synchronized SecurityAdaptor getAdaptor() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
-        if (m_adaptorBuilder == null) {
+    public synchronized SecurityCredential getCredential() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
+        if (m_adaptor== null) {
             throw new IncorrectStateException("Attribute MUST be set before using context: "+Context.TYPE, this);
         }
 
         // create adaptor if needed
-        if (m_adaptor == null) {
-            Usage usage = m_adaptorBuilder.getUsage();
+        if (m_credential== null) {
+            Usage usage = m_adaptor.getUsage();
             Map attributes = super._getAttributesMap();
             int matching;
             try {
@@ -250,18 +250,18 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
                     throw new NoSuccessException("[INTERNAL ERROR] Unexpected exception", this);
                 }
             }
-            m_adaptor = m_adaptorBuilder.createSecurityAdaptor(
+            m_credential = m_adaptor.createSecurityCredential(
                     matching, attributes, m_attributes.m_type.getObject());
-            if (m_adaptor == null) {
-                throw new NotImplementedException("[INTERNAL ERROR] Method createSecurityAdaptor should never return 'null'");
+            if (m_credential== null) {
+                throw new NotImplementedException("[INTERNAL ERROR] Method createSecurityCredential should never return 'null'");
             }
 
             // reset the job services using this context
             Map<JobServiceImpl,Map> jobServices = new HashMap<JobServiceImpl,Map>();
             jobServices.putAll(m_jobServices);
-            new Thread(new JobServiceReset(jobServices, m_adaptor)).start();
+            new Thread(new JobServiceReset(jobServices, m_credential)).start();
         }
-        return m_adaptor;
+        return m_credential;
     }
 
     /**

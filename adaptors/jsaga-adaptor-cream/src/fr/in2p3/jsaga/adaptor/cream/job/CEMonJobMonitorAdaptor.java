@@ -3,8 +3,8 @@ package fr.in2p3.jsaga.adaptor.cream.job;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.*;
 
@@ -37,12 +37,12 @@ public class CEMonJobMonitorAdaptor implements JobMonitorAdaptor {
         return null;  // no default
     }
 
-    public Class[] getSupportedSecurityAdaptorClasses() {
-        return new Class[]{GSSCredentialSecurityAdaptor.class};
+    public Class[] getSupportedSecurityCredentialClasses() {
+        return new Class[]{GSSCredentialSecurityCredential.class};
     }
 
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
-        m_credential = ((GSSCredentialSecurityAdaptor) securityAdaptor).getGSSCredential();
+    public void setSecurityCredential(SecurityCredential credential) {
+        m_credential = ((GSSCredentialSecurityCredential) credential).getGSSCredential();
     }
 
     public int getDefaultPort() {

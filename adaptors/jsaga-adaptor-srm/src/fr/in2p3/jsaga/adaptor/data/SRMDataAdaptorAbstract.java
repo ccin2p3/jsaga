@@ -3,8 +3,8 @@ package fr.in2p3.jsaga.adaptor.data;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 import org.apache.axis.SimpleTargetedChain;
 import org.apache.axis.client.Call;
 import org.apache.axis.configuration.SimpleProvider;
@@ -68,12 +68,12 @@ public abstract class SRMDataAdaptorAbstract implements DataAdaptor {
         return new Default[]{new Default(TRANSFER_PROTOCOLS, "gsiftp")};
     }
 
-    public Class[] getSupportedSecurityAdaptorClasses() {
-        return new Class[]{GSSCredentialSecurityAdaptor.class};
+    public Class[] getSupportedSecurityCredentialClasses() {
+        return new Class[]{GSSCredentialSecurityCredential.class};
     }
 
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
-        GSSCredentialSecurityAdaptor proxyAdaptor = (GSSCredentialSecurityAdaptor) securityAdaptor;
+    public void setSecurityCredential(SecurityCredential credential) {
+        GSSCredentialSecurityCredential proxyAdaptor = (GSSCredentialSecurityCredential) credential;
         m_credential = proxyAdaptor.getGSSCredential();
         m_certRepository = proxyAdaptor.getCertRepository();
     }

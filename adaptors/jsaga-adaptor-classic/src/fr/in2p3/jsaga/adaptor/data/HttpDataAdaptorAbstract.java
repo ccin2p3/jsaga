@@ -3,8 +3,8 @@ package fr.in2p3.jsaga.adaptor.data;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
 import org.ogf.saga.error.*;
 
 import java.io.InputStream;
@@ -38,13 +38,13 @@ public abstract class HttpDataAdaptorAbstract extends HtmlDataAdaptorAbstract im
         return null;    // no default
     }
 
-    public Class[] getSupportedSecurityAdaptorClasses() {
-        return new Class[]{UserPassSecurityAdaptor.class, null}; // also support no security context
+    public Class[] getSupportedSecurityCredentialClasses() {
+        return new Class[]{UserPassSecurityCredential.class, null}; // also support no security context
     }
 
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
-        if (securityAdaptor != null) {
-            UserPassSecurityAdaptor adaptor = (UserPassSecurityAdaptor) securityAdaptor;
+    public void setSecurityCredential(SecurityCredential credential) {
+        if (credential!= null) {
+            UserPassSecurityCredential adaptor = (UserPassSecurityCredential) credential;
             m_userID = adaptor.getUserID();
             m_userPass = adaptor.getUserPass();
         }

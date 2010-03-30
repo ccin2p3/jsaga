@@ -7,8 +7,8 @@ import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityCredential;
 import org.apache.log4j.Logger;
 import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.context.Context;
@@ -55,15 +55,15 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
     public String getType() {return null;}
     public Usage getUsage() {return null;}
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {return null;}
-    public Class[] getSupportedSecurityAdaptorClasses() {return new Class[]{InMemoryProxySecurityAdaptor.class};}
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {}
+    public Class[] getSupportedSecurityCredentialClasses() {return new Class[]{InMemoryProxySecurityCredential.class};}
+    public void setSecurityCredential(SecurityCredential credential) {}
     public BaseURL getBaseURL() throws IncorrectURLException {return null;}
 
     public SagaDataAdaptor(URI url, GSSCredential cred, java.io.File certRepository, String token, String srmPath, StreamCallback callback) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         try {
             Context context = ContextFactory.createContext();
             context.setAttribute(Context.TYPE, "InMemoryProxy");
-            context.setAttribute(Context.USERPROXY, InMemoryProxySecurityAdaptor.toBase64(cred));
+            context.setAttribute(Context.USERPROXY, InMemoryProxySecurityCredential.toBase64(cred));
             context.setAttribute(Context.CERTREPOSITORY, certRepository.getAbsolutePath());
             m_session = SessionFactory.createSession(false);
             m_session.addContext(context);

@@ -9,7 +9,7 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.adaptor.data.write.DataWriterTimes;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import org.ogf.saga.error.*;
 
 import java.io.*;
@@ -45,11 +45,11 @@ public class FileDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         return null;
     }
 
-    public Class[] getSupportedSecurityAdaptorClasses() {
+    public Class[] getSupportedSecurityCredentialClasses() {
         return null;    // no context class
     }
 
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
+    public void setSecurityCredential(SecurityCredential credential) {
         // do nothing
     }
 

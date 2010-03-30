@@ -11,7 +11,7 @@ import java.io.*;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   InMemoryProxySecurityAdaptor
+* File:   InMemoryProxySecurityCredential
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
 * Date:   12 oct. 2007
 * ***************************************************
@@ -19,8 +19,8 @@ import java.io.*;
 /**
  *
  */
-public class InMemoryProxySecurityAdaptor extends GSSCredentialSecurityAdaptor {
-    public InMemoryProxySecurityAdaptor(String base64, File certRepository) throws NoSuccessException {
+public class InMemoryProxySecurityCredential extends GSSCredentialSecurityCredential {
+    public InMemoryProxySecurityCredential(String base64, File certRepository) throws NoSuccessException {
         super(toGSSCredential(base64), certRepository);
     }
 

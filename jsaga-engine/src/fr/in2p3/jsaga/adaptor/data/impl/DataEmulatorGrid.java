@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.adaptor.data.impl;
 
 import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.schema.data.emulator.*;
-import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.*;
 import org.ogf.saga.error.AuthenticationFailedException;
@@ -69,7 +69,7 @@ public class DataEmulatorGrid {
     /**
      * find the secure server
      */
-    SecureServer connect(String protocol, String host, int port, UserPassSecurityAdaptor security) throws AuthenticationFailedException, AuthorizationFailedException {
+    SecureServer connect(String protocol, String host, int port, UserPassSecurityCredential security) throws AuthenticationFailedException, AuthorizationFailedException {
         if (security == null) {
             throw new AuthenticationFailedException("No security context found");
         }

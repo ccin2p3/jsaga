@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.security.impl;
 
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
@@ -19,20 +19,20 @@ import java.util.Date;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   X509SecurityAdaptor
+* File:   X509SecurityCredential
 * Author: Nicolas DEMESY (nicolas.demesy@bt.com)
 * Date:   17 mars 2008
 * ***************************************************
 * Description:                                      */
 
-public class X509SecurityAdaptor  implements SecurityAdaptor {
+public class X509SecurityCredential implements SecurityCredential {
 
     private KeyManager[] keyManager;
     private PrivateKey privateKey;
     private X509Certificate certificate;
 	private static final DateFormat DF = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
 
-    public X509SecurityAdaptor(KeyStore keyStore, String keyStorePass, String userAlias, String userPass) throws Exception {
+    public X509SecurityCredential(KeyStore keyStore, String keyStorePass, String userAlias, String userPass) throws Exception {
         KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         keyManagerFactory.init(keyStore, keyStorePass.toCharArray());
         keyManager = keyManagerFactory.getKeyManagers();

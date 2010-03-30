@@ -2,8 +2,8 @@ package fr.in2p3.jsaga.adaptor.data;
 
 import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.data.impl.DataEmulatorConnectionSecure;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
 import org.ogf.saga.error.*;
 
 import java.util.Map;
@@ -21,18 +21,18 @@ import java.util.Map;
  *
  */
 public class SecureEmulatorDataAdaptor extends EmulatorDataAdaptor {
-    UserPassSecurityAdaptor m_securityAdaptor;
+    UserPassSecurityCredential m_securityAdaptor;
 
     public String getType() {
         return "stest";
     }
 
-    public Class[] getSupportedSecurityAdaptorClasses() {
-        return new Class[]{UserPassSecurityAdaptor.class};
+    public Class[] getSupportedSecurityCredentialClasses() {
+        return new Class[]{UserPassSecurityCredential.class};
     }
 
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
-        m_securityAdaptor = (UserPassSecurityAdaptor) securityAdaptor;
+    public void setSecurityCredential(SecurityCredential credential) {
+        m_securityAdaptor = (UserPassSecurityCredential) credential;
     }
 
     public BaseURL getBaseURL() throws IncorrectURLException {

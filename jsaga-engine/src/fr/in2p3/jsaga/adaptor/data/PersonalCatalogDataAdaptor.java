@@ -10,7 +10,7 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.LogicalReaderMetaData;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriterMetaData;
 import fr.in2p3.jsaga.adaptor.schema.data.catalog.*;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import org.ogf.saga.error.*;
 import org.ogf.saga.url.URL;
 
@@ -43,11 +43,11 @@ public class PersonalCatalogDataAdaptor implements LogicalReaderMetaData, Logica
         return null;
     }
 
-    public Class[] getSupportedSecurityAdaptorClasses() {
+    public Class[] getSupportedSecurityCredentialClasses() {
         return null;    // no context class
     }
 
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
+    public void setSecurityCredential(SecurityCredential credential) {
         // do nothing
     }
 

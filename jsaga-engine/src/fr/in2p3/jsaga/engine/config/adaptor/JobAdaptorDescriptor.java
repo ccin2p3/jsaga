@@ -68,8 +68,8 @@ public class JobAdaptorDescriptor {
         service.setName("default");
         service.setType(adaptor.getType());
         service.setImpl(adaptor.getClass().getName());
-        if (adaptor.getSupportedSecurityAdaptorClasses() != null) {
-            String[] supportedContextTypes = securityDesc.getSupportedContextTypes(adaptor.getSupportedSecurityAdaptorClasses());
+        if (adaptor.getSupportedSecurityCredentialClasses() != null) {
+            String[] supportedContextTypes = securityDesc.getSupportedContextTypes(adaptor.getSupportedSecurityCredentialClasses());
             service.setSupportedContextType(supportedContextTypes);
         }
         FileStaging staging = new FileStaging();

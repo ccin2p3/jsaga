@@ -6,7 +6,7 @@ import java.util.Map;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   ExpirableSecurityAdaptorBuilder
+* File:   ExpirableSecurityAdaptor
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
 * Date:   14 juin 2007
 * ***************************************************
@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  *
  */
-public interface ExpirableSecurityAdaptorBuilder extends SecurityAdaptorBuilder {
+public interface ExpirableSecurityAdaptor extends SecurityAdaptor {
     /**
      * Destroy persisted state of security context
      * @param attributes the provided attributes.

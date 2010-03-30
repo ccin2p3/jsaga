@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor;
 
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.Adaptor;
 import org.ogf.saga.error.*;
 
@@ -20,15 +20,15 @@ import java.util.Map;
  */
 public interface ClientAdaptor extends Adaptor {
     /**
-     * @return list of supported SecurityAdaptor classes.
+     * @return list of supported SecurityCredential classes.
      */
-    public Class[] getSupportedSecurityAdaptorClasses();
+    public Class[] getSupportedSecurityCredentialClasses();
 
     /**
-     * Set the security adaptor.
-     * @param securityAdaptor the security adaptor.
+     * Set the security credential.
+     * @param credential the security credential.
      */
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor);
+    public void setSecurityCredential(SecurityCredential credential);
 
     /**
      * Connect to the server and initialize the connection with the provided attributes.

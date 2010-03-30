@@ -3,7 +3,7 @@ package fr.in2p3.jsaga.impl.job.service;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.engine.factories.JobAdaptorFactory;
 import fr.in2p3.jsaga.engine.factories.JobMonitorAdaptorFactory;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
@@ -86,7 +86,7 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
 
     ////////////////////////////////////////// private methods //////////////////////////////////////////
 
-    public synchronized void resetAdaptors(SecurityAdaptor security, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+    public synchronized void resetAdaptors(SecurityCredential security, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         m_monitorService.startReset();
         try {
             // reset control adaptor

@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.adaptor.data;
 
-import fr.in2p3.jsaga.adaptor.security.GlobusSecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.MyProxySecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.GlobusSecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.MyProxySecurityCredential;
 import org.globus.ftp.DataChannelAuthentication;
 import org.globus.ftp.exception.ServerException;
 import org.ogf.saga.error.*;
@@ -28,8 +28,8 @@ public class GsiftpWinDataAdaptor extends Gsiftp2DataAdaptor {
     }
 
     /** override super.getSupportedSecurityAdaptorClasses() because VOMS context type is not supported */
-    public Class[] getSupportedSecurityAdaptorClasses() {
-        return new Class[]{GlobusSecurityAdaptor.class, MyProxySecurityAdaptor.class};
+    public Class[] getSupportedSecurityCredentialClasses() {
+        return new Class[]{GlobusSecurityCredential.class, MyProxySecurityCredential.class};
     }
 
     /** override super.connect() because settings data channel authentication is not supported */

@@ -6,8 +6,8 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 
@@ -71,8 +71,8 @@ public class  IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 		try {
 			IRODSAccount account = null;
 			
-			if (securityAdaptor instanceof GSSCredentialSecurityAdaptor) { 
-				cert = ((GSSCredentialSecurityAdaptor)securityAdaptor).getGSSCredential();
+			if (credential instanceof GSSCredentialSecurityCredential) {
+				cert = ((GSSCredentialSecurityCredential) credential).getGSSCredential();
 				
 				if (userName == null) {
 					throw new BadParameterException("Missing required attribute: "+USERID);
@@ -201,10 +201,10 @@ public class  IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 	void parseValue(Map attributes, String userInfo) throws NoSuccessException {
 		
 		try {
-			if (securityAdaptor instanceof GSSCredentialSecurityAdaptor) { 
+			if (credential instanceof GSSCredentialSecurityCredential) {
 				userName =  (String) attributes.get(USERID);
 			} else {
-				userName = securityAdaptor.getUserID();
+				userName = credential.getUserID();
 			}
 			
 			if (userInfo!=null) {
@@ -220,9 +220,9 @@ public class  IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
 			throw new NoSuccessException(e);
 		}
 
-		if (securityAdaptor instanceof UserPassSecurityAdaptor) {
-            passWord = ((UserPassSecurityAdaptor)securityAdaptor).getUserPass();
-		} else if (securityAdaptor instanceof GSSCredentialSecurityAdaptor) {
+		if (credential instanceof UserPassSecurityCredential) {
+            passWord = ((UserPassSecurityCredential) credential).getUserPass();
+		} else if (credential instanceof GSSCredentialSecurityCredential) {
             passWord = null;
         }
 		

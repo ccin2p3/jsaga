@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.security.impl;
 
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
@@ -11,7 +11,7 @@ import java.io.PrintStream;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   UserPassSecurityAdaptor
+* File:   UserPassSecurityCredential
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
 * Date:   19 juin 2007
 * ***************************************************
@@ -19,11 +19,11 @@ import java.io.PrintStream;
 /**
  *
  */
-public class UserPassSecurityAdaptor implements SecurityAdaptor {
+public class UserPassSecurityCredential implements SecurityCredential {
     private String m_userId;
     private String m_userPass;
 
-    public UserPassSecurityAdaptor(String userId, String userPass) {
+    public UserPassSecurityCredential(String userId, String userPass) {
         m_userId = userId;
         m_userPass = userPass;
     }

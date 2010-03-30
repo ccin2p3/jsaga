@@ -4,7 +4,7 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.BaseURL;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import org.ogf.saga.error.*;
 
 import java.util.Map;
@@ -34,12 +34,12 @@ public class MyProtocolDataAdaptor implements DataAdaptor {
         return null;
     }
 
-    public Class[] getSupportedSecurityAdaptorClasses() {
+    public Class[] getSupportedSecurityCredentialClasses() {
         return null;
     }
 
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
-        // set security context
+    public void setSecurityCredential(SecurityCredential credential) {
+        // set security credential
     }
 
     public BaseURL getBaseURL() throws IncorrectURL {

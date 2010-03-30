@@ -63,7 +63,7 @@ public class ServiceAdaptorFactory {
             ContextImpl context = this.findContext(session, contextRef);
             if (context != null) {
                 try {
-                    context.getAdaptor();
+                    context.getCredential();
                     contextCandidates.add(context);
                 } catch(SagaException e) {
                     // ignore invalid contexts

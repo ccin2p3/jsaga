@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.engine.config.adaptor;
 
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptorBuilder;
+import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.engine.schema.config.Context;
 import org.ogf.saga.error.NoSuccessException;
 
@@ -20,22 +20,22 @@ import java.util.*;
  *
  */
 public class SecurityAdaptorDescriptor {
-    private Map m_builderClasses;
-    private Map m_classes;
+    private Map m_adaptorClasses;
+    private Map m_credentialClasses;
     private Map m_usages;
     protected Context[] m_xml;
 
     public SecurityAdaptorDescriptor(Class[] adaptorClasses) throws IllegalAccessException, InstantiationException {
-        m_builderClasses = new HashMap();
-        m_classes = new HashMap();
+        m_adaptorClasses = new HashMap();
+        m_credentialClasses = new HashMap();
         m_usages = new HashMap();
         m_xml = new Context[adaptorClasses.length];
         for (int i=0; i<adaptorClasses.length; i++) {
-            SecurityAdaptorBuilder adaptor = (SecurityAdaptorBuilder) adaptorClasses[i].newInstance();
+            SecurityAdaptor adaptor = (SecurityAdaptor) adaptorClasses[i].newInstance();
 
             // type
-            m_builderClasses.put(adaptor.getType(), adaptorClasses[i]);
-            m_classes.put(adaptor.getType(), adaptor.getSecurityAdaptorClass());
+            m_adaptorClasses.put(adaptor.getType(), adaptorClasses[i]);
+            m_credentialClasses.put(adaptor.getType(), adaptor.getSecurityCredentialClass());
             Usage usage = adaptor.getUsage();
             if (usage != null) {
                 m_usages.put(adaptor.getType(), usage);
@@ -44,8 +44,8 @@ public class SecurityAdaptorDescriptor {
         }
     }
 
-    public Class getBuilderClass(String type) throws NoSuccessException {
-        Class clazz = (Class) m_builderClasses.get(type);
+    public Class getAdaptorClass(String type) throws NoSuccessException {
+        Class clazz = (Class) m_adaptorClasses.get(type);
         if (clazz != null) {
             return clazz;
         } else {
@@ -59,7 +59,7 @@ public class SecurityAdaptorDescriptor {
 
     public String[] getSupportedContextTypes(Class[] supportedSecurityAdaptorClasses) {
         Set contextTypeSet = new HashSet();
-        for (Iterator it=m_classes.entrySet().iterator(); it.hasNext(); ) {
+        for (Iterator it= m_credentialClasses.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry entry = (Map.Entry) it.next();
             String contextType = (String) entry.getKey();
             Class securityAdaptorClazz = (Class) entry.getValue();
@@ -109,7 +109,7 @@ public class SecurityAdaptorDescriptor {
         }
     }
 
-    private static Context toXML(SecurityAdaptorBuilder adaptor) {
+    private static Context toXML(SecurityAdaptor adaptor) {
         Context ctx = new Context();
         ctx.setName(adaptor.getType()); // default identifier
         ctx.setType(adaptor.getType());

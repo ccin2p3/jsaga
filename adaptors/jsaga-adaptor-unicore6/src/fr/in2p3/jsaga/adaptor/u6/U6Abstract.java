@@ -20,8 +20,8 @@ import com.intel.gpe.clients.api.TargetSystemClient;
 import com.intel.gpe.clients.api.TargetSystemFactoryClient;
 import com.intel.gpe.clients.impl.tss.ApplicationImpl;
 
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityCredential;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -39,15 +39,15 @@ public class U6Abstract {
 	protected String m_serviceName;
 	protected String m_applicationName;
 	protected String m_serverUrl ;
-	protected JKSSecurityAdaptor m_credential;
+	protected JKSSecurityCredential m_credential;
 	protected U6SecurityManagerImpl m_securityManager = null;
     
-    public Class[] getSupportedSecurityAdaptorClasses() {
-    	return new Class[]{JKSSecurityAdaptor.class};
+    public Class[] getSupportedSecurityCredentialClasses() {
+    	return new Class[]{JKSSecurityCredential.class};
     }
 
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
-    	 m_credential = (JKSSecurityAdaptor) securityAdaptor;
+    public void setSecurityCredential(SecurityCredential credential) {
+    	 m_credential = (JKSSecurityCredential) credential;
     }
 
     public int getDefaultPort() {
@@ -139,5 +139,5 @@ public class U6Abstract {
         // no target system factory available that supports requested application.
         throw new NoSuccessException("No factory available for '"+m_applicationName+ "'.");
     }
-	
+
 }

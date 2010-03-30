@@ -5,9 +5,9 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.ssh.security.SSHSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
+import fr.in2p3.jsaga.adaptor.ssh.security.SSHSecurityCredential;
 
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
@@ -47,15 +47,15 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
 	protected static final String KNOWN_HOSTS = "KnownHosts";
 	protected Session session;
 	protected static Map sessionMap = new HashMap();
-	private SecurityAdaptor securityAdaptor;
+	private SecurityCredential credential;
 	private int compression_level = 0;
 
-    public Class[] getSupportedSecurityAdaptorClasses() {
-        return new Class[]{UserPassSecurityAdaptor.class, SSHSecurityAdaptor.class};
+    public Class[] getSupportedSecurityCredentialClasses() {
+        return new Class[]{UserPassSecurityCredential.class, SSHSecurityCredential.class};
     }
 
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
-    	this.securityAdaptor = securityAdaptor;
+    public void setSecurityCredential(SecurityCredential credential) {
+    	this.credential = credential;
     } 
 	
     public int getDefaultPort() {
@@ -88,18 +88,18 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
 				jsch.setKnownHosts((String) attributes.get(KNOWN_HOSTS));
 			}
     		
-    		if(securityAdaptor instanceof UserPassSecurityAdaptor) {
-        		String userId = ((UserPassSecurityAdaptor) securityAdaptor).getUserID();
-        		String password = ((UserPassSecurityAdaptor) securityAdaptor).getUserPass();
+    		if(credential instanceof UserPassSecurityCredential) {
+        		String userId = ((UserPassSecurityCredential) credential).getUserID();
+        		String password = ((UserPassSecurityCredential) credential).getUserPass();
         		session = jsch.getSession(userId, host, port);
         		session.setPassword(password);
         	}
-        	else if(securityAdaptor instanceof SSHSecurityAdaptor) {
-        		String userId = ((SSHSecurityAdaptor) securityAdaptor).getUserID();
-        		String passPhrase = ((SSHSecurityAdaptor) securityAdaptor).getUserPass();
+        	else if(credential instanceof SSHSecurityCredential) {
+        		String userId = ((SSHSecurityCredential) credential).getUserID();
+        		String passPhrase = ((SSHSecurityCredential) credential).getUserPass();
         		// clone private key because the object will be reset
-        		byte[] privateKey = ((SSHSecurityAdaptor) securityAdaptor).getPrivateKey().clone();
-        		byte[] publicKey = ((SSHSecurityAdaptor) securityAdaptor).getPublicKey();
+        		byte[] privateKey = ((SSHSecurityCredential) credential).getPrivateKey().clone();
+        		byte[] publicKey = ((SSHSecurityCredential) credential).getPublicKey();
 
         		// create identity
         		Identity identity = IdentityFile.newInstance(userId, privateKey, publicKey, jsch);
@@ -149,5 +149,5 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
     public void disconnect() throws NoSuccessException {
     	session.disconnect();
         session = null;
-    } 
- }
+    }
+}

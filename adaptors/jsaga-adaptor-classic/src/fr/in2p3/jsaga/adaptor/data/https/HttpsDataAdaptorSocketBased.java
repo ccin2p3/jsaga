@@ -8,8 +8,8 @@ import fr.in2p3.jsaga.adaptor.data.http_socket.HttpDataAdaptorSocketBased;
 import fr.in2p3.jsaga.adaptor.data.https.OneWayAuthenticationTrustManager;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.adaptor.data.BaseURL;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.impl.X509SecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.X509SecurityCredential;
 import org.ogf.saga.error.*;
 
 import javax.net.ssl.*;
@@ -57,12 +57,12 @@ public class HttpsDataAdaptorSocketBased extends HttpDataAdaptorSocketBased impl
         return new Default[]{new Default(MUTUAL_AUTHENTICATION, "false")};
     }
 
-    public Class[] getSupportedSecurityAdaptorClasses() {
-        return new Class[]{X509SecurityAdaptor.class, null}; // also support no security context
+    public Class[] getSupportedSecurityCredentialClasses() {
+        return new Class[]{X509SecurityCredential.class, null}; // also support no security context
     }
 
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
-        X509SecurityAdaptor adaptor = (X509SecurityAdaptor) securityAdaptor;
+    public void setSecurityCredential(SecurityCredential credential) {
+        X509SecurityCredential adaptor = (X509SecurityCredential) credential;
         m_userID = adaptor.getUserID();
         m_keyManager = adaptor.getKeyManager();
     }

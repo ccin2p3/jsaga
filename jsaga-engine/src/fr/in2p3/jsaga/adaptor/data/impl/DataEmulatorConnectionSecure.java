@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.adaptor.data.impl;
 
 import fr.in2p3.jsaga.adaptor.schema.data.emulator.SecureServer;
 import fr.in2p3.jsaga.adaptor.schema.data.emulator.ServerType;
-import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
 import org.ogf.saga.error.*;
 
 /* ***************************************************
@@ -20,7 +20,7 @@ import org.ogf.saga.error.*;
 public class DataEmulatorConnectionSecure extends DataEmulatorConnectionAbstract {
     private SecureServer m_serverRoot;
 
-    public DataEmulatorConnectionSecure(String protocol, String host, int port, UserPassSecurityAdaptor security) throws AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {
+    public DataEmulatorConnectionSecure(String protocol, String host, int port, UserPassSecurityCredential security) throws AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {
         super();
         m_serverRoot = m_grid.connect(protocol, host, port, security);
         if (m_serverRoot == null) {

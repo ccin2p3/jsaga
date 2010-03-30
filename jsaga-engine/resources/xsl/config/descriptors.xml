@@ -9,7 +9,7 @@
     <language name="saga" impl="fr.in2p3.jsaga.adaptor.language.SAGALanguageAdaptor"/>
 
     <!-- context instances -->
-    <context name="Globus" type="Globus" impl="fr.in2p3.jsaga.adaptor.security.GlobusSecurityAdaptorBuilder"
+    <context name="Globus" type="Globus" impl="fr.in2p3.jsaga.adaptor.security.GlobusSecurityAdaptor"
              usage="((((&lt;UserCertKey> | (&lt;UserCert> &lt;UserKey>)) UserProxy *UserPass* LifeTime [Delegation]) | _UserProxyObject_ | &lt;UserProxy>) &lt;CertRepository>)">
         <attribute name="UserProxy" value="C:\DOCUME~1\SYLVAI~1\LOCALS~1\Temp\x509up_u[uid]"/>
         <attribute name="UserCert" value="E:\User Settings/.globus/usercert.pem"/>
@@ -18,14 +18,14 @@
         <attribute name="LifeTime" value="PT12H"/>
         <attribute name="Limited" value="False"/>
     </context>
-    <context name="MyProxy" type="MyProxy" impl="fr.in2p3.jsaga.adaptor.security.MyProxySecurityAdaptorBuilder"
+    <context name="MyProxy" type="MyProxy" impl="fr.in2p3.jsaga.adaptor.security.MyProxySecurityAdaptor"
              usage="(((&lt;UserCert> &lt;UserKey> UserProxy *UserPass* Server UserID *MyProxyPass* LifeTime) | _UserProxyObject:10800_ | &lt;UserProxy:10800> | (_UserProxyObject_ UserID *MyProxyPass*) | (UserProxy UserID *MyProxyPass*)) &lt;CertRepository>)">
         <attribute name="UserProxy" value="C:\DOCUME~1\SYLVAI~1\LOCALS~1\Temp\x509up_u[uid]"/>
         <attribute name="UserCert" value="E:\User Settings/.globus/usercert.pem"/>
         <attribute name="UserKey" value="E:\User Settings/.globus/userkey.pem"/>
         <attribute name="CertRepository" value="/etc/grid-security/certificates/"/>
     </context>
-    <context name="VOMS" type="VOMS" impl="fr.in2p3.jsaga.adaptor.security.VOMSSecurityAdaptorBuilder"
+    <context name="VOMS" type="VOMS" impl="fr.in2p3.jsaga.adaptor.security.VOMSSecurityAdaptor"
              usage="((((&lt;UserCertKey> | (&lt;UserCert> &lt;UserKey>)) UserProxy *UserPass* Server UserVO [UserFQAN] LifeTime [Delegation] [ProxyType]) | _UserProxyObject_ | &lt;UserProxy>) &lt;CertRepository> &lt;VomsDir>)">
         <attribute name="UserProxy" value="C:\DOCUME~1\SYLVAI~1\LOCALS~1\Temp\x509up_u[uid]"/>
         <attribute name="UserCert" value="E:\User Settings/.globus/usercert.pem"/>
@@ -37,12 +37,12 @@
         <attribute name="UserCert" value="E:\User Settings/.ssh/id_dsa.pub"/>
         <attribute name="UserKey" value="E:\User Settings/.ssh/id_dsa"/>
     </context>
-    <context name="X509" type="X509" impl="fr.in2p3.jsaga.adaptor.security.X509SecurityAdaptorBuilder"
+    <context name="X509" type="X509" impl="fr.in2p3.jsaga.adaptor.security.X509SecurityAdaptor"
              usage="(&lt;UserCert> *UserPass* Alias)">
         <attribute name="UserCert" value="E:\User Settings/.keystore"/>
         <attribute name="UserPass" value="changeme"/>
     </context>
-    <context name="UserPass" type="UserPass" impl="fr.in2p3.jsaga.adaptor.security.UserPassSecurityAdaptorBuilder"
+    <context name="UserPass" type="UserPass" impl="fr.in2p3.jsaga.adaptor.security.UserPassSecurityAdaptor"
              usage="(UserID ((*UserPass* LifeTime) | *UserPass* | UserPassCrypted))">
         <attribute name="UserID" value="anonymous"/>
         <attribute name="UserPass" value="anon"/>

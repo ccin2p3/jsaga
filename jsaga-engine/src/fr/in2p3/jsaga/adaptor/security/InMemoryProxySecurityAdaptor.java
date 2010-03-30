@@ -6,8 +6,8 @@ import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UFile;
 import fr.in2p3.jsaga.adaptor.base.usage.UNoPrompt;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityCredential;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
@@ -19,7 +19,7 @@ import java.util.Map;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   InMemoryProxySecurityAdaptorBuilder
+* File:   InMemoryProxySecurityAdaptor
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
 * Date:   12 oct. 2007
 * ***************************************************
@@ -27,13 +27,13 @@ import java.util.Map;
 /**
  *
  */
-public class InMemoryProxySecurityAdaptorBuilder implements SecurityAdaptorBuilder {
+public class InMemoryProxySecurityAdaptor implements SecurityAdaptor {
     public String getType() {
         return "InMemoryProxy";
     }
 
-    public Class getSecurityAdaptorClass() {
-        return GSSCredentialSecurityAdaptor.class;
+    public Class getSecurityCredentialClass() {
+        return GSSCredentialSecurityCredential.class;
     }
 
     public Usage getUsage() {
@@ -50,11 +50,11 @@ public class InMemoryProxySecurityAdaptorBuilder implements SecurityAdaptorBuild
         };
     }
 
-    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectStateException, NoSuccessException {
+    public SecurityCredential createSecurityCredential(int usage, Map attributes, String contextId) throws IncorrectStateException, NoSuccessException {
         String base64 = (String) attributes.get(Context.USERPROXY);
         if (base64 != null) {
             File certRepository = new File((String) attributes.get(Context.CERTREPOSITORY));
-            return new InMemoryProxySecurityAdaptor(base64, certRepository);
+            return new InMemoryProxySecurityCredential(base64, certRepository);
         } else {
             throw new NoSuccessException("Attribute is null: "+Context.USERPROXY);
         }

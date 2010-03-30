@@ -1,9 +1,9 @@
 package fr.in2p3.jsaga.adaptor.security;
 
-import org.ogf.saga.error.NoSuccessException;
-import org.ogf.saga.error.NotImplementedException;
+import fr.in2p3.jsaga.adaptor.Adaptor;
+import org.ogf.saga.error.*;
 
-import java.io.PrintStream;
+import java.util.Map;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -17,28 +17,20 @@ import java.io.PrintStream;
 /**
  *
  */
-public interface SecurityAdaptor {
-    public static final int INFINITE_LIFETIME = -1;
+public interface SecurityAdaptor extends Adaptor {
+    /**
+     * @return the security adaptor class instanciated by this builder.
+     */
+    public Class getSecurityCredentialClass();
 
     /**
-     * @return the identifier of the user.
+     * Create a security context instance and initialize it with the provided attributes.
+     * @param usage the identifier of the usage.
+     * @param attributes the provided attributes.
+     * @param contextId the identifier of the context instance.
+     * @return the security context instance.
+     * @throws IncorrectStateException if the attributes refer to a context that is not of expected type
+     * @throws NoSuccessException if creating the adaptor failed
      */
-    public String getUserID() throws Exception;
-
-    /**
-     * @return the value of the attribute (other than UserID)
-     * @throws NotImplementedException if the attribute key is not supported by this adaptor
-     * @throws NoSuccessException if the adaptor failed to get the value of attribute key
-     */
-    public String getAttribute(String key) throws NotImplementedException, NoSuccessException;
-
-    /**
-     * Close the context (implementation may be empty).
-     */
-    public void close() throws Exception;
-
-    /**
-     * @return description of security context instance.
-     */
-    public void dump(PrintStream out) throws Exception;
+    public SecurityCredential createSecurityCredential(int usage, Map attributes, String contextId) throws IncorrectStateException, TimeoutException, NoSuccessException;
 }

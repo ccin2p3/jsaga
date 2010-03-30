@@ -6,14 +6,18 @@
     </xsl:text></xsl:variable>
 
     <xsl:template match="/jel">
-        <document><body>
+        <document>
+            <properties>
+                <title>How to develop adaptors ?</title>
+            </properties>
+            <body>
             <section name="Introduction">
                 <p>Adding to JSAGA support for new technologies can be done by developing adaptors.
                     There are 3 kind of adaptors: security adaptors, data adaptors and job adaptors.
                 </p>
                 <p>Adaptor interfaces are designed to be close to legacy middleware API.
-                    Most adaptor interfaces are optionals. An adaptor should implement
-                    <b>only</b> features that are required and those that are natively supported
+                    Most adaptor interfaces are optionals. An adaptor should implement <b>only</b>
+                    features that are required and optional features that are natively supported
                     by adapted middleware, other optional features should be managed by the core engine.
                     However, implemented interfaces must be <b>fully implemented</b>
                     (i.e. no NotImplementedException can be thrown).
@@ -24,6 +28,9 @@
                     <a href="http://www.ogf.org/documents/GFD.90.pdf">SAGA specification document</a>
                     for a description of each SAGA Exception class.
                 </p>
+                <p>This document is generated from source code. It is applicable to the version
+                    of JSAGA that can be downloaded <a href="download.html">here</a>.
+                </p>
             </section>
             <section name="Common interfaces">
                 <p>All the adaptors implement the <code>fr.in2p3.jsaga.adaptor.Adaptor</code> interface.
@@ -32,7 +39,7 @@
                 <xsl:apply-templates select="jelclass[@type='Adaptor' or @type='ClientAdaptor']"/>
             </section>
             <section name="Developing a security adaptor">
-                <p>A security adaptor must implement the <code>fr.in2p3.jsaga.adaptor.security.SecurityAdaptorBuilder</code> interface.
+                <p>A security adaptor must implement the <code>fr.in2p3.jsaga.adaptor.security.SecurityAdaptor</code> interface.
                 </p>
                 <i>Copy-paste these methods to your adaptor class, and implement them.</i>
                 <pre>

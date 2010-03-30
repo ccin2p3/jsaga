@@ -7,7 +7,7 @@ import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.file.Directory;
@@ -58,8 +58,8 @@ public class CacheDataAdaptor implements FileReaderStreamFactory, FileWriter {
                 new Default(AUTO_REFRESH, "false")};
     }
 
-    public Class[] getSupportedSecurityAdaptorClasses() {return null;}
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {}
+    public Class[] getSupportedSecurityCredentialClasses() {return null;}
+    public void setSecurityCredential(SecurityCredential credential) {}
     public BaseURL getBaseURL() throws IncorrectURLException {return null;}
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {

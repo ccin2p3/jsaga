@@ -7,7 +7,7 @@ import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderGetter;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterPutter;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import org.globus.ftp.*;
 import org.ogf.saga.error.*;
 
@@ -84,12 +84,12 @@ public class GsiftpDPMDataAdaptor implements DataCopy, DataRename, FileReaderGet
         return m_adaptor.getDefaults(attributes);
     }
 
-    public Class[] getSupportedSecurityAdaptorClasses() {
-        return m_adaptor.getSupportedSecurityAdaptorClasses();
+    public Class[] getSupportedSecurityCredentialClasses() {
+        return m_adaptor.getSupportedSecurityCredentialClasses();
     }
 
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
-        m_adaptor.setSecurityAdaptor(securityAdaptor);
+    public void setSecurityCredential(SecurityCredential credential) {
+        m_adaptor.setSecurityCredential(credential);
     }
 
     public BaseURL getBaseURL() throws IncorrectURLException {

@@ -7,8 +7,8 @@ import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 import org.globus.common.ChainedIOException;
 import org.globus.ftp.*;
 import org.globus.ftp.exception.*;
@@ -16,7 +16,6 @@ import org.globus.gsi.gssapi.GlobusGSSException;
 import org.globus.gsi.gssapi.auth.HostAuthorization;
 import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.*;
-import org.ogf.saga.error.NotImplementedException;
 
 import java.io.*;
 import java.util.Map;
@@ -48,12 +47,12 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
     public abstract FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException;
     public abstract FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException;
 
-    public Class[] getSupportedSecurityAdaptorClasses() {
-        return new Class[]{GSSCredentialSecurityAdaptor.class};
+    public Class[] getSupportedSecurityCredentialClasses() {
+        return new Class[]{GSSCredentialSecurityCredential.class};
     }
 
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
-        m_credential = ((GSSCredentialSecurityAdaptor) securityAdaptor).getGSSCredential();
+    public void setSecurityCredential(SecurityCredential credential) {
+        m_credential = ((GSSCredentialSecurityCredential) credential).getGSSCredential();
     }
 
     public BaseURL getBaseURL() throws IncorrectURLException {

@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.impl.context;
 
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.impl.job.service.JobServiceImpl;
 import org.apache.log4j.Logger;
 import org.ogf.saga.error.SagaException;
@@ -23,11 +23,11 @@ public class JobServiceReset implements Runnable {
     private static Logger s_logger = Logger.getLogger(JobServiceReset.class);
 
     private Map<JobServiceImpl,Map> m_jobServices;
-    private SecurityAdaptor m_adaptor;
+    private SecurityCredential m_credential;
 
-    public JobServiceReset(Map<JobServiceImpl,Map> registry, SecurityAdaptor adaptor) {
+    public JobServiceReset(Map<JobServiceImpl,Map> registry, SecurityCredential credential) {
         m_jobServices = registry;
-        m_adaptor = adaptor;
+        m_credential = credential;
     }
 
     public void run() {
@@ -35,7 +35,7 @@ public class JobServiceReset implements Runnable {
             JobServiceImpl jobService = entry.getKey();
             Map attributes = entry.getValue();
             try {
-                jobService.resetAdaptors(m_adaptor, attributes);
+                jobService.resetAdaptors(m_credential, attributes);
             } catch (SagaException e) {
                 s_logger.warn("Failed to reconnect to job service", e);
             }

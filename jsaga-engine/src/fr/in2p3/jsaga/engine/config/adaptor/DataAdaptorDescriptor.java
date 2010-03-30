@@ -82,8 +82,8 @@ public class DataAdaptorDescriptor {
         if (adaptor.getBaseURL() != null) {
             service.setBase(adaptor.getBaseURL().toString());
         }
-        if (adaptor.getSupportedSecurityAdaptorClasses() != null) {
-            String[] supportedContextTypes = securityDesc.getSupportedContextTypes(adaptor.getSupportedSecurityAdaptorClasses());
+        if (adaptor.getSupportedSecurityCredentialClasses() != null) {
+            String[] supportedContextTypes = securityDesc.getSupportedContextTypes(adaptor.getSupportedSecurityCredentialClasses());
             service.setSupportedContextType(supportedContextTypes);
         }
         if (adaptor.getUsage() != null) {

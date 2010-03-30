@@ -6,7 +6,7 @@ import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.evaluator.Evaluator;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.language.LanguageAdaptor;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptorBuilder;
+import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.schema.config.*;
 import fr.in2p3.jsaga.engine.schema.config.types.AttributeSourceType;
@@ -40,7 +40,7 @@ public class AdaptorDescriptors {
     public AdaptorDescriptors() throws ConfigurationException {
         AdaptorLoader loader = new AdaptorLoader();
         try {
-            m_securityDesc = new SecurityAdaptorDescriptor(loader.getClasses(SecurityAdaptorBuilder.class));
+            m_securityDesc = new SecurityAdaptorDescriptor(loader.getClasses(SecurityAdaptor.class));
             m_dataDesc = new DataAdaptorDescriptor(loader.getClasses(DataAdaptor.class), m_securityDesc);
             m_jobDesc = new JobAdaptorDescriptor(loader.getClasses(JobControlAdaptor.class), m_securityDesc);
             m_languageDesc = new LanguageAdaptorDescriptor(loader.getClasses(LanguageAdaptor.class));

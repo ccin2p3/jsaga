@@ -6,8 +6,8 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 
 import org.apache.axis.AxisProperties;
 import org.apache.axis.client.Stub;
@@ -69,12 +69,12 @@ public abstract class WSGramJobAdaptorAbstract implements ClientAdaptor {
         return "wsgram";
     }
     
-    public Class[] getSupportedSecurityAdaptorClasses() {
-        return new Class[]{GSSCredentialSecurityAdaptor.class};
+    public Class[] getSupportedSecurityCredentialClasses() {
+        return new Class[]{GSSCredentialSecurityCredential.class};
     }
 
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
-        m_credential = ((GSSCredentialSecurityAdaptor) securityAdaptor).getGSSCredential();
+    public void setSecurityCredential(SecurityCredential credential) {
+        m_credential = ((GSSCredentialSecurityCredential) credential).getGSSCredential();
     }
 
     public int getDefaultPort() {
@@ -190,4 +190,4 @@ public abstract class WSGramJobAdaptorAbstract implements ClientAdaptor {
         }
     	return job;
     }
- }
+}

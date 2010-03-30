@@ -1,9 +1,9 @@
 package fr.in2p3.jsaga.adaptor.naregi.job;
 
 import fr.in2p3.jsaga.adaptor.ClientAdaptor;
-import fr.in2p3.jsaga.adaptor.naregi.security.NaregiSecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.naregi.security.NaregiSecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 import org.ietf.jgss.GSSCredential;
 import org.naregi.ss.service.client.*;
 import org.ogf.saga.error.*;
@@ -34,16 +34,16 @@ public abstract class SuperSchedulerJobAdaptorAbstract implements ClientAdaptor 
         return "naregi";
     }
 
-    public Class[] getSupportedSecurityAdaptorClasses() {
-        return new Class[]{GSSCredentialSecurityAdaptor.class, NaregiSecurityAdaptor.class};
+    public Class[] getSupportedSecurityCredentialClasses() {
+        return new Class[]{GSSCredentialSecurityCredential.class, NaregiSecurityCredential.class};
     }
 
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
-        if (securityAdaptor instanceof GSSCredentialSecurityAdaptor) {
-            m_credential = ((GSSCredentialSecurityAdaptor) securityAdaptor).getGSSCredential();
-        } else if (securityAdaptor instanceof NaregiSecurityAdaptor) {
-            m_account = ((NaregiSecurityAdaptor) securityAdaptor).getUserID();
-            m_passPhrase = ((NaregiSecurityAdaptor) securityAdaptor).getUserPass();
+    public void setSecurityCredential(SecurityCredential credential) {
+        if (credential instanceof GSSCredentialSecurityCredential) {
+            m_credential = ((GSSCredentialSecurityCredential) credential).getGSSCredential();
+        } else if (credential instanceof NaregiSecurityCredential) {
+            m_account = ((NaregiSecurityCredential) credential).getUserID();
+            m_passPhrase = ((NaregiSecurityCredential) credential).getUserPass();
         }
     }
 

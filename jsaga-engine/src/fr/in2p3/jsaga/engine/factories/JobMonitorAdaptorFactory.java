@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.engine.factories;
 
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.config.adaptor.SecurityAdaptorDescriptor;
 import fr.in2p3.jsaga.engine.config.bean.JobserviceEngineConfiguration;
@@ -83,31 +83,31 @@ public class JobMonitorAdaptorFactory extends ServiceAdaptorFactory {
         }
 
         // set security adaptor
-        SecurityAdaptor securityAdaptor;
+        SecurityCredential credential;
         if (context != null) {
-            SecurityAdaptor candidate;
+            SecurityCredential candidate;
             try {
-                candidate = context.getAdaptor();
+                candidate = context.getCredential();
             } catch (IncorrectStateException e) {
                 throw new NoSuccessException("Invalid security context: "+super.getContextType(context), e);
             }
-            if (SecurityAdaptorDescriptor.isSupported(candidate.getClass(), monitorAdaptor.getSupportedSecurityAdaptorClasses())) {
-                securityAdaptor = candidate;
-            } else if (SecurityAdaptorDescriptor.isSupportedNoContext(monitorAdaptor.getSupportedSecurityAdaptorClasses())) {
-                securityAdaptor = null;
+            if (SecurityAdaptorDescriptor.isSupported(candidate.getClass(), monitorAdaptor.getSupportedSecurityCredentialClasses())) {
+                credential = candidate;
+            } else if (SecurityAdaptorDescriptor.isSupportedNoContext(monitorAdaptor.getSupportedSecurityCredentialClasses())) {
+                credential = null;
             } else {
                 throw new AuthenticationFailedException("Security context class '"+ candidate.getClass().getName() +"' not supported for protocol: "+monitorURL.getScheme());
             }
         } else {
-            securityAdaptor = null;
+            credential = null;
         }
 
         // connect
-        connect(monitorAdaptor, securityAdaptor, monitorURL, monitorAttributes);
+        connect(monitorAdaptor, credential, monitorURL, monitorAttributes);
     }
 
-    public static void connect(JobMonitorAdaptor monitorAdaptor, SecurityAdaptor securityAdaptor, URL url, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
-        monitorAdaptor.setSecurityAdaptor(securityAdaptor);
+    public static void connect(JobMonitorAdaptor monitorAdaptor, SecurityCredential credential, URL url, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+        monitorAdaptor.setSecurityCredential(credential);
         monitorAdaptor.connect(
                 url.getUserInfo(),
                 url.getHost(),

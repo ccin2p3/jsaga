@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.adaptor.job.local;
 
 import fr.in2p3.jsaga.adaptor.ClientAdaptor;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
@@ -27,7 +27,7 @@ public abstract class LocalAdaptorAbstract implements ClientAdaptor {
 	
 	protected static Map sessionMap = new HashMap();
 
-    public Class[] getSupportedSecurityAdaptorClasses() {
+    public Class[] getSupportedSecurityCredentialClasses() {
         return null;
     }
 
@@ -35,7 +35,7 @@ public abstract class LocalAdaptorAbstract implements ClientAdaptor {
 		return "local";
 	}
 	
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
+    public void setSecurityCredential(SecurityCredential credential) {
     } 
 	
     public int getDefaultPort() {
@@ -46,5 +46,5 @@ public abstract class LocalAdaptorAbstract implements ClientAdaptor {
     }
 
     public void disconnect() throws NoSuccessException {
-    } 
+    }
 }

@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.adaptor.security;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
-import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityCredential;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
@@ -19,12 +19,12 @@ import java.util.*;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   JKSSecurityAdaptorBuilder
+* File:   JKSSecurityAdaptor
 * Author: Nicolas DEMESY (nicolas.demesy@bt.com)
 * Date:   18 mars 2008
 * ***************************************************/
 
-public class JKSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
+public class JKSSecurityAdaptor implements SecurityAdaptor {
 
 	private static final String KEYSTORE = "Keystore";
 	private static final String KEYSTORE_PASS = "KeystorePass";
@@ -34,8 +34,8 @@ public class JKSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
     	return "JKS";
     }
 
-    public Class getSecurityAdaptorClass() {
-        return JKSSecurityAdaptor.class;
+    public Class getSecurityCredentialClass() {
+        return JKSSecurityCredential.class;
     }
 
     public Usage getUsage() {
@@ -54,7 +54,7 @@ public class JKSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
         };
     }
 
-    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectStateException, NoSuccessException {
+    public SecurityCredential createSecurityCredential(int usage, Map attributes, String contextId) throws IncorrectStateException, NoSuccessException {
     	
     	try {
     		// get required attributes
@@ -118,7 +118,7 @@ public class JKSSecurityAdaptorBuilder implements SecurityAdaptorBuilder {
 	    	for (int i = 0; i < certificates.length; i++) {
 	    		certificates[i] = (X509Certificate) loadCerts.get(i);
 			}
-	        return new JKSSecurityAdaptor(keyStore, keyStorePass, alias, userPass, certificates);
+	        return new JKSSecurityCredential(keyStore, keyStorePass, alias, userPass, certificates);
     	}
     	catch (Exception e) {
     		throw new NoSuccessException(e);

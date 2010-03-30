@@ -4,7 +4,7 @@ import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import org.ogf.saga.error.*;
 
 import java.io.File;
@@ -31,8 +31,8 @@ public class EmulatorJobAdaptorAbstract implements ClientAdaptor {
 
     public Usage getUsage() {return null;}
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {return null;}
-    public Class[] getSupportedSecurityAdaptorClasses() {return null;}
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {}
+    public Class[] getSupportedSecurityCredentialClasses() {return null;}
+    public void setSecurityCredential(SecurityCredential credential) {}
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         if (! STATUS_DIR.exists()) {

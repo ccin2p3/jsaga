@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.adaptor.data;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import org.ogf.saga.error.*;
 
 import java.util.Map;
@@ -39,12 +39,12 @@ public class SRMDataAdaptor implements DataAdaptor {
         return m_adaptor.getDefaults(attributes);
     }
 
-    public Class[] getSupportedSecurityAdaptorClasses() {
-        return m_adaptor.getSupportedSecurityAdaptorClasses();
+    public Class[] getSupportedSecurityCredentialClasses() {
+        return m_adaptor.getSupportedSecurityCredentialClasses();
     }
 
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
-        m_adaptor.setSecurityAdaptor(securityAdaptor);
+    public void setSecurityCredential(SecurityCredential credential) {
+        m_adaptor.setSecurityCredential(credential);
     }
 
     public BaseURL getBaseURL() throws IncorrectURLException {

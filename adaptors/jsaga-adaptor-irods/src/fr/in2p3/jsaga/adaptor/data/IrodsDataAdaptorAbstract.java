@@ -3,9 +3,9 @@ package fr.in2p3.jsaga.adaptor.data;
 import edu.sdsc.grid.io.*;
 import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
 import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.*;
 
@@ -29,15 +29,15 @@ public abstract class IrodsDataAdaptorAbstract implements DataReaderAdaptor {
 	protected final static String DOT =  "\\.";
 	protected final static String DEFAULTRESOURCE	= "defaultresource", DOMAIN="domain", ZONE="zone", METADATAVALUE="metadatavalue";
 	protected String srbHost, srbPort, userName, passWord, mdasDomainName, mcatZone, defaultStorageResource, metadataValue;
-	protected SecurityAdaptor securityAdaptor;
+	protected SecurityCredential credential;
 	protected GSSCredential cert;
 
-	public Class[] getSupportedSecurityAdaptorClasses() {
-        return new Class[]{UserPassSecurityAdaptor.class, GSSCredentialSecurityAdaptor.class};
+    public Class[] getSupportedSecurityCredentialClasses() {
+        return new Class[]{UserPassSecurityCredential.class, GSSCredentialSecurityCredential.class};
     }
 
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
-		this.securityAdaptor = securityAdaptor;	
+    public void setSecurityCredential(SecurityCredential credential) {
+		this.credential = credential;
     }
 	
 	public boolean exists(String absolutePath, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {

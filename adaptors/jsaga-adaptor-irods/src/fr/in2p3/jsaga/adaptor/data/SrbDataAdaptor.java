@@ -6,8 +6,8 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.defaults.EnvironmentVariables;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
 import org.ogf.saga.error.*;
 
 import java.io.File;
@@ -79,8 +79,8 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 			// connect to server
 			SRBAccount account = null;
 
-			if (securityAdaptor instanceof GSSCredentialSecurityAdaptor) { 
-				cert = ((GSSCredentialSecurityAdaptor)securityAdaptor).getGSSCredential();
+			if (credential instanceof GSSCredentialSecurityCredential) {
+				cert = ((GSSCredentialSecurityCredential) credential).getGSSCredential();
 				account = new SRBAccount(host, port, cert, basePath, defaultStorageResource, SRBAccount.GSI_AUTH);
             } else {
 				if (host == null) {
@@ -207,14 +207,14 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
 	
 	void parseValue(Map attributes) throws NoSuccessException {
 	
-		if (securityAdaptor instanceof UserPassSecurityAdaptor) {
+		if (credential instanceof UserPassSecurityCredential) {
             try {
-                userName = securityAdaptor.getUserID();
+                userName = credential.getUserID();
             } catch (Exception e) {
                 throw new NoSuccessException(e);
             }
-            passWord = ((UserPassSecurityAdaptor)securityAdaptor).getUserPass();
-		} else if (securityAdaptor instanceof GSSCredentialSecurityAdaptor) {
+            passWord = ((UserPassSecurityCredential) credential).getUserPass();
+		} else if (credential instanceof GSSCredentialSecurityCredential) {
 			userName = null;
             passWord = null;
         }

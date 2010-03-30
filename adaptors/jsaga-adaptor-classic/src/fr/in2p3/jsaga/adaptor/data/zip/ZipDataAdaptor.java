@@ -6,7 +6,7 @@ import fr.in2p3.jsaga.adaptor.data.BaseURL;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.helpers.EntryPath;
 import org.ogf.saga.error.*;
 
@@ -45,11 +45,11 @@ public class ZipDataAdaptor implements FileReaderStreamFactory{//, FileWriterPut
         return null;    // no default
     }
 
-    public Class[] getSupportedSecurityAdaptorClasses() {
+    public Class[] getSupportedSecurityCredentialClasses() {
         return null;    // no security
     }
 
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
+    public void setSecurityCredential(SecurityCredential credential) {
         // do nothing
     }
 

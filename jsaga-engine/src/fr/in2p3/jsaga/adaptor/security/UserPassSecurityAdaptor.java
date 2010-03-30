@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.adaptor.security;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
-import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
 import fr.in2p3.jsaga.engine.config.attributes.FilePropertiesAttributesParser;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.IncorrectStateException;
@@ -16,7 +16,7 @@ import java.util.Properties;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   UserPassSecurityAdaptorBuilder
+* File:   UserPassSecurityAdaptor
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
 * Date:   19 juin 2007
 * ***************************************************
@@ -24,7 +24,7 @@ import java.util.Properties;
 /**
  *
  */
-public class UserPassSecurityAdaptorBuilder implements ExpirableSecurityAdaptorBuilder {
+public class UserPassSecurityAdaptor implements ExpirableSecurityAdaptor {
     private static final String USERPASSCRYPTED = "UserPassCrypted";
     private static final int USAGE_INIT = 1;
     private static final int USAGE_VOLATILE = 2;
@@ -34,8 +34,8 @@ public class UserPassSecurityAdaptorBuilder implements ExpirableSecurityAdaptorB
         return "UserPass";
     }
 
-    public Class getSecurityAdaptorClass() {
-        return UserPassSecurityAdaptor.class;
+    public Class getSecurityCredentialClass() {
+        return UserPassSecurityCredential.class;
     }
 
     public Usage getUsage() {
@@ -56,7 +56,7 @@ public class UserPassSecurityAdaptorBuilder implements ExpirableSecurityAdaptorB
         };
     }
 
-    public SecurityAdaptor createSecurityAdaptor(int usage, Map attributes, String contextId) throws IncorrectStateException, NoSuccessException {
+    public SecurityCredential createSecurityCredential(int usage, Map attributes, String contextId) throws IncorrectStateException, NoSuccessException {
         try {
             switch(usage) {
                 case USAGE_INIT:
@@ -81,11 +81,11 @@ public class UserPassSecurityAdaptorBuilder implements ExpirableSecurityAdaptorB
                     }
                     prop.setProperty(contextId+"."+USERPASSCRYPTED, cryptedPassword);
                     prop.store(new FileOutputStream(propFile), "JSAGA user attributes");
-                    return new UserPassExpirableSecurityAdaptor(name, password, expiryDate);
+                    return new UserPassExpirableSecurityCredential(name, password, expiryDate);
                 }
                 case USAGE_VOLATILE:
                 {
-                    return new UserPassSecurityAdaptor(
+                    return new UserPassSecurityCredential(
                             (String) attributes.get(Context.USERID),
                             (String) attributes.get(Context.USERPASS));
                 }
@@ -106,7 +106,7 @@ public class UserPassSecurityAdaptorBuilder implements ExpirableSecurityAdaptorB
                     } else {
                         password = decrypter.decrypt(cryptedPassword);
                     }
-                    return new UserPassExpirableSecurityAdaptor(name, password, expiryDate);
+                    return new UserPassExpirableSecurityCredential(name, password, expiryDate);
                 }
                 default:
                     throw new NoSuccessException("INTERNAL ERROR: unexpected exception");

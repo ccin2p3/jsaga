@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.adaptor.job;
 
 import fr.in2p3.jsaga.adaptor.ClientAdaptor;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 import org.globus.common.CoGProperties;
 import org.globus.gram.*;
 import org.globus.gram.internal.GRAMProtocolErrorConstants;
@@ -29,12 +29,12 @@ public abstract class GatekeeperJobAdaptorAbstract implements ClientAdaptor {
     protected static final String IP_ADDRESS = "IPAddress";
     protected static final String TCP_PORT_RANGE = "TcpPortRange";
 
-    public Class[] getSupportedSecurityAdaptorClasses() {
-        return new Class[]{GSSCredentialSecurityAdaptor.class};
+    public Class[] getSupportedSecurityCredentialClasses() {
+        return new Class[]{GSSCredentialSecurityCredential.class};
     }
 
-    public void setSecurityAdaptor(SecurityAdaptor securityAdaptor) {
-        m_credential = ((GSSCredentialSecurityAdaptor) securityAdaptor).getGSSCredential();
+    public void setSecurityCredential(SecurityCredential credential) {
+        m_credential = ((GSSCredentialSecurityCredential) credential).getGSSCredential();
     }
 
     public int getDefaultPort() {

@@ -1,10 +1,10 @@
 package fr.in2p3.jsaga.command;
 
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptorBuilder;
+import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.config.bean.EngineConfiguration;
-import fr.in2p3.jsaga.engine.factories.SecurityAdaptorBuilderFactory;
+import fr.in2p3.jsaga.engine.factories.SecurityAdaptorFactory;
 import fr.in2p3.jsaga.engine.schema.config.*;
 import fr.in2p3.jsaga.helpers.ASCIITableFormatter;
 import fr.in2p3.jsaga.helpers.StringArray;
@@ -103,7 +103,7 @@ public class Help extends AbstractCommand {
                     for (int i=0; i<ctx.getAttributeCount(); i++) {
                         attributes.put(ctx.getAttribute(i).getName(), ctx.getAttribute(i).getValue());
                     }
-                    SecurityAdaptorBuilder adaptor = SecurityAdaptorBuilderFactory.getInstance().getSecurityAdaptorBuilder(ctx.getName());
+                    SecurityAdaptor adaptor = SecurityAdaptorFactory.getInstance().getSecurityAdaptor(ctx.getName());
                     Usage usage = adaptor.getUsage();
                     Usage missing = (usage!=null ? usage.getMissingValues(attributes) : null);
                     formatter.append(new String[] {ctx.getName(), (missing!=null ? missing.toString() : null)});

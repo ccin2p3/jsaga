@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.engine.factories;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.config.adaptor.DataAdaptorDescriptor;
@@ -70,42 +70,42 @@ public class DataAdaptorFactory extends ServiceAdaptorFactory {
         ContextImpl context;
         if (config.getContextRef() != null) {
             context = super.findContext(session, config.getContextRef());
-            if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(dataAdaptor.getSupportedSecurityAdaptorClasses())) {
+            if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(dataAdaptor.getSupportedSecurityCredentialClasses())) {
                 throw new ConfigurationException("INTERNAL ERROR: effective-config may be inconsistent");                
             }
         } else if (url.getFragment() != null) {
             context = super.findContext(session, url.getFragment());
-            if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(dataAdaptor.getSupportedSecurityAdaptorClasses())) {
+            if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(dataAdaptor.getSupportedSecurityCredentialClasses())) {
                 throw new NoSuccessException("Security context not found: "+url.getFragment());
             }
         } else if (session.listContexts().length == 1) {
             context = (ContextImpl) session.listContexts()[0];
         } else if (config.getSupportedContextTypeCount() > 0) {
             context = super.findContext(session, config.getSupportedContextType());
-            if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(dataAdaptor.getSupportedSecurityAdaptorClasses())) {
+            if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(dataAdaptor.getSupportedSecurityCredentialClasses())) {
                 throw new NoSuccessException("None of the supported security context is valid");
             }
         } else {
             context = null;
-            if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(dataAdaptor.getSupportedSecurityAdaptorClasses())) {
+            if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(dataAdaptor.getSupportedSecurityCredentialClasses())) {
                 throw new NoSuccessException("None of the supported security context is found");
             }
         }
 
         // set security adaptor
         if (context != null) {
-            SecurityAdaptor securityAdaptor;
+            SecurityCredential credential;
             try {
-                securityAdaptor = context.getAdaptor();
+                credential = context.getCredential();
             } catch (IncorrectStateException e) {
                 throw new NoSuccessException("Invalid security context: "+super.getContextType(context), e);
             }
-            if (SecurityAdaptorDescriptor.isSupported(securityAdaptor.getClass(), dataAdaptor.getSupportedSecurityAdaptorClasses())) {
-                dataAdaptor.setSecurityAdaptor(securityAdaptor);
-            } else if (SecurityAdaptorDescriptor.isSupportedNoContext(dataAdaptor.getSupportedSecurityAdaptorClasses())) {
-                dataAdaptor.setSecurityAdaptor(null);
+            if (SecurityAdaptorDescriptor.isSupported(credential.getClass(), dataAdaptor.getSupportedSecurityCredentialClasses())) {
+                dataAdaptor.setSecurityCredential(credential);
+            } else if (SecurityAdaptorDescriptor.isSupportedNoContext(dataAdaptor.getSupportedSecurityCredentialClasses())) {
+                dataAdaptor.setSecurityCredential(null);
             } else {
-                throw new AuthenticationFailedException("Security context class '"+ securityAdaptor.getClass().getName() +"' not supported for protocol: "+url.getScheme());
+                throw new AuthenticationFailedException("Security context class '"+ credential.getClass().getName() +"' not supported for protocol: "+url.getScheme());
             }
         }
 
