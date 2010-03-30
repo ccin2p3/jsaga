@@ -95,10 +95,6 @@ public class SrbDataAdaptorLogical extends SrbDataAdaptor implements LogicalRead
 		}
     }
 
-    public FileAttributes[] findAttributes(String logicalDir, String namePattern, BooleanExpr filter, boolean recursive, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException, BadParameterException	{
-        return null;
-    }
-
     public FileAttributes[] findAttributes(String logicalDir, Map keyValuePatterns, boolean recursive, String additionalArgs)  throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
 		logicalDir=logicalDir.substring(0,logicalDir.length()-1);
 		

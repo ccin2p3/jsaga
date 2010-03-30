@@ -1,9 +1,6 @@
 package fr.in2p3.jsaga.impl.logicalfile;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
-import fr.in2p3.jsaga.adaptor.data.optimise.LogicalReaderMetaDataExtended;
-import fr.in2p3.jsaga.adaptor.data.optimise.expr.BooleanExprAnd;
-import fr.in2p3.jsaga.adaptor.data.optimise.expr.BooleanExprCompare;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.LogicalReaderMetaData;
 import fr.in2p3.jsaga.helpers.SAGAPattern;
@@ -130,32 +127,6 @@ public abstract class AbstractSyncLogicalDirectoryImpl extends AbstractNSDirecto
         if (keyValuePatterns.isEmpty()) {
             for (URL current : super.findSync(namePattern, flags)) {
                 matchingPath.add(current);
-            }
-        } else if (m_adaptor instanceof LogicalReaderMetaDataExtended) {
-            // generate expression
-            BooleanExprAnd expr = new BooleanExprAnd();
-            for (Map.Entry<String,String> entry : keyValuePatterns.entrySet()) {
-                expr.add(new BooleanExprCompare(BooleanExprCompare.OPERATOR_EQUAL, entry.getKey(), entry.getValue()));
-            }
-            // filter by meta-data (and potentially by entry name)
-            FileAttributes[] childs;
-            try {
-                childs = ((LogicalReaderMetaDataExtended) m_adaptor).findAttributes(
-                        MetaDataAttributesImpl.getNormalizedPath(m_url),
-                        namePattern,
-                        expr,
-                        Flags.RECURSIVE.isSet(flags),
-                        m_url.getQuery());
-            } catch (DoesNotExistException doesNotExist) {
-                throw new IncorrectStateException("Logical directory does not exist: "+ m_url, doesNotExist);
-            }
-            // filter by entry name (in case it has not already been done by the adaptor)
-            Pattern p = SAGAPattern.toRegexp(namePattern);
-            for (int i=0; i<childs.length; i++) {
-                if (p==null || p.matcher(childs[i].getNameOnly()).matches()) {
-                    URL childUrl = URLFactoryImpl.createURLWithCache(childs[i]);
-                    matchingPath.add(childUrl);
-                }
             }
         } else if (m_adaptor instanceof LogicalReaderMetaData) {
             // filter by meta-data
