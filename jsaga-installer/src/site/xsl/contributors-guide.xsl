@@ -11,6 +11,8 @@
                 <title>How to develop adaptors ?</title>
             </properties>
             <body>
+
+
             <section name="Introduction">
                 <p>Adding to JSAGA support for new technologies can be done by developing adaptors.
                     There are 3 kind of adaptors: security adaptors, data adaptors and job adaptors.
@@ -32,42 +34,91 @@
                     of JSAGA that can be downloaded <a href="download.html">here</a>.
                 </p>
             </section>
+
+
             <section name="Common interfaces">
                 <p>All the adaptors implement the <code>fr.in2p3.jsaga.adaptor.Adaptor</code> interface.
-                    All the data and job adaptors also implement the <code>fr.in2p3.jsaga.adaptor.ClientAdaptor</code> interface.
                 </p>
-                <xsl:apply-templates select="jelclass[@type='Adaptor' or @type='ClientAdaptor']"/>
+                <xsl:apply-templates select="jelclass[@type='Adaptor']"/>
+                
+                <p>All the data and job adaptors also implement the <code>fr.in2p3.jsaga.adaptor.ClientAdaptor</code> interface.
+                </p>
+                <xsl:apply-templates select="jelclass[@type='ClientAdaptor']"/>
             </section>
+
+
             <section name="Developing a security adaptor">
-                <p>A security adaptor must implement the <code>fr.in2p3.jsaga.adaptor.security.SecurityAdaptor</code> interface.
-                </p>
-                <i>Copy-paste these methods to your adaptor class, and implement them.</i>
+                <i>Copy-paste required methods to your adaptor class, and implement them.</i>
                 <pre>
-                    <xsl:for-each select="jelclass[@type='Adaptor' or @type='SecurityAdaptorBuilder']">
+                    <xsl:for-each select="jelclass[@type='Adaptor' or @type='SecurityAdaptor']">
                         <xsl:call-template name="jelclass"/>
                     </xsl:for-each>
                 </pre>
+
+                <p>A security adaptor <b>must</b> implement the <code>fr.in2p3.jsaga.adaptor.security.SecurityAdaptor</code> interface.
+                </p>
+                <xsl:apply-templates select="jelclass[@type='SecurityAdaptor']"/>
+
+                <p>If your security adaptor creates expirable credentials, it should also implement
+                    the <code>fr.in2p3.jsaga.adaptor.security.ExpirableSecurityAdaptor</code> interface.
+                </p>
+                <xsl:apply-templates select="jelclass[@type='ExpirableSecurityAdaptor']"/>
+
+                <p>A security adaptor creates SecurityCredential instances. A security credential <b>must</b>
+                    implement the <code>fr.in2p3.jsaga.adaptor.security.SecurityCredential</code> interface.
+                </p>
+                <xsl:apply-templates select="jelclass[@type='SecurityCredential']"/>
             </section>
+
+
             <section name="Developing a data adaptor">
                 <p>A data adaptor is either a physical file adaptor, or a logical file adaptor.
+                    It <b>must</b> implement the <code>fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor</code>
+                    <b>and/or</b> the <code>fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor</code> interfaces.
                 </p>
+                <xsl:apply-templates select="jelclass[@type='DataAdaptor'
+                                or @type='DataReaderAdaptor' or @type='DataWriterAdaptor']"/>
+
                 <subsection name="Developing a physical file adator">
-                    <p>A physical file adaptor must implement the <code>fr.in2p3.jsaga.adaptor.data.read.FileReader</code>
-                        and/or <code>fr.in2p3.jsaga.adaptor.data.write.FileWriter</code> interfaces.
+                    <p>A physical file adaptor uses either stream methods or get/put methods.
                     </p>
+
+                    <h4>Developing a physical file adaptor that uses stream methods</h4>
+                    <i>Copy-paste required methods to your adaptor class, and implement them.</i>
                     <pre>
                         <xsl:for-each select="jelclass[@type='Adaptor' or @type='ClientAdaptor'
                                 or @type='DataAdaptor'
-                                or @type='DataReaderAdaptor' or @type='FileReader'
-                                or @type='DataWriterAdaptor' or @type='FileWriter']">
+                                or @type='DataReaderAdaptor' or @type='FileReaderStreamFactory'
+                                or @type='DataWriterAdaptor' or @type='FileWriterStreamFactory']">
                             <xsl:call-template name="jelclass"/>
                         </xsl:for-each>
                     </pre>
+
+                    <p>A physical file adaptor that uses stream methods <b>must</b> implement
+                        the <code>fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory</code>
+                        <b>and/or</b> the <code>fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory</code> interfaces.
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='FileReaderStreamFactory' or @type='FileWriterStreamFactory']"/>
+
+                    <h4>Developing a physical file adaptor that uses get/put methods</h4>
+                    <i>Copy-paste required methods to your adaptor class, and implement them.</i>
+                    <pre>
+                        <xsl:for-each select="jelclass[@type='Adaptor' or @type='ClientAdaptor'
+                                or @type='DataAdaptor'
+                                or @type='DataReaderAdaptor' or @type='FileReaderGetter'
+                                or @type='DataWriterAdaptor' or @type='FileWriterPutter']">
+                            <xsl:call-template name="jelclass"/>
+                        </xsl:for-each>
+                    </pre>
+
+                    <p>A physical file adaptor that uses get/put methods <b>must</b> implement
+                        the <code>fr.in2p3.jsaga.adaptor.data.read.FileReaderGetter</code>
+                        <b>and/or</b> the <code>fr.in2p3.jsaga.adaptor.data.write.FileWriterPutter</code> interfaces.
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='FileReaderGetter' or @type='FileWriterPutter']"/>
                 </subsection>
                 <subsection name="Developing a logical file adator">
-                    <p>A logical file adaptor must implement the <code>fr.in2p3.jsaga.adaptor.data.read.LogicalReader</code>
-                        and/or <code>fr.in2p3.jsaga.adaptor.data.write.LogicalWriter</code> interfaces.
-                    </p>
+                    <i>Copy-paste required methods to your adaptor class, and implement them.</i>
                     <pre>
                         <xsl:for-each select="jelclass[@type='Adaptor' or @type='ClientAdaptor'
                                 or @type='DataAdaptor'
@@ -76,33 +127,49 @@
                             <xsl:call-template name="jelclass"/>
                         </xsl:for-each>
                     </pre>
+
+                    <p>A logical file adaptor <b>must</b> implement the <code>fr.in2p3.jsaga.adaptor.data.read.LogicalReader</code>
+                        <b>and/or</b> the <code>fr.in2p3.jsaga.adaptor.data.write.LogicalWriter</code> interfaces.
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='LogicalReader' or @type='LogicalWriter']"/>
                 </subsection>
             </section>
+
+
             <section name="Developing a job adaptor">
                 <p>A job adaptor is composed of two classes (that can extend a common abstract class):
                     the job control adaptor and the job monitor adaptor.
                     This increases flexibility (advanced user can use an alternative monitoring implementation),
                     and enforces development of adaptors that support offline monitoring.
+                    Both classes <b>must</b> implement the <code>fr.in2p3.jsaga.adaptor.job.JobAdaptor</code> interface.
                 </p>
+                <xsl:apply-templates select="jelclass[@type='JobAdaptor']"/>
+                
                 <subsection name="Developing a job control adaptor">
-                    <p>A job control adaptor must implement the <code>fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor</code> interface.
-                    </p>
+                    <i>Copy-paste required methods to your adaptor class, and implement them.</i>
                     <pre>
                         <xsl:for-each select="jelclass[@type='Adaptor' or @type='ClientAdaptor'
                                 or @type='JobAdaptor' or @type='JobControlAdaptor']">
                             <xsl:call-template name="jelclass"/>
                         </xsl:for-each>
                     </pre>
+
+                    <p>A job control adaptor <b>must</b> implement the <code>fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor</code> interface.
+                    </p>
+                    <xsl:apply-templates select="jelclass[@type='JobControlAdaptor']"/>
                 </subsection>
                 <subsection name="Developing a job monitor adaptor">
-                    <p>A job monitor adaptor must implement the <code>fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor</code> interface.
-                    </p>
+                    <i>Copy-paste required methods to your adaptor class, and implement them.</i>
                     <pre>
                         <xsl:for-each select="jelclass[@type='Adaptor' or @type='ClientAdaptor'
                                 or @type='JobAdaptor' or @type='JobMonitorAdaptor']">
                             <xsl:call-template name="jelclass"/>
                         </xsl:for-each>
                     </pre>
+                    <xsl:apply-templates select="jelclass[@type='JobMonitorAdaptor']"/>
+
+                    <p>A job monitor adaptor <b>must</b> implement the <code>fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor</code> interface.
+                    </p>
                 </subsection>
             </section>
         </body></document>
