@@ -19,16 +19,16 @@ import java.util.Map;
  */
 public interface SecurityAdaptor extends Adaptor {
     /**
-     * @return the security adaptor class instanciated by this builder.
+     * @return the security credential class supported by this adaptor.
      */
     public Class getSecurityCredentialClass();
 
     /**
-     * Create a security context instance and initialize it with the provided attributes.
+     * Create a security credential and initialize it with the provided attributes.
      * @param usage the identifier of the usage.
      * @param attributes the provided attributes.
      * @param contextId the identifier of the context instance.
-     * @return the security context instance.
+     * @return the security credential.
      * @throws IncorrectStateException if the attributes refer to a context that is not of expected type
      * @throws NoSuccessException if creating the adaptor failed
      */
