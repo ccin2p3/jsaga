@@ -34,7 +34,7 @@
             <item name="Forum" href="https://forge.in2p3.fr/projects/jsaga/boards/show/11"/>
         </menu>
         <menu name="Contributor Documentation">
-            <item name="Adaptors API" href="jsaga-adaptoritf/index.html"/>
+            <item name="Developing Adaptors" href="contributors-guide.html"/>
             <item name="Adaptors Test Suite" href="saga-api-test/index.html"/>
             <item name="JSAGA Engine" href="jsaga-engine/index.html"/>
             <item name="Dependencies Graph" href="dependencies-graph.html"/>
