@@ -1,6 +1,7 @@
-package fr.in2p3.jsaga.adaptor.base;
+package fr.in2p3.jsaga.adaptor;
 
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.Adaptor;
 import org.ogf.saga.error.*;
 
 import java.util.Map;
@@ -9,7 +10,7 @@ import java.util.Map;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   SagaSecureAdaptor
+* File:   ClientAdaptor
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
 * Date:   21 août 2007
 * ***************************************************
@@ -17,7 +18,7 @@ import java.util.Map;
 /**
  *
  */
-public interface SagaSecureAdaptor extends SagaBaseAdaptor {
+public interface ClientAdaptor extends Adaptor {
     /**
      * @return list of supported SecurityAdaptor classes.
      */

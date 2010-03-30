@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.u6.job;
 
-import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
+import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import fr.in2p3.jsaga.adaptor.u6.TargetSystemInfo;
 import fr.in2p3.jsaga.adaptor.u6.U6Abstract;
 
@@ -26,7 +26,7 @@ import java.util.List;
 * Date:   18 fev. 2008
 * ***************************************************/
 
-public abstract class U6JobAdaptorAbstract extends U6Abstract implements SagaSecureAdaptor {
+public abstract class U6JobAdaptorAbstract extends U6Abstract implements ClientAdaptor {
 
     public String getType() {
         return "unicore6";

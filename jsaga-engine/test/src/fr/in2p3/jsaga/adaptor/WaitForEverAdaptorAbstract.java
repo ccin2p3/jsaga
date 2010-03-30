@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor;
 
-import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
+import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.BaseURL;
@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  *
  */
-public abstract class WaitForEverAdaptorAbstract implements SagaSecureAdaptor {
+public abstract class WaitForEverAdaptorAbstract implements ClientAdaptor {
     private static boolean s_isHanging = false;
 
     public Usage getUsage() {

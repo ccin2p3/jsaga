@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.adaptor.wsgram.job;
 
 import fr.in2p3.jsaga.Base;
-import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
+import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
@@ -59,7 +59,7 @@ import javax.xml.rpc.ServiceException;
 /**
  *
  */
-public abstract class WSGramJobAdaptorAbstract implements SagaSecureAdaptor {
+public abstract class WSGramJobAdaptorAbstract implements ClientAdaptor {
 	
     protected GSSCredential m_credential;
     protected String m_serverUrl, m_serverBatch = "Fork";

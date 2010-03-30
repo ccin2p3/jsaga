@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.job.monitor;
 
-import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
+import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -14,7 +14,7 @@ import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
 /**
  *
  */
-public interface JobMonitorAdaptor extends SagaSecureAdaptor {
+public interface JobMonitorAdaptor extends ClientAdaptor {
     /**
      * @return the default server port.
      */

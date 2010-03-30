@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
-import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
+import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  *
  */
-public class CreamJobAdaptorAbstract implements SagaSecureAdaptor {
+public class CreamJobAdaptorAbstract implements ClientAdaptor {
     private static final String DELEGATION_ID = "delegationId";
 
     protected GSSCredential m_credential;

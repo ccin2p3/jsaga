@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.wms.job;
 
-import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
+import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
 import org.ietf.jgss.GSSCredential;
@@ -19,7 +19,7 @@ import java.io.File;
 /**
  *
  */
-public abstract class WMSJobAdaptorAbstract implements SagaSecureAdaptor {
+public abstract class WMSJobAdaptorAbstract implements ClientAdaptor {
     protected GSSCredential m_credential;
     protected File m_certRepository;
         

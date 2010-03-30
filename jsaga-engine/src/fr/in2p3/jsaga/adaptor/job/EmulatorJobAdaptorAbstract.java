@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.adaptor.job;
 
 import fr.in2p3.jsaga.Base;
-import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
+import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  *
  */
-public class EmulatorJobAdaptorAbstract implements SagaSecureAdaptor {
+public class EmulatorJobAdaptorAbstract implements ClientAdaptor {
     private static final File STATUS_DIR = new File(Base.JSAGA_VAR, "JobEmulator");
 
     public String getType() {

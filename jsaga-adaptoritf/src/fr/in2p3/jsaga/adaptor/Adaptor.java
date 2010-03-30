@@ -1,4 +1,4 @@
-package fr.in2p3.jsaga.adaptor.base;
+package fr.in2p3.jsaga.adaptor;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
@@ -10,7 +10,7 @@ import java.util.Map;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   SagaBaseAdaptor
+* File:   Adaptor
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
 * Date:   14 juin 2007
 * ***************************************************
@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  *
  */
-public interface SagaBaseAdaptor {
+public interface Adaptor {
     /**
      * @return the adaptor type (context type, data protocol or job type).
      */

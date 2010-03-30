@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.data;
 
-import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
+import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import org.ogf.saga.error.IncorrectURLException;
 
 /* ***************************************************
@@ -15,7 +15,7 @@ import org.ogf.saga.error.IncorrectURLException;
 /**
  *
  */
-public interface DataAdaptor extends SagaSecureAdaptor {
+public interface DataAdaptor extends ClientAdaptor {
     /**
      * @return the base URL
      */

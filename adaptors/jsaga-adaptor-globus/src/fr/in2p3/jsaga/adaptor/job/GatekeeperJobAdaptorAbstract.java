@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.job;
 
-import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
+import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
 import org.globus.common.CoGProperties;
@@ -23,7 +23,7 @@ import java.util.Map;
 * ***************************************************
 * Description:                                      */
 
-public abstract class GatekeeperJobAdaptorAbstract implements SagaSecureAdaptor {
+public abstract class GatekeeperJobAdaptorAbstract implements ClientAdaptor {
     protected GSSCredential m_credential;
     protected String m_serverUrl;
     protected static final String IP_ADDRESS = "IPAddress";

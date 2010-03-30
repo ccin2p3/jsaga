@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.job.local;
 
-import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
+import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 
 import org.ogf.saga.error.AuthenticationFailedException;
@@ -23,7 +23,7 @@ import java.util.Map;
 * Date:   29 avril 2008
 * ***************************************************/
 
-public abstract class LocalAdaptorAbstract implements SagaSecureAdaptor {
+public abstract class LocalAdaptorAbstract implements ClientAdaptor {
 	
 	protected static Map sessionMap = new HashMap();
 

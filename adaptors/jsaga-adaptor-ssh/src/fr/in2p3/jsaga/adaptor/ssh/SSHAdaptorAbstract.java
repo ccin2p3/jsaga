@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.ssh;
 
-import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
+import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
@@ -41,7 +41,7 @@ import java.util.Map;
  * TODO : Test of compression
  */
 
-public abstract class SSHAdaptorAbstract implements SagaSecureAdaptor {
+public abstract class SSHAdaptorAbstract implements ClientAdaptor {
 	
 	protected static final String COMPRESSION_LEVEL = "CompressionLevel";
 	protected static final String KNOWN_HOSTS = "KnownHosts";

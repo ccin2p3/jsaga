@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.engine.config.adaptor;
 
-import fr.in2p3.jsaga.adaptor.base.SagaBaseAdaptor;
+import fr.in2p3.jsaga.adaptor.Adaptor;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.evaluator.Evaluator;
@@ -92,7 +92,7 @@ public class AdaptorDescriptors {
         return xmlStream.toByteArray();
     }
 
-    protected static void setDefaults(ObjectType bean, SagaBaseAdaptor adaptor) {
+    protected static void setDefaults(ObjectType bean, Adaptor adaptor) {
         Default[] defaults;
         try {
             defaults = adaptor.getDefaults(new HashMap());

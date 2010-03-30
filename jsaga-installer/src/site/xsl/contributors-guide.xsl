@@ -26,17 +26,17 @@
                 </p>
             </section>
             <section name="Common interfaces">
-                <p>All the adaptors implement the <code>fr.in2p3.jsaga.adaptor.base.SagaBaseAdaptor</code> interface.
-                    All the data and job adaptors also implement the <code>fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor</code> interface.
+                <p>All the adaptors implement the <code>fr.in2p3.jsaga.adaptor.Adaptor</code> interface.
+                    All the data and job adaptors also implement the <code>fr.in2p3.jsaga.adaptor.ClientAdaptor</code> interface.
                 </p>
-                <xsl:apply-templates select="jelclass[@type='SagaBaseAdaptor' or @type='SagaSecureAdaptor']"/>
+                <xsl:apply-templates select="jelclass[@type='Adaptor' or @type='ClientAdaptor']"/>
             </section>
             <section name="Developing a security adaptor">
                 <p>A security adaptor must implement the <code>fr.in2p3.jsaga.adaptor.security.SecurityAdaptorBuilder</code> interface.
                 </p>
                 <i>Copy-paste these methods to your adaptor class, and implement them.</i>
                 <pre>
-                    <xsl:for-each select="jelclass[@type='SagaBaseAdaptor' or @type='SecurityAdaptorBuilder']">
+                    <xsl:for-each select="jelclass[@type='Adaptor' or @type='SecurityAdaptorBuilder']">
                         <xsl:call-template name="jelclass"/>
                     </xsl:for-each>
                 </pre>
@@ -49,7 +49,7 @@
                         and/or <code>fr.in2p3.jsaga.adaptor.data.write.FileWriter</code> interfaces.
                     </p>
                     <pre>
-                        <xsl:for-each select="jelclass[@type='SagaBaseAdaptor' or @type='SagaSecureAdaptor'
+                        <xsl:for-each select="jelclass[@type='Adaptor' or @type='ClientAdaptor'
                                 or @type='DataAdaptor'
                                 or @type='DataReaderAdaptor' or @type='FileReader'
                                 or @type='DataWriterAdaptor' or @type='FileWriter']">
@@ -62,7 +62,7 @@
                         and/or <code>fr.in2p3.jsaga.adaptor.data.write.LogicalWriter</code> interfaces.
                     </p>
                     <pre>
-                        <xsl:for-each select="jelclass[@type='SagaBaseAdaptor' or @type='SagaSecureAdaptor'
+                        <xsl:for-each select="jelclass[@type='Adaptor' or @type='ClientAdaptor'
                                 or @type='DataAdaptor'
                                 or @type='DataReaderAdaptor' or @type='LogicalReader'
                                 or @type='DataWriterAdaptor' or @type='LogicalWriter']">
@@ -81,7 +81,7 @@
                     <p>A job control adaptor must implement the <code>fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor</code> interface.
                     </p>
                     <pre>
-                        <xsl:for-each select="jelclass[@type='SagaBaseAdaptor' or @type='SagaSecureAdaptor'
+                        <xsl:for-each select="jelclass[@type='Adaptor' or @type='ClientAdaptor'
                                 or @type='JobAdaptor' or @type='JobControlAdaptor']">
                             <xsl:call-template name="jelclass"/>
                         </xsl:for-each>
@@ -91,7 +91,7 @@
                     <p>A job monitor adaptor must implement the <code>fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor</code> interface.
                     </p>
                     <pre>
-                        <xsl:for-each select="jelclass[@type='SagaBaseAdaptor' or @type='SagaSecureAdaptor'
+                        <xsl:for-each select="jelclass[@type='Adaptor' or @type='ClientAdaptor'
                                 or @type='JobAdaptor' or @type='JobMonitorAdaptor']">
                             <xsl:call-template name="jelclass"/>
                         </xsl:for-each>

@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.security;
 
-import fr.in2p3.jsaga.adaptor.base.SagaBaseAdaptor;
+import fr.in2p3.jsaga.adaptor.Adaptor;
 import org.ogf.saga.error.*;
 
 import java.util.Map;
@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  *
  */
-public interface SecurityAdaptorBuilder extends SagaBaseAdaptor {
+public interface SecurityAdaptorBuilder extends Adaptor {
     /**
      * @return the security adaptor class instanciated by this builder.
      */

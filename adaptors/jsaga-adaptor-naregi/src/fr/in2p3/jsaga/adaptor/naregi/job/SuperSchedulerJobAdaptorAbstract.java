@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.naregi.job;
 
-import fr.in2p3.jsaga.adaptor.base.SagaSecureAdaptor;
+import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import fr.in2p3.jsaga.adaptor.naregi.security.NaregiSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityAdaptor;
@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  *
  */
-public abstract class SuperSchedulerJobAdaptorAbstract implements SagaSecureAdaptor {
+public abstract class SuperSchedulerJobAdaptorAbstract implements ClientAdaptor {
     protected GSSCredential m_credential;
     protected String m_account;
     protected String m_passPhrase;
