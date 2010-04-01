@@ -16,7 +16,7 @@ import java.io.InputStream;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * @deprecated
  */
 public interface LanguageAdaptor {
     /**

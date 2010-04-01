@@ -12,7 +12,7 @@ import org.w3c.dom.Document;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * @deprecated
  */
 public interface GridSelectionAdaptor {
     public SelectedGrid select(Document jsdlDOM, String[] args)

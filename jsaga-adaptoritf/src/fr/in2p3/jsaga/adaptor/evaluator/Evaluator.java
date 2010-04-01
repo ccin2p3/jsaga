@@ -12,7 +12,7 @@ import org.ogf.saga.error.BadParameterException;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * @deprecated
  */
 public interface Evaluator {
     public void init(int index);
