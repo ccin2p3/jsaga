@@ -26,6 +26,8 @@ import java.util.*;
 public class JobDescriptionTranslatorXSLT implements JobDescriptionTranslator {
     private static final String UNIQID = "UniqId";
 
+    private static Map s_stylesheetsMap = new HashMap();
+    
     private Templates m_stylesheet;
     private Properties m_parameters;
 
@@ -35,21 +37,8 @@ public class JobDescriptionTranslatorXSLT implements JobDescriptionTranslator {
      * @throws NoSuccessException if fails to parse the stylesheet
      */
     public JobDescriptionTranslatorXSLT(String xslResourcePath) throws NoSuccessException {
-        // load stylesheet
-        StreamSource xsl;
-        InputStream stream = JobDescriptionTranslatorXSLT.class.getClassLoader().getResourceAsStream(xslResourcePath);
-        if (stream != null) {
-            xsl = new StreamSource(stream);
-        } else {
-            throw new NoSuccessException("[ADAPTOR ERROR] Stylesheet not found: "+xslResourcePath);
-        }
-
-        // parse stylesheet
-        try {
-            m_stylesheet = TransformerFactory.newInstance().newTemplates(xsl);
-        } catch (TransformerConfigurationException e) {
-            throw new NoSuccessException("[ADAPTOR ERROR] Failed to parse stylesheet: "+xslResourcePath);
-        }
+        // get stylesheet
+        m_stylesheet = getStylesheet(xslResourcePath);
 
         // init parameters
         m_parameters = new Properties();
@@ -92,6 +81,33 @@ public class JobDescriptionTranslatorXSLT implements JobDescriptionTranslator {
 
         // return
         return writer.toString();
+    }
+
+    private static Templates getStylesheet(String xslResourcePath) throws NoSuccessException {
+        if (s_stylesheetsMap.containsKey(xslResourcePath)) {
+            // get from cache
+            return (Templates) s_stylesheetsMap.get(xslResourcePath);
+        } else {
+            // load stylesheet
+            InputStream stream = JobDescriptionTranslatorXSLT.class.getClassLoader().getResourceAsStream(xslResourcePath);
+            if (stream == null) {
+                throw new NoSuccessException("[ADAPTOR ERROR] Stylesheet not found: "+xslResourcePath);
+            }
+
+            // parse stylesheet
+            Templates stylesheet;
+            try {
+                stylesheet = TransformerFactory.newInstance().newTemplates(new StreamSource(stream));
+            } catch (TransformerConfigurationException e) {
+                throw new NoSuccessException("[ADAPTOR ERROR] Failed to parse stylesheet: "+xslResourcePath);
+            }
+
+            // set to cache
+            s_stylesheetsMap.put(xslResourcePath, stylesheet);
+
+            // returns
+            return stylesheet;
+        }
     }
 
     class TranslatorErrorListener implements ErrorListener {
