@@ -37,8 +37,8 @@
             </roles>
         </developer>
         <developer>
-            <name>Youri TCHINDA DJOU</name>
-            <email>ytchinda@in2p3.fr</email>
+            <name>contributors</name>
+            <url>https://forge.in2p3.fr/projects/show/jsaga</url>
             <roles>
                 <role>developer</role>
             </roles>
@@ -254,6 +254,7 @@
             </plugin>
         </plugins>
     </build>
+<!--
     <reporting>
         <plugins>
             <plugin>
@@ -266,6 +267,7 @@
             </plugin>
         </plugins>
     </reporting>
+-->
     <dependencies>
         <!-- for installer itself (for compiling custom panels) -->
         <dependency>
