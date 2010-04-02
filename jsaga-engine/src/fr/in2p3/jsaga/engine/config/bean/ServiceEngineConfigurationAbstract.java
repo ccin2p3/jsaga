@@ -25,7 +25,7 @@ public class ServiceEngineConfigurationAbstract {
                 for (int d=0; d<mapping.getDomainCount(); d++) {
                     Domain domain = mapping.getDomain(d);
                     if ((domain.getName()!=null && hostname.endsWith("."+domain.getName())) ||
-                        (domain.getName()==null && hostname.indexOf(".")==-1))
+                        domain.getName()==null)
                     {
                         for (int h=0; h<domain.getHostCount(); h++) {
                             Host host = domain.getHost(h);
