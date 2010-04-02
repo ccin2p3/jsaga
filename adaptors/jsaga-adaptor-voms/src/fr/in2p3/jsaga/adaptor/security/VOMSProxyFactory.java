@@ -56,19 +56,6 @@ public class VOMSProxyFactory {
         System.setProperty("CADIR", (String) attributes.get(Context.CERTREPOSITORY));
         System.setProperty("VOMSDIR", (String) attributes.get(VOMSContext.VOMSDIR));
 
-        // optional attributes
-        switch(certificateFormat) {
-            case CERTIFICATE_PEM:
-                System.setProperty("X509_USER_CERT", (String) attributes.get(Context.USERCERT));
-                System.setProperty("X509_USER_KEY", (String) attributes.get(Context.USERKEY));
-                break;
-            case CERTIFICATE_PKCS12:
-                System.setProperty("PKCS12_USER_CERT", (String) attributes.get(VOMSContext.USERCERTKEY));
-                break;
-            default:
-                throw new BadParameterException("Invalid case, either PEM or PKCS12 certificates is supported");
-        }
-
         URI uri = new URI((String) attributes.get(Context.SERVER));
         if (uri.getHost()==null) {
             throw new BadParameterException("Attribute Server has no host name: "+uri.toString());
@@ -84,10 +71,28 @@ public class VOMSProxyFactory {
             } else {
                 throw new BadParameterException("Not a globus proxy");
             }
-        } else if (!"".equals(attributes.get(Context.USERPASS))) {
-            m_proxyInit = VOMSProxyInit.instance((String) attributes.get(Context.USERPASS));
         } else {
-            m_proxyInit = VOMSProxyInit.instance();
+            // get passphrase
+            String passphrase = (String) attributes.get(Context.USERPASS);
+            if ("".equals(passphrase)) {
+                passphrase = null;
+            }
+
+            // get certificate
+            switch(certificateFormat) {
+                case CERTIFICATE_PEM:
+                    String userCert = (String) attributes.get(Context.USERCERT);
+                    String userKey = (String) attributes.get(Context.USERKEY);
+                    m_proxyInit = VOMSProxyInit.instance(userCert, userKey, passphrase);
+                    break;
+                case CERTIFICATE_PKCS12:
+                    String pkcs12 = (String) attributes.get(VOMSContext.USERCERTKEY);
+                    System.setProperty("PKCS12_USER_CERT", pkcs12); //todo: replace with VOMSProxyInit.instance(pkcs12,passphrase)
+                    m_proxyInit = VOMSProxyInit.instance(passphrase);
+                    break;
+                default:
+                    throw new BadParameterException("Invalid case, either PEM or PKCS12 certificates is supported");
+            }
         }
         m_proxyInit.addVomsServer(server);
         m_proxyInit.setProxyOutputFile((String) attributes.get(Context.USERPROXY));
