@@ -337,7 +337,15 @@ public class UserCredentials {
         loadCredentials( new File(userCertFile), new File(userKeyFile), keyPassword);
     }
     
-    
+    //sreynaud
+    private UserCredentials(File pkcs12UserCert, String pkcs12KeyPassword) {
+        loadPKCS12Credentials( pkcs12UserCert, pkcs12KeyPassword);
+    }
+
+    //sreynaud
+    public static UserCredentials instance(File pkcs12UserCert, String pkcs12KeyPassword){
+        return new UserCredentials(pkcs12UserCert, pkcs12KeyPassword);
+    }
     
     /**
      * Static instance constructor for a {@link UserCredentials}.

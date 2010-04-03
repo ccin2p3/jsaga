@@ -109,6 +109,24 @@ public class VOMSProxyInit {
     }
 
     //sreynaud
+    public VOMSProxyInit(File pkcs12UserCert, String pkcs12KeyPassword){
+        try {
+            serverMap = VOMSESFileParser.instance().buildServerMap();
+            userCredentials = UserCredentials.instance(pkcs12UserCert, pkcs12KeyPassword);
+        } catch ( IOException e ) {
+            log.error( "Error parsing vomses files: "+e.getMessage() );
+            if (log.isDebugEnabled())
+                log.error(e.getMessage(),e);
+            throw new VOMSException(e);
+        }
+    }
+
+    //sreynaud
+    public static VOMSProxyInit instance(File pkcs12UserCert, String pkcs12KeyPassword) {
+        return new VOMSProxyInit(pkcs12UserCert, pkcs12KeyPassword);
+    }
+
+    //sreynaud
     public static VOMSProxyInit instance(String userCertFile, String userKeyFile, String privateKeyPassword) {
         return new VOMSProxyInit(userCertFile, userKeyFile, privateKeyPassword);
     }
