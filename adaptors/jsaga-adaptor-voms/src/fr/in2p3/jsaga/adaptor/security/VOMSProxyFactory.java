@@ -12,6 +12,7 @@ import org.ogf.saga.context.Context;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -87,8 +88,7 @@ public class VOMSProxyFactory {
                     break;
                 case CERTIFICATE_PKCS12:
                     String pkcs12 = (String) attributes.get(VOMSContext.USERCERTKEY);
-                    System.setProperty("PKCS12_USER_CERT", pkcs12); //todo: replace with VOMSProxyInit.instance(pkcs12,passphrase)
-                    m_proxyInit = VOMSProxyInit.instance(passphrase);
+                    m_proxyInit = VOMSProxyInit.instance(new File(pkcs12), passphrase);
                     break;
                 default:
                     throw new BadParameterException("Invalid case, either PEM or PKCS12 certificates is supported");
