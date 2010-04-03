@@ -263,6 +263,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
                 client.authenticate(m_credential);
                 client.deleteFile(m_stagingPrefix+"-"+CreamJobIOHandler.OUTPUT_SUFFIX);
                 client.deleteFile(m_stagingPrefix+"-"+CreamJobIOHandler.ERROR_SUFFIX);
+                client.close();
             } catch (Exception e) {
                 throw new NoSuccessException("Failed to cleanup job: "+nativeJobId, e);
             }

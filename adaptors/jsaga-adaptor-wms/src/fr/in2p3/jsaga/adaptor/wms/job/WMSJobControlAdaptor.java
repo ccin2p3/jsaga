@@ -364,6 +364,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
                 client.authenticate(m_credential);
                 client.deleteFile(m_stagingPrefix+"-"+WMSJobIOHandler.OUTPUT_SUFFIX);
                 client.deleteFile(m_stagingPrefix+"-"+WMSJobIOHandler.ERROR_SUFFIX);
+                client.close();
             } catch (Exception e) {
                 throw new NoSuccessException("Failed to cleanup job: "+nativeJobId, e);
             }
