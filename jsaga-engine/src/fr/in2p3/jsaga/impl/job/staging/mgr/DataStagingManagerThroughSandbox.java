@@ -59,6 +59,7 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
             try {
                 Directory dir = FileFactory.createDirectory(job.getSession(), url);
                 dir.remove(Flags.NONE.getValue());
+                dir.close();
             } catch (IncorrectURLException e) {
                 throw new NoSuccessException(e);
             } catch (AlreadyExistsException e) {

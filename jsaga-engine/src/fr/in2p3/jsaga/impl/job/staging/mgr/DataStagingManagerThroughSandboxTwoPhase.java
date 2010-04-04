@@ -4,6 +4,7 @@ import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.impl.job.instance.AbstractSyncJobImpl;
 import org.ogf.saga.error.*;
+import org.ogf.saga.file.Directory;
 import org.ogf.saga.file.FileFactory;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.url.URL;
@@ -34,7 +35,8 @@ public class DataStagingManagerThroughSandboxTwoPhase extends DataStagingManager
         if (stagingDir != null) {
             URL url = URLFactory.createURL(stagingDir);
             try {
-                FileFactory.createDirectory(job.getSession(), url, Flags.CREATE.getValue());
+                Directory dir = FileFactory.createDirectory(job.getSession(), url, Flags.CREATE.getValue());
+                dir.close();
             } catch (IncorrectURLException e) {
                 throw new NoSuccessException(e);
             } catch (AlreadyExistsException e) {
