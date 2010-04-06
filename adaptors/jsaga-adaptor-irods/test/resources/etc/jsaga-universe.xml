@@ -1,25 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <UNIVERSE name="World" xmlns="http://www.in2p3.fr/jsaga">
-    <GRID name="IRODS_SRB" contextType="Globus">
-        <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/irods_srb_cred.txt"/>
-
-        <!-- SRB physical files -->
-        <data type="srb" base="srb://ccsrb01.in2p3.fr:5591/?defaultResource=MammoDisk&amp;domain=ccin2p3">
-            <attribute name="UseTrash" value="false"/>
-        </data>
+    <GRID name="iRODS_ctx" contextType="Globus">
+        <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/dteam_cred.txt"/>
 
         <!-- iRODS physical files -->
         <data type="irods" base="irods://ccirods01.in2p3.fr:5596/">
-            <attribute name="DefaultResource" value="lyon1"/>
-            <attribute name="UserID" value="calvat"/>
+            <attribute name="DefaultResource" value="demoResc2"/>
+            <attribute name="UserID" value="sreynaud"/>
             <attribute name="Zone" value="tempZone"/>
         </data>
         <!-- iRODS logical files -->
         <data type="irodsl" base="irodsl://ccirods01.in2p3.fr:5596/">
-            <attribute name="DefaultResource" value="lyon1"/>
-            <attribute name="UserID" value="calvat"/>
+            <attribute name="DefaultResource" value="demoResc2"/>
+            <attribute name="UserID" value="sreynaud"/>
             <attribute name="Zone" value="tempZone"/>
             <schemeAlias>irods</schemeAlias>
+        </data>
+    </GRID>
+    <GRID name="SRB_ctx" contextType="UserPass">
+        <attribute name="UserID" value="sreynaud"/>
+        <attribute name="UserPass"/>
+        <attribute name="LifeTime" value="PT12H"/>
+
+        <!-- SRB physical files -->
+        <data type="srb" base="srb://ccsrb01.in2p3.fr:5591/?defaultResource=MammoDisk&amp;domain=ccin2p3">
+            <attribute name="UseTrash" value="false"/>
         </data>
     </GRID>
 </UNIVERSE>
