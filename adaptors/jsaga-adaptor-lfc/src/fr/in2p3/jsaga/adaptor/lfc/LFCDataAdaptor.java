@@ -14,7 +14,7 @@ import fr.in2p3.jsaga.adaptor.lfc.LfcConnection.LFCReplica;
 import fr.in2p3.jsaga.adaptor.lfc.LfcConnection.LfcError;
 import fr.in2p3.jsaga.adaptor.lfc.LfcConnection.ReceiveException;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
-import fr.in2p3.jsaga.adaptor.security.VOMSSecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
@@ -32,7 +32,7 @@ import java.util.*;
  */
 public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor, DataAdaptor {
     private static final int LFC_PORT_DEFAULT = 5010;
-    private VOMSSecurityCredential m_vomscredential;
+    private GSSCredentialSecurityCredential m_vomscredential;
     private String m_vo;
     private LfcConnector m_lfcConnector;	
     
@@ -63,11 +63,11 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
     }
 
     public final Class<SecurityCredential>[] getSupportedSecurityCredentialClasses() {
-        return new Class[]{VOMSSecurityCredential.class};
+        return new Class[]{GSSCredentialSecurityCredential.class};
     }
 
     public final void setSecurityCredential(SecurityCredential credential) {
-    	m_vomscredential = (VOMSSecurityCredential) credential;
+    	m_vomscredential = (GSSCredentialSecurityCredential) credential;
         try {
 			m_vo = m_vomscredential.getAttribute(Context.USERVO);
 		} catch (Exception e) {
