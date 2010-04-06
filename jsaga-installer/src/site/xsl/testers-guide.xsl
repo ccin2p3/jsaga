@@ -56,15 +56,15 @@ public class <i>_MyGrid_</i>TestSuite extends JSAGATestSuite {
     /** test cases */
     public class <i>_MyGrid_</i>ContextInit extends <a
         href="saga-api-test/xref/org/ogf/saga/context/ContextInitTest.html">ContextInitTest</a> {
-        public <i>_MyGrid_</i>ContextInit() throws Exception {super("mygrid");}
+        public <i>_MyGrid_</i>ContextInit() throws Exception {super("<i>mygrid</i>");}
     }
     public class <i>_MyGrid_</i>ContextInfo extends <a
         href="saga-api-test/xref/org/ogf/saga/context/ContextInfoTest.html">ContextInfoTest</a> {
-        public <i>_MyGrid_</i>ContextInfo() throws Exception {super("mygrid");}
+        public <i>_MyGrid_</i>ContextInfo() throws Exception {super("<i>mygrid</i>");}
     }
     public class <i>_MyGrid_</i>ContextDestroy extends <a
         href="saga-api-test/xref/org/ogf/saga/context/ContextDestroyTest.html">ContextDestroyTest</a> {
-        public <i>_MyGrid_</i>ContextDestroy() throws Exception {super("mygrid");}
+        public <i>_MyGrid_</i>ContextDestroy() throws Exception {super("<i>mygrid</i>");}
     }
 }
                 </pre>
@@ -155,8 +155,8 @@ public class <i>_MyProtocol_</i>TestSuite extends JSAGATestSuite {
         <xsl:variable name="package" select="substring-before(substring-after(@fulltype,'org.ogf.saga.'),concat('.',@type))"/>
     public static class <i>_MyProtocol_</i><xsl:value-of select="@type"/> extends <a
         href="saga-api-test/xref/org/ogf/saga/{$package}/{@type}.html"><xsl:value-of select="@type"/></a> {
-        public <i>_MyProtocol_</i><xsl:value-of select="@type"/>() throws Exception {super("myprotocol<xsl:text/>
-        <xsl:if test="contains(@type,'Copy') or contains(@type,'Move')">, "<xsl:value-of select="$targetProtocol"/></xsl:if>");}<xsl:text/>
+        public <i>_MyProtocol_</i><xsl:value-of select="@type"/>() throws Exception {super("<i>myprotocol</i>"<xsl:text/>
+        <xsl:if test="contains(@type,'Copy') or contains(@type,'Move')">, "<i><xsl:value-of select="$targetProtocol"/></i>"</xsl:if>);}<xsl:text/>
         <xsl:for-each select="methods/method[@visibility='public' and starts-with(@name,'test_')]"><xsl:call-template name="CODE_method"/></xsl:for-each>
     }
     </xsl:template>
