@@ -21,7 +21,10 @@ import java.io.IOException;
  *
  */
 public class GsiftpOutputStream extends FTPOutputStream {
+    private boolean m_isClosed;
+
     public GsiftpOutputStream(GridFTPClient client, String file, boolean append) throws IOException, FTPException {
+        m_isClosed = false;
         super.ftp = client;
         boolean passive = true;
         super.put(passive, Session.TYPE_IMAGE, file, append);
@@ -43,4 +46,13 @@ public class GsiftpOutputStream extends FTPOutputStream {
         }
     }
 */
+
+    //todo: remove this when API will be able to reuse existing connection without hanging
+    /** override super.close() to close the temporary connection once and only once */
+    public synchronized void close() throws IOException {
+        if (! m_isClosed) {
+            m_isClosed = true;
+            super.close();
+        }
+    }
 }
