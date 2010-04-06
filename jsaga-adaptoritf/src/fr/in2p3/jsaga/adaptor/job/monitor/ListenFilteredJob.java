@@ -25,5 +25,5 @@ public interface ListenFilteredJob extends ListenJob {
     /**
      * Unsubscribe from notifications about job status changes.
      */
-    public void unsubscribeFileteredJob() throws TimeoutException, NoSuccessException;
+    public void unsubscribeFilteredJob() throws TimeoutException, NoSuccessException;
 }
