@@ -56,14 +56,18 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
         String stagingDir = m_adaptor.getStagingDirectory(nativeJobId);
         if (stagingDir != null) {
             URL url = URLFactory.createURL(stagingDir);
+            Directory dir = null;
             try {
-                Directory dir = FileFactory.createDirectory(job.getSession(), url);
+                dir = FileFactory.createDirectory(job.getSession(), url);
                 dir.remove(Flags.NONE.getValue());
-                dir.close();
             } catch (IncorrectURLException e) {
                 throw new NoSuccessException(e);
             } catch (AlreadyExistsException e) {
                 throw new NoSuccessException(e);
+            } finally {
+                if (dir != null) {
+                    dir.close();
+                }
             }
         }
     }
