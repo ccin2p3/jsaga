@@ -28,6 +28,7 @@ public class GsiftpOutputStream extends FTPOutputStream {
     }
 
     /** override super.close() to prevent it from closing the connection */
+/*TODO: uncomment this when API will be able to reuse existing connection without hanging
     public void close() throws IOException {
         if (super.output != null) {
             super.output.close();
@@ -41,4 +42,5 @@ public class GsiftpOutputStream extends FTPOutputStream {
             }
         }
     }
+*/
 }
