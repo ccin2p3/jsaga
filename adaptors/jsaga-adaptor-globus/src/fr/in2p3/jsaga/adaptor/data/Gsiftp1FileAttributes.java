@@ -22,52 +22,101 @@ import java.util.*;
  *
  */
 public class Gsiftp1FileAttributes extends FileAttributes {
+    private FileInfo m_entry;
+
     public Gsiftp1FileAttributes(FileInfo entry) throws DoesNotExistException {
-        // set name
-        m_name = entry.getName();
-        if (m_name ==null || m_name.equals(".") || m_name.equals("..")) {
+        // check if entry must be ignored
+        String name = entry.getName();
+        if (name ==null || name.equals(".") || name.equals("..")) {
             throw new DoesNotExistException("Ignore this entry");
         }
 
-        // set type
-        if (entry.isFile()) {
-            m_type = FileAttributes.FILE_TYPE;
-        } else if (entry.isDirectory()) {
-            m_type = FileAttributes.DIRECTORY_TYPE;
-        } else if (entry.isSoftLink()) {
-            m_type = FileAttributes.LINK_TYPE;
+        // set entry
+        m_entry = entry;
+    }
+
+    public String getName() {
+        return m_entry.getName();
+    }
+
+    public int getType() {
+        if (m_entry.isFile()) {
+            return FileAttributes.TYPE_FILE;
+        } else if (m_entry.isDirectory()) {
+            return FileAttributes.TYPE_DIRECTORY;
+        } else if (m_entry.isSoftLink()) {
+            return FileAttributes.TYPE_LINK;
         } else {
-            m_type = FileAttributes.UNKNOWN_TYPE;
+            return FileAttributes.TYPE_UNKNOWN;
         }
+    }
 
-        // set size
+    public long getSize() {
         try {
-            m_size = entry.getSize();
+            return m_entry.getSize();
         } catch(NumberFormatException e) {
-            m_size = -1;
+            return SIZE_UNKNOWN;
         }
+    }
 
-        // set permission
-        m_permission = PermissionBytes.NONE;
-        if (entry.userCanRead() || entry.allCanRead()) {
-            m_permission = m_permission.or(PermissionBytes.READ);
+    public PermissionBytes getUserPermission() {
+        PermissionBytes perms = PermissionBytes.NONE;
+        if (m_entry.userCanRead()) {
+            perms = perms.or(PermissionBytes.READ);
         }
-        if (entry.userCanWrite() || entry.allCanWrite()) {
-            m_permission = m_permission.or(PermissionBytes.WRITE);
+        if (m_entry.userCanWrite()) {
+            perms = perms.or(PermissionBytes.WRITE);
         }
-        if (entry.userCanExecute() || entry.allCanExecute()) {
-            m_permission = m_permission.or(PermissionBytes.EXEC);
+        if (m_entry.userCanExecute()) {
+            perms = perms.or(PermissionBytes.EXEC);
         }
+        return perms;
+    }
 
-        // set last modified
+    public PermissionBytes getGroupPermission() {
+        PermissionBytes perms = PermissionBytes.NONE;
+        if (m_entry.groupCanRead()) {
+            perms = perms.or(PermissionBytes.READ);
+        }
+        if (m_entry.groupCanWrite()) {
+            perms = perms.or(PermissionBytes.WRITE);
+        }
+        if (m_entry.groupCanExecute()) {
+            perms = perms.or(PermissionBytes.EXEC);
+        }
+        return perms;
+    }
+
+    public PermissionBytes getAnyPermission() {
+        PermissionBytes perms = PermissionBytes.NONE;
+        if (m_entry.allCanRead()) {
+            perms = perms.or(PermissionBytes.READ);
+        }
+        if (m_entry.allCanWrite()) {
+            perms = perms.or(PermissionBytes.WRITE);
+        }
+        if (m_entry.allCanExecute()) {
+            perms = perms.or(PermissionBytes.EXEC);
+        }
+        return perms;
+    }
+
+    public String getOwner() {
+        return ID_UNKNOWN;
+    }
+
+    public String getGroup() {
+        return ID_UNKNOWN;
+    }
+
+    public long getLastModified() {
         try {
-            switch (entry.getTime().length()) {
+            switch (m_entry.getTime().length()) {
                 case 4:
                 {
                     SimpleDateFormat format = new SimpleDateFormat("MMM dd,yyyy", Locale.ENGLISH);
-                    Date date = format.parse(entry.getDate()+","+entry.getTime());
-                    m_lastModified = date.getTime();
-                    break;
+                    Date date = format.parse(m_entry.getDate()+","+m_entry.getTime());
+                    return date.getTime();
                 }
                 case 5:
                 {
@@ -75,16 +124,14 @@ public class Gsiftp1FileAttributes extends FileAttributes {
                     cal.add(Calendar.MONTH, -6);
                     String year6MonthAgo = ""+cal.get(Calendar.YEAR);
                     SimpleDateFormat format = new SimpleDateFormat("MMM dd,hh:mm,yyyy", Locale.ENGLISH);
-                    Date date = format.parse(entry.getDate()+","+entry.getTime()+","+year6MonthAgo);
-                    m_lastModified = date.getTime();
-                    break;
+                    Date date = format.parse(m_entry.getDate()+","+m_entry.getTime()+","+year6MonthAgo);
+                    return date.getTime();
                 }
                 default:
-                    m_lastModified = 0;
-                    break;
+                    return DATE_UNKNOWN;
             }
         } catch (ParseException e) {
-            m_lastModified = 0;
+            return DATE_UNKNOWN;
         }
     }
 }

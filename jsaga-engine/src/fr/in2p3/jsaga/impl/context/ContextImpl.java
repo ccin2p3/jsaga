@@ -148,13 +148,15 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
         fr.in2p3.jsaga.engine.schema.config.Context config = Configuration.getInstance().getConfigurations().getContextCfg().findContext(
                 m_attributes.m_type.getObject());
         try {
+            Set<String> defaultsToRemove = new HashSet<String>();
+
             // set default attributes, from effective configuration
             for (int i=0; config!=null && i<config.getAttributeCount(); i++) {
                 fr.in2p3.jsaga.engine.schema.config.Attribute attr = config.getAttribute(i);
                 if (! super._containsAttributeKey(attr.getName())) {
                     super.setAttribute(attr.getName(), attr.getValue());
                 } else if (attr.getValue() == null) {
-                    super.removeAttribute(attr.getName());
+                    defaultsToRemove.add(attr.getName());
                 }
             }
 
@@ -162,7 +164,7 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
             Default[] defaults = m_adaptor.getDefaults(super._getAttributesMap());
             for (int i=0; defaults!=null && i<defaults.length; i++) {
                 Default attr = defaults[i];
-                if (! super._containsAttributeKey(attr.getName())) {
+                if (! super._containsAttributeKey(attr.getName()) && ! defaultsToRemove.contains(attr.getName())) {
                     super.setAttribute(attr.getName(), attr.getValue());
                 }
             }

@@ -162,11 +162,11 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
                     }
                     try {
                         switch(this.getAttributes(parentAbsolutePath, additionalArgs).getType()) {
-                            case FileAttributes.FILE_TYPE:
+                            case FileAttributes.TYPE_FILE:
                                 throw new BadParameterException("Parent entry is a file: "+parentAbsolutePath);
-                            case FileAttributes.LINK_TYPE:
+                            case FileAttributes.TYPE_LINK:
                                 throw new BadParameterException("Parent entry is a link: "+parentAbsolutePath);
-                            case FileAttributes.UNKNOWN_TYPE:
+                            case FileAttributes.TYPE_UNKNOWN:
                                 throw new NoSuccessException("Parent entry type is unknown: "+parentAbsolutePath, e);
                             default:
                                 throw new NoSuccessException("Unexpected error");
@@ -199,11 +199,11 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
                 case ChannelSftp.SSH_FX_NO_SUCH_FILE:
                     try {
                         switch(this.getAttributes(absolutePath, additionalArgs).getType()) {
-                            case FileAttributes.FILE_TYPE:
+                            case FileAttributes.TYPE_FILE:
                                 throw new BadParameterException("Entry is a file: "+absolutePath);
-                            case FileAttributes.LINK_TYPE:
+                            case FileAttributes.TYPE_LINK:
                                 throw new BadParameterException("Entry is a link: "+absolutePath);
-                            case FileAttributes.UNKNOWN_TYPE:
+                            case FileAttributes.TYPE_UNKNOWN:
                                 throw new NoSuccessException("Entry type is unknown: "+absolutePath, e);
                             default:
                                 throw new NoSuccessException("Unexpected error");
@@ -228,7 +228,7 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
                 case ChannelSftp.SSH_FX_PERMISSION_DENIED:
                     try {
                         switch(this.getAttributes(absolutePath, additionalArgs).getType()) {
-                            case FileAttributes.DIRECTORY_TYPE:
+                            case FileAttributes.TYPE_DIRECTORY:
                                 throw new BadParameterException("Entry is a directory: "+absolutePath);
                             default:
                                 throw new PermissionDeniedException(e);

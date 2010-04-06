@@ -46,7 +46,7 @@ public class Gsiftp1DataAdaptor extends GsiftpDataAdaptorAbstract {
         String entryName = path.getEntryName();
         FileAttributes[] list = this.listAttributes(path.getBaseDir(), additionalArgs);
         for (int i=0; i<list.length; i++) {
-            if (list[i].getNameOnly().equals(entryName)) {
+            if (list[i].getName().equals(entryName)) {
                 return list[i];
             }
         }

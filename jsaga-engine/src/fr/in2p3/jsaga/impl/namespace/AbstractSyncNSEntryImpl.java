@@ -119,12 +119,12 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
 
     public boolean isDirSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         FileAttributes attrs = this._getFileAttributes();
-        return (attrs.getType() == FileAttributes.DIRECTORY_TYPE);
+        return (attrs.getType() == FileAttributes.TYPE_DIRECTORY);
     }
 
     public boolean isEntrySync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         FileAttributes attrs = this._getFileAttributes();
-        return (attrs.getType() == FileAttributes.FILE_TYPE);
+        return (attrs.getType() == FileAttributes.TYPE_FILE);
     }
 
     public boolean isLinkSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
@@ -137,7 +137,7 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
             }
         } else {
             FileAttributes attrs = this._getFileAttributes();
-            return (attrs.getType() == FileAttributes.LINK_TYPE);
+            return (attrs.getType() == FileAttributes.TYPE_LINK);
         }
     }
 

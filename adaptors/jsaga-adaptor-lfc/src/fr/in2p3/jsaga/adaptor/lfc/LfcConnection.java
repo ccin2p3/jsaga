@@ -19,8 +19,6 @@ import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSManager;
 
-import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-
 /**
  * Low-Level connection to an LFC server.
  * 
@@ -947,8 +945,9 @@ public class LfcConnection {
 	 * @author Jerome Revillard
 	 * 
 	 */
-	 public class LFCFile extends FileAttributes {
+	 public class LFCFile {
 		private String guid; // global unique id
+        private String fileName; // name of the file
 		private String comment; // user comment of the file
 		private String chksumType; // checksum type
 		private String chksumValue; // checksum value
@@ -964,6 +963,7 @@ public class LfcConnection {
 		private int nLink; // number of children
 		private int uid; // user id
 		private int gid; // group id
+        private long fileSize;  // size of the file
 
 		private short fileMode; // see description on the end of the file
 		private short fileClass; // 1 = experiment, 2 = user (don't know what is
@@ -979,20 +979,9 @@ public class LfcConnection {
 			this.fileMode = byteBuffer.getShort();
 			this.nLink = byteBuffer.getInt();
 			
-			if ((fileMode & S_IFDIR) != 0) {
-				m_type = DIRECTORY_TYPE;
-			} else {
-				//FIXME: CHECK LINKS!!
-				if(true){
-					m_type = FILE_TYPE;
-				}else{
-					m_type = LINK_TYPE;
-				}
-			}
-			
 			this.uid = byteBuffer.getInt();
 			this.gid = byteBuffer.getInt();
-			this.m_size = byteBuffer.getLong();
+			this.fileSize = byteBuffer.getLong();
 
 			this.aDate = byteBuffer.getLong() * 1000;
 			this.mDate = byteBuffer.getLong() * 1000;
@@ -1005,7 +994,7 @@ public class LfcConnection {
 				this.chksumValue = getString();
 			}
 			if (readName) {
-				this.m_name = getString();
+				this.fileName = getString();
 			}
 			if (readComment) {
 				this.comment = getString();
@@ -1031,6 +1020,10 @@ public class LfcConnection {
 			return guid;
 		}
 
+        public String getFileName() {
+            return fileName;
+        }
+
 		public String getComment() {
 			return comment;
 		}
@@ -1046,6 +1039,14 @@ public class LfcConnection {
 		public long getFileId() {
 			return fileId;
 		}
+
+        public long getFileSize() {
+            return fileSize;
+        }
+
+        public short getFileMode() {
+            return fileMode;
+        }
 
 		public short getFileClass() {
 			return fileClass;
@@ -1134,8 +1135,8 @@ public class LfcConnection {
 		public String toString() {
 
 			String tostring = "";
-			if (m_name != null) {
-				tostring += "Name: " + m_name;
+			if (fileName != null) {
+				tostring += "Name: " + fileName;
 			}
 			if (guid != null)
 				tostring += (tostring.equals("") ? "" : " - ") + "guid: " + guid;
@@ -1151,7 +1152,7 @@ public class LfcConnection {
 			tostring += " - cDate: " + cDate;
 
 			tostring += " - fileId: " + fileId;
-			tostring += " - fileSize: " + m_size;
+			tostring += " - fileSize: " + fileSize;
 			tostring += " - nLink: " + nLink;
 			tostring += " - uid: " + uid;
 			tostring += " - gid: " + gid;

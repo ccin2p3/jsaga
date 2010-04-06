@@ -16,25 +16,44 @@ import org.ogf.saga.error.*;
  *
  */
 public interface PermissionAdaptor extends DataAdaptor {
+    public static final int SCOPE_USER = 0;
+    public static final int SCOPE_GROUP = 1;
+    public static final int SCOPE_ANY = 2;
+
     /**
-     * Enables the specified permissions for the specified id.
-     * An id of "*" enables the permissions for all.
-     * Unsupported permission types are silently ignored.
+     * Get the list of supported scopes.
+     * @return array of scopes.
+     */
+    public int[] getSupportedScopes();
+
+    /**
+     * Enables the specified permissions for the specified identifier and scope.
      * @param absolutePath the absolute path of the entry.
-     * @param id the id.
+     * @param scope the scope of permissions (USER, GROUP or ANY).
+     * @param id the identifier.
      * @param permissions the permissions to enable.
      */
-    public void permissionsAllow(String absolutePath, String id, PermissionBytes permissions)
+    public void permissionsAllow(String absolutePath, int scope, String id, PermissionBytes permissions)
             throws PermissionDeniedException, TimeoutException, NoSuccessException;
 
     /**
-     * Disables the specified permissions for the specified id.
-     * An id of "*" disables the permissions for all.
-     * Unsupported permission types throw NotImplementedException exception.
+     * Disables the specified permissions for the specified identifier and scope.
      * @param absolutePath the absolute path of the entry.
-     * @param id the id.
+     * @param scope the scope of permissions (USER, GROUP or ANY).
+     * @param id the identifier.
      * @param permissions the permissions to disable.
      */
-    public void permissionsDeny(String absolutePath, String id, PermissionBytes permissions)
+    public void permissionsDeny(String absolutePath, int scope, String id, PermissionBytes permissions)
+            throws PermissionDeniedException, TimeoutException, NoSuccessException;
+
+    /**
+     * Checks the specified permissions for the specified identifier and scope.
+     * @param absolutePath the absolute path of the entry.
+     * @param scope the scope of permissions (USER, GROUP or ANY).
+     * @param id the identifier.
+     * @param permissions the permissions to check.
+     * @return true if all permissions are set for id.
+     */
+    public boolean permissionsCheck(String absolutePath, int scope, String id, PermissionBytes permissions)
             throws PermissionDeniedException, TimeoutException, NoSuccessException;
 }

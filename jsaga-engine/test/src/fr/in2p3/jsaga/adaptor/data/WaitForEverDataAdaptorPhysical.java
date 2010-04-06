@@ -55,10 +55,20 @@ public class WaitForEverDataAdaptorPhysical extends WaitForEverDataAdaptorAbstra
 
     /////////////////////////////////////// interface PermissionAdaptor ///////////////////////////////////////
 
-    public void permissionsAllow(String absolutePath, String id, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+    public int[] getSupportedScopes() {
+        return new int[]{SCOPE_USER,SCOPE_GROUP,SCOPE_ANY};
+    }
+
+    public void permissionsAllow(String absolutePath, int scope, String id, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         hang();
     }
-    public void permissionsDeny(String absolutePath, String id, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+
+    public void permissionsDeny(String absolutePath, int scope, String id, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         hang();
+    }
+
+    public boolean permissionsCheck(String absolutePath, int scope, String id, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        hang();
+        return false;
     }
 }

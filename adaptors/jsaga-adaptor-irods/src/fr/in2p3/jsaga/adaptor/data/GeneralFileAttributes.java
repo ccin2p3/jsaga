@@ -17,34 +17,62 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
  *
  */
 public class GeneralFileAttributes extends FileAttributes {
-
+    private GeneralFile m_generalFile;
+    
     public GeneralFileAttributes(GeneralFile generalFile) {
-        // set name
-		m_name = generalFile.getName();
+        m_generalFile = generalFile;
+    }
 
-        // set type        
-		if (generalFile.isDirectory()) {
-			m_type = FileAttributes.DIRECTORY_TYPE;
-		} else  {
-			m_type = FileAttributes.FILE_TYPE;
-		} 
+    public String getName() {
+        return m_generalFile.getName();
+    }
 
-        // set size
-        if (generalFile.isFile()) {
-            m_size = generalFile.length() ;
+    public int getType() {
+        if (m_generalFile.isDirectory()) {
+            return TYPE_DIRECTORY;
+        } else if (m_generalFile.isFile()) {
+            return TYPE_FILE;
         } else {
-            m_size = 0;
+            return TYPE_UNKNOWN;
         }
+    }
 
-        // set permission
-        if (generalFile.canRead()) {
-			m_permission = m_permission.or(PermissionBytes.READ);
+    public long getSize() {
+        if (m_generalFile.isFile()) {
+            return m_generalFile.length() ;
+        } else {
+            return SIZE_UNKNOWN;
         }
-		if (generalFile.canWrite()) {
-			m_permission = m_permission.or(PermissionBytes.WRITE);
+    }
+
+    public PermissionBytes getUserPermission() {
+        PermissionBytes perms = PermissionBytes.NONE;
+        if (m_generalFile.canRead()) {
+			perms = perms.or(PermissionBytes.READ);
+        }
+		if (m_generalFile.canWrite()) {
+			perms = perms.or(PermissionBytes.WRITE);
 		}
-	
-        // set last modified
-		m_lastModified = generalFile.lastModified();
-	}
+        return perms;
+    }
+
+    public PermissionBytes getGroupPermission() {
+        return PERMISSION_UNKNOWN;
+    }
+
+    public PermissionBytes getAnyPermission() {
+        return PERMISSION_UNKNOWN;
+    }
+
+    public String getOwner() {
+        return ID_UNKNOWN;
+    }
+
+    public String getGroup() {
+        return ID_UNKNOWN;
+    }
+
+    public long getLastModified() {
+        return m_generalFile.lastModified();
+    }
 }

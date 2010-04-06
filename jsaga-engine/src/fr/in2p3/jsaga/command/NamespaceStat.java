@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.command;
 import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
 import org.apache.commons.cli.*;
 import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.file.File;
 import org.ogf.saga.namespace.NSEntry;
 import org.ogf.saga.namespace.NSFactory;
@@ -103,12 +104,14 @@ public class NamespaceStat extends AbstractCommand {
     private static String getPerm(NSEntry entry) throws Exception {
         try {
             StringBuffer perms = new StringBuffer();
-            perms.append(entry.permissionsCheck("*", Permission.QUERY.getValue()) ? "q" : "-");
-            perms.append(entry.permissionsCheck("*", Permission.READ.getValue()) ? "r" : "-");
-            perms.append(entry.permissionsCheck("*", Permission.WRITE.getValue()) ? "w" : "-");
-            perms.append(entry.permissionsCheck("*", Permission.EXEC.getValue()) ? "x" : "-");
-            perms.append(entry.permissionsCheck("*", Permission.OWNER.getValue()) ? "o" : "-");
+            perms.append(entry.permissionsCheck(null, Permission.QUERY.getValue()) ? "q" : "-");
+            perms.append(entry.permissionsCheck(null, Permission.READ.getValue()) ? "r" : "-");
+            perms.append(entry.permissionsCheck(null, Permission.WRITE.getValue()) ? "w" : "-");
+            perms.append(entry.permissionsCheck(null, Permission.EXEC.getValue()) ? "x" : "-");
+            perms.append(entry.permissionsCheck(null, Permission.OWNER.getValue()) ? "o" : "-");
             return perms.toString();
+        } catch(BadParameterException e) {
+            return "?";
         } catch(NotImplementedException e) {
             return "?";
         }

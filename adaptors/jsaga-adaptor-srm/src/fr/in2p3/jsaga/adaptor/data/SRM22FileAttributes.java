@@ -18,63 +18,110 @@ import org.ogf.srm22.*;
  *
  */
 public class SRM22FileAttributes extends FileAttributes {
+    private TMetaDataPathDetail m_entry;
+
     public SRM22FileAttributes(TMetaDataPathDetail entry) throws NoSuccessException {
-        // set name
-        String path = entry.getPath();
+        m_entry = entry;
+    }
+
+    public String getName() {
+        String path = m_entry.getPath();
         int pos = path.lastIndexOf("/");
         if (pos > 0) {
-            m_name = path.substring(pos+1);
+            return path.substring(pos+1);
         } else {
-            throw new NoSuccessException("unexpected exception");
+            throw new RuntimeException("unexpected exception");
         }
+    }
 
-        // set type
-        TFileType type = entry.getType();
+    public int getType() {
+        TFileType type = m_entry.getType();
         if (TFileType.FILE.equals(type)) {
-            m_type = FileAttributes.FILE_TYPE;
+            return TYPE_FILE;
         } else if (TFileType.DIRECTORY.equals(type)) {
-            m_type = FileAttributes.DIRECTORY_TYPE;
+            return TYPE_DIRECTORY;
         } else if (TFileType.LINK.equals(type)) {
-            m_type = FileAttributes.LINK_TYPE;
+            return TYPE_LINK;
         } else {
-            m_type = FileAttributes.UNKNOWN_TYPE;
+            return TYPE_UNKNOWN;
         }
+    }
 
-        // set size
-        if (entry.getSize() != null) {
-            m_size = entry.getSize().intValue();
+    public long getSize() {
+        if (m_entry.getSize() != null) {
+            return m_entry.getSize().intValue();
+        } else {
+            return SIZE_UNKNOWN;
         }
+    }
 
-        // set permission
-        if (entry.getOwnerPermission() != null) {
-            TPermissionMode perm = entry.getOwnerPermission().getMode();
-            if (TPermissionMode.NONE.equals(perm)) {
-                m_permission = PermissionBytes.NONE;
-            } else if (TPermissionMode.X.equals(perm)) {
-                m_permission = PermissionBytes.EXEC;
-            } else if (TPermissionMode.W.equals(perm)) {
-                m_permission = PermissionBytes.WRITE;
-            } else if (TPermissionMode.R.equals(perm)) {
-                m_permission = PermissionBytes.READ;
-            } else if (TPermissionMode.WX.equals(perm)) {
-                m_permission = PermissionBytes.WRITE.or(PermissionBytes.EXEC);
-            } else if (TPermissionMode.RX.equals(perm)) {
-                m_permission = PermissionBytes.READ.or(PermissionBytes.EXEC);
-            } else if (TPermissionMode.RW.equals(perm)) {
-                m_permission = PermissionBytes.READ.or(PermissionBytes.WRITE);
-            } else if (TPermissionMode.RWX.equals(perm)) {
-                m_permission = PermissionBytes.READ.or(PermissionBytes.WRITE).or(PermissionBytes.EXEC);
-            }
+    public PermissionBytes getUserPermission() {
+        if (m_entry.getOwnerPermission() != null) {
+            return getPermission(m_entry.getOwnerPermission().getMode());
+        } else {
+            return PERMISSION_UNKNOWN;
         }
+    }
 
-        // set owner
-        if (entry.getOwnerPermission() != null) {
-            m_owner = entry.getOwnerPermission().getUserID();
+    public PermissionBytes getGroupPermission() {
+        if (m_entry.getGroupPermission() != null) {
+            return getPermission(m_entry.getGroupPermission().getMode());
+        } else {
+            return PERMISSION_UNKNOWN;
         }
+    }
 
-        // set last modified
-        if (entry.getLastModificationTime() != null) {
-            m_lastModified = entry.getLastModificationTime().getTimeInMillis();
+    public PermissionBytes getAnyPermission() {
+        if (m_entry.getOtherPermission() != null) {
+            return getPermission(m_entry.getOtherPermission());
+        } else {
+            return PERMISSION_UNKNOWN;
+        }
+    }
+
+    private static PermissionBytes getPermission(TPermissionMode perm) {
+        if (TPermissionMode.NONE.equals(perm)) {
+            return PermissionBytes.NONE;
+        } else if (TPermissionMode.X.equals(perm)) {
+            return PermissionBytes.EXEC;
+        } else if (TPermissionMode.W.equals(perm)) {
+            return PermissionBytes.WRITE;
+        } else if (TPermissionMode.R.equals(perm)) {
+            return PermissionBytes.READ;
+        } else if (TPermissionMode.WX.equals(perm)) {
+            return PermissionBytes.WRITE.or(PermissionBytes.EXEC);
+        } else if (TPermissionMode.RX.equals(perm)) {
+            return PermissionBytes.READ.or(PermissionBytes.EXEC);
+        } else if (TPermissionMode.RW.equals(perm)) {
+            return PermissionBytes.READ.or(PermissionBytes.WRITE);
+        } else if (TPermissionMode.RWX.equals(perm)) {
+            return PermissionBytes.READ.or(PermissionBytes.WRITE).or(PermissionBytes.EXEC);
+        } else {
+            return PERMISSION_UNKNOWN;
+        }
+    }
+
+    public String getOwner() {
+        if (m_entry.getOwnerPermission() != null) {
+            return m_entry.getOwnerPermission().getUserID();
+        } else {
+            return ID_UNKNOWN;
+        }
+    }
+
+    public String getGroup() {
+        if (m_entry.getGroupPermission() != null) {
+            return m_entry.getGroupPermission().getGroupID();
+        } else {
+            return ID_UNKNOWN;
+        }
+    }
+
+    public long getLastModified() {
+        if (m_entry.getLastModificationTime() != null) {
+            return m_entry.getLastModificationTime().getTimeInMillis();
+        } else {
+            return DATE_UNKNOWN;
         }
     }
 }

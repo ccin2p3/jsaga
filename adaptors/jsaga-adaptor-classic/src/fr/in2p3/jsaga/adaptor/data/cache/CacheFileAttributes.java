@@ -2,10 +2,12 @@ package fr.in2p3.jsaga.adaptor.data.cache;
 
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import org.ogf.saga.url.URL;
+import org.ogf.saga.error.SagaException;
+import org.ogf.saga.file.Directory;
 import org.ogf.saga.file.File;
 import org.ogf.saga.namespace.NSEntry;
 import org.ogf.saga.permissions.Permission;
+import org.ogf.saga.url.URL;
 
 import java.lang.reflect.Method;
 
@@ -22,82 +24,108 @@ import java.lang.reflect.Method;
  *
  */
 public class CacheFileAttributes extends FileAttributes {
+    private NSEntry m_entry;
+
     public CacheFileAttributes(NSEntry entry) {
-        m_name = getName(entry);
-
-        m_type = isDir(entry)
-                ? FileAttributes.DIRECTORY_TYPE
-                : FileAttributes.FILE_TYPE;
-
-        m_size = getSize(entry);
-
-        String owner = getOwner(entry);
-        m_permission = PermissionBytes.NONE;
-        if(permissionsCheck(entry, owner, Permission.READ)) {
-            m_permission = m_permission.or(PermissionBytes.READ);
-        }
-        if(permissionsCheck(entry, owner, Permission.WRITE)) {
-            m_permission = m_permission.or(PermissionBytes.WRITE);
-        }
-
-        m_lastModified = getLastModified(entry);
+        m_entry = entry;
     }
 
-    private static String getName(NSEntry entry) {
+    public String getName() {
         try {
-            URL nameUrl = entry.getName();
+            URL nameUrl = m_entry.getName();
             String name = (nameUrl!=null ? nameUrl.toString() : "");
-            if (isDir(entry)) {
+            if (this.getType() == TYPE_DIRECTORY) {
                 name += "/";
             }
             return name;
-        } catch (Exception e) {
+        } catch (SagaException e) {
             return "?";
         }
     }
 
-    private static boolean isDir(NSEntry entry) {
+    public int getType() {
         try {
-            return entry.isDir();
-        } catch (Exception e) {
-            return false;
+            if (m_entry.isDir()) {
+                return TYPE_DIRECTORY;
+            } else if (m_entry.isEntry()) {
+                return TYPE_FILE;
+            } else if (m_entry.isLink()) {
+                return TYPE_LINK;
+            } else {
+                return TYPE_UNKNOWN;
+            }
+        } catch (SagaException e) {
+            return TYPE_UNKNOWN;
         }
     }
 
-    private static String getOwner(NSEntry entry) {
+    public long getSize() {
         try {
-            return entry.getOwner();
-        } catch (Exception e) {
-            return null;
+            if (m_entry instanceof File) {
+                return ((File)m_entry).getSize();
+            } else {
+                return SIZE_UNKNOWN;
+            }
+        } catch (SagaException e) {
+            return SIZE_UNKNOWN;
         }
     }
 
-    private static boolean permissionsCheck(NSEntry entry, String owner, Permission perm) {
+    public PermissionBytes getUserPermission() {
+        return this.getPermission("user-"+this.getOwner());
+    }
+
+    public PermissionBytes getGroupPermission() {
+        return this.getPermission("group-"+this.getGroup());
+    }
+
+    public PermissionBytes getAnyPermission() {
+        return this.getPermission("*");
+    }
+
+    private PermissionBytes getPermission(String id) {
+        PermissionBytes perms = PermissionBytes.NONE;
         try {
-            return entry.permissionsCheck(owner, perm.getValue());
-        } catch (Exception e) {
-            return false;
+            if (m_entry.permissionsCheck(id, Permission.READ.getValue())) {
+                perms = perms.or(PermissionBytes.READ);
+            }
+        } catch (SagaException e) {
+            // do nothing
+        }
+        try {
+            if (m_entry.permissionsCheck(id, Permission.WRITE.getValue())) {
+                perms = perms.or(PermissionBytes.WRITE);
+            }
+        } catch (SagaException e) {
+            // do nothing
+        }
+        return perms;
+    }
+
+    public String getOwner() {
+        try {
+            return m_entry.getOwner();
+        } catch (SagaException e) {
+            return ID_UNKNOWN;
         }
     }
 
-    private static long getSize(NSEntry entry) {
+    public String getGroup() {
         try {
-            return (entry instanceof File
-                    ? ((File)entry).getSize()
-                    : 0);
-        } catch (Exception e) {
-            return 0;
+            return m_entry.getGroup();
+        } catch (SagaException e) {
+            return ID_UNKNOWN;
         }
     }
 
-    private static long getLastModified(NSEntry entry) {
+    public long getLastModified() {
         try {
-            Method m = entry.getClass().getMethod("getLastModified", (Class[]) null);
+            Method m = m_entry.getClass().getMethod("getLastModified", (Class[]) null);
             return (m != null
-                    ? ((Long)m.invoke(entry, (Object[]) null)).longValue()
-                    : 0);
+                    ? ((Long)m.invoke(m_entry, (Object[]) null)).longValue()
+                    : DATE_UNKNOWN);
         } catch (Exception e) {
-            return 0;
+            return DATE_UNKNOWN;
         }
     }
 }

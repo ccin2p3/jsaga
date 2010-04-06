@@ -18,20 +18,56 @@ import java.util.zip.ZipEntry;
  *
  */
 public class ZipFileAttributes extends FileAttributes {
+    private ZipEntry m_entry;
+    private String m_basePath;
+
     public ZipFileAttributes(ZipEntry entry, String basePath) {
-        String name = entry.getName().substring(basePath.length());
-        m_name = entry.isDirectory()
-                ? name.substring(0, name.length()-1)
-                : name;
+        m_entry = entry;
+        m_basePath = basePath;
+    }
 
-        m_type = entry.isDirectory()
-                ? FileAttributes.DIRECTORY_TYPE
-                : FileAttributes.FILE_TYPE;
+    public String getName() {
+        String name = m_entry.getName().substring(m_basePath.length());
+        if (m_entry.isDirectory()) {
+            return name.substring(0, name.length()-1);
+        } else {
+            return name;
+        }
+    }
 
-        m_size = entry.getSize();
+    public int getType() {
+        if (m_entry.isDirectory()) {
+            return TYPE_DIRECTORY;
+        } else {
+            return TYPE_FILE;
+        }
+    }
 
-        m_permission = PermissionBytes.READ.or(PermissionBytes.WRITE);
+    public long getSize() {
+        return m_entry.getSize();
+    }
 
-        m_lastModified = entry.getTime();
+    public PermissionBytes getUserPermission() {
+        return PermissionBytes.READ;    // always readable, but writable not yet supported
+    }
+
+    public PermissionBytes getGroupPermission() {
+        return PermissionBytes.READ;    // always readable, but writable not yet supported
+    }
+
+    public PermissionBytes getAnyPermission() {
+        return PermissionBytes.READ;    // always readable, but writable not yet supported
+    }
+
+    public String getOwner() {
+        return ID_UNKNOWN;
+    }
+
+    public String getGroup() {
+        return ID_UNKNOWN;
+    }
+
+    public long getLastModified() {
+        return m_entry.getTime();
     }
 }

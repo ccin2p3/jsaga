@@ -15,7 +15,6 @@ import org.ogf.saga.permissions.Permission;
  *
  */
 public class PermissionBytes {
-    public static final PermissionBytes UNKNOWN = new PermissionBytes(-1);
     public static final PermissionBytes NONE = new PermissionBytes(0);
     public static final PermissionBytes QUERY = new PermissionBytes(1);
     public static final PermissionBytes READ = new PermissionBytes(2);

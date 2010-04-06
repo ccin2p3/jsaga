@@ -27,7 +27,7 @@ public abstract class WaitForEverDataAdaptorAbstract extends WaitForEverAdaptorA
     }
     public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         hang();
-        return new FileAttributes(){};
+        return new WaitForEverFileAttributes();
     }
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         hang();

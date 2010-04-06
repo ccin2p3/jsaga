@@ -36,13 +36,13 @@ public class EntryLongFormat {
     }
 
     public String toString(NSEntry entry) throws SagaException {
-        String owner = this.getOwner(entry);
         StringBuffer buf = new StringBuffer();
-        buf.append(this.isDir(entry) ? 'd' : '-');
-        buf.append(this.permissionsCheck(entry, owner, Permission.READ) ? 'r' : '-');
-        buf.append(this.permissionsCheck(entry, owner, Permission.WRITE) ? 'w' : '-');
-        buf.append(this.permissionsCheck(entry, owner, Permission.EXEC) ? 'x' : '-');
+        buf.append(this.isDir(entry));
+        buf.append(this.permissionsCheck(entry, Permission.READ, 'r'));
+        buf.append(this.permissionsCheck(entry, Permission.WRITE, 'w'));
+        buf.append(this.permissionsCheck(entry, Permission.EXEC, 'x'));
         buf.append(' ');
+        String owner = this.getOwner(entry);
         if (owner != null) {
             buf.append(format(owner, 8));
             buf.append(' ');
@@ -61,11 +61,15 @@ public class EntryLongFormat {
         return buf.toString();
     }
 
-    public boolean isDir(NSEntry entry) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+    public char isDir(NSEntry entry) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         try {
-            return entry.isDir();
+            if (entry.isDir()) {
+                return 'd';
+            } else {
+                return '-';
+            }
         } catch (NotImplementedException e) {
-            return false;
+            return '?';
         }
     }
 
@@ -77,11 +81,17 @@ public class EntryLongFormat {
         }
     }
 
-    public boolean permissionsCheck(NSEntry entry, String owner, Permission perm) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+    public char permissionsCheck(NSEntry entry, Permission perm, char c) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         try {
-            return entry.permissionsCheck(owner, perm.getValue());
+            if (entry.permissionsCheck(null, perm.getValue())) {
+                return c;
+            } else {
+                return '-';
+            }
+        } catch (BadParameterException e) {
+            return '?';
         } catch (NotImplementedException e) {
-            return false;
+            return '?';
         }
     }
 
@@ -114,7 +124,7 @@ public class EntryLongFormat {
             URL nameUrl = entry.getName();
             // getString() decodes the URL, while toString() does not
             String name = (nameUrl!=null ? nameUrl.getString() : "");
-            if (this.isDir(entry)) {
+            if (entry.isDir()) {
                 name += "/";
             }
             return name;

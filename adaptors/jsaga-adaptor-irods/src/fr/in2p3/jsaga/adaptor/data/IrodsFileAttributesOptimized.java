@@ -19,56 +19,84 @@ import org.ogf.saga.error.DoesNotExistException;
  *
  */
 public class IrodsFileAttributesOptimized extends FileAttributes {
+    private String m_name;
+    private MetaDataRecordList m_collection;
+    private MetaDataRecordList m_file;
 
     public IrodsFileAttributesOptimized(MetaDataRecordList collection, MetaDataRecordList file) throws DoesNotExistException {
-        // set name
+        // check if entry must be ignored
+        String name;
 		if (collection != null) {
-			m_name = (String) collection.getValue(collection.getFieldIndex(IRODSMetaDataSet.DIRECTORY_NAME));
+			name = (String) collection.getValue(collection.getFieldIndex(IRODSMetaDataSet.DIRECTORY_NAME));
 
-			String [] split = m_name.split("/");
-			m_name =split[split.length-1];
+			String [] split = name.split("/");
+			name =split[split.length-1];
 		} else {
-			m_name = (String) file.getValue(file.getFieldIndex(IRODSMetaDataSet.FILE_NAME));
+			name = (String) file.getValue(file.getFieldIndex(IRODSMetaDataSet.FILE_NAME));
 		}
-
-		if (m_name ==null || m_name.equals(".") || m_name.equals("..")) {
+		if (name ==null || name.equals(".") || name.equals("..")) {
 			throw new DoesNotExistException("Ignore this entry");
 		}
 
-        // set type
-		if (collection != null) {
-			m_type = FileAttributes.DIRECTORY_TYPE;
-		} else  {
-			m_type = FileAttributes.FILE_TYPE;
-		}
-
-        // set size
-        if (file != null) {
-            m_size = Long.parseLong((String)file.getValue(file.getFieldIndex(IRODSMetaDataSet.SIZE)));
-        } else {
-            m_size = 0;
-        }
-
-        // set permission
-        m_permission = PermissionBytes.READ;
-        /* This slow down execution
-        m_permission = PermissionBytes.NONE;
-        if (entry.canRead()) {
-			m_permission = m_permission.or(PermissionBytes.READ);
-        }
-		if (entry.canWrite()) {
-			m_permission = m_permission.or(PermissionBytes.WRITE);
-		}
-		*/
-
-        // set last modified
-		if (file != null) {
-			try
-			{
-				String modificationDate = (String) file.getValue(file.getFieldIndex(IRODSMetaDataSet.MODIFICATION_DATE));
-				modificationDate = modificationDate+"000";
-				m_lastModified = Long.parseLong(modificationDate);
-			} catch (Exception e){}
-		}
+        // set attributes
+        m_name = name;
+        m_collection = collection;
+        m_file = file;
 	}
+
+    public String getName() {
+        return m_name;
+    }
+
+    public int getType() {
+        if (m_collection != null) {
+            return TYPE_DIRECTORY;
+        } else if (m_file != null) {
+            return TYPE_FILE;
+        } else {
+            return TYPE_UNKNOWN;
+        }
+    }
+
+    public long getSize() {
+        if (m_file != null) {
+            return Long.parseLong((String)m_file.getValue(m_file.getFieldIndex(IRODSMetaDataSet.SIZE)));
+        } else {
+            return SIZE_UNKNOWN;
+        }
+    }
+
+    public PermissionBytes getUserPermission() {
+        return PERMISSION_UNKNOWN;
+    }
+
+    public PermissionBytes getGroupPermission() {
+        return PERMISSION_UNKNOWN;
+    }
+
+    public PermissionBytes getAnyPermission() {
+        return PERMISSION_UNKNOWN;
+    }
+
+    public String getOwner() {
+        return ID_UNKNOWN;
+    }
+
+    public String getGroup() {
+        return ID_UNKNOWN;
+    }
+
+    public long getLastModified() {
+        if (m_file != null) {
+            try {
+                String modificationDate = (String) m_file.getValue(m_file.getFieldIndex(IRODSMetaDataSet.MODIFICATION_DATE));
+                modificationDate = modificationDate+"000";
+                return Long.parseLong(modificationDate);
+            } catch (Exception e){
+                return DATE_UNKNOWN;
+            }
+        } else {
+            return DATE_UNKNOWN;
+        }
+    }
 }

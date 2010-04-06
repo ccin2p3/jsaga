@@ -140,7 +140,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             // move source childs to target directory
             FileAttributes[] sourceChilds = this._listAttributes(m_url.getPath());
             for (int i=0; i<sourceChilds.length; i++) {
-                URL remoteChild = URLHelper.createURL(effectiveTarget, sourceChilds[i].getName());
+                URL remoteChild = URLHelper.createURL(effectiveTarget, sourceChilds[i].getRelativePath());
                 SyncNSEntry entry = this._openNS(sourceChilds[i]);
                 if (entry instanceof SyncNSDirectory) {
                     entry.moveSync(remoteChild, flags);
@@ -240,16 +240,16 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
     //does not throw DoesNotExistException because it would mean "parent directory does not exist"
     protected SyncNSEntry _openNS(FileAttributes attr) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
         switch(attr.getType()) {
-            case FileAttributes.DIRECTORY_TYPE:
-                return this._openNSDir(URLFactory.createURL(attr.getName()));
-            case FileAttributes.FILE_TYPE:
-            case FileAttributes.LINK_TYPE:
-                return this._openNSEntry(URLFactory.createURL(attr.getName()));
-            case FileAttributes.UNKNOWN_TYPE:
+            case FileAttributes.TYPE_DIRECTORY:
+                return this._openNSDir(URLFactory.createURL(attr.getRelativePath()));
+            case FileAttributes.TYPE_FILE:
+            case FileAttributes.TYPE_LINK:
+                return this._openNSEntry(URLFactory.createURL(attr.getRelativePath()));
+            case FileAttributes.TYPE_UNKNOWN:
             default:
-                SyncNSEntry entry = this._openNSEntry(URLFactory.createURL(attr.getName()));
+                SyncNSEntry entry = this._openNSEntry(URLFactory.createURL(attr.getRelativePath()));
                 if (entry.isDirSync()) {
-                    return this._openNSDir(URLFactory.createURL(attr.getName()));
+                    return this._openNSDir(URLFactory.createURL(attr.getRelativePath()));
                 } else {
                     return entry;
                 }

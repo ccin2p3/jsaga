@@ -65,7 +65,7 @@ public class URLImpl implements URL {
 
     /** Encode the relative path + set the cache */
     URLImpl(FileAttributes cache) throws BadParameterException {
-        this(cache.getName());
+        this(cache.getRelativePath());
         m_cache = cache;
     }
 

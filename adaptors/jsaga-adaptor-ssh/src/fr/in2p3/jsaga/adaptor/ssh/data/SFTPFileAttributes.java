@@ -14,63 +14,77 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 * ***************************************************/
 
 public class SFTPFileAttributes extends FileAttributes {
-   
-	private int S_IRUSR = 00400; // read by owner
-	private int S_IWUSR = 00200; // write by owner
-	private int S_IXUSR = 00100; // execute/search by owner
+	private static final int S_IRUSR = 00400; // read by owner
+	private static final int S_IWUSR = 00200; // write by owner
+	private static final int S_IXUSR = 00100; // execute/search by owner
 
-	private int S_IRGRP = 00040; // read by group
-	private int S_IWGRP = 00020; // write by group
-	private int S_IXGRP = 00010; // execute/search by group
+	private static final int S_IRGRP = 00040; // read by group
+	private static final int S_IWGRP = 00020; // write by group
+	private static final int S_IXGRP = 00010; // execute/search by group
 
-	private int S_IROTH = 00004; // read by others
-	private int S_IWOTH = 00002; // write by others
-	private int S_IXOTH = 00001; // execute/search by others
+	private static final int S_IROTH = 00004; // read by others
+	private static final int S_IWOTH = 00002; // write by others
+	private static final int S_IXOTH = 00001; // execute/search by others
 
+    private String m_filename;
+    private SftpATTRS m_attrs;
 
 	public SFTPFileAttributes(String filename, SftpATTRS attrs) {
-		m_name = filename;
-		m_size = attrs.getSize();
-		if(attrs.isDir())
-			m_type = FileAttributes.DIRECTORY_TYPE;
-		else if(attrs.isLink())
-			m_type = FileAttributes.LINK_TYPE;
-		else 
-			m_type = FileAttributes.FILE_TYPE;
-		
-		m_group =  String.valueOf(attrs.getGId());
-		m_owner =  String.valueOf(attrs.getUId());
+        m_filename = filename;
+        m_attrs = attrs;
+    }
 
-        m_lastModified = ((long) attrs.getMTime()) * 1000;
+    public String getName() {
+        return m_filename;
+    }
 
-        int permissions = attrs.getPermissions();
-		if((permissions & S_IRUSR)!=0) 
-			m_permission = m_permission.or(PermissionBytes.READ);
+    public int getType() {
+        if(m_attrs.isDir()) {
+            return TYPE_DIRECTORY;
+        } else if(m_attrs.isLink()) {
+            return TYPE_LINK;
+        } else {
+            return TYPE_FILE;
+        }
+    }
 
-	    if((permissions & S_IWUSR)!=0)
-	    	m_permission = m_permission.or(PermissionBytes.WRITE);
+    public long getSize() {
+        return m_attrs.getSize();
+    }
 
-	    if ((permissions & S_IXUSR)!=0)  
-	    	m_permission = m_permission.or(PermissionBytes.EXEC);
-	    
-	    if((permissions & S_IRGRP)!=0)
-	    	m_permission = m_permission.or(PermissionBytes.READ);
-	    
-	    if((permissions & S_IWGRP)!=0)
-	    	m_permission = m_permission.or(PermissionBytes.WRITE);
-	    
-	    if((permissions & S_IXGRP)!=0) 
-	    	m_permission = m_permission.or(PermissionBytes.EXEC);
-	   
-	    if((permissions & S_IROTH) != 0)
-	    	m_permission = m_permission.or(PermissionBytes.READ);
-	    
-	    if((permissions & S_IWOTH) != 0)
-	    	m_permission = m_permission.or(PermissionBytes.WRITE);
-	    	
-	    if((permissions & S_IXOTH) != 0)
-	    	m_permission = m_permission.or(PermissionBytes.EXEC);
-	   
-	}
+    public PermissionBytes getUserPermission() {
+        return this.getPermission(S_IRUSR, S_IWUSR, S_IXUSR);
+    }
 
+    public PermissionBytes getGroupPermission() {
+        return this.getPermission(S_IRGRP, S_IWGRP, S_IXGRP);
+    }
+
+    public PermissionBytes getAnyPermission() {
+        return this.getPermission(S_IROTH, S_IWOTH, S_IXOTH);
+    }
+
+    private PermissionBytes getPermission(int read, int write, int exec) {
+        PermissionBytes perms = PermissionBytes.NONE;
+        int sftpPerms = m_attrs.getPermissions();
+        if((sftpPerms & read) != 0)
+            perms = perms.or(PermissionBytes.READ);
+        if((sftpPerms & write) != 0)
+            perms = perms.or(PermissionBytes.WRITE);
+        if((sftpPerms & exec) != 0)
+            perms = perms.or(PermissionBytes.EXEC);
+        return perms;
+    }
+
+    public String getOwner() {
+        return String.valueOf(m_attrs.getUId());
+    }
+
+    public String getGroup() {
+        return String.valueOf(m_attrs.getGId());
+    }
+
+    public long getLastModified() {
+        return ((long) m_attrs.getMTime()) * 1000;
+    }
 }

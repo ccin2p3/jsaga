@@ -61,11 +61,15 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
 
     public void permissionsAllow(String id, int permissions) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof PermissionAdaptor) {
-            PermissionBytes effectivePermissions = new PermissionBytes(permissions);
-            ((PermissionAdaptor)m_adaptor).permissionsAllow(
-                    m_url.getPath(),
-                    id,
-                    effectivePermissions);
+            if (isSupportedScope(((PermissionAdaptor)m_adaptor), id)) {
+                ((PermissionAdaptor)m_adaptor).permissionsAllow(
+                        m_url.getPath(),
+                        getPermissionsScope(id),
+                        getPermissionsIdentifier(id),
+                        new PermissionBytes(permissions));
+            } else {
+                throw new BadParameterException("Not supported for this protocol: "+ m_url.getScheme(), this);
+            }
         } else {
             throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
@@ -73,32 +77,95 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
 
     public void permissionsDeny(String id, int permissions) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof PermissionAdaptor) {
-            PermissionBytes effectivePermissions = new PermissionBytes(permissions);
-            ((PermissionAdaptor)m_adaptor).permissionsDeny(
-                    m_url.getPath(),
-                    id,
-                    effectivePermissions);
+            if (isSupportedScope(((PermissionAdaptor)m_adaptor), id)) {
+                ((PermissionAdaptor)m_adaptor).permissionsDeny(
+                        m_url.getPath(),
+                        getPermissionsScope(id),
+                        getPermissionsIdentifier(id),
+                        new PermissionBytes(permissions));
+            } else {
+                throw new BadParameterException("Not supported for this protocol: "+ m_url.getScheme(), this);
+            }
         } else {
             throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
     }
 
     public boolean permissionsCheck(String id, int permissions) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
-        try {
-            FileAttributes attrs = this._getFileAttributes();
-            PermissionBytes perm = attrs.getPermission();
-            if (perm != null) {
-                String owner = attrs.getOwner();
-                boolean checkOwnerPerm = (owner!=null && owner.equals(id));
-                boolean checkAllPerm = (owner==null && (id==null || id.equals("*")));
-                if (checkOwnerPerm || checkAllPerm) {
-                    return perm.containsAll(permissions);
+        final String ctxUserID = null;  //todo: get UserID from context
+
+        // get cache
+        FileAttributes attrs;
+        try{attrs=this._getFileAttributes();} catch(IncorrectStateException e){throw new NoSuccessException(e);}
+
+        // get permissions from cache
+        PermissionBytes perms = FileAttributes.PERMISSION_UNKNOWN;
+        switch (getPermissionsScope(id)) {
+            case PermissionAdaptor.SCOPE_USER:
+                if (id==null ||
+                    id==ctxUserID ||
+                    getPermissionsIdentifier(id).equals(attrs.getOwner()))
+                {
+                    perms = attrs.getUserPermission();
+                }
+                break;
+            case PermissionAdaptor.SCOPE_GROUP:
+                if (getPermissionsIdentifier(id).equals(attrs.getGroup())) {
+                    perms = attrs.getGroupPermission();
+                }
+                break;
+            case PermissionAdaptor.SCOPE_ANY:
+                perms = attrs.getAnyPermission();
+                break;
+        }
+
+        // check permissions
+        if (perms != FileAttributes.PERMISSION_UNKNOWN) {
+            return perms.containsAll(permissions);
+        } else if (m_adaptor instanceof PermissionAdaptor) {
+            if (isSupportedScope(((PermissionAdaptor)m_adaptor), id)) {
+                return ((PermissionAdaptor)m_adaptor).permissionsCheck(
+                        m_url.getPath(),
+                        getPermissionsScope(id),
+                        getPermissionsIdentifier(id),
+                        new PermissionBytes(permissions));
+            } else {
+                throw new BadParameterException("Not supported for this protocol: "+ m_url.getScheme(), this);
+            }
+        } else {
+            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
+        }
+    }
+
+    private static boolean isSupportedScope(PermissionAdaptor adaptor, String id) {
+        int scope = getPermissionsScope(id);
+        for (int s : adaptor.getSupportedScopes()) {
+            if (scope == s) {
+                return true;
+            }
+        }
+        return false;
+    }
+    private static int getPermissionsScope(String id) {
+        if (id != null) {
+            if (id.equals("*")) {
+                return PermissionAdaptor.SCOPE_ANY;
+            } else if (id.startsWith("group-")) {
+                return PermissionAdaptor.SCOPE_GROUP;
+            }
+        }
+        return PermissionAdaptor.SCOPE_USER;
+    }
+    private static String getPermissionsIdentifier(String id) {
+        if (id != null) {
+            if (id.startsWith("group-") || id.startsWith("user-")) {
+                String realIdentifier = id.substring(id.indexOf('-')+1);
+                if (realIdentifier.equals("null")) {
+                    return null;
                 }
             }
-        } catch (IncorrectStateException e) {
-            throw new NoSuccessException(e);
         }
-        throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
+        return id;
     }
 
     public String getOwner() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {

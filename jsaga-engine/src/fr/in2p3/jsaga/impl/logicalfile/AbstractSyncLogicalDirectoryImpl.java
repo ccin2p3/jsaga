@@ -143,7 +143,7 @@ public abstract class AbstractSyncLogicalDirectoryImpl extends AbstractNSDirecto
             // filter by entry name
             Pattern p = SAGAPattern.toRegexp(namePattern);
             for (int i=0; i<childs.length; i++) {
-                if (p==null || p.matcher(childs[i].getNameOnly()).matches()) {
+                if (p==null || p.matcher(childs[i].getName()).matches()) {
                     URL childUrl = URLFactoryImpl.createURLWithCache(childs[i]);
                     matchingPath.add(childUrl);
                 }

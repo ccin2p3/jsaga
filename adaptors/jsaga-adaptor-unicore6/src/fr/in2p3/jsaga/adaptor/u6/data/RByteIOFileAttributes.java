@@ -1,10 +1,9 @@
 package fr.in2p3.jsaga.adaptor.u6.data;
 
+import com.intel.gpe.clients.api.GridFile;
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import org.ogf.saga.error.DoesNotExistException;
-
-import com.intel.gpe.clients.api.GridFile;
 
 
 /* ***************************************************
@@ -20,37 +19,76 @@ import com.intel.gpe.clients.api.GridFile;
  *
  */
 public class RByteIOFileAttributes extends FileAttributes {
+    private GridFile m_file;
+    private String m_separator;
    
 	public RByteIOFileAttributes(GridFile file, String separator) throws DoesNotExistException {
-        // set name
-        m_name = file.getPath().substring(file.getPath().lastIndexOf(separator)+separator.length(), file.getPath().length());
-        // set type
-        if (file.isDirectory()) {
-            m_type = FileAttributes.DIRECTORY_TYPE;
+        m_file = file;
+        m_separator = separator;
+    }
+
+    public String getName() {
+        String path = m_file.getPath();
+        return path.substring(
+                path.lastIndexOf(m_separator)+m_separator.length(),
+                path.length());
+    }
+
+    public int getType() {
+        if (m_file.isDirectory()) {
+            return TYPE_DIRECTORY;
         } else {
-            m_type = FileAttributes.FILE_TYPE;
-        } 
+            return TYPE_FILE;
+        }
+    }
 
-        // set size
+    public long getSize() {
         try {
-            m_size = file.getSize();
+            return m_file.getSize();
         } catch(NumberFormatException e) {
-            m_size = -1;
+            return SIZE_UNKNOWN;
         }
+    }
 
-        // set last modified
-        m_lastModified = file.lastModified().getTimeInMillis();
-        
-        // set permission
-        m_permission = PermissionBytes.NONE;
-        if (file.getPermissions().getReadable()) {
-            m_permission = m_permission.or(PermissionBytes.READ);
+    public PermissionBytes getUserPermission() {
+        if (m_file.getPermissions() != null) {
+            PermissionBytes perms = PermissionBytes.NONE;
+            if (m_file.getPermissions().getReadable()) {
+                perms = perms.or(PermissionBytes.READ);
+            }
+            if (m_file.getPermissions().getWritable()) {
+                perms = perms.or(PermissionBytes.WRITE);
+            }
+            if (m_file.getPermissions().getExecutable()) {
+                perms = perms.or(PermissionBytes.EXEC);
+            }
+            return perms;
+        } else {
+            return PERMISSION_UNKNOWN;
         }
-        if (file.getPermissions().getWritable()) {
-            m_permission = m_permission.or(PermissionBytes.WRITE);
-        }
-        if (file.getPermissions().getExecutable()) {
-            m_permission = m_permission.or(PermissionBytes.EXEC);
+    }
+
+    public PermissionBytes getGroupPermission() {
+        return PERMISSION_UNKNOWN;
+    }
+
+    public PermissionBytes getAnyPermission() {
+        return PERMISSION_UNKNOWN;
+    }
+
+    public String getOwner() {
+        return ID_UNKNOWN;
+    }
+
+    public String getGroup() {
+        return ID_UNKNOWN;
+    }
+
+    public long getLastModified() {
+        if (m_file.lastModified() != null) {
+            return m_file.lastModified().getTimeInMillis();
+        } else {
+            return DATE_UNKNOWN;
         }
     }
 }

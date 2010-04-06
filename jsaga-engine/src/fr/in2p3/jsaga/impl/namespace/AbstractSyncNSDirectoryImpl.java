@@ -156,7 +156,7 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
         Pattern p = SAGAPattern.toRegexp(pattern);
         List<URL> matchingNames = new ArrayList<URL>();
         for (int i=0; i<childs.length; i++) {
-            if (p==null || p.matcher(childs[i].getName()).matches()) {
+            if (p==null || p.matcher(childs[i].getRelativePath()).matches()) {
                 URL childUrl = URLFactoryImpl.createURLWithCache(childs[i]);
                 matchingNames.add(childUrl);
             }
@@ -193,13 +193,13 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
         FileAttributes[] childs = this._listAttributes(m_url.getPath());
         for (int i=0; i<childs.length; i++) {
             // set child relative path
-            URL childRelativePath = URLHelper.createURL(currentRelativePath, childs[i].getName());
+            URL childRelativePath = URLHelper.createURL(currentRelativePath, childs[i].getRelativePath());
             // add child relative path to matching list
-            if (p==null || p.matcher(childs[i].getName()).matches()) {
+            if (p==null || p.matcher(childs[i].getRelativePath()).matches()) {
                 matchingPath.add(childRelativePath);
             }
             // may recurse
-            if (Flags.RECURSIVE.isSet(flags) && childs[i].getType()==FileAttributes.DIRECTORY_TYPE) {
+            if (Flags.RECURSIVE.isSet(flags) && childs[i].getType()==FileAttributes.TYPE_DIRECTORY) {
                 AbstractSyncNSDirectoryImpl childDir;
                 try {
                     childDir = (AbstractSyncNSDirectoryImpl) this._openNSDir(childRelativePath);
@@ -414,7 +414,7 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
         FileAttributes[] files = this._listAttributes(absolutePath);
         String[] filenames = new String[files.length];
         for (int i=0; i<files.length; i++) {
-            filenames[i] = files[i].getName();
+            filenames[i] = files[i].getRelativePath();
         }
         return filenames;
     }

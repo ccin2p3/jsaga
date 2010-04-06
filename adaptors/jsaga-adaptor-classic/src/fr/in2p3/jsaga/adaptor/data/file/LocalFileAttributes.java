@@ -18,27 +18,67 @@ import java.io.File;
  *
  */
 public class LocalFileAttributes extends FileAttributes {
+    private File m_entry;
+
     public LocalFileAttributes(File entry) {
-        m_name = (entry.getParentFile()!=null
-                ? entry.getName()
-                : entry.getPath().substring(0,2));  // entry.getName() is empty for Windows drives
+        m_entry = entry;
+    }
 
-        m_type = entry.isDirectory()
-                ? FileAttributes.DIRECTORY_TYPE
-                : entry.isFile()
-                    ? FileAttributes.FILE_TYPE
-                    : FileAttributes.UNKNOWN_TYPE;
-
-        m_size = (entry.isFile() ? entry.length() : 0);
-
-        m_permission = PermissionBytes.NONE;
-        if(entry.canRead()) {
-            m_permission = m_permission.or(PermissionBytes.READ);
+    public String getName() {
+        if (m_entry.getParentFile() != null) {
+            return m_entry.getName();
+        } else {
+            // m_entry.getName() is empty for Windows drives
+            return m_entry.getPath().substring(0,2);
         }
-        if(entry.canWrite()) {
-            m_permission = m_permission.or(PermissionBytes.WRITE);
-        }
+    }
 
-        m_lastModified = entry.lastModified();
+    public int getType() {
+        if (m_entry.isDirectory()) {
+            return TYPE_DIRECTORY;
+        } else if (m_entry.isFile()) {
+            return TYPE_FILE;
+        } else {
+            return TYPE_UNKNOWN;
+        }
+    }
+
+    public long getSize() {
+        if (m_entry.isFile()) {
+            return m_entry.length();
+        } else {
+            return SIZE_UNKNOWN;
+        }
+    }
+
+    public PermissionBytes getUserPermission() {
+        PermissionBytes perms = PermissionBytes.NONE;
+        if(m_entry.canRead()) {
+            perms = perms.or(PermissionBytes.READ);
+        }
+        if(m_entry.canWrite()) {
+            perms = perms.or(PermissionBytes.WRITE);
+        }
+        return perms;
+    }
+
+    public PermissionBytes getGroupPermission() {
+        return PERMISSION_UNKNOWN;
+    }
+
+    public PermissionBytes getAnyPermission() {
+        return PERMISSION_UNKNOWN;
+    }
+
+    public String getOwner() {
+        return ID_UNKNOWN;
+    }
+
+    public String getGroup() {
+        return ID_UNKNOWN;
+    }
+
+    public long getLastModified() {
+        return m_entry.lastModified();
     }
 }

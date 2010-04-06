@@ -21,24 +21,56 @@ import java.net.URLConnection;
  *
  */
 public class HttpFileAttributesDefault extends FileAttributes {
+    private URLConnection m_cnx;
+
     public HttpFileAttributesDefault(URLConnection cnx) throws NoSuccessException {
-        String path = cnx.getURL().getPath();
-        m_name = new EntryPath(path).getEntryName();
-        m_type = cnx.getLastModified()==0 ? DIRECTORY_TYPE : FILE_TYPE;
-//        m_type = path.endsWith("/") ? DIRECTORY_TYPE : FILE_TYPE;
+        m_cnx = cnx;
+    }
 
-        m_size = cnx.getContentLength();
+    public String getName() {
+        String path = m_cnx.getURL().getPath();
+        return new EntryPath(path).getEntryName();
+    }
 
+    public int getType() {
+//        String path = m_cnx.getURL().getPath();
+//        return path.endsWith("/") ? TYPE_DIRECTORY : TYPE_FILE;
+        return m_cnx.getLastModified()==0 ? TYPE_DIRECTORY : TYPE_FILE;
+    }
+
+    public long getSize() {
+        return m_cnx.getContentLength();
+    }
+
+    public PermissionBytes getUserPermission() {
         try {
-            if (cnx.getPermission().getActions().contains("connect")) {
-                m_permission = PermissionBytes.READ;
+            if (m_cnx.getPermission().getActions().contains("connect")) {
+                return PermissionBytes.READ;
             } else {
-                m_permission = PermissionBytes.NONE;
+                return PermissionBytes.NONE;
             }
         } catch (IOException e) {
-            throw new NoSuccessException(e);
+            return PERMISSION_UNKNOWN;
         }
+    }
 
-        m_lastModified = cnx.getLastModified();
+    public PermissionBytes getGroupPermission() {
+        return PERMISSION_UNKNOWN;
+    }
+
+    public PermissionBytes getAnyPermission() {
+        return PERMISSION_UNKNOWN;
+    }
+
+    public String getOwner() {
+        return ID_UNKNOWN;
+    }
+
+    public String getGroup() {
+        return ID_UNKNOWN;
+    }
+
+    public long getLastModified() {
+        return m_cnx.getLastModified();
     }
 }

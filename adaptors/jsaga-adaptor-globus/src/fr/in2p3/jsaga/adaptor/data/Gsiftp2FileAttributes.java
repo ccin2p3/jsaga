@@ -23,58 +23,98 @@ import java.util.Locale;
  *
  */
 public class Gsiftp2FileAttributes extends FileAttributes {
+    private static final int POSITION_USER = 1;
+    private static final int POSITION_GROUP = 2;
+    private static final int POSITION_ANY = 3;
+
     private static final int UNIX_READ = 4;
     private static final int UNIX_WRITE = 2;
     private static final int UNIX_EXEC = 1;
 
+    private MlsxEntry m_entry;
+
     public Gsiftp2FileAttributes(MlsxEntry entry) throws DoesNotExistException {
-        // set name
-        m_name = entry.getFileName();
-        if (m_name ==null || m_name.equals(".") || m_name.equals("..")) {
+        // check if entry must be ignored
+        String name = entry.getFileName();
+        if (name ==null || name.equals(".") || name.equals("..")) {
             throw new DoesNotExistException("Ignore this entry");
         }
 
-        // set type
-        String _type = entry.get("type");
-        if (_type != null) {
-            if (_type.equals("file")) {
-                m_type = FileAttributes.FILE_TYPE;
-            } else if (_type.endsWith("dir")) {
-                m_type = FileAttributes.DIRECTORY_TYPE;
-            } else {
-                m_type = FileAttributes.UNKNOWN_TYPE;
-            }
-        }
+        // set entry
+        m_entry = entry;
+    }
 
-        // set size
+    public String getName() {
+        return m_entry.getFileName();
+    }
+
+    public int getType() {
+        String _type = m_entry.get("type");
+        if (_type==null) return TYPE_UNKNOWN;
+        if (_type.equals("file")) {
+            return TYPE_FILE;
+        } else if (_type.endsWith("dir")) {
+            return TYPE_DIRECTORY;
+        } else {
+            return TYPE_UNKNOWN;
+        }
+    }
+
+    public long getSize() {
+        String _size = m_entry.get("size");
+        if (_size==null) return SIZE_UNKNOWN;
         try {
-            m_size = Long.parseLong(entry.get("size"));
+            return Long.parseLong(m_entry.get("size"));
         } catch(NumberFormatException e) {
-            m_size = -1;
+            return SIZE_UNKNOWN;
         }
+    }
 
-        // set permission
-        String _perm = entry.get("unix.mode");
-        if (_perm != null) {
-            m_permission = PermissionBytes.NONE;
-            int userPerm = _perm.charAt(1) - '0';
-            if ((userPerm & UNIX_READ) != 0) {
-                m_permission = m_permission.or(PermissionBytes.READ);
-            }
-            if ((userPerm & UNIX_WRITE) != 0) {
-                m_permission = m_permission.or(PermissionBytes.WRITE);
-            }
-            if ((userPerm & UNIX_EXEC) != 0) {
-                m_permission = m_permission.or(PermissionBytes.EXEC);
-            }
+    public PermissionBytes getUserPermission() {
+        return this.getPermission(POSITION_USER);
+    }
+
+    public PermissionBytes getGroupPermission() {
+        return this.getPermission(POSITION_GROUP);
+    }
+
+    public PermissionBytes getAnyPermission() {
+        return this.getPermission(POSITION_ANY);
+    }
+
+    private PermissionBytes getPermission(int position) {
+        String _perm = m_entry.get("unix.mode");
+        if (_perm==null) return PERMISSION_UNKNOWN;
+        PermissionBytes perms = PermissionBytes.NONE;
+        int userPerm = _perm.charAt(position) - '0';
+        if ((userPerm & UNIX_READ) != 0) {
+            perms = perms.or(PermissionBytes.READ);
         }
+        if ((userPerm & UNIX_WRITE) != 0) {
+            perms = perms.or(PermissionBytes.WRITE);
+        }
+        if ((userPerm & UNIX_EXEC) != 0) {
+            perms = perms.or(PermissionBytes.EXEC);
+        }
+        return perms;
+    }
 
-        // set last modified
+    public String getOwner() {
+        return ID_UNKNOWN;
+    }
+
+    public String getGroup() {
+        return ID_UNKNOWN;
+    }
+
+    public long getLastModified() {
+        String _date = m_entry.get("modify");
+        if (_date==null) return DATE_UNKNOWN;
         try {
-            Date date = new SimpleDateFormat("yyyyMMddhhmmss", Locale.ENGLISH).parse(entry.get("modify"));
-            m_lastModified = date.getTime()+7200000;
+            Date date = new SimpleDateFormat("yyyyMMddhhmmss", Locale.ENGLISH).parse(_date);
+            return date.getTime()+7200000;
         } catch (ParseException e) {
-            m_lastModified = 0;
+            return DATE_UNKNOWN;
         }
     }
 }

@@ -15,59 +15,75 @@ import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
  *
  */
 public abstract class FileAttributes {
-    public static final int UNKNOWN_TYPE = 0;
-    public static final int FILE_TYPE = 1;
-    public static final int DIRECTORY_TYPE = 2;
-    public static final int LINK_TYPE = 3;
+    public static final int TYPE_UNKNOWN = 0;
+    public static final int TYPE_FILE = 1;
+    public static final int TYPE_DIRECTORY = 2;
+    public static final int TYPE_LINK = 3;
 
-    /** to be set only by method findAttributes() */
+    public static final long SIZE_UNKNOWN = -1;
+    public static final long DATE_UNKNOWN = 0;
+    public static final PermissionBytes PERMISSION_UNKNOWN = null;
+    public static final String ID_UNKNOWN = null;
+
+    /** should be set only by method findAttributes() */
     protected String m_relativePath = null;
 
-    /** to be always set */
-    protected String m_name = null;
-
-    protected int m_type = UNKNOWN_TYPE;
-    protected long m_size = -1;
-    protected PermissionBytes m_permission = PermissionBytes.UNKNOWN;
-    protected String m_owner = null;
-    protected String m_group = null;
-    protected long m_lastModified = 0;
-
-    public String getName() {
-        String name = (m_relativePath!=null ? m_relativePath : m_name);
-        switch(m_type) {
-            case DIRECTORY_TYPE:
-                return name+"/";
+    /**
+     * @return the relative path
+     */
+    public final String getRelativePath() {
+        String relativePath = (m_relativePath!=null ? m_relativePath : this.getName());
+        switch(this.getType()) {
+            case TYPE_DIRECTORY:
+                return relativePath+"/";
             default:
-                return name;
+                return relativePath;
         }
     }
 
-    public String getNameOnly() {
-        return m_name;
-    }
+    /**
+     * @return the name of entry (no default value)
+     */
+    public abstract String getName();
 
-    public int getType() {
-        return m_type;
-    }
+    /**
+     * @return the type of entry (or TYPE_UNKNOWN)
+     */
+    public abstract int getType();
 
-    public long getSize() {
-        return m_size;
-    }
+    /**
+     * This method is invoked only on entries of type File.
+     * @return the size of entry (or SIZE_UNKNOWN)
+     */
+    public abstract long getSize();
 
-    public PermissionBytes getPermission() {
-        return m_permission;
-    }
+    /**
+     * @return the permissions of entry for current user (or PERMISSION_UNKNOWN)
+     */
+    public abstract PermissionBytes getUserPermission();
 
-    public String getOwner() {
-        return m_owner;
-    }
+    /**
+     * @return the permissions of entry for group of current user (or PERMISSION_UNKNOWN)
+     */
+    public abstract PermissionBytes getGroupPermission();
 
-    public String getGroup() {
-        return m_group;
-    }
+    /**
+     * @return the permissions of entry for any (or PERMISSION_UNKNOWN)
+     */
+    public abstract PermissionBytes getAnyPermission();
 
-    public long getLastModified() {
-        return m_lastModified;
-    }
+    /**
+     * @return the owner of entry (or ID_UNKNOWN)
+     */
+    public abstract String getOwner();
+
+    /**
+     * @return the group of entry (or ID_UNKNOWN)
+     */
+    public abstract String getGroup();
+
+    /**
+     * @return the last modified date of entry (or DATE_UNKNOWN)
+     */
+    public abstract long getLastModified();
 }

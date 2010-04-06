@@ -20,22 +20,65 @@ import java.util.Date;
  *
  */
 public class HttpFileAttributesSockedBased extends FileAttributes {
-    public HttpFileAttributesSockedBased(String path, HttpRequest request) throws NoSuccessException {
-        m_name = new EntryPath(path).getEntryName();
-        m_type = request.getLastModified()==null ? DIRECTORY_TYPE : FILE_TYPE;
-//        m_type = path.endsWith("/") ? DIRECTORY_TYPE : FILE_TYPE;
+    private String m_path;
+    private HttpRequest m_request;
 
-        m_size = request.getContentLength();
+    public HttpFileAttributesSockedBased(String path, HttpRequest request) {
+        m_path = path;
+        m_request = request;
+    }
 
-        if (request.getStatus().contains("OK")) {
-            m_permission = PermissionBytes.READ;
-        } else {
-            m_permission = PermissionBytes.NONE;
+    public String getName() {
+        return new EntryPath(m_path).getEntryName();
+    }
+
+    public int getType() {
+//        return m_path.endsWith("/") ? TYPE_DIRECTORY : TYPE_FILE;
+        try {
+            return m_request.getLastModified()==null ? TYPE_DIRECTORY : TYPE_FILE;
+        } catch (NoSuccessException e) {
+            return TYPE_UNKNOWN;
         }
+    }
 
-        Date lastModified = request.getLastModified();
-        if (lastModified != null) {
-            m_lastModified = lastModified.getTime();
+    public long getSize() {
+        return m_request.getContentLength();
+    }
+
+    public PermissionBytes getUserPermission() {
+        if (m_request.getStatus().contains("OK")) {
+            return PermissionBytes.READ;
+        } else {
+            return PermissionBytes.NONE;
+        }
+    }
+
+    public PermissionBytes getGroupPermission() {
+        return PERMISSION_UNKNOWN;
+    }
+
+    public PermissionBytes getAnyPermission() {
+        return PERMISSION_UNKNOWN;
+    }
+
+    public String getOwner() {
+        return ID_UNKNOWN;
+    }
+
+    public String getGroup() {
+        return ID_UNKNOWN;
+    }
+
+    public long getLastModified() {
+        try {
+            Date lastModified = m_request.getLastModified();
+            if (lastModified != null) {
+                return lastModified.getTime();
+            } else {
+                return DATE_UNKNOWN;
+            }
+        } catch (NoSuccessException e) {
+            return DATE_UNKNOWN;
         }
     }
 }
