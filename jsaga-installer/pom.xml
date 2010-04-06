@@ -161,6 +161,21 @@
                             <fileNameReplacement>contributors-guide.xml</fileNameReplacement>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>generate-testers-guide-web-page</id>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
+                        <configuration>
+                            <xslFile>src/site/xsl/testers-guide.xsl</xslFile>
+                            <destDir>${project.build.directory}/generated-site/xdoc</destDir>
+                            <srcDir>../saga-api-test/build/site/apidocs</srcDir>
+                            <srcIncludes>jel.xml</srcIncludes>
+                            <fileNameRegex>jel.xml</fileNameRegex>
+                            <fileNameReplacement>testers-guide.xml</fileNameReplacement>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>

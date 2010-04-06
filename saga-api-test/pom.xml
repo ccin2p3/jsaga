@@ -29,6 +29,23 @@
             </plugin>
         </plugins>
     </build>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <docletArtifact>
+                        <groupId>com.jeldoclet</groupId>
+                        <artifactId>jeldoclet</artifactId>
+                        <version>1.0</version>
+                    </docletArtifact>
+                    <doclet>com.jeldoclet.JELDoclet</doclet>
+                    <useStandardDocletOptions>false</useStandardDocletOptions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
     <dependencies>
         <dependency>
             <groupId>org.ogf.saga</groupId>

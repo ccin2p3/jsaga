@@ -26,22 +26,24 @@
                 <p>Adding to JSAGA support for new technologies can be done by developing adaptors.
                     There are 3 kind of adaptors: security adaptors, data adaptors and job adaptors.
                 </p><br/>
-                <p>Adaptor interfaces are designed to be close to legacy middleware API.
-                    Most adaptor interfaces are optionals. An adaptor should implement <b>only</b>
-                    features that are required and optional features that are natively supported
-                    by adapted middleware, other optional features should be managed by the core engine.
-                    However, implemented interfaces must be <b>fully implemented</b>
-                    (i.e. no NotImplementedException can be thrown).
+                <p>Adaptor interfaces are designed to be as close to legacy middleware API as possible.
+                    A few interfaces are required, most of them are optional.
+                    An adaptor should implement <b>only</b> required features, and optional features
+                    that can not be emulated by the core engine.
+                    However, selected interfaces must be <b>fully implemented</b> and adaptor methods
+                    can not throw exception "NotImplementedException".
                 </p><br/>
-                <p>JSAGA adaptors API re-use Exception classes of the <a href="../../../saga-api/apidocs/org/ogf/saga/error/package-summary.html"
+                <p>JSAGA adaptors API re-use Exception classes of the <a href="saga-api/apidocs/org/ogf/saga/error/package-summary.html"
                         >org.ogf.saga.error</a> package of the SAGA java binding API.
                     See pages 37 to 41 of the "SAGA Error Handling" chapter of the
                     <a href="http://www.ogf.org/documents/GFD.90.pdf">SAGA specification document</a>
                     for a description of each SAGA Exception class.
                 </p>
-                <p>This document describes adaptor interfaces
-                    Please look at the <a href="howto.html">Contributors How To</a> web page
-                    for information about how to create project skeleton, how to run test-suite...
+                <p>This document describes adaptor interfaces only.
+                    For information about how to create a test-suite for your adaptor,
+                    please look at the <a href="testers-guide.html">Testing Adaptors Guide</a> web page.
+                    For information about how to create project skeleton, how to run test-suite, etc.,
+                    please look at the <a href="howto.html">Contributors How To</a> web page.
                 </p>
                 <p>This document is generated from source code. It is applicable to the version
                     of JSAGA that can be downloaded <a href="download.html">here</a>.
@@ -69,7 +71,7 @@
                     the <xsl:apply-templates select="jelclass[@type='SecurityCredential']"/> interface.
                 </p>
 
-                <p>See <a href="../../../jsaga-engine/xref/fr/in2p3/jsaga/adaptor/security/UserPassSecurityAdaptor.html">example</a>.
+                <p>See <a href="jsaga-engine/xref/fr/in2p3/jsaga/adaptor/security/UserPassSecurityAdaptor.html">example</a>.
                 </p>
             </section>
 
@@ -89,7 +91,7 @@
                     extend the <xsl:apply-templates select="jelclass[@type='FileAttributes']"/> abstract class.
                 </p>
 
-                <p>See <a href="../../../jsaga-engine/xref/fr/in2p3/jsaga/adaptor/data/package-summary.html">example</a>.
+                <p>See <a href="jsaga-engine/xref/fr/in2p3/jsaga/adaptor/data/package-summary.html">example</a>.
                 </p>
 
                 <subsection name="Developing a physical file adator">
@@ -196,7 +198,7 @@
                     and enforces development of adaptors that support offline monitoring.
                 </p>
                 
-                <p>See <a href="../../../jsaga-engine/xref/fr/in2p3/jsaga/adaptor/job/package-summary.html">example</a>.
+                <p>See <a href="jsaga-engine/xref/fr/in2p3/jsaga/adaptor/job/package-summary.html">example</a>.
                 </p>
 
                 <subsection name="Developing a job control adaptor">
@@ -371,8 +373,11 @@
         <tr>
             <td>
                 <b><xsl:value-of select="@name"/></b>:
-                <xsl:value-of select="comment/description/text()"/>
-                <xsl:if test="@returncomment"><br/>
+                <xsl:if test="comment/description/text()">
+                    <xsl:value-of select="comment/description/text()"/>
+                    <xsl:if test="@returncomment"><br/></xsl:if>
+                </xsl:if>
+                <xsl:if test="@returncomment">
                     Returns <xsl:value-of select="@returncomment"/>
                 </xsl:if>
                 <ul>
