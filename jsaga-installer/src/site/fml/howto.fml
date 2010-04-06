@@ -58,6 +58,35 @@ mvn integration-test -Dtest={integration.MyProtocolIntegrationTestSuite}\$index<
                 </ul>
             </answer>
         </faq>
+        <faq id="configure-test-suite">
+            <question>How to configure test-suite ?</question>
+            <answer>There are 4 configuration files:
+                <ul>
+                    <li><i>test/resources/etc/jsaga-config.properties</i>: is not used by test-suite (used when testing your configuration with JSAGA CLIs).</li>
+                    <li><i>test/resources/etc/jsaga-universe.xml</i>: configures your adaptor and its security context.</li>
+                    <li><i>test/resources/etc/log4j.properties</i>: configures log severity thresholds for test-suite.</li>
+                    <li><i>test/resources/saga-test.properties</i>: configures the test-suite (i.e. URLs and test parameters).</li>
+                </ul>
+                Content of file saga-test.properties depends on the type of adaptor:
+                <ul>
+                    <li>For a security adaptor:
+                        <pre># can be empty</pre>
+                    </li>
+                    <li>For a data adaptor:
+                        <pre><i>myprotocol</i>.base.url=uri://...
+<i>myprotocol</i>.base2.url=uri://...
+test.base.url=test://emulator.test.org:1234/</pre>
+                    </li>
+                    <li>For a job adaptor:
+                        <pre><i>myprotocol</i>.jobservice.url=uri://...
+# optional test parameters:
+<i>myprotocol</i>.finalyTimeout=...
+<i>myprotocol</i>.maxQueuingTime=...
+<i>myprotocol</i>.candidate.host=...</pre>
+                    </li>
+                </ul>
+            </answer>
+        </faq>
         <faq id="create-test-entries">
             <question>How to create files and directories for data test suite ?</question>
             <answer><pre>mkdir -p dir/subdir ; echo "Content of file 1..." > dir/subdir/file1.txt

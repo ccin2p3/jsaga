@@ -32,7 +32,7 @@
                             replace the text "TODO: explain why this test is ignored..." with the explanation.</li>
                     </ul>
                 </p>
-                <p>For information about how to run your test-suite,
+                <p>For information about how to configure and run your test-suite,
                     please look at the <a href="howto.html">Contributors How To</a> web page.
                 </p><br/>
                 <p>This document is generated from source code. It is applicable to the version
