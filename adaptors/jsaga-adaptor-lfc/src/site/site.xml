@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="JSAGA">
+    <skin>
+        <groupId>fr.in2p3.maven</groupId>
+        <artifactId>in2p3-site-skin</artifactId>
+        <version>current</version>
+    </skin>
+    <bannerLeft><src>images/logo-jsaga.png</src><alt>JSAGA</alt></bannerLeft>
+    <bannerRight><src>images/logo-cc.png</src><alt>CC-IN2P3</alt></bannerRight>
+    <body>
+        <links>
+            <item name="ANR" href="http://www.agence-nationale-recherche.fr"/>
+            <item name="CNRS" href="http://www.cnrs.fr"/>
+            <item name="CC-IN2P3" href="http://cc.in2p3.fr"/>
+        </links>
+        <menu name="JSAGA">
+            <item name="Project Home" href="../../index.html"/>
+        </menu>
+        <menu name="User Documentation">
+            <item name="Module Home" href="index.html"/>
+            <item name="FAQ" href="faq.html"/>
+        </menu>
+        <menu name="Module Documentation" ref="reports"/>
+    </body>
+</project>
