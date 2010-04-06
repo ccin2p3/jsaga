@@ -89,6 +89,12 @@ public class <i>_MyProtocol_</i>TestSuite extends JSAGATestSuite {
                         <xsl:for-each select="jelclass[@package='org.ogf.saga.file' or @package='org.ogf.saga.namespace'][contains(@type,'Test')]">
                             <xsl:call-template name="CODE_jelclass"/>
                         </xsl:for-each>
+                        <xsl:for-each select="jelclass[@package='org.ogf.saga.file' or @package='org.ogf.saga.namespace'][contains(@type,'Test')]
+                                                      [contains(@type,'Copy') or contains(@type,'Move')]">
+                            <xsl:call-template name="CODE_jelclass">
+                                <xsl:with-param name="targetProtocol">test</xsl:with-param>
+                            </xsl:call-template>
+                        </xsl:for-each>
 }
                     </pre>
                 </subsection>
@@ -109,6 +115,12 @@ public class <i>_MyProtocol_</i>TestSuite extends JSAGATestSuite {
     /** test cases */<xsl:text/>
                         <xsl:for-each select="jelclass[@package='org.ogf.saga.logicalfile' or @package='org.ogf.saga.namespace'][contains(@type,'Test')]">
                             <xsl:call-template name="CODE_jelclass"/>
+                        </xsl:for-each>
+                        <xsl:for-each select="jelclass[@package='org.ogf.saga.logicalfile' or @package='org.ogf.saga.namespace'][contains(@type,'Test')]
+                                                      [contains(@type,'Copy') or contains(@type,'Move')]">
+                            <xsl:call-template name="CODE_jelclass">
+                                <xsl:with-param name="targetProtocol">test</xsl:with-param>
+                            </xsl:call-template>
                         </xsl:for-each>
 }
                     </pre>
@@ -139,10 +151,12 @@ public class <i>_MyProtocol_</i>TestSuite extends JSAGATestSuite {
     </xsl:template>
 
     <xsl:template name="CODE_jelclass">
+        <xsl:param name="targetProtocol">myprotocol</xsl:param>
         <xsl:variable name="package" select="substring-before(substring-after(@fulltype,'org.ogf.saga.'),concat('.',@type))"/>
     public static class <i>_MyProtocol_</i><xsl:value-of select="@type"/> extends <a
         href="saga-api-test/xref/org/ogf/saga/{$package}/{@type}.html"><xsl:value-of select="@type"/></a> {
-        public <i>_MyProtocol_</i><xsl:value-of select="@type"/>() throws Exception {super("myprotocol");}<xsl:text/>
+        public <i>_MyProtocol_</i><xsl:value-of select="@type"/>() throws Exception {super("myprotocol<xsl:text/>
+        <xsl:if test="contains(@type,'Copy') or contains(@type,'Move')">, "<xsl:value-of select="$targetProtocol"/></xsl:if>");}<xsl:text/>
         <xsl:for-each select="methods/method[@visibility='public' and starts-with(@name,'test_')]"><xsl:call-template name="CODE_method"/></xsl:for-each>
     }
     </xsl:template>
