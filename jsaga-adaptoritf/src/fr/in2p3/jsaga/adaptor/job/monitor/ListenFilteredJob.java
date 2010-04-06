@@ -16,6 +16,14 @@ import org.ogf.saga.error.TimeoutException;
  *
  */
 public interface ListenFilteredJob extends ListenJob {
+    /**
+     * Subscribe to receive notifications about job status changes.
+     * @param notifier the callback
+     */
     public void subscribeFilteredJob(JobStatusNotifier notifier) throws TimeoutException, NoSuccessException;
-    public void unsubscribeFilteredJob() throws TimeoutException, NoSuccessException;
+
+    /**
+     * Unsubscribe from notifications about job status changes.
+     */
+    public void unsubscribeFileteredJob() throws TimeoutException, NoSuccessException;
 }

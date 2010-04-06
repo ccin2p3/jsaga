@@ -20,22 +20,24 @@ import java.util.Map;
  */
 public interface Adaptor {
     /**
-     * @return the adaptor type (context type, data protocol or job type).
+     * @return the adaptor type (context type, data protocol or job protocol).
      */
     public String getType();
 
     /**
-     * Get the expected usage for this adaptor.
-     * @return the description of the expected usage.
+     * Get a data structure that describes how to use this adaptor.
+     * This data structure contains attribute names with usage constraints (and/or, required/optional, hidden...).
+     * @return the usage data structure.
      */
     public Usage getUsage();
 
     /**
-     * Get the defaults values for this adaptor.
-     * These values may be statically defined, or they may be generated according to the available information.
-     * @param attributes the available information.
-     * @return array of default values for some attributes.
-     * @throws IncorrectStateException if cannot create valid default values based on the available information.
+     * Get the defaults values for (some of the) attributes supported by this adaptor.
+     * These values can be static or dynamically created from the information available on local host
+     * (environment variables, files, ...) and from the attributes map.
+     * @param attributes the attributes set by the user.
+     * @return an array of default values.
+     * @throws IncorrectStateException if cannot create valid default values based on the information available.
      */
     public Default[] getDefaults(Map attributes) throws IncorrectStateException;
 }

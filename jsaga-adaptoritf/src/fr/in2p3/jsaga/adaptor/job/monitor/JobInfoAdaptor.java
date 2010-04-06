@@ -17,9 +17,44 @@ import java.util.Date;
  *
  */
 public interface JobInfoAdaptor extends JobMonitorAdaptor {
+    /**
+     * @param nativeJobId the identifier of the job in the grid
+     * @return the exit code of the job
+     * @throws NotImplementedException if not supported by the adaptor
+     * @throws NoSuccessException if failed to get the exit code
+     */
     public Integer getExitCode(String nativeJobId) throws NotImplementedException, NoSuccessException;
+
+    /**
+     * @param nativeJobId the identifier of the job in the grid
+     * @return the job creation time
+     * @throws NotImplementedException if not supported by the adaptor
+     * @throws NoSuccessException if failed to get the job creation time
+     */
     public Date getCreated(String nativeJobId) throws NotImplementedException, NoSuccessException;
+
+    /**
+     * @param nativeJobId the identifier of the job in the grid
+     * @return the job statup time
+     * @throws NotImplementedException if not supported by the adaptor
+     * @throws NoSuccessException if failed to get the job startup time
+     */
     public Date getStarted(String nativeJobId) throws NotImplementedException, NoSuccessException;
+
+    /**
+     * @param nativeJobId the identifier of the job in the grid
+     * @return the job end time
+     * @throws NotImplementedException if not supported by the adaptor
+     * @throws NoSuccessException if failed to get the job end time
+     */
     public Date getFinished(String nativeJobId) throws NotImplementedException, NoSuccessException;
+
+    /**
+     * Get the execution host. Several hosts may be returned if the job is a parallel job.
+     * @param nativeJobId the identifier of the job in the grid
+     * @return the array of execution hosts
+     * @throws NotImplementedException if not supported by the adaptor
+     * @throws NoSuccessException if failed to get the execution hosts
+     */
     public String[] getExecutionHosts(String nativeJobId) throws NotImplementedException, NoSuccessException;
 }

@@ -17,5 +17,8 @@ import java.io.OutputStream;
  *
  */
 public interface JobIOGetterInteractive extends JobIOGetter {
+    /**
+     * @return the job standard input stream
+     */
     public OutputStream getStdin() throws PermissionDeniedException, TimeoutException, NoSuccessException;
 }

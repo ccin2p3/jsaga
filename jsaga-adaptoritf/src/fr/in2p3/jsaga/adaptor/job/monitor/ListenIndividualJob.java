@@ -16,6 +16,16 @@ import org.ogf.saga.error.TimeoutException;
  *
  */
 public interface ListenIndividualJob extends ListenJob {
+    /**
+     * Subscribe to receive notifications about job status changes for job nativeJobId.
+     * @param nativeJobId the identifier of the job in the grid
+     * @param notifier the callback
+     */
     public void subscribeJob(String nativeJobId, JobStatusNotifier notifier) throws TimeoutException, NoSuccessException;
+
+    /**
+     * Unsubscribe from notifications about job status changes.
+     * @param nativeJobId the identifier of the job in the grid
+     */
     public void unsubscribeJob(String nativeJobId) throws TimeoutException, NoSuccessException;
 }

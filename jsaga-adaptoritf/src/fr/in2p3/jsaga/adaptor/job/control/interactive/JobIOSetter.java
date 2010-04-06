@@ -17,7 +17,15 @@ import java.io.OutputStream;
  *
  */
 public interface JobIOSetter extends JobIOHandler {
+    /**
+     * Set the job standard output stream.
+     * @param out the job standard output stream
+     */
     public void setStdout(OutputStream out) throws PermissionDeniedException, TimeoutException, NoSuccessException;
 
+    /**
+     * Set the job standard error stream.
+     * @param err the job standard error stream
+     */
     public void setStderr(OutputStream err) throws PermissionDeniedException, TimeoutException, NoSuccessException;
 }

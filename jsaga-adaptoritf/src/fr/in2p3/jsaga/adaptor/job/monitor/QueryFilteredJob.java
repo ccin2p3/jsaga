@@ -24,7 +24,7 @@ public interface QueryFilteredJob extends QueryJob {
     public static final int START_DATE = 2;
 
     /**
-     * Get status of jobs matching filter.
+     * Get the status of jobs matching filter.
      * @param filters the filter values.
      * @return the status of jobs matching filter.
      */

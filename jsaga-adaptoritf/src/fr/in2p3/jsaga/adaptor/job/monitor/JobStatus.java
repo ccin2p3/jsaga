@@ -42,22 +42,44 @@ public abstract class JobStatus {
         m_nativeCause = null;
     }
 
+    /**
+     * @return the identifier of the job in the grid
+     */
     public String getNativeJobId() {
         return m_nativeJobId;
     }
 
+    /**
+     * @return the saga state of the job
+     */
     public State getSagaState() {
         return this.getSubState().toSagaState();
     }
 
+    /**
+     * @return the backend state of the job
+     */
     public String getStateDetail() {
         return this.getModel()+":"+m_nativeStateString;
     }
 
+    /**
+     * @return the cause of failure
+     */
     public SagaException getCause() {
         return m_nativeCause;
     }
 
+    /**
+     * @return the backend name
+     */
     public abstract String getModel();
+
+    /**
+     * Get the implementation-specific but middleware-independant state of the job.
+     * In addition to SAGA states, this methods may return states such as PRE_STAGING, POST_STAGING,
+     * QUEUED, FAILED_ERROR and FAILED_ABORTED.
+     * @return the JSAGA state of the job
+     */
     public abstract SubState getSubState();
 }

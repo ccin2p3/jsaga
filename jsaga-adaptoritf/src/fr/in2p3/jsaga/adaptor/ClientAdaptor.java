@@ -20,7 +20,7 @@ import java.util.Map;
  */
 public interface ClientAdaptor extends Adaptor {
     /**
-     * @return list of supported SecurityCredential classes.
+     * @return the array of supported SecurityCredential classes.
      */
     public Class[] getSupportedSecurityCredentialClasses();
 

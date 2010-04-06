@@ -16,5 +16,10 @@ import org.ogf.saga.error.TimeoutException;
  *
  */
 public interface QueryIndividualJob extends QueryJob {
+    /**
+     * Get the status of the job matching identifier nativeJobId.
+     * @param nativeJobId the identifier of the job in the grid
+     * @return the status of the job.
+     */
     public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException;
 }
