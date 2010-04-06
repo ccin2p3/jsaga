@@ -52,13 +52,6 @@
 
 
             <section name="Developing a security adaptor">
-                <i>Copy-paste required methods to your adaptor class, and implement them.</i>
-                <pre>
-                    <xsl:for-each select="jelclass[@type='Adaptor' or @type='SecurityAdaptor']">
-                        <xsl:call-template name="CODE_jelclass"/>
-                    </xsl:for-each>
-                </pre>
-
                 <p>A security adaptor <b>must</b> implement the <xsl:apply-templates select="jelclass[@type='SecurityAdaptor']"/>
                     interface, which extends the <xsl:apply-templates select="jelclass[@type='Adaptor']"/> interface.
                 </p>
@@ -73,6 +66,13 @@
 
                 <p>See <a href="jsaga-engine/xref/fr/in2p3/jsaga/adaptor/security/UserPassSecurityAdaptor.html">example</a>.
                 </p>
+
+                <i>Copy-paste required methods to your adaptor class, and implement them.</i>
+                <pre>
+                    <xsl:for-each select="jelclass[@type='Adaptor' or @type='SecurityAdaptor']">
+                        <xsl:call-template name="CODE_jelclass"/>
+                    </xsl:for-each>
+                </pre>
             </section>
 
 
@@ -99,6 +99,11 @@
                     </p>
 
                     <h4>Developing a physical file adaptor that uses stream methods</h4>
+                    <p>A physical file adaptor that uses stream methods <b>must</b> implement
+                        the <xsl:apply-templates select="jelclass[@type='FileReaderStreamFactory']"/> <b>and/or</b>
+                        the <xsl:apply-templates select="jelclass[@type='FileWriterStreamFactory']"/> interfaces.
+                    </p>
+
                     <i>Copy-paste required methods to your adaptor class, and implement them.</i>
                     <pre>
                         <xsl:for-each select="jelclass[@type='Adaptor' or @type='ClientAdaptor'
@@ -109,12 +114,12 @@
                         </xsl:for-each>
                     </pre>
 
-                    <p>A physical file adaptor that uses stream methods <b>must</b> implement
-                        the <xsl:apply-templates select="jelclass[@type='FileReaderStreamFactory']"/> <b>and/or</b>
-                        the <xsl:apply-templates select="jelclass[@type='FileWriterStreamFactory']"/> interfaces.
+                    <h4>Developing a physical file adaptor that uses get/put methods</h4>
+                    <p>A physical file adaptor that uses get/put methods <b>must</b> implement
+                        the <xsl:apply-templates select="jelclass[@type='FileReaderGetter']"/> <b>and/or</b>
+                        the <xsl:apply-templates select="jelclass[@type='FileWriterPutter']"/> interfaces.
                     </p>
 
-                    <h4>Developing a physical file adaptor that uses get/put methods</h4>
                     <i>Copy-paste required methods to your adaptor class, and implement them.</i>
                     <pre>
                         <xsl:for-each select="jelclass[@type='Adaptor' or @type='ClientAdaptor'
@@ -124,14 +129,18 @@
                             <xsl:call-template name="CODE_jelclass"/>
                         </xsl:for-each>
                     </pre>
-
-                    <p>A physical file adaptor that uses get/put methods <b>must</b> implement
-                        the <xsl:apply-templates select="jelclass[@type='FileReaderGetter']"/> <b>and/or</b>
-                        the <xsl:apply-templates select="jelclass[@type='FileWriterPutter']"/> interfaces.
-                    </p>
                 </subsection>
 
                 <subsection name="Developing a logical file adator">
+                    <p>A logical file adaptor <b>must</b> implement the <xsl:apply-templates select="jelclass[@type='LogicalReader']"/>
+                        <b>and/or</b> the <xsl:apply-templates select="jelclass[@type='LogicalWriter']"/> interfaces.
+                    </p>
+
+                    <p>A logical file adaptor <b>may</b> implement the <xsl:apply-templates select="jelclass[@type='LogicalReaderMetaDataExtended']"/>
+                        optional interface, but this is <b>not recommended</b> because this feature can not be used
+                        through the SAGA API.
+                    </p>
+
                     <i>Copy-paste required methods to your adaptor class, and implement them.</i>
                     <pre>
                         <xsl:for-each select="jelclass[@type='Adaptor' or @type='ClientAdaptor'
@@ -141,15 +150,6 @@
                             <xsl:call-template name="CODE_jelclass"/>
                         </xsl:for-each>
                     </pre>
-
-                    <p>A logical file adaptor <b>must</b> implement the <xsl:apply-templates select="jelclass[@type='LogicalReader']"/>
-                        <b>and/or</b> the <xsl:apply-templates select="jelclass[@type='LogicalWriter']"/> interfaces.
-                    </p>
-
-                    <p>A logical file adaptor <b>may</b> implement the <xsl:apply-templates select="jelclass[@type='LogicalReaderMetaDataExtended']"/>
-                        optional interface, but this is <b>not recommended</b> because this feature can not be used
-                        through the SAGA API.
-                    </p>
                 </subsection>
 
                 <subsection name="Data adaptor optional features">
@@ -202,14 +202,6 @@
                 </p>
 
                 <subsection name="Developing a job control adaptor">
-                    <i>Copy-paste required methods to your adaptor class, and implement them.</i>
-                    <pre>
-                        <xsl:for-each select="jelclass[@type='Adaptor' or @type='ClientAdaptor'
-                                or @type='JobAdaptor' or @type='JobControlAdaptor']">
-                            <xsl:call-template name="CODE_jelclass"/>
-                        </xsl:for-each>
-                    </pre>
-
                     <p>A job control adaptor <b>must</b> implement the <xsl:apply-templates select="jelclass[@type='JobControlAdaptor']"/>
                         interface.
                     </p>
@@ -227,17 +219,17 @@
                         Although you have the possibility to implement your own job description translator, it is <b>recommended</b>
                         to use the JobDescriptionTranslatorXSLT in order to keep your code easy to maintain.
                     </p>
-                </subsection>
 
-                <subsection name="Developing a job monitor adaptor">
                     <i>Copy-paste required methods to your adaptor class, and implement them.</i>
                     <pre>
                         <xsl:for-each select="jelclass[@type='Adaptor' or @type='ClientAdaptor'
-                                or @type='JobAdaptor' or @type='JobMonitorAdaptor']">
+                                or @type='JobAdaptor' or @type='JobControlAdaptor']">
                             <xsl:call-template name="CODE_jelclass"/>
                         </xsl:for-each>
                     </pre>
+                </subsection>
 
+                <subsection name="Developing a job monitor adaptor">
                     <p>A job monitor adaptor <b>must</b> implement the <xsl:apply-templates select="jelclass[@type='JobMonitorAdaptor']"/>
                         interface.
                     </p>
@@ -268,6 +260,14 @@
                     <p>A job monitor adaptor <b>may</b> implement the <xsl:apply-templates select="jelclass[@type='JobInfoAdaptor']"/>
                         optional interface.
                     </p>
+
+                    <i>Copy-paste required methods to your adaptor class, and implement them.</i>
+                    <pre>
+                        <xsl:for-each select="jelclass[@type='Adaptor' or @type='ClientAdaptor'
+                                or @type='JobAdaptor' or @type='JobMonitorAdaptor']">
+                            <xsl:call-template name="CODE_jelclass"/>
+                        </xsl:for-each>
+                    </pre>
                 </subsection>
 
                 <subsection name="Job control adaptor optional features">
