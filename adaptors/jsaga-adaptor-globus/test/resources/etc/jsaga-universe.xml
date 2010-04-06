@@ -39,8 +39,8 @@
                 <!--<attribute name="IPAddress" value="134.158.71.193"/>-->
                 <attribute name="TcpPortRange" value="30000,31000"/>
             </job>
+            <data type="gsiftp"/>
         </GRID>
-        <data type="gsiftp"/>
     </UNIVERSE>
     <GRID name="EGEE" contextType="MyProxy">
         <attribute name="CertRepository" value="${user.home}/.globus/certificates/"/>
