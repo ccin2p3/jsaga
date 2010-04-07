@@ -20,7 +20,7 @@ public interface StagingJobAdaptorOnePhase extends StagingJobAdaptor {
      * Protocol must be one of the supported protocols.
      * @param nativeJobDescription the job description in native language
      * @param uniqId a identifier unique to this job (not the job identifier, which is not generated yet)
-     * @return the staging directory URL
+     * @return the staging directory URL, or null if the staging directory is managed by the job service.
      */
     public String getStagingDirectory(String nativeJobDescription, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException;
 
