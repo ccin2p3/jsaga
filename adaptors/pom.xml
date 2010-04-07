@@ -15,10 +15,8 @@
 
   <!-- aggregation -->
   <modules>
-    <module>jsaga-adaptor-default</module>
     <module>jsaga-adaptor-lfc</module>
     <module>jsaga-adaptor-srm</module>
-    <module>jsaga-adaptor-jdl</module>
     <module>jsaga-adaptor-wsgram</module>
     <module>jsaga-adaptor-cream</module>
     <module>jsaga-adaptor-wms</module>
