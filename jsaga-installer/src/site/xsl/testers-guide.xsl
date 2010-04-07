@@ -54,15 +54,15 @@ public class <i>_MyGrid_</i>TestSuite extends JSAGATestSuite {
     public static class index extends IndexTest {public index(){super(<i>_MyGrid_</i>TestSuite.class);}}
 
     /** test cases */
-    public class <i>_MyGrid_</i>ContextInit extends <a
+    public static class <i>_MyGrid_</i>ContextInit extends <a
         href="saga-api-test/xref/org/ogf/saga/context/ContextInitTest.html">ContextInitTest</a> {
         public <i>_MyGrid_</i>ContextInit() throws Exception {super("<i>mygrid</i>");}
     }
-    public class <i>_MyGrid_</i>ContextInfo extends <a
+    public static class <i>_MyGrid_</i>ContextInfo extends <a
         href="saga-api-test/xref/org/ogf/saga/context/ContextInfoTest.html">ContextInfoTest</a> {
         public <i>_MyGrid_</i>ContextInfo() throws Exception {super();}
     }
-    public class <i>_MyGrid_</i>ContextDestroy extends <a
+    public static class <i>_MyGrid_</i>ContextDestroy extends <a
         href="saga-api-test/xref/org/ogf/saga/context/ContextDestroyTest.html">ContextDestroyTest</a> {
         public <i>_MyGrid_</i>ContextDestroy() throws Exception {super("<i>mygrid</i>");}
     }
