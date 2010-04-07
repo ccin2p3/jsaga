@@ -255,11 +255,11 @@
 
                     <p>Monitoring interfaces create job status objects. A job status object <b>must</b>
                         extend the <xsl:apply-templates select="jelclass[@type='JobStatus']"/> abstract class.
-                    </p>
+                    </p><br/>
 
                     <p>A job monitor adaptor <b>may</b> implement the <xsl:apply-templates select="jelclass[@type='JobInfoAdaptor']"/>
                         optional interface.
-                    </p>
+                    </p><br/>
 
                     <i>Copy-paste required methods to your adaptor class, and implement them.</i>
                     <pre>
