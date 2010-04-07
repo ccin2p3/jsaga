@@ -60,7 +60,7 @@ public class <i>_MyGrid_</i>TestSuite extends JSAGATestSuite {
     }
     public class <i>_MyGrid_</i>ContextInfo extends <a
         href="saga-api-test/xref/org/ogf/saga/context/ContextInfoTest.html">ContextInfoTest</a> {
-        public <i>_MyGrid_</i>ContextInfo() throws Exception {super("<i>mygrid</i>");}
+        public <i>_MyGrid_</i>ContextInfo() throws Exception {super();}
     }
     public class <i>_MyGrid_</i>ContextDestroy extends <a
         href="saga-api-test/xref/org/ogf/saga/context/ContextDestroyTest.html">ContextDestroyTest</a> {
