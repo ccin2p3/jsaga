@@ -28,7 +28,7 @@
                 </p><br/>
                 <p>Adaptor interfaces are designed to be as close to legacy middleware API as possible.
                     A few interfaces are required, most of them are optional.
-                    An adaptor should implement <b>only</b> required features, and optional features
+                    An adaptor should implement <b>only</b> required functionalities and optional functionalities
                     that can not be emulated by the core engine.
                     However, selected interfaces must be <b>fully implemented</b> and adaptor methods
                     can not throw exception "NotImplementedException".
@@ -137,7 +137,7 @@
                     </p>
 
                     <p>A logical file adaptor <b>may</b> implement the <xsl:apply-templates select="jelclass[@type='LogicalReaderMetaDataExtended']"/>
-                        optional interface, but this is <b>not recommended</b> because this feature can not be used
+                        optional interface, but this is <b>not recommended</b> because this functionality can not be used
                         through the SAGA API.
                     </p>
 
@@ -152,7 +152,7 @@
                     </pre>
                 </subsection>
 
-                <subsection name="Data adaptor optional features">
+                <subsection name="Data adaptor optional functionalities">
                     <p>A data adaptor <b>may</b> implement the <xsl:apply-templates select="jelclass[@type='DataWriterTimes']"/>
                         optional interface in order to support preservation of last modification date when copying files.
                     </p>
@@ -270,7 +270,7 @@
                     </pre>
                 </subsection>
 
-                <subsection name="Job control adaptor optional features">
+                <subsection name="Job control adaptor optional functionalities">
                     <h4>Job data (staging and I/O streams)</h4>
 
                     <p>A job control adaptor <b>may</b> implement a data staging optional interface,
@@ -318,7 +318,7 @@
                     </p>
 
 
-                    <h4>Job optional features</h4>
+                    <h4>Job optional functionalities</h4>
 
                     <p>A job control adaptor <b>may</b> implement the <xsl:apply-templates select="jelclass[@type='CheckpointableJobAdaptor']"/>
                         interface in order to checkpoint running jobs.
