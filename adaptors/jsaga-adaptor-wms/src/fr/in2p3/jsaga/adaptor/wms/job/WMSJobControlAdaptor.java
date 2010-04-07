@@ -205,7 +205,9 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
     	try {
 			// parse JDL and Check Matching
-			checkJDLAndMAtch(jobDesc, checkMatch, m_client);
+            if (checkMatch) {
+			    checkJDLAndMAtch(jobDesc, m_client);
+            }
 
             // register job
             String nativeJobId = m_client.jobRegister(jobDesc, m_delegationId).getId();
@@ -215,6 +217,14 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
                 WMStoLB.getInstance().setLBHost(m_wmsServerUrl, nativeJobId);
             }
 	    	return nativeJobId;
+        } catch (ServiceException e) {
+            try {
+                AdParser.parseJdl(jobDesc);
+            } catch (JobAdException e2) {
+                throw new NoSuccessException("The job description is not valid", e2);
+            }
+            rethrow(e);
+            return null;    // dead code
         } catch (BaseException e) {
             rethrow(e);
             return null;    // dead code
@@ -239,7 +249,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         return new WMSJobIOHandler(stagingClient, m_stagingPrefix, jobId);
     }
 
-    private void checkJDLAndMAtch(String jobDesc, boolean checkMatch, WMProxyAPI m_client2)
+    private void checkJDLAndMAtch(String jobDesc, WMProxyAPI m_client2)
             throws NoSuccessException, AuthorizationFaultException, AuthenticationFaultException, InvalidArgumentFaultException, NoSuitableResourcesFaultException, ServiceException, ServerOverloadedFaultException
     {
 		// parse JDL
@@ -249,19 +259,16 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 			throw new NoSuccessException("The job description is not valid", e);
 		}
 
-		if(checkMatch) {				
-			// get available CE
-        	StringAndLongList result = m_client.jobListMatch(jobDesc, m_delegationId);            
-        	if ( result != null ) {
-				// list of CE
-				StringAndLongType[] list = (StringAndLongType[]) result.getFile ();
-				if (list == null) 
-					throw new BadResource("No Computing Element matching your job requirements has been found!");
-  			}
-        	else 
-        		throw new BadResource("No Computing Element matching your job requirements has been found!");
-		}
-
+        // get available CE
+        StringAndLongList result = m_client.jobListMatch(jobDesc, m_delegationId);
+        if ( result != null ) {
+            // list of CE
+            StringAndLongType[] list = (StringAndLongType[]) result.getFile ();
+            if (list == null)
+                throw new BadResource("No Computing Element matching your job requirements has been found!");
+        }
+        else
+            throw new BadResource("No Computing Element matching your job requirements has been found!");
 	}
 
     public String getStagingDirectory(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
