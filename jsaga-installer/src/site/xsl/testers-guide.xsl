@@ -42,6 +42,12 @@
 
 
             <section name="Testing a security adaptor">
+                <p>The security test-suite can also be used when testing data or job adaptors, in order to initialize,
+                    check and destroy the security context needed to be authentified by the remote data/job server.
+                </p>
+                <p>For example, in order to initialize the security context, enter:</p>
+                <pre>mvn integration-test -Dtest={integration.<i>_MyGrid_</i>TestSuite\$<i>_MyGrid_</i>ContextInit}</pre>
+
                 <i>Copy-paste this code to your test class.</i>
                 <pre>package integration;
 import junit.framework.Test;
@@ -72,6 +78,28 @@ public class <i>_MyGrid_</i>TestSuite extends JSAGATestSuite {
 
 
             <section name="Testing a data adaptor">
+                <p>If the tested adaptor only support read operations, you must set up the test environment manually
+                    (see <a href="howto.html#create-test-entries">Contributors How To</a> web page).
+                </p>
+                <p>If the tested adaptor support write operations, you should first test if the test environment set up
+                    properly, by using the NSSetUpTest test suite:
+                </p>
+                <pre>mvn integration-test -Dtest={integration.<i>_MyProtocol_</i>TestSuite\$<i>_MyProtocol_</i>NSSetUpTest}</pre>
+                <p>If the test environment set up fails with exception AlreadyExistsException, first clean it up
+                    with the IntegrationClean test suite.
+                </p>
+                <pre>package integration;
+import junit.framework.Test;
+import org.ogf.saga.namespace.IntegrationClean;
+
+public class <i>_MyProtocol_</i>Cleanup extends IntegrationClean {
+    public <i>_MyProtocol_</i>Cleanup() throws Exception {
+        super("<i>myprotocol</i>", "<i>myprotocol</i>");
+    }
+    public void test_dummy() {}
+}
+                </pre>
+
                 <subsection name="Testing a physical file adator">
                     <i>Copy-paste this code to your test class.</i>
                     <pre>package integration;
