@@ -4,8 +4,8 @@ package fr.in2p3.jsaga.adaptor.lfc;
  * @author Jerome Revillard
  */
 public class LFCUser {
-	protected final int uid; // uid
-	protected final String name;
+	private final int uid; // uid
+	private final String name;
 
 	protected LFCUser(int uid, String name) {
 		this.uid = uid;

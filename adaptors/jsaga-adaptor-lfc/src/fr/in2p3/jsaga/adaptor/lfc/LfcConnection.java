@@ -3,12 +3,13 @@ package fr.in2p3.jsaga.adaptor.lfc;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
-import java.nio.channels.ByteChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
 import org.globus.gsi.GSIConstants;
@@ -27,6 +28,9 @@ import org.ietf.jgss.GSSManager;
  */
 public class LfcConnection {
 	private static Logger s_logger = Logger.getLogger(LfcConnection.class);
+	
+	private final static int MAX_RETRY_IF_TIMEOUT = 1;
+	
 	/**
 	 * Bitmask for <b>file mode</b>
 	 */
@@ -162,7 +166,7 @@ public class LfcConnection {
 	// private static final int CNS_ABORTTRANS = 48;
 	// private static final int CNS_LISTLINKS = 49;
 	// private static final int CNS_SETFSIZEG = 50;
-	// private static final int CNS_STATG = 51;
+	 private static final int CNS_STATG = 51;
 	// private static final int CNS_STATR = 52;
 	// private static final int CNS_SETPTIME = 53;
 	// private static final int CNS_SETRATIME = 54;
@@ -170,8 +174,8 @@ public class LfcConnection {
 	// private static final int CNS_ACCESSR = 56;
 	// private static final int CNS_LISTREP4GC = 57;
 	// private static final int CNS_LISTREPLICAX = 58;
-	// private static final int CNS_STARTSESS = 59;
-	// private static final int CNS_ENDSESS = 60;
+	 private static final int CNS_STARTSESS = 59;
+	 private static final int CNS_ENDSESS = 60;
 	// private static final int CNS_DU = 61;
 	private static final int CNS_GETGRPID = 62;
 	private static final int CNS_GETGRPNAM = 63;
@@ -243,10 +247,17 @@ public class LfcConnection {
 		TOO_MANY_LINKS(31, "Too many links"),
 		BROKEN_PIPE(32, "Broken pipe"),
 		MATH_ARGUMENT_OUT_OF_DOMAIN_OF_FUNC(33, "Math argument out of domain of func"),
-		MATH_RESULT_NOT_REPRESENTABLE(34, "Math result not representable");
+		MATH_RESULT_NOT_REPRESENTABLE(34, "Math result not representable"),
+		
+		/* Extract from serrno.man */
+		TIMED_OUT(1004, "Has timed out"),
+		
+		UNKOWN_ERROR(9999, "Unknown LFC error");
 		
 		private String message;
 		private int error;
+		private String executedCmd = null;
+		
 		private LfcError(int error, String message) {
 			this.error = error;
 			this.message = message;
@@ -257,9 +268,18 @@ public class LfcConnection {
 		public int getError(){
 			return error;
 		}
+		
+		public String getExecutedCmd() {
+			return this.executedCmd;
+		}
+		
+		private void setExecutedCmd(String executedCmd) {
+			this.executedCmd = executedCmd;
+		}
+		
 		@Override
 		public String toString() {
-			return "Error "+error+": "+message;
+			return executedCmd+": Error "+error+": "+message;
 		}
 		
 		public static LfcError fromError(int error){
@@ -272,45 +292,6 @@ public class LfcConnection {
 			return null;
 		}
 	}
-//	private static final Map<Integer, String> CNS_ERRORS = new TreeMap<Integer, String>();
-//	static {
-//		CNS_ERRORS.put(1, "Operation not permitted");
-//		CNS_ERRORS.put(2, "No such file or directory");
-//		CNS_ERRORS.put(3, "No such process");
-//		CNS_ERRORS.put(4, "Interrupted system call");
-//		CNS_ERRORS.put(5, "I/O error");
-//		CNS_ERRORS.put(6, "No such device or address");
-//		CNS_ERRORS.put(7, "Argument list too long");
-//		CNS_ERRORS.put(8, "Exec format error");
-//		CNS_ERRORS.put(9, "Bad file number");
-//		CNS_ERRORS.put(10, "No child processes");
-//		CNS_ERRORS.put(11, "Try again");
-//		CNS_ERRORS.put(12, "Out of memory");
-//		CNS_ERRORS.put(13, "Permission denied");
-//		CNS_ERRORS.put(14, "Bad address");
-//		CNS_ERRORS.put(15, "Block device required");
-//		CNS_ERRORS.put(16, "Device or resource busy");
-//		CNS_ERRORS.put(17, "File exists");
-//		CNS_ERRORS.put(18, "Cross-device link");
-//		CNS_ERRORS.put(19, "No such device");
-//		CNS_ERRORS.put(20, "Not a directory");
-//		CNS_ERRORS.put(21, "Is a directory");
-//		CNS_ERRORS.put(22, "Invalid argument");
-//		CNS_ERRORS.put(23, "File table overflow");
-//		CNS_ERRORS.put(24, "Too many open files");
-//		CNS_ERRORS.put(25, "Not a typewriter");
-//		CNS_ERRORS.put(26, "Text file busy");
-//		CNS_ERRORS.put(27, "File too large");
-//		CNS_ERRORS.put(28, "No space left on device");
-//		CNS_ERRORS.put(29, "Illegal seek");
-//		CNS_ERRORS.put(30, "Read-only file system");
-//		CNS_ERRORS.put(31, "Too many links");
-//		CNS_ERRORS.put(32, "Broken pipe");
-//		CNS_ERRORS.put(33, "Math argument out of domain of func");
-//		CNS_ERRORS.put(34, "Math result not representable");
-//	}
-	
-	
 	
 	/**
 	 * Values that can be passed to the access function.
@@ -334,20 +315,31 @@ public class LfcConnection {
 
 	private final ByteBuffer sendBuf = ByteBuffer.allocateDirect(BUF_SIZE);
 	private ByteBuffer recvBuf = ByteBuffer.allocateDirect(BUF_SIZE);
-	private final ByteChannel channel;
+	private SocketChannel channel;
 
 	private final GSSCredential gssCredential;
 	private final String host;
 	private final int port;
 
-	public LfcConnection(String host, int port, final GSSCredential gssCredential) throws IOException, ReceiveException {
+	public LfcConnection(String host, int port, final GSSCredential gssCredential) throws IOException, ReceiveException, TimeoutException {
 		this.host = host;
 		this.port = port;
 		this.gssCredential = gssCredential;
+		init();
+	}
 		
+	public void init()throws IOException, ReceiveException, TimeoutException{
 		channel = SocketChannel.open(new InetSocketAddress(host, port));
-		s_logger.info("Establishing Connection with " + host + ":" + port);
-		authenticate();
+		s_logger.debug("Establishing Connection with " + host + ":" + port);
+		try{
+			authenticate();
+		}catch (IOException e) {
+			throw e;
+		}catch (ReceiveException e) {
+			e.getLFCError().setExecutedCmd("initLFCConnection()");
+			throw e;
+		}
+		s_logger.debug("Connection established with " + host + ":" + port);
 	}
 
 	private void preparePacket(int magic, int command) {
@@ -358,75 +350,118 @@ public class LfcConnection {
 		sendBuf.putInt(0);
 	}
 
-	private int sendAndReceive(boolean includeHeaderInLength) throws IOException, ReceiveException {
+	private int sendAndReceive(boolean includeHeaderInLength) throws IOException, ReceiveException, TimeoutException {
 		send(includeHeaderInLength);
 		return receive();
 	}
 
-	private void send(boolean includeHeaderInLength) throws IOException {
+	private void send(boolean includeHeaderInLength) throws IOException, ReceiveException {
 		int posNow = sendBuf.position();
 		sendBuf.reset();
-		if (includeHeaderInLength)
+		if (includeHeaderInLength){
 			sendBuf.putInt(posNow);
-		else
+		}else{
 			sendBuf.putInt(posNow - HEADER_SIZE);
+		}
 		sendBuf.position(posNow);
 		sendBuf.flip();
-		channel.write(sendBuf);
+		//Try to reconnect if the channel was closed...
+//		boolean done = false;
+//		int max_connection = 2;
+//		while (!done && max_connection-- > 0) {
+//			try{
+				int writtenBites = channel.write(sendBuf);
+				if(writtenBites != posNow){
+					throw new IOException("Socket Error: writtenBites="+writtenBites+" - bytesToWrite="+posNow );
+				}
+//				done = true;
+//			}catch (ClosedChannelException e) {
+//				init();
+//			}
+//		}
 	}
 
-	private int receive() throws IOException, ReceiveException {
-		recvBuf.clear();
-		channel.read(recvBuf);
-		recvBuf.flip();
-		int magic = recvBuf.getInt();
-		int type = recvBuf.getInt();
-		// For whatever reason, the reply never includes the size of the Header.
-		int sizeOrError = recvBuf.getInt();
-		s_logger.debug("Received M/T/S: " + magic + " " + type + " " + sizeOrError);
-
-		if (magic == CSEC_TOKEN_MAGIC_1) {
-			if ((type != CSEC_TOKEN_TYPE_PROTOCOL_RESP) && (type != CSEC_TOKEN_TYPE_HANDSHAKE) && (type != CSEC_TOKEN_TYPE_HANDSHAKE_FINAL)) {
-				throw new ReceiveException(sizeOrError, "Received invalid CSEC Type: " + type);
-			}
-		} else if (magic == CNS_MAGIC) {
-			if ((type == CNS_RESP_IRC) || (type == CNS_RESP_RC)) {
-				if (sizeOrError == 0)
-					return 0;
-				LfcError lfcError = LfcError.fromError(sizeOrError);
-				if (lfcError == null){
-					String errorMessage = "Unknown LFC error value: " + sizeOrError;
-					throw new ReceiveException(sizeOrError, errorMessage);
-				}
-				throw new ReceiveException(lfcError);
-			} else if (type == CNS_RESP_MSG_ERROR) {
-				String errorMessage = getString();
-				throw new ReceiveException(sizeOrError, errorMessage);
-			} else if ((type != CNS_RESP_MSG_DATA) && (type != CNS_RESP_MSG_SUMMARY) && (type != CNS_RESP_MSG_GROUPS)) {
-				throw new ReceiveException(sizeOrError, "Received invalid CNS Type: " + type);
-			}
-		} else {
-			throw new ReceiveException(sizeOrError, "Recieved invalid Magic/Type: " + magic + "/" + type);
-		}
-
-		s_logger.debug("Limit: " + recvBuf.limit() + ", Pos: " + recvBuf.position() + " MinContent: " + sizeOrError + " Avail " + recvBuf.remaining());
-
-		while (recvBuf.remaining() < sizeOrError) {
-			s_logger.debug("Reading once more: " + recvBuf.remaining() + " < " + sizeOrError);
-			// TODO: There must be an easier method of reading more data.
-			byte[] temp = new byte[recvBuf.remaining()];
-			recvBuf.get(temp);
-			if (recvBuf.capacity() < sizeOrError) {
-				recvBuf = ByteBuffer.allocateDirect(sizeOrError);
-			} else {
-				recvBuf.clear();
-			}
-			recvBuf.put(temp);
+	private int receive() throws IOException, ReceiveException, TimeoutException {
+		try{
+			recvBuf.clear();
 			channel.read(recvBuf);
+			int timeout = 5;
+		    int delay = 100;
+			while ((recvBuf.position() < HEADER_SIZE) && timeout-- > 0) {
+				try {
+					channel.read(recvBuf);
+					s_logger.debug("\t HEAD: waiting " + delay + " [ms]... AVAIL=" + recvBuf.position() + ", EXP="+HEADER_SIZE);
+					Thread.sleep(delay);
+					delay *= 2;
+				} catch (InterruptedException exc) {
+					s_logger.error(exc);
+				}
+			}
+		    if ( recvBuf.position() < HEADER_SIZE ) {
+		      throw new TimeoutException( "Connection timeout during receiving header." );
+		    }
+//		    s_logger.debug("AVAIL=" + recvBuf.position() + ", EXP="+HEADER_SIZE);
 			recvBuf.flip();
+			int magic = recvBuf.getInt();
+			int type = recvBuf.getInt();
+			// For whatever reason, the reply never includes the size of the Header.
+			int sizeOrError = recvBuf.getInt();
+//			s_logger.debug("Received M/T/S: " + magic + " " + type + " " + sizeOrError);
+	
+			if (magic == CSEC_TOKEN_MAGIC_1) {
+				if ((type != CSEC_TOKEN_TYPE_PROTOCOL_RESP) && (type != CSEC_TOKEN_TYPE_HANDSHAKE) && (type != CSEC_TOKEN_TYPE_HANDSHAKE_FINAL)) {
+					throw new ReceiveException(sizeOrError, "Received invalid CSEC Type: " + type);
+				}
+			} else if (magic == CNS_MAGIC) {
+				if ((type == CNS_RESP_IRC) || (type == CNS_RESP_RC)) {
+					if (sizeOrError == 0)
+						return 0;
+					LfcError lfcError = LfcError.fromError(sizeOrError);
+					if (lfcError == null){
+						String errorMessage = "Unknown LFC error value: " + sizeOrError;
+						throw new ReceiveException(sizeOrError, errorMessage);
+					}
+					throw new ReceiveException(lfcError);
+				} else if (type == CNS_RESP_MSG_ERROR) {
+					String errorMessage = getString();
+					throw new ReceiveException(sizeOrError, errorMessage);
+				} else if ((type != CNS_RESP_MSG_DATA) && (type != CNS_RESP_MSG_SUMMARY) && (type != CNS_RESP_MSG_GROUPS)) {
+					throw new ReceiveException(sizeOrError, "Received invalid CNS Type: " + type);
+				}
+			} else {
+				throw new ReceiveException(sizeOrError, "Recieved invalid Magic/Type: " + magic + "/" + type);
+			}
+	
+//			s_logger.debug("Limit: " + recvBuf.limit() + ", Pos: " + recvBuf.position() + " MinContent: " + sizeOrError + " Avail " + recvBuf.remaining());
+			timeout = 5;
+		    delay = 100;
+			while (recvBuf.remaining() < sizeOrError && timeout-- > 0) {
+//				s_logger.debug("Reading once more: " + recvBuf.remaining() + " < " + sizeOrError);
+				// TODO: There must be an easier method of reading more data.
+				byte[] temp = new byte[recvBuf.remaining()];
+				recvBuf.get(temp);
+				if (recvBuf.capacity() < sizeOrError) {
+					recvBuf = ByteBuffer.allocateDirect(sizeOrError);
+				} else {
+					recvBuf.clear();
+				}
+				recvBuf.put(temp);
+				channel.read(recvBuf);
+				recvBuf.flip();
+				try {
+					Thread.sleep(delay);
+					delay *= 2;
+				} catch (InterruptedException exc) {
+					s_logger.error(exc);
+				}
+			}
+			if ( recvBuf.remaining() < sizeOrError ) {
+			      throw new TimeoutException("Connection timeout during receiving data.");
+			}
+			return sizeOrError;
+		}catch (BufferUnderflowException e) {
+			throw new ReceiveException(-9999, e.getMessage());
 		}
-
-		return sizeOrError;
 	}
 
 	private void addIDs() {
@@ -436,7 +471,7 @@ public class LfcConnection {
 		sendBuf.putInt(gid);
 	}
 
-	private void authenticate() throws IOException, ReceiveException {
+	private void authenticate() throws IOException, ReceiveException, TimeoutException {
 		preparePacket(CSEC_TOKEN_MAGIC_1, CSEC_TOKEN_TYPE_PROTOCOL_REQ);
 		sendBuf.put(REQUEST_GSI_TOKEN);
 		sendAndReceive(false);
@@ -453,7 +488,7 @@ public class LfcConnection {
 			byte[] recvToken = new byte[0];
 			while (!secureContext.isEstablished()) {
 				byte[] sendToken = secureContext.initSecContext(recvToken, 0, recvToken.length);
-				s_logger.debug("Called initSecContext, doing another iteration");
+//				s_logger.debug("Called initSecContext, doing another iteration");
 
 				if (sendToken != null) {
 					preparePacket(CSEC_TOKEN_MAGIC_1, CSEC_TOKEN_TYPE_HANDSHAKE);
@@ -466,13 +501,12 @@ public class LfcConnection {
 					recvToken = new byte[l];
 					recvBuf.get(recvToken);
 				}
-			}
-
+			}			
 		} catch (GSSException e) {
-			s_logger.warn(e.toString());
+//			s_logger.warn(e.toString());
 			throw new IOException("Error processing credential");
 		}
-		s_logger.debug("Secure Context established!");
+//		s_logger.debug("Secure Context established!");
 	}
 
 	private void putString(String s) {
@@ -502,143 +536,288 @@ public class LfcConnection {
 		return builder.toString();
 	}
 
-	public LFCFile stat(String path) throws IOException, ReceiveException {
-		preparePacket(CNS_MAGIC, CNS_STAT);
-		addIDs();
-		long cwd = 0L;
-		sendBuf.putLong(cwd);
-		sendBuf.putLong(0L); // 0
-		putString(path);
-		sendAndReceive(true);
-
-		LFCFile file = new LFCFile(recvBuf, false, false, false, false);
-		if (s_logger.isDebugEnabled()) {
-			s_logger.debug(file.toString());
-		}
-		return file;
-	}
-
-	public LFCFile lstat(String path) throws IOException, ReceiveException {
-		preparePacket(CNS_MAGIC, CNS_LSTAT);
-		addIDs();
-		long cwd = 0L;
-		sendBuf.putLong(cwd);
-		sendBuf.putLong(0L); // 0
-		putString(path);
-		sendAndReceive(true);
-
-		LFCFile file = new LFCFile(recvBuf, false, false, false, false);
-		if (s_logger.isDebugEnabled()) {
-			s_logger.debug(file.toString());
-		}
-		return file;
-	}
-
-	public long opendir(String path, String guid) throws IOException, ReceiveException {
-		if (guid == null) {
-			preparePacket(CNS_MAGIC, CNS_OPENDIR);
-		} else {
-			preparePacket(CNS_MAGIC2, CNS_OPENDIR);
-		}
-		addIDs();
-		long cwd = 0L; // Current Working Directory
-		sendBuf.putLong(cwd);
-		putString(path);
-		putString(guid);
-		sendAndReceive(true);
-
-		long fileId = recvBuf.getLong();
-		s_logger.debug("Directory opened - fileID: " + fileId);
-		return fileId;
-	}
-
-	public void closedir() throws IOException, ReceiveException {
-		preparePacket(CNS_MAGIC2, CNS_CLOSEDIR);
-		sendAndReceive(false);
-		s_logger.debug("Directory closed");
-	}
-
-	public int getGrpByName(String grpName) throws IOException, ReceiveException {
-		if ("root".equals(grpName)) {
-			return 0;
-		}
-		preparePacket(CNS_MAGIC, CNS_GETGRPID);
-		putString(grpName);
-		sendAndReceive(true);
-
-		int s = recvBuf.getInt();
-		return s;
-	}
-
-	public String getGrpByGid(int gid) throws IOException, ReceiveException {
-		if (gid == 0) {
-			return "root";
-		}
-		preparePacket(CNS_MAGIC, CNS_GETGRPNAM);
-		sendBuf.putShort((short) 0);
-		sendBuf.putShort((short) gid);
-		sendAndReceive(true);
-
-		return getString();
-	}
-
-	public Collection<String> getGrpByGids(int[] gids) throws IOException, ReceiveException {
-		ArrayList<Integer> rootGIDIndexes = new ArrayList<Integer>();
-		ArrayList<Integer> newGids = new ArrayList<Integer>();
-		for (int i = 0; i < gids.length; i++) {
-			if (gids[i] == 0) {
-				rootGIDIndexes.add(i);
-			} else {
-				newGids.add(gids[i]);
+	
+	public void startSession() throws IOException, ReceiveException, TimeoutException{
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				preparePacket(CNS_MAGIC, CNS_STARTSESS);
+				addIDs();
+				long cwd = 0L;
+				sendBuf.putLong(cwd);
+				putString(null); //Session comment in the LFC logs.
+				long l = sendAndReceive(true);
+				if(l != 0){
+					throw new IOException("startSession: Something remains to be read ("+l+" bits)");
+				}
+				break;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
 			}
 		}
-
-		gids = new int[newGids.size()];
-		for (int i = 0; i < newGids.size(); i++) {
-			gids[i] = newGids.get(i);
-		}
-
-		preparePacket(CNS_MAGIC, CNS_GETGRPNAMES);
-		sendBuf.putShort((short) 0);
-		sendBuf.putShort((short) gids.length);
-		for (int i = 0; i < gids.length; i++) {
-			sendBuf.putInt(gids[i]);
-		}
-		sendAndReceive(true);
-
-		Collection<String> grpNames = new ArrayList<String>(gids.length);
-		for (int i = 0; i < gids.length; i++) {
-			if (rootGIDIndexes.contains(i)) {
-				grpNames.add("root");
-			} else {
-				grpNames.add(getString());
+	}
+	
+	public void closeSession() throws IOException, ReceiveException, TimeoutException{
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				preparePacket(CNS_MAGIC, CNS_ENDSESS);
+				addIDs();
+				long cwd = 0L;
+				sendBuf.putLong(cwd);
+				long l = sendAndReceive(true);
+				if(l != 0){
+					throw new IOException("closeSession: Something remains to be read ("+l+" bits)");
+				}
+				break;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
 			}
 		}
-		return grpNames;
+	}
+	
+	public LFCFile stat(String path) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				preparePacket(CNS_MAGIC, CNS_STAT);
+				addIDs();
+				long cwd = 0L;
+				sendBuf.putLong(cwd);
+				sendBuf.putLong(0L); // 0
+				putString(path);
+				sendAndReceive(true);
+		
+				LFCFile file = new LFCFile(recvBuf, false, false, false, false);
+				return file;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+			}
+		}
+		throw new RuntimeException("Must not be here. BUG");
+	}
+	
+	public LFCFile statg(String path, String guid) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				preparePacket(CNS_MAGIC, CNS_STATG);
+				addIDs();
+				long cwd = 0L;
+				sendBuf.putLong(cwd);
+				putString(path);
+				putString(guid);
+				sendAndReceive(true);
+		
+				LFCFile file = new LFCFile(recvBuf, false, true, true, false);
+				return file;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+			}
+		}
+		throw new RuntimeException("Must not be here. BUG");
 	}
 
-	public int getUsrByName(String usrName) throws IOException, ReceiveException {
-		if ("root".equals(usrName)) {
-			return 0;
+	public LFCFile lstat(String path) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				preparePacket(CNS_MAGIC, CNS_LSTAT);
+				addIDs();
+				long cwd = 0L;
+				sendBuf.putLong(cwd);
+				sendBuf.putLong(0L); // 0
+				putString(path);
+				sendAndReceive(true);
+				LFCFile file = new LFCFile(recvBuf, false, false, false, false);
+				return file;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+			}
 		}
-		preparePacket(CNS_MAGIC, CNS_GETUSRID);
-		putString(usrName);
-		sendAndReceive(true);
-
-		int s = recvBuf.getInt();
-		return s;
+		throw new RuntimeException("Must not be here. BUG");
 	}
 
-	public String getUsrByUid(int uid) throws IOException, ReceiveException {
-		if (uid == 0) {
-			return "root";
+	public long opendir(String path, String guid) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				if (guid == null) {
+					preparePacket(CNS_MAGIC, CNS_OPENDIR);
+				} else {
+					preparePacket(CNS_MAGIC2, CNS_OPENDIR);
+				}
+				addIDs();
+				long cwd = 0L; // Current Working Directory
+				sendBuf.putLong(cwd);
+				putString(path);
+				putString(guid);
+				long l = sendAndReceive(true);
+				long fileId = recvBuf.getLong();
+				if(l != 8){
+					throw new IOException("opendir: Something remains to be read ("+l+" bits)");
+				}
+				return fileId;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+			}
 		}
-		preparePacket(CNS_MAGIC, CNS_GETUSRNAM);
-		sendBuf.putShort((short) 0);
-		sendBuf.putShort((short) uid);
-		sendAndReceive(true);
+		throw new RuntimeException("Must not be here. BUG");
+	}
 
-		return getString();
+	public void closedir() throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				preparePacket(CNS_MAGIC2, CNS_CLOSEDIR);
+				long l = sendAndReceive(false);
+				//JEROME
+				if(l != 0){
+					if(l == 4){
+						recvBuf.getInt();
+					}else{
+						throw new IOException("closedir: Something remains to be read ("+l+" bits)");
+					}
+				}
+				break;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+			}
+		}
+	}
+
+	public int getGrpByName(String grpName) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				if ("root".equals(grpName)) {
+					return 0;
+				}
+				preparePacket(CNS_MAGIC, CNS_GETGRPID);
+				putString(grpName);
+				sendAndReceive(true);
+				int s = recvBuf.getInt();
+				return s;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+			}
+		}
+		throw new RuntimeException("Must not be here. BUG");
+	}
+
+	public String getGrpByGid(int gid) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				if (gid == 0) {
+					return "root";
+				}
+				preparePacket(CNS_MAGIC, CNS_GETGRPNAM);
+				sendBuf.putShort((short) 0);
+				sendBuf.putShort((short) gid);
+				sendAndReceive(true);
+				return getString();
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+			}
+		}
+		throw new RuntimeException("Must not be here. BUG");
+	}
+
+	public Collection<String> getGrpByGids(int[] gids) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				ArrayList<Integer> rootGIDIndexes = new ArrayList<Integer>();
+				ArrayList<Integer> newGids = new ArrayList<Integer>();
+				for (int i = 0; i < gids.length; i++) {
+					if (gids[i] == 0) {
+						rootGIDIndexes.add(i);
+					} else {
+						newGids.add(gids[i]);
+					}
+				}
+		
+				gids = new int[newGids.size()];
+				for (int i = 0; i < newGids.size(); i++) {
+					gids[i] = newGids.get(i);
+				}
+		
+				preparePacket(CNS_MAGIC, CNS_GETGRPNAMES);
+				sendBuf.putShort((short) 0);
+				sendBuf.putShort((short) gids.length);
+				for (int i = 0; i < gids.length; i++) {
+					sendBuf.putInt(gids[i]);
+				}
+				sendAndReceive(true);
+		
+				Collection<String> grpNames = new ArrayList<String>(gids.length);
+				for (int i = 0; i < gids.length; i++) {
+					if (rootGIDIndexes.contains(i)) {
+						grpNames.add("root");
+					} else {
+						grpNames.add(getString());
+					}
+				}
+				return grpNames;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+			}
+		}
+		throw new RuntimeException("Must not be here. BUG");
+	}
+
+	public int getUsrByName(String usrName) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				if ("root".equals(usrName)) {
+					return 0;
+				}
+				preparePacket(CNS_MAGIC, CNS_GETUSRID);
+				putString(usrName);
+				long l = sendAndReceive(true);
+				int s = recvBuf.getInt();
+				if(l != 4){
+					throw new IOException("getUsrByName: Something remains to be read ("+l+" bits)");
+				}
+				return s;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+			}
+		}
+		throw new RuntimeException("Must not be here. BUG");
+	}
+
+	public String getUsrByUid(int uid) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				if (uid == 0) {
+					return "root";
+				}
+				preparePacket(CNS_MAGIC, CNS_GETUSRNAM);
+				sendBuf.putShort((short) 0);
+				sendBuf.putShort((short) uid);
+				sendAndReceive(true);
+				return getString();
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+			}
+		}
+		throw new RuntimeException("Must not be here. BUG");
 	}
 
 	/**
@@ -652,15 +831,28 @@ public class LfcConnection {
 	 *             if something wrong occurs
 	 * @throws ReceiveException
 	 *             if received an error message from the LFC
+	 * @throws TimeoutException 
 	 */
-	public void access(String path, AccessType accessType) throws IOException, ReceiveException {
-		preparePacket(CNS_MAGIC, CNS_ACCESS);
-		addIDs();
-		long cwd = 0L;
-		sendBuf.putLong(cwd);
-		putString(path);
-		sendBuf.putInt(accessType.getValue());
-		sendAndReceive(true);
+	public void access(String path, AccessType accessType) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				preparePacket(CNS_MAGIC, CNS_ACCESS);
+				addIDs();
+				long cwd = 0L;
+				sendBuf.putLong(cwd);
+				putString(path);
+				sendBuf.putInt(accessType.getValue());
+				long l = sendAndReceive(true);
+				if(l != 0){
+					throw new IOException("access: Something remains to be read ("+l+" bits)");
+				}
+				break;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+			}
+		}
 	}
 
 	/**
@@ -671,272 +863,446 @@ public class LfcConnection {
 	 * @return A collection of {@link LFCFile} which are inside the directory
 	 * @throws IOException
 	 *             if something wrong occurs
+	 * @throws TimeoutException 
 	 */
-	public Collection<LFCFile> readdir(long fileID) throws IOException, ReceiveException {
-		preparePacket(CNS_MAGIC, CNS_READDIR);
-		addIDs();
-		sendBuf.putShort((short) 1); // 1 = full list (w/o comments), 0 = names only
-		sendBuf.putShort((short) 0);
-		sendBuf.putLong(fileID);
-		sendBuf.putShort((short) 1);
-		sendAndReceive(true);
-
-		// Jerome: I don't know why I have to do that but at least it works....
-		preparePacket(CNS_MAGIC, CNS_READDIR);
-		sendAndReceive(true);
-
-		short count = recvBuf.getShort();
-		Collection<LFCFile> lfcFiles = new ArrayList<LFCFile>(count);
-
-		String debug = null;
-		for (short i = 0; i < count; i++) {
-			LFCFile file = new LFCFile(recvBuf, true, false, false, false);
-			lfcFiles.add(file);
-			if (s_logger.isDebugEnabled()) {
-				if (i == 0) {
-					debug = "\nDirectory content (fileID: " + fileID + "):";
+	public Collection<LFCFile> readdir(long fileID) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				preparePacket(CNS_MAGIC, CNS_READDIR);
+				addIDs();
+				sendBuf.putShort((short) 1); // 1 = full list (w/o comments), 0 = names only
+				sendBuf.putShort((short) 0);
+				sendBuf.putLong(fileID);
+				sendBuf.putShort((short) 1);
+				int l = sendAndReceive(true);
+				if(l != 0){
+					throw new IOException("readdir: Something remains to be read ("+l+" bits)");
 				}
-				debug += "\n\t- " + (i + 1) + ")\t" + file.toString();
+				
+				// Jerome: I don't know why I have to do that but at least it works....
+				preparePacket(CNS_MAGIC, CNS_READDIR);
+				sendAndReceive(true);
+				short count = recvBuf.getShort();
+				Collection<LFCFile> lfcFiles = new ArrayList<LFCFile>(count);
+		
+		//		String debug = null;
+				for (short i = 0; i < count; i++) {
+					LFCFile file = new LFCFile(recvBuf, true, false, false, false);
+					lfcFiles.add(file);
+		//			if (s_logger.isDebugEnabled()) {
+		//				if (i == 0) {
+		//					debug = "\nDirectory content (fileID: " + fileID + "):";
+		//				}
+		//				debug += "\n\t- " + (i + 1) + ")\t" + file.toString();
+		//			}
+				}
+		//		if (s_logger.isDebugEnabled()) {
+		//			s_logger.debug(debug);
+		//		}
+				return lfcFiles;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
 			}
 		}
-		if (s_logger.isDebugEnabled()) {
-			s_logger.debug(debug);
-		}
-		return lfcFiles;
+		throw new RuntimeException("Must not be here. BUG");
 	}
 
 	/**
 	 * Use UNLINK command instead of DELETE to remove files. DELETE command is
 	 * for CASTOR entries only
+	 * @throws TimeoutException 
 	 */
-	public int delete(String path) throws IOException, ReceiveException {
-		preparePacket(CNS_MAGIC, CNS_DELETE);
-		addIDs();
-		long cwd = 0L;
-		sendBuf.putLong(cwd);
-		putString(path);
-		sendAndReceive(true);
-
-		int execResult = recvBuf.getInt();
-		s_logger.debug("delete result: " + execResult);
-		return execResult;
+	public int delete(String path) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				preparePacket(CNS_MAGIC, CNS_DELETE);
+				addIDs();
+				long cwd = 0L;
+				sendBuf.putLong(cwd);
+				putString(path);
+				long l = sendAndReceive(true);
+				int execResult = recvBuf.getInt();
+				if(l != 4){
+					throw new IOException("delete: Something remains to be read ("+l+" bits)");
+				}
+				return execResult;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+			}
+		}
+		throw new RuntimeException("Must not be here. BUG");
 	}
 
 	/**
 	 * Use this command instead of DELETE to remove files. DELETE command is for
 	 * CASTOR entries only
+	 * @throws TimeoutException 
 	 */
-	public void unlink(String path) throws IOException, ReceiveException {
-		preparePacket(CNS_MAGIC, CNS_UNLINK);
-		addIDs();
-		long cwd = 0L; // Current Working Directory
-		sendBuf.putLong(cwd);
-		putString(path);
-		sendAndReceive(true);
+	public void unlink(String path) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				preparePacket(CNS_MAGIC, CNS_UNLINK);
+				addIDs();
+				long cwd = 0L; // Current Working Directory
+				sendBuf.putLong(cwd);
+				putString(path);
+				long l = sendAndReceive(true);
+				if(l != 0){
+					throw new IOException("unlink: Something remains to be read ("+l+" bits)");
+				}
+				break;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+			}
+		}
 	}
 
 	/**
 	 * Set the file size
+	 * @throws TimeoutException 
 	 */
-	public void setfsize(String path, long fileSize) throws IOException, ReceiveException {
-		preparePacket(CNS_MAGIC2, CNS_SETFSIZE);
-		addIDs();
-		long cwd = 0L; // Current Working Directory
-		sendBuf.putLong(cwd);
-		sendBuf.putLong(0L);
-		putString(path);
-		sendBuf.putLong(fileSize);
-		putString(null);
-		putString(null);
-		sendAndReceive(true);
+	public void setfsize(String path, long fileSize) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				preparePacket(CNS_MAGIC2, CNS_SETFSIZE);
+				addIDs();
+				long cwd = 0L; // Current Working Directory
+				sendBuf.putLong(cwd);
+				sendBuf.putLong(0L);
+				putString(path);
+				sendBuf.putLong(fileSize);
+				putString(null);
+				putString(null);
+				long l = sendAndReceive(true);
+				if(l != 0){
+					throw new IOException("setfsize: Something remains to be read ("+l+" bits)");
+				}
+				break;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+			}
+		}
 	}
 
 	/**
 	 * Rename a file or a directory
+	 * @throws TimeoutException 
 	 */
-	public void rename(String oldPath, String newPath) throws IOException, ReceiveException {
-		preparePacket(CNS_MAGIC, CNS_RENAME);
-		addIDs();
-		long cwd = 0L; // Current Working Directory
-		sendBuf.putLong(cwd);
-		putString(oldPath);
-		putString(newPath);
-		sendAndReceive(true);
+	public void rename(String oldPath, String newPath) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				preparePacket(CNS_MAGIC, CNS_RENAME);
+				addIDs();
+				long cwd = 0L; // Current Working Directory
+				sendBuf.putLong(cwd);
+				putString(oldPath);
+				putString(newPath);
+				long l = sendAndReceive(true);
+				if(l != 0){
+					throw new IOException("rename: Something remains to be read ("+l+" bits)");
+				}
+				break;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+			}
+		}
 	}
 
 	/**
 	 * Change the permissions of a file or a directory. If the path represent a
 	 * symbolic link, the pointed file/directory will be modified, not the
 	 * symbolic link itself. TODO: Check the symbolic link behavior.
+	 * @throws TimeoutException 
 	 */
-	public void chmod(String path, int mode) throws IOException, ReceiveException {
-		preparePacket(CNS_MAGIC, CNS_CHMOD);
-		addIDs();
-		long cwd = 0L; // Current Working Directory
-		sendBuf.putLong(cwd);
-		putString(path);
-		mode &= 07777;
-		sendBuf.putInt(mode);
-		sendAndReceive(true);
+	public void chmod(String path, int mode) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				preparePacket(CNS_MAGIC, CNS_CHMOD);
+				addIDs();
+				long cwd = 0L; // Current Working Directory
+				sendBuf.putLong(cwd);
+				putString(path);
+				mode &= 07777;
+				sendBuf.putInt(mode);
+				long l = sendAndReceive(true);
+				if(l != 0){
+					throw new IOException("chmod: Something remains to be read ("+l+" bits)");
+				}
+				break;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+			}
+		}
 	}
 
 	/**
 	 * Change the owner and the group of a file or a directory. If the path
 	 * represent a symbolic link, the pointed file/directory will be modified,
 	 * not the symbolic link itself.
+	 * @throws TimeoutException 
 	 */
-	public void chown(String path, int new_uid, int new_gid) throws IOException, ReceiveException {
-		preparePacket(CNS_MAGIC, CNS_CHOWN);
-		addIDs();
-		long cwd = 0L; // Current Working Directory
-		sendBuf.putLong(cwd);
-		putString(path);
-		sendBuf.putInt(new_uid);
-		sendBuf.putInt(new_gid);
-		sendAndReceive(true);
+	public void chown(String path, int new_uid, int new_gid) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				preparePacket(CNS_MAGIC, CNS_CHOWN);
+				addIDs();
+				long cwd = 0L; // Current Working Directory
+				sendBuf.putLong(cwd);
+				putString(path);
+				sendBuf.putInt(new_uid);
+				sendBuf.putInt(new_gid);
+				long l = sendAndReceive(true);
+				if(l != 0){
+					throw new IOException("chown: Something remains to be read ("+l+" bits)");
+				}
+				break;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+			}
+		}
 	}
 
 	/**
 	 * Change the owner and the group of a file or a directory. If the path
 	 * represent a symbolic link, this later itself will be modified
+	 * @throws TimeoutException 
 	 */
-	public void lchown(String path, int new_uid, int new_gid) throws IOException, ReceiveException {
-		preparePacket(CNS_MAGIC, CNS_LCHOWN);
-		addIDs();
-		long cwd = 0L; // Current Working Directory
-		sendBuf.putLong(cwd);
-		putString(path);
-		sendBuf.putInt(new_uid);
-		sendBuf.putInt(new_gid);
-		sendAndReceive(true);
+	public void lchown(String path, int new_uid, int new_gid) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				preparePacket(CNS_MAGIC, CNS_LCHOWN);
+				addIDs();
+				long cwd = 0L; // Current Working Directory
+				sendBuf.putLong(cwd);
+				putString(path);
+				sendBuf.putInt(new_uid);
+				sendBuf.putInt(new_gid);
+				long l = sendAndReceive(true);
+				if(l != 0){
+					throw new IOException("lchown: Something remains to be read ("+l+" bits)");
+				}
+				break;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+			}
+		}
 	}
 
 	/**
 	 * List all the file replicas
+	 * @throws TimeoutException 
 	 */
-	public Collection<LFCReplica> listReplica(String path, String guid) throws IOException, ReceiveException {
-		preparePacket(CNS_MAGIC2, CNS_LISTREPLICA);
-		addIDs();
-		sendBuf.putShort((short) 0); // Size of nbentry
-		long cwd = 0L; // Current Working Directory
-		sendBuf.putLong(cwd);
-		putString(path);
-		putString(guid);
-		sendBuf.putShort((short) 1); // BOL = Beginning of List
-		sendAndReceive(true);
-
-		short count = recvBuf.getShort();
-
-		Collection<LFCReplica> srms = new ArrayList<LFCReplica>(count);
-
-		String debug = null;
-		for (short i = 0; i < count; i++) {
-			LFCReplica replica = new LFCReplica(recvBuf);
-			srms.add(replica);
-			if (s_logger.isDebugEnabled()) {
-				if (i == 0) {
-					debug = "\nFile replicas (" + count + "):";
+	public Collection<LFCReplica> listReplica(String path, String guid) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				preparePacket(CNS_MAGIC2, CNS_LISTREPLICA);
+				addIDs();
+				sendBuf.putShort((short) 0); // Size of nbentry
+				long cwd = 0L; // Current Working Directory
+				sendBuf.putLong(cwd);
+				putString(path);
+				putString(guid);
+				sendBuf.putShort((short) 1); // BOL = Beginning of List
+				sendAndReceive(true);
+		
+				short count = recvBuf.getShort();
+		
+				Collection<LFCReplica> srms = new ArrayList<LFCReplica>(count);
+				for (short i = 0; i < count; i++) {
+					LFCReplica replica = new LFCReplica(recvBuf);
+					srms.add(replica);
 				}
-				debug += "\n\t- " + (i + 1) + "\t:" + replica.toString();
+				return srms;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
 			}
 		}
-		if (s_logger.isDebugEnabled()) {
-			s_logger.debug(debug);
-		}
-		return srms;
+		throw new RuntimeException("Must not be here. BUG");
 	}
 
 	/**
 	 * Use UNLINK command instead of DELFILES to remove files.
+	 * @throws TimeoutException 
 	 */
-	public boolean delFiles(String[] guids, boolean force) throws IOException, ReceiveException {
-		preparePacket(CNS_MAGIC, CNS_DELFILES);
-		addIDs();
-		final short argtype = 0;
-		final short sforce;
-		if (force) {
-			sforce = 1;
-		} else {
-			sforce = 0;
+	public boolean delFiles(String[] guids, boolean force) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				preparePacket(CNS_MAGIC, CNS_DELFILES);
+				addIDs();
+				final short argtype = 0;
+				final short sforce;
+				if (force) {
+					sforce = 1;
+				} else {
+					sforce = 0;
+				}
+				sendBuf.putShort(argtype);
+				sendBuf.putShort(sforce);
+				sendBuf.putInt(guids.length); // nbguids
+				for (int i = 0; i < guids.length; i++) {
+					putString(guids[i]);
+				}
+				long l = sendAndReceive(true);
+				int nbstatuses = recvBuf.getInt();
+				if(l != 4){
+					throw new IOException("delFiles: Something remains to be read ("+l+" bits)");
+				}
+				return nbstatuses == 0;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+			}
 		}
-		sendBuf.putShort(argtype);
-		sendBuf.putShort(sforce);
-		sendBuf.putInt(guids.length); // nbguids
-		for (int i = 0; i < guids.length; i++) {
-			putString(guids[i]);
+		throw new RuntimeException("Must not be here. BUG");
+	}
+
+	public void rmdir(String path) throws IOException, ReceiveException , TimeoutException{
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				long cwd = 0L;
+				preparePacket(CNS_MAGIC, CNS_RMDIR);
+				addIDs();
+				sendBuf.putLong(cwd);
+				putString(path);
+				long l = sendAndReceive(true);
+				if(l != 0){
+					throw new IOException("rmdir: Something remains to be read ("+l+" bits)");
+				}
+				break;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+			}
 		}
-		sendAndReceive(true);
-		int nbstatuses = recvBuf.getInt();
-		s_logger.info("Statuses: " + nbstatuses);
-		return nbstatuses == 0;
 	}
 
-	public void rmdir(String path) throws IOException, ReceiveException {
-		long cwd = 0L;
-		preparePacket(CNS_MAGIC, CNS_RMDIR);
-		addIDs();
-		sendBuf.putLong(cwd);
-		putString(path);
-		sendAndReceive(true);
+	public long creat(String path, String guid) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				short mask = 0;
+				long cwd = 0L;
+				int mode = 0666;
+				preparePacket(CNS_MAGIC2, CNS_CREAT);
+				addIDs();
+				sendBuf.putShort(mask);
+				sendBuf.putLong(cwd);
+				putString(path);
+				sendBuf.putInt(mode);
+				putString(guid);
+				long l = sendAndReceive(true);
+				long file_id = recvBuf.getLong();
+				if(l != 8){
+					throw new IOException("creat: Something remains to be read ("+l+" bits)");
+				}
+				return file_id;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+			}
+		}
+		throw new RuntimeException("Must not be here. BUG");
 	}
 
-	public void creat(String path, String guid) throws IOException, ReceiveException {
-		short mask = 0;
-		long cwd = 0L;
-		int mode = 0666;
-		preparePacket(CNS_MAGIC2, CNS_CREAT);
-		addIDs();
-		sendBuf.putShort(mask);
-		sendBuf.putLong(cwd);
-		putString(path);
-		sendBuf.putInt(mode);
-		putString(guid);
-		sendAndReceive(true);
-		// TODO: Check status!
-	}
-
-	public void mkdir(String path, String guid) throws IOException, ReceiveException {
-		short mask = 0;
-		long cwd = 0L;
-		int mode = 0777;
-		preparePacket(CNS_MAGIC2, CNS_MKDIR);
-		addIDs();
-		sendBuf.putShort(mask);
-		sendBuf.putLong(cwd);
-		putString(path);
-		sendBuf.putInt(mode);
-		putString(guid);
-		sendAndReceive(true);
+	public void mkdir(String path, String guid) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				short mask = 0;
+				long cwd = 0L;
+				int mode = 0777;
+				preparePacket(CNS_MAGIC2, CNS_MKDIR);
+				addIDs();
+				sendBuf.putShort(mask);
+				sendBuf.putLong(cwd);
+				putString(path);
+				sendBuf.putInt(mode);
+				putString(guid);
+				long l = sendAndReceive(true);
+				if(l != 0){
+					throw new IOException("mkdir: Something remains to be read ("+l+" bits)");
+				}
+				break;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+			}
+		}
 	}
 
 	/**
 	 * It removes replica information from catalog, data stored on Storage
 	 * Element stays intact
+	 * @throws TimeoutException 
 	 */
-	public void delReplica(String guid, String replicaUri) throws IOException, ReceiveException {
-		long id = 0L;
-		preparePacket(CNS_MAGIC, CNS_DELREPLICA);
-		addIDs();
-		sendBuf.putLong(id);
-		putString(guid);
-		putString(replicaUri);
-		sendAndReceive(true);
+	public void delReplica(String guid, String replicaUri) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				long id = 0L;
+				preparePacket(CNS_MAGIC, CNS_DELREPLICA);
+				addIDs();
+				sendBuf.putLong(id);
+				putString(guid);
+				putString(replicaUri);
+				long l = sendAndReceive(true);
+				if(l != 0){
+					throw new IOException("delReplica: Something remains to be read ("+l+" bits)");
+				}
+				break;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+			}
+		}
 	}
 
-	public void addReplica(String guid, URI replicaUri) throws IOException, ReceiveException {
-		preparePacket(CNS_MAGIC4, CNS_ADDREPLICA);
-		this.addIDs();
-		sendBuf.putLong(0L); // uniqueId
-		this.putString(guid);
-		this.putString(replicaUri.getHost());
-		this.putString(replicaUri.toString());
-		sendBuf.put((byte) '-'); // status;
-		sendBuf.put((byte) 'P'); // file type
-		this.putString(null); // pool name
-		this.putString(null); // fs
-		sendBuf.put((byte) 'P'); // r_type
-		this.putString(null); // setname
-		this.sendAndReceive(true);
+	public void addReplica(String guid, URI replicaUri) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				preparePacket(CNS_MAGIC4, CNS_ADDREPLICA);
+				this.addIDs();
+				sendBuf.putLong(0L); // uniqueId
+				this.putString(guid);
+				this.putString(replicaUri.getHost());
+				this.putString(replicaUri.toString());
+				sendBuf.put((byte) '-'); // status;
+				sendBuf.put((byte) 'P'); // file type
+				this.putString(null); // pool name
+				this.putString(null); // fs
+				sendBuf.put((byte) 'P'); // r_type
+				this.putString(null); // setname
+				long l = sendAndReceive(true);
+				if(l != 0){
+					throw new IOException("addReplica: Something remains to be read ("+l+" bits)");
+				}
+				break;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+			}
+		}
 	}
 
 	/**
@@ -951,8 +1317,6 @@ public class LfcConnection {
 		private String comment; // user comment of the file
 		private String chksumType; // checksum type
 		private String chksumValue; // checksum value
-		private String userName;
-		private String groupName;
 
 		private long aDate; // last access time
 		private long mDate; // last modification
@@ -971,7 +1335,7 @@ public class LfcConnection {
 		private byte status; // '-' = online, 'm' = migrated (don't know what is
 								// this for)
 
-		public LFCFile(ByteBuffer byteBuffer, final boolean readName, final boolean readGuid, final boolean readCheckSum, final boolean readComment) throws IOException, ReceiveException {
+		public LFCFile(ByteBuffer byteBuffer, final boolean readName, final boolean readGuid, final boolean readCheckSum, final boolean readComment) throws IOException, ReceiveException, TimeoutException {
 			this.fileId = byteBuffer.getLong();
 			if (readGuid) {
 				this.guid = getString();
@@ -999,20 +1363,6 @@ public class LfcConnection {
 			if (readComment) {
 				this.comment = getString();
 			}
-
-			LfcConnection lfcConnection = new LfcConnection(host, port, gssCredential);
-			try {
-				this.userName = lfcConnection.getUsrByUid(uid);
-			} finally {
-				lfcConnection.close();
-			}
-			lfcConnection = new LfcConnection(host, port, gssCredential);
-			try {
-				this.groupName = lfcConnection.getGrpByGid(gid);
-			} finally {
-				lfcConnection.close();
-			}
-
 		}
 
 
@@ -1057,78 +1407,6 @@ public class LfcConnection {
 		}
 
 		/**
-		 * Creates <code>String</code> with linux-like permissions of this file.
-		 * 
-		 * @return linux-like permission description
-		 */
-		private String getPermissions() {
-			StringBuilder permisions = new StringBuilder(10);
-			int mode = this.fileMode;
-
-			if ((mode & S_IFDIR) != 0) {
-				permisions.append('d');
-			} else {
-				permisions.append('-');
-			}
-
-			if ((mode & S_IRUSR) != 0) {
-				permisions.append('r');
-			} else {
-				permisions.append('-');
-			}
-
-			if ((mode & S_IWUSR) != 0) {
-				permisions.append('w');
-			} else {
-				permisions.append('-');
-			}
-
-			if ((mode & S_IXUSR) != 0) {
-				permisions.append('x');
-			} else {
-				permisions.append('-');
-			}
-
-			if ((mode & S_IRGRP) != 0) {
-				permisions.append('r');
-			} else {
-				permisions.append('-');
-			}
-
-			if ((mode & S_IWGRP) != 0) {
-				permisions.append('w');
-			} else {
-				permisions.append('-');
-			}
-
-			if ((mode & S_IXGRP) != 0) {
-				permisions.append('x');
-			} else {
-				permisions.append('-');
-			}
-
-			if ((mode & S_IROTH) != 0) {
-				permisions.append('r');
-			} else {
-				permisions.append('-');
-			}
-
-			if ((mode & S_IWOTH) != 0) {
-				permisions.append('w');
-			} else {
-				permisions.append('-');
-			}
-
-			if ((mode & S_IXOTH) != 0) {
-				permisions.append('x');
-			} else {
-				permisions.append('-');
-			}
-
-			return permisions.toString();
-		}
-
-		/**
 		 * @return The string representation of the LFCFile object
 		 */
 		@Override
@@ -1157,47 +1435,34 @@ public class LfcConnection {
 			tostring += " - uid: " + uid;
 			tostring += " - gid: " + gid;
 
-			tostring += " - fileMode: " + getPermissions();
+			tostring += " - fileMode: " + fileMode;
 			tostring += " - fileClass: " + fileClass;
 			tostring += " - status: " + status;
 
 			return tostring;
 		}
 
-		public LFCGroup group() {
+		public LFCGroup group() throws IOException, ReceiveException, TimeoutException {
+			LfcConnection lfcConnection = new LfcConnection(host, port, gssCredential);
+			String groupName = null;
+			try {
+				groupName = lfcConnection.getGrpByGid(gid);
+			} finally {
+				lfcConnection.close();
+			}
 			return new LFCGroup(gid,groupName);
 		}
 		
-		public LFCUser owner() {
+		public LFCUser owner() throws IOException, ReceiveException, TimeoutException {
+			LfcConnection lfcConnection = new LfcConnection(host, port, gssCredential);
+			String userName = null;
+			try {
+				userName = lfcConnection.getUsrByUid(uid);
+			} finally {
+				lfcConnection.close();
+			}
 			return new LFCUser(uid,userName);
 		}
-
-		// public Set<PosixFilePermission> permissions() {
-		// HashSet<PosixFilePermission> perms = new
-		// HashSet<PosixFilePermission>();
-		// if ((this.fileMode & S_IRUSR ) != 0)
-		// perms.add(PosixFilePermission.OWNER_READ);
-		// if ((this.fileMode & S_IWUSR ) != 0)
-		// perms.add(PosixFilePermission.OWNER_WRITE);
-		// if ((this.fileMode & S_IXUSR ) != 0)
-		// perms.add(PosixFilePermission.OWNER_EXECUTE);
-		//
-		// if ((this.fileMode & S_IRGRP ) != 0)
-		// perms.add(PosixFilePermission.GROUP_READ);
-		// if ((this.fileMode & S_IWGRP ) != 0)
-		// perms.add(PosixFilePermission.GROUP_WRITE);
-		// if ((this.fileMode & S_IXGRP ) != 0)
-		// perms.add(PosixFilePermission.GROUP_EXECUTE);
-		//
-		// if ((this.fileMode & S_IROTH ) != 0)
-		// perms.add(PosixFilePermission.OTHERS_READ);
-		// if ((this.fileMode & S_IWOTH ) != 0)
-		// perms.add(PosixFilePermission.OTHERS_WRITE);
-		// if ((this.fileMode & S_IXOTH ) != 0)
-		// perms.add(PosixFilePermission.OTHERS_EXECUTE);
-		//
-		// return perms;
-		// }
 
 		public long creationTime() {
 			return mDate;
@@ -1386,11 +1651,15 @@ public class LfcConnection {
 	public final class ReceiveException extends Exception {
 		private static final long serialVersionUID = 1L;
 		private int error = -1;
-		private LfcError lfcError = null;
+		private LfcError lfcError = LfcError.UNKOWN_ERROR;
 
 		public ReceiveException(int error, String s) {
 			super(s);
 			this.error = error;
+			LfcError m_lfcError = LfcError.UNKOWN_ERROR;
+			m_lfcError.message = s;
+			m_lfcError.error = error;
+			this.lfcError = m_lfcError;
 		}
 		
 		public ReceiveException(LfcError lfcError) {
@@ -1399,6 +1668,15 @@ public class LfcConnection {
 			this.lfcError = lfcError;
 		}
 
+		public void setExecutedCmd(String executedCmd) {
+			this.lfcError.setExecutedCmd(executedCmd);
+		}
+		
+		@Override
+		public String getMessage() {
+			return lfcError.toString();
+		}
+		
 		/**
 		 * 
 		 * @return The LFC error code
@@ -1426,14 +1704,14 @@ public class LfcConnection {
 		}
 	}
 
-	/** {@inheritDoc} */
-	@Override
-	protected void finalize() throws Throwable {
-		try {
-			this.channel.close();
-		} catch (IOException e) {
-			// ignore
-		}
-		super.finalize();
-	}
+//	/** {@inheritDoc} */
+//	@Override
+//	protected void finalize() throws Throwable {
+//		try {
+//			this.channel.close();
+//		} catch (IOException e) {
+//			// ignore
+//		}
+//		super.finalize();
+//	}
 }

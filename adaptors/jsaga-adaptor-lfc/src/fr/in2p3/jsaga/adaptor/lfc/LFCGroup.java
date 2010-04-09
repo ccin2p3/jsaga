@@ -4,8 +4,8 @@ package fr.in2p3.jsaga.adaptor.lfc;
  * @author Jerome Revillard
  */
 public class LFCGroup {
-	protected final int gid; // gid
-	protected final String name;
+	private final int gid; // gid
+	private final String name;
 
 	protected LFCGroup(int gid, String name) {
 		this.gid = gid;

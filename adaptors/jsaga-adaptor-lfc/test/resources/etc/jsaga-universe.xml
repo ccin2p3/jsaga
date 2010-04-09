@@ -5,9 +5,12 @@
         <attribute name="CertRepository" value="/etc/grid-security/certificates/"/>
         <attribute name="VomsDir" value="/etc/grid-security/vomsdir/"/>
         <attribute name="UserVO" value="vo.neugrid.eu"/>
+        
+        <attribute name="UserCert" value="${user.home}/.globus/cnrs_usercert.pem"/>
+        <attribute name="UserKey" value="${user.home}/.globus/cnrs_userkey.pem"/>
 
         <!-- todo: enable support for proxy at a non default location -->
-        <!--<attribute name="UserProxy" value="${user.home}/.jsaga/tmp/dteam_cred.txt"/>-->
+        <attribute name="UserProxy" value="/tmp/jsaga_test_cred.txt"/>
 
         <!-- fixme: signer certificate expires earlier than the delegated proxy if VOMS lifetime is lower than  12H -->
         <attribute name="LifeTime" value="PT13H"/>

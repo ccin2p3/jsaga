@@ -2,13 +2,14 @@ package fr.in2p3.jsaga.adaptor.lfc;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.security.InvalidParameterException;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.UUID;
+import java.util.concurrent.TimeoutException;
 
-import org.apache.log4j.Logger;
 import org.ietf.jgss.GSSCredential;
 
 import fr.in2p3.jsaga.adaptor.lfc.LfcConnection.AccessType;
@@ -24,12 +25,11 @@ import fr.in2p3.jsaga.adaptor.lfc.LfcConnection.ReceiveException;
  * @author Jerome Revillard
  */
 public class LfcConnector {
-	private static Logger s_logger = Logger.getLogger(LfcConnector.class);
-
 	private final String vo;
 	private final String server;
 	private final int port;
 	private final GSSCredential gssCredential;
+//	private final LfcConnection lfcConnection;
 
 	/**
 	 * Create a new LfcConector
@@ -42,15 +42,19 @@ public class LfcConnector {
 	 *            VO of this server
 	 * @param gssCredential
 	 * 			  The credential with which the LFC server will be accessed.
+	 * @throws ReceiveException 
+	 * @throws IOException 
 	 */
-	private LfcConnector(String host, int port, String vo, GSSCredential gssCredential) {
+	private LfcConnector(String host, int port, String vo, GSSCredential gssCredential) throws IOException, ReceiveException {
 		this.server = host;
 		this.port = port;
 		this.vo = vo;
 		this.gssCredential = gssCredential;
+//		lfcConnection = new LfcConnection(host, port, gssCredential);
+//		startSession();
 	}
 	
-	public static LfcConnector getInstance(String host, int port, String vo, GSSCredential gssCredential) throws IllegalArgumentException{
+	public static LfcConnector getInstance(String host, int port, String vo, GSSCredential gssCredential) throws IllegalArgumentException, IOException, ReceiveException{
 		if(host == null || "".equals(host)){
 			throw new IllegalArgumentException("The LFC host must be set.");
 		}
@@ -60,7 +64,34 @@ public class LfcConnector {
 		return new LfcConnector(host, port, vo, gssCredential);
 	}
 	
+//	public void startSession() throws IOException, ReceiveException, TimeoutException{
+//		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
+//		try{
+//			lfcConnection.startSession();
+//		} catch (IOException e) {
+//			throw e;
+//		} catch (ReceiveException e) {
+//			e.setExecutedCmd("startSession()");
+//			throw e;
+//		}
+//	}
+//	
+//	public void closeSession() throws IOException, ReceiveException, TimeoutException{
+//		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
+//		try{
+//			lfcConnection.closeSession();
+//		} catch (IOException e) {
+//			throw e;
+//		} catch (ReceiveException e) {
+//			e.setExecutedCmd("closeSession()");
+//			throw e;
+//		}
+//	}
 
+	public void close(LfcConnection lfcConnection){
+		lfcConnection.close();
+	}	
+	
 	/**
 	 * Get the list of file replicas according to the file path or to the file
 	 * guid
@@ -73,20 +104,26 @@ public class LfcConnector {
 	 * @throws IOException
 	 *             if anything goes wrong
 	 * @throws ReceiveException 
+	 * @throws TimeoutException 
 	 */
-	public Collection<LFCReplica> listReplicas(String path, String guid) throws IOException, ReceiveException {
-		final LfcConnection connection = new LfcConnection(server, port, gssCredential);
+	public Collection<LFCReplica> listReplicas(String path, String guid) throws IOException, ReceiveException, TimeoutException {
+		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
 		final Collection<LFCReplica> retVal;
 		try {
-			retVal = connection.listReplica(path, guid);
+			retVal = lfcConnection.listReplica(path, guid);
+		} catch (IOException e) {
+			throw e;
+		} catch (ReceiveException e) {
+			e.setExecutedCmd("listReplicas("+path+","+guid+")");
+			throw e;
 		} finally {
-			connection.close();
+			close(lfcConnection);
 		}
 		return retVal;
 	}
 
 	/**
-	 * Get the different file/directory/symbolic link attributes
+	 * Get the different file/directory/symbolic link attributes. Do not retrieve the file GUID
 	 * 
 	 * @param path
 	 *            The file path
@@ -97,18 +134,31 @@ public class LfcConnector {
 	 * @return
 	 * @throws IOException
 	 * @throws ReceiveException 
+	 * @throws TimeoutException 
 	 */
-	public LFCFile stat(String path, boolean followSymbolicLink) throws IOException, ReceiveException {
-		final LfcConnection connection = new LfcConnection(server, port, gssCredential);
+	public LFCFile stat(String path, boolean followSymbolicLink, boolean getGUID) throws IOException, ReceiveException, TimeoutException {
+		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
 		final LFCFile file;
 		try {
-			if (followSymbolicLink) {
-				file = connection.stat(path);
-			} else {
-				file = connection.lstat(path);
+			if(getGUID == true && followSymbolicLink == false){
+				throw new InvalidParameterException("LFC stat: Cannot have both getGUID=true and followSymbolicLink=false");
 			}
+			if(!getGUID){
+				if (followSymbolicLink) {
+					file = lfcConnection.stat(path);
+				} else {
+					file = lfcConnection.lstat(path);
+				}
+			}else{
+				file = lfcConnection.statg(path, null);
+			}
+		} catch (IOException e) {
+			throw e;
+		} catch (ReceiveException e) {
+			e.setExecutedCmd("stat("+path+") - followSymbolicLink="+followSymbolicLink);
+			throw e;
 		} finally {
-			connection.close();
+			close(lfcConnection);
 		}
 		return file;
 	}
@@ -120,21 +170,23 @@ public class LfcConnector {
 	 * @return <code>true</code> if it can be read
 	 * @throws IOException
 	 * @throws ReceiveException 
+	 * @throws TimeoutException 
 	 */
-	public boolean canRead(String path) throws IOException, ReceiveException {
-		final LfcConnection connection = new LfcConnection(server, port, gssCredential);
+	public boolean canRead(String path) throws IOException, ReceiveException, TimeoutException {
+		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
 		try {
-			connection.access(path, AccessType.READ_OK);
+			lfcConnection.access(path, AccessType.READ_OK);
 		} catch (IOException e) {
 			throw e;
 		} catch (ReceiveException e) {
 			if (LfcError.PERMISSION_DENIED.equals(e.getLFCError())) {
 				return false;
 			}else{
+				e.setExecutedCmd("canRead("+path+")");
 				throw e;
 			}
 		} finally {
-			connection.close();
+			close(lfcConnection);
 		}
 		return true;
 	}
@@ -146,21 +198,23 @@ public class LfcConnector {
 	 * @return <code>true</code> if it can be written
 	 * @throws IOException
 	 * @throws ReceiveException
+	 * @throws TimeoutException 
 	 */
-	public boolean canWrite(String path) throws IOException, ReceiveException {
-		final LfcConnection connection = new LfcConnection(server, port, gssCredential);
+	public boolean canWrite(String path) throws IOException, ReceiveException, TimeoutException {
+		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
 		try {
-			connection.access(path, AccessType.WRITE_OK);
+			lfcConnection.access(path, AccessType.WRITE_OK);
 		} catch (IOException e) {
 			throw e;
 		} catch (ReceiveException e) {
 			if (LfcError.PERMISSION_DENIED.equals(e.getLFCError())) {
 				return false;
 			}else{
+				e.setExecutedCmd("canWrite("+path+")");
 				throw e;
 			}
 		} finally {
-			connection.close();
+			close(lfcConnection);
 		}
 		return true;
 	}
@@ -173,21 +227,23 @@ public class LfcConnector {
 	 * @return <code>true</code> if the path exists
 	 * @throws IOException
 	 * @throws ReceiveException 
+	 * @throws TimeoutException 
 	 */
-	public boolean exist(String path) throws IOException, ReceiveException {
-		final LfcConnection connection = new LfcConnection(server, port, gssCredential);
+	public boolean exist(String path) throws IOException, ReceiveException, TimeoutException {
+		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
 		try {
-			connection.access(path, AccessType.EXIST_OK);
+			lfcConnection.access(path, AccessType.EXIST_OK);
 		} catch (IOException e) {
 			throw e;
 		} catch (ReceiveException e) {
 			if (LfcError.NO_SUCH_FILE_OR_DIRECTORY.equals(e.getLFCError())) {
 				return false;
 			}else{
+				e.setExecutedCmd("exist("+path+")");
 				throw e;
 			}
 		} finally {
-			connection.close();
+			close(lfcConnection);
 		}
 		return true;
 	}
@@ -195,50 +251,63 @@ public class LfcConnector {
 	/**
 	 * Get the group names which correspond to specific gids.
 	 * @throws ReceiveException 
+	 * @throws ReceiveException 
+	 * @throws TimeoutException 
 	 */
-	public Collection<String> getGrpByGids(int[] gids) throws IOException, ReceiveException {
-		final LfcConnection connection = new LfcConnection(server, port, gssCredential);
+	public Collection<String> getGrpByGids(int[] gids) throws IOException, ReceiveException, TimeoutException {
+		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
 		try {
-			return connection.getGrpByGids(gids);
+			return lfcConnection.getGrpByGids(gids);
+		} catch (IOException e) {
+			throw e;
+		} catch (ReceiveException e) {
+			e.setExecutedCmd("getGrpByGids("+Arrays.toString(gids)+")");
+			throw e;
 		} finally {
-			connection.close();
+			close(lfcConnection);
 		}
 	}
 
-	public String getUsrByUid(int uid) throws IOException, ReceiveException {
-		final LfcConnection connection = new LfcConnection(server, port, gssCredential);
+	public String getUsrByUid(int uid) throws IOException, ReceiveException, TimeoutException {
+		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
 		try {
-			return connection.getUsrByUid(uid);
+			return lfcConnection.getUsrByUid(uid);
+		} catch (IOException e) {
+			throw e;
+		} catch (ReceiveException e) {
+			e.setExecutedCmd("getUsrByUid("+uid+")");
+			throw e;
 		} finally {
-			connection.close();
+			close(lfcConnection);
 		}
 	}
 
 	/**
-	 * Get the content of a directory. If the given path is not a directory it
-	 * will return <code>null</code>
+	 * Get the content of a directory.
 	 * 
 	 * @param path
 	 *            path of the directory
-	 * @return A collection of files or directories inside the given path or
-	 *         null if the given path is not a directory
+	 * @return A collection of files or directories inside the given path
 	 * @throws IOException
 	 * @throws ReceiveException 
+	 * @throws TimeoutException 
 	 */
-	public Collection<LFCFile> list(String path, boolean followSymbolicLink) throws IOException, ReceiveException {
-		final LFCFile file = this.stat(path, followSymbolicLink);
-		if (!file.isDirectory()) {
-			return null;
-		}
-
+	public Collection<LFCFile> list(String path, boolean followSymbolicLink) throws IOException, ReceiveException, TimeoutException {
 		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
 		final Collection<LFCFile> files;
-		try {
-			final long fileID = lfcConnection.opendir(path, null);
-			files = lfcConnection.readdir(fileID);
-			lfcConnection.closedir();
-		} finally {
-			lfcConnection.close();
+		try{
+			try {
+				final long fileID = lfcConnection.opendir(path, null);
+				files = lfcConnection.readdir(fileID);
+				lfcConnection.closedir();
+			} finally {
+				close(lfcConnection);
+			}
+		} catch (IOException e) {
+			throw e;
+		} catch (ReceiveException e) {
+			e.setExecutedCmd("list("+path+") - followSymbolicLink="+followSymbolicLink);
+			throw e;
 		}
 		return files;
 	}
@@ -250,13 +319,19 @@ public class LfcConnector {
 	 *            path of the directory
 	 * @throws IOException
 	 * @throws ReceiveException 
+	 * @throws TimeoutException 
 	 */
-	public void mkdir(String path) throws IOException, ReceiveException {
-		final LfcConnection connection = new LfcConnection(server, port, gssCredential);
+	public void mkdir(String path) throws IOException, ReceiveException, TimeoutException {
+		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
 		try {
-			connection.mkdir(path, UUID.randomUUID().toString());
+			lfcConnection.mkdir(path, UUID.randomUUID().toString());
+		} catch (IOException e) {
+			throw e;
+		} catch (ReceiveException e) {
+			e.setExecutedCmd("mkdir("+path+")");
+			throw e;
 		} finally {
-			connection.close();
+			close(lfcConnection);
 		}
 	}
 
@@ -268,13 +343,19 @@ public class LfcConnector {
 	 * @return <code>true</code> is everything was ok.
 	 * @throws IOException
 	 * @throws ReceiveException 
+	 * @throws TimeoutException 
 	 */
-	public boolean deleteDir(String path) throws IOException, ReceiveException {
-		final LfcConnection connection = new LfcConnection(server, port, gssCredential);
+	public boolean deleteDir(String path) throws IOException, ReceiveException, TimeoutException {
+		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
 		try {
-			connection.rmdir(path);
+			lfcConnection.rmdir(path);
+		} catch (IOException e) {
+			throw e;
+		} catch (ReceiveException e) {
+			e.setExecutedCmd("deleteFile("+path+")");
+			throw e;
 		} finally {
-			connection.close();
+			close(lfcConnection);
 		}
 		return true;
 	}
@@ -284,62 +365,70 @@ public class LfcConnector {
 	 * 
 	 * @param path
 	 *            path of the file
-	 * @return <code>true</code> is everything was ok.
 	 * @throws IOException
 	 * @throws ReceiveException 
+	 * @throws TimeoutException 
 	 */
-	public boolean deleteFile(String path) throws IOException, ReceiveException {
-		final LfcConnection connection = new LfcConnection(server, port, gssCredential);
-		final Collection<LFCReplica> replicas;
-		try {
-			replicas = connection.listReplica(path, null);
-		} finally {
-			connection.close();
-		}
-		for (LFCReplica replica : replicas) {
-			s_logger.info("Deleting Replica: " + replica.getSfn());
-			final LfcConnection connection2 = new LfcConnection(server, port, gssCredential);
+	public void unlink(String path) throws IOException, ReceiveException, TimeoutException {
+		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
+		try{
 			try {
-				connection2.delReplica(replica.getGuid(), replica.getSfn());
+				lfcConnection.unlink(path);
 			} finally {
-				connection2.close();
+				close(lfcConnection);
 			}
-			//FIXME: DPM????
+		} catch (IOException e) {
+			throw e;
+		} catch (ReceiveException e) {
+			e.setExecutedCmd("unlink("+path+")");
+			throw e;
 		}
-		s_logger.info("Deleting path: " + path);
-		final LfcConnection connection3 = new LfcConnection(server, port, gssCredential);
+	}
+	
+	/**
+	 * @param guid
+	 * @param sfn
+	 * @throws IOException
+	 * @throws ReceiveException
+	 * @throws TimeoutException 
+	 */
+	public void deleteReplica(String guid, String sfn) throws IOException, ReceiveException, TimeoutException {
+		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
 		try {
-			connection3.unlink(path);
+			lfcConnection.delReplica(guid, sfn);
+		} catch (IOException e) {
+			throw e;
+		} catch (ReceiveException e) {
+			e.setExecutedCmd("deleteReplica("+guid+","+sfn+")");
+			throw e;
 		} finally {
-			connection3.close();
+			close(lfcConnection);
 		}
-		return true;
 	}
 
 	/**
-	 * Delete a file and all the replicas.
+	 * Delete a file and all the replicas if <code>force==true</code>.
 	 * 
 	 * @param guid
 	 *            GUID of the file.
+	 * @param force
+	 * 			  Force replicas deletion too.
 	 * @return true if the file was deleted.
 	 * @throws IOException
 	 * @throws ReceiveException 
+	 * @throws TimeoutException 
 	 */
-	public boolean deleteGuid(String guid) throws IOException, ReceiveException {
-		final LfcConnection lfc_connection = new LfcConnection(server, port, gssCredential);
-		final Collection<LFCReplica> replicas;
+	public boolean deleteGuid(String guid, boolean force) throws IOException, ReceiveException, TimeoutException {
+		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
 		try {
-			replicas = lfc_connection.listReplica(null, guid);
-
-			for (LFCReplica replica : replicas) {
-				s_logger.info("Deleting Replica: " + replica.getSfn());
-				lfc_connection.delReplica(guid, replica.getSfn());
-				// FIXME: Delete from SRM here????
-			}
-			s_logger.info("Deleting GUID: " + guid);
-			return lfc_connection.delFiles(new String[] { guid }, false);
+			return lfcConnection.delFiles(new String[] { guid }, force);
+		} catch (IOException e) {
+			throw e;
+		} catch (ReceiveException e) {
+			e.setExecutedCmd("deleteGuid("+guid+","+force+")");
+			throw e;
 		} finally {
-			lfc_connection.close();
+			close(lfcConnection);
 		}
 	}
 
@@ -353,13 +442,19 @@ public class LfcConnector {
 	 *            Absolute UNIX like mode (octal value)
 	 * @throws IOException
 	 * @throws ReceiveException 
+	 * @throws TimeoutException 
 	 */
-	public void chmod(String path, int mode) throws IOException, ReceiveException {
-		LfcConnection lfc_connection = new LfcConnection(server, port, gssCredential);
+	public void chmod(String path, int mode) throws IOException, ReceiveException, TimeoutException {
+		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
 		try {
-			lfc_connection.chmod(path, mode);
+			lfcConnection.chmod(path, mode);
+		} catch (IOException e) {
+			throw e;
+		} catch (ReceiveException e) {
+			e.setExecutedCmd("chmod("+path+","+mode+")");
+			throw e;
 		} finally {
-			lfc_connection.close();
+			close(lfcConnection);
 		}
 	}
 
@@ -381,39 +476,38 @@ public class LfcConnector {
 	 *            The new group of the file
 	 * @throws IOException
 	 * @throws ReceiveException 
+	 * @throws TimeoutException 
 	 */
-	public void chown(String path, boolean recursive, boolean followSymbolicLinks, String usrName, String grpName) throws IOException, ReceiveException {
-		LfcConnection connection;
+	public void chown(String path, boolean recursive, boolean followSymbolicLinks, String usrName, String grpName) throws IOException, ReceiveException, TimeoutException {
+		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
 		int new_uid = -1;
 		int new_gid = -1;
-		if (usrName != null) {
-			if (usrName.equals("root")) {
-				new_uid = 0;
-			} else {
-				connection = new LfcConnection(server, port, gssCredential);
-				try {
-					new_uid = connection.getUsrByName(usrName);
-				} catch (Exception e) {
-					//FIXME: check of the correct error would be better 
-					throw new IOException("Unable to find the uid of " + usrName + " in the LFC");
-				} finally {
-					connection.close();
+		try{
+			if (usrName != null) {
+				if (usrName.equals("root")) {
+					new_uid = 0;
+				} else {
+					try {
+						new_uid = lfcConnection.getUsrByName(usrName);
+					} catch (IOException e) {
+						//FIXME: check of the correct error would be better 
+						throw new IOException("Unable to find the uid of " + usrName + " in the LFC");
+					}
 				}
 			}
-		}
-		if (grpName != null) {
-			if (grpName.equals("root")) {
-				new_gid = 0;
-			} else {
-				connection = new LfcConnection(server, port, gssCredential);
-				try {
-					new_gid = connection.getGrpByName(grpName);
-				} catch (IOException e) {
-					throw new IOException("Unable to find the gid of " + grpName + " in the LFC");
-				} finally {
-					connection.close();
+			if (grpName != null) {
+				if (grpName.equals("root")) {
+					new_gid = 0;
+				} else {
+					try {
+						new_gid = lfcConnection.getGrpByName(grpName);
+					} catch (IOException e) {
+						throw new IOException("Unable to find the gid of " + grpName + " in the LFC");
+					}
 				}
 			}
+		}finally{
+			close(lfcConnection);
 		}
 		chown(path, recursive, followSymbolicLinks, new_uid, new_gid);
 	}
@@ -436,8 +530,9 @@ public class LfcConnector {
 	 * @throws IOException
 	 *             If a problem occurs
 	 * @throws ReceiveException 
+	 * @throws TimeoutException 
 	 */
-	public void chown(String path, boolean recursive, boolean followSymbolicLinks, int new_uid, int new_gid) throws IOException, ReceiveException {
+	public void chown(String path, boolean recursive, boolean followSymbolicLinks, int new_uid, int new_gid) throws IOException, ReceiveException, TimeoutException {
 		if (recursive == true) {
 			// TODO ....
 			throw new UnsupportedOperationException("Recurcive chown is not implemented...");
@@ -445,15 +540,20 @@ public class LfcConnector {
 		if (new_uid < 0 && new_gid < 0) {
 			throw new IllegalArgumentException("You must specify at least a new owner or a new group");
 		}
-		LfcConnection connection = new LfcConnection(server, port, gssCredential);
+		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
 		try {
 			if (followSymbolicLinks) {
-				connection.chown(path, new_uid, new_gid);
+				lfcConnection.chown(path, new_uid, new_gid);
 			} else {
-				connection.lchown(path, new_uid, new_gid);
+				lfcConnection.lchown(path, new_uid, new_gid);
 			}
+		} catch (IOException e) {
+				throw e;
+		} catch (ReceiveException e) {
+			e.setExecutedCmd("chown("+path+") - uid="+new_uid+", gid="+new_gid+", followSymbolicLinks="+followSymbolicLinks);
+			throw e;
 		} finally {
-			connection.close();
+			close(lfcConnection);
 		}
 	}
 
@@ -466,13 +566,19 @@ public class LfcConnector {
 	 *            new file name
 	 * @throws IOException
 	 * @throws ReceiveException 
+	 * @throws TimeoutException 
 	 */
-	public void rename(String oldPath, String newPath) throws IOException, ReceiveException {
-		LfcConnection connection = new LfcConnection(server, port, gssCredential);
+	public void rename(String oldPath, String newPath) throws IOException, ReceiveException, TimeoutException {
+		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
 		try {
-			connection.rename(oldPath, newPath);
+			lfcConnection.rename(oldPath, newPath);
+		} catch (IOException e) {
+				throw e;
+		} catch (ReceiveException e) {
+			e.setExecutedCmd("rename("+oldPath+", "+newPath+")");
+			throw e;
 		} finally {
-			connection.close();
+			close(lfcConnection);
 		}
 	}
 
@@ -484,35 +590,33 @@ public class LfcConnector {
 	 * @return a GUID to the new file
 	 * @throws IOException
 	 * @throws ReceiveException 
+	 * @throws TimeoutException 
 	 */
-	public String create(long fileSize) throws IOException, ReceiveException {
+	public String create(long fileSize) throws IOException, ReceiveException, TimeoutException {
 		String guid = UUID.randomUUID().toString();
 		String parent = "/grid/" + vo + "/generated/" + dateAsPath();
-//		LfcConnection connection = new LfcConnection(server, port, gssCredential);
-//		try {
-//			connection.mkdir(parent, UUID.randomUUID().toString());
-//		} catch (IOException e) {
-//			//TODO: Check what's happen if the directory already exists of 
-//			s_logger.debug("Creating parent", e);
-//		} finally {
-//			connection.close();
-//		}
-		String path = parent + "/file-" + guid;
-		URI uri = null;
+		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
 		try {
-			uri = new URI("lfn:///" + path);
-		} catch (URISyntaxException e) {
+			lfcConnection.mkdir(parent, UUID.randomUUID().toString());
+		} catch (ReceiveException e) {
+			if(!LfcError.FILE_EXISTS.equals(e.getLFCError())){
+				if(e.getLFCError().getExecutedCmd() == null){
+					e.setExecutedCmd("create(/grid/" + vo + "/generated/" + dateAsPath()+")");
+				}
+				throw e;
+			}
+		} finally {
+			close(lfcConnection);
 		}
-		return create(uri, guid, fileSize);
+		String path = parent + "/file-" + guid;
+		return create("lfn:///" + path, guid, fileSize);
 	}
 
 	/**
 	 * Create a new File at a specific location
 	 * 
 	 * @param location
-	 *            The lfn of the file to create (lfn:////grid/vo/...). Please
-	 *            note the 4 (!) slashes. These are required to specify an empty
-	 *            hostname and an absolute directory.
+	 *            The lfn of the file to create (lfn:///grid/vo/...).
 	 * @param guid
 	 *            The guid of the file
 	 * @param fileSize
@@ -520,25 +624,26 @@ public class LfcConnector {
 	 * @return a GUID to the new file
 	 * @throws IOException
 	 * @throws ReceiveException 
+	 * @throws TimeoutException 
 	 */
-	public String create(URI location, String guid, long fileSize) throws IOException, ReceiveException {
-		String path = location.getPath();
-		s_logger.info("Creating " + guid + " with path " + path);
-		LfcConnection connection = new LfcConnection(server, port, gssCredential);
-		try {
-			connection.creat(path, guid);
-		} finally {
-			connection.close();
-		}
-		if (fileSize > 0L) {
-			connection = new LfcConnection(server, port, gssCredential);
+	public String create(String location, String guid, long fileSize) throws IOException, ReceiveException, TimeoutException {
+		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
+		try{
 			try {
-				connection.setfsize(location.getPath(), fileSize);
-			} catch (IOException e) {
-				s_logger.debug("Creating parent", e);
+				lfcConnection.creat(location, guid);
+				if (fileSize > 0L) {
+					lfcConnection.setfsize(location, fileSize);
+				}
 			} finally {
-				connection.close();
+				close(lfcConnection);
 			}
+		} catch (IOException e) {
+			throw e;
+		} catch (ReceiveException e) {
+			if(e.getLFCError().getExecutedCmd() == null){
+				e.setExecutedCmd("create("+location+", "+guid+")");
+			}
+			throw e;
 		}
 		return guid;
 	}
@@ -567,31 +672,23 @@ public class LfcConnector {
 	 * @param guid
 	 *            GUID of the file (without decoration)
 	 * @param target
-	 *            an SRM url.
+	 *            The physical location of the file.
 	 * @throws IOException
 	 * @throws ReceiveException 
 	 */
-	public void addReplica(String guid, URI target) throws IOException, ReceiveException {
-		final LfcConnection connection = new LfcConnection(server, port, gssCredential);
+	public void addReplica(String guid, URI target) throws IOException, ReceiveException, TimeoutException {
+		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
 		try {
-			connection.addReplica(guid, target);
+			lfcConnection.addReplica(guid, target);
+		} catch (IOException e) {
+			throw e;
+		} catch (ReceiveException e) {
+			if(e.getLFCError().getExecutedCmd() == null){
+				e.setExecutedCmd("create("+guid+", "+target+")");
+			}
+			throw e;
 		} finally {
-			connection.close();
+			close(lfcConnection);
 		}
 	}
-
-	/**
-	 * @return the server used by this connector.
-	 */
-	public String getServer() {
-		return server;
-	}
-
-	/**
-	 * @return the port used by this connector.
-	 */
-	public int getPort() {
-		return port;
-	}
-
 }
