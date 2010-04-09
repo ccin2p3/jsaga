@@ -51,7 +51,7 @@
 		<dependency>
             <groupId>org.glite</groupId>
             <artifactId>glite-jdl-api-java</artifactId>
-            <version>3.1.4</version>
+            <version>3.1.6</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -67,7 +67,7 @@
 		<dependency>
             <groupId>org.condor</groupId>
             <artifactId>classad</artifactId>
-            <version>2.2</version>
+            <version>2.4</version>
 			 <scope>compile</scope>
         </dependency>
   </dependencies>

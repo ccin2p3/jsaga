@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.condor</groupId>
     <artifactId>classad</artifactId>
-    <version>2.2</version>
+    <version>2.4</version>
     <name>Condor Classified Advertisements</name>
     <description>The lingua franca of Condor. It is used for describing jobs, workstations, and other resources.</description>
     <url>http://www.cs.wisc.edu/condor/classad/</url>
