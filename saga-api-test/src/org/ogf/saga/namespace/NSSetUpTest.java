@@ -14,7 +14,7 @@ import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
 /**
  *
  */
-public class NSSetUpTest extends AbstractNSEntryTest {
+public abstract class NSSetUpTest extends AbstractNSEntryTest {
     protected NSSetUpTest(String protocol) throws Exception {
         super(protocol);
     }
