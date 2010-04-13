@@ -5,6 +5,7 @@ import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.file.Directory;
 import org.ogf.saga.file.File;
 import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.namespace.*;
@@ -49,6 +50,7 @@ public abstract class AbstractNSEntryTest extends AbstractTest {
     // setup
     protected NSDirectory m_dir;
     protected NSEntry m_file;
+    protected Directory m_physicalDir;
     protected boolean m_toBeRemoved;
 
     public AbstractNSEntryTest(String protocol) throws Exception {
@@ -81,9 +83,16 @@ public abstract class AbstractNSEntryTest extends AbstractTest {
                 Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT.getBytes());
                 ((File)m_file).write(buffer);
             } else if (m_file instanceof LogicalFile) {
-                if (m_physicalFileUrl == null) {
+                if (m_physicalDirUrl == null) {
                     throw new Exception("Configuration is missing required property: "+CONFIG_PHYSICAL_PROTOCOL);
                 }
+                // create physical file
+                m_physicalDir = (Directory) NSFactory.createNSDirectory(m_session, m_physicalDirUrl, FLAGS_DIR);
+                File physicalFile = (File) m_physicalDir.open(m_physicalFileUrl, FLAGS_FILE);
+                Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT.getBytes());
+                physicalFile.write(buffer);
+                physicalFile.close(0);
+                // register it
                 ((LogicalFile)m_file).addLocation(m_physicalFileUrl);
             }
             m_file.close();
@@ -104,6 +113,11 @@ public abstract class AbstractNSEntryTest extends AbstractTest {
 
     /** Implicitely invoked after executing each test method */
     protected void tearDown() throws Exception {
+        if (m_file instanceof LogicalFile &&  m_physicalDir != null) {
+            m_physicalDir.remove(Flags.RECURSIVE.getValue());
+            m_physicalDir.close();
+        }
+
         if (m_file != null) {
             m_file.close();
         }

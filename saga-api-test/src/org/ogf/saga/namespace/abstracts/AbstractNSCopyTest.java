@@ -2,7 +2,6 @@ package org.ogf.saga.namespace.abstracts;
 
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
-import org.ogf.saga.file.Directory;
 import org.ogf.saga.file.File;
 import org.ogf.saga.logicalfile.LogicalFile;
 import org.ogf.saga.namespace.*;
@@ -39,7 +38,6 @@ public abstract class AbstractNSCopyTest extends AbstractNSDirectoryTest {
 
     // setup
     protected NSDirectory m_dir2;
-    protected Directory m_physicalDir;
 
     public AbstractNSCopyTest(String protocol, String targetProtocol) throws Exception {
         super(protocol);
@@ -72,6 +70,7 @@ public abstract class AbstractNSCopyTest extends AbstractNSDirectoryTest {
         super.setUp();
         try {
             if (m_dirUrl2 != null) {
+                // to be removed by this.tearDown()
                 m_dir2 = NSFactory.createNSDirectory(m_session, m_dirUrl2, FLAGS_DIR);
                 if (m_fileUrl2 != null) {
                     NSEntry file2 = m_dir2.open(m_fileUrl2, FLAGS_FILE);
@@ -84,20 +83,12 @@ public abstract class AbstractNSCopyTest extends AbstractNSDirectoryTest {
                     file2.close();
                 }
             }
-            if (m_physicalDirUrl != null) {
-                m_physicalDir = (Directory) NSFactory.createNSDirectory(m_session, m_physicalDirUrl, FLAGS_DIR);
-                if (m_physicalFileUrl != null) {
-                    File physicalFile = (File) m_physicalDir.open(m_physicalFileUrl, FLAGS_FILE);
-                    Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT.getBytes());
-                    physicalFile.write(buffer);
-                    physicalFile.close(0);
-                }
-                if (m_physicalFileUrl2 != null) {
-                    File physicalFile = (File) m_physicalDir.open(m_physicalFileUrl2, FLAGS_FILE);
-                    Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT_2.getBytes());
-                    physicalFile.write(buffer);
-                    physicalFile.close(0);
-                }
+            if (m_physicalFileUrl2 != null) {
+                // will be removed by super.tearDown()
+                File physicalFile = (File) m_physicalDir.open(m_physicalFileUrl2, FLAGS_FILE);
+                Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT_2.getBytes());
+                physicalFile.write(buffer);
+                physicalFile.close(0);
             }
         } catch(Exception e) {
 //            try{this.tearDown();}catch(Exception e2){/**/}
@@ -109,10 +100,6 @@ public abstract class AbstractNSCopyTest extends AbstractNSDirectoryTest {
         if (m_dir2 != null) {
             m_dir2.remove(Flags.RECURSIVE.getValue());
             m_dir2.close();
-        }
-        if (m_physicalDir != null) {
-            m_physicalDir.remove(Flags.RECURSIVE.getValue());
-            m_physicalDir.close();
         }
         super.tearDown();
     }
