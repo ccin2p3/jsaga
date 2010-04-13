@@ -82,25 +82,27 @@ public abstract class LogicalFileWriteTest extends AbstractNSEntryWriteTest {
 
     public void test_replicate() throws Exception {
         if (m_file instanceof LogicalFile) {
-            // setUp()
             Directory physicalDir = (Directory) NSFactory.createNSDirectory(m_session, m_physicalDirUrl, FLAGS_DIR);
-            File physicalFile = (File) physicalDir.open(m_physicalFileUrl, FLAGS_FILE);
-            Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT.getBytes());
-            physicalFile.write(buffer);
-            physicalFile.close();
+            try {
+                // setUp()
+                File physicalFile = (File) physicalDir.open(m_physicalFileUrl, FLAGS_FILE);
+                Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT.getBytes());
+                physicalFile.write(buffer);
+                physicalFile.close();
 
-            // replicate
-            ((LogicalFile)m_file).replicate(m_physicalFileUrl2, Flags.NONE.getValue());
-            assertEquals(
-                    2,
-                    ((LogicalFile)m_file).listLocations().size());
+                // replicate
+                ((LogicalFile)m_file).replicate(m_physicalFileUrl2, Flags.NONE.getValue());
+                assertEquals(
+                        2,
+                        ((LogicalFile)m_file).listLocations().size());
 
-            // read new replica
-            checkWrited(m_physicalFileUrl2, DEFAULT_CONTENT);
-            
-            // tearDown()
-            physicalDir.remove(Flags.RECURSIVE.getValue());
-            physicalDir.close();
+                // read new replica
+                checkWrited(m_physicalFileUrl2, DEFAULT_CONTENT);
+            } finally {
+                // tearDown()
+                physicalDir.remove(Flags.RECURSIVE.getValue());
+                physicalDir.close();
+            }
         } else {
             fail("Not an instance of class: LogicalFile");
         }
