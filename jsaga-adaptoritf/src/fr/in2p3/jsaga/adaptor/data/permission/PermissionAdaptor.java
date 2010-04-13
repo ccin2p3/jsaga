@@ -32,9 +32,10 @@ public interface PermissionAdaptor extends DataAdaptor {
      * @param scope the scope of permissions (USER, GROUP or ANY).
      * @param id the identifier.
      * @param permissions the permissions to enable.
+     * @throws BadParameterException if the given id is unknown or not supported
      */
     public void permissionsAllow(String absolutePath, int scope, String id, PermissionBytes permissions)
-            throws PermissionDeniedException, TimeoutException, NoSuccessException;
+            throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException;
 
     /**
      * Disables the specified permissions for the specified identifier and scope.
@@ -42,9 +43,10 @@ public interface PermissionAdaptor extends DataAdaptor {
      * @param scope the scope of permissions (USER, GROUP or ANY).
      * @param id the identifier.
      * @param permissions the permissions to disable.
+     * @throws BadParameterException if the given id is unknown or not supported
      */
     public void permissionsDeny(String absolutePath, int scope, String id, PermissionBytes permissions)
-            throws PermissionDeniedException, TimeoutException, NoSuccessException;
+            throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException;
 
     /**
      * Checks the specified permissions for the specified identifier and scope.
@@ -53,7 +55,8 @@ public interface PermissionAdaptor extends DataAdaptor {
      * @param id the identifier.
      * @param permissions the permissions to check.
      * @return true if all permissions are set for id.
+     * @throws BadParameterException if the given id is unknown or not supported
      */
     public boolean permissionsCheck(String absolutePath, int scope, String id, PermissionBytes permissions)
-            throws PermissionDeniedException, TimeoutException, NoSuccessException;
+            throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException;
 }
