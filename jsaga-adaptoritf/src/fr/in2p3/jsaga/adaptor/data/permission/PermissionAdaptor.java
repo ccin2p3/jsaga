@@ -35,6 +35,14 @@ public interface PermissionAdaptor extends DataAdaptor {
             throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException;
 
     /**
+     * Change group of the entry.
+     * @param id the identifier of the new group.
+     * @throws BadParameterException if the given id is unknown or if changing group is not supported
+     */
+    public void setGroup(String id)
+            throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException;
+
+    /**
      * Enables the specified permissions for the specified identifier and scope.
      * @param absolutePath the absolute path of the entry.
      * @param scope the scope of permissions (USER, GROUP or ANY).
