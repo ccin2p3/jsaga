@@ -27,6 +27,14 @@ public interface PermissionAdaptor extends DataAdaptor {
     public int[] getSupportedScopes();
 
     /**
+     * Change owner of the entry.
+     * @param id the identifier of the new owner.
+     * @throws BadParameterException if the given id is unknown or if changing owner is not supported
+     */
+    public void setOwner(String id)
+            throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException;
+
+    /**
      * Enables the specified permissions for the specified identifier and scope.
      * @param absolutePath the absolute path of the entry.
      * @param scope the scope of permissions (USER, GROUP or ANY).

@@ -20,8 +20,6 @@ public class PermissionBytes {
     public static final PermissionBytes READ = new PermissionBytes(2);
     public static final PermissionBytes WRITE = new PermissionBytes(4);
     public static final PermissionBytes EXEC = new PermissionBytes(8);
-    public static final PermissionBytes OWNER = new PermissionBytes(16);
-    public static final PermissionBytes ALL = new PermissionBytes(31);
 
     private int value;
 
