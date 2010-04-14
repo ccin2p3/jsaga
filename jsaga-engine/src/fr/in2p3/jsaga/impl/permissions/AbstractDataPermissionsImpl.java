@@ -12,6 +12,7 @@ import fr.in2p3.jsaga.sync.namespace.SyncNSEntry;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.NSEntry;
+import org.ogf.saga.permissions.Permission;
 import org.ogf.saga.permissions.Permissions;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.Task;
@@ -61,12 +62,30 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
 
     public void permissionsAllow(String id, int permissions) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof PermissionAdaptor) {
-            if (isSupportedScope(((PermissionAdaptor)m_adaptor), id)) {
-                ((PermissionAdaptor)m_adaptor).permissionsAllow(
-                        m_url.getPath(),
-                        getPermissionsScope(id),
-                        getPermissionsIdentifier(id),
-                        new PermissionBytes(permissions));
+            PermissionAdaptor adaptor = (PermissionAdaptor) m_adaptor;
+            if (isSupportedScope(adaptor, id)) {
+                int _scope = getPermissionsScope(id);
+                String _identifier = getPermissionsIdentifier(id);
+                PermissionBytes _permissions = new PermissionBytes(permissions);
+
+                // set OWNER permission
+                if (_permissions.contains(Permission.OWNER)) {
+                    switch (_scope) {
+                        case PermissionAdaptor.SCOPE_USER:
+                            adaptor.setOwner(_identifier);
+                            break;
+                        case PermissionAdaptor.SCOPE_GROUP:
+                            adaptor.setGroup(_identifier);
+                            break;
+                        case PermissionAdaptor.SCOPE_ANY:
+                            throw new BadParameterException("Setting * as OWNER is not allowed");
+                    }
+                    // remove flag OWNER
+                    _permissions = new PermissionBytes(permissions - Permission.OWNER.getValue());
+                }
+
+                // set other permissions
+                adaptor.permissionsAllow(m_url.getPath(), _scope, _identifier, _permissions);
             } else {
                 throw new BadParameterException("Not supported for this protocol: "+ m_url.getScheme(), this);
             }
@@ -77,12 +96,19 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
 
     public void permissionsDeny(String id, int permissions) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof PermissionAdaptor) {
-            if (isSupportedScope(((PermissionAdaptor)m_adaptor), id)) {
-                ((PermissionAdaptor)m_adaptor).permissionsDeny(
-                        m_url.getPath(),
-                        getPermissionsScope(id),
-                        getPermissionsIdentifier(id),
-                        new PermissionBytes(permissions));
+            PermissionAdaptor adaptor = (PermissionAdaptor) m_adaptor;
+            if (isSupportedScope(adaptor, id)) {
+                int _scope = getPermissionsScope(id);
+                String _identifier = getPermissionsIdentifier(id);
+                PermissionBytes _permissions = new PermissionBytes(permissions);
+
+                // set OWNER permission
+                if (_permissions.contains(Permission.OWNER)) {
+                    throw new BadParameterException("Unsetting OWNER permission is not allowed");
+                }
+
+                // set other permissions
+                adaptor.permissionsDeny(m_url.getPath(), _scope, _identifier, _permissions);
             } else {
                 throw new BadParameterException("Not supported for this protocol: "+ m_url.getScheme(), this);
             }
@@ -92,25 +118,54 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
     }
 
     public boolean permissionsCheck(String id, int permissions) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+        boolean checked = true;
+
         final String ctxUserID = null;  //todo: get UserID from context
+        int _scope = getPermissionsScope(id);
+        String _identifier = getPermissionsIdentifier(id);
+        PermissionBytes _permissions = new PermissionBytes(permissions);
 
         // get cache
         FileAttributes attrs;
         try{attrs=this._getFileAttributes();} catch(IncorrectStateException e){throw new NoSuccessException(e);}
 
-        // get permissions from cache
+        // check OWNER permission
+        if (_permissions.contains(Permission.OWNER)) {
+            switch (_scope) {
+                case PermissionAdaptor.SCOPE_USER:
+                    if (attrs.getOwner() != null) {
+                        checked = attrs.getOwner().equals(_identifier);
+                    } else {
+                        throw new BadParameterException("Not supported for this protocol: "+m_url.getScheme(), this);
+                    }
+                    break;
+                case PermissionAdaptor.SCOPE_GROUP:
+                    if (attrs.getGroup() != null) {
+                        checked = attrs.getGroup().equals(_identifier);
+                    } else {
+                        throw new BadParameterException("Not supported for this protocol: "+m_url.getScheme(), this);
+                    }
+                    break;
+                case PermissionAdaptor.SCOPE_ANY:
+                    throw new BadParameterException("* can not be OWNER of an entry");
+            }
+            // remove flag OWNER
+            _permissions = new PermissionBytes(permissions - Permission.OWNER.getValue());
+        }
+
+        //fixme: get other permissions from cache
         PermissionBytes perms = FileAttributes.PERMISSION_UNKNOWN;
-        switch (getPermissionsScope(id)) {
+        switch (_scope) {
             case PermissionAdaptor.SCOPE_USER:
                 if (id==null ||
                     id==ctxUserID ||
-                    getPermissionsIdentifier(id).equals(attrs.getOwner()))
+                    _identifier.equals(attrs.getOwner()))
                 {
                     perms = attrs.getUserPermission();
                 }
                 break;
             case PermissionAdaptor.SCOPE_GROUP:
-                if (getPermissionsIdentifier(id).equals(attrs.getGroup())) {
+                if (_identifier.equals(attrs.getGroup())) {
                     perms = attrs.getGroupPermission();
                 }
                 break;
@@ -119,22 +174,20 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
                 break;
         }
 
-        // check permissions
+        // check other permissions
         if (perms != FileAttributes.PERMISSION_UNKNOWN) {
-            return perms.containsAll(permissions);
+            checked &= perms.containsAll(_permissions.getValue());
         } else if (m_adaptor instanceof PermissionAdaptor) {
-            if (isSupportedScope(((PermissionAdaptor)m_adaptor), id)) {
-                return ((PermissionAdaptor)m_adaptor).permissionsCheck(
-                        m_url.getPath(),
-                        getPermissionsScope(id),
-                        getPermissionsIdentifier(id),
-                        new PermissionBytes(permissions));
+            PermissionAdaptor adaptor = (PermissionAdaptor) m_adaptor;
+            if (isSupportedScope(adaptor, id)) {
+                checked &= adaptor.permissionsCheck(m_url.getPath(), _scope, _identifier, _permissions);
             } else {
                 throw new BadParameterException("Not supported for this protocol: "+ m_url.getScheme(), this);
             }
         } else {
             throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
+        return checked;
     }
 
     private static boolean isSupportedScope(PermissionAdaptor adaptor, String id) {
