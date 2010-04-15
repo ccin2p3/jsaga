@@ -114,7 +114,7 @@ public class TimeoutableAbstractNSEntryImplTest extends AbstractTest {
 
     public void test_permissionsAllow() throws Exception {
         try {
-            m_entry.permissionsAllow("*", Permission.ALL.getValue(), Flags.NONE.getValue());
+            m_entry.permissionsAllow("*", Permission.READ.getValue(), Flags.NONE.getValue());
             fail("Expected exception: "+TimeoutException.class);
         } catch (TimeoutException e) {
             assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
@@ -123,7 +123,7 @@ public class TimeoutableAbstractNSEntryImplTest extends AbstractTest {
 
     public void test_permissionsDeny() throws Exception {
         try {
-            m_entry.permissionsDeny("*", Permission.ALL.getValue(), Flags.NONE.getValue());
+            m_entry.permissionsDeny("*", Permission.READ.getValue(), Flags.NONE.getValue());
             fail("Expected exception: "+TimeoutException.class);
         } catch (TimeoutException e) {
             assertTrue("Should be hanged", WaitForEverAdaptorAbstract.isHanging());
