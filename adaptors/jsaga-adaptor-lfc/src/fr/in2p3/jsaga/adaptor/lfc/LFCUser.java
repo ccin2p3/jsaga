@@ -36,9 +36,6 @@ public class LFCUser {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == this) {
-			return true;
-		}
 		if (!(obj instanceof LFCUser)) {
 			return false;
 		}

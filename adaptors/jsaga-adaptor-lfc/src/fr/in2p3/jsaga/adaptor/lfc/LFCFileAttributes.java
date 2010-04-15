@@ -15,21 +15,24 @@ public class LFCFileAttributes extends FileAttributes {
     public LFCFileAttributes(LfcConnection.LFCFile file) {
         m_file = file;
     }
+    
+    public LfcConnection.LFCFile getLFCFile(){
+    	return m_file;
+    }
 
     public String getName() {
         return m_file.getFileName();
     }
 
     public int getType() {
-        if ((m_file.getFileMode() & LfcConnection.S_IFDIR) != 0) {
+        if (m_file.isDirectory()) {
             return TYPE_DIRECTORY;
-        } else {
-            //FIXME: CHECK LINKS!!
-            if(true){
-                return TYPE_FILE;
-            }else{
+        } else if (m_file.isRegularFile()){
+                return TYPE_FILE;    
+        }else if (m_file.isSymbolicLink()){
                 return TYPE_LINK;
-            }
+        }else{
+        	return TYPE_UNKNOWN;
         }
     }
 

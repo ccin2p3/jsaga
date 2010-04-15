@@ -89,6 +89,8 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
             } else {
                 throw new BadParameterException("Not supported for this protocol: "+ m_url.getScheme(), this);
             }
+            // reset file attributes from cache
+            ((URLImpl)m_url).setCache(null);
         } else {
             throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
@@ -115,6 +117,8 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
         } else {
             throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
+        // reset file attributes from cache
+        ((URLImpl)m_url).setCache(null);
     }
 
     public boolean permissionsCheck(String id, int permissions) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {

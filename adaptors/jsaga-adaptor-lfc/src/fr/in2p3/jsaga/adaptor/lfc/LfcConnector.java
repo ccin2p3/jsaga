@@ -162,6 +162,64 @@ public class LfcConnector {
 		}
 		return file;
 	}
+	
+	/**
+	 * Resolve one level of symbolic link path
+	 * @param link The symbolic link path
+	 * @return 
+	 * @throws IOException
+	 * @throws ReceiveException
+	 * @throws TimeoutException
+	 */
+	public String readlink(String link) throws IOException, ReceiveException, TimeoutException {
+		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
+		final String path;
+		try {
+			path = lfcConnection.readlink(link);
+		} catch (IOException e) {
+			throw e;
+		} catch (ReceiveException e) {
+			e.setExecutedCmd("readlink("+link+")");
+			throw e;
+		} finally {
+			close(lfcConnection);
+		}
+		return path;
+	}
+
+	/**
+	 * Create a symbolic link
+	 * @param path	The original file/directory
+	 * @param target	The path of the link
+	 * @throws IOException
+	 * @throws ReceiveException
+	 * @throws TimeoutException
+	 */
+	public void symbLink(String path, String target, boolean overwrite) throws IOException, ReceiveException, TimeoutException {
+		//FIXME: DO A TRANSACTION....
+		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
+		try {
+			lfcConnection.link(path, target);
+		} catch (IOException e) {
+			throw e;
+		} catch (ReceiveException e) {
+			if(LfcError.FILE_EXISTS.equals(e.getLFCError())){
+				//The file already exists...remove if 'overwrite'==true;
+				if(overwrite == true){
+					this.unlink(path);
+					this.symbLink(path, target, false);
+				}else{
+					e.setExecutedCmd("symbLink("+path+","+target+")");
+					throw e;
+				}
+			}else{
+				e.setExecutedCmd("symbLink("+path+","+target+")");
+				throw e;
+			}
+		} finally {
+			close(lfcConnection);
+		}
+	}
 
 	/**
 	 * Test if the file or the directory can be read.
@@ -230,9 +288,8 @@ public class LfcConnector {
 	 * @throws TimeoutException 
 	 */
 	public boolean exist(String path) throws IOException, ReceiveException, TimeoutException {
-		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
 		try {
-			lfcConnection.access(path, AccessType.EXIST_OK);
+			this.stat(path,false,false);
 		} catch (IOException e) {
 			throw e;
 		} catch (ReceiveException e) {
@@ -242,8 +299,6 @@ public class LfcConnector {
 				e.setExecutedCmd("exist("+path+")");
 				throw e;
 			}
-		} finally {
-			close(lfcConnection);
 		}
 		return true;
 	}
@@ -293,23 +348,29 @@ public class LfcConnector {
 	 * @throws TimeoutException 
 	 */
 	public Collection<LFCFile> list(String path, boolean followSymbolicLink) throws IOException, ReceiveException, TimeoutException {
-		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
-		final Collection<LFCFile> files;
-		try{
-			try {
-				final long fileID = lfcConnection.opendir(path, null);
-				files = lfcConnection.readdir(fileID);
-				lfcConnection.closedir();
-			} finally {
-				close(lfcConnection);
+		for (int z = 0; z <= LfcConnection.MAX_RETRY_IF_TIMEOUT; z++) {
+			LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
+			try{
+				try {
+					final long fileID = lfcConnection.opendir(path, null);
+					Collection<LFCFile> files = lfcConnection.readdir(fileID);
+					lfcConnection.closedir();
+					return files;
+				} finally {
+					close(lfcConnection);
+				}
+			} catch (IOException e) {
+				throw e;
+			} catch (ReceiveException e) {
+				e.setExecutedCmd("list("+path+") - followSymbolicLink="+followSymbolicLink);
+				throw e;
+			}catch (TimeoutException e) {
+				if(z == LfcConnection.MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
 			}
-		} catch (IOException e) {
-			throw e;
-		} catch (ReceiveException e) {
-			e.setExecutedCmd("list("+path+") - followSymbolicLink="+followSymbolicLink);
-			throw e;
 		}
-		return files;
+		throw new RuntimeException("Must not be here. BUG");
 	}
 
 	/**
@@ -439,7 +500,7 @@ public class LfcConnector {
 	 * @param path
 	 *            File path
 	 * @param mode
-	 *            Absolute UNIX like mode (octal value)
+	 *            Absolute LFC permissions (see {@link LfcConnection} for values...)
 	 * @throws IOException
 	 * @throws ReceiveException 
 	 * @throws TimeoutException 

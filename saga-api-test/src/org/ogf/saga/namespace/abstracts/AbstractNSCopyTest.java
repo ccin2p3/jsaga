@@ -69,6 +69,13 @@ public abstract class AbstractNSCopyTest extends AbstractNSDirectoryTest {
     protected void setUp() throws Exception {
         super.setUp();
         try {
+        	if (m_physicalFileUrl2 != null) {
+                // will be removed by super.tearDown()
+                File physicalFile = (File) m_physicalDir.open(m_physicalFileUrl2, FLAGS_FILE);
+                Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT_2.getBytes());
+                physicalFile.write(buffer);
+                physicalFile.close(0);
+            }
             if (m_dirUrl2 != null) {
                 // to be removed by this.tearDown()
                 m_dir2 = NSFactory.createNSDirectory(m_session, m_dirUrl2, FLAGS_DIR);
@@ -82,13 +89,6 @@ public abstract class AbstractNSCopyTest extends AbstractNSDirectoryTest {
                     }
                     file2.close();
                 }
-            }
-            if (m_physicalFileUrl2 != null) {
-                // will be removed by super.tearDown()
-                File physicalFile = (File) m_physicalDir.open(m_physicalFileUrl2, FLAGS_FILE);
-                Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT_2.getBytes());
-                physicalFile.write(buffer);
-                physicalFile.close(0);
             }
         } catch(Exception e) {
 //            try{this.tearDown();}catch(Exception e2){/**/}

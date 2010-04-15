@@ -29,7 +29,7 @@ import org.ietf.jgss.GSSManager;
 public class LfcConnection {
 	private static Logger s_logger = Logger.getLogger(LfcConnection.class);
 	
-	private final static int MAX_RETRY_IF_TIMEOUT = 1;
+	public final static int MAX_RETRY_IF_TIMEOUT = 3;
 	
 	/**
 	 * Bitmask for <b>file mode</b>
@@ -156,8 +156,8 @@ public class LfcConnection {
 	// private static final int CNS_SETACL = 38;
 	private static final int CNS_LCHOWN = 39;
 	private static final int CNS_LSTAT = 40;
-	// private static final int CNS_READLINK = 41;
-	// private static final int CNS_SYMLINK = 42;
+	 private static final int CNS_READLINK = 41;
+	 private static final int CNS_SYMLINK = 42;
 	private static final int CNS_ADDREPLICA = 43;
 	private static final int CNS_DELREPLICA = 44;
 	private static final int CNS_LISTREPLICA = 45;
@@ -251,6 +251,7 @@ public class LfcConnection {
 		
 		/* Extract from serrno.man */
 		TIMED_OUT(1004, "Has timed out"),
+		INTERNAL_ERROR(1015, "Internal error"),
 		
 		UNKOWN_ERROR(9999, "Unknown LFC error");
 		
@@ -384,12 +385,18 @@ public class LfcConnection {
 	private int receive() throws IOException, ReceiveException, TimeoutException {
 		try{
 			recvBuf.clear();
-			channel.read(recvBuf);
+			int ret = channel.read(recvBuf);
+			if(ret == -1){
+				throw new TimeoutException("Broken pipe...The socket connection with the LFC server was closed unexpectedly.");
+			}
 			int timeout = 5;
 		    int delay = 100;
 			while ((recvBuf.position() < HEADER_SIZE) && timeout-- > 0) {
 				try {
-					channel.read(recvBuf);
+					ret = channel.read(recvBuf);
+					if(ret == -1){
+						throw new TimeoutException("Broken pipe...The socket connection with the LFC server was closed unexpectedly.");
+					}
 					s_logger.debug("\t HEAD: waiting " + delay + " [ms]... AVAIL=" + recvBuf.position() + ", EXP="+HEADER_SIZE);
 					Thread.sleep(delay);
 					delay *= 2;
@@ -433,9 +440,7 @@ public class LfcConnection {
 			}
 	
 //			s_logger.debug("Limit: " + recvBuf.limit() + ", Pos: " + recvBuf.position() + " MinContent: " + sizeOrError + " Avail " + recvBuf.remaining());
-			timeout = 5;
-		    delay = 100;
-			while (recvBuf.remaining() < sizeOrError && timeout-- > 0) {
+			while (recvBuf.remaining() < sizeOrError ) {
 //				s_logger.debug("Reading once more: " + recvBuf.remaining() + " < " + sizeOrError);
 				// TODO: There must be an easier method of reading more data.
 				byte[] temp = new byte[recvBuf.remaining()];
@@ -446,18 +451,23 @@ public class LfcConnection {
 					recvBuf.clear();
 				}
 				recvBuf.put(temp);
-				channel.read(recvBuf);
-				recvBuf.flip();
-				try {
-					Thread.sleep(delay);
-					delay *= 2;
-				} catch (InterruptedException exc) {
-					s_logger.error(exc);
+				ret = channel.read(recvBuf);
+				if(ret == -1){
+					throw new TimeoutException("Broken pipe...The socket connection with the LFC server was closed unexpectedly.");
 				}
+				recvBuf.flip();
+//				if(timeout < 4){
+//					try {
+//						Thread.sleep(delay);
+//						delay *= 2;
+//					} catch (InterruptedException exc) {
+//						s_logger.error(exc);
+//					}
+//				}
 			}
-			if ( recvBuf.remaining() < sizeOrError ) {
-			      throw new TimeoutException("Connection timeout during receiving data.");
-			}
+//			if ( recvBuf.remaining() < sizeOrError ) {
+//			      throw new TimeoutException("Connection timeout during receiving data.");
+//			}
 			return sizeOrError;
 		}catch (BufferUnderflowException e) {
 			throw new ReceiveException(-9999, e.getMessage());
@@ -554,6 +564,7 @@ public class LfcConnection {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 	}
@@ -574,6 +585,7 @@ public class LfcConnection {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 	}
@@ -588,13 +600,18 @@ public class LfcConnection {
 				sendBuf.putLong(0L); // 0
 				putString(path);
 				sendAndReceive(true);
-		
 				LFCFile file = new LFCFile(recvBuf, false, false, false, false);
+				//FIXME:
+				if(recvBuf.hasRemaining()){
+					System.err.println("stat: Something remains to be read");
+					//throw new IOException("stat: Something remains to be read");
+				}
 				return file;
 			}catch (TimeoutException e) {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 		throw new RuntimeException("Must not be here. BUG");
@@ -610,13 +627,18 @@ public class LfcConnection {
 				putString(path);
 				putString(guid);
 				sendAndReceive(true);
-		
 				LFCFile file = new LFCFile(recvBuf, false, true, true, false);
+				//FIXME:
+				if(recvBuf.hasRemaining()){
+					System.err.println("statg: Something remains to be read");
+					//throw new IOException("statg: Something remains to be read");
+				}
 				return file;
 			}catch (TimeoutException e) {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 		throw new RuntimeException("Must not be here. BUG");
@@ -633,62 +655,67 @@ public class LfcConnection {
 				putString(path);
 				sendAndReceive(true);
 				LFCFile file = new LFCFile(recvBuf, false, false, false, false);
+				//FIXME:
+				if(recvBuf.hasRemaining()){
+					System.err.println("lstat: Something remains to be read");
+					//throw new IOException("lstat: Something remains to be read");
+				}
 				return file;
 			}catch (TimeoutException e) {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 		throw new RuntimeException("Must not be here. BUG");
 	}
-
-	public long opendir(String path, String guid) throws IOException, ReceiveException, TimeoutException {
+	
+	public String readlink(String link) throws IOException, ReceiveException, TimeoutException {
 		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
 			try{
-				if (guid == null) {
-					preparePacket(CNS_MAGIC, CNS_OPENDIR);
-				} else {
-					preparePacket(CNS_MAGIC2, CNS_OPENDIR);
-				}
+				preparePacket(CNS_MAGIC, CNS_READLINK);
 				addIDs();
-				long cwd = 0L; // Current Working Directory
+				long cwd = 0L;
 				sendBuf.putLong(cwd);
-				putString(path);
-				putString(guid);
-				long l = sendAndReceive(true);
-				long fileId = recvBuf.getLong();
-				if(l != 8){
-					throw new IOException("opendir: Something remains to be read ("+l+" bits)");
+				putString(link);
+				sendAndReceive(true);
+				String path = getString();
+				//FIXME:
+				if(recvBuf.hasRemaining()){
+					System.err.println("readlink: Something remains to be read");
+					//throw new IOException("readlink: Something remains to be read");
 				}
-				return fileId;
+				return path;
 			}catch (TimeoutException e) {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 		throw new RuntimeException("Must not be here. BUG");
 	}
-
-	public void closedir() throws IOException, ReceiveException, TimeoutException {
+	
+	public void link(String path, String target) throws IOException, ReceiveException, TimeoutException {
 		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
 			try{
-				preparePacket(CNS_MAGIC2, CNS_CLOSEDIR);
-				long l = sendAndReceive(false);
-				//JEROME
+				preparePacket(CNS_MAGIC, CNS_SYMLINK);
+				addIDs();
+				long cwd = 0L;
+				sendBuf.putLong(cwd);
+				putString(path);
+				putString(target);
+				long l = sendAndReceive(true);
 				if(l != 0){
-					if(l == 4){
-						recvBuf.getInt();
-					}else{
-						throw new IOException("closedir: Something remains to be read ("+l+" bits)");
-					}
+					throw new IOException("link: Something remains to be read ("+l+" bits)");
 				}
 				break;
 			}catch (TimeoutException e) {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 	}
@@ -703,11 +730,15 @@ public class LfcConnection {
 				putString(grpName);
 				sendAndReceive(true);
 				int s = recvBuf.getInt();
+				if(recvBuf.hasRemaining()){
+					throw new IOException("getGrpByName: Something remains to be read");
+				}
 				return s;
 			}catch (TimeoutException e) {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 		throw new RuntimeException("Must not be here. BUG");
@@ -723,11 +754,16 @@ public class LfcConnection {
 				sendBuf.putShort((short) 0);
 				sendBuf.putShort((short) gid);
 				sendAndReceive(true);
-				return getString();
+				String group = getString();
+				if(recvBuf.hasRemaining()){
+					throw new IOException("getGrpByGid: Something remains to be read");
+				}
+				return group;
 			}catch (TimeoutException e) {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 		throw new RuntimeException("Must not be here. BUG");
@@ -767,11 +803,15 @@ public class LfcConnection {
 						grpNames.add(getString());
 					}
 				}
+				if(recvBuf.hasRemaining()){
+					throw new IOException("getGrpByGids: Something remains to be read");
+				}
 				return grpNames;
 			}catch (TimeoutException e) {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 		throw new RuntimeException("Must not be here. BUG");
@@ -795,6 +835,7 @@ public class LfcConnection {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 		throw new RuntimeException("Must not be here. BUG");
@@ -810,11 +851,16 @@ public class LfcConnection {
 				sendBuf.putShort((short) 0);
 				sendBuf.putShort((short) uid);
 				sendAndReceive(true);
-				return getString();
+				String user = getString();
+				if(recvBuf.hasRemaining()){
+					throw new IOException("getUsrByUid: Something remains to be read");
+				}
+				return user;
 			}catch (TimeoutException e) {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 		throw new RuntimeException("Must not be here. BUG");
@@ -851,10 +897,65 @@ public class LfcConnection {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 	}
 
+	public long opendir(String path, String guid) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				if (guid == null) {
+					preparePacket(CNS_MAGIC, CNS_OPENDIR);
+				} else {
+					preparePacket(CNS_MAGIC2, CNS_OPENDIR);
+				}
+				addIDs();
+				long cwd = 0L; // Current Working Directory
+				sendBuf.putLong(cwd);
+				putString(path);
+				putString(guid);
+				long l = sendAndReceive(true);
+				long fileId = recvBuf.getLong();
+				if(l != 8){
+					throw new IOException("opendir: Something remains to be read ("+l+" bits)");
+				}
+				return fileId;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+				//CNS_OPENDIR, CNS_READDIR and CNS_CLOSEDIR must be done with the same connection...
+				init();
+			}
+		}
+		throw new RuntimeException("Must not be here. BUG");
+	}
+
+	public void closedir() throws IOException, ReceiveException, TimeoutException {
+//		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+//			try{
+				preparePacket(CNS_MAGIC2, CNS_CLOSEDIR);
+				long l = sendAndReceive(false);
+				//JEROME
+				if(l != 0){
+					if(l == 4){
+						recvBuf.getInt();
+					}else{
+						throw new IOException("closedir: Something remains to be read ("+l+" bits)");
+					}
+				}
+//				break;
+//			}catch (TimeoutException e) {
+//				if(z == MAX_RETRY_IF_TIMEOUT ){
+//					throw e;
+//				}
+//				//CNS_OPENDIR, CNS_READDIR and CNS_CLOSEDIR must be done with the same connection...
+//				//init();
+//			}
+//		}
+	}
+	
 	/**
 	 * Read a directory entry
 	 * 
@@ -866,8 +967,8 @@ public class LfcConnection {
 	 * @throws TimeoutException 
 	 */
 	public Collection<LFCFile> readdir(long fileID) throws IOException, ReceiveException, TimeoutException {
-		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
-			try{
+//		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+//			try{
 				preparePacket(CNS_MAGIC, CNS_READDIR);
 				addIDs();
 				sendBuf.putShort((short) 1); // 1 = full list (w/o comments), 0 = names only
@@ -879,34 +980,35 @@ public class LfcConnection {
 					throw new IOException("readdir: Something remains to be read ("+l+" bits)");
 				}
 				
-				// Jerome: I don't know why I have to do that but at least it works....
+				// FIXME: Jerome: I don't know why I have to do that but at least it works....
 				preparePacket(CNS_MAGIC, CNS_READDIR);
-				sendAndReceive(true);
+				l = sendAndReceive(true);
+				
+				
 				short count = recvBuf.getShort();
 				Collection<LFCFile> lfcFiles = new ArrayList<LFCFile>(count);
-		
-		//		String debug = null;
 				for (short i = 0; i < count; i++) {
 					LFCFile file = new LFCFile(recvBuf, true, false, false, false);
 					lfcFiles.add(file);
-		//			if (s_logger.isDebugEnabled()) {
-		//				if (i == 0) {
-		//					debug = "\nDirectory content (fileID: " + fileID + "):";
-		//				}
-		//				debug += "\n\t- " + (i + 1) + ")\t" + file.toString();
-		//			}
 				}
-		//		if (s_logger.isDebugEnabled()) {
-		//			s_logger.debug(debug);
-		//		}
+//				short eod = recvBuf.getShort();
+//				int size = receive();
+//				//FIXME:
+//				while(recvBuf.hasRemaining()){
+//					System.out.println("FIXME: readdir: Something remains to be read:"+getString());
+//					getString();
+//					//throw new IOException("readdir: Something remains to be read");
+//				}
 				return lfcFiles;
-			}catch (TimeoutException e) {
-				if(z == MAX_RETRY_IF_TIMEOUT ){
-					throw e;
-				}
-			}
-		}
-		throw new RuntimeException("Must not be here. BUG");
+//			}catch (TimeoutException e) {
+//				if(z == MAX_RETRY_IF_TIMEOUT ){
+//					throw e;
+//				}
+//				//CNS_OPENDIR, CNS_READDIR and CNS_CLOSEDIR must be done with the same connection...
+//				//init();
+//			}
+//		}
+//		throw new RuntimeException("Must not be here. BUG");
 	}
 
 	/**
@@ -932,6 +1034,7 @@ public class LfcConnection {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 		throw new RuntimeException("Must not be here. BUG");
@@ -959,6 +1062,7 @@ public class LfcConnection {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 	}
@@ -988,6 +1092,7 @@ public class LfcConnection {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 	}
@@ -1014,6 +1119,7 @@ public class LfcConnection {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 	}
@@ -1043,6 +1149,7 @@ public class LfcConnection {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 	}
@@ -1072,6 +1179,7 @@ public class LfcConnection {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 	}
@@ -1100,6 +1208,7 @@ public class LfcConnection {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 	}
@@ -1128,11 +1237,16 @@ public class LfcConnection {
 					LFCReplica replica = new LFCReplica(recvBuf);
 					srms.add(replica);
 				}
+				//FIXME: 
+				if(recvBuf.hasRemaining()){
+					System.err.println("listReplica: Something remains to be read");
+				}
 				return srms;
 			}catch (TimeoutException e) {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 		throw new RuntimeException("Must not be here. BUG");
@@ -1170,6 +1284,7 @@ public class LfcConnection {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 		throw new RuntimeException("Must not be here. BUG");
@@ -1192,6 +1307,7 @@ public class LfcConnection {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 	}
@@ -1219,6 +1335,7 @@ public class LfcConnection {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 		throw new RuntimeException("Must not be here. BUG");
@@ -1246,6 +1363,7 @@ public class LfcConnection {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 	}
@@ -1273,6 +1391,7 @@ public class LfcConnection {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 	}
@@ -1301,6 +1420,7 @@ public class LfcConnection {
 				if(z == MAX_RETRY_IF_TIMEOUT ){
 					throw e;
 				}
+				init();
 			}
 		}
 	}
