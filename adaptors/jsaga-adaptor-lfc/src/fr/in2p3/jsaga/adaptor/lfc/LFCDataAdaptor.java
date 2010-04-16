@@ -609,7 +609,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		}
 		
 		if(permissions.contains(Permission.OWNER)){
-			throw new BadParameterException("The OWNER permission is not yet supported by the LFC");
+			throw new BadParameterException("The OWNER permission is not yet supported by the LFC adaptor");
 		}
 		
 		FileAttributes lfcFileAttributes;
@@ -720,25 +720,17 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 			throw new BadParameterException("The QUERY permission is not supported by the LFC");
 		}
 		
-		LFCFileAttributes lfcFileAttributes = null;
-		try{
-			lfcFileAttributes = new LFCFileAttributes(m_lfcConnector.stat(absolutePath, true, false));
-		} catch (IOException e) {
-			logger.error("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+id+", "+permissions+")",e);
-			throw new NoSuccessException(e);
-		} catch (ReceiveException e) {
-			logger.error("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+id+", "+permissions+")",e);
-			if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
-				throw new PermissionDeniedException(e.toString());
-			}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
-				throw new TimeoutException(e.getMessage());
-			}else{
-				throw new NoSuccessException(e);
-			}
-		} catch (java.util.concurrent.TimeoutException e) {
-			logger.error("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+id+", "+permissions+")",e);
-			throw new TimeoutException(e.getMessage());
+		if(permissions.contains(Permission.OWNER)){
+			throw new BadParameterException("The OWNER permission is not yet supported by the LFC adaptor");
 		}
+		
+		FileAttributes lfcFileAttributes;
+		try {
+			lfcFileAttributes = getAttributes(absolutePath, null);
+		} catch (DoesNotExistException e) {
+			throw new NoSuccessException(e);
+		}
+		
 		PermissionBytes actualScopePermissions;
 		switch (scope) {
 			case SCOPE_USER:
@@ -850,7 +842,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 	 * @param permissionsToRemove The permissions that have to be removed
 	 * @return The new permissions 
 	 */
-	private PermissionBytes removePermissions(PermissionBytes actualPermissions, PermissionBytes permissionsToRemove){
+	private static PermissionBytes removePermissions(PermissionBytes actualPermissions, PermissionBytes permissionsToRemove){
 		PermissionBytes newPermissionBytes = actualPermissions;
 		if(permissionsToRemove.contains(Permission.EXEC) && actualPermissions.contains(Permission.EXEC)){
 			newPermissionBytes = new PermissionBytes(actualPermissions.getValue() - Permission.EXEC.getValue());

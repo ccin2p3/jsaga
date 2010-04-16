@@ -3,6 +3,7 @@ package integration;
 import junit.framework.Test;
 import org.ogf.saga.file.*;
 import org.ogf.saga.namespace.*;
+import org.ogf.saga.permissions.PermissionsTest;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -68,5 +69,8 @@ public class SRMIntegrationTestSuite extends JSAGATestSuite {
     }
     public static class SRM_to_EmulatorNSMoveTest extends NSMoveTest {
         public SRM_to_EmulatorNSMoveTest() throws Exception {super("srm", "test");}
+    }
+    public static class SRMPermissionsTest extends PermissionsTest {
+        public SRMPermissionsTest() throws Exception {super("srm");}
     }
 }

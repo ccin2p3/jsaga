@@ -1,12 +1,16 @@
 package fr.in2p3.jsaga.adaptor.data;
 
+import fr.in2p3.jsaga.adaptor.data.permission.PermissionAdaptor;
+import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
+
 import org.apache.axis.AxisFault;
 import org.apache.axis.client.Stub;
 import org.globus.axis.gsi.GSIConstants;
 import org.ogf.saga.error.*;
+import org.ogf.saga.permissions.Permission;
 import org.ogf.srm22.*;
 
 import javax.xml.rpc.ServiceException;
@@ -27,7 +31,7 @@ import java.util.Map;
 /**
  * TODO: implement DataCopy when it will be supported also by DPM
  */
-public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileReaderStreamFactory, FileWriterStreamFactory, StreamCallback
+public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileReaderStreamFactory, FileWriterStreamFactory, StreamCallback, PermissionAdaptor
 //todo: uncomment this when mixed adaptors (i.e. both physical and logical) will be supported by engine
 //        , LogicalReader
 {
@@ -118,7 +122,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
                    status.getStatusCode().equals(TStatusCode.SRM_REQUEST_INPROGRESS))
             {
                 try {
-                    Thread.currentThread().sleep(period);
+                    Thread.sleep(period);
                     period *= 2;
                 } catch (InterruptedException e) {/*ignore*/}
                 SrmStatusOfGetRequestResponse response2 = m_stub.srmStatusOfGetRequest(request2);
@@ -240,7 +244,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
                    status.getStatusCode().equals(TStatusCode.SRM_REQUEST_INPROGRESS))
             {
                 try {
-                    Thread.currentThread().sleep(period);
+                    Thread.sleep(period);
                     period *= 2;
                 } catch (InterruptedException e) {/*ignore*/}
                 SrmStatusOfPutRequestResponse response2 = m_stub.srmStatusOfPutRequest(request2);
@@ -435,14 +439,249 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             }
         }
     }
+    
+    public int[] getSupportedScopes() {
+		return new int[]{SCOPE_USER,SCOPE_GROUP,SCOPE_ANY};
+	}
+
+	public void permissionsAllow(String absolutePath, int scope, String id, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
+		if(permissions.contains(Permission.QUERY)){
+			throw new BadParameterException("The QUERY permission is not supported by the SRM");
+		}
+		
+		if(permissions.contains(Permission.OWNER)){
+			throw new BadParameterException("The OWNER permission is not yet supported by the SRM adaptor");
+		}
+		
+		FileAttributes srmFileAttributes;
+		try {
+			srmFileAttributes = getAttributes(absolutePath, null);
+		} catch (DoesNotExistException e) {
+			throw new NoSuccessException(e);
+		}
+		
+		SrmSetPermissionRequest setPermissionRequest = new SrmSetPermissionRequest();
+		setPermissionRequest.setSURL(toSrmURI(absolutePath));
+		setPermissionRequest.setPermissionType(TPermissionType.CHANGE);
+		setPermissionRequest.setArrayOfUserPermissions(null);
+		switch (scope) {
+			case SCOPE_USER:
+					if(srmFileAttributes.getUserPermission().containsAll(permissions.getValue())){
+						return;
+					}else{
+						setPermissionRequest.setOwnerPermission(getSRMPermissions(srmFileAttributes.getUserPermission().or(permissions)));
+					}
+				break;
+			case SCOPE_GROUP:
+					if(srmFileAttributes.getGroupPermission().containsAll(permissions.getValue())){
+						return;
+					}else{
+						setPermissionRequest.setArrayOfGroupPermissions(new ArrayOfTGroupPermission(new TGroupPermission[]{new TGroupPermission(srmFileAttributes.getGroup(), getSRMPermissions(srmFileAttributes.getGroupPermission().or(permissions)))}));
+					}
+				break;
+			case SCOPE_ANY:
+					if(srmFileAttributes.getAnyPermission().containsAll(permissions.getValue())){
+						return;
+					}else{
+						setPermissionRequest.setOtherPermission(getSRMPermissions(srmFileAttributes.getAnyPermission().or(permissions)));
+					}
+				break;
+			default:
+				throw new RuntimeException("Unkown scope: "+scope);
+		}
+		
+		SrmSetPermissionResponse response = null;
+		try{
+			response = m_stub.srmSetPermission(setPermissionRequest);
+		} catch (RemoteException e) {
+	        throw new NoSuccessException(e);
+	    }
+		
+        TReturnStatus status = response.getReturnStatus();
+        if (! status.getStatusCode().equals(TStatusCode.SRM_SUCCESS)) {
+            try {
+                rethrowException(status);
+            } catch (DoesNotExistException e) {
+                throw new NoSuccessException(e);
+            } catch (AlreadyExistsException e) {
+            	throw new NoSuccessException(e);
+			}
+            throw new NoSuccessException("INTERNAL ERROR: an exception should have been raised");
+        }
+	}
+
+	public boolean permissionsCheck(String absolutePath, int scope, String id, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
+		if(id == null){
+			//TODO: Check it!
+		}
+		
+		if(permissions.contains(Permission.QUERY)){
+			throw new BadParameterException("The QUERY permission is not supported by the SRM");
+		}
+		
+		if(permissions.contains(Permission.OWNER)){
+			throw new BadParameterException("The OWNER permission is not yet supported by the SRM adaptor");
+		}
+		
+		FileAttributes srmFileAttributes;
+		try {
+			srmFileAttributes = getAttributes(absolutePath, null);
+		} catch (DoesNotExistException e) {
+			throw new NoSuccessException(e);
+		}
+		
+		PermissionBytes actualScopePermissions;
+		switch (scope) {
+			case SCOPE_USER:
+				actualScopePermissions = srmFileAttributes.getUserPermission();
+				break;
+			case SCOPE_GROUP:
+				actualScopePermissions = srmFileAttributes.getGroupPermission();
+				break;
+			case SCOPE_ANY:
+				actualScopePermissions = srmFileAttributes.getAnyPermission();
+				break;
+			default:
+				throw new RuntimeException("Unkown scope: "+scope);
+		}
+		
+		if(actualScopePermissions.containsAll(permissions.getValue())){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	public void permissionsDeny(String absolutePath, int scope, String id, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
+		if(id == null){
+			//TODO: ???
+		}
+		
+		if(permissions.contains(Permission.QUERY)){
+			throw new BadParameterException("The QUERY permission is not supported by the SRM");
+		}
+		
+		if(permissions.contains(Permission.OWNER)){
+			throw new BadParameterException("The OWNER permission is not yet supported by the SRM adaptor");
+		}
+		
+		FileAttributes srmFileAttributes;
+		try {
+			srmFileAttributes = getAttributes(absolutePath, null);
+		} catch (DoesNotExistException e) {
+			throw new NoSuccessException(e);
+		}
+		
+		SrmSetPermissionRequest setPermissionRequest = new SrmSetPermissionRequest();
+		setPermissionRequest.setSURL(toSrmURI(absolutePath));
+		setPermissionRequest.setPermissionType(TPermissionType.CHANGE);
+		setPermissionRequest.setArrayOfUserPermissions(null);
+		switch (scope) {
+			case SCOPE_USER:
+				PermissionBytes userPermissions = srmFileAttributes.getUserPermission();
+				PermissionBytes newUserPermissions = removePermissions(userPermissions, permissions);
+				if(userPermissions == newUserPermissions){
+					return;
+				}else{
+					setPermissionRequest.setOwnerPermission(getSRMPermissions(newUserPermissions));
+				}
+				break;
+			case SCOPE_GROUP:
+				PermissionBytes groupPermissions = srmFileAttributes.getGroupPermission();
+				PermissionBytes newGroupPermissions = removePermissions(groupPermissions, permissions);
+				if(groupPermissions == newGroupPermissions){
+					return;
+				}else{
+					setPermissionRequest.setArrayOfGroupPermissions(new ArrayOfTGroupPermission(new TGroupPermission[]{new TGroupPermission(srmFileAttributes.getGroup(), getSRMPermissions(newGroupPermissions))}));
+				}
+				break;
+			case SCOPE_ANY:
+				PermissionBytes anyPermissions = srmFileAttributes.getAnyPermission();
+				PermissionBytes newAnyPermissions = removePermissions(anyPermissions, permissions);
+				if(anyPermissions == newAnyPermissions){
+					return;
+				}else{
+					setPermissionRequest.setOtherPermission(getSRMPermissions(srmFileAttributes.getAnyPermission().or(permissions)));
+				}
+				break;
+			default:
+				throw new RuntimeException("Unkown scope: "+scope);
+		}
+		
+		SrmSetPermissionResponse response = null;
+		try{
+			response = m_stub.srmSetPermission(setPermissionRequest);
+		} catch (RemoteException e) {
+	        throw new NoSuccessException(e);
+	    }
+		
+        TReturnStatus status = response.getReturnStatus();
+        if (! status.getStatusCode().equals(TStatusCode.SRM_SUCCESS)) {
+            try {
+                rethrowException(status);
+            } catch (DoesNotExistException e) {
+                throw new NoSuccessException(e);
+            } catch (AlreadyExistsException e) {
+            	throw new NoSuccessException(e);
+			}
+            throw new NoSuccessException("INTERNAL ERROR: an exception should have been raised");
+        }
+	}
+
+	public void setGroup(String id) throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
+		throw new PermissionDeniedException("Only root can do that on SRM.");
+	}
+
+	public void setOwner(String id) throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
+		throw new PermissionDeniedException("Only root can do that on SRM.");
+	}
 
     //////////////////////////////////////// private methods ////////////////////////////////////////
-
+	
+	/**
+	 * @param actualPermissions The permissions to potentially modify.
+	 * @param permissionsToRemove The permissions that have to be removed
+	 * @return The new permissions 
+	 */
+	private static PermissionBytes removePermissions(PermissionBytes actualPermissions, PermissionBytes permissionsToRemove){
+		PermissionBytes newPermissionBytes = actualPermissions;
+		if(permissionsToRemove.contains(Permission.EXEC) && actualPermissions.contains(Permission.EXEC)){
+			newPermissionBytes = new PermissionBytes(actualPermissions.getValue() - Permission.EXEC.getValue());
+		}
+		if(permissionsToRemove.contains(Permission.READ) && actualPermissions.contains(Permission.READ)){
+			newPermissionBytes = new PermissionBytes(actualPermissions.getValue() - Permission.READ.getValue());
+		}
+		if(permissionsToRemove.contains(Permission.WRITE) && actualPermissions.contains(Permission.WRITE)){
+			newPermissionBytes = new PermissionBytes(actualPermissions.getValue() - Permission.WRITE.getValue());
+		}
+		return newPermissionBytes;
+	}
+	
+    private static TPermissionMode getSRMPermissions(PermissionBytes permissions) {
+    	String perms = "";
+    	if(permissions.contains(Permission.READ)){
+			perms += "R";
+		}
+		if(permissions.contains(Permission.WRITE)){
+			perms += "W";
+		}
+		if(permissions.contains(Permission.EXEC)){
+			perms += "X";
+		}
+		
+		if(perms.equals("")){
+			perms = "NONE";
+		}
+		
+		return TPermissionMode.fromValue(perms);
+    }
+	
     private TMetaDataPathDetail getMetaData(String absolutePath) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         org.apache.axis.types.URI uri = this.toSrmURI(absolutePath);
         SrmLsRequest request = new SrmLsRequest();
         request.setArrayOfSURLs(new ArrayOfAnyURI(new org.apache.axis.types.URI[]{uri}));
         request.setAllLevelRecursive(Boolean.FALSE);
+        request.setFullDetailedList(Boolean.TRUE);
         SrmLsResponse response;
         try {
             // send request
