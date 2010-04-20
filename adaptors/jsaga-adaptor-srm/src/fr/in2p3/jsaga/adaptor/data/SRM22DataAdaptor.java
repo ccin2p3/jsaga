@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.adaptor.data;
 
-import fr.in2p3.jsaga.adaptor.data.permission.PermissionAdaptor;
+import fr.in2p3.jsaga.adaptor.data.permission.PermissionAdaptorBasic;
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
@@ -8,7 +8,12 @@ import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.client.Stub;
+import org.glite.voms.VOMSAttribute;
+import org.glite.voms.VOMSValidator;
 import org.globus.axis.gsi.GSIConstants;
+import org.globus.gsi.GlobusCredential;
+import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
+import org.ietf.jgss.GSSException;
 import org.ogf.saga.error.*;
 import org.ogf.saga.permissions.Permission;
 import org.ogf.srm22.*;
@@ -17,7 +22,9 @@ import javax.xml.rpc.ServiceException;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.rmi.RemoteException;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Vector;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -31,7 +38,7 @@ import java.util.Map;
 /**
  * TODO: implement DataCopy when it will be supported also by DPM
  */
-public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileReaderStreamFactory, FileWriterStreamFactory, StreamCallback, PermissionAdaptor
+public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileReaderStreamFactory, FileWriterStreamFactory, StreamCallback, PermissionAdaptorBasic
 //todo: uncomment this when mixed adaptors (i.e. both physical and logical) will be supported by engine
 //        , LogicalReader
 {
@@ -444,15 +451,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
 		return new int[]{SCOPE_USER,SCOPE_GROUP,SCOPE_ANY};
 	}
 
-	public void permissionsAllow(String absolutePath, int scope, String id, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
-		if(permissions.contains(Permission.QUERY)){
-			throw new BadParameterException("The QUERY permission is not supported by the SRM");
-		}
-		
-		if(permissions.contains(Permission.OWNER)){
-			throw new BadParameterException("The OWNER permission is not yet supported by the SRM adaptor");
-		}
-		
+	public void permissionsAllow(String absolutePath, int scope, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		FileAttributes srmFileAttributes;
 		try {
 			srmFileAttributes = getAttributes(absolutePath, null);
@@ -505,12 +504,16 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
                 throw new NoSuccessException(e);
             } catch (AlreadyExistsException e) {
             	throw new NoSuccessException(e);
+			} catch (BadParameterException e) {
+				throw new NoSuccessException(e);
 			}
             throw new NoSuccessException("INTERNAL ERROR: an exception should have been raised");
         }
 	}
 
-	public boolean permissionsCheck(String absolutePath, int scope, String id, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
+//Will be needed when full permissions will be implemented.
+/*
+	public boolean permissionsCheck(String absolutePath, int scope, PermissionBytes permissions, String id) throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
 		if(id == null){
 			//TODO: Check it!
 		}
@@ -551,20 +554,9 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
 			return false;
 		}
 	}
+*/
 
-	public void permissionsDeny(String absolutePath, int scope, String id, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
-		if(id == null){
-			//TODO: ???
-		}
-		
-		if(permissions.contains(Permission.QUERY)){
-			throw new BadParameterException("The QUERY permission is not supported by the SRM");
-		}
-		
-		if(permissions.contains(Permission.OWNER)){
-			throw new BadParameterException("The OWNER permission is not yet supported by the SRM adaptor");
-		}
-		
+	public void permissionsDeny(String absolutePath, int scope, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		FileAttributes srmFileAttributes;
 		try {
 			srmFileAttributes = getAttributes(absolutePath, null);
@@ -623,6 +615,8 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
                 throw new NoSuccessException(e);
             } catch (AlreadyExistsException e) {
             	throw new NoSuccessException(e);
+			} catch (BadParameterException e) {
+				throw new NoSuccessException(e);
 			}
             throw new NoSuccessException("INTERNAL ERROR: an exception should have been raised");
         }
@@ -634,6 +628,42 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
 
 	public void setOwner(String id) throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
 		throw new PermissionDeniedException("Only root can do that on SRM.");
+	}
+
+	public String[] getGroupsOf(String id) throws BadParameterException, NoSuccessException {
+		String userId = null;
+		try {
+			userId = m_credential.getName().toString();
+		} catch (GSSException e) {
+			throw new BadParameterException("Unable to extract the user ID from the certificate");
+		}
+		if(!userId.equals(id)){
+			throw new BadParameterException("The id is not the actual user");
+		}
+		GlobusCredential globusCred = null;
+		if (m_credential instanceof GlobusGSSCredentialImpl) {
+			globusCred = ((GlobusGSSCredentialImpl)m_credential).getGlobusCredential();
+		} else {
+			throw new BadParameterException("Not a globus proxy");
+		}
+
+		Vector v = VOMSValidator.parse(globusCred.getCertificateChain());
+		for (int i=0; i<v.size(); i++) {
+			VOMSAttribute attr = (VOMSAttribute) v.elementAt(i);
+			if(m_vo.equals(attr.getVO())){
+				String[] groups = new String[attr.getFullyQualifiedAttributes().size()];
+				int index = 0;
+				for (Iterator it=attr.getFullyQualifiedAttributes().iterator(); it.hasNext(); ) {
+					groups[index] = (String) it.next();
+					if(groups[index].startsWith("/")){
+						groups[index] = groups[index].substring(1);
+					}
+					index++;
+				}
+				return groups;
+			}
+		}
+		return new String[0];
 	}
 
     //////////////////////////////////////// private methods ////////////////////////////////////////

@@ -61,6 +61,11 @@
             <version>0.9.9-SNAPSHOT</version>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>org.glite</groupId>
+            <artifactId>vomsjapi</artifactId>
+            <version>1.7.22</version>
+        </dependency>
         <dependency><!-- for saving credential (class DelegationStub) -->
             <groupId>org.globus</groupId>
             <artifactId>cog-jglobus</artifactId>

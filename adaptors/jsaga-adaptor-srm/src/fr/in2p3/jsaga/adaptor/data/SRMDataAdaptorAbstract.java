@@ -10,6 +10,7 @@ import org.apache.axis.client.Call;
 import org.apache.axis.configuration.SimpleProvider;
 import org.globus.axis.transport.GSIHTTPSender;
 import org.ietf.jgss.GSSCredential;
+import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 
 import java.io.File;
@@ -36,6 +37,7 @@ public abstract class SRMDataAdaptorAbstract implements DataAdaptor {
     protected String m_host;
     protected int m_port;
     protected String[] m_transferProtocols;
+    protected String m_vo;
 
     static {
         s_provider = new SimpleProvider();
@@ -76,6 +78,11 @@ public abstract class SRMDataAdaptorAbstract implements DataAdaptor {
         GSSCredentialSecurityCredential proxyAdaptor = (GSSCredentialSecurityCredential) credential;
         m_credential = proxyAdaptor.getGSSCredential();
         m_certRepository = proxyAdaptor.getCertRepository();
+        try {
+			m_vo = proxyAdaptor.getAttribute(Context.USERVO);
+		} catch (Exception e) {
+			m_vo = "Unknown_VO";
+		}
     }
 
     public BaseURL getBaseURL() throws IncorrectURLException {

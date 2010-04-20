@@ -7,7 +7,7 @@ import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.link.LinkAdaptor;
 import fr.in2p3.jsaga.adaptor.data.link.NotLink;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
-import fr.in2p3.jsaga.adaptor.data.permission.PermissionAdaptor;
+import fr.in2p3.jsaga.adaptor.data.permission.PermissionAdaptorBasic;
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
@@ -20,6 +20,11 @@ import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 
 import org.apache.log4j.Logger;
+import org.glite.voms.VOMSAttribute;
+import org.glite.voms.VOMSValidator;
+import org.globus.gsi.GlobusCredential;
+import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
+import org.ietf.jgss.GSSException;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 import org.ogf.saga.file.FileFactory;
@@ -36,10 +41,10 @@ import java.util.*;
  * 
  * @author Jerome Revillard
  */
-public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor, DataRename, PermissionAdaptor {
+public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor, DataRename, PermissionAdaptorBasic {
 	private static Logger logger = Logger.getLogger(LFCDataAdaptor.class);
     private static final int LFC_PORT_DEFAULT = 5010;
-    private GSSCredentialSecurityCredential m_vomscredential;
+    private GSSCredentialSecurityCredential m_globuscredential;
     private String m_vo;
     private LfcConnector m_lfcConnector;	
     
@@ -47,10 +52,11 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		return "lfn";
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {
 		logger.debug("DOING: connect");
 		try{
-			m_lfcConnector = LfcConnector.getInstance(host, port, m_vo, m_vomscredential.getGSSCredential());
+			m_lfcConnector = LfcConnector.getInstance(host, port, m_vo, m_globuscredential.getGSSCredential());
 		}catch (IllegalArgumentException e) {
 			throw new NoSuccessException(e.getMessage());
 		} catch (IOException e) {
@@ -84,14 +90,15 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
         return null;
     }
 
-    public final Class<SecurityCredential>[] getSupportedSecurityCredentialClasses() {
+    @SuppressWarnings("unchecked")
+	public final Class<SecurityCredential>[] getSupportedSecurityCredentialClasses() {
         return new Class[]{GSSCredentialSecurityCredential.class};
     }
 
     public final void setSecurityCredential(SecurityCredential credential) {
-    	m_vomscredential = (GSSCredentialSecurityCredential) credential;
+    	m_globuscredential = (GSSCredentialSecurityCredential) credential;
         try {
-			m_vo = m_vomscredential.getAttribute(Context.USERVO);
+			m_vo = m_globuscredential.getAttribute(Context.USERVO);
 		} catch (Exception e) {
 			m_vo = "Unknown_VO";
 		}
@@ -598,19 +605,8 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		return new int[]{SCOPE_USER,SCOPE_GROUP,SCOPE_ANY};
 	}
 
-	public void permissionsAllow(String absolutePath, int scope, String id, PermissionBytes permissions) throws PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
-		logger.debug("DOING: permissionsAllow("+absolutePath+", "+scope+", "+id+", "+permissions+")");
-		if(id == null){
-			//TODO: ???
-		}
-		
-		if(permissions.contains(Permission.QUERY)){
-			throw new BadParameterException("The QUERY permission is not supported by the LFC");
-		}
-		
-		if(permissions.contains(Permission.OWNER)){
-			throw new BadParameterException("The OWNER permission is not yet supported by the LFC adaptor");
-		}
+	public void permissionsAllow(String absolutePath, int scope, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+		logger.debug("DOING: permissionsAllow("+absolutePath+", "+scope+", "+permissions+")");
 		
 		FileAttributes lfcFileAttributes;
 		try {
@@ -652,10 +648,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			m_lfcConnector.chmod(absolutePath,permission);
 		}catch (IOException e) {
-			logger.error("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+id+", "+permissions+")",e);
+			logger.error("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+permissions+")",e);
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+id+", "+permissions+")",e);
+			logger.error("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+permissions+")",e);
 			if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
@@ -664,10 +660,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (java.util.concurrent.TimeoutException e) {
-			logger.error("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+id+", "+permissions+")",e);
+			logger.error("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+permissions+")",e);
 			throw new TimeoutException(e.getMessage());
 		}
-		logger.debug("DONE: permissionsAllow("+absolutePath+", "+scope+", "+id+", "+permissions+")");
+		logger.debug("DONE: permissionsAllow("+absolutePath+", "+scope+", "+permissions+")");
 	}
 	
 	private int generateLFCPermissions(int scope, PermissionBytes permissions){
@@ -710,11 +706,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		return perms;
 	}
 
-	public boolean permissionsCheck(String absolutePath, int scope, String id, PermissionBytes permissions) throws PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
-		logger.debug("DOING: permissionsCheck("+absolutePath+", "+scope+", "+id+", "+permissions+")");
-		if(id == null){
-			//TODO: Check it!
-		}
+// Will be needed for full permissions management
+/*
+	public boolean permissionsCheck(String absolutePath, int scope, PermissionBytes permissions) throws PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+		logger.debug("DOING: permissionsCheck("+absolutePath+", "+scope+", "+permissions+")");
 		
 		if(permissions.contains(Permission.QUERY)){
 			throw new BadParameterException("The QUERY permission is not supported by the LFC");
@@ -747,28 +742,17 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		}
 		
 		if(actualScopePermissions.containsAll(permissions.getValue())){
-			logger.debug("DONE: permissionsCheck("+absolutePath+", "+scope+", "+id+", "+permissions+")");
+			logger.debug("DONE: permissionsCheck("+absolutePath+", "+scope+", "+permissions+")");
 			return true;
 		}else{
-			logger.debug("DONE: permissionsCheck("+absolutePath+", "+scope+", "+id+", "+permissions+")");
+			logger.debug("DONE: permissionsCheck("+absolutePath+", "+scope+", "+permissions+")");
 			return false;
 		}
 	}
-	
+*/	
 
-	public void permissionsDeny(String absolutePath, int scope, String id, PermissionBytes permissions) throws PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
-		logger.debug("DOING: permissionsDeny("+absolutePath+", "+scope+", "+id+", "+permissions+")");
-		if(id == null){
-			//TODO: Check it!
-		}
-		
-		if(permissions.contains(Permission.QUERY)){
-			throw new BadParameterException("The QUERY permission is not supported by the LFC");
-		}
-		
-		if(permissions.contains(Permission.OWNER)){
-			throw new BadParameterException("Unsetting OWNER permission is not allowed");
-		}
+	public void permissionsDeny(String absolutePath, int scope, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+		logger.debug("DOING: permissionsDeny("+absolutePath+", "+scope+", "+permissions+")");
 		
 		FileAttributes lfcFileAttributes;
 		try {
@@ -816,10 +800,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			m_lfcConnector.chmod(absolutePath,permission);
 		}catch (IOException e) {
-			logger.error("ERROR: permissionsDeny("+absolutePath+", "+scope+", "+id+", "+permissions+")",e);
+			logger.error("ERROR: permissionsDeny("+absolutePath+", "+scope+", "+permissions+")",e);
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: permissionsDeny("+absolutePath+", "+scope+", "+id+", "+permissions+")",e);
+			logger.error("ERROR: permissionsDeny("+absolutePath+", "+scope+", "+permissions+")",e);
 			if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
@@ -828,11 +812,11 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (java.util.concurrent.TimeoutException e) {
-			logger.error("ERROR: permissionsDeny("+absolutePath+", "+scope+", "+id+", "+permissions+")",e);
+			logger.error("ERROR: permissionsDeny("+absolutePath+", "+scope+", "+permissions+")",e);
 			throw new TimeoutException(e.getMessage());
 		}
 		
-		logger.debug("DONE: permissionsDeny("+absolutePath+", "+scope+", "+id+", "+permissions+")");
+		logger.debug("DONE: permissionsDeny("+absolutePath+", "+scope+", "+permissions+")");
 
 	}
 	
@@ -866,6 +850,43 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 	public void setOwner(String id) throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
 		// TODO Auto-generated method stub
 		throw new NoSuccessException("Not implemented");
+	}
+	
+	@SuppressWarnings("unchecked")
+	public String[] getGroupsOf(String id) throws BadParameterException, NoSuccessException {
+		String userId = null;
+		try {
+			userId = m_globuscredential.getGSSCredential().getName().toString();
+		} catch (GSSException e) {
+			throw new BadParameterException("Unable to extract the user ID from the certificate");
+		}
+		if(!userId.equals(id)){
+			throw new BadParameterException("The id is not the actual user");
+		}
+		GlobusCredential globusCred = null;
+		if (m_globuscredential.getGSSCredential() instanceof GlobusGSSCredentialImpl) {
+			globusCred = ((GlobusGSSCredentialImpl)m_globuscredential.getGSSCredential()).getGlobusCredential();
+		} else {
+			throw new BadParameterException("Not a globus proxy");
+		}
+
+		Vector<VOMSAttribute> v = VOMSValidator.parse(globusCred.getCertificateChain());
+		for (int i=0; i<v.size(); i++) {
+			VOMSAttribute attr = (VOMSAttribute) v.elementAt(i);
+			if(m_vo.equals(attr.getVO())){
+				String[] groups = new String[attr.getFullyQualifiedAttributes().size()];
+				int index = 0;
+				for (Iterator it=attr.getFullyQualifiedAttributes().iterator(); it.hasNext(); ) {
+					groups[index] = (String) it.next();
+					if(groups[index].startsWith("/")){
+						groups[index] = groups[index].substring(1);
+					}
+					index++;
+				}
+				return groups;
+			}
+		}
+		return new String[0];
 	}
 	
 
