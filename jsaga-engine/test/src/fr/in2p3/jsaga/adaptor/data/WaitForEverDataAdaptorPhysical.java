@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.adaptor.data;
 
 import fr.in2p3.jsaga.adaptor.data.link.LinkAdaptor;
 import fr.in2p3.jsaga.adaptor.data.link.NotLink;
-import fr.in2p3.jsaga.adaptor.data.permission.PermissionAdaptor;
+import fr.in2p3.jsaga.adaptor.data.permission.PermissionAdaptorBasic;
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
@@ -23,7 +23,7 @@ import java.io.OutputStream;
 /**
  *
  */
-public class WaitForEverDataAdaptorPhysical extends WaitForEverDataAdaptorAbstract implements FileReaderStreamFactory, FileWriterStreamFactory, LinkAdaptor, PermissionAdaptor {
+public class WaitForEverDataAdaptorPhysical extends WaitForEverDataAdaptorAbstract implements FileReaderStreamFactory, FileWriterStreamFactory, LinkAdaptor, PermissionAdaptorBasic {
     public String getType() {
         return "waitforever";
     }
@@ -59,17 +59,17 @@ public class WaitForEverDataAdaptorPhysical extends WaitForEverDataAdaptorAbstra
         return new int[]{SCOPE_USER,SCOPE_GROUP,SCOPE_ANY};
     }
 
-    public void permissionsAllow(String absolutePath, int scope, String id, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+    public String[] getGroupsOf(String id) throws BadParameterException, NoSuccessException {
+        hang();
+        return null;
+    }
+
+    public void permissionsAllow(String absolutePath, int scope, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         hang();
     }
 
-    public void permissionsDeny(String absolutePath, int scope, String id, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+    public void permissionsDeny(String absolutePath, int scope, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         hang();
-    }
-
-    public boolean permissionsCheck(String absolutePath, int scope, String id, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-        hang();
-        return false;
     }
 
     public void setOwner(String id) throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {

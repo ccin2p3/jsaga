@@ -161,8 +161,17 @@
                         optional interface in order to support links.
                     </p>
 
-                    <p>A data adaptor <b>may</b> implement the <xsl:apply-templates select="jelclass[@type='PermissionAdaptor']"/>
-                        optional interface in order to support permissions management.
+                    <p>A data adaptor <b>may</b> implement a permission optional interface,
+                        in order to support entries permissions management.
+                        Permission interfaces are:
+                        <ul>
+                            <li><xsl:apply-templates select="jelclass[@type='PermissionAdaptorBasic']"/>:
+                                Implement this interface if an entry can only have owner/group/other permissions.</li>
+                            <li><xsl:apply-templates select="jelclass[@type='PermissionAdaptorFull']"/>:
+                                Implement this interface if an entry can have per user ACLs (for example).</li>
+                        </ul>
+                        Both interfaces extend the <xsl:apply-templates select="jelclass[@type='PermissionAdaptor']"/>
+                        abstract interface.
                     </p>
                 </subsection>
 
