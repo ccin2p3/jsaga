@@ -257,7 +257,6 @@ public class LfcConnection {
 		
 		private String message;
 		private int error;
-		private String executedCmd = null;
 		
 		private LfcError(int error, String message) {
 			this.error = error;
@@ -270,17 +269,9 @@ public class LfcConnection {
 			return error;
 		}
 		
-		public String getExecutedCmd() {
-			return this.executedCmd;
-		}
-		
-		private void setExecutedCmd(String executedCmd) {
-			this.executedCmd = executedCmd;
-		}
-		
 		@Override
 		public String toString() {
-			return executedCmd+": Error "+error+": "+message;
+			return "Error "+error+": "+message;
 		}
 		
 		public static LfcError fromError(int error){
@@ -337,7 +328,7 @@ public class LfcConnection {
 		}catch (IOException e) {
 			throw e;
 		}catch (ReceiveException e) {
-			e.getLFCError().setExecutedCmd("initLFCConnection()");
+			e.setExecutedCmd("initLFCConnection()");
 			throw e;
 		}
 		s_logger.debug("Connection established with " + host + ":" + port);
@@ -1772,6 +1763,7 @@ public class LfcConnection {
 		private static final long serialVersionUID = 1L;
 		private int error = -1;
 		private LfcError lfcError = LfcError.UNKOWN_ERROR;
+		private String executedCmd = null;
 
 		public ReceiveException(int error, String s) {
 			super(s);
@@ -1789,12 +1781,18 @@ public class LfcConnection {
 		}
 
 		public void setExecutedCmd(String executedCmd) {
-			this.lfcError.setExecutedCmd(executedCmd);
+			if(this.executedCmd == null){
+				this.executedCmd = executedCmd;
+			}
+		}
+		
+		public String getExecutedCmd() {
+			return this.executedCmd;
 		}
 		
 		@Override
 		public String getMessage() {
-			return lfcError.toString();
+			return executedCmd+": "+lfcError.toString();
 		}
 		
 		/**

@@ -661,9 +661,7 @@ public class LfcConnector {
 			lfcConnection.mkdir(parent, UUID.randomUUID().toString());
 		} catch (ReceiveException e) {
 			if(!LfcError.FILE_EXISTS.equals(e.getLFCError())){
-				if(e.getLFCError().getExecutedCmd() == null){
-					e.setExecutedCmd("create(/grid/" + vo + "/generated/" + dateAsPath()+")");
-				}
+				e.setExecutedCmd("create(/grid/" + vo + "/generated/" + dateAsPath()+")");
 				throw e;
 			}
 		} finally {
@@ -701,9 +699,7 @@ public class LfcConnector {
 		} catch (IOException e) {
 			throw e;
 		} catch (ReceiveException e) {
-			if(e.getLFCError().getExecutedCmd() == null){
-				e.setExecutedCmd("create("+location+", "+guid+")");
-			}
+			e.setExecutedCmd("create("+location+", "+guid+")");
 			throw e;
 		}
 		return guid;
@@ -744,9 +740,7 @@ public class LfcConnector {
 		} catch (IOException e) {
 			throw e;
 		} catch (ReceiveException e) {
-			if(e.getLFCError().getExecutedCmd() == null){
-				e.setExecutedCmd("create("+guid+", "+target+")");
-			}
+			e.setExecutedCmd("create("+guid+", "+target+")");
 			throw e;
 		} finally {
 			close(lfcConnection);

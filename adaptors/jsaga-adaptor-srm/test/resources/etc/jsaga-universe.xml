@@ -7,14 +7,4 @@
         <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/voms_cred.txt"/>
         <attribute name="UserVO" value="dteam"/>
     </GRID>
-        <GRID name="NEUGRID" contextType="VOMS">
-        <attribute name="Server" value="voms://voms.maatg.eu:15001/O=GRID-FR/C=FR/O=MAATG/CN=voms.maatg.eu"/>
-        <attribute name="CertRepository" value="/etc/grid-security/certificates/"/>
-        <attribute name="VomsDir" value="/etc/grid-security/vomsdir/"/>
-        <attribute name="UserVO" value="vo.neugrid.eu"/>
-        <attribute name="UserCert" value="${user.home}/.globus/cnrs_usercert.pem"/>
-        <attribute name="UserKey" value="${user.home}/.globus/cnrs_userkey.pem"/>
-        <attribute name="UserProxy" value="/tmp/jsaga_test_cred.txt"/>
-        <attribute name="LifeTime" value="PT13H"/>
-	</GRID>
 </UNIVERSE>
