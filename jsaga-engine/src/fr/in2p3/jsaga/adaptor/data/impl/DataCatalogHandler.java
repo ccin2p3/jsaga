@@ -123,7 +123,7 @@ public class DataCatalogHandler {
                 return parent.getDirectory(i);
             }
         }
-        throw new DoesNotExistException("Directory does not exist");
+        throw new DoesNotExistException("Directory does not exist: "+entryName);
     }
     public File getFile(String absolutePath) throws DoesNotExistException {
         return getFile(getParentDirectory(absolutePath), getEntryName(absolutePath));
@@ -134,7 +134,7 @@ public class DataCatalogHandler {
                 return parent.getFile(i);
             }
         }
-        throw new DoesNotExistException("File does not exist");
+        throw new DoesNotExistException("File does not exist: "+entryName);
     }
     public EntryType getEntry(String absolutePath) throws DoesNotExistException {
         DirectoryType parentDir = getParentDirectory(absolutePath);
