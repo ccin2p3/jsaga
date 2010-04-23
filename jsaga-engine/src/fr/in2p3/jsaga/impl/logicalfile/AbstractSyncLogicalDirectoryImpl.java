@@ -116,10 +116,20 @@ public abstract class AbstractSyncLogicalDirectoryImpl extends AbstractNSDirecto
         // convert meta-data keys and values to map
         Map<String,String> keyValuePatterns = new HashMap<String,String>();
         for (int i=0; attrPattern!=null && i<attrPattern.length; i++) {
-            String[] pair = attrPattern[i].split("=");
-            String key = pair[0];
-            String value = pair[1];
-            keyValuePatterns.put(key, value);
+            if (attrPattern[i] != null) {
+                int pos = attrPattern[i].indexOf('=');
+                switch (pos) {
+                    case -1:
+                        throw new BadParameterException("Missing separator '=' in attribute pattern: "+attrPattern[i], this);
+                    case 0:
+                        throw new BadParameterException("Missing name in attribute pattern: "+attrPattern[i], this);
+                    default:
+                        String key = attrPattern[i].substring(0, pos);
+                        String value = attrPattern[i].substring(pos+1);
+                        keyValuePatterns.put(key, value);
+                        break;
+                }
+            }
         }
 
         // search
