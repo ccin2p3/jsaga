@@ -82,7 +82,8 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 			String jobId = UUID.randomUUID().toString();
             //fixme: workaround for passing stdin to the user command
 //			String cde = prepareCde(commandLine, jobId);
-			Process p = Runtime.getRuntime().exec(m_shellPath+" -c \""+commandLine+"\"");
+            //warning: this is not equivalent to exec(m_shellPath+" -c \""+commandLine+"\"")
+			Process p = Runtime.getRuntime().exec(new String[]{m_shellPath, "-c", commandLine});
 			// add process in sessionMap
 			LocalAdaptorAbstract.sessionMap.put(jobId, p);
 			return new LocalJobIOHandler(p, jobId);
