@@ -106,7 +106,7 @@ public class JobMonitorAdaptorFactory extends ServiceAdaptorFactory {
         connect(monitorAdaptor, credential, monitorURL, monitorAttributes);
     }
 
-    public static void connect(JobMonitorAdaptor monitorAdaptor, SecurityCredential credential, URL url, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+    public static void connect(JobMonitorAdaptor monitorAdaptor, SecurityCredential credential, URL url, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, IncorrectURLException, BadParameterException, TimeoutException, NoSuccessException {
         monitorAdaptor.setSecurityCredential(credential);
         monitorAdaptor.connect(
                 url.getUserInfo(),

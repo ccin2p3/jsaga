@@ -39,7 +39,7 @@ public interface ClientAdaptor extends Adaptor {
      * @param attributes the provided attributes
      */
     public void connect(String userInfo, String host, int port, String basePath, Map attributes)
-        throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException;
+        throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, IncorrectURLException, BadParameterException, TimeoutException, NoSuccessException;
 
     /**
      * Disconnect from the server.

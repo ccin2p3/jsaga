@@ -55,7 +55,10 @@ public class PersonalCatalogDataAdaptor implements LogicalReaderMetaData, Logica
         return null;
     }
 
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, IncorrectURLException, TimeoutException, NoSuccessException {
+        if (host != null) {
+            throw new IncorrectURLException("Protocol '"+this.getType()+"' does not support hostname in URL: "+host);
+        }
         m_catalog = DataCatalogHandler.getInstance();
         if(Base.DEBUG) m_catalog.commit();
     }

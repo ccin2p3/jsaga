@@ -86,7 +86,7 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
 
     ////////////////////////////////////////// private methods //////////////////////////////////////////
 
-    public synchronized void resetAdaptors(SecurityCredential security, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+    public synchronized void resetAdaptors(SecurityCredential security, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, IncorrectURLException, BadParameterException, TimeoutException, NoSuccessException {
         m_monitorService.startReset();
         try {
             // reset control adaptor

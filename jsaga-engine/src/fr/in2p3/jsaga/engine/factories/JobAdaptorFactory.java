@@ -99,7 +99,7 @@ public class JobAdaptorFactory extends ServiceAdaptorFactory {
         }
     }
 
-    public void connect(URL url, JobControlAdaptor jobAdaptor, Map attributes, ContextImpl context) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+    public void connect(URL url, JobControlAdaptor jobAdaptor, Map attributes, ContextImpl context) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, IncorrectURLException, BadParameterException, TimeoutException, NoSuccessException {
         // set security adaptor
         SecurityCredential credential;
         if (context != null) {
@@ -124,7 +124,7 @@ public class JobAdaptorFactory extends ServiceAdaptorFactory {
         connect(jobAdaptor, credential, url, attributes);
     }
 
-    public static void connect(JobControlAdaptor jobAdaptor, SecurityCredential credential, URL url, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+    public static void connect(JobControlAdaptor jobAdaptor, SecurityCredential credential, URL url, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, IncorrectURLException, BadParameterException, TimeoutException, NoSuccessException {
         jobAdaptor.setSecurityCredential(credential);
         jobAdaptor.connect(
                 url.getUserInfo(),
