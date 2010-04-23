@@ -277,6 +277,8 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
                 String realIdentifier = id.substring(id.indexOf('-')+1);
                 if (realIdentifier.equals("null")) {
                     return null;
+                } else {
+                    return realIdentifier;
                 }
             }
         }
