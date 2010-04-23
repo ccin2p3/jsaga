@@ -46,12 +46,6 @@ chmod 664 $HASH.signing_policy]]></pre>
     </part>
     <part id="job">
         <title>Globus Gatekeeper</title>
-        <faq id="hang">
-            <question>My job is done but waitFor hangs.</question>
-            <answer>Open firewall ports range "40000,45000" or configure attribute "TcpPortRange" to a range of opened ports.
-                If you can not open ports, you can still use the "lcgce" plug-in instead, but with some limitations.
-            </answer>
-        </faq>
         <faq id="url">
             <question>What is the URL syntax understood by this plug-in ?</question>
             <answer>The URL must be:
@@ -61,6 +55,32 @@ Where:
     <PORT> is 2119 by default,
     <SCHEDULER> is the scheduler to use (must be available on targeted site): fork, pbs, lsf, condor, sge...
 ]]></pre>
+            </answer>
+        </faq>
+        <faq id="lcg-ce">
+            <question>How to use this plug-in on LCG-CE ?</question>
+            <answer>Move the additional part of the URL to the attribute 'Queue' of the job description.
+                <pre><![CDATA[For example: <HOSTNAME>[:<PORT>]/jobmanager-<SCHEDULER>-<QUEUE>
+
+must be split into:
+ResourceManagerURL = gatekeeper://<HOSTNAME>[:<PORT>]/jobmanager-<SCHEDULER>
+Queue = <QUEUE>]]></pre>
+            </answer>
+        </faq>
+        <faq id="error_code">
+            <question>I have error code XX, what does it mean ?</question>
+            <answer>See meaning of error codes <a href="http://pages.cs.wisc.edu/~adesmet/status.html#globus-gramerrorcodes">here</a>
+            </answer>
+        </faq>
+        <faq id="hang">
+            <question>My job is done but waitFor hangs.</question>
+            <answer>Open firewall ports range "40000,45000" or configure attribute "TcpPortRange" to a range of opened ports.
+                If you can not open ports, you can still use the "lcgce" plug-in instead, but with some limitations.
+            </answer>
+        </faq>
+        <faq id="gram_stdout">
+            <question>My job fails with exception: "org.globus.gram.GramException: The job manager failed to open stdout".</question>
+            <answer>You may need to specify the IP address of your local host with attribute 'IPAddress'.
             </answer>
         </faq>
     </part>
