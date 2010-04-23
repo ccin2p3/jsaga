@@ -20,7 +20,7 @@ public interface PermissionAdaptorFull extends PermissionAdaptor {
      * @param absolutePath the absolute path of the entry.
      * @param scope the scope of permissions (USER, GROUP or ANY).
      * @param permissions the permissions to enable.
-     * @param id the identifier.
+     * @param id the identifier (without "user-" or "group-" prefix).
      * @throws BadParameterException if the given id is unknown or not supported
      */
     public void permissionsAllow(String absolutePath, int scope, PermissionBytes permissions, String id)
@@ -31,7 +31,7 @@ public interface PermissionAdaptorFull extends PermissionAdaptor {
      * @param absolutePath the absolute path of the entry.
      * @param scope the scope of permissions (USER, GROUP or ANY).
      * @param permissions the permissions to disable.
-     * @param id the identifier.
+     * @param id the identifier (without "user-" or "group-" prefix).
      * @throws BadParameterException if the given id is unknown or not supported
      */
     public void permissionsDeny(String absolutePath, int scope, PermissionBytes permissions, String id)
@@ -42,7 +42,7 @@ public interface PermissionAdaptorFull extends PermissionAdaptor {
      * @param absolutePath the absolute path of the entry.
      * @param scope the scope of permissions (USER, GROUP or ANY).
      * @param permissions the permissions to check.
-     * @param id the identifier.
+     * @param id the identifier (without "user-" or "group-" prefix).
      * @return true if all permissions are set for id.
      * @throws BadParameterException if the given id is unknown or not supported
      */
