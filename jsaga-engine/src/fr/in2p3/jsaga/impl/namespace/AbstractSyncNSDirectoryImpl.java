@@ -212,7 +212,12 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
     }
 
     public boolean existsSync(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
-        return ((AbstractNSEntryImpl)this._openNSEntry(name)).exists();
+        try {
+            this._openNSEntryWithDoesNotExist(name);
+            return true;
+        } catch (DoesNotExistException e) {
+            return false;
+        }
     }
 
     public boolean isDirSync(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, DoesNotExistException {
