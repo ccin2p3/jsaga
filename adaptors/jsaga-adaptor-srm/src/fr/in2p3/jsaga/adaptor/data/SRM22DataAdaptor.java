@@ -676,13 +676,13 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
 	private static PermissionBytes removePermissions(PermissionBytes actualPermissions, PermissionBytes permissionsToRemove){
 		PermissionBytes newPermissionBytes = actualPermissions;
 		if(permissionsToRemove.contains(Permission.EXEC) && actualPermissions.contains(Permission.EXEC)){
-			newPermissionBytes = new PermissionBytes(actualPermissions.getValue() - Permission.EXEC.getValue());
+			newPermissionBytes = new PermissionBytes(newPermissionBytes.getValue() - Permission.EXEC.getValue());
 		}
 		if(permissionsToRemove.contains(Permission.READ) && actualPermissions.contains(Permission.READ)){
-			newPermissionBytes = new PermissionBytes(actualPermissions.getValue() - Permission.READ.getValue());
+			newPermissionBytes = new PermissionBytes(newPermissionBytes.getValue() - Permission.READ.getValue());
 		}
 		if(permissionsToRemove.contains(Permission.WRITE) && actualPermissions.contains(Permission.WRITE)){
-			newPermissionBytes = new PermissionBytes(actualPermissions.getValue() - Permission.WRITE.getValue());
+			newPermissionBytes = new PermissionBytes(newPermissionBytes.getValue() - Permission.WRITE.getValue());
 		}
 		return newPermissionBytes;
 	}

@@ -3,6 +3,8 @@ package fr.in2p3.jsaga.adaptor.lfc;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 
@@ -10,6 +12,8 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
  * @author Jerome Revillard
  */
 public class LFCFileAttributes extends FileAttributes {
+	private static Logger s_logger = Logger.getLogger(LFCFileAttributes.class);
+	
     private LfcConnection.LFCFile m_file;
 
     public LFCFileAttributes(LfcConnection.LFCFile file) {
@@ -104,6 +108,7 @@ public class LFCFileAttributes extends FileAttributes {
         try {
 			return m_file.owner().getName();
 		} catch (Exception e) {
+			s_logger.error("Unable to get the owner of "+getName()+":"+e.getMessage());
 			return ID_UNKNOWN;
 		}
     }
@@ -112,6 +117,7 @@ public class LFCFileAttributes extends FileAttributes {
         try {
 			return m_file.group().getName();
 		} catch (Exception e) {
+			s_logger.error("Unable to get the group of "+getName()+":"+e.getMessage());
 			return ID_UNKNOWN;
 		}
     }

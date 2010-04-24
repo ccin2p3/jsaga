@@ -606,7 +606,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 	}
 
 	public void permissionsAllow(String absolutePath, int scope, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		logger.debug("DOING: permissionsAllow("+absolutePath+", "+scope+", "+permissions+")");
+		logger.debug("DOING: permissionsAllow("+absolutePath+", "+scope+", "+permissions.getValue()+")");
 		
 		FileAttributes lfcFileAttributes;
 		try {
@@ -648,10 +648,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			m_lfcConnector.chmod(absolutePath,permission);
 		}catch (IOException e) {
-			logger.error("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+permissions+")",e);
+			logger.error("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+permissions.getValue()+")",e);
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+permissions+")",e);
+			logger.error("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+permissions.getValue()+")",e);
 			if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
@@ -660,10 +660,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (java.util.concurrent.TimeoutException e) {
-			logger.error("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+permissions+")",e);
+			logger.error("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+permissions.getValue()+")",e);
 			throw new TimeoutException(e.getMessage());
 		}
-		logger.debug("DONE: permissionsAllow("+absolutePath+", "+scope+", "+permissions+")");
+		logger.debug("DONE: permissionsAllow("+absolutePath+", "+scope+", "+permissions.getValue()+")");
 	}
 	
 	private int generateLFCPermissions(int scope, PermissionBytes permissions){
@@ -709,7 +709,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 // Will be needed for full permissions management
 /*
 	public boolean permissionsCheck(String absolutePath, int scope, PermissionBytes permissions) throws PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
-		logger.debug("DOING: permissionsCheck("+absolutePath+", "+scope+", "+permissions+")");
+		logger.debug("DOING: permissionsCheck("+absolutePath+", "+scope+", "+permissions.getValue()+")");
 		
 		if(permissions.contains(Permission.QUERY)){
 			throw new BadParameterException("The QUERY permission is not supported by the LFC");
@@ -742,17 +742,17 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		}
 		
 		if(actualScopePermissions.containsAll(permissions.getValue())){
-			logger.debug("DONE: permissionsCheck("+absolutePath+", "+scope+", "+permissions+")");
+			logger.debug("DONE: permissionsCheck("+absolutePath+", "+scope+", "+permissions.getValue()+")");
 			return true;
 		}else{
-			logger.debug("DONE: permissionsCheck("+absolutePath+", "+scope+", "+permissions+")");
+			logger.debug("DONE: permissionsCheck("+absolutePath+", "+scope+", "+permissions.getValue()+")");
 			return false;
 		}
 	}
 */	
 
 	public void permissionsDeny(String absolutePath, int scope, PermissionBytes permissions) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		logger.debug("DOING: permissionsDeny("+absolutePath+", "+scope+", "+permissions+")");
+		logger.debug("DOING: permissionsDeny("+absolutePath+", "+scope+", "+permissions.getValue()+")");
 		
 		FileAttributes lfcFileAttributes;
 		try {
@@ -800,10 +800,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			m_lfcConnector.chmod(absolutePath,permission);
 		}catch (IOException e) {
-			logger.error("ERROR: permissionsDeny("+absolutePath+", "+scope+", "+permissions+")",e);
+			logger.error("ERROR: permissionsDeny("+absolutePath+", "+scope+", "+permissions.getValue()+")",e);
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: permissionsDeny("+absolutePath+", "+scope+", "+permissions+")",e);
+			logger.error("ERROR: permissionsDeny("+absolutePath+", "+scope+", "+permissions.getValue()+")",e);
 			if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
@@ -812,11 +812,11 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (java.util.concurrent.TimeoutException e) {
-			logger.error("ERROR: permissionsDeny("+absolutePath+", "+scope+", "+permissions+")",e);
+			logger.error("ERROR: permissionsDeny("+absolutePath+", "+scope+", "+permissions.getValue()+")",e);
 			throw new TimeoutException(e.getMessage());
 		}
 		
-		logger.debug("DONE: permissionsDeny("+absolutePath+", "+scope+", "+permissions+")");
+		logger.debug("DONE: permissionsDeny("+absolutePath+", "+scope+", "+permissions.getValue()+")");
 
 	}
 	
@@ -829,13 +829,13 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 	private static PermissionBytes removePermissions(PermissionBytes actualPermissions, PermissionBytes permissionsToRemove){
 		PermissionBytes newPermissionBytes = actualPermissions;
 		if(permissionsToRemove.contains(Permission.EXEC) && actualPermissions.contains(Permission.EXEC)){
-			newPermissionBytes = new PermissionBytes(actualPermissions.getValue() - Permission.EXEC.getValue());
+			newPermissionBytes = new PermissionBytes(newPermissionBytes.getValue() - Permission.EXEC.getValue());
 		}
 		if(permissionsToRemove.contains(Permission.READ) && actualPermissions.contains(Permission.READ)){
-			newPermissionBytes = new PermissionBytes(actualPermissions.getValue() - Permission.READ.getValue());
+			newPermissionBytes = new PermissionBytes(newPermissionBytes.getValue() - Permission.READ.getValue());
 		}
 		if(permissionsToRemove.contains(Permission.WRITE) && actualPermissions.contains(Permission.WRITE)){
-			newPermissionBytes = new PermissionBytes(actualPermissions.getValue() - Permission.WRITE.getValue());
+			newPermissionBytes = new PermissionBytes(newPermissionBytes.getValue() - Permission.WRITE.getValue());
 		}
 		return newPermissionBytes;
 	}

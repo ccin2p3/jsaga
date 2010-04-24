@@ -721,8 +721,10 @@ public class LfcConnection {
 				putString(grpName);
 				sendAndReceive(true);
 				int s = recvBuf.getInt();
+				//FIXME
 				if(recvBuf.hasRemaining()){
-					throw new IOException("getGrpByName: Something remains to be read");
+					System.err.println("getGrpByName: Something remains to be read");
+//					throw new IOException("getGrpByName: Something remains to be read");
 				}
 				return s;
 			}catch (TimeoutException e) {
@@ -746,8 +748,10 @@ public class LfcConnection {
 				sendBuf.putShort((short) gid);
 				sendAndReceive(true);
 				String group = getString();
+				//FIXME
 				if(recvBuf.hasRemaining()){
-					throw new IOException("getGrpByGid: Something remains to be read");
+					System.err.println("getGrpByGid: Something remains to be read");
+//					throw new IOException("getGrpByGid: Something remains to be read");
 				}
 				return group;
 			}catch (TimeoutException e) {
@@ -794,8 +798,10 @@ public class LfcConnection {
 						grpNames.add(getString());
 					}
 				}
+				//FIXME
 				if(recvBuf.hasRemaining()){
-					throw new IOException("getGrpByGids: Something remains to be read");
+					System.err.println("getGrpByGids: Something remains to be read");
+//					throw new IOException("getGrpByGids: Something remains to be read");
 				}
 				return grpNames;
 			}catch (TimeoutException e) {
@@ -843,8 +849,10 @@ public class LfcConnection {
 				sendBuf.putShort((short) uid);
 				sendAndReceive(true);
 				String user = getString();
+				//FIXME
 				if(recvBuf.hasRemaining()){
-					throw new IOException("getUsrByUid: Something remains to be read");
+					System.err.println("getUsrByUid: Something remains to be read");
+//					throw new IOException("getUsrByUid: Something remains to be read");
 				}
 				return user;
 			}catch (TimeoutException e) {
@@ -930,10 +938,10 @@ public class LfcConnection {
 				long l = sendAndReceive(false);
 				//JEROME
 				if(l != 0){
-					if(l == 4){
-						recvBuf.getInt();
-					}else{
-						throw new IOException("closedir: Something remains to be read ("+l+" bits)");
+					//FIXME:
+					if(recvBuf.hasRemaining()){
+						System.err.println("closedir: Something remains to be read");
+						//throw new IOException("closedir: Something remains to be read");
 					}
 				}
 //				break;
