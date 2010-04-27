@@ -171,8 +171,8 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             return; //==========> EXIT
         }
         if (m_adaptor instanceof DataReaderAdaptor && m_adaptor instanceof DataWriterAdaptor) {
-            // remove source childs
             if (Flags.RECURSIVE.isSet(flags)) {
+                // remove childs
                 FileAttributes[] sourceChilds = this._listAttributes(m_url.getPath());
                 for (int i=0; i<sourceChilds.length; i++) {
                     SyncNSEntry entry;
@@ -188,7 +188,14 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
                         entry.removeSync(flags - Flags.RECURSIVE.getValue());
                     }
                 }
+            } else {
+                // check that there is no child
+                FileAttributes[] sourceChilds = this._listAttributes(m_url.getPath());
+                if (sourceChilds.length > 0) {
+                    throw new BadParameterException("Flag 'Recursive' is required for non-empty directory: "+m_url);
+                }
             }
+            
             // remove this directory
             URL parent = super._getParentDirURL();
             String directoryName = super._getEntryName();

@@ -563,6 +563,14 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
             getResult(super.copy(TaskMode.ASYNC, target, flags), timeout);
         }
     }
+    public void copy(URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
+        float timeout = this.getTimeout("copy");
+        if (timeout == WAIT_FOREVER) {
+            super.copySync(target);
+        } else {
+            getResult(super.copy(TaskMode.ASYNC, target), timeout);
+        }
+    }
 
     /** override super.copyFrom() */
     public void copyFrom(URL source, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
@@ -571,6 +579,14 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
             super.copyFromSync(source, flags);
         } else {
             getResult(super.copyFrom(TaskMode.ASYNC, source, flags), timeout);
+        }
+    }
+    public void copyFrom(URL source) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+        float timeout = this.getTimeout("copyFrom");
+        if (timeout == WAIT_FOREVER) {
+            super.copyFromSync(source);
+        } else {
+            getResult(super.copyFrom(TaskMode.ASYNC, source), timeout);
         }
     }
 
@@ -583,6 +599,14 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
             getResult(super.move(TaskMode.ASYNC, target, flags), timeout);
         }
     }
+    public void move(URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
+        float timeout = this.getTimeout("move");
+        if (timeout == WAIT_FOREVER) {
+            super.moveSync(target);
+        } else {
+            getResult(super.move(TaskMode.ASYNC, target), timeout);
+        }
+    }
 
     /** override super.remove() */
     public void remove(int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
@@ -592,6 +616,19 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         } else {
             try {
                 getResult(super.remove(TaskMode.ASYNC, flags), timeout);
+            }
+            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+        }
+    }
+    public void remove() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("remove");
+        if (timeout == WAIT_FOREVER) {
+            super.removeSync();
+        } else {
+            try {
+                getResult(super.remove(TaskMode.ASYNC), timeout);
             }
             catch (IncorrectURLException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
