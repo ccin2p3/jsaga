@@ -135,9 +135,7 @@ public abstract class AbstractSyncLogicalDirectoryImpl extends AbstractNSDirecto
         // search
         List<URL> matchingPath = new ArrayList<URL>();
         if (keyValuePatterns.isEmpty()) {
-            for (URL current : super.findSync(namePattern, flags)) {
-                matchingPath.add(current);
-            }
+            return super.findSync(namePattern, flags);
         } else if (m_adaptor instanceof LogicalReaderMetaData) {
             // filter by meta-data
             FileAttributes[] childs;
