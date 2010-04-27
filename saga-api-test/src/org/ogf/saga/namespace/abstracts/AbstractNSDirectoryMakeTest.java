@@ -82,7 +82,7 @@ public abstract class AbstractNSDirectoryMakeTest extends AbstractNSDirectoryTes
         try {
         	m_subDir.remove(Flags.NONE.getValue());
             fail("Expected exception: "+ NoSuccessException.class);
-        } catch(NoSuccessException e) {
+        } catch(BadParameterException e) {
         }
     }
 }
