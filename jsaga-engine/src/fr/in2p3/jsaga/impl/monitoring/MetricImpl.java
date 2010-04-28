@@ -128,7 +128,7 @@ public class MetricImpl<E> extends AbstractAttributesImpl implements Metric {
             case ReadWrite:
             case ReadOnly:
                 m_callbacks.put(m_cookieGenerator, cb);
-                return ++m_cookieGenerator;
+                return m_cookieGenerator++;
             case Final:
                 throw new IncorrectStateException("Can not add callback to a metric with mode: "+m_mode.name(), this);
             default:
