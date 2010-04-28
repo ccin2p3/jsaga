@@ -254,7 +254,6 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     {
 		// parse JDL
 		try {
-            //fixme: this library has a memory-leak
 			AdParser.parseJdl(jobDesc);
 		} catch (JobAdException e) {
 			throw new NoSuccessException("The job description is not valid", e);
