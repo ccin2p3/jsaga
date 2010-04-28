@@ -67,5 +67,14 @@ keytool -import -alias 1 -file myCA.der</pre></li>
                 <pre><![CDATA[local://localhost]]></pre>
             </answer>
         </faq>
+        <faq id="windows">
+            <question>What are the pre-requisites to use this plug-in on Windows ?</question>
+            <answer>You must install <a href="http://www.cygwin.com/">cygwin</a>,
+                and configure the path to the shell executable in file etc/jsaga-universe.xml
+                <pre><![CDATA[<job type="local">
+    <attribute name="ShellPath" value="C:\\cygwin\\bin\\sh.exe"/>
+</job>]]></pre>
+            </answer>
+        </faq>
     </part>
 </faqs>
