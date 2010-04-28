@@ -1,7 +1,7 @@
 .settings
-build
 .classpath
 .project
 *.iml
 dir
 dir2
+build
