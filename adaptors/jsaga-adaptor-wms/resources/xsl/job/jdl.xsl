@@ -37,7 +37,7 @@
         <xsl:apply-templates select="ext:Extension[@language='JDL']"/>
     </xsl:template>
 
-    <xsl:template match="jsdl:JobDescription">
+    <xsl:template match="jsdl:JobDescription">[
 Type = "Job";<xsl:text/>
         <!-- executable and arguments -->
 Executable = "<xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Executable/text()"/>";<xsl:text/>
@@ -153,14 +153,16 @@ NodeNumber = <xsl:value-of select="."/>;<xsl:text/>
         </xsl:if>
 
         <xsl:if test="jsdl:DataStaging[jsdl:Source]">
-            <xsl:variable name="UnsupportedURI" select="jsdl:DataStaging[jsdl:Source][
-                not(contains($SupportedProtocols,concat('/',substring-before(jsdl:Source/jsdl:URI/text(),'://'),'/')))]"/>
-  InputSandboxPreStaging = <xsl:value-of select="count($UnsupportedURI)"/>;<xsl:text/>
-            <xsl:for-each select="$UnsupportedURI">
-  InputSandboxPreStaging_<xsl:value-of select="position()-1"/>_From = "<xsl:value-of select="translate(jsdl:Source/jsdl:URI/text(),'\','/')"/>";<xsl:text/>
-  InputSandboxPreStaging_<xsl:value-of select="position()-1"/>_To = "<xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="jsdl:FileName/text()"/>";<xsl:text/>
-  InputSandboxPreStaging_<xsl:value-of select="position()-1"/>_Append = "<xsl:value-of select="string(jsdl:CreationFlag/text()='append')"/>";<xsl:text/>
+  InputSandboxPreStaging = {<xsl:text/>
+            <xsl:for-each select="jsdl:DataStaging[jsdl:Source][
+                    not(contains($SupportedProtocols,concat('/',substring-before(jsdl:Source/jsdl:URI/text(),'://'),'/')))]">
+    [
+        From = "<xsl:value-of select="translate(jsdl:Source/jsdl:URI/text(),'\','/')"/>";<xsl:text/>
+        To = "<xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="jsdl:FileName/text()"/>";<xsl:text/>
+        Append = "<xsl:value-of select="string(jsdl:CreationFlag/text()='append')"/>";<xsl:text/>
+    ]<xsl:if test="position()!=last()">,</xsl:if>
             </xsl:for-each>
+  };
   InputSandbox = {<xsl:text/>
             <xsl:for-each select="jsdl:DataStaging[jsdl:Source]">
                 <xsl:if test="position()>1">,</xsl:if>
@@ -178,14 +180,16 @@ NodeNumber = <xsl:value-of select="."/>;<xsl:text/>
         </xsl:if>
 
         <xsl:if test="jsdl:DataStaging[jsdl:Target] or $isInteractive">
-            <xsl:variable name="UnsupportedURI" select="jsdl:DataStaging[jsdl:Target][
-                not(contains($SupportedProtocols,concat('/',substring-before(jsdl:Target/jsdl:URI/text(),'://'),'/')))]"/>
-  OutputSandboxPostStaging = <xsl:value-of select="count($UnsupportedURI)"/>;<xsl:text/>
-            <xsl:for-each select="$UnsupportedURI">
-  OutputSandboxPostStaging_<xsl:value-of select="position()-1"/>_From = "<xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="jsdl:FileName/text()"/>";<xsl:text/>
-  OutputSandboxPostStaging_<xsl:value-of select="position()-1"/>_To = "<xsl:value-of select="translate(jsdl:Target/jsdl:URI/text(),'\','/')"/>";<xsl:text/>
-  OutputSandboxPostStaging_<xsl:value-of select="position()-1"/>_Append = "<xsl:value-of select="string(jsdl:CreationFlag/text()='append')"/>";<xsl:text/>
+  OutputSandboxPostStaging = {<xsl:text/>
+            <xsl:for-each select="jsdl:DataStaging[jsdl:Target][
+                not(contains($SupportedProtocols,concat('/',substring-before(jsdl:Target/jsdl:URI/text(),'://'),'/')))]">
+    [
+        From = "<xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="jsdl:FileName/text()"/>";<xsl:text/>
+        To = "<xsl:value-of select="translate(jsdl:Target/jsdl:URI/text(),'\','/')"/>";<xsl:text/>
+        Append = "<xsl:value-of select="string(jsdl:CreationFlag/text()='append')"/>";<xsl:text/>
+    ]<xsl:if test="position()!=last()">,</xsl:if>
             </xsl:for-each>
+  };
   OutputSandbox = {<xsl:text/>
             <xsl:if test="$isInteractive">
                 "<xsl:value-of select="$UniqId"/>-output.txt",
@@ -245,6 +249,7 @@ ListenerStorage = "<xsl:value-of select="$ListenerStorage"/>";<xsl:text/>
         <xsl:if test="$MyProxyServer">
 MyProxyServer = "<xsl:value-of select="$MyProxyServer"/>";<xsl:text/>
         </xsl:if>
+]
     </xsl:template>
 
     <xsl:template match="posix:Input | posix:Output | posix:Error">

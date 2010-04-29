@@ -1,0 +1,46 @@
+[
+Type = "Job";
+
+Executable = "worker-165e18fe-0884-4e34-b09c-eee48517e7b8.sh";
+
+
+Requirements = true
+&& (other.GlueCEStateStatus=="Production");
+
+
+Rank = (-other.GlueCEStateEstimatedResponseTime);
+  StdInput = "worker-165e18fe-0884-4e34-b09c-eee48517e7b8.input";
+  StdOutput = "worker-165e18fe-0884-4e34-b09c-eee48517e7b8.output";
+  SandboxDirectory = "gsiftp://lapp-wms02.in2p3.fr:2811/tmp/1272544850703";
+  InputSandboxPreStaging = {
+    [
+        From = "C:/DOCUME~1/SYLVAI~1/LOCALS~1/Temp/local-165e18fe-0884-4e34-b09c-eee48517e7b8.sh";
+        To = "gsiftp://lapp-wms02.in2p3.fr:2811/tmp/1272544850703/worker-165e18fe-0884-4e34-b09c-eee48517e7b8.sh";
+        Append = "false";
+    ],
+    [
+        From = "C:/DOCUME~1/SYLVAI~1/LOCALS~1/Temp/local-165e18fe-0884-4e34-b09c-eee48517e7b8.input";
+        To = "gsiftp://lapp-wms02.in2p3.fr:2811/tmp/1272544850703/worker-165e18fe-0884-4e34-b09c-eee48517e7b8.input";
+        Append = "false";
+    ]
+  };
+  InputSandbox = {
+                "gsiftp://lapp-wms02.in2p3.fr:2811/tmp/1272544850703/worker-165e18fe-0884-4e34-b09c-eee48517e7b8.sh",
+                "gsiftp://lapp-wms02.in2p3.fr:2811/tmp/1272544850703/worker-165e18fe-0884-4e34-b09c-eee48517e7b8.input"};
+
+  OutputSandboxPostStaging = {
+    [
+        From = "gsiftp://lapp-wms02.in2p3.fr:2811/tmp/1272544850703/worker-165e18fe-0884-4e34-b09c-eee48517e7b8.output";
+        To = "C:/DOCUME~1/SYLVAI~1/LOCALS~1/Temp/local-165e18fe-0884-4e34-b09c-eee48517e7b8.output";
+        Append = "false";
+    ]
+  };
+  OutputSandbox = {
+                "worker-165e18fe-0884-4e34-b09c-eee48517e7b8.output"};
+  OutputSandboxDestURI = {
+                "gsiftp://lapp-wms02.in2p3.fr:2811/tmp/1272544850703/worker-165e18fe-0884-4e34-b09c-eee48517e7b8.output"};
+
+RetryCount = 0;
+PerusalFileEnable = false;
+MyProxyServer = "myproxy.cern.ch";
+]

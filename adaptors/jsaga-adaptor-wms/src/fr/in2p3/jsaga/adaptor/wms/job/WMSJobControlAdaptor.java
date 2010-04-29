@@ -26,7 +26,6 @@ import org.ogf.saga.error.*;
 
 import java.io.*;
 import java.util.Map;
-import java.util.Properties;
 
 
 /* ***************************************************
@@ -278,8 +277,8 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         } catch (BaseException e) {
             rethrow(e);
         }
-        Properties jobDesc = parseJobDescription(jdl);
-        return getStringValue_IfExists(jobDesc, "SandboxDirectory");
+        StagingJDL parsedJdl = new StagingJDL(jdl);
+        return parsedJdl.getStagingDirectory();
     }
 
     public StagingTransfer[] getInputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
@@ -301,16 +300,8 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             rethrow(e);
         }
         String baseUri = "";
-        Properties jobDesc = parseJobDescription(jdl);
-        int transfersLength = getIntValue_IfExists(jobDesc, "InputSandboxPreStaging");
-        StagingTransfer[] transfers = new StagingTransfer[transfersLength];
-        for (int i=0; i<transfersLength; i++) {
-            transfers[i] = new StagingTransfer(
-                    getStringValue(jobDesc, "InputSandboxPreStaging_"+i+"_From"),
-                    baseUri+getStringValue(jobDesc, "InputSandboxPreStaging_"+i+"_To"),
-                    getBooleanValue(jobDesc, "InputSandboxPreStaging_"+i+"_Append"));
-        }
-        return transfers;
+        StagingJDL parsedJdl = new StagingJDL(jdl);
+        return parsedJdl.getInputStagingTransfer(baseUri);
     }
 
     public StagingTransfer[] getOutputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
@@ -332,16 +323,8 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             rethrow(e);
         }
         String baseUri = "";
-        Properties jobDesc = parseJobDescription(jdl);
-        int transfersLength = getIntValue_IfExists(jobDesc, "OutputSandboxPostStaging");
-        StagingTransfer[] transfers = new StagingTransfer[transfersLength];
-        for (int i=0; i<transfersLength; i++) {
-            transfers[i] = new StagingTransfer(
-                    baseUri+getStringValue(jobDesc, "OutputSandboxPostStaging_"+i+"_From"),
-                    getStringValue(jobDesc, "OutputSandboxPostStaging_"+i+"_To"),
-                    getBooleanValue(jobDesc, "OutputSandboxPostStaging_"+i+"_Append"));
-        }
-        return transfers;
+        StagingJDL parsedJdl = new StagingJDL(jdl);
+        return parsedJdl.getOutputStagingTransfers(baseUri);
     }
 
     public void start(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
@@ -404,69 +387,6 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             throw new NoSuccessException(e);
         } catch (BaseException e) {
             throw new NoSuccessException(e);
-        }
-    }
-
-    private static Properties parseJobDescription(String jdl) throws NoSuccessException {
-        Properties jobDesc = new Properties();
-        try {
-            jobDesc.load(new ByteArrayInputStream(jdl.getBytes()));
-        } catch (IOException e) {
-            throw new NoSuccessException("Failed to retrieve JDL", e);
-        }
-        return jobDesc;
-    }
-    private static String getValue(Properties jobDesc, String key) throws NoSuccessException {
-        String value = jobDesc.getProperty(key);
-        if (value!=null) {
-            String trimmed = value.trim();
-            if (trimmed.endsWith(";")) {
-                return trimmed.substring(0, trimmed.length()-1);
-            } else {
-                throw new NoSuccessException("Failed to parse JDL attribute: "+value);
-            }
-        } else {
-            return null;
-        }
-    }
-    private static String getStringValue(Properties jobDesc, String key) throws NoSuccessException {
-        String value = getValue(jobDesc, key);
-        if (value!=null && value.startsWith("\"") && value.endsWith("\"")) {
-            return value.substring(1, value.length()-1);
-        } else {
-            throw new NoSuccessException("Failed to parse JDL attribute: "+value);
-        }
-    }
-    private static String getStringValue_IfExists(Properties jobDesc, String key) throws NoSuccessException {
-        String value = getValue(jobDesc, key);
-        if (value!=null) {
-            if (value.startsWith("\"") && value.endsWith("\"")) {
-                return value.substring(1, value.length()-1);
-            } else {
-                throw new NoSuccessException("Failed to parse JDL attribute: "+value);
-            }
-        } else {
-            return null;
-        }
-    }
-    private static int getIntValue_IfExists(Properties jobDesc, String key) throws NoSuccessException {
-        String value = getValue(jobDesc, key);
-        if (value!=null) {
-            try {
-                return Integer.parseInt(value);
-            } catch (NumberFormatException e) {
-                throw new NoSuccessException("Failed to parse JDL attribute: "+value, e);
-            }
-        } else {
-            return 0;
-        }
-    }
-    private static boolean getBooleanValue(Properties jobDesc, String key) throws NoSuccessException {
-        String value = getValue(jobDesc, key);
-        if (value!=null) {
-            return Boolean.parseBoolean(value);
-        } else {
-            throw new NoSuccessException("Failed to parse JDL attribute: "+value);
         }
     }
 }
