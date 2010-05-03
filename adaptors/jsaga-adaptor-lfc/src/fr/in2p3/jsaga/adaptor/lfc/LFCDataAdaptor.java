@@ -34,6 +34,7 @@ import org.ogf.saga.permissions.Permission;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 
 import java.io.IOException;
 import java.net.URI;
@@ -162,8 +163,9 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				        m_session = SessionFactory.createSession(false);
 				        m_session.addContext(context);
 					}
-					replicaEntry.setFragment("InMemoryProxy");
-					replicaFile = FileFactory.createFile(m_session, replicaEntry);
+					URL new_replicaEntry = URLFactory.createURL(replicaEntry.getString());
+					new_replicaEntry.setFragment("InMemoryProxy");
+					replicaFile = FileFactory.createFile(m_session, new_replicaEntry);
 				} catch (Exception e) {
 					throw new NoSuccessException(e);
 				}
