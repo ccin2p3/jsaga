@@ -3,7 +3,8 @@ package fr.in2p3.jsaga.impl.namespace;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.impl.file.AbstractSyncDirectoryImpl;
 import fr.in2p3.jsaga.impl.file.AbstractSyncFileImpl;
-import fr.in2p3.jsaga.impl.file.copy.*;
+import fr.in2p3.jsaga.impl.file.copy.AbstractCopyFromTask;
+import fr.in2p3.jsaga.impl.file.copy.AbstractCopyTask;
 import fr.in2p3.jsaga.impl.task.AbstractThreadedTask;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.Flags;
@@ -101,9 +102,19 @@ public abstract class AbstractAsyncNSEntryImpl extends AbstractSyncNSEntryImpl i
 
     public Task<NSEntry, Void> copy(TaskMode mode, final URL target, final int flags) throws NotImplementedException {
         if (this instanceof AbstractSyncFileImpl) {
-            return new FileCopyTask<NSEntry,Void>(mode, m_session, (AbstractSyncFileImpl) this, target, flags);
+            final AbstractSyncFileImpl source = (AbstractSyncFileImpl) this;
+            return new AbstractCopyTask<NSEntry,Void>(m_session, target, flags) {
+                public void doCopy(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+                    source._copyAndMonitor(target, flags, this);
+                }
+            };
         } else if (this instanceof AbstractSyncDirectoryImpl) {
-            return new DirectoryCopyTask<NSEntry,Void>(mode, m_session, (AbstractSyncDirectoryImpl) this, target, flags);
+            final AbstractSyncDirectoryImpl source = (AbstractSyncDirectoryImpl) this;
+            return new AbstractCopyTask<NSEntry,Void>(m_session, target, flags) {
+                public void doCopy(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+                    source._copyAndMonitor(target, flags, this);
+                }
+            };
         } else {
             return new AbstractThreadedTask<NSEntry,Void>(mode) {
                 public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
@@ -119,9 +130,19 @@ public abstract class AbstractAsyncNSEntryImpl extends AbstractSyncNSEntryImpl i
 
     public Task<NSEntry, Void> copyFrom(TaskMode mode, final URL source, final int flags) throws NotImplementedException {
         if (this instanceof AbstractSyncFileImpl) {
-            return new FileCopyFromTask<NSEntry,Void>(mode, m_session, (AbstractSyncFileImpl) this, source, flags);
+            final AbstractSyncFileImpl target = (AbstractSyncFileImpl) this;
+            return new AbstractCopyFromTask<NSEntry,Void>(m_session, source, flags) {
+                public void doCopyFrom(URL source, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+                    target._copyFromAndMonitor(source, flags, this);
+                }
+            };
         } else if (this instanceof AbstractSyncDirectoryImpl) {
-            return new DirectoryCopyFromTask<NSEntry,Void>(mode, m_session, (AbstractSyncDirectoryImpl) this, source, flags);
+            final AbstractSyncDirectoryImpl target = (AbstractSyncDirectoryImpl) this;
+            return new AbstractCopyFromTask<NSEntry,Void>(m_session, source, flags) {
+                public void doCopyFrom(URL source, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+                    target.copyFromSync(source, flags);
+                }
+            };
         } else {
             return new AbstractThreadedTask<NSEntry,Void>(mode) {
                 public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {

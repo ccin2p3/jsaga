@@ -6,7 +6,7 @@ import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
 import fr.in2p3.jsaga.impl.file.FileImpl;
-import fr.in2p3.jsaga.impl.file.copy.DirectoryCopyTask;
+import fr.in2p3.jsaga.impl.file.copy.AbstractCopyTask;
 import fr.in2p3.jsaga.impl.url.URLHelper;
 import fr.in2p3.jsaga.sync.namespace.SyncNSDirectory;
 import fr.in2p3.jsaga.sync.namespace.SyncNSEntry;
@@ -55,7 +55,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
     public void copySync(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
         this._copyAndMonitor(target, flags, null);
     }
-    public void _copyAndMonitor(URL target, int flags, DirectoryCopyTask progressMonitor) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+    public void _copyAndMonitor(URL target, int flags, AbstractCopyTask progressMonitor) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
         new FlagsHelper(flags).allowed(JSAGAFlags.PRESERVETIMES, Flags.DEREFERENCE, Flags.RECURSIVE, Flags.OVERWRITE, Flags.CREATEPARENTS);
         new FlagsHelper(flags).required(Flags.RECURSIVE);
         if (Flags.DEREFERENCE.isSet(flags)) {

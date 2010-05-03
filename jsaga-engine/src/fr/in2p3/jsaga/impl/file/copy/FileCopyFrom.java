@@ -47,7 +47,7 @@ public class FileCopyFrom {
         m_adaptor = adaptor;
     }
 
-    public void copyFrom(URL effectiveSource, int flags, FileCopyFromTask progressMonitor) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
+    public void copyFrom(URL effectiveSource, int flags, AbstractCopyFromTask progressMonitor) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
         boolean overwrite = Flags.OVERWRITE.isSet(flags);
         URL target = m_targetFile.getURL();
         if (m_adaptor instanceof DataCopyDelegated && target.getScheme().equals(effectiveSource.getScheme())) {
@@ -104,7 +104,7 @@ public class FileCopyFrom {
         }
     }
 
-    private void getFromPhysicalFile(URL source, int flags, FileCopyFromTask progressMonitor) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
+    private void getFromPhysicalFile(URL source, int flags, AbstractCopyFromTask progressMonitor) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
         IOException closingException = null;
 
         // open source file if it exists

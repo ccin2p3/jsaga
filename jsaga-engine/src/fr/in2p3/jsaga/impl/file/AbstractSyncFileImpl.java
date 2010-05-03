@@ -167,7 +167,7 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
     public void copyFromSync(URL source, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
         this._copyFromAndMonitor(source, flags, null);
     }
-    public void _copyFromAndMonitor(URL source, int flags, FileCopyFromTask progressMonitor) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
+    public void _copyFromAndMonitor(URL source, int flags, AbstractCopyFromTask progressMonitor) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
         new FlagsHelper(flags).allowed(JSAGAFlags.PRESERVETIMES, Flags.DEREFERENCE, Flags.OVERWRITE);
         if (Flags.DEREFERENCE.isSet(flags)) {
             this._dereferenceEntry().copyFromSync(source, flags - Flags.DEREFERENCE.getValue());

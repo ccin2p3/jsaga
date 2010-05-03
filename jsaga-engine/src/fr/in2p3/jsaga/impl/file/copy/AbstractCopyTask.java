@@ -30,7 +30,7 @@ public abstract class AbstractCopyTask<T extends SagaObject,E> extends AbstractT
     private MetricImpl<Long> m_metric_Progress;
 
     /** constructor */
-    public AbstractCopyTask(TaskMode mode, Session session, URL target, int flags) throws NotImplementedException {
+    public AbstractCopyTask(Session session, URL target, int flags) throws NotImplementedException {
         super(session, null, true);
         // internal
         m_target = target;
@@ -44,6 +44,8 @@ public abstract class AbstractCopyTask<T extends SagaObject,E> extends AbstractT
                 "bytes",
                 MetricType.Int,
                 0L);
+    }
+    protected void mayRun(TaskMode mode) throws NotImplementedException {
         try {
             switch(mode) {
                 case TASK:

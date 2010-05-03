@@ -29,7 +29,7 @@ public abstract class AbstractCopyFromTask<T extends SagaObject,E> extends Abstr
     private MetricImpl<Long> m_metric_Progress;
 
     /** constructor */
-    public AbstractCopyFromTask(TaskMode mode, Session session, URL source, int flags) throws NotImplementedException {
+    public AbstractCopyFromTask(Session session, URL source, int flags) throws NotImplementedException {
         super(session, null, true);
         // internal
         m_source = source;
@@ -37,12 +37,14 @@ public abstract class AbstractCopyFromTask<T extends SagaObject,E> extends Abstr
         // metrics
         m_totalWrittenBytes = 0L;
         m_metric_Progress = new MetricFactoryImpl<Long>(this).createAndRegister(
-                FileCopyTask.FILE_COPY_PROGRESS,
+                AbstractCopyTask.FILE_COPY_PROGRESS,
                 "this metric gives the state of ongoing file transfer as number of bytes transfered.",
                 MetricMode.ReadOnly,
                 "bytes",
                 MetricType.Int,
                 0L);
+    }
+    protected void mayRun(TaskMode mode) throws NotImplementedException {
         try {
             switch(mode) {
                 case TASK:
