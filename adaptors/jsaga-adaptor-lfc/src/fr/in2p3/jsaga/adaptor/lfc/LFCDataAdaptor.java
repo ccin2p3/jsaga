@@ -18,6 +18,7 @@ import fr.in2p3.jsaga.adaptor.lfc.LfcConnection.LfcError;
 import fr.in2p3.jsaga.adaptor.lfc.LfcConnection.ReceiveException;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityCredential;
 
 import org.apache.log4j.Logger;
 import org.glite.voms.VOMSAttribute;
@@ -26,9 +27,12 @@ import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.context.Context;
+import org.ogf.saga.context.ContextFactory;
 import org.ogf.saga.error.*;
 import org.ogf.saga.file.FileFactory;
 import org.ogf.saga.permissions.Permission;
+import org.ogf.saga.session.Session;
+import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.url.URL;
 
 import java.io.IOException;
@@ -47,6 +51,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
     private GSSCredentialSecurityCredential m_globuscredential;
     private String m_vo;
     private LfcConnector m_lfcConnector;	
+    private Session m_session = null;
     
 	public String getType() {
 		return "lfn";
@@ -149,7 +154,16 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				//No then create it
 				org.ogf.saga.file.File replicaFile;
 				try {
-					replicaFile = FileFactory.createFile(replicaEntry);
+					if(m_session == null){
+						Context context = ContextFactory.createContext();
+				        context.setAttribute(Context.TYPE, "InMemoryProxy");
+				        context.setAttribute(Context.USERPROXY, InMemoryProxySecurityCredential.toBase64(m_globuscredential.getGSSCredential()));
+				        context.setAttribute(Context.CERTREPOSITORY, m_globuscredential.getCertRepository().getAbsolutePath());
+				        m_session = SessionFactory.createSession(false);
+				        m_session.addContext(context);
+					}
+					replicaEntry.setFragment("InMemoryProxy");
+					replicaFile = FileFactory.createFile(m_session, replicaEntry);
 				} catch (Exception e) {
 					throw new NoSuccessException(e);
 				}
