@@ -13,6 +13,29 @@
 security mechanisms (Globus, GlobusLegacy, GlobusRFC820, MyProxy),
 data management protocols (gsiftp v1, v2 and .NET implementation),
 execution management technologies (Gatekeeper).</description>
+    <developers>
+        <developer>
+            <name>Sylvain Reynaud</name>
+            <email>sreynaud@in2p3.fr</email>
+            <organization>CC-IN2P3</organization>
+            <organizationUrl>http://cc.in2p3.fr/</organizationUrl>
+            <properties>
+                <organizationLogoUrl>http://cc.in2p3.fr/plugins/kitcnrs/images/logoCC72.gif</organizationLogoUrl>
+            </properties>
+        </developer>
+        <developer>
+            <name>Aurélien Croc</name>
+            <email>aurelien.croc@cea.fr</email>
+            <organization>CEA</organization>
+            <organizationUrl>http://irfu.cea.fr/spp/</organizationUrl>
+            <properties>
+                <organizationLogoUrl>http://irfu.cea.fr/rt2003/img/logo_cea_couleur.gif</organizationLogoUrl>
+                <project>DØ</project>
+                <projectUrl>http://www-d0.fnal.gov</projectUrl>
+                <projectLogoUrl>http://www-d0.fnal.gov/Run2Physics/top/top_public_web_pages/detector_pictures/dzero_logo.jpg</projectLogoUrl>
+            </properties>
+        </developer>
+    </developers>
     <dependencies>
         <!-- common -->
         <dependency>
