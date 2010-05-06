@@ -28,7 +28,7 @@ public abstract class NSCopyFromTest extends AbstractNSCopyTest {
         URL target = createURL(m_subDirUrl, "unexisting.txt");
         NSEntry newFile = null;
         try {
-            newFile = NSFactory.createNSEntry(m_session, target, FLAGS_BYPASSEXIST);
+            newFile = NSFactory.createNSEntry(m_session, target, Flags.CREATE.or(FLAGS_BYPASSEXIST));
         } catch(DoesNotExistException e) {
             fail("Unexpected exception: "+ DoesNotExistException.class);
         }
