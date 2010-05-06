@@ -52,6 +52,7 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
     }
 
     private void init(int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        if(Flags.CREATEPARENTS.isSet(flags)) flags=Flags.CREATE.or(flags);
         new FlagsHelper(flags).allowed(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS);
         if (Flags.CREATE.isSet(flags)) {
             if (m_adaptor instanceof DataWriterAdaptor) {

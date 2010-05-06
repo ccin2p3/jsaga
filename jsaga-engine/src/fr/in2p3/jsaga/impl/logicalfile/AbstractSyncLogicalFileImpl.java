@@ -51,6 +51,8 @@ public abstract class AbstractSyncLogicalFileImpl extends AbstractNSEntryImplWit
     }
 
     private void init(int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        if(Flags.CREATEPARENTS.isSet(flags)) flags=Flags.CREATE.or(flags);
+        if(Flags.CREATE.isSet(flags)) flags=Flags.WRITE.or(flags);
         new FlagsHelper(flags).allowed(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS, Flags.ALLLOGICALFILEFLAGS);
         if (Flags.CREATE.isSet(flags)) {
             if (m_adaptor instanceof LogicalWriter) {

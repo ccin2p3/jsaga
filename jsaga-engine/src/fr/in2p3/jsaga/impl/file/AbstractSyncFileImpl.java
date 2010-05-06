@@ -54,6 +54,8 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
     }
 
     private void init(int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        if(Flags.CREATEPARENTS.isSet(flags)) flags=Flags.CREATE.or(flags);
+        if(Flags.CREATE.isSet(flags)) flags=Flags.WRITE.or(flags);
         new FlagsHelper(flags).allowed(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS, Flags.ALLFILEFLAGS);
         if (Flags.READ.isSet(flags)) {
             m_inStream = FileFactoryImpl.openFileInputStream(m_session, m_url, m_adaptor);
