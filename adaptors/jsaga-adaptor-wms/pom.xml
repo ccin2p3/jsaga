@@ -1,74 +1,95 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <parent>
-        <groupId>fr.in2p3.jsaga</groupId>
-        <artifactId>jsaga-adaptorpom</artifactId>
-        <version>current</version>
-    </parent>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>fr.in2p3.jsaga.adaptor</groupId>
-  <artifactId>jsaga-adaptor-wms</artifactId>
-  <version>0.9.9-SNAPSHOT</version>
-  <name>Adaptors for gLite-WMS</name>
-  <description>This module provides support for WMS (Workload Management System) execution management technology.</description>
-  <dependencies>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<groupId>fr.in2p3.jsaga</groupId>
+		<artifactId>jsaga-adaptorpom</artifactId>
+		<version>current</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>fr.in2p3.jsaga.adaptor</groupId>
+	<artifactId>jsaga-adaptor-wms</artifactId>
+	<version>0.9.9-SNAPSHOT</version>
+	<name>Adaptors for gLite-WMS</name>
+	<description>This module provides support for WMS (Workload Management System) execution management technology.</description>
+	<developers>
+		<developer>
+			<name>Jérôme Revillard</name>
+			<email>jrevillard@maatg.com</email>
+			<organization>MAAT France</organization>
+			<organizationUrl>http://www.maatg.com/</organizationUrl>
+			<properties>
+				<organizationLogoUrl>http://www.maatg.com/ptr/gestion/usuarios/user79048/maatg/files/img/vmaatg20090921224133.png</organizationLogoUrl>
+			</properties>
+		</developer>
+	</developers>
+	<dependencies>
 		<dependency>
-		  <groupId>fr.in2p3.jsaga</groupId>
-		  <artifactId>jsaga-adaptoritf</artifactId>
-		  <version>0.9.9-SNAPSHOT</version>
-		  <scope>provided</scope>
+			<groupId>fr.in2p3.jsaga</groupId>
+			<artifactId>jsaga-adaptoritf</artifactId>
+			<version>0.9.9-SNAPSHOT</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
-		  <groupId>org.ogf.saga</groupId>
-		  <artifactId>saga-api-test</artifactId>
-		  <version>0.9.9-SNAPSHOT</version>
-		  <scope>test</scope>
+			<groupId>org.ogf.saga</groupId>
+			<artifactId>saga-api-test</artifactId>
+			<version>0.9.9-SNAPSHOT</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
-		  <groupId>fr.in2p3.jsaga</groupId>
-		  <artifactId>jsaga-engine</artifactId>
-		  <version>0.9.9-SNAPSHOT</version>
-		  <scope>test</scope>
+			<groupId>fr.in2p3.jsaga</groupId>
+			<artifactId>jsaga-engine</artifactId>
+			<version>0.9.9-SNAPSHOT</version>
+			<scope>test</scope>
 		</dependency>
-        <!-- adaptor specific -->
-        <dependency><!-- for security context (WARNING: order of dependencies matters) -->
-            <groupId>fr.in2p3.jsaga.adaptor</groupId>
-            <artifactId>jsaga-adaptor-voms</artifactId>
-            <version>0.9.9-SNAPSHOT</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency><!-- for data staging -->
-            <groupId>fr.in2p3.jsaga.adaptor</groupId>
-            <artifactId>jsaga-adaptor-globus</artifactId>
-            <version>0.9.9-SNAPSHOT</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>fr.in2p3.jsaga.adaptor</groupId>
-            <artifactId>jsaga-adaptor-classic</artifactId>
-            <version>0.9.9-SNAPSHOT</version>
-            <scope>runtime</scope>
-        </dependency>
+		<!-- adaptor specific -->
 		<dependency>
-            <groupId>org.glite</groupId>
-            <artifactId>glite-jdl-api-java</artifactId>
-            <version>3.1.6</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.glite</groupId>
-            <artifactId>glite-wms-wmproxy-api-java</artifactId>
-            <version>3.1.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glite</groupId>
-            <artifactId>glite-lb-api-java</artifactId>
-            <version>3.1.2</version>
-        </dependency>
+			<!--
+				for security context (WARNING: order of dependencies matters)
+			-->
+			<groupId>fr.in2p3.jsaga.adaptor</groupId>
+			<artifactId>jsaga-adaptor-voms</artifactId>
+			<version>0.9.9-SNAPSHOT</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency><!-- for data staging -->
+			<groupId>fr.in2p3.jsaga.adaptor</groupId>
+			<artifactId>jsaga-adaptor-globus</artifactId>
+			<version>0.9.9-SNAPSHOT</version>
+			<scope>runtime</scope>
+		</dependency>
 		<dependency>
-            <groupId>org.condor</groupId>
-            <artifactId>classad</artifactId>
-            <version>2.4</version>
-			 <scope>compile</scope>
-        </dependency>
-  </dependencies>
+			<groupId>fr.in2p3.jsaga.adaptor</groupId>
+			<artifactId>jsaga-adaptor-classic</artifactId>
+			<version>0.9.9-SNAPSHOT</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.glite</groupId>
+			<artifactId>glite-jdl-api-java</artifactId>
+			<version>3.1.6</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.glite</groupId>
+			<artifactId>glite-wms-wmproxy-api-java</artifactId>
+			<version>3.1.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glite</groupId>
+			<artifactId>glite-lb-api-java</artifactId>
+			<version>3.1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.condor</groupId>
+			<artifactId>classad</artifactId>
+			<version>2.4</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache</groupId>
+			<artifactId>addressing-1.0</artifactId>
+			<version>1.0</version>
+		</dependency>
+	</dependencies>
 </project>
