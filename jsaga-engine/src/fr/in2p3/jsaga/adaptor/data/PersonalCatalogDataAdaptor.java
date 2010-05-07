@@ -76,6 +76,19 @@ public class PersonalCatalogDataAdaptor implements LogicalReaderMetaData, Logica
         }
     }
 
+    public void create(String logicalEntry, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
+        try {
+            m_catalog.getFile(logicalEntry);
+            throw new AlreadyExistsException("File already exists: "+logicalEntry);
+        } catch (DoesNotExistException e) {
+            try {
+                m_catalog.addFile(logicalEntry);
+            } catch (DoesNotExistException e2) {
+                throw new ParentDoesNotExist(e2);
+            }
+        }
+    }
+
     public void addLocation(String logicalEntry, URL replicaEntry, String additionalArgs) throws PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         // get or create logical entry
         File file;
@@ -87,6 +100,8 @@ public class PersonalCatalogDataAdaptor implements LogicalReaderMetaData, Logica
             } catch (DoesNotExistException e2) {
                 throw new IncorrectStateException(e2);
             }
+            //todo: replace block above with block below
+//            throw new IncorrectStateException(e);
         }
         // add replica location (if it does not already exist)
         if (! arrayContains(file.getReplica(), replicaEntry.toString())) {

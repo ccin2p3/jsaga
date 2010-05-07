@@ -28,6 +28,11 @@ public class WaitForEverDataAdaptorLogical extends WaitForEverDataAdaptorAbstrac
         hang();
         return new String[0];
     }
+
+    public void create(String logicalEntry, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
+        hang();
+    }
+
     public void addLocation(String logicalEntry, URL replicaEntry, String additionalArgs) throws PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         hang();
     }

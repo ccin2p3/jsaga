@@ -1,7 +1,8 @@
 package fr.in2p3.jsaga.adaptor.data.write;
 
-import org.ogf.saga.url.URL;
+import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import org.ogf.saga.error.*;
+import org.ogf.saga.url.URL;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -18,7 +19,17 @@ import org.ogf.saga.error.*;
 public interface LogicalWriter extends DataWriterAdaptor {
     /**
      * Add a replica location to the replica set.
-     * Note: does never throw an AlreadyExistsException exception!
+     * @param logicalEntry absolute path of the logical entry.
+     * @param additionalArgs adaptor specific arguments
+     * @throws BadParameterException if logicalEntry is a directory.
+     * @throws AlreadyExistsException if logicalEntry already exists.
+     * @throws ParentDoesNotExist if parent directory of logicalEntry does not exist.
+     */
+    public void create(String logicalEntry, String additionalArgs)
+        throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException;
+
+    /**
+     * Add a replica location to the replica set.
      * @param logicalEntry absolute path of the logical entry.
      * @param replicaEntry location to add to set.
      * @param additionalArgs adaptor specific arguments
@@ -35,7 +46,7 @@ public interface LogicalWriter extends DataWriterAdaptor {
      * @param additionalArgs adaptor specific arguments
      * @throws BadParameterException if logicalEntry is a directory.
      * @throws IncorrectStateException if logicalEntry does not exist.
-     * @throws DoesNotExistException if the location is not in the set of replicas.
+     * @throws DoesNotExistException if the replicaEntry is not in the set of replicas.
      */
     public void removeLocation(String logicalEntry, URL replicaEntry, String additionalArgs)
         throws PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException;

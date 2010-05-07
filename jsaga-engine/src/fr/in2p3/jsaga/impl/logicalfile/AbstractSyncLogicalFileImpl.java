@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.impl.logicalfile;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
+import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.read.DataReaderAdaptor;
 import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
@@ -77,6 +78,52 @@ public abstract class AbstractSyncLogicalFileImpl extends AbstractNSEntryImplWit
             }
         }
     }
+    //todo: replace block above with block below
+/*
+    private void init(int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        if(Flags.CREATEPARENTS.isSet(flags)) flags=Flags.CREATE.or(flags);
+        if(Flags.CREATE.isSet(flags)) flags=Flags.WRITE.or(flags);
+        new FlagsHelper(flags).allowed(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS, Flags.ALLLOGICALFILEFLAGS);
+        if (Flags.CREATE.isSet(flags)) {
+            if (m_adaptor instanceof LogicalWriter) {
+                try {
+                    this.tryToCreate(flags);
+                } catch (DoesNotExistException e) {
+                    if (Flags.CREATEPARENTS.isSet(flags)) {
+                        // make parent directories
+                        this._makeParentDirs();
+                        // retry
+                        this.tryToCreate(flags);
+                    } else {
+                        throw e;
+                    }
+                }
+            } else {
+                throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme());
+            }
+        } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !((URLImpl)m_url).hasCache() && m_adaptor instanceof DataReaderAdaptor) {
+            boolean exists = ((DataReaderAdaptor)m_adaptor).exists(
+                    m_url.getPath(),
+                    m_url.getQuery());
+            if (! exists) {
+                throw new DoesNotExistException("Logical file does not exist: "+ m_url);
+            }
+        }
+    }
+    private void tryToCreate(int flags) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        try {
+            ((LogicalWriter)m_adaptor).create(
+                    m_url.getPath(),
+                    m_url.getQuery());
+        } catch (AlreadyExistsException e) {
+            if (Flags.EXCL.isSet(flags)) {
+                throw new AlreadyExistsException("Entry already exists: "+ m_url);
+            }
+        } catch (ParentDoesNotExist e) {
+            throw new DoesNotExistException("Failed to create parent directory", e.getCause());
+        }
+    }
+*/
 
     /** clone */
     public SagaObject clone() throws CloneNotSupportedException {

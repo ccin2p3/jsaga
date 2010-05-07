@@ -241,12 +241,16 @@ public class SrbDataAdaptorLogical extends SrbDataAdaptor implements LogicalRead
 			throw new NoSuccessException(e);
 		}
 	}
-	
-	public void addLocation(String logicalEntry, URL replicaEntry, String additionalArgs) throws PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
-		
+
+    public void create(String logicalEntry, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
+        //todo
+    }
+
+    public void addLocation(String logicalEntry, URL replicaEntry, String additionalArgs) throws PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
+		//todo
 	}
 	
 	public void removeLocation(String logicalEntry, URL replicaEntry, String additionalArgs) throws PermissionDeniedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
-		
+		//todo
 	}	
 }
