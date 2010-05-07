@@ -44,9 +44,6 @@ public class SrbIntegrationTestSuite extends JSAGATestSuite {
     public static class Srb_to_EmulatorNSCopyTest extends NSCopyTest {
         public Srb_to_EmulatorNSCopyTest() throws Exception {super("srb", "test");}
     }
-    public static class Srb_to_EmulatorNSCopyFromTest extends NSCopyFromTest {
-        public Srb_to_EmulatorNSCopyFromTest() throws Exception {super("srb", "test");}
-    }
     public static class Srb_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
         public Srb_to_EmulatorNSCopyRecursiveTest() throws Exception {super("srb", "test");}
     }

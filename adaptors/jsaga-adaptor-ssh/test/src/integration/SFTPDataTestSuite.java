@@ -41,9 +41,6 @@ public class SFTPDataTestSuite extends JSAGATestSuite {
     public static class SFTPNSCopyTest extends NSCopyTest {
         public SFTPNSCopyTest() throws Exception {super("sftp", "sftp");}
     }
-    public static class SFTPNSCopyFromTest extends NSCopyFromTest {
-        public SFTPNSCopyFromTest() throws Exception {super("sftp", "sftp");}
-    }
     public static class SFTPNSCopyRecursiveTest extends NSCopyRecursiveTest {
         public SFTPNSCopyRecursiveTest() throws Exception {super("sftp", "sftp");}
     }
@@ -52,9 +49,6 @@ public class SFTPDataTestSuite extends JSAGATestSuite {
     }
     public static class SFTP_to_EmulatorNSCopyTest extends NSCopyTest {
         public SFTP_to_EmulatorNSCopyTest() throws Exception {super("sftp", "test");}
-    }
-    public static class SFTP_to_EmulatorNSCopyFromTest extends NSCopyFromTest {
-        public SFTP_to_EmulatorNSCopyFromTest() throws Exception {super("sftp", "test");}
     }
     public static class SFTP_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
         public SFTP_to_EmulatorNSCopyRecursiveTest() throws Exception {super("sftp", "test");}

@@ -48,9 +48,6 @@ public class SRMIntegrationTestSuite extends JSAGATestSuite {
     public static class SRMNSCopyTest extends NSCopyTest {
         public SRMNSCopyTest() throws Exception {super("srm", "srm");}
     }
-    public static class SRMNSCopyFromTest extends NSCopyFromTest {
-        public SRMNSCopyFromTest() throws Exception {super("srm", "srm");}
-    }
     public static class SRMNSCopyRecursiveTest extends NSCopyRecursiveTest {
         public SRMNSCopyRecursiveTest() throws Exception {super("srm", "srm");}
     }
@@ -60,9 +57,6 @@ public class SRMIntegrationTestSuite extends JSAGATestSuite {
     }
     public static class SRM_to_EmulatorNSCopyTest extends NSCopyTest {
         public SRM_to_EmulatorNSCopyTest() throws Exception {super("srm", "test");}
-    }
-    public static class SRM_to_EmulatorNSCopyFromTest extends NSCopyFromTest {
-        public SRM_to_EmulatorNSCopyFromTest() throws Exception {super("srm", "test");}
     }
     public static class SRM_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
         public SRM_to_EmulatorNSCopyRecursiveTest() throws Exception {super("srm", "test");}

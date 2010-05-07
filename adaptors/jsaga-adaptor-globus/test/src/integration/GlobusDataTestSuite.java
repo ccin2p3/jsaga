@@ -47,9 +47,6 @@ public class GlobusDataTestSuite extends JSAGATestSuite {
     public static class GsiftpNSCopyTest extends NSCopyTest {
         public GsiftpNSCopyTest() throws Exception {super("gsiftp", "gsiftp");}
     }
-    public static class GsiftpNSCopyFromTest extends NSCopyFromTest {
-        public GsiftpNSCopyFromTest() throws Exception {super("gsiftp", "gsiftp");}
-    }
     public static class GsiftpNSCopyRecursiveTest extends NSCopyRecursiveTest {
         public GsiftpNSCopyRecursiveTest() throws Exception {super("gsiftp", "gsiftp");}
     }
@@ -58,9 +55,6 @@ public class GlobusDataTestSuite extends JSAGATestSuite {
     }
     public static class Gsiftp_to_EmulatorNSCopyTest extends NSCopyTest {
         public Gsiftp_to_EmulatorNSCopyTest() throws Exception {super("gsiftp", "test");}
-    }
-    public static class Gsiftp_to_EmulatorNSCopyFromTest extends NSCopyFromTest {
-        public Gsiftp_to_EmulatorNSCopyFromTest() throws Exception {super("gsiftp", "test");}
     }
     public static class Gsiftp_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
         public Gsiftp_to_EmulatorNSCopyRecursiveTest() throws Exception {super("gsiftp", "test");}

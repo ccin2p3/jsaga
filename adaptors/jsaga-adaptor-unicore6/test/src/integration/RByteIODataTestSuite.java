@@ -45,9 +45,6 @@ public class RByteIODataTestSuite extends JSAGATestSuite {
     public static class RByteIONSCopyTest extends NSCopyTest {
         public RByteIONSCopyTest() throws Exception {super("rbyteio", "rbyteio");}
     }
-    public static class RByteIONSCopyFromTest extends NSCopyFromTest {
-        public RByteIONSCopyFromTest() throws Exception {super("rbyteio", "rbyteio");}
-    }
     public static class RByteIONSCopyRecursiveTest extends NSCopyRecursiveTest {
         public RByteIONSCopyRecursiveTest() throws Exception {super("rbyteio", "rbyteio");}
     }
@@ -56,9 +53,6 @@ public class RByteIODataTestSuite extends JSAGATestSuite {
     }
     public static class RByteIO_to_EmulatorNSCopyTest extends NSCopyTest {
         public RByteIO_to_EmulatorNSCopyTest() throws Exception {super("rbyteio", "test");}
-    }
-    public static class RByteIO_to_EmulatorNSCopyFromTest extends NSCopyFromTest {
-        public RByteIO_to_EmulatorNSCopyFromTest() throws Exception {super("rbyteio", "test");}
     }
     public static class RByteIO_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
         public RByteIO_to_EmulatorNSCopyRecursiveTest() throws Exception {super("rbyteio", "test");}

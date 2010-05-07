@@ -44,9 +44,6 @@ public class IrodsIntegrationTestSuite extends JSAGATestSuite {
     public static class Irods_to_EmulatorNSCopyTest extends NSCopyTest {
         public Irods_to_EmulatorNSCopyTest() throws Exception {super("irods", "test");}
     }
-    public static class Irods_to_EmulatorNSCopyFromTest extends NSCopyFromTest {
-        public Irods_to_EmulatorNSCopyFromTest() throws Exception {super("irods", "test");}
-    }
     public static class Irods_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
         public Irods_to_EmulatorNSCopyRecursiveTest() throws Exception {super("irods", "test");}
     }

@@ -44,9 +44,6 @@ public class FileIntegrationTestSuite extends JSAGATestSuite {
     public static class FileNSCopyTest extends NSCopyTest {
         public FileNSCopyTest() throws Exception {super("file", "file");}
     }
-    public static class FileNSCopyFromTest extends NSCopyFromTest {
-        public FileNSCopyFromTest() throws Exception {super("file", "file");}
-    }
     public static class FileNSCopyRecursiveTest extends NSCopyRecursiveTest {
         public FileNSCopyRecursiveTest() throws Exception {super("file", "file");}
     }
@@ -55,9 +52,6 @@ public class FileIntegrationTestSuite extends JSAGATestSuite {
     }
     public static class File_to_EmulatorNSCopyTest extends NSCopyTest {
         public File_to_EmulatorNSCopyTest() throws Exception {super("file", "test");}
-    }
-    public static class File_to_EmulatorNSCopyFromTest extends NSCopyFromTest {
-        public File_to_EmulatorNSCopyFromTest() throws Exception {super("file", "test");}
     }
     public static class File_to_EmulatorNSCopyRecursiveTest extends NSCopyRecursiveTest {
         public File_to_EmulatorNSCopyRecursiveTest() throws Exception {super("file", "test");}
