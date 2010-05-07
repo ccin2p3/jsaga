@@ -61,26 +61,31 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
             m_inStream = FileFactoryImpl.openFileInputStream(m_session, m_url, m_adaptor);
         }
         if (Flags.WRITE.isSet(flags)) {
-            boolean append = Flags.APPEND.isSet(flags);
-            boolean exclusive = Flags.EXCL.isSet(flags);
             try {
-                m_outStream = FileFactoryImpl.openFileOutputStream(m_session, m_url, m_adaptor, append, exclusive);
-            } catch(DoesNotExistException e) {
-                // make parent directories, then retry
+                this.tryToOpen(flags);
+            } catch (DoesNotExistException e) {
                 if (Flags.CREATEPARENTS.isSet(flags)) {
+                    // make parent directories
                     this._makeParentDirs();
-                    try {
-                        m_outStream = FileFactoryImpl.openFileOutputStream(m_session, m_url, m_adaptor, append, exclusive);
-                    } catch(DoesNotExistException e2) {
-                        throw new DoesNotExistException("Failed to create parent directory", e2.getCause());
-                    }
+                    // retry
+                    this.tryToOpen(flags);
                 } else {
                     throw e;
                 }
             }
-        } else if (Flags.CREATEPARENTS.isSet(flags)) {
-            // make parent directories
-            this._makeParentDirs();
+        } else if (Flags.CREATE.isSet(flags)) {
+            try {
+                this.tryToCreate(flags);
+            } catch (DoesNotExistException e) {
+                if (Flags.CREATEPARENTS.isSet(flags)) {
+                    // make parent directories
+                    this._makeParentDirs();
+                    // retry
+                    this.tryToCreate(flags);
+                } else {
+                    throw e;
+                }
+            }
         }
         if (Flags.READ.isSet(flags) || Flags.WRITE.isSet(flags)) {
             // exists check already done
@@ -89,6 +94,27 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
             if (! exists) {
                 throw new DoesNotExistException("File does not exist: "+ m_url);
             }
+        }
+    }
+    private void tryToOpen(int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        boolean append = Flags.APPEND.isSet(flags);
+        boolean exclusive = Flags.EXCL.isSet(flags);
+        try {
+            m_outStream = FileFactoryImpl.openFileOutputStream(m_session, m_url, m_adaptor, append, exclusive);
+        } catch (DoesNotExistException e) {
+            throw new DoesNotExistException("Failed to create parent directory", e.getCause());
+        }
+    }
+    private void tryToCreate(int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+        boolean append = true;
+        boolean exclusive = Flags.EXCL.isSet(flags);
+        try {
+            FileOutputStream out = FileFactoryImpl.openFileOutputStream(m_session, m_url, m_adaptor, append, exclusive);
+            out.close();
+        } catch (DoesNotExistException e) {
+            throw new DoesNotExistException("Failed to create parent directory", e.getCause());
+        } catch (IOException e) {
+            throw new NoSuccessException(e);
         }
     }
 
