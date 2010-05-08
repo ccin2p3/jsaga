@@ -1,40 +1,56 @@
 package fr.in2p3.jsaga.adaptor.wms.job;
 
-import fr.in2p3.jsaga.adaptor.base.defaults.Default;
-import fr.in2p3.jsaga.adaptor.base.usage.*;
-import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
-import fr.in2p3.jsaga.adaptor.job.monitor.*;
-import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
-import holders.StringArrayHolder;
-import org.apache.axis.SimpleTargetedChain;
-import org.apache.axis.configuration.SimpleProvider;
-import org.apache.axis.transport.http.HTTPSender;
-import org.glite.lb.LoggingAndBookkeepingLocatorClient;
-import org.glite.wsdl.services.lb.LoggingAndBookkeepingLocator;
-import org.glite.wsdl.services.lb.LoggingAndBookkeepingPortType;
-import org.glite.wsdl.types.lb.*;
-import org.glite.wsdl.types.lb.holders.JobStatusArrayHolder;
-import org.globus.axis.transport.HTTPSSender;
-import org.globus.axis.util.Util;
-import org.ietf.jgss.GSSCredential;
-import org.ogf.saga.error.*;
-
-import javax.xml.rpc.ServiceException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Map;
+
+import javax.xml.rpc.ServiceException;
+
+import org.apache.axis.SimpleTargetedChain;
+import org.apache.axis.client.Stub;
+import org.apache.axis.configuration.SimpleProvider;
+import org.glite.wsdl.services.lb.LoggingAndBookkeepingLocator;
+import org.glite.wsdl.services.lb.LoggingAndBookkeepingPortType;
+import org.glite.wsdl.types.lb.GenericFault;
+import org.glite.wsdl.types.lb.JobFlags;
+import org.glite.wsdl.types.lb.JobFlagsValue;
+import org.glite.wsdl.types.lb.StatName;
+import org.glite.wsdl.types.lb.StateEnterTimesItem;
+import org.globus.axis.gsi.GSIConstants;
+import org.globus.axis.transport.HTTPSSender;
+import org.globus.gsi.TrustedCertificates;
+import org.ietf.jgss.GSSCredential;
+import org.ogf.saga.error.AuthenticationFailedException;
+import org.ogf.saga.error.AuthorizationFailedException;
+import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.IncorrectStateException;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.TimeoutException;
+
+import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.U;
+import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.job.monitor.JobInfoAdaptor;
+import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
+import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
 * File:   WMSJobMonitorAdaptor
-* Author: Nicolas DEMESY (nicolas.demesy@bt.com)
+* Authors: Nicolas DEMESY (nicolas.demesy@bt.com)
+* 		   Jerome Revillard (jrevillard@maatg.com) - MAAT France
 * Date:   18 fev. 2008
+* Updated: 8 Mai  2010 (Jerome)
 * ***************************************************/
 
-public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements QueryIndividualJob, QueryFilteredJob, ListableJobAdaptor, JobInfoAdaptor {
+public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements QueryIndividualJob, JobInfoAdaptor {
     public static final String MONITOR_PORT = "MonitorPort";
     private String m_wmsServerUrl;
     private String m_lbHost;
@@ -112,6 +128,12 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 
     private org.glite.wsdl.types.lb.JobStatus getJobInfo(String nativeJobId) throws NoSuccessException {
     	try {
+    		// Store the LB host if not exists. This is the case for Job.getjob(nativejobid)
+    		// to monitor a job that was not submitted by JSAGA.
+    		if (m_lbHost == null) {
+    			WMStoLB.getInstance().setLBHost(m_wmsServerUrl, nativeJobId);
+    		}
+    		
     		// get stub
 	        LoggingAndBookkeepingPortType stub = getLBStub(m_credential);
 	        
@@ -150,9 +172,13 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
     }
 
 	/**
+	 * For QueryFilteredJob: Problematic when the user has thousands of jobs
+	 * registered in the LB. Fonctionality removed until we find a solution for that.  
+	 * 
+	 * 
 	 * Get all jobs for authenticated user 
 	 */
-	public JobStatus[] getFilteredStatus(Object[] filters) throws TimeoutException, NoSuccessException {
+/*	public JobStatus[] getFilteredStatus(Object[] filters) throws TimeoutException, NoSuccessException {
 		try {
 			
 			// get stub
@@ -175,9 +201,8 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 	        value1.setC("https://"+m_lbHost+"/");
 	        qR[0] = new QueryRecord(QueryOp.UNEQUAL, value1, null );	        
 	        queryConditions[0].setRecord(qR);	        
-	        // Cannot use stub.userJobs() because not yet implemented (version > 1.8 needed) 
+	        // Cannot use stub.userJobs() because not yet implemented (version > 1.8 needed)
 	        stub.queryJobs(queryConditions, jobFlags, jobNativeIdResult, jobStatusResult);
-	        
 	        if(jobNativeIdResult != null && jobNativeIdResult.value != null) {
 	        	JobStatus[] filterJobs = new WMSJobStatus[jobNativeIdResult.value.length];
 	        	for (int i = 0; i < filterJobs.length; i++) {
@@ -192,8 +217,14 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
     		throw new NoSuccessException(e);
     	}
 	}
+*/
 
-    public String[] list() throws PermissionDeniedException, TimeoutException, NoSuccessException {
+	/**
+	 * For QueryFilteredJob: Problematic when the user has thousands of jobs
+	 * registered in the LB. Fonctionality removed until we find a solution for that.  
+	 *
+	 */
+/*  public String[] list() throws PermissionDeniedException, TimeoutException, NoSuccessException {
         try {
             // get stub
             LoggingAndBookkeepingPortType stub = getLBStub(m_credential);
@@ -216,20 +247,18 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
             qR[0] = new QueryRecord(QueryOp.UNEQUAL, value1, null );
             queryConditions[0].setRecord(qR);
             // Cannot use stub.userJobs() because not yet implemented (version > 1.8 needed)
-            stub.queryJobs(queryConditions, jobFlags, jobNativeIdResult, jobStatusResult);
-
+	        stub.queryJobs(queryConditions, jobFlags, jobNativeIdResult, jobStatusResult);
             return jobNativeIdResult.value;
         } catch (MalformedURLException e) {
             throw new NoSuccessException(e);
         } catch (ServiceException e) {
             throw new NoSuccessException(e);
-        } catch (GenericFault e) {
-            throw new NoSuccessException(e);
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             throw new NoSuccessException(e);
         }
     }
-
+*/
+    
 	private LoggingAndBookkeepingPortType getLBStub(GSSCredential m_credential) throws MalformedURLException, ServiceException, NoSuccessException {
         // set LB url
         if (m_lbHost == null) {
@@ -245,15 +274,18 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
 
 		// Set provider
         SimpleProvider provider = new SimpleProvider();
-        SimpleTargetedChain c = null;
-        c = new SimpleTargetedChain(new HTTPSSender());
+        SimpleTargetedChain c = new SimpleTargetedChain(new HTTPSSender());
         provider.deployTransport("https",c);
-        c = new SimpleTargetedChain(new HTTPSender());
+        c = new SimpleTargetedChain(new HTTPSSender());
         provider.deployTransport("http",c);
-        Util.registerTransport();
         
         // get LB Stub
-        LoggingAndBookkeepingLocator loc = new LoggingAndBookkeepingLocatorClient(provider, m_credential);
-        return loc.getLoggingAndBookkeeping(lbURL);
+        LoggingAndBookkeepingLocator loc = new LoggingAndBookkeepingLocator(provider);
+        LoggingAndBookkeepingPortType loggingAndBookkeepingPortType = loc.getLoggingAndBookkeeping(lbURL);
+        ((Stub)loggingAndBookkeepingPortType)._setProperty(GSIConstants.GSI_CREDENTIALS, m_credential);
+        ((Stub)loggingAndBookkeepingPortType)._setProperty(GSIConstants.GSI_TRANSPORT, GSIConstants.ENCRYPTION);
+        ((Stub)loggingAndBookkeepingPortType)._setProperty(GSIConstants.TRUSTED_CERTIFICATES, TrustedCertificates.load(m_certRepository.getAbsolutePath()));
+        ((Stub)loggingAndBookkeepingPortType).setTimeout(120 * 1000); //2 mins
+        return loggingAndBookkeepingPortType;
 	}
 }

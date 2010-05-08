@@ -4,7 +4,6 @@ import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOSetter;
 import org.globus.ftp.*;
 import org.ogf.saga.error.*;
 
-import java.io.InputStream;
 import java.io.OutputStream;
 
 
@@ -39,7 +38,7 @@ public class WMSJobIOHandler implements JobIOSetter {
     public void setStderr(OutputStream err) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         // workaround: sleep between setStdout and setStderr
         try {
-            Thread.currentThread().sleep(500);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             throw new NoSuccessException(e);
         }
@@ -67,20 +66,21 @@ public class WMSJobIOHandler implements JobIOSetter {
         }
     }
 
-    private void putFromStream(String absolutePath, boolean append, InputStream stream) throws NoSuccessException {
-        final int DEFAULT_BUFFER_SIZE = 16384;
-        try {
-            m_stagingClient.setType(GridFTPSession.TYPE_IMAGE);
-            m_stagingClient.setMode(GridFTPSession.MODE_EBLOCK);
-            m_stagingClient.setPassive();
-            m_stagingClient.setLocalActive();
-            m_stagingClient.put(
-                absolutePath,
-                new DataSourceStream(stream, DEFAULT_BUFFER_SIZE),
-                    null,
-                    append);
-        } catch (Exception e) {
-            throw new NoSuccessException("Failed to write file: "+absolutePath, e);
-        }
-    }
+    //Not used...
+//    private void putFromStream(String absolutePath, boolean append, InputStream stream) throws NoSuccessException {
+//        final int DEFAULT_BUFFER_SIZE = 16384;
+//        try {
+//            m_stagingClient.setType(GridFTPSession.TYPE_IMAGE);
+//            m_stagingClient.setMode(GridFTPSession.MODE_EBLOCK);
+//            m_stagingClient.setPassive();
+//            m_stagingClient.setLocalActive();
+//            m_stagingClient.put(
+//                absolutePath,
+//                new DataSourceStream(stream, DEFAULT_BUFFER_SIZE),
+//                    null,
+//                    append);
+//        } catch (Exception e) {
+//            throw new NoSuccessException("Failed to write file: "+absolutePath, e);
+//        }
+//    }
 }
