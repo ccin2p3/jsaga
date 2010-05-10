@@ -51,6 +51,54 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         return m_url.normalize();
     }
 
+    /** override super.permissionsAllowSync() */
+    public void permissionsAllowSync(String id, int permissions, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, TimeoutException, NoSuccessException {
+        new FlagsHelper(flags).allowed(Flags.DEREFERENCE, Flags.RECURSIVE);
+        new FlagsHelper(flags).required(Flags.RECURSIVE);
+        try {
+            if (Flags.DEREFERENCE.isSet(flags)) {
+                this._dereferenceDir().permissionsAllowSync(id, permissions, flags - Flags.DEREFERENCE.getValue());
+                return; //==========> EXIT
+            }
+            // allow permission on current directory
+            super.permissionsAllowSync(id, permissions, flags - Flags.RECURSIVE.getValue());
+            // allow permission on child entries
+            for (FileAttributes child : this._listAttributes(m_url.getPath())) {
+                SyncNSEntry childEntry = this._openNS(child);
+                int childFlags = (childEntry instanceof AbstractSyncNSDirectoryImpl
+                        ? flags
+                        : flags - Flags.RECURSIVE.getValue());
+                childEntry.permissionsAllowSync(id, permissions, childFlags);
+            }
+        } catch (IncorrectURLException e) {
+            throw new NoSuccessException(e);
+        }
+    }
+
+    /** override super.permissionsDenySync() */
+    public void permissionsDenySync(String id, int permissions, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, TimeoutException, NoSuccessException {
+        new FlagsHelper(flags).allowed(Flags.DEREFERENCE, Flags.RECURSIVE);
+        new FlagsHelper(flags).required(Flags.RECURSIVE);
+        try {
+            if (Flags.DEREFERENCE.isSet(flags)) {
+                this._dereferenceDir().permissionsDenySync(id, permissions, flags - Flags.DEREFERENCE.getValue());
+                return; //==========> EXIT
+            }
+            // deny permission on current directory
+            super.permissionsDenySync(id, permissions, flags - Flags.RECURSIVE.getValue());
+            // deny permission on child entries
+            for (FileAttributes child : this._listAttributes(m_url.getPath())) {
+                SyncNSEntry childEntry = this._openNS(child);
+                int childFlags = (childEntry instanceof AbstractSyncNSDirectoryImpl
+                        ? flags
+                        : flags - Flags.RECURSIVE.getValue());
+                childEntry.permissionsDenySync(id, permissions, childFlags);
+            }
+        } catch (IncorrectURLException e) {
+            throw new NoSuccessException(e);
+        }
+    }
+
     /** override super.copySync() */
     public void copySync(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
         this._copyAndMonitor(target, flags, null);
