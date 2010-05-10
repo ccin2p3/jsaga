@@ -167,8 +167,17 @@ public class URLImpl implements URL {
             return "."+u.getPath();                         //sreynaud
         } else if (u.getPath().startsWith("/./") || m_mustRemoveSlash) {
             return u.getPath().substring(1);                //sreynaud
+        } else if (u.getPath().startsWith("//")) {
+            return trimPath(u.getPath());                   //sreynaud
         }
         return u.getPath();
+    }
+    private static String trimPath(String path) {
+        if (path.startsWith("//")) {
+            return trimPath(path.substring(1));
+        } else {
+            return path;
+        }
     }
 
     public void setPath(String path) throws BadParameterException {
