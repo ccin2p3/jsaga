@@ -302,6 +302,7 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
     }
 
     public void permissionsAllowSync(String id, int permissions, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, TimeoutException, NoSuccessException {
+        new FlagsHelper(flags).allowed(Flags.DEREFERENCE);
         if (Flags.DEREFERENCE.isSet(flags)) {
             try {
                 this._dereferenceEntry().permissionsAllowSync(id, permissions, flags - Flags.DEREFERENCE.getValue());
@@ -313,7 +314,8 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
         super.permissionsAllow(id, permissions);
     }
 
-    public void permissionsDenySync(String id, int permissions, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+    public void permissionsDenySync(String id, int permissions, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, TimeoutException, NoSuccessException {
+        new FlagsHelper(flags).allowed(Flags.DEREFERENCE);
         if (Flags.DEREFERENCE.isSet(flags)) {
             try {
                 this._dereferenceEntry().permissionsDenySync(id, permissions, flags - Flags.DEREFERENCE.getValue());
