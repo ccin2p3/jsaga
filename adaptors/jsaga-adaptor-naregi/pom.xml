@@ -10,6 +10,17 @@
     <version>0.9.9-SNAPSHOT</version>
     <name>Adaptors for NAREGI</name>
     <description>This module provides support for NAREGI execution management technologies (Super Scheduler).</description>
+    <developers>
+        <developer>
+            <name>Sylvain Reynaud</name>
+            <email>sreynaud@in2p3.fr</email>
+            <organization>CC-IN2P3</organization>
+            <organizationUrl>http://cc.in2p3.fr/</organizationUrl>
+            <properties>
+                <organizationLogoUrl>http://cc.in2p3.fr/plugins/kitcnrs/images/logoCC72.gif</organizationLogoUrl>
+            </properties>
+        </developer>
+    </developers>
     <dependencies>
         <!-- common -->
         <dependency>

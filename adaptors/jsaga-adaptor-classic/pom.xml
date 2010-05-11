@@ -13,6 +13,29 @@
 security mechanisms (X509 certificates, Java Keystore),
 data management protocols (HTTP, HTTPS, local, ZIP),
 execution management technologies (fork).</description>
+    <developers>
+        <developer>
+            <name>Sylvain Reynaud</name>
+            <email>sreynaud@in2p3.fr</email>
+            <organization>CC-IN2P3</organization>
+            <organizationUrl>http://cc.in2p3.fr/</organizationUrl>
+            <properties>
+                <organizationLogoUrl>http://cc.in2p3.fr/plugins/kitcnrs/images/logoCC72.gif</organizationLogoUrl>
+            </properties>
+        </developer>
+        <developer>
+            <name>Nicolas Demesy</name>
+            <email>nicolas.demesy@bt.com</email>
+            <organization>British Telecom</organization>
+            <organizationUrl>http://www.bt.com/</organizationUrl>
+            <properties>
+                <organizationLogoUrl>http://www.bt.com/static/wa/homepage/images/logo_75x36.gif</organizationLogoUrl>
+                <project>elis@</project>
+                <projectUrl>http://elara.c-s.fr/elisaportal/servlet/Bienvenue</projectUrl>
+                <projectLogoUrl>http://elara.c-s.fr/elisaportal/images/logo.jpg</projectLogoUrl>
+            </properties>
+        </developer>
+    </developers>
     <dependencies>
         <!-- common -->
         <dependency>

@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>fr.in2p3.jsaga</groupId>
         <artifactId>jsaga-adaptorpom</artifactId>
@@ -11,6 +12,20 @@
   <name>Adaptors for Globus WS-GRAM</name>
   <description>This module provides support for Globus WS-GRAM (Web Service - Grid Resource Allocation Management)
 execution management technology from Globus Toolkit 4.0.</description>
+    <developers>
+        <developer>
+            <name>Nicolas Demesy</name>
+            <email>nicolas.demesy@bt.com</email>
+            <organization>British Telecom</organization>
+            <organizationUrl>http://www.bt.com/</organizationUrl>
+            <properties>
+                <organizationLogoUrl>http://www.bt.com/static/wa/homepage/images/logo_75x36.gif</organizationLogoUrl>
+                <project>elis@</project>
+                <projectUrl>http://elara.c-s.fr/elisaportal/servlet/Bienvenue</projectUrl>
+                <projectLogoUrl>http://elara.c-s.fr/elisaportal/images/logo.jpg</projectLogoUrl>
+            </properties>
+        </developer>
+    </developers>
   <dependencies>
 	<!-- common -->
     <dependency>

@@ -4,14 +4,28 @@
         <artifactId>jsaga-adaptorpom</artifactId>
         <version>current</version>
     </parent>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>fr.in2p3.jsaga.adaptor</groupId>
-  <artifactId>jsaga-adaptor-unicore6</artifactId>
-  <version>0.9.9-SNAPSHOT</version>
-  <name>Adaptors for Unicore 6</name>
-  <description>This module provides support for Unicore 6 components:
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>fr.in2p3.jsaga.adaptor</groupId>
+    <artifactId>jsaga-adaptor-unicore6</artifactId>
+    <version>0.9.9-SNAPSHOT</version>
+    <name>Adaptors for Unicore 6</name>
+    <description>This module provides support for Unicore 6 components:
 data management protocol (RByte-IO),
 execution management technology (Unicore Gateway).</description>
+    <developers>
+        <developer>
+            <name>Nicolas Demesy</name>
+            <email>nicolas.demesy@bt.com</email>
+            <organization>British Telecom</organization>
+            <organizationUrl>http://www.bt.com/</organizationUrl>
+            <properties>
+                <organizationLogoUrl>http://www.bt.com/static/wa/homepage/images/logo_75x36.gif</organizationLogoUrl>
+                <project>elis@</project>
+                <projectUrl>http://elara.c-s.fr/elisaportal/servlet/Bienvenue</projectUrl>
+                <projectLogoUrl>http://elara.c-s.fr/elisaportal/images/logo.jpg</projectLogoUrl>
+            </properties>
+        </developer>
+    </developers>
   <build>
     <plugins>
       <plugin>

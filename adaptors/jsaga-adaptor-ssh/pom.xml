@@ -14,6 +14,20 @@
 security mecanism (SSH asymmetric keys),
 data management protocol (SFTP),
 execution management technology (SSH).</description>
+    <developers>
+        <developer>
+            <name>Nicolas Demesy</name>
+            <email>nicolas.demesy@bt.com</email>
+            <organization>British Telecom</organization>
+            <organizationUrl>http://www.bt.com/</organizationUrl>
+            <properties>
+                <organizationLogoUrl>http://www.bt.com/static/wa/homepage/images/logo_75x36.gif</organizationLogoUrl>
+                <project>elis@</project>
+                <projectUrl>http://elara.c-s.fr/elisaportal/servlet/Bienvenue</projectUrl>
+                <projectLogoUrl>http://elara.c-s.fr/elisaportal/images/logo.jpg</projectLogoUrl>
+            </properties>
+        </developer>
+    </developers>
     <build>
 	  <plugins>
 	    <plugin>

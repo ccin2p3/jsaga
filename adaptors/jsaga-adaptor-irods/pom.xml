@@ -10,6 +10,19 @@
     <version>0.9.9-SNAPSHOT</version>
     <name>Adaptors for iRODS and SRB</name>
     <description>This module provides support for iRODS and SRB data management protocols.</description>
+    <developers>
+        <developer>
+            <name>Pascal Calvat</name>
+            <email>pcalvat@cc.in2p3.fr</email>
+            <organization>CC-IN2P3</organization>
+            <organizationUrl>http://cc.in2p3.fr/</organizationUrl>
+            <properties>
+                <organizationLogoUrl>http://cc.in2p3.fr/plugins/kitcnrs/images/logoCC72.gif</organizationLogoUrl>
+                <project>JUX</project>
+                <projectUrl>http://cc.in2p3.fr/docenligne/821</projectUrl>
+            </properties>
+        </developer>
+    </developers>
     <dependencies>
         <!-- common -->
         <dependency>
