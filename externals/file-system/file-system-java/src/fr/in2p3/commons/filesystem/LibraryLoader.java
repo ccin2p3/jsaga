@@ -37,7 +37,10 @@ public class LibraryLoader {
     private static File findLibraryForTest(String libName) {
         String file = LibraryLoader.class.getCanonicalName().replaceAll("\\.", "/")+".class";
         URL url = LibraryLoader.class.getClassLoader().getResource(file);
-        File dir = new File(url.getPath().replaceAll(file, ""));
+        String path = "jar".equals(url.getProtocol())
+                ? url.getPath().replaceAll("file:", "")
+                : url.getPath();
+        File dir = new File(path.replaceAll(file, ""));
         File projectDir = dir.getParentFile().getParentFile().getParentFile();
         File lib = new File(new File(new File(projectDir, libName), "target"), System.mapLibraryName(libName));
         if (lib.exists()) {
