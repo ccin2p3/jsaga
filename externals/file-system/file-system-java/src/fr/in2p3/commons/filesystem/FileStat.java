@@ -44,18 +44,28 @@ public class FileStat {
         this.name = name;
     }
 
+    public static boolean isReadable(int perms) {
+        return (perms & READ) > 0;
+    }
+    public static boolean isWritable(int perms) {
+        return (perms & WRITE) > 0;
+    }
+    public static boolean isExecutable(int perms) {
+        return (perms & EXEC) > 0;
+    }
+
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append(isdir ? 'd' : '-');
-        buf.append((user_perms&READ)>0 ? 'r' : '-');
-        buf.append((user_perms&WRITE)>0 ? 'w' : '-');
-        buf.append((user_perms&EXEC)>0 ? 'x' : '-');
-        buf.append((group_perms&READ)>0 ? 'r' : '-');
-        buf.append((group_perms&WRITE)>0 ? 'w' : '-');
-        buf.append((group_perms&EXEC)>0 ? 'x' : '-');
-        buf.append((other_perms&READ)>0 ? 'r' : '-');
-        buf.append((other_perms&WRITE)>0 ? 'w' : '-');
-        buf.append((other_perms&EXEC)>0 ? 'x' : '-');
+        buf.append(isReadable(user_perms) ? 'r' : '-');
+        buf.append(isWritable(user_perms) ? 'w' : '-');
+        buf.append(isExecutable(user_perms) ? 'x' : '-');
+        buf.append(isReadable(group_perms) ? 'r' : '-');
+        buf.append(isWritable(group_perms) ? 'w' : '-');
+        buf.append(isExecutable(group_perms) ? 'x' : '-');
+        buf.append(isReadable(other_perms) ? 'r' : '-');
+        buf.append(isWritable(other_perms) ? 'w' : '-');
+        buf.append(isExecutable(other_perms) ? 'x' : '-');
         buf.append((' '));
         buf.append(owner!=null ? owner : "?");
         buf.append((' '));
