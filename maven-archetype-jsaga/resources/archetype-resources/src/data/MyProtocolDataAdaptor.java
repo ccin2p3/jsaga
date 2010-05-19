@@ -30,8 +30,12 @@ public class MyProtocolDataAdaptor implements DataAdaptor {
         return null;
     }
 
-    public Default[] getDefaults(Map attributes) throws IncorrectState {
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return null;
+    }
+
+    public BaseURL getBaseURL() throws IncorrectURLException {
+        return new BaseURL();
     }
 
     public Class[] getSupportedSecurityCredentialClasses() {
@@ -42,15 +46,11 @@ public class MyProtocolDataAdaptor implements DataAdaptor {
         // set security credential
     }
 
-    public BaseURL getBaseURL() throws IncorrectURL {
-        return new BaseURL();
-    }
-
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplemented, AuthenticationFailed, AuthorizationFailed, BadParameter, Timeout, NoSuccess {
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, IncorrectURLException, BadParameterException, TimeoutException, NoSuccessException {
         // connect to server
     }
 
-    public void disconnect() throws NoSuccess {
+    public void disconnect() throws NoSuccessException {
         // disconnect from server
     }
 }
