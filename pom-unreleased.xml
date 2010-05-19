@@ -22,7 +22,6 @@
   <!-- aggregation -->
   <modules>
     <module>externals</module>
-    <module>saga-api</module>
     <module>jsaga-adaptorpom</module>
     <module>maven-archetype-jsaga</module>
     <module>jsaga-universe-api</module>
