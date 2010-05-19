@@ -37,16 +37,36 @@ public class LibraryLoader {
     private static File findLibraryForTest(String libName) {
         String file = LibraryLoader.class.getCanonicalName().replaceAll("\\.", "/")+".class";
         URL url = LibraryLoader.class.getClassLoader().getResource(file);
-        String path = "jar".equals(url.getProtocol())
-                ? url.getPath().replaceAll("file:", "")
-                : url.getPath();
-        File dir = new File(path.replaceAll(file, ""));
-        File projectDir = dir.getParentFile().getParentFile().getParentFile();
-        File lib = new File(new File(new File(projectDir, libName), "target"), System.mapLibraryName(libName));
-        if (lib.exists()) {
-            return lib;
+        File lib;
+        if ("jar".equals(url.getProtocol())) {
+            // find library in maven repository
+            String path = decode(url.getPath().replaceAll("file:", ""));
+            File jar = new File(path.replaceAll("!/"+file, ""));
+            if (! jar.exists()) {
+                throw new RuntimeException(new FileNotFoundException(jar.getAbsolutePath()));
+            }
+            File projectDir = jar.getParentFile().getParentFile().getParentFile();
+            String version = jar.getParentFile().getName();
+            File libDir = new File(new File(projectDir, libName), version);
+            lib = new File(libDir, System.mapLibraryName(libName+"-"+version));
         } else {
+            // find library in project target directory
+            String path = decode(url.getPath());
+            File classesDir = new File(path.replaceAll(file, ""));
+            if (! classesDir.exists()) {
+                throw new RuntimeException(new FileNotFoundException(classesDir.getAbsolutePath()));
+            }
+            File projectDir = classesDir.getParentFile().getParentFile().getParentFile();
+            File libDir = new File(new File(projectDir, libName), "target");
+            lib = new File(libDir, System.mapLibraryName(libName));
+        }
+        if (! lib.exists()) {
             throw new RuntimeException(new FileNotFoundException(lib.getAbsolutePath()));
         }
+        return lib;
+    }
+
+    private static String decode(String path) {
+        return path.replaceAll("%20", " ");
     }
 }
