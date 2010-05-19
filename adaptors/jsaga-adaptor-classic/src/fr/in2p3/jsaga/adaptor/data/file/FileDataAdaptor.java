@@ -121,7 +121,7 @@ public class FileDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         return new LocalFileAttributes(entry);
     }
 
-    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+    protected File[] listFiles(String absolutePath) throws PermissionDeniedException, BadParameterException, DoesNotExistException, NoSuccessException {
         File[] list;
         File entry = this.newPath(absolutePath);
         if (entry == null) {
@@ -136,6 +136,10 @@ public class FileDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         if (list == null) {
             throw new PermissionDeniedException("Permission denied");
         }
+        return list;
+    }
+    public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+        File[] list = this.listFiles(absolutePath);
         FileAttributes[] ret = new FileAttributes[list.length];
         for (int i=0; i<list.length; i++) {
             ret[i] = new LocalFileAttributes(list[i]);
@@ -203,7 +207,7 @@ public class FileDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         }
     }
 
-    private File newEntry(String absolutePath) throws DoesNotExistException, NoSuccessException {
+    protected File newEntry(String absolutePath) throws DoesNotExistException, NoSuccessException {
         File entry = this.newPath(absolutePath);
         if (entry!=null && entry.exists()) {
             return entry;
