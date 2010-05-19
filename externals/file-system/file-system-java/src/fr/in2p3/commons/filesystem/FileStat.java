@@ -40,7 +40,7 @@ public class FileStat {
     public long mtime;
     public long ctime;
 
-    public FileStat(String name) {
+    FileStat(String name) {
         this.name = name;
     }
 
