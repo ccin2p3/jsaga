@@ -131,15 +131,15 @@ public class MetaDataAttributesImpl<T extends NSEntry> implements AsyncAttribute
     }
 
     public synchronized boolean isReadOnlyAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        throw new NotImplementedException("Not implemented");
+        return false;
     }
 
     public synchronized boolean isWritableAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        throw new NotImplementedException("Not implemented");
+        return true;
     }
 
     public synchronized boolean isRemovableAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        throw new NotImplementedException("Not implemented");
+        return true;
     }
 
     public synchronized boolean isVectorAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
