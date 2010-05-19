@@ -54,6 +54,10 @@ public class FileStat {
         return (perms & EXEC) > 0;
     }
 
+    public long getModifiedDate() {
+        return mtime*1000;
+    }
+
     public String toString() {
         StringBuffer buf = new StringBuffer();
         buf.append(isdir ? 'd' : '-');
@@ -73,7 +77,7 @@ public class FileStat {
         buf.append((' '));
         buf.append(size);
         buf.append((' '));
-        buf.append(m_formatter.format(new Date(mtime)));
+        buf.append(m_formatter.format(new Date(getModifiedDate())));
         buf.append((' '));
         buf.append(name);
         if(isdir) buf.append('/');
