@@ -22,7 +22,6 @@
 
   <!-- aggregation -->
   <modules>
-    <module>saga-api</module>
     <module>saga-api-test</module>
     <module>jsaga-adaptoritf</module>
     <module>jsaga-engine</module>
