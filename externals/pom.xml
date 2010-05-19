@@ -25,6 +25,7 @@
     <module>concurrent</module>
     <module>cryptix-asn1</module>
     <module>cryptix32</module>
+    <module>file-system</module>
     <module>jargon</module>
     <module>jce-jdk13</module>
     <module>jsch</module>
