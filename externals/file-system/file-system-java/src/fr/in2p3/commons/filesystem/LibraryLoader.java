@@ -39,16 +39,23 @@ public class LibraryLoader {
         URL url = LibraryLoader.class.getClassLoader().getResource(file);
         File lib;
         if ("jar".equals(url.getProtocol())) {
-            // find library in maven repository
             String path = decode(url.getPath().replaceAll("file:", ""));
             File jar = new File(path.replaceAll("!/"+file, ""));
             if (! jar.exists()) {
                 throw new RuntimeException(new FileNotFoundException(jar.getAbsolutePath()));
             }
-            File projectDir = jar.getParentFile().getParentFile().getParentFile();
-            String version = jar.getParentFile().getName();
-            File libDir = new File(new File(projectDir, libName), version);
-            lib = new File(libDir, System.mapLibraryName(libName+"-"+version));
+            String parentDirName = jar.getParentFile().getName();
+            if ("lib".equals(parentDirName) || "lib-adaptors".equals(parentDirName)) {
+                // find library in directory lib/
+                File dir = jar.getParentFile();
+                lib = new File(dir, System.mapLibraryName(libName));
+            } else {
+                // find library in maven repository
+                File projectDir = jar.getParentFile().getParentFile().getParentFile();
+                String version = jar.getParentFile().getName();
+                File dir = new File(new File(projectDir, libName), version);
+                lib = new File(dir, System.mapLibraryName(libName+"-"+version));
+            }
         } else {
             // find library in project target directory
             String path = decode(url.getPath());
@@ -57,8 +64,8 @@ public class LibraryLoader {
                 throw new RuntimeException(new FileNotFoundException(classesDir.getAbsolutePath()));
             }
             File projectDir = classesDir.getParentFile().getParentFile().getParentFile();
-            File libDir = new File(new File(projectDir, libName), "target");
-            lib = new File(libDir, System.mapLibraryName(libName));
+            File dir = new File(new File(projectDir, libName), "target");
+            lib = new File(dir, System.mapLibraryName(libName));
         }
         if (! lib.exists()) {
             throw new RuntimeException(new FileNotFoundException(lib.getAbsolutePath()));
