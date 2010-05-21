@@ -46,18 +46,18 @@ public class LibraryLoader {
             }
             String parentDirName = jar.getParentFile().getName();
             if ("lib".equals(parentDirName) || "lib-adaptors".equals(parentDirName)) {
-                // find library in directory lib/
+                // find library in directory lib/ (for runtime)
                 File dir = jar.getParentFile();
                 lib = new File(dir, System.mapLibraryName(libName));
             } else {
-                // find library in maven repository
+                // find library in maven repository (for testing from maven)
                 File projectDir = jar.getParentFile().getParentFile().getParentFile();
                 String version = jar.getParentFile().getName();
                 File dir = new File(new File(projectDir, libName), version);
                 lib = new File(dir, System.mapLibraryName(libName+"-"+version));
             }
         } else {
-            // find library in project target directory
+            // find library in project target directory (for testing from IDE)
             String path = decode(url.getPath());
             File classesDir = new File(path.replaceAll(file, ""));
             if (! classesDir.exists()) {
