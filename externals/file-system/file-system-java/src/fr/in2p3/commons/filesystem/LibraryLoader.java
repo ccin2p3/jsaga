@@ -3,6 +3,8 @@ package fr.in2p3.commons.filesystem;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -47,8 +49,9 @@ public class LibraryLoader {
             String parentDirName = jar.getParentFile().getName();
             if ("lib".equals(parentDirName) || "lib-adaptors".equals(parentDirName)) {
                 // find library in directory lib/ (for runtime)
+                String version = extractVersion(jar.getName());
                 File dir = jar.getParentFile();
-                lib = new File(dir, System.mapLibraryName(libName));
+                lib = new File(dir, System.mapLibraryName(libName+"-"+version));
             } else {
                 // find library in maven repository (for testing from maven)
                 File projectDir = jar.getParentFile().getParentFile().getParentFile();
@@ -75,5 +78,14 @@ public class LibraryLoader {
 
     private static String decode(String path) {
         return path.replaceAll("%20", " ");
+    }
+    private static String extractVersion(String jarName) {
+        Pattern pattern = Pattern.compile(".*-([0-9\\.]+[0-9](?:-SNAPSHOT)?).*");
+        Matcher matcher = pattern.matcher(jarName);
+        if (matcher.matches() && matcher.groupCount()==1) {
+            return matcher.group(1);
+        } else {
+            throw new RuntimeException("Failed to extract version from: "+jarName);
+        }
     }
 }
