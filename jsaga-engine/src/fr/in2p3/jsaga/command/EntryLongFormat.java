@@ -36,15 +36,35 @@ public class EntryLongFormat {
     }
 
     public String toString(NSEntry entry) throws SagaException {
+        String owner = this.getOwner(entry);
+        String group = this.getGroup(entry);
+
         StringBuffer buf = new StringBuffer();
         buf.append(this.isDir(entry));
-        buf.append(this.permissionsCheck(entry, Permission.READ, 'r'));
-        buf.append(this.permissionsCheck(entry, Permission.WRITE, 'w'));
-        buf.append(this.permissionsCheck(entry, Permission.EXEC, 'x'));
-        buf.append(' ');
-        String owner = this.getOwner(entry);
         if (owner != null) {
-            buf.append(format(owner, 8));
+            buf.append(this.getPermissions(entry, "user-"+owner));
+        } else {
+            buf.append("???");
+        }
+        if (group != null) {
+            buf.append(this.getPermissions(entry, "group-"+group));
+        } else {
+            buf.append("???");
+        }
+        buf.append(this.getPermissions(entry, "*"));
+        buf.append(' ');
+        if (owner != null) {
+            if (owner.startsWith("/")) {
+                buf.append("'");
+                buf.append(owner.substring(owner.lastIndexOf("/CN=")+4));
+                buf.append("'");
+            } else {
+                buf.append(format(owner, 8));
+            }
+            buf.append(' ');
+        }
+        if (group != null) {
+            buf.append(format(group, 8));
             buf.append(' ');
         }
         buf.append(format(this.getSize(entry), 10));
@@ -81,9 +101,24 @@ public class EntryLongFormat {
         }
     }
 
-    public char permissionsCheck(NSEntry entry, Permission perm, char c) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+    public String getGroup(NSEntry entry) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
         try {
-            if (entry.permissionsCheck(null, perm.getValue())) {
+            return entry.getGroup();
+        } catch (NotImplementedException e) {
+            return null;
+        }
+    }
+
+    public String getPermissions(NSEntry entry, String id) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+        StringBuffer buf = new StringBuffer();
+        buf.append(this.permissionsCheck(entry, id, Permission.READ, 'r'));
+        buf.append(this.permissionsCheck(entry, id, Permission.WRITE, 'w'));
+        buf.append(this.permissionsCheck(entry, id, Permission.EXEC, 'x'));
+        return buf.toString();
+    }
+    public char permissionsCheck(NSEntry entry, String id, Permission perm, char c) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
+        try {
+            if (entry.permissionsCheck(id, perm.getValue())) {
                 return c;
             } else {
                 return '-';
