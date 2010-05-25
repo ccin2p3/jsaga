@@ -46,11 +46,7 @@ public class HttpFileAttributesSockedBased extends FileAttributes {
     }
 
     public PermissionBytes getUserPermission() {
-        if (m_request.getStatus().contains("OK")) {
-            return PermissionBytes.READ;
-        } else {
-            return PermissionBytes.NONE;
-        }
+        return PERMISSION_UNKNOWN;
     }
 
     public PermissionBytes getGroupPermission() {
@@ -58,7 +54,11 @@ public class HttpFileAttributesSockedBased extends FileAttributes {
     }
 
     public PermissionBytes getAnyPermission() {
-        return PERMISSION_UNKNOWN;
+        if (m_request.getStatus().contains("OK")) {
+            return PermissionBytes.READ;
+        } else {
+            return PermissionBytes.NONE;
+        }
     }
 
     public String getOwner() {

@@ -43,6 +43,14 @@ public class HttpFileAttributesDefault extends FileAttributes {
     }
 
     public PermissionBytes getUserPermission() {
+        return PERMISSION_UNKNOWN;
+    }
+
+    public PermissionBytes getGroupPermission() {
+        return PERMISSION_UNKNOWN;
+    }
+
+    public PermissionBytes getAnyPermission() {
         try {
             if (m_cnx.getPermission().getActions().contains("connect")) {
                 return PermissionBytes.READ;
@@ -52,14 +60,6 @@ public class HttpFileAttributesDefault extends FileAttributes {
         } catch (IOException e) {
             return PERMISSION_UNKNOWN;
         }
-    }
-
-    public PermissionBytes getGroupPermission() {
-        return PERMISSION_UNKNOWN;
-    }
-
-    public PermissionBytes getAnyPermission() {
-        return PERMISSION_UNKNOWN;
     }
 
     public String getOwner() {

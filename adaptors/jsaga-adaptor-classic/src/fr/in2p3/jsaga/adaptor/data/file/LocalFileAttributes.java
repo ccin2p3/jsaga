@@ -52,6 +52,14 @@ public class LocalFileAttributes extends FileAttributes {
     }
 
     public PermissionBytes getUserPermission() {
+        return PERMISSION_UNKNOWN;
+    }
+
+    public PermissionBytes getGroupPermission() {
+        return PERMISSION_UNKNOWN;
+    }
+
+    public PermissionBytes getAnyPermission() {
         PermissionBytes perms = PermissionBytes.NONE;
         if(m_entry.canRead()) {
             perms = perms.or(PermissionBytes.READ);
@@ -60,14 +68,6 @@ public class LocalFileAttributes extends FileAttributes {
             perms = perms.or(PermissionBytes.WRITE);
         }
         return perms;
-    }
-
-    public PermissionBytes getGroupPermission() {
-        return PERMISSION_UNKNOWN;
-    }
-
-    public PermissionBytes getAnyPermission() {
-        return PERMISSION_UNKNOWN;
     }
 
     public String getOwner() {
