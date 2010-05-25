@@ -13,7 +13,7 @@
                 <url>http://grid.in2p3.fr/jsaga/</url>
                 <authors>
                     <author name="Sylvain Reynaud" email="sreynaud@in2p3.fr"/>
-                    <author name="Nicolas Demesy" email="nicolas.demesy@bt.com"/>
+                    <author name="See contributors list" email="http://grid.in2p3.fr/software/jsaga-dev/contributors.html"/>
                 </authors>
                 <javaversion>1.5</javaversion>
             </info>

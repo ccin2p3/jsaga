@@ -16,6 +16,7 @@
         <menu name="JSAGA">
             <item name="Project Home" href="http://grid.in2p3.fr/jsaga/"/>
             <item name="Adaptors" href="adaptors.html"/>
+            <item name="Contributors" href="contributors.html"/>
             <item name="Presentations" href="presentations.html"/>
             <item name="Download" href="download.html"/>
             <item name="Dependencies" href="dependencies-licenses.html"/>

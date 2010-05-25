@@ -30,15 +30,8 @@
             </roles>
         </developer>
         <developer>
-            <name>Nicolas DEMESY</name>
-            <email>nicolas.demesy@bt.com</email>
-            <roles>
-                <role>developer</role>
-            </roles>
-        </developer>
-        <developer>
-            <name>contributors</name>
-            <url>https://forge.in2p3.fr/projects/show/jsaga</url>
+            <name>See contributors list</name>
+            <url>http://grid.in2p3.fr/software/jsaga-dev/contributors.html</url>
             <roles>
                 <role>developer</role>
             </roles>
@@ -104,6 +97,19 @@
                             <destDir>${project.build.directory}/generated-site/xdoc</destDir>
                             <fileNameRegex>dependencies.xml</fileNameRegex>
                             <fileNameReplacement>adaptors.xml</fileNameReplacement>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-contributors-web-page</id>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
+                        <configuration>
+                            <xslFile>src/site/xsl/contributors.xsl</xslFile>
+                            <destDir>${project.build.directory}/generated-site/xdoc</destDir>
+                            <fileNameRegex>dependencies.xml</fileNameRegex>
+                            <fileNameReplacement>contributors.xml</fileNameReplacement>
                         </configuration>
                     </execution>
                     <execution>
