@@ -21,6 +21,7 @@ public class FileSystem {
     }
 
     private native boolean stat(String path, FileStat stat);
+    private native boolean chmod(String path, int user_perms, int group_perms, int other_perms);
 
     public native void intArray(int arr[]);
     public native void stringArray(String arr[]);
@@ -31,5 +32,10 @@ public class FileSystem {
             throw new FileNotFoundException("File not found: "+file);
         }
         return stat;
+    }
+    public void chmod(File file, int user_perms, int group_perms, int other_perms) throws FileNotFoundException {
+        if (! this.chmod(file.getAbsolutePath(), user_perms, group_perms, other_perms)) {
+            throw new FileNotFoundException("File not found: "+file);
+        }
     }
 }

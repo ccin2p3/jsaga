@@ -1,8 +1,12 @@
 #include "file-system.h"
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <unistd.h>
+
+//WARNING: not compatible with -mno-cygwin
 #ifndef WIN32
     #include <pwd.h>
+    #include <grp.h>
 #endif
 #include <iostream>
 
@@ -13,7 +17,7 @@ using namespace std;
 #define FALSE 0
 
 JNIEXPORT jboolean JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_stat
-  (JNIEnv * env, jobject, jstring jPath, jobject obj)
+  (JNIEnv *env, jobject, jstring jPath, jobject obj)
 {
     const char *cPath = env->GetStringUTFChars(jPath, 0);
     struct stat buf;
@@ -21,7 +25,7 @@ JNIEXPORT jboolean JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_stat
     env->ReleaseStringUTFChars(jPath, cPath);
 
     //file does not exist
-    if (buf.st_mode == 7) {
+    if (buf.st_mode==0 || buf.st_mode==7) {
         return FALSE;
     }
 
@@ -47,15 +51,28 @@ JNIEXPORT jboolean JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_stat
     env->SetIntField(obj, env->GetFieldID(cls, "user_perms", "I"), user_perms);
     env->SetIntField(obj, env->GetFieldID(cls, "group_perms", "I"), group_perms);
     env->SetIntField(obj, env->GetFieldID(cls, "other_perms", "I"), other_perms);
-#ifdef _PWD_H_
+//WARNING: not compatible with -mno-cygwin
+#ifndef WIN32
     struct passwd *pws = getpwuid(buf.st_uid);
     char *owner = pws->pw_name;
     env->SetObjectField(obj, env->GetFieldID(cls, "owner", "Ljava/lang/String;"), env->NewStringUTF(owner));
+    struct group *grp = getgrgid(buf.st_gid);
+    char *group = grp->gr_name;
+    env->SetObjectField(obj, env->GetFieldID(cls, "group", "Ljava/lang/String;"), env->NewStringUTF(group));
 #endif
-//    env->SetObjectField(obj, env->GetFieldID(cls, "group", "Ljava/lang/String;"), env->NewStringUTF(group));
     env->SetLongField(obj, env->GetFieldID(cls, "atime", "J"), buf.st_atime);
     env->SetLongField(obj, env->GetFieldID(cls, "mtime", "J"), buf.st_mtime);
     env->SetLongField(obj, env->GetFieldID(cls, "ctime", "J"), buf.st_ctime);
+    return TRUE;
+}
+
+JNIEXPORT jboolean JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_chmod
+  (JNIEnv *env, jobject, jstring jPath, jint user_perms, jint group_perms, jint other_perms)
+{
+    const char *cPath = env->GetStringUTFChars(jPath, 0);
+    mode_t perms = user_perms*8*8 + group_perms*8 + other_perms;
+    int ret = chmod(cPath, perms);
+    env->ReleaseStringUTFChars(jPath, cPath);
     return TRUE;
 }
 
