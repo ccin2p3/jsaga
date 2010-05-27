@@ -63,6 +63,7 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 			OutputStream stream) throws PermissionDeniedException, BadParameterException,
             DoesNotExistException, TimeoutException, NoSuccessException {
 		try {
+            channelSftp.setFilenameEncoding("ISO-8859-1");
 			channelSftp.get(absolutePath, stream);
 		} catch (SftpException e) {
 			if (e.getid() == ChannelSftp.SSH_FX_NO_SUCH_FILE)
@@ -132,6 +133,7 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 			String additionalArgs, InputStream stream) throws PermissionDeniedException,
             BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
 		try {
+            channelSftp.setFilenameEncoding("ISO-8859-1");
 			if (append)
 				channelSftp.put(stream, absolutePath, ChannelSftp.APPEND);
 			else
