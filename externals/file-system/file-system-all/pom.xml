@@ -41,4 +41,19 @@
             </dependencies>
         </profile>
     </profiles>
+    <scm>
+        <connection>${scm.root}</connection>
+        <developerConnection>${devscm.root}</developerConnection>
+        <url>${webscm.root}</url>
+    </scm>
+    <distributionManagement>
+        <repository>
+            <id>CC-IN2P3 artifacts repository</id>
+            <url>${repository.upload.root}</url>
+        </repository>
+        <site>
+            <id>Web site for this application</id>
+            <url>${site.upload.root}</url>
+        </site>
+    </distributionManagement>
 </project>
