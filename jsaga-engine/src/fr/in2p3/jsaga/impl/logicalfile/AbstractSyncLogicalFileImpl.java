@@ -57,35 +57,6 @@ public abstract class AbstractSyncLogicalFileImpl extends AbstractNSEntryImplWit
         new FlagsHelper(flags).allowed(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS, Flags.ALLLOGICALFILEFLAGS);
         if (Flags.CREATE.isSet(flags)) {
             if (m_adaptor instanceof LogicalWriter) {
-                if (this.exists()) {
-                    if (Flags.EXCL.isSet(flags)) {
-                        throw new AlreadyExistsException("Entry already exists: "+ m_url);
-                    }
-                } else if (Flags.CREATEPARENTS.isSet(flags)) {
-                    this._makeParentDirs();
-                }
-            } else {
-                throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme());
-            }
-        } else if (Flags.CREATEPARENTS.isSet(flags)) {
-            this._makeParentDirs();
-        } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !((URLImpl)m_url).hasCache() && m_adaptor instanceof DataReaderAdaptor) {
-            boolean exists = ((DataReaderAdaptor)m_adaptor).exists(
-                    m_url.getPath(),
-                    m_url.getQuery());
-            if (! exists) {
-                throw new DoesNotExistException("Logical file does not exist: "+ m_url);
-            }
-        }
-    }
-    //todo: replace block above with block below
-/*
-    private void init(int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        if(Flags.CREATEPARENTS.isSet(flags)) flags=Flags.CREATE.or(flags);
-        if(Flags.CREATE.isSet(flags)) flags=Flags.WRITE.or(flags);
-        new FlagsHelper(flags).allowed(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS, Flags.ALLLOGICALFILEFLAGS);
-        if (Flags.CREATE.isSet(flags)) {
-            if (m_adaptor instanceof LogicalWriter) {
                 try {
                     this.tryToCreate(flags);
                 } catch (DoesNotExistException e) {
@@ -123,7 +94,6 @@ public abstract class AbstractSyncLogicalFileImpl extends AbstractNSEntryImplWit
             throw new DoesNotExistException("Failed to create parent directory", e.getCause());
         }
     }
-*/
 
     /** clone */
     public SagaObject clone() throws CloneNotSupportedException {

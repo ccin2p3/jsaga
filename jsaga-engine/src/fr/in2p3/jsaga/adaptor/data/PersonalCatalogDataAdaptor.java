@@ -95,13 +95,7 @@ public class PersonalCatalogDataAdaptor implements LogicalReaderMetaData, Logica
         try {
             file = m_catalog.getFile(logicalEntry);
         } catch(DoesNotExistException e) {
-            try {
-                file = m_catalog.addFile(logicalEntry);
-            } catch (DoesNotExistException e2) {
-                throw new IncorrectStateException(e2);
-            }
-            //todo: replace block above with block below
-//            throw new IncorrectStateException(e);
+            throw new IncorrectStateException(e);
         }
         // add replica location (if it does not already exist)
         if (! arrayContains(file.getReplica(), replicaEntry.toString())) {
