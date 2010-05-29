@@ -33,8 +33,8 @@ public class LFNIntegrationTestSuite extends JSAGATestSuite {
     }
     
     /** OK */
-    public static class D_LFNLogicalFileReadTest extends LogicalFileReadTest {
-        public D_LFNLogicalFileReadTest() throws Exception {super("lfn");}
+    public static class LFNLogicalFileReadTest extends LogicalFileReadTest {
+        public LFNLogicalFileReadTest() throws Exception {super("lfn");}
     }
     
     /** OK */
@@ -72,17 +72,17 @@ public class LFNIntegrationTestSuite extends JSAGATestSuite {
     	public LFNNSCopyTest() throws Exception {super("lfn", "lfn");}
     	@Override
     	public void test_copy() throws Exception {
-    		super.ignore("The LFC maintains a list of replica/location. Then this test fails because a replica/location cannot" +
+    		super.ignore("The LFC maintains a list of replica/location. Then this test fails because a replica/location cannot " +
     		"belong to 2 different LFC entries.");
     	}
     	@Override
     	public void test_copy_overwrite() throws Exception {
-    		super.ignore("The LFC maintains a list of replica/location. Then this test fails because a replica/location cannot" +
+    		super.ignore("The LFC maintains a list of replica/location. Then this test fails because a replica/location cannot " +
     		"belong to 2 different LFC entries.");
     	}
     	@Override
     	public void test_copy_and_rename() throws Exception {
-    		super.ignore("The LFC maintains a list of replica/location. Then this test fails because a replica/location cannot" +
+    		super.ignore("The LFC maintains a list of replica/location. Then this test fails because a replica/location cannot " +
     		"belong to 2 different LFC entries.");
     	}
     }
@@ -102,12 +102,12 @@ public class LFNIntegrationTestSuite extends JSAGATestSuite {
         public LFNNSCopyRecursiveTest() throws Exception {super("lfn", "lfn");}
         @Override
         public void test_copy_recurse() throws Exception {
-        	super.ignore("The LFC maintains a list of replica/location. Then this test fails because a replica/location cannot" +
+        	super.ignore("The LFC maintains a list of replica/location. Then this test fails because a replica/location cannot " +
         	"belong to 2 different LFC entries.");
         }
         @Override
         public void test_copy_recurse_overwrite() throws Exception {
-        	super.ignore("The LFC maintains a list of replica/location. Then this test fails because a replica/location cannot" +
+        	super.ignore("The LFC maintains a list of replica/location. Then this test fails because a replica/location cannot " +
         	"belong to 2 different LFC entries.");
         }
     }

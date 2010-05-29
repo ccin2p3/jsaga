@@ -1,6 +1,9 @@
 package org.ogf.saga.logicalfile;
 
+import org.ogf.saga.buffer.Buffer;
+import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.file.File;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.abstracts.AbstractNSEntryWriteTest;
 
@@ -29,6 +32,15 @@ public abstract class LogicalFileWriteTest extends AbstractNSEntryWriteTest {
                     1,
                     ((LogicalFile)m_file).listLocations().size());
 
+            
+            //Create m_physicalFileUrl2... will be removed by tearDown()
+            if(m_physicalFileUrl2 != null && !new java.io.File(m_physicalFileUrl2.getString()).exists()){
+	            File physicalFile = (File) m_physicalDir.open(m_physicalFileUrl2, FLAGS_FILE);
+	            Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT2.getBytes());
+	            physicalFile.write(buffer);
+	            physicalFile.close(0);
+            }
+
             // add
             ((LogicalFile)m_file).addLocation(m_physicalFileUrl2);
             assertEquals(
@@ -51,7 +63,7 @@ public abstract class LogicalFileWriteTest extends AbstractNSEntryWriteTest {
                         ((LogicalFile)m_file).listLocations().size());
             }
 
-            // add
+            // remove
             ((LogicalFile)m_file).removeLocation(m_physicalFileUrl);
             assertEquals(
                     0,
@@ -63,6 +75,14 @@ public abstract class LogicalFileWriteTest extends AbstractNSEntryWriteTest {
 
     public void test_updateLocation() throws Exception {
         if (m_file instanceof LogicalFile) {
+        	//Create m_physicalFileUrl2... will be removed by tearDown()
+            if(m_physicalFileUrl2 != null && !new java.io.File(m_physicalFileUrl2.getString()).exists()){
+	            File physicalFile = (File) m_physicalDir.open(m_physicalFileUrl2, FLAGS_FILE);
+	            Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT2.getBytes());
+	            physicalFile.write(buffer);
+	            physicalFile.close(0);
+            }
+            
             ((LogicalFile)m_file).updateLocation(m_physicalFileUrl, m_physicalFileUrl2);
             assertEquals(
                     1,

@@ -44,11 +44,11 @@
                             <goal>javah</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/include</outputDirectory>
-                            <outputFileName>file-system.h</outputFileName>
-                            <classNames>
+                            <javahOutputDirectory>${project.build.directory}/include</javahOutputDirectory>
+                            <javahOutputFileName>file-system.h</javahOutputFileName>
+                            <javahClassNames>
                                 <className>fr.in2p3.commons.filesystem.FileSystem</className>
-                            </classNames>
+                            </javahClassNames>
                         </configuration>
                     </execution>
                 </executions>

@@ -19,6 +19,9 @@
                 <extensions>true</extensions>
                 <configuration>
                     <javahOS>linux</javahOS>
+                    <compilerStartOptions>
+                        <compilerStartOption>-fPIC</compilerStartOption>
+                    </compilerStartOptions>
                     <linkerStartOptions>
                         <linkerStartOption>-shared</linkerStartOption>
                     </linkerStartOptions>

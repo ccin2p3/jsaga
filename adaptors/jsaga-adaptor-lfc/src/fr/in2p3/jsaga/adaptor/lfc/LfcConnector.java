@@ -746,4 +746,29 @@ public class LfcConnector {
 			close(lfcConnection);
 		}
 	}
+	
+	
+	/**
+	 * Set the correct file size to a specific location
+	 * @param location 
+	 * 				The lfn of the file to create (lfn:///grid/vo/...).
+	 * @param fileSize
+	 * 				The size of the file.If <0 then 0 will be set
+	 * @throws IOException
+	 * @throws ReceiveException
+	 * @throws TimeoutException
+	 */
+	public void setFileSize(String location, long fileSize) throws IOException, ReceiveException, TimeoutException {
+		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
+		try {
+			lfcConnection.setfsize(location, fileSize);
+		} catch (IOException e) {
+			throw e;
+		} catch (ReceiveException e) {
+			e.setExecutedCmd("setFileSize("+location+", "+fileSize+")");
+			throw e;
+		} finally {
+			close(lfcConnection);
+		}
+	}
 }

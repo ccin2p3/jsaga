@@ -37,7 +37,6 @@ import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 
@@ -121,10 +120,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 			logger.debug("DONE: exists("+absolutePath+", "+additionalArgs+")");
 			return exist;
 		} catch (IOException e) {
-			logger.error("ERROR: exists("+absolutePath+", "+additionalArgs+")",e);
+			logger.error("ERROR: exists("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: exists("+absolutePath+", "+additionalArgs+")",e);
+			logger.error("ERROR: exists("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
 			if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
@@ -133,13 +132,38 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (java.util.concurrent.TimeoutException e) {
-			logger.error("ERROR: exists("+absolutePath+", "+additionalArgs+")",e);
+			logger.error("ERROR: exists("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 	}
 
     public void create(String logicalEntry, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
-        //todo
+    	try {
+			logger.debug("DOING: create("+logicalEntry+", "+additionalArgs+")");
+			m_lfcConnector.create(logicalEntry, UUID.randomUUID().toString(), 0L);
+			logger.debug("DONE: create("+logicalEntry+", "+additionalArgs+")");
+		} catch (IOException e) {
+			logger.error("ERROR: create("+logicalEntry+", "+additionalArgs+"): "+e.getMessage());
+			throw new NoSuccessException(e);
+		} catch (ReceiveException e) {
+			logger.error("ERROR: create("+logicalEntry+", "+additionalArgs+"): "+e.getMessage());
+			if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
+				throw new PermissionDeniedException(e.toString());
+			}else if(LfcError.IS_A_DIRECOTRY.equals(e.getLFCError())){
+				throw new BadParameterException(e.toString());
+			}else if(LfcError.FILE_EXISTS.equals(e.getLFCError())){
+				throw new AlreadyExistsException(e.toString());
+			}else if(LfcError.NO_SUCH_FILE_OR_DIRECTORY.equals(e.getLFCError())){
+				throw new ParentDoesNotExist(e.toString());
+			}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
+				throw new TimeoutException(e.getMessage());
+			}else{
+				throw new NoSuccessException(e);
+			}
+		} catch (java.util.concurrent.TimeoutException e) {
+			logger.error("ERROR: create("+logicalEntry+", "+additionalArgs+"): "+e.getMessage());
+			throw new TimeoutException(e.getMessage());
+		}
     }
 
     public void addLocation(String logicalEntry, URL replicaEntry, String additionalArgs) throws PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
@@ -150,76 +174,69 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 			try{
 				replicas = m_lfcConnector.listReplicas(logicalEntry, null);
 			}catch (ReceiveException e) {
-				if(!LfcError.NO_SUCH_FILE_OR_DIRECTORY.equals(e.getLFCError())){
-					throw e;
+				logger.debug("ERROR: addLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+")");
+				if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
+					throw new PermissionDeniedException(e.toString());
+				}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
+					throw new TimeoutException(e.getMessage());
+				}else if(LfcError.NO_SUCH_FILE_OR_DIRECTORY.equals(e.getLFCError())){
+					throw new IncorrectStateException(e);
+				}else{
+					throw new NoSuccessException(e);
+				}
+			}
+
+			// add replica location (if it does not already exist)
+			for (Iterator<LFCReplica> iterator = replicas.iterator(); iterator.hasNext();) {
+				LFCReplica lfcReplica = iterator.next();
+				if(lfcReplica.getSfn().equals(replicaEntry.getString())){
+					//The replica already exists... nothing to do
+					return;
 				}
 			}
 			
-			if(replicas == null){
-				//No then create it
-				org.ogf.saga.file.File replicaFile;
-				try {
-					if(m_session == null){
-						Context context = ContextFactory.createContext();
-				        context.setAttribute(Context.TYPE, "InMemoryProxy");
-				        context.setAttribute(Context.USERPROXY, InMemoryProxySecurityCredential.toBase64(m_globuscredential.getGSSCredential()));
-				        context.setAttribute(Context.CERTREPOSITORY, m_globuscredential.getCertRepository().getAbsolutePath());
-				        m_session = SessionFactory.createSession(false);
-				        m_session.addContext(context);
-					}
-					URL new_replicaEntry = URLFactory.createURL(replicaEntry.getString());
-					new_replicaEntry.setFragment("InMemoryProxy");
-					replicaFile = FileFactory.createFile(m_session, new_replicaEntry);
-				} catch (Exception e) {
-					throw new NoSuccessException(e);
+			//It does not exists...so create it
+			org.ogf.saga.file.File replicaFile;
+			try {
+				if(m_session == null){
+					Context context = ContextFactory.createContext();
+			        context.setAttribute(Context.TYPE, "InMemoryProxy");
+			        context.setAttribute(Context.USERPROXY, InMemoryProxySecurityCredential.toBase64(m_globuscredential.getGSSCredential()));
+			        context.setAttribute(Context.CERTREPOSITORY, m_globuscredential.getCertRepository().getAbsolutePath());
+			        m_session = SessionFactory.createSession(false);
+			        m_session.addContext(context);
 				}
-				String guid = null;
-				try {
-					guid = m_lfcConnector.create(logicalEntry, UUID.randomUUID().toString(), replicaFile.getSize());
-				} catch (NotImplementedException e) {
-					throw new NoSuccessException("Unable to get the file size of "+replicaEntry, e);
-				} catch (AuthenticationFailedException e) {
-					throw new NoSuccessException("Unable to get the file size of "+replicaEntry, e);
-				} catch (AuthorizationFailedException e) {
-					throw new NoSuccessException("Unable to get the file size of "+replicaEntry, e);
-				}
-				try{
-					m_lfcConnector.addReplica(guid, new URI(replicaEntry.getString()));
-				} catch (IOException e) {
-					try{
-						m_lfcConnector.deleteGuid(guid,true);
-					}catch (Exception e1) {}
-					throw e;
-				} catch (ReceiveException e) {
-					try{
-						m_lfcConnector.deleteGuid(guid,true);
-					}catch (Exception e1) {}
-					throw e;
-				} catch (URISyntaxException e) {
-					//impossible..
-				}
-			}else{
-				// add replica location (if it does not already exist)
-				for (Iterator<LFCReplica> iterator = replicas.iterator(); iterator.hasNext();) {
-					LFCReplica lfcReplica = iterator.next();
-					if(lfcReplica.getSfn().equals(replicaEntry.getString())){
-						//The replica already exists... nothing to do
-						return;
-					}
-				}
-				String guid = m_lfcConnector.stat(logicalEntry, true, true).getGuid();
-				try {
-					m_lfcConnector.addReplica(guid, new java.net.URI(replicaEntry.getString()));
-				} catch (URISyntaxException e) {
-					//Cannot happen
-				}
+				URL new_replicaEntry = URLFactory.createURL(replicaEntry.getString());
+				new_replicaEntry.setFragment("InMemoryProxy");
+				replicaFile = FileFactory.createFile(m_session, new_replicaEntry);
+			} catch (Exception e) {
+				throw new NoSuccessException(e);
+			}
+			
+			long fileSize;
+			try {
+				fileSize = replicaFile.getSize();
+			} catch (NotImplementedException e) {
+				throw new NoSuccessException("Unable to get the file size of "+replicaEntry, e);
+			} catch (AuthenticationFailedException e) {
+				throw new NoSuccessException("Unable to get the file size of "+replicaEntry, e);
+			} catch (AuthorizationFailedException e) {
+				throw new NoSuccessException("Unable to get the file size of "+replicaEntry, e);
+			}
+			
+			String guid = m_lfcConnector.stat(logicalEntry, true, true).getGuid();
+			try {
+				m_lfcConnector.addReplica(guid, new java.net.URI(replicaEntry.getString()));
+				m_lfcConnector.setFileSize(logicalEntry, fileSize);
+			} catch (URISyntaxException e) {
+				//Cannot happen
 			}
 			logger.debug("DONE: addLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+")");
 		}catch (IOException e) {
-			logger.error("ERROR: addLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+")",e);
+			logger.error("ERROR: addLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: addLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+")",e);
+			logger.error("ERROR: addLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
 			if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
@@ -228,7 +245,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (java.util.concurrent.TimeoutException e) {
-			logger.error("ERROR: addLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+")",e);
+			logger.error("ERROR: addLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 	}
@@ -239,10 +256,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try{
 			lfcFile = m_lfcConnector.stat(logicalEntry, true, true);
 		}catch (IOException e) {
-			logger.error("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+")",e);
+			logger.error("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+")",e);
+			logger.error("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
 			if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
@@ -253,23 +270,23 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (java.util.concurrent.TimeoutException e) {
-			logger.error("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+")",e);
+			logger.error("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		
 		if(lfcFile.isDirectory()){
 			BadParameterException e = new BadParameterException(logicalEntry+" is a directory");
-			logger.error("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+")",e);
+			logger.error("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
 			throw e;
 		}
 		
 		try{
 			m_lfcConnector.deleteReplica(lfcFile.getGuid(), replicaEntry.getString());
 		}catch (IOException e) {
-			logger.error("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+")",e);
+			logger.error("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+")",e);
+			logger.error("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
 			if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
@@ -280,7 +297,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (java.util.concurrent.TimeoutException e) {
-			logger.error("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+")",e);
+			logger.error("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		logger.debug("DONE: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+")");
@@ -292,10 +309,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			replicas = m_lfcConnector.listReplicas(logicalEntry, null);
 		} catch (IOException e) {
-			logger.error("ERROR: listLocations("+logicalEntry+", "+additionalArgs+")",e);
+			logger.error("ERROR: listLocations("+logicalEntry+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: listLocations("+logicalEntry+", "+additionalArgs+")",e);
+			logger.error("ERROR: listLocations("+logicalEntry+", "+additionalArgs+"): "+e.getMessage());
 			if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
@@ -306,7 +323,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (java.util.concurrent.TimeoutException e) {
-			logger.error("ERROR: listLocations("+logicalEntry+", "+additionalArgs+")",e);
+			logger.error("ERROR: listLocations("+logicalEntry+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		String[] locations = new String[replicas.size()];
@@ -326,10 +343,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			lfcFiles = m_lfcConnector.list(absolutePath, true);
 		} catch (IOException e) {
-			logger.error("ERROR: listAttributes("+absolutePath+", "+additionalArgs+")",e);
+			logger.error("ERROR: listAttributes("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: listAttributes("+absolutePath+", "+additionalArgs+")",e);
+			logger.error("ERROR: listAttributes("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
 			if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
@@ -342,7 +359,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (java.util.concurrent.TimeoutException e) {
-			logger.error("ERROR: listAttributes("+absolutePath+", "+additionalArgs+")",e);
+			logger.error("ERROR: listAttributes("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		FileAttributes[] fileAttributes = new FileAttributes[lfcFiles.size()];
@@ -361,10 +378,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			lfcFile = m_lfcConnector.stat(absolutePath, false,false);
 		} catch (IOException e) {
-			logger.error("ERROR: getAttributes("+absolutePath+", "+additionalArgs+")",e);
+			logger.error("ERROR: getAttributes("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: getAttributes("+absolutePath+", "+additionalArgs+")",e);
+			logger.error("ERROR: getAttributes("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
 			if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
@@ -375,7 +392,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (java.util.concurrent.TimeoutException e) {
-			logger.error("ERROR: getAttributes("+absolutePath+", "+additionalArgs+")",e);
+			logger.error("ERROR: getAttributes("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		logger.debug("DONE: getAttributes("+absolutePath+", "+additionalArgs+")");
@@ -387,10 +404,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			m_lfcConnector.mkdir(parentAbsolutePath + (parentAbsolutePath.endsWith("/")?"":"/") + directoryName);
 		} catch (IOException e) {
-			logger.error("ERROR: makeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+")",e);
+			logger.error("ERROR: makeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: makeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+")",e);
+			logger.error("ERROR: makeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+"): "+e.getMessage());
 			if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
@@ -405,7 +422,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (java.util.concurrent.TimeoutException e) {
-			logger.error("ERROR: makeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+")",e);
+			logger.error("ERROR: makeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		logger.debug("DONE: makeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+")");
@@ -416,10 +433,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			m_lfcConnector.deleteDir(parentAbsolutePath + (parentAbsolutePath.endsWith("/")?"":"/") + directoryName);
 		} catch (IOException e) {
-			logger.error("ERROR: removeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+")",e);
+			logger.error("ERROR: removeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: removeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+")",e);
+			logger.error("ERROR: removeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+"): "+e.getMessage());
 			if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
@@ -432,7 +449,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (java.util.concurrent.TimeoutException e) {
-			logger.error("ERROR: removeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+")",e);
+			logger.error("ERROR: removeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		logger.debug("DONE: removeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+")");
@@ -445,10 +462,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try{
 			lfcFile = m_lfcConnector.stat(filePath, false, false);
 		} catch (IOException e) {
-			logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+")",e);
+			logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+")",e);
+			logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 			if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
@@ -459,7 +476,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (java.util.concurrent.TimeoutException e) {
-			logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+")",e);
+			logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		
@@ -470,10 +487,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 			try{
 				replicas = m_lfcConnector.listReplicas(filePath,null);
 			} catch (IOException e) {
-				logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+")",e);
+				logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 				throw new NoSuccessException(e);
 			} catch (ReceiveException e) {
-				logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+")",e);
+				logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 				if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
 					throw new PermissionDeniedException(e.toString());
 				}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
@@ -484,7 +501,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 					throw new NoSuccessException(e);
 				}
 			} catch (java.util.concurrent.TimeoutException e) {
-				logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+")",e);
+				logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 				throw new TimeoutException(e.getMessage());
 			}
 			//Delete replicas information
@@ -494,10 +511,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 					m_lfcConnector.deleteReplica(lfcReplica.getGuid(), lfcReplica.getSfn());
 				}
 			} catch (IOException e) {
-				logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+")",e);
+				logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 				throw new NoSuccessException(e);
 			} catch (ReceiveException e) {
-				logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+")",e);
+				logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 				if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
 					throw new PermissionDeniedException(e.toString());
 				}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
@@ -508,7 +525,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 					throw new NoSuccessException(e);
 				}
 			} catch (java.util.concurrent.TimeoutException e) {
-				logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+")",e);
+				logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 				throw new TimeoutException(e.getMessage());
 			}
 		}
@@ -517,10 +534,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			m_lfcConnector.unlink(filePath);
 		} catch (IOException e) {
-			logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+")",e);
+			logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+")",e);
+			logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 			if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
@@ -531,7 +548,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (java.util.concurrent.TimeoutException e) {
-			logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+")",e);
+			logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		logger.debug("DONE: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+")");
@@ -548,10 +565,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				return false;
 			}
 		}catch (IOException e) {
-			logger.error("ERROR: isLink("+absolutePath+")",e);
+			logger.error("ERROR: isLink("+absolutePath+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: isLink("+absolutePath+")",e);
+			logger.error("ERROR: isLink("+absolutePath+"): "+e.getMessage());
 			if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
@@ -562,7 +579,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (java.util.concurrent.TimeoutException e) {
-			logger.error("ERROR: isLink("+absolutePath+")",e);
+			logger.error("ERROR: isLink("+absolutePath+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 	}
@@ -573,10 +590,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			path = m_lfcConnector.readlink(absolutePath);
 		}catch (IOException e) {
-			logger.error("ERROR: readLink("+absolutePath+")",e);
+			logger.error("ERROR: readLink("+absolutePath+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: readLink("+absolutePath+")",e);
+			logger.error("ERROR: readLink("+absolutePath+"): "+e.getMessage());
 			if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
@@ -587,7 +604,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (java.util.concurrent.TimeoutException e) {
-			logger.error("ERROR: readLink("+absolutePath+")",e);
+			logger.error("ERROR: readLink("+absolutePath+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		logger.debug("DONE: readLink("+absolutePath+")");
@@ -599,10 +616,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			m_lfcConnector.symbLink(sourceAbsolutePath, linkAbsolutePath, overwrite);
 		}catch (IOException e) {
-			logger.error("ERROR: link("+sourceAbsolutePath+", "+linkAbsolutePath+", "+overwrite+")",e);
+			logger.error("ERROR: link("+sourceAbsolutePath+", "+linkAbsolutePath+", "+overwrite+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: link("+sourceAbsolutePath+", "+linkAbsolutePath+", "+overwrite+")",e);
+			logger.error("ERROR: link("+sourceAbsolutePath+", "+linkAbsolutePath+", "+overwrite+"): "+e.getMessage());
 			if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
@@ -615,7 +632,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (java.util.concurrent.TimeoutException e) {
-			logger.error("ERROR: link("+sourceAbsolutePath+", "+linkAbsolutePath+", "+overwrite+")",e);
+			logger.error("ERROR: link("+sourceAbsolutePath+", "+linkAbsolutePath+", "+overwrite+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		logger.debug("DONE: link("+sourceAbsolutePath+", "+linkAbsolutePath+", "+overwrite+")");
@@ -668,10 +685,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			m_lfcConnector.chmod(absolutePath,permission);
 		}catch (IOException e) {
-			logger.error("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+permissions.getValue()+")",e);
+			logger.error("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+permissions.getValue()+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+permissions.getValue()+")",e);
+			logger.error("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+permissions.getValue()+"): "+e.getMessage());
 			if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
@@ -680,7 +697,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (java.util.concurrent.TimeoutException e) {
-			logger.error("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+permissions.getValue()+")",e);
+			logger.error("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+permissions.getValue()+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		logger.debug("DONE: permissionsAllow("+absolutePath+", "+scope+", "+permissions.getValue()+")");
@@ -820,10 +837,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			m_lfcConnector.chmod(absolutePath,permission);
 		}catch (IOException e) {
-			logger.error("ERROR: permissionsDeny("+absolutePath+", "+scope+", "+permissions.getValue()+")",e);
+			logger.error("ERROR: permissionsDeny("+absolutePath+", "+scope+", "+permissions.getValue()+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: permissionsDeny("+absolutePath+", "+scope+", "+permissions.getValue()+")",e);
+			logger.error("ERROR: permissionsDeny("+absolutePath+", "+scope+", "+permissions.getValue()+"): "+e.getMessage());
 			if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
@@ -832,7 +849,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (java.util.concurrent.TimeoutException e) {
-			logger.error("ERROR: permissionsDeny("+absolutePath+", "+scope+", "+permissions.getValue()+")",e);
+			logger.error("ERROR: permissionsDeny("+absolutePath+", "+scope+", "+permissions.getValue()+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		
@@ -914,10 +931,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try{
 			m_lfcConnector.rename(sourceAbsolutePath, targetAbsolutePath);
 		} catch (IOException e) {
-			logger.error("ERROR: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+")",e);
+			logger.error("ERROR: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+")",e);
+			logger.error("ERROR: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+"): "+e.getMessage());
 			if(LfcError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(LfcError.TIMED_OUT.equals(e.getLFCError())){
@@ -938,10 +955,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 							this.removeFile(formattedTargetAbsolutePath.substring(0, formattedTargetAbsolutePath.lastIndexOf("/")-1), formattedTargetAbsolutePath.substring(formattedTargetAbsolutePath.lastIndexOf("/")+1),null);
 						}
 					} catch (IOException e1) {
-						logger.error("ERROR: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+")",e1);
+						logger.error("ERROR: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+"): "+e1.getMessage());
 						throw new NoSuccessException(e);
 					} catch (ReceiveException e1) {
-						logger.error("ERROR: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+")",e1);
+						logger.error("ERROR: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+"): "+e1.getMessage());
 						if(LfcError.PERMISSION_DENIED.equals(e1.getLFCError())){
 							throw new PermissionDeniedException(e1.toString());
 						}else if(LfcError.TIMED_OUT.equals(e1.getLFCError())){
@@ -950,7 +967,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 							throw new NoSuccessException(e1);
 						}
 					} catch (java.util.concurrent.TimeoutException e1) {
-						logger.error("ERROR: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+")",e1);
+						logger.error("ERROR: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+"): "+e1.getMessage());
 						throw new TimeoutException(e1.getMessage());
 					}
 					this.rename(sourceAbsolutePath, targetAbsolutePath, false, additionalArgs);
@@ -960,7 +977,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (java.util.concurrent.TimeoutException e) {
-			logger.error("ERROR: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+")",e);
+			logger.error("ERROR: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		logger.debug("DONE: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+")");

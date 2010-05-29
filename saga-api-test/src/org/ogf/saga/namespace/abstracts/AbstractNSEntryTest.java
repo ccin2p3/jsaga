@@ -33,6 +33,7 @@ public abstract class AbstractNSEntryTest extends AbstractTest {
     protected static final String DEFAULT_FILENAME = "file1.txt";
     protected static final String DEFAULT_FILEPATTERN = "file*";
     protected static final String DEFAULT_CONTENT = "Content of file 1...\n";
+    protected static final String DEFAULT_CONTENT2 = "Content of file 2...\n";
     protected static final String DEFAULT_PHYSICAL = "physical1.txt";
     protected static final String DEFAULT_PHYSICAL2 = "physical2.txt";
     protected static final int FLAGS_DIR = Flags.CREATE.or(Flags.EXCL);

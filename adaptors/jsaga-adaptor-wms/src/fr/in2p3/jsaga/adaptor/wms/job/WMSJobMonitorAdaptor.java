@@ -1,5 +1,7 @@
 package fr.in2p3.jsaga.adaptor.wms.job;
 
+import holders.StringArrayHolder;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
@@ -17,8 +19,14 @@ import org.glite.wsdl.services.lb.LoggingAndBookkeepingPortType;
 import org.glite.wsdl.types.lb.GenericFault;
 import org.glite.wsdl.types.lb.JobFlags;
 import org.glite.wsdl.types.lb.JobFlagsValue;
+import org.glite.wsdl.types.lb.QueryAttr;
+import org.glite.wsdl.types.lb.QueryConditions;
+import org.glite.wsdl.types.lb.QueryOp;
+import org.glite.wsdl.types.lb.QueryRecValue;
+import org.glite.wsdl.types.lb.QueryRecord;
 import org.glite.wsdl.types.lb.StatName;
 import org.glite.wsdl.types.lb.StateEnterTimesItem;
+import org.glite.wsdl.types.lb.holders.JobStatusArrayHolder;
 import org.globus.axis.gsi.GSIConstants;
 import org.globus.axis.transport.HTTPSSender;
 import org.globus.gsi.TrustedCertificates;
@@ -29,12 +37,14 @@ import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.U;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobInfoAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
@@ -50,11 +60,11 @@ import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
 * Updated: 8 Mai  2010 (Jerome)
 * ***************************************************/
 
-public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements QueryIndividualJob, JobInfoAdaptor {
+public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements QueryIndividualJob, ListableJobAdaptor, JobInfoAdaptor {
     public static final String MONITOR_PORT = "MonitorPort";
-    private String m_wmsServerUrl;
-    private String m_lbHost;
-	private int m_lbPort;
+    protected String m_wmsServerUrl;
+    protected String m_lbHost;
+    protected int m_lbPort;
 
 	// Should never be invoked 
 	public int getDefaultPort() {
@@ -172,59 +182,10 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
     }
 
 	/**
-	 * For QueryFilteredJob: Problematic when the user has thousands of jobs
-	 * registered in the LB. Fonctionality removed until we find a solution for that.  
-	 * 
-	 * 
-	 * Get all jobs for authenticated user 
+	 * For ListableJobAdaptor: Problematic when the user has thousands of jobs
+	 * registered in the LB. Out of memory exceptions can happened.
 	 */
-/*	public JobStatus[] getFilteredStatus(Object[] filters) throws TimeoutException, NoSuccessException {
-		try {
-			
-			// get stub
-			LoggingAndBookkeepingPortType stub = getLBStub(m_credential);
-			
-	        // get Jobs Status
-            JobFlagsValue[] jobFlagsValue = new JobFlagsValue[1];
-            jobFlagsValue[0] = JobFlagsValue.CLASSADS;
-            JobFlags jobFlags = new JobFlags(jobFlagsValue);
-	        
-            JobStatusArrayHolder jobStatusResult = new JobStatusArrayHolder();
-	        StringArrayHolder jobNativeIdResult = new StringArrayHolder();
-	       
-	        QueryConditions[] queryConditions = new  QueryConditions[1];
-	        queryConditions[0] = new QueryConditions();
-	        queryConditions[0].setAttr(QueryAttr.JOBID);
-	        
-	        QueryRecord[] qR = new QueryRecord[1];
-	        QueryRecValue value1 = new QueryRecValue();
-	        value1.setC("https://"+m_lbHost+"/");
-	        qR[0] = new QueryRecord(QueryOp.UNEQUAL, value1, null );	        
-	        queryConditions[0].setRecord(qR);	        
-	        // Cannot use stub.userJobs() because not yet implemented (version > 1.8 needed)
-	        stub.queryJobs(queryConditions, jobFlags, jobNativeIdResult, jobStatusResult);
-	        if(jobNativeIdResult != null && jobNativeIdResult.value != null) {
-	        	JobStatus[] filterJobs = new WMSJobStatus[jobNativeIdResult.value.length];
-	        	for (int i = 0; i < filterJobs.length; i++) {
-                    org.glite.wsdl.types.lb.JobStatus jobInfo = jobStatusResult.value[i];
-	        		filterJobs[i] = new WMSJobStatus(jobNativeIdResult.value[i], jobInfo);
-				}
-		        return filterJobs;
-	        }
-	        // TODO : exception or null ?
-	        return null;
-    	} catch (Exception e) {
-    		throw new NoSuccessException(e);
-    	}
-	}
-*/
-
-	/**
-	 * For QueryFilteredJob: Problematic when the user has thousands of jobs
-	 * registered in the LB. Fonctionality removed until we find a solution for that.  
-	 *
-	 */
-/*  public String[] list() throws PermissionDeniedException, TimeoutException, NoSuccessException {
+	public String[] list() throws PermissionDeniedException, TimeoutException, NoSuccessException {
         try {
             // get stub
             LoggingAndBookkeepingPortType stub = getLBStub(m_credential);
@@ -257,9 +218,8 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
             throw new NoSuccessException(e);
         }
     }
-*/
     
-	private LoggingAndBookkeepingPortType getLBStub(GSSCredential m_credential) throws MalformedURLException, ServiceException, NoSuccessException {
+	protected LoggingAndBookkeepingPortType getLBStub(GSSCredential m_credential) throws MalformedURLException, ServiceException, NoSuccessException {
         // set LB url
         if (m_lbHost == null) {
             // second chance to get the lbHost
