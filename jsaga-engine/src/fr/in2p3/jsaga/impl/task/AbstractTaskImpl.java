@@ -183,6 +183,11 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
     public synchronized void cancel() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         switch (this.getState_fromCache(State.RUNNING)) {
             case NEW:
+                try {
+                    this.stopListening();
+                } catch (SagaException e){
+                    s_logger.warn("Failed to stop listening", e);
+                }
                 throw new IncorrectStateException("Can not cancel task in 'New' state", this); //as specified in SAGA
             case DONE:
             case CANCELED:
