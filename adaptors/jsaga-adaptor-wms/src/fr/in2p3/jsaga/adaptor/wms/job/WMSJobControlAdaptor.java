@@ -252,7 +252,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
     	try {
 			// parse JDL and Check Matching
             if (checkMatch) {
-			    checkJDLAndMAtch(jobDesc, m_client);
+			    checkJDLAndMatch(jobDesc, m_client);
             }
 
             // register job
@@ -294,7 +294,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         return new WMSJobIOHandler(stagingClient, m_stagingPrefix, jobId);
     }
 
-    private void checkJDLAndMAtch(String jobDesc, WMProxy_PortType m_client2) throws NoSuccessException, ServerOverloadedFaultType, AuthorizationFaultType, GenericFaultType, AuthenticationFaultType, NoSuitableResourcesFaultType, InvalidArgumentFaultType, RemoteException{
+    private void checkJDLAndMatch(String jobDesc, WMProxy_PortType m_client2) throws NoSuccessException, ServerOverloadedFaultType, AuthorizationFaultType, GenericFaultType, AuthenticationFaultType, NoSuitableResourcesFaultType, InvalidArgumentFaultType, RemoteException{
 		// parse JDL
 		try {
 			AdParser.parseJdl(jobDesc);
