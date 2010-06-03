@@ -184,6 +184,7 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
         switch (this.getState_fromCache(State.RUNNING)) {
             case NEW:
                 try {
+                    // if task is somewhere between NEW and RUNNING state, we may need to stop listening
                     this.stopListening();
                 } catch (SagaException e){
                     s_logger.warn("Failed to stop listening", e);
