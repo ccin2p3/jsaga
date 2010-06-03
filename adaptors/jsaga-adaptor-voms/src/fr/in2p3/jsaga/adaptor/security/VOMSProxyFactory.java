@@ -57,7 +57,8 @@ public class VOMSProxyFactory {
         System.setProperty("CADIR", (String) attributes.get(Context.CERTREPOSITORY));
         System.setProperty("VOMSDIR", (String) attributes.get(VOMSContext.VOMSDIR));
 
-        URI uri = new URI((String) attributes.get(Context.SERVER));
+        String serverUrl = (String) attributes.get(Context.SERVER);
+        URI uri = new URI(serverUrl.replaceAll(" ", "%20"));
         if (uri.getHost()==null) {
             throw new BadParameterException("Attribute Server has no host name: "+uri.toString());
         }
