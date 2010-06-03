@@ -13,7 +13,7 @@ import java.util.List;
 * ***************************************************
 * File:   AbstractCommand
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   12 août 2007
+* Date:   12 aoï¿½t 2007
 * ***************************************************
 * Description:                                      */
 /**

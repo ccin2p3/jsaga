@@ -24,11 +24,11 @@ import java.util.Map;
  */
 public class JobMonitorServiceFactory {
     private JobMonitorAdaptorFactory m_adaptorFactory;
-    private Map<URL,JobMonitorService> m_services;
+    private Map<JobService,JobMonitorService> m_services;
 
     public JobMonitorServiceFactory(JobMonitorAdaptorFactory adaptorFactory) {
         m_adaptorFactory = adaptorFactory;
-        m_services = new HashMap<URL,JobMonitorService>();
+        m_services = new HashMap<JobService,JobMonitorService>();
     }
 
     public JobMonitorService getJobMonitorService(URL controlURL, JobService config, ContextImpl context) throws TimeoutException, PermissionDeniedException, NoSuccessException, BadParameterException, IncorrectURLException, AuthorizationFailedException, NotImplementedException, AuthenticationFailedException {
@@ -45,7 +45,7 @@ public class JobMonitorServiceFactory {
 
             // register monitor service
             service = new JobMonitorService(monitorURL, monitorAdaptor, monitorAttributes);
-            m_services.put(monitorURL, service);
+            m_services.put(config, service);
         }
         return service;
     }

@@ -5,7 +5,8 @@ import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorCallback;
 import org.apache.log4j.Logger;
 
-import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -29,12 +30,12 @@ public class IndividualJobStatusPoller extends AbstractJobStatusPoller {
     }
 
     public void run() {
-        //todo: should be multi-threaded
-        Map.Entry[] entries;
+        //TODO: should be multi-threaded
+        Set<Entry<String, JobMonitorCallback>> entries;
         synchronized(m_subscribedJobs) {
-            entries = m_subscribedJobs.entrySet().toArray(new Map.Entry[m_subscribedJobs.size()]);
+            entries = m_subscribedJobs.entrySet();
         }
-        for (Map.Entry entry : entries) {
+        for (Entry<String, JobMonitorCallback> entry : entries) {
             String nativeJobId = (String) entry.getKey();
             JobMonitorCallback callback = (JobMonitorCallback) entry.getValue();
             try {

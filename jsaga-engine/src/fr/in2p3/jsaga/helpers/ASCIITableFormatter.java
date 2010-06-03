@@ -9,7 +9,7 @@ import java.util.*;
 * ***************************************************
 * File:   ASCIITableFormatter
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   3 août 2007
+* Date:   3 aoï¿½t 2007
 * ***************************************************
 * Description:                                      */
 /**
