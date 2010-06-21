@@ -27,7 +27,10 @@ import java.util.Map;
  * ***************************************************
  * Description:                                      */
 /**
- *
+ * NOTE: This is a (very) limited version of the GkCommonJobControlAdaptor,
+ *       it supports neither job monitoring, nor job cancelling.
+ *       However, it avoids crashing server when submitting a lot of jobs on the same server,
+ *       by stopping the job manager within 9 to 10 seconds.
  */
 public class LCGCEJobControlAdaptor extends GatekeeperJobAdaptorAbstract implements JobControlAdaptor, CleanableJobAdaptor {
     private Logger logger = Logger.getLogger(LCGCEJobControlAdaptor.class);
@@ -96,6 +99,15 @@ public class LCGCEJobControlAdaptor extends GatekeeperJobAdaptorAbstract impleme
             this.rethrowException(e);
         } catch (GSSException e) {
             throw new NoSuccessException(e);
+        } finally {
+            //NOTE: this prevents from crashing LCG-CE but disables job monitoring
+            try {
+                job.signal(GRAMConstants.SIGNAL_STOP_MANAGER);
+            } catch (GramException e) {
+                this.rethrowException(e);
+            } catch (GSSException e) {
+                throw new NoSuccessException(e);
+            }
         }
         return job.getIDAsString();
     }
