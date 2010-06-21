@@ -54,17 +54,11 @@ Where:
     <HOSTNAME> is the name of the host running the Gatekeeper server,
     <PORT> is 2119 by default,
     <SCHEDULER> is the scheduler to use (must be available on targeted site): fork, pbs, lsf, condor, sge...
+    <QUEUE> must be set in job description instead of resource manager URL.
 ]]></pre>
-            </answer>
-        </faq>
-        <faq id="lcg-ce">
-            <question>How to use this plug-in on LCG-CE ?</question>
-            <answer>Move the additional part of the URL to the attribute 'Queue' of the job description.
-                <pre><![CDATA[For example: <HOSTNAME>[:<PORT>]/jobmanager-<SCHEDULER>-<QUEUE>
-
-must be split into:
-ResourceManagerURL = gatekeeper://<HOSTNAME>[:<PORT>]/jobmanager-<SCHEDULER>
-Queue = <QUEUE>]]></pre>
+                Please note that the "gatekeeper" adaptor <b>MUST NOT</b> be used to submit many jobs
+                on the same server.
+                If you need to do this, then you should use the "wms" adaptors instead.
             </answer>
         </faq>
         <faq id="error_code">
@@ -75,7 +69,7 @@ Queue = <QUEUE>]]></pre>
         <faq id="hang">
             <question>My job is done but waitFor hangs.</question>
             <answer>Open firewall ports range "40000,45000" or configure attribute "TcpPortRange" to a range of opened ports.
-                If you can not open ports, you can still use the "lcgce" plug-in instead, but with some limitations.
+                If you can not open ports, you can still use the "gk" plug-in instead, but with some limitations.
             </answer>
         </faq>
         <faq id="gram_stdout">

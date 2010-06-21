@@ -8,8 +8,7 @@ import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
  *
  * LCGCE+ Job Monitor
  */
-public class GatekeeperCondorJobMonitorAdaptor extends LCGCEJobMonitorAdaptor implements QueryIndividualJob {
-
+public class GatekeeperCondorJobMonitorAdaptor extends GkCommonJobMonitorAdaptor implements QueryIndividualJob {
     public String getType() {
         return "gatekeeper-condor";
     }

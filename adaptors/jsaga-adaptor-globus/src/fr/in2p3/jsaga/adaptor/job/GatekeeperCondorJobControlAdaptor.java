@@ -25,7 +25,7 @@ import java.util.Map;
  * job through a unique GASS server loaded once.
  */
 
-public class GatekeeperCondorJobControlAdaptor extends LCGCEJobControlAdaptor implements JobControlAdaptor, CleanableJobAdaptor {
+public class GatekeeperCondorJobControlAdaptor extends GkCommonJobControlAdaptor implements JobControlAdaptor, CleanableJobAdaptor {
     private Logger logger = Logger.getLogger(GatekeeperCondorJobControlAdaptor.class);
 
     /** override super.getType() */

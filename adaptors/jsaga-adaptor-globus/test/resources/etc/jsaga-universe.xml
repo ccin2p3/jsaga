@@ -25,6 +25,7 @@
             <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/dteam_cred.txt"/>
             <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
             <domain name="in2p3.fr"/>
+            <job type="gk"/>
             <job type="lcgce"/>
             <data type="gsiftp"/>
         </GRID>
@@ -34,7 +35,7 @@
             <attribute name="UserKey" value="${user.home}/.jsaga/contexts/d-grid/userkey.pem"/>
             <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/dgrid_cred.txt"/>
             <domain name="de"/>
-            <job type="lcgce"/>
+            <job type="gk"/>
             <job type="gatekeeper">
                 <!--<attribute name="IPAddress" value="134.158.71.193"/>-->
                 <attribute name="TcpPortRange" value="30000,31000"/>

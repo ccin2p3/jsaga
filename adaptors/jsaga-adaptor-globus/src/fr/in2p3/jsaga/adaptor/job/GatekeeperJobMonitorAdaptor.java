@@ -2,7 +2,8 @@ package fr.in2p3.jsaga.adaptor.job;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
-import fr.in2p3.jsaga.adaptor.job.monitor.*;
+import fr.in2p3.jsaga.adaptor.job.monitor.JobStatusNotifier;
+import fr.in2p3.jsaga.adaptor.job.monitor.ListenIndividualJob;
 import org.apache.log4j.Logger;
 import org.globus.gram.*;
 import org.globus.gram.internal.GRAMConstants;
@@ -25,7 +26,7 @@ import java.util.Map;
 /**
  *
  */
-public class GatekeeperJobMonitorAdaptor extends LCGCEJobMonitorAdaptor implements QueryIndividualJob , ListenIndividualJob  {
+public class GatekeeperJobMonitorAdaptor extends GkCommonJobMonitorAdaptor implements ListenIndividualJob  {
 	private Logger logger = Logger.getLogger(GatekeeperJobMonitorAdaptor.class.getName());	
 
     /** override super.getType() */

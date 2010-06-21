@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * TODO: remove stdin file and stop gass server when cleanup
  */
-public class GatekeeperJobControlAdaptor extends LCGCEJobControlAdaptor implements JobControlAdaptor, CleanableJobAdaptor, StreamableJobInteractiveSet {
+public class GatekeeperJobControlAdaptor extends GkCommonJobControlAdaptor implements JobControlAdaptor, CleanableJobAdaptor, StreamableJobInteractiveSet {
 	private static final String SHELLPATH = "ShellPath";
     private Logger logger = Logger.getLogger(GatekeeperJobControlAdaptor.class);
 
