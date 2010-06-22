@@ -30,7 +30,7 @@ public class Base {
                     ? new File(System.getProperty("JSAGA_VAR"))
                     : new File(JSAGA_USER, "var/");
     static {
-        if (!JSAGA_USER.exists() && JSAGA_USER.mkdir()) {
+        if(!JSAGA_USER.exists() && !JSAGA_USER.mkdir()) {
             throw new RuntimeException("Failed to create directory: "+JSAGA_USER);
         }
         if(!JSAGA_VAR.exists() && !JSAGA_VAR.mkdir()) {
