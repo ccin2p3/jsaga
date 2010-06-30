@@ -26,7 +26,10 @@
             <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
             <domain name="in2p3.fr"/>
             <job type="gk"/>
-            <job type="lcgce"/>
+            <job type="unmonitored"/>
+            <job type="lcgce">
+                <attribute name="TcpPortRange" value="9000,9001"/>
+            </job>
             <data type="gsiftp"/>
         </GRID>
         <GRID name="DGrid" contextType="Globus">
