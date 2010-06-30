@@ -15,7 +15,6 @@
         </links>
         <menu name="JSAGA">
             <item name="Project Home" href="http://grid.in2p3.fr/jsaga/"/>
-            <item name="Adaptors" href="adaptors.html"/>
             <item name="Contributors" href="contributors.html"/>
             <item name="Presentations" href="presentations.html"/>
             <item name="Download" href="download.html"/>
@@ -25,6 +24,7 @@
         <menu name="User Documentation">
             <item name="Quick Start Guide" href="quickstart.html"/>
             <item name="Commands" href="commands.html"/>
+            <item name="Adaptors" href="adaptors.html"/>
             <item name="SAGA Specification" href="http://www.ogf.org/documents/GFD.90.pdf"/>
             <item name="SAGA Java Binding API" href="saga-api/apidocs/index.html"/>
             <item name="Code Examples" href="jsaga-engine/xref/fr/in2p3/jsaga/command/package-summary.html"/>
