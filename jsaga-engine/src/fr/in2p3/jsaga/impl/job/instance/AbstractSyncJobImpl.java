@@ -231,6 +231,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             this.setState(State.CANCELED, "Canceled by user", SubState.CANCELED, new IncorrectStateException("Canceled by user"));
         } catch (SagaException e) {
             // do nothing (failed to cancel task)
+            s_logger.warn(e);
         }
     }
 
