@@ -271,7 +271,7 @@ public class JobRun extends AbstractCommand {
     private static void setOptMulti(JobDescription desc, Properties prop, String name) throws Exception {
         String values = prop.getProperty(name);
         if (values != null) {
-            desc.setVectorAttribute(name, values.split(" "));
+            desc.setVectorAttribute(name, values.split(","));
         }
     }
 
