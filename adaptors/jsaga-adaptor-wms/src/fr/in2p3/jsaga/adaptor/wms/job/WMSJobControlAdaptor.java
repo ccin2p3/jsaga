@@ -443,8 +443,10 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 			throw new NoSuccessException(createExceptionMessage(exc));
 		} catch (org.glite.wms.wmproxy.GenericFaultType exc) {
 			throw new NoSuccessException(createExceptionMessage(exc));
+        } catch (org.glite.wms.wmproxy.JobUnknownFaultType exc) {
+            throw new NoSuccessException(createExceptionMessage(exc));
 		} catch (Exception exc) {
-			throw new NoSuccessException(exc.getMessage());
+			throw new NoSuccessException(exc.getMessage(), exc);
 		}
     }
     
