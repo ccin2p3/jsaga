@@ -22,6 +22,16 @@ import java.util.Map;
  *
  */
 public class UnmonitoredJobMonitorAdaptor implements QueryIndividualJob {
+    private boolean m_cancelled;
+
+    public UnmonitoredJobMonitorAdaptor() {
+        m_cancelled = false;
+    }
+
+    void cancel() {
+        m_cancelled = true;
+    }
+
     public String getType() {
         return "unmonitored";
     }
@@ -49,7 +59,13 @@ public class UnmonitoredJobMonitorAdaptor implements QueryIndividualJob {
     public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
         return new JobStatus(nativeJobId, null, null){
             public String getModel() {return "unmonitored";}
-            public SubState getSubState() {return SubState.RUNNING_ACTIVE;}
+            public SubState getSubState() {
+                if (m_cancelled) {
+                    return SubState.CANCELED;
+                } else {
+                    return SubState.RUNNING_ACTIVE;
+                }
+            }
         };
     }
 }

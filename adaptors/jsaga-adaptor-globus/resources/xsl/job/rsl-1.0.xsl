@@ -37,6 +37,8 @@
         </xsl:choose>
 <!--  two_phase=time out : timeout indicates the timeout to send COMMIT and END signal  -->
 (two_phase=300)<xsl:text/>
+<!-- needed for restarting jobmanager -->
+(save_state=yes)<xsl:text/>
 		<xsl:choose>
             <xsl:when test="jsdl:Application/posix:POSIXApplication/posix:Output/text()">
 (stdout = <xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Output/text()"/>)<xsl:text/>
