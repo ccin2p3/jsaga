@@ -86,6 +86,7 @@ public class PersonalCatalogDataAdaptor implements LogicalReaderMetaData, Logica
             } catch (DoesNotExistException e2) {
                 throw new ParentDoesNotExist(e2);
             }
+            if(Base.DEBUG) m_catalog.commit();
         }
     }
 
