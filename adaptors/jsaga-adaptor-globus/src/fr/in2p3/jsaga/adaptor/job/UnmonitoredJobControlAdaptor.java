@@ -3,7 +3,6 @@ package fr.in2p3.jsaga.adaptor.job;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
@@ -31,9 +30,8 @@ import java.util.Map;
  * NOTE: This is a limited version of the GkCommonJobControlAdaptor, which does not support job monitoring.
  *       However, it avoids crashing server when submitting a lot of jobs on the same server,
  *       by stopping the job manager within 9 to 10 seconds.
- * fixme: method cancel restarts the job, except for jobs submitted by command globusrun (with save_state=yes)
  */
-public class UnmonitoredJobControlAdaptor extends GatekeeperJobAdaptorAbstract implements JobControlAdaptor, CleanableJobAdaptor {
+public class UnmonitoredJobControlAdaptor extends GatekeeperJobAdaptorAbstract implements JobControlAdaptor {
     private static Logger s_logger = Logger.getLogger(UnmonitoredJobControlAdaptor.class);
 
     private UnmonitoredJobMonitorAdaptor m_monitor = new UnmonitoredJobMonitorAdaptor();
@@ -63,7 +61,7 @@ public class UnmonitoredJobControlAdaptor extends GatekeeperJobAdaptorAbstract i
     }
 
     public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
-        return new JobDescriptionTranslatorXSLT("xsl/job/rsl-1.0.xsl");
+        return new JobDescriptionTranslatorXSLT("xsl/job/lcgce.xsl");
     }
 
     public String submit(String jobDesc, boolean checkMatch, String uniqId)  throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
@@ -82,13 +80,7 @@ public class UnmonitoredJobControlAdaptor extends GatekeeperJobAdaptorAbstract i
 		}
         GramJob job = new GramJob(m_credential, rslTree.toRSL(true));
         try {
-        	try {
-            	Gram.request(m_serverUrl, job, isInteractive);
-        	} catch (WaitingForCommitException e) {
-        		// send signal to start job
-        		try{Thread.sleep(1000);} catch(InterruptedException e1){s_logger.warn(e1);}
-        		job.signal(GRAMConstants.SIGNAL_COMMIT_REQUEST);
-        	}
+            Gram.request(m_serverUrl, job, isInteractive);
         } catch (GramException e) {
             this.rethrowException(e);
         } catch (GSSException e) {
@@ -116,23 +108,9 @@ public class UnmonitoredJobControlAdaptor extends GatekeeperJobAdaptorAbstract i
             throw new NoSuccessException("Failed to cancel job", e);
         }
 
-        //todo: job.signal(GRAMConstants.SIGNAL_STOP_MANAGER) ???
-
         // tell job monitor to return status CANCELED
         m_monitor.cancel();
     }
-
-	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-        GramJob job = super.getGramJobById(nativeJobId);
-        try {
-            // Send signal to clean jobmanager
-            job.signal(GRAMConstants.SIGNAL_COMMIT_END);
-        } catch (GramException e) {
-            this.rethrowException(e);
-        } catch (GSSException e) {
-            throw new NoSuccessException("Failed to send commit end signal", e);
-        }
-	}
 
     private GramJob restart(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         GramJob job = new GramJob(m_credential, "&(restart="+nativeJobId+")(proxy_timeout=240)");
@@ -142,11 +120,7 @@ public class UnmonitoredJobControlAdaptor extends GatekeeperJobAdaptorAbstract i
             throw new NoSuccessException(e1);
         }
         try {
-            try {
-                Gram.request(m_serverUrl, job);
-            } catch (WaitingForCommitException e) {
-                job.signal(GRAMConstants.SIGNAL_COMMIT_REQUEST);
-            }
+            Gram.request(m_serverUrl, job);
         } catch (GramException e) {
                 this.rethrowException(e);
         } catch (GSSException e) {
