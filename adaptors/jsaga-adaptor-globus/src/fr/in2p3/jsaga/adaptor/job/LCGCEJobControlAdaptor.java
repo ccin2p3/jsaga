@@ -1,7 +1,6 @@
 package fr.in2p3.jsaga.adaptor.job;
 
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
 /* ***************************************************
@@ -16,7 +15,7 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 /**
  *
  */
-public class LCGCEJobControlAdaptor extends UnmonitoredJobControlAdaptor implements JobControlAdaptor, CleanableJobAdaptor {
+public class LCGCEJobControlAdaptor extends UnmonitoredJobControlAdaptor implements JobControlAdaptor {
     public String getType() {
         return "lcgce";
     }
