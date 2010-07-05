@@ -3,20 +3,18 @@ JSAGA
  {{{http://grid.in2p3.fr/jsaga/}JSAGA}} is a Java implementation of the
  Simple API for Grid Applications ({{{http://www.ogf.org/documents/GFD.90.pdf}SAGA}})
  specification from the Open Grid Forum ({{{http://www.ogf.org/}OGF}}).
- SAGA provides a uniform interface to heterogeneous grid middleware for
- security, data management and execution management.
 
- But JSAGA does not only hide heterogeneity between middleware, it also
- hides heterogeneity between grid infrastructures. Indeed, heterogeneity
- between infrastructures leads to additional issues, including selection
- of the security context, setup of the job's environment, or efficient
- transport of input/output files to/from worker nodes. Transfer strategy
- depends on file size, on the possibility of sharing a given file among
- several jobs, on required data protection level, on protocol access
- modes and third-party transfer capability, on security context
- delegation capability, on characteristics of the execution site
- (supported protocols, network filtering policy, shared file system and
- preinstalled files availability). 
+ JSAGA features comprises:
 
- JSAGA addresses these issues to enable efficient jobs submission to
- several grid infrastructures with a single job description.
+    * enable uniform data management and execution management across
+      existing grid infrastructures.
+ 
+    * ease extension: adaptor interfaces are designed to minimize coding
+      effort for integrating support of new technologies.
+      See list of currently {{{adaptors.html}supported technologies}}.
+
+    * operating system indenpendancy: most of the provided adaptors are written
+      in full Java, and they are tested on Windows and Linux.
+
+ JSAGA can also be used from Python applications, thanks to the
+ {{{https://forge.in2p3.fr/projects/show/jpysaga}JPySAGA}} project.
