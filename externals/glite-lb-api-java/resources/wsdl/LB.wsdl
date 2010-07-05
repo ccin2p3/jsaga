@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:lb="http://glite.org/wsdl/services/lb" xmlns:lbe="http://glite.org/wsdl/elements/lb" xmlns:lbt="http://glite.org/wsdl/types/lb" name="LoggingAndBookkeeping" targetNamespace="http://glite.org/wsdl/services/lb">
-  <documentation>CVS revision:  Header: /cvs/glite/org.glite.lb.ws-interface/src/LB.xml,v 1.5 2006/06/09 13:49:32 valtri Exp
+  <documentation>CVS revision:  Header: /cvs/glite/org.glite.lb.ws-interface/src/LB.xml,v 1.11 2009/05/11 15:40:38 akrenek Exp $
 
 	</documentation>
   <wsdl:import namespace="http://glite.org/wsdl/services/lb" location="LBTypes.wsdl"/>
@@ -9,7 +9,7 @@
       <xsd:element name="GetVersion">
         <xsd:complexType>
           <xsd:sequence>
-            <xsd:element name="dummy" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="dummy" type="xsd:string" minOccurs="0" maxOccurs="1"/>
           </xsd:sequence>
         </xsd:complexType>
       </xsd:element>
@@ -77,6 +77,95 @@
           <xsd:sequence>
             <xsd:element name="events" type="lbt:event" minOccurs="1" maxOccurs="unbounded"/>
           </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="GetIndexedAttrs">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="dummy" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="GetIndexedAttrsResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="attrs" type="lbt:queryConditions" minOccurs="1" maxOccurs="unbounded"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="GetServerLimit">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="dummy" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="GetServerLimitResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="limit" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="NotifNew">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="notifId" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="destination" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="conditions" type="lbt:queryConditions" minOccurs="1" maxOccurs="unbounded"/>
+            <xsd:element name="flags" type="lbt:jobFlags" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="valid" type="xsd:dateTime" minOccurs="0" maxOccurs="1"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="NotifNewResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="valid" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="NotifBind">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="notifId" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="destination" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="valid" type="xsd:dateTime" minOccurs="0" maxOccurs="1"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="NotifBindResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="valid" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="NotifRefresh">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="notifId" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="valid" type="xsd:dateTime" minOccurs="0" maxOccurs="1"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="NotifRefreshResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="valid" type="xsd:dateTime" minOccurs="1" maxOccurs="1"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="NotifDrop">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="notifId" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="NotifDropResponse">
+        <xsd:complexType>
+          <xsd:sequence/>
         </xsd:complexType>
       </xsd:element>
       <xsd:element name="genericFault" type="lbt:genericFault"/>
@@ -169,6 +258,88 @@
 			</wsdl:documentation>
     </wsdl:part>
   </wsdl:message>
+  <wsdl:message name="GetIndexedAttrsRequest">
+    <wsdl:part name="input" element="lbe:GetIndexedAttrs">
+      <wsdl:documentation>
+			Server supported indexed attributes
+
+			</wsdl:documentation>
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetIndexedAttrsResponse">
+    <wsdl:part name="output" element="lbe:GetIndexedAttrsResponse">
+      <wsdl:documentation>
+			Server supported indexed attributes
+
+			</wsdl:documentation>
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetServerLimitRequest">
+    <wsdl:part name="input" element="lbe:GetServerLimit">
+      <wsdl:documentation>
+			Retrieve limit on query result size (no. of events or jobs).
+			Not implemented at server side.
+
+			</wsdl:documentation>
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetServerLimitResponse">
+    <wsdl:part name="output" element="lbe:GetServerLimitResponse">
+      <wsdl:documentation>
+			Retrieve limit on query result size (no. of events or jobs).
+			Not implemented at server side.
+
+			</wsdl:documentation>
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="NotifNewRequest">
+    <wsdl:part name="input" element="lbe:NotifNew">
+      <wsdl:documentation>
+			</wsdl:documentation>
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="NotifNewResponse">
+    <wsdl:part name="output" element="lbe:NotifNewResponse">
+      <wsdl:documentation>
+			</wsdl:documentation>
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="NotifBindRequest">
+    <wsdl:part name="input" element="lbe:NotifBind">
+      <wsdl:documentation>
+			</wsdl:documentation>
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="NotifBindResponse">
+    <wsdl:part name="output" element="lbe:NotifBindResponse">
+      <wsdl:documentation>
+			</wsdl:documentation>
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="NotifRefreshRequest">
+    <wsdl:part name="input" element="lbe:NotifRefresh">
+      <wsdl:documentation>
+			</wsdl:documentation>
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="NotifRefreshResponse">
+    <wsdl:part name="output" element="lbe:NotifRefreshResponse">
+      <wsdl:documentation>
+			</wsdl:documentation>
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="NotifDropRequest">
+    <wsdl:part name="input" element="lbe:NotifDrop">
+      <wsdl:documentation>
+			</wsdl:documentation>
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="NotifDropResponse">
+    <wsdl:part name="output" element="lbe:NotifDropResponse">
+      <wsdl:documentation>
+			</wsdl:documentation>
+    </wsdl:part>
+  </wsdl:message>
   <wsdl:portType name="LoggingAndBookkeepingPortType">
     <wsdl:operation name="GetVersion">
       <wsdl:documentation>
@@ -215,6 +386,53 @@
 			</wsdl:documentation>
       <wsdl:input name="i" message="lb:QueryEventsRequest"/>
       <wsdl:output name="o" message="lb:QueryEventsResponse"/>
+      <wsdl:fault name="f" message="lb:genericFault"/>
+    </wsdl:operation>
+    <wsdl:operation name="GetIndexedAttrs">
+      <wsdl:documentation>
+			Server supported indexed attributes
+
+			</wsdl:documentation>
+      <wsdl:input name="i" message="lb:GetIndexedAttrsRequest"/>
+      <wsdl:output name="o" message="lb:GetIndexedAttrsResponse"/>
+      <wsdl:fault name="f" message="lb:genericFault"/>
+    </wsdl:operation>
+    <wsdl:operation name="GetServerLimit">
+      <wsdl:documentation>
+			Retrieve limit on query result size (no. of events or jobs).
+			Not implemented at server side.
+
+			</wsdl:documentation>
+      <wsdl:input name="i" message="lb:GetServerLimitRequest"/>
+      <wsdl:output name="o" message="lb:GetServerLimitResponse"/>
+      <wsdl:fault name="f" message="lb:genericFault"/>
+    </wsdl:operation>
+    <wsdl:operation name="NotifNew">
+      <wsdl:documentation>
+			</wsdl:documentation>
+      <wsdl:input name="i" message="lb:NotifNewRequest"/>
+      <wsdl:output name="o" message="lb:NotifNewResponse"/>
+      <wsdl:fault name="f" message="lb:genericFault"/>
+    </wsdl:operation>
+    <wsdl:operation name="NotifBind">
+      <wsdl:documentation>
+			</wsdl:documentation>
+      <wsdl:input name="i" message="lb:NotifBindRequest"/>
+      <wsdl:output name="o" message="lb:NotifBindResponse"/>
+      <wsdl:fault name="f" message="lb:genericFault"/>
+    </wsdl:operation>
+    <wsdl:operation name="NotifRefresh">
+      <wsdl:documentation>
+			</wsdl:documentation>
+      <wsdl:input name="i" message="lb:NotifRefreshRequest"/>
+      <wsdl:output name="o" message="lb:NotifRefreshResponse"/>
+      <wsdl:fault name="f" message="lb:genericFault"/>
+    </wsdl:operation>
+    <wsdl:operation name="NotifDrop">
+      <wsdl:documentation>
+			</wsdl:documentation>
+      <wsdl:input name="i" message="lb:NotifDropRequest"/>
+      <wsdl:output name="o" message="lb:NotifDropResponse"/>
       <wsdl:fault name="f" message="lb:genericFault"/>
     </wsdl:operation>
   </wsdl:portType>
@@ -269,6 +487,78 @@
       </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="QueryEvents">
+      <soap:operation style="document"/>
+      <wsdl:input name="i">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="o">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="f">
+        <soap:fault name="f" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetIndexedAttrs">
+      <soap:operation style="document"/>
+      <wsdl:input name="i">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="o">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="f">
+        <soap:fault name="f" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetServerLimit">
+      <soap:operation style="document"/>
+      <wsdl:input name="i">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="o">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="f">
+        <soap:fault name="f" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="NotifNew">
+      <soap:operation style="document"/>
+      <wsdl:input name="i">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="o">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="f">
+        <soap:fault name="f" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="NotifBind">
+      <soap:operation style="document"/>
+      <wsdl:input name="i">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="o">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="f">
+        <soap:fault name="f" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="NotifRefresh">
+      <soap:operation style="document"/>
+      <wsdl:input name="i">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="o">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="f">
+        <soap:fault name="f" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="NotifDrop">
       <soap:operation style="document"/>
       <wsdl:input name="i">
         <soap:body use="literal"/>
