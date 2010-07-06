@@ -228,17 +228,18 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
     public State getState() throws NotImplementedException, TimeoutException, NoSuccessException {
         // do not use getState_fromCache() because it may lead to infinite recursion
         State oldState = m_metric_TaskState.getValue();
-        if (oldState == null)
-            oldState = State.RUNNING;
 
-        // if oldState is terminal
-        switch(oldState) {
+        switch(oldState!=null ? oldState : State.NEW) {
+            // if oldState is final
             case DONE:
             case CANCELED:
             case FAILED:
                 return oldState;
+
+            // if oldState is not final
             default:
-                if (!m_isWaitingFor && !m_metric_TaskState.isListening()) {
+                // if not notified or not yet initialized, then update state
+                if ( (!m_isWaitingFor && !m_metric_TaskState.isListening()) || oldState==null ) {
                     State state = this.queryState();
                     if (state != null) {
                         this.setState(state);
