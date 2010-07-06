@@ -1,8 +1,7 @@
 package fr.in2p3.jsaga.adaptor.data;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
-import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
-import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 import org.apache.axis.SimpleTargetedChain;
@@ -30,13 +29,16 @@ import java.util.StringTokenizer;
  *
  */
 public abstract class SRMDataAdaptorAbstract implements DataAdaptor {
-    private static final String TRANSFER_PROTOCOLS = "TransferProtocols";    
+    private static final String TRANSFER_PROTOCOLS = "TransferProtocols";
+    private static final String PREPARE_TIMEOUT = "PrepareTimeout";
+
     protected static SimpleProvider s_provider;
     protected GSSCredential m_credential;
     protected File m_certRepository;
     protected String m_host;
     protected int m_port;
     protected String[] m_transferProtocols;
+    protected long m_prepareTimeout;
     protected String m_vo;
 
     static {
@@ -60,14 +62,28 @@ public abstract class SRMDataAdaptorAbstract implements DataAdaptor {
                 m_transferProtocols[i] = tokenizer.nextToken();
             }
         }
+        if (attributes!=null && attributes.containsKey(PREPARE_TIMEOUT)) {
+            String value = (String) attributes.get(PREPARE_TIMEOUT);
+            try {
+                m_prepareTimeout = Integer.parseInt(value) * 1000;
+            } catch (NumberFormatException e) {
+                throw new BadParameterException("Unexpected value type for attribute: "+ PREPARE_TIMEOUT, e);
+            }
+        }
     }
 
     public Usage getUsage() {
-        return new UOptional(TRANSFER_PROTOCOLS);
+        return new UAnd(new U[]{
+                new UOptional(TRANSFER_PROTOCOLS),
+                new UOptional(PREPARE_TIMEOUT)
+        });
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-        return new Default[]{new Default(TRANSFER_PROTOCOLS, "gsiftp")};
+        return new Default[]{
+                new Default(TRANSFER_PROTOCOLS, "gsiftp"),
+                new Default(PREPARE_TIMEOUT, "300")
+        };
     }
 
     public Class[] getSupportedSecurityCredentialClasses() {

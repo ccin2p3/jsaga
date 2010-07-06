@@ -108,6 +108,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         try {
             // send request
             SrmPrepareToGetResponse response = m_stub.srmPrepareToGet(request);
+            long deadline = System.currentTimeMillis() + m_prepareTimeout;
 
             // save request token
             String token = response.getRequestToken();
@@ -128,6 +129,9 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             while (status.getStatusCode().equals(TStatusCode.SRM_REQUEST_QUEUED) ||
                    status.getStatusCode().equals(TStatusCode.SRM_REQUEST_INPROGRESS))
             {
+                if (System.currentTimeMillis() > deadline) {
+                    throw new TimeoutException("SRM request blocked in status: "+status.getStatusCode().getValue());
+                }
                 try {
                     Thread.sleep(period);
                     period *= 2;
@@ -230,6 +234,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         try {
             // send request
             SrmPrepareToPutResponse response = m_stub.srmPrepareToPut(request);
+            long deadline = System.currentTimeMillis() + m_prepareTimeout;
 
             // save request token
             String token = response.getRequestToken();
@@ -250,6 +255,9 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             while (status.getStatusCode().equals(TStatusCode.SRM_REQUEST_QUEUED) ||
                    status.getStatusCode().equals(TStatusCode.SRM_REQUEST_INPROGRESS))
             {
+                if (System.currentTimeMillis() > deadline) {
+                    throw new TimeoutException("SRM request blocked in status: "+status.getStatusCode().getValue());
+                }
                 try {
                     Thread.sleep(period);
                     period *= 2;
