@@ -64,7 +64,7 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 
 			String jobId = UUID.randomUUID().toString();
 			String cde = prepareCde(commandLine, jobId);
-			Process p = Runtime.getRuntime().exec(m_shellPath+" -c \""+cde+"\"");
+			Process p = Runtime.getRuntime().exec(new String[]{m_shellPath, "-c", cde});
 			// add process in sessionMap
 			LocalAdaptorAbstract.sessionMap.put(jobId, p);
 			return jobId;
