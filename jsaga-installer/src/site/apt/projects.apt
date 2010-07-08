@@ -24,3 +24,17 @@ Related Projects
       scientific quality of the modeling process. It provides an environment with a set of tools to
       help to build experimental design on complex models. It provides transparent distribution of
       the computational load on multi-core computers, clusters and grid environments thanks to JSAGA.
+
+    * {{{http://jcae.sourceforge.net/}jCAE}}
+
+[images/jcae.jpg] jCAE
+
+      jCAE is a tool for Computer Aided Engineering with support for distributed computing facilities,
+      developed by EADS Research Center in India.
+
+    * {{{http://www.maatg.com//}Pandora Gateway}}
+
+      Pandora Gateway
+
+      Pandora Gateway is a platform developed by maatG company, for using grid infrastructures.
+      This platform is used for several grid projects, including Health-e-Child and neuGRID.
