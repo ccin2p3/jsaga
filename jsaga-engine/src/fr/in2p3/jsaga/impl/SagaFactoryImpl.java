@@ -3,12 +3,10 @@ package fr.in2p3.jsaga.impl;
 import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.factories.*;
-import fr.in2p3.jsaga.engine.workflow.WorkflowFactoryImpl;
 import fr.in2p3.jsaga.impl.buffer.BufferFactoryImpl;
 import fr.in2p3.jsaga.impl.context.ContextFactoryImpl;
 import fr.in2p3.jsaga.impl.file.FileFactoryImpl;
 import fr.in2p3.jsaga.impl.job.JobFactoryImpl;
-import fr.in2p3.jsaga.impl.jobcollection.JobCollectionFactoryImpl;
 import fr.in2p3.jsaga.impl.logicalfile.LogicalFileFactoryImpl;
 import fr.in2p3.jsaga.impl.monitoring.MonitoringFactoryImpl;
 import fr.in2p3.jsaga.impl.namespace.NSFactoryImpl;
@@ -16,8 +14,6 @@ import fr.in2p3.jsaga.impl.session.SessionFactoryImpl;
 import fr.in2p3.jsaga.impl.task.TaskFactoryImpl;
 import fr.in2p3.jsaga.impl.unimplemented.RPCFactoryImpl;
 import fr.in2p3.jsaga.impl.url.URLFactoryImpl;
-import fr.in2p3.jsaga.jobcollection.JobCollectionFactory;
-import fr.in2p3.jsaga.workflow.WorkflowFactory;
 import org.ogf.saga.bootstrap.SagaFactory;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.context.ContextFactory;
@@ -51,17 +47,12 @@ public class SagaFactoryImpl implements SagaFactory {
     // job
     private JobAdaptorFactory m_jobAdaptorFactory;
     private JobMonitorAdaptorFactory m_jobMonitorAdaptorFactory;
-    // job collection
-    private LanguageAdaptorFactory m_languageAdaptorFactory;
-    private EvaluatorAdaptorFactory m_evaluatorAdaptorFactory;
 
     public SagaFactoryImpl() throws ConfigurationException {
         Configuration config = Configuration.getInstance();
         m_dataAdaptorFactory = new DataAdaptorFactory(config);
         m_jobAdaptorFactory = new JobAdaptorFactory(config);
         m_jobMonitorAdaptorFactory = new JobMonitorAdaptorFactory(config);
-        m_languageAdaptorFactory = new LanguageAdaptorFactory(config);
-        m_evaluatorAdaptorFactory = new EvaluatorAdaptorFactory(config);
     }
 
     public BufferFactory createBufferFactory() throws NotImplementedException {
@@ -110,13 +101,5 @@ public class SagaFactoryImpl implements SagaFactory {
 
     public URLFactory createURLFactory() throws NotImplementedException {
         return new URLFactoryImpl();
-    }
-
-    public WorkflowFactory createWorkflowFactory() throws NotImplementedException {
-        return new WorkflowFactoryImpl();
-    }
-
-    public JobCollectionFactory createJobCollectionFactory() throws NotImplementedException {
-        return new JobCollectionFactoryImpl(m_languageAdaptorFactory, m_evaluatorAdaptorFactory);
     }
 }

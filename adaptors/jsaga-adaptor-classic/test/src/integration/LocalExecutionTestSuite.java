@@ -47,6 +47,7 @@ public class LocalExecutionTestSuite extends JSAGATestSuite {
     // test cases
     public static class LocalJobRunRequiredTest extends JobRunRequiredTest {
         public LocalJobRunRequiredTest() throws Exception {super("local");}
+        public void test_run_long() throws Exception {super.ignore("test working but too long");}        
     }
 
     // test cases
@@ -76,6 +77,7 @@ public class LocalExecutionTestSuite extends JSAGATestSuite {
         public void test_suspend_done() { super.ignore("not supported"); }
         public void test_suspend_running() { super.ignore("not supported"); }
         public void test_listJob() { super.ignore("not supported but MUST BE REACTIVATED when the jsaga-engine will support this"); }
+        public void test_simultaneousLongJob() throws Exception {super.ignore("test working but too long");}        
     }
     
  	// test cases

@@ -17,10 +17,8 @@ import org.exolab.castor.xml.Unmarshaller;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.*;
+import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.net.URL;
 import java.util.Properties;
@@ -171,22 +169,6 @@ public class Configuration {
 
         // serialize config
         m_configurations = new EngineConfiguration(mergedConfig);
-
-        // generate job structure
-        File jobStructure = new File(Base.JSAGA_VAR, "jsaga-job-structure.xml");
-        if (!jobStructure.exists()) {
-            Transformer t = TransformerFactory.newInstance().newTransformer(new StreamSource(
-                    Configuration.class.getClassLoader().getResourceAsStream("xsl/jsaga-job-structure.xsl")));
-            t.setURIResolver(new URIResolver(){
-                public Source resolve(String href, String base) throws TransformerException {
-                    return new StreamSource(Configuration.class.getClassLoader().getResourceAsStream(href));
-                }
-            });
-            Source source = new StreamSource(new ByteArrayInputStream("<dummy/>".getBytes()));
-            //bugfix: JAXB modify the file path if it is not encapsulated in an OutputStream
-            Result result = new StreamResult(new FileOutputStream(jobStructure));
-            t.transform(source, result);
-        }
     }
 
     public AdaptorDescriptors getDescriptors() {

@@ -256,7 +256,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     public void stopListening() throws NotImplementedException, TimeoutException, NoSuccessException {
         m_monitorService.checkState();
         if (m_nativeJobId == null) {
-            throw new RuntimeException("INTERNAL ERROR: JobID not initialized");
+            return;
         }
         m_monitorService.stopListening(m_nativeJobId);
 

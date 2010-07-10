@@ -52,7 +52,6 @@
             </panels>
             <packs>
                 <xsl:apply-templates select="artifact[@id='jsaga-engine' and not(@classifier)]"/>
-                <xsl:apply-templates select="artifact[@id='graphviz']"/>
                 <pack name="Adaptors" required="no">
                     <description>The adaptors provide the support for various technologies.</description>
                 </pack>
@@ -99,16 +98,6 @@
             <xsl:for-each select="/project/artifact[@scope='test']">
                 <file src="{@file}" targetdir="$INSTALL_PATH/lib-test"/>
             </xsl:for-each>
-        </pack>
-    </xsl:template>
-
-    <xsl:template match="/project/artifact[@id='graphviz']">
-        <pack name="Graph Visualizer" required="no">
-            <description>Install libraries needed for visualizing data staging graphs (recommended).</description>
-            <!-- unix -->
-            <file os="unix" src="lib/linux/" targetdir="$INSTALL_PATH/lib/"/>
-            <!-- windows -->
-            <file os="windows" src="lib/win32/" targetdir="$INSTALL_PATH/lib/"/>
         </pack>
     </xsl:template>
 

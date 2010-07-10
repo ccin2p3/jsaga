@@ -3,9 +3,7 @@ package fr.in2p3.jsaga.engine.config.adaptor;
 import fr.in2p3.jsaga.adaptor.Adaptor;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
-import fr.in2p3.jsaga.adaptor.evaluator.Evaluator;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
-import fr.in2p3.jsaga.adaptor.language.LanguageAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
 import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.schema.config.*;
@@ -33,8 +31,6 @@ public class AdaptorDescriptors {
     private SecurityAdaptorDescriptor m_securityDesc;
     private DataAdaptorDescriptor m_dataDesc;
     private JobAdaptorDescriptor m_jobDesc;
-    private LanguageAdaptorDescriptor m_languageDesc;
-    private EvaluatorAdaptorDescriptor m_evaluatorDesc;
     private EffectiveConfig m_xml;
 
     public AdaptorDescriptors() throws ConfigurationException {
@@ -43,8 +39,6 @@ public class AdaptorDescriptors {
             m_securityDesc = new SecurityAdaptorDescriptor(loader.getClasses(SecurityAdaptor.class));
             m_dataDesc = new DataAdaptorDescriptor(loader.getClasses(DataAdaptor.class), m_securityDesc);
             m_jobDesc = new JobAdaptorDescriptor(loader.getClasses(JobControlAdaptor.class), m_securityDesc);
-            m_languageDesc = new LanguageAdaptorDescriptor(loader.getClasses(LanguageAdaptor.class));
-            m_evaluatorDesc = new EvaluatorAdaptorDescriptor(loader.getClasses(Evaluator.class));
         } catch(Exception e) {
             throw new ConfigurationException(e);
         }
@@ -52,8 +46,6 @@ public class AdaptorDescriptors {
         m_xml.setContext(m_securityDesc.m_xml);
         m_xml.setProtocol(m_dataDesc.m_xml);
         m_xml.setExecution(m_jobDesc.m_xml);
-        m_xml.setLanguage(m_languageDesc.m_xml);
-        m_xml.setEvaluatorImpl(m_evaluatorDesc.getClazz().getName());
         setRootAttributes(m_xml);
     }
 
@@ -67,14 +59,6 @@ public class AdaptorDescriptors {
 
     public JobAdaptorDescriptor getJobDesc() {
         return m_jobDesc;
-    }
-
-    public LanguageAdaptorDescriptor getLanguageDesc() {
-        return m_languageDesc;
-    }
-
-    public EvaluatorAdaptorDescriptor getEvaluatorDesc() {
-        return m_evaluatorDesc;
     }
 
     public byte[] toByteArray() throws IOException, ValidationException, MarshalException {

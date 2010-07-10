@@ -9,7 +9,6 @@ import fr.in2p3.jsaga.engine.job.monitor.JobMonitorServiceFactory;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import fr.in2p3.jsaga.impl.job.description.SAGAJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.job.service.JobServiceImpl;
-import fr.in2p3.jsaga.impl.job.service.LateBindedJobServiceImpl;
 import fr.in2p3.jsaga.sync.job.SyncJobFactory;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
@@ -87,7 +86,7 @@ public abstract class AbstractSyncJobFactoryImpl extends JobFactory implements S
             }
             return jobService;
         } else {
-            return new LateBindedJobServiceImpl(session);
+            throw new NotImplementedException("Resource discovery not yet implemented");
         }
     }
 }
