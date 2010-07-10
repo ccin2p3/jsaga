@@ -13,8 +13,8 @@ JSAGA
       effort for integrating support of new technologies.
       See list of currently {{{adaptors.html}supported technologies}}.
 
-    * operating system indenpendancy: most of the provided adaptors are written
-      in full Java, and they are tested on Windows and Linux.
+    * operating system indenpendancy: most of the provided adaptors are
+      written in full Java, and they are tested on Windows and Linux.
 
  JSAGA can also be used from Python applications, thanks to the
  {{{https://forge.in2p3.fr/projects/show/jpysaga}JPySAGA}} project.
