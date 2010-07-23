@@ -57,7 +57,7 @@ public class StagingJDL {
                 if (to.startsWith(SANDBOX_BASE_URI)) {
                     to = baseUri+"/"+to.replace(SANDBOX_BASE_URI, "");
                 }
-                Boolean append = Boolean.parseBoolean(getValue(r,VALUE_APPEND));
+                boolean append = Boolean.parseBoolean(getValue(r,VALUE_APPEND));
                 transfers[i] = new StagingTransfer(from, to, append);
             }
             return transfers;
@@ -74,7 +74,7 @@ public class StagingJDL {
                 RecordExpr r = (RecordExpr) output.sub(i);
                 String from = files[i].getName();
                 String to = getValue(r,VALUE_TO);
-                Boolean append = Boolean.parseBoolean(getValue(r,VALUE_APPEND));
+                boolean append = Boolean.parseBoolean(getValue(r,VALUE_APPEND));
                 transfers[i] = new StagingTransfer(from, to, append);
             }
             return transfers;
