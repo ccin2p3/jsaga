@@ -19,8 +19,8 @@ import java.io.InputStream;
  */
 public class StagingJDLTest extends TestCase {
     private static String EXPECTED_INPUT[] = {
-        "C:/DOCUME~1/SYLVAI~1/LOCALS~1/Temp/local-165e18fe-0884-4e34-b09c-eee48517e7b8.sh -> uri://gsiftp://lapp-wms02.in2p3.fr:2811/tmp/1272544850703/worker-165e18fe-0884-4e34-b09c-eee48517e7b8.sh (false)",
-        "C:/DOCUME~1/SYLVAI~1/LOCALS~1/Temp/local-165e18fe-0884-4e34-b09c-eee48517e7b8.input -> uri://gsiftp://lapp-wms02.in2p3.fr:2811/tmp/1272544850703/worker-165e18fe-0884-4e34-b09c-eee48517e7b8.input (false)"
+        "C:/DOCUME~1/SYLVAI~1/LOCALS~1/Temp/local-165e18fe-0884-4e34-b09c-eee48517e7b8.sh -> gsiftp://lapp-wms02.in2p3.fr:2811/tmp/1272544850703/worker-165e18fe-0884-4e34-b09c-eee48517e7b8.sh (false)",
+        "C:/DOCUME~1/SYLVAI~1/LOCALS~1/Temp/local-165e18fe-0884-4e34-b09c-eee48517e7b8.input -> gsiftp://lapp-wms02.in2p3.fr:2811/tmp/1272544850703/worker-165e18fe-0884-4e34-b09c-eee48517e7b8.input (false)"
     };
 
     public void test_parse() throws Exception {
@@ -29,7 +29,7 @@ public class StagingJDLTest extends TestCase {
         StagingJDL jdl = new StagingJDL(stream);
 
         // extract info
-        StagingTransfer[] input = jdl.getInputStagingTransfer("uri://");
+        StagingTransfer[] input = jdl.getInputStagingTransfer("gsiftp://lapp-wms02.in2p3.fr:2811/tmp/1272544850703");
         for (int i=0; i<input.length; i++) {
             assertEquals(EXPECTED_INPUT[i], toString(input[i]));
         }
