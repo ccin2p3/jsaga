@@ -224,7 +224,7 @@ mvn archetype:create</pre>
 Either generate Eclipse project from maven CLI:
                 <ul>
                     <li>Set the Eclipse "Classpath Variable" M2_REPO to the path of your maven local repository.</li>
-                    <li><pre>mvn -f pom-unrelease.xml install
+                    <li><pre>mvn install
 mvn -s profiles.xml eclipse:eclipse</pre></li>
                     <li>File / import existing projects into workspace and select the jsaga directory.</li>
                     <li>(for more information see: http://maven.apache.org/guides/mini/guide-ide-eclipse.html
