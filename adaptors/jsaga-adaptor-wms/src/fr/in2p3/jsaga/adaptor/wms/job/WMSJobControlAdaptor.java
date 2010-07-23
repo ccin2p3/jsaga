@@ -19,18 +19,7 @@ import org.glite.jdl.AdParser;
 import org.glite.jdl.JobAdException;
 import org.glite.security.delegation.GrDPConstants;
 import org.glite.security.delegation.GrDPX509Util;
-import org.glite.wms.wmproxy.AuthenticationFaultType;
-import org.glite.wms.wmproxy.AuthorizationFaultType;
-import org.glite.wms.wmproxy.BaseFaultType;
-import org.glite.wms.wmproxy.GenericFaultType;
-import org.glite.wms.wmproxy.InvalidArgumentFaultType;
-import org.glite.wms.wmproxy.JdlType;
-import org.glite.wms.wmproxy.NoSuitableResourcesFaultType;
-import org.glite.wms.wmproxy.ServerOverloadedFaultType;
-import org.glite.wms.wmproxy.StringAndLongList;
-import org.glite.wms.wmproxy.StringAndLongType;
-import org.glite.wms.wmproxy.WMProxyLocator;
-import org.glite.wms.wmproxy.WMProxy_PortType;
+import org.glite.wms.wmproxy.*;
 import org.globus.axis.gsi.GSIConstants;
 import org.globus.axis.transport.HTTPSSender;
 import org.globus.ftp.GridFTPClient;
@@ -315,20 +304,10 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 	}
 
     public String getStagingDirectory(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-        String jdl = null;
-        try {
-            jdl = m_client.getJDL(nativeJobId, JdlType.ORIGINAL);
-        } catch(BaseFaultType  e) {
-            rethrow(e);
-        } catch (RemoteException e) {
-        	throw new NoSuccessException(e.getMessage());
-		}
-        StagingJDL parsedJdl = new StagingJDL(jdl);
-        return parsedJdl.getStagingDirectory();
+        return null;    // use the CREAM default staging directory
     }
 
     public StagingTransfer[] getInputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-/*
         StringList result = null;
         try {
             result = m_client.getSandboxDestURI(nativeJobId, "gsiftp");
@@ -340,7 +319,8 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         if(result==null  || result.getItem()==null || result.getItem().length<1) {
             throw new NoSuccessException("Unable to find sandbox dest uri");
         }
-*/
+        String baseUri = result.getItem(0);
+
         String jdl = null;
         try {
             jdl = m_client.getJDL(nativeJobId, JdlType.ORIGINAL);
@@ -349,13 +329,11 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         } catch (RemoteException e) {
         	throw new NoSuccessException(e.getMessage());
 		}
-        String baseUri = "";
         StagingJDL parsedJdl = new StagingJDL(jdl);
         return parsedJdl.getInputStagingTransfer(baseUri);
     }
 
     public StagingTransfer[] getOutputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-/*
         StringAndLongList result = null;
         try {
             result = m_client.getOutputFileList(nativeJobId, "gsiftp");
@@ -367,7 +345,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         if (result==null || result.getFile()==null || result.getFile().length<1) {
             throw new NoSuccessException("Unable to find output file list");
         }
-*/
+
         String jdl = null;
         try {
             jdl = m_client.getJDL(nativeJobId, JdlType.ORIGINAL);
@@ -376,9 +354,8 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         } catch (RemoteException e) {
         	throw new NoSuccessException(e.getMessage());
 		}
-        String baseUri = "";
         StagingJDL parsedJdl = new StagingJDL(jdl);
-        return parsedJdl.getOutputStagingTransfers(baseUri);
+        return parsedJdl.getOutputStagingTransfers(result.getFile());
     }
 
     public void start(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {

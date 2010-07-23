@@ -27,9 +27,7 @@
 
     <!-- constants -->
     <xsl:variable name="SupportedProtocols">/gsiftp/</xsl:variable>
-    <xsl:variable name="IntermediaryURL">
-        <xsl:text/>gsiftp://<xsl:value-of select="$HostName"/>:2811/tmp/<xsl:value-of select="$UniqId"/>
-    </xsl:variable>
+    <xsl:variable name="SANDBOX_BASE_URI">file:///sandbox/</xsl:variable>
 
     <!-- entry point (MUST BE RELATIVE) -->
     <xsl:template match="jsdl:JobDefinition">
@@ -148,17 +146,13 @@ NodeNumber = <xsl:value-of select="."/>;<xsl:text/>
             </xsl:otherwise>
         </xsl:choose>
 
-        <xsl:if test="jsdl:DataStaging">
-  SandboxDirectory = "<xsl:value-of select="$IntermediaryURL"/>";<xsl:text/>
-        </xsl:if>
-
         <xsl:if test="jsdl:DataStaging[jsdl:Source]">
   InputSandboxPreStaging = {<xsl:text/>
             <xsl:for-each select="jsdl:DataStaging[jsdl:Source][
                     not(contains($SupportedProtocols,concat('/',substring-before(jsdl:Source/jsdl:URI/text(),'://'),'/')))]">
     [
         From = "<xsl:value-of select="translate(jsdl:Source/jsdl:URI/text(),'\','/')"/>";<xsl:text/>
-        To = "<xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="jsdl:FileName/text()"/>";<xsl:text/>
+        To = "<xsl:value-of select="$SANDBOX_BASE_URI"/><xsl:value-of select="jsdl:FileName/text()"/>";<xsl:text/>
         Append = "<xsl:value-of select="string(jsdl:CreationFlag/text()='append')"/>";<xsl:text/>
     ]<xsl:if test="position()!=last()">,</xsl:if>
             </xsl:for-each>
@@ -172,7 +166,7 @@ NodeNumber = <xsl:value-of select="."/>;<xsl:text/>
                         <xsl:value-of select="jsdl:Source/jsdl:URI/text()"/>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="jsdl:FileName/text()"/>
+                        <xsl:value-of select="jsdl:FileName/text()"/>
                     </xsl:otherwise>
                 </xsl:choose>
                 <xsl:text>"</xsl:text>
@@ -184,7 +178,7 @@ NodeNumber = <xsl:value-of select="."/>;<xsl:text/>
             <xsl:for-each select="jsdl:DataStaging[jsdl:Target][
                 not(contains($SupportedProtocols,concat('/',substring-before(jsdl:Target/jsdl:URI/text(),'://'),'/')))]">
     [
-        From = "<xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="jsdl:FileName/text()"/>";<xsl:text/>
+        From = "<xsl:value-of select="$SANDBOX_BASE_URI"/><xsl:value-of select="jsdl:FileName/text()"/>";<xsl:text/>
         To = "<xsl:value-of select="translate(jsdl:Target/jsdl:URI/text(),'\','/')"/>";<xsl:text/>
         Append = "<xsl:value-of select="string(jsdl:CreationFlag/text()='append')"/>";<xsl:text/>
     ]<xsl:if test="position()!=last()">,</xsl:if>
@@ -212,7 +206,7 @@ NodeNumber = <xsl:value-of select="."/>;<xsl:text/>
                         <xsl:value-of select="jsdl:Target/jsdl:URI/text()"/>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="jsdl:FileName/text()"/>
+                        <xsl:value-of select="jsdl:FileName/text()"/>
                     </xsl:otherwise>
                 </xsl:choose>
                 <xsl:text>"</xsl:text>

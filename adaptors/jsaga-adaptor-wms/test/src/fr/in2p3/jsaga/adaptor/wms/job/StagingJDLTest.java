@@ -22,10 +22,7 @@ public class StagingJDLTest extends TestCase {
         "C:/DOCUME~1/SYLVAI~1/LOCALS~1/Temp/local-165e18fe-0884-4e34-b09c-eee48517e7b8.sh -> uri://gsiftp://lapp-wms02.in2p3.fr:2811/tmp/1272544850703/worker-165e18fe-0884-4e34-b09c-eee48517e7b8.sh (false)",
         "C:/DOCUME~1/SYLVAI~1/LOCALS~1/Temp/local-165e18fe-0884-4e34-b09c-eee48517e7b8.input -> uri://gsiftp://lapp-wms02.in2p3.fr:2811/tmp/1272544850703/worker-165e18fe-0884-4e34-b09c-eee48517e7b8.input (false)"
     };
-    private static String EXPECTED_OUTPUT[] = {
-        "uri://gsiftp://lapp-wms02.in2p3.fr:2811/tmp/1272544850703/worker-165e18fe-0884-4e34-b09c-eee48517e7b8.output -> C:/DOCUME~1/SYLVAI~1/LOCALS~1/Temp/local-165e18fe-0884-4e34-b09c-eee48517e7b8.output (false)"
-    };
-    
+
     public void test_parse() throws Exception {
         // parse
         InputStream stream = StagingJDLTest.class.getClassLoader().getResourceAsStream("jdl-test.txt");
@@ -35,10 +32,6 @@ public class StagingJDLTest extends TestCase {
         StagingTransfer[] input = jdl.getInputStagingTransfer("uri://");
         for (int i=0; i<input.length; i++) {
             assertEquals(EXPECTED_INPUT[i], toString(input[i]));
-        }
-        StagingTransfer[] output = jdl.getOutputStagingTransfers("uri://");
-        for (int i=0; i<output.length; i++) {
-            assertEquals(EXPECTED_OUTPUT[i], toString(output[i]));
         }
     }
 

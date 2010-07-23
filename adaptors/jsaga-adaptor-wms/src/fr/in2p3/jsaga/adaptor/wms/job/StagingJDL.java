@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.adaptor.wms.job;
 
 import condor.classad.*;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
+import org.glite.wms.wmproxy.StringAndLongType;
 import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.error.NoSuccessException;
 
@@ -25,7 +26,8 @@ public class StagingJDL {
     private static final String VALUE_FROM = "From";
     private static final String VALUE_TO = "To";
     private static final String VALUE_APPEND = "Append";
-    private static final String VALUE_BASEDIR = "SandboxDirectory";
+
+    private static final String SANDBOX_BASE_URI = "file:///sandbox/";
 
     protected RecordExpr m_expr;
 
@@ -44,24 +46,19 @@ public class StagingJDL {
         }
     }
 
-    public String getStagingDirectory() {
-        try {
-            return getValue(m_expr, VALUE_BASEDIR);
-        } catch (DoesNotExistException e) {
-            return null;
-        }
-    }
-
     public StagingTransfer[] getInputStagingTransfer(String baseUri) {
         try {
             ListExpr input = (ListExpr) findExpr(m_expr, LIST_INPUT);
             StagingTransfer[] transfers = new StagingTransfer[input.size()];
             for (int i=0; i<input.size(); i++) {
                 RecordExpr r = (RecordExpr) input.sub(i);
-                transfers[i] = new StagingTransfer(
-                        getValue(r,VALUE_FROM),
-                        baseUri+getValue(r,VALUE_TO),
-                        Boolean.parseBoolean(getValue(r,VALUE_APPEND)));
+                String from = getValue(r,VALUE_FROM);
+                String to = getValue(r,VALUE_TO);
+                if (to.startsWith(SANDBOX_BASE_URI)) {
+                    to = baseUri+"/"+to.replace(SANDBOX_BASE_URI, "");
+                }
+                Boolean append = Boolean.parseBoolean(getValue(r,VALUE_APPEND));
+                transfers[i] = new StagingTransfer(from, to, append);
             }
             return transfers;
         } catch (DoesNotExistException e) {
@@ -69,16 +66,16 @@ public class StagingJDL {
         }
     }
 
-    public StagingTransfer[] getOutputStagingTransfers(String baseUri) {
+    public StagingTransfer[] getOutputStagingTransfers(StringAndLongType[] files) {
         try {
             ListExpr output = (ListExpr) findExpr(m_expr, LIST_OUTPUT);
             StagingTransfer[] transfers = new StagingTransfer[output.size()];
             for (int i=0; i<output.size(); i++) {
                 RecordExpr r = (RecordExpr) output.sub(i);
-                transfers[i] = new StagingTransfer(
-                        baseUri+getValue(r,VALUE_FROM),
-                        getValue(r,VALUE_TO),
-                        Boolean.parseBoolean(getValue(r,VALUE_APPEND)));
+                String from = files[i].getName();
+                String to = getValue(r,VALUE_TO);
+                Boolean append = Boolean.parseBoolean(getValue(r,VALUE_APPEND));
+                transfers[i] = new StagingTransfer(from, to, append);
             }
             return transfers;
         } catch (DoesNotExistException e) {
