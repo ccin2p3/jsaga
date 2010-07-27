@@ -36,6 +36,9 @@ import java.util.regex.Pattern;
  *
  */
 public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements StagingJobAdaptorTwoPhase, StreamableJobBatch, CleanableJobAdaptor {
+    // constant
+    private static final String SANDBOX_BASE_URI = "file:///sandbox/";
+
     // parameters configured
     private static final String SSL_CA_FILES = "sslCAFiles";
 
@@ -160,39 +163,41 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     }
 
     public String getStagingDirectory(String nativeJobId) throws TimeoutException, NoSuccessException {
-        JobInfo jobInfo = this.getJobInfo(nativeJobId);
-        Properties jobDesc = parseJobDescription(jobInfo.getJDL());
-        return getStringValue_IfExists(jobDesc, "SandboxDirectory");
+        return null;    // use the WMS default staging directory
     }
 
     public StagingTransfer[] getInputStagingTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {
         JobInfo jobInfo = this.getJobInfo(nativeJobId);
-        //String baseUri = jobInfo.getCREAMInputSandboxURI()+"/";
-        String baseUri = "";
+        String baseUri = jobInfo.getCREAMInputSandboxURI();
         Properties jobDesc = parseJobDescription(jobInfo.getJDL());
         int transfersLength = getIntValue_IfExists(jobDesc, "InputSandboxPreStaging");
         StagingTransfer[] transfers = new StagingTransfer[transfersLength];
         for (int i=0; i<transfersLength; i++) {
-            transfers[i] = new StagingTransfer(
-                    getStringValue(jobDesc, "InputSandboxPreStaging_"+i+"_From"),
-                    baseUri+getStringValue(jobDesc, "InputSandboxPreStaging_"+i+"_To"),
-                    getBooleanValue(jobDesc, "InputSandboxPreStaging_"+i+"_Append"));
+            String from = getStringValue(jobDesc, "InputSandboxPreStaging_"+i+"_From");
+            String to = getStringValue(jobDesc, "InputSandboxPreStaging_"+i+"_To");
+            if (to.startsWith(SANDBOX_BASE_URI)) {
+                to = baseUri+"/"+to.replace(SANDBOX_BASE_URI, "");
+            }
+            boolean append = getBooleanValue(jobDesc, "InputSandboxPreStaging_"+i+"_Append");
+            transfers[i] = new StagingTransfer(from, to, append);
         }
         return transfers;
     }
 
     public StagingTransfer[] getOutputStagingTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {
         JobInfo jobInfo = this.getJobInfo(nativeJobId);
-        //String baseUri = jobInfo.getCREAMOutputSandboxURI()+"/";
-        String baseUri = "";
+        String baseUri = jobInfo.getCREAMOutputSandboxURI();
         Properties jobDesc = parseJobDescription(jobInfo.getJDL());
         int transfersLength = getIntValue_IfExists(jobDesc, "OutputSandboxPostStaging");
         StagingTransfer[] transfers = new StagingTransfer[transfersLength];
         for (int i=0; i<transfersLength; i++) {
-            transfers[i] = new StagingTransfer(
-                    baseUri+getStringValue(jobDesc, "OutputSandboxPostStaging_"+i+"_From"),
-                    getStringValue(jobDesc, "OutputSandboxPostStaging_"+i+"_To"),
-                    getBooleanValue(jobDesc, "OutputSandboxPostStaging_"+i+"_Append"));
+            String from = getStringValue(jobDesc, "OutputSandboxPostStaging_"+i+"_From");
+            if (from.startsWith(SANDBOX_BASE_URI)) {
+                from = baseUri+"/"+from.replace(SANDBOX_BASE_URI, "");
+            }
+            String to = getStringValue(jobDesc, "OutputSandboxPostStaging_"+i+"_To");
+            boolean append = getBooleanValue(jobDesc, "OutputSandboxPostStaging_"+i+"_Append");
+            transfers[i] = new StagingTransfer(from, to, append);
         }
         return transfers;
     }
