@@ -57,6 +57,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     private Stdin m_stdin;
     private Stdout m_stdout;
     private Stdout m_stderr;
+    private boolean m_willStartListening;
 
     /** constructor for submission */
     protected AbstractSyncJobImpl(Session session, String nativeJobDesc, JobDescription jobDesc, DataStagingManager stagingMgr, String uniqId, AbstractSyncJobServiceImpl service) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
@@ -90,6 +91,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         m_stdin = null;
         m_stdout = null;
         m_stderr = null;
+        m_willStartListening = false;
     }
 
     /** clone */
@@ -199,6 +201,12 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             String sagaJobId = "["+monitorUrl+"]-["+m_nativeJobId+"]";
             m_attributes.m_JobId.setObject(sagaJobId);
 
+            // start listening if a callback was registered
+            if (m_willStartListening) {
+                m_willStartListening = false;
+                this.startListening();
+            }
+
             // pre-staging (after job register)
             if (m_stagingMgr instanceof DataStagingManagerThroughSandboxTwoPhase) {
                 ((DataStagingManagerThroughSandboxTwoPhase)m_stagingMgr).preStaging(this, m_nativeJobId);
@@ -247,9 +255,10 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     public boolean startListening() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         m_monitorService.checkState();
         if (m_nativeJobId == null) {
-            throw new IncorrectStateException("Can not listen to job in 'New' state", this);
+            m_willStartListening = true;
+        } else {
+            m_monitorService.startListening(m_nativeJobId, this);
         }
-        m_monitorService.startListening(m_nativeJobId, this);
         return true;    // a job task is always listening (either with notification, or with polling)
     }
 
