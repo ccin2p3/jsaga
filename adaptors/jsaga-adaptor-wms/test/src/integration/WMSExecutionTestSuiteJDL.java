@@ -1,6 +1,5 @@
 package integration;
 
-import fr.in2p3.jsaga.impl.job.instance.JobImpl;
 import org.ogf.saga.error.SagaException;
 import org.ogf.saga.job.*;
 import org.ogf.saga.job.abstracts.AbstractJobTest;
@@ -30,6 +29,6 @@ public class WMSExecutionTestSuiteJDL extends AbstractJobTest {
         desc.setVectorAttribute(JobDescription.FILETRANSFER, new String[]{"myScript.sh > myScript.sh"});
         JobService service = JobFactory.createJobService(m_session, m_jobservice);
         Job job = service.createJob(desc);
-        System.out.println(job.getAttribute(JobImpl.NATIVEJOBDESCRIPTION));
+        System.out.println(job.getAttribute("NativeJobDescription"));
     }
 }
