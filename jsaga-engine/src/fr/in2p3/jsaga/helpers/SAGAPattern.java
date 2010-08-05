@@ -33,7 +33,7 @@ public class SAGAPattern {
             // convert wildcards to regular expression
             regexp = regexp.replaceAll("\\*", ".*");
             regexp = regexp.replaceAll("\\?", ".?");
-            regexp = regexp.replaceAll("\\[!", "[^");
+            regexp = regexp.replaceAll("\\[^", "[^");
 
             // compile regular expression
             return Pattern.compile(regexp);
