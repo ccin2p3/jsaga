@@ -27,7 +27,7 @@ import java.util.Vector;
 /**
  *
  */
-public class GsiftpDCacheDataAdaptor extends GsiftpDataAdaptorAbstract {
+public class GsiftpDCacheDataAdaptor extends Gsiftp2DataAdaptor {
     public String getType() {
         return "gsiftp-dcache";
     }
@@ -42,7 +42,8 @@ public class GsiftpDCacheDataAdaptor extends GsiftpDataAdaptorAbstract {
         return null;
     }
 
-    /** RNFR command is not supported */
+    /* RNFR command is not supported */
+    /*
     public boolean exists(String absolutePath, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         try {
             m_client.getSize(absolutePath);
@@ -57,7 +58,9 @@ public class GsiftpDCacheDataAdaptor extends GsiftpDataAdaptorAbstract {
             throw new NoSuccessException(e);
         }
     }
+    */
 
+    /*
     public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         EntryPath path = new EntryPath(absolutePath);
         String entryName = path.getEntryName();
@@ -69,9 +72,10 @@ public class GsiftpDCacheDataAdaptor extends GsiftpDataAdaptorAbstract {
         }
         throw new DoesNotExistException("Entry does not exist: "+entryName);
     }
+    */
 
-    //fixme: listAttributes does not work
-    /** MLSD command is not supported */
+    /* MLSD command is not supported */
+    /*
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         Vector v;
         try {
@@ -95,10 +99,11 @@ public class GsiftpDCacheDataAdaptor extends GsiftpDataAdaptorAbstract {
         }
         return ret;
     }
+    */
 
     protected void rethrowParsedException(UnexpectedReplyCodeException e) throws DoesNotExistException, AlreadyExistsException, PermissionDeniedException, NoSuccessException {
         String message = e.getReply().getMessage();
-        if (message.indexOf("not a plain file") > -1) {
+        if (message.indexOf("not a plain file") > -1 || message.indexOf("Local error") > -1) {
             throw new DoesNotExistException(e);
         } else if (message.indexOf("exists") > -1) {
             throw new AlreadyExistsException(e);
