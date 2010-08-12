@@ -375,6 +375,7 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
                             case 500:
                             case 521:
                             case 550:
+                            case 451:
                                 this.rethrowParsedException(unexpectedReplyCode);
                             default:
                                 throw new NoSuccessException(e);
