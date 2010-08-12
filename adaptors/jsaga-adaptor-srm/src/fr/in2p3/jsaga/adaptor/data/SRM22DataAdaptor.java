@@ -45,6 +45,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
     private static final String SERVICE_PROTOCOL = "httpg";
     private static final String SERVICE_PATH = "/srm/managerv2";
     private ISRM m_stub;
+    private String m_impl_name;
 
     public SRM22DataAdaptor() {
         m_stub = null;
@@ -70,17 +71,29 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         } catch (ServiceException e) {
             throw new NoSuccessException(e);
         }
+        // Get implementation name
+        try {
+        	this.ping();
+        } catch (Exception e) {
+        	this.m_impl_name = "UNKNOWN";
+        }
     }
 
     public void disconnect() throws NoSuccessException {
         // do nothing
     }
 
+    public String getImplementationName() {
+    	return this.m_impl_name;
+    }
     protected void ping() throws BadParameterException, NoSuccessException {
         try {
             SrmPingResponse response = m_stub.srmPing(new SrmPingRequest());
             if (response.getVersionInfo() == null) {
                 throw new NoSuccessException("Unknown version");
+            } else {
+            	// FIXME: Implementation name is not necessary the first element of TExtraInfoArray (CASTOR)
+            	this.m_impl_name = response.getOtherInfo().getExtraInfoArray(0).getValue();
             }
         } catch (RemoteException e) {
             throw new BadParameterException(e);
@@ -180,6 +193,26 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         SRMResponse srmResponse = this.srmPrepareToGet(absolutePath);
         String token = srmResponse.getToken();
         java.net.URI transferUrl = srmResponse.getTransferUrl();
+
+        // change URI to match appropriate gsiftp adaptor
+        if ("gsiftp".equals(transferUrl.getScheme())) {
+        	try {
+                if ("DPM".equals(this.m_impl_name)) {
+                	transferUrl = new java.net.URI("gsiftp-dpm",
+                			transferUrl.getUserInfo(), transferUrl.getHost(),
+                			transferUrl.getPort(), transferUrl.getPath(), transferUrl.getQuery(),
+                			transferUrl.getFragment());
+                } else if ("dCache".equals(this.m_impl_name)) {
+                	transferUrl = new java.net.URI("gsiftp-dcache",
+                			transferUrl.getUserInfo(), transferUrl.getHost(),
+                			transferUrl.getPort(), transferUrl.getPath(), transferUrl.getQuery(),
+                			transferUrl.getFragment());               	
+                }
+        		
+        	} catch (java.net.URISyntaxException e) {
+        		// keep transferUrl
+        	}
+        }
 
         // connect to transfer server
         SagaDataAdaptor adaptor = new SagaDataAdaptor(transferUrl, m_credential, m_certRepository, token, absolutePath, this);
@@ -300,6 +333,26 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         String token = srmResponse.getToken();
         java.net.URI transferUrl = srmResponse.getTransferUrl();
         
+        // change URI to match appropriate gsiftp adaptor
+        if ("gsiftp".equals(transferUrl.getScheme())) {
+        	try {
+                if ("DPM".equals(this.m_impl_name)) {
+                	transferUrl = new java.net.URI("gsiftp-dpm",
+                			transferUrl.getUserInfo(), transferUrl.getHost(),
+                			transferUrl.getPort(), transferUrl.getPath(), transferUrl.getQuery(),
+                			transferUrl.getFragment());
+                } else if ("dCache".equals(this.m_impl_name)) {
+                	transferUrl = new java.net.URI("gsiftp-dcache",
+                			transferUrl.getUserInfo(), transferUrl.getHost(),
+                			transferUrl.getPort(), transferUrl.getPath(), transferUrl.getQuery(),
+                			transferUrl.getFragment());               	
+                }
+        		
+        	} catch (java.net.URISyntaxException e) {
+        		// keep transferUrl
+        	}
+        }
+
         // connect to transfer server
         SagaDataAdaptor adaptor;
         try {
@@ -389,7 +442,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             try {
                 rethrowException(status);
             } catch (DoesNotExistException e) {
-                throw new NoSuccessException(e);
+                throw new ParentDoesNotExist(e);
             }
             throw new NoSuccessException("INTERNAL ERROR: an exception should have been raised");
         }
