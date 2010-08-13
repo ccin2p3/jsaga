@@ -3,6 +3,11 @@
         <title>JSAGA Release Notes</title>
     </properties>
     <body>
+        <release version="0.9.9" date="2010-08-13">
+            <action dev="sreynaud" type="update">Improved data staging management in core engine.</action>
+            <action dev="sreynaud" type="fix">Fix problem with data staging in WMS plug-in.</action>
+            <action dev="lschwarz" type="add">Added support for dCache implementation in SRM plug-in.</action>
+        </release>
         <release version="0.9.8" date="2009-06-30">
             <action dev="sreynaud" type="add">Added a per method/protocol configurable timeout.</action>
             <action dev="sreynaud" type="fix">Bugfixes and improvments on plug-ins.</action>
