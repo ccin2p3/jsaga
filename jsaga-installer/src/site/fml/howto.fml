@@ -167,7 +167,7 @@ echo "Options +Indexes" > $LOCAL_BASE/maven2/.htaccess</pre>
                         <pre>MVN_ROOT=ccali:/afs/in2p3.fr/home/throng/ccin2p3/grid/maven2
 WEB_ROOT=gridsoft@grid.in2p3.fr:/www/htdocs
 cd $LOCAL_BASE
-rsync --progress -azC --force -e ssh maven2/ $MVN_ROOT/maven2/
+rsync --progress -azC --force -e ssh maven2/ $MVN_ROOT/
 rsync --progress -azC --force -e ssh maven2/fr/in2p3/jsaga/jsaga-installer/ $WEB_ROOT/archives/jsaga/
 rsync --progress -azC --force -e ssh --delete build-tools/ $WEB_ROOT/build-tools/
 rsync --progress -azC --force -e ssh --delete jsaga/ $WEB_ROOT/jsaga/</pre>
