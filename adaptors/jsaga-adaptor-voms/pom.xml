@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
     <artifactId>jsaga-adaptor-voms</artifactId>
-    <version>0.9.9</version>
+    <version>0.9.10-SNAPSHOT</version>
     <name>Adaptors for VOMS</name>
     <description>This module provides support for VOMS (Virtual Organization Membership Service) security mechanism.</description>
     <developers>
@@ -26,19 +26,19 @@
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-adaptoritf</artifactId>
-            <version>0.9.9</version>
+            <version>0.9.10-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api-test</artifactId>
-            <version>0.9.9</version>
+            <version>0.9.10-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
-            <version>0.9.9</version>
+            <version>0.9.10-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <!-- adaptor specific -->
@@ -48,8 +48,4 @@
             <version>1.7.22</version>
         </dependency>
     </dependencies>
-
-  <scm>
-    <tag>jsaga-0_9_9</tag>
-  </scm>
 </project>
