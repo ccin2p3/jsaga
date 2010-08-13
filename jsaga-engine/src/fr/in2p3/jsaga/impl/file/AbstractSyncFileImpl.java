@@ -36,24 +36,24 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
     protected FileInputStream m_inStream;
 
     /** constructor for factory */
-    protected AbstractSyncFileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, IncorrectStateException, TimeoutException, NoSuccessException {
+    protected AbstractSyncFileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session, URLHelper.toFileURL(url), adaptor, new FlagsHelper(flags).remove(Flags.ALLFILEFLAGS));
         this.init(flags);
     }
 
     /** constructor for NSDirectory.open() */
-    protected AbstractSyncFileImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, IncorrectStateException, TimeoutException, NoSuccessException {
+    protected AbstractSyncFileImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(dir, URLHelper.toFileURL(relativeUrl), new FlagsHelper(flags).remove(Flags.ALLFILEFLAGS));
         this.init(flags);
     }
 
     /** constructor for NSEntry.openAbsolute() */
-    protected AbstractSyncFileImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, IncorrectStateException, TimeoutException, NoSuccessException {
+    protected AbstractSyncFileImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(entry, URLHelper.toFilePath(absolutePath), new FlagsHelper(flags).remove(Flags.ALLFILEFLAGS));
         this.init(flags);
     }
 
-    private void init(int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, IncorrectStateException, TimeoutException, NoSuccessException {
+    private void init(int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         if(Flags.CREATEPARENTS.isSet(flags)) flags=Flags.CREATE.or(flags);
         if(Flags.CREATE.isSet(flags)) flags=Flags.WRITE.or(flags);
         new FlagsHelper(flags).allowed(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS, Flags.ALLFILEFLAGS);
@@ -78,8 +78,12 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
                 } else {
             		if (!Flags.APPEND.isSet(flags)) {
             			// delete file first
-            			this.remove();
-            		}
+                        try {
+                            this.remove();
+                        } catch (IncorrectStateException e1) {
+                            throw e;
+                        }
+                    }
             		// retry
             		this.tryToOpen(flags);
             	}
