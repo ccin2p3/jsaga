@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.commons.filesystem</groupId>
     <artifactId>file-system</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>pom</packaging>
     <build>
         <!-- inherited -->
@@ -106,7 +106,7 @@
         <dependency>
             <groupId>fr.in2p3.commons.filesystem</groupId>
             <artifactId>file-system-java</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
         <!-- inherited -->
         <dependency>
