@@ -70,11 +70,6 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
             m_rootUrl = URLFactory.createURL(url.resolve(".").toString());
             m_rootUrl.setFragment("InMemoryProxy");
 
-            // workaround for DPM
-            //if ("gsiftp".equals(m_rootUrl.getScheme())) {
-            //    m_rootUrl.setScheme("gsiftp-dpm");
-            //}
-
             // for releasing SRM file
             m_token = token;
             m_srmPath = srmPath;
