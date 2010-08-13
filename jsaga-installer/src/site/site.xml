@@ -46,10 +46,10 @@
         </menu>
         <menu name="Project Documentation" ref="reports"/>
         <menu name="Links">
-            <item name="Development Release" href="/software/jsaga-dev/index.html"/>
+            <item name="Development Release" href="http://grid.in2p3.fr/software/jsaga-dev/index.html"/>
             <item name="Issue Tracking" href="https://forge.in2p3.fr/projects/jsaga/issues"/>
-            <item name="Build Tools" href="/software/build-tools/index.html"/>
-            <item name="Common Tools" href="/software/in2p3-commons/index.html"/>
+            <item name="Build Tools" href="http://grid.in2p3.fr/software/build-tools/index.html"/>
+            <item name="Common Tools" href="http://grid.in2p3.fr/software/in2p3-commons/index.html"/>
         </menu>
         <menu name="Adaptors developed by..."/>
     </body>
