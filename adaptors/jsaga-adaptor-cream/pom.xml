@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
     <artifactId>jsaga-adaptor-cream</artifactId>
-    <version>0.9.9-SNAPSHOT</version>
+    <version>0.9.9</version>
     <name>Adaptors for gLite-CREAM</name>
     <description>This module provides support for execution management service gLite-CREAM
 (Computing Resource Execution And Management).</description>
@@ -27,38 +27,38 @@
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-adaptoritf</artifactId>
-            <version>0.9.9-SNAPSHOT</version>
+            <version>0.9.9</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api-test</artifactId>
-            <version>0.9.9-SNAPSHOT</version>
+            <version>0.9.9</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
-            <version>0.9.9-SNAPSHOT</version>
+            <version>0.9.9</version>
             <scope>test</scope>
         </dependency>
         <!-- adaptor specific -->
         <dependency><!-- for security context (WARNING: order of dependencies matters) -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-voms</artifactId>
-            <version>0.9.9-SNAPSHOT</version>
+            <version>0.9.9</version>
             <scope>runtime</scope>
         </dependency>
         <dependency><!-- for data staging -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-globus</artifactId>
-            <version>0.9.9-SNAPSHOT</version>
+            <version>0.9.9</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-classic</artifactId>
-            <version>0.9.9-SNAPSHOT</version>
+            <version>0.9.9</version>
             <scope>runtime</scope>
         </dependency>
         <dependency><!-- for saving credential (class DelegationStub) -->
@@ -77,4 +77,8 @@
             <version>unknown</version>
         </dependency>
     </dependencies>
+
+  <scm>
+    <tag>jsaga-0_9_9</tag>
+  </scm>
 </project>

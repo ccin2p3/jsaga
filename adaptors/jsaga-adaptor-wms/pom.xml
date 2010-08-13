@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
 		<groupId>fr.in2p3.jsaga</groupId>
 		<artifactId>jsaga-adaptorpom</artifactId>
@@ -9,7 +8,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.in2p3.jsaga.adaptor</groupId>
 	<artifactId>jsaga-adaptor-wms</artifactId>
-	<version>0.9.9-SNAPSHOT</version>
+	<version>0.9.9</version>
 	<name>Adaptors for gLite-WMS</name>
 	<description>This module provides support for WMS (Workload Management System) execution management technology.</description>
 	<developers>
@@ -39,19 +38,19 @@
 		<dependency>
 			<groupId>fr.in2p3.jsaga</groupId>
 			<artifactId>jsaga-adaptoritf</artifactId>
-			<version>0.9.9-SNAPSHOT</version>
+			<version>0.9.9</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.ogf.saga</groupId>
 			<artifactId>saga-api-test</artifactId>
-			<version>0.9.9-SNAPSHOT</version>
+			<version>0.9.9</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>fr.in2p3.jsaga</groupId>
 			<artifactId>jsaga-engine</artifactId>
-			<version>0.9.9-SNAPSHOT</version>
+			<version>0.9.9</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- adaptor specific -->
@@ -61,19 +60,19 @@
 			-->
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-voms</artifactId>
-			<version>0.9.9-SNAPSHOT</version>
+			<version>0.9.9</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency><!-- for data staging -->
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-globus</artifactId>
-			<version>0.9.9-SNAPSHOT</version>
+			<version>0.9.9</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-classic</artifactId>
-			<version>0.9.9-SNAPSHOT</version>
+			<version>0.9.9</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -99,4 +98,8 @@
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
+
+  <scm>
+    <tag>jsaga-0_9_9</tag>
+  </scm>
 </project>
