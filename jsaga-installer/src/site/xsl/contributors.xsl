@@ -8,7 +8,7 @@
             <section name="Contributors">
                 <table border="1">
                     <xsl:call-template name="HEADERS"/>
-                    <xsl:apply-templates select="artifact[starts-with(@id,'jsaga-adaptor-') and not(@classifier)]">
+                    <xsl:apply-templates select="artifact[@id='jsaga-adaptors']/artifact[not(@classifier)]">
                         <xsl:sort select="@name" order="ascending"/>
                     </xsl:apply-templates>
                 </table>

@@ -1,8 +1,9 @@
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
-        <groupId>fr.in2p3.parent</groupId>
-        <artifactId>in2p3-external-pom</artifactId>
-        <version>current</version>
+        <groupId>fr.in2p3.jsaga</groupId>
+        <artifactId>externals</artifactId>
+        <version>1.0-SNAPSHOT</version>
     </parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>javax.xml</groupId>
@@ -24,4 +25,12 @@
     <distributionManagement>
 		<downloadUrl>http://ftpna2.bea.com/pub/downloads/jsr173.jar</downloadUrl>
 	</distributionManagement>
+    <build>
+        <plugins>
+            <plugin><!-- copy jar -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>

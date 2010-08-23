@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faqs title="Developers Frequently Asked Questions">
+    <part id="developing">
+        <title>Developing JSAGA engine</title>
+        <faq id="developer-pre-requisites">
+            <question>What are the pre-requisites for building JSAGA entirely ?</question>
+            <answer>
+                <ul>
+                    <li>Install <a href="http://java.sun.com/j2se/1.5/download.html">JDK 1.5</a> (or above)</li>
+                    <li>Install <a href="http://archive.apache.org/dist/maven/binaries/">Maven 2.2.1</a> (or above)</li>
+                    <li>Optional: releasing JSAGA requires SSH to be installed</li>
+                    <li>Optional: some adaptors requires gcc compiler to be installed
+                        (these adaptors must either be built on both windows and linux platforms,
+or you can build everything from windows by installing <a href="http://www.cygwin.com/">cygwin</a>,
+<a href="http://prdownloads.sourceforge.net/metamod-p/cygwin-gcc-3.3.6-glibc-2.3.2-linux.tar.bz2">cross-compiler for linux</a>
+and JNI header files for linux)
+                    </li>
+                </ul>
+            </answer>
+        </faq>
+        <faq id="build-from-source">
+            <question>How to build JSAGA from source ?</question>
+            <answer>
+                <ul>
+                    <li>Install and configure SSH according to <a href="https://git.in2p3.fr/doc-en.html#access">these instructions</a></li>
+                    <li>Download <a href="files/bootstrap/pom.xml">bootstrap POM file</a></li>
+                    <li>Build from latest source code
+                        <pre>mvn scm:bootstrap</pre>
+                        Or build an old release
+                        <pre>TAG={release_tag}
+mvn scm:bootstrap -DscmVersionType=tag -DscmVersion=$TAG -Dgoals=deploy,site-deploy</pre>
+                    </li>
+                </ul>
+            </answer>
+        </faq>
+        <faq id="make-release">
+            <question>How to release JSAGA ?</question>
+            <answer>
+                <ul>
+                    <li>Update the release notes
+                        <br/>
+                    </li>
+                    <li>Commit every changes to GIT repository
+                        <br/>
+                    </li>
+                    <li>From a ccdevli host, run:
+                        <pre>export MAVEN_OPTS=-Xmx256m
+mvn -f pom-unreleased.xml deploy clean
+mvn release:prepare
+mvn release:perform -P release</pre>
+                    </li>
+                </ul>
+            </answer>
+        </faq>
+        <faq id="make-snapshot">
+            <question>How to deploy a snapshot of JSAGA ?</question>
+            <answer>From a ccdevli host, run:
+                <pre>export MAVEN_OPTS=-Xmx256m
+mvn deploy site-deploy</pre>
+            </answer>
+        </faq>
+        <faq id="test-web-site">
+            <question>How to test web site generation without deploying it ?</question>
+            <answer>From a ccdevli host, run:
+                <pre>export MAVEN_OPTS=-Xmx256m
+mvn site-deploy -P local</pre>
+            </answer>
+        </faq>
+    </part>
+</faqs>

@@ -18,7 +18,7 @@
             <section name="Adaptors dependencies">
                 <table border="1">
                     <xsl:call-template name="HEADERS"/>
-                    <xsl:apply-templates select="artifact[starts-with(@id,'jsaga-adaptor-') and not(@classifier)]/
+                    <xsl:apply-templates select="artifact[@id='jsaga-adaptors']/
                         descendant::artifact[not(@id=preceding::artifact/@id) and not(starts-with(@id,'jsaga-adaptor-'))]">
                         <xsl:sort select="@id"/>
                     </xsl:apply-templates>

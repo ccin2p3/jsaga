@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <!-- built from source because we need to patch ConfigManager -->
+    <parent>
+        <groupId>fr.in2p3.jsaga</groupId>
+        <artifactId>externals-java</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath>../pom-java.xml</relativePath>
+    </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.naregi.ss</groupId>
     <artifactId>naregi-ss-api</artifactId>
@@ -8,50 +14,11 @@
     <name>NAREGI Super Scheduler Client API (from sub-directory naregi2)</name>
     <url>http://rpm1.naregi.org/index_beta2.html</url>
     <build>
-        <directory>build</directory>
-        <outputDirectory>build/classes</outputDirectory>
-        <sourceDirectory>java</sourceDirectory>
         <plugins>
-            <plugin>
+            <plugin><!-- copy jar -->
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-file-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <files>
-                                <file>
-                                    <source>${project.build.directory}/${artifactId}-${version}.jar</source>
-                                    <destination>${basedir}/${artifactId}.jar</destination>
-                                </file>
-                            </files>
-                        </configuration>
-                    </execution>
-                </executions>
+                <artifactId>maven-antrun-plugin</artifactId>
             </plugin>
-			<plugin>
-				<artifactId>maven-clean-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>clean</phase>
-					</execution>
-				</executions>
-				<configuration>
-					<filesets>
-						<fileset>
-							<directory>${basedir}</directory>
-							<includes>
-								<include>${artifactId}.jar</include>
-							</includes>
-							<followSymlinks>false</followSymlinks>
-						</fileset>
-					</filesets>
-				</configuration>
-			</plugin>
         </plugins>
     </build>
     <dependencies>

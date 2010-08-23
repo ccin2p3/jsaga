@@ -1,45 +1,31 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!-- declaration -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <groupId>fr.in2p3.jsaga.aggregator</groupId>
-        <artifactId>jsaga-adaptors</artifactId>
+        <groupId>fr.in2p3.jsaga</groupId>
+        <artifactId>jsaga</artifactId>
         <version>0.9.10-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga</groupId>
     <artifactId>jsaga-installer</artifactId>
-    <version>0.9.10-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>JSAGA Installer</name>
-    <description>JSAGA is a Java implementation of the Simple API for Grid Applications (SAGA)</description>
-    <licenses>
-        <license>
-            <name>GNU Lesser General Public License</name>
-            <url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
-        </license>
-    </licenses>
+    <description>JSAGA is a Java implementation of the SAGA (Simple API for Grid Applications) specification</description>
 
-    <!-- web site -->
-    <developers>
-        <developer>
-            <name>Sylvain REYNAUD</name>
-            <email>sreynaud@in2p3.fr</email>
-            <roles>
-                <role>architect</role>
-                <role>developer</role>
-            </roles>
-        </developer>
-        <developer>
-            <name>See contributors list</name>
-            <url>http://grid.in2p3.fr/software/jsaga-dev/contributors.html</url>
-            <roles>
-                <role>developer</role>
-            </roles>
-        </developer>
-    </developers>
+    <!-- set as project root -->
+    <scm>
+        <connection>scm:git:git://git.in2p3.fr/jsaga</connection>
+        <developerConnection>scm:git:ssh://git.in2p3.fr/jsaga</developerConnection>
+        <url>https://git.in2p3.fr/cgit/jsaga</url>
+    </scm>
     <distributionManagement>
+        <repository>
+            <id>maven2-repository</id>
+            <url>${maven.repository}</url>
+        </repository>
         <site>
-            <url>${site.upload.root}</url>
+            <id>project-web-site</id>
+            <url>${project.web.site}</url>
         </site>
     </distributionManagement>
 
@@ -48,12 +34,7 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependserializer-plugin</artifactId>
-                <configuration>
-                    <testableArtifacts>
-                        <testableArtifact>fr.in2p3.jsaga:jsaga-engine:jar</testableArtifact>
-                    </testableArtifacts>
-                </configuration>
+                <artifactId>maven-plugin-dependency-xml</artifactId>
                 <executions>
                     <execution>
                         <id>serialize-dependencies</id>
@@ -138,19 +119,6 @@
                             <fileNameReplacement>dependencies-tree.xml</fileNameReplacement>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>generate-dependencies-graph-web-page</id>
-                        <phase>pre-site</phase>
-                        <goals>
-                            <goal>transform</goal>
-                        </goals>
-                        <configuration>
-                            <xslFile>src/site/xsl/dependencies-graph.xsl</xslFile>
-                            <destDir>${project.build.directory}</destDir>
-                            <fileNameRegex>dependencies.xml</fileNameRegex>
-                            <fileNameReplacement>dependencies-graph</fileNameReplacement>
-                        </configuration>
-                    </execution>
 
                     <execution>
                         <id>generate-contributors-guide-web-page</id>
@@ -185,58 +153,67 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-graphviz-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>xml-maven-plugin</artifactId>
+                <version>1.0-beta-3</version>
                 <executions>
                     <execution>
-                        <phase>site</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <dotFile>${project.build.directory}/dependencies-graph</dotFile>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-htmlextract-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>post-site</phase>
-                        <goals>
-                            <goal>extract</goal>
-                        </goals>
-                        <configuration>
-                            <htmls>
-                                <html>${project.build.directory}/site/index.html</html>
-                                <html>${project.build.directory}/site/download.html</html>
-                                <html>${project.build.directory}/site/presentations.html</html>
-                            </htmls>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-command-plugin</artifactId>
-                <configuration>
-                    <workingDirectory>${project.build.directory}/${project.artifactId}-${project.version}-bin.dir/jsaga-${project.version}/</workingDirectory>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>generate-commands-web-page</id>
+                        <id>generate-xdocs</id>
                         <phase>pre-site</phase>
-                        <goals><goal>run</goal></goals>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
                         <configuration>
-                            <title>JSAGA commands</title>
-                            <include>bin/jsaga-*</include>
-                            <aptFileName>commands.apt</aptFileName>
+                            <transformationSets>
+                                <transformationSet>
+                                    <stylesheet>src/site/xsl/download.xsl</stylesheet>
+                                    <dir>${basedir}</dir>
+                                    <includes><include>pom.xml</include></includes>
+                                    <outputDir>${project.build.directory}/generated-site/xdoc</outputDir>
+                                    <fileMappers>
+                                        <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.RegExpFileMapper">
+                                            <pattern>pom.xml</pattern>
+                                            <replacement>download.xml</replacement>
+                                        </fileMapper>
+                                    </fileMappers>
+                                    <parameters>
+                                        <parameter>
+                                            <name>project.version</name>
+                                            <value>${project.version}</value>
+                                        </parameter>
+                                    </parameters>
+                                </transformationSet>
+                            </transformationSets>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-saga-javadoc</id>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.ogf.saga</groupId>
+                                    <artifactId>saga-api</artifactId>
+                                    <version>1.0</version>
+                                    <classifier>javadoc</classifier>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/site/saga-apidocs</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
@@ -275,26 +252,21 @@
             </plugin>
         </plugins>
     </build>
-<!--
     <reporting>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-statistic-plugin</artifactId>
-                <configuration>
-                    <root>..</root>
-                    <disableLOC>true</disableLOC>
-                </configuration>
+                <artifactId>maven-changes-plugin</artifactId>
+                <reportSets><reportSet><reports><report>changes-report</report></reports></reportSet></reportSets>
             </plugin>
         </plugins>
     </reporting>
--->
     <dependencies>
         <!-- for installer itself (for compiling custom panels) -->
         <dependency>
             <groupId>org.codehaus.izpack</groupId>
             <artifactId>izpack-standalone-compiler</artifactId>
-            <version>4.0.1</version>
+            <version>4.2.1</version>
         </dependency>
 
         <!-- test -->
@@ -316,6 +288,14 @@
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
             <version>0.9.10-SNAPSHOT</version>
+        </dependency>
+
+        <!-- adaptors -->
+        <dependency>
+            <groupId>fr.in2p3.jsaga.poms</groupId>
+            <artifactId>jsaga-adaptors</artifactId>
+            <version>0.9.10-SNAPSHOT</version>
+            <type>pom</type>
         </dependency>
     </dependencies>
 </project>

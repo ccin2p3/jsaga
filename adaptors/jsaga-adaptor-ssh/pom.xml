@@ -1,14 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <groupId>fr.in2p3.jsaga</groupId>
-        <artifactId>jsaga-adaptorpom</artifactId>
-        <version>current</version>
+        <groupId>fr.in2p3.jsaga.adaptor</groupId>
+        <artifactId>adaptors</artifactId>
+        <version>0.9.10-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>fr.in2p3.jsaga.adaptor</groupId>
     <artifactId>jsaga-adaptor-ssh</artifactId>
-    <version>0.9.10-SNAPSHOT</version>
     <name>Adaptors for SSH</name>
     <description>This module provides support for SSH components;
 security mecanism (SSH asymmetric keys),
@@ -28,39 +26,7 @@ execution management technology (SSH).</description>
             </properties>
         </developer>
     </developers>
-    <build>
-	  <plugins>
-	    <plugin>
-	        <groupId>org.apache.maven.plugins</groupId>
-	        <artifactId>maven-compiler-plugin</artifactId>
-	        <configuration>
-	            <source>1.5</source>
-	            <target>1.5</target>
-	        </configuration>
-	    </plugin>
-	  </plugins>
-	</build>
     <dependencies>
-        <!-- common -->
-        <dependency>
-            <groupId>fr.in2p3.jsaga</groupId>
-            <artifactId>jsaga-adaptoritf</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.ogf.saga</groupId>
-            <artifactId>saga-api-test</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>fr.in2p3.jsaga</groupId>
-            <artifactId>jsaga-engine</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- adaptor specific -->
         <dependency><!-- for data staging -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-classic</artifactId>

@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:pom="http://maven.apache.org/POM/4.0.0" xmlns="http://maven.apache.org/POM/4.0.0">
-    <xsl:output method="xml" indent="yes" xalan:indent-amount="2" xmlns:xalan="http://xml.apache.org/xslt"/>
+                xmlns="http://maven.apache.org/POM/4.0.0"
+                xmlns:pom="http://maven.apache.org/POM/4.0.0"
+                exclude-result-prefixes="pom">
+    <xsl:output method="xml" indent="yes" xalan:indent-amount="4" xmlns:xalan="http://xml.apache.org/xslt"/>
 
     <xsl:template match="/pom:project">
         <project>
             <parent>
-                <groupId>fr.in2p3.parent</groupId>
-                <artifactId>in2p3-root-pom</artifactId>
-                <version>current</version>
+                <groupId>fr.in2p3.jsaga</groupId>
+                <artifactId>jsaga</artifactId>
+                <version><xsl:value-of select="pom:version/text()"/></version>
             </parent>
             <modelVersion>4.0.0</modelVersion>
-            <groupId>fr.in2p3.jsaga.aggregator</groupId>
+            <groupId>fr.in2p3.jsaga.poms</groupId>
             <artifactId>jsaga-adaptors</artifactId>
-            <version><xsl:value-of select="pom:version/text()"/></version>
             <packaging>pom</packaging>
             <name>List of adaptors</name>
             <dependencies>

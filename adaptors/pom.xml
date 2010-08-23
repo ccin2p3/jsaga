@@ -1,34 +1,100 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <!-- declaration -->
-  <parent>
-    <groupId>fr.in2p3.parent</groupId>
-    <artifactId>in2p3-root-pom</artifactId>
-    <version>current</version>
-  </parent>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>fr.in2p3.jsaga.aggregator</groupId>
-  <artifactId>adaptors</artifactId>
-  <version>0.9.10-SNAPSHOT</version>
-  <packaging>pom</packaging>
-  <name>JSAGA Adaptors</name>
-  <description>These are the adaptors for the JSAGA engine.</description>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>fr.in2p3.jsaga</groupId>
+        <artifactId>jsaga</artifactId>
+        <version>0.9.10-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>fr.in2p3.jsaga.adaptor</groupId>
+    <artifactId>adaptors</artifactId>
+    <packaging>pom</packaging>
+    <name>JSAGA Adaptors</name>
+    <description>Adaptors extend JSAGA with support for additional technologies.</description>
 
-  <!-- aggregation -->
-  <modules>
-    <module>jsaga-adaptor-linux</module>
-    <module>jsaga-adaptor-lfc</module>
-    <module>jsaga-adaptor-srm</module>
-    <module>jsaga-adaptor-wsgram</module>
-    <module>jsaga-adaptor-cream</module>
-    <module>jsaga-adaptor-wms</module>
-    <module>jsaga-adaptor-unicore6</module>
-    <module>jsaga-adaptor-naregi</module>
-    <module>jsaga-adaptor-ssh</module>
-    <module>jsaga-adaptor-irods</module>
-    <module>jsaga-adaptor-mail</module>
-    <!-- adaptors which are used as dependencies of other adaptors must be declared at the end -->
-    <module>jsaga-adaptor-classic</module>
-    <module>jsaga-adaptor-voms</module>
-    <module>jsaga-adaptor-globus</module>
-  </modules>
+    <modules>
+        <module>jsaga-adaptor-linux</module>
+        <module>jsaga-adaptor-lfc</module>
+        <module>jsaga-adaptor-srm</module>
+        <module>jsaga-adaptor-wsgram</module>
+        <module>jsaga-adaptor-cream</module>
+        <module>jsaga-adaptor-wms</module>
+        <module>jsaga-adaptor-unicore6</module>
+        <module>jsaga-adaptor-naregi</module>
+        <module>jsaga-adaptor-ssh</module>
+        <module>jsaga-adaptor-irods</module>
+        <module>jsaga-adaptor-mail</module>
+        <!-- adaptors which are used as dependencies of other adaptors must be declared at the end -->
+        <module>jsaga-adaptor-classic</module>
+        <module>jsaga-adaptor-voms</module>
+        <module>jsaga-adaptor-globus</module>
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>integration/*.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>xslt-maven-plugin</artifactId>
+                <version>1.0</version>
+                <configuration>
+                    <xslFile>src/site/xsl/example.xsl</xslFile>
+                    <srcDir>test/resources/etc</srcDir>
+                    <srcIncludes>jsaga-universe.xml</srcIncludes>
+                    <destDir>${project.build.directory}/generated-site/xdoc</destDir>
+                    <fileNameRegex>jsaga-universe.xml</fileNameRegex>
+                    <fileNameReplacement>example.xml</fileNameReplacement>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>fr.in2p3.jsaga</groupId>
+            <artifactId>jsaga-adaptoritf</artifactId>
+            <version>0.9.10-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ogf.saga</groupId>
+            <artifactId>saga-api-test</artifactId>
+            <version>0.9.10-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>fr.in2p3.jsaga</groupId>
+            <artifactId>jsaga-engine</artifactId>
+            <version>0.9.10-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>

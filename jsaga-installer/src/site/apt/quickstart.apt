@@ -2,14 +2,14 @@ Quick Start Guide
 
 * Overview
 
-    * {{{download.html}Download and install}} JSAGA.
+    * {{{./download.html}Download and install}} JSAGA.
 
-    * Use the {{{commands.html}command line interfaces}} provided with JSAGA (see examples below),
-      or use the {{{saga-api/apidocs/index.html}SAGA API}}
-      (see {{{jsaga-engine/xref/fr/in2p3/jsaga/command/package-summary.html}code examples}}).
+    * Use the {{{./commands.html}command line interfaces}} provided with JSAGA (see examples below),
+      or use the {{{./saga-api/apidocs/index.html}SAGA API}}
+      (see {{{./jsaga-engine/xref/fr/in2p3/jsaga/command/package-summary.html}code examples}}).
 
     * If you install and use several adaptors, default configurations may overlap and you will
-      have to configure adaptors (see configuration examples of {{{adaptors.html}plug-ins}}).
+      have to configure adaptors (see configuration examples of {{{./adaptors.html}plug-ins}}).
 
 * Security context
 

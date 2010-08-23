@@ -11,7 +11,7 @@ JSAGA
  
     * ease extension: adaptor interfaces are designed to minimize coding
       effort for integrating support of new technologies.
-      See list of currently {{{adaptors.html}supported technologies}}.
+      See list of currently {{{./adaptors.html}supported technologies}}.
 
     * operating system indenpendancy: most of the provided adaptors are
       written in full Java, and they are tested on Windows and Linux.

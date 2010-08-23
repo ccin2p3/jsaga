@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>fr.in2p3.jsaga</groupId>
+        <artifactId>jsaga</artifactId>
+        <version>0.9.10-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
     <name>Main</name>
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.commons.filesystem</groupId>
@@ -86,21 +92,6 @@
             </modules>
         </profile>
     </profiles>
-    <scm>
-        <connection>${scm.root}</connection>
-        <developerConnection>${devscm.root}</developerConnection>
-        <url>${webscm.root}</url>
-    </scm>
-    <distributionManagement>
-        <repository>
-            <id>CC-IN2P3 artifacts repository</id>
-            <url>${repository.upload.root}</url>
-        </repository>
-        <site>
-            <id>Web site for this application</id>
-            <url>${site.upload.root}</url>
-        </site>
-    </distributionManagement>
     <dependencies>
         <!-- needed for javah -->
         <dependency>

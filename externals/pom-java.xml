@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>fr.in2p3.jsaga</groupId>
+    <artifactId>externals-java</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>glite-lb-api-java</module>
+        <module>jsch</module>
+        <module>jzlib</module>
+        <module>naregi-ss-api</module>
+        <module>unicore6-api</module>
+        <module>vomsjapi</module>
+        <module>wsgram-api</module>
+    </modules>
+    <build>
+        <directory>build</directory>
+        <outputDirectory>build/classes</outputDirectory>
+        <sourceDirectory>java</sourceDirectory>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>copy-jar</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <tasks>
+                                    <copy overwrite="true"
+                                          file="${project.build.directory}/${artifactId}-${version}.jar"
+                                          tofile="${basedir}/${artifactId}.jar"/>
+                                </tasks>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>

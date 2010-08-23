@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-plugin-clone-template</artifactId>
+    <version>1.0</version>
+    <packaging>maven-plugin</packaging>
+    <name>Filter Plugin</name>
+    <description>This plugin enables copying a resource file to several target files,
+        with filter properties depending on the names of target files (useful for
+        generation of java application launchers)</description>
+    <build>
+        <sourceDirectory>src</sourceDirectory>
+    </build>
+    <reporting>
+        <outputDirectory>build/site</outputDirectory>
+        <plugins>
+            <plugin>
+                <artifactId>maven-plugin-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </reporting>
+    <dependencies>
+        <!-- dependencies common to maven plugins -->
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+            <version>2.2.1</version>
+        </dependency>
+    </dependencies>
+</project>
