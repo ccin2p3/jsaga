@@ -147,11 +147,6 @@
             <resource>
                 <directory>resources</directory>
             </resource>
-            <resource>
-                <directory>src/site/apt-templates</directory>
-                <targetPath>apt</targetPath>
-                <filtering>true</filtering>
-            </resource>
         </resources>
         <testSourceDirectory>test/src</testSourceDirectory>
         <testResources>
