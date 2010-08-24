@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<installation version="1.0" xmlns="uri:izpack">
+    <info>
+        <appname>workaround</appname>
+        <appversion>1.0</appversion>
+    </info>
+    <locale>
+      <langpack iso3="eng"/>
+    </locale>
+    <panels>
+        <panel/>
+    </panels>
+    <packs>
+        <pack name="workaround" required="no">
+            <description>workaround</description>
+        </pack>
+    </packs>
+</installation>

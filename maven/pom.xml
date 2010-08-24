@@ -12,5 +12,6 @@
         <module>maven-plugin-clone-template</module>
         <module>maven-plugin-dependency-xml</module>
         <module>maven-skin-jsaga</module>
+        <module>maven-workaround-izpack</module>
     </modules>
 </project>

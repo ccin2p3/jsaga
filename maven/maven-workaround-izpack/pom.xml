@@ -1,0 +1,39 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>fr.in2p3.jsaga.poms</groupId>
+    <artifactId>maven-workaround-izpack</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Maven workaround for IzPack plug-in</name>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.izpack</groupId>
+                <artifactId>izpack-maven-plugin</artifactId>
+                <configuration>
+                    <descriptor>${basedir}/resources/izpack.xml</descriptor>
+                    <izpackBasedir>${project.build.directory}</izpackBasedir>
+                    <attach>false</attach>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>workaround-to-download-izpack</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>izpack</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.izpack</groupId>
+                        <artifactId>izpack-standalone-compiler</artifactId>
+                        <version>4.2.1</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+</project>
