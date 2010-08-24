@@ -178,7 +178,9 @@ public class FileDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         if (!overwrite && target!=null && target.exists()) {
             throw new AlreadyExistsException("Target entry already exists");
         }
-        source.renameTo(target);
+        if (!source.renameTo(target)) {
+            throw new NoSuccessException("Failed to rename "+sourceAbsolutePath+" to "+targetAbsolutePath);
+        }
     }
 
     public void setLastModified(String absolutePath, String additionalArgs, long lastModified) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
