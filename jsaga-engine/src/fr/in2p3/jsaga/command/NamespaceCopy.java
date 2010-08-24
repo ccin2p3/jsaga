@@ -55,12 +55,7 @@ public class NamespaceCopy extends AbstractCommand {
 
             // execute command
             Session session = SessionFactory.createSession(true);
-            NSEntry entry;
-            if (source.getPath().endsWith("/")) {
-                entry = NSFactory.createNSDirectory(session, source, Flags.NONE.getValue());
-            } else {
-                entry = NSFactory.createNSEntry(session, source, Flags.NONE.getValue());
-            }
+            NSEntry entry = NSFactory.createNSEntry(session, source, Flags.NONE.getValue());
             if (line.hasOption(OPT_MONITOR)) {
                 Task task = entry.copy(TaskMode.TASK, target, flags);
                 try {

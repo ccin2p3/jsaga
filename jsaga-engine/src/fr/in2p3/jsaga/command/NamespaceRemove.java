@@ -42,12 +42,7 @@ public class NamespaceRemove extends AbstractCommand {
 
             // execute command
             Session session = SessionFactory.createSession(true);
-            NSEntry entry;
-            if (url.getPath().endsWith("/")) {
-                entry = NSFactory.createNSDirectory(session, url, Flags.NONE.getValue());
-            } else {
-                entry = NSFactory.createNSEntry(session, url, Flags.NONE.getValue());
-            }
+            NSEntry entry = NSFactory.createNSEntry(session, url, Flags.NONE.getValue());
             entry.remove(flags.getValue());
             entry.close();
         }

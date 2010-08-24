@@ -49,12 +49,7 @@ public class NamespaceMove extends AbstractCommand {
 
             // execute command
             Session session = SessionFactory.createSession(true);
-            NSEntry entry;
-            if (source.getPath().endsWith("/")) {
-                entry = NSFactory.createNSDirectory(session, source, Flags.NONE.getValue());
-            } else {
-                entry = NSFactory.createNSEntry(session, source, Flags.NONE.getValue());
-            }
+            NSEntry entry = NSFactory.createNSEntry(session, source, Flags.NONE.getValue());
             this.changeBehavior(session, target);
             entry.move(target, flags);
             entry.close();
