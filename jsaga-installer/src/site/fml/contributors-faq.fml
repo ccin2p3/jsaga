@@ -20,20 +20,16 @@
 -DartifactId=maven-archetype-jsaga -Dversion=1.0 -Dpackaging=jar \
 -Dfile=maven-archetype-jsaga-1.0.jar</pre>
                     </li>
-                    <li>Create your adaptor (replace _your.company.namespace_ and _name_ with your own values)
-                        <pre>mvn archetype:create -DarchetypeArtifactId=maven-archetype-jsaga \
--DarchetypeVersion=1.0 -DgroupId=_your.company.namespace_ \
--DartifactId=jsaga-adaptor-_name_</pre>
+                    <li>Create the skeleton of your project
+                        <pre>mvn archetype:generate -DarchetypeArtifactId=maven-archetype-jsaga</pre>
                     </li>
-                    <li>Set the version of the JSAGA engine (replace _version_ with the version you want to use)
-                        <pre>VERSION=_version_
-sed -i pom.xml -e "s/CHANGEME/$VERSION/g"</pre>
+                    <li>Replace all occurence of CHANGE in file pom.xml</li>
+                    <li>Rename and modify the class MyProtocolDataAdaptor
+                        (see "<a href="contributors-guide.html">Contributors Guide</a>").
                     </li>
-                    <li>Install all the dependencies
-                        <pre>mvn validate -s profiles.xml</pre>
+                    <li>Build your adaptor
+                        <pre>mvn test</pre>
                     </li>
-                    <li>Rename and modify the class MyProtocolDataAdaptor to implements some of
-                        the <a href="jsaga-adaptoritf/apidocs/index.html">adaptor interfaces</a>.</li>
                 </ul>
             </answer>
         </faq>

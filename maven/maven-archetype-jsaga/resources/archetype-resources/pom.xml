@@ -2,37 +2,30 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <groupId>fr.in2p3.jsaga</groupId>
-        <artifactId>jsaga-adaptorpom</artifactId>
-        <version>current</version>
+        <groupId>fr.in2p3.jsaga.adaptor</groupId>
+        <artifactId>adaptors</artifactId>
+        <version>0.9.10-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>${groupId}</groupId>
     <artifactId>${artifactId}</artifactId>
     <version>${version}</version>
     <name>${artifactId}</name>
-    <dependencies>
-        <!-- common -->
-        <dependency>
-            <groupId>fr.in2p3.jsaga</groupId>
-            <artifactId>jsaga-adaptoritf</artifactId>
-            <version>CHANGEME</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.ogf.saga</groupId>
-            <artifactId>saga-api-test</artifactId>
-            <version>CHANGEME</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>fr.in2p3.jsaga</groupId>
-            <artifactId>jsaga-engine</artifactId>
-            <version>CHANGEME</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- adaptor specific -->
-    </dependencies>
+    <description>CHANGEME: Write a short description of plug-ins provided by this module.</description>
+    <developers>
+        <developer>
+            <name>CHANGEME</name>
+            <email>CHANGEME</email>
+            <organization>CHANGEME</organization>
+            <organizationUrl>CHANGEME</organizationUrl>
+            <properties>
+                <organizationLogoUrl>CHANGEME</organizationLogoUrl>
+                <project>CHANGEME</project>
+                <projectUrl>CHANGEME</projectUrl>
+                <projectLogoUrl>CHANGEME</projectLogoUrl>
+            </properties>
+        </developer>
+    </developers>
     <build>
         <sourceDirectory>src</sourceDirectory>
         <testSourceDirectory>test/src</testSourceDirectory>
