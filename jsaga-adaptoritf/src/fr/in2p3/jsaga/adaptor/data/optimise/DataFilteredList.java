@@ -14,7 +14,7 @@ import org.ogf.saga.error.*;
 * ***************************************************
 * Description:                                      */
 /**
- *
+ * TODO: replace this with interface DataFinder
  */
 public interface DataFilteredList extends DataReaderAdaptor {
     /**
@@ -23,6 +23,7 @@ public interface DataFilteredList extends DataReaderAdaptor {
      * @param additionalArgs adaptor specific arguments
      * @return the entry attributes.
      * @throws DoesNotExistException if absolutePath does not exist.
+     * @deprecated
      */
     public FileAttributes[] listDirectories(String absolutePath, String additionalArgs)
         throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException;
