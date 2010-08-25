@@ -45,6 +45,8 @@
                     <li>Generate a patch (WARNING: no slash at the end of directory name)
                         <pre>diff -Naur -xbuild &lt;origin&gt; &lt;modified&gt;</pre>
                     </li>
+                    <li>Send it to JSAGA developers.
+                    </li>
                 </ul>
             </answer>
         </faq>

@@ -40,12 +40,12 @@ mvn scm:bootstrap -DscmVersionType=tag -DscmVersion=$TAG -Dgoals=deploy,site-dep
                     <li>Update the release notes
                         <br/>
                     </li>
-                    <li>Commit every changes to GIT repository
-                        <br/>
+                    <li>Update from GIT and select the branch "master"
+                        <pre>git pull
+git checkout master</pre>
                     </li>
                     <li>From a ccdevli host, run:
                         <pre>export MAVEN_OPTS=-Xmx256m
-mvn scm:update
 mvn -f pom-unreleased.xml deploy
 
 mvn release:prepare
@@ -56,9 +56,15 @@ mvn release:perform -P release</pre>
         </faq>
         <faq id="make-snapshot">
             <question>How to deploy a snapshot of JSAGA ?</question>
-            <answer>From a ccdevli host, run:
+            <answer>
+                <ul>
+                    <li>Update from GIT and select the branch to build
+                        <pre>git pull
+git checkout &lt;yourBranch&gt;</pre>
+                    </li>
+                </ul>
+                From a ccdevli host, run:
                 <pre>export MAVEN_OPTS=-Xmx256m
-mvn scm:update
 mvn -f pom-unreleased.xml deploy
 
 mvn deploy site-deploy</pre>
