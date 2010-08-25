@@ -38,7 +38,7 @@
             <answer>
                 <ul>
                     <li>Download and extract the latest version of the adaptor from
-                        <a href="http://grid.in2p3.fr/maven2/fr/in2p3/jsaga/adaptor/sources/">here</a>.
+                        <a href="http://grid.in2p3.fr/maven2/fr/in2p3/jsaga/adaptor/sources/latest/">here</a>.
                     </li>
                     <li>Do your modifications.
                     </li>
