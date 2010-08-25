@@ -62,12 +62,13 @@ mvn release:perform -P release</pre>
                         <pre>git pull
 git checkout &lt;yourBranch&gt;</pre>
                     </li>
-                </ul>
-                From a ccdevli host, run:
-                <pre>export MAVEN_OPTS=-Xmx256m
+                    <li>From a ccdevli host, run:
+                        <pre>export MAVEN_OPTS=-Xmx256m
 mvn -f pom-unreleased.xml deploy
 
 mvn deploy site-deploy</pre>
+                    </li>
+                </ul>
             </answer>
         </faq>
         <faq id="test-web-site">
