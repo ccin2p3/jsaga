@@ -21,7 +21,7 @@
                         <configuration>
                             <srcDir>./</srcDir>
                             <srcIncludes>pom.xml</srcIncludes>
-                            <xslFile>aggregate.xsl</xslFile>
+                            <xslFile>src/aggregate.xsl</xslFile>
                             <destDir>../jsaga-adaptors/</destDir>
                         </configuration>
                     </execution>
