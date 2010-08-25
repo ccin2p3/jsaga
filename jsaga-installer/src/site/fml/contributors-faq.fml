@@ -40,12 +40,14 @@
                     <li>Download and extract the latest version of the adaptor from
                         <a href="http://grid.in2p3.fr/maven2/fr/in2p3/jsaga/adaptor/sources/latest/">here</a>.
                     </li>
-                    <li>Do your modifications.
+                    <li>Modify the code.
+                    </li>
+                    <li>Run the non-regression test-suite.
                     </li>
                     <li>Generate a patch (WARNING: no slash at the end of directory name)
                         <pre>diff -Naur -xbuild &lt;origin&gt; &lt;modified&gt;</pre>
                     </li>
-                    <li>Send it to JSAGA developers.
+                    <li>Send it to JSAGA developers for inclusion in future JSAGA releases.
                     </li>
                 </ul>
             </answer>
