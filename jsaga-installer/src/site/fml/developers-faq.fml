@@ -49,6 +49,7 @@ git checkout master</pre>
 mvn -f pom-unreleased.xml deploy
 
 mvn release:prepare
+mvn install ; mvn release:prepare   # workaround
 mvn release:perform -P release</pre>
                     </li>
                 </ul>
