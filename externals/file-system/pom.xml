@@ -3,9 +3,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>fr.in2p3.jsaga</groupId>
-        <artifactId>jsaga</artifactId>
-        <version>0.9.10-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
+        <artifactId>externals</artifactId>
+        <version>1.0-SNAPSHOT</version>
     </parent>
     <name>Main</name>
     <modelVersion>4.0.0</modelVersion>
