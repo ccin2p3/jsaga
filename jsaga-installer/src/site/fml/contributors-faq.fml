@@ -33,6 +33,21 @@
                 </ul>
             </answer>
         </faq>
+        <faq id="adaptor-modify">
+            <question>How to modify an existing adaptor for JSAGA ?</question>
+            <answer>
+                <ul>
+                    <li>Download and extract the latest version of the adaptor from
+                        <a href="http://grid.in2p3.fr/maven2/fr/in2p3/jsaga/adaptor/sources/">here</a>.
+                    </li>
+                    <li>Do your modifications.
+                    </li>
+                    <li>Generate a patch (WARNING: no slash at the end of directory name)
+                        <pre>diff -Naur -xbuild &lt;origin&gt; &lt;modified&gt;</pre>
+                    </li>
+                </ul>
+            </answer>
+        </faq>
         <faq id="eclipse">
             <question>How to import the maven project into Eclipse (http://www.eclipse.org/) ?</question>
             <answer>
