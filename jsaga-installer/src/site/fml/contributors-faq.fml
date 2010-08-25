@@ -23,7 +23,7 @@
                     <li>Create the skeleton of your project
                         <pre>mvn archetype:generate -DarchetypeArtifactId=maven-archetype-jsaga</pre>
                     </li>
-                    <li>Replace all occurence of CHANGE in file pom.xml</li>
+                    <li>Replace all occurences of CHANGE in file pom.xml</li>
                     <li>Rename and modify the class MyProtocolDataAdaptor
                         (see "<a href="contributors-guide.html">Contributors Guide</a>").
                     </li>
