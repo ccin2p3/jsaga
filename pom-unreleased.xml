@@ -11,4 +11,11 @@
     <module>maven</module>
     <module>saga-api</module>
   </modules>
+
+    <distributionManagement>
+        <repository>
+            <id>maven2-repository</id>
+            <url>file:///afs/in2p3.fr/home/throng/ccin2p3/grid/maven2</url>
+        </repository>
+    </distributionManagement>
 </project>
