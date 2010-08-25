@@ -87,13 +87,12 @@ Requirements = true <xsl:text/>
 		<xsl:for-each select="jsdl:JobIdentification/jsdl:JobAnnotation/text()">
 &amp;&amp; other.GlueCEUniqueID == "<xsl:value-of select="."/>" <xsl:text/>
 		</xsl:for-each>
-		<!-- Value to use ? 
  		<xsl:for-each select="jsdl:Resources/jsdl:CPUArchitecture/jsdl:CPUArchitectureName/text()">
-&amp;&amp;  other.GlueSubClusterPlatformType == "<xsl:value-of select="."/>" <xsl:text/>
+&amp;&amp;  other.GlueHostArchitecturePlatformType == "<xsl:value-of select="."/>" <xsl:text/>
 		</xsl:for-each>
 		<xsl:for-each select="jsdl:Resources/jsdl:OperatingSystem/jsdl:OperatingSystemType/jsdl:OperatingSystemName/text()">
 &amp;&amp;  other.OperatingSystemName == "<xsl:value-of select="."/>" <xsl:text/>
-		</xsl:for-each>   -->
+		</xsl:for-each>
 <xsl:text/>;
 
         <xsl:if test="$rank">
