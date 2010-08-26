@@ -90,7 +90,7 @@
                             <schemaDirectory>${basedir}/resources/schema</schemaDirectory>
                             <properties>${basedir}/resources/schema/NStoPkg.properties</properties>
                             <bindingfile>${basedir}/resources/schema/bindings.xml</bindingfile>
-                            <dest>${project.build.directory}/generated-sources</dest>
+                            <dest>${project.build.directory}/generated-sources/src</dest>
                             <tstamp>${project.build.directory}/tstamp</tstamp>
                         </configuration>
                     </execution>

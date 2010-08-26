@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.impl.job.instance;
 
-import fr.in2p3.jsaga.impl.attributes.AttributeImpl;
+import fr.in2p3.jsaga.impl.attributes.ScalarAttributeImpl;
 import fr.in2p3.jsaga.impl.attributes.VectorAttributeImpl;
 import fr.in2p3.jsaga.impl.monitoring.MetricMode;
 import fr.in2p3.jsaga.impl.monitoring.MetricType;
@@ -22,18 +22,18 @@ import java.util.Date;
  *
  */
 public class JobAttributes implements Cloneable {
-    AttributeImpl<String> m_JobId;
+    ScalarAttributeImpl<String> m_JobId;
     VectorAttributeImpl<String> m_ExecutionHosts;
-    AttributeImpl<Date> m_Created;
-    AttributeImpl<Date> m_Started;
-    AttributeImpl<Date> m_Finished;
-    AttributeImpl<Integer> m_ExitCode;
+    ScalarAttributeImpl<Date> m_Created;
+    ScalarAttributeImpl<Date> m_Started;
+    ScalarAttributeImpl<Date> m_Finished;
+    ScalarAttributeImpl<Integer> m_ExitCode;
     /** deviation from SAGA specification */
-    AttributeImpl<String> m_NativeJobDescription;
+    ScalarAttributeImpl<String> m_NativeJobDescription;
 
     /** constructor */
     JobAttributes(final AbstractSyncJobImpl job) {
-        m_JobId = job._addAttribute(new AttributeImpl<String>(
+        m_JobId = job._addAttribute(new ScalarAttributeImpl<String>(
                 Job.JOBID,
                 "SAGA representation of the job identifier",
                 MetricMode.ReadOnly,
@@ -55,7 +55,7 @@ public class JobAttributes implements Cloneable {
                 }
             }
         });
-        m_Created = job._addAttribute(new AttributeImpl<Date>(
+        m_Created = job._addAttribute(new ScalarAttributeImpl<Date>(
                 Job.CREATED,
                 "time stamp of the job creation in the resource manager",
                 MetricMode.ReadOnly,
@@ -71,7 +71,7 @@ public class JobAttributes implements Cloneable {
                 }
             }
         });
-        m_Started = job._addAttribute(new AttributeImpl<Date>(
+        m_Started = job._addAttribute(new ScalarAttributeImpl<Date>(
                 Job.STARTED,
                 "time stamp indicating when the job started running",
                 MetricMode.ReadOnly,
@@ -87,7 +87,7 @@ public class JobAttributes implements Cloneable {
                 }
             }
         });
-        m_Finished = job._addAttribute(new AttributeImpl<Date>(
+        m_Finished = job._addAttribute(new ScalarAttributeImpl<Date>(
                 Job.FINISHED,
                 "time stamp indicating when the job completed",
                 MetricMode.ReadOnly,
@@ -103,7 +103,7 @@ public class JobAttributes implements Cloneable {
                 }
             }
         });
-        m_ExitCode = job._addAttribute(new AttributeImpl<Integer>(
+        m_ExitCode = job._addAttribute(new ScalarAttributeImpl<Integer>(
                 Job.EXITCODE,
                 "process exit code",
                 MetricMode.ReadOnly,
@@ -119,7 +119,7 @@ public class JobAttributes implements Cloneable {
                 }
             }
         });
-        m_NativeJobDescription = job._addAttribute(new AttributeImpl<String>(
+        m_NativeJobDescription = job._addAttribute(new ScalarAttributeImpl<String>(
                 AbstractSyncJobImpl.NATIVEJOBDESCRIPTION,
                 "job description understood by the job service (deviation from SAGA specification)",
                 MetricMode.ReadOnly,

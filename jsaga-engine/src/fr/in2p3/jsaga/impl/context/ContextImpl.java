@@ -65,11 +65,15 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     /** override super.setAttribute() */
     public void setAttribute(String key, String value) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         // set attribute
-        if (Context.TYPE.equals(key)) {
-            m_attributes.m_type.setObject(value);
-            m_adaptor = SecurityAdaptorFactory.getInstance().getSecurityAdaptor(value);
-        } else {
+        try {
+            m_attributes.getScalarAttribute(key).setObject(value);
+        } catch (DoesNotExistException e) {
             super.setAttribute(key, value);
+        }
+
+        // instanciate adaptor
+        if (Context.TYPE.equals(key)) {
+            m_adaptor = SecurityAdaptorFactory.getInstance().getSecurityAdaptor(value);
         }
         // reset adaptor
         m_credential = null;
@@ -77,63 +81,64 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
 
     /** override super.getAttribute() */
     public String getAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
-        if (Context.TYPE.equals(key)) {
-            return super.getAttribute(key);
-        } else {
-            // get credential
+        // get attribute
+        try {
+            return m_attributes.getScalarAttribute(key).getObject();
+        } catch (DoesNotExistException e) {
+            // try to get from credential
             SecurityCredential credential = this.getCredential();
-            // get attribute
             if (Context.USERID.equals(key)) {
                 try {
                     return credential.getUserID();
-                } catch (Exception e) {
-                    throw new NoSuccessException(e);
+                } catch (Exception e2) {
+                    throw new NoSuccessException(e2);
                 }
             } else {
                 String value = credential.getAttribute(key);
                 if (value != null) {
                     return value;
-                } else {
-                    return super.getAttribute(key);
                 }
             }
+            // try to get from parent class
+            return super.getAttribute(key);
         }
     }
 
     /** override super.setVectorAttribute() */
     public void setVectorAttribute(String key, String[] values) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         // set attribute
-        if (Context.TYPE.equals(key)) {
-            throw new IncorrectStateException("Operation setVectorAttribute not allowed on scalar attribute: "+key, this);
-        } else {
+        try {
+            m_attributes.getVectorAttribute(key).setObjects(values);
+        } catch (DoesNotExistException e) {
             super.setVectorAttribute(key, values);
         }
+
         // reset adaptor
         m_credential = null;
     }
 
     /** override super.getVectorAttribute() */
     public String[] getVectorAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
-        if (Context.TYPE.equals(key)) {
-            return super.getVectorAttribute(key);
-        } else {
-            // get credential
+        // get attribute
+        try {
+            return m_attributes.getVectorAttribute(key).getObjects();
+        } catch (DoesNotExistException e) {
+            // try to get from credential
             SecurityCredential credential = this.getCredential();
-            // get attribute
             try {
                 if (Context.USERID.equals(key)) {
-                    throw new IncorrectStateException("Operation getVectorAttribute not allowed on scalar attribute: "+key, this);
+                    throw new IncorrectStateException("Operation not allowed on scalar attribute: "+key, this);
                 } else {
                     String value = credential.getAttribute(key);
                     if (value != null) {
-                        throw new IncorrectStateException("Operation getVectorAttribute not allowed on scalar attribute: "+key, this);
-                    } else {
-                        return super.getVectorAttribute(key);
+                        throw new IncorrectStateException("Operation not allowed on scalar attribute: "+key, this);
                     }
                 }
-            } catch (Exception e) {
-                throw new NoSuccessException(e);
+            } catch (Exception e2) {
+                throw new NoSuccessException(e2);
             }
+            // try to get from parent class
+            return super.getVectorAttribute(key);
         }
     }
 

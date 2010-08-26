@@ -17,7 +17,7 @@ import org.ogf.saga.error.*;
 /**
  *
  */
-public class VectorAttributeImpl<E> implements Attribute {
+public class VectorAttributeImpl<E> implements AttributeVector {
     protected String m_key;
     protected E[] m_objects;
     private MetricMode m_mode;

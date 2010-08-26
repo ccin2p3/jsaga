@@ -6,6 +6,7 @@ import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.session.Session;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class SessionImpl extends AbstractSagaObjectImpl implements Session {
         return clone;
     }
 
-    public void addContext(Context context) {
+    public void addContext(Context context) throws NotImplementedException {
         if (! m_contexts.contains(context)) {
             m_contexts.add(context);
         }

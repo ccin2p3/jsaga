@@ -119,8 +119,8 @@ public abstract class AbstractTaskImplWithAsyncAttributes<T,E,A extends Attribut
 
     //////////////////////////////////////////// internal methods ////////////////////////////////////////////
 
-    public AttributeImpl _addAttribute(AttributeImpl attribute) {
-        return m_attributes._addAttribute(attribute);
+    public ScalarAttributeImpl _addAttribute(ScalarAttributeImpl scalarAttribute) {
+        return m_attributes._addAttribute(scalarAttribute);
     }
 
     public VectorAttributeImpl _addVectorAttribute(VectorAttributeImpl vectorAttribute) {

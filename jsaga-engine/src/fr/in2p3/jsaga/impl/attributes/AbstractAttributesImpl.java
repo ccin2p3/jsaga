@@ -50,9 +50,13 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
     public void setAttribute(String key, String value) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         Attribute attribute = m_attributes.get(key);
         if (attribute != null) {
-            attribute.setValue(value);
+            if (attribute instanceof AttributeScalar) {
+                ((AttributeScalar)attribute).setValue(value);
+            } else {
+                throw new IncorrectStateException("Attempted to set scalar value on a vector attribute: "+key, this);
+            }
         } else if (m_isExtensible) {
-            m_attributes.put(key, new AttributeScalar(key, value));
+            m_attributes.put(key, new DefaultAttributeScalar(key, value));
         } else {
             throw new DoesNotExistException("Attribute "+key+" does not exist", this);
         }
@@ -61,7 +65,11 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
     public String getAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         Attribute attribute = m_attributes.get(key);
         if (attribute != null) {
-            return attribute.getValue();
+            if (attribute instanceof AttributeScalar) {
+                return ((AttributeScalar)attribute).getValue();
+            } else {
+                throw new IncorrectStateException("Attempted to get scalar value from a vector attribute: "+key, this);
+            }
         } else {
             throw new DoesNotExistException("Attribute "+key+" does not exist", this);
         }
@@ -70,9 +78,13 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
     public void setVectorAttribute(String key, String[] values) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         Attribute attribute = m_attributes.get(key);
         if (attribute != null) {
-            attribute.setValues(values);
+            if (attribute instanceof AttributeVector) {
+                ((AttributeVector)attribute).setValues(values);
+            } else {
+                throw new IncorrectStateException("Attempted to set vector value on a scalar attribute: "+key, this);
+            }
         } else if (m_isExtensible) {
-            m_attributes.put(key, new AttributeVector(key, values));
+            m_attributes.put(key, new DefaultAttributeVector(key, values));
         } else {
             throw new DoesNotExistException("Attribute "+key+" does not exist", this);
         }
@@ -81,7 +93,11 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
     public String[] getVectorAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         Attribute attribute = m_attributes.get(key);
         if (attribute != null) {
-            return attribute.getValues();
+            if (attribute instanceof AttributeVector) {
+                return ((AttributeVector)attribute).getValues();
+            } else {
+                throw new IncorrectStateException("Attempted to get vector value from a scalar attribute: "+key, this);
+            }
         } else {
             throw new DoesNotExistException("Attribute "+key+" does not exist", this);
         }
@@ -133,8 +149,18 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
                             return true;    //found
                         } else {
                             try {
-                                if (valueRegexp.matcher(attribute.getValue()).matches()) {
-                                    return true;    //found
+                                if (attribute instanceof AttributeScalar) {
+                                    String value = ((AttributeScalar)attribute).getValue();
+                                    if (valueRegexp.matcher(value).matches()) {
+                                        return true;    //found
+                                    }
+                                } else {
+                                    String[] values = ((AttributeVector)attribute).getValues();
+                                    for (String value : values) {
+                                        if (valueRegexp.matcher(value).matches()) {
+                                            return true;    //found (OR semantic)
+                                        }
+                                    }
                                 }
                             } catch (IncorrectStateException e) {
                                 throw new NoSuccessException(e);
@@ -177,7 +203,7 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
     public boolean isVectorAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         Attribute attribute = m_attributes.get(key);
         if (attribute != null) {
-            return attribute instanceof AttributeVector;
+            return attribute instanceof DefaultAttributeVector;
         } else {
             throw new DoesNotExistException("Attribute "+key+" does not exist", this);
         }
@@ -189,9 +215,9 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
 
     //////////////////////////////////////////// protected methods ////////////////////////////////////////////
 
-    public AttributeImpl _addAttribute(AttributeImpl attribute) {
-        m_attributes.put(attribute.getKey(), attribute);
-        return attribute;
+    public ScalarAttributeImpl _addAttribute(ScalarAttributeImpl scalarAttribute) {
+        m_attributes.put(scalarAttribute.getKey(), scalarAttribute);
+        return scalarAttribute;
     }
     public VectorAttributeImpl _addVectorAttribute(VectorAttributeImpl vectorAttribute) {
         m_attributes.put(vectorAttribute.getKey(), vectorAttribute);
@@ -199,74 +225,34 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
     }
 
     protected void _addAttribute(String key, String value) {
-        m_attributes.put(key, new AttributeScalar(key, value));
-    }
-    protected void _addVectorAttribute(String key, String values) {
-        m_attributes.put(key, new AttributeVector(key, values));
+        m_attributes.put(key, new DefaultAttributeScalar(key, value));
     }
     protected void _addUnsupportedAttribute(String key) {
-        m_attributes.put(key, new AttributeScalar(key, false, false, null));
+        m_attributes.put(key, new DefaultAttributeScalar(key, false, false, null));
     }
     public void _addReadOnlyAttribute(String key, String constantValue) {
-        m_attributes.put(key, new AttributeScalar(key, true, true, constantValue));
+        m_attributes.put(key, new DefaultAttributeScalar(key, true, true, constantValue));
     }
     public void _addReadOnlyAttribute(String key, String[] constantValues) {
-        m_attributes.put(key, new AttributeVector(key, true, true, constantValues));
+        m_attributes.put(key, new DefaultAttributeVector(key, true, true, constantValues));
     }
     protected Map _getAttributesMap() throws NotImplementedException, IncorrectStateException, NoSuccessException {
         Map<String,String> map = new HashMap<String,String>();
         for (Map.Entry<String, Attribute> entry : m_attributes.entrySet()) {
             String key = entry.getKey();
             Attribute attr = entry.getValue();
-            if (attr.getValue() != null) {
-                map.put(key, attr.getValue());
+            if (attr instanceof AttributeScalar) {
+                String value = ((AttributeScalar)attr).getValue();
+                if (value != null) {
+                    map.put(key, value);
+                }
+            } else {
+                // ignore vector attributes
             }
         }
         return map;
     }
     protected boolean _containsAttributeKey(String key) {
         return m_attributes.containsKey(key);
-    }
-    /**
-     * To be used with fixed keys only
-     */
-    protected String _getOptionalAttribute(String key) throws NotImplementedException, IncorrectStateException, NoSuccessException {
-        Attribute attribute = m_attributes.get(key);
-        if (attribute != null) {
-            return attribute.getValue();
-        } else {
-            return null;
-        }
-    }
-
-    /** For MetricImpl */
-    protected boolean _changeAttribute(String key, String value) throws NoSuccessException {
-        Attribute attribute = m_attributes.get(key);
-        if (attribute != null) {
-            try {
-                if (attribute.getValue() != null) {
-                    if (!attribute.getValue().equals(value)) {
-                        attribute.setValue(value);
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } else {
-                    if (value != null) {
-                        attribute.setValue(value);
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            } catch(SagaException e) {
-                throw new NoSuccessException(e);
-            }
-        } else if (m_isExtensible) {
-            m_attributes.put(key, new AttributeScalar(key, value));
-            return false;   //initial value must not be notified
-        } else {
-            throw new NoSuccessException("Attribute "+key+" does not exist", this);
-        }
     }
 }
