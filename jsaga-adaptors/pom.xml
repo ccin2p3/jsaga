@@ -1,9 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>fr.in2p3.jsaga</groupId>
         <artifactId>jsaga</artifactId>
-        <version>0.9.10-SNAPSHOT</version>
+        <version>0.9.9-1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga.poms</groupId>
@@ -14,168 +13,168 @@
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-linux</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-linux</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-lfc</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-lfc</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-srm</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-srm</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-wsgram</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-wsgram</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-cream</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-cream</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-wms</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-wms</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-unicore6</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-unicore6</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-naregi</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-naregi</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-ssh</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-ssh</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-irods</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-irods</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-mail</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-mail</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-classic</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-classic</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-voms</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-voms</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-globus</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-globus</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.9-1</version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>

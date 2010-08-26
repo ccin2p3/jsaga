@@ -1,9 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga</groupId>
     <artifactId>jsaga</artifactId>
-    <version>0.9.10-SNAPSHOT</version>
+    <version>0.9.9-1</version>
     <packaging>pom</packaging>
     <name>JSAGA Project</name>
     <description>JSAGA is a Java implementation of the SAGA specification (Open Grid Forum).</description>
@@ -104,9 +103,7 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <move overwrite="true" failonerror="false"
-                                              file="${project.build.directory}/site/images/logo-jsaga-dev.png"
-                                              tofile="${project.build.directory}/site/images/logo-jsaga.png"/>
+                                        <move overwrite="true" failonerror="false" file="${project.build.directory}/site/images/logo-jsaga-dev.png" tofile="${project.build.directory}/site/images/logo-jsaga.png" />
                                     </tasks>
                                 </configuration>
                             </execution>
