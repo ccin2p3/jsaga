@@ -233,6 +233,7 @@
             <plugin>
                 <groupId>org.codehaus.izpack</groupId>
                 <artifactId>izpack-maven-plugin</artifactId>
+                <version>1.0-alpha-5</version>
                 <configuration>
                     <descriptor>${project.build.directory}/izpack.xml</descriptor>
                     <izpackBasedir>${project.build.directory}/${project.artifactId}-${project.version}-bin.dir/jsaga-${project.version}/</izpackBasedir>
