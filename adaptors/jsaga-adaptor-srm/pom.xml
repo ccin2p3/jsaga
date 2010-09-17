@@ -18,6 +18,15 @@
                 <organizationLogoUrl>http://cc.in2p3.fr/plugins/kitcnrs/images/logoCC72.gif</organizationLogoUrl>
             </properties>
         </developer>
+        <developer>
+            <name>Lionel Schwarz</name>
+            <email>lionel.schwarz@in2p3.fr</email>
+            <organization>CC-IN2P3</organization>
+            <organizationUrl>http://cc.in2p3.fr/</organizationUrl>
+            <properties>
+                <organizationLogoUrl>http://cc.in2p3.fr/plugins/kitcnrs/images/logoCC72.gif</organizationLogoUrl>
+            </properties>
+        </developer>
 		<developer>
 			<name>Jérôme Revillard</name>
 			<email>jrevillard@maatg.com</email>
