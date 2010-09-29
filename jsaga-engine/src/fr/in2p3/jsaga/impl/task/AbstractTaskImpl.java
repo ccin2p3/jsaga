@@ -469,8 +469,7 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
             try {
                 return this.getState();
             } catch (Exception e) {
-                s_logger.error("Failed to query state", e);
-                return null;
+                throw new RuntimeException("Failed to query state", e);
             }
         }
     }
