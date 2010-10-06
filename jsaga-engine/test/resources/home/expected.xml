@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
+    <contexts>
+        <context type="UserPass">
+            <attribute name="BaseUrlIncludes">
+                <item>stest://</item>
+            </attribute>
+            <attribute name="ServiceAttributes"/>
+        </context>
+        <context type="VOMS">
+            <attribute name="UserVO" value="dteam"/>
+            <attribute name="BaseUrlIncludes">
+                <item>gsiftp://</item>
+                <item>srm://</item>
+                <item>lfn://</item>
+                <item>cream://</item>
+                <item>wms://</item>
+            </attribute>
+            <attribute name="ServiceAttributes">
+                <item>wms.virtualorganisation=dteam</item>
+            </attribute>
+        </context>
+        <context type="Globus">
+            <attribute name="BaseUrlIncludes">
+                <item>gatekeeper://</item>
+            </attribute>
+            <attribute name="ServiceAttributes">
+                <item>gatekeeper.ShellPath=F\:\\cygwin\\bin\\sh.exe</item>
+            </attribute>
+        </context>
+        <context type="None">
+            <attribute name="BaseUrlIncludes">
+                <item>local://</item>
+            </attribute>
+            <attribute name="ServiceAttributes">
+                <item>local.ShellPath=F\:\\cygwin\\bin\\sh.exe</item>
+            </attribute>
+        </context>
+    </contexts>
+    <session>
+        <context type="UserPass">
+            <attribute name="UrlPrefix" value="STestContext"/>
+        </context>
+    </session>
+</jsaga-default>

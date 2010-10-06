@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
+    <contexts>
+        <context type="VOMS">
+            <!--<attribute name="Server" value="voms://lcg-voms.cern.ch:15004/DC=ch/DC=cern/OU=computers/CN=lcg-voms.cern.ch"/>-->
+            <!--<attribute name="UserVO" value="dteam"/>-->
+
+            <attribute name="Server" value="voms://cclcgvomsli01.in2p3.fr:15011/O=GRID-FR/C=FR/O=CNRS/OU=CC-LYON/CN=cclcgvomsli01.in2p3.fr"/>
+            <attribute name="UserVO" value="vo.rhone-alpes.idgrilles.fr"/>
+
+            <!--<attribute name="CertRepository" value="${user.home}/.jsaga/contexts/voms/certificates/"/>-->
+            <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
+            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/ra_cred.txt"/>
+
+            <job type="wms">
+                <!--<attribute name="DefaultJdlFile" value="etc/glite_wms.conf"/>-->
+                <attribute name="RetryCount" value="0"/>
+                <attribute name="PerusalFileEnable" value="false"/>
+                <attribute name="MyProxyServer" value="myproxy.cern.ch"/>
+
+                <!-- WARNING: attribute OutputStorage is suppported but it is incompatible with SAGA -->
+                <!--<attribute name="OutputStorage" value="${java.io.tmpdir}/sandbox"/>-->
+            </job>
+        </context>
+    </contexts>
+    <session>
+        <context type="VOMS"/>
+    </session>
+</jsaga-default>

@@ -47,9 +47,8 @@ public class  IrodsDataAdaptor extends IrodsDataAdaptorAbstract {
         });
     }
 
-	public BaseURL getBaseURL() throws IncorrectURLException {
-        //todo: parse IRODSENV file
-        return null;
+	public int getDefaultPort() {
+        return NO_PORT;
     }
 	
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {

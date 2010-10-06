@@ -1,0 +1,99 @@
+options {
+    JAVA_UNICODE_ESCAPE = true;
+    STATIC = false;
+    LOOKAHEAD = 2;
+}
+
+PARSER_BEGIN(BaseUrlParser)
+package fr.in2p3.jsaga.generated.parser;
+import fr.in2p3.jsaga.engine.session.BaseUrlItem;
+import fr.in2p3.jsaga.engine.session.item.*;
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.List;
+public class BaseUrlParser {
+    public static BaseUrlItem[] parse(String pattern) throws ParseException {
+        return new BaseUrlParser(new ByteArrayInputStream(pattern.getBytes())).parse();
+    }
+}
+PARSER_END(BaseUrlParser)
+
+SKIP: { " " | "\t" | "\n" | "\r" | "\f" }
+
+TOKEN: {
+    <STAR:      "*" >
+|   <SEP_ALIAS: "->" >
+|   <SEP_SCHEME: "://" >
+|   <SEP_DOMAIN: "." >
+|   <SEP_PORT:  ":" >
+|   <SEP_DIR:   "/" >
+|   <NUMBER:    (<DIGIT>)+ >
+|   <NAME:      <LETTER> ( ("-")? (<LETTER>|<DIGIT>) )* >
+|   <#DIGIT:    ["0"-"9"] >
+|   <#LETTER:   ["A"-"Z","a"-"z"] >
+}
+
+BaseUrlItem[] parse(): {
+    Token scheme,alias=null,host,port;   StringBuffer domain,dir;
+    Token preHost=null,postHost=null,preDomain=null,preDir=null,postDir=null;
+    List<BaseUrlItem> result = new ArrayList<BaseUrlItem>();
+    result.add(null);
+    result.add(new HostItem());
+    result.add(new DomainItem());
+    result.add(new PortItem());
+}
+{
+    (alias=<NAME> <SEP_ALIAS>)?
+    scheme=<NAME>                                { result.set(0, new SchemeItem(scheme.toString(),
+                                                           alias!=null ? alias.toString() : null)); }
+    (   <SEP_SCHEME>
+        (
+            (   (   (preHost=<STAR>)?
+                    host=<NAME>
+                    (postHost=<STAR>)?           { result.set(1, new HostItem(host.toString(), preHost, postHost)); }
+                )
+            |   preHost=<STAR>
+            )
+            (   <SEP_DOMAIN>
+                (   (   (preDomain=<STAR>)?
+                        domain=parseDomain()     { result.set(2, new DomainItem(domain.toString(), preDomain)); }
+                    )
+                |   preDomain=<STAR>
+                )
+            )?
+            (   <SEP_PORT> port=<NUMBER>         { result.set(3, new PortItem(port.toString(), PortItem.REQUIRED)); }
+            |   "[" <SEP_PORT> port=<NUMBER> "]" { result.set(3, new PortItem(port.toString(), PortItem.OPTIONAL)); }
+            )?
+            (   <SEP_PORT>
+                (   port=<NUMBER>
+                |   "[" port=<NUMBER> "]"
+                )
+            )?
+        )?
+        (   <SEP_DIR>
+            (   (   (preDir=<STAR>)?
+                    dir=parseDir()
+                    (postDir=<STAR>)?            { result.add(new DirItem(dir.toString(), preDir, postDir)); }
+                )
+            |   preDir=<STAR>                    { result.add(new DirItem()); }
+            )                                    { preDir=postDir=null; /* reset tokens for next dir */ }
+        )*
+        (<SEP_DIR>)?
+    )?
+    <EOF>                               { return (BaseUrlItem[]) result.toArray(new BaseUrlItem[result.size()]); }
+}
+
+StringBuffer parseDomain(): {StringBuffer buffer=new StringBuffer(); Token token;}
+{
+    token=<NAME>                            { buffer.append(token.toString()); }
+    (   "." token=<NAME>                    { buffer.append(".").append(token.toString()); }
+    )*                                      { return buffer; }
+}
+
+StringBuffer parseDir(): {StringBuffer buffer=new StringBuffer(); Token token;}
+{
+    (   token=<NAME>                        { buffer.append(token.toString()); }
+    |   token=<NUMBER>                      { buffer.append(token.toString()); }
+    |   token=<["_", ".", ",", "+"]>        { buffer.append(token.toString()); }
+    )+                                      { return buffer; }
+}

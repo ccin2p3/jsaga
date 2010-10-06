@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.in2p3.fr/jsaga/session"
+        xmlns:tns="http://www.in2p3.fr/jsaga/session"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        attributeFormDefault="unqualified"
+        elementFormDefault="qualified">
+
+    <complexType name="ConfigurableType">
+        <sequence>
+            <element name="attribute" minOccurs="0" maxOccurs="unbounded"><complexType>
+                <sequence>
+                    <!-- todo: rename 'item' to 'value' (requires explicit binding to resolve name conflict) -->
+                    <element name="item" type="string" minOccurs="0" maxOccurs="unbounded"/>
+                </sequence>
+                <attribute name="name" type='string' use="required"/>
+                <attribute name="value" type="string" use="optional"/>
+            </complexType></element>
+        </sequence>
+        <attribute name="type" type="string" use="required"/>
+    </complexType>
+
+    <complexType name="FilterType">
+        <attribute name="domain" type="string" use="optional"/>
+        <attribute name="host" type="string" use="optional"/>
+        <attribute name="port" type="positiveInteger" use="optional"/>
+        <attribute name="isPortOptional" type="boolean" use="optional" default="false"/>
+        <attribute name="basepath" type="string" use="optional"/>
+    </complexType>
+    <element name="include" type="tns:FilterType"/>
+    <element name="exclude" type="tns:FilterType"/>
+
+    <complexType name="ServiceType"><complexContent><extension base="tns:ConfigurableType">
+        <sequence>
+            <element name="alias" type="string" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="tns:include" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="tns:exclude" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+    </extension></complexContent></complexType>
+    <element name="context"><complexType><complexContent><extension base="tns:ConfigurableType">
+        <sequence>
+            <element name="data" type="tns:ServiceType" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="job" type="tns:ServiceType" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="tns:include" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="tns:exclude" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+        <attribute name="id" type="string" use="optional"/>
+    </extension></complexContent></complexType></element>
+
+    <!-- the root -->
+    <element name="jsaga-default"><complexType>
+        <sequence>
+            <element name="contexts" minOccurs="0" maxOccurs="1">
+                <complexType>
+                    <sequence>
+                        <element ref="tns:context" minOccurs="0" maxOccurs="unbounded"/>
+                    </sequence>
+                </complexType>
+                <unique name="uniqueContextType">
+                    <selector xpath="tns:context"/>
+                    <field xpath="@type"/>
+                </unique>
+            </element>
+            <element name="session" minOccurs="0" maxOccurs="1">
+                <complexType>
+                    <sequence>
+                        <element ref="tns:context" minOccurs="0" maxOccurs="unbounded"/>
+                    </sequence>
+                </complexType>
+                <unique name="uniqueContextId">
+                    <selector xpath="tns:context"/>
+                    <field xpath="@id"/>
+                </unique>
+            </element>
+        </sequence>
+        <attribute name="extends" type="string" use="optional"/>
+    </complexType></element>
+</schema>

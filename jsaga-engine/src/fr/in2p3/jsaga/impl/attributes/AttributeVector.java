@@ -15,6 +15,6 @@ import org.ogf.saga.error.*;
  *
  */
 public interface AttributeVector extends Attribute {
-    public void setValues(String[] values) throws NotImplementedException, IncorrectStateException, PermissionDeniedException;
+    public void setValues(String[] values) throws NotImplementedException, IncorrectStateException, PermissionDeniedException, BadParameterException;
     public String[] getValues() throws NotImplementedException, IncorrectStateException, NoSuccessException;
 }

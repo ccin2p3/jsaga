@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://www.in2p3.fr/jsaga"
+        xmlns:tns="http://www.in2p3.fr/jsaga"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        attributeFormDefault="unqualified"
+        elementFormDefault="qualified">
+
+    <!-- base types -->
+    <simpleType name="SetOperationType"><restriction base="string">
+        <enumeration value="union"/>
+        <enumeration value="intersection"/>
+        <enumeration value="substraction"/>
+    </restriction></simpleType>
+    <simpleType name="ProtectionLevelType"><restriction base="string">
+        <enumeration value="none"/>
+        <enumeration value="integrity"/>
+        <enumeration value="confidentiality"/>
+    </restriction></simpleType>
+    <complexType name="ObjectType">
+        <sequence>
+            <element name="attribute" minOccurs="0" maxOccurs="unbounded"><complexType>
+                <attribute name="name" type='string' use="required"/>
+                <attribute name="value" type="string" use="optional"/><!-- no value means 'unset attribute' -->
+                <attribute name="source" use="optional"><simpleType><restriction base="string">
+                    <enumeration value="AdaptorDefaults"/>
+                    <enumeration value="EngineConfiguration"/>
+                    <enumeration value="UserProperties"/>
+                </restriction></simpleType></attribute>
+            </complexType></element>
+        </sequence>
+    </complexType>
+
+    <!-- main types -->
+    <element name="context"><complexType><complexContent><extension base="tns:ObjectType">
+        <attribute name="name" type="string" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="type" type="string" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="impl" type="string" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="usage" type="string" use="optional"/><!-- from adaptor descriptor -->
+    </extension></complexContent></complexType></element>
+
+    <element name="protocol"><complexType><complexContent><extension base="tns:ObjectType">
+        <sequence>
+            <element name="supportedContextType" minOccurs="0" maxOccurs="unbounded" type="string"/><!-- from adaptor descriptor -->
+        </sequence>
+        <attribute name="type" type="string" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="impl" type="string" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="usage" type="string" use="optional"/><!-- from adaptor descriptor -->
+
+        <attribute name="read" type="boolean" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="write" type="boolean" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="thirdparty" type="boolean" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="logical" type="boolean" use="required"/><!-- from adaptor descriptor -->
+    </extension></complexContent></complexType></element>
+
+    <element name="execution"><complexType><complexContent><extension base="tns:ObjectType">
+        <sequence>
+            <element name="monitorService" minOccurs="1" maxOccurs="1"><complexType><complexContent><extension base="tns:ObjectType">
+                <attribute name="impl" type="string" use="required"/><!-- from adaptor descriptor -->
+                <attribute name="url" type="anyURI" use="optional"/>
+            </extension></complexContent></complexType></element>
+            <element name="supportedContextType" minOccurs="0" maxOccurs="unbounded" type="string"/><!-- from adaptor descriptor -->
+        </sequence>
+        <attribute name="type" type="string" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="impl" type="string" use="required"/><!-- from adaptor descriptor -->
+        <attribute name="usage" type="string" use="optional"/><!-- from adaptor descriptor -->
+    </extension></complexContent></complexType></element>
+
+    <!-- root type -->
+    <element name="adaptors"><complexType>
+        <sequence>
+            <element ref="tns:context" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="tns:protocol" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="tns:execution" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+        <attribute name="localIntermediary" type="string" use="required"/>
+    </complexType></element>
+</schema>

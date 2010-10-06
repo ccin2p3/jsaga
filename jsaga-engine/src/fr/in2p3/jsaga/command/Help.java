@@ -1,19 +1,20 @@
 package fr.in2p3.jsaga.command;
 
-import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
-import fr.in2p3.jsaga.engine.config.Configuration;
-import fr.in2p3.jsaga.engine.config.bean.EngineConfiguration;
-import fr.in2p3.jsaga.engine.factories.SecurityAdaptorFactory;
-import fr.in2p3.jsaga.engine.schema.config.*;
+import fr.in2p3.jsaga.EngineProperties;
+import fr.in2p3.jsaga.engine.session.SessionConfiguration;
+import fr.in2p3.jsaga.engine.descriptors.*;
+import fr.in2p3.jsaga.engine.schema.config.Execution;
+import fr.in2p3.jsaga.engine.schema.config.Protocol;
 import fr.in2p3.jsaga.helpers.ASCIITableFormatter;
-import fr.in2p3.jsaga.helpers.StringArray;
-import fr.in2p3.jsaga.introspector.Introspector;
-import fr.in2p3.jsaga.introspector.IntrospectorFactory;
+import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.apache.commons.cli.*;
+import org.ogf.saga.context.Context;
+import org.ogf.saga.error.DoesNotExistException;
+import org.ogf.saga.session.Session;
+import org.ogf.saga.session.SessionFactory;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.net.URL;
+import java.util.*;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -33,14 +34,11 @@ public class Help extends AbstractCommand {
     private static final String OPT_SECURITY = "s", LONGOPT_SECURITY = "security",
             ARG_SECURITY_USAGE = "usage", ARG_SECURITY_DEFAULT = "default", ARG_SECURITY_MISSING = "missing",
             USAGE_OPT_SECURITY = "<mode> = "+ARG_SECURITY_USAGE+" | "+ ARG_SECURITY_DEFAULT +" | "+ARG_SECURITY_MISSING;
-    private static final String OPT_DATA = "d", LONGOPT_DATA = "data",
-            ARG_DATA_SERVICE = "service", ARG_DATA_CONTEXT = "context",
-            USAGE_OPT_DATA = "<mode> = "+ARG_DATA_SERVICE+" | "+ARG_DATA_CONTEXT;
-    private static final String OPT_JOB = "j", LONGOPT_JOB = "job",
-            ARG_JOB_SERVICE = "service", ARG_JOB_CONTEXT = "context",
-            USAGE_OPT_JOB = "<mode> = "+ARG_JOB_SERVICE+" | "+ARG_JOB_CONTEXT;
-    private static final String OPT_SECURITY_ATTRIBUTE = "a", LONGOPT_SECURITY_ATTRIBUTE = "attribute";
-    private static final String LONGOPT_EFFECTIVE_CONFIG = "config";
+    private static final String OPT_DATA = "d", LONGOPT_DATA = "data";
+    private static final String OPT_JOB = "j", LONGOPT_JOB = "job";
+    private static final String LONGOPT_DUMP_ADAPTORS = "adaptors";
+    private static final String LONGOPT_DUMP_SESSION = "session";
+    private static final String LONGOPT_DUMP_CONFIG = "config";
 
     public Help() {
         super("jsaga-help");
@@ -49,7 +47,6 @@ public class Help extends AbstractCommand {
     public static void main(String[] args) throws Exception {
         Help command = new Help();
         CommandLine line = command.parse(args);
-        EngineConfiguration config = Configuration.getInstance().getConfigurations();
         if (line.hasOption(OPT_HELP))
         {
             command.printHelpAndExit(null);
@@ -68,7 +65,7 @@ public class Help extends AbstractCommand {
         {
             String arg = line.getOptionValue(OPT_SECURITY);
 
-            Context[] ctxArray = config.getContextCfg().toXMLArray();
+            Session session = SessionFactory.createSession(true);
             String LEGENDE = "\nwhere:\n"+
                     "\t_Attribute_\tcan not be entered from the prompt\n"+
                     "\t*Attribute*\tis a hidden attribute\n"+
@@ -77,36 +74,42 @@ public class Help extends AbstractCommand {
             if (arg.equals(ARG_SECURITY_USAGE)) {
                 ASCIITableFormatter formatter = new ASCIITableFormatter(new String[] {
                         "Type", "Attributes usage"});
-                for (int c=0; c<ctxArray.length; c++) {
-                    Context ctx = ctxArray[c];
-                    formatter.append(new String[] {ctx.getName(), ctx.getUsage()});
+                for (Context context : session.listContexts()) {
+                    String type = context.getAttribute(Context.TYPE);
+                    String usage = ((ContextImpl) context).getUsage();
+                    formatter.append(new String[] {type, usage});
                 }
                 formatter.dump(System.out);
                 System.out.print(LEGENDE);
             } else if (arg.equals(ARG_SECURITY_DEFAULT)) {
                 ASCIITableFormatter formatter = new ASCIITableFormatter(new String[] {
                         "Type", "Default attributes"});
-                for (int c=0; c<ctxArray.length; c++) {
-                    Context ctx = ctxArray[c];
-                    for (int a=0; a<ctx.getAttributeCount(); a++) {
-                        String attribute = ctx.getAttribute(a).getName()+" = "+ctx.getAttribute(a).getValue();
-                        formatter.append(new String[] {(a==0 ? ctx.getName() : null), attribute});
+                Set<String> ignored = new HashSet<String>();
+                ignored.addAll(Arrays.asList(Context.TYPE, ContextImpl.URL_PREFIX,
+                        ContextImpl.BASE_URL_INCLUDES, ContextImpl.BASE_URL_EXCLUDES,
+                        ContextImpl.SERVICE_ATTRIBUTES));
+                for (Context context : session.listContexts()) {
+                    String type = context.getAttribute(Context.TYPE);
+                    boolean first = true;
+                    for (String key : context.listAttributes()) {
+                        if (! ignored.contains(key)) {
+                            formatter.append(new String[] {
+                                    (first ? type : null),
+                                    key+"="+((ContextImpl)context).getDefault(key)});
+                            first = false;
+                        }
                     }
                 }
                 formatter.dump(System.out);
             } else if (arg.equals(ARG_SECURITY_MISSING)) {
                 ASCIITableFormatter formatter = new ASCIITableFormatter(new String[] {
                         "Type", "Missing attributes"});
-                for (int c=0; c<ctxArray.length; c++) {
-                    Context ctx = ctxArray[c];
-                    Map attributes = new HashMap();
-                    for (int i=0; i<ctx.getAttributeCount(); i++) {
-                        attributes.put(ctx.getAttribute(i).getName(), ctx.getAttribute(i).getValue());
-                    }
-                    SecurityAdaptor adaptor = SecurityAdaptorFactory.getInstance().getSecurityAdaptor(ctx.getName());
-                    Usage usage = adaptor.getUsage();
-                    Usage missing = (usage!=null ? usage.getMissingValues(attributes) : null);
-                    formatter.append(new String[] {ctx.getName(), (missing!=null ? missing.toString() : null)});
+                for (Context context : session.listContexts()) {
+                    String type = context.getAttribute(Context.TYPE);
+                    String missing = ((ContextImpl) context).getMissings();
+                    formatter.append(new String[] {
+                            type,
+                            (missing!=null ? missing.toString() : null)});
                 }
                 formatter.dump(System.out);
                 System.out.print(LEGENDE);
@@ -116,82 +119,57 @@ public class Help extends AbstractCommand {
         }
         else if (line.hasOption(OPT_DATA))
         {
-            String arg = line.getOptionValue(OPT_DATA);
-            if (arg.equals(ARG_DATA_SERVICE)) {
-                dumpServices(IntrospectorFactory.createNSIntrospector());
-            } else if (arg.equals(ARG_DATA_CONTEXT)) {
-                dumpContexts(IntrospectorFactory.createNSIntrospector());
-            } else {
-                command.printHelpAndExit("Missing required argument: "+USAGE_OPT_DATA);
+            DataAdaptorDescriptor descriptor = AdaptorDescriptors.getInstance().getDataDesc();
+            ASCIITableFormatter formatter = new ASCIITableFormatter(new String[] {
+                    "Scheme", "Supported contexts"});
+            for (Protocol protocol : descriptor.getXML()) {
+                formatter.append(new String[] {
+                        protocol.getType(),
+                        Arrays.toString(protocol.getSupportedContextType())});
             }
+            formatter.dump(System.out);
         }
         else if (line.hasOption(OPT_JOB))
         {
-            String arg = line.getOptionValue(OPT_JOB);
-            if (arg.equals(ARG_JOB_SERVICE)) {
-                dumpServices(IntrospectorFactory.createJobIntrospector());
-            } else if (arg.equals(ARG_JOB_CONTEXT)) {
-                dumpContexts(IntrospectorFactory.createJobIntrospector());
-            } else {
-                command.printHelpAndExit("Missing required argument: "+USAGE_OPT_JOB);
-            }
-        }
-        else if (line.hasOption(OPT_SECURITY_ATTRIBUTE))
-        {
-            String arg = line.getOptionValue(OPT_SECURITY_ATTRIBUTE);
-            if (arg.contains(".")) {
-                String ctxId = arg.substring(0, arg.indexOf("."));
-                String attrName = arg.substring(arg.indexOf(".")+1);
-                String attrValue = getAttribute(config.getContextCfg().findContextByName(ctxId), attrName);
-                System.out.println(attrValue);
-            } else {
-                command.printHelpAndExit("Bad argument: "+arg);
-            }
-        }
-        else if (line.hasOption(LONGOPT_EFFECTIVE_CONFIG))
-        {
-            config.dump(System.out);
-        }
-    }
-
-    private static void dumpServices(Introspector introspector) throws Exception {
-        ASCIITableFormatter formatter = new ASCIITableFormatter(new String[] {
-                "Scheme", "Host pattern", "Service name"});
-        for (String scheme : introspector.getVectorAttribute(Introspector.SCHEME)) {
-            Introspector nsScheme = introspector.getChildIntrospector(scheme);
-            boolean isFirst = true;
-            for (String hostPattern : nsScheme.getVectorAttribute(Introspector.HOST_PATTERN)) {
-                Introspector nsHostPattern = nsScheme.getChildIntrospector(hostPattern);
+            JobAdaptorDescriptor descriptor = AdaptorDescriptors.getInstance().getJobDesc();
+            ASCIITableFormatter formatter = new ASCIITableFormatter(new String[] {
+                    "Scheme", "Supported contexts"});
+            for (Execution execution : descriptor.getXML()) {
                 formatter.append(new String[] {
-                        isFirst ? scheme : null,
-                        hostPattern,
-                        StringArray.arrayToString(nsHostPattern.getVectorAttribute(Introspector.SERVICE), ",")});
-                isFirst = false;
+                        execution.getType(),
+                        Arrays.toString(execution.getSupportedContextType())});
+            }
+            formatter.dump(System.out);
+        }
+        else if (line.hasOption(LONGOPT_DUMP_ADAPTORS))
+        {
+            System.out.println(new String(AdaptorDescriptors.getInstance().toByteArray()));
+        }
+        else if (line.hasOption(LONGOPT_DUMP_SESSION))
+        {
+            Session session = SessionFactory.createSession(true);
+            for (org.ogf.saga.context.Context context : session.listContexts()) {
+                System.out.println("-------------------------");
+                for (String key : context.listAttributes()) {
+                    try {
+                        if (context.isVectorAttribute(key)) {
+                            System.out.println(key+"="+Arrays.toString(context.getVectorAttribute(key)));
+                        } else {
+                            System.out.println(key+"="+context.getAttribute(key));
+                        }
+                    } catch (DoesNotExistException e) {
+                        System.out.println(key+"=[NOT INITIALIZED]");
+                    }
+                }
             }
         }
-        formatter.dump(System.out);
-    }
-
-    private static void dumpContexts(Introspector introspector) throws Exception {
-        ASCIITableFormatter formatter = new ASCIITableFormatter(new String[] {
-                "Scheme", "Context name"});
-        for (String scheme : introspector.getVectorAttribute(Introspector.SCHEME)) {
-            Introspector nsScheme = introspector.getChildIntrospector(scheme);
-            formatter.append(new String[] {
-                    scheme,
-                    StringArray.arrayToString(nsScheme.getVectorAttribute(Introspector.CONTEXT), ",")});
+        else if (line.hasOption(LONGOPT_DUMP_CONFIG))
+        {
+            // WARNING: this code is JSAGA specific
+            URL url = EngineProperties.getURL(EngineProperties.JSAGA_DEFAULT_CONTEXTS);
+            SessionConfiguration cfg = new SessionConfiguration(url);
+            System.out.println(cfg.toXML());
         }
-        formatter.dump(System.out);
-    }
-
-    private static String getAttribute(ObjectType object, String name) throws Exception {
-        for (int a=0; object!=null && a<object.getAttributeCount(); a++) {
-            Attribute attribute = object.getAttribute(a);
-            if (attribute.getName().equals(name)) {
-                return attribute.getValue();
-            }
-        }
-        throw new Exception("Attribute not found: "+name);
     }
 
     protected Options createOptions() {
@@ -212,23 +190,20 @@ public class Help extends AbstractCommand {
                     .withArgName("mode")
                     .hasArg()
                     .create(OPT_SECURITY));
-            group.addOption(OptionBuilder.withDescription("Information about data protocols.\n"+ USAGE_OPT_DATA)
+            group.addOption(OptionBuilder.withDescription("Information about data protocols.")
                     .withLongOpt(LONGOPT_DATA)
-                    .withArgName("mode")
-                    .hasArg()
                     .create(OPT_DATA));
-            group.addOption(OptionBuilder.withDescription("Information about job services.\n"+ USAGE_OPT_JOB)
+            group.addOption(OptionBuilder.withDescription("Information about job services.")
                     .withLongOpt(LONGOPT_JOB)
-                    .withArgName("mode")
-                    .hasArg()
                     .create(OPT_JOB));
-            group.addOption(OptionBuilder.withDescription("Output the value of security context attribute")
-                    .withLongOpt(LONGOPT_SECURITY_ATTRIBUTE)
-                    .withArgName("ctxId>.<attr")
-                    .hasArg()
-                    .create(OPT_SECURITY_ATTRIBUTE));
-            group.addOption(OptionBuilder.withDescription("Output the effective configuration")
-                    .withLongOpt(LONGOPT_EFFECTIVE_CONFIG)
+            group.addOption(OptionBuilder.withDescription("Dump information about adaptors as XML")
+                    .withLongOpt(LONGOPT_DUMP_ADAPTORS)
+                    .create());
+            group.addOption(OptionBuilder.withDescription("Dump the default session")
+                    .withLongOpt(LONGOPT_DUMP_SESSION)
+                    .create());
+            group.addOption(OptionBuilder.withDescription("Dump the effective XML configuration")
+                    .withLongOpt(LONGOPT_DUMP_CONFIG)
                     .create());
         }
         opt.addOptionGroup(group);

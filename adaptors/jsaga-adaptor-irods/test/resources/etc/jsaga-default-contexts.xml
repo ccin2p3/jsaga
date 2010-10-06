@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
+    <contexts>
+        <context type="Globus">
+            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/dteam_cred.txt"/>
+        </context>
+        <context type="UserPass">
+            <attribute name="UserID" value="sreynaud"/>
+            <attribute name="UserPass"/>
+            <attribute name="UserPassFile" value="${user.home}/.jsaga/tmp/srb_cred.txt"/>
+            <attribute name="LifeTime" value="PT12H"/>
+        </context>
+    </contexts>
+    <session>
+        <context type="Globus" id="iRODSctx">
+            <!-- iRODS physical files -->
+            <data type="irods">
+                <attribute name="UserID" value="sreynaud"/>
+                <attribute name="DefaultResource" value="demoResc2"/>
+                <attribute name="Zone" value="tempZone"/>
+            </data>
+            <!-- iRODS logical files -->
+            <data type="irodsl">
+                <attribute name="UserID" value="sreynaud"/>
+                <attribute name="DefaultResource" value="demoResc2"/>
+                <attribute name="Zone" value="tempZone"/>
+                <alias>irods</alias>
+            </data>
+        </context>
+        <context type="UserPass" id="SRBctx">
+            <!-- SRB physical files -->
+            <data type="srb">
+                <attribute name="UseTrash" value="false"/>
+                <attribute name="DefaultResource" value="MammoDisk"/>
+                <attribute name="Zone" value="ccin2p3"/>
+                <attribute name="Domain" value="ccin2p3"/>
+            </data>
+        </context>
+    </session>
+</jsaga-default>

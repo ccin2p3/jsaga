@@ -1,13 +1,11 @@
 package fr.in2p3.jsaga.impl.file.copy;
 
-import fr.in2p3.jsaga.adaptor.data.*;
+import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
+import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyDelegated;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterPutter;
-import fr.in2p3.jsaga.engine.config.Configuration;
-import fr.in2p3.jsaga.engine.factories.DataAdaptorFactory;
-import fr.in2p3.jsaga.engine.schema.config.Protocol;
 import fr.in2p3.jsaga.impl.file.AbstractSyncFileImpl;
 import fr.in2p3.jsaga.impl.logicalfile.AbstractSyncLogicalFileImpl;
 import fr.in2p3.jsaga.impl.namespace.FlagsHelper;
@@ -62,13 +60,12 @@ public class FileCopyFrom {
                 throw new IncorrectStateException("Target entry already exists: "+target, alreadyExists);
             }
         } else if (m_adaptor instanceof DataCopy && target.getScheme().equals(effectiveSource.getScheme())) {
-            BaseURL base = m_adaptor.getBaseURL();
-            if (base == null) {
-                base = new BaseURL();
-            }
+            String sourceHost = effectiveSource.getHost();
+            int sourcePort = effectiveSource.getPort()>-1 ? effectiveSource.getPort() : m_adaptor.getDefaultPort();
+            String sourcePath = effectiveSource.getPath();
             try {
                 ((DataCopy)m_adaptor).copyFrom(
-                        effectiveSource.getHost(), base.getPort(effectiveSource), effectiveSource.getPath(),
+                        sourceHost, sourcePort, sourcePath,
                         target.getPath(),
                         overwrite, target.getQuery());
             } catch (DoesNotExistException doesNotExist) {
@@ -92,13 +89,8 @@ public class FileCopyFrom {
                 sourceFile.close();
             }
         } else if (m_adaptor instanceof FileWriter) {
-            Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(
-                    effectiveSource.getScheme(), DataAdaptorFactory.PHYSICAL);
-            if (descriptor.hasLogical() && descriptor.getLogical()) {
-                this.getFromLogicalFile(effectiveSource, flags);
-            } else {
-                this.getFromPhysicalFile(effectiveSource, flags, progressMonitor);
-            }
+            // todo: check that source is not a logical entry
+            this.getFromPhysicalFile(effectiveSource, flags, progressMonitor);
         } else {
             throw new NotImplementedException("Not supported for this protocol: "+target.getScheme());
         }

@@ -2,7 +2,6 @@ package fr.in2p3.jsaga.adaptor.lfc;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.data.BaseURL;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.link.LinkAdaptor;
 import fr.in2p3.jsaga.adaptor.data.link.NotLink;
@@ -12,14 +11,10 @@ import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
-import fr.in2p3.jsaga.adaptor.lfc.LfcConnection.LFCFile;
-import fr.in2p3.jsaga.adaptor.lfc.LfcConnection.LFCReplica;
-import fr.in2p3.jsaga.adaptor.lfc.LfcConnection.LfcError;
-import fr.in2p3.jsaga.adaptor.lfc.LfcConnection.ReceiveException;
+import fr.in2p3.jsaga.adaptor.lfc.LfcConnection.*;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityCredential;
-
 import org.apache.log4j.Logger;
 import org.glite.voms.VOMSAttribute;
 import org.glite.voms.VOMSValidator;
@@ -109,8 +104,8 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		}
     }
 
-    public final BaseURL getBaseURL() throws IncorrectURLException {
-        return new BaseURL(LFC_PORT_DEFAULT);
+    public final int getDefaultPort() {
+        return LFC_PORT_DEFAULT;
     }
 
 	public boolean exists(String absolutePath, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {

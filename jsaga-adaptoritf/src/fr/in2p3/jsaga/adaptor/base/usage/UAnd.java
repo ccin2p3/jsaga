@@ -29,6 +29,14 @@ public class UAnd implements Usage {
         m_and = usage;
     }
 
+    public Set<String> getKeys() {
+        Set<String> keys = new HashSet<String>(m_and.length);
+        for (Usage u : m_and) {
+            keys.addAll(u.getKeys());
+        }
+        return keys;
+    }
+
     public String correctValue(String attributeName, String attributeValue) throws DoesNotExistException {
         for (int i=0; m_and!=null && i<m_and.length; i++) {
             try {

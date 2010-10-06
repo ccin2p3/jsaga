@@ -2,7 +2,6 @@ package fr.in2p3.jsaga.adaptor.data.file;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.data.BaseURL;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
@@ -53,8 +52,8 @@ public class FileDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         // do nothing
     }
 
-    public BaseURL getBaseURL() throws IncorrectURLException {
-        return null;
+    public int getDefaultPort() {
+        return NO_PORT;
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {

@@ -112,7 +112,7 @@ public class GlobusProxyFactory extends GlobusProxyFactoryAbstract {
             final boolean GLOBUS_STYLE = false;
             super.createProxy(m_certFile, m_keyFile, VERIFY, GLOBUS_STYLE, m_proxyFile);
         } catch (NullPointerException e) {
-            throw new IncorrectStateException("Bad passphrase", e);
+            throw new IncorrectStateException("Bad passphrase", super.m_exception);
         }
         try {
 			proxy.verify();

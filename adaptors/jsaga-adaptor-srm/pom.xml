@@ -44,7 +44,7 @@
 						<configuration>
 							<sourceDirectory>${basedir}/resources/wsdl</sourceDirectory>
 							<fileNamespaceToPackage>${basedir}/resources/wsdl/NStoPkg.properties</fileNamespaceToPackage>
-							<outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
+							<outputDirectory>${project.build.directory}/generated-sources/src</outputDirectory>
 							<timestampDirectory>${project.build.directory}</timestampDirectory>
 						</configuration>
 					</execution>

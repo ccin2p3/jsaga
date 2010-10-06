@@ -18,6 +18,7 @@
             <plugin>
                 <groupId>org.codehaus.izpack</groupId>
                 <artifactId>izpack-maven-plugin</artifactId>
+                <version>1.0-alpha-5</version>
                 <configuration>
                     <descriptor>${basedir}/resources/izpack.xml</descriptor>
                     <izpackBasedir>${project.build.directory}</izpackBasedir>

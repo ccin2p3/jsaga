@@ -1,12 +1,12 @@
 package fr.in2p3.jsaga.engine.factories;
 
-import fr.in2p3.jsaga.engine.config.AmbiguityException;
-import fr.in2p3.jsaga.engine.config.bean.ContextEngineConfiguration;
-import fr.in2p3.jsaga.helpers.StringArray;
+import fr.in2p3.jsaga.adaptor.ClientAdaptor;
+import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
+import fr.in2p3.jsaga.engine.descriptors.SecurityAdaptorDescriptor;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
-import org.ogf.saga.session.Session;
+import org.ogf.saga.url.URL;
 
 import java.util.*;
 
@@ -23,77 +23,61 @@ import java.util.*;
  *
  */
 public class ServiceAdaptorFactory {
-    private ContextEngineConfiguration m_config;
+    public static Map getAttributes(URL url, ContextImpl context, Map adaptorDefaults) throws NotImplementedException, BadParameterException, NoSuccessException {
+        // map rather than properties, because map supports "put(key, null)"
+        Map attributes = new HashMap();
 
-    protected ServiceAdaptorFactory(ContextEngineConfiguration config) {
-        m_config = config;
-    }
+        // add service config
+        String scheme = context.getSchemeFromAlias(url.getScheme());
+        Properties serviceConfig = context.getServiceConfig(scheme);
+        if (serviceConfig != null) {
+            attributes.putAll(serviceConfig);
+        } else {
+            attributes.putAll(adaptorDefaults);
+        }
 
-    protected ContextImpl findContext(Session session, String contextRef) throws NotImplementedException, NoSuccessException {
-        if (session != null) {
-            Context[] contextArray = session.listContexts();
-            for (int i=0; contextArray!=null && i<contextArray.length; i++) {
-                try {
-                    if (contextRef.equals(contextArray[i].getAttribute(Context.TYPE))) {
-                        return (ContextImpl) contextArray[i];
-                    }
-                } catch(Exception e) {
-                    throw new NoSuccessException(e.getMessage(), contextArray[i]);
+        // add service call
+        String query = url.getQuery();
+        if (query != null) {
+            String[] pairs = query.split("&");
+            for (int i=0; pairs!=null && i<pairs.length; i++) {
+                String[] pair = pairs[i].split("=");
+                switch (pair.length) {
+                    case 1:
+                        attributes.put(pair[0], null);
+                        break;
+                    case 2:
+                        attributes.put(pair[0], pair[1]);
+                        break;
+                    default:
+                        throw new BadParameterException("Bad query in URL: "+url);
                 }
             }
         }
-        return null;
+        return attributes;
     }
 
-    protected ContextImpl findContext(Session session, String[] supportedContextTypeArray) throws NotImplementedException, NoSuccessException {
-        Set<String> contextRefCandidates = new HashSet<String>();
-        for (int i=0; supportedContextTypeArray!=null && i<supportedContextTypeArray.length; i++) {
-            if ("None".equals(supportedContextTypeArray[i])) {
-                return null;
-            }
-            fr.in2p3.jsaga.engine.schema.config.Context[] configArray = m_config.listContextsArrayByType(supportedContextTypeArray[i]);
-            for (int c=0; configArray!=null && c<configArray.length; c++) {
-                contextRefCandidates.add(configArray[c].getName());
-            }
-        }
-
-        List<ContextImpl> contextCandidates = new ArrayList<ContextImpl>();
-        for (Iterator<String> it=contextRefCandidates.iterator(); it.hasNext(); ) {
-            String contextRef = it.next();
-            ContextImpl context = this.findContext(session, contextRef);
-            if (context != null) {
+    protected static SecurityCredential getCredential(URL url, ContextImpl context, ClientAdaptor adaptor) throws NotImplementedException, AuthenticationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+        if (context != null) {
+            if (SecurityAdaptorDescriptor.isSupported(context.getCredentialClass(), adaptor.getSupportedSecurityCredentialClasses())) {
                 try {
-                    context.getCredential();
-                    contextCandidates.add(context);
-                } catch(SagaException e) {
-                    // ignore invalid contexts
-                }
-            }
-        }
-
-        switch(contextCandidates.size()) {
-            case 0:
-                return null;
-            case 1:
-                return contextCandidates.get(0);
-            default:
-                String[] candidateRefs = new String[contextCandidates.size()];
-                for (int i=0; i<candidateRefs.length; i++) {
+                    return context.getCredential();
+                } catch (IncorrectStateException e) {
                     try {
-                        candidateRefs[i] = contextCandidates.get(i).getAttribute(Context.TYPE);
-                    } catch (Exception e) {
-                        throw new AmbiguityException("Found several valid security contexts");
+                        throw new NoSuccessException("Invalid security context: "+context.getAttribute(Context.TYPE), e);
+                    } catch (SagaException e2) {
+                        throw new NoSuccessException("Invalid security context: "+e2.getMessage(), e);
                     }
                 }
-                throw new AmbiguityException("Found several valid security contexts: "+StringArray.arrayToString(candidateRefs,", "));
-        }
-    }
-
-    protected String getContextType(Context context) {
-        try {
-            return context.getAttribute(Context.TYPE);
-        } catch (Exception e) {
-            return "error ["+e.getMessage()+"]";
+            } else if (SecurityAdaptorDescriptor.isSupportedNoContext(adaptor.getSupportedSecurityCredentialClasses())) {
+                return null;
+            } else {
+                throw new AuthenticationFailedException("Security context class '"+context.getCredentialClass().getName()+"' not supported for protocol: "+url.getScheme());
+            }
+        } else if (SecurityAdaptorDescriptor.isSupportedNoContext(adaptor.getSupportedSecurityCredentialClasses())) {
+            return null;
+        } else {
+            throw new AuthenticationFailedException("No security context configured for URL: "+url);
         }
     }
 }

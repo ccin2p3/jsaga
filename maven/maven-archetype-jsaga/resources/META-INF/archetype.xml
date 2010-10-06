@@ -16,7 +16,7 @@
     </resources>
     <testResources>
         <resource>test/resources/saga-test.properties</resource>
-        <resource>test/resources/etc/jsaga-universe.xml</resource>
+        <resource>test/resources/etc/jsaga-default-contexts.xml</resource>
         <resource>test/resources/etc/log4j.properties</resource>
         <resource>test/src/integration/MyProtocolIntegrationTestSuite.java</resource>
     </testResources>

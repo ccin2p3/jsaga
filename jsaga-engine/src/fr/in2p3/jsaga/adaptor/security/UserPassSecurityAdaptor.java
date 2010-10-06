@@ -3,14 +3,12 @@ package fr.in2p3.jsaga.adaptor.security;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
-import fr.in2p3.jsaga.engine.config.attributes.FilePropertiesAttributesParser;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
 
 import java.io.*;
 import java.util.Map;
-import java.util.Properties;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -25,7 +23,7 @@ import java.util.Properties;
  *
  */
 public class UserPassSecurityAdaptor implements ExpirableSecurityAdaptor {
-    private static final String USERPASSCRYPTED = "UserPassCrypted";
+    private static final String USERPASSFILE = "UserPassFile";
     private static final int USAGE_INIT = 1;
     private static final int USAGE_VOLATILE = 2;
     private static final int USAGE_LOAD = 3;
@@ -42,9 +40,11 @@ public class UserPassSecurityAdaptor implements ExpirableSecurityAdaptor {
         return new UAnd(new Usage[]{
                 new U(Context.USERID),
                 new UOr(new Usage[]{
-                        new UAnd(USAGE_INIT, new Usage[]{new UHidden(Context.USERPASS), new U(Context.LIFETIME)}),
+                        new UAnd(USAGE_INIT, new Usage[]{
+                                new UHidden(Context.USERPASS), new U(Context.LIFETIME), new UFilePath(USERPASSFILE)
+                        }),
                         new U(USAGE_VOLATILE, Context.USERPASS),
-                        new U(USAGE_LOAD, USERPASSCRYPTED)
+                        new UFile(USAGE_LOAD, USERPASSFILE)
                 })
         });
     }
@@ -67,20 +67,19 @@ public class UserPassSecurityAdaptor implements ExpirableSecurityAdaptor {
                     int lifetime = (attributes.containsKey(Context.LIFETIME)
                             ? UDuration.toInt(attributes.get(Context.LIFETIME))
                             : 12*3600);
+                    File file = new File((String) attributes.get(USERPASSFILE));
 
                     // encrypt password
                     PasswordEncrypterSingleton crypter = new PasswordEncrypterSingleton(name, lifetime);
                     String cryptedPassword = crypter.encrypt(password);
                     int expiryDate = PasswordEncrypterSingleton.getExpiryDate(lifetime);
 
-                    // write to user properties file
-                    File propFile = FilePropertiesAttributesParser.FILE;
-                    Properties prop = new Properties();
-                    if (propFile.exists()) {
-                        prop.load(new FileInputStream(propFile));
-                    }
-                    prop.setProperty(contextId+"."+USERPASSCRYPTED, cryptedPassword);
-                    prop.store(new FileOutputStream(propFile), "JSAGA user attributes");
+                    // write to file
+                    DataOutputStream out = new DataOutputStream(new FileOutputStream(file));
+                    out.writeBytes(cryptedPassword);
+                    out.close();
+
+                    // returns
                     return new UserPassExpirableSecurityCredential(name, password, expiryDate);
                 }
                 case USAGE_VOLATILE:
@@ -93,7 +92,14 @@ public class UserPassSecurityAdaptor implements ExpirableSecurityAdaptor {
                 {
                     // get attributes
                     String name = (String) attributes.get(Context.USERID);
-                    String cryptedPassword = (String) attributes.get(USERPASSCRYPTED);
+                    File file = new File((String) attributes.get(USERPASSFILE));
+
+                    // load from file
+                    byte[] buffer = new byte[(int) file.length()];
+                    DataInputStream in = new DataInputStream(new FileInputStream(file));
+                    in.readFully(buffer);
+                    in.close();
+                    String cryptedPassword = new String(buffer);
 
                     // decrypt password
                     PasswordDecrypterSingleton decrypter = new PasswordDecrypterSingleton(name);
@@ -121,10 +127,9 @@ public class UserPassSecurityAdaptor implements ExpirableSecurityAdaptor {
     }
 
     public void destroySecurityAdaptor(Map attributes, String contextId) throws Exception {
-        File propFile = FilePropertiesAttributesParser.FILE;
-        Properties prop = new Properties();
-        prop.load(new FileInputStream(propFile));
-        prop.remove(contextId+"."+USERPASSCRYPTED);
-        prop.store(new FileOutputStream(propFile), "JSAGA user attributes");
+        File file = new File((String) attributes.get(USERPASSFILE));
+        if (! file.delete()) {
+            throw new Exception("Failed to delete file: "+file);
+        }
     }
 }

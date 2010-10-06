@@ -70,9 +70,9 @@ public abstract class GlobusProxyFactoryAbstract extends ProxyInit {
         		loadPKCS12Certificate(arg, CERT);
         	}
         } catch(IOException e) {
-            m_exception = new IOException("Failed to load certificate file: "+arg);
+            m_exception = new IOException("Failed to load certificate file: "+arg+" ["+e.getMessage()+"]");
         } catch(GeneralSecurityException e) {
-            m_exception = new GeneralSecurityException("Unable to load user certificate: "+e.getMessage());
+            m_exception = new GeneralSecurityException("Unable to load user certificate: "+e.getMessage(), e);
         }
     }
 
@@ -94,9 +94,9 @@ public abstract class GlobusProxyFactoryAbstract extends ProxyInit {
         		loadPKCS12Certificate(arg, KEY);
         	}
         } catch(IOException e) {
-            m_exception = new IOException("Failed to load key file: "+arg);
+            m_exception = new IOException("Failed to load key file: "+arg+" ["+e.getMessage()+"]");
         } catch(GeneralSecurityException e) {
-            m_exception = new GeneralSecurityException("Wrong pass phrase");
+            m_exception = new GeneralSecurityException("Wrong pass phrase", e);
         }
     } 
 
@@ -134,9 +134,9 @@ public abstract class GlobusProxyFactoryAbstract extends ProxyInit {
             	m_exception = new GeneralSecurityException("Unsupported certificate type '"+type+"' : you must must use 0 or 1");
             }
         } catch(IOException e) {
-        	throw new IOException("Failed to load PKCS12 cert: "+arg);
-        } catch(GeneralSecurityException generalsecurityexception) {
-        	throw new GeneralSecurityException("Wrong password or other security error");
+            throw new IOException("Failed to load PKCS12 cert: "+arg+" ["+e.getMessage()+"]");
+        } catch(GeneralSecurityException e) {
+            throw new GeneralSecurityException("Wrong password or other security error", e);
         }
     }
     

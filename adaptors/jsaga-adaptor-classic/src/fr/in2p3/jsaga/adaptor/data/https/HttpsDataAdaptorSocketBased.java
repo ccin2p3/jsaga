@@ -3,11 +3,9 @@ package fr.in2p3.jsaga.adaptor.data.https;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.data.http_socket.HttpRequest;
 import fr.in2p3.jsaga.adaptor.data.http_socket.HttpDataAdaptorSocketBased;
-import fr.in2p3.jsaga.adaptor.data.https.OneWayAuthenticationTrustManager;
+import fr.in2p3.jsaga.adaptor.data.http_socket.HttpRequest;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
-import fr.in2p3.jsaga.adaptor.data.BaseURL;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.X509SecurityCredential;
 import org.ogf.saga.error.*;
@@ -67,8 +65,8 @@ public class HttpsDataAdaptorSocketBased extends HttpDataAdaptorSocketBased impl
         m_keyManager = adaptor.getKeyManager();
     }
 
-    public BaseURL getBaseURL() throws IncorrectURLException {
-        return new BaseURL(443);
+    public int getDefaultPort() {
+        return 443;
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {

@@ -16,6 +16,6 @@ import org.ogf.saga.context.ContextInitTest;
  */
 public class GlobusContextInitForWindows extends ContextInitTest {
     public GlobusContextInitForWindows() throws Exception {
-        super("Test_Globus");
+        super("GlobusRFC820");
     }
 }

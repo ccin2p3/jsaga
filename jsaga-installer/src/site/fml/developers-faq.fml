@@ -80,4 +80,56 @@ mvn site-deploy -P local</pre>
             </answer>
         </faq>
     </part>
+    <part id="git">
+        <title>GIT</title>
+        <faq id="merge-without-history">
+            <question>How to merge a branch without detailed history ?</question>
+            <answer>Use unix diff instead of "git format-patch":
+                <pre># Update local repository
+git pull
+
+# Create patch
+git checkout workingBranch
+git diff origin/master > mydiff.patch
+
+# Apply patch
+git checkout -b mergedBranch master
+git apply --stat myDiff.patch
+git apply --check myDiff.patch
+git apply myDiff.patch
+
+# Merge
+git checkout master
+git merge mergedBranch
+
+# Delete remote and local branches
+git push origin :workingBranch
+git branch -d workingBranch
+git branch -d mergedBranch
+git branch -al</pre>
+                WARNING: This does not work if some binary files have been modified.
+            </answer>
+        </faq>
+        <faq id="apply-patch">
+            <question>How to apply and merge a patch ?</question>
+            <answer>Use "git apply-patch" or "git am":
+                <pre># Update local repository
+git pull
+
+# Apply patch
+git checkout -b mergedBranch master
+git am --ignore-space-change --ignore-whitespace patch.mbox
+
+# Check changes with IDE (GIT -> Push Active Branches...)
+
+# Merge
+git checkout master
+git merge mergedBranch
+
+# Delete local branch
+git branch -d mergedBranch
+git branch -al</pre>
+            </answer>
+        </faq>
+    </part>
 </faqs>

@@ -12,6 +12,27 @@
             </answer>
         </faq>
     </part>
+    <part id="security">
+        <title>Security</title>
+        <faq id="jks">
+            <question>How to generate the JKS file required to authenticate to Unicore services ?</question>
+            <answer>Move to your certificates directory, then issue the following commands:
+                <pre>openssl pkcs12 -export -in usercert.pem -inkey userkey.pem -out usercert.p12
+keytool -keystore usercert.jks -import -file certificates/*.0 -noprompt -storepass changeit
+java -Djavax.net.ssl.keyStore=usercert.jks -Djavax.net.ssl.keyStorePassword=changeit \
+     -cp $JSAGA_HOME/lib/jsaga-adaptor-classic-*.jar fr.in2p3.jsaga.adaptor.security.JKSImportCert \
+     usercert.p12 changeit
+keytool -keystore usercert.jks -list -storepass changeit
+keytool -keystore usercert.jks -list -storepass changeit -alias CERT -printcert</pre>
+            </answer>
+        </faq>
+        <faq id="error">
+            <question>The following exception occurs:
+                <pre>java.security.UnrecoverableKeyException: Cannot recover key</pre>
+            </question>
+            <answer>Use the same password for keystore and for certificate</answer>
+        </faq>
+    </part>
     <part id="execution">
         <title>Execution management</title>
         <faq id="windows">

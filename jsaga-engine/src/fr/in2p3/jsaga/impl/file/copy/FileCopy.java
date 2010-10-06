@@ -1,13 +1,11 @@
 package fr.in2p3.jsaga.impl.file.copy;
 
-import fr.in2p3.jsaga.adaptor.data.*;
+import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
+import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyDelegated;
 import fr.in2p3.jsaga.adaptor.data.read.FileReader;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderGetter;
-import fr.in2p3.jsaga.engine.config.Configuration;
-import fr.in2p3.jsaga.engine.factories.DataAdaptorFactory;
-import fr.in2p3.jsaga.engine.schema.config.Protocol;
 import fr.in2p3.jsaga.impl.file.AbstractSyncFileImpl;
 import fr.in2p3.jsaga.impl.namespace.FlagsHelper;
 import fr.in2p3.jsaga.impl.namespace.JSAGAFlags;
@@ -61,13 +59,12 @@ public class FileCopy {
             }
         } else if (m_adaptor instanceof DataCopy && source.getScheme().equals(effectiveTarget.getScheme())) {
             try {
-                BaseURL base = m_adaptor.getBaseURL();
-                if (base == null) {
-                    base = new BaseURL();
-                }
+                String targetHost = effectiveTarget.getHost();
+                int targetPort = (effectiveTarget.getPort()>-1 ? effectiveTarget.getPort() : m_adaptor.getDefaultPort());
+                String targetPath = effectiveTarget.getPath();
                 ((DataCopy)m_adaptor).copy(
                         source.getPath(),
-                        effectiveTarget.getHost(), base.getPort(effectiveTarget), effectiveTarget.getPath(),
+                        targetHost, targetPort, targetPath,
                         overwrite, source.getQuery());
             } catch (ParentDoesNotExist parentDoesNotExist) {
                 throw new DoesNotExistException("Target parent directory does not exist: "+effectiveTarget.resolve(URLFactory.createURL(".")), parentDoesNotExist);
@@ -90,13 +87,8 @@ public class FileCopy {
                 targetFile.close();
             }
         } else if (m_adaptor instanceof FileReader) {
-            Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(
-                    effectiveTarget.getScheme(), DataAdaptorFactory.PHYSICAL);
-            if (descriptor.hasLogical() && descriptor.getLogical()) {
-                throw new BadParameterException("Maybe what you want to do is to register to logical file the following location: "+source.toString());
-            } else {
-                this.putToPhysicalFile(effectiveTarget, flags, progressMonitor);
-            }
+            // todo: check that target is not a logical entry
+            this.putToPhysicalFile(effectiveTarget, flags, progressMonitor);
         } else {
             throw new NotImplementedException("Not supported for this protocol: "+source.getScheme());
         }

@@ -51,8 +51,8 @@ public class PersonalCatalogDataAdaptor implements LogicalReaderMetaData, Logica
         // do nothing
     }
 
-    public BaseURL getBaseURL() throws IncorrectURLException {
-        return null;
+    public int getDefaultPort() {
+        return NO_PORT;
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, IncorrectURLException, TimeoutException, NoSuccessException {

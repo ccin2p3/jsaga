@@ -2,18 +2,12 @@ package fr.in2p3.jsaga.engine.factories;
 
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
-import fr.in2p3.jsaga.engine.config.Configuration;
-import fr.in2p3.jsaga.engine.config.ConfigurationException;
-import fr.in2p3.jsaga.engine.config.adaptor.JobAdaptorDescriptor;
-import fr.in2p3.jsaga.engine.config.adaptor.SecurityAdaptorDescriptor;
-import fr.in2p3.jsaga.engine.config.bean.JobserviceEngineConfiguration;
-import fr.in2p3.jsaga.engine.schema.config.JobService;
+import fr.in2p3.jsaga.engine.descriptors.AdaptorDescriptors;
+import fr.in2p3.jsaga.engine.descriptors.JobAdaptorDescriptor;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.ogf.saga.error.*;
-import org.ogf.saga.session.Session;
 import org.ogf.saga.url.URL;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /* ***************************************************
@@ -30,27 +24,19 @@ import java.util.Map;
  */
 public class JobAdaptorFactory extends ServiceAdaptorFactory {
     private JobAdaptorDescriptor m_descriptor;
-    private JobserviceEngineConfiguration m_configuration;
 
-    public JobAdaptorFactory(Configuration configuration) {
-        super(configuration.getConfigurations().getContextCfg());
-        m_descriptor = configuration.getDescriptors().getJobDesc();
-        m_configuration = configuration.getConfigurations().getJobserviceCfg();
+    public JobAdaptorFactory(AdaptorDescriptors descriptors) {
+        m_descriptor = descriptors.getJobDesc();
     }
 
-    public JobService getConfig(URL url) throws NotImplementedException, IncorrectURLException, NoSuccessException {
-        // check URL
+    public JobControlAdaptor getJobControlAdaptor(URL url, ContextImpl context) throws NotImplementedException, IncorrectURLException, NoSuccessException {
         if (url==null || url.getScheme()==null) {
-            throw new IncorrectURLException("Invalid entry name: "+url);
+            throw new IncorrectURLException("No protocol found in URL: "+url);
         }
 
-        // get config
-        return m_configuration.findJobService(url);
-    }
-
-    public JobControlAdaptor getJobControlAdaptor(JobService config) throws NoSuccessException {
         // create instance
-        Class clazz = m_descriptor.getClass(config.getType());
+        String scheme = context.getSchemeFromAlias(url.getScheme());
+        Class clazz = m_descriptor.getClass(scheme);
         try {
             return (JobControlAdaptor) clazz.newInstance();
         } catch (Exception e) {
@@ -58,42 +44,10 @@ public class JobAdaptorFactory extends ServiceAdaptorFactory {
         }
     }
 
-    public ContextImpl getContextImpl(URL url, JobControlAdaptor jobAdaptor, JobService config, Session session) throws NotImplementedException, NoSuccessException {
-        // get security context
-        ContextImpl context;
-        if (config.getContextRef() != null) {
-            context = super.findContext(session, config.getContextRef());
-            if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(jobAdaptor.getSupportedSecurityCredentialClasses())) {
-                throw new ConfigurationException("INTERNAL ERROR: effective-config may be inconsistent");
-            }
-        } else if (url.getFragment() != null) {
-            context = super.findContext(session, url.getFragment());
-            if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(jobAdaptor.getSupportedSecurityCredentialClasses())) {
-                throw new NoSuccessException("Security context not found: "+url.getFragment());
-            }
-        } else if (session.listContexts().length == 1) {
-            context = (ContextImpl) session.listContexts()[0];
-        } else if (config.getSupportedContextTypeCount() > 0) {
-            context = super.findContext(session, config.getSupportedContextType());
-            if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(jobAdaptor.getSupportedSecurityCredentialClasses())) {
-                throw new NoSuccessException("None of the supported security context is valid");
-            }
-        } else {
-            context = null;
-            if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(jobAdaptor.getSupportedSecurityCredentialClasses())) {
-                throw new NoSuccessException("None of the supported security context is found");
-            }
-        }
-        return context;
-    }
-
-    public Map getAttributes(URL url, JobService config) throws NotImplementedException, NoSuccessException {
+    public Map getAttribute(URL url, ContextImpl context) throws NotImplementedException, NoSuccessException {
+        String scheme = context.getSchemeFromAlias(url.getScheme());
         try {
-            // get attributes from config and URL
-            Map attributes = new HashMap();
-            AttributesBuilder.updateAttributes(attributes, config);
-            AttributesBuilder.updateAttributes(attributes, url);
-            return attributes;
+            return getAttributes(url, context, m_descriptor.getDefaultsMap(scheme));
         } catch (BadParameterException e) {
             throw new NoSuccessException(e);
         }
@@ -101,24 +55,7 @@ public class JobAdaptorFactory extends ServiceAdaptorFactory {
 
     public void connect(URL url, JobControlAdaptor jobAdaptor, Map attributes, ContextImpl context) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, IncorrectURLException, BadParameterException, TimeoutException, NoSuccessException {
         // set security adaptor
-        SecurityCredential credential;
-        if (context != null) {
-            SecurityCredential candidate;
-            try {
-                candidate = context.getCredential();
-            } catch (IncorrectStateException e) {
-                throw new NoSuccessException("Invalid security context: "+super.getContextType(context), e);
-            }
-            if (SecurityAdaptorDescriptor.isSupported(candidate.getClass(), jobAdaptor.getSupportedSecurityCredentialClasses())) {
-                credential = candidate;
-            } else if (SecurityAdaptorDescriptor.isSupportedNoContext(jobAdaptor.getSupportedSecurityCredentialClasses())) {
-                credential = null;
-            } else {
-                throw new AuthenticationFailedException("Security context class '"+candidate.getClass().getName()+"' not supported for protocol: "+url.getScheme());
-            }
-        } else {
-            credential = null;
-        }
+        SecurityCredential credential = getCredential(url, context, jobAdaptor);
 
         // connect
         connect(jobAdaptor, credential, url, attributes);

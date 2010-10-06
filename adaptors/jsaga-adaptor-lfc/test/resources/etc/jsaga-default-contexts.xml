@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
+    <contexts>
+        <context type="VOMS">
+            <attribute name="Server" value="voms://lcg-voms.cern.ch:15004/DC=ch/DC=cern/OU=computers/CN=lcg-voms.cern.ch"/>
+            <!--<attribute name="CertRepository" value="${user.home}/.jsaga/contexts/voms/certificates/"/>-->
+            <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
+            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/voms_cred.txt"/>
+            <attribute name="UserVO" value="dteam"/>
+            <data type="lfc"/>
+        </context>
+    </contexts>
+    <session>
+        <context type="VOMS"/>
+    </session>
+</jsaga-default>

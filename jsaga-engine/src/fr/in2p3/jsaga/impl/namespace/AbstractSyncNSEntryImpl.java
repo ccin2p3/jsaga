@@ -53,8 +53,6 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
     protected static URL _resolveRelativeUrl(URL baseUrl, URL relativeUrl) throws NotImplementedException, IncorrectURLException, BadParameterException, NoSuccessException {
         if (relativeUrl==null) {
             throw new IncorrectURLException("URL must not be null");
-        } else if (relativeUrl.getScheme()!=null && !relativeUrl.getScheme().equals(baseUrl.getScheme())) {
-            throw new IncorrectURLException("You must not modify the scheme of the URL: "+ baseUrl.getScheme());
         } else if (relativeUrl.getUserInfo()!=null && !relativeUrl.getUserInfo().equals(baseUrl.getUserInfo())) {
             throw new IncorrectURLException("You must not modify the user part of the URL: "+ baseUrl.getUserInfo());
         } else if (relativeUrl.getHost()!=null && !relativeUrl.getHost().equals(baseUrl.getHost())) {

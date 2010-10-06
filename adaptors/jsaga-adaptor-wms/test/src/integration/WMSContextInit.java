@@ -16,6 +16,6 @@ import org.ogf.saga.context.ContextInitTest;
  */
 public class WMSContextInit extends ContextInitTest {
     public WMSContextInit() throws Exception {
-        super("EGEE");
+        super("VOMS");
     }
 }

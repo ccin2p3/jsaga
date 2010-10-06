@@ -16,9 +16,4 @@ import fr.in2p3.jsaga.adaptor.ClientAdaptor;
  */
 public interface JobAdaptor extends ClientAdaptor {
     public static final String CHECK_AVAILABILITY = "CheckAvailability";
-
-    /**
-     * @return the default server port.
-     */
-    public int getDefaultPort();
 }

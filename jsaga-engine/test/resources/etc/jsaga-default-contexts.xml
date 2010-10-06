@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
+    <contexts>
+        <context type="UserPass">
+            <data type="stest"/>
+        </context>
+        <context type="VOMS">
+            <data type="gsiftp"/>
+            <data type="srm"/>
+            <data type="lfn"/>
+            <job type="wms"/>
+            <job type="cream"/>
+        </context>
+    </contexts>
+    <session>
+        <context type="UserPass" id="STestContext"/>
+    </session>
+</jsaga-default>

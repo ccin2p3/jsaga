@@ -1,14 +1,10 @@
 package fr.in2p3.jsaga.command;
 
-import fr.in2p3.jsaga.introspector.Introspector;
-import fr.in2p3.jsaga.introspector.IntrospectorFactory;
-import org.ogf.saga.error.*;
+import org.ogf.saga.error.DoesNotExistException;
 
 import java.io.*;
 import java.net.URL;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -25,13 +21,11 @@ import java.util.regex.Pattern;
 public class PostInstall {
     private static enum PostInstallType {security, data, job}
     private String m_scheme;                private static final String SCHEME = "scheme";
-    private Introspector m_introspector;    private static final String TYPE = "type";
     private String m_osName;                private static final String OS_NAME = "os.name";
     private File[] m_preInstalledFiles;     private static final String PREINSTALLED_FILES = "pre-installed.files";
     private String m_preInstalledMessage;   private static final String PREINSTALLED_MESSAGE = "pre-installed.message";
     private boolean m_superUser;            private static final String SUPER_USER = "super-user";
     private URL m_script;                   private static final String SCRIPT = "script";
-    private String[] m_arguments;           private static final String ARGUMENTS = "arguments";
     private File[] m_postInstalledFiles;    private static final String POSTINSTALLED_FILES = "post-installed.files";
     private DoesNotExistException m_exception;
 
@@ -79,22 +73,11 @@ public class PostInstall {
         prop.load(stream);
         stream.close();
         m_scheme = prop.getProperty(SCHEME);
-        m_introspector = getIntrospector(m_scheme, prop.getProperty(TYPE));
         m_osName = prop.getProperty(OS_NAME);
         m_preInstalledFiles = toFilesArray(prop.getProperty(PREINSTALLED_FILES));
         m_preInstalledMessage = prop.getProperty(PREINSTALLED_MESSAGE);
         m_superUser = "true".equalsIgnoreCase(prop.getProperty(SUPER_USER));
         m_script = PostInstall.class.getClassLoader().getResource(prop.getProperty(SCRIPT));
-        try {
-            m_arguments = evalAttributes(prop.getProperty(ARGUMENTS)).split(" ");
-        } catch(DoesNotExistException e) {
-            m_exception = e;
-        }
-        try {
-            m_postInstalledFiles = toFilesArray(evalAttributes(prop.getProperty(POSTINSTALLED_FILES)));
-        } catch(DoesNotExistException e) {
-            m_exception = e;
-        }
     }
 
     ///////////////////////////////////////////// public ////////////////////////////////////////////
@@ -135,41 +118,12 @@ public class PostInstall {
         String line;
         BufferedReader reader = new BufferedReader(new InputStreamReader(m_script.openStream()));
         while( (line=reader.readLine()) != null ) {
-            for (int i=0; m_arguments!=null && i<m_arguments.length; i++) {
-                line = line.replaceAll("\\$"+(i+1), m_arguments[i]);
-            }
             System.out.println(line);
         }
         reader.close();
     }
 
     //////////////////////////////////////////// private ////////////////////////////////////////////
-
-    private static final Pattern s_pattern = Pattern.compile("\\$\\{(.*)\\}");
-    private String evalAttributes(String value) throws Exception {
-        Matcher matcher = s_pattern.matcher(value);
-        for (int i=0; matcher.find() && i<matcher.groupCount(); i++) {
-            String attributeName = matcher.group(i+1);
-            String attributeValue = m_introspector.getAttribute(attributeName);
-            value = value.replaceFirst("\\$\\{"+attributeName+"\\}", attributeValue);
-        }
-        return value;
-    }
-
-    private static Introspector getIntrospector(String scheme, String type) throws NotImplementedException, DoesNotExistException, NoSuccessException {
-        switch (PostInstallType.valueOf(type)) {
-            case security:
-                throw new NotImplementedException("Security contexts introspection not yet implemented"); //TODO
-            case data:
-                Introspector nsIntr = IntrospectorFactory.createNSIntrospector();
-                return nsIntr.getChildIntrospector(scheme);
-            case job:
-                Introspector jobIntr = IntrospectorFactory.createJobIntrospector();
-                return jobIntr.getChildIntrospector(scheme);
-            default:
-                throw new NoSuccessException("Unexpected type: "+type);
-        }
-    }
 
     private static File[] toFilesArray(String paths) {
         String[] pathsArray = paths.split(" ");

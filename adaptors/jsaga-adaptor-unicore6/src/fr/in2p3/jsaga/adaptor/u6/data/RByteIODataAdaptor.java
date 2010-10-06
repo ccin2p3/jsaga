@@ -14,7 +14,6 @@ import com.intel.gpe.gridbeans.GPEFile;
 import com.intel.gpe.util.sets.Pair;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
-import fr.in2p3.jsaga.adaptor.data.BaseURL;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderGetter;
@@ -26,7 +25,6 @@ import org.ogf.saga.error.*;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.Exception;
 import java.util.*;
 
 /* ***************************************************
@@ -53,8 +51,8 @@ public class RByteIODataAdaptor extends U6Abstract implements FileWriterPutter, 
         return "rbyteio";
     }
 
-    public BaseURL getBaseURL() throws IncorrectURLException {
-        return new BaseURL(8080);
+    public int getDefaultPort() {
+        return 8080;
     }
 
     public Usage getUsage() {

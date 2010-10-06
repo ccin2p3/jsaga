@@ -31,7 +31,7 @@ public interface JobDescriptionTranslator {
      * @param key the name of the attribute
      * @param value the value of the attribute
      */
-    public void setAttribute(String key, String value);
+    public void setAttribute(String key, String value) throws NoSuccessException;
 
     /**
      * Translate the job description from JSDL to targeted native language

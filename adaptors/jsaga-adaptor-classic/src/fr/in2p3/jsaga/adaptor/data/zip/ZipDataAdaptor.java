@@ -2,7 +2,6 @@ package fr.in2p3.jsaga.adaptor.data.zip;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.data.BaseURL;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
@@ -53,8 +52,8 @@ public class ZipDataAdaptor implements FileReaderStreamFactory{//, FileWriterPut
         // do nothing
     }
 
-    public BaseURL getBaseURL() throws IncorrectURLException {
-        return null;
+    public int getDefaultPort() {
+        return NO_PORT;
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {

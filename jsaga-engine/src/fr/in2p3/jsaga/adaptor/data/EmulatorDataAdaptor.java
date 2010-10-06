@@ -55,8 +55,8 @@ public class EmulatorDataAdaptor implements FileReaderStreamFactory, FileWriterS
         // do nothing
     }
 
-    public BaseURL getBaseURL() throws IncorrectURLException {
-        return new BaseURL(1234);
+    public int getDefaultPort() {
+        return 1234;
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {

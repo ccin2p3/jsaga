@@ -48,10 +48,8 @@ public class SrbDataAdaptor extends IrodsDataAdaptorAbstract {
         });
     }
 
-	public BaseURL getBaseURL() throws IncorrectURLException {
-        //todo: parse MDASENV file
-		//return new BaseURL(String userInfo, String host, int port, "/", "domain=mydomain&zone=myzone&resource=myresource");
-		return null;
+	public int getDefaultPort() {
+		return NO_PORT;
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {

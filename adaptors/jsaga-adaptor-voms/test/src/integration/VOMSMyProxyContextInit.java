@@ -17,7 +17,7 @@ import org.ogf.saga.context.ContextInitTest;
  */
 public class VOMSMyProxyContextInit extends ContextInitTest {
     public VOMSMyProxyContextInit() throws Exception {
-        super("dteam_myproxy", true);    // has UserPass
+        super("VOMSMyProxy", true);    // has UserPass
     }
 
     protected void updateContextAttributes(Context context) throws Exception {

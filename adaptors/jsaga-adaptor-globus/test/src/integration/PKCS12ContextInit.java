@@ -16,6 +16,6 @@ import org.ogf.saga.context.ContextInitTest;
  */
 public class PKCS12ContextInit extends ContextInitTest {
     public PKCS12ContextInit() throws Exception {
-        super("Test_PKCS12");
+        super("Globus");
     }
 }

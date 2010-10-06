@@ -7,14 +7,14 @@ import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.engine.factories.JobAdaptorFactory;
 import fr.in2p3.jsaga.engine.factories.JobMonitorAdaptorFactory;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
+import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.TaskMode;
 import org.ogf.saga.url.URL;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -86,12 +86,14 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
 
     ////////////////////////////////////////// private methods //////////////////////////////////////////
 
-    public synchronized void resetAdaptors(SecurityCredential security, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, IncorrectURLException, BadParameterException, TimeoutException, NoSuccessException {
+    public synchronized void resetAdaptors(ContextImpl context, SecurityCredential security) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, IncorrectURLException, BadParameterException, TimeoutException, NoSuccessException {
         m_monitorService.startReset();
         try {
             // reset control adaptor
+            String scheme = context.getSchemeFromAlias(m_resourceManager.getScheme());
+            Properties controlAttributes = context.getServiceConfig(scheme);
             JobAdaptorFactory.disconnect(m_controlAdaptor);
-            JobAdaptorFactory.connect(m_controlAdaptor, security, m_resourceManager, attributes);
+            JobAdaptorFactory.connect(m_controlAdaptor, security, m_resourceManager, controlAttributes);
 
             // reset monitor adaptor
             JobMonitorAdaptor monitorAdaptor = m_monitorService.getAdaptor();

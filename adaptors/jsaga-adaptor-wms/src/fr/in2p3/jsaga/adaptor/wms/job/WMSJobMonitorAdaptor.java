@@ -41,8 +41,6 @@ import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
-import fr.in2p3.jsaga.adaptor.base.usage.U;
-import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobInfoAdaptor;
@@ -61,7 +59,6 @@ import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
 * ***************************************************/
 
 public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements QueryIndividualJob, ListableJobAdaptor, JobInfoAdaptor {
-    public static final String MONITOR_PORT = "MonitorPort";
     protected String m_wmsServerUrl;
     protected String m_lbHost;
     protected int m_lbPort;
@@ -75,20 +72,21 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
         return "wms";
     }
 
+    /** this method is ignored */
     public Usage getUsage() {
-        return new UAnd(new Usage[]{new U(MONITOR_PORT)});
+        return null;
     }
 
+    /** this method is ignored */
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-    	return new Default[]{
-    			new Default(MONITOR_PORT, "9003")};
+        return null;
     }
   
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         m_wmsServerUrl = "https://"+host+":"+port+basePath;
         m_lbHost = WMStoLB.getInstance().getLBHost(m_wmsServerUrl);
         // jobIdUrl port can not be used for invoking web service, use default port instead...
-        m_lbPort = Integer.parseInt((String) attributes.get(MONITOR_PORT));
+        m_lbPort = 9003;
     }
 
     public void disconnect() throws NoSuccessException {

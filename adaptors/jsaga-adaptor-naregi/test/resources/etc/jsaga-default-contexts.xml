@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
+    <contexts>
+        <context type="VOMS">
+            <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/naregi/certificates/"/>
+            <attribute name="UserCert" value="${user.home}/.jsaga/contexts/naregi/usercert.pem"/>
+            <attribute name="UserKey" value="${user.home}/.jsaga/contexts/naregi/userkey.pem"/>
+            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/naregi_cred.txt"/>
+
+            <attribute name="Server"
+                       value="voms://host113.ccvm.lan:15000/C=FR/O=naregi/OU=ccin2p3/CN=host/host113.ccvm.lan"/>
+            <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/naregi/vomsdir/"/>
+            <attribute name="UserVO" value="cctest"/>
+            <!--<attribute name="UserFQAN" value="/cctest/Role=DefaultRole"/>-->
+
+            <job type="naregi">
+                <attribute name="Server" value="host119.ccvm.lan"/>
+                <attribute name="myproxy.server.host" value="host116.ccvm.lan"/>
+                <attribute name="myproxy.server.hostDN" value="/C=FR/O=naregi/OU=ccin2p3/CN=host/host116.ccvm.lan"/>
+                <attribute name="myproxy_plus.server.host" value="host119.ccvm.lan"/>
+                <attribute name="myproxy_plus.server.hostDN" value="/C=FR/O=naregi/OU=ccin2p3/CN=host/host119.ccvm.lan"/>
+                <attribute name="ss.command.location" value="${user.home}/naregi-SS"/>
+            </job>
+
+            <include domain="ccvm.lan"/>
+            <include domain="jp"/>
+        </context>
+        <context type="NAREGI">
+            <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/naregi/certificates/"/>
+            <attribute name="UserID" value="naregiuser"/>
+            <job type="naregi">
+                <attribute name="Server" value="host119.ccvm.lan"/>
+                <attribute name="myproxy.server.host" value="host116.ccvm.lan"/>
+                <attribute name="myproxy.server.hostDN" value="/C=FR/O=naregi/OU=ccin2p3/CN=host/host116.ccvm.lan"/>
+                <attribute name="myproxy_plus.server.host" value="host119.ccvm.lan"/>
+                <attribute name="myproxy_plus.server.hostDN" value="/C=FR/O=naregi/OU=ccin2p3/CN=host/host119.ccvm.lan"/>
+                <attribute name="ss.command.location" value="${user.home}/naregi-SS"/>
+            </job>
+        </context>
+    </contexts>
+</jsaga-default>

@@ -1,9 +1,7 @@
 package fr.in2p3.jsaga.adaptor;
 
-import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.data.BaseURL;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import org.ogf.saga.error.*;
 
@@ -30,8 +28,8 @@ public abstract class WaitForEverAdaptorAbstract implements ClientAdaptor {
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return null;
     }
-    public BaseURL getBaseURL() throws IncorrectURLException {
-        return null;
+    public int getDefaultPort() {
+        return NO_PORT;
     }
     public Class[] getSupportedSecurityCredentialClasses() {
         return null;

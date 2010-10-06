@@ -1,0 +1,21 @@
+<jsaga-default xmlns="http://www.in2p3.fr/jsaga/session"
+               extends="../test/resources/etc/jsaga-default-contexts.xml">
+    <contexts>
+        <context type="VOMS">
+            <attribute name="UserVO" value="${VO}"/>
+            <job type="wms">
+                <attribute name="virtualorganisation" value="${VO}"/>
+            </job>
+        </context>
+        <context type="Globus">
+            <job type="gatekeeper">
+                <attribute name="ShellPath" value="F\:\\cygwin\\bin\\sh.exe"/>
+            </job>
+        </context>
+        <context type="None">
+            <job type="local">
+                <attribute name="ShellPath" value="F\:\\cygwin\\bin\\sh.exe"/>
+            </job>
+        </context>
+    </contexts>
+</jsaga-default>

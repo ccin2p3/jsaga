@@ -16,6 +16,6 @@ import org.ogf.saga.context.ContextDestroyTest;
  */
 public class VOMSMyProxyContextDestroy extends ContextDestroyTest {
     public VOMSMyProxyContextDestroy() throws Exception {
-        super("dteam_myproxy");
+        super("VOMSMyProxy");
     }
 }

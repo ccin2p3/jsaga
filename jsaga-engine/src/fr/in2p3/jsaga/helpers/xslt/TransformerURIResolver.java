@@ -1,12 +1,11 @@
 package fr.in2p3.jsaga.helpers.xslt;
 
 import fr.in2p3.jsaga.Base;
-import fr.in2p3.jsaga.engine.config.Configuration;
+import fr.in2p3.jsaga.engine.descriptors.AdaptorDescriptors;
 
 import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
-import java.io.File;
+import java.io.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -22,9 +21,21 @@ import java.io.File;
  */
 public class TransformerURIResolver implements URIResolver {
     public Source resolve(String href, String base) throws TransformerException {
-        if ("var/jsaga-merged-config.xml".equals(href)) {
+        if ("SystemProperties.xml".equals(href)) {
+            ByteArrayOutputStream xml = new ByteArrayOutputStream();
             try {
-                return new DOMSource(Configuration.getInstance().getConfigurations().getAsDocument());
+                System.getProperties().storeToXML(xml, "System properties");
+                BufferedReader reader = new BufferedReader(new StringReader(xml.toString()));
+                reader.readLine();
+                reader.readLine();  // remove DTD (prevent from raising FileNotFoundException)
+                return new StreamSource(reader);
+            } catch (IOException e) {
+                throw new TransformerException(e);
+            }
+        } else if ("AdaptorsDescriptor.xml".equals(href)) {
+            try {
+                byte[] xml = AdaptorDescriptors.getInstance().toByteArray();
+                return new StreamSource(new ByteArrayInputStream(xml));
             } catch (Exception e) {
                 throw new TransformerException(e);
             }

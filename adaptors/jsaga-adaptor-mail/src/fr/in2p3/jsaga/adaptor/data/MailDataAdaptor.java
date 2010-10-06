@@ -2,8 +2,6 @@ package fr.in2p3.jsaga.adaptor.data;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.data.BaseURL;
-import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import org.ogf.saga.error.*;
 
@@ -42,8 +40,8 @@ public class MailDataAdaptor implements DataAdaptor {
         // set security context
     }
 
-    public BaseURL getBaseURL() throws IncorrectURLException {
-        return new BaseURL();
+    public int getDefaultPort() {
+        return NO_PORT;
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {

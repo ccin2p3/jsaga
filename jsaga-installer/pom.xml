@@ -15,7 +15,7 @@
     <scm>
         <connection>scm:git:git://git.in2p3.fr/jsaga</connection>
         <developerConnection>scm:git:ssh://git.in2p3.fr/jsaga</developerConnection>
-        <url>https://git.in2p3.fr/cgit/jsaga</url>
+        <url>https://git.in2p3.fr/public/jsaga</url>
     </scm>
     <distributionManagement>
         <repository>
@@ -233,6 +233,7 @@
             <plugin>
                 <groupId>org.codehaus.izpack</groupId>
                 <artifactId>izpack-maven-plugin</artifactId>
+                <version>1.0-alpha-5</version>
                 <configuration>
                     <descriptor>${project.build.directory}/izpack.xml</descriptor>
                     <izpackBasedir>${project.build.directory}/${project.artifactId}-${project.version}-bin.dir/jsaga-${project.version}/</izpackBasedir>

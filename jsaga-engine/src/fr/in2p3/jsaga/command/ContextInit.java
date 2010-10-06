@@ -1,14 +1,13 @@
 package fr.in2p3.jsaga.command;
 
-import fr.in2p3.jsaga.engine.config.Configuration;
-import fr.in2p3.jsaga.engine.schema.config.Attribute;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
+import fr.in2p3.jsaga.impl.session.SessionImpl;
 import org.apache.commons.cli.*;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.context.ContextFactory;
-import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
+import org.ogf.saga.url.URLFactory;
 
 import java.io.*;
 
@@ -43,47 +42,35 @@ public class ContextInit extends AbstractCommand {
             Session session = SessionFactory.createSession(true);
             Context[] contexts = session.listContexts();
             for (int i=0; i<contexts.length; i++) {
-                // get context configuration
-                fr.in2p3.jsaga.engine.schema.config.Context xmlContext = Configuration.getInstance().getConfigurations().getContextCfg().findContext(
-                        contexts[i].getAttribute(Context.TYPE));
-
-                // set UserPass attribute
-                setUserPass(contexts[i], xmlContext);
-
-                // trigger initialization of context
-                contexts[i].getAttribute(Context.USERID);
+                try {
+                    setUserPass(contexts[i]);
+                } catch (Exception e) {
+                    throw new Exception("Exception occured for context: "+contexts[i].getAttribute(Context.TYPE), e);
+                }
             }
             session.close();
         }
         else if (command.m_nonOptionValues.length == 1)
         {
             String id = command.m_nonOptionValues[0];
-            fr.in2p3.jsaga.engine.schema.config.Context[] xmlContexts = Configuration.getInstance().getConfigurations().getContextCfg().listContextsArray(id);
-            if (xmlContexts.length == 0) {
-                throw new BadParameterException("Context type not found: "+id);
-            }
-            for (int i=0; i<xmlContexts.length; i++) {
-                // set context
-                Context context = ContextFactory.createContext();
-                context.setAttribute(Context.TYPE, xmlContexts[i].getName());
-                context.setDefaults();
-
-                // set UserPass attribute
-                setUserPass(context, xmlContexts[i]);
-
-                // trigger initialization of context
-                context.getAttribute(Context.USERID);
-
-                // close context
-                ((ContextImpl) context).close();
+            SessionImpl session = (SessionImpl) SessionFactory.createSession(true);
+            ContextImpl context = session.findContext(URLFactory.createURL(id+"-any://host"));
+            if (context != null) {
+                setUserPass(context);
+                context.close();
+            } else {
+                throw new Exception("Context not found: "+id);
             }
         }
     }
 
-    private static void setUserPass(Context context, fr.in2p3.jsaga.engine.schema.config.Context config) throws Exception {
-        if (config.getUsage()!=null && config.getUsage().contains(Context.USERPASS) && !containsUserPass(config)) {
+    private static void setUserPass(Context context) throws Exception {
+        // todo: introspect context object to know whether UserPass is supported or not
+        try {
+            context.getAttribute(Context.USERPASS);
+        } catch (DoesNotExistException e) {
             // prompt for UserPass
-            System.out.println("Enter UserPass for security context: "+context.getAttribute(Context.TYPE));
+            System.out.println("Enter UserPass for security context: "+ContextInfo.getLabel(context));
             String userPass = getUserInput();
 
             // set UserPass
@@ -91,16 +78,8 @@ public class ContextInit extends AbstractCommand {
                 context.setAttribute(Context.USERPASS, userPass);
             }
         }
-    }
-
-    private static boolean containsUserPass(fr.in2p3.jsaga.engine.schema.config.Context config) {
-        for (int i=0; i<config.getAttributeCount(); i++) {
-            Attribute attr = config.getAttribute(i);
-            if (attr.getName().equals(Context.USERPASS)) {
-                return (attr.getValue()!=null);
-            }
-        }
-        return false;
+        // trigger initialization of context
+        context.getAttribute(Context.USERID);
     }
 
     private static volatile boolean s_stopped;
