@@ -104,7 +104,7 @@ git merge mergedBranch
 
 # Delete remote and local branches
 git push origin :workingBranch
-git branch -d workingBranch
+git branch -D workingBranch
 git branch -d mergedBranch
 git branch -al</pre>
                 WARNING: This does not work if some binary files have been modified.
