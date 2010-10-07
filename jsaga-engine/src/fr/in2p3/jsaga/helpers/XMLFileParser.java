@@ -31,14 +31,19 @@ public class XMLFileParser {
     private DocumentBuilderFactory m_parser;
 
     public XMLFileParser(String[] schemaResourcePaths) throws IOException {
-        System.setProperty("javax.xml.parsers.DocumentBuilderFactory",
-                "org.apache.xerces.jaxp.DocumentBuilderFactoryImpl");
-        System.setProperty("javax.xml.parsers.SAXParserFactory",
-                "org.apache.xerces.jaxp.SAXParserFactoryImpl");
-        System.setProperty("org.apache.xerces.xni.parser.XMLParserConfiguration",
-                "org.apache.xerces.parsers.XIncludeParserConfiguration");
         m_parser = DocumentBuilderFactory.newInstance();
         m_parser.setNamespaceAware(true);
+/*
+        if (schemaResourcePath!=null) {
+            // create schema
+            SchemaFactory factory =  SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            Source source = new StreamSource(XMLFileParser.class.getResourceAsStream("/"+schemaResourcePath));
+            Schema schema = factory.newSchema(source);
+
+            // set parser
+            m_parser.setValidating(false);  // use schema instead
+            m_parser.setSchema(schema);
+*/
         if (schemaResourcePaths!=null && schemaResourcePaths.length>0) {
             extractSchemaFiles(schemaResourcePaths);
             m_parser.setValidating(true);
