@@ -93,24 +93,69 @@
                     </execution>
                 </executions>
             </plugin>
+<!--
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <configuration>
+                    <outputDirectory>${project.build.directory}/generated-sources/src</outputDirectory>
+                    <clearOutputDir>false</clearOutputDir>
+                    <schemaDirectory>resources/schema</schemaDirectory>
+                    <schemaFiles>jsaga-default-contexts.xsd</schemaFiles>
+                    <packageName>fr.in2p3.jsaga.generated.session</packageName>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+-->
 
             <!-- todo: remove this (castor) -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>castor-maven-plugin</artifactId>
                 <version>1.0</version>
+                <configuration>
+                    <schemaDirectory>${basedir}/resources/schema</schemaDirectory>
+                    <properties>${basedir}/resources/schema/NStoPkg.properties</properties>
+                    <bindingfile>${basedir}/resources/schema/bindings.xml</bindingfile>
+                    <dest>${project.build.directory}/generated-sources/src</dest>
+                    <tstamp>${project.build.directory}/tstamp</tstamp>
+                </configuration>
                 <executions>
                     <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <schemaDirectory>${basedir}/resources/schema</schemaDirectory>
-                            <properties>${basedir}/resources/schema/NStoPkg.properties</properties>
-                            <bindingfile>${basedir}/resources/schema/bindings.xml</bindingfile>
-                            <dest>${project.build.directory}/generated-sources/src</dest>
-                            <tstamp>${project.build.directory}/tstamp</tstamp>
-                        </configuration>
+                        <id>adaptor-data-catalog</id>
+                        <goals><goal>generate</goal></goals>
+                        <configuration><schema>${basedir}/resources/schema/adaptor-data-catalog.xsd</schema></configuration>
+                    </execution>
+                    <execution>
+                        <id>adaptor-data-emulator</id>
+                        <goals><goal>generate</goal></goals>
+                        <configuration><schema>${basedir}/resources/schema/adaptor-data-emulator.xsd</schema></configuration>
+                    </execution>
+                    <execution>
+                        <id>adaptor-job-emulator-config</id>
+                        <goals><goal>generate</goal></goals>
+                        <configuration><schema>${basedir}/resources/schema/adaptor-job-emulator-config.xsd</schema></configuration>
+                    </execution>
+                    <execution>
+                        <id>adaptor-job-emulator</id>
+                        <goals><goal>generate</goal></goals>
+                        <configuration><schema>${basedir}/resources/schema/adaptor-job-emulator.xsd</schema></configuration>
+                    </execution>
+                    <execution>
+                        <id>descriptors</id>
+                        <goals><goal>generate</goal></goals>
+                        <configuration><schema>${basedir}/resources/schema/descriptors.xsd</schema></configuration>
+                    </execution>
+                    <execution>
+                        <id>jsaga-default-contexts</id>
+                        <goals><goal>generate</goal></goals>
+                        <configuration><schema>${basedir}/resources/schema/jsaga-default-contexts.xsd</schema></configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -160,6 +205,18 @@
             <artifactId>log4j</artifactId>
             <version>1.2.8</version>
         </dependency>
+<!--
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.1.3</version>
+        </dependency>
+-->
 
         <!-- todo: remove this (castor dependencies) -->
         <dependency>
