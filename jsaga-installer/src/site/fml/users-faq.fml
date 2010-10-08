@@ -12,6 +12,80 @@
                 <p>You can also see sample code <a href="jsaga-engine/xref/fr/in2p3/jsaga/command/package-summary.html">here</a>.</p>
             </answer>
         </faq>
+        <faq id="example">
+            <question>How to develop my first grid application ?</question>
+            <answer>
+                <p>See the following example (list entries under specified URL):</p>
+                <pre><![CDATA[import org.ogf.saga.file.FileFactory;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
+
+public class List {
+    public static void main(String[] args) throws Exception {
+        System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
+        if (args.length != 1) {
+            throw new Exception("usage: List <URL>");
+        }
+        for (URL url : FileFactory.createDirectory(URLFactory.createURL(args[0])).list()) {
+            System.out.println(url.getString());
+        }
+    }
+}]]></pre>
+            </answer>
+        </faq>
+        <faq id="compile-with-javac">
+            <question>How to compile your grid application with javac ?</question>
+            <answer>
+                <p><a href="download.html">Download</a> and install JSAGA.</p>
+                <p>Set the JSAGA_HOME environment variable to your JSAGA installation path.</p>
+                <p>Compile your grid application:</p>
+                <pre>javac -d . -classpath $JSAGA_HOME/lib/saga-api-1.0.jar List.java</pre>
+                <p>Run your grid application:</p>
+                <ul>
+                    <li>Example with Java 1.6 on Unix/Linux operating system:
+                        <pre>java -cp .:$JSAGA_HOME/lib/'*' -DJSAGA_HOME=$JSAGA_HOME List file:///</pre>
+                    </li>
+                    <li>Example with Java 1.5 on Unix/Linux operating system:
+                        <pre>for i in $JSAGA_HOME/lib/*.jar ; do CLASSPATH="${CLASSPATH}:${i}" ; done
+java -cp .:$CLASSPATH -DJSAGA_HOME=$JSAGA_HOME List file:///</pre>
+                    </li>
+                </ul>
+            </answer>
+        </faq>
+        <faq id="compile-with-maven">
+            <question>How to compile your grid application with maven ?</question>
+            <answer>
+                <p>Add to your profiles, settings or project file the CC-IN2P3 maven repository:</p>
+                <pre><![CDATA[    <repositories>
+        <repository>
+            <id>CC-IN2P3 maven repository</id>
+            <url>http://grid.in2p3.fr/maven2</url>
+        </repository>
+    </repositories>]]></pre>
+                <p>Add to your project file the dependencies needed for build:</p>
+                <pre><![CDATA[        <dependency>
+            <groupId>org.ogf.saga</groupId>
+            <artifactId>saga-api</artifactId>
+            <version>1.0</version>
+            <scope>compile</scope>
+        </dependency>]]></pre>
+                <p>Add to your project file the dependencies needed for runtime or for testing:</p>
+                <pre><![CDATA[        <dependency>
+            <groupId>fr.in2p3.jsaga</groupId>
+            <artifactId>jsaga-engine</artifactId>
+            <version>${version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- add all the adaptors that you expect to use (for example, add jsaga-adaptor-classic for file://) -->
+        <dependency>
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-classic</artifactId>
+            <version>${version}</version>
+            <scope>runtime</scope>
+        </dependency>]]></pre>
+                <p>where ${version} is the version of JSAGA you want to compile with.</p>
+            </answer>
+        </faq>
     </part>
     <part id="configuration">
         <title>Configuration FAQ</title>
