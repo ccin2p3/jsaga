@@ -1,0 +1,17 @@
+<body>
+    <p>
+    The methods of the SAGA RPC package map with the methods as defined in
+    the GridRPC specification, as described in GFD.52, at least semantically,
+    with slight modifications for SAGA look and feel, SAGA error conventions,
+    SAGA task model, et cetera.
+    </p>
+    <p>
+	In contrast to the language-independent SAGA specifications, the
+	{@link org.ogf.saga.rpc.Parameter Parameter} interface does not extend
+	the {@link org.ogf.saga.buffer.Buffer Buffer} interface. The motivation
+	for this is that most Java language bindings for RPC systems use
+	{@link java.lang.Object} for parameters, implying that at least some
+	types are serialized automatically. See, for instance, the Java bindings
+	for Ninf-g and Apache XML-RPC.
+    </p>
+</body>

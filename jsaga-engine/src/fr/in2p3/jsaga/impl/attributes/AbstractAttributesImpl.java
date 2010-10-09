@@ -132,6 +132,11 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
         }
         return foundKeys.toArray(new String[foundKeys.size()]);
     }
+
+    public boolean existsAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
+        return m_attributes.containsKey(key);
+    }
+
     private static final Pattern PATTERN = Pattern.compile("([^=]*)(=(.*))?");
     private static boolean matches(Attribute attribute, String... patterns) throws NotImplementedException, NoSuccessException {
         for (String pattern : patterns) {

@@ -32,28 +32,36 @@ public abstract class StreamOutputStream extends java.io.OutputStream implements
 
     /**
      * Creates a task that writes a byte to this stream.
-     * 
+     * See {@link java.io.OutputStream#write(int)}. 
      * @param mode
-     *            the task mode. See {@link java.io.OutputStream#write(int)}.
+     *      the task mode.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
      */
     public abstract Task<StreamOutputStream, Void> write(TaskMode mode, int b)
             throws NotImplementedException;
 
     /**
      * Creates a task that writes (part of) a buffer to this stream.
-     * 
+     * See {@link java.io.OutputStream#write(byte[], int, int)}. 
      * @param mode
-     *            the task mode. See
-     *            {@link java.io.OutputStream#write(byte[], int, int)}.
+     *      the task mode.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
      */
     public abstract Task<StreamOutputStream, Void> write(TaskMode mode,
             byte[] buf, int off, int len) throws NotImplementedException;
 
     /**
      * Creates a task that writes a buffer to this stream.
-     * 
+     * See {@link java.io.OutputStream#write(byte[])}. 
      * @param mode
-     *            the task mode. See {@link java.io.OutputStream#write(byte[])}.
+     *      the task mode.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
      */
     public Task<StreamOutputStream, Void> write(TaskMode mode, byte[] buf)
             throws NotImplementedException {
@@ -62,19 +70,26 @@ public abstract class StreamOutputStream extends java.io.OutputStream implements
 
     /**
      * Creates a task that flushes this stream.
-     * 
+     * See {@link java.io.OutputStream#flush()}. 
      * @param mode
-     *            the task mode. See {@link java.io.OutputStream#flush()}.
+     *      the task mode.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
      */
     public abstract Task<StreamOutputStream, Void> flush(TaskMode mode)
             throws NotImplementedException;
 
     /**
      * Creates a task that closes this stream.
-     * 
+     * See {@link java.io.OutputStream#close()}. 
      * @param mode
-     *            the task mode. See {@link java.io.OutputStream#close()}.
+     *      the task mode.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
      */
+    
     public abstract Task<StreamOutputStream, Void> close(TaskMode mode)
             throws NotImplementedException;
 }

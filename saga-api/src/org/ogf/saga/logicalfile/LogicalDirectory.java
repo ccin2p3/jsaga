@@ -31,8 +31,42 @@ public interface LogicalDirectory extends NSDirectory,
      * {@link NSDirectory#isEntry}.
      * 
      * @param name
-     *            to be tested.
-     * @return <code>true</code> if the name represents a non-directory entry.
+     *      to be tested.
+     * @return
+     *      <code>true</code> if the name represents a non-directory entry.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL contains an invalid entry name.
+     * @exception IncorrectStateException
+     *      is thrown when the LogicalDirectory is already closed.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception DoesNotExistException
+     *      is thrown if the specified name does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public boolean isFile(URL name) throws NotImplementedException,
             IncorrectURLException, AuthenticationFailedException,
@@ -45,12 +79,42 @@ public interface LogicalDirectory extends NSDirectory,
      * names and matching meta data.
      * 
      * @param namePattern
-     *            pattern for names of entries to be found.
+     *      pattern for names of entries to be found.
      * @param attrPattern
-     *            pattern for meta data keys/values of entries to be found.
+     *      pattern for meta data keys/values of entries to be found.
      * @param flags
-     *            flags defining the operation modus.
-     * @return the list of matching entries.
+     *      flags defining the operation modus.
+     * @return
+     *      the list of matching entries.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when illegal flags are specified: only RECURSIVE
+     *      (or NONE) is allowed, or one or more of the patterns is
+     *      not correctly formatted.
+     * @exception IncorrectStateException
+     *      is thrown when the LogicalDirectory is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public List<URL> find(String namePattern, String[] attrPattern, int flags)
             throws NotImplementedException, AuthenticationFailedException,
@@ -63,10 +127,39 @@ public interface LogicalDirectory extends NSDirectory,
      * matching meta data.
      * 
      * @param namePattern
-     *            pattern for names of entries to be found.
+     *      pattern for names of entries to be found.
      * @param attrPattern
-     *            pattern for meta data keys/values of entries to be found.
-     * @return the list of matching entries.
+     *      pattern for meta data keys/values of entries to be found.
+     * @return
+     *      the list of matching entries.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when one or more of the patterns is
+     *      not correctly formatted.
+     * @exception IncorrectStateException
+     *      is thrown when the LogicalDirectory is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public List<URL> find(String namePattern, String[] attrPattern)
             throws NotImplementedException, AuthenticationFailedException,
@@ -82,10 +175,49 @@ public interface LogicalDirectory extends NSDirectory,
      * Creates a new <code>LogicalDirectory</code> instance.
      * 
      * @param name
-     *            directory to open.
+     *      directory to open.
      * @param flags
-     *            defining the operation modus.
-     * @return the opened directory instance.
+     *      defining the operation modus.
+     * @return
+     *      the opened directory instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL does not point to a directory,
+     *      or is an invalid entry name.
+     * @exception IncorrectStateException
+     *      is thrown when the LogicalDirectory is already closed.
+     * @exception IncorrectURLException
+     *      is thrown if an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified URL already exists, and the
+     *      <code>CREATE</code> and <code>EXCLUSIVE</code> flags are given.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist, and the
+     *      <code>CREATE</code> flag is not given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public LogicalDirectory openLogicalDir(URL name, int flags)
             throws NotImplementedException, IncorrectURLException,
@@ -98,8 +230,46 @@ public interface LogicalDirectory extends NSDirectory,
      * Creates a new <code>LogicalDirectory</code> instance with read flag.
      * 
      * @param name
-     *            directory to open.
-     * @return the opened directory instance.
+     *      directory to open.
+     * @return
+     *      the opened directory instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL does not point to a directory,
+     *      or is an invalid entry name.
+     * @exception IncorrectStateException
+     *      is thrown when the LogicalDirectory is already closed.
+     * @exception IncorrectURLException
+     *      is thrown if an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      not thrown, but specified because a method may be invoked
+     *      that can throw this exception, but will not in this case.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public LogicalDirectory openLogicalDir(URL name)
             throws NotImplementedException, IncorrectURLException,
@@ -112,10 +282,49 @@ public interface LogicalDirectory extends NSDirectory,
      * Creates a new <code>LogicalFile</code> instance.
      * 
      * @param name
-     *            logical file to open.
+     *      logical file to open.
      * @param flags
-     *            defining the operation modus.
-     * @return the opened logical file.
+     *      defining the operation modus.
+     * @return
+     *      the opened logical file.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL points to a directory,
+     *      or is an invalid entry name.
+     * @exception IncorrectStateException
+     *      is thrown when the LogicalDirectory is already closed.
+     * @exception IncorrectURLException
+     *      is thrown if an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified URL already exists, and the
+     *      <code>CREATE</code> and <code>EXCLUSIVE</code> flags are given.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist, and the
+     *      <code>CREATE</code> flag is not given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public LogicalFile openLogicalFile(URL name, int flags)
             throws NotImplementedException, IncorrectURLException,
@@ -130,6 +339,43 @@ public interface LogicalDirectory extends NSDirectory,
      * @param name
      *            logical file to open.
      * @return the opened logical file.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL does not point to a directory,
+     *      or is an invalid entry name.
+     * @exception IncorrectStateException
+     *      is thrown when the LogicalDirectory is already closed.
+     * @exception IncorrectURLException
+     *      is thrown if an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      not thrown, but specified because a method may be invoked
+     *      that can throw this exception, but will not in this case.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public LogicalFile openLogicalFile(URL name)
             throws NotImplementedException, IncorrectURLException,

@@ -1,0 +1,36 @@
+<body>
+    <p>
+    This package provides classes to manipulate namespaces.
+    </p>
+    <p>
+    An {@link org.ogf.saga.namespace.NSEntry NSEntry} represents
+    a namespace entry, and provides methods to inspect and manipulate
+    this entry.
+    </p>
+    <p>
+    An {@link org.ogf.saga.namespace.NSDirectory NSDirectory}
+    represents a namespace entry that is a directory, and defines additional
+    methods for them. A Java specific extension is that
+    this interface extends <code>Iterable</code>, which allows
+    an application to iterate over the entries in this directory, like this:
+    <br>
+    <code>
+	for (URL url : directory) {...}
+    </code>
+    </p>
+
+    <p>
+    The possible namespace flags are defined in the
+    {@link org.ogf.saga.namespace.Flags Flags} enumeration
+    class, which includes methods to combine them into integers,
+    and to determine if they are set in an integer.
+    These methods are not described in the language-independent SAGA
+    specification, but are added in the Java language bindings because
+    in Java, enumerations cannot be treated as integers.
+    Also, since enumeration classes are not extensible in Java, flags
+    from the {@link org.ogf.saga.logicalfile logicalfile} package
+    and the {@link org.ogf.saga.file file} package are included
+    here as well.
+    </p>
+
+</body>

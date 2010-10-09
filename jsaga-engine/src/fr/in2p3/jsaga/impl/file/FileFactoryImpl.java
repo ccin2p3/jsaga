@@ -38,6 +38,7 @@ public class FileFactoryImpl extends AbstractAsyncFileFactoryImpl {
                 return (File) this.getResult(createFile(TaskMode.ASYNC, session, name, flags), timeout);
             }
             catch (IncorrectStateException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -50,6 +51,7 @@ public class FileFactoryImpl extends AbstractAsyncFileFactoryImpl {
                 return (FileInputStream) this.getResult(createFileInputStream(TaskMode.ASYNC, session, name), timeout);
             }
             catch (IncorrectStateException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -62,6 +64,7 @@ public class FileFactoryImpl extends AbstractAsyncFileFactoryImpl {
                 return (FileOutputStream) this.getResult(createFileOutputStream(TaskMode.ASYNC, session, name, append), timeout);
             }
             catch (IncorrectStateException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -74,6 +77,7 @@ public class FileFactoryImpl extends AbstractAsyncFileFactoryImpl {
                 return (Directory) this.getResult(createDirectory(TaskMode.ASYNC, session, name, flags), timeout);
             }
             catch (IncorrectStateException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -87,7 +91,7 @@ public class FileFactoryImpl extends AbstractAsyncFileFactoryImpl {
             throws NotImplementedException, IncorrectURLException,
             AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException,
             BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException,
-            TimeoutException, NoSuccessException
+            TimeoutException, NoSuccessException, SagaIOException
     {
         return AbstractSagaObjectImpl.getResult(task, timeout);
     }

@@ -236,11 +236,21 @@ public abstract class FileFactory {
      * Creates an IOVec.
      * 
      * @param data
-     *            data to be used.
+     *      data to be used.
      * @param lenIn
-     *            number of bytes to read/write on readV/writeV.
-     * @return the IOVec.
-     * @throws NotImplementedException
+     *      number of bytes to read/write on readV/writeV.
+     * @return
+     *      the IOVec.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception BadParameterException
+     *      is thrown when <code>lenIn</code> is larger than the size of the
+     *      specified buffer, or < 0, or when the implementation cannot handle
+     *      the specified data buffer.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static IOVec createIOVec(byte[] data, int lenIn)
             throws BadParameterException, NoSuccessException,
@@ -253,9 +263,18 @@ public abstract class FileFactory {
      * Creates an IOVec.
      * 
      * @param data
-     *            data to be used.
-     * @return the IOVec.
-     * @throws NotImplementedException
+     *      data to be used.
+     * @return
+     *      the IOVec.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception BadParameterException
+     *      is thrown when the implementation cannot handle
+     *      the specified data buffer.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static IOVec createIOVec(byte[] data) throws BadParameterException,
             NoSuccessException, NotImplementedException {
@@ -267,11 +286,20 @@ public abstract class FileFactory {
      * Creates an IOVec.
      * 
      * @param size
-     *            size of data to be used.
+     *      size of data to be used.
      * @param lenIn
-     *            number of bytes to read/write on readV/writeV.
-     * @return the IOVec.
-     * @throws NotImplementedException
+     *      number of bytes to read/write on readV/writeV.
+     * @return
+     *      the IOVec.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception BadParameterException
+     *      is thrown when <code>lenIn</code> is larger than the size of the
+     *      specified buffer, or < 0.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static IOVec createIOVec(int size, int lenIn)
             throws BadParameterException, NoSuccessException,
@@ -284,9 +312,17 @@ public abstract class FileFactory {
      * Creates an IOVec.
      * 
      * @param size
-     *            size of data to be used.
-     * @return the IOVec.
-     * @throws NotImplementedException
+     *      size of data to be used.
+     * @return
+     *      the IOVec.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception BadParameterException
+     *      is thrown when the implementation cannot handle the specified size.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static IOVec createIOVec(int size) throws BadParameterException,
             NoSuccessException, NotImplementedException {
@@ -298,12 +334,48 @@ public abstract class FileFactory {
      * Creates a File.
      * 
      * @param session
-     *            the session handle.
+     *      the session handle.
      * @param name
-     *            location of the file.
+     *      location of the file.
      * @param flags
-     *            the open mode.
-     * @return the file instance.
+     *      the open mode.
+     * @return
+     *      the file instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid file name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified URL already exists, and the
+     *      <code>CREATE</code> and <code>EXCLUSIVE</code> flags are given.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist, and the
+     *      <code>CREATE</code> flag is not given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static File createFile(Session session, URL name, int flags)
             throws NotImplementedException, IncorrectURLException,
@@ -319,10 +391,45 @@ public abstract class FileFactory {
      * Creates a File for reading.
      * 
      * @param session
-     *            the session handle.
+     *      the session handle.
      * @param name
-     *            location of the file.
-     * @return the file instance.
+     *      location of the file.
+     * @return
+     *      the file instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid file name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is not thrown, but a method may be invoked that may throw it (but
+     *      not in this case).
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static File createFile(Session session, URL name)
             throws NotImplementedException, IncorrectURLException,
@@ -338,10 +445,46 @@ public abstract class FileFactory {
      * Creates a File using the default session.
      * 
      * @param name
-     *            location of the file.
+     *      location of the file.
      * @param flags
-     *            the open mode.
-     * @return the file instance.
+     *      the open mode.
+     * @return
+     *      the file instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid file name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified URL already exists, and the
+     *      <code>CREATE</code> and <code>EXCLUSIVE</code> flags are given.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist, and the
+     *      <code>CREATE</code> flag is not given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static File createFile(URL name, int flags)
             throws NotImplementedException, IncorrectURLException,
@@ -358,8 +501,43 @@ public abstract class FileFactory {
      * Creates a File for reading, using the default session.
      * 
      * @param name
-     *            location of the file.
-     * @return the file instance.
+     *      location of the file.
+     * @return
+     *      the file instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid file name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is not thrown, but a method may be invoked that may throw it (but
+     *      not in this case).
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static File createFile(URL name) throws NotImplementedException,
             IncorrectURLException, AuthenticationFailedException,
@@ -375,10 +553,45 @@ public abstract class FileFactory {
      * Creates a FileInputStream.
      * 
      * @param session
-     *            the session handle.
+     *      the session handle.
      * @param name
-     *            location of the file.
-     * @return the FileInputStream instance.
+     *      location of the file.
+     * @return
+     *      the FileInputStream instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid file name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is not thrown, but a method may be invoked that may throw it (but
+     *      not in this case).
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static FileInputStream createFileInputStream(Session session,
             URL name) throws NotImplementedException, IncorrectURLException,
@@ -394,8 +607,43 @@ public abstract class FileFactory {
      * Creates a FileInputStream using the default session.
      * 
      * @param name
-     *            location of the file.
-     * @return the FileInputStream instance.
+     *      location of the file.
+     * @return
+     *      the FileInputStream instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid file name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is not thrown, but a method may be invoked that may throw it (but
+     *      not in this case).
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static FileInputStream createFileInputStream(URL name)
             throws NotImplementedException, IncorrectURLException,
@@ -412,12 +660,50 @@ public abstract class FileFactory {
      * Creates a FileOutputStream.
      * 
      * @param session
-     *            the session handle.
+     *      the session handle.
      * @param name
-     *            location of the file.
+     *      location of the file.
      * @param append
-     *            when set, the file is opened for appending.
-     * @return the FileOutputStream instance.
+     *      when set, the file is opened for appending.
+     * @return
+     *      the FileOutputStream instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL points to a directory,
+     *      or is an invalid entry name.
+     * @exception IncorrectStateException
+     *      is thrown when the NSDirectory is already closed.
+     * @exception IncorrectURLException
+     *      is thrown if an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is not thrown, but a method may be invoked that may throw it (but
+     *      not in this case).
+     * @exception DoesNotExistException
+     *      is thrown if the parent directory does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static FileOutputStream createFileOutputStream(Session session,
             URL name, boolean append) throws NotImplementedException,
@@ -433,10 +719,48 @@ public abstract class FileFactory {
      * Creates a FileOutputStream.
      * 
      * @param session
-     *            the session handle.
+     *      the session handle.
      * @param name
-     *            location of the file.
-     * @return the FileOutputStream instance.
+     *      location of the file.
+     * @return
+     *      the FileOutputStream instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL points to a directory,
+     *      or is an invalid entry name.
+     * @exception IncorrectStateException
+     *      is thrown when the NSDirectory is already closed.
+     * @exception IncorrectURLException
+     *      is thrown if an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is not thrown, but a method may be invoked that may throw it (but
+     *      not in this case).
+     * @exception DoesNotExistException
+     *      is thrown if the parent directory does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static FileOutputStream createFileOutputStream(Session session,
             URL name) throws NotImplementedException, IncorrectURLException,
@@ -451,10 +775,48 @@ public abstract class FileFactory {
      * Creates a FileOutputStream using the default session.
      * 
      * @param name
-     *            location of the file.
+     *      location of the file.
      * @param append
-     *            when set, the file is opened for appending.
-     * @return the FileOutputStream instance.
+     *      when set, the file is opened for appending.
+     * @return
+     *      the FileOutputStream instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL points to a directory,
+     *      or is an invalid entry name.
+     * @exception IncorrectStateException
+     *      is thrown when the NSDirectory is already closed.
+     * @exception IncorrectURLException
+     *      is thrown if an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is not thrown, but a method may be invoked that may throw it (but
+     *      not in this case).
+     * @exception DoesNotExistException
+     *      is thrown if the parent directory does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.  
      */
     public static FileOutputStream createFileOutputStream(URL name,
             boolean append) throws NotImplementedException,
@@ -471,8 +833,46 @@ public abstract class FileFactory {
      * Creates a FileOutputStream using the default session.
      * 
      * @param name
-     *            location of the file.
-     * @return the FileOutputStream instance.
+     *      location of the file.
+     * @return
+     *      the FileOutputStream instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL points to a directory,
+     *      or is an invalid entry name.
+     * @exception IncorrectStateException
+     *      is thrown when the NSDirectory is already closed.
+     * @exception IncorrectURLException
+     *      is thrown if an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is not thrown, but a method may be invoked that may throw it (but
+     *      not in this case).
+     * @exception DoesNotExistException
+     *      is thrown if the parent directory does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static FileOutputStream createFileOutputStream(URL name)
             throws NotImplementedException, IncorrectURLException,
@@ -487,12 +887,48 @@ public abstract class FileFactory {
      * Creates a Directory.
      * 
      * @param session
-     *            the session handle.
+     *      the session handle.
      * @param name
-     *            location of the directory.
+     *      location of the directory.
      * @param flags
-     *            the open mode.
-     * @return the directory instance.
+     *      the open mode.
+     * @return
+     *      the directory instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid file name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified URL already exists, and the
+     *      <code>CREATE</code> and <code>EXCLUSIVE</code> flags are given.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist, and the
+     *      <code>CREATE</code> flag is not given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static Directory createDirectory(Session session, URL name, int flags)
             throws NotImplementedException, IncorrectURLException,
@@ -508,10 +944,45 @@ public abstract class FileFactory {
      * Creates a Directory for reading.
      * 
      * @param session
-     *            the session handle.
+     *      the session handle.
      * @param name
-     *            location of the directory.
-     * @return the directory instance.
+     *      location of the directory.
+     * @return
+     *      the directory instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid file name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is not thrown, but a method may be invoked that may throw it (but
+     *      not in this case).
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static Directory createDirectory(Session session, URL name)
             throws NotImplementedException, IncorrectURLException,
@@ -527,10 +998,46 @@ public abstract class FileFactory {
      * Creates a Directory, using the default session.
      * 
      * @param name
-     *            location of the directory.
+     *      location of the directory.
      * @param flags
-     *            the open mode.
-     * @return the directory instance.
+     *      the open mode.
+     * @return
+     *      the directory instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid file name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified URL already exists, and the
+     *      <code>CREATE</code> and <code>EXCLUSIVE</code> flags are given.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist, and the
+     *      <code>CREATE</code> flag is not given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static Directory createDirectory(URL name, int flags)
             throws NotImplementedException, IncorrectURLException,
@@ -547,8 +1054,43 @@ public abstract class FileFactory {
      * Creates a Directory for reading, using the default session.
      * 
      * @param name
-     *            location of the directory.
-     * @return the directory instance.
+     *      location of the directory.
+     * @return
+     *      the directory instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid file name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is not thrown, but a method may be invoked that may throw it (but
+     *      not in this case).
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static Directory createDirectory(URL name)
             throws NotImplementedException, IncorrectURLException,

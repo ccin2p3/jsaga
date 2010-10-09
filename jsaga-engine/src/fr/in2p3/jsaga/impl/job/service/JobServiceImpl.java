@@ -72,6 +72,7 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
             catch (IncorrectStateException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 

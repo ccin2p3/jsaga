@@ -57,6 +57,10 @@ public abstract class AbstractTaskImplWithAsyncAttributes<T,E,A extends Attribut
         return m_attributes.findAttributes(patterns);
     }
 
+    public boolean existsAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
+        return m_attributes.existsAttribute(key);
+    }
+
     public boolean isReadOnlyAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         return m_attributes.isReadOnlyAttribute(key);
     }
@@ -99,6 +103,10 @@ public abstract class AbstractTaskImplWithAsyncAttributes<T,E,A extends Attribut
 
     public Task<A, String[]> findAttributes(TaskMode mode, String... patterns) throws NotImplementedException {
         return m_attributes.findAttributes(mode, patterns);
+    }
+
+    public Task<A, Boolean> existsAttribute(TaskMode mode, String key) throws NotImplementedException {
+        return m_attributes.existsAttribute(mode, key);
     }
 
     public Task<A, Boolean> isReadOnlyAttribute(TaskMode mode, String key) throws NotImplementedException {

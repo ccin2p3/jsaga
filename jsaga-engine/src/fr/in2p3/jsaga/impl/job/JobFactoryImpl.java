@@ -41,6 +41,7 @@ public class JobFactoryImpl extends AbstractAsyncJobFactoryImpl {
             catch (IncorrectStateException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -54,7 +55,7 @@ public class JobFactoryImpl extends AbstractAsyncJobFactoryImpl {
             throws NotImplementedException, IncorrectURLException,
             AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException,
             BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException,
-            TimeoutException, NoSuccessException
+            TimeoutException, NoSuccessException, SagaIOException
     {
         return AbstractSagaObjectImpl.getResult(task, timeout);
     }

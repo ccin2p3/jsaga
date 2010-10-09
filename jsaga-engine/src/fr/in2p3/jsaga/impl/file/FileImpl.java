@@ -54,6 +54,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
             catch (BadParameterException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -195,6 +196,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
             catch (IncorrectURLException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -238,6 +240,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
             catch (BadParameterException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -252,6 +255,7 @@ public class FileImpl extends AbstractAsyncFileImpl implements File {
             catch (IncorrectURLException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 

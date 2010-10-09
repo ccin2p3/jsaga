@@ -120,6 +120,21 @@ public interface AsyncAttributes<T> extends Attributes {
             throws NotImplementedException;
 
     /**
+     * Creates a task that tests for the existence of an attribute.
+     * 
+     * @param mode
+     *            determines the initial state of the task.
+     * @param key
+     *            the attribute key.
+     * @return the task.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     */
+    public Task<T, Boolean> existsAttribute(TaskMode mode, String key)
+            throws NotImplementedException;
+
+    /**
      * Creates a task that checks the attribute mode for being read-only.
      * 
      * @param mode

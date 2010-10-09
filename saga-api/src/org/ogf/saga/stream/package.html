@@ -1,0 +1,23 @@
+<body>
+    <p>
+    The streams package provides a simple mechanism for setting up
+    connections to remote components.
+    </p>
+
+    <p>
+    The <code>Stream.wait()</code> method as described in the
+    language-independent SAGA specifications is renamed to
+    {@link org.ogf.saga.stream.Stream#waitFor(int) Stream.waitFor()},
+    to avoid conflicts or confusion with {@link java.lang.Object#wait()}.
+    </p>
+
+    <p>
+    Java programmers are used to {@link java.io.InputStream} and
+    {@link java.io.OutputStream}. Therefore, a mechanism is provided
+    to obtain such streams from a {@link org.ogf.saga.stream.Stream Stream}
+    object (see
+    {@link org.ogf.saga.stream.Stream#getInputStream() Stream.getInputStream()}
+    and
+    {@link org.ogf.saga.stream.Stream#getOutputStream() Stream.getOutputStream()}).
+    </p>
+</body>

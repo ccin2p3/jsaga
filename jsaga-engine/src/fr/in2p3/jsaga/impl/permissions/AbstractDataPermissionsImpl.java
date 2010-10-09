@@ -294,8 +294,6 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
             }
         } catch (IncorrectStateException e) {
             throw new NoSuccessException(e);
-        } catch (BadParameterException e) {
-            throw new NoSuccessException(e);
         }
         throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
     }
@@ -308,8 +306,6 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
                 return group;
             }
         } catch (IncorrectStateException e) {
-            throw new NoSuccessException(e);
-        } catch (BadParameterException e) {
             throw new NoSuccessException(e);
         }
         throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
@@ -359,7 +355,7 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
         };
     }
 
-    protected FileAttributes _getFileAttributes() throws NotImplementedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+    protected FileAttributes _getFileAttributes() throws NotImplementedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         FileAttributes attrs;
         if ( ((URLImpl)m_url).hasCache() ) {
             // get file attributes from cache

@@ -1,5 +1,9 @@
 package org.ogf.saga.error;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 import org.ogf.saga.SagaObject;
 
 /**
@@ -8,9 +12,17 @@ import org.ogf.saga.SagaObject;
  * The {@link #getMessage} does not quite behave as specified in the SAGA specs, because
  * Java already has {@link #toString} for that.
  * So, {@link #getMessage} does what it always does for Java throwables.
+ * 
+ * A simple mechanism exists for storing and examining exceptions that may be thrown
+ * by adaptors in adaptor-based Saga implementations. In such implementations, the
+ * top-level exception (the one highest up in the Saga exception hierarchy) is not
+ * always the most informative one, and the implementation is not always capable
+ * of selecting the most informative exception. In these cases, the implementation
+ * may opt to add the individual exceptions as nested exceptions to the exception
+ * thrown.
  */
 public abstract class SagaException extends Exception implements
-        Comparable<SagaException> {
+        Comparable<SagaException>, Iterable<SagaException> {
 
     // Determine the order of the exceptions, most specific first.
     protected static final int NOT_IMPLEMENTED = 0;
@@ -43,6 +55,9 @@ public abstract class SagaException extends Exception implements
     private static final long serialVersionUID = 1L;
 
     private transient final SagaObject object;
+    
+    private final ArrayList<SagaException> nestedExceptions
+            = new ArrayList<SagaException>();
 
     /**
      * Constructs a new SAGA exception.
@@ -211,5 +226,51 @@ public abstract class SagaException extends Exception implements
         }
         return result;
     }
+    
+    /**
+     * Adds an exception to the list of nested exceptions. This method should
+     * only be used by SAGA implementations.
+     * @param e the exception to be added to the list.
+     */
+    public void addNestedException(SagaException e) {
+        nestedExceptions.add(e);
+    }
+    
+    /**
+     * Returns an iterator that iterates over the nested exceptions.
+     * @return the iterator.
+     */
+    public Iterator<SagaException> iterator() {
+        return new ExceptionIterator(this);
+    }
+    
+    private class ExceptionIterator implements Iterator<SagaException> {
+        private SagaException[] exceptions
+                = nestedExceptions.toArray(new SagaException[nestedExceptions.size()]);
+        private int index = -1;
+        private SagaException ex;
+        
+        ExceptionIterator(SagaException ex) {
+            this.ex = ex;
+        }
+        
+        public boolean hasNext() {
+            return index < exceptions.length;
+        }
 
+        public SagaException next() {
+            if (index == -1) {
+                index++;
+                return ex;
+            }
+            if (index < exceptions.length) {
+                return exceptions[index++];
+            }
+            throw new NoSuchElementException("Iterator exhausted");
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException("remove() not supported");
+        }
+    }
 }

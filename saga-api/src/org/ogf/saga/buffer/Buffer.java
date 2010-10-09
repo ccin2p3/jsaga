@@ -21,7 +21,17 @@ public interface Buffer extends SagaObject {
      * semantically equivalent to destruct and then call constructor.
      * 
      * @param size
-     *            the size.
+     *      the size.
+     * @exception IncorrectStateException
+     *      is thrown when the buffer is closed.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception BadParameterException
+     *      is thrown when the implementation cannot handle the specified size.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void setSize(int size) throws NotImplementedException,
             BadParameterException, IncorrectStateException, NoSuccessException;
@@ -32,6 +42,16 @@ public interface Buffer extends SagaObject {
      * inconsistency: this method should also throw NoSuccess, as the
      * constructor can throw this, and this method is semantically equivalent to
      * destruct and then call constructor.
+     * @exception IncorrectStateException
+     *      is thrown when the buffer is closed.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception BadParameterException
+     *      is thrown when the implementation cannot handle the default size.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void setSize() throws NotImplementedException,
             BadParameterException, IncorrectStateException, NoSuccessException;
@@ -39,7 +59,13 @@ public interface Buffer extends SagaObject {
     /**
      * Retrieves the current value of the buffer size.
      * 
-     * @return the size.
+     * @return
+     *      the size.
+     * @exception IncorrectStateException
+     *      is thrown when the buffer is closed.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
      */
     public int getSize() throws NotImplementedException,
             IncorrectStateException;
@@ -52,7 +78,17 @@ public interface Buffer extends SagaObject {
      * method is semantically equivalent to destruct and then call constructor.
      * 
      * @param data
-     *            the data.
+     *      the data.
+     * @exception IncorrectStateException
+     *      is thrown when the buffer is closed.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception BadParameterException
+     *      is thrown when the implementation cannot handle the specified data buffer.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void setData(byte[] data) throws NotImplementedException,
             BadParameterException, IncorrectStateException, NoSuccessException;
@@ -60,16 +96,25 @@ public interface Buffer extends SagaObject {
     /**
      * Retrieves the buffer data.
      * 
-     * @return the data.
+     * @return
+     *      the data.
+     * @exception IncorrectStateException
+     *      is thrown when the buffer is closed.
      * @exception DoesNotExistException
-     *                is thrown when the buffer was created with size -1, and no
-     *                I/O operation has been done on it yet.
+     *      is thrown when the buffer was created with size -1, and no
+     *      I/O operation has been done on it yet.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
      */
     public byte[] getData() throws NotImplementedException,
             DoesNotExistException, IncorrectStateException;
 
     /**
      * Non-blocking close of the buffer object.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
      */
     public void close() throws NotImplementedException;
 
@@ -77,7 +122,10 @@ public interface Buffer extends SagaObject {
      * Closes the buffer object.
      * 
      * @param timeoutInSeconds
-     *            the timeout in seconds.
+     *      he timeout in seconds.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
      */
     public void close(float timeoutInSeconds) throws NotImplementedException;
 }

@@ -1,12 +1,14 @@
 package org.ogf.saga.rpc;
 
+import org.ogf.saga.SagaObject;
+
 /**
  * Parameters for RPC calls. Unlike the language-independent SAGA specifications,
  * this interface does not extend Buffer, because existing Java language
  * bindings for RPC usually just use {@link java.lang.Object}. See,
  * for instance, the Java bindings for Ninf-g and the Apache XML-RPC. 
  */
-public interface Parameter {
+public interface Parameter extends SagaObject {
 
     /**
      * Sets the io mode.

@@ -13,7 +13,7 @@ public enum Activity {
 
     private int value;
 
-    Activity(int value) {
+    private Activity(int value) {
         this.value = value;
     }
 

@@ -1,0 +1,64 @@
+<body>
+<p>
+Each SAGA API call has an associated list of exceptions it may
+throw, which are described in this package.
+These exceptions all extend the
+{@link org.ogf.saga.error.SagaException SagaException} class.
+</p>
+
+<p>
+Since Java has excellent exception handling support, the Java language
+bindings use the Java mechanism instead of the <code>error_handler</code>
+interface as described in the language-independent SAGA specification.
+The language-independent SAGA specification specifies that in languages
+with exception-handling mechanisms, such as Java, C++ and Perl,
+the language binding may allow exceptions to be thrown.
+If an exception handling mechanism is included in a language
+binding, the <code>error_handler</code> must not be included in the same
+binding.
+</p>
+
+<p>
+The SAGA specifications say that
+in languages bindings where this is appropriate,
+some API methods return POSIX <code>errno</code> codes for errors.
+For Java, this is not appropriate. The "usual" Java <code>read</code>
+and <code>write</code> methods throw an exception when an error occurs.
+The Java language binding versions of these SAGA API methods throw an
+{@link org.ogf.saga.error.SagaIOException SagaIOException} when an error occurs.
+If a specific error code is available, it can be examined through
+the {@link org.ogf.saga.error.SagaIOException#getPosixErrorCode() getPosixErrorCode()} method.
+</p>
+
+<p>
+The {@link org.ogf.saga.error.SagaIOException SagaIOException}
+is specific for the Java Language Bindings for SAGA.
+In the ordering of SAGA exceptions, as discussed in the language-independent
+SAGA specification, the
+{@link org.ogf.saga.error.SagaIOException SagaIOException}
+is considered almost the most specific, inbetween
+{@link org.ogf.saga.error.NotImplementedException NotImplementedException} and
+{@link org.ogf.saga.error.IncorrectURLException IncorrectURLException}.
+</p>
+
+<p>
+The layout of the result of
+{@link org.ogf.saga.error.SagaException#getMessage() getMessage()}
+deviates from that as specified in the language-independent SAGA specification.
+The usual Java convention is followed instead. To obtain a result as required
+by the language-independent SAGA specification,
+{@link org.ogf.saga.error.SagaException#toString() toString()}
+can be used, again as usual in Java.
+</p>
+
+<p>
+A simple mechanism exists for storing and examining exceptions that may be thrown
+by adaptors in adaptor-based Saga implementations. In such implementations, the
+top-level exception (the one highest up in the Saga exception hierarchy) is not
+always the most informative one, and the implementation is not always capable
+of selecting the most informative exception. In these cases, the implementation
+may opt to add the individual exceptions as nested exceptions to the exception
+thrown.
+</p>
+
+</body>

@@ -113,12 +113,48 @@ public abstract class NSFactory {
      * Creates a namespace entry.
      * 
      * @param session
-     *            the session handle.
+     *      the session handle.
      * @param name
-     *            the initial working directory.
+     *      the initial working directory.
      * @param flags
-     *            the open mode.
-     * @return the namespace entry.
+     *      the open mode.
+     * @return
+     *      the namespace entry.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified URL already exists, and the
+     *      <code>CREATE</code> and <code>EXCLUSIVE</code> flags are given.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist, and the
+     *      <code>CREATE</code> flag is not given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static NSEntry createNSEntry(Session session, URL name, int flags)
             throws NotImplementedException, IncorrectURLException,
@@ -134,10 +170,46 @@ public abstract class NSFactory {
      * Creates a namespace entry.
      * 
      * @param session
-     *            the session handle.
+     *      the session handle.
      * @param name
-     *            the initial working directory.
-     * @return the namespace entry.
+     *      the initial working directory.
+     * @return
+     *      the namespace entry.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified URL already exists, and the
+     *      <code>CREATE</code> and <code>EXCLUSIVE</code> flags are given.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist, and the
+     *      <code>CREATE</code> flag is not given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static NSEntry createNSEntry(Session session, URL name)
             throws NotImplementedException, IncorrectURLException,
@@ -153,10 +225,46 @@ public abstract class NSFactory {
      * Creates a namespace entry using the default session.
      * 
      * @param name
-     *            the initial working directory.
+     *      the initial working directory.
      * @param flags
-     *            the open mode.
-     * @return the namespace entry.
+     *      the open mode.
+     * @return
+     *      the namespace entry.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified URL already exists, and the
+     *      <code>CREATE</code> and <code>EXCLUSIVE</code> flags are given.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist, and the
+     *      <code>CREATE</code> flag is not given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static NSEntry createNSEntry(URL name, int flags)
             throws NotImplementedException, IncorrectURLException,
@@ -173,8 +281,44 @@ public abstract class NSFactory {
      * Creates a namespace entry using the default session.
      * 
      * @param name
-     *            the initial working directory.
-     * @return the namespace entry.
+     *      the initial working directory.
+     * @return
+     *      the namespace entry.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified URL already exists, and the
+     *      <code>CREATE</code> and <code>EXCLUSIVE</code> flags are given.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist, and the
+     *      <code>CREATE</code> flag is not given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static NSEntry createNSEntry(URL name)
             throws NotImplementedException, IncorrectURLException,
@@ -191,12 +335,48 @@ public abstract class NSFactory {
      * Creates a namespace directory.
      * 
      * @param session
-     *            the session handle.
+     *      the session handle.
      * @param name
-     *            the initial working directory.
+     *      the initial working directory.
      * @param flags
-     *            the open mode.
-     * @return the namespace entry.
+     *      the open mode.
+     * @return
+     *      the namespace directory.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified URL already exists, and the
+     *      <code>CREATE</code> and <code>EXCLUSIVE</code> flags are given.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist, and the
+     *      <code>CREATE</code> flag is not given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static NSDirectory createNSDirectory(Session session, URL name,
             int flags) throws NotImplementedException, IncorrectURLException,
@@ -212,10 +392,46 @@ public abstract class NSFactory {
      * Creates a namespace directory.
      * 
      * @param session
-     *            the session handle.
+     *      the session handle.
      * @param name
-     *            the initial working directory.
-     * @return the namespace entry.
+     *      the initial working directory.
+     * @return
+     *      the namespace directory.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified URL already exists, and the
+     *      <code>CREATE</code> and <code>EXCLUSIVE</code> flags are given.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist, and the
+     *      <code>CREATE</code> flag is not given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static NSDirectory createNSDirectory(Session session, URL name)
             throws NotImplementedException, IncorrectURLException,
@@ -232,10 +448,46 @@ public abstract class NSFactory {
      * Creates a namespace directory using the default session.
      * 
      * @param name
-     *            the initial working directory.
+     *      the initial working directory.
      * @param flags
-     *            the open mode.
-     * @return the namespace entry.
+     *      the open mode.
+     * @return
+     *      the namespace directory.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified URL already exists, and the
+     *      <code>CREATE</code> and <code>EXCLUSIVE</code> flags are given.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist, and the
+     *      <code>CREATE</code> flag is not given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static NSDirectory createNSDirectory(URL name, int flags)
             throws NotImplementedException, IncorrectURLException,
@@ -252,8 +504,44 @@ public abstract class NSFactory {
      * Creates a namespace directory using the default session.
      * 
      * @param name
-     *            the initial working directory.
-     * @return the namespace entry.
+     *      the initial working directory.
+     * @return 
+     *      the namespace directory.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified URL already exists, and the
+     *      <code>CREATE</code> and <code>EXCLUSIVE</code> flags are given.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist, and the
+     *      <code>CREATE</code> flag is not given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static NSDirectory createNSDirectory(URL name)
             throws NotImplementedException, IncorrectURLException,

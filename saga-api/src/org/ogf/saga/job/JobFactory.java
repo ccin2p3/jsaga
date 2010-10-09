@@ -73,7 +73,12 @@ public abstract class JobFactory {
     /**
      * Creates a job description.
      * 
-     * @return the job description.
+     * @return
+     *      the job description.
+     * @exception NotImplementedException
+     *      is thrown when this method is not implemented.
+     * @throws NoSuccessException
+     *      is thrown when the Saga factory could not be created.
      */
     public static JobDescription createJobDescription()
             throws NotImplementedException, NoSuccessException {
@@ -85,10 +90,38 @@ public abstract class JobFactory {
      * Creates a job service.
      * 
      * @param session
-     *            the session handle.
+     *      the session handle.
      * @param rm
-     *            contact string for the resource manager.
-     * @return the job service.
+     *      contact string for the resource manager.
+     * @return
+     *      the job service.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static JobService createJobService(Session session, URL rm)
             throws NotImplementedException, IncorrectURLException,
@@ -99,11 +132,39 @@ public abstract class JobFactory {
     }
 
     /**
-     * Creates a job service.
+     * Creates a job service using the default contact string.
      * 
      * @param session
-     *            the session handle.
-     * @return the job service.
+     *      the session handle.
+     * @return
+     *      the job service.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static JobService createJobService(Session session)
             throws NotImplementedException, IncorrectURLException,
@@ -123,8 +184,36 @@ public abstract class JobFactory {
      * Creates a job service, using the default session.
      * 
      * @param rm
-     *            contact string for the resource manager.
-     * @return the job service.
+     *      contact string for the resource manager.
+     * @return
+     *      the job service.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static JobService createJobService(URL rm)
             throws NotImplementedException, IncorrectURLException,
@@ -139,7 +228,35 @@ public abstract class JobFactory {
      * Creates a job service, using the default session and default contact
      * string.
      * 
-     * @return the job service.
+     * @return
+     *      the job service.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static JobService createJobService() throws NotImplementedException,
             IncorrectURLException, AuthenticationFailedException,

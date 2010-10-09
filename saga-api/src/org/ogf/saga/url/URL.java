@@ -1,9 +1,10 @@
 package org.ogf.saga.url;
 
+import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
 
-public interface URL {
+public interface URL extends SagaObject {
 
     /**
      * Replaces the current value of the URL with the specified value.
@@ -150,6 +151,9 @@ public interface URL {
      * @return the new URL.
      * @exception BadParameterException
      *                is thrown when there is a syntax error in the new URL.
+     * @exception NoSuccessException
+     *                is thrown when the scheme is supported, but the URL
+     *                cannot be translated to the scheme.
      */
     public URL translate(String scheme) throws BadParameterException, NoSuccessException;
 
@@ -159,6 +163,8 @@ public interface URL {
      * @param url
      *            the url to resolve with respect to this one.
      * @return the resolved url.
+     * @exception NoSuccessException
+     *            is thrown when resolving fails for some reason.
      */
     public URL resolve(URL url) throws NoSuccessException;
 

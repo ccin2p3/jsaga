@@ -103,8 +103,6 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
             throw new NoSuccessException(e);
         } catch (AuthorizationFailedException e) {
             throw new NoSuccessException(e);
-        } catch (BadParameterException e) {
-            throw new NoSuccessException(e);
         } catch (IncorrectStateException e) {
             throw new NoSuccessException(e);
         } finally {

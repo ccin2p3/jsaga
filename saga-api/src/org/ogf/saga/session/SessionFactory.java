@@ -33,10 +33,17 @@ public abstract class SessionFactory {
      * Creates a session.
      * 
      * @param defaults
-     *            when set, the default session is returned, with all the
-     *            default contexts. Later modifications to this session are
-     *            reflected in the default session.
-     * @return the session.
+     *      when set, the default session is returned, with all the
+     *      default contexts. Later modifications to this session are
+     *      reflected in the default session.
+     * @return
+     *      the session.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception NoSuccessException
+     *      is thrown if the implementation cannot create valid
+     *      default values based on the available information.
      */
     public static Session createSession(boolean defaults)
             throws NotImplementedException, NoSuccessException {
@@ -48,7 +55,14 @@ public abstract class SessionFactory {
      * Returns the default session, with all the default contexts. Later
      * modifications to this session are reflected in the default session.
      * 
-     * @return the session.
+     * @return
+     *      the session.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception NoSuccessException
+     *      is thrown if the implementation cannot create valid
+     *      default values based on the available information.
      */
     public static Session createSession() throws NotImplementedException,
             NoSuccessException {

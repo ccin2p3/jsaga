@@ -52,6 +52,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             catch (BadParameterException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -70,6 +71,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             catch (BadParameterException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -88,10 +90,11 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             catch (BadParameterException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
-    public boolean isDir() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+    public boolean isDir() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         float timeout = this.getTimeout("isDir");
         if (timeout == WAIT_FOREVER) {
             return super.isDirSync();
@@ -100,12 +103,14 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
                 return (Boolean) getResult(super.isDir(TaskMode.ASYNC), timeout);
             }
             catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (BadParameterException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
-    public boolean isEntry() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+    public boolean isEntry() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         float timeout = this.getTimeout("isEntry");
         if (timeout == WAIT_FOREVER) {
             return super.isEntrySync();
@@ -114,12 +119,14 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
                 return (Boolean) getResult(super.isEntry(TaskMode.ASYNC), timeout);
             }
             catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (BadParameterException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
-    public boolean isLink() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+    public boolean isLink() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         float timeout = this.getTimeout("isLink");
         if (timeout == WAIT_FOREVER) {
             return super.isLinkSync();
@@ -128,12 +135,14 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
                 return (Boolean) getResult(super.isLink(TaskMode.ASYNC), timeout);
             }
             catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (BadParameterException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
-    public URL readLink() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+    public URL readLink() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         float timeout = this.getTimeout("readLink");
         if (timeout == WAIT_FOREVER) {
             return super.readLinkSync();
@@ -142,8 +151,10 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
                 return (URL) getResult(super.readLink(TaskMode.ASYNC), timeout);
             }
             catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (BadParameterException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -153,7 +164,10 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             // implemented by inheriting classes
             this.copySync(target, flags);
         } else {
-            getResult(super.copy(TaskMode.ASYNC, target, flags), timeout);
+            try {
+                getResult(super.copy(TaskMode.ASYNC, target, flags), timeout);
+            }
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -162,7 +176,10 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
         if (timeout == WAIT_FOREVER) {
             super.copySync(target);
         } else {
-            getResult(super.copy(TaskMode.ASYNC, target), timeout);
+            try {
+                getResult(super.copy(TaskMode.ASYNC, target), timeout);
+            }
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -172,7 +189,10 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             // implemented by inheriting classes
             this.copyFromSync(source, flags);
         } else {
-            getResult(super.copyFrom(TaskMode.ASYNC, source, flags), timeout);
+            try {
+                getResult(super.copyFrom(TaskMode.ASYNC, source, flags), timeout);
+            }
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -181,7 +201,10 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
         if (timeout == WAIT_FOREVER) {
             super.copyFromSync(source);
         } else {
-            getResult(super.copyFrom(TaskMode.ASYNC, source), timeout);
+            try {
+                getResult(super.copyFrom(TaskMode.ASYNC, source), timeout);
+            }
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -194,6 +217,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
                 getResult(super.link(TaskMode.ASYNC, target, flags), timeout);
             }
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -206,6 +230,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
                 getResult(super.link(TaskMode.ASYNC, target), timeout);
             }
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -214,7 +239,10 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
         if (timeout == WAIT_FOREVER) {
             super.moveSync(target, flags);
         } else {
-            getResult(super.move(TaskMode.ASYNC, target, flags), timeout);
+            try {
+                getResult(super.move(TaskMode.ASYNC, target, flags), timeout);
+            }
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -223,7 +251,10 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
         if (timeout == WAIT_FOREVER) {
             super.moveSync(target);
         } else {
-            getResult(super.move(TaskMode.ASYNC, target), timeout);
+            try {
+                getResult(super.move(TaskMode.ASYNC, target), timeout);
+            }
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -238,6 +269,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             catch (IncorrectURLException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -252,6 +284,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             catch (IncorrectURLException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -284,6 +317,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             catch (IncorrectURLException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -298,6 +332,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             catch (IncorrectURLException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 

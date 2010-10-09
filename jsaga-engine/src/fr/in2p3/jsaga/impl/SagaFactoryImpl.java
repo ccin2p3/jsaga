@@ -1,10 +1,10 @@
 package fr.in2p3.jsaga.impl;
 
 import fr.in2p3.jsaga.EngineProperties;
-import fr.in2p3.jsaga.engine.session.SessionConfiguration;
 import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.descriptors.AdaptorDescriptors;
 import fr.in2p3.jsaga.engine.factories.*;
+import fr.in2p3.jsaga.engine.session.SessionConfiguration;
 import fr.in2p3.jsaga.impl.buffer.BufferFactoryImpl;
 import fr.in2p3.jsaga.impl.context.ContextFactoryImpl;
 import fr.in2p3.jsaga.impl.file.FileFactoryImpl;
@@ -14,7 +14,6 @@ import fr.in2p3.jsaga.impl.monitoring.MonitoringFactoryImpl;
 import fr.in2p3.jsaga.impl.namespace.NSFactoryImpl;
 import fr.in2p3.jsaga.impl.session.SessionFactoryImpl;
 import fr.in2p3.jsaga.impl.task.TaskFactoryImpl;
-import fr.in2p3.jsaga.impl.unimplemented.RPCFactoryImpl;
 import fr.in2p3.jsaga.impl.url.URLFactoryImpl;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -28,6 +27,7 @@ import org.ogf.saga.logicalfile.LogicalFileFactory;
 import org.ogf.saga.monitoring.MonitoringFactory;
 import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.rpc.RPCFactory;
+import org.ogf.saga.sd.SDFactory;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.stream.StreamFactory;
 import org.ogf.saga.task.TaskFactory;
@@ -118,8 +118,12 @@ public class SagaFactoryImpl implements SagaFactory {
         return new NSFactoryImpl(m_dataAdaptorFactory);
     }
 
-    public RPCFactory createRPCFactory() {
-        return new RPCFactoryImpl();
+    public RPCFactory createRPCFactory() throws NotImplementedException {
+        throw new NotImplementedException("Not implemented by the SAGA engine");
+    }
+
+    public SDFactory createSDFactory() throws NotImplementedException {
+        throw new NotImplementedException("Not implemented by the SAGA engine");
     }
 
     public SessionFactory createSessionFactory() {

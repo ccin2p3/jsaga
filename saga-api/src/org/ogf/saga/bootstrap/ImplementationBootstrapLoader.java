@@ -13,6 +13,7 @@ import org.ogf.saga.logicalfile.LogicalFileFactory;
 import org.ogf.saga.monitoring.MonitoringFactory;
 import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.rpc.RPCFactory;
+import org.ogf.saga.sd.SDFactory;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.stream.StreamFactory;
 import org.ogf.saga.task.TaskFactory;
@@ -20,8 +21,9 @@ import org.ogf.saga.url.URLFactory;
 
 /**
  * The idea of this class is that the SAGA user sets the environment variable
- * "saga.factory" to the classname of an implementation of the
- * {@link SagaFactory} interface. The ImplementationBootstrapLoader instantiates
+ * (Java property) <code>saga.factory</code> to the classname of an
+ * implementation of the {@link SagaFactory} interface. The
+ * <code>ImplementationBootstrapLoader</code> instantiates
  * exactly one instance of this class, which must have a public parameter-less
  * constructor.
  */
@@ -171,17 +173,35 @@ public class ImplementationBootstrapLoader {
     }
 
     /**
-     * Creates an RPC factory. Cannot throw NotImplemented, because the
-     * Parameter constructor cannot throw NotImplemented.
+     * Creates an RPC factory.
      * 
      * @return an RPC factory.
      * @throws NoSuccessException
      *             is thrown when the Saga factory could not be created.
+     * @throws NotImplementedException 
+     * @throws NotImplementedException
+     *             is thrown when RPC is not implemented.            
      */
-    public static RPCFactory createRPCFactory() throws NoSuccessException {
+    public static RPCFactory createRPCFactory() throws NoSuccessException,
+            NotImplementedException {
         initFactory();
         return factory.createRPCFactory();
     }
+
+    /**
+     * Creates a SD factory for Service Discovery.
+     * 
+     * @return a SD factory.
+     * @throws NoSuccessException
+     *             is thrown when the Saga factory could not be created.
+     * @throws NotImplementedException
+     *             is thrown when SD is not implemented.   
+     */
+    public static SDFactory createSDFactory()
+            throws NotImplementedException, NoSuccessException {
+        initFactory();
+        return factory.createSDFactory();
+    } 
 
     /**
      * Creates a Session factory.

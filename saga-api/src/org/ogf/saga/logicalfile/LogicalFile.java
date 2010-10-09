@@ -29,7 +29,38 @@ public interface LogicalFile extends NSEntry, AsyncAttributes<LogicalFile> {
      * <code>AlreadyExists</code> exception!
      * 
      * @param name
-     *            the location to add.
+     *      the location to add.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception IncorrectStateException
+     *      is thrown when the logical file is closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void addLocation(URL name) throws NotImplementedException,
             IncorrectURLException, AuthenticationFailedException,
@@ -41,7 +72,40 @@ public interface LogicalFile extends NSEntry, AsyncAttributes<LogicalFile> {
      * Removes a replica location from the replica set.
      * 
      * @param name
-     *            the location to remove.
+     *      the location to remove.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception IncorrectStateException
+     *      is thrown when the logical file is closed.
+     * @exception DoesNotExistException
+     *      is thrown when the logical file does not contain the specified URL.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void removeLocation(URL name) throws NotImplementedException,
             IncorrectURLException, AuthenticationFailedException,
@@ -53,9 +117,46 @@ public interface LogicalFile extends NSEntry, AsyncAttributes<LogicalFile> {
      * Changes a replica location in the replica set.
      * 
      * @param nameOld
-     *            the location to be updated.
+     *      the location to be updated.
      * @param nameNew
-     *            the updated location.
+     *      the updated location.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when either of the specified URLs is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception IncorrectStateException
+     *      is thrown when the logical file is closed.
+     * @exception DoesNotExistException
+     *      is thrown when the logical file does not contain the specified
+     *      <code>nameOld</code> URL.
+     * @exception AlreadyExistsException
+     *      is thrown when the logical file already contains the specified
+     *      <code>nameNew</code> URL.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void updateLocation(URL nameOld, URL nameNew)
             throws NotImplementedException, IncorrectURLException,
@@ -67,7 +168,33 @@ public interface LogicalFile extends NSEntry, AsyncAttributes<LogicalFile> {
     /**
      * Lists the locations in this location set.
      * 
-     * @return the location list.
+     * @return
+     *      the location list.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the logical file is closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public List<URL> listLocations() throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -78,9 +205,47 @@ public interface LogicalFile extends NSEntry, AsyncAttributes<LogicalFile> {
      * Replicates a file from any of the known locations to a new location.
      * 
      * @param name
-     *            location to replicate to.
+     *      location to replicate to.
      * @param flags
-     *            flags defining the operation modus.
+     *      flags defining the operation modus.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully, or the file was opened ReadOnly or WriteOnly.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified URL already exists, and the
+     *      <code>OVERWRITE</code> flag is not given.
+     * @exception DoesNotExistException
+     *      is thrown if the target lies in a non-existing part of the
+     *      name space, unless the CREATEPARENTS flag is given.
+     * @exception IncorrectStateException
+     *      is thrown when the logical file is closed, or the location set
+     *      is empty.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void replicate(URL name, int flags) throws NotImplementedException,
             IncorrectURLException, AuthenticationFailedException,
@@ -94,7 +259,44 @@ public interface LogicalFile extends NSEntry, AsyncAttributes<LogicalFile> {
      * default flags NONE.
      * 
      * @param name
-     *            location to replicate to.
+     *      location to replicate to.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully, or the file was opened ReadOnly or WriteOnly.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified URL already exists.
+     * @exception DoesNotExistException
+     *      is thrown if the target lies in a non-existing part of the
+     *      name space.
+      * @exception IncorrectStateException
+     *      is thrown when the logical file is closed, or the location set
+     *      is empty.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void replicate(URL name) throws NotImplementedException,
             IncorrectURLException, AuthenticationFailedException,

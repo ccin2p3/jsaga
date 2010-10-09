@@ -32,7 +32,33 @@ public interface StreamService extends SagaObject, Async,
     /**
      * Obtains the URL to be used to connect to this server.
      * 
-     * @return the URL.
+     * @return 
+     *      the URL.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the stream service is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public URL getUrl() throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -41,9 +67,35 @@ public interface StreamService extends SagaObject, Async,
 
     /**
      * Waits for incoming client connections (like an accept of a serversocket).
-     * The returned stream is in OPEN state. This call may block indefinately.
+     * The returned stream is in OPEN state. This call may block indefinitely.
      * 
-     * @return the client connection.
+     * @return
+     *      the client connection.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the stream service is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public Stream serve() throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -55,9 +107,35 @@ public interface StreamService extends SagaObject, Async,
      * The returned stream is in OPEN state.
      * 
      * @param timeoutInSeconds
-     *            the timeout in seconds.
-     * @return the client connection, or <code>null</code> if the timeout
-     *         expires before a client connects.
+     *      the timeout in seconds.
+     * @return
+     *      the client connection, or <code>null</code> if the timeout
+     *      expires before a client connects.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the stream service is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public Stream serve(float timeoutInSeconds) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -66,6 +144,14 @@ public interface StreamService extends SagaObject, Async,
 
     /**
      * Closes a stream service. This is a non-blocking call.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception IncorrectStateException
+     *      is thrown when the backend changed its state.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void close() throws NotImplementedException,
             IncorrectStateException, NoSuccessException;
@@ -74,7 +160,15 @@ public interface StreamService extends SagaObject, Async,
      * Closes a stream service.
      * 
      * @param timeoutInSeconds
-     *            the timeout in seconds.
+     *      the timeout in seconds.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception IncorrectStateException
+     *      is thrown when the backend changed its state.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void close(float timeoutInSeconds) throws NotImplementedException,
             IncorrectStateException, NoSuccessException;

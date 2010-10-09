@@ -63,6 +63,18 @@ public interface Context extends SagaObject, Attributes {
     /**
      * Sets default attribute values for this context type, based on all
      * non-empty attributes.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception IncorrectStateException
+     *      is thrown if the <code>Type</code> attribute has an empty value.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception NoSuccessException
+     *      is thrown if the implementation cannot create valid
+     *      default values based on the available information.
      */
     public void setDefaults() throws NotImplementedException,
             IncorrectStateException, TimeoutException, NoSuccessException;

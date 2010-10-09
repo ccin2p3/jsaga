@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.impl.url;
 
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
+import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.url.URL;
@@ -20,7 +21,7 @@ import java.net.URISyntaxException;
 /**
  *
  */
-public class URLImpl implements URL {
+public class URLImpl extends AbstractSagaObjectImpl implements URL {
     private URI u;
     private FileAttributes m_cache;
     private boolean m_mustRemoveSlash;
@@ -70,7 +71,7 @@ public class URLImpl implements URL {
     }
 
     /** Encode the relative path */
-    URLImpl(URL base, String relativePath) throws BadParameterException {
+    URLImpl(URL base, String relativePath) {
         this(   base,
                 URLEncoder.encodePathOnly(relativePath),
                 null,
@@ -79,7 +80,7 @@ public class URLImpl implements URL {
     }
 
     /** Encode the URL */
-    URLImpl(URL base, URL relativeUrl) throws BadParameterException {
+    URLImpl(URL base, URL relativeUrl) {
         this(   base,
                 URLEncoder.encodePathOnly(relativeUrl.getPath()),
                 relativeUrl.getQuery()!=null ? relativeUrl.getQuery() : base.getQuery(),

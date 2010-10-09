@@ -130,10 +130,40 @@ public abstract class StreamFactory {
      * Creates a Stream.
      * 
      * @param session
-     *            the session handle.
+     *      the session handle.
      * @param name
-     *            location of the stream service.
-     * @return the stream.
+     *      location of the stream service.
+     * @return
+     *      the stream.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL cannot be found.
+     * @exception IncorrectURLException
+     *      is thrown if an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static Stream createStream(Session session, URL name)
             throws NotImplementedException, IncorrectURLException,
@@ -148,8 +178,38 @@ public abstract class StreamFactory {
      * Creates a Stream using the default session.
      * 
      * @param name
-     *            location of the stream service.
-     * @return the stream.
+     *      location of the stream service.
+     * @return
+     *      the stream.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL cannot be found.
+     * @exception IncorrectURLException
+     *      is thrown if an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static Stream createStream(URL name) throws NotImplementedException,
             IncorrectURLException, BadParameterException,
@@ -164,10 +224,40 @@ public abstract class StreamFactory {
      * Creates a StreamService.
      * 
      * @param session
-     *            the session handle.
+     *      the session handle.
      * @param name
-     *            location of the service.
-     * @return the service.
+     *      location of the service.
+     * @return
+     *      the service.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL cannot be found.
+     * @exception IncorrectURLException
+     *      is thrown if an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static StreamService createStreamService(Session session, URL name)
             throws NotImplementedException, IncorrectURLException,
@@ -182,8 +272,38 @@ public abstract class StreamFactory {
      * Creates a StreamService.
      * 
      * @param session
-     *            the session handle.
-     * @return the service.
+     *      the session handle.
+     * @return
+     *      the service.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL cannot be found.
+     * @exception IncorrectURLException
+     *      is thrown if an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static StreamService createStreamService(Session session)
             throws NotImplementedException, IncorrectURLException,
@@ -198,8 +318,38 @@ public abstract class StreamFactory {
      * Creates a StreamService using the default session.
      * 
      * @param name
-     *            location of the service.
-     * @return the service.
+     *      location of the service.
+     * @return
+     *      the service.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL cannot be found.
+     * @exception IncorrectURLException
+     *      is thrown if an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static StreamService createStreamService(URL name)
             throws NotImplementedException, IncorrectURLException,
@@ -214,7 +364,37 @@ public abstract class StreamFactory {
     /**
      * Creates a StreamService using the default session.
      * 
-     * @return the service.
+     * @return
+     *      the service.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL cannot be found.
+     * @exception IncorrectURLException
+     *      is thrown if an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static StreamService createStreamService()
             throws NotImplementedException, IncorrectURLException,

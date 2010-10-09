@@ -115,12 +115,48 @@ public abstract class LogicalFileFactory {
      * Creates a LogicalFile.
      * 
      * @param session
-     *            the session handle.
+     *      the session handle.
      * @param name
-     *            location of the file.
+     *      location of the file.
      * @param flags
-     *            the open mode.
-     * @return the file instance.
+     *      the open mode.
+     * @return
+     *      the file instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified URL already exists, and the
+     *      <code>CREATE</code> and <code>EXCLUSIVE</code> flags are given.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist, and the
+     *      <code>CREATE</code> flag is not given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static LogicalFile createLogicalFile(Session session, URL name,
             int flags) throws NotImplementedException, IncorrectURLException,
@@ -136,10 +172,44 @@ public abstract class LogicalFileFactory {
      * Creates a LogicalFile using READ open mode.
      * 
      * @param session
-     *            the session handle.
+     *      the session handle.
      * @param name
-     *            location of the file.
-     * @return the file instance.
+     *      location of the file.
+     * @return
+     *      the file instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is actually not thrown, but specified in the SAGA specifications.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static LogicalFile createLogicalFile(Session session, URL name)
             throws NotImplementedException, IncorrectURLException,
@@ -156,10 +226,46 @@ public abstract class LogicalFileFactory {
      * Creates a LogicalFile using the default session.
      * 
      * @param name
-     *            location of the file.
+     *      location of the file.
      * @param flags
-     *            the open mode.
-     * @return the file instance.
+     *      the open mode.
+     * @return
+     *      the file instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified URL already exists, and the
+     *      <code>CREATE</code> and <code>EXCLUSIVE</code> flags are given.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist, and the
+     *      <code>CREATE</code> flag is not given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static LogicalFile createLogicalFile(URL name, int flags)
             throws NotImplementedException, IncorrectURLException,
@@ -176,8 +282,42 @@ public abstract class LogicalFileFactory {
      * Creates a LogicalFile using READ open mode, using the default session.
      * 
      * @param name
-     *            location of the file.
-     * @return the file instance.
+     *      location of the file.
+     * @return
+     *      the file instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is actually not thrown, but specified in the SAGA specifications.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static LogicalFile createLogicalFile(URL name)
             throws NotImplementedException, IncorrectURLException,
@@ -195,12 +335,48 @@ public abstract class LogicalFileFactory {
      * Creates a LogicalDirectory.
      * 
      * @param session
-     *            the session handle.
+     *      the session handle.
      * @param name
-     *            location of the directory.
+     *      location of the directory.
      * @param flags
-     *            the open mode.
-     * @return the directory instance.
+     *      the open mode.
+     * @return
+     *      the directory instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified URL already exists, and the
+     *      <code>CREATE</code> and <code>EXCLUSIVE</code> flags are given.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist, and the
+     *      <code>CREATE</code> flag is not given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static LogicalDirectory createLogicalDirectory(Session session,
             URL name, int flags) throws NotImplementedException,
@@ -216,10 +392,44 @@ public abstract class LogicalFileFactory {
      * Creates a LogicalDirectory using READ open mode.
      * 
      * @param session
-     *            the session handle.
+     *      the session handle.
      * @param name
-     *            location of the directory.
-     * @return the directory instance.
+     *      location of the directory.
+     * @return
+     *      the directory instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is actually not thrown, but specified in the SAGA specifications.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static LogicalDirectory createLogicalDirectory(Session session,
             URL name) throws NotImplementedException, IncorrectURLException,
@@ -236,10 +446,46 @@ public abstract class LogicalFileFactory {
      * Creates a LogicalDirectory using the default session.
      * 
      * @param name
-     *            location of the directory.
+     *      location of the directory.
      * @param flags
-     *            the open mode.
-     * @return the directory instance.
+     *      the open mode.
+     * @return
+     *      the directory instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified URL already exists, and the
+     *      <code>CREATE</code> and <code>EXCLUSIVE</code> flags are given.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist, and the
+     *      <code>CREATE</code> flag is not given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static LogicalDirectory createLogicalDirectory(URL name, int flags)
             throws NotImplementedException, IncorrectURLException,
@@ -257,8 +503,42 @@ public abstract class LogicalFileFactory {
      * session.
      * 
      * @param name
-     *            location of the directory.
-     * @return the directory instance.
+     *      location of the directory.
+     * @return
+     *      the directory instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is actually not thrown, but specified in the SAGA specifications.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public static LogicalDirectory createLogicalDirectory(URL name)
             throws NotImplementedException, IncorrectURLException,

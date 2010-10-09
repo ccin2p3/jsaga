@@ -1,0 +1,18 @@
+<body>
+    <p>
+    This package provides classes and methods for manipulating tasks and
+    collections of tasks. Tasks get created by invoking methods that return a task,
+    so there are no factory methods for them.
+    A task has two generic type parameters: the type of the object that created
+    the task, and the type of the return value of the task.
+    Tasks can be stored in a {@link org.ogf.saga.task.TaskContainer TaskContainer}.
+    However, since a task container should be able to contain any task
+    (and even jobs), the generic type information gets lost.
+    So, when a task is pulled from a task container, the return type of
+    {@link org.ogf.saga.task.Task#getResult() getResult()} is
+    {@link java.lang.Object}. If necessary, the user can associate information
+    about the task with the task's UUID, and use that information to cast
+    the result to the correct type. This is beyond the scope of Java generics.
+    </p>
+
+</body>

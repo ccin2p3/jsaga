@@ -1,0 +1,22 @@
+<body>
+    <p>
+    This package contains the 
+    {@link org.ogf.saga.context.Context Context}
+    interface, which provides a common interface for storing security information.
+    Contexts get created by the factory methods
+    {@link org.ogf.saga.context.ContextFactory#createContext()
+    ContextFactory.createContext()} and
+    {@link org.ogf.saga.context.ContextFactory#createContext(String)
+    ContextFactory.createContext(String)},
+    and are attached to a session by calling
+    {@link org.ogf.saga.session.Session#addContext(Context) addContext(Context)}.
+    </p>
+
+    <p>
+    A single {@link org.ogf.saga.session.Session Session} instance can contain
+    multiple contexts, and it is up to the implementation to select the
+    correct context for a specific method call.
+    </p>
+
+
+</body>
