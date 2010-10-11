@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.impl.url;
 
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
+import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.url.URL;
@@ -112,6 +113,15 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
     /** DO NOT encode the URL */
     private URLImpl(URI u) {
         this.u = u;
+    }
+
+    /** clone */
+    public SagaObject clone() throws CloneNotSupportedException {
+        URLImpl clone = (URLImpl) super.clone();
+        clone.u = u;
+        clone.m_cache = m_cache;
+        clone.m_mustRemoveSlash = m_mustRemoveSlash;
+        return clone;
     }
 
     /** Encode the URL */
