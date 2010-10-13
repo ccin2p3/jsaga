@@ -280,7 +280,7 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
             // reset the job services using this context
             Set<JobServiceImpl> jobServices = new HashSet<JobServiceImpl>();
             jobServices.addAll(m_jobServices.keySet());
-            new Thread(new JobServiceReset(jobServices, this, m_credential)).start();
+            new Thread(new JobServiceReset(jobServices, m_credential)).start();
         }
         return m_credential;
     }

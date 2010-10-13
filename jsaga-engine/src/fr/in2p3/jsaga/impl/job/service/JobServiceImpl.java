@@ -7,14 +7,14 @@ import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.engine.factories.JobAdaptorFactory;
 import fr.in2p3.jsaga.engine.factories.JobMonitorAdaptorFactory;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
-import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.TaskMode;
 import org.ogf.saga.url.URL;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -87,21 +87,20 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
 
     ////////////////////////////////////////// private methods //////////////////////////////////////////
 
-    public synchronized void resetAdaptors(ContextImpl context, SecurityCredential security) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, IncorrectURLException, BadParameterException, TimeoutException, NoSuccessException {
+    public synchronized void resetAdaptors(SecurityCredential security) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, IncorrectURLException, BadParameterException, TimeoutException, NoSuccessException {
         m_monitorService.startReset();
+        // retrieve service attributes
+        Map attributes = m_monitorService.getAttributes();
         try {
             // reset control adaptor
-            String scheme = context.getSchemeFromAlias(m_resourceManager.getScheme());
-            Properties controlAttributes = context.getServiceConfig(scheme);
             JobAdaptorFactory.disconnect(m_controlAdaptor);
-            JobAdaptorFactory.connect(m_controlAdaptor, security, m_resourceManager, controlAttributes);
+            JobAdaptorFactory.connect(m_controlAdaptor, security, m_resourceManager, attributes);
 
             // reset monitor adaptor
             JobMonitorAdaptor monitorAdaptor = m_monitorService.getAdaptor();
             URL monitorURL = m_monitorService.getURL();
-            Map monitorAttributes = m_monitorService.getAttributes();
             JobMonitorAdaptorFactory.disconnect(monitorAdaptor);
-            JobMonitorAdaptorFactory.connect(monitorAdaptor, security, monitorURL, monitorAttributes);
+            JobMonitorAdaptorFactory.connect(monitorAdaptor, security, monitorURL, attributes);
         } finally {
             m_monitorService.stopReset();
         }
