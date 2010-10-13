@@ -293,14 +293,9 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 
         // get available CE
         StringAndLongList result = m_client.jobListMatch(jobDesc, m_delegationId);
-        if ( result != null ) {
-            // list of CE
-            StringAndLongType[] list = (StringAndLongType[]) result.getFile ();
-            if (list == null)
-                throw new BadResource("No Computing Element matching your job requirements has been found!");
-        }
-        else
+        if (result==null || result.getFile()==null) {
             throw new BadResource("No Computing Element matching your job requirements has been found!");
+        }
 	}
 
     public String getStagingDirectory(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
