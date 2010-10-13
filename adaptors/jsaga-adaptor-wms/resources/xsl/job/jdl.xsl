@@ -68,6 +68,9 @@ Requirements = true <xsl:text/>
         <xsl:if test="$requirements">
 &amp;&amp; <xsl:value-of select="$requirements"/> <xsl:text/>
         </xsl:if>
+        <xsl:for-each select="jsdl:Resources/jsdl:TotalCPUTime/jsdl:UpperBoundedRange/text()">
+&amp;&amp; other.GlueCEPolicyMaxCPUTime >= <xsl:value-of select="."/> <xsl:text/>
+        </xsl:for-each>
 		<xsl:for-each select="jsdl:Resources/jsdl:TotalPhysicalMemory/jsdl:UpperBoundedRange/text()">
 &amp;&amp; other.GlueHostMainMemoryRAMSize >= <xsl:value-of select="."/> <xsl:text/>
 		</xsl:for-each>
