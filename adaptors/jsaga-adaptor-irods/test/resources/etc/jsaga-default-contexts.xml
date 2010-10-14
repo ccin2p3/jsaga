@@ -24,7 +24,8 @@
                 <attribute name="UserID" value="sreynaud"/>
                 <attribute name="DefaultResource" value="demoResc2"/>
                 <attribute name="Zone" value="tempZone"/>
-                <alias>irods</alias>
+                <!-- WARNING: same alias as an existing scheme is no more supported -->
+                <!--<alias>irods</alias>-->
             </data>
         </context>
         <context type="UserPass" id="SRBctx">
