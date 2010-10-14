@@ -8,14 +8,9 @@
     </parent>
 	<modelVersion>4.0.0</modelVersion>
     <groupId>org.glite</groupId>
-    <artifactId>glite-lb-api-java</artifactId>
-    <version>3.2</version>
-    <name>gLite-LB API</name>
-    <!--
-        mvn -f pom-java.xml generate-sources
-        sed build/generated-sources/org/glite/wsdl/types/lb/GenericFault.java -e "s/GenericFault  implements/GenericFault extends org.apache.axis.AxisFault implements/" -i
-        mvn -f pom-java.xml package
-    -->
+    <artifactId>glite-wms-wmproxy-api-java</artifactId>
+    <version>3.1.3</version>
+    <name>gLite WMS WMProxy API</name>
     <build>
 		<plugins>
             <plugin>
@@ -30,6 +25,9 @@
                             <goal>wsdl2java</goal>
                         </goals>
                         <configuration>
+                            <wsdlFiles>
+                                <wsdlFile>WMProxyGL31.wsdl</wsdlFile>
+                            </wsdlFiles>
                             <sourceDirectory>${basedir}/resources/wsdl</sourceDirectory>
                             <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
                             <timestampDirectory>${project.build.directory}</timestampDirectory>

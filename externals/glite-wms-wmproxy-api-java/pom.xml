@@ -45,28 +45,28 @@
           <dependency>
               <groupId>org.glite</groupId>
               <artifactId>glite-security-delegation-java</artifactId>
-              <version>1.4.4</version>
+              <version>1.6.1</version>
           </dependency>
           <dependency>
               <groupId>org.glite</groupId>
               <artifactId>glite-security-trustmanager</artifactId>
-              <version>1.8.16</version>
+              <version>2.5.3</version>
           </dependency>
           <dependency>
               <groupId>org.glite</groupId>
               <artifactId>glite-security-util-java</artifactId>
-              <version>1.4.0</version>
+              <version>2.7.3</version>
           </dependency>
           <dependency>
               <groupId>org.globus</groupId>
               <artifactId>cog-jglobus</artifactId>
-              <version>1.4</version>
+              <version>1.7.0</version>
               <scope>compile</scope>
           </dependency>
           <dependency>
               <groupId>org.globus</groupId>
               <artifactId>cog-axis</artifactId>
-              <version>gt4</version>
+              <version>gt4-2</version>
               <scope>compile</scope>
           </dependency>
       </dependencies>

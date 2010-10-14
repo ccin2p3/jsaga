@@ -9,6 +9,7 @@
 
     <modules>
         <module>glite-lb-api-java</module>
+        <module>glite-wms-wmproxy-api-java</module>
         <module>jsch</module>
         <module>jzlib</module>
         <module>naregi-ss-api</module>

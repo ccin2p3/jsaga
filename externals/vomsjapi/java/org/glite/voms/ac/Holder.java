@@ -103,7 +103,8 @@ public class Holder implements DEREncodable {
         Enumeration e = ((ASN1Sequence) targets.getDERObject()).getObjects();
 
         while (e.hasMoreElements()) {
-            GeneralName gn = GeneralName.getInstance((ASN1TaggedObject) e.nextElement());
+            //patch: getInstance() was incompatible with Bouncy Castle 1.45
+            GeneralName gn = (GeneralName)/*GeneralName.getInstance((ASN1TaggedObject)*/ e.nextElement()/*)*/;
 
             if (gn.getTagNo() == 4) {
                 try {

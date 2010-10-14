@@ -9,7 +9,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.glite</groupId>
     <artifactId>glite-security-trustmanager</artifactId>
-    <version>1.8.16</version>
+    <version>2.5.3</version>
     <name>Glite Security trustmanager</name>
     <build>
         <plugins>

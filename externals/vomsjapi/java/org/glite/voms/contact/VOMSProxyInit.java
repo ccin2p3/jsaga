@@ -229,7 +229,9 @@ public class VOMSProxyInit {
             throw new VOMSException("Error instantiating PKIVerifier: "+e.getMessage(),e);
             
         }
-        
+
+	  try {
+
         Iterator i = ACs.iterator();
         
         while(i.hasNext()){
@@ -241,7 +243,9 @@ public class VOMSProxyInit {
         }
         
         log.debug("AC Validation ended at: "+ new Date(  ));
-        
+      } finally {
+		verifier.cleanup();
+	  }
     }
     public synchronized GlobusCredential getVomsProxy(){
         

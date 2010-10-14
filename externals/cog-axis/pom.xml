@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.globus</groupId>
     <artifactId>cog-axis</artifactId>
-    <version>gt4</version>
+    <version>gt4-2</version>
     <name>Java CoG Kit - AXIS</name>
     <description>Utilities for Apache AXIS.</description>
     <url>http://wiki.cogkit.org/index.php/Java_CoG_Kit</url>
