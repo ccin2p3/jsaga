@@ -3,9 +3,11 @@
     <contexts>
         <context type="VOMS">
             <attribute name="Server" value="voms://lcg-voms.cern.ch:15004/DC=ch/DC=cern/OU=computers/CN=lcg-voms.cern.ch"/>
-            <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/voms/certificates/"/>
             <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
             <attribute name="UserVO" value="dteam"/>
+
+            <!-- fixme: directory ${user.home}/.globus/certificates/ is needed anyway... -->
+            <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/voms/certificates/"/>
 
             <!-- todo: enable support for proxy at a non default location -->
             <!--<attribute name="UserProxy" value="${user.home}/.jsaga/tmp/dteam_cred.txt"/>-->
