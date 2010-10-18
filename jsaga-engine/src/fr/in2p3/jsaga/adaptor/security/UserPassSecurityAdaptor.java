@@ -128,7 +128,7 @@ public class UserPassSecurityAdaptor implements ExpirableSecurityAdaptor {
 
     public void destroySecurityAdaptor(Map attributes, String contextId) throws Exception {
         File file = new File((String) attributes.get(USERPASSFILE));
-        if (! file.delete()) {
+        if (file.exists() && !file.delete()) {
             throw new Exception("Failed to delete file: "+file);
         }
     }
