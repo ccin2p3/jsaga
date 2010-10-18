@@ -79,6 +79,18 @@ mvn deploy site-deploy</pre>
 mvn site-deploy -P local</pre>
             </answer>
         </faq>
+        <faq id="maven-repository">
+            <question>How to configure apache for maven repository ?</question>
+            <answer>Create file .htaccess with the following content:
+                <pre>Options +Indexes
+IndexOptions +NameWidth=* +DescriptionWidth=*
+AddDescription " " .md5
+AddDescription " " .sha1
+AddDescription "Tarball distribution" .tar.gz
+AddDescription "ZIP distribution" .zip
+AddDescription "GUI Installer" .jar</pre>
+            </answer>
+        </faq>
     </part>
     <part id="git">
         <title>GIT</title>
