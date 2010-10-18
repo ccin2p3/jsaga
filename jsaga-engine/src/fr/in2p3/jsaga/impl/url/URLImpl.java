@@ -102,6 +102,11 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
             if(i>1)relativePath="/"+relativePath.substring(i);
         }
 
+        //workaround: force to be interpreted as a relative path (even if path contains character ':')
+        if (! relativePath.startsWith("/")) {
+            relativePath = "./"+relativePath;
+        }
+
         // resolve URI
         URI baseUri = ((URLImpl) base).u;
         String relativeUri = relativePath
