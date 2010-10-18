@@ -1,6 +1,5 @@
-local://localhost
+fork://localhost
 ssh://localhost
 gatekeeper://localhost:2119/CN=Sylvain Reynaud/E=sreynaud@in2p3.fr
-wsgram://gt4-fzk.gridka.de:8443/PBS
 cream://cream-ce-1.ba.infn.it:8443/cream-pbs-short
 wms://lapp-wms02.in2p3.fr:7443/glite_wms_wmproxy_server
