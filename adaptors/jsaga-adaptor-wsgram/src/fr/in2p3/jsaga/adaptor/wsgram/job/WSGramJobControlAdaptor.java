@@ -3,6 +3,8 @@ package fr.in2p3.jsaga.adaptor.wsgram.job;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorOnePhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
@@ -14,6 +16,7 @@ import org.globus.exec.generated.JobDescriptionType;
 import org.globus.exec.utils.client.ManagedJobFactoryClientHelper;
 import org.globus.exec.utils.rsl.RSLHelper;
 import org.globus.exec.utils.rsl.RSLParseException;
+import org.globus.ftp.GridFTPClient;
 import org.globus.gram.GramException;
 import org.globus.gram.internal.GRAMProtocolErrorConstants;
 import org.globus.wsrf.impl.security.authorization.Authorization;
@@ -21,6 +24,7 @@ import org.ietf.jgss.GSSException;
 import org.ogf.saga.error.*;
 
 import javax.xml.namespace.QName;
+import java.io.InputStream;
 import java.util.Iterator;
 
 
@@ -36,7 +40,7 @@ import java.util.Iterator;
  * TODO : setProtection
  * TODO : during cleanup, remove proxy saved in server in $HOME/.globus/gram_proxy...
  */
-public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements StagingJobAdaptorOnePhase, CleanableJobAdaptor {
+public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements StagingJobAdaptorOnePhase, StreamableJobBatch, CleanableJobAdaptor {
     private static final int STAGE_DIRECTORY = 0;
     private static final int PRE_STAGE_IN = 1;
     private static final int POST_STAGE_OUT = 2;
@@ -48,6 +52,24 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
 
     public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
         return new JobDescriptionTranslatorXSLT("xsl/job/rsl-2.0.xsl");
+    }
+
+    private String m_stagingPrefix;
+    public JobIOHandler submit(String jobDesc, boolean checkMatch, String uniqId, InputStream stdin) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        m_stagingPrefix = "/tmp/"+uniqId;
+
+        // connect to gsiftp
+        GridFTPClient stagingClient;
+        try {
+            stagingClient = new GridFTPClient(m_host, 2811);
+            stagingClient.authenticate(m_credential);
+        } catch (Exception e) {
+            throw new NoSuccessException("Failed to connect to GridFTP server: "+m_host, e);
+        }
+
+        // submit
+        String jobId = this.submit(jobDesc, checkMatch, uniqId);
+        return new WSGramJobIOHandler(stagingClient, m_stagingPrefix, jobId);
     }
 
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
@@ -182,6 +204,18 @@ public class WSGramJobControlAdaptor extends WSGramJobAdaptorAbstract implements
 
 	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException,
             NoSuccessException {
+        if (m_stagingPrefix != null) {
+            try {
+                GridFTPClient client = new GridFTPClient(m_host, 2811);
+                client.authenticate(m_credential);
+                client.deleteFile(m_stagingPrefix+"-"+WSGramJobIOHandler.OUTPUT_SUFFIX);
+                client.deleteFile(m_stagingPrefix+"-"+WSGramJobIOHandler.ERROR_SUFFIX);
+                client.close();
+            } catch (Exception e) {
+                throw new NoSuccessException("Failed to cleanup job: "+nativeJobId, e);
+            }
+        }
+
 		GramJob job = super.getGramJobById(nativeJobId);        
     	try {
             job.destroy();
