@@ -61,8 +61,10 @@ public class HttpsDataAdaptorSocketBased extends HttpDataAdaptorSocketBased impl
 
     public void setSecurityCredential(SecurityCredential credential) {
         X509SecurityCredential adaptor = (X509SecurityCredential) credential;
-        m_userID = adaptor.getUserID();
-        m_keyManager = adaptor.getKeyManager();
+        if (adaptor != null) {  // also support no security context
+            m_userID = adaptor.getUserID();
+            m_keyManager = adaptor.getKeyManager();
+        }
     }
 
     public int getDefaultPort() {
