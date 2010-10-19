@@ -8,6 +8,7 @@
             <!--<attribute name="UserProxy" value="${user.home}/.jsaga/tmp/dteam_cred.txt"/>-->
             <attribute name="LifeTime" value="PT13H"/>
             <data type="gsiftp">
+                <exclude domain="in2p3.fr"/>
                 <exclude domain="de"/>
             </data>
             <data type="lfn"/>
@@ -32,10 +33,12 @@
             <attribute name="UserVO" value="vo.rhone-alpes.idgrilles.fr"/>
             <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
             <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/ra_cred.txt"/>
+            <data type="gsiftp"/>
             <job type="wms">
                 <attribute name="RetryCount" value="0"/>
                 <attribute name="PerusalFileEnable" value="false"/>
             </job>
+            <include domain="in2p3.fr"/>
         </context>
 
         <context type="Globus" id="DGrid">

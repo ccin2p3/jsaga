@@ -7,5 +7,7 @@ srb://ccsrb01.in2p3.fr:5591/ccin2p3/home/ccin2p3.groups/
 irods://ccirods02.in2p3.fr:5596/tempZone/home/sreynaud/
 gsiftp://cream-ce-1.ba.infn.it/tmp/
 gsiftp://gt4-fzk.gridka.de/tmp/
+gsiftp://udo-ce04.grid.tu-dortmund.de/
+dteam-gsiftp://udo-ce04.grid.tu-dortmund.de/
 srm://lyogrid06.in2p3.fr/dpm/in2p3.fr/home/dteam/
 lfn://cclcglfcli03.in2p3.fr:5010/grid/dteam/
