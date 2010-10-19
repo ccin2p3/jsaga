@@ -115,6 +115,8 @@ public class ZipDataAdaptor implements FileReaderStreamFactory{//, FileWriterPut
         String path = absolutePath.substring(m_zipPath.length()+1);
         boolean found = false;
         List list = new ArrayList();
+        Set<String> entries = new HashSet<String>();
+        Set<String> candidates = new HashSet<String>();
         try {
             ZipEntry entry;
             while ( (entry=zipReader.getNextEntry()) != null ) {
@@ -125,12 +127,18 @@ public class ZipDataAdaptor implements FileReaderStreamFactory{//, FileWriterPut
                         FileAttributes attr = new ZipFileAttributes(entry, path);
                         if (attr.getName().indexOf('/') == -1) {
                             list.add(attr);
+                            entries.add(attr.getName());
+                        } else {
+                            candidates.add(attr.getName().substring(0, attr.getName().indexOf('/')));
                         }
                     }
                 }
             }
         } catch (IOException e) {
             throw new NoSuccessException(e);
+        }
+        if (! entries.containsAll(candidates)) {
+            throw new NoSuccessException("Unsupported ZIP file (does not contain entries for directories)");
         }
         if (found || "".equals(path)) {
             return (FileAttributes[]) list.toArray(new FileAttributes[list.size()]);
