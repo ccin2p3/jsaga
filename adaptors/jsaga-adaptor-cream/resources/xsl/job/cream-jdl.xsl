@@ -159,6 +159,9 @@
 
 <!--  Requirements -->
   Requirements = true <xsl:text/>
+        <xsl:for-each select="jsdl:JobIdentification/JDLRequirements/text()">
+  &amp;&amp; <xsl:value-of select="."/> <xsl:text/>
+        </xsl:for-each>
 		<xsl:for-each select="jsdl:Resources/jsdl:TotalPhysicalMemory/jsdl:UpperBoundedRange/text()">
   &amp;&amp; other.GlueHostMainMemoryRAMSize >= <xsl:value-of select="."/> <xsl:text/>
 		</xsl:for-each>

@@ -36,6 +36,11 @@
                     <xsl:for-each select="Queue/@value">
                         <jsdl:JobAnnotation><xsl:value-of select="."/></jsdl:JobAnnotation>
                     </xsl:for-each>
+                    <xsl:for-each select="Extension/value/text()">
+                        <xsl:element name="{substring-before(.,'=')}">
+                            <xsl:value-of select="substring-after(.,'=')"/>
+                        </xsl:element>
+                    </xsl:for-each>
                 </jsdl:JobIdentification>
                 <jsdl:Application>
                     <posix:POSIXApplication>
