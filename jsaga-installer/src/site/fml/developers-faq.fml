@@ -143,5 +143,21 @@ git branch -d mergedBranch
 git branch -al</pre>
             </answer>
         </faq>
+        <faq id="rebase-published-branch">
+            <question>How to rebase a published branch</question>
+            <answer>Note: you should not rebase a branch if it has been modified by other contributors.
+                <pre># Update local repository
+git pull
+
+git checkout workingBranch
+# perform interactive rebasing onto branch "master"
+# in case of conflict, add the conflicting file(s) to GIT (but do not commit them)
+
+# replace old branch (remote) with rebased branch (local)
+git push origin :workingBranch
+git push workingBranch
+                </pre>
+            </answer>
+        </faq>
     </part>
 </faqs>
