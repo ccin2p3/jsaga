@@ -248,6 +248,10 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         JobStatus status = m_monitorService.getState(m_nativeJobId);
         // set job state
         this.setJobState(status.getSagaState(), status.getStateDetail(), status.getSubState(), status.getCause());
+
+        // close job output and error streams
+        this.closeStreamsIfDoneAndInteractive();
+
         // return task state (may trigger finish task)
         return status.getSagaState();
     }
@@ -270,23 +274,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         m_monitorService.stopListening(m_nativeJobId);
 
         // close job output and error streams
-        boolean isDone = (State.DONE.compareTo(m_metrics.m_State.getValue()) == 0);
-        if (isDone && m_IOHandler!=null) {  //if job is done and interactive
-            if (m_controlAdaptor instanceof StreamableJobInteractiveGet || m_controlAdaptor instanceof StreamableJobBatch) {
-                try {
-                    if (m_stdout == null) {
-                        m_stdout = new JobStdoutInputStream(this, m_IOHandler);
-                    }
-                    m_stdout.closeJobIOHandler();
-                    if (m_stderr == null) {
-                        m_stderr = new JobStderrInputStream(this, m_IOHandler);
-                    }
-                    m_stderr.closeJobIOHandler();
-                } catch (Exception e) {
-                    s_logger.warn("Failed to get job output/error streams: "+m_nativeJobId, e);
-                }
-            }
-        }
+        this.closeStreamsIfDoneAndInteractive();
 
         if (this.isFinalState()) {
             // post-staging
@@ -302,6 +290,26 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
                 this.cleanUp();
             } catch (SagaException e) {
                 s_logger.warn("Failed to cleanup job: "+m_nativeJobId, e);
+            }
+        }
+    }
+
+    private void closeStreamsIfDoneAndInteractive() {
+        boolean isDone = (State.DONE.compareTo(m_metrics.m_State.getValue()) == 0);
+        if (isDone && m_IOHandler!=null) {  //if job is done and interactive
+            if (m_controlAdaptor instanceof StreamableJobInteractiveGet || m_controlAdaptor instanceof StreamableJobBatch) {
+                try {
+                    if (m_stdout == null) {
+                        m_stdout = new JobStdoutInputStream(this, m_IOHandler);
+                    }
+                    m_stdout.closeJobIOHandler();
+                    if (m_stderr == null) {
+                        m_stderr = new JobStderrInputStream(this, m_IOHandler);
+                    }
+                    m_stderr.closeJobIOHandler();
+                } catch (Exception e) {
+                    s_logger.warn("Failed to get job output/error streams: "+m_nativeJobId, e);
+                }
             }
         }
     }
