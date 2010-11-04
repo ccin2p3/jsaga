@@ -2,7 +2,7 @@ package fr.in2p3.jsaga.adaptor.base.usage;
 
 import org.ogf.saga.error.DoesNotExistException;
 
-import java.util.Map;
+import java.util.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -27,6 +27,12 @@ public class U implements Usage {
     public U(int id, String name) {
         m_id = id;
         m_name = name;
+    }
+
+    public final Set<String> getKeys() {
+        Set<String> keys = new HashSet<String>(1);
+        keys.add(m_name);
+        return keys;
     }
 
     /** Default implementation to override if needed */

@@ -30,7 +30,7 @@ public enum State {
 
     private int value;
 
-    State(int value) {
+    private State(int value) {
         this.value = value;
     }
 

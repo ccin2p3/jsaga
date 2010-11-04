@@ -18,7 +18,7 @@ import fr.in2p3.jsaga.adaptor.security.VOMSContext;
  */
 public class VOMSMyProxyContextRetrieve extends ContextInitTest {
     public VOMSMyProxyContextRetrieve() throws Exception {
-        super("dteam_myproxy", false);  // has no UserPass
+        super("VOMSMyProxy", false);  // has no UserPass
     }
 
     protected void updateContextAttributes(Context context) throws Exception {

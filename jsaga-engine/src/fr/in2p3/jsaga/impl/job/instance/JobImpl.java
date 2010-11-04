@@ -52,6 +52,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job {
             catch (BadParameterException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -70,6 +71,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job {
             catch (BadParameterException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -89,6 +91,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job {
             catch (IncorrectStateException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -106,6 +109,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job {
             catch (BadParameterException e) {throw new NoSuccessException(e);}
             catch (IncorrectStateException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -136,6 +140,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job {
             catch (BadParameterException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -151,6 +156,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job {
             catch (BadParameterException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -166,6 +172,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job {
             catch (BadParameterException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -180,6 +187,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job {
             catch (IncorrectURLException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -194,6 +202,7 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job {
             catch (IncorrectURLException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 

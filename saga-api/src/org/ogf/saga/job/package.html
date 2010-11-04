@@ -1,0 +1,36 @@
+<body>
+    <p>
+    The job package describes the API for submitting jobs to a grid resource.
+    It has four interfaces:
+    {@link org.ogf.saga.job.JobDescription JobDescription},
+    {@link org.ogf.saga.job.JobService JobService},
+    {@link org.ogf.saga.job.Job Job}, and
+    {@link org.ogf.saga.job.JobSelf JobSelf}.
+    A {@link org.ogf.saga.job.JobDescription JobDescription} encapsulates
+    a set of attributes that together describe a job that is to be submitted
+    to a grid resource. A {@link org.ogf.saga.job.JobService JobService}
+    is responsible for submitting the job. When a job is submitted
+    successfully, a {@link org.ogf.saga.job.Job Job} is returned, which provides
+    handles for monitoring, actually running, waiting for it to finish.
+    Finally, a {@link org.ogf.saga.job.JobSelf JobSelf} represents an application
+    instance running under the management of a resource manager. It is a job,
+    but also implements the {@link org.ogf.saga.monitoring.Steerable Steerable}
+    interface.
+    </p>
+
+    <p>
+    An important deviation from the language-independent SAGA specifications is
+    that the {@link org.ogf.saga.job.JobService#runJob(String, String, boolean)
+    JobService.runJob} method is specified differently:
+    the input, output and error stream OUT parameters are not
+    specified here, since Java has no OUT parameters. Unfortunately, their
+    absence, according to the SAGA specifications, implies a non-interactive
+    job. Since interactive jobs should still be supported, a parameter is
+    added here to specify whether the job is interactive. If interactive, the
+    streams can be obtained from the Job using the
+    {@link org.ogf.saga.job.Job#getStdin() Job.getStdin},
+    {@link org.ogf.saga.job.Job#getStdout() Job.getStdout}, and
+    {@link org.ogf.saga.job.Job#getStderr() Job.getStderr} methods.
+    </p>
+
+</body>

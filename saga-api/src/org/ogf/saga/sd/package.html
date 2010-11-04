@@ -1,0 +1,78 @@
+<body>
+<p>This API provides a mechanism to locate services.</p>
+
+<p>It is expected that this Service Discovery API will make use of
+various information systems or other service discovery mechanisms. The
+quality of the information returned will depend upon the quality of the
+data in the back-end system or systems.</p>
+
+<h2>Service Model</h2>
+
+<p>This API is based upon the GLUE (version 1.3) model of a service.
+This service model is also compatible with GLUE 2.0. A <i>Site</i> may
+host many <i>Services</i> and a <i>Service</i> has multiple <i>ServiceData</i>
+entries associated with it. Each <i>ServiceData</i> entry is represented
+by a key and a value, thus allowing any set of keyword/value pairs to be
+associated with an instance of a <i>Service</i>. In addition, a <i>Service</i>
+has a many-to-many relationship with itself. This allows the model to
+describe groupings of services.</p>
+
+<p>It is possible that this Service Discovery API may be
+incompatible with a future version of GLUE. This issue will be
+addressed, if necessary, in a future revision of this API.</p>
+
+<h2>Classes</h2>
+
+<p>This API consists of a {@link org.ogf.saga.sd.Discoverer} class
+with a single method: <code>listServices</code>. This method returns a
+list of objects of the {@link org.ogf.saga.sd.ServiceDescription} class,
+filtered according to several specified filters.</p>
+
+<p>The <code>ServiceDescription</code> class has three methods. One
+of these, <code>getUrl</code>, is all that most people will use to
+obtain the address registered for the service. In the case of a Web
+Service, this will be the service endpoint. It also implements the
+{@link org.ogf.saga.attributes.Attributes
+org.ogf.saga.attributes.Attributes} interface, and thus exposes
+additional <i>ReadOnly</i> properties of the service, such as its type
+and uid. These might be used by those who wish to generate a web page of
+services, or need detailed information for other purposes. There is a
+method <code>getRelatedServices</code> that returns the set of related <code>ServiceDescription</code>
+objects, which represent related services. Finally, there is a method <code>getData</code>
+to access the set of further key value pairs. This method returns a
+{@link org.ogf.saga.sd.ServiceData} object, which also implements the <code>org.ogf.saga.attributes.Attributes</code>
+interface giving <i>ReadOnly</i> access to all the key names and values
+in the <code>ServiceData</code> object.</p>
+
+<p>By making the <code>ServiceDescription</code> implement the <code>org.ogf.saga.attributes.Attributes</code>
+interface, and by referencing a separate <code>ServiceData</code> object
+holding the key value pairs, potential key name clashes between the sets
+of pre-defined and free-form attributes are avoided.</p>
+
+<h2>Details</h2>
+
+<p>This API will typically use some underlying information system
+and should not contact the services to check their availability. The
+user must expect that a service provided by the Service Discovery API
+may not be available. Even if the API were to contact a service to
+confirm its availability, by the time the user attempts to use that
+service, it may have failed. Similarly the API cannot be guaranteed to
+provide a complete set of matching services - it is the responsibility
+of the implementation to apply any algorithm it chooses to return a set
+of services.</p>
+
+<p>The API may try to use an underlying information system but not
+be able to access it. The precise behaviour is implementation dependent
+- for example if it uses adapters it may try a different one. If no
+result can be returned because of information system or other internal
+problems, it SHOULD throw the {@link
+org.ogf.saga.error.NoSuccessException
+org.ogf.saga.error.NoSuccessException} exception. Note that an
+implementation MAY choose to return search results from multiple backend
+services. In the case of an adaptor based implementation, several
+adaptors may get queried at once, and the results may be collated into a
+single list, if the specified URL does not limit the range of usable
+adaptors.</p>
+
+@since not released
+</body>

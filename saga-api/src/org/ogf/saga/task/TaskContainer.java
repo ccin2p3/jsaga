@@ -23,14 +23,27 @@ public interface TaskContainer extends SagaObject, Monitorable {
      * Metric name: fires on state changes of any task in the container, and has
      * the value of that task's handle.
      */
-    public static final String TASKCONTAINER_STATE = "TaskContainer.state";
-
+    public static final String TASKCONTAINER_STATE = "task_container.state";
+    
     /**
-     * Adds a task to the task container.
+     * Adds a task to the task container. If the container already contains the
+     * task, it is not added again. Instead, the cookie for the original entry
+     * is then returned.
      * 
      * @param task
-     *            the task to add.
-     * @return a handle allowing for removal of the task.
+     *      the task to add.
+     * @return
+     *      a handle allowing for removal of the task.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public int add(Task<?,?> task) throws NotImplementedException, TimeoutException,
             NoSuccessException;
@@ -39,14 +52,43 @@ public interface TaskContainer extends SagaObject, Monitorable {
      * Removes the task identified by the specified cookie from this container.
      * 
      * @param cookie
-     *            identifies the task.
-     * @return the task.
+     *      identifies the task.
+     * @return
+     *      the task.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception DoesNotExistException
+     *      is thrown when the container does not contain a task for the
+     *      specified cookie.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public Task<?,?> remove(int cookie) throws NotImplementedException,
             DoesNotExistException, TimeoutException, NoSuccessException;
 
     /**
      * Starts all asynchronous operations in the container.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when any of the tasks in the container
+     *      is not in NEW state. 
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception DoesNotExistException
+     *      is thrown when the container does not contain any tasks.
      */
     public void run() throws NotImplementedException, IncorrectStateException,
             DoesNotExistException, TimeoutException, NoSuccessException;
@@ -57,8 +99,24 @@ public interface TaskContainer extends SagaObject, Monitorable {
      * removed from the task container.
      * 
      * @param mode
-     *            wait for ALL or ANY task.
-     * @return any of the finished tasks.
+     *      wait for ALL or ANY task.
+     * @return
+     *      any of the finished tasks.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      may be thrown when any of the tasks in the container
+     *      would throw this on {@link Task#waitFor()}. 
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception DoesNotExistException
+     *      is thrown when the container does not contain any tasks.
      */
     public Task<?,?> waitFor(WaitMode mode) throws NotImplementedException,
             IncorrectStateException, DoesNotExistException, TimeoutException,
@@ -71,10 +129,26 @@ public interface TaskContainer extends SagaObject, Monitorable {
      * is returned.
      * 
      * @param timeoutInSeconds
-     *            number of seconds to wait.
+     *      number of seconds to wait.
      * @param mode
-     *            wait for ALL or ANY task.
-     * @return any of the finished tasks.
+     *      wait for ALL or ANY task.
+     * @return
+     *      any of the finished tasks.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      may be thrown when any of the tasks in the container
+     *      would throw this on {@link Task#waitFor()}. 
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception DoesNotExistException
+     *      is thrown when the container does not contain any tasks.
      */
     public Task<?,?> waitFor(float timeoutInSeconds, WaitMode mode)
             throws NotImplementedException, IncorrectStateException,
@@ -85,6 +159,21 @@ public interface TaskContainer extends SagaObject, Monitorable {
      * non-blocking version, which may continue to try and cancel tasks in the
      * background. The task states will remain RUNNING until the cancel
      * operation succeeds.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when any of the tasks in the container
+     *      would throw this on {@link Task#cancel()}. 
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception DoesNotExistException
+     *      is thrown when the container does not contain any tasks.
      */
     public void cancel() throws NotImplementedException,
             IncorrectStateException, DoesNotExistException, TimeoutException,
@@ -97,7 +186,22 @@ public interface TaskContainer extends SagaObject, Monitorable {
      * operation succeeds.
      * 
      * @param timeoutInSeconds
-     *            time for freeing resources.
+     *      time for freeing resources.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when any of the tasks in the container
+     *      would throw this on {@link Task#cancel()}. 
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception DoesNotExistException
+     *      is thrown when the container does not contain any tasks.
      */
     public void cancel(float timeoutInSeconds) throws NotImplementedException,
             IncorrectStateException, DoesNotExistException, TimeoutException,
@@ -114,7 +218,18 @@ public interface TaskContainer extends SagaObject, Monitorable {
     /**
      * Lists the tasks in this task container.
      * 
-     * @return an array of cookies.
+     * @return
+     *      an array of cookies.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public int[] listTasks() throws NotImplementedException, TimeoutException,
             NoSuccessException;
@@ -123,8 +238,22 @@ public interface TaskContainer extends SagaObject, Monitorable {
      * Gets a single task from the task container.
      * 
      * @param cookie
-     *            the integer identifying the task.
-     * @return the task.
+     *      the integer identifying the task.
+     * @return
+     *      the task.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception DoesNotExistException
+     *      is thrown when the container does not contain a task for the
+     *      specified cookie.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public Task<?,?> getTask(int cookie) throws NotImplementedException,
             DoesNotExistException, TimeoutException, NoSuccessException;
@@ -132,7 +261,18 @@ public interface TaskContainer extends SagaObject, Monitorable {
     /**
      * Gets the tasks in this task container.
      * 
-     * @return the tasks.
+     * @return
+     *      the tasks.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public Task<?,?>[] getTasks() throws NotImplementedException, TimeoutException,
             NoSuccessException;
@@ -140,7 +280,18 @@ public interface TaskContainer extends SagaObject, Monitorable {
     /**
      * Gets the states of all tasks in the task container.
      * 
-     * @return the states.
+     * @return
+     *      the states.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public State[] getStates() throws NotImplementedException,
             TimeoutException, NoSuccessException;

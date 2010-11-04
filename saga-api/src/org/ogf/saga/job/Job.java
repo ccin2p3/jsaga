@@ -91,7 +91,35 @@ public interface Job extends Task<Void, Void>, Async, AsyncAttributes<Job>,
     /**
      * Retrieves the job description that was used to submit this job instance.
      * 
-     * @return the job description
+     * @return
+     *      the job description
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception DoesNotExistException
+     *      is thrown in cases where the job description is not available,
+     *      for instance when the job was not submitted through SAGA and the
+     *      job was obtained using the {@link JobService#getJob(String)} call.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public JobDescription getJobDescription() throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -101,7 +129,36 @@ public interface Job extends Task<Void, Void>, Async, AsyncAttributes<Job>,
     /**
      * Returns the input stream of this job (to which can be written).
      * 
-     * @return the stream.
+     * @return
+     *      the stream.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception DoesNotExistException
+     *      is thrown when the stream is not available for some reason.
+     * @exception IncorrectStateException
+     *      is thrown when the job is not interactive.
+     * @exception BadParameterException
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public OutputStream getStdin() throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -112,7 +169,36 @@ public interface Job extends Task<Void, Void>, Async, AsyncAttributes<Job>,
     /**
      * Returns the output stream of this job (which can be read).
      * 
-     * @return the stream.
+     * @return
+     *      the stream.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception DoesNotExistException
+     *      is thrown when the stream is not available for some reason.
+     * @exception IncorrectStateException
+     *      is thrown when the job is not interactive.
+     * @exception BadParameterException
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public InputStream getStdout() throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -123,7 +209,36 @@ public interface Job extends Task<Void, Void>, Async, AsyncAttributes<Job>,
     /**
      * Returns the error stream of this job (which can be read).
      * 
-     * @return the stream.
+     * @return
+     *      the stream.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception DoesNotExistException
+     *      is thrown when the stream is not available for some reason.
+     * @exception IncorrectStateException
+     *      is thrown when the job is not interactive.
+     * @exception BadParameterException
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public InputStream getStderr() throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -134,6 +249,31 @@ public interface Job extends Task<Void, Void>, Async, AsyncAttributes<Job>,
     /**
      * Asks the resource manager to perform a suspend operation on a running
      * job.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the job is not in RUNNING state.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void suspend() throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -143,6 +283,31 @@ public interface Job extends Task<Void, Void>, Async, AsyncAttributes<Job>,
     /**
      * Asks the resource manager to perform a resume operation on a suspended
      * job.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the job is not in SUSPENDED state.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void resume() throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -152,6 +317,31 @@ public interface Job extends Task<Void, Void>, Async, AsyncAttributes<Job>,
     /**
      * Asks the resource manager to initiate a checkpoint operation on a running
      * job.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the job is not in RUNNING state.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void checkpoint() throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -162,7 +352,35 @@ public interface Job extends Task<Void, Void>, Async, AsyncAttributes<Job>,
      * Asks the resource manager to migrate a job.
      * 
      * @param jd
-     *            new job parameters to apply when the job is migrated.
+     *      new job parameters to apply when the job is migrated.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the job is not in RUNNING or SUSPENDED state.
+     * @exception BadParameterException
+     *      is thrown if there is something wrong with the specified
+     *      job description.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void migrate(JobDescription jd) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -172,6 +390,33 @@ public interface Job extends Task<Void, Void>, Async, AsyncAttributes<Job>,
     /**
      * Asks the resource manager to deliver an arbitrary signal to a dispatched
      * job.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the job is not in RUNNING or SUSPENDED state.
+     * @exception BadParameterException
+     *      is thrown if the specified signal is not supported by the backend.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void signal(int signum) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,

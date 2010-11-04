@@ -51,6 +51,7 @@ public class LogicalDirectoryImpl extends AbstractAsyncLogicalDirectoryImpl impl
                 return (Boolean) getResult(super.isFile(TaskMode.ASYNC, name), timeout);
             }
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -65,6 +66,7 @@ public class LogicalDirectoryImpl extends AbstractAsyncLogicalDirectoryImpl impl
             catch (IncorrectURLException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -79,6 +81,7 @@ public class LogicalDirectoryImpl extends AbstractAsyncLogicalDirectoryImpl impl
             catch (IncorrectURLException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 

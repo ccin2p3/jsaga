@@ -79,5 +79,85 @@ mvn deploy site-deploy</pre>
 mvn site-deploy -P local</pre>
             </answer>
         </faq>
+        <faq id="maven-repository">
+            <question>How to configure apache for maven repository ?</question>
+            <answer>Create file .htaccess with the following content:
+                <pre>Options +Indexes
+IndexOptions +NameWidth=* +DescriptionWidth=*
+AddDescription " " .md5
+AddDescription " " .sha1
+AddDescription "Tarball distribution" .tar.gz
+AddDescription "ZIP distribution" .zip
+AddDescription "GUI Installer" .jar</pre>
+            </answer>
+        </faq>
+    </part>
+    <part id="git">
+        <title>GIT</title>
+        <faq id="merge-without-history">
+            <question>How to merge a branch without detailed history ?</question>
+            <answer>Use unix diff instead of "git format-patch":
+                <pre># Update local repository
+git pull
+
+# Create patch
+git checkout workingBranch
+git diff origin/master > mydiff.patch
+
+# Apply patch
+git checkout -b mergedBranch master
+git apply --stat myDiff.patch
+git apply --check myDiff.patch
+git apply myDiff.patch
+
+# Merge
+git checkout master
+git merge mergedBranch
+
+# Delete remote and local branches
+git push origin :workingBranch
+git branch -D workingBranch
+git branch -d mergedBranch
+git branch -al</pre>
+                WARNING: This does not work if some binary files have been modified.
+            </answer>
+        </faq>
+        <faq id="apply-patch">
+            <question>How to apply and merge a patch ?</question>
+            <answer>Use "git apply-patch" or "git am":
+                <pre># Update local repository
+git pull
+
+# Apply patch
+git checkout -b mergedBranch master
+git am --ignore-space-change --ignore-whitespace patch.mbox
+
+# Check changes with IDE (GIT -> Push Active Branches...)
+
+# Merge
+git checkout master
+git merge mergedBranch
+
+# Delete local branch
+git branch -d mergedBranch
+git branch -al</pre>
+            </answer>
+        </faq>
+        <faq id="rebase-published-branch">
+            <question>How to rebase a published branch</question>
+            <answer>Note: you should not rebase a branch if it has been modified by other contributors.
+                <pre># Update local repository
+git pull
+
+git checkout workingBranch
+# perform interactive rebasing onto branch "master"
+# in case of conflict, add the conflicting file(s) to GIT (but do not commit them)
+
+# replace old branch (remote) with rebased branch (local)
+git push origin :workingBranch
+git push workingBranch
+                </pre>
+            </answer>
+        </faq>
     </part>
 </faqs>

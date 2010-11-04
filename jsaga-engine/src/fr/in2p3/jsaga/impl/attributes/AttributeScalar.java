@@ -15,6 +15,6 @@ import org.ogf.saga.error.*;
  *
  */
 public interface AttributeScalar extends Attribute {
-    public void setValue(String value) throws NotImplementedException, IncorrectStateException, PermissionDeniedException;
+    public void setValue(String value) throws NotImplementedException, IncorrectStateException, PermissionDeniedException, BadParameterException;
     public String getValue() throws NotImplementedException, IncorrectStateException, NoSuccessException;
 }

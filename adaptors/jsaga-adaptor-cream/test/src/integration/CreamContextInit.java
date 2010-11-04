@@ -16,6 +16,6 @@ import org.ogf.saga.context.ContextInitTest;
  */
 public class CreamContextInit extends ContextInitTest {
     public CreamContextInit() throws Exception {
-        super("EGEE");
+        super("VOMS");
     }
 }

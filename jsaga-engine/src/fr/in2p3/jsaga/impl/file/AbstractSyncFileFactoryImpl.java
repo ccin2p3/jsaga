@@ -50,7 +50,7 @@ public abstract class AbstractSyncFileFactoryImpl extends FileFactory implements
     }
 
     public File doCreateFileSync(Session session, URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session, PLUGIN_TYPE);
+        DataAdaptor adaptor = m_adaptorFactory.getDataAdaptorAndConnect(name, session, PLUGIN_TYPE);
         boolean isPhysical = adaptor instanceof FileReader || adaptor instanceof FileWriter;
         boolean isLogical = adaptor instanceof LogicalReader || adaptor instanceof LogicalWriter;
         if (isPhysical || !isLogical) {
@@ -61,7 +61,7 @@ public abstract class AbstractSyncFileFactoryImpl extends FileFactory implements
     }
 
     public FileInputStream doCreateFileInputStreamSync(Session session, URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session, PLUGIN_TYPE);
+        DataAdaptor adaptor = m_adaptorFactory.getDataAdaptorAndConnect(name, session, PLUGIN_TYPE);
         boolean disconnectable = true;
         return FileStreamFactoryImpl.newFileInputStream(session, name, adaptor, disconnectable);
     }
@@ -71,7 +71,7 @@ public abstract class AbstractSyncFileFactoryImpl extends FileFactory implements
     }
 
     public FileOutputStream doCreateFileOutputStreamSync(Session session, URL name, boolean append) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session, PLUGIN_TYPE);
+        DataAdaptor adaptor = m_adaptorFactory.getDataAdaptorAndConnect(name, session, PLUGIN_TYPE);
         boolean disconnectable = true;
         boolean exclusive = false;
         return FileStreamFactoryImpl.newFileOutputStream(session, name, adaptor, disconnectable, append, exclusive);
@@ -82,7 +82,7 @@ public abstract class AbstractSyncFileFactoryImpl extends FileFactory implements
     }
 
     public Directory doCreateDirectorySync(Session session, URL name, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        DataAdaptor adaptor = m_adaptorFactory.getDataAdaptor(name, session, PLUGIN_TYPE);
+        DataAdaptor adaptor = m_adaptorFactory.getDataAdaptorAndConnect(name, session, PLUGIN_TYPE);
         boolean isPhysical = adaptor instanceof FileReader || adaptor instanceof FileWriter;
         boolean isLogical = adaptor instanceof LogicalReader || adaptor instanceof LogicalWriter;
         if (isPhysical || !isLogical) {

@@ -87,6 +87,14 @@ public abstract class AbstractAsyncAttributesImpl<T extends Attributes> extends 
         };
     }
 
+    public Task<T, Boolean> existsAttribute(TaskMode mode, final String key) throws NotImplementedException {
+        return new AbstractThreadedTask<T,Boolean>(mode) {
+            public Boolean invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return m_object.existsAttribute(key);
+            }
+        };
+    }
+
     public Task<T, Boolean> isReadOnlyAttribute(TaskMode mode, final String key) throws NotImplementedException {
         return new AbstractThreadedTask<T,Boolean>(mode) {
             public Boolean invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {

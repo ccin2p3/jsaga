@@ -1,6 +1,8 @@
 package fr.in2p3.jsaga.impl.url;
 
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
+import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
+import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.url.URL;
@@ -20,7 +22,7 @@ import java.net.URISyntaxException;
 /**
  *
  */
-public class URLImpl implements URL {
+public class URLImpl extends AbstractSagaObjectImpl implements URL {
     private URI u;
     private FileAttributes m_cache;
     private boolean m_mustRemoveSlash;
@@ -70,7 +72,7 @@ public class URLImpl implements URL {
     }
 
     /** Encode the relative path */
-    URLImpl(URL base, String relativePath) throws BadParameterException {
+    URLImpl(URL base, String relativePath) {
         this(   base,
                 URLEncoder.encodePathOnly(relativePath),
                 null,
@@ -79,7 +81,7 @@ public class URLImpl implements URL {
     }
 
     /** Encode the URL */
-    URLImpl(URL base, URL relativeUrl) throws BadParameterException {
+    URLImpl(URL base, URL relativeUrl) {
         this(   base,
                 URLEncoder.encodePathOnly(relativeUrl.getPath()),
                 relativeUrl.getQuery()!=null ? relativeUrl.getQuery() : base.getQuery(),
@@ -100,6 +102,11 @@ public class URLImpl implements URL {
             if(i>1)relativePath="/"+relativePath.substring(i);
         }
 
+        //workaround: force to be interpreted as a relative path (even if path contains character ':')
+        if (! relativePath.startsWith("/")) {
+            relativePath = "./"+relativePath;
+        }
+
         // resolve URI
         URI baseUri = ((URLImpl) base).u;
         String relativeUri = relativePath
@@ -111,6 +118,15 @@ public class URLImpl implements URL {
     /** DO NOT encode the URL */
     private URLImpl(URI u) {
         this.u = u;
+    }
+
+    /** clone */
+    public SagaObject clone() throws CloneNotSupportedException {
+        URLImpl clone = (URLImpl) super.clone();
+        clone.u = u;
+        clone.m_cache = m_cache;
+        clone.m_mustRemoveSlash = m_mustRemoveSlash;
+        return clone;
     }
 
     /** Encode the URL */

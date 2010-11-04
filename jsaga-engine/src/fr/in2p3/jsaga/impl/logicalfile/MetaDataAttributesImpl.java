@@ -130,6 +130,17 @@ public class MetaDataAttributesImpl<T extends NSEntry> implements AsyncAttribute
         }
     }
 
+    public boolean existsAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
+        if (m_adaptor instanceof LogicalReaderMetaData) {
+            if (m_cache==null || System.currentTimeMillis() - m_cacheTimestamp > 10000) {
+                this._refreshCache();
+            }
+            return m_cache.containsKey(key);
+        } else {
+            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), m_object);
+        }
+    }
+
     public synchronized boolean isReadOnlyAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         return false;
     }
@@ -207,6 +218,14 @@ public class MetaDataAttributesImpl<T extends NSEntry> implements AsyncAttribute
         return new AbstractThreadedTask<T,String[]>(mode) {
             public String[] invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
                 return MetaDataAttributesImpl.this.findAttributes(patterns);
+            }
+        };
+    }
+
+    public Task<T, Boolean> existsAttribute(TaskMode mode, final String key) throws NotImplementedException {
+        return new AbstractThreadedTask<T,Boolean>(mode) {
+            public Boolean invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return MetaDataAttributesImpl.this.existsAttribute(key);
             }
         };
     }

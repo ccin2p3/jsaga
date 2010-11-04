@@ -66,7 +66,7 @@ public enum Flags {
 
     private int value;
 
-    Flags(int value) {
+    private Flags(int value) {
         this.value = value;
     }
 

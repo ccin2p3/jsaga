@@ -1,5 +1,7 @@
 package fr.in2p3.jsaga.impl.context;
 
+import fr.in2p3.jsaga.engine.session.SessionConfiguration;
+import fr.in2p3.jsaga.engine.factories.SecurityAdaptorFactory;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.context.ContextFactory;
 import org.ogf.saga.error.*;
@@ -17,7 +19,15 @@ import org.ogf.saga.error.*;
  *
  */
 public class ContextFactoryImpl extends ContextFactory {
+    private SessionConfiguration m_config;
+    private SecurityAdaptorFactory m_adaptorFactory;
+
+    public ContextFactoryImpl(SessionConfiguration config, SecurityAdaptorFactory adaptorFactory) {
+        m_config = config;
+        m_adaptorFactory = adaptorFactory;
+    }
+
     protected Context doCreateContext(String type) throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
-        return new ContextImpl(type);
+        return new ContextImpl(type, m_config, m_adaptorFactory);
     }
 }

@@ -5,7 +5,7 @@ import fr.in2p3.jsaga.impl.job.service.JobServiceImpl;
 import org.apache.log4j.Logger;
 import org.ogf.saga.error.SagaException;
 
-import java.util.Map;
+import java.util.Set;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -22,20 +22,18 @@ import java.util.Map;
 public class JobServiceReset implements Runnable {
     private static Logger s_logger = Logger.getLogger(JobServiceReset.class);
 
-    private Map<JobServiceImpl,Map> m_jobServices;
+    private Set<JobServiceImpl> m_jobServices;
     private SecurityCredential m_credential;
 
-    public JobServiceReset(Map<JobServiceImpl,Map> registry, SecurityCredential credential) {
+    public JobServiceReset(Set<JobServiceImpl> registry, SecurityCredential credential) {
         m_jobServices = registry;
         m_credential = credential;
     }
 
     public void run() {
-        for (Map.Entry<JobServiceImpl,Map> entry : m_jobServices.entrySet()) {
-            JobServiceImpl jobService = entry.getKey();
-            Map attributes = entry.getValue();
+        for (JobServiceImpl jobService : m_jobServices) {
             try {
-                jobService.resetAdaptors(m_credential, attributes);
+                jobService.resetAdaptors(m_credential);
             } catch (SagaException e) {
                 s_logger.warn("Failed to reconnect to job service", e);
             }

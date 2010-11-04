@@ -18,7 +18,7 @@ public enum WaitMode {
 
     private int value;
 
-    WaitMode(int value) {
+    private WaitMode(int value) {
         this.value = value;
     }
 

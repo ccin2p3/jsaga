@@ -13,7 +13,7 @@ public enum IOMode {
 
     private int value;
 
-    IOMode(int value) {
+    private IOMode(int value) {
         this.value = value;
     }
 

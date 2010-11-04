@@ -47,18 +47,32 @@ public abstract class MonitoringFactory {
      * Constructs a <code>Metric</code> object with the specified parameters.
      * 
      * @param name
-     *            name of the metric.
+     *      name of the metric.
      * @param desc
-     *            description of the metric.
+     *      description of the metric.
      * @param mode
-     *            mode of the metric.
+     *      mode of the metric.
      * @param unit
-     *            unit of the metric value.
+     *      unit of the metric value.
      * @param type
-     *            type of the metric.
+     *      type of the metric.
      * @param value
-     *            value of the metric.
-     * @return the metric.
+     *      value of the metric.
+     * @return
+     *      the metric.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown on incorrectly formatted 'value' parameter, invalid 'mode'
+     *      or 'type' parameter, and empty required parameter (all but 'unit'). 
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public synchronized static Metric createMetric(String name, String desc,
             String mode, String unit, String type, String value)

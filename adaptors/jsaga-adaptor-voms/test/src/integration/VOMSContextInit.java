@@ -16,6 +16,6 @@ import org.ogf.saga.context.ContextInitTest;
  */
 public class VOMSContextInit extends ContextInitTest {
     public VOMSContextInit() throws Exception {
-        super("dteam");
+        super("VOMS");
     }
 }

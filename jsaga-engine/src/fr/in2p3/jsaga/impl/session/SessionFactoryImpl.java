@@ -1,8 +1,8 @@
 package fr.in2p3.jsaga.impl.session;
 
-import fr.in2p3.jsaga.engine.config.Configuration;
-import fr.in2p3.jsaga.impl.context.ContextFactoryImpl;
-import org.ogf.saga.context.Context;
+import fr.in2p3.jsaga.engine.session.SessionConfiguration;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 
@@ -19,28 +19,16 @@ import org.ogf.saga.session.SessionFactory;
  *
  */
 public class SessionFactoryImpl extends SessionFactory {
-    protected Session doCreateSession(boolean defaults) {
+    private SessionConfiguration m_config;
+
+    public SessionFactoryImpl(SessionConfiguration config) {
+        m_config = config;
+    }
+    
+    protected Session doCreateSession(boolean defaults) throws NotImplementedException, NoSuccessException {
         Session session = new SessionImpl();
         if (defaults) {
-            try {
-                // load config
-                fr.in2p3.jsaga.engine.schema.config.Context[] xmlInstanceArray = Configuration.getInstance().getConfigurations().getContextCfg().toXMLArray();
-
-                // create default contexts
-                for (fr.in2p3.jsaga.engine.schema.config.Context xmlInstance : xmlInstanceArray) {
-                    // create context
-                    Context context = ContextFactoryImpl.createContext();   //NOTE: no type here, else setDefaults() is invoked
-                    context.setAttribute(Context.TYPE, xmlInstance.getName());
-
-                    // set context defaults
-                    context.setDefaults();
-
-                    // add context to session
-                    session.addContext(context);
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            m_config.setDefaultSession(session);
         }
         return session;
     }

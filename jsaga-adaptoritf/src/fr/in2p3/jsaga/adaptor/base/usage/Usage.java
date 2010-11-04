@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.adaptor.base.usage;
 import org.ogf.saga.error.DoesNotExistException;
 
 import java.util.Map;
+import java.util.Set;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -17,6 +18,11 @@ import java.util.Map;
  *
  */
 public interface Usage {
+    /**
+     * @return the set of attribute keys
+     */
+    public Set<String> getKeys();
+
     /**
      * Correct the value according to this usage
      * @param attributeName the name of the attribute to correct

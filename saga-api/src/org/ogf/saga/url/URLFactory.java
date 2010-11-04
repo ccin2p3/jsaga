@@ -25,7 +25,16 @@ public abstract class URLFactory {
 
     /**
      * Creates an URL object from the specified string.
-     * @param url the URL as a string.
+     * @param
+     *      url the URL as a string.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception BadParameterException
+     *      is thrown when there is a syntax error in the parameter.
+     * @exception NoSuccessException
+     *      is thrown if the implementation cannot create valid
+     *      default values based on the available information.
      */
     public static URL createURL(String url)
             throws BadParameterException, NoSuccessException,

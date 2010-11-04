@@ -1,0 +1,28 @@
+<body>
+
+<p>
+This package contains the bootstrap mechanism which connects a SAGA
+application, written on top of the SAGA Java language bindings, to
+a specific SAGA implementation.
+</p>
+
+<p>
+The setup requires a bootstrap mechanism for creating factory objects.
+This is realized with the
+{@link org.ogf.saga.bootstrap.SagaFactory SagaFactory}
+interface, and the
+{@link org.ogf.saga.bootstrap.ImplementationBootstrapLoader ImplementationBootstrapLoader} class.
+This mechanism uses the <code>saga.factory</code> property,
+to be set by the user to point to an implementation-specific
+metafactory, which in turn has methods to create factories for all
+SAGA packages.
+</p>
+
+<p>
+A mechanism is included to provide properties by means of a configuration
+file called <code>saga.properties</code>, which is looked for in the
+classpath, and in the current directory. Also, properties can be passed
+on by means of the usual Java System properties.
+</p>
+
+</body>

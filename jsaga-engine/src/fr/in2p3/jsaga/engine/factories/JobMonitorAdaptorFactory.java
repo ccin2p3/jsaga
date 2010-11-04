@@ -1,18 +1,12 @@
 package fr.in2p3.jsaga.engine.factories;
 
+import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
-import fr.in2p3.jsaga.engine.config.Configuration;
-import fr.in2p3.jsaga.engine.config.adaptor.SecurityAdaptorDescriptor;
-import fr.in2p3.jsaga.engine.config.bean.JobserviceEngineConfiguration;
-import fr.in2p3.jsaga.engine.schema.config.JobService;
-import fr.in2p3.jsaga.engine.schema.config.MonitorService;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import org.ogf.saga.error.*;
 import org.ogf.saga.url.URL;
-import org.ogf.saga.url.URLFactory;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /* ***************************************************
@@ -28,54 +22,10 @@ import java.util.Map;
  *
  */
 public class JobMonitorAdaptorFactory extends ServiceAdaptorFactory {
-    private JobserviceEngineConfiguration m_configuration;
-
-    public JobMonitorAdaptorFactory(Configuration configuration) {
-        super(configuration.getConfigurations().getContextCfg());
-        m_configuration = configuration.getConfigurations().getJobserviceCfg();
+    public JobMonitorAdaptor getJobMonitorAdaptor(JobControlAdaptor controlAdaptor) {
+        return controlAdaptor.getDefaultJobMonitor();
     }
 
-    public URL getJobMonitorURL(URL controlURL) throws NotImplementedException, IncorrectURLException, BadParameterException, NoSuccessException {
-        if (controlURL==null || controlURL.getScheme()==null) {
-            throw new IncorrectURLException("Invalid entry name: "+controlURL);
-        }
-
-        // get config
-        JobService jobServiceConfig = m_configuration.findJobService(controlURL);
-        MonitorService config = jobServiceConfig.getMonitorService();
-
-        // get monitorURL
-        if (config.getUrl() != null) {
-            return URLFactory.createURL(config.getUrl());
-        } else {
-            return controlURL;
-        }
-    }
-
-    public JobMonitorAdaptor getJobMonitorAdaptor(JobService config) throws NoSuccessException {
-        MonitorService monitorConfig = config.getMonitorService();
-
-        // create instance
-        try {
-            Class clazz = Class.forName(monitorConfig.getImpl());
-            return (JobMonitorAdaptor) clazz.newInstance();
-        } catch (Exception e) {
-            throw new NoSuccessException(e);
-        }
-    }
-
-    public Map getAttributes(URL monitorURL, JobService config) throws NoSuccessException {
-        try {
-            // get attributes from config and URL
-            Map attributes = new HashMap();
-            AttributesBuilder.updateAttributes(attributes, config.getMonitorService());
-            AttributesBuilder.updateAttributes(attributes, monitorURL);
-            return attributes;
-        } catch (BadParameterException e) {
-            throw new NoSuccessException(e);
-        }
-    }
-    
     public void connect(URL monitorURL, JobMonitorAdaptor monitorAdaptor, Map monitorAttributes, ContextImpl context) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         // check URL
         if (monitorURL==null || monitorURL.getScheme()==null) {
@@ -83,24 +33,7 @@ public class JobMonitorAdaptorFactory extends ServiceAdaptorFactory {
         }
 
         // set security adaptor
-        SecurityCredential credential;
-        if (context != null) {
-            SecurityCredential candidate;
-            try {
-                candidate = context.getCredential();
-            } catch (IncorrectStateException e) {
-                throw new NoSuccessException("Invalid security context: "+super.getContextType(context), e);
-            }
-            if (SecurityAdaptorDescriptor.isSupported(candidate.getClass(), monitorAdaptor.getSupportedSecurityCredentialClasses())) {
-                credential = candidate;
-            } else if (SecurityAdaptorDescriptor.isSupportedNoContext(monitorAdaptor.getSupportedSecurityCredentialClasses())) {
-                credential = null;
-            } else {
-                throw new AuthenticationFailedException("Security context class '"+ candidate.getClass().getName() +"' not supported for protocol: "+monitorURL.getScheme());
-            }
-        } else {
-            credential = null;
-        }
+        SecurityCredential credential = getCredential(monitorURL, context, monitorAdaptor);
 
         // connect
         connect(monitorAdaptor, credential, monitorURL, monitorAttributes);

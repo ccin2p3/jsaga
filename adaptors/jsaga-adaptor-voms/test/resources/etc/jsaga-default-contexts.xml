@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
+    <contexts>
+        <context type="VOMS">
+            <attribute name="Server" value="voms://lcg-voms.cern.ch:15004/DC=ch/DC=cern/OU=computers/CN=lcg-voms.cern.ch"/>
+            <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/voms/certificates/"/>
+            <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
+            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/voms_cred.txt"/>
+            <attribute name="UserVO" value="dteam"/>
+        </context>
+<!-- FIXME: this does not work anymore
+        <context type="VOMS">
+            <attribute name="Server" value="voms://lcg-voms.cern.ch:15004/DC=ch/DC=cern/OU=computers/CN=lcg-voms.cern.ch"/>
+            <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/voms/certificates/"/>
+            <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
+            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/voms_pkcs12_cred.txt"/>
+            <attribute name="UserVO" value="dteam"/>
+            <attribute name="UserCertKey" value="${user.home}/.jsaga/contexts/voms/mycert.p12"/>
+        </context>
+-->
+        <context type="VOMSMyProxy">
+            <attribute name="Server" value="voms://lcg-voms.cern.ch:15004/DC=ch/DC=cern/OU=computers/CN=lcg-voms.cern.ch"/>
+            <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/voms/certificates/"/>
+            <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
+            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/voms_myproxy_cred.txt"/>
+            <attribute name="UserVO" value="dteam"/>
+            <attribute name="MyProxyServer" value="myproxy.cern.ch:7512"/>
+            <attribute name="MyProxyUserID" value="jsaga"/>
+            <attribute name="MyProxyPass" value="tototo"/>
+        </context>
+    </contexts>
+    <session>
+        <context type="VOMS" id="dteam"/>
+        <context type="VOMSMyProxy" id="myproxy"/>
+    </session>
+</jsaga-default>

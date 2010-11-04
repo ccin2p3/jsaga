@@ -125,7 +125,7 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
         if (attributes.containsKey(DEFAULT_JDL_FILE)) {
             File defaultJdlFile = new File((String) attributes.get(DEFAULT_JDL_FILE));
             try {
-                // may override jsaga-universe.xml attributes
+                // may override jsaga-default-contexts.xml attributes
                 new DefaultJDL(defaultJdlFile).fill(attributes);
             } catch (FileNotFoundException e) {
                 throw new BadParameterException(e);

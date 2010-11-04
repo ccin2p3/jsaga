@@ -101,7 +101,7 @@ public abstract class SRMDataAdaptorAbstract implements DataAdaptor {
 		}
     }
 
-    public BaseURL getBaseURL() throws IncorrectURLException {
-        return new BaseURL(8446);
+    public int getDefaultPort() {
+        return 8446;
     }
 }

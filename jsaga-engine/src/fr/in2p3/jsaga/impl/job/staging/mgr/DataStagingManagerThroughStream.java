@@ -145,12 +145,12 @@ public class DataStagingManagerThroughStream implements DataStagingManager {
 
             // copy template to script
             InputStream template = this.getClass().getClassLoader().getResourceAsStream("bash/template.sh");
-            byte[] buffer = new byte[1024];
+            BufferedReader reader = new BufferedReader(new InputStreamReader(template));
             try {
-                for (int len; (len=template.read(buffer)) > -1; ) {
-                    stdin.write(buffer, 0, len);
+                for (String line; (line=reader.readLine())!=null; ) {
+                    stdin.println(line);
                 }
-                template.close();
+                reader.close();
             } catch (IOException e) {
                 throw new NoSuccessException(e);
             }

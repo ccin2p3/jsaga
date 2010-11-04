@@ -57,7 +57,7 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {return null;}
     public Class[] getSupportedSecurityCredentialClasses() {return new Class[]{InMemoryProxySecurityCredential.class};}
     public void setSecurityCredential(SecurityCredential credential) {}
-    public BaseURL getBaseURL() throws IncorrectURLException {return null;}
+    public int getDefaultPort() {return NO_PORT;}
 
     public SagaDataAdaptor(URI url, GSSCredential cred, java.io.File certRepository, String token, String srmPath, StreamCallback callback) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         try {
@@ -102,8 +102,6 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         } catch (AuthenticationFailedException e) {
             throw new NoSuccessException(e);
         } catch (AuthorizationFailedException e) {
-            throw new NoSuccessException(e);
-        } catch (BadParameterException e) {
             throw new NoSuccessException(e);
         } catch (IncorrectStateException e) {
             throw new NoSuccessException(e);

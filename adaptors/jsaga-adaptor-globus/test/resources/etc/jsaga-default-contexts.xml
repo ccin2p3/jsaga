@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
+    <contexts>
+        <context type="VOMS">
+            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/dteam_cred.txt"/>
+            <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
+            <data type="gsiftp"/>
+            <job type="gk"/>
+            <job type="unmonitored"/>
+            <job type="lcgce">
+                <attribute name="TcpPortRange" value="9000,9001"/>
+            </job>
+            <include domain="in2p3.fr"/>
+        </context>
+        <context type="MyProxy">
+            <attribute name="CertRepository" value="${user.home}/.globus/certificates/"/>
+            <attribute name="Server" value="myproxy.cern.ch:7512"/>
+            <attribute name="MyProxyPass" value="tototo"/>
+            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/myproxy_cred.txt"/>
+        </context>
+<!-- FIXME: this does not work anymore
+        <context type="Globus">
+            <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/globus/certificates/"/>
+            <attribute name="UserCertKey" value="${user.home}/.jsaga/contexts/globus/mycert.p12"/>
+            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/pkcs12_cred.txt"/>
+        </context>
+-->
+        <context type="Globus">
+            <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/d-grid/certificates/"/>
+            <attribute name="UserCert" value="${user.home}/.jsaga/contexts/d-grid/usercert.pem"/>
+            <attribute name="UserKey" value="${user.home}/.jsaga/contexts/d-grid/userkey.pem"/>
+            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/dgrid_cred.txt"/>
+        </context>
+        <context type="GlobusRFC820">
+            <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/globus/certificates/"/>
+            <attribute name="UserCert" value="${user.home}/.jsaga/contexts/globus/usercert.pem"/>
+            <attribute name="UserKey" value="${user.home}/.jsaga/contexts/globus/userkey.pem"/>
+            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/globus_cred.txt"/>
+        </context>
+    </contexts>
+    <session>
+        <context type="Globus" id="DGrid">
+            <data type="gsiftp"/>
+            <job type="gk"/>
+            <job type="gatekeeper">
+                <!--<attribute name="IPAddress" value="134.158.71.193"/>-->
+                <attribute name="TcpPortRange" value="30000,31000"/>
+            </job>
+            <include domain="de"/>
+        </context>
+        <context type="GlobusRFC820" id="DemoCert">
+            <job type="gatekeeper">
+                <attribute name="ShellPath" value="F:\cygwin\bin\sh.exe"/>
+            </job>
+            <include domain="vmnet.net"/>
+            <include host="localhost"/>
+            <exclude host="localhost" domain="de"/>
+        </context>
+    </session>
+</jsaga-default>

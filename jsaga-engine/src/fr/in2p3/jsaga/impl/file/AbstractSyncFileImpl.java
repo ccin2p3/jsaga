@@ -259,14 +259,10 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
                 try {m_outStream.close();} catch (IOException e) {/*ignore*/}
             }
         }
-        try {
-            FileAttributes attrs = this._getFileAttributes();
-            long size = attrs.getSize();
-            if (size > -1) {
-                return size;
-            }
-        } catch (BadParameterException e) {
-            throw new NoSuccessException(e);
+        FileAttributes attrs = this._getFileAttributes();
+        long size = attrs.getSize();
+        if (size > -1) {
+            return size;
         }
         throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
     }

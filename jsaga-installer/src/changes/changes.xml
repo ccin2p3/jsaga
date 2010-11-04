@@ -3,6 +3,12 @@
         <title>JSAGA Release Notes</title>
     </properties>
     <body>
+        <release version="0.9.11" date="2010-10-08" description="Compatible with SAGA Java Binding v1.0.1">
+            <action dev="sreynaud" type="update">Update SAGA Java Binding to version 1.0.1</action>
+        </release>
+        <release version="0.9.10" date="2010-10-05" description="New configuration engine">
+            <action dev="sreynaud" type="update">Replace configuration engine</action>
+        </release>
         <release version="0.9.9-1" date="2010-08-25" description="Same as 0.9.9, but built from GIT with maven 2.2.1">
             <action dev="sreynaud" type="update">Use GIT instead of CVS</action>
             <action dev="sreynaud" type="update">Use Maven 2.2.1 instead of 2.0.9</action>

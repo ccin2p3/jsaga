@@ -55,8 +55,8 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
         m_credential = ((GSSCredentialSecurityCredential) credential).getGSSCredential();
     }
 
-    public BaseURL getBaseURL() throws IncorrectURLException {
-        return new BaseURL(2811);
+    public int getDefaultPort() {
+        return 2811;
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {

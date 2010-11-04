@@ -69,7 +69,7 @@ public abstract class AbstractSagaObjectImpl implements SagaObject {
             throws NotImplementedException, IncorrectURLException,
             AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException,
             BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException,
-            TimeoutException, NoSuccessException
+            TimeoutException, NoSuccessException, SagaIOException
     {
         task.waitFor(timeout);
         switch(task.getState()) {

@@ -1,0 +1,21 @@
+<body>
+    <p>
+    There are various places in the SAGA API where attributes need to be
+    associated with objects, for instance for job descriptions and
+    metrics.  The {@link org.ogf.saga.attributes.Attributes Attributes}
+    interface provides a common interface for storing and retrieving attributes.
+   </p>
+
+   <p>
+   A separate interface
+   {@link org.ogf.saga.attributes.AsyncAttributes AsyncAttributes}
+   is provided for objects that should implement both 
+   {@link org.ogf.saga.attributes.Attributes Attributes}
+   and the <code>Async</code> interface
+   as specified in the language-independent SAGA specifications. These
+   objects must also provide async versions of the methods in
+   {@link org.ogf.saga.attributes.Attributes Attributes}. These async
+   versions are specified in this separate interface.
+   </p>
+
+</body>

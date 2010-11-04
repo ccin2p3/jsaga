@@ -14,7 +14,10 @@ public interface Session extends SagaObject {
      * Attaches a deep copy of the specified security context to the session.
      * 
      * @param context
-     *            the context to be added.
+     *      the context to be added.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
      */
     public void addContext(Context context) throws NotImplementedException;
 
@@ -22,10 +25,13 @@ public interface Session extends SagaObject {
      * Detaches the specified security context from the session.
      * 
      * @param context
-     *            the context to be removed.
+     *      the context to be removed.
      * @exception DoesNotExistException
-     *                is thrown when the session does not contain the specified
-     *                context.
+     *      is thrown when the session does not contain the specified
+     *      context.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
      */
     public void removeContext(Context context) throws NotImplementedException,
             DoesNotExistException;
@@ -34,7 +40,11 @@ public interface Session extends SagaObject {
      * Retrieves all contexts attached to the session. An empty array is
      * returned if no context is attached.
      * 
-     * @return a list of contexts.
+     * @return
+     *      a list of contexts.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
      */
     public Context[] listContexts() throws NotImplementedException;
 
@@ -43,6 +53,9 @@ public interface Session extends SagaObject {
      * this method. However, middleware may for instance have threads which may
      * need to be terminated, or the application will hang. This may not be the
      * right place for it, but there is no other place ...
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
      */
     public void close() throws NotImplementedException;
 
@@ -52,7 +65,10 @@ public interface Session extends SagaObject {
      * need to be terminated, or the application will hang.
      * 
      * @param timeoutInSeconds
-     *            the timeout in seconds.
+     *      the timeout in seconds.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
      */
     public void close(float timeoutInSeconds) throws NotImplementedException;
 }

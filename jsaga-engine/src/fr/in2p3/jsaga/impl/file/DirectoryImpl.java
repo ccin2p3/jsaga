@@ -48,6 +48,7 @@ public class DirectoryImpl extends AbstractAsyncDirectoryImpl implements Directo
                 return (Long) getResult(super.getSize(TaskMode.ASYNC, name, flags), timeout);
             }
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -60,6 +61,7 @@ public class DirectoryImpl extends AbstractAsyncDirectoryImpl implements Directo
                 return (Long) getResult(super.getSize(TaskMode.ASYNC, name), timeout);
             }
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -72,6 +74,7 @@ public class DirectoryImpl extends AbstractAsyncDirectoryImpl implements Directo
                 return (Boolean) getResult(super.isFile(TaskMode.ASYNC, name), timeout);
             }
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -116,7 +119,10 @@ public class DirectoryImpl extends AbstractAsyncDirectoryImpl implements Directo
         if (timeout == WAIT_FOREVER) {
             return super.openFileInputStreamSync(name);
         } else {
-            return (FileInputStream) getResult(super.openFileInputStream(TaskMode.ASYNC, name), timeout);
+            try {
+                return (FileInputStream) getResult(super.openFileInputStream(TaskMode.ASYNC, name), timeout);
+            }
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -125,7 +131,10 @@ public class DirectoryImpl extends AbstractAsyncDirectoryImpl implements Directo
         if (timeout == WAIT_FOREVER) {
             return super.openFileOutputStreamSync(name);
         } else {
-            return (FileOutputStream) getResult(super.openFileOutputStream(TaskMode.ASYNC, name), timeout);
+            try {
+                return (FileOutputStream) getResult(super.openFileOutputStream(TaskMode.ASYNC, name), timeout);
+            }
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -134,7 +143,10 @@ public class DirectoryImpl extends AbstractAsyncDirectoryImpl implements Directo
         if (timeout == WAIT_FOREVER) {
             return super.openFileOutputStreamSync(name, append);
         } else {
-            return (FileOutputStream) getResult(super.openFileOutputStream(TaskMode.ASYNC, name, append), timeout);
+            try {
+                return (FileOutputStream) getResult(super.openFileOutputStream(TaskMode.ASYNC, name, append), timeout);
+            }
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 

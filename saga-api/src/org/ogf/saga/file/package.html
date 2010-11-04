@@ -1,0 +1,44 @@
+<body>
+    <p>
+    This package provides classes to manipulate the contents of directories
+    or files. In addition to the classes described in the language-independent
+    SAGA specifications, this package also contains classes that are
+    extensions of {@link java.io.InputStream} and {@link java.io.OutputStream}.
+    These are specific for the Java language bindings and were added because
+    Java programmers are used to them and the Java libraries have various
+    classes that build on top of these,
+    </p>
+    <p>
+    A {@link org.ogf.saga.file.File File} represents
+    an open file descriptor for read/write operations on a physical file.
+    A deviation from the language-independent SAGA specifications is that
+    the read and write methods do not return POSIX error codes in case
+    of an error. Instead, they throw a
+    {@link org.ogf.saga.error.SagaIOException SagaIOException}. If a
+    POSIX error code happens to be available, it is stored inside the
+    exception object.
+    </p>
+    <p>
+    An {@link org.ogf.saga.file.Directory Directory}
+    represents a file entry that is a directory, and defines additional
+    methods for them.
+    Some methods have been renamed slightly to avoid conflicts with methods
+    in {@link org.ogf.saga.namespace.NSDirectory NSDirectory}, as only
+    the type of the return value differs, and Java forbids that.
+    </p>
+
+    <p>
+    The possible file flags are defined in the
+    {@link org.ogf.saga.namespace.Flags} enumeration
+    class, which includes methods to combine them into integers,
+    and to determine if they are set in an integer.
+    These methods are not described in the language-independent SAGA
+    specification, but are added in the Java language bindings because
+    in Java, enumerations cannot be treated as integers.
+    Also, since enumeration classes are not extensible in Java, flags
+    from the {@link org.ogf.saga.logicalfile logicalfile} package
+    and the {@link org.ogf.saga.namespace namespace} package are included
+    there as well.
+    </p>
+
+</body>

@@ -38,6 +38,7 @@ public class NSFactoryImpl extends AbstractAsyncNSFactoryImpl {
                 return (NSEntry) this.getResult(createNSEntry(TaskMode.ASYNC, session, name, flags), timeout);
             }
             catch (IncorrectStateException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -50,6 +51,7 @@ public class NSFactoryImpl extends AbstractAsyncNSFactoryImpl {
                 return (NSDirectory) this.getResult(createNSDirectory(TaskMode.ASYNC, session, name, flags), timeout);
             }
             catch (IncorrectStateException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -63,7 +65,7 @@ public class NSFactoryImpl extends AbstractAsyncNSFactoryImpl {
             throws NotImplementedException, IncorrectURLException,
             AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException,
             BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException,
-            TimeoutException, NoSuccessException
+            TimeoutException, NoSuccessException, SagaIOException
     {
         return AbstractSagaObjectImpl.getResult(task, timeout);
     }

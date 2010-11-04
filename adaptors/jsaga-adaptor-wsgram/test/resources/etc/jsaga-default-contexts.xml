@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
+    <contexts>
+        <context type="Globus">
+            <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/d-grid/certificates/"/>
+            <attribute name="UserCert" value="${user.home}/.jsaga/contexts/d-grid/usercert.pem"/>
+            <attribute name="UserKey" value="${user.home}/.jsaga/contexts/d-grid/userkey.pem"/>
+            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/dgrid_cred.txt"/>
+        </context>
+    </contexts>
+    <session>
+        <context type="Globus" id="DGrid">
+            <include domain="de"/>
+        </context>
+    </session>
+</jsaga-default>

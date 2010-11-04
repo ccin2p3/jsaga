@@ -1,0 +1,139 @@
+<html>
+
+    <head>
+	<meta name=Title
+	content="The SAGA Java Language Bindings"
+	<title>The SAGA Java Language Bindings</title>
+    </head>
+
+    <body>
+
+	<p>
+	This overview discusses some of the general, Java-specific design
+	considerations for the classes and interfaces from the
+	language-independent SAGA specification (GFD.90).
+	</p>
+
+	<h2>Java language version</h2>
+
+	<p>
+	The Java language version used is the one provided in J2SE 5.0
+	This version of the Java language is widely available and,
+	in contrast to earlier versions, this version provides generics and
+	enumerated types, features used in the SAGA language bindings
+	for Java.
+	Also, this version provides the {@link java.util.concurrent}
+	package, which is not available in earlier versions, and which is
+	used for the Java language bindings of SAGA tasks.
+	</p>
+
+	<h2>Identifiers</h2>
+
+	<p>
+	Various identifiers as used in the language-independent SAGA
+	specification are changed slightly to obey Java conventions
+	(for instance, <code>set_data</code> became <code>setData</code>,
+	enumeration literals are completely capitalized)
+	or to avoid conflicts with already existing method names
+	(<code>wait</code> is replaced by <code>waitFor</code>).
+	</p>
+
+	<h2>Concurrency control and thread-safety</h2>
+
+	<p>
+	Java SAGA implementations must be thread-safe. Multiple application
+	threads are allowed to access a common SAGA object. However, no
+	particular order is enforced, unless the application itself does so.
+	</p>
+
+	<h2>File I/O and Java file streams</h2>
+
+	<p>
+	Earlier experience with JavaGAT
+	has shown that having implementations of
+	the Java streams {@link java.io.InputStream} and
+	{@link java.io.OutputStream} is very much appreciated by
+	Java application programmers, since these
+	are the types on which most Java I/O is based. Therefore, it
+	was decided to add specifications for
+	{@link org.ogf.saga.file.FileInputStream FileInputStream} and
+	{@link org.ogf.saga.file.FileOutputStream FileOutputStream}
+	to the file package.
+	The {@link org.ogf.saga.file.File File} class as specified in the
+	SAGA specifications is also specified in the Java language bindings.
+	Of course, implementations and factories
+	may throw the
+	{@link org.ogf.saga.error.NotImplementedException NotImplementedException}
+	exception when methods or complete classes cannot be implemented.
+	</p>
+
+	<p>
+	Also, methods were added to {@link org.ogf.saga.stream.Stream Stream}
+	to obtain the usual java IO streams.
+	</p>
+
+	<h2>Error handling</h2>
+
+	<p>
+	The SAGA specifications refer to POSIX error return codes for several
+	methods. However, it is not to be expected that these will be available
+	in existing Java Grid middleware. Also, in Java, error conditions are
+	supposed to be passed on by means of exceptions. Therefore, it was
+	decided that where the SAGA specifications refer to POSIX error codes,
+	a {@link org.ogf.saga.error.SagaIOException SagaIOException}
+	is to be thrown in these cases. If an error code is available,
+	it is stored in the exception object.
+	</p>
+
+	<h2>Features unavailable in Java: permissions, links</h2>
+
+	<p>
+	For some features of the SAGA specifications, most notably permissions
+	and links, Java just does not provide building blocks, even locally.
+	Java is not a systems programming language.
+	Nevertheless, all methods concerning links and permissions are specified
+	in the Java language bindings. SAGA application writers should not be
+	surprised, however, if SAGA implementations throw a
+	<code>NotImplemented</code> exception when these methods are invoked.
+	</p>
+
+	<h2>Prescribing the API for applications and SAGA implementors</h2>
+
+	<p>
+	The aim of having bindings of the SAGA API specification to certain programming
+	languages is to define the precise syntax and semantics of the SAGA
+	functionality, in the given language. This language binding can be seen as
+	a contract between applications and SAGA implementors: both parties can
+	safely assume that exactly the classes and interfaces described in this
+	document will be either provided or requested for.
+	</p>
+
+	<p>
+	For facilitating both application writing and implementing SAGA,
+	providing the Java language binding in the form of directly usable files
+	is considered important. It has been decided to provide both interfaces and
+	classes from the language-independent SAGA specification in the form of
+	Java interfaces.
+	This leaves SAGA implementations with the task of writing
+	classes that implement these interfaces. For allowing applications to create
+	SAGA objects, the interfaces are accompanied by factory classes.
+	Java implementations of SAGA must implement the interfaces and factories
+	as specified here.
+	</p>
+
+	<p>
+	This setup requires a bootstrap mechanism for creating factory objects.
+	This is realized with the
+	{@link org.ogf.saga.bootstrap.SagaFactory SagaFactory}
+	interface, and the
+	{@link org.ogf.saga.bootstrap.ImplementationBootstrapLoader ImplementationBootstrapLoader} class, as described here.
+	This mechanism uses the <code>saga.factory</code> system property,
+	to be set by the user to point to an implementation-specific
+	metafactory, which in turn has methods to create factories for all
+	SAGA packages.
+	</p>
+
+    </body>
+
+</html>
+

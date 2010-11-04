@@ -33,7 +33,18 @@ public abstract class TaskFactory {
      * Constructs a <code>TaskContainer</code> object. This method is to be
      * provided by the factory.
      * 
-     * @return the task container.
+     * @return
+     *      the task container.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public synchronized static TaskContainer createTaskContainer()
             throws NotImplementedException, TimeoutException,

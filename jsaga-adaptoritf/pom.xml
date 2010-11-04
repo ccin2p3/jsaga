@@ -2,7 +2,7 @@
     <parent>
         <groupId>fr.in2p3.jsaga</groupId>
         <artifactId>jsaga</artifactId>
-        <version>0.9.10-SNAPSHOT</version>
+        <version>0.9.11-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga</groupId>
@@ -30,7 +30,7 @@
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api</artifactId>
-            <version>1.0</version>
+            <version>1.0.1</version>
         </dependency>
     </dependencies>
 </project>

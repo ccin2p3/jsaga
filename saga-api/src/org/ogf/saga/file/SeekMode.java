@@ -14,7 +14,7 @@ public enum SeekMode {
 
     private int value;
 
-    SeekMode(int value) {
+    private SeekMode(int value) {
         this.value = value;
     }
 

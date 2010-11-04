@@ -16,6 +16,6 @@ import org.ogf.saga.context.ContextInitTest;
  */
 public class SrbContextInit extends ContextInitTest {
     public SrbContextInit() throws Exception {
-        super("SRB_ctx");
+        super("UserPass");
     }
 }

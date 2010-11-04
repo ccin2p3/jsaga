@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga</groupId>
     <artifactId>jsaga</artifactId>
-    <version>0.9.10-SNAPSHOT</version>
+    <version>0.9.11-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>JSAGA Project</name>
     <description>JSAGA is a Java implementation of the SAGA specification (Open Grid Forum).</description>
@@ -46,7 +46,7 @@
     <scm>
         <connection>scm:git:git://git.in2p3.fr/jsaga</connection>
         <developerConnection>scm:git:ssh://git.in2p3.fr/jsaga</developerConnection>
-        <url>https://git.in2p3.fr/cgit/jsaga</url>
+        <url>https://git.in2p3.fr/public/jsaga</url>
     </scm>
     <distributionManagement>
         <repository>

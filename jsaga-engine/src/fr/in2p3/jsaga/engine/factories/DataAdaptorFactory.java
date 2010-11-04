@@ -1,20 +1,17 @@
 package fr.in2p3.jsaga.engine.factories;
 
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
+import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
+import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
-import fr.in2p3.jsaga.engine.config.Configuration;
-import fr.in2p3.jsaga.engine.config.ConfigurationException;
-import fr.in2p3.jsaga.engine.config.adaptor.DataAdaptorDescriptor;
-import fr.in2p3.jsaga.engine.config.adaptor.SecurityAdaptorDescriptor;
-import fr.in2p3.jsaga.engine.config.bean.ProtocolEngineConfiguration;
-import fr.in2p3.jsaga.engine.data.FilledURL;
-import fr.in2p3.jsaga.engine.schema.config.DataService;
+import fr.in2p3.jsaga.engine.descriptors.AdaptorDescriptors;
+import fr.in2p3.jsaga.engine.descriptors.DataAdaptorDescriptor;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
+import fr.in2p3.jsaga.impl.session.SessionImpl;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.url.URL;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /* ***************************************************
@@ -34,31 +31,53 @@ public class DataAdaptorFactory extends ServiceAdaptorFactory {
     public static final boolean LOGICAL = true;
     
     private DataAdaptorDescriptor m_descriptor;
-    private ProtocolEngineConfiguration m_configuration;
 
-    public DataAdaptorFactory(Configuration configuration) {
-        super(configuration.getConfigurations().getContextCfg());
-        m_descriptor = configuration.getDescriptors().getDataDesc();
-        m_configuration = configuration.getConfigurations().getProtocolCfg();
+    public DataAdaptorFactory(AdaptorDescriptors descriptors) {
+        m_descriptor = descriptors.getDataDesc();
     }
 
     /**
-     * Create a new instance of data adaptor for URL <code>url</code> and connect to service.
-     * todo: cache data adaptor instances with "scheme://userInfo@host:port"
+     * Create a new instance of data adaptor for URL <code>url</code>.
      * @param url the URL of the service
      * @param session the security session
      * @return the data adaptor instance
      */
-    public DataAdaptor getDataAdaptor(URL url, Session session, boolean isLogical) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+    public DataAdaptor getDataAdaptor(URL url, Session session) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (url==null || url.getScheme()==null) {
             throw new IncorrectURLException("No protocol found in URL: "+url);
         }
 
-        // get config
-        DataService config = m_configuration.findDataService(url, isLogical);
+        // get context (security + config)
+        ContextImpl context = ((SessionImpl)session).getBestMatchingContext(url);
 
-        // create instance
-        Class clazz = m_descriptor.getClass(config.getType());
+        // create adaptor instance
+        String scheme = context.getSchemeFromAlias(url.getScheme());
+        Class clazz = m_descriptor.getClass(scheme);
+        try {
+            return (DataAdaptor) clazz.newInstance();
+        } catch (Exception e) {
+            throw new NoSuccessException(e);
+        }
+    }
+
+    /**
+     * Create a new instance of data adaptor for URL <code>url</code> and connect to service.
+     * @param url the URL of the service
+     * @param session the security session
+     * @param expectsLogical the expected type of adaptor
+     * @return the data adaptor instance
+     */
+    public DataAdaptor getDataAdaptorAndConnect(URL url, Session session, boolean expectsLogical) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
+        if (url==null || url.getScheme()==null) {
+            throw new IncorrectURLException("No protocol found in URL: "+url);
+        }
+
+        // get context (security + config)
+        ContextImpl context = ((SessionImpl)session).getBestMatchingContext(url);
+
+        // create adaptor instance
+        String scheme = context.getSchemeFromAlias(url.getScheme());
+        Class clazz = m_descriptor.getClass(scheme);
         DataAdaptor dataAdaptor;
         try {
             dataAdaptor = (DataAdaptor) clazz.newInstance();
@@ -66,59 +85,25 @@ public class DataAdaptorFactory extends ServiceAdaptorFactory {
             throw new NoSuccessException(e);
         }
 
-        // get security context
-        ContextImpl context;
-        if (config.getContextRef() != null) {
-            context = super.findContext(session, config.getContextRef());
-            if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(dataAdaptor.getSupportedSecurityCredentialClasses())) {
-                throw new ConfigurationException("INTERNAL ERROR: effective-config may be inconsistent");                
-            }
-        } else if (url.getFragment() != null) {
-            context = super.findContext(session, url.getFragment());
-            if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(dataAdaptor.getSupportedSecurityCredentialClasses())) {
-                throw new NoSuccessException("Security context not found: "+url.getFragment());
-            }
-        } else if (session.listContexts().length == 1) {
-            context = (ContextImpl) session.listContexts()[0];
-        } else if (config.getSupportedContextTypeCount() > 0) {
-            context = super.findContext(session, config.getSupportedContextType());
-            if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(dataAdaptor.getSupportedSecurityCredentialClasses())) {
-                throw new NoSuccessException("None of the supported security context is valid");
-            }
-        } else {
-            context = null;
-            if (context == null && !SecurityAdaptorDescriptor.isSupportedNoContext(dataAdaptor.getSupportedSecurityCredentialClasses())) {
-                throw new NoSuccessException("None of the supported security context is found");
-            }
+        // check if adaptor is of expected type
+        if (expectsLogical && !(dataAdaptor instanceof LogicalReader || dataAdaptor instanceof LogicalWriter)) {
+            throw new BadParameterException("Protocol '"+scheme+"' is not a logical file protocol");
         }
 
-        // set security adaptor
-        if (context != null) {
-            SecurityCredential credential;
-            try {
-                credential = context.getCredential();
-            } catch (IncorrectStateException e) {
-                throw new NoSuccessException("Invalid security context: "+super.getContextType(context), e);
-            }
-            if (SecurityAdaptorDescriptor.isSupported(credential.getClass(), dataAdaptor.getSupportedSecurityCredentialClasses())) {
-                dataAdaptor.setSecurityCredential(credential);
-            } else if (SecurityAdaptorDescriptor.isSupportedNoContext(dataAdaptor.getSupportedSecurityCredentialClasses())) {
-                dataAdaptor.setSecurityCredential(null);
-            } else {
-                throw new AuthenticationFailedException("Security context class '"+ credential.getClass().getName() +"' not supported for protocol: "+url.getScheme());
-            }
-        }
+        // get service attributes
+        Map attributes = getAttributes(url, context, m_descriptor.getDefaultsMap(scheme));
 
-        // get attributes from config
-        Map attributes = new HashMap();
-        AttributesBuilder.updateAttributes(attributes, config);
+        // set credential
+        SecurityCredential credential = getCredential(url, context, dataAdaptor);
+        dataAdaptor.setSecurityCredential(credential);
 
-        // get attributes from filled URL
-        FilledURL filledUrl = new FilledURL(url, config);
-        filledUrl.setAttributes(attributes);
-        
         // connect
-        dataAdaptor.connect(filledUrl.getUserInfo(), filledUrl.getHost(), filledUrl.getPort(), filledUrl.getPath(), attributes);
+        dataAdaptor.connect(
+                url.getUserInfo(),
+                url.getHost(),
+                url.getPort()>0 ? url.getPort() : dataAdaptor.getDefaultPort(),
+                url.getPath(),
+                attributes);
         return dataAdaptor;
     }
 }

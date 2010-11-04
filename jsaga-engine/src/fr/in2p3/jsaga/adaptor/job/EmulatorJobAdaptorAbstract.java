@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  *
  */
-public class EmulatorJobAdaptorAbstract implements ClientAdaptor {
+public abstract class EmulatorJobAdaptorAbstract implements ClientAdaptor {
     private static final File STATUS_DIR = new File(Base.JSAGA_VAR, "JobEmulator");
 
     public String getType() {

@@ -14,6 +14,9 @@ public interface IOVec extends Buffer {
      * 
      * @param len
      *            the value for the attribute.
+     * @exception BadParameterException
+     *            is thrown when the lenIn is set to an illegal
+     *            value (< 0 or larger than size if size != -1).
      */
     void setLenIn(int len) throws BadParameterException;
 
@@ -36,6 +39,9 @@ public interface IOVec extends Buffer {
      * 
      * @param offset
      *            the value for the attribute.
+     * @exception BadParameterException
+     *            is thrown when the offset is set to an illegal
+     *            value (< 0).
      */
     void setOffset(int offset) throws BadParameterException;
 

@@ -20,13 +20,10 @@ import java.util.Properties;
  *
  */
 public class EngineProperties {
-    public static final String JSAGA_UNIVERSE = "jsaga.universe";
-    public static final String JSAGA_UNIVERSE_ENABLE_CACHE = "jsaga.universe.enable.cache";
-    public static final String JSAGA_UNIVERSE_IGNORE_MISSING_ADAPTOR = "jsaga.universe.ignore.missing.adaptor";
+    public static final String JSAGA_DEFAULT_CONTEXTS = "jsaga.default.contexts";
     public static final String JSAGA_TIMEOUT = "jsaga.timeout";
     public static final String LOG4J_CONFIGURATION = "log4j.configuration";
     public static final String DATA_COPY_BUFFER_SIZE = "data.copy.buffer.size";
-    public static final String JOB_DESCRIPTION_DEFAULT = "job.description.default";
     public static final String JOB_MONITOR_POLL_PERIOD = "job.monitor.poll.period";
     public static final String JOB_MONITOR_ERROR_THRESHOLD = "job.monitor.error.threshold";
     public static final String JOB_CONTROL_CHECK_AVAILABILITY = "job.control.check.availability";
@@ -39,13 +36,10 @@ public class EngineProperties {
         if (s_prop == null) {
             // set default properties
             s_prop = new Properties();
-            //s_prop.setProperty(JSAGA_UNIVERSE, "etc/jsaga-universe.xml");
-            s_prop.setProperty(JSAGA_UNIVERSE_ENABLE_CACHE, "true");
-            s_prop.setProperty(JSAGA_UNIVERSE_IGNORE_MISSING_ADAPTOR, "true");
+            //s_prop.setProperty(JSAGA_DEFAULT_CONTEXTS, "etc/jsaga-default-contexts.xml");
             //s_prop.setProperty(JSAGA_TIMEOUT, "etc/jsaga-timeout.properties");
             //s_prop.setProperty(LOG4J_CONFIGURATION, "etc/log4j.properties");
             s_prop.setProperty(DATA_COPY_BUFFER_SIZE, "16384");
-            //s_prop.setProperty(JOB_DESCRIPTION_DEFAULT, "etc/jsaga-default.jsdl");
             s_prop.setProperty(JOB_MONITOR_POLL_PERIOD, "1000");
             s_prop.setProperty(JOB_MONITOR_ERROR_THRESHOLD, "3");
             s_prop.setProperty(JOB_CONTROL_CHECK_AVAILABILITY, "false");

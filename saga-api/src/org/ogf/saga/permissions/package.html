@@ -1,0 +1,21 @@
+<body>
+    <p>
+    The permissions package provides the interface
+    {@link org.ogf.saga.permissions.Permissions Permissions}
+    to query and set
+    permissions on Saga objects, such as files or streams.
+    Objects that implement this interface maintain a set of permissions
+    for each object instance, for a set of IDs.
+    </p>
+
+    <p>
+    The possible permission flags are defined in the
+    {@link org.ogf.saga.permissions.Permission Permission} enumeration
+    class, which includes methods to combine them into integers,
+    and to determine if they are set in an integer.
+    These methods are not described in the language-independent SAGA
+    specification, but are added in the Java language bindings because
+    in Java, enumerations cannot be treated as integers.
+    </p>
+
+</body>

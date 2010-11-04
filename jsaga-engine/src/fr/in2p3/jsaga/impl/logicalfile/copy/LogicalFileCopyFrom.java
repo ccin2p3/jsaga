@@ -4,9 +4,6 @@ import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyDelegated;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
-import fr.in2p3.jsaga.engine.config.Configuration;
-import fr.in2p3.jsaga.engine.factories.DataAdaptorFactory;
-import fr.in2p3.jsaga.engine.schema.config.Protocol;
 import fr.in2p3.jsaga.impl.logicalfile.AbstractSyncLogicalFileImpl;
 import fr.in2p3.jsaga.impl.namespace.FlagsHelper;
 import fr.in2p3.jsaga.impl.namespace.JSAGAFlags;
@@ -69,13 +66,8 @@ public class LogicalFileCopyFrom {
                 throw new IncorrectStateException("Target entry already exists: "+target, alreadyExists);
             }
         } else if (m_adaptor instanceof LogicalWriter) {
-            Protocol descriptor = Configuration.getInstance().getConfigurations().getProtocolCfg().findProtocol(
-                    effectiveSource.getScheme(), DataAdaptorFactory.LOGICAL);
-            if (descriptor.hasLogical() && descriptor.getLogical()) {
-                this.getFromLogicalFile(effectiveSource, flags);
-            } else {
-                throw new BadParameterException("Maybe what you want to do is to register to logical file the following location: "+effectiveSource);
-            }
+            // todo: check that source is not a physical entry
+            this.getFromLogicalFile(effectiveSource, flags);
         } else {
             throw new NotImplementedException("Not supported for this protocol: "+target.getScheme());
         }

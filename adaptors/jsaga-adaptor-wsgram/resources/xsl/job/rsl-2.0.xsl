@@ -32,18 +32,29 @@
         </xsl:for-each>
 
         <!-- streams -->
-        <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Output/text()">
-            <stdout><xsl:value-of select="."/></stdout>
-        </xsl:for-each>
-        <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Error/text()">
-            <stderr><xsl:value-of select="."/></stderr>
-        </xsl:for-each>
-        <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Input/text()">
-            <stdin><xsl:value-of select="."/></stdin>
-        </xsl:for-each>
+        <xsl:variable name="isInteractive" select="jsdl:Application/posix:POSIXApplication/@name='interactive'"/>
+        <xsl:choose>
+            <xsl:when test="$isInteractive">
+                <stdout><xsl:value-of select="$UniqId"/>-output.txt</stdout>
+                <stderr><xsl:value-of select="$UniqId"/>-error.txt</stderr>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:for-each select="jsdl:Application/posix:POSIXApplication">
+                    <xsl:for-each select="posix:Input">
+                        <stdin><xsl:value-of select="text()"/></stdin>
+                    </xsl:for-each>
+                    <xsl:for-each select="posix:Output">
+                        <stdout><xsl:value-of select="text()"/></stdout>
+                    </xsl:for-each>
+                    <xsl:for-each select="posix:Error">
+                        <stderr><xsl:value-of select="text()"/></stderr>
+                    </xsl:for-each>
+                </xsl:for-each>
+            </xsl:otherwise>
+        </xsl:choose>
 
         <!-- data staging -->
-        <xsl:if test="jsdl:DataStaging">
+        <xsl:if test="jsdl:DataStaging or $isInteractive">
             <xsl:if test="jsdl:DataStaging[jsdl:Source]">
                 <fileStageIn>
                     <xsl:for-each select="jsdl:DataStaging[jsdl:Source]">
@@ -63,8 +74,18 @@
                     </xsl:for-each>
                 </fileStageIn>
             </xsl:if>
-            <xsl:if test="jsdl:DataStaging[jsdl:Target]">
+            <xsl:if test="jsdl:DataStaging[jsdl:Target] or $isInteractive">
                 <fileStageOut>
+                    <xsl:if test="$isInteractive">
+                        <transfer>
+                            <sourceUrl>file:///${GLOBUS_USER_HOME}/<xsl:value-of select="$UniqId"/>-output.txt</sourceUrl>
+                            <destinationUrl>gsiftp://<xsl:value-of select="$HostName"/>/tmp/<xsl:value-of select="$UniqId"/>-output.txt</destinationUrl>
+                        </transfer>
+                        <transfer>
+                            <sourceUrl>file:///${GLOBUS_USER_HOME}/<xsl:value-of select="$UniqId"/>-error.txt</sourceUrl>
+                            <destinationUrl>gsiftp://<xsl:value-of select="$HostName"/>/tmp/<xsl:value-of select="$UniqId"/>-error.txt</destinationUrl>
+                        </transfer>
+                    </xsl:if>
                     <xsl:for-each select="jsdl:DataStaging[jsdl:Target]">
                         <transfer>
                             <sourceUrl>file:///${GLOBUS_USER_HOME}/<xsl:value-of select="jsdl:FileName/text()"/></sourceUrl>

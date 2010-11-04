@@ -74,6 +74,10 @@ public abstract class AbstractNSEntryImplWithMetaData extends AbstractNSEntryImp
         return m_metadatas.findAttributes(patterns);
     }
 
+    public boolean existsAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
+        return m_metadatas.existsAttribute(key);
+    }
+
     public boolean isReadOnlyAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         return m_metadatas.isReadOnlyAttribute(key);
     }
@@ -118,6 +122,10 @@ public abstract class AbstractNSEntryImplWithMetaData extends AbstractNSEntryImp
 
     public Task<LogicalFile, String[]> findAttributes(TaskMode mode, String... patterns) throws NotImplementedException {
         return m_metadatas.findAttributes(mode, patterns);
+    }
+
+    public Task<LogicalFile, Boolean> existsAttribute(TaskMode mode, String key) throws NotImplementedException {
+        return m_metadatas.existsAttribute(mode, key);
     }
 
     public Task<LogicalFile, Boolean> isReadOnlyAttribute(TaskMode mode, String key) throws NotImplementedException {

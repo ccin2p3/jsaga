@@ -132,6 +132,11 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
         }
         return foundKeys.toArray(new String[foundKeys.size()]);
     }
+
+    public boolean existsAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
+        return m_attributes.containsKey(key);
+    }
+
     private static final Pattern PATTERN = Pattern.compile("([^=]*)(=(.*))?");
     private static boolean matches(Attribute attribute, String... patterns) throws NotImplementedException, NoSuccessException {
         for (String pattern : patterns) {
@@ -203,7 +208,7 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
     public boolean isVectorAttribute(String key) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         Attribute attribute = m_attributes.get(key);
         if (attribute != null) {
-            return attribute instanceof DefaultAttributeVector;
+            return attribute instanceof AttributeVector;
         } else {
             throw new DoesNotExistException("Attribute "+key+" does not exist", this);
         }
@@ -215,6 +220,14 @@ public abstract class AbstractAttributesImpl extends AbstractSagaObjectImpl impl
 
     //////////////////////////////////////////// protected methods ////////////////////////////////////////////
 
+    public AttributeScalar _addAttribute(AttributeScalar scalarAttribute) {
+        m_attributes.put(scalarAttribute.getKey(), scalarAttribute);
+        return scalarAttribute;
+    }
+    public AttributeVector _addVectorAttribute(AttributeVector vectorAttribute) {
+        m_attributes.put(vectorAttribute.getKey(), vectorAttribute);
+        return vectorAttribute;
+    }
     public ScalarAttributeImpl _addAttribute(ScalarAttributeImpl scalarAttribute) {
         m_attributes.put(scalarAttribute.getKey(), scalarAttribute);
         return scalarAttribute;

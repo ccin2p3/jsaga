@@ -2,7 +2,6 @@ package fr.in2p3.jsaga.adaptor.ssh.data;
 
 import com.jcraft.jsch.*;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
-import fr.in2p3.jsaga.adaptor.data.BaseURL;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
@@ -34,8 +33,8 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 		return "sftp";
 	}
 
-    public BaseURL getBaseURL() throws IncorrectURLException {
-        return new BaseURL(22);
+    public int getDefaultPort() {
+        return 22;
     }
 
 	public void connect(String userInfo, String host, int port,

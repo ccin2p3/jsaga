@@ -51,6 +51,7 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
             }
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -63,6 +64,7 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
                 getResult(super.removeLocation(TaskMode.ASYNC, name), timeout);
             }
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -71,7 +73,10 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
         if (timeout == WAIT_FOREVER) {
             super.updateLocationSync(nameOld, nameNew);
         } else {
-            getResult(super.updateLocation(TaskMode.ASYNC, nameOld, nameNew), timeout);
+            try {
+                getResult(super.updateLocation(TaskMode.ASYNC, nameOld, nameNew), timeout);
+            }
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -87,6 +92,7 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
             catch (BadParameterException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -95,7 +101,10 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
         if (timeout == WAIT_FOREVER) {
             super.replicateSync(name, flags);
         } else {
-            getResult(super.replicate(TaskMode.ASYNC, name, flags), timeout);
+            try {
+                getResult(super.replicate(TaskMode.ASYNC, name, flags), timeout);
+            }
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -104,7 +113,10 @@ public class LogicalFileImpl extends AbstractAsyncLogicalFileImpl implements Log
         if (timeout == WAIT_FOREVER) {
             super.replicateSync(name);
         } else {
-            getResult(super.replicate(TaskMode.ASYNC, name), timeout);
+            try {
+                getResult(super.replicate(TaskMode.ASYNC, name), timeout);
+            }
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 

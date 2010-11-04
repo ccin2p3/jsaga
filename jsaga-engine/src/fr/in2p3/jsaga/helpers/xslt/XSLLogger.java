@@ -36,6 +36,10 @@ public class XSLLogger implements ErrorListener {
 
     /** explicitely invoked by XSLTransformer */
     public void fatalError(TransformerException exception) throws TransformerException {
-        throw m_cause;
+        if (m_cause != null) {
+            throw m_cause;
+        } else {
+            throw exception;
+        }
     }
 }

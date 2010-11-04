@@ -2,21 +2,19 @@ package fr.in2p3.jsaga.adaptor.data.cache;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
-import fr.in2p3.jsaga.adaptor.data.BaseURL;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
-import org.ogf.saga.url.URL;
 import org.ogf.saga.error.*;
 import org.ogf.saga.file.Directory;
 import org.ogf.saga.file.FileFactory;
 import org.ogf.saga.namespace.NSEntry;
+import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
 import java.io.InputStream;
-import java.lang.Exception;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -60,7 +58,7 @@ public class CacheDataAdaptor implements FileReaderStreamFactory, FileWriter {
 
     public Class[] getSupportedSecurityCredentialClasses() {return null;}
     public void setSecurityCredential(SecurityCredential credential) {}
-    public BaseURL getBaseURL() throws IncorrectURLException {return null;}
+    public int getDefaultPort() {return NO_PORT;}
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         m_baseURL = URLFactory.createURL((String) attributes.get(BASE_URL));

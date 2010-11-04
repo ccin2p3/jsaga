@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
+    <contexts>
+        <context type="VOMS">
+            <data type="gsiftp"/>
+            <data type="srm"/>
+            <data type="lfn"/>
+            <job type="wms"/>
+            <job type="cream"/>
+        </context>
+    </contexts>
+    <session>
+        <context type="VOMS">
+            <attribute name="Server" value="voms://lcg-voms.cern.ch:15004/DC=ch/DC=cern/OU=computers/CN=lcg-voms.cern.ch"/>
+            <attribute name="VomsDir" value="etc/vomsdir"/>
+        </context>
+<!--
+        <context type="MyProxy">
+            <attribute name="Server" value="cclcgproxli01.in2p3.fr:7512"/>
+        </context>
+-->
+    </session>
+</jsaga-default>

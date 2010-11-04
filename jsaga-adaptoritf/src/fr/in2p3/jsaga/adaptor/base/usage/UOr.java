@@ -23,6 +23,14 @@ public class UOr implements Usage {
         m_or = usage;
     }
 
+    public Set<String> getKeys() {
+        Set<String> keys = new HashSet<String>(m_or.length);
+        for (Usage u : m_or) {
+            keys.addAll(u.getKeys());
+        }
+        return keys;
+    }
+
     public String correctValue(String attributeName, String attributeValue) throws DoesNotExistException {
         for (int i=0; m_or!=null && i<m_or.length; i++) {
             try {

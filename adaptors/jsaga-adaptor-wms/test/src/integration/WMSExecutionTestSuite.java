@@ -25,7 +25,6 @@ public class WMSExecutionTestSuite extends JSAGATestSuite {
     public static class WMSJobDescriptionTest extends JobDescriptionTest {
         public WMSJobDescriptionTest() throws Exception {super("wms");}
         public void test_totalCPUCount() { super.ignore("JDL does not support this"); }
-        public void test_totalCPUTime() { super.ignore("JDL does not support this"); }
         public void test_fileTransfer() { super.ignore("not yet implemented but MUST BE REACTIVATED when implemented"); }
         public void test_cleanup() { super.ignore("JDL does not support this"); }
         public void test_workingDirectory() { super.ignore("JDL does not support this"); }        

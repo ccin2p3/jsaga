@@ -14,17 +14,6 @@
                 <exclude>bin/template.sh</exclude>
             </excludes>
         </fileSet>
-        <fileSet>
-            <outputDirectory>doc/examples</outputDirectory>
-            <directory>test/resources/jobcollection</directory>
-            <excludes>
-                <exclude>*/expected-*.xml</exclude>
-            </excludes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>doc/examples/test_config</outputDirectory>
-            <directory>test/resources/config</directory>
-        </fileSet>
         <!-- generate launcher scripts -->
         <fileSet>
             <outputDirectory>bin</outputDirectory>

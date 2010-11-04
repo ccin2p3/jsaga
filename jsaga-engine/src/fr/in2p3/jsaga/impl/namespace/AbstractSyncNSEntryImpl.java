@@ -53,8 +53,6 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
     protected static URL _resolveRelativeUrl(URL baseUrl, URL relativeUrl) throws NotImplementedException, IncorrectURLException, BadParameterException, NoSuccessException {
         if (relativeUrl==null) {
             throw new IncorrectURLException("URL must not be null");
-        } else if (relativeUrl.getScheme()!=null && !relativeUrl.getScheme().equals(baseUrl.getScheme())) {
-            throw new IncorrectURLException("You must not modify the scheme of the URL: "+ baseUrl.getScheme());
         } else if (relativeUrl.getUserInfo()!=null && !relativeUrl.getUserInfo().equals(baseUrl.getUserInfo())) {
             throw new IncorrectURLException("You must not modify the user part of the URL: "+ baseUrl.getUserInfo());
         } else if (relativeUrl.getHost()!=null && !relativeUrl.getHost().equals(baseUrl.getHost())) {
@@ -117,17 +115,17 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
         }
     }
 
-    public boolean isDirSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+    public boolean isDirSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         FileAttributes attrs = this._getFileAttributes();
         return (attrs.getType() == FileAttributes.TYPE_DIRECTORY);
     }
 
-    public boolean isEntrySync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+    public boolean isEntrySync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         FileAttributes attrs = this._getFileAttributes();
         return (attrs.getType() == FileAttributes.TYPE_FILE);
     }
 
-    public boolean isLinkSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+    public boolean isLinkSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof LinkAdaptor) {
             try {
                 return ((LinkAdaptor)m_adaptor).isLink(
@@ -141,7 +139,7 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
         }
     }
 
-    public URL readLinkSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+    public URL readLinkSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof LinkAdaptor) {
             String absolutePath;
             try {
@@ -152,9 +150,13 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
                     throw new IncorrectStateException("Link does not exist: "+ m_url, doesNotExist);
                 }
             } catch (NotLink notLink) {
-                throw new BadParameterException("Not a link: "+ m_url, this);
+                throw new IncorrectStateException("Not a link: "+ m_url, this);
             }
-            return URLHelper.createURL(m_url, absolutePath);
+            try {
+                return URLHelper.createURL(m_url, absolutePath);
+            } catch (BadParameterException e) {
+                throw new IncorrectStateException(e);
+            }
         } else {
             throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
@@ -337,13 +339,9 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
 
     /** deviation from SAGA specification */
     public Date getLastModified() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
-        try {
-            FileAttributes attrs = this._getFileAttributes();
-            if (attrs!=null && attrs.getLastModified()>0) {
-                return new Date(attrs.getLastModified());
-            }
-        } catch (BadParameterException e) {
-            throw new NoSuccessException(e);
+        FileAttributes attrs = this._getFileAttributes();
+        if (attrs!=null && attrs.getLastModified()>0) {
+            return new Date(attrs.getLastModified());
         }
         throw new NotImplementedException("Not supported for this protocol: "+m_url.getScheme(), this);
     }

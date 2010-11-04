@@ -2,7 +2,7 @@
     <parent>
         <groupId>fr.in2p3.jsaga</groupId>
         <artifactId>jsaga</artifactId>
-        <version>0.9.10-SNAPSHOT</version>
+        <version>0.9.11-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
@@ -100,9 +100,9 @@
                 <configuration>
                     <xslFile>src/site/xsl/example.xsl</xslFile>
                     <srcDir>test/resources/etc</srcDir>
-                    <srcIncludes>jsaga-universe.xml</srcIncludes>
+                    <srcIncludes>jsaga-default-contexts.xml</srcIncludes>
                     <destDir>${project.build.directory}/generated-site/xdoc</destDir>
-                    <fileNameRegex>jsaga-universe.xml</fileNameRegex>
+                    <fileNameRegex>jsaga-default-contexts.xml</fileNameRegex>
                     <fileNameReplacement>example.xml</fileNameReplacement>
                 </configuration>
                 <executions>
@@ -120,19 +120,19 @@
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-adaptoritf</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.11-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api-test</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.11-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
-            <version>0.9.10-SNAPSHOT</version>
+            <version>0.9.11-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

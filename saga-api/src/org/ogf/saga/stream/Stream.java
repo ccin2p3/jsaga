@@ -86,7 +86,33 @@ public interface Stream extends SagaObject, Async, AsyncAttributes<Stream>,
      * the result of a {@link StreamService#serve()} call, <code>null</code>
      * is returned.
      * 
-     * @return the URL.
+     * @return
+     *      the URL.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the stream is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public URL getUrl() throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -97,7 +123,33 @@ public interface Stream extends SagaObject, Async, AsyncAttributes<Stream>,
      * Returns the remote authorization info. The returned context is
      * deep-copied.
      * 
-     * @return the remote context.
+     * @return
+     *      the remote context.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the stream is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public Context getContext() throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -109,6 +161,31 @@ public interface Stream extends SagaObject, Async, AsyncAttributes<Stream>,
     /**
      * Establishes a connection to the target defined during the construction of
      * the stream.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the stream is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void connect() throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -121,8 +198,30 @@ public interface Stream extends SagaObject, Async, AsyncAttributes<Stream>,
      * blocks until one or more of the specified activities apply.
      * 
      * @param what
-     *            the activities to wait for.
-     * @return the activities that apply.
+     *      the activities to wait for.
+     * @return
+     *      the activities that apply.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception IncorrectStateException
+     *      is thrown when the stream is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public int waitFor(int what) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -135,10 +234,32 @@ public interface Stream extends SagaObject, Async, AsyncAttributes<Stream>,
      * expires, an empty list is returned.
      * 
      * @param what
-     *            the activities to wait for.
+     *      the activities to wait for.
      * @param timeoutInSeconds
-     *            the timeout in seconds.
-     * @return the activities that apply.
+     *      the timeout in seconds.
+     * @return
+     *      the activities that apply.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception IncorrectStateException
+     *      is thrown when the stream is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public int waitFor(int what, float timeoutInSeconds)
             throws NotImplementedException, AuthenticationFailedException,
@@ -148,6 +269,14 @@ public interface Stream extends SagaObject, Async, AsyncAttributes<Stream>,
     /**
      * Closes an active connection. This method performs a non-blocking close.
      * I/O is no longer possible. The stream is put in state CLOSED.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception IncorrectStateException
+     *      is thrown when the backend changed its state.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void close() throws NotImplementedException,
             IncorrectStateException, NoSuccessException;
@@ -157,7 +286,15 @@ public interface Stream extends SagaObject, Async, AsyncAttributes<Stream>,
      * in state CLOSED.
      * 
      * @param timeoutInSeconds
-     *            the timeout in seconds.
+     *      the timeout in seconds.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception IncorrectStateException
+     *      is thrown when the backend changed its state.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void close(float timeoutInSeconds) throws NotImplementedException,
             IncorrectStateException, NoSuccessException;
@@ -168,15 +305,44 @@ public interface Stream extends SagaObject, Async, AsyncAttributes<Stream>,
      * Reads a raw buffer from the stream.
      * 
      * @param len
-     *            the maximum number of bytes to be read.
+     *      the maximum number of bytes to be read.
      * @param buffer
-     *            the buffer to store into.
-     * @return the number of bytes read.
+     *      the buffer to store into.
+     * @return
+     *      the number of bytes read.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully, or if the file was opened WriteOnly.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown if the provided buffer is not large enough to hold
+     *      the required length.
+     * @exception IncorrectStateException
+     *      is thrown when the Stream is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      * @exception SagaIOException
-     *                deviation from the SAGA specs: thrown in case of an error,
-     *                where the SAGA specs describe a return of a negative
-     *                value, corresponding to negatives of the respective ERRNO
-     *                error code.
+     *      is thrown on read failures when the SAGA specifications say that
+     *      a POSIX error number should be returned (which does not really
+     *      make sense for Java).
+
      */
     public int read(Buffer buffer, int len) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -188,13 +354,41 @@ public interface Stream extends SagaObject, Async, AsyncAttributes<Stream>,
      * Reads a raw buffer from the stream.
      * 
      * @param buffer
-     *            the buffer to store into.
-     * @return the number of bytes read.
+     *      the buffer to store into.
+     * @return
+     *      the number of bytes read.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully, or if the file was opened WriteOnly.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown if the provided buffer is not large enough to hold
+     *      the required length.
+     * @exception IncorrectStateException
+     *      is thrown when the Stream is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      * @exception SagaIOException
-     *                deviation from the SAGA specs: thrown in case of an error,
-     *                where the SAGA specs describe a return of a negative
-     *                value, corresponding to negatives of the respective ERRNO
-     *                error code.
+     *      is thrown on read failures when the SAGA specifications say that
+     *      a POSIX error number should be returned (which does not really
+     *      make sense for Java).
      */
     public int read(Buffer buffer) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -205,7 +399,37 @@ public interface Stream extends SagaObject, Async, AsyncAttributes<Stream>,
     /**
      * Obtains an InputStream from the stream.
      * 
-     * @return the inputstream.
+     * @return
+     *      the input stream.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully, or if the file was opened WriteOnly.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the Stream is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception SagaIOException
+     *      is thrown on read failures when the SAGA specifications say that
+     *      a POSIX error number should be returned (which does not really
+     *      make sense for Java).
      */
     public StreamInputStream getInputStream() throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -217,15 +441,43 @@ public interface Stream extends SagaObject, Async, AsyncAttributes<Stream>,
      * than the specified len, only the data in the buffer are written.
      * 
      * @param len
-     *            the number of bytes of data in the buffer.
+     *      the number of bytes of data in the buffer.
      * @param buffer
-     *            the data to be sent.
-     * @return the number of bytes written.
+     *      the data to be sent.
+     * @return
+     *      the number of bytes written.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully, or if the file was opened WriteOnly.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown if the provided buffer is not large enough to hold
+     *      the required (specified) length, or no buffer size is available.
+     * @exception IncorrectStateException
+     *      is thrown when the Stream is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      * @exception SagaIOException
-     *                deviation from the SAGA specs: thrown in case of an error,
-     *                where the SAGA specs describe a return of a negative
-     *                value, corresponding to negatives of the respective ERRNO
-     *                error code.
+     *      is thrown on read failures when the SAGA specifications say that
+     *      a POSIX error number should be returned (which does not really
+     *      make sense for Java).
      */
     public int write(Buffer buffer, int len) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -237,13 +489,41 @@ public interface Stream extends SagaObject, Async, AsyncAttributes<Stream>,
      * Writes a raw buffer to the stream.
      * 
      * @param buffer
-     *            the data to be sent.
-     * @return the number of bytes written.
+     *      the data to be sent.
+     * @return
+     *      the number of bytes written.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully, or if the file was opened WriteOnly.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown if the provided buffer is not large enough to hold
+     *      the required length, or bo buffer size is available.
+     * @exception IncorrectStateException
+     *      is thrown when the Stream is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      * @exception SagaIOException
-     *                deviation from the SAGA specs: thrown in case of an error,
-     *                where the SAGA specs describe a return of a negative
-     *                value, corresponding to negatives of the respective ERRNO
-     *                error code.
+     *      is thrown on read failures when the SAGA specifications say that
+     *      a POSIX error number should be returned (which does not really
+     *      make sense for Java).
      */
     public int write(Buffer buffer) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -254,7 +534,37 @@ public interface Stream extends SagaObject, Async, AsyncAttributes<Stream>,
     /**
      * Obtains an OutputStream from the stream.
      * 
-     * @return the outputstream.
+     * @return
+     *      the output stream.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully, or if the file was opened WriteOnly.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the Stream is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception SagaIOException
+     *      is thrown on read failures when the SAGA specifications say that
+     *      a POSIX error number should be returned (which does not really
+     *      make sense for Java).
      */
     public StreamOutputStream getOutputStream() throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,

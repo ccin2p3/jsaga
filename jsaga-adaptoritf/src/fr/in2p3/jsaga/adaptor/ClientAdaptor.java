@@ -1,7 +1,6 @@
 package fr.in2p3.jsaga.adaptor;
 
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
-import fr.in2p3.jsaga.adaptor.Adaptor;
 import org.ogf.saga.error.*;
 
 import java.util.Map;
@@ -19,6 +18,8 @@ import java.util.Map;
  *
  */
 public interface ClientAdaptor extends Adaptor {
+    static final int NO_PORT = -1;
+
     /**
      * @return the array of supported SecurityCredential classes.
      */
@@ -29,6 +30,11 @@ public interface ClientAdaptor extends Adaptor {
      * @param credential the security credential.
      */
     public void setSecurityCredential(SecurityCredential credential);
+
+    /**
+     * @return the default server port.
+     */
+    public int getDefaultPort();
 
     /**
      * Connect to the server and initialize the connection with the provided attributes.

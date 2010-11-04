@@ -15,9 +15,13 @@ public class LFCFileAttributes extends FileAttributes {
 	private static Logger s_logger = Logger.getLogger(LFCFileAttributes.class);
 	
     private LfcConnection.LFCFile m_file;
+    private String m_owner;
+    private String m_group;
 
     public LFCFileAttributes(LfcConnection.LFCFile file) {
         m_file = file;
+        m_owner = null;
+        m_group = null;
     }
     
     public LfcConnection.LFCFile getLFCFile(){
@@ -104,22 +108,28 @@ public class LFCFileAttributes extends FileAttributes {
 		}
     }
 
-    public String getOwner() {
-        try {
-			return m_file.owner().getName();
-		} catch (Exception e) {
-			s_logger.error("Unable to get the owner of "+getName()+":"+e.getMessage());
-			return ID_UNKNOWN;
-		}
+    public synchronized String getOwner() {
+        if (m_owner == null) {
+            try {
+                m_owner = m_file.owner().getName();
+            } catch (Exception e) {
+                s_logger.error("Unable to get the owner of "+getName()+":"+e.getMessage());
+                return ID_UNKNOWN;
+            }
+        }
+        return m_owner;
     }
 
-    public String getGroup() {
-        try {
-			return m_file.group().getName();
-		} catch (Exception e) {
-			s_logger.error("Unable to get the group of "+getName()+":"+e.getMessage());
-			return ID_UNKNOWN;
-		}
+    public synchronized String getGroup() {
+        if (m_group == null) {
+            try {
+                m_group = m_file.group().getName();
+            } catch (Exception e) {
+                s_logger.error("Unable to get the group of "+getName()+":"+e.getMessage());
+                return ID_UNKNOWN;
+            }
+        }
+        return m_group;
     }
 
     public long getLastModified() {

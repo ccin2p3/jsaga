@@ -26,14 +26,43 @@ public interface RPC extends SagaObject, Async, Permissions<RPC> {
      * Calls the remote procedure.
      * 
      * @param parameters
-     *            arguments and results for the call.
+     *      arguments and results for the call.
      * @exception IncorrectURLException
-     *                may be thrown here because the RPC server that was
-     *                specified to the factory may not have been contacted
-     *                before invoking the call.
+     *      may be thrown here because the RPC server that was
+     *      specified to the factory may not have been contacted
+     *      before invoking the call.
      * @exception NoSuccessException
-     *                is thrown for arbitrary backend failures, with a
-     *                descriptive error message.
+     *      is thrown for arbitrary backend failures, with a
+     *      descriptive error message.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception BadParameterException
+     *      is thrown when at least one of the parameters of the method
+     *      call is ill-formed, invalid, out of bounds or otherwise not
+     *      usable, or if the RPC server cannot be found.
+     * @exception DoesNotExistException
+     *      is thrown when an operation cannot succeed because the RPC server
+     *      does not recognize the specified method.
+     * @exception IncorrectStateException
+     *      is thrown when the object is already closed.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
      */
     public void call(Parameter... parameters) throws NotImplementedException,
             IncorrectURLException, AuthenticationFailedException,
@@ -45,6 +74,15 @@ public interface RPC extends SagaObject, Async, Permissions<RPC> {
      * Non-blocking close of the RPC handle instance. Note for Java
      * implementations: A finalizer could be used in case the application
      * forgets to close.
+     * @exception NoSuccessException
+     *      is thrown for arbitrary backend failures, with a
+     *      descriptive error message.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception IncorrectStateException
+     *      is in the SAGA specifications, but is not thrown when the object
+     *      is already closed.
      */
     public void close() throws NotImplementedException,
             IncorrectStateException, NoSuccessException;
@@ -54,7 +92,16 @@ public interface RPC extends SagaObject, Async, Permissions<RPC> {
      * finalizer could be used in case the application forgets to close.
      * 
      * @param timeoutInSeconds
-     *            seconds to wait.
+     *      seconds to wait.
+     * @exception NoSuccessException
+     *      is thrown for arbitrary backend failures, with a
+     *      descriptive error message.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception IncorrectStateException
+     *      is in the SAGA specifications, but is not thrown when the object
+     *      is already closed.
      */
     public void close(float timeoutInSeconds) throws NotImplementedException,
             IncorrectStateException, NoSuccessException;

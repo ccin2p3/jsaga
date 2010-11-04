@@ -35,9 +35,21 @@ public abstract class ContextFactory {
      * Constructs a security context.
      * 
      * @param type
-     *            when set to a non-empty string, {@link Context#setDefaults()}
-     *            is called.
-     * @return the security context.
+     *      when set to a non-empty string, {@link Context#setDefaults()} is called.
+     * @return 
+     *      the security context.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception IncorrectStateException
+     *      is here because {@link Context#setDefaults()} can throw it.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception NoSuccessException
+     *      is thrown if the implementation cannot create valid
+     *      default values based on the available information.
      */
     public static Context createContext(String type)
             throws NotImplementedException, IncorrectStateException,
@@ -50,6 +62,18 @@ public abstract class ContextFactory {
      * Constructs a security context.
      * 
      * @return the security context.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception IncorrectStateException
+     *      is here because {@link Context#setDefaults()} can throw it.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception NoSuccessException
+     *      is thrown if the implementation cannot create valid
+     *      default values based on the available information.
      */
     public static Context createContext() throws NotImplementedException,
             IncorrectStateException, TimeoutException, NoSuccessException {

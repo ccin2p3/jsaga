@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
+    <session>
+        <context type="VOMS" id="dteam">
+            <!-- get defaults from gLite-UI environment and configuration files -->
+            <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
+            <!-- todo: uncomment this when it will be supported by CREAM adaptor -->
+            <!--<attribute name="UserProxy" value="${user.home}/.jsaga/tmp/dteam_cred.txt"/>-->
+            <attribute name="LifeTime" value="PT13H"/>
+            <data type="gsiftp">
+                <exclude domain="in2p3.fr"/>
+                <exclude domain="de"/>
+            </data>
+            <data type="lfn"/>
+            <data type="srm"/>
+            <data type="irods">
+                <attribute name="UserID" value="sreynaud"/>
+                <attribute name="DefaultResource" value="demoResc2"/>
+                <attribute name="Zone" value="tempZone"/>
+            </data>
+            <data type="irodsl">
+                <attribute name="UserID" value="sreynaud"/>
+                <attribute name="DefaultResource" value="demoResc2"/>
+                <attribute name="Zone" value="tempZone"/>
+                <!-- WARNING: same alias as an existing scheme is no more supported -->
+                <!--<alias>irods</alias>-->
+            </data>
+            <job type="cream"/>
+        </context>
+
+        <context type="VOMS" id="ragrid">
+            <attribute name="Server" value="voms://cclcgvomsli01.in2p3.fr:15011/O=GRID-FR/C=FR/O=CNRS/OU=CC-LYON/CN=cclcgvomsli01.in2p3.fr"/>
+            <attribute name="UserVO" value="vo.rhone-alpes.idgrilles.fr"/>
+            <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
+            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/ra_cred.txt"/>
+            <data type="gsiftp"/>
+            <job type="wms">
+                <attribute name="RetryCount" value="0"/>
+                <attribute name="PerusalFileEnable" value="false"/>
+            </job>
+            <include domain="in2p3.fr"/>
+        </context>
+
+        <context type="Globus" id="DGrid">
+            <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/d-grid/certificates/"/>
+            <attribute name="UserCert" value="${user.home}/.jsaga/contexts/d-grid/usercert.pem"/>
+            <attribute name="UserKey" value="${user.home}/.jsaga/contexts/d-grid/userkey.pem"/>
+            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/dgrid_cred.txt"/>
+            <data type="gsiftp"/>
+            <job type="wsgram"/>
+            <include domain="de"/>
+        </context>
+
+        <context type="Globus" id="Test">
+            <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/globus/certificates/"/>
+            <attribute name="UserCert" value="${user.home}/.jsaga/contexts/globus/usercert.pem"/>
+            <attribute name="UserKey" value="${user.home}/.jsaga/contexts/globus/userkey.pem"/>
+            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/globus_cred.txt"/>
+            <job type="gatekeeper">
+                <attribute name="ShellPath" value="F:\cygwin\bin\sh.exe"/>
+            </job>
+            <include host="localhost"/>
+            <exclude host="localhost" domain="de"/>
+        </context>
+
+        <context type="X509">
+            <attribute name="UserCert" value="${user.home}/.jsaga/contexts/https/mycert.p12"/>
+            <attribute name="UserPass" value="toto"/>
+            <data type="https"/>
+        </context>
+
+        <context type="SSH">
+            <attribute name="UserID" value="sreynaud"/><!-- optional -->
+            <attribute name="UserKey" value="${user.home}/.jsaga/contexts/ssh/id_rsa"/>
+            <data type="sftp"/>
+            <job type="ssh"/>
+        </context>
+
+        <context type="UserPass" id="SRBctx">
+            <attribute name="UserID" value="sreynaud"/>
+            <attribute name="UserPass"/>
+            <attribute name="UserPassFile" value="${user.home}/.jsaga/tmp/srb_cred.txt"/>
+            <attribute name="LifeTime" value="PT12H"/>
+            <data type="srb">
+                <attribute name="UseTrash" value="false"/>
+                <attribute name="DefaultResource" value="MammoDisk"/>
+                <attribute name="Zone" value="ccin2p3"/>
+                <attribute name="Domain" value="ccin2p3"/>
+            </data>
+        </context>
+
+        <context type="None">
+            <job type="local">
+                <attribute name="ShellPath" value="f:/cygwin/bin/sh.exe"/>
+                <alias>fork</alias>
+            </job>
+        </context>
+    </session>
+</jsaga-default>

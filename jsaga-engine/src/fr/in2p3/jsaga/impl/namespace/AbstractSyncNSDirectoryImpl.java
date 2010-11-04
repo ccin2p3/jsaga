@@ -203,7 +203,8 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
             if (Flags.RECURSIVE.isSet(flags) && childs[i].getType()==FileAttributes.TYPE_DIRECTORY) {
                 AbstractSyncNSDirectoryImpl childDir;
                 try {
-                    childDir = (AbstractSyncNSDirectoryImpl) this._openNSDir(childRelativePath);
+                    URL childDirName = URLFactory.createURL(childs[i].getRelativePath());
+                    childDir = (AbstractSyncNSDirectoryImpl) this._openNSDir(childDirName);
                 } catch (IncorrectURLException e) {
                     throw new NoSuccessException(e);
                 }

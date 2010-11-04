@@ -9,6 +9,7 @@ import org.ogf.saga.logicalfile.LogicalFileFactory;
 import org.ogf.saga.monitoring.MonitoringFactory;
 import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.rpc.RPCFactory;
+import org.ogf.saga.sd.SDFactory;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.stream.StreamFactory;
 import org.ogf.saga.task.TaskFactory;
@@ -84,13 +85,22 @@ public interface SagaFactory {
     NSFactory createNamespaceFactory() throws NotImplementedException;
 
     /**
-     * Creates a factory for the Saga RPC package. Note: this method cannot
-     * throw NotImplemented, because the Parameter constructor from the SAGA
-     * specs does not throw NotImplemented.
+     * Creates a factory for the Saga RPC package.
      * 
      * @return the RPC factory.
+     * @exception NotImplementedException
+     *                is thrown when RPC is not implemented.
      */
-    RPCFactory createRPCFactory();
+    RPCFactory createRPCFactory() throws NotImplementedException;
+
+    /**
+     * Creates a factory for the Saga Service Discovery package.
+     * 
+     * @return the SD factory.
+     * @exception NotImplementedException
+     *                is thrown when SD is not implemented.
+     */
+    SDFactory createSDFactory() throws NotImplementedException;
 
     /**
      * Creates a factory for the Saga session package.

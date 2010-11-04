@@ -16,6 +16,6 @@ import org.ogf.saga.context.ContextDestroyTest;
  */
 public class MyProxyContextDestroy extends ContextDestroyTest {
     public MyProxyContextDestroy() throws Exception {
-        super("EGEE");
+        super("MyProxy");
     }
 }

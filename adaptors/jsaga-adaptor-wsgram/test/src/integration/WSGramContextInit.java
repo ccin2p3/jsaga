@@ -16,6 +16,6 @@ import org.ogf.saga.context.ContextInitTest;
  */
 public class WSGramContextInit extends ContextInitTest {
     public WSGramContextInit() throws Exception {
-        super("DGrid");
+        super("Globus");
     }
 }

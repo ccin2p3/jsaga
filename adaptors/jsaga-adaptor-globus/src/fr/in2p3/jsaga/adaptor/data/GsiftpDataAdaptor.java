@@ -55,8 +55,8 @@ public class GsiftpDataAdaptor implements DataCopy, DataRename, FileReaderStream
         m_adaptor.setSecurityCredential(credential);
     }
 
-    public BaseURL getBaseURL() throws IncorrectURLException {
-        return m_adaptor.getBaseURL();
+    public int getDefaultPort() {
+        return m_adaptor.getDefaultPort();
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {

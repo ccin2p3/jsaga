@@ -16,6 +16,6 @@ import org.ogf.saga.context.ContextDestroyTest;
  */
 public class VOMSContextDestroy extends ContextDestroyTest {
     public VOMSContextDestroy() throws Exception {
-        super("dteam");
+        super("VOMS");
     }
 }

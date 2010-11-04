@@ -25,7 +25,7 @@ public enum StreamState {
 
     private int value;
 
-    StreamState(int value) {
+    private StreamState(int value) {
         this.value = value;
     }
 

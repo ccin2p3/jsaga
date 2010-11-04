@@ -28,6 +28,31 @@ public interface File extends NSEntry {
      * Returns the number of bytes in the file.
      * 
      * @return the size.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the Directory is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public long getSize() throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -42,10 +67,43 @@ public interface File extends NSEntry {
      * blocking. The async version can be used to implement non-blocking reads.
      * 
      * @param buffer
-     *            the buffer to read data into.
+     *      the buffer to read data into.
      * @param len
-     *            the number of bytes to be read.
-     * @return the number of bytes read.
+     *      the number of bytes to be read.
+     * @return
+     *      the number of bytes read
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully, or if the file was opened WriteOnly.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown if the provided buffer is not large enough to hold
+     *      the required length.
+     * @exception IncorrectStateException
+     *      is thrown when the File is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception SagaIOException
+     *      is thrown on read failures when the SAGA specifications say that
+     *      a POSIX error number should be returned (which does not really
+     *      make sense for Java).
      */
     public int read(Buffer buffer, int len) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -60,12 +118,45 @@ public interface File extends NSEntry {
      * be used to implement non-blocking reads.
      * 
      * @param buffer
-     *            the buffer to read data into.
+     *      the buffer to read data into.
      * @param offset
-     *            ths offset in the buffer.
+     *      the offset in the buffer.
      * @param len
-     *            the number of bytes to be read.
-     * @return the number of bytes read.
+     *      the number of bytes to be read.
+     * @return
+     *      the number of bytes read.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully, or if the file was opened WriteOnly.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown if the provided buffer is not large enough to hold
+     *      the required length.
+     * @exception IncorrectStateException
+     *      is thrown when the File is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception SagaIOException
+     *      is thrown on read failures when the SAGA specifications say that
+     *      a POSIX error number should be returned (which does not really
+     *      make sense for Java).
      */
     public int read(Buffer buffer, int offset, int len)
             throws NotImplementedException, AuthenticationFailedException,
@@ -79,8 +170,41 @@ public interface File extends NSEntry {
      * The async version can be used to implement non-blocking reads.
      * 
      * @param buffer
-     *            the buffer to read data into.
-     * @return the number of bytes read.
+     *      the buffer to read data into.
+     * @return
+     *      the number of bytes read.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully, or if the file was opened WriteOnly.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown if the provided buffer is not large enough to hold
+     *      the required length.
+     * @exception IncorrectStateException
+     *      is thrown when the File is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception SagaIOException
+     *      is thrown on read failures when the SAGA specifications say that
+     *      a POSIX error number should be returned (which does not really
+     *      make sense for Java).
      */
     public int read(Buffer buffer) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -96,11 +220,44 @@ public interface File extends NSEntry {
      * @param buffer
      *            the buffer to write data from.
      * @param offset
-     *            the buffer offset.
+     *      the buffer offset.
      * @param len
-     *            the number of bytes to be written.
-     * @return the number of bytes written.
-     */
+     *      the number of bytes to be written.
+     * @return
+     *      the number of bytes written.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully, or if the file was opened ReadOnly.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown if the provided buffer is not large enough to hold
+     *      the specified length.
+     * @exception IncorrectStateException
+     *      is thrown when the File is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception SagaIOException
+     *      is thrown on write failures when the SAGA specifications say that
+     *      a POSIX error number should be returned (which does not really
+     *      make sense for Java).
+     */    
     public int write(Buffer buffer, int offset, int len)
             throws NotImplementedException, AuthenticationFailedException,
             AuthorizationFailedException, PermissionDeniedException,
@@ -112,10 +269,43 @@ public interface File extends NSEntry {
      * current file position. Returns the number of bytes written.
      * 
      * @param buffer
-     *            the buffer to write data from.
+     *      the buffer to write data from.
      * @param len
-     *            the number of bytes to be written.
-     * @return the number of bytes written.
+     *      the number of bytes to be written.
+     * @return
+     *      the number of bytes written.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully, or if the file was opened ReadOnly.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown if the provided buffer is not large enough to hold
+     *      the specified length.
+     * @exception IncorrectStateException
+     *      is thrown when the File is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception SagaIOException
+     *      is thrown on write failures when the SAGA specifications say that
+     *      a POSIX error number should be returned (which does not really
+     *      make sense for Java).
      */
     public int write(Buffer buffer, int len) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -128,8 +318,41 @@ public interface File extends NSEntry {
      * current file position. Returns the number of bytes written.
      * 
      * @param buffer
-     *            the buffer to write data from.
-     * @return the number of bytes written.
+     *      the buffer to write data from.
+     * @return
+     *      the number of bytes written.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully, or if the file was opened ReadOnly.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown if the provided buffer is not large enough to hold
+     *      the specified length.
+     * @exception IncorrectStateException
+     *      is thrown when the File is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception SagaIOException
+     *      is thrown on write failures when the SAGA specifications say that
+     *      a POSIX error number should be returned (which does not really
+     *      make sense for Java).
      */
     public int write(Buffer buffer) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -141,10 +364,40 @@ public interface File extends NSEntry {
      * Repositions the current file position as requested.
      * 
      * @param offset
-     *            offset in bytes to move pointer.
+     *      offset in bytes to move pointer.
      * @param whence
-     *            determines from where the offset is relative.
-     * @return the position after the seek.
+     *      determines from where the offset is relative.
+     * @return
+     *      the position after the seek.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the File is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception SagaIOException
+     *      is thrown on seek failures when the SAGA specifications say that
+     *      a POSIX error number should be returned (which does not really
+     *      make sense for Java).
      */
     public long seek(long offset, SeekMode whence)
             throws NotImplementedException, AuthenticationFailedException,
@@ -158,8 +411,40 @@ public interface File extends NSEntry {
      * Gather/scatter read.
      * 
      * @param iovecs
-     *            array of IOVecs determining how much to read and where to
-     *            store it.
+     *      array of IOVecs determining how much to read and where to
+     *      store it.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully, or if the file was opened WriteOnly.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown if the provided buffer is not large enough to hold
+     *      the required length.
+     * @exception IncorrectStateException
+     *      is thrown when the File is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception SagaIOException
+     *      is thrown on read failures when the SAGA specifications say that
+     *      a POSIX error number should be returned (which does not really
+     *      make sense for Java).
      */
     public void readV(IOVec[] iovecs) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -171,8 +456,40 @@ public interface File extends NSEntry {
      * Gather/scatter write.
      * 
      * @param iovecs
-     *            array of IOVecs determining how much to write and where to
-     *            obtain the data from.
+     *      array of IOVecs determining how much to write and where to
+     *      obtain the data from.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully, or if the file was opened ReadOnly.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown if the provided buffer is not large enough to hold
+     *      the specified length.
+     * @exception IncorrectStateException
+     *      is thrown when the File is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception SagaIOException
+     *      is thrown on write failures when the SAGA specifications say that
+     *      a POSIX error number should be returned (which does not really
+     *      make sense for Java).
      */
     public void writeV(IOVec[] iovecs) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -186,8 +503,36 @@ public interface File extends NSEntry {
      * Determines the storage size required for a pattern I/O operation.
      * 
      * @param pattern
-     *            to determine size for.
-     * @return the size.
+     *      to determine size for.
+     * @return
+     *      the size.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the pattern cannot be parsed. 
+     * @exception IncorrectStateException
+     *      is thrown when the File is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public int sizeP(String pattern) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -198,10 +543,42 @@ public interface File extends NSEntry {
      * Pattern-based read.
      * 
      * @param pattern
-     *            specification for the read operation.
+     *      specification for the read operation.
      * @param buffer
-     *            to store data into.
-     * @return number of succesfully read bytes.
+     *      to store data into.
+     * @return
+     *      number of succesfully read bytes.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully, or if the file was opened WriteOnly.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the pattern cannot be parsed. 
+     * @exception IncorrectStateException
+     *      is thrown when the File is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception SagaIOException
+     *      is thrown on read failures when the SAGA specifications say that
+     *      a POSIX error number should be returned (which does not really
+     *      make sense for Java).
      */
     public int readP(String pattern, Buffer buffer)
             throws NotImplementedException, AuthenticationFailedException,
@@ -213,10 +590,42 @@ public interface File extends NSEntry {
      * Pattern-based write.
      * 
      * @param pattern
-     *            specification for the write operation.
+     *      specification for the write operation.
      * @param buffer
-     *            to be written.
-     * @return number of succesfully written bytes.
+     *      to be written.
+     * @return
+     *      number of succesfully written bytes.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully, or if the file was opened ReadOnly.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the pattern cannot be parsed. 
+     * @exception IncorrectStateException
+     *      is thrown when the File is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception SagaIOException
+     *      is thrown on write failures when the SAGA specifications say that
+     *      a POSIX error number should be returned (which does not really
+     *      make sense for Java).
      */
     public int writeP(String pattern, Buffer buffer)
             throws NotImplementedException, AuthenticationFailedException,
@@ -230,7 +639,33 @@ public interface File extends NSEntry {
      * Lists the extended modes available in this implementation and/or on the
      * server side.
      * 
-     * @return list of available modes.
+     * @return
+     *      list of available modes.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the File is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public List<String> modesE() throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -241,10 +676,39 @@ public interface File extends NSEntry {
      * Determines the storage size required for an extended I/O operation.
      * 
      * @param emode
-     *            extended mode to use.
+     *      extended mode to use.
      * @param spec
-     *            to determine size for.
-     * @return the size.
+     *      to determine size for.
+     * @return
+     *      the size.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the emode is not supported or the spec cannot
+     *      be parsed. 
+     * @exception IncorrectStateException
+     *      is thrown when the File is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public int sizeE(String emode, String spec) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -255,12 +719,45 @@ public interface File extends NSEntry {
      * Extended read.
      * 
      * @param emode
-     *            extended mode to use.
+     *      extended mode to use.
      * @param spec
-     *            specification of read operation.
+     *      specification of read operation.
      * @param buffer
-     *            to store the data read.
-     * @return the number of successfully read bytes.
+     *      to store the data read.
+     * @return
+     *      the number of successfully read bytes.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully, or if the file was opened WriteOnly.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the emode is not supported or the spec cannot
+     *      be parsed. 
+     * @exception IncorrectStateException
+     *      is thrown when the File is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception SagaIOException
+     *      is thrown on read failures when the SAGA specifications say that
+     *      a POSIX error number should be returned (which does not really
+     *      make sense for Java).
      */
     public int readE(String emode, String spec, Buffer buffer)
             throws NotImplementedException, AuthenticationFailedException,
@@ -272,12 +769,45 @@ public interface File extends NSEntry {
      * Extended write.
      * 
      * @param emode
-     *            extended mode to use.
+     *      extended mode to use.
      * @param spec
-     *            specification of write operation.
+     *      specification of write operation.
      * @param buffer
-     *            data to write.
-     * @return the number of successfully written bytes.
+     *      data to write.
+     * @return
+     *      the number of successfully written bytes.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully, or if the file was opened ReadOnly.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the emode is not supported or the spec cannot
+     *      be parsed. 
+     * @exception IncorrectStateException
+     *      is thrown when the File is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception SagaIOException
+     *      is thrown on write failures when the SAGA specifications say that
+     *      a POSIX error number should be returned (which does not really
+     *      make sense for Java).
      */
     public int writeE(String emode, String spec, Buffer buffer)
             throws NotImplementedException, AuthenticationFailedException,

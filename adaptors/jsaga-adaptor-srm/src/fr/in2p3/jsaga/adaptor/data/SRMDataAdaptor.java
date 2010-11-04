@@ -47,8 +47,8 @@ public class SRMDataAdaptor implements DataAdaptor {
         m_adaptor.setSecurityCredential(credential);
     }
 
-    public BaseURL getBaseURL() throws IncorrectURLException {
-        return m_adaptor.getBaseURL();
+    public int getDefaultPort() {
+        return m_adaptor.getDefaultPort();
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {

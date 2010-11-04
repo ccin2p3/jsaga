@@ -72,6 +72,7 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
             catch (IncorrectStateException e) {throw new NoSuccessException(e);}
             catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
             catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
@@ -86,8 +87,10 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
 
     ////////////////////////////////////////// private methods //////////////////////////////////////////
 
-    public synchronized void resetAdaptors(SecurityCredential security, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, IncorrectURLException, BadParameterException, TimeoutException, NoSuccessException {
+    public synchronized void resetAdaptors(SecurityCredential security) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, IncorrectURLException, BadParameterException, TimeoutException, NoSuccessException {
         m_monitorService.startReset();
+        // retrieve service attributes
+        Map attributes = m_monitorService.getAttributes();
         try {
             // reset control adaptor
             JobAdaptorFactory.disconnect(m_controlAdaptor);
@@ -96,9 +99,8 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
             // reset monitor adaptor
             JobMonitorAdaptor monitorAdaptor = m_monitorService.getAdaptor();
             URL monitorURL = m_monitorService.getURL();
-            Map monitorAttributes = m_monitorService.getAttributes();
             JobMonitorAdaptorFactory.disconnect(monitorAdaptor);
-            JobMonitorAdaptorFactory.connect(monitorAdaptor, security, monitorURL, monitorAttributes);
+            JobMonitorAdaptorFactory.connect(monitorAdaptor, security, monitorURL, attributes);
         } finally {
             m_monitorService.stopReset();
         }

@@ -16,6 +16,6 @@ import org.ogf.saga.context.ContextInitTest;
  */
 public class IrodsContextInit extends ContextInitTest {
     public IrodsContextInit() throws Exception {
-        super("iRODS_ctx");
+        super("Globus");
     }
 }

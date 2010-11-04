@@ -2,13 +2,14 @@ package fr.in2p3.jsaga.impl.job;
 
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
+import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.engine.factories.JobAdaptorFactory;
 import fr.in2p3.jsaga.engine.factories.JobMonitorAdaptorFactory;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
-import fr.in2p3.jsaga.engine.job.monitor.JobMonitorServiceFactory;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import fr.in2p3.jsaga.impl.job.description.SAGAJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.job.service.JobServiceImpl;
+import fr.in2p3.jsaga.impl.session.SessionImpl;
 import fr.in2p3.jsaga.sync.job.SyncJobFactory;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
@@ -31,11 +32,11 @@ import java.util.Map;
  */
 public abstract class AbstractSyncJobFactoryImpl extends JobFactory implements SyncJobFactory {
     private JobAdaptorFactory m_adaptorFactory;
-    private JobMonitorServiceFactory m_monitorServiceFactory;
+    private JobMonitorAdaptorFactory m_monitorAdaptorFactory;
 
     public AbstractSyncJobFactoryImpl(JobAdaptorFactory adaptorFactory, JobMonitorAdaptorFactory monitorAdaptorFactory) {
         m_adaptorFactory = adaptorFactory;
-        m_monitorServiceFactory = new JobMonitorServiceFactory(monitorAdaptorFactory);
+        m_monitorAdaptorFactory = monitorAdaptorFactory;
     }
 
     protected JobDescription doCreateJobDescription() throws NotImplementedException {
@@ -49,20 +50,27 @@ public abstract class AbstractSyncJobFactoryImpl extends JobFactory implements S
     //NOTICE: resource discovery should NOT be done here because it should depend on the job description
     public JobService doCreateJobServiceSync(Session session, URL rm) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
         if (rm!=null && !rm.toString().equals("")) {
-            // get config
-            fr.in2p3.jsaga.engine.schema.config.JobService config = m_adaptorFactory.getConfig(rm);
-            // get adaptor
-            JobControlAdaptor controlAdaptor = m_adaptorFactory.getJobControlAdaptor(config);
-            // get context
-            ContextImpl context = m_adaptorFactory.getContextImpl(rm, controlAdaptor, config, session);
-            // get attributes
-            Map attributes = m_adaptorFactory.getAttributes(rm, config);
+            // get context (security + config)
+            ContextImpl context;
+            try {
+                context = ((SessionImpl)session).getBestMatchingContext(rm);
+            } catch (BadParameterException e) {
+                throw new NoSuccessException(e);
+            } catch (DoesNotExistException e) {
+                throw new NoSuccessException(e);
+            }
 
-            // connect to control/monitor services (may also update attributes)
-            JobMonitorService monitorService;
+            // create adaptor instance
+            JobControlAdaptor controlAdaptor = m_adaptorFactory.getJobControlAdaptor(rm, context);
+            JobMonitorAdaptor monitorAdaptor = m_monitorAdaptorFactory.getJobMonitorAdaptor(controlAdaptor);
+
+            // get attributes
+            Map attributes = m_adaptorFactory.getAttribute(rm, context);
+
+            // connect to control/monitor services
             try {
                 m_adaptorFactory.connect(rm, controlAdaptor, attributes, context);
-                monitorService = m_monitorServiceFactory.getJobMonitorService(rm, config, context);
+                m_monitorAdaptorFactory.connect(rm, monitorAdaptor, attributes, context);
             } catch (BadParameterException e) {
                 throw new NoSuccessException(e);
             }
@@ -78,12 +86,11 @@ public abstract class AbstractSyncJobFactoryImpl extends JobFactory implements S
             }
 
             // create JobService
+            JobMonitorService monitorService = new JobMonitorService(rm, monitorAdaptor, attributes);
             JobServiceImpl jobService = new JobServiceImpl(session, rm, controlAdaptor, monitorService, translator);
 
             // register
-            if (context != null) {
-                context.registerJobService(jobService, attributes);
-            }
+            context.registerJobService(jobService);
             return jobService;
         } else {
             throw new NotImplementedException("Resource discovery not yet implemented");

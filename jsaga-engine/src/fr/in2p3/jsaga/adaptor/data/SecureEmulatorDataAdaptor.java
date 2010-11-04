@@ -35,8 +35,8 @@ public class SecureEmulatorDataAdaptor extends EmulatorDataAdaptor {
         m_securityAdaptor = (UserPassSecurityCredential) credential;
     }
 
-    public BaseURL getBaseURL() throws IncorrectURLException {
-        return new BaseURL(43);
+    public int getDefaultPort() {
+        return 43;
     }
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {

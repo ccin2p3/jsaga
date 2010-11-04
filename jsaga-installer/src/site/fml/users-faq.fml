@@ -2,40 +2,220 @@
 <faqs title="Users Frequently Asked Questions">
     <part id="general">
         <title>General FAQ</title>
-        <faq id="resolve-ambiguity">
-            <question>An AmbiguityException is thrown, how can I resolve this ambiguity ?</question>
+        <faq id="use">
+            <question>How to use JSAGA ?</question>
             <answer>
-                <ul>
-                    <li>fill in the JSAGA configuration file to help the engine choosing the appropriate security context,
-                        according to the protocol, the hostname, the domain, the activated security context types...</li>
-                    <li>uninstall (remove from lib-adaptors directory) or deactivate (add attribute deactivated="true")
-                        unused adaptor modules</li>
-                    <li>at the end of the URL, add the caracter '#' followed by the identifier of the grid or by the
-                        security context type to use (e.g. gsiftp://cclcgseli01.in2p3.fr/tmp/#VOMS).</li>
-                </ul>
-                <p>Use the jsaga-help command to display the list of possible ambiguities.</p>
+                <p>JSAGA is an implementation of the SAGA specification, so it is supposed to be used as any
+                    other implementation of this specification.</p>
+                <p>Please refer to the <a href="https://forge.gridforum.org/sf/projects/saga-core-wg">Open Grid Forum
+                    documentation</a> to learn more about SAGA specification and how to use it.</p>
+                <p>You can also see sample code <a href="jsaga-engine/xref/fr/in2p3/jsaga/command/package-summary.html">here</a>.</p>
             </answer>
         </faq>
-        <faq id="optimize-for-known-version">
-            <question>How can I help JSAGA to improve its efficiency ?</question>
+        <faq id="example">
+            <question>How to develop my first grid application ?</question>
             <answer>
+                <p>See the following example (list entries under specified URL):</p>
+                <pre><![CDATA[import org.ogf.saga.file.FileFactory;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
+
+public class List {
+    public static void main(String[] args) throws Exception {
+        System.setProperty("saga.factory", "fr.in2p3.jsaga.impl.SagaFactoryImpl");
+        if (args.length != 1) {
+            throw new Exception("usage: List <URL>");
+        }
+        for (URL url : FileFactory.createDirectory(URLFactory.createURL(args[0])).list()) {
+            System.out.println(url.getString());
+        }
+    }
+}]]></pre>
+            </answer>
+        </faq>
+        <faq id="compile-with-javac">
+            <question>How to compile your grid application with javac ?</question>
+            <answer>
+                <p><a href="download.html">Download</a> and install JSAGA.</p>
+                <p>Set the JSAGA_HOME environment variable to your JSAGA installation path.</p>
+                <p>Compile your grid application:</p>
+                <pre>javac -d . -classpath $JSAGA_HOME/lib/saga-api-1.0.jar List.java</pre>
+                <p>Run your grid application:</p>
                 <ul>
-                    <li>use version-specific plugins rather than generic plugins when the selected grid is homogeneous</li>
-                    <li>TBD...</li>
+                    <li>Example with Java 1.6 on Unix/Linux operating system:
+                        <pre>java -cp .:$JSAGA_HOME/lib/'*' -DJSAGA_HOME=$JSAGA_HOME List file:///</pre>
+                    </li>
+                    <li>Example with Java 1.5 on Unix/Linux operating system:
+                        <pre>for i in $JSAGA_HOME/lib/*.jar ; do CLASSPATH="${CLASSPATH}:${i}" ; done
+java -cp .:$CLASSPATH -DJSAGA_HOME=$JSAGA_HOME List file:///</pre>
+                    </li>
                 </ul>
             </answer>
         </faq>
-        <faq id="attribute-values">
-            <question>Where should I set attribute values ?</question>
+        <faq id="compile-with-maven">
+            <question>How to compile your grid application with maven ?</question>
             <answer>
-                <ul>
-                    <li>for a one shot usage, set the attribute in the command line arguments</li>
-                    <li>for a user, set the attribute in the user properties file: ~/.jsaga/jsaga-user.properties</li>
-                    <li>for all users, set the attribute in the JSAGA configuration file: $JSAGA_HOME/etc/jsaga-universe.xml</li>
-                    <li>if attribute is not set, then JSAGA may set it according to the adaptor default values</li>
-                    <li>if a required attribute is not set and has no default value, then JSAGA will prompt the user for entering the value (unless the system property "interactive" is not defined)</li>
-                </ul>
-                <p>Use the jsaga-help command with mode "default" to display the effective attribute values used by JSAGA.</p>
+                <p>Add to your profiles, settings or project file the CC-IN2P3 maven repository:</p>
+                <pre><![CDATA[    <repositories>
+        <repository>
+            <id>CC-IN2P3 maven repository</id>
+            <url>http://grid.in2p3.fr/maven2</url>
+        </repository>
+    </repositories>]]></pre>
+                <p>Add to your project file the dependencies needed for build:</p>
+                <pre><![CDATA[        <dependency>
+            <groupId>org.ogf.saga</groupId>
+            <artifactId>saga-api</artifactId>
+            <version>1.0</version>
+            <scope>compile</scope>
+        </dependency>]]></pre>
+                <p>Add to your project file the dependencies needed for runtime or for testing:</p>
+                <pre><![CDATA[        <dependency>
+            <groupId>fr.in2p3.jsaga</groupId>
+            <artifactId>jsaga-engine</artifactId>
+            <version>${version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- add all the adaptors that you expect to use (for example, add jsaga-adaptor-classic for file://) -->
+        <dependency>
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-classic</artifactId>
+            <version>${version}</version>
+            <scope>runtime</scope>
+        </dependency>]]></pre>
+                <p>where ${version} is the version of JSAGA you want to compile with.</p>
+            </answer>
+        </faq>
+    </part>
+    <part id="configuration">
+        <title>Configuration FAQ</title>
+        <faq id="why">
+            <question>Why does JSAGA need configuration ?</question>
+            <answer>
+                <p>Rather than trying to connect to grid resource with several security contexts, in JSAGA
+                    we prefer to rely on configuration in order to have more predictible behaviors.</p>
+                <p>This choice allows to prevent from:
+                    <ul>
+                        <li>efficiency problems (e.g. wasting time while trying bad contexts, long running
+                            jobs failing to save result because of unexpected VO/role...),</li>
+                        <li>failures (e.g. creating entries unaccessible to partners, locking account because
+                            of too many failed attempts...),</li>
+                        <li>and security issues (i.e. sending authentication information to the wrong service).</li>
+                    </ul>
+                </p>
+            </answer>
+        </faq>
+        <faq id="required">
+            <question>Is it always required to configure JSAGA ?</question>
+            <answer>
+                <p>If your SAGA session contains several security contexts, then you must provide to JSAGA
+                    the information needed to select the right context for each service. You can do this:
+                    <ul>
+                        <li>either by configuring JSAGA default contexts and/or default sessions,</li>
+                        <li>or by prefixing your URL with the identifier of the context to use
+                            (e.g. <i>MyCtx-protocol://hostname</i>).</li>
+                    </ul>
+                    In order to improve portability of your code with other SAGA implementations, the recommended
+                    way is to configure JSAGA, and to use URL prefix (or scheme aliases) only when configuration
+                    is not enough to disambiguate context selection.
+                </p>
+                <p>If your SAGA session contains only one security context, then neither configuration,
+                    nor URL prefix (or scheme aliases), are required.</p>
+            </answer>
+        </faq>
+        <faq id="configure">
+            <question>How to configure JSAGA ?</question>
+            <answer>
+                <p>The configuration can be done:
+                    <ul>
+                        <li>either by editing the jsaga-default-contexts.xml configuration file.
+                            This is the recommended way to go in order to keep the code of your application
+                            portable to other SAGA implementations.
+                        </li>
+                        <li>or programmatically (through the SAGA API). This enables:
+                            <ul>
+                                <li>dynamic configuration (e.g. configuration depending on runtime decisions),</li>
+                                <li>per-session configuration (e.g. if you need one different configuration for each session).</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </p>
+            </answer>
+        </faq>
+        <faq id="configure-with-XML">
+            <question>How to configure JSAGA with configuration file ?</question>
+            <answer>
+                <p>The jsaga-default-contexts.xml configuration file is composed of two parts:
+                    <ul>
+                        <li><b>&lt;contexts&gt;</b>: configures the default attribute values of security contexts.
+                            Must not contain several contexts with the same type.</li>
+                        <li><b>&lt;session&gt;</b>: configures the default session [SessionFactory.createSession(true)].
+                            Can contain several contexts with the same type, but must not contain several
+                            contexts with the same identifier.</li>
+                    </ul>
+                    Both parts may contain several occurences of element <b>&lt;context&gt;</b>.
+                </p>
+                <p>A <b>&lt;context&gt;</b> element may contains several occurences of each of the following elements:
+                    <ul>
+                        <li><b>&lt;attribute&gt;</b>: configures the context itself.</li>
+                        <li><b>&lt;data&gt;</b>/<b>&lt;job&gt;</b>:
+                            <ul>
+                                <li><b>&lt;attribute&gt;</b>: configures the data/job adaptor.</li>
+                                <li><b>&lt;alias&gt;</b>: replace default scheme with specified alias.
+                                    Possible use-cases for this feature include improving compatibility with other
+                                    SAGA implementations, selecting different contexts with the same adaptor
+                                    (like with UrlPrefix), using the same scheme with different adaptors.
+                                </li>
+                                <li><b>&lt;include&gt;</b>/<b>&lt;exclude&gt;</b>: configures URL patterns
+                                    that will respectively select or ignore current context when matched.
+                                    These patterns will apply to current protocol scheme only.</li>
+                            </ul>
+                        </li>
+                        <li><b>&lt;include&gt;</b>/<b>&lt;exclude&gt;</b>: configures URL patterns
+                            that will respectively select or ignore current context when matched.
+                            These patterns will apply to all protocol schemes associated to current context.</li>
+                    </ul>
+                </p>
+                <p>A <b>&lt;include&gt;</b>/<b>&lt;exclude&gt;</b> element contains optional attributes:
+                    <ul>
+                        <li><i>domain</i>: the full domain (e.g. 'in2p3.fr') or country code (e.g. 'fr').</li>
+                        <li><i>host</i>: the host name or part of it (use character '*' to ignore beginning and/or end of name).</li>
+                        <li><i>port</i>: the port number</li>
+                        <li><i>isPortOptional</i>: if true, then URL without port number will also match.</li>
+                        <li><i>basepath</i>: the base path (use character '*' to ignore the name of a directory in the path).</li>
+                    </ul>
+                </p>
+            </answer>
+        </faq>
+        <faq id="configure-with-SAGA">
+            <question>How to configure JSAGA programmatically ?</question>
+            <answer>
+                <p>In order to enable configuring sessions through the SAGA API, JSAGA adds non-standard attribute
+                    names to the context objects:
+                    <ul>
+                        <li><b>UrlPrefix</b>: the identifier of the context within the session.
+                            When added at the beginning of the URL (e.g. <i>MyCtx-protocol://hostname</i>),
+                            it tells to JSAGA ot use this context for this URL.</li>
+                        <li><b>BaseUrlIncludes</b>: the URL patterns that will select this context when matched.</li>
+                        <li><b>BaseUrlExcludes</b>: the URL patterns that will exclude this context from selection when matched.</li>
+                        <li><b>ServiceAttributes</b>: the configuration of data and execution services associated with this context.</li>
+                    </ul>
+                </p>
+                <p>Tips: you can generate the SAGA attribute values from the XML configuration file with command line
+                    <source>jsaga-help --config</source>
+                </p>
+            </answer>
+        </faq>
+        <faq id="help">
+            <question>Other information useful for configuring JSAGA</question>
+            <answer>
+                <p>You can see an example configuration file for each adaptor: see item "Example" in each adaptor menu.</p>
+                <p>Some command line interfaces provide information useful to solve configuration problems:
+                    <ul>
+                        <li>The jsaga-help command line interface (see usage with option --help).</li>
+                        <li>The jsaga-context-info command line interface (for problems related to security contexts).</li>
+                    </ul>
+                </p>
             </answer>
         </faq>
     </part>

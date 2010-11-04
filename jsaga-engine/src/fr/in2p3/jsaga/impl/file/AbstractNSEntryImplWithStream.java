@@ -56,28 +56,28 @@ public abstract class AbstractNSEntryImplWithStream extends AbstractNSEntryImpl 
         return super.exists();
     }
 
-    public boolean isDir() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+    public boolean isDir() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_outStream != null) {
             try {m_outStream.close();} catch (IOException e) {/*ignore*/}
         }
         return super.isDir();
     }
 
-    public boolean isEntry() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+    public boolean isEntry() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_outStream != null) {
             try {m_outStream.close();} catch (IOException e) {/*ignore*/}
         }
         return super.isEntry();
     }
 
-    public boolean isLink() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+    public boolean isLink() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_outStream != null) {
             try {m_outStream.close();} catch (IOException e) {/*ignore*/}
         }
         return super.isLink();
     }
 
-    public URL readLink() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+    public URL readLink() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_outStream != null) {
             try {m_outStream.close();} catch (IOException e) {/*ignore*/}
         }

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
+    <session>
+        <context type="VOMS" id="DGrid"><!-- default id is VOMS0 -->
+            <attribute name="UserProxy" value="/tmp/dgrid.pem"/>
+            <attribute name="ServiceAttributes">
+                <item>srb.Resource=toto</item>
+            </attribute>
+            <attribute name="BaseUrlIncludes">
+                <item>DGrid-srm->srm</item><!-- useless because this is an implicit rule -->
+            </attribute>
+            <data type="gsiftp">
+                <alias>gsiftp</alias><!-- by default, aliases replace the main scheme -->
+                <alias>gridftp</alias>
+                <include domain="in2p3.fr" host="cc*" basepath="/*/dteam"/>
+                <include port="1234"/>
+                <exclude domain="fzk.de" port="2811" isPortOptional="true"/>
+            </data>
+            <data type="srb">
+                <attribute name="Zone" value="titi"/>
+            </data>
+            <include domain="de"/>
+            <include host="localhost" port="8080"/>
+        </context>
+        <context type="VOMS" id="EGEE-dteam">
+            <attribute name="UserProxy" value="/tmp/EGEE-dteam.pem"/>
+            <data type="gsiftp">
+                <include domain="fzk.de" port="2811" isPortOptional="true"/>
+            </data>
+        </context>
+        <context type="VOMS" id="EGEE-myvo">
+            <attribute name="UserProxy" value="/tmp/EGEE-myvo.pem"/>
+            <data type="srm">
+                <attribute name="TransferProtocols">
+                    <item>gsiftp</item>
+                    <item>gsidcap</item>
+                </attribute>
+            </data>
+        </context>
+    </session>
+</jsaga-default>

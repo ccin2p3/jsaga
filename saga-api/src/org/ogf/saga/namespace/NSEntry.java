@@ -24,9 +24,22 @@ import org.ogf.saga.url.URL;
 public interface NSEntry extends SagaObject, Async, Permissions<NSEntry> {
 
     /**
-     * Obtains the complete URL refering to the entry.
+     * Obtains the complete URL referring to the entry.
      * 
-     * @return the URL.
+     * @return
+     *      the URL.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the NSEntry is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public URL getURL() throws NotImplementedException,
             IncorrectStateException, TimeoutException, NoSuccessException;
@@ -34,7 +47,20 @@ public interface NSEntry extends SagaObject, Async, Permissions<NSEntry> {
     /**
      * Obtains the current working directory for the entry.
      * 
-     * @return the current working directory.
+     * @return
+     *      the current working directory.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the NSEntry is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public URL getCWD() throws NotImplementedException,
             IncorrectStateException, TimeoutException, NoSuccessException;
@@ -42,7 +68,20 @@ public interface NSEntry extends SagaObject, Async, Permissions<NSEntry> {
     /**
      * Obtains the name part of the URL of this entry.
      * 
-     * @return the name part.
+     * @return
+     *      the name part.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the NSEntry is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public URL getName() throws NotImplementedException,
             IncorrectStateException, TimeoutException, NoSuccessException;
@@ -50,12 +89,38 @@ public interface NSEntry extends SagaObject, Async, Permissions<NSEntry> {
     /**
      * Tests this entry for being a directory.
      * 
-     * @return true if the entry is a directory.
+     * @return
+     *      true if the entry is a directory.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the NSEntry is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public boolean isDir() throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
-            PermissionDeniedException, BadParameterException,
-            IncorrectStateException, TimeoutException, NoSuccessException;
+            PermissionDeniedException, IncorrectStateException,
+            TimeoutException, NoSuccessException;
 
     /**
      * Tests this entry for being a namespace entry. If this entry represents a
@@ -63,40 +128,156 @@ public interface NSEntry extends SagaObject, Async, Permissions<NSEntry> {
      * strictly speaking, directories and links are namespace entries as well.
      * 
      * @return true if the entry is a namespace entry.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the NSEntry is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public boolean isEntry() throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
-            PermissionDeniedException, BadParameterException,
-            IncorrectStateException, TimeoutException, NoSuccessException;
+            PermissionDeniedException, IncorrectStateException,
+            TimeoutException, NoSuccessException;
 
     /**
      * Tests this entry for being a link.
      * 
-     * @return true if the entry is a link.
+     * @return
+     *      true if the entry is a link.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the NSEntry is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public boolean isLink() throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
-            PermissionDeniedException, BadParameterException,
-            IncorrectStateException, TimeoutException, NoSuccessException;
+            PermissionDeniedException, IncorrectStateException,
+            TimeoutException, NoSuccessException;
 
     /**
      * Returns the URL representing the link target. Resolves one link level
      * only.
      * 
-     * @return the link target.
+     * @return
+     *      the link target.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the NSEntry is already closed, or does not refer
+     *      to a link.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public URL readLink() throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
-            PermissionDeniedException, BadParameterException,
-            IncorrectStateException, TimeoutException, NoSuccessException;
+            PermissionDeniedException, IncorrectStateException,
+            TimeoutException, NoSuccessException;
 
     /**
      * Copies this entry to another part of the namespace.
      * 
      * @param target
-     *            the name to copy to.
+     *      the name to copy to.
      * @param flags
-     *            defining the operation modus.
+     *      defining the operation modus.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL contains an invalid entry name.
+     * @exception IncorrectStateException
+     *      is thrown when the NSEntry is already closed or the DEREFERENCE
+     *      flag is given and dereferencing is impossible.
+     * @exception IncorrectURLException
+     *      is thrown if an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified target URL already exists, and the
+     *      <code>OVERWRITE</code> flag is not given.
+     * @exception DoesNotExistException
+     *      is thrown if the target lies in a non-existing part of the
+     *      name space, unless the CREATEPARENTS flag is given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void copy(URL target, int flags) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -109,7 +290,45 @@ public interface NSEntry extends SagaObject, Async, Permissions<NSEntry> {
      * Copies this entry to another part of the namespace.
      * 
      * @param target
-     *            the name to copy to.
+     *      the name to copy to.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL contains an invalid entry name.
+     * @exception IncorrectStateException
+     *      is thrown when the NSEntry is already closed or the DEREFERENCE
+     *      flag is given and dereferencing is impossible.
+     * @exception IncorrectURLException
+     *      is thrown if an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified target URL already exists, and the
+     *      <code>OVERWRITE</code> flag is not given.
+     * @exception DoesNotExistException
+     *      is thrown if the target lies in a non-existing part of the
+     *      name space, unless the CREATEPARENTS flag is given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void copy(URL target) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -122,9 +341,47 @@ public interface NSEntry extends SagaObject, Async, Permissions<NSEntry> {
      * Creates a symbolic link from the target to this entry.
      * 
      * @param target
-     *            the name that will have the symbolic link to this entry.
+     *      the name that will have the symbolic link to this entry.
      * @param flags
-     *            defining the operation modus.
+     *      defining the operation modus.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL contains an invalid entry name.
+     * @exception IncorrectStateException
+     *      is thrown when the NSEntry is already closed or the DEREFERENCE
+     *      flag is given and dereferencing is impossible.
+     * @exception IncorrectURLException
+     *      is thrown if an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified target URL already exists, and the
+     *      <code>OVERWRITE</code> flag is not given.
+     * @exception DoesNotExistException
+     *      is thrown if the target lies in a non-existing part of the
+     *      name space, unless the CREATEPARENTS flag is given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void link(URL target, int flags) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -136,7 +393,45 @@ public interface NSEntry extends SagaObject, Async, Permissions<NSEntry> {
      * Creates a symbolic link from the target to this entry.
      * 
      * @param target
-     *            the name that will have the symbolic link to this entry.
+     *      the name that will have the symbolic link to this entry.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL contains an invalid entry name.
+     * @exception IncorrectStateException
+     *      is thrown when the NSEntry is already closed or the DEREFERENCE
+     *      flag is given and dereferencing is impossible.
+     * @exception IncorrectURLException
+     *      is thrown if an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified target URL already exists, and the
+     *      <code>OVERWRITE</code> flag is not given.
+     * @exception DoesNotExistException
+     *      is thrown if the target lies in a non-existing part of the
+     *      name space, unless the CREATEPARENTS flag is given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void link(URL target) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -149,9 +444,47 @@ public interface NSEntry extends SagaObject, Async, Permissions<NSEntry> {
      * is a directory.
      * 
      * @param target
-     *            the name to move to.
+     *      the name to move to.
      * @param flags
-     *            defining the operation modus.
+     *      defining the operation modus.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL contains an invalid entry name.
+     * @exception IncorrectStateException
+     *      is thrown when the NSEntry is already closed or the DEREFERENCE
+     *      flag is given and dereferencing is impossible.
+     * @exception IncorrectURLException
+     *      is thrown if an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified target URL already exists, and the
+     *      <code>OVERWRITE</code> flag is not given.
+     * @exception DoesNotExistException
+     *      is thrown if the target lies in a non-existing part of the
+     *      name space, unless the CREATEPARENTS flag is given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void move(URL target, int flags) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -165,7 +498,45 @@ public interface NSEntry extends SagaObject, Async, Permissions<NSEntry> {
      * is a directory.
      * 
      * @param target
-     *            the name to move to.
+     *      the name to move to.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL contains an invalid entry name.
+     * @exception IncorrectStateException
+     *      is thrown when the NSEntry is already closed or the DEREFERENCE
+     *      flag is given and dereferencing is impossible.
+     * @exception IncorrectURLException
+     *      is thrown if an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified target URL already exists, and the
+     *      <code>OVERWRITE</code> flag is not given.
+     * @exception DoesNotExistException
+     *      is thrown if the target lies in a non-existing part of the
+     *      name space, unless the CREATEPARENTS flag is given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void move(URL target) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -178,7 +549,37 @@ public interface NSEntry extends SagaObject, Async, Permissions<NSEntry> {
      * Removes this entry and closes it.
      * 
      * @param flags
-     *            defining the operation modus.
+     *      defining the operation modus. The only allowed flags are
+     *      RECURSIVE, DEREFERENCE, and NONE.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown if the entry is a directory and the RECURSIVE flag is not set,
+     *      or the entry is a directory and the RECURSIVE flag is set,
+     *      or invalid flags are specified.
+     * @exception IncorrectStateException
+     *      is thrown when the NSEntry is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void remove(int flags) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -187,6 +588,35 @@ public interface NSEntry extends SagaObject, Async, Permissions<NSEntry> {
 
     /**
      * Removes this entry and closes it.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown if the entry is a directory and the RECURSIVE flag is not set,
+     *      or the entry is a directory and the RECURSIVE flag is set,
+     *      or invalid flags are set.
+     * @exception IncorrectStateException
+     *      is thrown when the NSEntry is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void remove() throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
@@ -195,7 +625,15 @@ public interface NSEntry extends SagaObject, Async, Permissions<NSEntry> {
 
     /**
      * Closes this entry. This is a non-blocking close. Any subsequent method
-     * invocation on the object will throw an IncorrectState exception.
+     * invocation on the object (except for close()) will throw an IncorrectState exception.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception IncorrectStateException
+     *      the SAGA specs specify that this can be thrown. But when???
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void close() throws NotImplementedException,
             IncorrectStateException, NoSuccessException;
@@ -205,7 +643,15 @@ public interface NSEntry extends SagaObject, Async, Permissions<NSEntry> {
      * throw an IncorrectState exception.
      * 
      * @param timeoutInSeconds
-     *            seconds to wait.
+     *      seconds to wait.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception IncorrectStateException
+     *      the SAGA specs specify that this can be thrown. But when???
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void close(float timeoutInSeconds) throws NotImplementedException,
             IncorrectStateException, NoSuccessException;
@@ -215,11 +661,39 @@ public interface NSEntry extends SagaObject, Async, Permissions<NSEntry> {
      * enables the permissions for all.
      * 
      * @param id
-     *            the id.
+     *      the id.
      * @param permissions
-     *            the permissions to enable.
+     *      the permissions to enable.
      * @param flags
-     *            the only allowed flags are RECURSIVE and DEREFERENCE.
+     *      the only allowed flags are RECURSIVE and DEREFERENCE.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the given id is unknown or not supported, or illegal
+     *      flags are specified, or RECURSIVE is specified on a non-directory.
+     * @exception IncorrectStateException
+     *      is thrown when the NSEntry is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void permissionsAllow(String id, int permissions, int flags)
             throws NotImplementedException, AuthenticationFailedException,
@@ -232,11 +706,39 @@ public interface NSEntry extends SagaObject, Async, Permissions<NSEntry> {
      * disables the permissions for all.
      * 
      * @param id
-     *            the id.
+     *      the id.
      * @param permissions
-     *            the permissions to disable.
+     *      the permissions to disable.
      * @param flags
-     *            the only allowed flags are RECURSIVE and DEREFERENCE.
+     *      the only allowed flags are RECURSIVE and DEREFERENCE.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the given id is unknown or not supported, or illegal
+     *      flags are specified, or RECURSIVE is specified on a non-directory.
+     * @exception IncorrectStateException
+     *      is thrown when the NSEntry is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
      */
     public void permissionsDeny(String id, int permissions, int flags)
             throws NotImplementedException, AuthenticationFailedException,

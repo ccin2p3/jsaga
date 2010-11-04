@@ -1,0 +1,31 @@
+<body>
+    <p>
+    This package provides classes to interact with replica systems.
+    No specific consistency model is impied by the SAGA API specification.
+    A {@link org.ogf.saga.logicalfile.LogicalFile LogicalFile} represents
+    an entry in a namespace which administers a set of registered replicas
+    of a specific file.
+    A {@link org.ogf.saga.logicalfile.LogicalDirectory LogicalDirectory}
+    represents a directory entry in the namespace of logical files, that is,
+    it is a container for logical files.
+    Some methods in this interface have been renamed slightly to avoid
+    conflicts with methods in
+    {@link org.ogf.saga.namespace.NSDirectory NSDirectory}, as only
+    the type of the return value differs, and Java forbids that.
+    </p>
+
+    <p>
+    The possible logicalfile flags are defined in the
+    {@link org.ogf.saga.namespace.Flags} enumeration
+    class, which includes methods to combine them into integers,
+    and to determine if they are set in an integer.
+    These methods are not described in the language-independent SAGA
+    specification, but are added in the Java language bindings because
+    in Java, enumerations cannot be treated as integers.
+    Also, since enumeration classes are not extensible in Java, flags
+    from the {@link org.ogf.saga.namespace namespace} package
+    and the {@link org.ogf.saga.file file} package are included
+    there as well.
+    </p>
+
+</body>

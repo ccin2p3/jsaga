@@ -1,14 +1,14 @@
 package fr.in2p3.jsaga.command;
 
-import fr.in2p3.jsaga.engine.config.Configuration;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
+import fr.in2p3.jsaga.impl.session.SessionImpl;
 import org.apache.commons.cli.*;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.context.ContextFactory;
-import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.SagaException;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
+import org.ogf.saga.url.URLFactory;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -45,7 +45,7 @@ public class ContextInfo extends AbstractCommand {
                 Context context = contexts[i];
 
                 // print title
-                System.out.println("Security context: "+context.getAttribute(Context.TYPE));
+                System.out.println("Security context: "+getLabel(context));
 
                 // print context
                 print(context, line);
@@ -55,30 +55,26 @@ public class ContextInfo extends AbstractCommand {
         else if (command.m_nonOptionValues.length == 1)
         {
             String id = command.m_nonOptionValues[0];
-            fr.in2p3.jsaga.engine.schema.config.Context[] xmlContexts = Configuration.getInstance().getConfigurations().getContextCfg().listContextsArray(id);
-            if (xmlContexts.length == 0) {
-                throw new BadParameterException("Context type not found: "+id);
-            }
-            for (int i=0; i<xmlContexts.length; i++) {
-                // set context
-                Context context = ContextFactory.createContext();
-                context.setAttribute(Context.TYPE, xmlContexts[i].getName());
-                context.setDefaults();
-
+            SessionImpl session = (SessionImpl) SessionFactory.createSession(true);
+            ContextImpl context = session.findContext(URLFactory.createURL(id+"-any://host"));
+            if (context != null) {
                 // print title
-                if (xmlContexts.length > 1) {
-                    System.out.println("Security context: "+context.getAttribute(Context.TYPE));
-                }
+                System.out.println("Security context: "+getLabel(context));
 
                 // print context
                 print(context, line);
 
                 // close context
-                ((ContextImpl) context).close();
+                context.close();
+            } else {
+                throw new Exception("Context not found: "+id);
             }
         }
     }
 
+    public static String getLabel(Context context) throws SagaException {
+        return context.getAttribute(ContextImpl.URL_PREFIX)+" ("+context.getAttribute(Context.TYPE)+")";
+    }
     private static void print(Context context, CommandLine line) {
         try {
             if (line.hasOption(OPT_ATTRIBUTE)) {

@@ -54,10 +54,17 @@ public abstract class BufferFactory {
      * size of the specified array.
      * 
      * @param data
-     *            the storage.
-     * @return the buffer.
-     * @throws NoSuccessException
-     *             is thrown when the Saga factory could not be created.
+     *      the storage.
+     * @return
+     *      the buffer.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception BadParameterException
+     *      is thrown when the implementation cannot handle the specified data buffer.
      */
     public static Buffer createBuffer(byte[] data)
             throws NotImplementedException, BadParameterException,
@@ -67,12 +74,20 @@ public abstract class BufferFactory {
     }
 
     /**
-     * Creates a (implementation-managed and implementation-allocated) buffer of
-     * the specified size.
+     * Creates a (implementation-managed) buffer of the specified size.
      * 
      * @param size
-     *            the size.
-     * @return the buffer.
+     *      the size.
+     * @return
+     *      the buffer.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception BadParameterException
+     *      is thrown when the implementation cannot handle the specified size.
      */
     public static Buffer createBuffer(int size) throws NotImplementedException,
             BadParameterException, NoSuccessException {
@@ -83,9 +98,16 @@ public abstract class BufferFactory {
     /**
      * Creates a (implementation-managed) buffer.
      * 
-     * @return the buffer.
-     * @throws NoSuccessException
-     *             is thrown when the Saga factory could not be created.
+     * @return
+     *      the buffer.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception BadParameterException
+     *      is thrown when the defaults are not suitable.
      */
     public static Buffer createBuffer() throws NotImplementedException,
             BadParameterException, NoSuccessException {

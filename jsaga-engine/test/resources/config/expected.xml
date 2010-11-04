@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
+    <session>
+        <context type="VOMS">
+            <attribute name="UserProxy" value="/tmp/dgrid.pem"/>
+            <attribute name="UrlPrefix" value="DGrid"/>
+            <attribute name="BaseUrlIncludes">
+                <item>DGrid-srm-&gt;srm</item>
+                <item>{gsiftp,gridftp-&gt;gsiftp}://cc*.*in2p3.fr/*/dteam</item>
+                <item>{gsiftp,gridftp-&gt;gsiftp}://*:1234</item>
+                <item>{gsiftp,gridftp-&gt;gsiftp}://*.*de</item>
+                <item>{gsiftp,gridftp-&gt;gsiftp}://localhost:8080</item>
+                <item>srb://*.*de</item>
+                <item>srb://localhost:8080</item>
+            </attribute>
+            <attribute name="BaseUrlExcludes">
+                <item>{gsiftp,gridftp-&gt;gsiftp}://*.*fzk.de[:2811]</item>
+            </attribute>
+            <attribute name="ServiceAttributes">
+                <item>srb.Resource=toto</item>
+                <item>srb.Zone=titi</item>
+            </attribute>
+        </context>
+        <context type="VOMS">
+            <attribute name="UserProxy" value="/tmp/EGEE-dteam.pem"/>
+            <attribute name="UrlPrefix" value="EGEE-dteam"/>
+            <attribute name="BaseUrlIncludes">
+                <item>gsiftp://*.*fzk.de[:2811]</item>
+            </attribute>
+            <attribute name="ServiceAttributes"/>
+        </context>
+        <context type="VOMS">
+            <attribute name="UserProxy" value="/tmp/EGEE-myvo.pem"/>
+            <attribute name="UrlPrefix" value="EGEE-myvo"/>
+            <attribute name="BaseUrlIncludes">
+                <item>srm://</item>
+            </attribute>
+            <attribute name="ServiceAttributes">
+                <item>srm.TransferProtocols=gsiftp,gsidcap</item>
+            </attribute>
+        </context>
+    </session>
+</jsaga-default>

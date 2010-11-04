@@ -38,10 +38,10 @@ public abstract class AbstractTest extends TestCase {
 
     public AbstractTest() throws Exception {
         // set configuration files to use
-        if (System.getProperty("jsaga.universe") == null) {
-            java.net.URL universe = this.getResource("etc/jsaga-universe.xml");
-            if (universe != null) {
-                System.setProperty("jsaga.universe", universe.toString());
+        if (System.getProperty("jsaga.default.contexts") == null) {
+            java.net.URL defaultContexts = this.getResource("etc/jsaga-default-contexts.xml");
+            if (defaultContexts != null) {
+                System.setProperty("jsaga.default.contexts", defaultContexts.toString());
             }
         }
         if (System.getProperty("jsaga.timeout") == null) {

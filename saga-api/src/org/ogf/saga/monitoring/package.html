@@ -1,0 +1,25 @@
+<body>
+    <p>
+    The monitoring package defines the
+    {@link org.ogf.saga.monitoring.Monitorable Monitorable} interface,
+    which must be implemented by monitorable SAGA objects, and also
+    defines the 
+    {@link org.ogf.saga.monitoring.Steerable Steerable} interface,
+    which extends the monitoring mechanism with the ability to push
+    values back to the monitored entity.
+    </p>
+
+    <p>
+    Interfaces that extend {@link org.ogf.saga.task.Async Async} and also should
+    extend {@link org.ogf.saga.monitoring.Monitorable Monitorable}, should
+    extend {@link org.ogf.saga.monitoring.AsyncMonitorable AsyncMonitorable}
+    instead, as that provides the task versions of the methods in
+    {@link org.ogf.saga.monitoring.Monitorable Monitorable} as well.
+    Likewise, interfaces that extend {@link org.ogf.saga.task.Async Async} and also
+    should extend {@link org.ogf.saga.monitoring.Steerable Steerable}, should
+    extend {@link org.ogf.saga.monitoring.AsyncSteerable AsyncSteerable}
+    instead, as that provides the task versions of the methods in
+    {@link org.ogf.saga.monitoring.Steerable Steerable} as well.
+    </p>
+
+</body>

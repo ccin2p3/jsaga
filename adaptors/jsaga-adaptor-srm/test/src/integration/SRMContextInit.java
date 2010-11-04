@@ -16,6 +16,6 @@ import org.ogf.saga.context.ContextInitTest;
  */
 public class SRMContextInit extends ContextInitTest {
     public SRMContextInit() throws Exception {
-        super("EGEE");
+        super("VOMS");
     }
 }

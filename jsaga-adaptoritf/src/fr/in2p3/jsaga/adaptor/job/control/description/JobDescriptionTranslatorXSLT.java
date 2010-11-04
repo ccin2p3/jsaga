@@ -44,8 +44,12 @@ public class JobDescriptionTranslatorXSLT implements JobDescriptionTranslator {
         m_parameters = new Properties();
     }
 
-    public void setAttribute(String key, String value) {
-        m_parameters.setProperty(key, value);
+    public void setAttribute(String key, String value) throws NoSuccessException {
+        if (value != null) {
+            m_parameters.setProperty(key, value);
+        } else {
+            throw new NoSuccessException("Service attribute is not set: "+key);
+        }
     }
 
     public String translate(Document jsdl, String uniqId) throws NoSuccessException {

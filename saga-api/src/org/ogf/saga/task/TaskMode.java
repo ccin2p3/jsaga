@@ -19,7 +19,7 @@ public enum TaskMode {
 
     private int value;
 
-    TaskMode(int value) {
+    private TaskMode(int value) {
         this.value = value;
     }
 
