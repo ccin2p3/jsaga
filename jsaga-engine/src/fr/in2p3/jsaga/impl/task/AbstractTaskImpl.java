@@ -249,13 +249,15 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
         }
     }
 
-    public E getResult() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
+    public E getResult() throws NotImplementedException, IncorrectURLException, BadParameterException, AlreadyExistsException, DoesNotExistException, IncorrectStateException, PermissionDeniedException, AuthorizationFailedException, AuthenticationFailedException, TimeoutException, SagaIOException, NoSuccessException {
         this.waitFor();
         switch (this.getState_fromCache(State.DONE)) {
             case NEW:
-            case FAILED:
             case CANCELED:
                 throw new IncorrectStateException("Can not get result for task in state: "+this.getState_fromCache().name());
+            case FAILED:
+                this.rethrow();
+                throw new NoSuccessException("[INTERNAL ERROR] unexpected exception", this);
             default:
                 return m_result;
         }
@@ -265,7 +267,7 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
         return m_object;
     }
 
-    public void rethrow() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+    public void rethrow() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, SagaIOException, NoSuccessException {
         switch (this.getState_fromCache()) {
             case FAILED:
                 if (m_exception != null) {
@@ -280,13 +282,12 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
                     catch(AlreadyExistsException e) {throw e;}
                     catch(DoesNotExistException e) {throw e;}
                     catch(TimeoutException e) {throw e;}
+                    catch(SagaIOException e) {throw e;}
                     catch(NoSuccessException e) {throw e;}
                     catch(SagaException e) {throw new NoSuccessException(m_exception);}
                 } else {
                     throw new NoSuccessException("task failed with unknown reason", this);
                 }
-            case CANCELED:
-                throw new NoSuccessException("task canceled", this);
         }
     }
 

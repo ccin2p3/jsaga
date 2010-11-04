@@ -83,7 +83,7 @@ public interface Stream extends SagaObject, Async, AsyncAttributes<Stream>,
 
     /**
      * Obtains the URL that was used to create the stream. When this stream is
-     * the result of a {@link StreamService#serve()} call, <code>null</code>
+     * the result of a {@link StreamServer#serve()} call, <code>null</code>
      * is returned.
      * 
      * @return
@@ -193,6 +193,42 @@ public interface Stream extends SagaObject, Async, AsyncAttributes<Stream>,
             TimeoutException, NoSuccessException;
 
     /**
+     * Establishes a connection to the target defined during the construction of
+     * the stream.
+     * @param timeoutInSeconds
+     *      the timeout in seconds.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the stream is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     */
+    public void connect(float timeoutInSeconds) throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, IncorrectStateException,
+            TimeoutException, NoSuccessException;
+
+    /**
      * Checks if the stream is ready for I/O, or if it has entered the ERROR
      * state. It will only check for the specified activities. This method
      * blocks until one or more of the specified activities apply.
@@ -272,14 +308,12 @@ public interface Stream extends SagaObject, Async, AsyncAttributes<Stream>,
      * @exception NotImplementedException
      *      is thrown if the implementation does not provide an
      *      implementation of this method.
-     * @exception IncorrectStateException
-     *      is thrown when the backend changed its state.
      * @exception NoSuccessException
      *      is thrown when the operation was not successfully performed,
      *      and none of the other exceptions apply.
      */
     public void close() throws NotImplementedException,
-            IncorrectStateException, NoSuccessException;
+            NoSuccessException;
 
     /**
      * Closes an active connection. I/O is no longer possible. The stream is put
@@ -290,14 +324,12 @@ public interface Stream extends SagaObject, Async, AsyncAttributes<Stream>,
      * @exception NotImplementedException
      *      is thrown if the implementation does not provide an
      *      implementation of this method.
-     * @exception IncorrectStateException
-     *      is thrown when the backend changed its state.
      * @exception NoSuccessException
      *      is thrown when the operation was not successfully performed,
      *      and none of the other exceptions apply.
      */
     public void close(float timeoutInSeconds) throws NotImplementedException,
-            IncorrectStateException, NoSuccessException;
+            NoSuccessException;
 
     // I/O methods
 
@@ -579,7 +611,7 @@ public interface Stream extends SagaObject, Async, AsyncAttributes<Stream>,
 
     /**
      * Creates a task that obtains the URL that was used to create the stream.
-     * When this stream is the result of a {@link StreamService#serve()} call,
+     * When this stream is the result of a {@link StreamServer#serve()} call,
      * the URL will be <code>null</code>.
      * 
      * @param mode
@@ -620,6 +652,22 @@ public interface Stream extends SagaObject, Async, AsyncAttributes<Stream>,
      *                implemented.
      */
     public Task<Stream, Void> connect(TaskMode mode)
+            throws NotImplementedException;
+
+    /**
+     * Returns a task that establishes a connection to the target defined during
+     * the construction of the stream.
+     * 
+     * @param mode
+     *            the task mode.
+     * @param timeoutInSeconds
+     *            the timeout in seconds.
+     * @return the task.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     */
+    public Task<Stream, Void> connect(TaskMode mode, float timeoutInSeconds)
             throws NotImplementedException;
 
     /**

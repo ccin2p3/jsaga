@@ -34,17 +34,17 @@ import java.util.regex.Pattern;
 public abstract class AbstractSyncLogicalDirectoryImpl extends AbstractNSDirectoryImplWithMetaData implements SyncLogicalDirectory {
     /** constructor for factory */
     public AbstractSyncLogicalDirectoryImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(session, url, adaptor, new FlagsHelper(flags).remove(Flags.ALLLOGICALFILEFLAGS));
+        super(session, url, adaptor, new FlagsHelper(flags).keep(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS));
     }
 
     /** constructor for NSDirectory.open() */
     public AbstractSyncLogicalDirectoryImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(dir, relativeUrl, new FlagsHelper(flags).remove(Flags.ALLLOGICALFILEFLAGS));
+        super(dir, relativeUrl, new FlagsHelper(flags).keep(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS));
     }
 
     /** constructor for NSEntry.openAbsolute() */
     public AbstractSyncLogicalDirectoryImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(entry, absolutePath, new FlagsHelper(flags).remove(Flags.ALLLOGICALFILEFLAGS));
+        super(entry, absolutePath, new FlagsHelper(flags).keep(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS));
     }
 
     /** clone */

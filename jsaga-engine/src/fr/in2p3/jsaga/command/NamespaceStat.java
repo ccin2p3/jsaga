@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.command;
 
-import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
 import org.apache.commons.cli.*;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.BadParameterException;
@@ -12,6 +11,8 @@ import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
+
+import java.util.Date;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -67,7 +68,7 @@ public class NamespaceStat extends AbstractCommand {
             } else if (line.hasOption(OPT_GROUP)) {
                 System.out.println(getGroup(entry));
             } else if (line.hasOption(OPT_DATE)) {
-                System.out.println(getDate(entry));
+                System.out.println(getMTime(entry));
             } else {
                 System.out.println("  File: "+entry.getName());
                 System.out.println("  Type: "+getType(entry));
@@ -75,7 +76,7 @@ public class NamespaceStat extends AbstractCommand {
                 System.out.println("  Perm: "+getPerm(entry));
                 System.out.println(" Owner: "+getOwner(entry));
                 System.out.println(" Group: "+getGroup(entry));
-                System.out.println("Modify: "+getDate(entry));
+                System.out.println("Modify: "+ getMTime(entry));
             }
             entry.close();
         }
@@ -133,9 +134,9 @@ public class NamespaceStat extends AbstractCommand {
         }
     }
 
-    private static String getDate(NSEntry entry) throws Exception {
+    private static String getMTime(NSEntry entry) throws Exception {
         try {
-            return ((AbstractNSEntryImpl)entry).getLastModified().toString();
+            return new Date(entry.getMTime()).toString();
         } catch(NotImplementedException e) {
             return "?";
         }

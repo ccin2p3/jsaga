@@ -42,8 +42,7 @@ public abstract class FileFactory {
      * @return the IOVec.
      */
     protected abstract IOVec doCreateIOVec(byte[] data, int lenIn)
-            throws BadParameterException, NoSuccessException,
-            NotImplementedException;
+            throws BadParameterException, NoSuccessException;
 
     /**
      * Creates an IOVec. To be provided by the implementation.
@@ -55,30 +54,7 @@ public abstract class FileFactory {
      * @return the IOVec.
      */
     protected abstract IOVec doCreateIOVec(int size, int lenIn)
-            throws BadParameterException, NoSuccessException,
-            NotImplementedException;
-
-    /**
-     * Creates an IOVec. To be provided by the implementation.
-     * 
-     * @param data
-     *            data to be used.
-     * @return the IOVec.
-     */
-    protected abstract IOVec doCreateIOVec(byte[] data)
-            throws BadParameterException, NoSuccessException,
-            NotImplementedException;
-
-    /**
-     * Creates an IOVec. To be provided by the implementation.
-     * 
-     * @param size
-     *            size of data to be used.
-     * @return the IOVec.
-     */
-    protected abstract IOVec doCreateIOVec(int size)
-            throws BadParameterException, NoSuccessException,
-            NotImplementedException;
+            throws BadParameterException, NoSuccessException;
 
     /**
      * Creates a File. To be provided by the implementation.
@@ -266,20 +242,17 @@ public abstract class FileFactory {
      *      data to be used.
      * @return
      *      the IOVec.
-     * @exception NotImplementedException
-     *      is thrown if the implementation does not provide an
-     *      implementation of this method.
-     * @exception BadParameterException
-     *      is thrown when the implementation cannot handle
-     *      the specified data buffer.
      * @exception NoSuccessException
      *      is thrown when the operation was not successfully performed,
      *      and none of the other exceptions apply.
+     * @exception BadParameterException
+     *      is thrown when the implementation cannot handle
+     *      the specified data buffer.
      */
     public static IOVec createIOVec(byte[] data) throws BadParameterException,
-            NoSuccessException, NotImplementedException {
+            NoSuccessException {
         initializeFactory();
-        return factory.doCreateIOVec(data);
+        return factory.doCreateIOVec(data, data.length);
     }
 
     /**
@@ -291,9 +264,6 @@ public abstract class FileFactory {
      *      number of bytes to read/write on readV/writeV.
      * @return
      *      the IOVec.
-     * @exception NotImplementedException
-     *      is thrown if the implementation does not provide an
-     *      implementation of this method.
      * @exception BadParameterException
      *      is thrown when <code>lenIn</code> is larger than the size of the
      *      specified buffer, or < 0.
@@ -302,8 +272,7 @@ public abstract class FileFactory {
      *      and none of the other exceptions apply.
      */
     public static IOVec createIOVec(int size, int lenIn)
-            throws BadParameterException, NoSuccessException,
-            NotImplementedException {
+            throws BadParameterException, NoSuccessException {
         initializeFactory();
         return factory.doCreateIOVec(size, lenIn);
     }
@@ -327,7 +296,7 @@ public abstract class FileFactory {
     public static IOVec createIOVec(int size) throws BadParameterException,
             NoSuccessException, NotImplementedException {
         initializeFactory();
-        return factory.doCreateIOVec(size);
+        return factory.doCreateIOVec(size, size);
     }
 
     /**
@@ -690,8 +659,6 @@ public abstract class FileFactory {
      * @exception BadParameterException
      *      is thrown when the specified URL points to a directory,
      *      or is an invalid entry name.
-     * @exception IncorrectStateException
-     *      is thrown when the NSDirectory is already closed.
      * @exception IncorrectURLException
      *      is thrown if an implementation cannot handle the specified
      *      protocol, or that access to the specified entity via the
@@ -747,8 +714,6 @@ public abstract class FileFactory {
      * @exception BadParameterException
      *      is thrown when the specified URL points to a directory,
      *      or is an invalid entry name.
-     * @exception IncorrectStateException
-     *      is thrown when the NSDirectory is already closed.
      * @exception IncorrectURLException
      *      is thrown if an implementation cannot handle the specified
      *      protocol, or that access to the specified entity via the
@@ -803,8 +768,6 @@ public abstract class FileFactory {
      * @exception BadParameterException
      *      is thrown when the specified URL points to a directory,
      *      or is an invalid entry name.
-     * @exception IncorrectStateException
-     *      is thrown when the NSDirectory is already closed.
      * @exception IncorrectURLException
      *      is thrown if an implementation cannot handle the specified
      *      protocol, or that access to the specified entity via the
@@ -859,8 +822,6 @@ public abstract class FileFactory {
      * @exception BadParameterException
      *      is thrown when the specified URL points to a directory,
      *      or is an invalid entry name.
-     * @exception IncorrectStateException
-     *      is thrown when the NSDirectory is already closed.
      * @exception IncorrectURLException
      *      is thrown if an implementation cannot handle the specified
      *      protocol, or that access to the specified entity via the

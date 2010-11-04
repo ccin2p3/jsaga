@@ -79,6 +79,18 @@ public interface SyncNSEntry extends SagaObject, Permissions<NSEntry> {
             TimeoutException, NoSuccessException;
 
     /**
+     * Returns the time of the last modification in seconds since epoch
+     * (01.01.1970).
+     *
+     * @return
+     *      the last modification time.
+     */
+    public long getMTimeSync() throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, IncorrectStateException,
+            TimeoutException, NoSuccessException;
+
+    /**
      * Copies this entry to another part of the namespace.
      *
      * @param target
@@ -116,7 +128,7 @@ public interface SyncNSEntry extends SagaObject, Permissions<NSEntry> {
      */
     public void linkSync(URL target, int flags) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
-            PermissionDeniedException, BadParameterException,
+            PermissionDeniedException, BadParameterException, DoesNotExistException,
             IncorrectStateException, AlreadyExistsException, TimeoutException,
             NoSuccessException, IncorrectURLException;
 
@@ -128,7 +140,7 @@ public interface SyncNSEntry extends SagaObject, Permissions<NSEntry> {
      */
     public void linkSync(URL target) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
-            PermissionDeniedException, BadParameterException,
+            PermissionDeniedException, BadParameterException, DoesNotExistException,
             IncorrectStateException, AlreadyExistsException, TimeoutException,
             NoSuccessException, IncorrectURLException;
 

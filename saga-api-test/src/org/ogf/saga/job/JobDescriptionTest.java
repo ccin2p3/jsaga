@@ -70,6 +70,11 @@ public abstract class JobDescriptionTest extends AbstractJobTest {
         m_jobDescription.setVectorAttribute(JobDescription.FILETRANSFER, new String[]{"myfile>myf", "file1<f1"});
     	this.change(JobDescription.CLEANUP, JobDescription.TRUE);
     }
+/* TODO: uncomment this test when it will be supported by adaptors
+    public void test_wallTimeLimit() throws Exception {
+        this.change(JobDescription.WALLTIMELIMIT, "120");
+    }
+*/
     public void test_totalCPUTime() throws Exception {
         this.change(JobDescription.TOTALCPUTIME, "120");
     }
@@ -88,6 +93,11 @@ public abstract class JobDescriptionTest extends AbstractJobTest {
     public void test_queue() throws Exception {
         this.change(JobDescription.QUEUE, "queue2");
     }
+/* TODO: uncomment this test when it will be supported by adaptors
+    public void test_jobProject() throws Exception {
+        this.change(JobDescription.JOBPROJECT, "project2");
+    }
+*/
 
     ////////////////////////////////////// common methods //////////////////////////////////////
 
@@ -111,12 +121,14 @@ public abstract class JobDescriptionTest extends AbstractJobTest {
         // JobDescription.FILETRANSFER ignored because it modifies job description
         m_jobDescription.setAttribute(JobDescription.CLEANUP, JobDescription.FALSE);
         // JobDescription.JOBSTARTTIME is not supported by JSAGA
+        m_jobDescription.setAttribute(JobDescription.WALLTIMELIMIT, "60");
         m_jobDescription.setAttribute(JobDescription.TOTALCPUTIME, "60");
         m_jobDescription.setAttribute(JobDescription.TOTALPHYSICALMEMORY, "1024");
         m_jobDescription.setAttribute(JobDescription.CPUARCHITECTURE, "x86");
         m_jobDescription.setAttribute(JobDescription.OPERATINGSYSTEMTYPE, "LINUX");
         m_jobDescription.setVectorAttribute(JobDescription.CANDIDATEHOSTS, new String[]{"myhost", "host1"});
         m_jobDescription.setAttribute(JobDescription.QUEUE, "queue1");
+        m_jobDescription.setAttribute(JobDescription.JOBPROJECT, "project1");
         // JobDescription.JOBCONTACT is not supported by JSAGA
     }
 

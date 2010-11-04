@@ -145,6 +145,19 @@ public abstract class AbstractNSDirectoryImpl extends AbstractAsyncNSDirectoryIm
         }
     }
 
+    public long getMTime(URL name) throws NotImplementedException, IncorrectURLException, DoesNotExistException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("getMTime");
+        if (timeout == WAIT_FOREVER) {
+            return super.getMTimeSync(name);
+        } else {
+            try {
+                return (Long) getResult(super.getMTime(TaskMode.ASYNC, name), timeout);
+            }
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
+        }
+    }
+
     public boolean isDir(URL name) throws NotImplementedException, IncorrectURLException, DoesNotExistException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         float timeout = this.getTimeout("isDir");
         if (timeout == WAIT_FOREVER) {

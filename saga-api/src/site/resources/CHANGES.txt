@@ -1,0 +1,74 @@
+Most of the additions and fixes in release 1.1 are prompted by the
+recent changes in the SAGA specifications.
+
+Additions and fixes in release 1.1 with respect to release 1.0.1:
+- Buffer factory method no longer throws NotImplementedException.
+- Buffer methods no longer throw NotImplementedException.
+- Context factory method no longer throws NotImplementedException.
+- Context setDefault() method no longer exists. Instead, an implementation
+  can add default values for attributes when a context is added to a session.
+- IOVec factory method no longer throws NotImplementedException.
+- a JobDescription has two new attributes: WALLTIMELIMIT and JOBPROJECT.
+- the JobService create method now may throw a BadParameterException.
+- a Job now has a new attribute: SERVICEURL.
+- the READ and WRITE flags are moved to the namespace package.
+- NSDirectory now has a method getMTime(URL) that returns the last modification
+  time of the specified entry, and also a task version of same.
+- NSEntry now has a method getMTime() that returns the last modification time
+  of the entry at hand, and also a task version of same.
+- the NSEntry.link(URL) method can now throw DoesNotExistException.
+- NSEntry.close() no longer throws IncorrectStateException.
+- various namespace methods now have READ as default flag instead of NONE.
+- Session constructor methods can no longer throw NotImplementedException.
+- Session.addContext() can no longer throw NotImplementedException.
+- Session.removeContext() can no longer throw NotImplementedException.
+- Session.listContexts() can no longer throw NotImplementedException.
+- Session.close() can no longer throw NotImplementedException.
+- TASKCONTAINER_STATE attribute is now of type String and indicates a
+  Saga Object ID instead of a handle or cookie.
+- TaskContainer.add(Task t) now does not return a cookie anymore.
+- TaskContainer.remove() now takes a task instead of a cookie as parameter.
+- TaskContainer now has a version of "waitFor" with a timeout.
+- TaskContainer.getTask() now takes a string (object id) instead of an int
+  (cookie).
+- TaskContainer.listTasks() is removed, as we already have getTasks().
+- Task.getResult() now can throw any Saga exception. It returns the result of
+  the method executed, including its exceptions.
+- URL factory methods can no longer throw NotImplementedException.
+- URL now has a method getEscaped() which returns the URL as a string, with
+  escapes added where needed to parse the result as an URL.
+- URL now has default parameters for various set... methods.
+- StreamService has been renamed StreamServer. A StreamServer object now
+  can also represent a remote server. It also has a connect() method now.
+- Stream.connect() now also has a variant with a timeout.
+- Stream.close() can no longer throw IncorrectState.
+
+Additions and fixes in release 1.0.1 with respect to release 1.0:
+
+- a simple nested-exception mechanism has been added to
+  org.ogf.saga.error.SagaException.
+- language bindings for the SD (Service Discovery) package have been
+  added by Steve Fisher and Antony Wilson.
+- the org.ogf.sage.url.URL interface now extends org.ogf.saga.SagaObject,
+  as it should.
+- org.ogf.saga.task.Task: rethrow() can now also throw SagaIOException, because
+  it may be thrown by the method of which a task version was executed.
+- the org.ogf.saga.rpc.Parameter interface now extends org.ogf.saga.SagaObject,
+  as it should.
+- org.ogf.saga.namespace.NSEntry: isDir(), isEntry(), isLink(), readLink()
+  do not throw BadParameterException.
+- org.ogf.saga.namespace.NSDirectory:
+    permissionsDeny(String target, String id, int permissions, int flags) and
+    permissionsDeny(String target, String id, int permissions) 
+  can now also throw IncorrectStateException.
+- org.ogf.saga.monitoring.Steerable: addMetric(Metric) and removeMetric(Metric)
+  can now also throw IncorrectStateException.
+- org.ogf.saga.bootstrap.SagaFactory: createRPCFactory() can now throw
+  NotImplementedException.
+- org.ogf.saga.bootstrap.SagaFactory: now also contains a method createSDFactory()
+  for the service discovery package.
+- org.ogf.saga.attributes.Attributes now contains a method 
+  boolean existsAttribute(String key), which apparently was added to the
+  SAGA specifications at some point during the finalization of version 1.0.
+  org.ogf.saga.attributs.AsyncAttributes now contains a tasking version
+  of this method.

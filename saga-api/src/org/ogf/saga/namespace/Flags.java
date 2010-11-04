@@ -43,13 +43,11 @@ public enum Flags {
     EXCL(16),
     /** Enforces a lock on the namespace entry when it is opened. */
     LOCK(32), 
-    /** Implies that missing path elements are created on the fly. */
+    /** Implies that missing path elements are created on the fly. Implies CREATE. */
     CREATEPARENTS(64),
-    /** All flags applicable to the namespace package. */
-    ALLNAMESPACEFLAGS(1 | 2 | 4 | 8 | 16 | 32 | 64),
-    /** Upon opening, the file is truncated to length 0. */
+    /** Upon opening, the file is truncated to length 0. Implies WRITE. */
     TRUNCATE(128),
-    /** Upon opening, the file pointer is set to the end of the file. */
+    /** Upon opening, the file pointer is set to the end of the file. IMPLIES WRITE. */
     APPEND(256),
     /** The file or directory is opened for reading. */
     READ(512),
@@ -57,12 +55,14 @@ public enum Flags {
     WRITE(1024),
     /** The file or directory is opened for reading and writing. */
     READWRITE(512 | 1024),
+    /** All flags applicable to the namespace package. */
+    ALLNAMESPACEFLAGS(1 | 2 | 4 | 8 | 16 | 32 | 64 | 512 | 1024),
     /** For OS-es that distinguish between binary and non-binary modes. */
     BINARY(2048),
     /** All flags applicable to the logical file package. */
-    ALLLOGICALFILEFLAGS(512 | 1024),
+    ALLLOGICALFILEFLAGS(ALLNAMESPACEFLAGS.getValue()),
     /** All flags applicable to the file package. */
-    ALLFILEFLAGS(128 | 256 | 512 | 1024 | 2048);
+    ALLFILEFLAGS(ALLNAMESPACEFLAGS.getValue() | 128 | 256 | 2048);
 
     private int value;
 

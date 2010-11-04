@@ -17,7 +17,6 @@ import org.ogf.saga.session.Session;
 import org.ogf.saga.url.URL;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 /* ***************************************************
@@ -37,26 +36,26 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
 
     /** constructor for factory */
     protected AbstractSyncFileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(session, URLHelper.toFileURL(url), adaptor, new FlagsHelper(flags).remove(Flags.ALLFILEFLAGS));
+        super(session, URLHelper.toFileURL(url), adaptor, new FlagsHelper(flags).keep(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS));
         this.init(flags);
     }
 
     /** constructor for NSDirectory.open() */
     protected AbstractSyncFileImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(dir, URLHelper.toFileURL(relativeUrl), new FlagsHelper(flags).remove(Flags.ALLFILEFLAGS));
+        super(dir, URLHelper.toFileURL(relativeUrl), new FlagsHelper(flags).keep(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS));
         this.init(flags);
     }
 
     /** constructor for NSEntry.openAbsolute() */
     protected AbstractSyncFileImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(entry, URLHelper.toFilePath(absolutePath), new FlagsHelper(flags).remove(Flags.ALLFILEFLAGS));
+        super(entry, URLHelper.toFilePath(absolutePath), new FlagsHelper(flags).keep(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS));
         this.init(flags);
     }
 
     private void init(int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         if(Flags.CREATEPARENTS.isSet(flags)) flags=Flags.CREATE.or(flags);
         if(Flags.CREATE.isSet(flags)) flags=Flags.WRITE.or(flags);
-        new FlagsHelper(flags).allowed(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS, Flags.ALLFILEFLAGS);
+        new FlagsHelper(flags).allowed(JSAGAFlags.BYPASSEXIST, Flags.ALLFILEFLAGS);
         if (Flags.READ.isSet(flags)) {
             m_inStream = FileFactoryImpl.openFileInputStream(m_session, m_url, m_adaptor);
         }
@@ -143,7 +142,7 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
     ///////////////////////////// override some NSEntry methods /////////////////////////////
 
     /** override super.close() in order to close opened input and output streams */
-    public synchronized void close() throws NotImplementedException, IncorrectStateException, NoSuccessException {
+    public synchronized void close() throws NotImplementedException, NoSuccessException {
         try {
             if (m_outStream != null) {
                 m_outStream.close();
@@ -154,14 +153,14 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
                 m_inStream = null;
             }
         } catch (IOException e) {
-            throw new IncorrectStateException(e);
+            throw new NoSuccessException(e);
         } finally {
             super.close();
         }
     }
 
     /** override super.close() in order to close opened input and output streams */
-    public synchronized void close(float timeoutInSeconds) throws NotImplementedException, IncorrectStateException, NoSuccessException {
+    public synchronized void close(float timeoutInSeconds) throws NotImplementedException, NoSuccessException {
         this.close();
     }
 
@@ -192,14 +191,14 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
         }
         if (JSAGAFlags.PRESERVETIMES.isSet(flags)) {
             // throw NotImplementedException if can not preserve times
-            Date sourceTimes = this.getLastModified();
+            long sourceTimes = this.getMTime();
             AbstractNSEntryImpl targetEntry = super._getTargetEntry_checkPreserveTimes(effectiveTarget);
 
             // copy
             new FileCopy(m_session, this, m_adaptor).copy(effectiveTarget, flags, progressMonitor);
 
             // preserve times
-            targetEntry.setLastModified(sourceTimes);
+            targetEntry.setMTime(sourceTimes);
         } else {
             // copy only
             new FileCopy(m_session, this, m_adaptor).copy(effectiveTarget, flags, progressMonitor);
@@ -222,13 +221,13 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
         }
         if (JSAGAFlags.PRESERVETIMES.isSet(flags)) {
             // throw NotImplementedException if can not preserve times
-            Date sourceTimes = super._getSourceTimes_checkPreserveTimes(effectiveSource);
+            long sourceTimes = super._getSourceTimes_checkPreserveTimes(effectiveSource);
 
             // copy
             new FileCopyFrom(m_session, this, m_adaptor).copyFrom(effectiveSource, flags, progressMonitor);
 
             // preserve times
-            this.setLastModified(sourceTimes);
+            this.setMTime(sourceTimes);
         } else {
             // copy only
             new FileCopyFrom(m_session, this, m_adaptor).copyFrom(effectiveSource, flags, progressMonitor);

@@ -52,6 +52,12 @@ can be used, again as usual in Java.
 </p>
 
 <p>
+The IncorrectType exception as described in the language-independent
+SAGA specification does not exist in the Java Language Bindings for SAGA,
+as Java has a ClassCastException for that purpose.
+</p>
+
+<p>
 A simple mechanism exists for storing and examining exceptions that may be thrown
 by adaptors in adaptor-based Saga implementations. In such implementations, the
 top-level exception (the one highest up in the Saga exception hierarchy) is not

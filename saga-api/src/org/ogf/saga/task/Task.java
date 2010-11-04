@@ -163,25 +163,45 @@ public interface Task<T, E> extends SagaObject, Monitorable, Future<E> {
             NoSuccessException;
 
     /**
-     * Obtains the result of the asynchronous method call.
+     * Obtains the result of the asynchronous method call. Implies a 
+     * {@link #waitFor()}.
+     * If the task is in {@link State#FAILED} state after a
+     * {@link #waitFor()}, a {@link #rethrow()} is called.
      * 
      * @return
      *      the result.
-     * @exception NotImplementedException
-     *      is thrown if the implementation does not provide an
-     *      implementation of this method.
-     * @exception TimeoutException
-     *      is thrown when a remote operation did not complete successfully
-     *      because the network communication or the remote service timed
-     *      out.
-     * @exception IncorrectStateException
-     *      is thrown when the task is in DONE state. 
+     * @exception IncorrectURLException
+     *      is thrown when the failed task threw it.
      * @exception NoSuccessException
-     *      is thrown when the operation was not successfully performed,
-     *      and none of the other exceptions apply.
+     *      is thrown when the failed task threw it.
+     * @exception BadParameterException
+     *      is thrown when the failed task threw it.
+     * @exception IncorrectStateException
+     *      is thrown when the failed task threw it, or when the task is in
+     *      {@link State#NEW} or {@link State#CANCELED} state.
+     * @exception PermissionDeniedException
+     *      is thrown when the failed task threw it.
+     * @exception AuthorizationFailedException
+     *      is thrown when the failed task threw it.
+     * @exception AuthenticationFailedException
+     *      is thrown when the failed task threw it.
+     * @exception NotImplementedException
+     *      is thrown when the failed task threw it, or when 
+     *      {@link #getResult()} is not implemented.
+     * @exception AlreadyExistsException
+     *      is thrown when the failed task threw it.
+     * @exception DoesNotExistException
+     *      is thrown when the failed task threw it.
+     * @exception TimeoutException
+     *      is thrown when the failed task threw it.
+     * @exception SagaIOException
+     *      is thrown when the failed task threw it.
      */
-    public E getResult() throws NotImplementedException,
-            IncorrectStateException, TimeoutException, NoSuccessException;
+    public E getResult() throws NotImplementedException, IncorrectURLException,
+            BadParameterException, AlreadyExistsException, DoesNotExistException,
+            IncorrectStateException, PermissionDeniedException,
+            AuthorizationFailedException, AuthenticationFailedException,
+            TimeoutException, SagaIOException, NoSuccessException;
 
     /**
      * Gets the object from which the task was created.
@@ -203,7 +223,10 @@ public interface Task<T, E> extends SagaObject, Monitorable, Future<E> {
             NoSuccessException;
 
     /**
-     * Throws any exception a failed task caught.
+     * Throws any exception a failed task caught. It does nothing unless the
+     * task is in state {@link State#FAILED}. Rethrow can be called multiple times,
+     * always throwing the same exception.
+     * 
      * @exception IncorrectURLException
      *      is thrown when the failed task threw it.
      * @exception NoSuccessException

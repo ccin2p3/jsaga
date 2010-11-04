@@ -84,7 +84,14 @@ public abstract class AbstractNSEntryImplWithStream extends AbstractNSEntryImpl 
         return super.readLink();
     }
 
-    public void link(URL link, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+    public long getMTime() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
+        if (m_outStream != null) {
+            try {m_outStream.close();} catch (IOException e) {/*ignore*/}
+        }
+        return super.getMTime();
+    }
+
+    public void link(URL link, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
         if (m_outStream != null) {
             try {m_outStream.close();} catch (IOException e) {/*ignore*/}
         }

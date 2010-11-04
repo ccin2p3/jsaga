@@ -234,6 +234,43 @@ public interface NSEntry extends SagaObject, Async, Permissions<NSEntry> {
             TimeoutException, NoSuccessException;
 
     /**
+     * Returns the time of the last modification in seconds since epoch
+     * (01.01.1970).
+     * 
+     * @return
+     *      the last modification time.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the NSEntry is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     */
+    public long getMTime() throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, IncorrectStateException,
+            TimeoutException, NoSuccessException;
+
+    /**
      * Copies this entry to another part of the namespace.
      * 
      * @param target
@@ -385,7 +422,7 @@ public interface NSEntry extends SagaObject, Async, Permissions<NSEntry> {
      */
     public void link(URL target, int flags) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
-            PermissionDeniedException, BadParameterException,
+            PermissionDeniedException, BadParameterException, DoesNotExistException,
             IncorrectStateException, AlreadyExistsException, TimeoutException,
             NoSuccessException, IncorrectURLException;
 
@@ -435,7 +472,7 @@ public interface NSEntry extends SagaObject, Async, Permissions<NSEntry> {
      */
     public void link(URL target) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
-            PermissionDeniedException, BadParameterException,
+            PermissionDeniedException, BadParameterException, DoesNotExistException,
             IncorrectStateException, AlreadyExistsException, TimeoutException,
             NoSuccessException, IncorrectURLException;
 
@@ -629,14 +666,12 @@ public interface NSEntry extends SagaObject, Async, Permissions<NSEntry> {
      * @exception NotImplementedException
      *      is thrown if the implementation does not provide an
      *      implementation of this method.
-     * @exception IncorrectStateException
-     *      the SAGA specs specify that this can be thrown. But when???
      * @exception NoSuccessException
      *      is thrown when the operation was not successfully performed,
      *      and none of the other exceptions apply.
      */
     public void close() throws NotImplementedException,
-            IncorrectStateException, NoSuccessException;
+            NoSuccessException;
 
     /**
      * Closes this entry. Any subsequent method invocation on the object will
@@ -647,14 +682,12 @@ public interface NSEntry extends SagaObject, Async, Permissions<NSEntry> {
      * @exception NotImplementedException
      *      is thrown if the implementation does not provide an
      *      implementation of this method.
-     * @exception IncorrectStateException
-     *      the SAGA specs specify that this can be thrown. But when???
      * @exception NoSuccessException
      *      is thrown when the operation was not successfully performed,
      *      and none of the other exceptions apply.
      */
     public void close(float timeoutInSeconds) throws NotImplementedException,
-            IncorrectStateException, NoSuccessException;
+            NoSuccessException;
 
     /**
      * Allows the specified permissions for the specified id. An id of "*"
@@ -788,6 +821,19 @@ public interface NSEntry extends SagaObject, Async, Permissions<NSEntry> {
      *                implemented.
      */
     public Task<NSEntry, URL> getName(TaskMode mode)
+            throws NotImplementedException;
+
+    /**
+     * Creates a task that returns the last modification time of this entry.
+     * 
+     * @param mode
+     *            the task mode.
+     * @return the task.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     */
+    public Task<NSEntry, Long> getMTime(TaskMode mode)
             throws NotImplementedException;
 
     /**

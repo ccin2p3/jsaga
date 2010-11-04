@@ -48,14 +48,12 @@ public abstract class AbstractSyncJobFactoryImpl extends JobFactory implements S
     }
 
     //NOTICE: resource discovery should NOT be done here because it should depend on the job description
-    public JobService doCreateJobServiceSync(Session session, URL rm) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
+    public JobService doCreateJobServiceSync(Session session, URL rm) throws NotImplementedException, BadParameterException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, TimeoutException, NoSuccessException {
         if (rm!=null && !rm.toString().equals("")) {
             // get context (security + config)
             ContextImpl context;
             try {
                 context = ((SessionImpl)session).getBestMatchingContext(rm);
-            } catch (BadParameterException e) {
-                throw new NoSuccessException(e);
             } catch (DoesNotExistException e) {
                 throw new NoSuccessException(e);
             }
@@ -68,12 +66,8 @@ public abstract class AbstractSyncJobFactoryImpl extends JobFactory implements S
             Map attributes = m_adaptorFactory.getAttribute(rm, context);
 
             // connect to control/monitor services
-            try {
-                m_adaptorFactory.connect(rm, controlAdaptor, attributes, context);
-                m_monitorAdaptorFactory.connect(rm, monitorAdaptor, attributes, context);
-            } catch (BadParameterException e) {
-                throw new NoSuccessException(e);
-            }
+            m_adaptorFactory.connect(rm, controlAdaptor, attributes, context);
+            m_monitorAdaptorFactory.connect(rm, monitorAdaptor, attributes, context);
 
             // initialize translator
             JobDescriptionTranslator translator = controlAdaptor.getJobDescriptionTranslator();

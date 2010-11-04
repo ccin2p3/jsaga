@@ -126,6 +126,21 @@ public interface SyncNSDirectory extends SyncNSEntry, Iterable<URL> {
             NoSuccessException;
 
     /**
+     * Returns the time of the last modification in seconds since epoch
+     * (01.01.1970) of the specified name.
+     *
+     * @param name
+     *      the name of which the last modification time must be returned.
+     * @return
+     *      the last modification time.
+     */
+    public long getMTimeSync(URL name) throws NotImplementedException,
+            IncorrectURLException, DoesNotExistException, AuthenticationFailedException,
+            AuthorizationFailedException, PermissionDeniedException,
+            BadParameterException, IncorrectStateException, TimeoutException,
+            NoSuccessException;
+
+    /**
      * Tests the name for being a directory.
      *
      * @param name

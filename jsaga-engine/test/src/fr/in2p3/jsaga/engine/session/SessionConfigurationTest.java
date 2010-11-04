@@ -4,8 +4,7 @@ import fr.in2p3.jsaga.impl.context.ContextImpl;
 import fr.in2p3.jsaga.impl.session.SessionImpl;
 import junit.framework.TestCase;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.error.NoSuccessException;
-import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.url.URLFactory;
@@ -57,8 +56,8 @@ public class SessionConfigurationTest extends TestCase {
     public void test_failure() throws Exception {
         try {
             createConfiguredSession(CONFIG_FAILURE);
-            fail("Expected exception: "+NotImplementedException.class);
-        } catch (NotImplementedException e) {
+            fail("Expected exception: "+NoSuccessException.class);
+        } catch (NoSuccessException e) {
             if (e.getMessage()!=null && e.getMessage().contains("conflicts with")) {
                 // test successful
             } else {
@@ -71,7 +70,7 @@ public class SessionConfigurationTest extends TestCase {
         try {
             createConfiguredSession(CONFIG_SUCCESS);
             // test successful
-        } catch (NotImplementedException e) {
+        } catch (NoSuccessException e) {
             if (e.getMessage()!=null && e.getMessage().contains("conflicts with")) {
                 fail("Unexpected exception: "+e.getMessage());
             } else {
@@ -113,7 +112,7 @@ public class SessionConfigurationTest extends TestCase {
         }
     }
 
-    private static Session createConfiguredSession(String configPath) throws NotImplementedException, NoSuccessException {
+    private static Session createConfiguredSession(String configPath) throws IncorrectStateException, NoSuccessException, TimeoutException {
         URL configUrl = SessionConfigurationTest.class.getResource(configPath);
         SessionConfiguration config = new SessionConfiguration(configUrl);
         Session session = SessionFactory.createSession(false);

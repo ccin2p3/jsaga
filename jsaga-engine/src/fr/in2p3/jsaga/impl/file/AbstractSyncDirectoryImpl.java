@@ -26,17 +26,17 @@ import org.ogf.saga.url.URL;
 public class AbstractSyncDirectoryImpl extends AbstractNSDirectoryImpl implements SyncDirectory {
     /** constructor for factory */
     public AbstractSyncDirectoryImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(session, url, adaptor, new FlagsHelper(flags).remove(Flags.ALLFILEFLAGS));
+        super(session, url, adaptor, new FlagsHelper(flags).keep(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS));
     }
 
     /** constructor for NSDirectory.open() */
     public AbstractSyncDirectoryImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(dir, relativeUrl, new FlagsHelper(flags).remove(Flags.ALLFILEFLAGS));
+        super(dir, relativeUrl, new FlagsHelper(flags).keep(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS));
     }
 
     /** constructor for NSEntry.openAbsolute() */
     public AbstractSyncDirectoryImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(entry, absolutePath, new FlagsHelper(flags).remove(Flags.ALLFILEFLAGS));
+        super(entry, absolutePath, new FlagsHelper(flags).keep(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS));
     }
 
     /** clone */

@@ -35,8 +35,6 @@ public class JobRun extends AbstractCommand {
     private static final String OPT_DESCRIPTION = "d", LONGOPT_DESCRIPTION = "description";
     private static final String OPT_JOBID = "i", LONGOPT_JOBID = "jobid";
     private static final String OPT_BATCH = "b", LONGOPT_BATCH = "batch";
-    // attribute names missing in interface JobDescription
-    private static final String JOBNAME = "JobName";
 
     protected JobRun() {
         super("jsaga-job-run", null, null, new GnuParser());
@@ -195,7 +193,6 @@ public class JobRun extends AbstractCommand {
         opt.addOptionGroup(reqGroup);
 
         // job description
-        opt.addOption(o("job name to be attached to the job submission").hasArg().create(JOBNAME));
         opt.addOption(o("positional parameters for the command").hasArgs().create(JobDescription.ARGUMENTS));
         opt.addOption(o("SPMD job type and startup mechanism").hasArg().create(JobDescription.SPMDVARIATION));
         opt.addOption(o("total number of cpus requested for this job").hasArg().create(JobDescription.TOTALCPUCOUNT));
@@ -211,12 +208,14 @@ public class JobRun extends AbstractCommand {
         opt.addOption(o("a list of file transfer directives").hasArgs().create(JobDescription.FILETRANSFER));
         opt.addOption(o("defines if output files get removed after the job finishes").hasArg().create(JobDescription.CLEANUP));
         opt.addOption(o("time at which a job should be scheduled").hasArg().create(JobDescription.JOBSTARTTIME));
+        opt.addOption(o("hard limit for the total job runtime").hasArg().create(JobDescription.WALLTIMELIMIT));
         opt.addOption(o("estimated total number of CPU seconds which the job will require").hasArg().create(JobDescription.TOTALCPUTIME));
         opt.addOption(o("estimated amount of memory the job requires").hasArg().create(JobDescription.TOTALPHYSICALMEMORY));
         opt.addOption(o("compatible processor for job submission").hasArg().create(JobDescription.CPUARCHITECTURE));
         opt.addOption(o("compatible operating system for job submission").hasArg().create(JobDescription.OPERATINGSYSTEMTYPE));
         opt.addOption(o("list of host names which are to be considered by the resource manager as candidate targets").hasArgs().create(JobDescription.CANDIDATEHOSTS));
         opt.addOption(o("name of a queue to place the job into").hasArg().create(JobDescription.QUEUE));
+        opt.addOption(o("name of an account or project name").hasArg().create(JobDescription.JOBPROJECT));
         opt.addOption(o("set of endpoints describing where to report").hasArgs().create(JobDescription.JOBCONTACT));
 
         // returns
@@ -228,7 +227,6 @@ public class JobRun extends AbstractCommand {
 
     private static JobDescription createJobDescription(Properties prop) throws Exception {
         JobDescription desc = JobFactory.createJobDescription();
-        setOptional(desc, prop, JOBNAME);
         setRequired(desc, prop, JobDescription.EXECUTABLE);
         setOptMulti(desc, prop, JobDescription.ARGUMENTS);
         setOptional(desc, prop, JobDescription.SPMDVARIATION);
@@ -245,12 +243,14 @@ public class JobRun extends AbstractCommand {
         setOptMulti(desc, prop, JobDescription.FILETRANSFER);
         setOptional(desc, prop, JobDescription.CLEANUP);
         setOptional(desc, prop, JobDescription.JOBSTARTTIME);
+        setOptional(desc, prop, JobDescription.WALLTIMELIMIT);
         setOptional(desc, prop, JobDescription.TOTALCPUTIME);
         setOptional(desc, prop, JobDescription.TOTALPHYSICALMEMORY);
         setOptional(desc, prop, JobDescription.CPUARCHITECTURE);
         setOptional(desc, prop, JobDescription.OPERATINGSYSTEMTYPE);
         setOptMulti(desc, prop, JobDescription.CANDIDATEHOSTS);
         setOptional(desc, prop, JobDescription.QUEUE);
+        setOptional(desc, prop, JobDescription.JOBPROJECT);
         setOptMulti(desc, prop, JobDescription.JOBCONTACT);
         return desc;
     }

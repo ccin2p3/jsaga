@@ -68,9 +68,6 @@ public abstract class ContextInitTest extends AbstractTest {
         // set context-specific attributes
         this.updateContextAttributes(context);
 
-        // initialize context
-        context.setDefaults();
-
         // throw exception if context is still not initialized
         context.getAttribute(Context.USERID);
     }

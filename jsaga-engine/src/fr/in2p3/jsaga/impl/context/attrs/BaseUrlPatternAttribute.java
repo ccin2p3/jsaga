@@ -97,7 +97,7 @@ public class BaseUrlPatternAttribute implements AttributeVector {
         return values;
     }
 
-    public void throwIfConflictsWith(String currentLabel, String refLabel, BaseUrlPatternAttribute refIncludes, BaseUrlPatternAttribute refExcludes, BaseUrlPatternAttribute currentExcludes) throws NotImplementedException {
+    public void throwIfConflictsWith(String currentLabel, String refLabel, BaseUrlPatternAttribute refIncludes, BaseUrlPatternAttribute refExcludes, BaseUrlPatternAttribute currentExcludes) throws NoSuccessException {
         mainloop: for (BaseUrlPattern pattern : m_values) {
             // ignore exclude patterns
             for (BaseUrlPattern currentPattern: currentExcludes.m_values) {
@@ -113,7 +113,7 @@ public class BaseUrlPatternAttribute implements AttributeVector {
             // verify include patterns
             for (BaseUrlPattern refPattern : refIncludes.m_values) {
                 if (pattern.conflictsWith(refPattern)) {
-                    throw new NotImplementedException("Pattern '"+pattern.toString()+"' of context "+currentLabel+
+                    throw new NoSuccessException("Pattern '"+pattern.toString()+"' of context "+currentLabel+
                             " conflicts with pattern '"+refPattern.toString()+"' of context "+refLabel);
                 }
             }

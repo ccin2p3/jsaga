@@ -23,10 +23,17 @@ addressed, if necessary, in a future revision of this API.</p>
 
 <h2>Classes</h2>
 
-<p>This API consists of a {@link org.ogf.saga.sd.Discoverer} class
-with a single method: <code>listServices</code>. This method returns a
-list of objects of the {@link org.ogf.saga.sd.ServiceDescription} class,
-filtered according to several specified filters.</p>
+<p>This API has a {@link org.ogf.saga.sd.SDFactory} class for the
+creation of {@link org.ogf.saga.sd.Discoverer} objects. There are two
+optional arguments for creating a <code>Discoverer</code>, {@link
+org.ogf.saga.session} and {@link org.ogf.saga.url}. The URL is to assist
+the implementation to locate the underlying information system such that
+it can be queried.</p>
+
+<p>The <code>Discoverer</code> class has a single method: <code>listServices</code>.
+This method returns a list of objects of the {@link
+org.ogf.saga.sd.ServiceDescription} class, filtered according to several
+specified filters.</p>
 
 <p>The <code>ServiceDescription</code> class has three methods. One
 of these, <code>getUrl</code>, is all that most people will use to

@@ -84,11 +84,11 @@ public class SessionConfiguration {
         }
     }
 
-    public void setDefaultSession(Session session) throws NotImplementedException, NoSuccessException {
+    public void setDefaultSession(Session session) throws IncorrectStateException, NoSuccessException, TimeoutException {
         fr.in2p3.jsaga.generated.session.Session sessionCfg = m_config.getSession();
         if (sessionCfg != null) {
             for (fr.in2p3.jsaga.generated.session.Context contextCfg : sessionCfg.getContext()) {
-                Context context = createContext(contextCfg.getType());
+                Context context = ContextFactory.createContext(contextCfg.getType());
                 // set CONFIGURATION defaults (/jsaga-defaults/session)
                 setDefaultContext(context, contextCfg);
                 session.addContext(context);
@@ -118,16 +118,7 @@ public class SessionConfiguration {
         return null;
     }
 
-    private static Context createContext(String type) throws NotImplementedException, NoSuccessException {
-        try {
-            return ContextFactory.createContext(type);
-        }
-        catch (NotImplementedException e) {throw e;}
-        catch (NoSuccessException e) {throw e;}
-        catch (SagaException e) {throw new NoSuccessException(e);}
-    }
-
-    private static void setDefaultContext(Context context, fr.in2p3.jsaga.generated.session.Context config) throws NotImplementedException, NoSuccessException {
+    private static void setDefaultContext(Context context, fr.in2p3.jsaga.generated.session.Context config) throws NoSuccessException {
         try {
             for (Attribute attributeCfg : config.getAttribute()) {
                 if (attributeCfg.getValue() != null) {
@@ -143,7 +134,6 @@ public class SessionConfiguration {
                 }
             }
         }
-        catch (NotImplementedException e) {throw e;}
         catch (NoSuccessException e) {throw e;}
         catch (SagaException e) {throw new NoSuccessException(e);}
     }

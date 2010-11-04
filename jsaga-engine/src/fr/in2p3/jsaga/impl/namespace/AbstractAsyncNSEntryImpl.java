@@ -68,6 +68,14 @@ public abstract class AbstractAsyncNSEntryImpl extends AbstractSyncNSEntryImpl i
         };
     }
 
+    public Task<NSEntry, Long> getMTime(TaskMode mode) throws NotImplementedException {
+        return new AbstractThreadedTask<NSEntry,Long>(mode) {
+            public Long invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncNSEntryImpl.super.getMTimeSync();
+            }
+        };
+    }
+
     public Task<NSEntry, Boolean> isDir(TaskMode mode) throws NotImplementedException {
         return new AbstractThreadedTask<NSEntry,Boolean>(mode) {
             public Boolean invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {

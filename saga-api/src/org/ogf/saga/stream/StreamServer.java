@@ -16,11 +16,11 @@ import org.ogf.saga.task.TaskMode;
 import org.ogf.saga.url.URL;
 
 /**
- * A <code>StreamService</code> object establishes a listening/server object
- * that waits for client connections. It is similar to a serversocket.
+ * A <code>StreamServer</code> object represents an endpoint for
+ * a listening/server object that waits for client connections.
  */
-public interface StreamService extends SagaObject, Async,
-        AsyncMonitorable<StreamService>, Permissions<StreamService> {
+public interface StreamServer extends SagaObject, Async,
+        AsyncMonitorable<StreamServer>, Permissions<StreamServer> {
 
     // Metrics
 
@@ -55,7 +55,7 @@ public interface StreamService extends SagaObject, Async,
      *      because the network communication or the remote service timed
      *      out.
      * @exception IncorrectStateException
-     *      is thrown when the stream service is already closed.
+     *      is thrown when the stream server is already closed.
      * @exception NoSuccessException
      *      is thrown when the operation was not successfully performed,
      *      and none of the other exceptions apply.
@@ -92,12 +92,84 @@ public interface StreamService extends SagaObject, Async,
      *      because the network communication or the remote service timed
      *      out.
      * @exception IncorrectStateException
-     *      is thrown when the stream service is already closed.
+     *      is thrown when the stream server is already closed.
      * @exception NoSuccessException
      *      is thrown when the operation was not successfully performed,
      *      and none of the other exceptions apply.
      */
     public Stream serve() throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, IncorrectStateException,
+            TimeoutException, NoSuccessException;
+
+    /**
+     * Establishes a connection to the stream server.
+     * @return
+     *      the resulting stream.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the stream is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     */
+    public Stream connect() throws NotImplementedException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, IncorrectStateException,
+            TimeoutException, NoSuccessException;
+
+    /**
+     * Establishes a connection to the stream server.
+     * @param timeoutInSeconds
+     *      the timeout in seconds.
+     * @return
+     *      the resulting stream.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception IncorrectStateException
+     *      is thrown when the stream is already closed.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     */
+    public Stream connect(float timeoutInSeconds) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException,
             PermissionDeniedException, IncorrectStateException,
             TimeoutException, NoSuccessException;
@@ -132,7 +204,7 @@ public interface StreamService extends SagaObject, Async,
      *      because the network communication or the remote service timed
      *      out.
      * @exception IncorrectStateException
-     *      is thrown when the stream service is already closed.
+     *      is thrown when the stream server is already closed.
      * @exception NoSuccessException
      *      is thrown when the operation was not successfully performed,
      *      and none of the other exceptions apply.
@@ -143,35 +215,30 @@ public interface StreamService extends SagaObject, Async,
             TimeoutException, NoSuccessException;
 
     /**
-     * Closes a stream service. This is a non-blocking call.
+     * Closes a stream server. This is a non-blocking call.
      * @exception NotImplementedException
      *      is thrown if the implementation does not provide an
      *      implementation of this method.
-     * @exception IncorrectStateException
-     *      is thrown when the backend changed its state.
      * @exception NoSuccessException
      *      is thrown when the operation was not successfully performed,
      *      and none of the other exceptions apply.
      */
-    public void close() throws NotImplementedException,
-            IncorrectStateException, NoSuccessException;
+    public void close() throws NotImplementedException, NoSuccessException;
 
     /**
-     * Closes a stream service.
+     * Closes a stream server.
      * 
      * @param timeoutInSeconds
      *      the timeout in seconds.
      * @exception NotImplementedException
      *      is thrown if the implementation does not provide an
      *      implementation of this method.
-     * @exception IncorrectStateException
-     *      is thrown when the backend changed its state.
      * @exception NoSuccessException
      *      is thrown when the operation was not successfully performed,
      *      and none of the other exceptions apply.
      */
     public void close(float timeoutInSeconds) throws NotImplementedException,
-            IncorrectStateException, NoSuccessException;
+            NoSuccessException;
 
     //
     // Task versions ...
@@ -187,7 +254,7 @@ public interface StreamService extends SagaObject, Async,
      *                is thrown when the task version of this method is not
      *                implemented.
      */
-    public Task<StreamService, URL> getUrl(TaskMode mode)
+    public Task<StreamServer, URL> getUrl(TaskMode mode)
             throws NotImplementedException;
 
     /**
@@ -201,7 +268,7 @@ public interface StreamService extends SagaObject, Async,
      *                is thrown when the task version of this method is not
      *                implemented.
      */
-    public Task<StreamService, Stream> serve(TaskMode mode)
+    public Task<StreamServer, Stream> serve(TaskMode mode)
             throws NotImplementedException;
 
     /**
@@ -217,11 +284,11 @@ public interface StreamService extends SagaObject, Async,
      *                is thrown when the task version of this method is not
      *                implemented.
      */
-    public Task<StreamService, Stream> serve(TaskMode mode,
+    public Task<StreamServer, Stream> serve(TaskMode mode,
             float timeoutInSeconds) throws NotImplementedException;
 
     /**
-     * Obtains a task that closes a stream service.
+     * Returns a task that establishes a connection to the stream server.
      * 
      * @param mode
      *            the task mode.
@@ -230,11 +297,11 @@ public interface StreamService extends SagaObject, Async,
      *                is thrown when the task version of this method is not
      *                implemented.
      */
-    public Task<StreamService, Void> close(TaskMode mode)
+    public Task<StreamServer, Stream> connect(TaskMode mode)
             throws NotImplementedException;
 
     /**
-     * Obtains a task that closes a stream service.
+     * Returns a task that establishes a connection to the stream server.
      * 
      * @param mode
      *            the task mode.
@@ -245,6 +312,34 @@ public interface StreamService extends SagaObject, Async,
      *                is thrown when the task version of this method is not
      *                implemented.
      */
-    public Task<StreamService, Void> close(TaskMode mode, float timeoutInSeconds)
+    public Task<StreamServer, Stream> connect(TaskMode mode, float timeoutInSeconds)
+            throws NotImplementedException;
+
+    /**
+     * Obtains a task that closes a stream server.
+     * 
+     * @param mode
+     *            the task mode.
+     * @return the task.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     */
+    public Task<StreamServer, Void> close(TaskMode mode)
+            throws NotImplementedException;
+
+    /**
+     * Obtains a task that closes a stream server.
+     * 
+     * @param mode
+     *            the task mode.
+     * @param timeoutInSeconds
+     *            the timeout in seconds.
+     * @return the task.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     */
+    public Task<StreamServer, Void> close(TaskMode mode, float timeoutInSeconds)
             throws NotImplementedException;
 }

@@ -12,9 +12,9 @@ import org.ogf.saga.error.TimeoutException;
 
 /**
  * <p>
- * Provides the entry point for service discovery. Apart from the constructor
- * and destructor it has one method: <code>listServices</code> which returns
- * the list of descriptions of services matching the specified filter strings.
+ * Provides the entry point for service discovery. Apart from the constructor it
+ * has one method: <code>listServices</code> which returns the list of
+ * descriptions of services matching the specified filter strings.
  * </p>
  * <p>
  * An implementation SHOULD return the results in a random order if there is
@@ -40,7 +40,7 @@ import org.ogf.saga.error.TimeoutException;
  * involving multi-valued attributes: <code>IN</code>, <code>LIKE</code>,
  * <code>AND</code>, <code>OR</code>, <code>NOT</code>, <code>=</code>,
  * <code>&gt;=</code>, <code>&gt;</code>, <code>&lt;=</code>,
- * <code>&lt;</code>, <code>&gt;&lt;</code> in addition to column names,
+ * <code>&lt;</code>, <code>&lt;&gt;</code> in addition to column names,
  * parentheses, column values as single quoted strings, numeric values and the
  * comma. For a multi-valued attribute, the name of the attribute MUST have the
  * keyword <code>ALL</code> or <code>ANY</code> immediately before it,
@@ -76,33 +76,39 @@ import org.ogf.saga.error.TimeoutException;
  * Column names in the <code>serviceFilter</code> are:
  * </p>
  * <dl>
- * <dt><code>type</code></dt>
- * <dd>type of service. This API does not restrict values of the service type --
- * it might be a DNS name, a URN or any other string.</dd>
- * <dt><code>name</code></dt>
+ * <dt><code>Capabilities</code></dt>
+ * <dd>identifiable aspects of functionality</dd>
+ * <dt><code>ImplementationVersion</code></dt>
+ * <dd>the version of the service implementation</dd>
+ * <dt><code>Implementor</code></dt>
+ * <dd>name of the organisation providing the implementation of the service</dd>
+ * <dt><code>InterfaceVersion</code></dt>
+ * <dd>the version of the service interface</dd>
+ * <dt><code>Name</code></dt>
  * <dd>name of service (not necessarily unique)</dd>
- * <dt><code>uid</code></dt>
- * <dd>unique identifier of service</dd>
- * <dt><code>site</code></dt>
+ * <dt><code>RelatedServices</code></dt>
+ * <dd>the uids of services related to the one being looked for</dd>
+ * <dt><code>Site</code></dt>
  * <dd>name of site the service is running at</dd>
- * <dt><code>url</code></dt>
+ * <dt><code>Type</code></dt>
+ * <dd>type of service. This API does not restrict values of the service type --
+ * it might be a DNS name, a URN or any other non-empty string.</dd>
+ * <dt><code>Uid</code></dt>
+ * <dd>unique identifier of service</dd>
+ * <dt><code>Url</code></dt>
  * <dd>the endpoint to contact the service - will normally be used with the
  * LIKE operator</dd>
- * <dt><code>implementor</code></dt>
- * <dd>name of the organisation providing the implementation of the service</dd>
- * <dt><code>relatedService</code></dt>
- * <dd>the uid of a service related to the one being looked for</dd>
  * </dl>
  * <dl>
  * <dt>Some examples are:</dt>
- * <dd><code>type = 'org.ogf.saga.service.job'</code></dd>
- * <dd><code>site IN ('INFN-CNAF', 'RAL-LCG2')</code></dd>
- * <dd><code>type = 'org.glite.ResourceBroker' AND Site LIKE '%.uk' AND implementor = 'EGEE'</code></dd>
- * <dd><code>ANY relatedService = 'someServiceUID'</code></dd>
+ * <dd><code>ANY Capabilities = 'org.ogf.saga.service.job'</code></dd>
+ * <dd><code>Site IN ('INFN-CNAF', 'RAL-LCG2')</code></dd>
+ * <dd><code>Type = 'org.glite.ResourceBroker' AND Site LIKE '%.uk' AND Implementor = 'EGEE'</code></dd>
+ * <dd><code>ANY RelatedServices = 'someServiceUID'</code></dd>
  * </dl>
  * <p>
- * Note the use of the <code>ANY</code> keyword in the last example as
- * <code>relatedService</code> is multi-valued.
+ * Note the use of the <code>ANY</code> keyword in two of these examples as
+|Capabilities| and |RelatedServices| are multi-valued.
  * </p>
  * <h2>Data Filter</h2>
  * <p>
@@ -131,26 +137,28 @@ import org.ogf.saga.error.TimeoutException;
  * Instead the list below shows a possible set of names and how they might be
  * interpreted. Each of these column names could reasonably be related to an
  * authorization decision. Implementations MAY reuse the attribute names defined
- * for the {@link org.ogf.saga.context.Context org.ogf.saga.context.Contex} class.
+ * for the {@link org.ogf.saga.context.Context org.ogf.saga.context.Contex}
+ * class.
  * </p>
  * <dl>
- * <dt>vo</dt>
+ * <dt>Vo</dt>
  * <dd>virtual organization - will often be used with the IN operator</dd>
- * <dt>dn</dt>
+ * <dt>Dn</dt>
  * <dd>an X.509 ``distinguished name''</dd>
- * <dt>group</dt>
+ * <dt>Group</dt>
  * <dd>a grouping of people within a Virtual Organization</dd>
- * <dt>role</dt>
+ * <dt>Role</dt>
  * <dd>values might include ``Administrator'' or ``ProductionManager''</dd>
  * </dl>
  * <p>
- * It is expected that many of the attributes used in then
+ * It is expected that many of the attributes used in the
  * <code>authzFilter</code> will be multi-valued.
  * </p>
  * <dl>
- * <dt>Some examples, where <code>VO</code> is assumed to be multi-valued are:</dt>
- * <dd><code>ANY VO IN ('cms', 'atlas')</code></dd>
- * <dd><code>VO = ('dteam')</code></dd>
+ * <dt>Some examples, where <code>VO</code> is assumed to be multi-valued
+ * are:</dt>
+ * <dd><code>ANY Vo IN ('cms', 'atlas')</code></dd>
+ * <dd><code>Vo = ('dteam')</code></dd>
  * </dl>
  * <p>
  * Note the use of the set constructor in both examples. Being a set,
@@ -174,80 +182,74 @@ public interface Discoverer extends SagaObject {
      * at all.
      * 
      * @param serviceFilter
-     *                a string containing the filter for filtering on the basic
-     *                service and site attributes and on related services
+     *            a string containing the filter for filtering on the basic
+     *            service and site attributes and on related services
      * @param dataFilter
-     *                a string containing the filter for filtering on key/value
-     *                pairs associated with the service
+     *            a string containing the filter for filtering on key/value
+     *            pairs associated with the service
      * @return list of service descriptions, in a random order, matching the
      *         filter criteria
-     * @throws BadParameterException
-     *                 if any filter has an invalid syntax or if any filter uses
-     *                 invalid keys. However the <code>dataFilter</code> never
-     *                 signals invalid keys as there is no schema with
-     *                 permissible key names.
-     * @throws AuthorizationFailedException
-     *                 if none of the available contexts of the used session
-     *                 could be used for successful authorization. That error
-     *                 indicates that the resource could not be accessed at all,
-     *                 and not that an operation was not available due to
-     *                 restricted permissions.
      * @throws AuthenticationFailedException
-     *                 if none of the available session contexts could
-     *                 successfully be used for authentication
-     * @throws TimeoutException
-     *                 if a remote operation did not complete successfully
-     *                 because the network communication or the remote service
-     *                 timed out
+     *             if none of the available session contexts could successfully
+     *             be used for authentication
+     * @throws AuthorizationFailedException
+     *             if none of the available contexts of the used session could
+     *             be used for successful authorization. That error indicates
+     *             that the resource could not be accessed at all, and not that
+     *             an operation was not available due to restricted permissions.
+     * @throws BadParameterException
+     *             if any filter has an invalid syntax or if any filter uses
+     *             invalid keys. However the <code>dataFilter</code> never
+     *             signals invalid keys as there is no schema with permissible
+     *             key names.
      * @throws NoSuccessException
-     *                 if no result can be returned because of information
-     *                 system or other internal problems
+     *             if no result can be returned because of information system or
+     *             other internal problems
+     * @throws TimeoutException
+     *             if a remote operation did not complete successfully because
+     *             the network communication or the remote service timed out
      */
-    public List<ServiceDescription> listServices(String serviceFilter,
-	    String dataFilter) throws BadParameterException,
-	    AuthorizationFailedException, AuthenticationFailedException,
-	    TimeoutException, NoSuccessException;
+    public List<ServiceDescription> listServices(String serviceFilter, String dataFilter)
+            throws AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
+            NoSuccessException, TimeoutException;
 
     /**
      * Returns the set of services that pass the set of specified filters. A
      * service will only be included once in the returned list of services.
      * 
      * @param serviceFilter
-     *                a string containing the filter for filtering on the basic
-     *                service and site attributes and on related services
+     *            a string containing the filter for filtering on the basic
+     *            service and site attributes and on related services
      * @param dataFilter
-     *                a string containing the filter for filtering on key/value
-     *                pairs associated with the service
+     *            a string containing the filter for filtering on key/value
+     *            pairs associated with the service
      * @param authzFilter
-     *                a string containing the filter for filtering on
-     *                authorization information associated with the service
+     *            a string containing the filter for filtering on authorization
+     *            information associated with the service
      * @return list of service descriptions, in a random order, matching the
      *         filter criteria
-     * @throws BadParameterException
-     *                 if any filter has an invalid syntax or if any filter uses
-     *                 invalid keys. However the <code>dataFilter</code> never
-     *                 signals invalid keys as there is no schema with
-     *                 permissible key names.
-     * @throws AuthorizationFailedException
-     *                 if none of the available contexts of the used session
-     *                 could be used for successful authorization. That error
-     *                 indicates that the resource could not be accessed at all,
-     *                 and not that an operation was not available due to
-     *                 restricted permissions.
      * @throws AuthenticationFailedException
-     *                 if none of the available session contexts could
-     *                 successfully be used for authentication
-     * @throws TimeoutException
-     *                 if a remote operation did not complete successfully
-     *                 because the network communication or the remote service
-     *                 timed out
+     *             if none of the available session contexts could successfully
+     *             be used for authentication
+     * @throws AuthorizationFailedException
+     *             if none of the available contexts of the used session could
+     *             be used for successful authorization. That error indicates
+     *             that the resource could not be accessed at all, and not that
+     *             an operation was not available due to restricted permissions.
+     * @throws BadParameterException
+     *             if any filter has an invalid syntax or if any filter uses
+     *             invalid keys. However the <code>dataFilter</code> never
+     *             signals invalid keys as there is no schema with permissible
+     *             key names.
      * @throws NoSuccessException
-     *                 if no result can be returned because of information system
-     *                 or other internal problems
+     *             if no result can be returned because of information system or
+     *             other internal problems
+     * @throws TimeoutException
+     *             if a remote operation did not complete successfully because
+     *             the network communication or the remote service timed out
      */
-    public List<ServiceDescription> listServices(String serviceFilter,
-	    String dataFilter, String authzFilter)
-	    throws BadParameterException, AuthorizationFailedException,
-	    AuthenticationFailedException, TimeoutException, NoSuccessException;
+    public List<ServiceDescription> listServices(String serviceFilter, String dataFilter, String authzFilter)
+            throws AuthenticationFailedException, AuthorizationFailedException, BadParameterException,
+            NoSuccessException, TimeoutException;
 
 }

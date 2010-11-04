@@ -17,11 +17,11 @@
         <xsl:variable name="lf"><xsl:text>
 </xsl:text></xsl:variable>
         <xsl:for-each select="jsdl:JobIdentification">
-            <xsl:for-each select="jsdl:JobName"
-                    >JobName=<xsl:value-of select="concat(text(),$lf)"/>
-            </xsl:for-each>
             <xsl:for-each select="jsdl:JobAnnotation"
                     >Queue=<xsl:value-of select="concat(text(),$lf)"/>
+            </xsl:for-each>
+            <xsl:for-each select="jsdl:JobProject"
+                    >JobProject=<xsl:value-of select="concat(text(),$lf)"/>
             </xsl:for-each>
         </xsl:for-each>
         <xsl:for-each select="jsdl:Application">
@@ -89,6 +89,9 @@
             </xsl:for-each>
             <xsl:for-each select="jsdl:TotalPhysicalMemory/*"
                     >TotalPhysicalMemory=<xsl:value-of select="concat(text(),$lf)"/>
+            </xsl:for-each>
+            <xsl:for-each select="WallTimeLimit/*"
+                    >WallTimeLimit=<xsl:value-of select="concat(text(),$lf)"/>
             </xsl:for-each>
         </xsl:for-each>
         <xsl:if test="jsdl:DataStaging"

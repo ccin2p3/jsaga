@@ -23,6 +23,7 @@ import java.util.Date;
  */
 public class JobAttributes implements Cloneable {
     ScalarAttributeImpl<String> m_JobId;
+    ScalarAttributeImpl<String> m_ServiceUrl;
     VectorAttributeImpl<String> m_ExecutionHosts;
     ScalarAttributeImpl<Date> m_Created;
     ScalarAttributeImpl<Date> m_Started;
@@ -36,6 +37,12 @@ public class JobAttributes implements Cloneable {
         m_JobId = job._addAttribute(new ScalarAttributeImpl<String>(
                 Job.JOBID,
                 "SAGA representation of the job identifier",
+                MetricMode.ReadOnly,
+                MetricType.String,
+                null));
+        m_ServiceUrl = job._addAttribute(new ScalarAttributeImpl<String>(
+                Job.SERVICEURL,
+                "URL representation of the JobService that created the job",
                 MetricMode.ReadOnly,
                 MetricType.String,
                 null));
@@ -131,6 +138,7 @@ public class JobAttributes implements Cloneable {
     public JobAttributes clone() throws CloneNotSupportedException {
         JobAttributes clone = (JobAttributes) super.clone();
         clone.m_JobId = m_JobId.clone();
+        clone.m_ServiceUrl = m_ServiceUrl.clone();
         clone.m_ExecutionHosts = m_ExecutionHosts.clone();
         clone.m_Created = m_Created.clone();
         clone.m_Started = m_Started.clone();

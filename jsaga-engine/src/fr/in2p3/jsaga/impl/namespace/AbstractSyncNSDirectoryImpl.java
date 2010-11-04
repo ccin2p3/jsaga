@@ -222,6 +222,10 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
         }
     }
 
+    public long getMTimeSync(URL name) throws NotImplementedException, IncorrectURLException, DoesNotExistException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
+        return this._openNSEntryWithDoesNotExist(name).getMTimeSync();
+    }
+
     public boolean isDirSync(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, DoesNotExistException {
         return this._openNSEntryWithDoesNotExist(name).isDirSync();
     }

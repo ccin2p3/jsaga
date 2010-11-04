@@ -128,6 +128,14 @@ public abstract class AbstractAsyncNSDirectoryImpl extends AbstractSyncNSDirecto
         };
     }
 
+    public Task<NSDirectory, Long> getMTime(TaskMode mode, final URL name) throws NotImplementedException {
+        return new AbstractThreadedTask<NSDirectory,Long>(mode) {
+            public Long invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+                return AbstractAsyncNSDirectoryImpl.super.getMTimeSync(name);
+            }
+        };
+    }
+
     public Task<NSDirectory, URL> readLink(TaskMode mode, final URL name) throws NotImplementedException {
         return new AbstractThreadedTask<NSDirectory,URL>(mode) {
             public URL invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {

@@ -24,7 +24,7 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
     // metrics
 //    private MetricImpl<Task> m_metric_TaskContainerState;
     // internal
-    private final Map<Integer,AbstractTaskImpl> m_tasks;
+    private final Map<String,AbstractTaskImpl> m_tasks;
 
     /** constructor */
     public TaskContainerImpl(Session session) throws NoSuccessException {
@@ -43,7 +43,7 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
 */
 
         // internal
-        m_tasks = Collections.synchronizedMap(new HashMap<Integer,AbstractTaskImpl>());
+        m_tasks = Collections.synchronizedMap(new HashMap<String,AbstractTaskImpl>());
     }
 
     /** clone */
@@ -54,18 +54,15 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
         return clone;
     }
 
-    public int add(Task<?,?> task) throws NotImplementedException, TimeoutException, NoSuccessException {
-        int cookie = task.hashCode();
-        m_tasks.put(cookie, (AbstractTaskImpl) task);
-        return cookie;
+    public void add(Task<?,?> task) throws NotImplementedException, TimeoutException, NoSuccessException {
+        m_tasks.put(task.getId(), (AbstractTaskImpl) task);
     }
 
-    public Task<?,?> remove(int cookie) throws NotImplementedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        Task task = m_tasks.remove(cookie);
-        if (task == null) {
-            throw new DoesNotExistException("Task not in task container: "+cookie, this);
+    public void remove(Task<?,?> task) throws NotImplementedException, DoesNotExistException, TimeoutException, NoSuccessException {
+        Task removed = m_tasks.remove(task.getId());
+        if (removed== null) {
+            throw new DoesNotExistException("Task not in task container: "+task.getId(), this);
         }
-        return task;
     }
 
     public void run() throws NotImplementedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
@@ -76,8 +73,16 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
         }
     }
 
+    public Task<?, ?> waitFor() throws NotImplementedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
+        return this.waitFor(WAIT_FOREVER, WaitMode.ALL);
+    }
+
     public Task<?,?> waitFor(WaitMode mode) throws NotImplementedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         return this.waitFor(WAIT_FOREVER, mode);
+    }
+
+    public Task<?, ?> waitFor(float timeoutInSeconds) throws NotImplementedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
+        return this.waitFor(timeoutInSeconds, WaitMode.ALL);
     }
 
     public Task<?,?> waitFor(float timeoutInSeconds, WaitMode mode) throws NotImplementedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
@@ -99,7 +104,7 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
         catch (AuthorizationFailedException e) {throw new NoSuccessException(e);}
         catch (PermissionDeniedException e) {throw new NoSuccessException(e);}*/
 
-        Integer cookie = null;
+        String id = null;
         try {
             boolean forever;
             long endTime;
@@ -113,7 +118,7 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
                 forever = false;
                 endTime = System.currentTimeMillis() + (long) timeoutInSeconds;
             }
-            while((cookie=this.getFinished(mode))==null && (forever || System.currentTimeMillis()<endTime)) {
+            while((id=this.getFinished(mode))==null && (forever || System.currentTimeMillis()<endTime)) {
                 Thread.currentThread().sleep(100);
             }
         } catch(InterruptedException e) {/*ignore*/}
@@ -130,7 +135,7 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
             catch (PermissionDeniedException e2) {throw new NoSuccessException(e);}
         }*/
 
-        return m_tasks.remove(cookie);
+        return m_tasks.remove(id);
     }
 
     public void cancel() throws NotImplementedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
@@ -153,22 +158,10 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
         return m_tasks.size();
     }
 
-    public int[] listTasks() throws NotImplementedException, TimeoutException, NoSuccessException {
-        int i=0;
-        synchronized(m_tasks) {
-            Set<Integer> keys = m_tasks.keySet();
-            int[] cookies = new int[keys.size()];
-            for (Integer key : keys) {
-                cookies[i++] = key;
-            }
-            return cookies;
-        }
-    }
-
-    public Task<?,?> getTask(int cookie) throws NotImplementedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        Task task = m_tasks.get(cookie);
+    public Task<?,?> getTask(String id) throws NotImplementedException, DoesNotExistException, TimeoutException, NoSuccessException {
+        Task task = m_tasks.get(id);
         if (task == null) {
-            throw new DoesNotExistException("Task not in task container: "+cookie, this);
+            throw new DoesNotExistException("Task not in task container: "+id, this);
         }
         return task;
     }
@@ -225,39 +218,33 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
         }
     }
 
-    private Integer getFinished(WaitMode mode) throws NotImplementedException {
+    private String getFinished(WaitMode mode) throws NotImplementedException {
         switch(mode) {
             case ALL:
-                return getFinishedAll();
+                synchronized(m_tasks) {
+                    String id = null;
+                    for (Map.Entry<String,AbstractTaskImpl> entry : m_tasks.entrySet()) {
+                        id = entry.getKey();
+                        AbstractTaskImpl task = entry.getValue();
+                        if (!task.isDone()) {
+                            return null;
+                        }
+                    }
+                    return id;
+                }
             case ANY:
-                return getFinishedAny();
+                synchronized(m_tasks) {
+                    for (Map.Entry<String,AbstractTaskImpl> entry : m_tasks.entrySet()) {
+                        String id = entry.getKey();
+                        AbstractTaskImpl task = entry.getValue();
+                        if (task.isDone()) {
+                            return id;
+                        }
+                    }
+                    return null;
+                }
             default:
                 throw new NotImplementedException("INTERNAL ERROR: unexpected exception");
         }
-    }
-    private Integer getFinishedAll() {
-        Integer cookie = null;
-        synchronized(m_tasks) {
-            for (Map.Entry<Integer,AbstractTaskImpl> entry : m_tasks.entrySet()) {
-                cookie = entry.getKey();
-                AbstractTaskImpl task = entry.getValue();
-                if (!task.isDone()) {
-                    return null;
-                }
-            }
-        }
-        return cookie;
-    }
-    private Integer getFinishedAny() {
-        synchronized(m_tasks) {
-            for (Map.Entry<Integer,AbstractTaskImpl> entry : m_tasks.entrySet()) {
-                Integer cookie = entry.getKey();
-                AbstractTaskImpl task = entry.getValue();
-                if (task.isDone()) {
-                    return cookie;
-                }
-            }
-        }
-        return null;
     }
 }
