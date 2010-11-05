@@ -14,13 +14,28 @@ import org.ogf.saga.session.SessionFactory;
 import org.ogf.saga.task.TaskMode;
 import org.ogf.saga.task.Task;
 import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 
 /**
  * Factory for objects from the stream package.
  */
 public abstract class StreamFactory {
+    
+    private static final String DEFAULT_SERVER_URL = "";
 
     private static StreamFactory factory;
+    
+    private static URL createDefaultURL() {
+        URL url;
+        try {
+            url = URLFactory.createURL(DEFAULT_SERVER_URL);
+        } catch (Throwable e) {
+            // Cannot happen.
+            throw new Error("Implementation error", e);
+                        
+        }
+        return url;
+    }
 
     private static synchronized void initializeFactory()
             throws NotImplementedException, NoSuccessException {
@@ -35,7 +50,7 @@ public abstract class StreamFactory {
      * @param session
      *            the session handle.
      * @param name
-     *            location of the stream service.
+     *            location of the stream server.
      * @return the stream.
      */
     protected abstract Stream doCreateStream(Session session, URL name)
@@ -45,29 +60,16 @@ public abstract class StreamFactory {
             TimeoutException, NoSuccessException;
 
     /**
-     * Creates a StreamService. To be provided by the implementation.
+     * Creates a StreamServer. To be provided by the implementation.
      * 
      * @param session
      *            the session handle.
      * @param name
-     *            location of the service.
-     * @return the service.
+     *            location of the server.
+     * @return the stream server.
      */
-    protected abstract StreamService doCreateStreamService(Session session,
+    protected abstract StreamServer doCreateStreamServer(Session session,
             URL name) throws NotImplementedException, IncorrectURLException,
-            BadParameterException, AuthenticationFailedException,
-            AuthorizationFailedException, PermissionDeniedException,
-            TimeoutException, NoSuccessException;
-
-    /**
-     * Creates a StreamService. To be provided by the implementation.
-     * 
-     * @param session
-     *            the session handle.
-     * @return the service.
-     */
-    protected abstract StreamService doCreateStreamService(Session session)
-            throws NotImplementedException, IncorrectURLException,
             BadParameterException, AuthenticationFailedException,
             AuthorizationFailedException, PermissionDeniedException,
             TimeoutException, NoSuccessException;
@@ -81,7 +83,7 @@ public abstract class StreamFactory {
      * @param session
      *            the session handle.
      * @param name
-     *            location of the stream service.
+     *            location of the stream server.
      * @return the task.
      * @exception NotImplementedException
      *                is thrown when the task version of this method is not
@@ -92,7 +94,7 @@ public abstract class StreamFactory {
             throws NotImplementedException;
 
     /**
-     * Creates a task that creates a StreamService. To be provided by the
+     * Creates a task that creates a StreamServer. To be provided by the
      * implementation.
      * 
      * @param mode
@@ -100,31 +102,15 @@ public abstract class StreamFactory {
      * @param session
      *            the session handle.
      * @param name
-     *            location of the service.
+     *            location of the server.
      * @return the task.
      * @exception NotImplementedException
      *                is thrown when the task version of this method is not
      *                implemented.
      */
-    protected abstract Task<StreamFactory, StreamService> doCreateStreamService(
+    protected abstract Task<StreamFactory, StreamServer> doCreateStreamServer(
             TaskMode mode, Session session, URL name)
             throws NotImplementedException;
-
-    /**
-     * Creates a task that creates a StreamService. To be provided by the
-     * implementation.
-     * 
-     * @param mode
-     *            the task mode.
-     * @param session
-     *            the session handle.
-     * @return the task.
-     * @exception NotImplementedException
-     *                is thrown when the task version of this method is not
-     *                implemented.
-     */
-    protected abstract Task<StreamFactory, StreamService> doCreateStreamService(
-            TaskMode mode, Session session) throws NotImplementedException;
 
     /**
      * Creates a Stream.
@@ -132,7 +118,7 @@ public abstract class StreamFactory {
      * @param session
      *      the session handle.
      * @param name
-     *      location of the stream service.
+     *      location of the stream server.
      * @return
      *      the stream.
      * @exception NotImplementedException
@@ -178,7 +164,7 @@ public abstract class StreamFactory {
      * Creates a Stream using the default session.
      * 
      * @param name
-     *      location of the stream service.
+     *      location of the stream server.
      * @return
      *      the stream.
      * @exception NotImplementedException
@@ -221,14 +207,14 @@ public abstract class StreamFactory {
     }
 
     /**
-     * Creates a StreamService.
+     * Creates a StreamServer.
      * 
      * @param session
      *      the session handle.
      * @param name
-     *      location of the service.
+     *      location of the server.
      * @return
-     *      the service.
+     *      the server.
      * @exception NotImplementedException
      *      is thrown if the implementation does not provide an
      *      implementation of this method.
@@ -259,22 +245,22 @@ public abstract class StreamFactory {
      *      is thrown when the operation was not successfully performed,
      *      and none of the other exceptions apply.
      */
-    public static StreamService createStreamService(Session session, URL name)
+    public static StreamServer createStreamServer(Session session, URL name)
             throws NotImplementedException, IncorrectURLException,
             BadParameterException, AuthenticationFailedException,
             AuthorizationFailedException, PermissionDeniedException,
             TimeoutException, NoSuccessException {
         initializeFactory();
-        return factory.doCreateStreamService(session, name);
+        return factory.doCreateStreamServer(session, name);
     }
 
     /**
-     * Creates a StreamService.
+     * Creates a StreamServer.
      * 
      * @param session
      *      the session handle.
      * @return
-     *      the service.
+     *      the server.
      * @exception NotImplementedException
      *      is thrown if the implementation does not provide an
      *      implementation of this method.
@@ -305,22 +291,21 @@ public abstract class StreamFactory {
      *      is thrown when the operation was not successfully performed,
      *      and none of the other exceptions apply.
      */
-    public static StreamService createStreamService(Session session)
+    public static StreamServer createStreamServer(Session session)
             throws NotImplementedException, IncorrectURLException,
             BadParameterException, AuthenticationFailedException,
             AuthorizationFailedException, PermissionDeniedException,
             TimeoutException, NoSuccessException {
-        initializeFactory();
-        return factory.doCreateStreamService(session);
+        return createStreamServer(session, createDefaultURL());
     }
 
     /**
-     * Creates a StreamService using the default session.
+     * Creates a StreamServer using the default session.
      * 
      * @param name
-     *      location of the service.
+     *      location of the stream server.
      * @return
-     *      the service.
+     *      the server.
      * @exception NotImplementedException
      *      is thrown if the implementation does not provide an
      *      implementation of this method.
@@ -351,21 +336,19 @@ public abstract class StreamFactory {
      *      is thrown when the operation was not successfully performed,
      *      and none of the other exceptions apply.
      */
-    public static StreamService createStreamService(URL name)
+    public static StreamServer createStreamServer(URL name)
             throws NotImplementedException, IncorrectURLException,
             BadParameterException, AuthenticationFailedException,
             AuthorizationFailedException, PermissionDeniedException,
             TimeoutException, NoSuccessException {
-        Session session = SessionFactory.createSession();
-        initializeFactory();
-        return factory.doCreateStreamService(session, name);
+        return createStreamServer(SessionFactory.createSession(), name);
     }
 
     /**
-     * Creates a StreamService using the default session.
+     * Creates a StreamServer using the default session.
      * 
      * @return
-     *      the service.
+     *      the server.
      * @exception NotImplementedException
      *      is thrown if the implementation does not provide an
      *      implementation of this method.
@@ -396,14 +379,12 @@ public abstract class StreamFactory {
      *      is thrown when the operation was not successfully performed,
      *      and none of the other exceptions apply.
      */
-    public static StreamService createStreamService()
+    public static StreamServer createStreamServer()
             throws NotImplementedException, IncorrectURLException,
             BadParameterException, AuthenticationFailedException,
             AuthorizationFailedException, PermissionDeniedException,
             TimeoutException, NoSuccessException {
-        Session session = SessionFactory.createSession();
-        initializeFactory();
-        return factory.doCreateStreamService(session);
+        return createStreamServer(SessionFactory.createSession());
     }
 
     /**
@@ -414,7 +395,7 @@ public abstract class StreamFactory {
      * @param session
      *            the session handle.
      * @param name
-     *            location of the stream service.
+     *            location of the stream server.
      * @return the task.
      * @exception NotImplementedException
      *                is thrown when the task version of this method is not
@@ -435,7 +416,7 @@ public abstract class StreamFactory {
      * @param mode
      *            the task mode.
      * @param name
-     *            location of the stream service.
+     *            location of the stream server.
      * @return the task.
      * @exception NotImplementedException
      *                is thrown when the task version of this method is not
@@ -446,20 +427,18 @@ public abstract class StreamFactory {
      */
     public static Task<StreamFactory, Stream> createStream(TaskMode mode,
             URL name) throws NotImplementedException, NoSuccessException {
-        Session session = SessionFactory.createSession();
-        initializeFactory();
-        return factory.doCreateStream(mode, session, name);
+        return createStream(mode, SessionFactory.createSession(), name);
     }
 
     /**
-     * Creates a task that creates a StreamService.
+     * Creates a task that creates a StreamServer.
      * 
      * @param mode
      *            the task mode.
      * @param session
      *            the session handle.
      * @param name
-     *            location of the service.
+     *            location of the server.
      * @return the task.
      * @exception NotImplementedException
      *                is thrown when the task version of this method is not
@@ -467,15 +446,15 @@ public abstract class StreamFactory {
      * @throws NoSuccessException
      *             is thrown when the Saga factory could not be created.
      */
-    public static Task<StreamFactory, StreamService> createStreamService(
+    public static Task<StreamFactory, StreamServer> createStreamServer(
             TaskMode mode, Session session, URL name)
             throws NotImplementedException, NoSuccessException {
         initializeFactory();
-        return factory.doCreateStreamService(mode, session, name);
+        return factory.doCreateStreamServer(mode, session, name);
     }
 
     /**
-     * Creates a task that creates a StreamService.
+     * Creates a task that creates a StreamServer.
      * 
      * @param mode
      *            the task mode.
@@ -488,20 +467,19 @@ public abstract class StreamFactory {
      * @throws NoSuccessException
      *             is thrown when the Saga factory could not be created.
      */
-    public static Task<StreamFactory, StreamService> createStreamService(
+    public static Task<StreamFactory, StreamServer> createStreamServer(
             TaskMode mode, Session session) throws NotImplementedException,
             NoSuccessException {
-        initializeFactory();
-        return factory.doCreateStreamService(mode, session);
+        return createStreamServer(mode, session, createDefaultURL());
     }
 
     /**
-     * Creates a task that creates a StreamService using the default session.
+     * Creates a task that creates a StreamServer using the default session.
      * 
      * @param mode
      *            the task mode.
      * @param name
-     *            location of the service.
+     *            location of the server.
      * @return the task.
      * @exception NotImplementedException
      *                is thrown when the task version of this method is not
@@ -510,16 +488,14 @@ public abstract class StreamFactory {
      *                is thrown when the Saga factory could not be created or
      *                when the default session could not be created.
      */
-    public static Task<StreamFactory, StreamService> createStreamService(
+    public static Task<StreamFactory, StreamServer> createStreamServer(
             TaskMode mode, URL name) throws NotImplementedException,
             NoSuccessException {
-        Session session = SessionFactory.createSession();
-        initializeFactory();
-        return factory.doCreateStreamService(mode, session, name);
+        return createStreamServer(mode, SessionFactory.createSession(), name);
     }
 
     /**
-     * Creates a task that creates a StreamService using the default session.
+     * Creates a task that creates a StreamServer using the default session.
      * 
      * @param mode
      *            the task mode.
@@ -531,10 +507,8 @@ public abstract class StreamFactory {
      *                is thrown when the Saga factory could not be created or
      *                when the default session could not be created.
      */
-    public static Task<StreamFactory, StreamService> createStreamService(
+    public static Task<StreamFactory, StreamServer> createStreamServer(
             TaskMode mode) throws NotImplementedException, NoSuccessException {
-        Session session = SessionFactory.createSession();
-        initializeFactory();
-        return factory.doCreateStreamService(mode, session);
+        return createStreamServer(mode, createDefaultURL());
     }
 }

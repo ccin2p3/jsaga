@@ -20,7 +20,6 @@ public class SAGALanguageAdaptor extends AbstractLanguageAdaptorProperties imple
     private static final String[] REQUIRED_PROPERTY_NAMES = new String[] {
             JobDescription.EXECUTABLE};
     private static final String[] OPTIONAL_PROPERTY_NAMES = new String[] {
-            "JobName",
             JobDescription.SPMDVARIATION,
             JobDescription.TOTALCPUCOUNT,
             JobDescription.NUMBEROFPROCESSES,
@@ -33,10 +32,12 @@ public class SAGALanguageAdaptor extends AbstractLanguageAdaptorProperties imple
             JobDescription.ERROR,
             JobDescription.CLEANUP,
             JobDescription.JOBSTARTTIME,
+            JobDescription.WALLTIMELIMIT,
             JobDescription.TOTALCPUTIME,
             JobDescription.TOTALPHYSICALMEMORY,
             JobDescription.CPUARCHITECTURE,     // deviation from SAGA specification (for consistency with JSDL)
             JobDescription.OPERATINGSYSTEMTYPE, // deviation from SAGA specification (for consistency with JSDL)
+            JobDescription.JOBPROJECT,
             JobDescription.QUEUE};
     private static final String[] REQUIRED_VECTOR_PROPERTY_NAMES = new String[] {};
     private static final String[] OPTIONAL_VECTOR_PROPERTY_NAMES = new String[] {

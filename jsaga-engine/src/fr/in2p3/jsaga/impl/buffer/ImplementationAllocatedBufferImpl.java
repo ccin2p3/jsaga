@@ -18,7 +18,7 @@ import org.ogf.saga.error.*;
  */
 public class ImplementationAllocatedBufferImpl extends AbstractBufferImpl implements Buffer {
     /** constructor */
-    public ImplementationAllocatedBufferImpl(int size) throws BadParameterException, NotImplementedException, NoSuccessException {
+    public ImplementationAllocatedBufferImpl(int size) throws BadParameterException, NoSuccessException {
         super();
         this.setSize(size);
     }
@@ -35,23 +35,23 @@ public class ImplementationAllocatedBufferImpl extends AbstractBufferImpl implem
         return clone;
     }
 
-    public void setSize(int size) throws NotImplementedException, BadParameterException, NoSuccessException {
+    public void setSize(int size) throws BadParameterException, NoSuccessException {
         if (size > -1) {
             m_buffer = new byte[size];
         } else {
-            throw new NotImplementedException("You must specify either the buffer or its size");
+            throw new BadParameterException("You must specify either the buffer or its size");
         }
     }
 
-    public void setSize() throws NotImplementedException, BadParameterException, NoSuccessException {
+    public void setSize() throws BadParameterException, NoSuccessException {
         if (m_buffer != null) {
             m_buffer = new byte[m_buffer.length];
         } else {
-            throw new NotImplementedException("You must specify either the buffer or its size");
+            throw new BadParameterException("You must specify either the buffer or its size");
         }
     }
 
-    public void setData(byte[] data) throws NotImplementedException, BadParameterException, NoSuccessException {
-        throw new NotImplementedException("Not allowed to change the byte[] of an implementation-allocated buffer", this);
+    public void setData(byte[] data) throws BadParameterException, IncorrectStateException, NoSuccessException {
+        throw new IncorrectStateException("Not allowed to change the byte[] of an implementation-allocated buffer", this);
     }
 }

@@ -19,6 +19,6 @@ import org.ogf.saga.url.URL;
  */
 public interface SyncJobFactory {
     public JobService doCreateJobServiceSync(Session session, URL rm) throws NotImplementedException,
-            IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException,
+            BadParameterException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException,
             PermissionDeniedException, TimeoutException, NoSuccessException;
 }

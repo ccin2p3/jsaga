@@ -218,7 +218,7 @@ public abstract class NSFactory {
             DoesNotExistException, AlreadyExistsException, TimeoutException,
             NoSuccessException {
         initializeFactory();
-        return factory.doCreateNSEntry(session, name, Flags.NONE.getValue());
+        return factory.doCreateNSEntry(session, name, Flags.READ.getValue());
     }
 
     /**
@@ -328,7 +328,7 @@ public abstract class NSFactory {
             NoSuccessException {
         Session session = SessionFactory.createSession();
         initializeFactory();
-        return factory.doCreateNSEntry(session, name, Flags.NONE.getValue());
+        return factory.doCreateNSEntry(session, name, Flags.READ.getValue());
     }
 
     /**
@@ -441,7 +441,7 @@ public abstract class NSFactory {
             NoSuccessException {
         initializeFactory();
         return factory
-                .doCreateNSDirectory(session, name, Flags.NONE.getValue());
+                .doCreateNSDirectory(session, name, Flags.READ.getValue());
     }
 
     /**
@@ -552,7 +552,7 @@ public abstract class NSFactory {
         Session session = SessionFactory.createSession();
         initializeFactory();
         return factory
-                .doCreateNSDirectory(session, name, Flags.NONE.getValue());
+                .doCreateNSDirectory(session, name, Flags.READ.getValue());
     }
 
     /**
@@ -600,8 +600,8 @@ public abstract class NSFactory {
             Session session, URL name) throws NotImplementedException,
             NoSuccessException {
         initializeFactory();
-        return factory.doCreateNSEntry(mode, session, name, Flags.NONE
-                .getValue());
+        return factory.doCreateNSEntry(mode, session, name,
+                Flags.READ.getValue());
     }
 
     /**
@@ -648,8 +648,8 @@ public abstract class NSFactory {
             throws NotImplementedException, NoSuccessException {
         Session session = SessionFactory.createSession();
         initializeFactory();
-        return factory.doCreateNSEntry(mode, session, name, Flags.NONE
-                .getValue());
+        return factory.doCreateNSEntry(mode, session, name,
+                Flags.READ.getValue());
     }
 
     /**
@@ -698,8 +698,8 @@ public abstract class NSFactory {
             Session session, URL name) throws NotImplementedException,
             NoSuccessException {
         initializeFactory();
-        return factory.doCreateNSDirectory(mode, session, name, Flags.NONE
-                .getValue());
+        return factory.doCreateNSDirectory(mode, session, name,
+                Flags.READ.getValue());
     }
 
     /**
@@ -749,7 +749,7 @@ public abstract class NSFactory {
             URL name) throws NotImplementedException, NoSuccessException {
         Session session = SessionFactory.createSession();
         initializeFactory();
-        return factory.doCreateNSDirectory(mode, session, name, Flags.NONE
-                .getValue());
+        return factory.doCreateNSDirectory(mode, session, name,
+                Flags.READ.getValue());
     }
 }

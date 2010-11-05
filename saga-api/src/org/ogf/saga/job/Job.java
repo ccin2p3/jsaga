@@ -32,6 +32,9 @@ public interface Job extends Task<Void, Void>, Async, AsyncAttributes<Job>,
 
     /** Attribute name, SAGA representation of the job identifier. */
     public static final String JOBID = "JobID";
+    
+    /** Attribute name, URL representation of the JobService that created the job. */
+    public static final String SERVICEURL = "ServiceURL";
 
     // Optional attributes:
 

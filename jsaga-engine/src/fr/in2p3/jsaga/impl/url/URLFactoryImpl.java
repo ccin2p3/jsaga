@@ -18,7 +18,7 @@ import org.ogf.saga.url.URLFactory;
  *
  */
 public class URLFactoryImpl extends URLFactory {
-    protected URL doCreateURL(String url) throws BadParameterException, NoSuccessException, NotImplementedException {
+    protected URL doCreateURL(String url) throws BadParameterException, NoSuccessException {
         return new URLImpl(url, true);  // encode = true
     }
 

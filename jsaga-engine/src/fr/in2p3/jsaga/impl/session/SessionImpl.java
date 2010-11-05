@@ -41,7 +41,7 @@ public class SessionImpl extends AbstractSagaObjectImpl implements Session {
         return clone;
     }
 
-    public void addContext(Context context) throws NotImplementedException {
+    public void addContext(Context context) throws NoSuccessException, TimeoutException {
         if (context instanceof ContextImpl) {
             ContextImpl ctxImpl = (ContextImpl) context;
             if (! m_contexts.contains(ctxImpl)) {
@@ -55,7 +55,7 @@ public class SessionImpl extends AbstractSagaObjectImpl implements Session {
                 m_contexts.add(ctxImpl);
             }
         } else {
-            throw new NotImplementedException("Unsupported context implementation: "+context.getClass());
+            throw new NoSuccessException("Unsupported context implementation: "+context.getClass());
         }
     }
 

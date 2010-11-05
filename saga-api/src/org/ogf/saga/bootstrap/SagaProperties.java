@@ -32,7 +32,7 @@ public final class SagaProperties {
     public static final String PREFIX = "saga.";
 
     /** Property name for selecting a Saga implementation. */
-    public static final String IMPLEMENTATION = PREFIX + "implementation";
+    public static final String FACTORY = PREFIX + "factory";
 
     /** Property name of the property file. */
     public static final String PROPERTIES_FILE = PREFIX + "properties.file";
@@ -40,7 +40,7 @@ public final class SagaProperties {
     /** List of {NAME, DEFAULT_VALUE, DESCRIPTION} for properties. */
     private static final String[][] propertiesList =
             new String[][] {
-                { IMPLEMENTATION, null,
+                { FACTORY, null,
                     "Classname of a Saga implementation factory."},
                 { PROPERTIES_FILE, null,
                     "Name of the property file used for the configuration of Saga." },

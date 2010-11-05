@@ -8,6 +8,7 @@ import org.ogf.saga.context.ContextFactory;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.file.FileFactory;
+import org.ogf.saga.isn.ISNFactory;
 import org.ogf.saga.job.JobFactory;
 import org.ogf.saga.logicalfile.LogicalFileFactory;
 import org.ogf.saga.monitoring.MonitoringFactory;
@@ -29,8 +30,6 @@ import org.ogf.saga.url.URLFactory;
  */
 public class ImplementationBootstrapLoader {
 
-    private static final String PROPERTY_NAME = "saga.factory";
-
     private static SagaFactory factory;
 
     private static synchronized void initFactory() throws NoSuccessException {
@@ -38,7 +37,7 @@ public class ImplementationBootstrapLoader {
         if (factory == null) {
             Properties sagaProperties = SagaProperties.getDefaultProperties();
             // Obtain the name of the SAGA factory.
-            String factoryName = sagaProperties.getProperty(PROPERTY_NAME);
+            String factoryName = sagaProperties.getProperty(SagaProperties.FACTORY);
             if (factoryName == null) {
                 throw new NoSuccessException("No SAGA factory name specified");
             }
@@ -75,13 +74,11 @@ public class ImplementationBootstrapLoader {
      * Creates a buffer factory.
      * 
      * @return a buffer factory.
-     * @throws NotImplementedException
-     *             is thrown when buffers are not implemented.
      * @throws NoSuccessException
      *             is thrown when the Saga factory could not be created.
      */
     public static BufferFactory createBufferFactory()
-            throws NotImplementedException, NoSuccessException {
+            throws NoSuccessException {
         initFactory();
         return factory.createBufferFactory();
     }
@@ -111,7 +108,22 @@ public class ImplementationBootstrapLoader {
         initFactory();
         return factory.createFileFactory();
     }
-
+    
+    /**
+     * Creates a ISN factory for the Information System Navigator.
+     * 
+     * @return an ISN factory.
+     * @throws NoSuccessException
+     *             is thrown when the Saga factory could not be created.
+     * @throws NotImplementedException
+     *             is thrown when ISN is not implemented.   
+     */
+    public static ISNFactory createISNFactory()
+            throws NotImplementedException, NoSuccessException {
+        initFactory();
+        return factory.createISNFactory();
+    } 
+    
     /**
      * Creates a job factory.
      * 
@@ -250,13 +262,11 @@ public class ImplementationBootstrapLoader {
      * Creates an URL factory.
      * 
      * @return an URL factory.
-     * @throws NotImplementedException
-     *             is thrown when URLs are not implemented.
-     * @throws NoSuccessException
+      * @throws NoSuccessException
      *             is thrown when the Saga factory could not be created.
      */
     public static URLFactory createURLFactory()
-            throws NotImplementedException, NoSuccessException {
+            throws NoSuccessException {
         initFactory();
         return factory.createURLFactory();
     }

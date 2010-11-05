@@ -4,6 +4,7 @@ import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.context.ContextFactory;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.file.FileFactory;
+import org.ogf.saga.isn.ISNFactory;
 import org.ogf.saga.job.JobFactory;
 import org.ogf.saga.logicalfile.LogicalFileFactory;
 import org.ogf.saga.monitoring.MonitoringFactory;
@@ -26,10 +27,8 @@ public interface SagaFactory {
      * Creates a factory for the Saga buffer package.
      * 
      * @return the buffer factory.
-     * @exception NotImplementedException
-     *                is thrown when buffers are not implemented.
      */
-    BufferFactory createBufferFactory() throws NotImplementedException;
+    BufferFactory createBufferFactory();
 
     /**
      * Creates a factory for the Saga context package.
@@ -37,7 +36,7 @@ public interface SagaFactory {
      * @return the context factory.
      */
     ContextFactory createContextFactory();
-
+    
     /**
      * Creates a factory for the Saga file package. Note: this method cannot
      * throw NotImplemented, because the IOVec constructor from the SAGA specs
@@ -94,15 +93,6 @@ public interface SagaFactory {
     RPCFactory createRPCFactory() throws NotImplementedException;
 
     /**
-     * Creates a factory for the Saga Service Discovery package.
-     * 
-     * @return the SD factory.
-     * @exception NotImplementedException
-     *                is thrown when SD is not implemented.
-     */
-    SDFactory createSDFactory() throws NotImplementedException;
-
-    /**
      * Creates a factory for the Saga session package.
      * 
      * @return the session factory.
@@ -131,8 +121,27 @@ public interface SagaFactory {
      * Creates a factory for the Saga URL package.
      * 
      * @return the URL factory.
-     * @exception NotImplementedException
-     *                is thrown when URLs are not implemented.
      */
-    URLFactory createURLFactory() throws NotImplementedException;
+    URLFactory createURLFactory();
+    
+    // REMOVE FROM GFD DOC
+    /**
+     * Creates a factory for the Saga Service Discovery package.
+     * 
+     * @return the SD factory.
+     * @exception NotImplementedException
+     *                is thrown when SD is not implemented.
+     */
+    SDFactory createSDFactory() throws NotImplementedException;
+    
+
+    /**
+     * Creates a factory for the Saga Information System Navigator package.
+     * 
+     * @return the ISN factory.
+     * @exception NotImplementedException
+     *                is thrown when ISN is not implemented.
+     */
+    ISNFactory createISNFactory() throws NotImplementedException;
+    // END REMOVE FROM GFD DOC
 }

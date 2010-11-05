@@ -43,6 +43,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2-beta-2</version>
                 <configuration>
                     <descriptors>
                         <descriptor>assembly/config.xml</descriptor>
@@ -135,7 +136,7 @@
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api</artifactId>
-            <version>1.0.1</version>
+            <version>1.1</version>
         </dependency>
         <dependency>
             <groupId>org.ogf.saga</groupId>

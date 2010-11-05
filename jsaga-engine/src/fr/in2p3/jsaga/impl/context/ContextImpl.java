@@ -44,7 +44,7 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     private SecurityAdaptorFactory m_adaptorFactory;
 
     /** constructor */
-    public ContextImpl(String type, SessionConfiguration config, SecurityAdaptorFactory adaptorFactory) throws NotImplementedException, IncorrectStateException, NoSuccessException {
+    public ContextImpl(String type, SessionConfiguration config, SecurityAdaptorFactory adaptorFactory) throws IncorrectStateException, TimeoutException, NoSuccessException {
         super(null, true);  //not attached to a session, isExtensible=true
         m_attributes = new ContextAttributes(this);
         m_adaptor = null;
@@ -56,8 +56,8 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
             try {
                 this.setAttribute(Context.TYPE, type);
             }
-            catch (NotImplementedException e) {throw e;}
             catch (IncorrectStateException e) {throw e;}
+            catch (TimeoutException e) {throw e;}
             catch (NoSuccessException e) {throw e;}
             catch (SagaException e) {throw new NoSuccessException(e);}
         }
@@ -180,10 +180,6 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     }
 
     ///////////////////////////////////////// implementation /////////////////////////////////////////
-
-    public void setDefaults() throws NotImplementedException, IncorrectStateException, NoSuccessException {
-        // do nothing
-    }
 
     /**
      * @see org.ogf.saga.session.Session
@@ -313,7 +309,7 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     /**
      * This method is specific to JSAGA implementation.
      */
-    public void throwIfConflictsWith(ContextImpl ref) throws NotImplementedException {
+    public void throwIfConflictsWith(ContextImpl ref) throws NoSuccessException {
         try {
             m_attributes.m_baseUrlIncludes.throwIfConflictsWith(
                     m_attributes.m_urlPrefix.getValue(),
@@ -321,11 +317,9 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
                     ref.m_attributes.m_baseUrlIncludes,
                     ref.m_attributes.m_baseUrlExcludes,
                     m_attributes.m_baseUrlExcludes);
-        } catch (IncorrectStateException e) {
-            throw new NotImplementedException(e);
-        } catch (NoSuccessException e) {
-            throw new NotImplementedException(e);
         }
+        catch (NoSuccessException e) {throw e;}
+        catch (SagaException e) {throw new NoSuccessException(e);}
     }
 
     /**
@@ -343,14 +337,14 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     /**
      * This method is specific to JSAGA implementation.
      */
-    public void setUrlPrefix(int position) throws NotImplementedException {
+    public void setUrlPrefix(int position) throws NoSuccessException {
         try {
             if (m_attributes.m_urlPrefix.getValue() == null) {
                 m_attributes.m_urlPrefix.setValue(m_attributes.m_type.getValue()+position);
             }
-        } catch (SagaException e) {
-            throw new NotImplementedException(e);
         }
+        catch (NoSuccessException e) {throw e;}
+        catch (SagaException e) {throw new NoSuccessException(e);}
     }
 
     /**

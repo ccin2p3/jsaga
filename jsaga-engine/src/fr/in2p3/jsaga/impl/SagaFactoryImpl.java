@@ -22,6 +22,7 @@ import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.context.ContextFactory;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.file.FileFactory;
+import org.ogf.saga.isn.ISNFactory;
 import org.ogf.saga.job.JobFactory;
 import org.ogf.saga.logicalfile.LogicalFileFactory;
 import org.ogf.saga.monitoring.MonitoringFactory;
@@ -90,7 +91,7 @@ public class SagaFactoryImpl implements SagaFactory {
         m_jobMonitorAdaptorFactory = new JobMonitorAdaptorFactory();
     }
 
-    public BufferFactory createBufferFactory() throws NotImplementedException {
+    public BufferFactory createBufferFactory() {
         return new BufferFactoryImpl();
     }
 
@@ -126,6 +127,10 @@ public class SagaFactoryImpl implements SagaFactory {
         throw new NotImplementedException("Not implemented by the SAGA engine");
     }
 
+    public ISNFactory createISNFactory() throws NotImplementedException {
+        throw new NotImplementedException("Not implemented by the SAGA engine");
+    }
+
     public SessionFactory createSessionFactory() {
         return new SessionFactoryImpl(m_config);
     }
@@ -138,7 +143,7 @@ public class SagaFactoryImpl implements SagaFactory {
         return new TaskFactoryImpl();
     }
 
-    public URLFactory createURLFactory() throws NotImplementedException {
+    public URLFactory createURLFactory() {
         return new URLFactoryImpl();
     }
 }

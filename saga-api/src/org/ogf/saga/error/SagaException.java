@@ -1,7 +1,9 @@
 package org.ogf.saga.error;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.ogf.saga.SagaObject;
@@ -9,45 +11,53 @@ import org.ogf.saga.SagaObject;
 /**
  * This is the base class for all exceptions in SAGA. It is a checked exception,
  * so all exceptions in SAGA are checked exceptions.
- * The {@link #getMessage} does not quite behave as specified in the SAGA specs, because
- * Java already has {@link #toString} for that.
+ * The {@link #getMessage} method does not quite behave as specified in the SAGA specs,
+ * because Java already has {@link #toString} for exactly that behavior.
  * So, {@link #getMessage} does what it always does for Java throwables.
- * 
+ * <p>
  * A simple mechanism exists for storing and examining exceptions that may be thrown
  * by adaptors in adaptor-based Saga implementations. In such implementations, the
  * top-level exception (the one highest up in the Saga exception hierarchy) is not
  * always the most informative one, and the implementation is not always capable
  * of selecting the most informative exception. In these cases, the implementation
  * may opt to add the individual exceptions as nested exceptions to the exception
- * thrown.
+ * thrown. The nested exceptions can be examined using the {@link #getAllExceptions}
+ * or {@link #getAllMessages} methods.
+ * <p>
+ * In addition to the {@link #getAllExceptions} and {@link #getAllMessages} mechanisms,
+ * this implementation also allows the user to iterate over the lower-level exception
+ * list.
  */
 public abstract class SagaException extends Exception implements
         Comparable<SagaException>, Iterable<SagaException> {
 
     // Determine the order of the exceptions, most specific first.
-    protected static final int NOT_IMPLEMENTED = 0;
 
-    protected static final int IO_EXCEPTION = 1;
+    protected static final int INCORRECT_URL = 1;
+    
+    protected static final int BAD_PARAMETER = 2;
 
-    protected static final int INCORRECT_URL = 2;
+    protected static final int ALREADY_EXISTS = 3;
 
-    protected static final int BAD_PARAMETER = 3;
+    protected static final int DOES_NOT_EXIST = 4;
 
-    protected static final int ALREADY_EXISTS = 4;
-
-    protected static final int DOES_NOT_EXIST = 5;
-
-    protected static final int INCORRECT_STATE = 6;
+    protected static final int INCORRECT_STATE = 5;
+    
+    // protected static final int INCORRECT_TYPE = 6;
 
     protected static final int PERMISSION_DENIED = 7;
 
     protected static final int AUTHORIZATION_FAILED = 8;
 
     protected static final int AUTHENTICATION_FAILED = 9;
+    
+    protected static final int IO_EXCEPTION = 10;
 
-    protected static final int TIMEOUT = 10;
+    protected static final int TIMEOUT = 11;
 
-    protected static final int NO_SUCCESS = 11;
+    protected static final int NO_SUCCESS = 12;   
+    
+    protected static final int NOT_IMPLEMENTED = 13;
 
     /** Determines how specific the exception is with respect to others. */
     private final int exceptionOrder;
@@ -58,6 +68,8 @@ public abstract class SagaException extends Exception implements
     
     private final ArrayList<SagaException> nestedExceptions
             = new ArrayList<SagaException>();
+    
+    private boolean isCopy = false;
 
     /**
      * Constructs a new SAGA exception.
@@ -178,7 +190,11 @@ public abstract class SagaException extends Exception implements
 
     /**
      * Returns the SAGA object associated with this exception.
-     * 
+     * @exception DoesNotExistException
+     *           is thrown when there is no object associated with this exception.
+     * @exception NoSuccessException
+     *           is thrown when the operation was not successfully performed,
+     *           and none of the other exceptions apply.
      * @return the associated SAGA object.
      */
     public SagaObject getObject() throws DoesNotExistException,
@@ -244,14 +260,79 @@ public abstract class SagaException extends Exception implements
         return new ExceptionIterator(this);
     }
     
-    private class ExceptionIterator implements Iterator<SagaException> {
-        private SagaException[] exceptions
-                = nestedExceptions.toArray(new SagaException[nestedExceptions.size()]);
-        private int index = -1;
-        private SagaException ex;
+    /**
+     * Strips nested exceptions from a Saga exception. This is needed for adaptors that
+     * call Saga factory methods from within a method, for instance <code>openDir</code>.
+     * 
+     * @return the stripped exception.
+     */
+    private SagaException stripNestedExceptions() {
+        try {
+            SagaException ex;
+            if (this instanceof SagaIOException) {
+                Constructor<SagaIOException> c = SagaIOException.class.getConstructor(
+                        String.class, Throwable.class, Integer.TYPE,
+                        SagaObject.class);
+
+                ex = c.newInstance(getMessage(),
+                        getCause(),
+                        ((SagaIOException) this).getPosixErrorCode(),
+                        object);
+            } else {
+                Constructor<? extends SagaException> c = getClass().getConstructor(
+                        String.class, Throwable.class, SagaObject.class);
+
+                ex = c.newInstance(getMessage(),
+                        getCause(), object);
+            }
+            ex.setStackTrace(getStackTrace());
+            ex.isCopy = true;
+            return ex;
+        } catch (Throwable e) {
+            throw new Error("Could not create copy of exception", e);
+        }
+    }
+    
+    /**
+     * Gets the list of lower-level exceptions. The first exception in the list
+     * is the one on which this method is invoked, but without lower-level exceptions.
+     * 
+     * @return the list of exceptions.
+     */
+    public List<SagaException> getAllExceptions() {
+        ArrayList<SagaException> list = new ArrayList<SagaException>();
+        if (isCopy) {
+            // Method is invoked nested, on a copy.
+            // Should return empty list.
+            return list;
+        }
+        list.add(stripNestedExceptions());
+        list.addAll(nestedExceptions);
+        return list;
+    }
+    
+    /**
+     * Gets the list of lower-level exception messages. The first message in the list
+     * is from the one on which this method is invoked.
+     * 
+     * @return the list of exception messages.
+     */
+    public List<String> getAllMessages() {
+        ArrayList<String> list = new ArrayList<String>();
+        list.add(toString());
+        for (SagaException e : nestedExceptions) {
+            list.add(e.toString());
+        }
+        return list;
+    }
+    
+    private static class ExceptionIterator implements Iterator<SagaException> {
+        private SagaException[] exceptions;
+        private int index = 0;
         
         ExceptionIterator(SagaException ex) {
-            this.ex = ex;
+            List<SagaException> list = ex.getAllExceptions();
+            exceptions = list.toArray(new SagaException[list.size()]);
         }
         
         public boolean hasNext() {
@@ -259,10 +340,6 @@ public abstract class SagaException extends Exception implements
         }
 
         public SagaException next() {
-            if (index == -1) {
-                index++;
-                return ex;
-            }
             if (index < exceptions.length) {
                 return exceptions[index++];
             }

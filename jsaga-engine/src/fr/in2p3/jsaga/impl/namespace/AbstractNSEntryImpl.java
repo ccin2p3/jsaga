@@ -158,6 +158,22 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
         }
     }
 
+    public long getMTime() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
+        float timeout = this.getTimeout("getMTime");
+        if (timeout == WAIT_FOREVER) {
+            return super.getMTimeSync();
+        } else {
+            try {
+                return (Long) getResult(super.getMTime(TaskMode.ASYNC), timeout);
+            }
+            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (BadParameterException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
+        }
+    }
+
     public void copy(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
         float timeout = this.getTimeout("copy");
         if (timeout == WAIT_FOREVER) {
@@ -208,7 +224,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
         }
     }
 
-    public void link(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+    public void link(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
         float timeout = this.getTimeout("link");
         if (timeout == WAIT_FOREVER) {
             super.linkSync(target, flags);
@@ -216,12 +232,11 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             try {
                 getResult(super.link(TaskMode.ASYNC, target, flags), timeout);
             }
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
             catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
 
-    public void link(URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
+    public void link(URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
         float timeout = this.getTimeout("link");
         if (timeout == WAIT_FOREVER) {
             super.linkSync(target);
@@ -229,7 +244,6 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
             try {
                 getResult(super.link(TaskMode.ASYNC, target), timeout);
             }
-            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
             catch (SagaIOException e) {throw new NoSuccessException(e);}
         }
     }
@@ -288,7 +302,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
         }
     }
 
-    public void close() throws NotImplementedException, IncorrectStateException, NoSuccessException {
+    public void close() throws NotImplementedException, NoSuccessException {
         float timeout = this.getTimeout("close");
         if (timeout == WAIT_FOREVER) {
             super.close();
@@ -297,7 +311,7 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
         }
     }
 
-    public void close(float timeoutInSeconds) throws NotImplementedException, IncorrectStateException, NoSuccessException {
+    public void close(float timeoutInSeconds) throws NotImplementedException, NoSuccessException {
         float timeout = this.getTimeout("close");
         if (timeout == WAIT_FOREVER) {
             super.close(timeoutInSeconds);

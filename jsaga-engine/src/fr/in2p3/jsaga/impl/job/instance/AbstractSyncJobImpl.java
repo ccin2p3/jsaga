@@ -20,7 +20,6 @@ import org.ogf.saga.error.*;
 import org.ogf.saga.job.JobDescription;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
-import org.ogf.saga.url.URL;
 
 import java.io.*;
 
@@ -44,7 +43,6 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     /** logger */
     private static Logger s_logger = Logger.getLogger(AbstractSyncJobImpl.class);
 
-    protected URL m_resourceManager;
     private JobControlAdaptor m_controlAdaptor;
     private JobMonitorService m_monitorService;
     private JobAttributes m_attributes;
@@ -83,8 +81,8 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     private AbstractSyncJobImpl(Session session, AbstractSyncJobServiceImpl service, boolean create) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         super(session, create);
         m_attributes = new JobAttributes(this);
+        m_attributes.m_ServiceUrl.setObject(service.m_resourceManager.getString());
         m_metrics = new JobMetrics(this);
-        m_resourceManager = service.m_resourceManager;
         m_controlAdaptor = service.m_controlAdaptor;
         m_monitorService = service.m_monitorService;
         m_IOHandler = null;
@@ -99,7 +97,6 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         AbstractSyncJobImpl clone = (AbstractSyncJobImpl) super.clone();
         clone.m_attributes = m_attributes.clone();
         clone.m_metrics = m_metrics.clone();
-        clone.m_resourceManager = m_resourceManager;
         clone.m_controlAdaptor = m_controlAdaptor;
         clone.m_monitorService = m_monitorService;
         clone.m_jobDescription = m_jobDescription;
@@ -547,7 +544,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         if (monitorAdaptor instanceof JobInfoAdaptor) {
             return (JobInfoAdaptor) monitorAdaptor;
         } else {
-            throw new NotImplementedException("Job attribute not supported by this adaptor: "+m_resourceManager.getScheme());
+            throw new NotImplementedException("Job attribute not supported by this adaptor: "+monitorAdaptor.getClass());
         }
     }
 

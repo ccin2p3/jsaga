@@ -6,14 +6,6 @@
                 xmlns:spmd="http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd"
                 xmlns:ext="http://www.in2p3.fr/jsdl-extension">
     <xsl:output method="xml" indent="yes"/>
-    <xsl:variable name="id">
-        <xsl:choose>
-            <xsl:when test="/attributes/JobName/@value">
-                <xsl:value-of select="/attributes/JobName/@value"/>
-            </xsl:when>
-            <xsl:otherwise><xsl:value-of select="generate-id(/attributes)"/></xsl:otherwise>
-        </xsl:choose>
-    </xsl:variable>
 
     <xsl:template match="/">
         <xsl:apply-templates select="attributes"/>
@@ -32,9 +24,11 @@
         <jsdl:JobDefinition>
             <jsdl:JobDescription>
                 <jsdl:JobIdentification>
-                    <jsdl:JobName><xsl:value-of select="$id"/></jsdl:JobName>
                     <xsl:for-each select="Queue/@value">
                         <jsdl:JobAnnotation><xsl:value-of select="."/></jsdl:JobAnnotation>
+                    </xsl:for-each>
+                    <xsl:for-each select="JobProject/@value">
+                        <jsdl:JobProject><xsl:value-of select="."/></jsdl:JobProject>
                     </xsl:for-each>
                     <xsl:for-each select="Extension/value/text()">
                         <xsl:element name="{substring-before(.,'=')}">
@@ -154,6 +148,11 @@
                         <jsdl:TotalPhysicalMemory>
                             <jsdl:UpperBoundedRange exclusiveBound="false"><xsl:value-of select="."/></jsdl:UpperBoundedRange>
                         </jsdl:TotalPhysicalMemory>
+                    </xsl:for-each>
+                    <xsl:for-each select="WallTimeLimit/@value">
+                        <WallTimeLimit>
+                            <jsdl:UpperBoundedRange exclusiveBound="false"><xsl:value-of select="."/></jsdl:UpperBoundedRange>
+                        </WallTimeLimit>
                     </xsl:for-each>
                 </jsdl:Resources>
                 <xsl:for-each select="FileTransfer/value/text()">

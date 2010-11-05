@@ -25,14 +25,18 @@ import java.io.OutputStream;
  *
  */
 public class JobImpl extends AbstractAsyncJobImpl implements Job {
+    private String m_scheme;
+
     /** constructor for submission */
     public JobImpl(Session session, String nativeJobDesc, JobDescription jobDesc, DataStagingManager stagingMgr, String uniqId, AbstractSyncJobServiceImpl service) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         super(session, nativeJobDesc, jobDesc, stagingMgr, uniqId, service);
+        m_scheme = service.m_resourceManager.getScheme();
     }
 
     /** constructor for control and monitoring only */
     public JobImpl(Session session, String nativeJobId, DataStagingManager stagingMgr, AbstractSyncJobServiceImpl service) throws NotImplementedException, BadParameterException, TimeoutException, NoSuccessException {
         super(session, nativeJobId, stagingMgr, service);
+        m_scheme = service.m_resourceManager.getScheme();
     }
 
     ////////////////////////////////////////// interface Task ///////////////////////////////////////////
@@ -209,6 +213,6 @@ public class JobImpl extends AbstractAsyncJobImpl implements Job {
     ////////////////////////////////////// private methods //////////////////////////////////////
 
     private float getTimeout(String methodName) throws NoSuccessException {
-        return getTimeout(Job.class, methodName, m_resourceManager.getScheme());
+        return getTimeout(Job.class, methodName, m_scheme);
     }
 }

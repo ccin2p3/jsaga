@@ -5,6 +5,7 @@ import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.session.Session;
 import org.ogf.saga.url.URL;
 
 import java.net.URI;
@@ -131,6 +132,9 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
 
     /** Encode the URL */
     public void setString(String url) throws BadParameterException {
+        if (url == null) {
+            url = "";
+        }
         String encodedUrl = (url.startsWith("file://"))
                 ? URLEncoder.encodePathOnly(url)
                 : URLEncoder.encode(url);
@@ -141,10 +145,21 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
             throw new BadParameterException("syntax error in url", e);
         }
     }
+    public void setString() throws BadParameterException {
+        this.setString(null);
+    }
 
     /** Decode the URL */
     public String getString() {
         return URLEncoder.decode(u, m_mustRemoveSlash);
+    }
+    /** DO NOT decode the URL */
+    public String getEscaped() {
+        return u.toString();
+    }
+    /** DO NOT decode the URL */
+    public String toString() {
+        return u.toString();
     }
 
     public String getFragment() {
@@ -158,6 +173,9 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
         } catch(URISyntaxException e) {
             throw new BadParameterException("syntax error in fragment", e);
         }
+    }
+    public void setFragment() throws BadParameterException {
+        this.setFragment(null);
     }
 
     public String getHost() {
@@ -174,6 +192,9 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
         } catch(URISyntaxException e) {
             throw new BadParameterException("syntax error in host", e);
         }
+    }
+    public void setHost() throws BadParameterException {
+        this.setHost(null);
     }
 
     public String getPath() {
@@ -197,6 +218,9 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
     }
 
     public void setPath(String path) throws BadParameterException {
+        if (path == null) {
+            path = "";
+        }
         try {
             if (path.startsWith("./")) {
                 //sreynaud: set relative path
@@ -212,6 +236,9 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
         } catch(URISyntaxException e) {
             throw new BadParameterException("syntax error in path", e);
         }
+    }
+    public void setPath() throws BadParameterException {
+        this.setPath(null);
     }
 
     public int getPort() {
@@ -229,6 +256,9 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
             throw new BadParameterException("syntax error in port", e);     // ???
         }
     }
+    public void setPort() throws BadParameterException {
+        this.setPort(-1);
+    }
 
     public String getQuery() {
         if (u.getQuery() == null) {
@@ -245,6 +275,9 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
             throw new BadParameterException("syntax error in query", e);
         }
     }
+    public void setQuery() throws BadParameterException {
+        this.setQuery(null);
+    }
 
     public String getScheme() {
         return u.getScheme();
@@ -257,6 +290,9 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
         } catch(URISyntaxException e) {
             throw new BadParameterException("syntax error in scheme", e);
         }
+    }
+    public void setScheme() throws BadParameterException {
+        this.setScheme(null);
     }
 
     public String getUserInfo() {
@@ -274,6 +310,9 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
             throw new BadParameterException("syntax error in query", e);
         }
     }
+    public void setUserInfo() throws BadParameterException {
+        this.setUserInfo(null);
+    }
 
     public URL translate(String scheme) throws BadParameterException, NoSuccessException {
         try {
@@ -286,6 +325,9 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
         } catch(URISyntaxException e) {
             throw new BadParameterException("syntax error in scheme", e);
         }
+    }
+    public URL translate(Session session, String scheme) throws BadParameterException, NoSuccessException {
+        return this.translate(scheme);
     }
 
     public URL resolve(URL url) throws NoSuccessException {
@@ -324,11 +366,6 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
         }
         URLImpl other = (URLImpl) o;
         return u.equals(other.u);
-    }
-
-    /** DO NOT decode the URL */
-    public String toString() {
-        return u.toString();
     }
 
     ////////////////////////////////////////// cache methods //////////////////////////////////////////

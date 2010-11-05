@@ -1,8 +1,7 @@
 package fr.in2p3.jsaga.impl.session;
 
 import fr.in2p3.jsaga.engine.session.SessionConfiguration;
-import org.ogf.saga.error.NoSuccessException;
-import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
 
@@ -25,10 +24,14 @@ public class SessionFactoryImpl extends SessionFactory {
         m_config = config;
     }
     
-    protected Session doCreateSession(boolean defaults) throws NotImplementedException, NoSuccessException {
+    protected Session doCreateSession(boolean defaults) throws NoSuccessException {
         Session session = new SessionImpl();
         if (defaults) {
-            m_config.setDefaultSession(session);
+            try {
+                m_config.setDefaultSession(session);
+            }
+            catch (NoSuccessException e) {throw e;}
+            catch (SagaException e) {throw new NoSuccessException(e);}
         }
         return session;
     }

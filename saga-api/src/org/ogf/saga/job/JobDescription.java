@@ -62,6 +62,9 @@ public interface JobDescription extends SagaObject, Attributes {
 
     /** Attribute name, time at which the job should be scheduled. */
     public static final String JOBSTARTTIME = "JobStartTime";
+    
+    /** Attribute name, hard limit for the total job runtime. */
+    public static final String WALLTIMELIMIT = "WallTimeLimit";
 
     /**
      * Attribute name, estimate of total number of CPU seconds the job will
@@ -86,7 +89,10 @@ public interface JobDescription extends SagaObject, Attributes {
 
     /** Attribute name, name of queue to place the job into. */
     public static final String QUEUE = "Queue";
-
+    
+    /** Attribute name, name of an account or project name. */
+    public static final String JOBPROJECT = "JobProject";
+    
     /**
      * Attribute name, set of end points where to report job state transitions.
      */

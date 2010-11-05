@@ -35,26 +35,26 @@ import java.util.*;
 public abstract class AbstractSyncLogicalFileImpl extends AbstractNSEntryImplWithMetaData implements SyncLogicalFile {
     /** constructor for factory */
     public AbstractSyncLogicalFileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(session, URLHelper.toFileURL(url), adaptor, new FlagsHelper(flags).remove(Flags.ALLLOGICALFILEFLAGS));
+        super(session, URLHelper.toFileURL(url), adaptor, new FlagsHelper(flags).keep(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS));
         this.init(flags);
     }
 
     /** constructor for NSDirectory.open() */
     public AbstractSyncLogicalFileImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(dir, URLHelper.toFileURL(relativeUrl), new FlagsHelper(flags).remove(Flags.ALLLOGICALFILEFLAGS));
+        super(dir, URLHelper.toFileURL(relativeUrl), new FlagsHelper(flags).keep(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS));
         this.init(flags);
     }
 
     /** constructor for NSEntry.openAbsolute() */
     public AbstractSyncLogicalFileImpl(AbstractNSEntryImpl entry, String absolutePath, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(entry, URLHelper.toFilePath(absolutePath), new FlagsHelper(flags).remove(Flags.ALLLOGICALFILEFLAGS));
+        super(entry, URLHelper.toFilePath(absolutePath), new FlagsHelper(flags).keep(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS));
         this.init(flags);
     }
 
     private void init(int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         if(Flags.CREATEPARENTS.isSet(flags)) flags=Flags.CREATE.or(flags);
         if(Flags.CREATE.isSet(flags)) flags=Flags.WRITE.or(flags);
-        new FlagsHelper(flags).allowed(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS, Flags.ALLLOGICALFILEFLAGS);
+        new FlagsHelper(flags).allowed(JSAGAFlags.BYPASSEXIST, Flags.ALLLOGICALFILEFLAGS);
         if (Flags.CREATE.isSet(flags)) {
             if (m_adaptor instanceof LogicalWriter) {
                 try {
@@ -110,14 +110,14 @@ public abstract class AbstractSyncLogicalFileImpl extends AbstractNSEntryImplWit
         URL effectiveTarget = this._getEffectiveURL(target);
         if (JSAGAFlags.PRESERVETIMES.isSet(flags)) {
             // throw NotImplementedException if can not preserve times
-            Date sourceTimes = this.getLastModified();
+            long sourceTimes = this.getMTime();
             AbstractNSEntryImpl targetEntry = super._getTargetEntry_checkPreserveTimes(effectiveTarget);
 
             // copy
             new LogicalFileCopy(m_session, this, m_adaptor).copy(effectiveTarget, flags);
 
             // preserve times
-            targetEntry.setLastModified(sourceTimes);
+            targetEntry.setMTime(sourceTimes);
         } else {
             // copy only
             new LogicalFileCopy(m_session, this, m_adaptor).copy(effectiveTarget, flags);
@@ -133,13 +133,13 @@ public abstract class AbstractSyncLogicalFileImpl extends AbstractNSEntryImplWit
         URL effectiveSource = this._getEffectiveURL(source);
         if (JSAGAFlags.PRESERVETIMES.isSet(flags)) {
             // throw NotImplementedException if can not preserve times
-            Date sourceTimes = super._getSourceTimes_checkPreserveTimes(effectiveSource);
+            long sourceTimes = super._getSourceTimes_checkPreserveTimes(effectiveSource);
 
             // copy
             new LogicalFileCopyFrom(m_session, this, m_adaptor).copyFrom(effectiveSource, flags);
 
             // preserve times
-            this.setLastModified(sourceTimes);
+            this.setMTime(sourceTimes);
         } else {
             // copy only
             new LogicalFileCopyFrom(m_session, this, m_adaptor).copyFrom(effectiveSource, flags);

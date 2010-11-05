@@ -31,7 +31,7 @@ public abstract class AbstractBufferImpl extends AbstractSagaObjectImpl implemen
         return super.clone();
     }
 
-    public int getSize() throws NotImplementedException, IncorrectStateException {
+    public int getSize() throws IncorrectStateException {
         if (m_buffer != null) {
             return m_buffer.length;
         } else {
@@ -39,7 +39,7 @@ public abstract class AbstractBufferImpl extends AbstractSagaObjectImpl implemen
         }
     }
 
-    public byte[] getData() throws NotImplementedException, DoesNotExistException, IncorrectStateException {
+    public byte[] getData() throws DoesNotExistException, IncorrectStateException {
         if (m_buffer != null) {
             return m_buffer;
         } else {
@@ -47,11 +47,11 @@ public abstract class AbstractBufferImpl extends AbstractSagaObjectImpl implemen
         }
     }
 
-    public void close() throws NotImplementedException {
+    public void close() {
         m_buffer = null;
     }
 
-    public void close(float timeoutInSeconds) throws NotImplementedException {
+    public void close(float timeoutInSeconds) {
         this.close();
     }
 }

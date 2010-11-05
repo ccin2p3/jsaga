@@ -27,7 +27,7 @@ public class ContextFactoryImpl extends ContextFactory {
         m_adaptorFactory = adaptorFactory;
     }
 
-    protected Context doCreateContext(String type) throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
+    protected Context doCreateContext(String type) throws IncorrectStateException, TimeoutException, NoSuccessException {
         return new ContextImpl(type, m_config, m_adaptorFactory);
     }
 }

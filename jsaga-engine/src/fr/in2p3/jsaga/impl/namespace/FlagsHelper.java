@@ -16,7 +16,7 @@ import org.ogf.saga.namespace.Flags;
  *
  */
 public class FlagsHelper {
-    private static final int ALL = Flags.ALLNAMESPACEFLAGS.or(Flags.ALLFILEFLAGS.or(JSAGAFlags.ALLFLAGS.getValue()));
+    private static final int ALL = Flags.ALLFILEFLAGS.or(JSAGAFlags.ALLFLAGS.getValue());
     private int m_flags;
 
     public FlagsHelper(int flags) {
@@ -66,6 +66,17 @@ public class FlagsHelper {
         
         // return addition
         return m_flags | added;
+    }
+
+    public int keep(Flags... keepedFlags) {
+        return this.keep(null, keepedFlags);
+    }
+    public int keep(JSAGAFlags jsagaFlag, Flags... keepedFlags) {
+        // set keeped flags
+        int keeped = toInt(jsagaFlag, keepedFlags);
+
+        // return intersection
+        return m_flags & keeped;
     }
 
     public int remove(Flags... substractedFlags) {

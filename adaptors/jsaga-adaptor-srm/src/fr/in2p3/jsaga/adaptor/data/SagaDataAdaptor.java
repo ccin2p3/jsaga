@@ -151,8 +151,6 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         try {
             String protocol = m_rootUrl.getScheme();
             targetUrl = URLFactory.createURL(getURLString(protocol, targetHost, targetPort, targetAbsolutePath));
-        } catch (NotImplementedException e) {
-            throw new NoSuccessException(e);
         } catch (IncorrectURLException e) {
             throw new NoSuccessException(e);
         }
@@ -176,8 +174,6 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         try {
             String protocol = m_rootUrl.getScheme();
             sourceUrl = URLFactory.createURL(getURLString(protocol, sourceHost, sourcePort, sourceAbsolutePath));
-        } catch (NotImplementedException e) {
-            throw new NoSuccessException(e);
         } catch (IncorrectURLException e) {
             throw new NoSuccessException(e);
         }

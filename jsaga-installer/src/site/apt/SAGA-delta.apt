@@ -2,14 +2,16 @@ Deviations from SAGA specifications
 
 * Security management
 
-    * If several valid context candidates are available for a given URL, then instead of trying all the contexts,
-      an AmbiguityException (extends NoSuccessException) is thrown. This avoid the risk of...
+    * Context attributes added to get some control on context selection
 
-        * creating files with unexpected owner.
+        * UrlPrefix: the identifier of the context within the session.
+          When added at the beginning of the URL (e.g. MyCtx-protocol://hostname), it tells to JSAGA ot use this context for this URL.
 
-        * submitting jobs that fail at runtime because of unexpected user.
+        * BaseUrlIncludes: the URL patterns that will select this context when matched.
 
-        * locking the account because of too many failed connection attempts.
+        * BaseUrlExcludes: the URL patterns that will exclude this context from selection when matched.
+
+        * ServiceAttributes: the configuration of data and execution services associated with this context.
 
     * Methods
 
@@ -19,12 +21,11 @@ Deviations from SAGA specifications
 
     * URL
 
+        * Scheme (...://) at the beginning of URL can be prefixed by a context name to force usage of this context.
+
         * Query (?...) at the end of URL refers to adaptor-specific parameters.
-
-        * Fragment (#...) at the end of URL refers to a specific configuration of the protocol.
-
-        * Modified class URL to support windows paths, relative paths (<scheme>://./<path>) and special characters (e.g. % \ #).
-          <(NOTE: this is the only modification made on the SAGA Java Binding, and it will disappear when a URL factory will be provided)>
+        
+        * Path can be relative (<scheme>://./<path>).
 
     * Constructor flags
 
@@ -32,19 +33,15 @@ Deviations from SAGA specifications
           <(NOTE: an IncorrectState exception embedding a DoesNotExist exception may be thrown on subsequent method invocations)>
 
     * Methods
-      <(NOTE: These methods are accessible by casting NSEntry instances to AbstractNSEntryImpl and NSDirectory instances to AbstractNSDirectoryImpl)>
 
-        * copyFrom(): added to copy remote source entry to current entry (for optimization purposes).
-        
-        * getLastModified(): added to get the date of last modification (for implementation of "ls -l").
+        * copyFrom() (<<deprecated>>): added to copy remote source entry to current entry (for optimization purposes).
+          <(NOTE: This method is accessible by casting NSEntry instances to AbstractNSEntryImpl and NSDirectory instances to AbstractNSDirectoryImpl)>
 
         * NSEntry.remove(): allow no RECURSIVE flag for directory (for enabling "rmdir-like" behavior).
 
 * Job management
 
     * Job description attributes
-
-        * JobName: added
 
         * JobStartTime: not supported
           <(NOTE: this attribute is ’not supported by JSDL and might disappear in future versions of the SAGA API)>
@@ -58,18 +55,13 @@ Deviations from SAGA specifications
         * OperatingSystemType: defined as scalar attribute
           <(NOTE: for compliance with JSDL)>
 
-    * Attributes
+    * Job attributes
 
         * NativeJobDescription: added
 
     * Metrics
 
-        * job.sub_state: added
-
-    * Methods
-
-        * allocateResource: added
-          <(NOTE: to be renamed to bindResourceManager)>
+        * job.sub_state (<<deprecated>>): added
 
 * Streams, Remote Procedure Call
 

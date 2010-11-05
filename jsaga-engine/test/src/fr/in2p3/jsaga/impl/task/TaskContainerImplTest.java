@@ -18,8 +18,8 @@ import org.ogf.saga.task.*;
 public class TaskContainerImplTest extends TestCase {
     public void test_sync() throws Exception {
         TaskContainer container = new TaskContainerImpl(null);
-        int cookie1 = container.add(new AsyncTest().getHello(TaskMode.SYNC, "test1"));
-        Task<?,?> task1 = container.getTask(cookie1);
+        Task<?,?> task1 = new AsyncTest().getHello(TaskMode.SYNC, "test1");
+        container.add(task1);
         assertEquals(
                 "Hello test1 !",
                 task1.getResult());

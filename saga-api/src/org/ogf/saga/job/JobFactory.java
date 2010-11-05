@@ -3,6 +3,7 @@ package org.ogf.saga.job;
 import org.ogf.saga.bootstrap.ImplementationBootstrapLoader;
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
+import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.IncorrectURLException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
@@ -47,7 +48,7 @@ public abstract class JobFactory {
      * @return the job service.
      */
     protected abstract JobService doCreateJobService(Session session, URL rm)
-            throws NotImplementedException, IncorrectURLException,
+            throws NotImplementedException, BadParameterException, IncorrectURLException,
             AuthenticationFailedException, AuthorizationFailedException,
             PermissionDeniedException, TimeoutException, NoSuccessException;
 
@@ -119,12 +120,15 @@ public abstract class JobFactory {
      *      is thrown when an implementation cannot handle the specified
      *      protocol, or that access to the specified entity via the
      *      given protocol is impossible.
+     * @exception BadParameterException
+     *      is thrown if the specified URL cannot be contacted, or a
+     *      default contact point does not exist or cannot be found.
      * @exception NoSuccessException
      *      is thrown when the operation was not successfully performed,
      *      and none of the other exceptions apply.
      */
     public static JobService createJobService(Session session, URL rm)
-            throws NotImplementedException, IncorrectURLException,
+            throws NotImplementedException, BadParameterException, IncorrectURLException,
             AuthenticationFailedException, AuthorizationFailedException,
             PermissionDeniedException, TimeoutException, NoSuccessException {
         initializeFactory();
@@ -162,12 +166,14 @@ public abstract class JobFactory {
      *      is thrown when an implementation cannot handle the specified
      *      protocol, or that access to the specified entity via the
      *      given protocol is impossible.
+     * @exception BadParameterException
+     *      is thrown if a default contact point does not exist or cannot be found.
      * @exception NoSuccessException
      *      is thrown when the operation was not successfully performed,
      *      and none of the other exceptions apply.
      */
     public static JobService createJobService(Session session)
-            throws NotImplementedException, IncorrectURLException,
+            throws NotImplementedException, BadParameterException, IncorrectURLException,
             AuthenticationFailedException, AuthorizationFailedException,
             PermissionDeniedException, TimeoutException, NoSuccessException {
         URL url;
@@ -211,12 +217,15 @@ public abstract class JobFactory {
      *      is thrown when an implementation cannot handle the specified
      *      protocol, or that access to the specified entity via the
      *      given protocol is impossible.
+     * @exception BadParameterException
+     *      is thrown if the specified URL cannot be contacted, or a
+     *      default contact point does not exist or cannot be found.
      * @exception NoSuccessException
      *      is thrown when the operation was not successfully performed,
      *      and none of the other exceptions apply.
      */
     public static JobService createJobService(URL rm)
-            throws NotImplementedException, IncorrectURLException,
+            throws NotImplementedException, BadParameterException, IncorrectURLException,
             AuthenticationFailedException, AuthorizationFailedException,
             PermissionDeniedException, TimeoutException, NoSuccessException {
         Session session = SessionFactory.createSession();
@@ -254,12 +263,14 @@ public abstract class JobFactory {
      *      is thrown when an implementation cannot handle the specified
      *      protocol, or that access to the specified entity via the
      *      given protocol is impossible.
+     * @exception BadParameterException
+     *      is thrown if a default contact point does not exist or cannot be found.
      * @exception NoSuccessException
      *      is thrown when the operation was not successfully performed,
      *      and none of the other exceptions apply.
      */
     public static JobService createJobService() throws NotImplementedException,
-            IncorrectURLException, AuthenticationFailedException,
+            BadParameterException, IncorrectURLException, AuthenticationFailedException,
             AuthorizationFailedException, PermissionDeniedException,
             TimeoutException, NoSuccessException {
         URL url;

@@ -51,9 +51,15 @@ public class FlagsHelperTest extends TestCase {
         assertEquals(Flags.CREATE.or(Flags.READ.or(Flags.RECURSIVE)), newFlags);
     }
 
-    public void test_remove() {
-        int flags = Flags.CREATE.or(Flags.READ);
-        int newFlags = new FlagsHelper(flags).remove(Flags.ALLFILEFLAGS);
+    public void test_keep() {
+        int flags = Flags.CREATE.or(Flags.APPEND);
+        int newFlags = new FlagsHelper(flags).keep(Flags.ALLNAMESPACEFLAGS);
         assertEquals(Flags.CREATE.getValue(), newFlags);
+    }
+
+    public void test_remove() {
+        int flags = Flags.CREATE.or(Flags.APPEND);
+        int newFlags = new FlagsHelper(flags).remove(Flags.ALLNAMESPACEFLAGS);
+        assertEquals(Flags.APPEND.getValue(), newFlags);
     }
 }

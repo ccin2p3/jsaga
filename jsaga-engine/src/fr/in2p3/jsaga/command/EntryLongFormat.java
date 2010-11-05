@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.command;
 
-import fr.in2p3.jsaga.impl.namespace.AbstractNSEntryImpl;
 import org.ogf.saga.error.*;
 import org.ogf.saga.file.File;
 import org.ogf.saga.namespace.*;
@@ -70,7 +69,7 @@ public class EntryLongFormat {
         buf.append(format(this.getSize(entry), 10));
         buf.append(' ');
         final String FORMAT = "MMM-dd-yyyy HH:mm";
-        Date lastModified = this.getLastModified(entry);
+        Date lastModified = this.getMTime(entry);
         if (lastModified != null) {
             buf.append(new SimpleDateFormat(FORMAT, Locale.ENGLISH).format(lastModified));
         } else {
@@ -142,15 +141,11 @@ public class EntryLongFormat {
         }
     }
 
-    public Date getLastModified(NSEntry entry) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
-        if (entry instanceof AbstractNSEntryImpl) {
-            try {
-                return ((AbstractNSEntryImpl)entry).getLastModified();
-            } catch (NotImplementedException e) {
-                return new Date(0);
-            }
-        } else {
-            return null;
+    public Date getMTime(NSEntry entry) throws AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
+        try {
+            return new Date(entry.getMTime());
+        } catch (NotImplementedException e) {
+            return new Date(0);
         }
     }
 

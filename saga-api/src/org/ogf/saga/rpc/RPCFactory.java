@@ -44,17 +44,6 @@ public abstract class RPCFactory {
             NotImplementedException;
 
     /**
-     * Creates a Parameter object. To be provided by the implementation.
-     * 
-     * @param mode
-     *            IN, OUT, INOUT.
-     * @return the parameter.
-     */
-    protected abstract Parameter doCreateParameter(IOMode mode)
-            throws BadParameterException, NoSuccessException,
-            NotImplementedException;
-
-    /**
      * Creates a RPC handle instance. To be provided by the implementation.
      * 
      * @param session
@@ -134,8 +123,7 @@ public abstract class RPCFactory {
     public static Parameter createParameter(IOMode mode)
             throws BadParameterException, NoSuccessException,
             NotImplementedException {
-        initializeFactory();
-        return factory.doCreateParameter(mode);
+        return createParameter(null, mode);
     }
 
     /**
@@ -158,8 +146,7 @@ public abstract class RPCFactory {
     public static Parameter createParameter(Object data)
             throws BadParameterException, NoSuccessException,
             NotImplementedException {
-        initializeFactory();
-        return factory.doCreateParameter(data, IOMode.IN);
+        return createParameter(data, IOMode.IN);
     }
 
     /**
@@ -179,8 +166,7 @@ public abstract class RPCFactory {
      */
     public static Parameter createParameter() throws BadParameterException,
             NoSuccessException, NotImplementedException {
-        initializeFactory();
-        return factory.doCreateParameter(IOMode.IN);
+        return createParameter(IOMode.IN);
     }
 
     /**
@@ -282,8 +268,7 @@ public abstract class RPCFactory {
             BadParameterException, DoesNotExistException, TimeoutException,
             NoSuccessException {
         Session session = SessionFactory.createSession();
-        initializeFactory();
-        return factory.doCreateRPC(session, funcname);
+        return createRPC(session, funcname);
     }
 
     /**
@@ -329,7 +314,6 @@ public abstract class RPCFactory {
     public static Task<RPCFactory, RPC> createRPC(TaskMode mode, URL funcname)
             throws NotImplementedException, NoSuccessException {
         Session session = SessionFactory.createSession();
-        initializeFactory();
-        return factory.doCreateRPC(mode, session, funcname);
+        return createRPC(mode, session, funcname);
     }
 }

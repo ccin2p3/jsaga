@@ -84,8 +84,6 @@ public class CacheDataAdaptor implements FileReaderStreamFactory, FileWriter {
             m_cache.close();
         } catch (NotImplementedException e) {
             throw new NoSuccessException(e);
-        } catch (IncorrectStateException e) {
-            throw new NoSuccessException(e);
         }
     }
 
@@ -198,12 +196,8 @@ public class CacheDataAdaptor implements FileReaderStreamFactory, FileWriter {
     }
 
     private static URL getURL(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
-        try {
-            return URLFactory.createURL(additionalArgs!=null
-                    ? absolutePath+"?"+additionalArgs
-                    : absolutePath);
-        } catch (NotImplementedException e) {
-            throw new NoSuccessException(e);
-        }
+        return URLFactory.createURL(additionalArgs!=null
+                ? absolutePath+"?"+additionalArgs
+                : absolutePath);
     }
 }

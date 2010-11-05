@@ -32,7 +32,7 @@
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api</artifactId>
-            <version>1.0.1</version>
+            <version>1.1</version>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
