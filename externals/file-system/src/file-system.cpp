@@ -44,9 +44,9 @@ JNIEXPORT jboolean JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_stat
     int other_perms = perms%8%8;
 
     jclass cls = env->GetObjectClass(obj);
-    env->SetIntField(obj, env->GetFieldID(cls, "isdir", "Z"), isdir);
-    env->SetIntField(obj, env->GetFieldID(cls, "isfile", "Z"), isfile);
-    env->SetIntField(obj, env->GetFieldID(cls, "islink", "Z"), islink);
+    env->SetBooleanField(obj, env->GetFieldID(cls, "isdir", "Z"), isdir);
+    env->SetBooleanField(obj, env->GetFieldID(cls, "isfile", "Z"), isfile);
+    env->SetBooleanField(obj, env->GetFieldID(cls, "islink", "Z"), islink);
     env->SetIntField(obj, env->GetFieldID(cls, "size", "I"), buf.st_size);
     env->SetIntField(obj, env->GetFieldID(cls, "user_perms", "I"), user_perms);
     env->SetIntField(obj, env->GetFieldID(cls, "group_perms", "I"), group_perms);
