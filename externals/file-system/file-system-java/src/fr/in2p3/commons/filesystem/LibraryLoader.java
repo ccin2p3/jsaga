@@ -56,7 +56,8 @@ public class LibraryLoader {
                 // find library in maven repository (for testing from maven)
                 File projectDir = jar.getParentFile().getParentFile().getParentFile();
                 String version = jar.getParentFile().getName();
-                File dir = new File(new File(projectDir, libName), version);
+                String prefix = System.mapLibraryName(libName).endsWith(".so")?"lib":"";
+                File dir = new File(new File(projectDir, prefix+libName), version);
                 lib = new File(dir, System.mapLibraryName(libName+"-"+version));
             }
         } else {
