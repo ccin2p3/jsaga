@@ -15,6 +15,8 @@ Deviations from SAGA specifications
 
     * Methods
 
+        * getAttribute(USER_ID) (<<deprecated>>): set default attributes and initialise the context.
+
         * toString(): overrided to dump a description of the security context instance.
 
 * Data management
@@ -66,3 +68,5 @@ Deviations from SAGA specifications
 * Streams, Remote Procedure Call
 
     * Will not be implemented.
+
+Note: <<deprecated>> deviations will be removed as soon as possible.
