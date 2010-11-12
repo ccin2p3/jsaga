@@ -14,8 +14,10 @@
         </context>
         <context type="MyProxy">
             <attribute name="CertRepository" value="${user.home}/.globus/certificates/"/>
-            <attribute name="Server" value="myproxy.cern.ch:7512"/>
-            <attribute name="MyProxyPass" value="tototo"/>
+            <attribute name="Server" value="cclcgsrvli02.in2p3.fr:7512"/>
+            <!-- Optional attributes (equivalent to "-d -n" if not specified) -->
+            <!-- <attribute name="MyProxyPass" value="tototo"/>-->
+            <!-- <attribute name="UserID" value="${user.name}"/>-->
             <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/myproxy_cred.txt"/>
         </context>
 <!-- FIXME: this does not work anymore
