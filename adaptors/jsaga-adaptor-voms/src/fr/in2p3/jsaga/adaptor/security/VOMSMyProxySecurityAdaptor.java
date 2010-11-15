@@ -4,8 +4,13 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityCredential;
 import org.globus.common.CoGProperties;
+import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.myproxy.MyProxy;
 import org.globus.myproxy.MyProxyException;
+import org.globus.myproxy.InitParams;
+import org.globus.myproxy.InfoParams;
+import org.globus.myproxy.DestroyParams;
+import org.globus.myproxy.GetParams;
 import org.globus.util.Util;
 import org.gridforum.jgss.ExtendedGSSCredential;
 import org.ietf.jgss.GSSCredential;
@@ -33,7 +38,7 @@ import java.util.Map;
 public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
     private static final int USAGE_GET_DELEGATED_MEMORY = 5; // 1 to 4 reserved by super class
     private static final int USAGE_GET_DELEGATED_LOAD = 6;
-    private static final int DEFAULT_STORED_PROXY_LIFETIME = 7*12*3600;
+    private static final int DEFAULT_STORED_PROXY_LIFETIME = 7*24*3600;
     private static final int DEFAULT_DELEGATED_PROXY_LIFETIME = 12*3600;
 
     public String getType() {
@@ -100,8 +105,8 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
                 new UFile(Context.CERTREPOSITORY),
                 new UFile(VOMSContext.VOMSDIR),
                 new U(VOMSContext.MYPROXYSERVER),
-                new U(VOMSContext.MYPROXYUSERID),
-                new UHidden(VOMSContext.MYPROXYPASS),
+                new UOptional(VOMSContext.MYPROXYUSERID),
+                new UOptional(VOMSContext.MYPROXYPASS),
         });
     }
 
@@ -179,13 +184,23 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
     public void destroySecurityAdaptor(Map attributes, String contextId) throws Exception {
         // get attributes
         GSSCredential cred = load(new File((String) attributes.get(Context.USERPROXY)));
+        DestroyParams proxyParameters = new DestroyParams();
+
         String myProxyServer = (String) attributes.get(VOMSContext.MYPROXYSERVER);
-        String myProxyUserId = (String) attributes.get(VOMSContext.MYPROXYUSERID);
-        String myProxyPass = (String) attributes.get(VOMSContext.MYPROXYPASS);
+
+        // --- String myProxyUserId = (String) attributes.get(VOMSContext.MYPROXYUSERID);
+    	String myProxyUserId = getUserName(cred, attributes);
+        proxyParameters.setUserName(myProxyUserId);
+
+        // --- String myProxyPass = (String) attributes.get(VOMSContext.MYPROXYPASS);
+        if (attributes.get(VOMSContext.MYPROXYPASS) != null) {
+        	proxyParameters.setPassphrase((String)attributes.get(VOMSContext.MYPROXYPASS));
+        }
 
         // destroy remote proxy
         MyProxy server = getServer(myProxyServer);
-        server.destroy(cred, myProxyUserId, myProxyPass);
+        // server.destroy(cred, myProxyUserId, myProxyPass);
+        server.destroy(cred, proxyParameters);
 
         // destroy local proxy
         Util.destroy((String) attributes.get(Context.USERPROXY));
@@ -205,22 +220,46 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
     }
 
     private static void storeCredential(GSSCredential newCred, Map attributes) throws ParseException, MyProxyException {
-        String myProxyUserId = (String) attributes.get(VOMSContext.MYPROXYUSERID);
-        String myProxyPass = (String) attributes.get(VOMSContext.MYPROXYPASS);
+        InitParams proxyParameters = new InitParams();
+        // ---String myProxyUserId = (String) attributes.get(VOMSContext.MYPROXYUSERID);
+    	String myProxyUserId = getUserName(newCred, attributes);
+        proxyParameters.setUserName(myProxyUserId);
+
+    	// --- String myProxyPass = (String) attributes.get(VOMSContext.MYPROXYPASS);
+        if (attributes.get(VOMSContext.MYPROXYPASS) != null) {
+        	proxyParameters.setPassphrase((String)attributes.get(VOMSContext.MYPROXYPASS));
+        }
+        
         int storedLifetime = attributes.containsKey(Context.LIFETIME)
                 ? UDuration.toInt(attributes.get(Context.LIFETIME))
                 : DEFAULT_STORED_PROXY_LIFETIME;  // default lifetime for stored proxies
+        proxyParameters.setLifetime(storedLifetime);
+        
         MyProxy server = getServer((String) attributes.get(VOMSContext.MYPROXYSERVER));
-        server.put(newCred, myProxyUserId, myProxyPass, storedLifetime);
+        // --- server.put(newCred, myProxyUserId, myProxyPass, storedLifetime);
+        server.put(newCred, proxyParameters);
+
     }
     private static GSSCredential getDelegatedCredential(GSSCredential oldCred, Map attributes) throws ParseException, URISyntaxException, MyProxyException {
-        String myProxyUserId = (String) attributes.get(VOMSContext.MYPROXYUSERID);
-        String myProxyPass = (String) attributes.get(VOMSContext.MYPROXYPASS);
+        GetParams proxyParameters = new GetParams();
+
+        // --- String myProxyUserId = (String) attributes.get(VOMSContext.MYPROXYUSERID);
+    	String myProxyUserId = getUserName(oldCred, attributes);
+        proxyParameters.setUserName(myProxyUserId);
+
+        // --- String myProxyPass = (String) attributes.get(VOMSContext.MYPROXYPASS);
+        if (attributes.get(VOMSContext.MYPROXYPASS) != null) {
+        	proxyParameters.setPassphrase((String)attributes.get(VOMSContext.MYPROXYPASS));
+        }
+
         int delegatedLifetime = attributes.containsKey(Context.LIFETIME)
                 ? UDuration.toInt(attributes.get(Context.LIFETIME))
                 : DEFAULT_DELEGATED_PROXY_LIFETIME;  // effective lifetime for delegated proxy
+        proxyParameters.setLifetime(delegatedLifetime);
+
         MyProxy server = getServer((String) attributes.get(VOMSContext.MYPROXYSERVER));
-        return server.get(oldCred, myProxyUserId, myProxyPass, delegatedLifetime);
+        // --- return server.get(oldCred, myProxyUserId, myProxyPass, delegatedLifetime);
+        return server.get(oldCred, proxyParameters);
     }
 
     private static void save(File proxyFile, GSSCredential cred) throws GSSException, IOException {
@@ -228,5 +267,11 @@ public class VOMSMyProxySecurityAdaptor extends VOMSSecurityAdaptor implements E
         FileOutputStream out = new FileOutputStream(proxyFile);
         out.write(proxyBytes);
         out.close();
+    }
+
+    private static String getUserName(GSSCredential cred, Map attributes) {
+        return attributes.get(VOMSContext.MYPROXYUSERID) != null 
+        			? (String) attributes.get(VOMSContext.MYPROXYUSERID) 
+        			: ((GlobusGSSCredentialImpl)cred).getGlobusCredential().getIdentity();
     }
 }
