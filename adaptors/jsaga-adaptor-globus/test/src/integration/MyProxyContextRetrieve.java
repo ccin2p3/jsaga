@@ -22,6 +22,7 @@ public class MyProxyContextRetrieve extends ContextInitTest {
     }
 
     protected void updateContextAttributes(Context context) throws Exception {
+    	// "DelegationLifeTime" activates USAGE_GET_DELEGATED_* usage
         context.setAttribute(GlobusContext.DELEGATIONLIFETIME, "PT12H");
     }
 }
