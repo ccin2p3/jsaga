@@ -52,6 +52,26 @@
                 </ul>
             </answer>
         </faq>
+        <faq id="git">
+            <question>How to push my contribution to GIT ?</question>
+            <answer>First, request for access to the jsaga-contrib repository and configure your SSH client
+                (see <a href="https://git.in2p3.fr/index-en.html">CC-IN2P3 VCS guide</a>).
+                <pre># initialization
+git clone git://git.in2p3.fr/jsaga
+cd jsaga
+git remote add jsaga-contrib ssh://git.in2p3.fr/jsaga-contrib
+
+# list existing branches
+git ls-remote ssh://git.in2p3.fr/jsaga-contrib
+
+# create your own branch
+git checkout -b myBranch
+...
+git push jsaga-contrib</pre>
+                Then send a mail to JSAGA developers to get your contribution included
+                in future JSAGA releases.
+            </answer>
+        </faq>
         <faq id="eclipse">
             <question>How to import the maven project into Eclipse (http://www.eclipse.org/) ?</question>
             <answer>
