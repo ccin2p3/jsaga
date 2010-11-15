@@ -28,7 +28,6 @@
             <!-- Optional attributes (equivalent to "-d -n" if not specified) -->
             <!--<attribute name="MyProxyUserID" value="jsaga"/>-->
             <!-- <attribute name="MyProxyPass" value="tototo"/>-->
-            <attribute name="DelegationLifeTime" value="PT4H"/>
         </context>
     </contexts>
     <session>
