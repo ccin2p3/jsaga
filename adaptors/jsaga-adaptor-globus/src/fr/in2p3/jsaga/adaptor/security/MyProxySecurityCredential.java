@@ -24,16 +24,11 @@ import java.io.PrintStream;
  */
 public class MyProxySecurityCredential extends GSSCredentialSecurityCredential implements SecurityCredential {
     private String m_server;
-    // --- private String m_userId;
-    // --- private String m_myProxyPass;
     private InfoParams m_proxyParameters;
     
-    // --- public MyProxySecurityCredential(GSSCredential proxy, File certRepository, String server, String userId, String myProxyPass) {
     public MyProxySecurityCredential(GSSCredential proxy, File certRepository, String server, InfoParams proxyParameters) {
         super(proxy, certRepository);
         m_server = server;
-        // --- m_userId = userId;
-        // --- m_myProxyPass = myProxyPass;
         m_proxyParameters = proxyParameters;
     }
 
@@ -42,7 +37,6 @@ public class MyProxySecurityCredential extends GSSCredentialSecurityCredential i
         MyProxy server = MyProxySecurityAdaptor.getServer(m_server);
 
         // server info
-        // --- CredentialInfo info = server.info(m_proxy, m_userId, m_myProxyPass);
         CredentialInfo[] infos = server.info(m_proxy, m_proxyParameters);
         out.println("Owner    : "+infos[0].getOwner());
         for (int i=0;i<infos.length;i++) {

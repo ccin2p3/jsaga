@@ -7,7 +7,6 @@ import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.usage.UProxyFile;
 import fr.in2p3.jsaga.adaptor.security.usage.UProxyObject;
 import org.globus.common.CoGProperties;
-import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.GlobusCredentialException;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.myproxy.MyProxy;
@@ -119,7 +118,6 @@ public class MyProxySecurityAdaptor implements ExpirableSecurityAdaptor {
                         new File(System.getProperty("user.home")+"/.globus/certificates/"),
                         new File("/etc/grid-security/certificates/")}),
                 new Default(Context.SERVER, env.getProperty("MYPROXY_SERVER")),
-                // --- new Default(Context.USERID, System.getProperty("user.name")),
         };
     }
 
@@ -135,7 +133,6 @@ public class MyProxySecurityAdaptor implements ExpirableSecurityAdaptor {
                     InitParams proxyParameters = new InitParams();
 
                     // send it to MyProxy server
-                    // --- String userId = (String) attributes.get(Context.USERID);
                     String userId = getUserName(cred, attributes);
                     proxyParameters.setUserName(userId);
 
@@ -149,7 +146,6 @@ public class MyProxySecurityAdaptor implements ExpirableSecurityAdaptor {
                     proxyParameters.setLifetime(storedLifetime);
 
                     MyProxy server = getServer(attributes);
-                    // --- server.put(cred, userId, myProxyPass, storedLifetime);
                     server.put(cred, proxyParameters);
 
                     // destroy local temporary proxy (requires anonymous to be authorized by server's default trusted_retrievers policy)
@@ -203,7 +199,7 @@ public class MyProxySecurityAdaptor implements ExpirableSecurityAdaptor {
     private SecurityCredential createSecurityAdaptor(GSSCredential cred, Map attributes) throws IncorrectStateException {
         File certRepository = new File((String) attributes.get(Context.CERTREPOSITORY));
         String server = (String) attributes.get(Context.SERVER);
-        // --- String userId = (String) attributes.get(Context.USERID);
+
         InfoParams proxyParameters = new InfoParams();
         String userId = getUserName(cred, attributes);
         proxyParameters.setUserName(userId);
@@ -211,7 +207,7 @@ public class MyProxySecurityAdaptor implements ExpirableSecurityAdaptor {
         if (attributes.get(GlobusContext.MYPROXYPASS) != null) {
         	proxyParameters.setPassphrase((String)attributes.get(GlobusContext.MYPROXYPASS));
         }
-        // --- return new MyProxySecurityCredential(cred, certRepository, server, userId, myProxyPass);
+
         return new MyProxySecurityCredential(cred, certRepository, server, proxyParameters);
     }
 
@@ -220,11 +216,9 @@ public class MyProxySecurityAdaptor implements ExpirableSecurityAdaptor {
         GSSCredential cred = load(new File((String) attributes.get(Context.USERPROXY)));
         DestroyParams proxyParameters = new DestroyParams();
 
-        // --- String userId = (String) attributes.get(Context.USERID);
         String userId = getUserName(cred, attributes);
         proxyParameters.setUserName(userId);
         
-        // --- String myProxyPass = (String) attributes.get(GlobusContext.MYPROXYPASS);
         if (attributes.get(GlobusContext.MYPROXYPASS) != null) {
         	proxyParameters.setPassphrase((String)attributes.get(GlobusContext.MYPROXYPASS));
         }
@@ -239,11 +233,9 @@ public class MyProxySecurityAdaptor implements ExpirableSecurityAdaptor {
     private static GSSCredential getDelegatedCredential(GSSCredential oldCred, Map attributes) throws ParseException, URISyntaxException, MyProxyException, GSSException, GlobusCredentialException {
         GetParams proxyParameters = new GetParams();
 
-        // --- String userId = (String) attributes.get(Context.USERID);
         String userId = getUserName(oldCred, attributes);
         proxyParameters.setUserName(userId);
 
-        // --- String myProxyPass = (String) attributes.get(GlobusContext.MYPROXYPASS);
         if (attributes.get(GlobusContext.MYPROXYPASS) != null) {
         	proxyParameters.setPassphrase((String)attributes.get(GlobusContext.MYPROXYPASS));
         }
@@ -254,7 +246,7 @@ public class MyProxySecurityAdaptor implements ExpirableSecurityAdaptor {
         proxyParameters.setLifetime(delegatedLifetime);
         
         MyProxy server = getServer(attributes);
-        // --- return server.get(oldCred, userId, myProxyPass, delegatedLifetime);
+
         return server.get(oldCred, proxyParameters);
     }
 
