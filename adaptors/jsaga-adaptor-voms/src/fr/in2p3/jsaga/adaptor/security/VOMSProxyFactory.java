@@ -6,6 +6,7 @@ import org.glite.voms.VOMSValidator;
 import org.glite.voms.contact.*;
 import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
+import org.globus.util.Util;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ogf.saga.context.Context;
@@ -142,6 +143,7 @@ public class VOMSProxyFactory {
             ArrayList options = new ArrayList();
             options.add(m_requestOptions);
         	globusProxy = m_proxyInit.getVomsProxy(options);
+        	Util.setFilePermissions(m_proxyInit.getProxyOutputFile(), 600);
 	        // validate
 	        try {
 		        Vector v = VOMSValidator.parse(globusProxy.getCertificateChain());
