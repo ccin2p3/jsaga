@@ -240,8 +240,8 @@ public class MyProxySecurityAdaptor implements ExpirableSecurityAdaptor {
         	proxyParameters.setPassphrase((String)attributes.get(GlobusContext.MYPROXYPASS));
         }
 
-        int delegatedLifetime = attributes.containsKey(VOMSContext.DELEGATIONLIFETIME)
-        		? UDuration.toInt(attributes.get(VOMSContext.DELEGATIONLIFETIME))
+        int delegatedLifetime = attributes.containsKey(GlobusContext.DELEGATIONLIFETIME)
+        		? UDuration.toInt(attributes.get(GlobusContext.DELEGATIONLIFETIME))
                 : DEFAULT_DELEGATED_PROXY_LIFETIME;  // effective lifetime for delegated proxy
         proxyParameters.setLifetime(delegatedLifetime);
         
