@@ -43,6 +43,17 @@ EOF
 chmod 664 $HASH.signing_policy]]></pre>
             </answer>
         </faq>
+        <faq id="myproxy">
+            <question>How to use the MyProxy adaptor ?</question>
+            <answer>
+                <ul>
+                    <li><i>LifeTime</i>: activate initializing the proxy and storing it on MyProxy server,</li>
+                    <li><i>DelegationLifeTime</i>: activate retrieving a delegated proxy from MyProxy server,</li>
+                    <li>else the local proxy file is loaded.</li>
+                </ul>
+                <p>For more details about usage, please use command "jsaga-help -s usage".</p>
+            </answer>
+        </faq>
     </part>
     <part id="job">
         <title>Globus Gatekeeper</title>
