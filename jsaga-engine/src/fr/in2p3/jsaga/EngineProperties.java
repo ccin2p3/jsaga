@@ -23,6 +23,7 @@ public class EngineProperties {
     public static final String JSAGA_DEFAULT_CONTEXTS = "jsaga.default.contexts";
     public static final String JSAGA_TIMEOUT = "jsaga.timeout";
     public static final String LOG4J_CONFIGURATION = "log4j.configuration";
+    public static final String JSAGA_DEFAULT_CONTEXTS_CHECK_CONFLICTS = "jsaga.default.contexts.check.conflicts";
     public static final String DATA_COPY_BUFFER_SIZE = "data.copy.buffer.size";
     public static final String JOB_MONITOR_POLL_PERIOD = "job.monitor.poll.period";
     public static final String JOB_MONITOR_ERROR_THRESHOLD = "job.monitor.error.threshold";
@@ -39,6 +40,7 @@ public class EngineProperties {
             //s_prop.setProperty(JSAGA_DEFAULT_CONTEXTS, "etc/jsaga-default-contexts.xml");
             //s_prop.setProperty(JSAGA_TIMEOUT, "etc/jsaga-timeout.properties");
             //s_prop.setProperty(LOG4J_CONFIGURATION, "etc/log4j.properties");
+            s_prop.setProperty(JSAGA_DEFAULT_CONTEXTS_CHECK_CONFLICTS, "true");
             s_prop.setProperty(DATA_COPY_BUFFER_SIZE, "16384");
             s_prop.setProperty(JOB_MONITOR_POLL_PERIOD, "1000");
             s_prop.setProperty(JOB_MONITOR_ERROR_THRESHOLD, "3");

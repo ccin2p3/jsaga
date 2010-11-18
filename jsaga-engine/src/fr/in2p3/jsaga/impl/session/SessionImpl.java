@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl.session;
 
+import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.helpers.cloner.SagaObjectCloner;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
@@ -46,8 +47,11 @@ public class SessionImpl extends AbstractSagaObjectImpl implements Session {
             ContextImpl ctxImpl = (ContextImpl) context;
             if (! m_contexts.contains(ctxImpl)) {
                 // check if new context will conflict with old contexts
-                for (ContextImpl refContext : m_contexts) {
-                    ctxImpl.throwIfConflictsWith(refContext);
+                boolean check = EngineProperties.getBoolean(EngineProperties.JSAGA_DEFAULT_CONTEXTS_CHECK_CONFLICTS);
+                if (check) {
+                    for (ContextImpl refContext : m_contexts) {
+                        ctxImpl.throwIfConflictsWith(refContext);
+                    }
                 }
                 // set UrlPrefix (if needed)
                 ctxImpl.setUrlPrefix(m_contexts.size()+1);
