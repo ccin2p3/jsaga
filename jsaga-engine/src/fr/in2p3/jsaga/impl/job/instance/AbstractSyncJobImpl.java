@@ -227,7 +227,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     }
 
     protected void doCancel() {
-        try{m_monitorService.checkState();} catch(TimeoutException e){throw new RuntimeException(e);}
+        try{m_monitorService.checkState();} catch(SagaException e){throw new RuntimeException(e);}
         if (m_nativeJobId == null) {
             throw new RuntimeException("INTERNAL ERROR: JobID not initialized");
         }

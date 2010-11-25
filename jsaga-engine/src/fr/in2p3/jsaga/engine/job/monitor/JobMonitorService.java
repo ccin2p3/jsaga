@@ -87,11 +87,15 @@ public class JobMonitorService {
     }
 
     private boolean m_isReseting = false;
+    private SagaException m_exception = null;
     public synchronized void startReset() {m_isReseting = true;}
     public synchronized void stopReset() {m_isReseting = false;}
-    public synchronized void checkState() throws TimeoutException {
+    public synchronized void failReset(SagaException exception) {m_exception = exception;}
+    public synchronized void checkState() throws TimeoutException, NoSuccessException {
         if (m_isReseting) {
             throw new TimeoutException("Currently reconnecting to job service, please retry later...");
+        } else if (m_exception != null) {
+            throw new NoSuccessException("Failed to reconnect to job service after proxy renewal", m_exception);
         }
     }
 }

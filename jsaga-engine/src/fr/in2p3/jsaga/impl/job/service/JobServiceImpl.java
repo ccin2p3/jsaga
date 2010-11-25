@@ -7,6 +7,7 @@ import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.engine.factories.JobAdaptorFactory;
 import fr.in2p3.jsaga.engine.factories.JobMonitorAdaptorFactory;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
+import org.apache.log4j.Logger;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.*;
 import org.ogf.saga.session.Session;
@@ -29,6 +30,8 @@ import java.util.Map;
  *
  */
 public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobService {
+    private static Logger s_logger = Logger.getLogger(JobServiceImpl.class);
+
     /** constructor */
     public JobServiceImpl(Session session, URL rm, JobControlAdaptor controlAdaptor, JobMonitorService monitorService, JobDescriptionTranslator translator) {
         super(session, rm, controlAdaptor, monitorService, translator);
@@ -87,7 +90,7 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
 
     ////////////////////////////////////////// private methods //////////////////////////////////////////
 
-    public synchronized void resetAdaptors(SecurityCredential security) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, IncorrectURLException, BadParameterException, TimeoutException, NoSuccessException {
+    public synchronized void resetAdaptors(SecurityCredential security) {
         m_monitorService.startReset();
         // retrieve service attributes
         Map attributes = m_monitorService.getAttributes();
@@ -101,6 +104,9 @@ public class JobServiceImpl extends AbstractAsyncJobServiceImpl implements JobSe
             URL monitorURL = m_monitorService.getURL();
             JobMonitorAdaptorFactory.disconnect(monitorAdaptor);
             JobMonitorAdaptorFactory.connect(monitorAdaptor, security, monitorURL, attributes);
+        } catch (SagaException e) {
+            s_logger.warn("Failed to reconnect to job service", e);
+            m_monitorService.failReset(e);
         } finally {
             m_monitorService.stopReset();
         }

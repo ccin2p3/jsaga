@@ -2,8 +2,6 @@ package fr.in2p3.jsaga.impl.context;
 
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.impl.job.service.JobServiceImpl;
-import org.apache.log4j.Logger;
-import org.ogf.saga.error.SagaException;
 
 import java.util.Set;
 
@@ -20,8 +18,6 @@ import java.util.Set;
  *
  */
 public class JobServiceReset implements Runnable {
-    private static Logger s_logger = Logger.getLogger(JobServiceReset.class);
-
     private Set<JobServiceImpl> m_jobServices;
     private SecurityCredential m_credential;
 
@@ -32,11 +28,7 @@ public class JobServiceReset implements Runnable {
 
     public void run() {
         for (JobServiceImpl jobService : m_jobServices) {
-            try {
-                jobService.resetAdaptors(m_credential);
-            } catch (SagaException e) {
-                s_logger.warn("Failed to reconnect to job service", e);
-            }
+            jobService.resetAdaptors(m_credential);
         }
     }
 }
