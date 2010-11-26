@@ -6,7 +6,7 @@
             <attribute name="KeystorePass" value="the!user"/>
 
             <data type="rbyteio"/>
-            <job type="unicore6"/>
+            <job type="bes"/>
 
         </context>
     </session>
