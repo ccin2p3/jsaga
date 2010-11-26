@@ -20,6 +20,12 @@
         </developer>
 	</developers>
 	<dependencies>
+		<dependency><!-- for security context (WARNING: order of dependencies matters) -->
+			<groupId>fr.in2p3.jsaga.adaptor</groupId>
+			<artifactId>jsaga-adaptor-classic</artifactId>
+			<version>0.9.11-SNAPSHOT</version>
+			<scope>runtime</scope>
+		</dependency>
 		<!-- <dependency>
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-voms</artifactId>
