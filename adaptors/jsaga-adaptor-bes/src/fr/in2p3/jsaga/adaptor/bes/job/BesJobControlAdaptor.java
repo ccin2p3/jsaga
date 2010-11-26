@@ -15,7 +15,11 @@ import org.ggf.schemas.bes.x2006.x08.besFactory.FactoryResourceAttributesDocumen
 import org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentResponseType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.InvalidRequestMessageFaultType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.NotAcceptingNewActivitiesFaultType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.NotAuthorizedFaultType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.UnsupportedFeatureFaultType;
 import org.ggf.schemas.jsdl.x2005.x11.jsdl.JobDefinition_Type;
+import org.globus.wsrf.encoding.DeserializationException;
 import org.globus.wsrf.encoding.ObjectDeserializer;
 import org.ogf.saga.error.*;
 
@@ -56,7 +60,7 @@ public class BesJobControlAdaptor extends BesJobAdaptorAbstract
     public String submit(String jobDesc, boolean checkMatch, String uniqId)
     		throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
     	// Check if BESFactory isAcceptingNewActivities
-        GetFactoryAttributesDocumentResponseType r;
+        /*GetFactoryAttributesDocumentResponseType r;
 		try {
 			r = _bes_pt.getFactoryAttributesDocument(new GetFactoryAttributesDocumentType());
 		} catch (InvalidRequestMessageFaultType e1) {
@@ -67,29 +71,40 @@ public class BesJobControlAdaptor extends BesJobAdaptorAbstract
         FactoryResourceAttributesDocumentType attr = r.getFactoryResourceAttributesDocument();
         if (! attr.isIsAcceptingNewActivities()) {
         	throw new PermissionDeniedException("Is not accepting new activities");
-        }
+        }*/
     	
-    	try {
-            CreateActivityResponseType response = null;
-            ActivityDocumentType adt = new ActivityDocumentType();
-            
-            StringReader sr = new StringReader(jobDesc);
-            JobDefinition_Type jsdl_type = (JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(sr), JobDefinition_Type.class);
-            
-            adt.setJobDefinition(jsdl_type);
-            
-            CreateActivityType createActivity = new CreateActivityType();
-            createActivity.setActivityDocument(adt);
-            response = _bes_pt.createActivity(createActivity);
 
-            return response.getActivityIdentifier().getAddress().get_value().toString();
-			
-		} catch (Exception e) {
-			if(e instanceof BadResource) {
-				throw new BadResource(e);
-			}
+        CreateActivityResponseType response = null;
+        ActivityDocumentType adt = new ActivityDocumentType();
+        
+        StringReader sr = new StringReader(jobDesc);
+        JobDefinition_Type jsdl_type;
+		try {
+			jsdl_type = (JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(sr), JobDefinition_Type.class);
+		} catch (DeserializationException e) {
+			throw new BadResource(e);
+		}
+        
+        adt.setJobDefinition(jsdl_type);
+        
+        CreateActivityType createActivity = new CreateActivityType();
+        createActivity.setActivityDocument(adt);
+        try {
+			response = _bes_pt.createActivity(createActivity);
+		} catch (NotAcceptingNewActivitiesFaultType e) {
+			throw new PermissionDeniedException(e);
+		} catch (InvalidRequestMessageFaultType e) {
+			throw new NoSuccessException(e);
+		} catch (UnsupportedFeatureFaultType e) {
+			throw new NoSuccessException(e);
+		} catch (NotAuthorizedFaultType e) {
+			throw new PermissionDeniedException(e);
+		} catch (RemoteException e) {
 			throw new NoSuccessException(e);
 		}
+
+        return response.getActivityIdentifier().getAddress().get_value().toString();
+			
     }
     
     public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
