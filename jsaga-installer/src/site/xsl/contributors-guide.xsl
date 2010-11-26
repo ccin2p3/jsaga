@@ -43,7 +43,7 @@
                     For information about how to create a test-suite for your adaptor,
                     please look at the <a href="testers-guide.html">Testing Adaptors Guide</a> web page.
                     For information about how to create project skeleton, how to configure and run test-suite, etc.,
-                    please look at the <a href="howto.html">Contributors How To</a> web page.
+                    please look at the <a href="contributors-faq.html">Contributors How To</a> web page.
                 </p>
                 <p>This document is generated from source code. It is applicable to the version
                     of JSAGA that can be downloaded <a href="download.html">here</a>.

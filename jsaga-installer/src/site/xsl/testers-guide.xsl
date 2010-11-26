@@ -33,7 +33,7 @@
                     </ul>
                 </p>
                 <p>For information about how to configure and run your test-suite,
-                    please look at the <a href="howto.html">Contributors How To</a> web page.
+                    please look at the <a href="contributors-faq.html">Contributors How To</a> web page.
                 </p><br/>
                 <p>This document is generated from source code. It is applicable to the version
                     of JSAGA that can be downloaded <a href="download.html">here</a>.
@@ -79,7 +79,7 @@ public class <i>_MyGrid_</i>TestSuite extends JSAGATestSuite {
 
             <section name="Testing a data adaptor">
                 <p>If the tested adaptor only support read operations, you must set up the test environment manually
-                    (see <a href="howto.html#create-test-entries">Contributors How To</a> web page).
+                    (see <a href="contributors-faq.html#create-test-entries">Contributors How To</a> web page).
                 </p>
                 <p>If the tested adaptor support write operations, you should first test if the test environment set up
                     properly, by using the NSSetUpTest test suite:
