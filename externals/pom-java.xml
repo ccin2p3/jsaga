@@ -15,6 +15,7 @@
         <module>unicore6-api</module>
         <module>vomsjapi</module>
         <module>wsgram-api</module>
+        <module>bes-api-java</module>
     </modules>
     <build>
         <directory>build</directory>
