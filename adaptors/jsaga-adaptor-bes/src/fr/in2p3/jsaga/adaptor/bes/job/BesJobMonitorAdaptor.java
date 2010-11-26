@@ -6,10 +6,17 @@ import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryFilteredJob;
+import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
 
+import org.ggf.schemas.bes.x2006.x08.besFactory.GetActivityStatusResponseType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.GetActivityStatusesResponseType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.GetActivityStatusesType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.InvalidRequestMessageFaultType;
 import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.TimeoutException;
+import org.w3.x2005.x08.addressing.AttributedURIType;
+import org.w3.x2005.x08.addressing.EndpointReferenceType;
 
 /*
 import com.intel.gpe.clients.api.JobClient;
@@ -21,6 +28,7 @@ import fr.in2p3.jsaga.adaptor.u6.TargetSystemInfo;
 */
 
 import java.lang.Exception;
+import java.rmi.RemoteException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +42,7 @@ import java.util.Map;
 * Date:   23 Nov. 2010
 * ***************************************************/
 
-public class BesJobMonitorAdaptor extends BesJobAdaptorAbstract implements QueryFilteredJob {
+public class BesJobMonitorAdaptor extends BesJobAdaptorAbstract implements QueryIndividualJob {
         
     public Usage getUsage() {
     	return new UAnd(new Usage[]{new U(APPLICATION_NAME)});
@@ -45,34 +53,25 @@ public class BesJobMonitorAdaptor extends BesJobAdaptorAbstract implements Query
     			new Default(APPLICATION_NAME, "Bash shell")};
     }
     
-    public JobStatus[] getFilteredStatus(Object[] filters) throws TimeoutException, NoSuccessException {
-		/*try {
-			// list jobs
-			TargetSystemInfo targetSystemInfo = findTargetSystem();
-            List<JobClient> jobList = targetSystemInfo.getTargetSystem().getJobs();
-            U6JobStatus[] jobListStatus = new U6JobStatus[jobList.size()];
-            int index = 0;
-            for (Iterator<JobClient> iterator = jobList.iterator(); iterator.hasNext();) {
-				JobClient jobClient = iterator.next();
-				Status jobStatus = jobClient.getStatus();
-				jobListStatus[index] = new U6JobStatus(((AtomicJobClientImpl) jobClient).getId().toString(), jobStatus, jobStatus.toString());
-				index ++;
-			}
-            return jobListStatus;
-    	} catch (GPEInvalidResourcePropertyQNameException e) {
-    		throw new NoSuccessException(e);
-		} catch (GPEResourceUnknownException e) {
-			throw new NoSuccessException(e);
-		} catch (GPEUnmarshallingException e) {
-			throw new NoSuccessException(e);
-		} catch (GPEMiddlewareRemoteException e) {
-			throw new NoSuccessException(e);
-		} catch (GPEMiddlewareServiceException e) {
-			throw new NoSuccessException(e);
-		} catch (Exception e) {
-			throw new NoSuccessException(e);
-		}*/
-    	return null;
+    public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
+		GetActivityStatusesType requestStatus = new GetActivityStatusesType();
+		EndpointReferenceType epr[] = new EndpointReferenceType[1];
+        EndpointReferenceType e= new EndpointReferenceType();
+        e.setAddress(new AttributedURIType(nativeJobId));
+		epr[0]= e;
+		requestStatus.setActivityIdentifier(epr);
+		GetActivityStatusesResponseType responseStatus;
+		try {
+			responseStatus = _bes_pt.getActivityStatuses(requestStatus);
+		} catch (InvalidRequestMessageFaultType e1) {
+			throw new NoSuccessException(e1);
+		} catch (RemoteException e1) {
+			throw new NoSuccessException(e1);
+		}
+		GetActivityStatusResponseType activityStatusArray = responseStatus.getResponse(0);
+		
+		//String state= activityStatusArray.getActivityStatus().getState().getValue();
+    	return new BesJobStatus(nativeJobId, activityStatusArray.getActivityStatus());
 	}
 
 }
