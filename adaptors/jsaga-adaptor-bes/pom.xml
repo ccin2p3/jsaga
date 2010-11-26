@@ -1,0 +1,83 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>fr.in2p3.jsaga.adaptor</groupId>
+        <artifactId>adaptors</artifactId>
+        <version>0.9.11-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>jsaga-adaptor-bes</artifactId>
+	<name>Adaptors for BES</name>
+	<description>This module provides support for BES (Basic Execution Standard)</description>
+	<developers>
+        <developer>
+            <name>Lionel Schwarz</name>
+            <email>lionel.schwarz@in2p3.fr</email>
+            <organization>CC-IN2P3</organization>
+            <organizationUrl>http://cc.in2p3.fr/</organizationUrl>
+            <properties>
+                <organizationLogoUrl>http://cc.in2p3.fr/plugins/kitcnrs/images/logoCC72.gif</organizationLogoUrl>
+            </properties>
+        </developer>
+	</developers>
+	<dependencies>
+		<!-- <dependency>
+			<groupId>fr.in2p3.jsaga.adaptor</groupId>
+			<artifactId>jsaga-adaptor-voms</artifactId>
+			<version>0.9.11-SNAPSHOT</version>
+			<scope>runtime</scope>
+		</dependency>-->
+		<!--<dependency>
+			<groupId>org.glite</groupId>
+			<artifactId>vomsjapi</artifactId>
+			<version>1.7.22</version>
+		</dependency>-->
+		<!-- <dependency>
+			<groupId>fr.in2p3.jsaga.adaptor</groupId>
+			<artifactId>jsaga-adaptor-globus</artifactId>
+			<version>0.9.11-SNAPSHOT</version>
+			<scope>runtime</scope>
+		</dependency>-->
+		<dependency>
+			<groupId>axis</groupId>
+			<artifactId>axis</artifactId>
+			<version>1.4</version>
+			<scope>compile</scope>
+		</dependency>
+        <dependency>
+            <groupId>org.ogf</groupId>
+            <artifactId>bes-api-java</artifactId>
+            <version>1.0</version>
+			<scope>runtime</scope>
+        </dependency>
+        <dependency> <!-- pour ObjectDeserializer de wsrf-core -->
+            <groupId>org.globus</groupId>
+            <artifactId>wsgram-api</artifactId>
+            <version>4.0.0</version>
+			<scope>compile</scope>
+        </dependency>
+		<!-- <dependency>
+			<groupId>org.globus</groupId>
+			<artifactId>cog-axis</artifactId>
+			<version>gt4</version>
+			<scope>compile</scope>
+		</dependency>-->
+        <!--<dependency>
+            <groupId>org.apache.xmlbeans</groupId>
+            <artifactId>xmlbeans</artifactId>
+            <version>2.4.0</version>
+            <scope>runtime</scope>
+        </dependency>-->
+		<!-- <dependency>
+			<groupId>org.globus</groupId>
+			<artifactId>cog-url</artifactId>
+			<version>1.4</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.8</version>
+			<scope>provided</scope>
+		</dependency>-->
+	</dependencies>
+</project>
