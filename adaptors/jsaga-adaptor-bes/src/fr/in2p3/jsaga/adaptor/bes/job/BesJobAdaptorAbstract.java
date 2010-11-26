@@ -44,7 +44,7 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
 	//protected U6SecurityManagerImpl m_securityManager = null;
     
 	//protected BesFactoryServiceLocator _bes_service;
-	protected BESFactoryPortType _bes_pt;
+	protected BESFactoryPortType _bes_pt = null;
 	
     public String getType() {
         return "bes";
@@ -59,6 +59,7 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
     }
 
     public int getDefaultPort() {
+    	// Il n'y a pas de port par défaut
         return 8080;
     }
 
@@ -67,7 +68,12 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
         
     	// get APPLICATION_NAME
     	//m_applicationName = (String) attributes.get(APPLICATION_NAME);
-
+    	if (_bes_pt != null) return;
+    	
+		System.setProperty("javax.net.ssl.keyStore", "/home/schwarz/.jsaga/contexts/unicore6/demouser.jks");
+		System.setProperty("javax.net.ssl.keyStorePassword", "the!user");
+		System.setProperty("javax.net.ssl.trustStore", "/home/schwarz/.jsaga/contexts/unicore6/demouser.jks");
+		System.setProperty("javax.net.ssl.trustStorePassword", "the!user");
     	BesFactoryServiceLocator _bes_service = new BesFactoryServiceLocator();
 		try {
 			_bes_service.setEndpointAddress(BES_FACTORY_PORT_TYPE,
