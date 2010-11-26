@@ -1,11 +1,8 @@
 package fr.in2p3.jsaga.adaptor.bes.job;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
-import fr.in2p3.jsaga.adaptor.base.usage.U;
-import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
-import fr.in2p3.jsaga.adaptor.job.monitor.QueryFilteredJob;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
 
 import org.ggf.schemas.bes.x2006.x08.besFactory.GetActivityStatusResponseType;
@@ -18,19 +15,7 @@ import org.ogf.saga.error.TimeoutException;
 import org.w3.x2005.x08.addressing.AttributedURIType;
 import org.w3.x2005.x08.addressing.EndpointReferenceType;
 
-/*
-import com.intel.gpe.clients.api.JobClient;
-import com.intel.gpe.clients.api.Status;
-import com.intel.gpe.clients.api.exceptions.*;
-import com.intel.gpe.clients.impl.jms.AtomicJobClientImpl;
-
-import fr.in2p3.jsaga.adaptor.u6.TargetSystemInfo;
-*/
-
-import java.lang.Exception;
 import java.rmi.RemoteException;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 /* ***************************************************
@@ -45,12 +30,11 @@ import java.util.Map;
 public class BesJobMonitorAdaptor extends BesJobAdaptorAbstract implements QueryIndividualJob {
         
     public Usage getUsage() {
-    	return new UAnd(new Usage[]{new U(APPLICATION_NAME)});
+    	return null;
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-    	return new Default[]{
-    			new Default(APPLICATION_NAME, "Bash shell")};
+    	return new Default[]{};
     }
     
     public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
@@ -70,7 +54,6 @@ public class BesJobMonitorAdaptor extends BesJobAdaptorAbstract implements Query
 		}
 		GetActivityStatusResponseType activityStatusArray = responseStatus.getResponse(0);
 		
-		//String state= activityStatusArray.getActivityStatus().getState().getValue();
     	return new BesJobStatus(nativeJobId, activityStatusArray.getActivityStatus());
 	}
 
