@@ -11,6 +11,10 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityDocumentType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.CreateActivityResponseType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.CreateActivityType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.FactoryResourceAttributesDocumentType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentResponseType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.InvalidRequestMessageFaultType;
 import org.ggf.schemas.jsdl.x2005.x11.jsdl.JobDefinition_Type;
 import org.globus.wsrf.encoding.ObjectDeserializer;
 import org.ogf.saga.error.*;
@@ -18,6 +22,7 @@ import org.ogf.saga.error.*;
 import org.xml.sax.InputSource;
 
 import java.io.*;
+import java.rmi.RemoteException;
 import java.util.*;
 
 
@@ -50,7 +55,20 @@ public class BesJobControlAdaptor extends BesJobAdaptorAbstract
 
     public String submit(String jobDesc, boolean checkMatch, String uniqId)
     		throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
-    	// TODO: test isAcceptingNewActivities    	
+    	// Check if BESFactory isAcceptingNewActivities
+        GetFactoryAttributesDocumentResponseType r;
+		try {
+			r = _bes_pt.getFactoryAttributesDocument(new GetFactoryAttributesDocumentType());
+		} catch (InvalidRequestMessageFaultType e1) {
+			throw new NoSuccessException(e1);
+		} catch (RemoteException e1) {
+			throw new NoSuccessException(e1);
+		}
+        FactoryResourceAttributesDocumentType attr = r.getFactoryResourceAttributesDocument();
+        if (! attr.isIsAcceptingNewActivities()) {
+        	throw new PermissionDeniedException("Is not accepting new activities");
+        }
+    	
     	try {
             CreateActivityResponseType response = null;
             ActivityDocumentType adt = new ActivityDocumentType();
