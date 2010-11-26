@@ -17,12 +17,17 @@ import org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentType
 import org.ggf.schemas.bes.x2006.x08.besFactory.InvalidRequestMessageFaultType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.NotAcceptingNewActivitiesFaultType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.NotAuthorizedFaultType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.TerminateActivitiesResponseType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.TerminateActivitiesType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.TerminateActivityResponseType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.UnsupportedFeatureFaultType;
 import org.ggf.schemas.jsdl.x2005.x11.jsdl.JobDefinition_Type;
 import org.globus.wsrf.encoding.DeserializationException;
 import org.globus.wsrf.encoding.ObjectDeserializer;
 import org.ogf.saga.error.*;
 
+import org.w3.x2005.x08.addressing.AttributedURIType;
+import org.w3.x2005.x08.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
 
 import java.io.*;
@@ -108,23 +113,19 @@ public class BesJobControlAdaptor extends BesJobAdaptorAbstract
     }
     
     public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-        /*
-    	try {
-    		// abort
-    		getJobById(nativeJobId).abort();
-    	} catch (GPEResourceUnknownException e) {
-			throw new NoSuccessException(e);
-		} catch (GPESecurityException e) {
-			throw new PermissionDeniedException(e);
-		} catch (GPEMiddlewareRemoteException e) {
-			throw new NoSuccessException(e);
-		} catch (GPEMiddlewareServiceException e) {
-			throw new NoSuccessException(e);
-		} catch (GPEJobNotAbortedException e) {
-			throw new NoSuccessException(e);
-		} catch (Exception e) {
-			throw new NoSuccessException(e);
-		}*/
+    	TerminateActivitiesType request = new TerminateActivitiesType();
+		//EndpointReferenceType epr[] = new EndpointReferenceType[1];
+        EndpointReferenceType e= new EndpointReferenceType();
+        e.setAddress(new AttributedURIType(nativeJobId));
+		//epr[0]= e;
+		request.setActivityIdentifier(0, e);
+		try {
+			TerminateActivitiesResponseType response = _bes_pt.terminateActivities(request);
+		} catch (InvalidRequestMessageFaultType e1) {
+			throw new NoSuccessException(e1);
+		} catch (RemoteException e1) {
+			throw new NoSuccessException(e1);
+		}
     }
 
 	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException,
