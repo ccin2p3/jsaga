@@ -7,7 +7,7 @@ import org.ogf.saga.job.*;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   BESTestSuite
+* File:   BesTestSuite
 * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
 * Date:   23 Nov. 2010
 ***************************************************
@@ -15,30 +15,30 @@ import org.ogf.saga.job.*;
 /**
  *
  */
-public class BESTestSuite extends JSAGATestSuite {
+public class BesTestSuite extends JSAGATestSuite {
     /** create test suite */
-    public static Test suite() throws Exception {return new BESTestSuite();}
+    public static Test suite() throws Exception {return new BesTestSuite();}
     /** index of test cases */
-    public static class index extends IndexTest {public index(){super(BESTestSuite.class);}}
+    public static class index extends IndexTest {public index(){super(BesTestSuite.class);}}
 
     // test cases
-    public static class BESJobDescriptionTest extends JobDescriptionTest {
-        public BESJobDescriptionTest() throws Exception {super("bes");}
+    public static class BesJobDescriptionTest extends JobDescriptionTest {
+        public BesJobDescriptionTest() throws Exception {super("bes");}
      }
     
     // test cases
-    public static class BESJobRunMinimalTest extends JobRunMinimalTest {
-        public BESJobRunMinimalTest() throws Exception {super("bes");}
+    public static class BesJobRunMinimalTest extends JobRunMinimalTest {
+        public BesJobRunMinimalTest() throws Exception {super("bes");}
     }
     
     // test cases
-    public static class BESJobRunRequiredTest extends JobRunRequiredTest {
-        public BESJobRunRequiredTest() throws Exception {super("bes");}
+    public static class BesJobRunRequiredTest extends JobRunRequiredTest {
+        public BesJobRunRequiredTest() throws Exception {super("bes");}
     }
     
     // test cases
-    public static class BESJobRunOptionalTest extends JobRunOptionalTest {
-        public BESJobRunOptionalTest() throws Exception {super("bes");}
+    public static class BesJobRunOptionalTest extends JobRunOptionalTest {
+        public BesJobRunOptionalTest() throws Exception {super("bes");}
         public void test_resume_done() { super.ignore("not supported"); }
         public void test_resume_running() { super.ignore("not supported"); }
         public void test_suspend_done() { super.ignore("not supported"); }
@@ -47,13 +47,13 @@ public class BESTestSuite extends JSAGATestSuite {
     }
     
  	// test cases
-    public static class BESJobRunDescriptionTest extends JobRunDescriptionTest {
-        public BESJobRunDescriptionTest() throws Exception {super("bes");}
+    public static class BesJobRunDescriptionTest extends JobRunDescriptionTest {
+        public BesJobRunDescriptionTest() throws Exception {super("bes");}
         public void test_run_queueRequirement() { super.ignore("not supported"); }
     }
 
     // test cases
-    public static class BESJobRunInteractiveTest extends JobRunInteractiveTest {
-        public BESJobRunInteractiveTest() throws Exception {super("bes");}
+    public static class BesJobRunInteractiveTest extends JobRunInteractiveTest {
+        public BesJobRunInteractiveTest() throws Exception {super("bes");}
     }
 }
