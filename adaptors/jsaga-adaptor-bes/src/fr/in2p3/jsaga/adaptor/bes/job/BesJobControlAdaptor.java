@@ -115,28 +115,17 @@ public class BesJobControlAdaptor extends BesJobAdaptorAbstract
     public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
     	TerminateActivitiesType request = new TerminateActivitiesType();
 		//EndpointReferenceType epr[] = new EndpointReferenceType[1];
-        EndpointReferenceType e= new EndpointReferenceType();
-        e.setAddress(new AttributedURIType(nativeJobId));
+        //EndpointReferenceType e= new EndpointReferenceType();
+        //e.setAddress(new AttributedURIType(nativeJobId));
 		//epr[0]= e;
-		request.setActivityIdentifier(0, e);
+		request.setActivityIdentifier(new BesJob(nativeJobId).getReferenceEndpoints());
 		try {
 			TerminateActivitiesResponseType response = _bes_pt.terminateActivities(request);
-		} catch (InvalidRequestMessageFaultType e1) {
-			throw new NoSuccessException(e1);
-		} catch (RemoteException e1) {
-			throw new NoSuccessException(e1);
+		} catch (InvalidRequestMessageFaultType e) {
+			throw new NoSuccessException(e);
+		} catch (RemoteException e) {
+			throw new NoSuccessException(e);
 		}
     }
 
-	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException,
-            NoSuccessException {
-	    /*
-		try {
-			// destroy
-	        getJobById(nativeJobId).destroy();
-		} catch (Exception e1) {
-			throw new NoSuccessException(e1);
-		}
-	*/
-	}
 }

@@ -39,18 +39,18 @@ public class BesJobMonitorAdaptor extends BesJobAdaptorAbstract implements Query
     
     public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
 		GetActivityStatusesType requestStatus = new GetActivityStatusesType();
-		EndpointReferenceType epr[] = new EndpointReferenceType[1];
-        EndpointReferenceType e= new EndpointReferenceType();
-        e.setAddress(new AttributedURIType(nativeJobId));
-		epr[0]= e;
-		requestStatus.setActivityIdentifier(epr);
+		//EndpointReferenceType epr[] = new EndpointReferenceType[1];
+        //EndpointReferenceType rep= new EndpointReferenceType();
+        //rep.setAddress(new AttributedURIType(nativeJobId));
+		//epr[0]= rep;
+		requestStatus.setActivityIdentifier(new BesJob(nativeJobId).getReferenceEndpoints());
 		GetActivityStatusesResponseType responseStatus;
 		try {
 			responseStatus = _bes_pt.getActivityStatuses(requestStatus);
-		} catch (InvalidRequestMessageFaultType e1) {
-			throw new NoSuccessException(e1);
-		} catch (RemoteException e1) {
-			throw new NoSuccessException(e1);
+		} catch (InvalidRequestMessageFaultType e) {
+			throw new NoSuccessException(e);
+		} catch (RemoteException e) {
+			throw new NoSuccessException(e);
 		}
 		GetActivityStatusResponseType activityStatusArray = responseStatus.getResponse(0);
 		
