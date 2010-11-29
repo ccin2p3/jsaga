@@ -11,9 +11,6 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityDocumentType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.CreateActivityResponseType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.CreateActivityType;
-import org.ggf.schemas.bes.x2006.x08.besFactory.FactoryResourceAttributesDocumentType;
-import org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentResponseType;
-import org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.InvalidRequestMessageFaultType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.NotAcceptingNewActivitiesFaultType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.NotAuthorizedFaultType;
@@ -26,8 +23,6 @@ import org.globus.wsrf.encoding.DeserializationException;
 import org.globus.wsrf.encoding.ObjectDeserializer;
 import org.ogf.saga.error.*;
 
-import org.w3.x2005.x08.addressing.AttributedURIType;
-import org.w3.x2005.x08.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
 
 import java.io.*;
@@ -114,13 +109,13 @@ public class BesJobControlAdaptor extends BesJobAdaptorAbstract
     
     public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
     	TerminateActivitiesType request = new TerminateActivitiesType();
-		//EndpointReferenceType epr[] = new EndpointReferenceType[1];
-        //EndpointReferenceType e= new EndpointReferenceType();
-        //e.setAddress(new AttributedURIType(nativeJobId));
-		//epr[0]= e;
 		request.setActivityIdentifier(new BesJob(nativeJobId).getReferenceEndpoints());
 		try {
 			TerminateActivitiesResponseType response = _bes_pt.terminateActivities(request);
+			TerminateActivityResponseType r = response.getResponse(0);
+			if (! r.isCancelled()) {
+				throw new NoSuccessException("Unable to cancel job");
+			}
 		} catch (InvalidRequestMessageFaultType e) {
 			throw new NoSuccessException(e);
 		} catch (RemoteException e) {
