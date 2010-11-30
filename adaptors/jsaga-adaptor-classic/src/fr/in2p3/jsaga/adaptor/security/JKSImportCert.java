@@ -37,7 +37,9 @@ public class JKSImportCert {
         char[] keystorePassword = System.getProperty("javax.net.ssl.keyStorePassword")!=null
                 ? System.getProperty("javax.net.ssl.keyStorePassword").toCharArray()
                 : DEFAULT_KEYSTORE_PASSWORD;
-
+        if (keystorePassword.length < 6) {
+        	throw new KeyStoreException("KeyStore password must be at least 6 characters");
+        }
         // Extract alias, certChain and key from PKCS12
         KeyStore pkcs12Keystore = KeyStore.getInstance("PKCS12");
         InputStream inP12 = new FileInputStream(pkcs12File);
