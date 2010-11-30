@@ -118,7 +118,8 @@ public abstract class AbstractSyncJobServiceImpl extends AbstractSagaObjectImpl 
             String[] array = ((ListableJobAdaptor)monitorAdaptor).list();
             List<String> list = new ArrayList<String>();
             for (int i=0; array!=null && i<array.length; i++) {
-                list.add(array[i]);
+                String sagaJobId = "["+m_resourceManager.getString()+"]-["+array[i]+"]";
+                list.add(sagaJobId);
             }
             return list;
         } else {
