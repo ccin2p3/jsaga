@@ -184,7 +184,7 @@ public abstract class JobRunOptionalTest extends AbstractJobTest {
 	        List<String> jobList = service.list();
 	        // test if the running job is in the job list
 	        boolean jobIsInList = false;
-	        if(jobList.contains(job.getId()))
+	        if(jobList.contains(job.getAttribute(Job.JOBID)))
 	        	jobIsInList = true;
 	        
 	        assertEquals(
