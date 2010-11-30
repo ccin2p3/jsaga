@@ -5,6 +5,7 @@ import fr.in2p3.jsaga.engine.job.monitor.listen.FilteredJobStatusListener;
 import fr.in2p3.jsaga.engine.job.monitor.listen.IndividualJobStatusListener;
 import fr.in2p3.jsaga.engine.job.monitor.poll.*;
 import fr.in2p3.jsaga.engine.job.monitor.request.JobStatusRequestor;
+import fr.in2p3.jsaga.impl.job.service.ReconnectionException;
 import org.apache.log4j.Logger;
 import org.ogf.saga.error.*;
 import org.ogf.saga.url.URL;
@@ -91,11 +92,11 @@ public class JobMonitorService {
     public synchronized void startReset() {m_isReseting = true;}
     public synchronized void stopReset() {m_isReseting = false;}
     public synchronized void failReset(SagaException exception) {m_exception = exception;}
-    public synchronized void checkState() throws TimeoutException, NoSuccessException {
+    public synchronized void checkState() throws TimeoutException, ReconnectionException {
         if (m_isReseting) {
             throw new TimeoutException("Currently reconnecting to job service, please retry later...");
         } else if (m_exception != null) {
-            throw new NoSuccessException("Failed to reconnect to job service after proxy renewal", m_exception);
+            throw new ReconnectionException(m_exception);
         }
     }
 }
