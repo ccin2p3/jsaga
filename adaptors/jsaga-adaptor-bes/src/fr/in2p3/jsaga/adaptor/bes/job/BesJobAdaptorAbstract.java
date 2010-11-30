@@ -1,8 +1,11 @@
 package fr.in2p3.jsaga.adaptor.bes.job;
 
 import fr.in2p3.jsaga.adaptor.ClientAdaptor;
+import fr.in2p3.jsaga.adaptor.security.GlobusSecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
+//import fr.in2p3.jsaga.adaptor.security.VOMSSecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityCredential;
+//import fr.in2p3.jsaga.adaptor.security.impl.X509SecurityCredential;
 
 import org.ggf.schemas.bes.x2006.x08.besFactory.BESFactoryPortType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.BesFactoryServiceLocator;
@@ -34,6 +37,7 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
 	
 	protected String _bes_url ;
 	protected JKSSecurityCredential m_credential;
+	protected GlobusSecurityCredential m_voms_credential;
 
 	protected BESFactoryPortType _bes_pt = null;
 	
@@ -42,11 +46,15 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
     }
     
     public Class[] getSupportedSecurityCredentialClasses() {
-    	return new Class[]{JKSSecurityCredential.class};
+    	return new Class[]{JKSSecurityCredential.class, GlobusSecurityCredential.class};
     }
 
     public void setSecurityCredential(SecurityCredential credential) {
-    	 m_credential = (JKSSecurityCredential) credential;
+    	if (credential instanceof JKSSecurityCredential) {
+    		m_credential = (JKSSecurityCredential) credential;
+    	} else if (credential instanceof GlobusSecurityCredential) {
+    		m_voms_credential = (GlobusSecurityCredential) credential;
+    	}
     }
 
     public int getDefaultPort() {
@@ -59,11 +67,6 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
         
     	if (_bes_pt != null) return;
     	
-    	// TODO: use JKS security context
-		System.setProperty("javax.net.ssl.keyStore", "/home/schwarz/.jsaga/contexts/unicore6/demouser.jks");
-		System.setProperty("javax.net.ssl.keyStorePassword", "the!user");
-		System.setProperty("javax.net.ssl.trustStore", "/home/schwarz/.jsaga/contexts/unicore6/demouser.jks");
-
         BesFactoryServiceLocator _bes_service = new BesFactoryServiceLocator();
 		try {
 			_bes_service.setEndpointAddress(BES_FACTORY_PORT_TYPE,
@@ -77,6 +80,7 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
 
 	public void disconnect() throws NoSuccessException {
         m_credential = null;
+        m_voms_credential = null;
         _bes_pt = null;
     }    
 	
