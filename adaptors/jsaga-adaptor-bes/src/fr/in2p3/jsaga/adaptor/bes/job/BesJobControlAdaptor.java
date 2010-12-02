@@ -8,6 +8,7 @@ import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorJSDL;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
+import org.apache.axis.message.MessageElement;
 import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityDocumentType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.CreateActivityResponseType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.CreateActivityType;
@@ -21,13 +22,19 @@ import org.ggf.schemas.bes.x2006.x08.besFactory.UnsupportedFeatureFaultType;
 import org.ggf.schemas.jsdl.x2005.x11.jsdl.JobDefinition_Type;
 import org.globus.wsrf.encoding.DeserializationException;
 import org.globus.wsrf.encoding.ObjectDeserializer;
+import org.globus.wsrf.encoding.ObjectSerializer;
+import org.globus.wsrf.encoding.SerializationException;
 import org.ogf.saga.error.*;
 
+import org.w3.x2005.x08.addressing.EndpointReferenceType;
+import org.w3.x2005.x08.addressing.ReferenceParametersType;
 import org.xml.sax.InputSource;
 
 import java.io.*;
 import java.rmi.RemoteException;
 import java.util.*;
+
+import javax.xml.namespace.QName;
 
 
 /* ***************************************************
@@ -102,8 +109,22 @@ public class BesJobControlAdaptor extends BesJobAdaptorAbstract
 		} catch (RemoteException e) {
 			throw new NoSuccessException(e);
 		}
-
-        return response.getActivityIdentifier().getAddress().get_value().toString();
+		/*StringWriter writer = new StringWriter();
+		try {
+			ObjectSerializer.serialize(writer, response, 
+					new QName("http://schemas.ggf.org/bes/2006/08/bes-factory", "CreateActivityResponseType"));
+			System.out.println(writer);
+		} catch (SerializationException e) {
+			e.printStackTrace();
+		}*/
+		EndpointReferenceType activityIdentifier = response.getActivityIdentifier();
+		ReferenceParametersType rpt = activityIdentifier.getReferenceParameters();
+		for (MessageElement me: rpt.get_any()) {
+			if ("JobSessionDir".equals(me.getName())) {
+				return me.getFirstChild().getNodeValue();
+			}
+		}
+        return activityIdentifier.getAddress().get_value().toString();
 			
     }
     
