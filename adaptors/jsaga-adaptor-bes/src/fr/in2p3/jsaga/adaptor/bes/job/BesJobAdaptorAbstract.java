@@ -64,13 +64,16 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
 
 	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     	_bes_url = "https://"+host+":"+port+basePath;
-        
+    	// ?res=default_bes_factory in case of Unicore
+		if (attributes.get("res") != null) {
+			_bes_url += "?res=" + (String)attributes.get("res");
+		}
+        System.out.println(_bes_url);
     	if (_bes_pt != null) return;
     	
         BesFactoryServiceLocator _bes_service = new BesFactoryServiceLocator();
 		try {
-			_bes_service.setEndpointAddress(BES_FACTORY_PORT_TYPE,
-							_bes_url + "/BESFactory?res=default_bes_factory");
+			_bes_service.setEndpointAddress(BES_FACTORY_PORT_TYPE,	_bes_url);
 	        _bes_pt=(BESFactoryPortType) _bes_service.getBESFactoryPortType(); 
 		} catch (ServiceException e) {
 			throw new NoSuccessException(e);
