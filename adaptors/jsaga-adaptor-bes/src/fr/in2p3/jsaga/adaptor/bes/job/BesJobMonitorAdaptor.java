@@ -40,7 +40,7 @@ import javax.xml.namespace.QName;
 * Date:   23 Nov. 2010
 * ***************************************************/
 
-public class BesJobMonitorAdaptor extends BesJobAdaptorAbstract implements QueryIndividualJob, ListableJobAdaptor {
+public abstract class BesJobMonitorAdaptor extends BesJobAdaptorAbstract implements QueryIndividualJob, ListableJobAdaptor {
         
     public Usage getUsage() {
     	return null;
