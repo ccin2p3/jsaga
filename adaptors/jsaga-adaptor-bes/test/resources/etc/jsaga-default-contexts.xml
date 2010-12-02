@@ -5,24 +5,21 @@
             <attribute name="Keystore" value="${user.home}/.jsaga/contexts/unicore6/demouser.jks"/>
             <attribute name="KeystorePass" value="the!user"/>
             <data type="rbyteio"/>
-            <job type="bes"/>
+            <job type="bes-unicore"/>
             <include host="localhost6"/>
             <exclude host="localhost6" domain="hu" />
             <exclude host="localhost6" domain="de" />
         </context>
-        <context type="GlobusRFC820" id="Arc">
-            <attribute name="UserProxy" value="/tmp/x509up_u1000"/>
-            <job type="bes"/>
+        <context type="BESJKS" id="Arc">
+            <attribute name="Keystore" value="${user.home}/.jsaga/contexts/arc/grid2-fr.jks"/>
+            <attribute name="KeystorePass" value="changeit"/>
+            <job type="bes-arex"/>
             <include domain="hu"/>
         </context>
         <context type="BESJKS" id="DGrid">
             <attribute name="Keystore" value="${user.home}/.jsaga/contexts/d-grid/dgrid.jks"/>
             <attribute name="KeystorePass" value="changeit"/>
-            <attribute name="UserAlias" value="CERT"/>
-            <attribute name="UserPass" value="changeit"/>
-
-            <job type="bes"/>
-
+            <job type="bes-unicore"/>
             <include domain="de"/>
         </context>
     </session>
