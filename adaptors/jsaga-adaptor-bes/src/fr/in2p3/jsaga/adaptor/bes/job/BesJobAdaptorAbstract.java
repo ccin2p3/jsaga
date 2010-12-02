@@ -9,6 +9,12 @@ import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityCredential;
 
 import org.ggf.schemas.bes.x2006.x08.besFactory.BESFactoryPortType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.BesFactoryServiceLocator;
+import org.ggf.schemas.bes.x2006.x08.besFactory.FactoryResourceAttributesDocumentType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentResponseType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.InvalidRequestMessageFaultType;
+import org.globus.wsrf.encoding.ObjectSerializer;
+import org.globus.wsrf.encoding.SerializationException;
 
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
@@ -17,8 +23,11 @@ import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
 
+import java.io.StringWriter;
+import java.rmi.RemoteException;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;
 
 
@@ -37,30 +46,29 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
 	
 	protected String _bes_url ;
 	protected JKSSecurityCredential m_credential;
-	protected GlobusSecurityCredential m_voms_credential;
 
 	protected BESFactoryPortType _bes_pt = null;
 	
-    public String getType() {
+    /*public String getType() {
         return "bes";
-    }
+    }*/
     
     public Class[] getSupportedSecurityCredentialClasses() {
-    	return new Class[]{JKSSecurityCredential.class, GlobusSecurityCredential.class};
+    	return new Class[]{JKSSecurityCredential.class};
     }
 
     public void setSecurityCredential(SecurityCredential credential) {
-    	if (credential instanceof JKSSecurityCredential) {
+    	//if (credential instanceof JKSSecurityCredential) {
     		m_credential = (JKSSecurityCredential) credential;
-    	} else if (credential instanceof GlobusSecurityCredential) {
-    		m_voms_credential = (GlobusSecurityCredential) credential;
-    	}
+    	//} else if (credential instanceof GlobusSecurityCredential) {
+    	//	m_voms_credential = (GlobusSecurityCredential) credential;
+    	//}
     }
 
-    public int getDefaultPort() {
+    /*public int getDefaultPort() {
     	// Il n'y a pas de port par défaut
         return 8080;
-    }
+    }*/
 
 	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     	_bes_url = "https://"+host+":"+port+basePath;
@@ -73,8 +81,8 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
     	
         BesFactoryServiceLocator _bes_service = new BesFactoryServiceLocator();
 		try {
-			_bes_service.setEndpointAddress(BES_FACTORY_PORT_TYPE,	_bes_url);
-	        _bes_pt=(BESFactoryPortType) _bes_service.getBESFactoryPortType(); 
+			_bes_service.setEndpointAddress(BES_FACTORY_PORT_TYPE, _bes_url);
+	        _bes_pt=(BESFactoryPortType) _bes_service.getBESFactoryPortType();
 		} catch (ServiceException e) {
 			throw new NoSuccessException(e);
 		}
@@ -83,7 +91,7 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
 
 	public void disconnect() throws NoSuccessException {
         m_credential = null;
-        m_voms_credential = null;
+        //m_voms_credential = null;
         _bes_pt = null;
     }    
 	
