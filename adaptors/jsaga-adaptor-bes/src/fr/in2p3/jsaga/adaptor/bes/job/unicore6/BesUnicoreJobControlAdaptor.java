@@ -28,6 +28,7 @@ import org.globus.wsrf.encoding.ObjectSerializer;
 import org.globus.wsrf.encoding.SerializationException;
 import org.ogf.saga.error.*;
 
+import org.w3.x2005.x08.addressing.AttributedURIType;
 import org.w3.x2005.x08.addressing.EndpointReferenceType;
 import org.w3.x2005.x08.addressing.ReferenceParametersType;
 import org.xml.sax.InputSource;
@@ -47,8 +48,7 @@ import javax.xml.namespace.QName;
 * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
 * Date:   23 Nov. 2010
 * ***************************************************/
-public class BesUnicoreJobControlAdaptor extends BesJobAdaptorAbstract 
-		implements JobControlAdaptor {
+public class BesUnicoreJobControlAdaptor extends BesJobAdaptorAbstract {
 
     public String getType() {
         return "bes-unicore";
@@ -70,89 +70,8 @@ public class BesUnicoreJobControlAdaptor extends BesJobAdaptorAbstract
         return new BesUnicoreJobMonitorAdaptor();
     }
 
-    public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
-        return new JobDescriptionTranslatorJSDL();
-    }
-
-    public String submit(String jobDesc, boolean checkMatch, String uniqId)
-    		throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
-    	// Check if BESFactory isAcceptingNewActivities
-        /*GetFactoryAttributesDocumentResponseType r;
-		try {
-			r = _bes_pt.getFactoryAttributesDocument(new GetFactoryAttributesDocumentType());
-		} catch (InvalidRequestMessageFaultType e1) {
-			throw new NoSuccessException(e1);
-		} catch (RemoteException e1) {
-			throw new NoSuccessException(e1);
-		}
-        FactoryResourceAttributesDocumentType attr = r.getFactoryResourceAttributesDocument();
-        if (! attr.isIsAcceptingNewActivities()) {
-        	throw new PermissionDeniedException("Is not accepting new activities");
-        }*/
-    	
-
-        CreateActivityResponseType response = null;
-        ActivityDocumentType adt = new ActivityDocumentType();
-        
-        StringReader sr = new StringReader(jobDesc);
-        JobDefinition_Type jsdl_type;
-		try {
-			jsdl_type = (JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(sr), JobDefinition_Type.class);
-		} catch (DeserializationException e) {
-			throw new BadResource(e);
-		}
-        
-        adt.setJobDefinition(jsdl_type);
-        
-        CreateActivityType createActivity = new CreateActivityType();
-        createActivity.setActivityDocument(adt);
-        try {
-			response = _bes_pt.createActivity(createActivity);
-		} catch (NotAcceptingNewActivitiesFaultType e) {
-			throw new PermissionDeniedException(e);
-		} catch (InvalidRequestMessageFaultType e) {
-			throw new NoSuccessException(e);
-		} catch (UnsupportedFeatureFaultType e) {
-			throw new NoSuccessException(e);
-		} catch (NotAuthorizedFaultType e) {
-			throw new PermissionDeniedException(e);
-		} catch (RemoteException e) {
-			throw new NoSuccessException(e);
-		}
-		/*StringWriter writer = new StringWriter();
-		try {
-			ObjectSerializer.serialize(writer, response, 
-					new QName("http://schemas.ggf.org/bes/2006/08/bes-factory", "CreateActivityResponseType"));
-			System.out.println(writer);
-		} catch (SerializationException e) {
-			e.printStackTrace();
-		}*/
-		EndpointReferenceType activityIdentifier = response.getActivityIdentifier();
-		ReferenceParametersType rpt = activityIdentifier.getReferenceParameters();
-		for (MessageElement me: rpt.get_any()) {
-			if ("JobSessionDir".equals(me.getName())) {
-				return me.getFirstChild().getNodeValue();
-			}
-		}
-        return activityIdentifier.getAddress().get_value().toString();
-			
-    }
-    
-    public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-    	TerminateActivitiesType request = new TerminateActivitiesType();
-		request.setActivityIdentifier(new BesJob(nativeJobId).getReferenceEndpoints());
-		try {
-			TerminateActivitiesResponseType response = _bes_pt.terminateActivities(request);
-			TerminateActivityResponseType r = response.getResponse(0);
-			if (! r.isCancelled()) {
-				throw new NoSuccessException("Unable to cancel job");
-			}
-		} catch (InvalidRequestMessageFaultType e) {
-			throw new NoSuccessException(e);
-		} catch (RemoteException e) {
-			throw new NoSuccessException(e);
-		}
-    }
-
+	protected Class getJobClass() {
+		return BesUnicoreJob.class;
+	}
 
 }
