@@ -48,7 +48,7 @@ import javax.xml.namespace.QName;
 * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
 * Date:   23 Nov. 2010
 * ***************************************************/
-public class BesUnicoreJobControlAdaptor extends BesJobAdaptorAbstract {
+public class BesUnicoreJobControlAdaptor extends BesJobControlAdaptorAbstract implements JobControlAdaptor {
 
     public String getType() {
         return "bes-unicore";

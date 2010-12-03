@@ -62,7 +62,7 @@ import javax.xml.rpc.ServiceException;
 * Date:   23 Nov. 2010
 * ***************************************************/
 
-public abstract class BesJobAdaptorAbstract implements ClientAdaptor, JobControlAdaptor {
+public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
 
 	protected static final String BES_FACTORY_PORT_TYPE = "BESFactoryPortType";
 	
@@ -112,65 +112,6 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor, JobControl
     public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
         return new JobDescriptionTranslatorJSDL();
     }
-
-    public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
-
-		CreateActivityResponseType response = null;
-		ActivityDocumentType adt = new ActivityDocumentType();
-		
-		StringReader sr = new StringReader(jobDesc);
-		JobDefinition_Type jsdl_type;
-		try {
-			jsdl_type = (JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(sr), JobDefinition_Type.class);
-		} catch (DeserializationException e) {
-			throw new BadResource(e);
-		}
-		
-		adt.setJobDefinition(jsdl_type);
-		
-		CreateActivityType createActivity = new CreateActivityType();
-		createActivity.setActivityDocument(adt);
-		try {
-			response = _bes_pt.createActivity(createActivity);
-		} catch (NotAcceptingNewActivitiesFaultType e) {
-			throw new PermissionDeniedException(e);
-		} catch (InvalidRequestMessageFaultType e) {
-			throw new NoSuccessException(e);
-		} catch (UnsupportedFeatureFaultType e) {
-			throw new NoSuccessException(e);
-		} catch (NotAuthorizedFaultType e) {
-			throw new PermissionDeniedException(e);
-		} catch (RemoteException e) {
-			throw new NoSuccessException(e);
-		}
-		/*StringWriter writer = new StringWriter();
-		try {
-			ObjectSerializer.serialize(writer, response, 
-					new QName("http://schemas.ggf.org/bes/2006/08/bes-factory", "CreateActivityResponseType"));
-			System.out.println(writer);
-		} catch (SerializationException e) {
-			e.printStackTrace();
-		}*/
-		return activityId2NativeId(response.getActivityIdentifier());
-	}
-		
-    public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		TerminateActivitiesType request = new TerminateActivitiesType();
-		EndpointReferenceType[] refs = new EndpointReferenceType[1];
-		refs[0] = nativeId2ActivityId(nativeJobId);
-		request.setActivityIdentifier(refs);
-		try {
-			TerminateActivitiesResponseType response = _bes_pt.terminateActivities(request);
-			TerminateActivityResponseType r = response.getResponse(0);
-			if (! r.isCancelled()) {
-				throw new NoSuccessException("Unable to cancel job");
-			}
-		} catch (InvalidRequestMessageFaultType e) {
-			throw new NoSuccessException(e);
-		} catch (RemoteException e) {
-			throw new NoSuccessException(e);
-		}
-	}
 
     public String activityId2NativeId(EndpointReferenceType epr) throws NoSuccessException {
 		BesJob _job;

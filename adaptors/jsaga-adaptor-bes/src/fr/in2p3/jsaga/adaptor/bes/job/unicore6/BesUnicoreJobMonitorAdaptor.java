@@ -67,9 +67,4 @@ public class BesUnicoreJobMonitorAdaptor extends BesJobMonitorAdaptor implements
 			return BesUnicoreJob.class;
 	}
 
-	public JobMonitorAdaptor getDefaultJobMonitor() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

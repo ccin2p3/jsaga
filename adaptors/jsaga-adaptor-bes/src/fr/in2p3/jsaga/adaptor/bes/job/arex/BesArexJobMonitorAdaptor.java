@@ -68,11 +68,6 @@ public class BesArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements Qu
 		return BesArexJob.class;
 	}
 
-	public JobMonitorAdaptor getDefaultJobMonitor() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	/**
 	 * 
   <soapenv:Fault xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
