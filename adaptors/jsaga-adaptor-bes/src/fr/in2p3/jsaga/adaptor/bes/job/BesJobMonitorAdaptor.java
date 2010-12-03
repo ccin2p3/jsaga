@@ -8,6 +8,7 @@ import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.Text;
+import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityStatusType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.FactoryResourceAttributesDocumentType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.GetActivityStatusResponseType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.GetActivityStatusesResponseType;
@@ -50,58 +51,37 @@ public abstract class BesJobMonitorAdaptor extends BesJobAdaptorAbstract impleme
     	return new Default[]{};
     }
     
+    protected ActivityStatusType getActivityStatus(GetActivityStatusesResponseType responseStatus) throws NoSuccessException {
+    	return responseStatus.getResponse(0).getActivityStatus();
+    }
+    
     public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
 		GetActivityStatusesType requestStatus = new GetActivityStatusesType();
-		requestStatus.setActivityIdentifier(new BesJob(nativeJobId).getReferenceEndpoints());
 		GetActivityStatusesResponseType responseStatus;
+		EndpointReferenceType[] refs = new EndpointReferenceType[1];
 		try {
+			refs[0] = nativeId2ActivityId(nativeJobId);
+			requestStatus.setActivityIdentifier(refs);
 			responseStatus = _bes_pt.getActivityStatuses(requestStatus);
 		} catch (InvalidRequestMessageFaultType e) {
 			throw new NoSuccessException(e);
 		} catch (RemoteException e) {
 			throw new NoSuccessException(e);
 		}
-		StringWriter writer = new StringWriter();
+		/*StringWriter writer = new StringWriter();
 		try {
+			System.out.println("----> REQUEST");
+			ObjectSerializer.serialize(writer, requestStatus, 
+					new QName("http://schemas.ggf.org/bes/2006/08/bes-factory", "GetActivityStatusesType"));
+			System.out.println(writer);
+			System.out.println("----> RESPONSE");
 			ObjectSerializer.serialize(writer, responseStatus, 
 					new QName("http://schemas.ggf.org/bes/2006/08/bes-factory", "GetActivityStatusesResponseType"));
 			System.out.println(writer);
 		} catch (SerializationException e) {
 			e.printStackTrace();
-		}
-		MessageElement[] me_list = responseStatus.getResponse(0).get_any();
-		if (me_list != null) {
-			for (MessageElement me : responseStatus.getResponse(0).get_any()) {
-				if ("Fault".equals(me.getName())) {
-					String soap_ns = me.getNamespaceURI();
-					/* it is possible that error is sent in the SOAP envelope
-  <soapenv:Fault xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
-   <soapenv:Code>
-    <soapenv:Value>soap-env:Sender</soapenv:Value>
-   </soapenv:Code>
-   <soapenv:Reason>
-    <soapenv:Text>Missing a-rex:JobID in ActivityIdentifier</soapenv:Text>
-   </soapenv:Reason>
-   <soapenv:Detail>
-    <ns1:UnknownActivityIdentifierFault>
-     <ns1:Message>Unrecognized EPR in ActivityIdentifier</ns1:Message>
-    </ns1:UnknownActivityIdentifierFault>
-   </soapenv:Detail>
-  </soapenv:Fault>
-				 */
-					MessageElement soap_fault = me.getChildElement(new QName(soap_ns, "Reason"));
-					if (soap_fault != null) {
-						MessageElement me_text = soap_fault.getChildElement(new QName(soap_ns, "Text"));
-						if (me_text != null) {
-							Text text = (Text)me_text.getChildElements().next();
-							throw new NoSuccessException(text.getNodeValue());
-						}
-					}
-				}
-			}
-		}
-		GetActivityStatusResponseType activityStatus = responseStatus.getResponse(0);
-    	return new BesJobStatus(nativeJobId, activityStatus.getActivityStatus());
+		}*/
+    	return new BesJobStatus(nativeJobId, getActivityStatus(responseStatus));
 	}
 
 	public String[] list() throws PermissionDeniedException, TimeoutException,	NoSuccessException {
