@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.adaptor.bes.job;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 
+import org.apache.axis.message.MessageElement;
 import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityDocumentType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.CreateActivityResponseType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.CreateActivityType;
@@ -28,6 +29,8 @@ import org.xml.sax.InputSource;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.rmi.RemoteException;
+
+import javax.xml.namespace.QName;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -89,8 +92,20 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
 		try {
 			TerminateActivitiesResponseType response = _bes_pt.terminateActivities(request);
 			TerminateActivityResponseType r = response.getResponse(0);
-			if (! r.isCancelled()) {
-				throw new NoSuccessException("Unable to cancel job");
+			StringWriter writer = new StringWriter();
+			try {
+				ObjectSerializer.serialize(writer, response, 
+						new QName("http://schemas.ggf.org/bes/2006/08/bes-factory", "TerminateActivitiesResponseType"));
+				System.out.println(writer);
+			} catch (SerializationException e) {
+				e.printStackTrace();
+			}
+			for (MessageElement me: r.get_any()) {
+				if ("Terminated".equals(me.getName())) {
+					if (! me.getFirstChild().getNodeValue().equals("true")) {
+						throw new NoSuccessException("Unable to cancel job");
+					}
+				}
 			}
 		} catch (InvalidRequestMessageFaultType e) {
 			throw new NoSuccessException(e);
