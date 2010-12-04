@@ -44,8 +44,7 @@ public class BesArexJob extends BesJob {
 		try {
 			_msg_element_jobsessiondir.addTextNode(_job_nativeId);
 		} catch (SOAPException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new NoSuccessException(e);
 		}
 		msg_elements[1] = _msg_element_jobsessiondir;
 		
