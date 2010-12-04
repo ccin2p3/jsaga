@@ -92,14 +92,14 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
 		try {
 			TerminateActivitiesResponseType response = _bes_pt.terminateActivities(request);
 			TerminateActivityResponseType r = response.getResponse(0);
-			StringWriter writer = new StringWriter();
+			/*StringWriter writer = new StringWriter();
 			try {
 				ObjectSerializer.serialize(writer, response, 
 						new QName("http://schemas.ggf.org/bes/2006/08/bes-factory", "TerminateActivitiesResponseType"));
 				System.out.println(writer);
 			} catch (SerializationException e) {
 				e.printStackTrace();
-			}
+			}*/
 			for (MessageElement me: r.get_any()) {
 				if ("Terminated".equals(me.getName())) {
 					if (! me.getFirstChild().getNodeValue().equals("true")) {
