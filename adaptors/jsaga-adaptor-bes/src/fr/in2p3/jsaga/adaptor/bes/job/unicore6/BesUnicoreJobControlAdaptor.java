@@ -4,6 +4,7 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.bes.job.BesJob;
 import fr.in2p3.jsaga.adaptor.bes.job.BesJobAdaptorAbstract;
+import fr.in2p3.jsaga.adaptor.bes.job.BesJobControlAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
