@@ -42,7 +42,10 @@
 keytool -import -alias 1 -file myCA.der</pre></li>
                     <li>import your certificate
                         <pre>java -cp $JSAGA_HOME/lib-adaptors/jsaga-adaptor-classic-*.jar \
-        fr.in2p3.jsaga.adaptor.security.JKSImportCert mycert.p12 passphrase</pre></li>
+        fr.in2p3.jsaga.adaptor.security.JKSImportCert mycert.p12 passphrase</pre>
+                        If the keystore already exist, you may need to change the default values:
+                        <pre>-Djavax.net.ssl.keyStore=~/.keystore -Djavax.net.ssl.keyStorePassword=changeit</pre>
+                    </li>
                 </ul>
             </answer>
         </faq>
