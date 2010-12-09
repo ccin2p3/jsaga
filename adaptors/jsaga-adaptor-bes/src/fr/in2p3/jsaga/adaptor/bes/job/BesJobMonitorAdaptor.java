@@ -96,7 +96,7 @@ public abstract class BesJobMonitorAdaptor extends BesJobAdaptorAbstract impleme
 		}
 		FactoryResourceAttributesDocumentType attr = r.getFactoryResourceAttributesDocument();
 		for (EndpointReferenceType epr: attr.getActivityReference()) {
-			urls.add(epr.getAddress().get_value().toString());
+			urls.add(activityId2NativeId(epr));
 		}
 		return (String[])urls.toArray(new String[urls.size()]);
 	}
