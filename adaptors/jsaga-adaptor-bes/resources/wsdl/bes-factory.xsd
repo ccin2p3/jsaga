@@ -47,7 +47,7 @@
       <xsd:element name="ContainedResource" type="xsd:anyType" minOccurs="0" maxOccurs="unbounded"/>
       <xsd:element name="NamingProfile" type="xsd:anyURI" maxOccurs="unbounded"/>
       <xsd:element name="BESExtension" type="xsd:anyURI" minOccurs="0" maxOccurs="unbounded"/>
-      <xsd:element name="LocalResourceManagerType" type="xsd:string"/>
+      <xsd:element name="LocalResourceManagerType" type="xsd:anyURI"/>
       <xsd:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
     </xsd:sequence>
     <xsd:anyAttribute namespace="##other" processContents="lax"/>
