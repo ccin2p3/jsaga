@@ -6,7 +6,7 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>jsaga-adaptor-bes</artifactId>
-	<name>Adaptors for BES</name>
+	<name>Adaptor for BES</name>
 	<description>This module provides support for BES (Basic Execution Standard)</description>
 	<developers>
         <developer>
@@ -19,12 +19,46 @@
             </properties>
         </developer>
 	</developers>
+    <build>
+		<plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>axistools-maven-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>wsdl2java</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirectory>${basedir}/resources/wsdl</sourceDirectory>
+                            <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
+                            <timestampDirectory>${project.build.directory}</timestampDirectory>
+                            <fileNamespaceToPackage>${basedir}/resources/wsdl/NStoPkg.properties</fileNamespaceToPackage>
+                            <wsdlFiles>
+                            	<wsdlFile>bes-factory.wsdl</wsdlFile>
+                            </wsdlFiles>
+                            <!-- <nsExcludes>
+                            	<nsExclude>http://schemas.ggf.org/jsdl/2005/11/jsdl</nsExclude>
+                            </nsExcludes>-->
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin><!-- copy jar -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+            </plugin>
+		</plugins>
+    </build>
 	<dependencies>
-		<dependency><!-- for security context (WARNING: order of dependencies matters) -->
+	    <!-- for security context (WARNING: order of dependencies matters) -->
+		<dependency>
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-classic</artifactId>
 			<version>0.9.11-SNAPSHOT</version>
-			<scope>runtime</scope>
+			<scope>compile</scope>
 		</dependency>
 		<!-- <dependency>
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
@@ -37,24 +71,24 @@
 			<artifactId>vomsjapi</artifactId>
 			<version>1.7.22</version>
 		</dependency>-->
-		<dependency>
+		<!-- <dependency>
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-globus</artifactId>
 			<version>0.9.11-SNAPSHOT</version>
 			<scope>runtime</scope>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>axis</groupId>
 			<artifactId>axis</artifactId>
 			<version>1.4</version>
 			<scope>compile</scope>
 		</dependency>
-        <dependency>
+        <!-- <dependency>
             <groupId>org.ogf</groupId>
             <artifactId>bes-api-java</artifactId>
             <version>1.0</version>
 			<scope>runtime</scope>
-        </dependency>
+        </dependency>-->
         <dependency> <!-- pour ObjectDeserializer de wsrf-core -->
             <groupId>org.globus</groupId>
             <artifactId>wsgram-api</artifactId>
