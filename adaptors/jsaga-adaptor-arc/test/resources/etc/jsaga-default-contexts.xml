@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
+    <session>
+        <context type="BESJKS" id="Arc">
+            <attribute name="Keystore" value="${user.home}/.jsaga/contexts/arc/grid2-fr.jks"/>
+            <attribute name="KeystorePass" value="changeit"/>
+            <job type="arex"/>
+            <include domain="hu"/>
+        </context>
+    </session>
+</jsaga-default>
