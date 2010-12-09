@@ -44,15 +44,14 @@ public class BesTestSuite extends JSAGATestSuite {
         public void test_resume_running() { super.ignore("not supported"); }
         public void test_suspend_done() { super.ignore("not supported"); }
         public void test_suspend_running() { super.ignore("not supported"); }
-        public void test_listJob() { super.ignore("not supported"); }
     }
     
  	// test cases
     public static class BesJobRunDescriptionTest extends JobRunDescriptionTest {
         public BesJobRunDescriptionTest() throws Exception {super("bes");}
-        public void test_run_inWorkingDirectory() { super.ignore("return code not supported"); }
-        public void test_run_queueRequirement() { super.ignore("not supported"); }
-        public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
+        //public void test_run_inWorkingDirectory() { super.ignore("return code not supported"); }
+        //public void test_run_queueRequirement() { super.ignore("not supported"); }
+        //public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
     }
 
     // test cases
