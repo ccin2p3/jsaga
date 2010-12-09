@@ -1,55 +1,24 @@
 package fr.in2p3.jsaga.adaptor.bes.job;
 
 import fr.in2p3.jsaga.adaptor.ClientAdaptor;
-import fr.in2p3.jsaga.adaptor.job.BadResource;
-import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorJSDL;
-import fr.in2p3.jsaga.adaptor.security.GlobusSecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
-//import fr.in2p3.jsaga.adaptor.security.VOMSSecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityCredential;
-//import fr.in2p3.jsaga.adaptor.security.impl.X509SecurityCredential;
 
-import org.apache.axis.message.MessageElement;
-import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityDocumentType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.BESFactoryPortType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.BesFactoryServiceLocator;
-import org.ggf.schemas.bes.x2006.x08.besFactory.CreateActivityResponseType;
-import org.ggf.schemas.bes.x2006.x08.besFactory.CreateActivityType;
-import org.ggf.schemas.bes.x2006.x08.besFactory.FactoryResourceAttributesDocumentType;
-import org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentResponseType;
-import org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentType;
-import org.ggf.schemas.bes.x2006.x08.besFactory.InvalidRequestMessageFaultType;
-import org.ggf.schemas.bes.x2006.x08.besFactory.NotAcceptingNewActivitiesFaultType;
-import org.ggf.schemas.bes.x2006.x08.besFactory.NotAuthorizedFaultType;
-import org.ggf.schemas.bes.x2006.x08.besFactory.TerminateActivitiesResponseType;
-import org.ggf.schemas.bes.x2006.x08.besFactory.TerminateActivitiesType;
-import org.ggf.schemas.bes.x2006.x08.besFactory.TerminateActivityResponseType;
-import org.ggf.schemas.bes.x2006.x08.besFactory.UnsupportedFeatureFaultType;
-import org.ggf.schemas.jsdl.x2005.x11.jsdl.JobDefinition_Type;
-import org.globus.wsrf.encoding.DeserializationException;
-import org.globus.wsrf.encoding.ObjectDeserializer;
-import org.globus.wsrf.encoding.ObjectSerializer;
-import org.globus.wsrf.encoding.SerializationException;
 
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
-import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
 import org.w3.x2005.x08.addressing.EndpointReferenceType;
-import org.w3.x2005.x08.addressing.ReferenceParametersType;
-import org.xml.sax.InputSource;
 
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.rmi.RemoteException;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;
 
 
@@ -71,10 +40,6 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
 
 	protected BESFactoryPortType _bes_pt = null;
 	
-    /*public String getType() {
-        return "bes";
-    }*/
-    
 	protected abstract Class getJobClass();
 	
     public Class[] getSupportedSecurityCredentialClasses() {
@@ -85,12 +50,12 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
     		m_credential = (JKSSecurityCredential) credential;
     }
 
+    protected String getBESUrl(String userInfo, String host, int port, String basePath, Map attributes) {
+    	return "https://"+host+":"+port+basePath;
+    }
+    
 	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
-    	_bes_url = "https://"+host+":"+port+basePath;
-    	// ?res=default_bes_factory in case of Unicore
-		if (attributes.get("res") != null) {
-			_bes_url += "?res=" + (String)attributes.get("res");
-		}
+    	_bes_url = getBESUrl(userInfo, host, port, basePath, attributes);
         System.out.println(_bes_url);
     	if (_bes_pt != null) return;
     	

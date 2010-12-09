@@ -45,4 +45,13 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlAdaptorAbstract im
 		return BesUnicoreJob.class;
 	}
 
+    protected String getBESUrl(String userInfo, String host, int port, String basePath, Map attributes) {
+    	String url = "https://"+host+":"+port+basePath;
+    	// ?res=default_bes_factory
+		if (attributes.get("res") != null) {
+			url += "?res=" + (String)attributes.get("res");
+		}
+		return url;
+    }
+    
 }
