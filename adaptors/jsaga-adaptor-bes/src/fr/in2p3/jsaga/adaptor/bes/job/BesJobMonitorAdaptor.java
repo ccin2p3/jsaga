@@ -5,6 +5,7 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
+import fr.in2p3.jsaga.adaptor.job.monitor.QueryListJob;
 
 import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.Text;
@@ -41,7 +42,7 @@ import javax.xml.namespace.QName;
 * Date:   23 Nov. 2010
 * ***************************************************/
 
-public abstract class BesJobMonitorAdaptor extends BesJobAdaptorAbstract implements QueryIndividualJob, ListableJobAdaptor {
+public abstract class BesJobMonitorAdaptor extends BesJobAdaptorAbstract implements QueryIndividualJob, QueryListJob, ListableJobAdaptor {
         
     public Usage getUsage() {
     	return null;
@@ -54,36 +55,53 @@ public abstract class BesJobMonitorAdaptor extends BesJobAdaptorAbstract impleme
     protected ActivityStatusType getActivityStatus(GetActivityStatusesResponseType responseStatus) throws NoSuccessException {
     	return responseStatus.getResponse(0).getActivityStatus();
     }
-    
-    public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
-		GetActivityStatusesType requestStatus = new GetActivityStatusesType();
-		GetActivityStatusesResponseType responseStatus;
-		EndpointReferenceType[] refs = new EndpointReferenceType[1];
+
+    private GetActivityStatusResponseType[] getActivityStatuses(String[] nativeJobIdArray) throws NoSuccessException{
 		try {
-			refs[0] = nativeId2ActivityId(nativeJobId);
+			GetActivityStatusesType requestStatus = new GetActivityStatusesType();
+			EndpointReferenceType[] refs = new EndpointReferenceType[nativeJobIdArray.length];
+			int i=0;
+			for (String nativeJobId: nativeJobIdArray) {
+				refs[i++] = nativeId2ActivityId(nativeJobId);
+			}
 			requestStatus.setActivityIdentifier(refs);
-			responseStatus = _bes_pt.getActivityStatuses(requestStatus);
+			GetActivityStatusesResponseType responseStatus = _bes_pt.getActivityStatuses(requestStatus);
+			/*StringWriter writer = new StringWriter();
+			try {
+				System.out.println("----> REQUEST");
+				ObjectSerializer.serialize(writer, requestStatus, 
+						new QName("http://schemas.ggf.org/bes/2006/08/bes-factory", "GetActivityStatusesType"));
+				System.out.println(writer);
+				System.out.println("----> RESPONSE");
+				ObjectSerializer.serialize(writer, responseStatus, 
+						new QName("http://schemas.ggf.org/bes/2006/08/bes-factory", "GetActivityStatusesResponseType"));
+				System.out.println(writer);
+			} catch (SerializationException e) {
+				e.printStackTrace();
+			}*/
+			return responseStatus.getResponse();
 		} catch (InvalidRequestMessageFaultType e) {
 			throw new NoSuccessException(e);
 		} catch (RemoteException e) {
 			throw new NoSuccessException(e);
 		}
-		/*StringWriter writer = new StringWriter();
-		try {
-			System.out.println("----> REQUEST");
-			ObjectSerializer.serialize(writer, requestStatus, 
-					new QName("http://schemas.ggf.org/bes/2006/08/bes-factory", "GetActivityStatusesType"));
-			System.out.println(writer);
-			System.out.println("----> RESPONSE");
-			ObjectSerializer.serialize(writer, responseStatus, 
-					new QName("http://schemas.ggf.org/bes/2006/08/bes-factory", "GetActivityStatusesResponseType"));
-			System.out.println(writer);
-		} catch (SerializationException e) {
-			e.printStackTrace();
-		}*/
-    	return new BesJobStatus(nativeJobId, getActivityStatus(responseStatus));
+    	
+    }
+    
+    public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
+    	GetActivityStatusResponseType[] responseStatus = getActivityStatuses(new String[]{nativeJobId});
+    	return new BesJobStatus(nativeJobId, responseStatus[0].getActivityStatus());
 	}
 
+	public JobStatus[] getStatusList(String[] nativeJobIdArray) throws TimeoutException, NoSuccessException {
+    	GetActivityStatusResponseType[] responseStatus = getActivityStatuses(nativeJobIdArray);
+		BesJobStatus[] statusArray = new BesJobStatus[responseStatus.length];
+		for (int i=0; i<responseStatus.length; i++) {
+				statusArray[i] = new BesJobStatus(nativeJobIdArray[i], responseStatus[i].getActivityStatus());
+		}
+		return statusArray;
+	}
+	
 	public String[] list() throws PermissionDeniedException, TimeoutException,	NoSuccessException {
 		List<String> urls = new ArrayList<String>();
 		GetFactoryAttributesDocumentResponseType r;
