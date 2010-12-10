@@ -166,8 +166,8 @@ public class LfcConnection {
 	// private static final int CNS_ABORTTRANS = 48;
 	// private static final int CNS_LISTLINKS = 49;
 	// private static final int CNS_SETFSIZEG = 50;
-	 private static final int CNS_STATG = 51;
-	// private static final int CNS_STATR = 52;
+	private static final int CNS_STATG = 51;
+	private static final int CNS_STATR = 52;
 	// private static final int CNS_SETPTIME = 53;
 	// private static final int CNS_SETRATIME = 54;
 	// private static final int CNS_SETRSTATUS = 55;
@@ -594,7 +594,7 @@ public class LfcConnection {
 				LFCFile file = new LFCFile(recvBuf, false, false, false, false);
 				//FIXME:
 				if(recvBuf.hasRemaining()){
-					s_logger.info("stat: Something remains to be read");
+					System.err.println("stat: Something remains to be read");
 					//throw new IOException("stat: Something remains to be read");
 				}
 				return file;
@@ -621,7 +621,7 @@ public class LfcConnection {
 				LFCFile file = new LFCFile(recvBuf, false, true, true, false);
 				//FIXME:
 				if(recvBuf.hasRemaining()){
-					s_logger.info("statg: Something remains to be read");
+					System.err.println("statg: Something remains to be read");
 					//throw new IOException("statg: Something remains to be read");
 				}
 				return file;
@@ -634,6 +634,32 @@ public class LfcConnection {
 		}
 		throw new RuntimeException("Must not be here. BUG");
 	}
+	
+	//sfn = physical path
+	public LFCFile statr(String sfn) throws IOException, ReceiveException, TimeoutException {
+		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
+			try{
+				preparePacket(CNS_MAGIC, CNS_STATR);
+				addIDs();
+				putString(sfn);
+				sendAndReceive(true);
+				LFCFile file = new LFCFile(recvBuf, false, true, true, false);
+				//FIXME:
+				if(recvBuf.hasRemaining()){
+					System.err.println("statr: Something remains to be read");
+					//throw new IOException("statr: Something remains to be read");
+				}
+				return file;
+			}catch (TimeoutException e) {
+				if(z == MAX_RETRY_IF_TIMEOUT ){
+					throw e;
+				}
+				init();
+			}
+		}
+		throw new RuntimeException("Must not be here. BUG");
+	}
+
 
 	public LFCFile lstat(String path) throws IOException, ReceiveException, TimeoutException {
 		for (int z = 0; z <= MAX_RETRY_IF_TIMEOUT; z++) {
@@ -648,7 +674,7 @@ public class LfcConnection {
 				LFCFile file = new LFCFile(recvBuf, false, false, false, false);
 				//FIXME:
 				if(recvBuf.hasRemaining()){
-					s_logger.info("lstat: Something remains to be read");
+					System.err.println("lstat: Something remains to be read");
 					//throw new IOException("lstat: Something remains to be read");
 				}
 				return file;
@@ -674,7 +700,7 @@ public class LfcConnection {
 				String path = getString();
 				//FIXME:
 				if(recvBuf.hasRemaining()){
-					s_logger.info("readlink: Something remains to be read");
+					System.err.println("readlink: Something remains to be read");
 					//throw new IOException("readlink: Something remains to be read");
 				}
 				return path;
@@ -723,7 +749,7 @@ public class LfcConnection {
 				int s = recvBuf.getInt();
 				//FIXME
 				if(recvBuf.hasRemaining()){
-					s_logger.info("getGrpByName: Something remains to be read");
+					System.err.println("getGrpByName: Something remains to be read");
 //					throw new IOException("getGrpByName: Something remains to be read");
 				}
 				return s;
@@ -750,7 +776,7 @@ public class LfcConnection {
 				String group = getString();
 				//FIXME
 				if(recvBuf.hasRemaining()){
-					s_logger.info("getGrpByGid: Something remains to be read");
+					System.err.println("getGrpByGid: Something remains to be read");
 //					throw new IOException("getGrpByGid: Something remains to be read");
 				}
 				return group;
@@ -800,7 +826,7 @@ public class LfcConnection {
 				}
 				//FIXME
 				if(recvBuf.hasRemaining()){
-					s_logger.info("getGrpByGids: Something remains to be read");
+					System.err.println("getGrpByGids: Something remains to be read");
 //					throw new IOException("getGrpByGids: Something remains to be read");
 				}
 				return grpNames;
@@ -851,7 +877,7 @@ public class LfcConnection {
 				String user = getString();
 				//FIXME
 				if(recvBuf.hasRemaining()){
-					s_logger.info("getUsrByUid: Something remains to be read");
+					System.err.println("getUsrByUid: Something remains to be read");
 //					throw new IOException("getUsrByUid: Something remains to be read");
 				}
 				return user;
@@ -940,7 +966,7 @@ public class LfcConnection {
 				if(l != 0){
 					//FIXME:
 					if(recvBuf.hasRemaining()){
-						s_logger.info("closedir: Something remains to be read");
+						System.err.println("closedir: Something remains to be read");
 						//throw new IOException("closedir: Something remains to be read");
 					}
 				}
@@ -1238,7 +1264,7 @@ public class LfcConnection {
 				}
 				//FIXME: 
 				if(recvBuf.hasRemaining()){
-					s_logger.info("listReplica: Something remains to be read");
+					System.err.println("listReplica: Something remains to be read");
 				}
 				return srms;
 			}catch (TimeoutException e) {

@@ -164,9 +164,33 @@ public class LfcConnector {
 	}
 	
 	/**
+	 * Get the GUID of an PFN path
+	 * @param sfn	The PFN for which the GUID will be returned
+	 * @return The GUID of the PFN
+	 * @throws IOException
+	 * @throws ReceiveException
+	 * @throws TimeoutException
+	 */
+	public LFCFile getGuidFromPfn(String sfn) throws IOException, ReceiveException, TimeoutException {
+		final LfcConnection lfcConnection = new LfcConnection(server, port, gssCredential);
+		final LFCFile file;
+		try {
+		    file = lfcConnection.statr(sfn);
+		} catch (IOException e) {
+			throw e;
+		} catch (ReceiveException e) {
+			e.setExecutedCmd("getGuidFromSfn("+sfn+")");
+			throw e;
+		} finally {
+			close(lfcConnection);
+		}
+		return file;
+	}
+	
+	/**
 	 * Resolve one level of symbolic link path
 	 * @param link The symbolic link path
-	 * @return 
+	 * @return  The path to which point the symbolic link
 	 * @throws IOException
 	 * @throws ReceiveException
 	 * @throws TimeoutException
@@ -189,7 +213,7 @@ public class LfcConnector {
 
 	/**
 	 * Create a symbolic link
-	 * @param path	The original file/directory
+	 * @param path		The original file/directory
 	 * @param target	The path of the link
 	 * @throws IOException
 	 * @throws ReceiveException
