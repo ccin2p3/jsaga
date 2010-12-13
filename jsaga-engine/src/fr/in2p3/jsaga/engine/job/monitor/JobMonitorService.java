@@ -92,9 +92,9 @@ public class JobMonitorService {
     public synchronized void startReset() {m_isReseting = true;}
     public synchronized void stopReset() {m_isReseting = false;}
     public synchronized void failReset(SagaException exception) {m_exception = exception;}
-    public synchronized void checkState() throws TimeoutException, ReconnectionException {
+    public synchronized void checkState() throws ReconnectionException {
         if (m_isReseting) {
-            throw new TimeoutException("Currently reconnecting to job service, please retry later...");
+            throw new ReconnectionException(new TimeoutException("Currently reconnecting to job service, please retry later..."));
         } else if (m_exception != null) {
             throw new ReconnectionException(m_exception);
         }
