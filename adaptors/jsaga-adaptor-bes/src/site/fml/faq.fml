@@ -12,16 +12,4 @@
             </answer>
         </faq>
     </part>
-    <part id="srm">
-        <title>Storage Resource Manager</title>
-        <faq id="TransferProtocols">
-            <question>How do I configure the SRM adaptor to support new transfer protocols ?</question>
-            <answer>
-                <ul>
-                    <li>set the attribute TransferProtocols with the list of transfer protocols to support</li>
-                    <li>install the adaptors implementing these protocols</li>
-                </ul>
-            </answer>
-        </faq>
-    </part>
 </faqs>
