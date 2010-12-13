@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.adaptor.bes.job;
 
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 
 import org.apache.axis.message.MessageElement;
 import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityDocumentType;
@@ -15,6 +16,7 @@ import org.ggf.schemas.bes.x2006.x08.besFactory.TerminateActivitiesType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.TerminateActivityResponseType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.UnsupportedFeatureFaultType;
 import org.ggf.schemas.jsdl.x2005.x11.jsdl.JobDefinition_Type;
+import org.ggf.schemas.jsdl.x2005.x11.jsdl.Resources_Type;
 import org.globus.wsrf.encoding.DeserializationException;
 import org.globus.wsrf.encoding.ObjectDeserializer;
 import org.globus.wsrf.encoding.ObjectSerializer;
@@ -41,12 +43,13 @@ import javax.xml.namespace.QName;
 * Date:   23 Nov. 2010
 * ***************************************************/
 
-public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract implements JobControlAdaptor {
+public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract implements JobControlAdaptor, CleanableJobAdaptor {
 
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
 
 		CreateActivityResponseType response = null;
 		ActivityDocumentType adt = new ActivityDocumentType();
+		Resources_Type required_resources;
 		
 		StringReader sr = new StringReader(jobDesc);
 		JobDefinition_Type jsdl_type;
@@ -55,7 +58,27 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
 		} catch (DeserializationException e) {
 			throw new BadResource(e);
 		}
-		
+		required_resources = jsdl_type.getJobDescription().getResources();
+		// Check if TotalCPU Time required is too large > 5 days
+		// TODO how to get a variable duration ?
+		if (required_resources.getTotalCPUTime() != null 
+				&& required_resources.getTotalCPUTime().getUpperBoundedRange() != null 
+				&& required_resources.getTotalCPUTime().getUpperBoundedRange().get_value() > 60*60*24*5) {
+			throw new BadResource("Total CPU Time is too large");
+		}
+		// if checkMatch, check resources asked (jsdl_type.getJobDescription().getResources()) VS resources available
+		if (checkMatch) {
+			if ( _br != null) {
+				if (required_resources.getCPUArchitecture() != null 
+						&& _br.getCPUArchitecture() != null
+						&& ! required_resources.getCPUArchitecture().equals(_br.getCPUArchitecture())) {
+					throw new BadResource("CPU Architecture not matching");
+				}
+			}
+			/*if ( _cr != null) {
+				System.out.println(_cr.length);
+			}*/
+		}
 		adt.setJobDefinition(jsdl_type);
 		
 		CreateActivityType createActivity = new CreateActivityType();
@@ -112,6 +135,9 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
 		} catch (RemoteException e) {
 			throw new NoSuccessException(e);
 		}
+	}
+
+	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 	}
 
     public String activityId2NativeId(EndpointReferenceType epr) throws NoSuccessException {
