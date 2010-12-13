@@ -3,8 +3,6 @@ package fr.in2p3.jsaga.adaptor.bes_unicore.job;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.bes.job.BesJobMonitorAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
-import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
 
 import org.ogf.saga.error.IncorrectStateException;
 
@@ -19,7 +17,7 @@ import java.util.Map;
 * Date:   9 déc. 2010
 * ***************************************************/
 
-public class BesUnicoreJobMonitorAdaptor extends BesJobMonitorAdaptor implements QueryIndividualJob, ListableJobAdaptor {
+public class BesUnicoreJobMonitorAdaptor extends BesJobMonitorAdaptor  {
         
     public String getType() {
         return "bes-unicore";
@@ -49,4 +47,5 @@ public class BesUnicoreJobMonitorAdaptor extends BesJobMonitorAdaptor implements
 		}
 		return url;
     }
+
 }

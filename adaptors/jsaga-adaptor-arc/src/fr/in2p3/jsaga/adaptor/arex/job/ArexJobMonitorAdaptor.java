@@ -25,7 +25,7 @@ import javax.xml.namespace.QName;
 * Date:   9 déc 2010
 * ***************************************************/
 
-public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements QueryIndividualJob, ListableJobAdaptor {
+public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor {
         
     public String getType() {
         return "arex";
@@ -63,6 +63,8 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements Query
    </soapenv:Detail>
   </soapenv:Fault>
 	 */
+	/*
+	 * obsolete
     protected ActivityStatusType getActivityStatus(GetActivityStatusesResponseType responseStatus) throws NoSuccessException{
 		MessageElement[] me_list = responseStatus.getResponse(0).get_any();
 		if (me_list != null) {
@@ -81,5 +83,5 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements Query
 			}
 		}
 		return super.getActivityStatus(responseStatus);
-    }
+    }*/
 }
