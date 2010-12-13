@@ -7,7 +7,7 @@
             <answer>The command "jsaga-help" provides some useful information about the usage
                 and the current configuration of the plug-ins.
                 <pre>jsaga-help -help</pre>
-                If this command does not provides the answer to your question, then
+                If this command does not provide the answer to your question, then
                 please contact us so that we can fill out this FAQ.
             </answer>
         </faq>
