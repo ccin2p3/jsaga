@@ -292,8 +292,8 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
     private boolean m_disconnected = false;
     public synchronized void close() throws NotImplementedException, NoSuccessException {
         if (m_disconnectable && !m_disconnected) {
-            m_adaptor.disconnect();
             m_disconnected = true;
+            m_adaptor.disconnect();
         }
     }
 
