@@ -23,19 +23,21 @@
             </answer>
         </faq>
         <faq id="jdl">
-            <question>How can I pass JDL atttributes that are not supported by JSDL ?</question>
-            <answer>Put unsupported attributes into a &lt;Extension&gt; element.
-                <pre><![CDATA[<!-- DO NOT REMOVE (workaround for fml) --><JobDefinition xmlns="http://schemas.ggf.org/jsdl/2005/11/jsdl">
-    <!-- Your job description here... -->
-    <ext:Extension language="JDL" xmlns:ext="http://www.in2p3.fr/jsdl-extension">
-MyProxyServer = "skurut.cesnet.cz";
-UserTags = [
-    color = "red";
-    position = "12";
-    prodId = "cms_1234";
-];
-    </ext:Extension>
-</JobDefinition>]]></pre>
+            <question>How can I pass JDL atttributes that have no equivalent in SAGA specification ?</question>
+            <answer>There are several alternatives for doing that:
+                <ul>
+                    <li>Default JDL attributes can be added in a file, by adding path to this file as the value
+                        of attribute "DefaultJdlFile" in etc/jsaga-default-contexts.xml configuration file.
+                    </li>
+                    <li>Default JDL attributes can be put directly into the etc/jsaga-default-contexts.xml configuration file
+                        (see example http://grid.in2p3.fr/software/jsaga-dev/adaptors/jsaga-adaptor-wms/example.html).
+                    </li>
+                    <li>In addition to default JDL requirements, user-defined requirements can be added at run-time
+                        by setting the non-standard attribute "JDLRequirements" in your job description.
+                        Example usage :
+                        <pre>description.setVectorAttribute("Extension", new String[]{"JDLRequirements=(other.GlueHostOperatingSystemRelease>=5.0)"});</pre>
+                    </li>
+                </ul>
             </answer>
         </faq>
         <faq id="url">
