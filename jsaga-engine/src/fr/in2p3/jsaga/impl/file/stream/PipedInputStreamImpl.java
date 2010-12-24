@@ -22,22 +22,21 @@ public class PipedInputStreamImpl extends PipedInputStream implements Runnable {
     private String m_absolutePath;
     private String m_additionalArgs;
     private IOException m_exception;
-    private boolean m_closed;
     private OutputStream m_out;
+    private Thread thread = new Thread(this);
 
     public PipedInputStreamImpl(FileReaderGetter adaptor, String absolutePath, String additionalArgs) throws NoSuccessException {
         m_adaptor = adaptor;
         m_absolutePath = absolutePath;
         m_additionalArgs = additionalArgs;
         m_exception = null;
-        m_closed = false;
         try {
             // pipe must be connected before reading (else will throw exception)
             m_out = new PipedOutputStream(this);
         } catch (IOException e) {
             throw new NoSuccessException(e);
         }
-        new Thread(this).start();
+        thread.start();
     }
 
     public synchronized int read() throws IOException {
@@ -67,15 +66,10 @@ public class PipedInputStreamImpl extends PipedInputStream implements Runnable {
             throw m_exception;
         }
         super.close();
-        while (!m_closed) {
-            if (m_exception != null) {
-                throw m_exception;
-            }
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                throw new IOException("InterruptedException: "+e.getMessage());
-            }
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            throw new IOException("InterruptedException: " + e.getMessage());
         }
     }
 
@@ -85,8 +79,8 @@ public class PipedInputStreamImpl extends PipedInputStream implements Runnable {
                     m_absolutePath,
                     m_additionalArgs,
                     m_out);
-        } catch (Exception e) {
-            m_exception = new IOException(e.getClass()+": "+e.getMessage());
+        } catch (Throwable e) {
+            m_exception = new IOException(e.getClass()+": "+e.getMessage(), e);
         } finally {
             try {
                 // pipe must be closed to unlock read attempt
@@ -94,7 +88,6 @@ public class PipedInputStreamImpl extends PipedInputStream implements Runnable {
             } catch (IOException e) {
                 m_exception = e;
             }
-            m_closed = true;
         }
     }
 }

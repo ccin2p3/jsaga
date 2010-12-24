@@ -67,7 +67,6 @@ public class PipedOutputStreamImpl extends PipedOutputStream implements Runnable
         } catch (InterruptedException e) {
             throw new IOException("InterruptedException: " + e.getMessage());
         }
-
     }
 
     public void run() {
@@ -78,7 +77,7 @@ public class PipedOutputStreamImpl extends PipedOutputStream implements Runnable
                     m_additionalArgs,
                     m_in);
         } catch (Throwable e) {
-            m_exception = new IOException(e.getClass() + ": " + e.getMessage());
+            m_exception = new IOException(e.getClass() + ": " + e.getMessage(), e);
         } finally {
             try {
                 m_in.close();
