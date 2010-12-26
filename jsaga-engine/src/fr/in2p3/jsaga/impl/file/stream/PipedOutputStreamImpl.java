@@ -58,14 +58,14 @@ public class PipedOutputStreamImpl extends PipedOutputStream implements Runnable
     }
 
     public void close() throws IOException {
-        if (m_exception != null) {
-            throw m_exception;
-        }
         super.close();
         try {
             thread.join();
         } catch (InterruptedException e) {
             throw new IOException("InterruptedException: " + e.getMessage());
+        }
+        if (m_exception != null) {
+            throw m_exception;
         }
     }
 
