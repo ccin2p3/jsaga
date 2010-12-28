@@ -23,12 +23,12 @@ import fr.in2p3.jsaga.adaptor.bes.job.BesJob;
 public class ArexJob extends BesJob {
 
 	protected EndpointReferenceType toActivityIdentifier() throws NoSuccessException {
-		_job_endpoints = new EndpointReferenceType();
+		_job_endpoint = new EndpointReferenceType();
 		// split NativeJobID in serviceURL and jobId
 		int lastSlash = _job_nativeId.lastIndexOf("/");
 		String service = _job_nativeId.substring(0, lastSlash);
 		String jobId = _job_nativeId.substring(lastSlash+1);
-		_job_endpoints.setAddress(new AttributedURIType(service));
+		_job_endpoint.setAddress(new AttributedURIType(service));
 		
 		MessageElement[] msg_elements = new MessageElement[2];
 
@@ -51,13 +51,13 @@ public class ArexJob extends BesJob {
 		ReferenceParametersType rpt = new ReferenceParametersType();
 		rpt.set_any(msg_elements);
 		
-		_job_endpoints.setReferenceParameters(rpt);
-        return _job_endpoints;
+		_job_endpoint.setReferenceParameters(rpt);
+        return _job_endpoint;
 	}
 	
 	protected String toStringIdentifier() throws NoSuccessException {
 		_job_nativeId = null;
-		ReferenceParametersType rpt = _job_endpoints.getReferenceParameters();
+		ReferenceParametersType rpt = _job_endpoint.getReferenceParameters();
 		for (MessageElement me: rpt.get_any()) {
 			if ("JobSessionDir".equals(me.getName())) {
 				_job_nativeId = me.getFirstChild().getNodeValue();
