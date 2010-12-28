@@ -43,7 +43,9 @@ import javax.xml.namespace.QName;
 * ***************************************************/
 
 public abstract class BesJobMonitorAdaptor extends BesJobAdaptorAbstract implements QueryIndividualJob, QueryListJob, ListableJobAdaptor {
-        
+      
+	// TODO : implement ListenIndividualJob
+	
     public Usage getUsage() {
     	return null;
     }
@@ -52,10 +54,6 @@ public abstract class BesJobMonitorAdaptor extends BesJobAdaptorAbstract impleme
     	return new Default[]{};
     }
     
-    protected ActivityStatusType getActivityStatus(GetActivityStatusesResponseType responseStatus) throws NoSuccessException {
-    	return responseStatus.getResponse(0).getActivityStatus();
-    }
-
     private GetActivityStatusResponseType[] getActivityStatuses(String[] nativeJobIdArray) throws NoSuccessException{
 		try {
 			GetActivityStatusesType requestStatus = new GetActivityStatusesType();

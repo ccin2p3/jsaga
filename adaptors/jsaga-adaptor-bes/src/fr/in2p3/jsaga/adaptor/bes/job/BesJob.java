@@ -15,7 +15,7 @@ import org.w3.x2005.x08.addressing.EndpointReferenceType;
 
 public abstract class BesJob {
 
-	protected EndpointReferenceType _job_endpoints = null;
+	protected EndpointReferenceType _job_endpoint = null;
 	protected String _job_nativeId = null;
 	
 	/**
@@ -43,7 +43,7 @@ public abstract class BesJob {
 	 * @param epr the BES activity identifier
 	 */
 	public void setActivityIdentifier(EndpointReferenceType epr) {
-		_job_endpoints = epr;
+		_job_endpoint = epr;
 	}
 	
 	/**
@@ -62,8 +62,8 @@ public abstract class BesJob {
 	 * @return EndpointReferenceType the BES activity identifier
 	 */
 	public EndpointReferenceType getActivityIdentifier() throws NoSuccessException {
-		if (_job_endpoints != null) 
-			return _job_endpoints;
+		if (_job_endpoint != null) 
+			return _job_endpoint;
 		else
 			return toActivityIdentifier();
 	}
