@@ -45,8 +45,8 @@ public class ArexTestSuite extends JSAGATestSuite {
         public void test_suspend_done() { super.ignore("not supported"); }
         public void test_suspend_running() { super.ignore("not supported"); }
     }
-    
- 	// test cases
+
+    // test cases
     public static class ArexJobRunDescriptionTest extends JobRunDescriptionTest {
         public ArexJobRunDescriptionTest() throws Exception {super("arex");}
         //public void test_run_inWorkingDirectory() { super.ignore("return code not supported"); }

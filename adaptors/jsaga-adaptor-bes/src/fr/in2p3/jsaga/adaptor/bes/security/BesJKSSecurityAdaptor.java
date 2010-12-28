@@ -1,20 +1,10 @@
 package fr.in2p3.jsaga.adaptor.bes.security;
 
-import fr.in2p3.jsaga.adaptor.base.defaults.Default;
-import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.security.JKSSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
-import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityCredential;
-import org.ogf.saga.context.Context;
 import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.util.*;
 
 /* ***************************************************
@@ -28,6 +18,8 @@ import java.util.*;
 
 public class BesJKSSecurityAdaptor extends JKSSecurityAdaptor {
 
+	// TODO : insert this code into JKSSecurityAdaptor ?
+	
 	private static final String KEYSTORE = "Keystore";
 	private static final String KEYSTORE_PASS = "KeystorePass";
 	
@@ -40,9 +32,8 @@ public class BesJKSSecurityAdaptor extends JKSSecurityAdaptor {
     		String keyStorePass = (String) attributes.get(KEYSTORE_PASS);
 			String keyStorePath = (String) attributes.get(KEYSTORE);
     		System.setProperty("javax.net.ssl.keyStore", keyStorePath);
-    		System.setProperty("javax.net.ssl.keyStorePassword", keyStorePass); //"the!user");
-    		System.setProperty("javax.net.ssl.trustStore", keyStorePath); //"/home/schwarz/.jsaga/contexts/unicore6/demouser.jks");
-    		//System.setProperty("javax.net.debug", "SSL");
+    		System.setProperty("javax.net.ssl.keyStorePassword", keyStorePass);
+    		System.setProperty("javax.net.ssl.trustStore", keyStorePath);
     		return super.createSecurityCredential(usage, attributes, contextId);
     }
 }
