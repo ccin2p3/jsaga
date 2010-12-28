@@ -47,9 +47,15 @@ public class BesUnicoreTestSuite extends JSAGATestSuite {
     }
     
  	// test cases
+    public static class BesUnicoreJobRunSandboxTest extends JobRunSandboxTest {
+        public BesUnicoreJobRunSandboxTest() throws Exception {super("bes-unicore");}
+    }
+    
+ 	// test cases
     public static class BesUnicoreJobRunDescriptionTest extends JobRunDescriptionTest {
         public BesUnicoreJobRunDescriptionTest() throws Exception {super("bes-unicore");}
         public void test_run_inWorkingDirectory() { super.ignore("return code not supported"); }
+        // TODO : test_run_queueRequirement
         public void test_run_queueRequirement() { super.ignore("not supported"); }
         //public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
     }
