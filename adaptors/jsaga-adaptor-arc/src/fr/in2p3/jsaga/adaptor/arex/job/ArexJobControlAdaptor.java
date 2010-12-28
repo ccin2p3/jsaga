@@ -3,12 +3,46 @@ package fr.in2p3.jsaga.adaptor.arex.job;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.bes.job.BesJobControlAdaptorAbstract;
-import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.BadResource;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.HoldableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
-import org.ogf.saga.error.*;
+import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityDocumentType;
+import org.nordugrid.schemas.besFactory.ActivityStateEnumeration;
+import org.nordugrid.schemas.besFactory.ActivityStatusType;
+import org.nordugrid.schemas.besFactory.holders.ActivityStatusTypeHolder;
+import org.ggf.schemas.bes.x2006.x08.besFactory.BESFactoryPortType;
+import org.nordugrid.schemas.besFactory.CantApplyOperationToCurrentStateFaultType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.CreateActivityResponseType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.CreateActivityType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.FactoryResourceAttributesDocumentType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentResponseType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentType;
+import org.nordugrid.schemas.besFactory.InvalidActivityIdentifierFaultType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.InvalidRequestMessageFaultType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.NotAcceptingNewActivitiesFaultType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.NotAuthorizedFaultType;
+import org.nordugrid.schemas.besFactory.OperationWillBeAppliedEventuallyFaultType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.UnsupportedFeatureFaultType;
+import org.ggf.schemas.jsdl.x2005.x11.jsdl.JobDefinition_Type;
+import org.globus.wsrf.encoding.DeserializationException;
+import org.globus.wsrf.encoding.ObjectDeserializer;
+import org.globus.wsrf.encoding.ObjectSerializer;
+import org.globus.wsrf.encoding.SerializationException;
 
+import org.nordugrid.schemas.arex.ARex_PortType;
+import org.nordugrid.schemas.arex.ARex_ServiceLocator;
+
+import org.ogf.saga.error.*;
+import org.xml.sax.InputSource;
+
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.rmi.RemoteException;
 import java.util.*;
+
+import javax.xml.namespace.QName;
+import javax.xml.rpc.ServiceException;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -18,8 +52,9 @@ import java.util.*;
 * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
 * Date:   9 déc 2010
 * ***************************************************/
-public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract 
-		implements JobControlAdaptor {
+public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract /*implements HoldableJobAdaptor*/ {
+
+	protected ARex_PortType _arex_pt = null;
 
     public String getType() {
         return "arex";
@@ -45,4 +80,31 @@ public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract
         return new ArexJobMonitorAdaptor();
     }
 
+	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+    	super.connect(userInfo, host, port, basePath, attributes);
+    	
+    	if (_arex_pt != null) return;
+    	
+        ARex_ServiceLocator _arex_service = new ARex_ServiceLocator();
+		try {
+			_arex_service.setEndpointAddress("ARex", _bes_url);
+			_arex_pt=(ARex_PortType) _arex_service.getARex();
+		} catch (ServiceException e) {
+			throw new NoSuccessException(e);
+		}
+    }
+
+	public void disconnect() throws NoSuccessException {
+        //_arex_pt = null;
+        super.disconnect();
+    }
+
+	// TODO : hold
+	//public boolean hold(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+
+	/*public boolean release(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+		// TODO release 
+		return false;
+	} */   
+   			
 }
