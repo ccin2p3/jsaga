@@ -34,6 +34,7 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlAdaptorAbstract im
     }
 	
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
+    	// TODO : default value: ?res=default_bes_factory
     	return new Default[]{};
     }
     
