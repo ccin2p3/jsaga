@@ -54,7 +54,9 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
 	
 	// Basic resources
 	protected BasicResourceAttributesDocumentType _br = null;
+	
 	// Contained resources
+	// Can be of type BasicResourceAttributesDocumentType or FactoryResourceAttributesDocumentType
 	protected Object[] _cr = null;
 	
 	protected abstract Class getJobClass();
@@ -108,10 +110,6 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
         _cr = null;
     }    
    	
-    public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
-        return new JobDescriptionTranslatorJSDL();
-    }
-
     public String activityId2NativeId(EndpointReferenceType epr) throws NoSuccessException {
 		BesJob _job;
 		try {
