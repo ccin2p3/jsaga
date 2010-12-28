@@ -19,13 +19,13 @@ import fr.in2p3.jsaga.adaptor.bes.job.BesJob;
 public class BesUnicoreJob extends BesJob {
 
 	protected EndpointReferenceType toActivityIdentifier() throws NoSuccessException {
-		_job_endpoints = new EndpointReferenceType();
-		_job_endpoints.setAddress(new AttributedURIType(_job_nativeId));
-        return _job_endpoints;
+		_job_endpoint = new EndpointReferenceType();
+		_job_endpoint.setAddress(new AttributedURIType(_job_nativeId));
+        return _job_endpoint;
 	}
 	
 	protected String toStringIdentifier() throws NoSuccessException {
-		_job_nativeId = _job_endpoints.getAddress().get_value().toString();
+		_job_nativeId = _job_endpoint.getAddress().get_value().toString();
 		return _job_nativeId;
 	}
 }
