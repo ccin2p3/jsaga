@@ -32,19 +32,17 @@ public class BesUnicoreJobMonitorAdaptor extends BesJobMonitorAdaptor  {
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-    	return new Default[]{};
+    	return new Default[]{
+    			new Default("res", "default_bes_factory")};
     }
     
 	protected Class getJobClass() {
 			return BesUnicoreJob.class;
 	}
 
-    protected String getBESUrl(String userInfo, String host, int port, String basePath, Map attributes) {
-    	String url = "https://"+host+":"+port+basePath;
-    	// ?res=default_bes_factory
-		if (attributes.get("res") != null) {
-			url += "?res=" + (String)attributes.get("res");
-		}
+    protected String getBESUrl(String host, int port, String basePath, Map attributes) {
+    	String url = super.getBESUrl(host, port, basePath, attributes);
+		url += "?res=" + (String)attributes.get("res");
 		return url;
     }
 
