@@ -5,6 +5,7 @@ import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.bes.job.BesJobControlAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.HoldableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.SuspendableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
 import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityDocumentType;
@@ -12,19 +13,20 @@ import org.nordugrid.schemas.besFactory.ActivityStateEnumeration;
 import org.nordugrid.schemas.besFactory.ActivityStatusType;
 import org.nordugrid.schemas.besFactory.holders.ActivityStatusTypeHolder;
 import org.ggf.schemas.bes.x2006.x08.besFactory.BESFactoryPortType;
+
 import org.nordugrid.schemas.besFactory.CantApplyOperationToCurrentStateFaultType;
+import org.nordugrid.schemas.besFactory.InvalidActivityIdentifierFaultType;
+import org.nordugrid.schemas.besFactory.OperationWillBeAppliedEventuallyFaultType;
+import org.nordugrid.schemas.besFactory.NotAuthorizedFaultType;
+
+
 import org.ggf.schemas.bes.x2006.x08.besFactory.CreateActivityResponseType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.CreateActivityType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.FactoryResourceAttributesDocumentType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentResponseType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentType;
-import org.nordugrid.schemas.besFactory.InvalidActivityIdentifierFaultType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.InvalidRequestMessageFaultType;
-import org.ggf.schemas.bes.x2006.x08.besFactory.NotAcceptingNewActivitiesFaultType;
-import org.ggf.schemas.bes.x2006.x08.besFactory.NotAuthorizedFaultType;
-import org.nordugrid.schemas.besFactory.OperationWillBeAppliedEventuallyFaultType;
-import org.ggf.schemas.bes.x2006.x08.besFactory.UnsupportedFeatureFaultType;
-import org.ggf.schemas.jsdl.x2005.x11.jsdl.JobDefinition_Type;
+
 import org.globus.wsrf.encoding.DeserializationException;
 import org.globus.wsrf.encoding.ObjectDeserializer;
 import org.globus.wsrf.encoding.ObjectSerializer;
@@ -32,6 +34,8 @@ import org.globus.wsrf.encoding.SerializationException;
 
 import org.nordugrid.schemas.arex.ARex_PortType;
 import org.nordugrid.schemas.arex.ARex_ServiceLocator;
+import org.nordugrid.schemas.arex.ChangeActivityStatusRequestType;
+import org.nordugrid.schemas.arex.ChangeActivityStatusResponseType;
 
 import org.ogf.saga.error.*;
 import org.xml.sax.InputSource;
@@ -52,7 +56,7 @@ import javax.xml.rpc.ServiceException;
 * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
 * Date:   9 déc 2010
 * ***************************************************/
-public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract /*implements HoldableJobAdaptor*/ {
+public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract /*implements SuspendableJobAdaptor*/ {
 
 	protected ARex_PortType _arex_pt = null;
 
@@ -95,16 +99,32 @@ public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract /*implem
     }
 
 	public void disconnect() throws NoSuccessException {
-        //_arex_pt = null;
+        _arex_pt = null;
         super.disconnect();
     }
 
-	// TODO : hold
-	//public boolean hold(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-
-	/*public boolean release(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		// TODO release 
-		return false;
-	} */   
-   			
+	/*
+	private void changeStatus(String nativeJobId, ActivityStateEnumeration oldStatus, ActivityStateEnumeration newStatus) throws PermissionDeniedException, NoSuccessException {
+		//ChangeActivityStatusRequestType request = new ChangeActivityStatusRequestType();
+		//request.setActivityIdentifier(nativeId2ActivityId(nativeJobId));
+		ActivityStatusType oldAst = new ActivityStatusType();
+		oldAst.setState(oldStatus);
+		ActivityStatusType newAst = new ActivityStatusType();
+		newAst.setState(newStatus);
+		//request.setNewStatus(newAst);
+		try {
+			_arex_pt.changeActivityStatus(nativeId2ActivityId(nativeJobId),	oldAst, new ActivityStatusTypeHolder(newAst)) ;
+		} catch (OperationWillBeAppliedEventuallyFaultType e) {
+			throw new NoSuccessException(e);
+		} catch (CantApplyOperationToCurrentStateFaultType e) {
+			throw new NoSuccessException(e);
+		} catch (InvalidActivityIdentifierFaultType e) {
+			throw new NoSuccessException(e);
+		} catch (NotAuthorizedFaultType e) {
+			throw new PermissionDeniedException(e);
+		} catch (Exception e) {
+			throw new NoSuccessException(e);
+		}
+	}
+	*/
 }
