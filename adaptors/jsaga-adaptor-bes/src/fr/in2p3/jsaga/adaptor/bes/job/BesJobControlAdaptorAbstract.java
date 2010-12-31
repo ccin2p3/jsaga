@@ -265,7 +265,6 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
     }
     
 	private JobDefinition_Type getJobDescriptionTypeFromString(String nativeJobDescription) throws BadResource {
-		System.out.println(nativeJobDescription);
     	StringReader sr = new StringReader(nativeJobDescription);
 		JobDefinition_Type jsdl_type;
 		try {

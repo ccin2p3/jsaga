@@ -69,12 +69,12 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
     		m_credential = (JKSSecurityCredential) credential;
     }
 
-    protected String getBESUrl(String userInfo, String host, int port, String basePath, Map attributes) {
+    protected String getBESUrl(String host, int port, String basePath, Map attributes) {
     	return "https://"+host+":"+port+basePath;
     }
     
 	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
-    	_bes_url = getBESUrl(userInfo, host, port, basePath, attributes);
+    	_bes_url = getBESUrl(host, port, basePath, attributes);
     	if (_bes_pt != null) return;
     	
         BesFactoryServiceLocator _bes_service = new BesFactoryServiceLocator();
