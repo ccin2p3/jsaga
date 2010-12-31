@@ -47,6 +47,9 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor {
 		return ArexJob.class;
 	}
 
+	protected Class getJobStatusClass() {
+		return ArexJobStatus.class;
+	}
 	/**
 	 * 
   <soapenv:Fault xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">

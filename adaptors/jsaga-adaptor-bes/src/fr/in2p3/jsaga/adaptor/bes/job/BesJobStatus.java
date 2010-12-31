@@ -16,39 +16,14 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 * Date:   26 Nov 2010
 * ***************************************************/
 
-public class BesJobStatus extends JobStatus {
+public abstract class BesJobStatus extends JobStatus {
 
 	public BesJobStatus(String jobId, ActivityStatusType activityStatus) {
 		super(jobId, activityStatus, activityStatus.getState().getValue());
 	}
 
 	public String getModel() {
-        return "TODO";
+        return "BES";
     }
 
-    public SubState getSubState() {
-    	ActivityStateEnumeration state = ((ActivityStatusType) m_nativeStateCode).getState();
-    	MessageElement any[] = ((ActivityStatusType) m_nativeStateCode).get_any();
-    	String substate = (any == null)?null:any[0].getName();
-    		
-        if (ActivityStateEnumeration.Pending.equals(state)) {
-            return SubState.RUNNING_SUBMITTED;
-        } else if (ActivityStateEnumeration.Running.equals(state)) {
-        	if ("Staging-In".equals(substate)) {
-        		return SubState.RUNNING_PRE_STAGING;
-        	} else if ("Staging-Out".equals(substate)) {
-        		return SubState.RUNNING_POST_STAGING;
-        	} else {
-        		return SubState.RUNNING_ACTIVE;
-        	}
-        } else if (ActivityStateEnumeration.Finished.equals(state)) {
-            return SubState.DONE;
-        } else if (ActivityStateEnumeration.Cancelled.equals(state)) {
-            return SubState.CANCELED;
-        } else if (ActivityStateEnumeration.Failed.equals(state)) {
-            return SubState.FAILED_ERROR;
-        } else {
-            return null;
-        }
-    }
 }

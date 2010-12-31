@@ -26,6 +26,8 @@ import org.ogf.saga.error.TimeoutException;
 import org.w3.x2005.x08.addressing.EndpointReferenceType;
 
 import java.io.StringWriter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +56,9 @@ public abstract class BesJobMonitorAdaptor extends BesJobAdaptorAbstract impleme
     	return new Default[]{};
     }
     
-    private GetActivityStatusResponseType[] getActivityStatuses(String[] nativeJobIdArray) throws NoSuccessException{
+	protected abstract Class getJobStatusClass();
+
+	private GetActivityStatusResponseType[] getActivityStatuses(String[] nativeJobIdArray) throws NoSuccessException{
 		try {
 			GetActivityStatusesType requestStatus = new GetActivityStatusesType();
 			EndpointReferenceType[] refs = new EndpointReferenceType[nativeJobIdArray.length];
@@ -63,13 +67,17 @@ public abstract class BesJobMonitorAdaptor extends BesJobAdaptorAbstract impleme
 				refs[i++] = nativeId2ActivityId(nativeJobId);
 			}
 			requestStatus.setActivityIdentifier(refs);
-			GetActivityStatusesResponseType responseStatus = _bes_pt.getActivityStatuses(requestStatus);
-			/*StringWriter writer = new StringWriter();
-			try {
+			StringWriter writer = new StringWriter();
+			/*try {
 				System.out.println("----> REQUEST");
 				ObjectSerializer.serialize(writer, requestStatus, 
 						new QName("http://schemas.ggf.org/bes/2006/08/bes-factory", "GetActivityStatusesType"));
 				System.out.println(writer);
+			} catch (SerializationException e) {
+				e.printStackTrace();
+			}*/
+			GetActivityStatusesResponseType responseStatus = _bes_pt.getActivityStatuses(requestStatus);
+			/*try {
 				System.out.println("----> RESPONSE");
 				ObjectSerializer.serialize(writer, responseStatus, 
 						new QName("http://schemas.ggf.org/bes/2006/08/bes-factory", "GetActivityStatusesResponseType"));
@@ -86,16 +94,34 @@ public abstract class BesJobMonitorAdaptor extends BesJobAdaptorAbstract impleme
     	
     }
     
+	private JobStatus instanciateJobStatusObject(String nativeJobId, ActivityStatusType ast) throws NoSuccessException {
+    	try {
+    		Constructor c = getJobStatusClass().getConstructor(new Class[]{String.class,ActivityStatusType.class});
+			return (JobStatus)c.newInstance(new Object[]{nativeJobId, ast});
+		} catch (InstantiationException e) {
+			throw new NoSuccessException(e);
+		} catch (IllegalAccessException e) {
+			throw new NoSuccessException(e);
+		} catch (SecurityException e) {
+			throw new NoSuccessException(e);
+		} catch (NoSuchMethodException e) {
+			throw new NoSuccessException(e);
+		} catch (IllegalArgumentException e) {
+			throw new NoSuccessException(e);
+		} catch (InvocationTargetException e) {
+			throw new NoSuccessException(e);
+		}
+	}
     public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
     	GetActivityStatusResponseType[] responseStatus = getActivityStatuses(new String[]{nativeJobId});
-    	return new BesJobStatus(nativeJobId, responseStatus[0].getActivityStatus());
+    	return instanciateJobStatusObject(nativeJobId, responseStatus[0].getActivityStatus());
 	}
 
 	public JobStatus[] getStatusList(String[] nativeJobIdArray) throws TimeoutException, NoSuccessException {
     	GetActivityStatusResponseType[] responseStatus = getActivityStatuses(nativeJobIdArray);
-		BesJobStatus[] statusArray = new BesJobStatus[responseStatus.length];
+		JobStatus[] statusArray = new JobStatus[responseStatus.length];
 		for (int i=0; i<responseStatus.length; i++) {
-				statusArray[i] = new BesJobStatus(nativeJobIdArray[i], responseStatus[i].getActivityStatus());
+				statusArray[i] = instanciateJobStatusObject(nativeJobIdArray[i], responseStatus[i].getActivityStatus());
 		}
 		return statusArray;
 	}
