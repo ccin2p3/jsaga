@@ -1,10 +1,7 @@
 package fr.in2p3.jsaga.adaptor.bes.job;
 
-import org.apache.axis.message.MessageElement;
-import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityStateEnumeration;
-import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityStatusType;
 
-import fr.in2p3.jsaga.adaptor.job.SubState;
+import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityStatusType;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 
 /* ***************************************************

@@ -1,7 +1,6 @@
 package fr.in2p3.jsaga.adaptor.bes_unicore.job;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
-import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.bes.job.BesJobMonitorAdaptor;
 
 import org.ogf.saga.error.IncorrectStateException;
@@ -26,10 +25,6 @@ public class BesUnicoreJobMonitorAdaptor extends BesJobMonitorAdaptor  {
 	public int getDefaultPort() {
 		return 8080;
 	}
-
-    public Usage getUsage() {
-    	return null;
-    }
 
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
     	return new Default[]{

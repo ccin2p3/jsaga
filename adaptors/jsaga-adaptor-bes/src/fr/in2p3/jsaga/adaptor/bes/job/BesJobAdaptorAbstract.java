@@ -1,8 +1,10 @@
 package fr.in2p3.jsaga.adaptor.bes.job;
 
+import fr.in2p3.jsaga.adaptor.bes.BesUtils;
+
 import fr.in2p3.jsaga.adaptor.ClientAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
-import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorJSDL;
+import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityCredential;
 
@@ -12,25 +14,18 @@ import org.ggf.schemas.bes.x2006.x08.besFactory.BesFactoryServiceLocator;
 import org.ggf.schemas.bes.x2006.x08.besFactory.FactoryResourceAttributesDocumentType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentResponseType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentType;
-import org.ggf.schemas.bes.x2006.x08.besFactory.InvalidRequestMessageFaultType;
-import org.ggf.schemas.jsdl.x2005.x11.jsdl.CPUArchitecture_Type;
-import org.ggf.schemas.jsdl.x2005.x11.jsdl.OperatingSystem_Type;
-import org.globus.wsrf.encoding.ObjectSerializer;
-import org.globus.wsrf.encoding.SerializationException;
 
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
 import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
 import org.w3.x2005.x08.addressing.EndpointReferenceType;
 
-import java.io.StringWriter;
-import java.rmi.RemoteException;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;
 
 
@@ -43,6 +38,9 @@ import javax.xml.rpc.ServiceException;
 * Date:   23 Nov. 2010
 * ***************************************************/
 
+/**
+ * This class is the abstract class for the Adaptor specific to a BES implementation
+ */
 public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
 
 	protected static final String BES_FACTORY_PORT_TYPE = "BESFactoryPortType";
@@ -59,8 +57,18 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
 	// Can be of type BasicResourceAttributesDocumentType or FactoryResourceAttributesDocumentType
 	protected Object[] _cr = null;
 	
-	protected abstract Class getJobClass();
+	//////////////////////////////////////////////////
+	// Implementation of the ClientAdaptor interface
+	//////////////////////////////////////////////////
 	
+    public Usage getUsage() {
+    	return null;
+    }
+
+    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
+    	return new Default[]{};
+    }
+    
     public Class[] getSupportedSecurityCredentialClasses() {
     	return new Class[]{JKSSecurityCredential.class};
     }
@@ -69,10 +77,6 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
     		m_credential = (JKSSecurityCredential) credential;
     }
 
-    protected String getBESUrl(String host, int port, String basePath, Map attributes) {
-    	return "https://"+host+":"+port+basePath;
-    }
-    
 	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     	_bes_url = getBESUrl(host, port, basePath, attributes);
     	if (_bes_pt != null) return;
@@ -84,20 +88,11 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
 		} catch (ServiceException e) {
 			throw new NoSuccessException(e);
 		}
-		// Get resource attributes
-		/*StringWriter writer = new StringWriter();
-		try {
-			ObjectSerializer.serialize(writer, gfadt, 
-					new QName("http://schemas.ggf.org/bes/2006/08/bes-factory", "GetFactoryAttributesDocumentType"));
-			System.out.println(writer);
-		} catch (SerializationException e) {
-			e.printStackTrace();
-		}*/
 		try {
 			GetFactoryAttributesDocumentResponseType r = _bes_pt.getFactoryAttributesDocument(new GetFactoryAttributesDocumentType());
 	        FactoryResourceAttributesDocumentType attr = r.getFactoryResourceAttributesDocument();
 			_br = attr.getBasicResourceAttributesDocument();
-			_cr = attr.getContainedResource();
+			//_cr = attr.getContainedResource();
 		} catch (Exception e) {
 		}
 		
@@ -109,7 +104,11 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
         _br = null;
         _cr = null;
     }    
-   	
+
+	///////////////////////////////////
+	// Other public methods
+	///////////////////////////////////
+	
     public String activityId2NativeId(EndpointReferenceType epr) throws NoSuccessException {
 		BesJob _job;
 		try {
@@ -135,4 +134,30 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
 		_job.setNativeJobId(nativeId);
 		return _job.getActivityIdentifier();   	
     }
+
+	///////////////////////////////////
+    // Private methods
+	///////////////////////////////////
+    
+    /**
+     * Get the class of the appropriate Job object, depending of the BES implementation
+     * 
+     * @return Class the Java class of the Job object (this object must extend BesJob)
+     * @see BesJob
+     */
+	protected abstract Class getJobClass();
+	
+	/**
+	 * Get the BES URL to use
+	 * 
+	 * @param host
+	 * @param port
+	 * @param basePath
+	 * @param attributes
+	 * @return String the URL build as "https://"+host+":"+port+basePath
+	 */
+    protected String getBESUrl(String host, int port, String basePath, Map attributes) {
+    	return "https://"+host+":"+port+basePath;
+    }
+    
 }

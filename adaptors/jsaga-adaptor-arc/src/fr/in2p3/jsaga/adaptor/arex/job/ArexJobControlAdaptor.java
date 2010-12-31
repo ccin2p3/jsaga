@@ -1,7 +1,5 @@
 package fr.in2p3.jsaga.adaptor.arex.job;
 
-import fr.in2p3.jsaga.adaptor.base.defaults.Default;
-import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.bes.job.BesJobControlAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
@@ -50,18 +48,10 @@ public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract /*implem
 		return 2010;
 	}
 
-	public Usage getUsage() {
-    	return null;
-    }
-	
 	protected Class getJobClass() {
 		return ArexJob.class;
 	}
 
-	public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-    	return new Default[]{};
-    }
-    
     public JobMonitorAdaptor getDefaultJobMonitor() {
         return new ArexJobMonitorAdaptor();
     }

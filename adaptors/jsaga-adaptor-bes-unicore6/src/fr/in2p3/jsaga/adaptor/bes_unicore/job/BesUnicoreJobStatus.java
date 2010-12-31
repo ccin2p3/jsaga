@@ -6,7 +6,6 @@ import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityStatusType;
 
 import fr.in2p3.jsaga.adaptor.bes.job.BesJobStatus;
 import fr.in2p3.jsaga.adaptor.job.SubState;
-import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -23,11 +22,17 @@ public class BesUnicoreJobStatus extends BesJobStatus {
 		super(jobId, activityStatus);
 	}
 
-	/*public String getModel() {
-        return "TODO";
-    }*/
-
-    public SubState getSubState() {
+	/**
+	 * Gets the Unicore6 substate of the job as found in the GetActivityStatusesResponseType message
+	 * 
+	 * For example:
+	 * <ns1:ActivityStatus state="Running" xsi:type="ns1:ActivityStatusType">
+	 *   <fs:Staging-In xmlns:fs="http://schemas.ogf.org/hpcp/2007/01/fs"/>
+     * </ns1:ActivityStatus>
+	 * 
+	 * @return JobStatus the substate 
+	 */
+	public SubState getSubState() {
     	ActivityStateEnumeration state = ((ActivityStatusType) m_nativeStateCode).getState();
     	MessageElement any[] = ((ActivityStatusType) m_nativeStateCode).get_any();
     	String substate = (any == null)?null:any[0].getName();

@@ -1,7 +1,6 @@
 package fr.in2p3.jsaga.adaptor.bes_unicore.job;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
-import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.bes.job.BesJobControlAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
@@ -29,10 +28,6 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlAdaptorAbstract im
 		return 8080;
 	}
 
-	public Usage getUsage() {
-    	return null;
-    }
-	
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
     	return new Default[]{
     			new Default("res", "default_bes_factory")};

@@ -6,13 +6,12 @@ import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityStatusType;
 import org.nordugrid.schemas.arex.ActivitySubStateType;
 import fr.in2p3.jsaga.adaptor.bes.job.BesJobStatus;
 import fr.in2p3.jsaga.adaptor.job.SubState;
-import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   BesArexJobStatus
+* File:   ArexJobStatus
 * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
 * Date:   30 déc 2010
 * ***************************************************/
@@ -23,10 +22,17 @@ public class ArexJobStatus extends BesJobStatus {
 		super(jobId, activityStatus);
 	}
 
-	/*public String getModel() {
-        return "TODO";
-    }*/
-
+	/**
+	 * Gets the A-Rex substate of the job as found in the GetActivityStatusesResponseType message
+	 * 
+	 * For example:
+	 * <ns1:ActivityStatus state="Running" xsi:type="ns1:ActivityStatusType">
+	 *   <ns5:State xmlns:ns5="http://www.nordugrid.org/schemas/a-rex">Executing</ns5:State>
+     *   <ns6:State xmlns:ns6="http://schemas.ogf.org/glue/2008/05/spec_2.0_d41_r01">SUBMIT</ns6:State>
+	 * </ns1:ActivityStatus>
+	 * 
+	 * @return JobStatus the substate 
+	 */
     public SubState getSubState() {
     	ActivityStateEnumeration state = ((ActivityStatusType) m_nativeStateCode).getState();
     	String substate = null;
