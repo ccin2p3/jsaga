@@ -92,17 +92,17 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 			connection = m_lfcConnector.getNewConnection();
 			connection.startSession();
 		} catch (IOException e) {
-			logger.error("ERROR: connect("+userInfo+", "+host+", "+port+"): "+e.getMessage());
+			logger.debug("ERROR: connect("+userInfo+", "+host+", "+port+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: connect("+userInfo+", "+host+", "+port+"): "+e.getMessage());
+			logger.debug("ERROR: connect("+userInfo+", "+host+", "+port+"): "+e.getMessage());
 			if(NSError.TIMED_OUT.equals(e.getLFCError())){
 				throw new TimeoutException(e.getMessage());
 			}else{
 				throw new NoSuccessException(e);
 			}
 		} catch (LFCBrokenPipeException e) {
-			logger.error("ERROR: connect("+userInfo+", "+host+", "+port+"): "+e.getMessage());
+			logger.debug("ERROR: connect("+userInfo+", "+host+", "+port+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		
@@ -153,10 +153,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 			logger.debug("DONE: exists("+absolutePath+", "+additionalArgs+")");
 			return exist;
 		} catch (IOException e) {
-			logger.error("ERROR: exists("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: exists("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: exists("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: exists("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
 			if(NSError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(NSError.TIMED_OUT.equals(e.getLFCError())){
@@ -165,7 +165,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (LFCBrokenPipeException e) {
-			logger.error("ERROR: exists("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: exists("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 	}
@@ -176,10 +176,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 			m_lfcConnector.create(connection, true, logicalEntry, UUID.randomUUID().toString(), 0L);
 			logger.debug("DONE: create("+logicalEntry+", "+additionalArgs+")");
 		} catch (IOException e) {
-			logger.error("ERROR: create("+logicalEntry+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: create("+logicalEntry+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: create("+logicalEntry+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: create("+logicalEntry+", "+additionalArgs+"): "+e.getMessage());
 			if(NSError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(NSError.IS_A_DIRECOTRY.equals(e.getLFCError())){
@@ -194,7 +194,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (LFCBrokenPipeException e) {
-			logger.error("ERROR: create("+logicalEntry+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: create("+logicalEntry+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
     }
@@ -274,10 +274,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 			}
 			logger.debug("DONE: addLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+")");
 		}catch (IOException e) {
-			logger.error("ERROR: addLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: addLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: addLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: addLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
 			if(NSError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(NSError.TIMED_OUT.equals(e.getLFCError())){
@@ -286,7 +286,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (LFCBrokenPipeException e) {
-			logger.error("ERROR: addLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: addLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 	}
@@ -297,10 +297,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try{
 			lfcFile = m_lfcConnector.stat(connection, logicalEntry, true, true);
 		}catch (IOException e) {
-			logger.error("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
 			if(NSError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(NSError.TIMED_OUT.equals(e.getLFCError())){
@@ -311,23 +311,23 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (LFCBrokenPipeException e) {
-			logger.error("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		
 		if(lfcFile.isDirectory()){
 			BadParameterException e = new BadParameterException(logicalEntry+" is a directory");
-			logger.error("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
 			throw e;
 		}
 		
 		try{
 			m_lfcConnector.deleteReplica(connection, lfcFile.getGuid(), replicaEntry.getString());
 		}catch (IOException e) {
-			logger.error("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
 			if(NSError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(NSError.TIMED_OUT.equals(e.getLFCError())){
@@ -338,7 +338,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (LFCBrokenPipeException e) {
-			logger.error("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		logger.debug("DONE: removeLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+")");
@@ -350,10 +350,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			replicas = m_lfcConnector.listReplicas(logicalEntry, null);
 		} catch (IOException e) {
-			logger.error("ERROR: listLocations("+logicalEntry+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: listLocations("+logicalEntry+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: listLocations("+logicalEntry+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: listLocations("+logicalEntry+", "+additionalArgs+"): "+e.getMessage());
 			if(NSError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(NSError.TIMED_OUT.equals(e.getLFCError())){
@@ -364,7 +364,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (LFCBrokenPipeException e) {
-			logger.error("ERROR: listLocations("+logicalEntry+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: listLocations("+logicalEntry+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		String[] locations = new String[replicas.size()];
@@ -384,10 +384,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			lfcFiles = m_lfcConnector.list(absolutePath, true);
 		} catch (IOException e) {
-			logger.error("ERROR: listAttributes("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: listAttributes("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: listAttributes("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: listAttributes("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
 			if(NSError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(NSError.TIMED_OUT.equals(e.getLFCError())){
@@ -400,7 +400,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (LFCBrokenPipeException e) {
-			logger.error("ERROR: listAttributes("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: listAttributes("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		FileAttributes[] fileAttributes = new FileAttributes[lfcFiles.size()];
@@ -419,10 +419,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			lfcFile = m_lfcConnector.stat(connection, absolutePath, false,false);
 		} catch (IOException e) {
-			logger.error("ERROR: getAttributes("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: getAttributes("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: getAttributes("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: getAttributes("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
 			if(NSError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(NSError.TIMED_OUT.equals(e.getLFCError())){
@@ -433,7 +433,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (LFCBrokenPipeException e) {
-			logger.error("ERROR: getAttributes("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: getAttributes("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		logger.debug("DONE: getAttributes("+absolutePath+", "+additionalArgs+")");
@@ -445,10 +445,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			m_lfcConnector.mkdir(connection, parentAbsolutePath + (parentAbsolutePath.endsWith("/")?"":"/") + directoryName);
 		} catch (IOException e) {
-			logger.error("ERROR: makeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: makeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: makeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: makeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+"): "+e.getMessage());
 			if(NSError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(NSError.TIMED_OUT.equals(e.getLFCError())){
@@ -463,7 +463,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (LFCBrokenPipeException e) {
-			logger.error("ERROR: makeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: makeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		logger.debug("DONE: makeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+")");
@@ -474,10 +474,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			m_lfcConnector.deleteDir(connection, parentAbsolutePath + (parentAbsolutePath.endsWith("/")?"":"/") + directoryName);
 		} catch (IOException e) {
-			logger.error("ERROR: removeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: removeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: removeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: removeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+"): "+e.getMessage());
 			if(NSError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(NSError.TIMED_OUT.equals(e.getLFCError())){
@@ -490,7 +490,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (LFCBrokenPipeException e) {
-			logger.error("ERROR: removeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: removeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		logger.debug("DONE: removeDir("+parentAbsolutePath+", "+directoryName+", "+additionalArgs+")");
@@ -503,10 +503,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try{
 			lfcFile = m_lfcConnector.stat(connection, filePath, false, false);
 		} catch (IOException e) {
-			logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 			if(NSError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(NSError.TIMED_OUT.equals(e.getLFCError())){
@@ -517,7 +517,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (LFCBrokenPipeException e) {
-			logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		
@@ -528,10 +528,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 			try{
 				replicas = m_lfcConnector.listReplicas(filePath,null);
 			} catch (IOException e) {
-				logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
+				logger.debug("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 				throw new NoSuccessException(e);
 			} catch (ReceiveException e) {
-				logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
+				logger.debug("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 				if(NSError.PERMISSION_DENIED.equals(e.getLFCError())){
 					throw new PermissionDeniedException(e.toString());
 				}else if(NSError.TIMED_OUT.equals(e.getLFCError())){
@@ -542,7 +542,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 					throw new NoSuccessException(e);
 				}
 			} catch (LFCBrokenPipeException e) {
-				logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
+				logger.debug("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 				throw new TimeoutException(e.getMessage());
 			}
 			//Delete replicas information
@@ -552,10 +552,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 					m_lfcConnector.deleteReplica(connection, lfcReplica.getGuid(), lfcReplica.getSfn());
 				}
 			} catch (IOException e) {
-				logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
+				logger.debug("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 				throw new NoSuccessException(e);
 			} catch (ReceiveException e) {
-				logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
+				logger.debug("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 				if(NSError.PERMISSION_DENIED.equals(e.getLFCError())){
 					throw new PermissionDeniedException(e.toString());
 				}else if(NSError.TIMED_OUT.equals(e.getLFCError())){
@@ -566,7 +566,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 					throw new NoSuccessException(e);
 				}
 			} catch (LFCBrokenPipeException e) {
-				logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
+				logger.debug("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 				throw new TimeoutException(e.getMessage());
 			}
 		}
@@ -575,10 +575,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			m_lfcConnector.unlink(connection, filePath);
 		} catch (IOException e) {
-			logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 			if(NSError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(NSError.TIMED_OUT.equals(e.getLFCError())){
@@ -589,7 +589,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (LFCBrokenPipeException e) {
-			logger.error("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		logger.debug("DONE: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+")");
@@ -606,10 +606,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				return false;
 			}
 		}catch (IOException e) {
-			logger.error("ERROR: isLink("+absolutePath+"): "+e.getMessage());
+			logger.debug("ERROR: isLink("+absolutePath+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: isLink("+absolutePath+"): "+e.getMessage());
+			logger.debug("ERROR: isLink("+absolutePath+"): "+e.getMessage());
 			if(NSError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(NSError.TIMED_OUT.equals(e.getLFCError())){
@@ -620,7 +620,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (LFCBrokenPipeException e) {
-			logger.error("ERROR: isLink("+absolutePath+"): "+e.getMessage());
+			logger.debug("ERROR: isLink("+absolutePath+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 	}
@@ -631,10 +631,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			path = m_lfcConnector.readlink(connection, absolutePath);
 		}catch (IOException e) {
-			logger.error("ERROR: readLink("+absolutePath+"): "+e.getMessage());
+			logger.debug("ERROR: readLink("+absolutePath+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: readLink("+absolutePath+"): "+e.getMessage());
+			logger.debug("ERROR: readLink("+absolutePath+"): "+e.getMessage());
 			if(NSError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(NSError.TIMED_OUT.equals(e.getLFCError())){
@@ -645,7 +645,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (LFCBrokenPipeException e) {
-			logger.error("ERROR: readLink("+absolutePath+"): "+e.getMessage());
+			logger.debug("ERROR: readLink("+absolutePath+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		logger.debug("DONE: readLink("+absolutePath+")");
@@ -657,10 +657,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			m_lfcConnector.symbLink(connection, sourceAbsolutePath, linkAbsolutePath, overwrite);
 		}catch (IOException e) {
-			logger.error("ERROR: link("+sourceAbsolutePath+", "+linkAbsolutePath+", "+overwrite+"): "+e.getMessage());
+			logger.debug("ERROR: link("+sourceAbsolutePath+", "+linkAbsolutePath+", "+overwrite+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: link("+sourceAbsolutePath+", "+linkAbsolutePath+", "+overwrite+"): "+e.getMessage());
+			logger.debug("ERROR: link("+sourceAbsolutePath+", "+linkAbsolutePath+", "+overwrite+"): "+e.getMessage());
 			if(NSError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(NSError.TIMED_OUT.equals(e.getLFCError())){
@@ -673,7 +673,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (LFCBrokenPipeException e) {
-			logger.error("ERROR: link("+sourceAbsolutePath+", "+linkAbsolutePath+", "+overwrite+"): "+e.getMessage());
+			logger.debug("ERROR: link("+sourceAbsolutePath+", "+linkAbsolutePath+", "+overwrite+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		logger.debug("DONE: link("+sourceAbsolutePath+", "+linkAbsolutePath+", "+overwrite+")");
@@ -726,10 +726,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			m_lfcConnector.chmod(connection, absolutePath,permission);
 		}catch (IOException e) {
-			logger.error("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+permissions.getValue()+"): "+e.getMessage());
+			logger.debug("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+permissions.getValue()+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+permissions.getValue()+"): "+e.getMessage());
+			logger.debug("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+permissions.getValue()+"): "+e.getMessage());
 			if(NSError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(NSError.TIMED_OUT.equals(e.getLFCError())){
@@ -738,7 +738,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (LFCBrokenPipeException e) {
-			logger.error("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+permissions.getValue()+"): "+e.getMessage());
+			logger.debug("ERROR: permissionsAllow("+absolutePath+", "+scope+", "+permissions.getValue()+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		logger.debug("DONE: permissionsAllow("+absolutePath+", "+scope+", "+permissions.getValue()+")");
@@ -878,10 +878,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			m_lfcConnector.chmod(connection, absolutePath,permission);
 		}catch (IOException e) {
-			logger.error("ERROR: permissionsDeny("+absolutePath+", "+scope+", "+permissions.getValue()+"): "+e.getMessage());
+			logger.debug("ERROR: permissionsDeny("+absolutePath+", "+scope+", "+permissions.getValue()+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: permissionsDeny("+absolutePath+", "+scope+", "+permissions.getValue()+"): "+e.getMessage());
+			logger.debug("ERROR: permissionsDeny("+absolutePath+", "+scope+", "+permissions.getValue()+"): "+e.getMessage());
 			if(NSError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(NSError.TIMED_OUT.equals(e.getLFCError())){
@@ -890,7 +890,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (LFCBrokenPipeException e) {
-			logger.error("ERROR: permissionsDeny("+absolutePath+", "+scope+", "+permissions.getValue()+"): "+e.getMessage());
+			logger.debug("ERROR: permissionsDeny("+absolutePath+", "+scope+", "+permissions.getValue()+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		
@@ -972,10 +972,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try{
 			m_lfcConnector.rename(connection, sourceAbsolutePath, targetAbsolutePath);
 		} catch (IOException e) {
-			logger.error("ERROR: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
 		} catch (ReceiveException e) {
-			logger.error("ERROR: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+"): "+e.getMessage());
 			if(NSError.PERMISSION_DENIED.equals(e.getLFCError())){
 				throw new PermissionDeniedException(e.toString());
 			}else if(NSError.TIMED_OUT.equals(e.getLFCError())){
@@ -996,10 +996,10 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 							this.removeFile(formattedTargetAbsolutePath.substring(0, formattedTargetAbsolutePath.lastIndexOf("/")-1), formattedTargetAbsolutePath.substring(formattedTargetAbsolutePath.lastIndexOf("/")+1),null);
 						}
 					} catch (IOException e1) {
-						logger.error("ERROR: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+"): "+e1.getMessage());
+						logger.debug("ERROR: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+"): "+e1.getMessage());
 						throw new NoSuccessException(e);
 					} catch (ReceiveException e1) {
-						logger.error("ERROR: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+"): "+e1.getMessage());
+						logger.debug("ERROR: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+"): "+e1.getMessage());
 						if(NSError.PERMISSION_DENIED.equals(e1.getLFCError())){
 							throw new PermissionDeniedException(e1.toString());
 						}else if(NSError.TIMED_OUT.equals(e1.getLFCError())){
@@ -1008,7 +1008,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 							throw new NoSuccessException(e1);
 						}
 					} catch (LFCBrokenPipeException e1) {
-						logger.error("ERROR: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+"): "+e1.getMessage());
+						logger.debug("ERROR: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+"): "+e1.getMessage());
 						throw new TimeoutException(e1.getMessage());
 					}
 					this.rename(sourceAbsolutePath, targetAbsolutePath, false, additionalArgs);
@@ -1018,7 +1018,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				throw new NoSuccessException(e);
 			}
 		} catch (LFCBrokenPipeException e) {
-			logger.error("ERROR: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+"): "+e.getMessage());
+			logger.debug("ERROR: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+"): "+e.getMessage());
 			throw new TimeoutException(e.getMessage());
 		}
 		logger.debug("DONE: rename("+sourceAbsolutePath+", "+targetAbsolutePath+", "+overwrite+", "+additionalArgs+")");
