@@ -6,6 +6,7 @@ import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorOnePhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 
@@ -36,6 +37,7 @@ import org.xml.sax.InputSource;
 
 import java.io.StringReader;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.xml.namespace.QName;
@@ -55,12 +57,16 @@ import javax.xml.namespace.QName;
 public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract implements JobControlAdaptor, StagingJobAdaptorOnePhase, CleanableJobAdaptor {
 
     private static final int STAGING_DIRECTORY = 0;
+    private static final String STAGING_DIRECTORY_TAGNAME = "StagingDirectory";
+    private static final String DATA_STAGING_TAGNAME = "DataStaging";
+    private static final String PRE_STAGING_TRANSFERS_TAGNAME = "PreStagingIn";
+    private static final String POST_STAGING_TRANSFERS_TAGNAME = "PostStagingOut";
     
     ////////////////////////////////////////////////////
     // Implementation of the JobControlAdaptor interface
     ////////////////////////////////////////////////////
     public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
-        return new BesJobDescriptionTranslatorJSDL();
+        return new JobDescriptionTranslatorXSLT("xsl/job/bes-jsdl.xsl");//BesJobDescriptionTranslatorJSDL();
     }
 
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
@@ -69,6 +75,7 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
 		ActivityDocumentType adt = new ActivityDocumentType();
 		
 		StringReader sr = new StringReader(jobDesc);
+		//System.out.println(jobDesc);
 		JobDefinition_Type jsdl_type;
 		try {
 			jsdl_type = (JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(sr), JobDefinition_Type.class);
@@ -136,6 +143,7 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
     ////////////////////////////////////////////////////
 
 	public String getStagingDirectory(String nativeJobDescription, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+		System.out.println(nativeJobDescription);
 		// Get JobDefinition from String
 		JobDefinition_Type jsdl_type = getJobDescriptionTypeFromString(nativeJobDescription);
 		// Extract stagingDirectory
@@ -150,36 +158,30 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
     }
 
     public StagingTransfer[] getInputStagingTransfer(String nativeJobDescription, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		StagingTransfer[] st = new StagingTransfer[0];
     	// Get JobDefinition from String
 		JobDefinition_Type jsdl_type = getJobDescriptionTypeFromString(nativeJobDescription);
         /*
         MessageElement preStageIn = getExtensions(jobDesc)[PRE_STAGE_IN];
         return toStagingTransferArray(preStageIn);*/
-    	// TODO : extract STAGING_TRANSFERS from Description
-    	return st;
+		return getStagingTransfers(jsdl_type, PRE_STAGING_TRANSFERS_TAGNAME);
     }
 
     public StagingTransfer[] getInputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		StagingTransfer[] st = new StagingTransfer[0];
 		// Get JobDefinition from BES service
     	JobDefinition_Type jsdl_type = getJobDescriptionTypeFromNativeId(nativeJobId);
         /*
         MessageElement preStageIn = getExtensions(jobDesc)[PRE_STAGE_IN];
         return toStagingTransferArray(preStageIn);*/
-    	// TODO : extract STAGING_TRANSFERS from Job Descr retrieved by the server
-    	return st;
+		return getStagingTransfers(jsdl_type, PRE_STAGING_TRANSFERS_TAGNAME);
     }
 
     public StagingTransfer[] getOutputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		StagingTransfer[] st = new StagingTransfer[0];
 		// Get JobDefinition from BES service
     	JobDefinition_Type jsdl_type = getJobDescriptionTypeFromNativeId(nativeJobId);
         /*
         MessageElement postStageOut = getExtensions(jobDesc)[POST_STAGE_OUT];
         return toStagingTransferArray(postStageOut);*/
-    	// TODO : extract TRANSFERS OUT from Job Descr retrieved by the server
-    	return st;
+		return getStagingTransfers(jsdl_type, POST_STAGING_TRANSFERS_TAGNAME);
     }
 
     
@@ -197,15 +199,35 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
      *   <jsdl:JobIdentification/>
      *   <jsdl:Application>
      *     ...
-     *   <StagingDirectory>/tmp/1998763545</StagingDirectory>	
+     *   <jsaga:StagingDirectory><jsaga:URI>gsiftp://host:2811/tmp/1998763545</jsaga:URI></jsaga:StagingDirectory>	
      * </jsdl:JobDescription>
      * 
      * @param jsdl_type the JSDL Job Definition
      * @return the StagingDirectory defined in the JobDescription
      */
     private String getStagingDirectory(JobDefinition_Type jsdl_type) {
-		MessageElement stagingDirectory = jsdl_type.getJobDescription().get_any()[STAGING_DIRECTORY];
-		return stagingDirectory.getValue();
+		//MessageElement stagingDirectory = jsdl_type.getJobDescription().get_any()[STAGING_DIRECTORY];
+    	for (MessageElement me: jsdl_type.getJobDescription().get_any()) {
+    		if (STAGING_DIRECTORY_TAGNAME.equals(me.getName())) {
+    			return me.getElementsByTagName("URI").item(0).getFirstChild().getNodeValue();
+    		}
+    	}
+    	return "";
+    }
+
+    private StagingTransfer[] getStagingTransfers(JobDefinition_Type jsdl_type, String PreOrPost) {
+    	StagingTransfer[] st = new StagingTransfer[]{};
+    	ArrayList transfers = new ArrayList();
+    	for (MessageElement me: jsdl_type.getJobDescription().get_any()) {
+    		if (DATA_STAGING_TAGNAME.equals(me.getName())) {
+    			if (PreOrPost.equals(me.getFirstChild().getLocalName())) {
+    				String from = me.getElementsByTagName("Source").item(0).getFirstChild().getNodeValue();
+    				String to = me.getElementsByTagName("Source").item(0).getFirstChild().getNodeValue();
+    				transfers.add(new StagingTransfer(from, to, false));
+    			}
+    		}
+    	}
+    	return (StagingTransfer[]) transfers.toArray(st);
     }
 
     /**
@@ -290,39 +312,5 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
 			throw new NoSuccessException(e);
 		}
     	
-    }
-    
-    private static StagingTransfer[] toStagingTransferArray(MessageElement elem) {
-        StagingTransfer[] transfers = new StagingTransfer[elem.getLength()];
-        Iterator it = elem.getChildElements();
-        for (int i=0; it.hasNext(); i++) {
-            MessageElement child = (MessageElement) it.next();
-            transfers[i] = new StagingTransfer(
-                    getStringValue(child, "sourceUrl"),
-                    getStringValue(child, "destinationUrl"),
-                    getBooleanValue(child, "append"));
-        }
-        return transfers;
-    }
-    private static String getStringValue(MessageElement elem, String key) {
-        MessageElement child = elem.getChildElement(new QName("", key));
-        if (child != null) {
-            try {
-                return child.getValue();
-            } catch (Exception e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                return null;
-            }
-        } else {
-            return null;
-        }
-    }
-    private static boolean getBooleanValue(MessageElement elem, String key) {
-        String value = getStringValue(elem, key);
-        if (value != null) {
-            return "true".equalsIgnoreCase(value);
-        } else {
-            return false;
-        }
     }
 }

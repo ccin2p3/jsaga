@@ -25,7 +25,6 @@ public class BesJobDescriptionTranslatorJSDL extends JobDescriptionTranslatorJSD
     public String translate(Document jsdl, String uniqId) throws NoSuccessException {
     	Node stagingDir = jsdl.createElement("StagingDirectory");
     	//stagingDir.setPrefix("jsaga");
-    	// TODO: add protocol
     	stagingDir.setTextContent("file:/tmp/" + uniqId);
     	
     	jsdl.getElementsByTagName("jsdl:JobDescription").item(0).appendChild(stagingDir);
