@@ -80,7 +80,8 @@ public class PipedInputStreamImpl extends PipedInputStream implements Runnable {
                     m_additionalArgs,
                     m_out);
         } catch (Throwable e) {
-            m_exception = new IOException(e.getClass()+": "+e.getMessage(), e);
+            m_exception = new IOException(e.getClass()+": "+e.getMessage());
+            m_exception.initCause(e);
         } finally {
             try {
                 // pipe must be closed to unlock read attempt

@@ -77,7 +77,8 @@ public class PipedOutputStreamImpl extends PipedOutputStream implements Runnable
                     m_additionalArgs,
                     m_in);
         } catch (Throwable e) {
-            m_exception = new IOException(e.getClass() + ": " + e.getMessage(), e);
+            m_exception = new IOException(e.getClass() + ": " + e.getMessage());
+            m_exception.initCause(e);
         } finally {
             try {
                 m_in.close();
