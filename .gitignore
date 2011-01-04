@@ -5,3 +5,4 @@ build
 *.iml
 *.ipr
 *.iws
+maven/maven-workaround-izpack/target/
