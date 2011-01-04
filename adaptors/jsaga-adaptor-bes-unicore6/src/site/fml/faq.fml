@@ -14,12 +14,12 @@
         <faq id="url">
             <question>What is the URL syntax understood by this plug-in ?</question>
             <answer>The URL must be:
-                <pre><![CDATA[bes-unicore://<HOSTNAME>[:<PORT>]/<SITENAME>/services/BESFactory?res=<FACTORY>
+                <pre><![CDATA[bes-unicore://<HOSTNAME>[:<PORT>]/<SITENAME>/services/BESFactory[?res=<FACTORY>]
 Where:
     <HOSTNAME> is the name of the host running the BES Unicore6 service,
     <PORT> is 8080 by default,
-    <SITENAME> is the name of the site (e.g. "DEMO-SITE")
-    <FACTORY> is the name of the factory (probably "default_bes_factory")
+    <SITENAME> is the name of the site (e.g. "DEMO-SITE"),
+    <FACTORY> is the name of the factory (by default "default_bes_factory")
 ]]></pre>
             </answer>
         </faq>
