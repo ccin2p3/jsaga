@@ -12,7 +12,17 @@ import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorOnePhase;
 * ***************************************************/
 
 public interface BesStagingJobAdaptor extends StagingJobAdaptorOnePhase {
+	
+	/**
+	 * Get the staging protocol
+	 * @return the staging protocol
+	 */
     public abstract String getDataStagingProtocol();
+    
+    /**
+     * Get the staging port
+     * @return the staging port
+     */
     public abstract int getDataStagingPort();
     
 }
