@@ -114,10 +114,12 @@ public class <i>_MyProtocol_</i>TestSuite extends JSAGATestSuite {
     public static class index extends IndexTest {public index(){super(<i>_MyProtocol_</i>TestSuite.class);}}
 
     /** test cases */<xsl:text/>
-                        <xsl:for-each select="jelclass[@package='org.ogf.saga.file' or @package='org.ogf.saga.namespace'][contains(@type,'Test')]">
+                        <xsl:for-each select="jelclass[@package='org.ogf.saga.file' or @package='org.ogf.saga.namespace' or @package='org.ogf.saga.permissions']
+                                                      [contains(@type,'Test')]">
                             <xsl:call-template name="CODE_jelclass"/>
                         </xsl:for-each>
-                        <xsl:for-each select="jelclass[@package='org.ogf.saga.file' or @package='org.ogf.saga.namespace'][contains(@type,'Test')]
+                        <xsl:for-each select="jelclass[@package='org.ogf.saga.file' or @package='org.ogf.saga.namespace']
+                                                      [contains(@type,'Test')]
                                                       [contains(@type,'Copy') or contains(@type,'Move')]">
                             <xsl:call-template name="CODE_jelclass">
                                 <xsl:with-param name="targetAdaptor">_to_Emulator</xsl:with-param>
@@ -142,10 +144,12 @@ public class <i>_MyProtocol_</i>TestSuite extends JSAGATestSuite {
     public static class index extends IndexTest {public index(){super(<i>_MyProtocol_</i>TestSuite.class);}}
 
     /** test cases */<xsl:text/>
-                        <xsl:for-each select="jelclass[@package='org.ogf.saga.logicalfile' or @package='org.ogf.saga.namespace'][contains(@type,'Test')]">
+                        <xsl:for-each select="jelclass[@package='org.ogf.saga.logicalfile' or @package='org.ogf.saga.namespace' or @package='org.ogf.saga.permissions']
+                                                      [contains(@type,'Test')]">
                             <xsl:call-template name="CODE_jelclass"/>
                         </xsl:for-each>
-                        <xsl:for-each select="jelclass[@package='org.ogf.saga.logicalfile' or @package='org.ogf.saga.namespace'][contains(@type,'Test')]
+                        <xsl:for-each select="jelclass[@package='org.ogf.saga.logicalfile' or @package='org.ogf.saga.namespace']
+                                                      [contains(@type,'Test')]
                                                       [contains(@type,'Copy') or contains(@type,'Move')]">
                             <xsl:call-template name="CODE_jelclass">
                                 <xsl:with-param name="targetAdaptor">_to_Emulator</xsl:with-param>
