@@ -10,11 +10,20 @@
 	<!-- JSAGA parameters -->
 	<xsl:param name="HostName">host</xsl:param>
 	<xsl:param name="UniqId">staging</xsl:param>
+	<xsl:param name="Protocol">file</xsl:param>
+	<xsl:param name="Port"></xsl:param>
 	
 	<!-- constants -->
 	<!-- <xsl:variable name="SupportedProtocols">/gsiftp/</xsl:variable> -->
 	<xsl:variable name="IntermediaryURL">
-	    <xsl:text/>gsiftp://<xsl:value-of select="$HostName"/>:2811/tmp/<xsl:value-of select="$UniqId"/>
+		<xsl:choose>
+          <xsl:when test="$Protocol = 'file'">
+		    <xsl:text/>file:/tmp/<xsl:value-of select="$UniqId"/>
+          </xsl:when>
+          <xsl:otherwise>
+		    <xsl:value-of select="$Protocol"/>://<xsl:value-of select="$HostName"/>:<xsl:value-of select="$Port"/>/tmp/<xsl:value-of select="$UniqId"/>
+          </xsl:otherwise>
+		</xsl:choose>
 	</xsl:variable>
 
 	<xsl:template match="/ | @* | node()">
