@@ -3,11 +3,11 @@ package fr.in2p3.jsaga.adaptor.lfc;
 /**
  * @author Jerome Revillard
  */
-public class LFCGroup {
+public class NSGroup {
 	private final int gid; // gid
 	private final String name;
 
-	protected LFCGroup(int gid, String name) {
+	protected NSGroup(int gid, String name) {
 		this.gid = gid;
 		this.name = name;
 	}
@@ -16,7 +16,7 @@ public class LFCGroup {
 	 * @param name
 	 *            The VO group (i.e: hec/pdi)
 	 */
-	public LFCGroup(String name) {
+	public NSGroup(String name) {
 		this(-1, name);
 	}
 
@@ -35,10 +35,10 @@ public class LFCGroup {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof LFCGroup)) {
+		if (!(obj instanceof NSGroup)) {
 			return false;
 		}
-		LFCGroup other = (LFCGroup) obj;
+		NSGroup other = (NSGroup) obj;
 		if ((this.gid != other.gid)) {
 			return false;
 		}

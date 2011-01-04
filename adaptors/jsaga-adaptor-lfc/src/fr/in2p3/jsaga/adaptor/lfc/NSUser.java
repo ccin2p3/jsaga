@@ -3,11 +3,11 @@ package fr.in2p3.jsaga.adaptor.lfc;
 /**
  * @author Jerome Revillard
  */
-public class LFCUser {
+public class NSUser {
 	private final int uid; // uid
 	private final String name;
 
-	protected LFCUser(int uid, String name) {
+	protected NSUser(int uid, String name) {
 		this.uid = uid;
 		this.name = name;
 	}
@@ -17,7 +17,7 @@ public class LFCUser {
 	 *            The certificate header of the user (i.e:
 	 *            /C=ES/O=Maat_GKnowledge/CN=Jerome Revillard)
 	 */
-	public LFCUser(String name) {
+	public NSUser(String name) {
 		this(-1, name);
 	}
 
@@ -36,10 +36,10 @@ public class LFCUser {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof LFCUser)) {
+		if (!(obj instanceof NSUser)) {
 			return false;
 		}
-		LFCUser other = (LFCUser) obj;
+		NSUser other = (NSUser) obj;
 		if ((this.uid != other.uid)) {
 			return false;
 		}
