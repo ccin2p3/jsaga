@@ -37,11 +37,19 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlAdaptorAbstract im
         return new BesUnicoreJobMonitorAdaptor();
     }
 
-	protected Class getJobClass() {
+	public Class getJobClass() {
 		return BesUnicoreJob.class;
 	}
 
-    protected String getBESUrl(String host, int port, String basePath, Map attributes) {
+	public String getDataStagingProtocol() {
+		return "file";
+	}
+
+	public int getDataStagingPort() {
+		return getDefaultPort();
+	}
+
+    public String getBESUrl(String host, int port, String basePath, Map attributes) {
     	String url = super.getBESUrl(host, port, basePath, attributes);
 		url += "?res=" + (String)attributes.get("res");
 		return url;

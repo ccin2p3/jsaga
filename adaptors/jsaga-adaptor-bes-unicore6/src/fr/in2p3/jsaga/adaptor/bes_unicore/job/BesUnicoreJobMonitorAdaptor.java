@@ -31,7 +31,7 @@ public class BesUnicoreJobMonitorAdaptor extends BesJobMonitorAdaptor  {
     			new Default("res", "default_bes_factory")};
     }
     
-	protected Class getJobClass() {
+	public Class getJobClass() {
 		return BesUnicoreJob.class;
 	}
 
@@ -39,7 +39,7 @@ public class BesUnicoreJobMonitorAdaptor extends BesJobMonitorAdaptor  {
 		return BesUnicoreJobStatus.class;
 	}
 	
-    protected String getBESUrl(String host, int port, String basePath, Map attributes) {
+    public String getBESUrl(String host, int port, String basePath, Map attributes) {
     	String url = super.getBESUrl(host, port, basePath, attributes);
 		url += "?res=" + (String)attributes.get("res");
 		return url;

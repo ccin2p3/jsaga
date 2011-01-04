@@ -41,7 +41,7 @@ import javax.xml.rpc.ServiceException;
 /**
  * This class is the abstract class for the Adaptor specific to a BES implementation
  */
-public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
+public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 
 	protected static final String BES_FACTORY_PORT_TYPE = "BESFactoryPortType";
 	
@@ -94,6 +94,7 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
 			_br = attr.getBasicResourceAttributesDocument();
 			//_cr = attr.getContainedResource();
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		
     }
@@ -105,6 +106,23 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
         _cr = null;
     }    
 
+	///////////////////////////////////
+    // Implementation of BesClientAdaptor
+	///////////////////////////////////
+    
+	/**
+	 * Get the BES URL to use
+	 * 
+	 * @param host
+	 * @param port
+	 * @param basePath
+	 * @param attributes
+	 * @return String the URL build as "https://"+host+":"+port+basePath
+	 */
+    public String getBESUrl(String host, int port, String basePath, Map attributes) {
+    	return "https://"+host+":"+port+basePath;
+    }
+    
 	///////////////////////////////////
 	// Other public methods
 	///////////////////////////////////
@@ -135,29 +153,4 @@ public abstract class BesJobAdaptorAbstract implements ClientAdaptor {
 		return _job.getActivityIdentifier();   	
     }
 
-	///////////////////////////////////
-    // Private methods
-	///////////////////////////////////
-    
-    /**
-     * Get the class of the appropriate Job object, depending of the BES implementation
-     * 
-     * @return Class the Java class of the Job object (this object must extend BesJob)
-     * @see BesJob
-     */
-	protected abstract Class getJobClass();
-	
-	/**
-	 * Get the BES URL to use
-	 * 
-	 * @param host
-	 * @param port
-	 * @param basePath
-	 * @param attributes
-	 * @return String the URL build as "https://"+host+":"+port+basePath
-	 */
-    protected String getBESUrl(String host, int port, String basePath, Map attributes) {
-    	return "https://"+host+":"+port+basePath;
-    }
-    
 }

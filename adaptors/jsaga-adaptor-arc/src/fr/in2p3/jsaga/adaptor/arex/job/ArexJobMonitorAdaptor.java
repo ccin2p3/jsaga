@@ -22,7 +22,7 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor {
 		return 2010;
 	}
 
-	protected Class getJobClass() {
+	public Class getJobClass() {
 		return ArexJob.class;
 	}
 

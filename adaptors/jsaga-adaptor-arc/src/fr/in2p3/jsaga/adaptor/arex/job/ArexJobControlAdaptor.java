@@ -34,7 +34,7 @@ import javax.xml.rpc.ServiceException;
 * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
 * Date:   9 déc 2010
 * ***************************************************/
-public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract /*implements SuspendableJobAdaptor*/ {
+public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract {
 
 	public static final String AREX_NAMESPACE_URI = "http://www.nordugrid.org/schemas/a-rex";
 	
@@ -48,8 +48,16 @@ public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract /*implem
 		return 2010;
 	}
 
-	protected Class getJobClass() {
+	public Class getJobClass() {
 		return ArexJob.class;
+	}
+
+	public String getDataStagingProtocol() {
+		return "gsiftp";
+	}
+
+	public int getDataStagingPort() {
+		return 2811;
 	}
 
     public JobMonitorAdaptor getDefaultJobMonitor() {

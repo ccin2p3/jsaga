@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.bes.job;
 
 import fr.in2p3.jsaga.adaptor.bes.BesUtils;
+import fr.in2p3.jsaga.adaptor.bes.job.control.staging.BesStagingJobAdaptor;
 
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
@@ -54,19 +55,24 @@ import javax.xml.namespace.QName;
 /**
  * This class is the abstract class for the JobControl specific to a BES implementation
  */
-public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract implements JobControlAdaptor, StagingJobAdaptorOnePhase, CleanableJobAdaptor {
+public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract implements JobControlAdaptor, BesStagingJobAdaptor, CleanableJobAdaptor {
 
-    private static final int STAGING_DIRECTORY = 0;
     private static final String STAGING_DIRECTORY_TAGNAME = "StagingDirectory";
     private static final String DATA_STAGING_TAGNAME = "DataStaging";
     private static final String PRE_STAGING_TRANSFERS_TAGNAME = "PreStagingIn";
     private static final String POST_STAGING_TRANSFERS_TAGNAME = "PostStagingOut";
     
+    private static final String XSLTPARAM_PROTOCOL = "Protocol";
+    private static final String XSLTPARAM_PORT = "Port";
+    
     ////////////////////////////////////////////////////
     // Implementation of the JobControlAdaptor interface
     ////////////////////////////////////////////////////
     public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
-        return new JobDescriptionTranslatorXSLT("xsl/job/bes-jsdl.xsl");//BesJobDescriptionTranslatorJSDL();
+    	JobDescriptionTranslator translator =  new JobDescriptionTranslatorXSLT("xsl/job/bes-jsdl.xsl");//BesJobDescriptionTranslatorJSDL();
+    	translator.setAttribute(XSLTPARAM_PROTOCOL, getDataStagingProtocol());
+    	translator.setAttribute(XSLTPARAM_PORT, String.valueOf(getDataStagingPort()));
+    	return translator;
     }
 
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
@@ -75,7 +81,6 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
 		ActivityDocumentType adt = new ActivityDocumentType();
 		
 		StringReader sr = new StringReader(jobDesc);
-		//System.out.println(jobDesc);
 		JobDefinition_Type jsdl_type;
 		try {
 			jsdl_type = (JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(sr), JobDefinition_Type.class);
@@ -221,8 +226,8 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
     	for (MessageElement me: jsdl_type.getJobDescription().get_any()) {
     		if (DATA_STAGING_TAGNAME.equals(me.getName())) {
     			if (PreOrPost.equals(me.getFirstChild().getLocalName())) {
-    				String from = me.getElementsByTagName("Source").item(0).getFirstChild().getNodeValue();
-    				String to = me.getElementsByTagName("Source").item(0).getFirstChild().getNodeValue();
+    				String from = me.getElementsByTagName("Source").item(0).getFirstChild().getFirstChild().getNodeValue();
+    				String to = me.getElementsByTagName("Target").item(0).getFirstChild().getFirstChild().getNodeValue();
     				transfers.add(new StagingTransfer(from, to, false));
     			}
     		}
