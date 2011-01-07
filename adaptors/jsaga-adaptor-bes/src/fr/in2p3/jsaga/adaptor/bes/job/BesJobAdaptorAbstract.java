@@ -24,6 +24,8 @@ import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
 import org.w3.x2005.x08.addressing.EndpointReferenceType;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
 
 import javax.xml.rpc.ServiceException;
@@ -45,7 +47,7 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 
 	protected static final String BES_FACTORY_PORT_TYPE = "BESFactoryPortType";
 	
-	protected String _bes_url ;
+	protected URI _bes_url ;
 	protected JKSSecurityCredential m_credential;
 
 	protected BESFactoryPortType _bes_pt = null;
@@ -78,30 +80,35 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
     }
 
 	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
-    	_bes_url = getBESUrl(host, port, basePath, attributes);
+    	try {
+			_bes_url = getBESUrl(host, port, basePath, attributes);
+		} catch (URISyntaxException e) {
+			throw new NoSuccessException(e);
+		}
     	if (_bes_pt != null) return;
     	
         BesFactoryServiceLocator _bes_service = new BesFactoryServiceLocator();
 		try {
-			_bes_service.setEndpointAddress(BES_FACTORY_PORT_TYPE, _bes_url);
+			_bes_service.setEndpointAddress(BES_FACTORY_PORT_TYPE, _bes_url.toString());
 	        _bes_pt=(BESFactoryPortType) _bes_service.getBESFactoryPortType();
 		} catch (ServiceException e) {
 			throw new NoSuccessException(e);
 		}
-		try {
+		/*try {
 			GetFactoryAttributesDocumentResponseType r = _bes_pt.getFactoryAttributesDocument(new GetFactoryAttributesDocumentType());
 	        FactoryResourceAttributesDocumentType attr = r.getFactoryResourceAttributesDocument();
 			_br = attr.getBasicResourceAttributesDocument();
 			//_cr = attr.getContainedResource();
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}*/
 		
     }
 
 	public void disconnect() throws NoSuccessException {
         m_credential = null;
         _bes_pt = null;
+        _bes_url = null;
         _br = null;
         _cr = null;
     }    
@@ -117,10 +124,11 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 	 * @param port
 	 * @param basePath
 	 * @param attributes
-	 * @return String the URL build as "https://"+host+":"+port+basePath
+	 * @return the URL build as "https://"+host+":"+port+basePath
+	 * @throws URISyntaxException 
 	 */
-    public String getBESUrl(String host, int port, String basePath, Map attributes) {
-    	return "https://"+host+":"+port+basePath;
+    public URI getBESUrl(String host, int port, String basePath, Map attributes) throws URISyntaxException {
+    	return new URI("https://"+host+":"+port+basePath);
     }
     
 	///////////////////////////////////

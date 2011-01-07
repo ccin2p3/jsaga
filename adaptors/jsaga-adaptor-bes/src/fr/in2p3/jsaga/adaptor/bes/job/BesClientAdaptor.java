@@ -1,5 +1,7 @@
 package fr.in2p3.jsaga.adaptor.bes.job;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
 
 import fr.in2p3.jsaga.adaptor.ClientAdaptor;
@@ -29,8 +31,9 @@ public interface BesClientAdaptor extends ClientAdaptor {
 	 * @param port
 	 * @param basePath
 	 * @param attributes
-	 * @return String the URL build as "https://"+host+":"+port+basePath
+	 * @return String the URL for the BES service
+	 * @throws URISyntaxException 
 	 */
-    public abstract String getBESUrl(String host, int port, String basePath, Map attributes);
-	
+    public abstract URI getBESUrl(String host, int port, String basePath, Map attributes) throws URISyntaxException;
+
 }
