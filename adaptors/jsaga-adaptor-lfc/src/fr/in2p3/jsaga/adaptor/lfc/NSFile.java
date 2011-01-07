@@ -13,14 +13,14 @@ import fr.in2p3.jsaga.adaptor.lfc.NSConnection.ReceiveException;
  * @author Jerome Revillard
  * 
  */
-public class NSFile extends NSObject {
-	private final boolean readName;
-	private final boolean readGuid;
-	private final boolean readCheckSum;
-	private final boolean readComment;
-
+ public class NSFile extends NSObject{
+	 private final boolean readName;
+	 private final boolean readGuid;
+	 private final boolean readCheckSum;
+	 private final boolean readComment;
+	 
 	private String guid; // global unique id
-	private String fileName; // name of the file
+    private String fileName; // name of the file
 	private String comment; // user comment of the file
 	private String chksumType; // checksum type
 	private String chksumValue; // checksum value
@@ -34,7 +34,7 @@ public class NSFile extends NSObject {
 	private int nLink; // number of children
 	private int uid; // user id
 	private int gid; // group id
-	private long fileSize; // size of the file
+    private long fileSize;  // size of the file
 
 	private short fileMode; // see description on the end of the file
 	private short fileClass; // 1 = experiment, 2 = user (don't know what is
@@ -42,10 +42,7 @@ public class NSFile extends NSObject {
 	private byte status; // '-' = online, 'm' = migrated (don't know what is
 							// this for)
 
-	public NSFile(ByteBuffer byteBuffer, final boolean readName,
-			final boolean readGuid, final boolean readCheckSum,
-			final boolean readComment) throws IOException, ReceiveException,
-			LFCBrokenPipeException {
+	public NSFile(ByteBuffer byteBuffer, final boolean readName, final boolean readGuid, final boolean readCheckSum, final boolean readComment) throws IOException{
 		super(byteBuffer);
 		this.readName = readName;
 		this.readGuid = readGuid;
@@ -53,13 +50,9 @@ public class NSFile extends NSObject {
 		this.readComment = readComment;
 		fillObject();
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.pandora.gateway.dpm.datamanagementdaemon.ns.NSConnection.NSObject
-	 * #fillObject(java.nio.ByteBuffer)
+	
+	/* (non-Javadoc)
+	 * @see org.pandora.gateway.dpm.datamanagementdaemon.ns.NSConnection.NSObject#fillObject(java.nio.ByteBuffer)
 	 */
 	@Override
 	protected void fillObject() throws IOException {
@@ -69,7 +62,7 @@ public class NSFile extends NSObject {
 		}
 		this.fileMode = byteBuffer.getShort();
 		this.nLink = byteBuffer.getInt();
-
+		
 		this.uid = byteBuffer.getInt();
 		this.gid = byteBuffer.getInt();
 		this.fileSize = byteBuffer.getLong();
@@ -92,13 +85,14 @@ public class NSFile extends NSObject {
 		}
 	}
 
+
 	public String getGuid() {
 		return guid;
 	}
 
-	public String getFileName() {
-		return fileName;
-	}
+    public String getFileName() {
+        return fileName;
+    }
 
 	public String getComment() {
 		return comment;
@@ -116,13 +110,13 @@ public class NSFile extends NSObject {
 		return fileId;
 	}
 
-	public long getFileSize() {
-		return fileSize;
-	}
+    public long getFileSize() {
+        return fileSize;
+    }
 
-	public short getFileMode() {
-		return fileMode;
-	}
+    public short getFileMode() {
+        return fileMode;
+    }
 
 	public short getFileClass() {
 		return fileClass;
@@ -131,15 +125,13 @@ public class NSFile extends NSObject {
 	public byte getStatus() {
 		return status;
 	}
-
-	public NSGroup group(NSConnection connection) throws IOException,
-			ReceiveException, LFCBrokenPipeException {
-		return new NSGroup(gid, connection.getGrpByGid(gid));
+	
+	public NSGroup group(NSConnection connection) throws IOException, ReceiveException, LFCBrokenPipeException {
+		return new NSGroup(gid,connection.getGrpByGid(gid));
 	}
-
-	public NSUser owner(NSConnection connection) throws IOException,
-			ReceiveException, LFCBrokenPipeException {
-		return new NSUser(uid, connection.getUsrByUid(uid));
+	
+	public NSUser owner(NSConnection connection) throws IOException, ReceiveException, LFCBrokenPipeException {
+		return new NSUser(uid,connection.getUsrByUid(uid));
 	}
 
 	public long creationTime() {
@@ -195,11 +187,9 @@ public class NSFile extends NSObject {
 		if (guid != null)
 			tostring += (tostring.equals("") ? "" : " - ") + "guid: " + guid;
 		if (comment != null)
-			tostring += (tostring.equals("") ? "" : " - ") + "comment: "
-					+ comment;
+			tostring += (tostring.equals("") ? "" : " - ") + "comment: " + comment;
 		if (chksumType != null) {
-			tostring += (tostring.equals("") ? "" : " - ") + "chksumType: "
-					+ chksumType;
+			tostring += (tostring.equals("") ? "" : " - ") + "chksumType: " + chksumType;
 			tostring += " - chksumValue: " + chksumValue;
 		}
 
@@ -219,4 +209,4 @@ public class NSFile extends NSObject {
 
 		return tostring;
 	}
-}
+ }

@@ -112,7 +112,8 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 	public void disconnect() throws NoSuccessException {
 		logger.debug("DOING: disconnect");
 		try {
-			m_lfcConnector.closeSession(connection);
+//			m_lfcConnector.closeSession(connection);
+			m_lfcConnector.close(connection);
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
@@ -173,7 +174,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
     public void create(String logicalEntry, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
     	try {
 			logger.debug("DOING: create("+logicalEntry+", "+additionalArgs+")");
-			m_lfcConnector.create(connection, true, logicalEntry, UUID.randomUUID().toString(), 0L);
+			m_lfcConnector.create(connection, logicalEntry, UUID.randomUUID().toString(), 0L);
 			logger.debug("DONE: create("+logicalEntry+", "+additionalArgs+")");
 		} catch (IOException e) {
 			logger.debug("ERROR: create("+logicalEntry+", "+additionalArgs+"): "+e.getMessage());
@@ -205,7 +206,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 			//Test if the replica exists
 			Collection<NSReplica> replicas = null;
 			try{
-				replicas = m_lfcConnector.listReplicas(logicalEntry, null);
+				replicas = m_lfcConnector.listReplicas(connection, logicalEntry, null);
 			}catch (ReceiveException e) {
 				logger.debug("ERROR: addLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+")");
 				if(NSError.PERMISSION_DENIED.equals(e.getLFCError())){
@@ -348,7 +349,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		logger.debug("DOING: listLocations("+logicalEntry+", "+additionalArgs+")");
 		Collection<NSReplica> replicas;
 		try {
-			replicas = m_lfcConnector.listReplicas(logicalEntry, null);
+			replicas = m_lfcConnector.listReplicas(connection, logicalEntry, null);
 		} catch (IOException e) {
 			logger.debug("ERROR: listLocations("+logicalEntry+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
@@ -382,7 +383,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		logger.debug("DOING: listAttributes("+absolutePath+", "+additionalArgs+")");
 		Collection<NSFile> lfcFiles = null;
 		try {
-			lfcFiles = m_lfcConnector.list(absolutePath, true);
+			lfcFiles = m_lfcConnector.list(connection, absolutePath, false);
 		} catch (IOException e) {
 			logger.debug("ERROR: listAttributes("+absolutePath+", "+additionalArgs+"): "+e.getMessage());
 			throw new NoSuccessException(e);
@@ -524,9 +525,43 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		if(lfcFile.isDirectory()){
 			throw new BadParameterException(filePath+" is a directory.");
 		}else if(lfcFile.isRegularFile()){
+//	TODO: It seems that doing it induce a problem in the links tests tearDone. I don't know yet why.
+//			try {
+//				m_lfcConnector.deleteFilesByNames(connection, new String[]{filePath}, true);
+//			} catch (IOException e) {
+//				logger.debug("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
+//				throw new NoSuccessException(e);
+//			} catch (ReceiveException e) {
+//				logger.debug("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
+//				if(NSError.PERMISSION_DENIED.equals(e.getLFCError())){
+//					throw new PermissionDeniedException(e.toString());
+//				}else if(NSError.TIMED_OUT.equals(e.getLFCError())){
+//					throw new TimeoutException(e.getMessage());
+//				}else if (NSError.NO_SUCH_FILE_OR_DIRECTORY.equals(e.getLFCError())) {
+//					throw new DoesNotExistException(e);
+//				}else{
+//					throw new NoSuccessException(e);
+//				}
+//			} catch (LFCBrokenPipeException e) {
+//				logger.debug("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
+//				throw new TimeoutException(e.getMessage());
+//			} catch (NSStatusesException e) {
+//				logger.debug("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
+//				if(NSError.PERMISSION_DENIED.equals(e.getNsErrors()[0])){
+//					throw new PermissionDeniedException(e.toString());
+//				}else if(NSError.TIMED_OUT.equals(e.getNsErrors()[0])){
+//					throw new TimeoutException(e.getMessage());
+//				}else if (NSError.NO_SUCH_FILE_OR_DIRECTORY.equals(e.getNsErrors()[0])) {
+//					throw new DoesNotExistException(e);
+//				}else{
+//					throw new NoSuccessException(e);
+//				}
+//			}
+//		}
+			
 			Collection<NSReplica> replicas;
 			try{
-				replicas = m_lfcConnector.listReplicas(filePath,null);
+				replicas = m_lfcConnector.listReplicas(connection, filePath,null);
 			} catch (IOException e) {
 				logger.debug("ERROR: removeFile("+parentAbsolutePath+", "+fileName+", "+additionalArgs+"): "+e.getMessage());
 				throw new NoSuccessException(e);

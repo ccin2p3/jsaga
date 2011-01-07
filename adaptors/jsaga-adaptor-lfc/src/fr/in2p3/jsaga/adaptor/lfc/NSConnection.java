@@ -153,7 +153,7 @@ public class NSConnection {
 	// private static final int CNS_GETSEGAT = 18;
 	// private static final int CNS_SETSEGAT = 19;
 	// private static final int CNS_LISTTAPE = 20;
-	// private static final int CNS_ENDLIST = 21;
+	 private static final int CNS_ENDLIST = 21;
 	// private static final int CNS_GETPATH = 22;
 	private static final int CNS_DELETE = 23;
 	// private static final int CNS_UNDELETE = 24;
@@ -214,12 +214,15 @@ public class NSConnection {
 	// private static final int CNS_GETREPLICAS = 80;
 	private static final int CNS_GETGRPNAMES = 81;
 	// private static final int CNS_PING = 82;
-	private static final int CNS_DELFILES = 83;
-	// private static final int CNS_DELFILESBYP = 84;
-	// private static final int CNS_DELREPLICAS = 85;
+	private static final int CNS_DELFILES = 83; // TRANSCTIONS NOT SUPPORTED
+	// private static final int CNS_DELFILESBYP = 84; // TRANSCTIONS NOT SUPPORTED
+	// private static final int CNS_DELREPLICAS = 85; // TRANSCTIONS NOT SUPPORTED
 	// private static final int CNS_GETGRPMAP = 86;
 	// private static final int CNS_GETUSRMAP = 87;
 	// private static final int CNS_GETREPLICAL = 88;
+	// private static final int CNS_MODREPLICAX = 89;
+	// private static final int CNS_DELREPBYSFN = 90;
+	// private static final int CNS_REGFILES = 91; // TRANSCTIONS NOT SUPPORTED
 
 	public static final short CNS_LIST_BEGIN = 0;
 	public static final short CNS_LIST_CONTINUE = 1;
@@ -228,6 +231,7 @@ public class NSConnection {
 	private static final byte REQUEST_GSI_TOKEN[] = { 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x47, 0x53, 0x49, 0x00, 0x49, 0x44, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01 };
 
 	private boolean sessionStarted = false;
+	private int openedTransaction = 0;
 	
 	/**
 	 * Messages that are returned when CNS_IRC or CNS_RC are received
@@ -272,7 +276,7 @@ public class NSConnection {
 		TIMED_OUT(1004, "Has timed out"),
 		INTERNAL_ERROR(1015, "Internal error"),
 		
-		UNKOWN_ERROR(9999, "Unknown LFC error");
+		UNKOWN_ERROR(9999, "Unknown NS error");
 		
 		private String message;
 		private int error;
@@ -399,6 +403,8 @@ public class NSConnection {
 		try{
 			int sizeOrError;
 			ByteBuffer respBuffer = null;
+			NSObject[] nsObjects = null;
+			Boolean nsObjectsHaveErrors = null;
 			while(true){
 				recvBuf.clear();
 				//Read only the header.
@@ -447,12 +453,12 @@ public class NSConnection {
 					}
 					readChannelData(recvBuf, sizeOrError);
 					recvBuf.reset();
-					return new NSResponse(sizeOrError, null);
+					return new NSResponse(sizeOrError, null, null, null);
 				} else if (magic == CNS_MAGIC) {
 					
 					if ((rep_type == CNS_IRC) || (rep_type == CNS_RC)) {
 						if (sizeOrError == 0){
-							return new NSResponse(0, respBuffer);
+							return new NSResponse(0, respBuffer, nsObjects, nsObjectsHaveErrors);
 						}
 						NSError nSError = NSError.fromError(sizeOrError);
 						if (nSError == null){
@@ -480,7 +486,19 @@ public class NSConnection {
 					} else if (rep_type == MSG_GROUPS){
 						throw new ReceiveException(NSError.UNKOWN_ERROR.getError(), "MSG_GROUPS Not implemented yet");
 					} else if (rep_type == MSG_STATUSES){
-						throw new ReceiveException(NSError.UNKOWN_ERROR.getError(), "MSG_STATUSES Not implemented yet");
+						ByteBuffer respBuffer2 = ByteBuffer.allocateDirect(sizeOrError);
+						readChannelData(respBuffer2, sizeOrError);
+						respBuffer2.flip();
+						int nbrOfData = respBuffer2.remaining()/4;
+						nsObjects = new NSStatus[nbrOfData];
+						nsObjectsHaveErrors = Boolean.FALSE;
+						for (int i = 0; i < nbrOfData; i++) {
+							int status = respBuffer2.getInt();
+							if(status != 0){
+								nsObjectsHaveErrors = Boolean.TRUE;
+							}
+							nsObjects[i] = new NSStatus(status);
+						}
 					} else if (rep_type == MSG_FILEST){
 						throw new ReceiveException(NSError.UNKOWN_ERROR.getError(), "MSG_FILEST Not implemented yet");
 					} else if (rep_type == MSG_GRPINFO){
@@ -502,19 +520,31 @@ public class NSConnection {
 	private class NSResponse{
 		private final int responseCode;
 		
-		private ByteBuffer dataRespBuffer;
+		private ByteBuffer msgDataRespBuffer;
+		private NSObject[] nsObjects;
+		private Boolean nsObjectsHaveErrors;
 
-		public NSResponse(int responseCode, ByteBuffer dataRespBuffer) {
+		public NSResponse(int responseCode, ByteBuffer dataRespBuffer, NSObject[] nsObjects, Boolean nsObjectsHaveErrors) {
 			this.responseCode = responseCode;
-			this.dataRespBuffer = dataRespBuffer;
+			this.msgDataRespBuffer = dataRespBuffer;
+			this.nsObjects = nsObjects;
+			this.nsObjectsHaveErrors = nsObjectsHaveErrors;
 		}
 		
-		public ByteBuffer getDataRespBuffer() {
-			return dataRespBuffer;
+		public ByteBuffer getMsgDataRespBuffer() {
+			return msgDataRespBuffer;
+		}
+		
+		public NSObject[] getNSObjects() {
+			return nsObjects;
 		}
 		
 		public int getResponseCode() {
 			return responseCode;
+		}
+
+		public boolean nsObjectsHaveErrors() {
+			return nsObjectsHaveErrors == null ? false : nsObjectsHaveErrors.booleanValue();
 		}
 	}
 	
@@ -680,6 +710,7 @@ public class NSConnection {
 				addIDs();
 				putString(comment);
 				sendAndReceive(true);
+				openedTransaction++;
 				break;
 			}catch (LFCBrokenPipeException e) {
 				if(z == MAX_RETRY_IF_BROKEN_PIPE ){
@@ -696,6 +727,10 @@ public class NSConnection {
 				preparePacket(CNS_MAGIC, CNS_ENDTRANS);
 				addIDs();
 				sendAndReceive(true);
+				if(openedTransaction < 1){
+					openedTransaction = 1;
+				}
+				openedTransaction--;
 				break;
 			}catch (LFCBrokenPipeException e) {
 				if(z == MAX_RETRY_IF_BROKEN_PIPE ){
@@ -731,7 +766,7 @@ public class NSConnection {
 				sendBuf.putLong(cwd);
 				sendBuf.putLong(0L); // 0
 				putString(path);
-				ByteBuffer respBuffer = sendAndReceive(true).getDataRespBuffer();
+				ByteBuffer respBuffer = sendAndReceive(true).getMsgDataRespBuffer();
 				NSFile file = new NSFile(respBuffer, false, false, false, false);
 				if(respBuffer.hasRemaining()){
 					throw new IOException("stat: Something remains to be read ("+respBuffer.remaining()+" byte(s))");
@@ -756,7 +791,7 @@ public class NSConnection {
 				sendBuf.putLong(cwd);
 				putString(path);
 				putString(guid);
-				ByteBuffer respBuffer = sendAndReceive(true).getDataRespBuffer();
+				ByteBuffer respBuffer = sendAndReceive(true).getMsgDataRespBuffer();
 				NSFile file = new NSFile(respBuffer, false, true, true, false);
 				if(respBuffer.hasRemaining()){
 					throw new IOException("statg: Something remains to be read ("+respBuffer.remaining()+" byte(s))");
@@ -779,7 +814,7 @@ public class NSConnection {
 				preparePacket(CNS_MAGIC, CNS_STATR);
 				addIDs();
 				putString(sfn);
-				ByteBuffer respBuffer = sendAndReceive(true).getDataRespBuffer();
+				ByteBuffer respBuffer = sendAndReceive(true).getMsgDataRespBuffer();
 				NSFile file = new NSFile(respBuffer, false, true, true, false);
 				if(respBuffer.hasRemaining()){
 					throw new IOException("statr: Something remains to be read ("+respBuffer.remaining()+" byte(s))");
@@ -805,7 +840,7 @@ public class NSConnection {
 				sendBuf.putLong(cwd);
 				sendBuf.putLong(0L); // 0
 				putString(path);
-				ByteBuffer respBuffer = sendAndReceive(true).getDataRespBuffer();
+				ByteBuffer respBuffer = sendAndReceive(true).getMsgDataRespBuffer();
 				NSFile file = new NSFile(respBuffer, false, false, false, false);
 				if(respBuffer.hasRemaining()){
 					throw new IOException("lstat: Something remains to be read ("+respBuffer.remaining()+" byte(s))");
@@ -829,7 +864,7 @@ public class NSConnection {
 				long cwd = 0L;
 				sendBuf.putLong(cwd);
 				putString(link);
-				ByteBuffer respBuffer = sendAndReceive(true).getDataRespBuffer();
+				ByteBuffer respBuffer = sendAndReceive(true).getMsgDataRespBuffer();
 				String path = getString(respBuffer);
 				if(respBuffer.hasRemaining()){
 					throw new IOException("readlink: Something remains to be read ("+respBuffer.remaining()+" byte(s))");
@@ -873,7 +908,7 @@ public class NSConnection {
 				}
 				preparePacket(CNS_MAGIC, CNS_GETGRPID);
 				putString(grpName);
-				ByteBuffer respBuffer = sendAndReceive(true).getDataRespBuffer();
+				ByteBuffer respBuffer = sendAndReceive(true).getMsgDataRespBuffer();
 				int s = respBuffer.getInt();
 				if(respBuffer.hasRemaining()){
 					throw new IOException("getGrpByName: Something remains to be read ("+respBuffer.remaining()+" byte(s))");
@@ -898,7 +933,7 @@ public class NSConnection {
 				preparePacket(CNS_MAGIC, CNS_GETGRPNAM);
 				sendBuf.putShort((short) 0);
 				sendBuf.putShort((short) gid);
-				ByteBuffer respBuffer = sendAndReceive(true).getDataRespBuffer();
+				ByteBuffer respBuffer = sendAndReceive(true).getMsgDataRespBuffer();
 				String group = getString(respBuffer);
 				if(respBuffer.hasRemaining()){
 					throw new IOException("getGrpByGid: Something remains to be read ("+respBuffer.remaining()+" byte(s))");
@@ -939,7 +974,7 @@ public class NSConnection {
 					sendBuf.putInt(gids[i]);
 				}
 				
-				ByteBuffer respBuffer = sendAndReceive(true).getDataRespBuffer();
+				ByteBuffer respBuffer = sendAndReceive(true).getMsgDataRespBuffer();
 		
 				Collection<String> grpNames = new ArrayList<String>(gids.length);
 				for (int i = 0; i < gids.length; i++) {
@@ -971,7 +1006,7 @@ public class NSConnection {
 				}
 				preparePacket(CNS_MAGIC, CNS_GETUSRID);
 				putString(usrName);
-				ByteBuffer respBuffer = sendAndReceive(true).getDataRespBuffer();
+				ByteBuffer respBuffer = sendAndReceive(true).getMsgDataRespBuffer();
 				int s = respBuffer.getInt();
 				if(respBuffer.hasRemaining()){
 					throw new IOException("getUsrByName: Something remains to be read ("+respBuffer.remaining()+" byte(s))");
@@ -996,7 +1031,7 @@ public class NSConnection {
 				preparePacket(CNS_MAGIC, CNS_GETUSRNAM);
 				sendBuf.putShort((short) 0);
 				sendBuf.putShort((short) uid);
-				ByteBuffer respBuffer = sendAndReceive(true).getDataRespBuffer();
+				ByteBuffer respBuffer = sendAndReceive(true).getMsgDataRespBuffer();
 				String user = getString(respBuffer);
 				if(respBuffer.hasRemaining()){
 					throw new IOException("getUsrByUid: Something remains to be read ("+respBuffer.remaining()+" byte(s))");
@@ -1045,46 +1080,25 @@ public class NSConnection {
 		}
 	}
 	
-	/**
-	 * 
-	 * /!\ SESSIONS NOT SUPPORTED /!\
-	 * 
-	 */
 	long opendir(String path, String guid) throws IOException, ReceiveException, LFCBrokenPipeException {
-		for (int z = 0; z <= MAX_RETRY_IF_BROKEN_PIPE; z++) {
-			try{
-				if (guid == null) {
-					preparePacket(CNS_MAGIC, CNS_OPENDIR);
-				} else {
-					preparePacket(CNS_MAGIC2, CNS_OPENDIR);
-				}
-				addIDs();
-				long cwd = 0L; // Current Working Directory
-				sendBuf.putLong(cwd);
-				putString(path);
-				putString(guid);
-				ByteBuffer respBuffer = sendAndReceive(true).getDataRespBuffer();
-				long fileId = respBuffer.getLong();
-				if(respBuffer.hasRemaining()){
-					throw new IOException("opendir: Something remains to be read ("+respBuffer.remaining()+" byte(s))");
-				}
-				return fileId;
-			}catch (LFCBrokenPipeException e) {
-				if(z == MAX_RETRY_IF_BROKEN_PIPE ){
-					throw e;
-				}
-				//CNS_OPENDIR, CNS_READDIR and CNS_CLOSEDIR must be done with the same connection...
-				init();
-			}
+		if (guid == null) {
+			preparePacket(CNS_MAGIC, CNS_OPENDIR);
+		} else {
+			preparePacket(CNS_MAGIC2, CNS_OPENDIR);
 		}
-		throw new RuntimeException("Must not be here. BUG");
+		addIDs();
+		long cwd = 0L; // Current Working Directory
+		sendBuf.putLong(cwd);
+		putString(path);
+		putString(guid);
+		ByteBuffer respBuffer = sendAndReceive(true).getMsgDataRespBuffer();
+		long fileId = respBuffer.getLong();
+		if(respBuffer.hasRemaining()){
+			throw new IOException("opendir: Something remains to be read ("+respBuffer.remaining()+" byte(s))");
+		}
+		return fileId;
 	}
 	
-	/**
-	 * 
-	 * /!\ SESSIONS NOT SUPPORTED /!\
-	 * 
-	 */
 	void closedir() throws IOException, ReceiveException, LFCBrokenPipeException {
 		preparePacket(CNS_MAGIC, CNS_CLOSEDIR);
 		sendAndReceive(true);
@@ -1092,10 +1106,6 @@ public class NSConnection {
 	
 	/**
 	 * Read a directory entry
-	 * 
-	 * 
-	 * /!\ SESSIONS NOT SUPPORTED /!\
-	 * 
 	 * 
 	 * @param fileID
 	 *            The id of the directory
@@ -1121,7 +1131,7 @@ public class NSConnection {
 		sendBuf.putShort((short) 0);
 		sendBuf.putLong(fileID);
 		sendBuf.putShort((short) bod); // beginning of directory
-		ByteBuffer respBuffer = sendAndReceive(true).getDataRespBuffer();
+		ByteBuffer respBuffer = sendAndReceive(true).getMsgDataRespBuffer();
 		
 		short count = respBuffer.getShort();
 		Collection<NSFile> lfcFiles = new ArrayList<NSFile>(count);
@@ -1318,8 +1328,6 @@ public class NSConnection {
 	/**
 	 * List all the file replicas
 	 * 
-	 * /!\ SESSIONS NOT SUPPORTED /!\
-	 * 
 	 * @param path
 	 * @param guid
 	 * @param flag	{@link NSConnection#CNS_LIST_BEGIN} or {@link NSConnection#CNS_LIST_CONTINUE} or {@link NSConnection#CNS_LIST_END}
@@ -1333,15 +1341,19 @@ public class NSConnection {
 	Collection<NSReplica> listReplica(String path, String guid, short flag, short[] eol) throws IOException, ReceiveException, LFCBrokenPipeException {
 		for (int z = 0; z <= MAX_RETRY_IF_BROKEN_PIPE; z++) {
 			try{
-				preparePacket(CNS_MAGIC2, CNS_LISTREPLICA);
+				preparePacket(CNS_MAGIC2, flag == CNS_LIST_END ? CNS_ENDLIST : CNS_LISTREPLICA);
 				addIDs();
 				sendBuf.putShort((short) 0); // Size of nbentry
 				long cwd = 0L; // Current Working Directory
 				sendBuf.putLong(cwd);
 				putString(path);
 				putString(guid);
-				sendBuf.putShort(flag); // CNS_LIST_BEGIN, CNS_LIST_CONTINUE, CNS_LIST_END
-				ByteBuffer respBuffer = sendAndReceive(true).getDataRespBuffer();
+				short bol = 0;
+				if(flag == CNS_LIST_BEGIN){
+					bol = 1;
+				}
+				sendBuf.putShort(bol); // Beginning of list
+				ByteBuffer respBuffer = sendAndReceive(true).getMsgDataRespBuffer();
 		
 				short count = respBuffer.getShort();
 		
@@ -1365,12 +1377,22 @@ public class NSConnection {
 		throw new RuntimeException("Must not be here. BUG");
 	}
 	
-	boolean delFiles(String[] guids, boolean force) throws IOException, ReceiveException, LFCBrokenPipeException {
+	void delFilesByGuids(String[] guids, boolean force) throws IOException, ReceiveException, LFCBrokenPipeException, NSStatusesException {
+		delFiles((short) 0, guids, force);
+	}
+	
+	void delFilesByFilenames(String[] filenames, boolean force) throws IOException, ReceiveException, LFCBrokenPipeException, NSStatusesException {
+		delFiles((short) 1, filenames, force);
+	}
+	
+	private void delFiles(short argtype, String[] guidsOrFilenames, boolean force) throws IOException, ReceiveException, LFCBrokenPipeException, NSStatusesException {
+		if(openedTransaction > 0){
+			throw new IllegalArgumentException("CNS_DELFILES cannot be used inside a transaction");
+		}
 		for (int z = 0; z <= MAX_RETRY_IF_BROKEN_PIPE; z++) {
 			try{
 				preparePacket(CNS_MAGIC, CNS_DELFILES);
 				addIDs();
-				final short argtype = 0;
 				final short sforce;
 				if (force) {
 					sforce = 1;
@@ -1379,13 +1401,22 @@ public class NSConnection {
 				}
 				sendBuf.putShort(argtype);
 				sendBuf.putShort(sforce);
-				sendBuf.putInt(guids.length); // nbguids
-				for (int i = 0; i < guids.length; i++) {
-					putString(guids[i]);
+				if(argtype == 1){
+					long cwd = 0L;
+					sendBuf.putLong(cwd);
 				}
-				ByteBuffer respBuffer = sendAndReceive(true).getDataRespBuffer();
-				int nbstatuses = respBuffer.getInt();
-				return nbstatuses == 0;
+				sendBuf.putInt(guidsOrFilenames.length); // nbr of items
+				for (int i = 0; i < guidsOrFilenames.length; i++) {
+					putString(guidsOrFilenames[i]);
+				}
+				NSResponse response = sendAndReceive(true);
+				// We don't need to read it...
+				// ByteBuffer respBuffer = response.getMsgDataRespBuffer();
+				// int nbrStatuses = respBuffer.getInt();
+				if(response.nsObjectsHaveErrors()){
+					throw new NSStatusesException("At least one error occurs during the CNS_DELFILES operation", (NSStatus[]) response.getNSObjects());
+				}
+				break;
 			}catch (LFCBrokenPipeException e) {
 				if(z == MAX_RETRY_IF_BROKEN_PIPE ){
 					throw e;
@@ -1393,7 +1424,6 @@ public class NSConnection {
 				init();
 			}
 		}
-		throw new RuntimeException("Must not be here. BUG");
 	}
 
 	void rmdir(String path) throws IOException, ReceiveException , LFCBrokenPipeException {
@@ -1428,7 +1458,7 @@ public class NSConnection {
 				putString(path);
 				sendBuf.putInt(mode);
 				putString(guid);
-				ByteBuffer respBuffer = sendAndReceive(true).getDataRespBuffer();
+				ByteBuffer respBuffer = sendAndReceive(true).getMsgDataRespBuffer();
 				return respBuffer.getLong();
 			}catch (LFCBrokenPipeException e) {
 				if(z == MAX_RETRY_IF_BROKEN_PIPE ){
@@ -1470,6 +1500,9 @@ public class NSConnection {
 	 * @throws TimeoutException 
 	 */
 	void delReplica(String guid, String replicaUri) throws IOException, ReceiveException, LFCBrokenPipeException {
+		if(openedTransaction > 0){
+			throw new IllegalArgumentException("CNS_DELREPLICA cannot be used inside a transaction");
+		}
 		for (int z = 0; z <= MAX_RETRY_IF_BROKEN_PIPE; z++) {
 			try{
 				long id = 0L;
@@ -1516,7 +1549,29 @@ public class NSConnection {
 	}
 
 	
-
+	/**
+	 * Try to close the connection to free resources.
+	 * @throws IOException If a problem occurs
+	 */
+	void close() throws IOException {
+		try {
+			this.channel.close();
+		} catch (IOException e) {
+			s_logger.warn(e.toString());
+			throw e;
+		}
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	protected void finalize() throws Throwable {
+		try {
+			close();
+		} catch (IOException e) {
+			// ignore
+		}
+		super.finalize();
+	}
 
 	/**
 	 * Exception that can be thrown by the {@link NSConnection#receive()}
@@ -1573,22 +1628,39 @@ public class NSConnection {
 			return nSError;
 		}
 	}
-
+	
+	
 	/**
-	 * Try to close the connection to free resources.
-	 * @throws IOException If a problem occurs
+	 * Exception thrown if an MSG_STATUSES with one or more
+	 * error(s) was received
+	 * 
+	 * @author Jerome Revillard
 	 */
-	void close() throws IOException {
-		try {
-			this.channel.close();
-		} catch (IOException e) {
-			s_logger.warn(e.toString());
-			throw e;
+	public class NSStatusesException extends Exception {
+		private static final long serialVersionUID = 1L;
+		NSError[] nsErrors;
+		
+		NSStatusesException(String message,NSStatus[] nsStatuses) {
+			super(message);
+			nsErrors = new NSError[nsStatuses.length];
+			for (int i = 0; i < nsStatuses.length; i++) {
+				if(nsStatuses[i].getStatus() != 0){
+					nsErrors[i] = NSError.fromError(nsStatuses[i].getStatus());
+				}
+			}
+		}
+		
+		/**
+		 * @return the error(s) details. The table can contain null values if no errors 
+		 * for the specific operation.
+		 */
+		public NSError[] getNsErrors() {
+			return nsErrors;
 		}
 	}
 	
 	/**
-	 * Specific Exception thrown if the connction with the LFC
+	 * Specific Exception thrown if the connection with the LFC
 	 * throws a timeout.
 	 *
 	 */
@@ -1598,16 +1670,5 @@ public class NSConnection {
 		public LFCBrokenPipeException(String message) {
 			super(message);
 		}
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	protected void finalize() throws Throwable {
-		try {
-			close();
-		} catch (IOException e) {
-			// ignore
-		}
-		super.finalize();
 	}
 }

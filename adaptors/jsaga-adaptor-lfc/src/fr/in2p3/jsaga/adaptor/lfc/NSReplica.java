@@ -129,7 +129,7 @@ public class NSReplica extends NSObject {
 	}
 
 	/**
-	 * @return The string representation of the LFCReplica object
+	 * @return The string representation of the {@link NSReplica} object
 	 */
 	@Override
 	public String toString() {

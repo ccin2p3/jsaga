@@ -15,6 +15,7 @@ import org.ietf.jgss.GSSCredential;
 import fr.in2p3.jsaga.adaptor.lfc.NSConnection.AccessType;
 import fr.in2p3.jsaga.adaptor.lfc.NSConnection.LFCBrokenPipeException;
 import fr.in2p3.jsaga.adaptor.lfc.NSConnection.NSError;
+import fr.in2p3.jsaga.adaptor.lfc.NSConnection.NSStatusesException;
 import fr.in2p3.jsaga.adaptor.lfc.NSConnection.ReceiveException;
 
 /**
@@ -124,7 +125,7 @@ public class NSConnector {
 	 * Close the connection
 	 * @throws IOException If a problem occurs
 	 */
-	private void close(NSConnection connection) throws IOException{
+	public void close(NSConnection connection) throws IOException{
 		connection.close();
 	}	
 	
@@ -142,9 +143,16 @@ public class NSConnector {
 	 * @throws ReceiveException 
 	 * @throws LFCBrokenPipeException 
 	 */
-	// /!\ SESSIONS NOT SUPPORTED /!\
 	public Collection<NSReplica> listReplicas(String path, String guid) throws IOException, ReceiveException, LFCBrokenPipeException {
 		final NSConnection connection = new NSConnection(server, port, gssCredential);
+		try {
+			return listReplicas(connection, path, guid);
+		} finally {
+			close(connection);
+		}
+	}
+	
+	public Collection<NSReplica> listReplicas(NSConnection connection, String path, String guid) throws IOException, ReceiveException, LFCBrokenPipeException {
 		try {
 			final Collection<NSReplica> replicas = new ArrayList<NSReplica>();
 			short flag = NSConnection.CNS_LIST_BEGIN;
@@ -153,16 +161,13 @@ public class NSConnector {
 				replicas.addAll(connection.listReplica(path, guid, flag, eol));
 				flag = NSConnection.CNS_LIST_CONTINUE;
 			}
-			// Removed to speed up the process as the connection will be closed.
-			//connection.listReplica(path, guid, NSConnection.CNS_LIST_END, eol);
+			connection.listReplica(path, guid, NSConnection.CNS_LIST_END, eol);
 			return replicas;
 		} catch (IOException e) {
 			throw e;
 		} catch (ReceiveException e) {
 			e.setExecutedCmd("listReplicas("+path+","+guid+")");
 			throw e;
-		} finally {
-			close(connection);
 		}
 	}
 
@@ -496,23 +501,12 @@ public class NSConnector {
 	 * @throws ReceiveException 
 	 * @throws LFCBrokenPipeException 
 	 */
-	// /!\ SESSIONS NOT SUPPORTED /!\
 	public Collection<NSFile> list(String path, boolean followSymbolicLink) throws IOException, ReceiveException, LFCBrokenPipeException {
 		for (int z = 0; z <= NSConnection.MAX_RETRY_IF_BROKEN_PIPE; z++) {
 			NSConnection connection = new NSConnection(server, port, gssCredential);
 			try{
-				try {
-					final long fileID = connection.opendir(path, null);
-					Collection<NSFile> files = new ArrayList<NSFile>();
-					short bod = 1;
-					final short[] eod = new short[]{0};
-					while (eod[0] != 1) {
-						files.addAll(connection.readdir(fileID, bod, eod));
-						bod = 0;
-					}
-					//FIXME: it raises an error;
-//					connection.closedir();
-					return files;
+				try{	
+					return list(connection, path, followSymbolicLink, false);
 				} finally {
 					close(connection);
 				}
@@ -525,6 +519,52 @@ public class NSConnector {
 				if(z == NSConnection.MAX_RETRY_IF_BROKEN_PIPE ){
 					throw e;
 				}
+				connection.init();
+			}
+		}
+		throw new RuntimeException("Must not be here. BUG");
+	}
+	
+	public Collection<NSFile> list(NSConnection connection, String path, boolean followSymbolicLink) throws IOException, ReceiveException, LFCBrokenPipeException {
+		return list(connection, path, followSymbolicLink, true);
+	}
+	
+	private Collection<NSFile> list(NSConnection connection, String path, boolean followSymbolicLink, boolean retryIfBrokenPipe) throws IOException, ReceiveException, LFCBrokenPipeException {
+		if (followSymbolicLink) {
+			// TODO ....
+			throw new UnsupportedOperationException("followSymbolicLink is not implemented in list yet...");
+		}
+		int max_retry = NSConnection.MAX_RETRY_IF_BROKEN_PIPE;
+		if(!retryIfBrokenPipe){
+			max_retry = 0;
+		}
+		for (int z = 0; z <= max_retry; z++) {
+			try{
+				final long fileID = connection.opendir(path, null);
+				Collection<NSFile> files = new ArrayList<NSFile>();
+				short bod = 1;
+				final short[] eod = new short[]{0};
+				while (eod[0] != 1) {
+					files.addAll(connection.readdir(fileID, bod, eod));
+					bod = 0;
+				}
+				//FIXME: it raises an error;
+				try{
+					connection.closedir();
+				}catch (Exception e) {
+					//Ignore errors here for the moment.
+				}
+				return files;
+			} catch (IOException e) {
+				throw e;
+			} catch (ReceiveException e) {
+				e.setExecutedCmd("list("+path+") - followSymbolicLink="+followSymbolicLink);
+				throw e;
+			}catch (LFCBrokenPipeException e) {
+				if(z == max_retry ){
+					throw e;
+				}
+				connection.init();
 			}
 		}
 		throw new RuntimeException("Must not be here. BUG");
@@ -646,33 +686,67 @@ public class NSConnector {
 	}
 
 	/**
-	 * Delete a file and all the replicas if <code>force==true</code>.
+	 * Delete file(s) and all the replicas if <code>force==true</code>.
 	 * 
-	 * @param guid
-	 *            GUID of the file.
+	 * @param guids
+	 *            GUID(s) of the file(s) to delete.
 	 * @param force
 	 * 			  Force replicas deletion too.
 	 * @return true if the file was deleted.
 	 * @throws IOException
 	 * @throws ReceiveException 
 	 * @throws LFCBrokenPipeException 
+	 * @throws NSStatusesException 
 	 */
-	public boolean deleteGuid(String guid, boolean force) throws IOException, ReceiveException, LFCBrokenPipeException {
+	public void deleteFilesByGuids(String[] guids, boolean force) throws IOException, ReceiveException, LFCBrokenPipeException, NSStatusesException {
 		final NSConnection connection = new NSConnection(server, port, gssCredential);
 		try {
-			return deleteGuid(connection, guid, force);
+			deleteFilesByGuids(connection, guids, force);
 		} finally {
 			close(connection);
 		}
 	}
 	
-	public boolean deleteGuid(NSConnection connection, String guid, boolean force) throws IOException, ReceiveException, LFCBrokenPipeException {
+	public void deleteFilesByGuids(NSConnection connection, String[] guids, boolean force) throws IOException, ReceiveException, LFCBrokenPipeException, NSStatusesException {
 		try {
-			return connection.delFiles(new String[] { guid }, force);
+			connection.delFilesByGuids(guids, force);
 		} catch (IOException e) {
 			throw e;
 		} catch (ReceiveException e) {
-			e.setExecutedCmd("deleteGuid("+guid+","+force+")");
+			e.setExecutedCmd("deleteFilesByGuids("+Arrays.toString(guids)+","+force+")");
+			throw e;
+		}
+	}
+	
+	/**
+	 * Delete file(s) and all the replicas if <code>force==true</code>.
+	 * 
+	 * @param guids
+	 *            GUID(s) of the file(s) to delete.
+	 * @param force
+	 * 			  Force replicas deletion too.
+	 * @return true if the file was deleted.
+	 * @throws IOException
+	 * @throws ReceiveException 
+	 * @throws LFCBrokenPipeException 
+	 * @throws NSStatusesException 
+	 */
+	public void deleteFilesByNames(String[] filenames, boolean force) throws IOException, ReceiveException, LFCBrokenPipeException, NSStatusesException {
+		final NSConnection connection = new NSConnection(server, port, gssCredential);
+		try {
+			deleteFilesByNames(connection, filenames, force);
+		} finally {
+			close(connection);
+		}
+	}
+	
+	public void deleteFilesByNames(NSConnection connection, String[] filenames, boolean force) throws IOException, ReceiveException, LFCBrokenPipeException, NSStatusesException {
+		try {
+			connection.delFilesByFilenames(filenames, force);
+		} catch (IOException e) {
+			throw e;
+		} catch (ReceiveException e) {
+			e.setExecutedCmd("deleteFilesByNames("+Arrays.toString(filenames)+","+force+")");
 			throw e;
 		}
 	}
@@ -862,33 +936,13 @@ public class NSConnector {
 	public String create(long fileSize) throws IOException, ReceiveException, LFCBrokenPipeException {
 		final NSConnection connection = new NSConnection(server, port, gssCredential);
 		try {
-			return create(connection, false, fileSize);
+			return create(connection, fileSize);
 		} finally {
 			close(connection);
 		}
 	}
 	
-	/**
-	 * See {@link NSConnector#create(long)}
-	 * WARN: THe connection that you will use here must not 
-	 * have an opened session or an opened transaction if the
-	 * fileSize parameter is > 0 because a transaction will be 
-	 * opened.
-	 * 
-	 * @param connection
-	 * @param fileSize
-	 * 				the size of the file
-	 * @return a GUID to the new file
-	 * @throws IOException
-	 * @throws ReceiveException
-	 * @throws LFCBrokenPipeException
-	 */
 	public String create(NSConnection connection, long fileSize) throws IOException, ReceiveException, LFCBrokenPipeException {
-		return create(connection, true, fileSize);
-	}
-	
-	
-	public String create(NSConnection connection, boolean createNewConnection, long fileSize) throws IOException, ReceiveException, LFCBrokenPipeException {
 		String guid = UUID.randomUUID().toString();
 		String parent = "/grid/" + vo + "/generated/" + dateAsPath();
 		try {
@@ -900,7 +954,7 @@ public class NSConnector {
 			}
 		}
 		String path = parent + "/file-" + guid;
-		return create(connection, createNewConnection, "lfn:///" + path, guid, fileSize);
+		return create(connection, "lfn:///" + path, guid, fileSize);
 	}
 
 	/**
@@ -920,34 +974,28 @@ public class NSConnector {
 	public String create(String location, String guid, long fileSize) throws IOException, ReceiveException, LFCBrokenPipeException {
 		final NSConnection connection = new NSConnection(server, port, gssCredential);
 		try{
-			return create(connection, false, location, guid, fileSize);
+			return create(connection, location, guid, fileSize);
 		} finally {
 			close(connection);
 		}
 	}
 	
-
-	public String create(NSConnection connection, boolean createNewConnection, String location, String guid, long fileSize) throws IOException, ReceiveException, LFCBrokenPipeException {
-		NSConnection m_connection = connection;
-		boolean newConnectionCreated = false;
+	public String create(NSConnection connection, String location, String guid, long fileSize) throws IOException, ReceiveException, LFCBrokenPipeException {
 		try{
 			if (fileSize > 0L) {
-				if(createNewConnection){
-					m_connection = new NSConnection(server, port, gssCredential);
-					newConnectionCreated = true;
-				}
-				m_connection.startTransaction(null);
+				connection.startTransaction(null);
 			}
 			boolean done = false;
 			try{
-				m_connection.creat(location, guid);
+				connection.creat(location, guid);
 				if (fileSize > 0L) {
-					m_connection.setfsize(location, fileSize);
-					m_connection.endTransaction();
+					connection.setfsize(location, fileSize);
+					connection.endTransaction();
+					done = true;
 				}
 			}finally{
 				if( fileSize > 0L && !done){
-					m_connection.abordTransaction();
+					connection.abordTransaction();
 				}
 			}
 		} catch (IOException e) {
@@ -955,10 +1003,6 @@ public class NSConnector {
 		} catch (ReceiveException e) {
 			e.setExecutedCmd("create("+location+", "+guid+")");
 			throw e;
-		}finally{
-			if(newConnectionCreated){
-				m_connection.close();
-			}
 		}
 		return guid;
 	}
