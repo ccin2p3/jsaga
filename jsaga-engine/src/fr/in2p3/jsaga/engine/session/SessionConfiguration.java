@@ -35,7 +35,7 @@ public class SessionConfiguration {
     private static final String XSL = "xsl/jsaga-default-contexts.xsl";
     private static final File DEBUG = new File(Base.JSAGA_VAR, "jsaga-default-contexts.xml");
 
-    private JsagaDefault m_config;
+    protected JsagaDefault m_config;
 
     public SessionConfiguration(URL sessionCfgUrl) throws ConfigurationException {
         try {
@@ -68,12 +68,15 @@ public class SessionConfiguration {
 
     /** WARNING: use this method for debugging purpose only */
     public String toXML() throws MarshalException, ValidationException, IOException {
-        LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
         StringWriter writer = new StringWriter();
+        this.dump(writer);
+        return writer.toString();
+    }
+    protected void dump(Writer writer) throws MarshalException, ValidationException, IOException {
+        LocalConfiguration.getInstance().getProperties().setProperty("org.exolab.castor.indent", "true");
         Marshaller marshaller = new Marshaller(writer);
         marshaller.setValidation(true);
         marshaller.marshal(m_config);
-        return writer.toString();
     }
 
     public void setDefaultContext(Context context) throws NotImplementedException, NoSuccessException {
