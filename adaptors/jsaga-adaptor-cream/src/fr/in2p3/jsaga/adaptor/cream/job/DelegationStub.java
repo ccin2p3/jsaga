@@ -27,10 +27,12 @@ import java.util.Calendar;
  *
  */
 public class DelegationStub {
+    public static final String ANY_VO = null;
+
     private File m_proxyFile;
     private Delegation m_stub;
 
-    public DelegationStub(String host, int port) throws BadParameterException, NoSuccessException {
+    public DelegationStub(String host, int port, String vo) throws BadParameterException, NoSuccessException {
         // set endpoint
         URL epr;
         try {
@@ -40,7 +42,7 @@ public class DelegationStub {
         }
 
         // create stub
-        m_proxyFile = new File(System.getProperty("java.io.tmpdir"), "dlgor_"+System.getProperty("user.name"));
+        m_proxyFile = getDlgorFile(vo);
         try {
             if (epr.getProtocol().startsWith("https")) {
                 System.setProperty("axis.socketSecureFactory", "org.glite.security.trustmanager.axis.AXISSocketFactory");
@@ -137,6 +139,14 @@ public class DelegationStub {
             throw new NoSuccessException(e.getMsg(), e);
         } catch (RemoteException e) {
             throw new NoSuccessException(e);
+        }
+    }
+
+    public static File getDlgorFile(String vo) {
+        if (vo != null) {
+            return new File(System.getProperty("java.io.tmpdir"), "dlgor_"+vo+"_"+System.getProperty("user.name"));
+        } else {
+            return new File(System.getProperty("java.io.tmpdir"), "dlgor_"+System.getProperty("user.name"));
         }
     }
 }

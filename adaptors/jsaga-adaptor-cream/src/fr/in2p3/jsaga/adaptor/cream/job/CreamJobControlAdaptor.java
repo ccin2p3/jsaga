@@ -84,7 +84,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         }
 
         // renew/create delegated proxy
-        DelegationStub delegationStub = new DelegationStub(host, port);
+        DelegationStub delegationStub = new DelegationStub(host, port, m_vo);
         m_delegProxy = delegationStub.renewDelegation(m_delegationId, m_credential);
         // put new delegated proxy for multiple jobs
         if (m_delegProxy != null) {

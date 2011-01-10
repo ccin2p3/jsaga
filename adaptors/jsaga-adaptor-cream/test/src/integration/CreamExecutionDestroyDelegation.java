@@ -41,7 +41,7 @@ public class CreamExecutionDestroyDelegation extends AbstractTest {
     public void test_destroy() throws Exception {
         System.setProperty("sslCAFiles", new File(new File(new File(System.getProperty("user.home"),".globus"),"certificates"),"*.0").getAbsolutePath());
 
-        DelegationStub stub = new DelegationStub(m_url.getHost(), m_url.getPort());
+        DelegationStub stub = new DelegationStub(m_url.getHost(), m_url.getPort(), DelegationStub.ANY_VO);
         stub.getStub().destroy(m_delegationId);
     }
 }

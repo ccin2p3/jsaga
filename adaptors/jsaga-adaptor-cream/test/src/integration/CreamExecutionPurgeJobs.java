@@ -1,6 +1,7 @@
 package integration;
 
 import fr.in2p3.jsaga.adaptor.cream.job.CreamStub;
+import fr.in2p3.jsaga.adaptor.cream.job.DelegationStub;
 import org.glite.ce.creamapi.ws.cream2.types.JobFilter;
 import org.glite.ce.creamapi.ws.cream2.types.Result;
 import org.ogf.saga.AbstractTest;
@@ -49,7 +50,7 @@ public class CreamExecutionPurgeJobs extends AbstractTest {
         }
 
         // purge jobs
-        CreamStub creamStub = new CreamStub(m_url.getHost(), m_url.getPort());
+        CreamStub creamStub = new CreamStub(m_url.getHost(), m_url.getPort(), DelegationStub.ANY_VO);
         Result[] resultArray = creamStub.getStub().jobPurge(filter);
         System.out.println(resultArray.length+" have been purged!");
     }

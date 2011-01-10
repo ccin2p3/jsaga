@@ -1,10 +1,7 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
-import org.apache.axis.types.URI;
-import org.apache.axis.configuration.SimpleProvider;
-import org.apache.axis.SimpleTargetedChain;
 import org.apache.axis.client.Call;
-import org.apache.axis.transport.http.HTTPSender;
+import org.apache.axis.types.URI;
 import org.glite.ce.creamapi.ws.cream2.CREAMLocator;
 import org.glite.ce.creamapi.ws.cream2.CREAMPort;
 import org.ogf.saga.error.BadParameterException;
@@ -31,7 +28,7 @@ public class CreamStub {
     private URL m_url;
     private CREAMPort m_stub;
 
-    public CreamStub(String host, int port) throws BadParameterException, NoSuccessException {
+    public CreamStub(String host, int port, String vo) throws BadParameterException, NoSuccessException {
         try {
             m_url = new URL("https", host, port, "/ce-cream/services/CREAM2");
         } catch (MalformedURLException e) {
@@ -41,7 +38,7 @@ public class CreamStub {
         // create stub
         try {
             if (m_url.getProtocol().startsWith("https")) {
-                File proxyFile = new File(System.getProperty("java.io.tmpdir"), "dlgor_"+System.getProperty("user.name"));
+                File proxyFile = DelegationStub.getDlgorFile(vo);
                 System.setProperty("axis.socketSecureFactory", "org.glite.security.trustmanager.axis.AXISSocketFactory");
                 System.setProperty("gridProxyFile", proxyFile.getAbsolutePath());
             }

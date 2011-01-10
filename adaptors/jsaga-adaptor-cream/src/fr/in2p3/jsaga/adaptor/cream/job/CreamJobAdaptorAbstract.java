@@ -8,6 +8,7 @@ import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
+import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 
 import java.util.Map;
@@ -28,6 +29,8 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
     private static final String DELEGATION_ID = "delegationId";
 
     protected GSSCredential m_credential;
+    protected String m_vo;
+
     protected String m_delegationId;
     protected CreamStub m_creamStub;
 
@@ -41,6 +44,11 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
 
     public void setSecurityCredential(SecurityCredential credential) {
         m_credential = ((GSSCredentialSecurityCredential) credential).getGSSCredential();
+        try {
+            m_vo = credential.getAttribute(Context.USERVO);
+        } catch (Exception e) {
+            /* ignore */
+        }
     }
 
     public int getDefaultPort() {
@@ -67,7 +75,7 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
                 throw new NoSuccessException(e);
             }
         }
-        m_creamStub = new CreamStub(host, port);
+        m_creamStub = new CreamStub(host, port, m_vo);
     }
 
     public void disconnect() throws NoSuccessException {
