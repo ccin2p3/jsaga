@@ -7,14 +7,20 @@
             <data type="rbyteio"/>
             <job type="bes-unicore"/>
             <include host="localhost6"/>
-            <exclude host="localhost6" domain="hu" />
             <exclude host="localhost6" domain="de" />
+            <exclude host="localhost6" domain="org" />
         </context>
         <context type="BESJKS" id="DGrid">
             <attribute name="Keystore" value="${user.home}/.jsaga/contexts/d-grid/dgrid.jks"/>
             <attribute name="KeystorePass" value="changeit"/>
             <job type="bes-unicore"/>
             <include domain="de"/>
+        </context>
+        <context type="BESJKS" id="ZZZZZ">
+            <attribute name="Keystore" value="${user.home}/.jsaga/contexts/d-grid/dgrid.jks"/>
+            <attribute name="KeystorePass" value="changeit"/>
+            <job type="bes-unicore"/>
+            <include domain="futuregrid.org"/>
         </context>
     </session>
 </jsaga-default>
