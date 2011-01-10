@@ -7,6 +7,8 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
 import org.ogf.saga.error.*;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 
 
@@ -41,18 +43,14 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlAdaptorAbstract im
 		return BesUnicoreJob.class;
 	}
 
-	public String getDataStagingProtocol() {
-		return "file";
-	}
-
-	public int getDataStagingPort() {
-		return getDefaultPort();
-	}
-
-    public String getBESUrl(String host, int port, String basePath, Map attributes) {
-    	String url = super.getBESUrl(host, port, basePath, attributes);
-		url += "?res=" + (String)attributes.get("res");
-		return url;
+    public URI getBESUrl(String host, int port, String basePath, Map attributes) throws URISyntaxException {
+    	URI url = super.getBESUrl(host, port, basePath, attributes);
+		return new URI(url.toString()+"?res=" + (String)attributes.get("res"));
     }
+
+	public URI getDataStagingUrl(String host, int port, String basePath, Map attributes) throws URISyntaxException {
+		// FIXME : customized Path
+		return new URI("rbyteio://"+host+":"+port+"/DEMO-SITE/services/Registry/Home");
+	}
     
 }

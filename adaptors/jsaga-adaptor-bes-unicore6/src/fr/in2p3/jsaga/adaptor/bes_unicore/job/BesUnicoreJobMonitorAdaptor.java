@@ -5,6 +5,8 @@ import fr.in2p3.jsaga.adaptor.bes.job.BesJobMonitorAdaptor;
 
 import org.ogf.saga.error.IncorrectStateException;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Map;
 
 /* ***************************************************
@@ -39,10 +41,9 @@ public class BesUnicoreJobMonitorAdaptor extends BesJobMonitorAdaptor  {
 		return BesUnicoreJobStatus.class;
 	}
 	
-    public String getBESUrl(String host, int port, String basePath, Map attributes) {
-    	String url = super.getBESUrl(host, port, basePath, attributes);
-		url += "?res=" + (String)attributes.get("res");
-		return url;
+    public URI getBESUrl(String host, int port, String basePath, Map attributes) throws URISyntaxException {
+    	URI url = super.getBESUrl(host, port, basePath, attributes);
+		return new URI(url.toString()+"?res=" + (String)attributes.get("res"));
     }
 
 }
