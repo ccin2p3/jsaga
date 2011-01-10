@@ -42,5 +42,11 @@
 			<version>1.4</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>fr.in2p3.jsaga.adaptor</groupId>
+			<artifactId>jsaga-adaptor-unicore6</artifactId>
+			<version>0.9.11-SNAPSHOT</version>
+			<scope>runtime</scope>
+		</dependency>
 	</dependencies>
 </project>
