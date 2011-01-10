@@ -7,7 +7,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>jsaga-adaptor-bes</artifactId>
 	<name>Adaptor for BES</name>
-	<description>This module provides support for BES (Basic Execution Standard)</description>
+	<description>This module provides generic support for BES (Basic Execution Standard). It cannot be used on its own.</description>
 	<developers>
         <developer>
             <name>Lionel Schwarz</name>
