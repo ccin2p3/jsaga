@@ -23,7 +23,10 @@ import org.nordugrid.schemas.arex.ARex_ServiceLocator;
 
 import org.ogf.saga.error.*;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
+
 import javax.xml.rpc.ServiceException;
 
 /* ***************************************************
@@ -52,14 +55,6 @@ public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract {
 		return ArexJob.class;
 	}
 
-	public String getDataStagingProtocol() {
-		return "gsiftp";
-	}
-
-	public int getDataStagingPort() {
-		return 2811;
-	}
-
     public JobMonitorAdaptor getDefaultJobMonitor() {
         return new ArexJobMonitorAdaptor();
     }
@@ -71,7 +66,7 @@ public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract {
     	
         ARex_ServiceLocator _arex_service = new ARex_ServiceLocator();
 		try {
-			_arex_service.setEndpointAddress("ARex", _bes_url);
+			_arex_service.setEndpointAddress("ARex", _bes_url.toString());
 			_arex_pt=(ARex_PortType) _arex_service.getARex();
 		} catch (ServiceException e) {
 			throw new NoSuccessException(e);
@@ -82,6 +77,11 @@ public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract {
         _arex_pt = null;
         super.disconnect();
     }
+
+	public URI getDataStagingUrl(String host, int port, String basePath, Map attributes) throws URISyntaxException {
+		// FIXME : change for https
+		return new URI("gsiftp://"+host+":2811"+"/tmp/");
+	}
 
 	/*private void changeStatus(String nativeJobId, ActivityStateEnumeration oldStatus, ActivityStateEnumeration newStatus, ActivitySubStateType newSubState) throws PermissionDeniedException, NoSuccessException {
 		//ChangeActivityStatusRequestType request = new ChangeActivityStatusRequestType();
