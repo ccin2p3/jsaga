@@ -94,6 +94,24 @@ AddDescription "GUI Installer" .jar</pre>
     </part>
     <part id="git">
         <title>GIT</title>
+        <faq id="merge">
+            <question>How to merge a contribution into the reference repository ?</question>
+            <answer>
+                <pre># Get branch name
+git ls-remote ssh://git.in2p3.fr/jsaga-contrib
+
+# Pull contribution in branch "mergedBranch"
+git checkout -b mergedBranch master
+git pull ssh://git.in2p3.fr/jsaga-contrib &lt;branch name&gt;
+
+# Merge it in branch "master"
+git checkout master
+git merge mergedBranch
+
+# Cleanup
+git branch -d mergedBranch</pre>
+            </answer>
+        </faq>
         <faq id="merge-without-history">
             <question>How to merge a branch without detailed history ?</question>
             <answer>Use unix diff instead of "git format-patch":
