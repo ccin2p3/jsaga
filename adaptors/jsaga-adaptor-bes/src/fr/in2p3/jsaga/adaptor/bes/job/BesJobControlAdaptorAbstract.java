@@ -8,7 +8,6 @@ import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
-import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorOnePhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 
 import org.apache.axis.message.MessageElement;
@@ -30,18 +29,22 @@ import org.ggf.schemas.jsdl.x2005.x11.jsdl.Resources_Type;
 import org.globus.wsrf.encoding.DeserializationException;
 import org.globus.wsrf.encoding.ObjectDeserializer;
 
+import org.ogf.saga.error.AuthenticationFailedException;
+import org.ogf.saga.error.AuthorizationFailedException;
+import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
 import org.w3.x2005.x08.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
 
 import java.io.StringReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Iterator;
-
-import javax.xml.namespace.QName;
+import java.util.Map;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -63,15 +66,37 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
     private static final String POST_STAGING_TRANSFERS_TAGNAME = "PostStagingOut";
     
     private static final String XSLTPARAM_PROTOCOL = "Protocol";
+    private static final String XSLTPARAM_HOST = "HostName";
     private static final String XSLTPARAM_PORT = "Port";
+    private static final String XSLTPARAM_PATH = "Path";
     
+	protected URI _ds_url ;
+    
+	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+    	super.connect(userInfo, host, port, basePath, attributes);
+    	try {
+			_ds_url = getDataStagingUrl(host, port, basePath, attributes);
+		} catch (URISyntaxException e) {
+			throw new NoSuccessException(e);
+		}
+    	
+	}
+
+	public void disconnect() throws NoSuccessException {
+		_ds_url = null;
+        super.disconnect();
+    }
+
+
     ////////////////////////////////////////////////////
     // Implementation of the JobControlAdaptor interface
     ////////////////////////////////////////////////////
     public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
+    	// _bes_url is built by connect()
     	JobDescriptionTranslator translator =  new JobDescriptionTranslatorXSLT("xsl/job/bes-jsdl.xsl");//BesJobDescriptionTranslatorJSDL();
-    	translator.setAttribute(XSLTPARAM_PROTOCOL, getDataStagingProtocol());
-    	translator.setAttribute(XSLTPARAM_PORT, String.valueOf(getDataStagingPort()));
+    	translator.setAttribute(XSLTPARAM_PROTOCOL, _ds_url.getScheme());
+    	translator.setAttribute(XSLTPARAM_PORT, String.valueOf(_ds_url.getPort()));
+    	translator.setAttribute(XSLTPARAM_PATH, _ds_url.getPath());
     	return translator;
     }
 
@@ -81,6 +106,11 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
 		ActivityDocumentType adt = new ActivityDocumentType();
 		
 		StringReader sr = new StringReader(jobDesc);
+		
+		// **************
+		//System.out.println(jobDesc);
+		// **************
+		
 		JobDefinition_Type jsdl_type;
 		try {
 			jsdl_type = (JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(sr), JobDefinition_Type.class);
@@ -148,7 +178,6 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
     ////////////////////////////////////////////////////
 
 	public String getStagingDirectory(String nativeJobDescription, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		System.out.println(nativeJobDescription);
 		// Get JobDefinition from String
 		JobDefinition_Type jsdl_type = getJobDescriptionTypeFromString(nativeJobDescription);
 		// Extract stagingDirectory
@@ -165,27 +194,21 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
     public StagingTransfer[] getInputStagingTransfer(String nativeJobDescription, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
     	// Get JobDefinition from String
 		JobDefinition_Type jsdl_type = getJobDescriptionTypeFromString(nativeJobDescription);
-        /*
-        MessageElement preStageIn = getExtensions(jobDesc)[PRE_STAGE_IN];
-        return toStagingTransferArray(preStageIn);*/
+		// Extract PreStaging transfers
 		return getStagingTransfers(jsdl_type, PRE_STAGING_TRANSFERS_TAGNAME);
     }
 
     public StagingTransfer[] getInputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		// Get JobDefinition from BES service
     	JobDefinition_Type jsdl_type = getJobDescriptionTypeFromNativeId(nativeJobId);
-        /*
-        MessageElement preStageIn = getExtensions(jobDesc)[PRE_STAGE_IN];
-        return toStagingTransferArray(preStageIn);*/
+		// Extract PreStaging transfers
 		return getStagingTransfers(jsdl_type, PRE_STAGING_TRANSFERS_TAGNAME);
     }
 
     public StagingTransfer[] getOutputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		// Get JobDefinition from BES service
     	JobDefinition_Type jsdl_type = getJobDescriptionTypeFromNativeId(nativeJobId);
-        /*
-        MessageElement postStageOut = getExtensions(jobDesc)[POST_STAGE_OUT];
-        return toStagingTransferArray(postStageOut);*/
+		// Extract PostStaging transfers
 		return getStagingTransfers(jsdl_type, POST_STAGING_TRANSFERS_TAGNAME);
     }
 
