@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl.task;
 
+import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.impl.monitoring.*;
 import org.apache.log4j.Logger;
 import org.ogf.saga.SagaObject;
@@ -198,7 +199,8 @@ public abstract class AbstractTaskImpl<T,E> extends AbstractMonitorableImpl impl
             case RUNNING:
                 // try to cancel synchronously
                 this.doCancel();
-                if (!this.isDone_fromCache()) {
+                boolean checkStatus = EngineProperties.getBoolean(EngineProperties.JOB_CANCEL_CHECK_STATUS);
+                if (checkStatus && !this.isDone_fromCache()) {
                     // try to cancel asynchronously (every minutes)
                     s_logger.warn("Failed to cancel synchronously, trying asynchronously...");
                     new Thread(new Runnable() {

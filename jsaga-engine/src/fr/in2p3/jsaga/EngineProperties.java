@@ -29,6 +29,7 @@ public class EngineProperties {
     public static final String JOB_MONITOR_ERROR_THRESHOLD = "job.monitor.error.threshold";
     public static final String JOB_CONTROL_CHECK_AVAILABILITY = "job.control.check.availability";
     public static final String JOB_CONTROL_CHECK_MATCH = "job.control.check.match";
+    public static final String JOB_CANCEL_CHECK_STATUS = "job.cancel.check.status";
 
     private static Exception s_exception;
     private static Properties s_prop;
@@ -46,6 +47,7 @@ public class EngineProperties {
             s_prop.setProperty(JOB_MONITOR_ERROR_THRESHOLD, "3");
             s_prop.setProperty(JOB_CONTROL_CHECK_AVAILABILITY, "false");
             s_prop.setProperty(JOB_CONTROL_CHECK_MATCH, "false");
+            s_prop.setProperty(JOB_CANCEL_CHECK_STATUS, "true");
 
             // load properties
             File file = new File(Base.JSAGA_HOME, "etc/jsaga-config.properties");
