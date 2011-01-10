@@ -8,20 +8,20 @@
 	<xsl:output method="xml"/>
 	
 	<!-- JSAGA parameters -->
-	<xsl:param name="HostName">host</xsl:param>
 	<xsl:param name="UniqId">staging</xsl:param>
+	<xsl:param name="HostName">host</xsl:param>
 	<xsl:param name="Protocol">file</xsl:param>
 	<xsl:param name="Port"></xsl:param>
+	<xsl:param name="Path">/tmp</xsl:param>
 	
 	<!-- constants -->
-	<!-- <xsl:variable name="SupportedProtocols">/gsiftp/</xsl:variable> -->
 	<xsl:variable name="IntermediaryURL">
 		<xsl:choose>
           <xsl:when test="$Protocol = 'file'">
 		    <xsl:text/>file:/tmp/<xsl:value-of select="$UniqId"/>
           </xsl:when>
           <xsl:otherwise>
-		    <xsl:value-of select="$Protocol"/>://<xsl:value-of select="$HostName"/>:<xsl:value-of select="$Port"/>/tmp/<xsl:value-of select="$UniqId"/>
+		    <xsl:value-of select="$Protocol"/>://<xsl:value-of select="$HostName"/>:<xsl:value-of select="$Port"/><xsl:value-of select="$Path"/>/<xsl:value-of select="$UniqId"/>
           </xsl:otherwise>
 		</xsl:choose>
 	</xsl:variable>
