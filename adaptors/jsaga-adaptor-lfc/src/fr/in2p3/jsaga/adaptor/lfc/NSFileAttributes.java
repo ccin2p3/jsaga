@@ -11,20 +11,22 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 /**
  * @author Jerome Revillard
  */
-public class LFCFileAttributes extends FileAttributes {
-	private static Logger s_logger = Logger.getLogger(LFCFileAttributes.class);
+public class NSFileAttributes extends FileAttributes {
+	private static Logger s_logger = Logger.getLogger(NSFileAttributes.class);
 	
-    private LfcConnection.LFCFile m_file;
+    private NSFile m_file;
     private String m_owner;
     private String m_group;
+    private NSConnection connection;
 
-    public LFCFileAttributes(LfcConnection.LFCFile file) {
+    public NSFileAttributes(NSFile file, NSConnection connection) {
         m_file = file;
         m_owner = null;
         m_group = null;
+        this.connection = connection;
     }
     
-    public LfcConnection.LFCFile getLFCFile(){
+    public NSFile getLFCFile(){
     	return m_file;
     }
 
@@ -50,11 +52,11 @@ public class LFCFileAttributes extends FileAttributes {
 
     public PermissionBytes getUserPermission() {
     	List<PermissionBytes> permissionBytesList = new ArrayList<PermissionBytes>();
-		if ((m_file.getFileMode() & LfcConnection.S_IRUSR) != 0)
+		if ((m_file.getFileMode() & NSConnection.S_IRUSR) != 0)
 			permissionBytesList.add(PermissionBytes.READ);
-		if ((m_file.getFileMode() & LfcConnection.S_IWUSR) != 0)
+		if ((m_file.getFileMode() & NSConnection.S_IWUSR) != 0)
 			permissionBytesList.add(PermissionBytes.WRITE);
-		if ((m_file.getFileMode() & LfcConnection.S_IXUSR) != 0)
+		if ((m_file.getFileMode() & NSConnection.S_IXUSR) != 0)
 			permissionBytesList.add(PermissionBytes.EXEC);
     	
 		if(permissionBytesList.isEmpty()){
@@ -70,11 +72,11 @@ public class LFCFileAttributes extends FileAttributes {
 
     public PermissionBytes getGroupPermission() {
     	List<PermissionBytes> permissionBytesList = new ArrayList<PermissionBytes>();
-		if ((m_file.getFileMode() & LfcConnection.S_IRGRP) != 0)
+		if ((m_file.getFileMode() & NSConnection.S_IRGRP) != 0)
 			permissionBytesList.add(PermissionBytes.READ);
-		if ((m_file.getFileMode() & LfcConnection.S_IWGRP) != 0)
+		if ((m_file.getFileMode() & NSConnection.S_IWGRP) != 0)
 			permissionBytesList.add(PermissionBytes.WRITE);
-		if ((m_file.getFileMode() & LfcConnection.S_IXGRP) != 0)
+		if ((m_file.getFileMode() & NSConnection.S_IXGRP) != 0)
 			permissionBytesList.add(PermissionBytes.EXEC);
     	
 		if(permissionBytesList.isEmpty()){
@@ -90,11 +92,11 @@ public class LFCFileAttributes extends FileAttributes {
 
     public PermissionBytes getAnyPermission() {
     	List<PermissionBytes> permissionBytesList = new ArrayList<PermissionBytes>();
-		if ((m_file.getFileMode() & LfcConnection.S_IROTH) != 0)
+		if ((m_file.getFileMode() & NSConnection.S_IROTH) != 0)
 			permissionBytesList.add(PermissionBytes.READ);
-		if ((m_file.getFileMode() & LfcConnection.S_IWOTH) != 0)
+		if ((m_file.getFileMode() & NSConnection.S_IWOTH) != 0)
 			permissionBytesList.add(PermissionBytes.WRITE);
-		if ((m_file.getFileMode() & LfcConnection.S_IXOTH) != 0)
+		if ((m_file.getFileMode() & NSConnection.S_IXOTH) != 0)
 			permissionBytesList.add(PermissionBytes.EXEC);
     	
 		if(permissionBytesList.isEmpty()){
@@ -111,7 +113,7 @@ public class LFCFileAttributes extends FileAttributes {
     public synchronized String getOwner() {
         if (m_owner == null) {
             try {
-                m_owner = m_file.owner().getName();
+                m_owner = m_file.owner(connection).getName();
             } catch (Exception e) {
                 s_logger.error("Unable to get the owner of "+getName()+":"+e.getMessage());
                 return ID_UNKNOWN;
@@ -123,7 +125,7 @@ public class LFCFileAttributes extends FileAttributes {
     public synchronized String getGroup() {
         if (m_group == null) {
             try {
-                m_group = m_file.group().getName();
+                m_group = m_file.group(connection).getName();
             } catch (Exception e) {
                 s_logger.error("Unable to get the group of "+getName()+":"+e.getMessage());
                 return ID_UNKNOWN;
