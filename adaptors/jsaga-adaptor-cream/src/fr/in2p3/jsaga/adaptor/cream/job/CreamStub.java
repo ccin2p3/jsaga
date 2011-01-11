@@ -38,7 +38,7 @@ public class CreamStub {
         // create stub
         try {
             if (m_url.getProtocol().startsWith("https")) {
-                File proxyFile = DelegationStub.getDlgorFile(vo);
+                File proxyFile = DelegationStub.getDlgorFile(host, vo);
                 System.setProperty("axis.socketSecureFactory", "org.glite.security.trustmanager.axis.AXISSocketFactory");
                 System.setProperty("gridProxyFile", proxyFile.getAbsolutePath());
             }

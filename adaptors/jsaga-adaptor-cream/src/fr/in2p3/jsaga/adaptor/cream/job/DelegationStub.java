@@ -42,7 +42,7 @@ public class DelegationStub {
         }
 
         // create stub
-        m_proxyFile = getDlgorFile(vo);
+        m_proxyFile = getDlgorFile(host, vo);
         try {
             if (epr.getProtocol().startsWith("https")) {
                 System.setProperty("axis.socketSecureFactory", "org.glite.security.trustmanager.axis.AXISSocketFactory");
@@ -142,11 +142,11 @@ public class DelegationStub {
         }
     }
 
-    public static File getDlgorFile(String vo) {
+    public static File getDlgorFile(String host, String vo) {
         if (vo != null) {
-            return new File(System.getProperty("java.io.tmpdir"), "dlgor_"+vo+"_"+System.getProperty("user.name"));
+            return new File(System.getProperty("java.io.tmpdir"), "dlgor_"+host+"_"+vo+"_"+System.getProperty("user.name"));
         } else {
-            return new File(System.getProperty("java.io.tmpdir"), "dlgor_"+System.getProperty("user.name"));
+            return new File(System.getProperty("java.io.tmpdir"), "dlgor_"+host+"_"+System.getProperty("user.name"));
         }
     }
 }
