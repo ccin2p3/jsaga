@@ -1,14 +1,11 @@
  package fr.in2p3.jsaga.adaptor.arex.job;
 
 import fr.in2p3.jsaga.adaptor.bes.job.BesJobControlAdaptorAbstract;
-import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
-import fr.in2p3.jsaga.adaptor.security.X509SecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityCredential;
 
 /* for changeStatus
 import org.apache.axis.message.MessageElement;
@@ -25,7 +22,6 @@ import org.nordugrid.schemas.arex.ChangeActivityStatusResponseType;
 import org.nordugrid.schemas.arex.ActivitySubStateType;
 */
 
-import org.apache.axis.message.MessageElement;
 import org.ggf.schemas.jsdl.x2005.x11.jsdl.DataStaging_Type;
 import org.ggf.schemas.jsdl.x2005.x11.jsdl.JobDefinition_Type;
 import org.nordugrid.schemas.arex.ARex_PortType;
@@ -49,12 +45,8 @@ import javax.xml.rpc.ServiceException;
 * ***************************************************/
 public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract implements StagingJobAdaptorTwoPhase {
 
-    //private static final String XSLTPARAM_PROTOCOL = "Protocol";
-    //private static final String XSLTPARAM_HOST = "HostName";
-    //private static final String XSLTPARAM_PORT = "Port";
-    //private static final String XSLTPARAM_PATH = "Path";
 
-    public static final String AREX_NAMESPACE_URI = "http://www.nordugrid.org/schemas/a-rex";
+	public static final String AREX_NAMESPACE_URI = "http://www.nordugrid.org/schemas/a-rex";
 	
 	protected ARex_PortType _arex_pt = null;
 	

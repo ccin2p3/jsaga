@@ -77,7 +77,7 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
 			throw new NoSuccessException(e);
 		}
 		
-		System.out.println(getExecutionHosts("dd")[0]);
+		//System.out.println(getExecutionHosts("dd")[0]);
     }
 
 	public void disconnect() throws NoSuccessException {
@@ -115,7 +115,7 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
 		};
 	}
 	
-	// TODO : operation not permitted
+	// FIXME : operation not permitted
 	private String getInfo(String nativeJobId, String infoName) throws NotImplementedException, NoSuccessException {
         try {
         	String xpathQuery = "//glue:Services/glue:ComputingService/glue:ComputingEndpoint/glue:ComputingActivities/glue:ComputingActivity/glue:ID[contains(.,'98381294326045446690564')]/..";

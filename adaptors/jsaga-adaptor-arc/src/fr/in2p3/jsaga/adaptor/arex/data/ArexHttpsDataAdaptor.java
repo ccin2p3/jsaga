@@ -6,7 +6,6 @@ import org.ogf.saga.error.PermissionDeniedException;
 
 import fr.in2p3.jsaga.adaptor.data.http_socket.HttpRequest;
 import fr.in2p3.jsaga.adaptor.data.https.HttpsDataAdaptorSocketBased;
-import fr.in2p3.jsaga.adaptor.security.JKSSecurityAdaptor;
 import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityCredential;
 
 /* ***************************************************
