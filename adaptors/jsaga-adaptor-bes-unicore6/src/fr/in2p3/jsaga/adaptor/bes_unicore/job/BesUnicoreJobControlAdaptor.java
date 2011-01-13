@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.adaptor.bes_unicore.job;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.bes.job.BesJobControlAdaptorAbstract;
+import fr.in2p3.jsaga.adaptor.bes.job.BesJobControlStagingOnePhaseAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
@@ -20,7 +21,7 @@ import java.util.*;
 * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
 * Date:   9 déc. 2010
 * ***************************************************/
-public class BesUnicoreJobControlAdaptor extends BesJobControlAdaptorAbstract implements JobControlAdaptor {
+public class BesUnicoreJobControlAdaptor extends BesJobControlStagingOnePhaseAdaptorAbstract implements JobControlAdaptor {
 
     public String getType() {
         return "bes-unicore";

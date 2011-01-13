@@ -50,7 +50,7 @@ import java.util.Map;
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   BesJobAdaptorAbstract
+* File:   BesJobControlAdaptorAbstract
 * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
 * Date:   23 Nov. 2010
 * ***************************************************/
@@ -58,35 +58,13 @@ import java.util.Map;
 /**
  * This class is the abstract class for the JobControl specific to a BES implementation
  */
-public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract implements JobControlAdaptor, BesStagingJobAdaptor, CleanableJobAdaptor {
+public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract implements JobControlAdaptor, CleanableJobAdaptor {
 
-    private static final String STAGING_DIRECTORY_TAGNAME = "StagingDirectory";
-    private static final String DATA_STAGING_TAGNAME = "DataStaging";
-    private static final String PRE_STAGING_TRANSFERS_TAGNAME = "PreStagingIn";
-    private static final String POST_STAGING_TRANSFERS_TAGNAME = "PostStagingOut";
+    protected static final String STAGING_DIRECTORY_TAGNAME = "StagingDirectory";
+    protected static final String DATA_STAGING_TAGNAME = "DataStaging";
+    protected static final String PRE_STAGING_TRANSFERS_TAGNAME = "PreStagingIn";
+    protected static final String POST_STAGING_TRANSFERS_TAGNAME = "PostStagingOut";
     
-    private static final String XSLTPARAM_PROTOCOL = "Protocol";
-    private static final String XSLTPARAM_HOST = "HostName";
-    private static final String XSLTPARAM_PORT = "Port";
-    private static final String XSLTPARAM_PATH = "Path";
-    
-	protected URI _ds_url ;
-    
-	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
-    	super.connect(userInfo, host, port, basePath, attributes);
-    	try {
-			_ds_url = getDataStagingUrl(host, port, basePath, attributes);
-		} catch (URISyntaxException e) {
-			throw new NoSuccessException(e);
-		}
-    	
-	}
-
-	public void disconnect() throws NoSuccessException {
-		_ds_url = null;
-        super.disconnect();
-    }
-
 
     ////////////////////////////////////////////////////
     // Implementation of the JobControlAdaptor interface
@@ -94,9 +72,6 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
     public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
     	// _bes_url is built by connect()
     	JobDescriptionTranslator translator =  new JobDescriptionTranslatorXSLT("xsl/job/bes-jsdl.xsl");//BesJobDescriptionTranslatorJSDL();
-    	translator.setAttribute(XSLTPARAM_PROTOCOL, _ds_url.getScheme());
-    	translator.setAttribute(XSLTPARAM_PORT, String.valueOf(_ds_url.getPort()));
-    	translator.setAttribute(XSLTPARAM_PATH, _ds_url.getPath());
     	return translator;
     }
 
@@ -173,45 +148,6 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
     public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 	}
 
-    ////////////////////////////////////////////////////
-	// Implementation of the StagingJobAdaptorOnePhase interface
-    ////////////////////////////////////////////////////
-
-	public String getStagingDirectory(String nativeJobDescription, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		// Get JobDefinition from String
-		JobDefinition_Type jsdl_type = getJobDescriptionTypeFromString(nativeJobDescription);
-		// Extract stagingDirectory
-		return getStagingDirectory(jsdl_type);
-    }
-
-    public String getStagingDirectory(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		// Get JobDefinition from BES service
-    	JobDefinition_Type jsdl_type = getJobDescriptionTypeFromNativeId(nativeJobId);
-		// Extract stagingDirectory
-		return getStagingDirectory(jsdl_type);
-    }
-
-    public StagingTransfer[] getInputStagingTransfer(String nativeJobDescription, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-    	// Get JobDefinition from String
-		JobDefinition_Type jsdl_type = getJobDescriptionTypeFromString(nativeJobDescription);
-		// Extract PreStaging transfers
-		return getStagingTransfers(jsdl_type, PRE_STAGING_TRANSFERS_TAGNAME);
-    }
-
-    public StagingTransfer[] getInputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		// Get JobDefinition from BES service
-    	JobDefinition_Type jsdl_type = getJobDescriptionTypeFromNativeId(nativeJobId);
-		// Extract PreStaging transfers
-		return getStagingTransfers(jsdl_type, PRE_STAGING_TRANSFERS_TAGNAME);
-    }
-
-    public StagingTransfer[] getOutputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		// Get JobDefinition from BES service
-    	JobDefinition_Type jsdl_type = getJobDescriptionTypeFromNativeId(nativeJobId);
-		// Extract PostStaging transfers
-		return getStagingTransfers(jsdl_type, POST_STAGING_TRANSFERS_TAGNAME);
-    }
-
     
     
     
@@ -220,44 +156,6 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
     // Private methods
     ////////////////////////////////////////////////////
     
-    /**
-     * Extract the StagingDirectory from the JSDL as follows:
-     * 
-     * <jsdl:JobDescription>
-     *   <jsdl:JobIdentification/>
-     *   <jsdl:Application>
-     *     ...
-     *   <jsaga:StagingDirectory><jsaga:URI>gsiftp://host:2811/tmp/1998763545</jsaga:URI></jsaga:StagingDirectory>	
-     * </jsdl:JobDescription>
-     * 
-     * @param jsdl_type the JSDL Job Definition
-     * @return the StagingDirectory defined in the JobDescription
-     */
-    private String getStagingDirectory(JobDefinition_Type jsdl_type) {
-		//MessageElement stagingDirectory = jsdl_type.getJobDescription().get_any()[STAGING_DIRECTORY];
-    	for (MessageElement me: jsdl_type.getJobDescription().get_any()) {
-    		if (STAGING_DIRECTORY_TAGNAME.equals(me.getName())) {
-    			return me.getElementsByTagName("URI").item(0).getFirstChild().getNodeValue();
-    		}
-    	}
-    	return "";
-    }
-
-    private StagingTransfer[] getStagingTransfers(JobDefinition_Type jsdl_type, String PreOrPost) {
-    	StagingTransfer[] st = new StagingTransfer[]{};
-    	ArrayList transfers = new ArrayList();
-    	for (MessageElement me: jsdl_type.getJobDescription().get_any()) {
-    		if (DATA_STAGING_TAGNAME.equals(me.getName())) {
-    			if (PreOrPost.equals(me.getFirstChild().getLocalName())) {
-    				String from = me.getElementsByTagName("Source").item(0).getFirstChild().getFirstChild().getNodeValue();
-    				String to = me.getElementsByTagName("Target").item(0).getFirstChild().getFirstChild().getNodeValue();
-    				transfers.add(new StagingTransfer(from, to, false));
-    			}
-    		}
-    	}
-    	return (StagingTransfer[]) transfers.toArray(st);
-    }
-
     /**
      * Check required resources against available resources
      * 
@@ -290,7 +188,7 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
      * @return a JobDefinition_Type object 
      * @throws BadResource
      */
-	private JobDefinition_Type getJobDescriptionTypeFromString(String nativeJobDescription) throws BadResource {
+	protected JobDefinition_Type getJobDescriptionTypeFromString(String nativeJobDescription) throws BadResource {
     	StringReader sr = new StringReader(nativeJobDescription);
 		JobDefinition_Type jsdl_type;
 		try {
@@ -307,7 +205,7 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
 	 * @return a JobDefinition_Type object 
 	 * @throws NoSuccessException
 	 */
-	private JobDefinition_Type getJobDescriptionTypeFromNativeId(String nativeJobId) throws NoSuccessException {
+	protected JobDefinition_Type getJobDescriptionTypeFromNativeId(String nativeJobId) throws NoSuccessException {
     	GetActivityDocumentResponseType[] response = getActivityDocuments(new String[]{nativeJobId});
     	return response[0].getJobDefinition();
 	}
@@ -341,4 +239,47 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
 		}
     	
     }
+
+    ////////////////////////////////////////////////////
+    // Protected methods
+    ////////////////////////////////////////////////////
+    
+    /**
+     * Extract the StagingDirectory from the JSDL as follows:
+     * 
+     * <jsdl:JobDescription>
+     *   <jsdl:JobIdentification/>
+     *   <jsdl:Application>
+     *     ...
+     *   <jsaga:StagingDirectory><jsaga:URI>gsiftp://host:2811/tmp/1998763545</jsaga:URI></jsaga:StagingDirectory>	
+     * </jsdl:JobDescription>
+     * 
+     * @param jsdl_type the JSDL Job Definition
+     * @return the StagingDirectory defined in the JobDescription
+     */
+    protected String getStagingDirectory(JobDefinition_Type jsdl_type) {
+		//MessageElement stagingDirectory = jsdl_type.getJobDescription().get_any()[STAGING_DIRECTORY];
+    	for (MessageElement me: jsdl_type.getJobDescription().get_any()) {
+    		if (STAGING_DIRECTORY_TAGNAME.equals(me.getName())) {
+    			return me.getElementsByTagName("URI").item(0).getFirstChild().getNodeValue();
+    		}
+    	}
+    	return "";
+    }
+
+    protected StagingTransfer[] getStagingTransfers(JobDefinition_Type jsdl_type, String PreOrPost) {
+    	StagingTransfer[] st = new StagingTransfer[]{};
+    	ArrayList transfers = new ArrayList();
+    	for (MessageElement me: jsdl_type.getJobDescription().get_any()) {
+    		if (DATA_STAGING_TAGNAME.equals(me.getName())) {
+    			if (PreOrPost.equals(me.getFirstChild().getLocalName())) {
+    				String from = me.getElementsByTagName("Source").item(0).getFirstChild().getFirstChild().getNodeValue();
+    				String to = me.getElementsByTagName("Target").item(0).getFirstChild().getFirstChild().getNodeValue();
+    				transfers.add(new StagingTransfer(from, to, false));
+    			}
+    		}
+    	}
+    	return (StagingTransfer[]) transfers.toArray(st);
+    }
+
 }
