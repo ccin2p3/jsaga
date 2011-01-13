@@ -54,6 +54,16 @@ public class ArexTestSuite extends JSAGATestSuite {
         //public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
     }
 
+ 	// test cases
+    // TODO : implement HTTPS PUT
+    public static class ArexJobRunSandboxTest extends JobRunSandboxTest {
+        public ArexJobRunSandboxTest() throws Exception {super("arex");}
+        public void test_remote_input_explicit() { super.ignore("HTTPS PUT not supported"); }
+        public void test_remote_output_explicit() { super.ignore("HTTPS PUT not supported"); }
+        public void test_input_output_explicit() { super.ignore("HTTPS PUT not supported"); }
+        public void test_input_output_implicit() { super.ignore("HTTPS PUT not supported"); }
+    }
+    
     // test cases
     public static class ArexJobRunInteractiveTest extends JobRunInteractiveTest {
         public ArexJobRunInteractiveTest() throws Exception {super("arex");}
