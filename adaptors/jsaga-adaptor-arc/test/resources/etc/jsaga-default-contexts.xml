@@ -4,6 +4,7 @@
         <context type="BESJKS" id="Arc">
             <attribute name="Keystore" value="${user.home}/.jsaga/contexts/arc/grid2-fr.jks"/>
             <attribute name="KeystorePass" value="changeit"/>
+            <data type="arex"/>
             <job type="arex"/>
             <include domain="hu"/>
         </context>
