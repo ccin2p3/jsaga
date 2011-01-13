@@ -2,7 +2,7 @@
     <parent>
         <groupId>fr.in2p3.jsaga.adaptor</groupId>
         <artifactId>adaptors</artifactId>
-        <version>0.9.11</version>
+        <version>0.9.12-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>jsaga-adaptor-wsgram</artifactId>
@@ -28,13 +28,13 @@
         <dependency><!-- for security context (WARNING: order of dependencies matters) -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-globus</artifactId>
-            <version>0.9.11</version>
+            <version>0.9.12-SNAPSHOT</version>
             <scope>runtime</scope>
         </dependency>
         <dependency><!-- for data staging -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-classic</artifactId>
-            <version>0.9.11</version>
+            <version>0.9.12-SNAPSHOT</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
