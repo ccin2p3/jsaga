@@ -22,6 +22,7 @@
                     </docletArtifact>
                     <doclet>com.jeldoclet.JELDoclet</doclet>
                     <useStandardDocletOptions>false</useStandardDocletOptions>
+                    <failOnError>false</failOnError>
                 </configuration>
             </plugin>
         </plugins>
