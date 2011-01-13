@@ -12,6 +12,7 @@ import fr.in2p3.jsaga.impl.permissions.AbstractDataPermissionsImpl;
 import fr.in2p3.jsaga.impl.url.URLFactoryImpl;
 import fr.in2p3.jsaga.impl.url.URLHelper;
 import fr.in2p3.jsaga.sync.namespace.SyncNSEntry;
+import org.apache.log4j.Logger;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.*;
@@ -32,6 +33,8 @@ import org.ogf.saga.url.URLFactory;
  *
  */
 public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImpl implements SyncNSEntry {
+    private static Logger s_logger = Logger.getLogger(AbstractSyncNSEntryImpl.class);
+
     protected int m_flags;
     private boolean m_disconnectable;
 
@@ -331,7 +334,9 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
 
     /** override Object.finalize() to disconnect from server */
     public void finalize() throws Throwable {
-        this.close();
+        if (m_disconnectable && !m_disconnected) {
+            s_logger.error("NSEntry objects MUST be closed in order to free resources");
+        }
         super.finalize();
     }
 
