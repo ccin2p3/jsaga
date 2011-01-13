@@ -1,7 +1,14 @@
-package fr.in2p3.jsaga.adaptor.arex.job;
+ package fr.in2p3.jsaga.adaptor.arex.job;
 
 import fr.in2p3.jsaga.adaptor.bes.job.BesJobControlAdaptorAbstract;
+import fr.in2p3.jsaga.adaptor.job.BadResource;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
+import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
+import fr.in2p3.jsaga.adaptor.security.X509SecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityCredential;
 
 /* for changeStatus
 import org.apache.axis.message.MessageElement;
@@ -18,6 +25,9 @@ import org.nordugrid.schemas.arex.ChangeActivityStatusResponseType;
 import org.nordugrid.schemas.arex.ActivitySubStateType;
 */
 
+import org.apache.axis.message.MessageElement;
+import org.ggf.schemas.jsdl.x2005.x11.jsdl.DataStaging_Type;
+import org.ggf.schemas.jsdl.x2005.x11.jsdl.JobDefinition_Type;
 import org.nordugrid.schemas.arex.ARex_PortType;
 import org.nordugrid.schemas.arex.ARex_ServiceLocator;
 
@@ -37,12 +47,17 @@ import javax.xml.rpc.ServiceException;
 * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
 * Date:   9 déc 2010
 * ***************************************************/
-public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract {
+public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract implements StagingJobAdaptorTwoPhase {
 
-	public static final String AREX_NAMESPACE_URI = "http://www.nordugrid.org/schemas/a-rex";
+    //private static final String XSLTPARAM_PROTOCOL = "Protocol";
+    //private static final String XSLTPARAM_HOST = "HostName";
+    //private static final String XSLTPARAM_PORT = "Port";
+    //private static final String XSLTPARAM_PATH = "Path";
+
+    public static final String AREX_NAMESPACE_URI = "http://www.nordugrid.org/schemas/a-rex";
 	
 	protected ARex_PortType _arex_pt = null;
-
+	
     public String getType() {
         return "arex";
     }
@@ -59,9 +74,13 @@ public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract {
         return new ArexJobMonitorAdaptor();
     }
 
-	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+    public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
+    	return new JobDescriptionTranslatorXSLT("xsl/job/arex-jsdl.xsl");
+    }
+
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     	super.connect(userInfo, host, port, basePath, attributes);
-    	
+		
     	if (_arex_pt != null) return;
     	
         ARex_ServiceLocator _arex_service = new ARex_ServiceLocator();
@@ -78,11 +97,108 @@ public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract {
         super.disconnect();
     }
 
-	public URI getDataStagingUrl(String host, int port, String basePath, Map attributes) throws URISyntaxException {
-		// FIXME : change for https
-		return new URI("gsiftp://"+host+":2811"+"/tmp/");
+	/////////////////////////////////////
+	// Implementation of StagingJobAdaptorTwoPhase
+	/////////////////////////////////////
+	public String getStagingDirectory(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+		// The staging directory is the A-REX SD "Session Directory" managed by A-REX
+		return null;
 	}
 
+	public StagingTransfer[] getInputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException,NoSuccessException {
+		// Get JobDefinition from BES service
+    	JobDefinition_Type jsdl_type = getJobDescriptionTypeFromNativeId(nativeJobId);
+		// Extract PreStaging transfers
+		return getStagingTransfers(nativeJobId, jsdl_type, PRE_STAGING_TRANSFERS_TAGNAME);
+	}
+
+	public StagingTransfer[] getOutputStagingTransfer(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+		// Get JobDefinition from BES service
+    	JobDefinition_Type jsdl_type = getJobDescriptionTypeFromNativeId(nativeJobId);
+		// Extract PostStaging transfers
+		return getStagingTransfers(nativeJobId, jsdl_type, POST_STAGING_TRANSFERS_TAGNAME);
+	}
+
+	public void start(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+		// nothing to do
+	}
+
+	
+    /**
+     * Extract the staging URL from the JSDL as follows:
+     * 
+     * <jsdl:DataStaging>
+     *   <jsdl:FileName>xxx<jsdl:FileName>
+     *   <jsdl:Source/>
+     *   <jsaga:Source><jsaga:URI>file:/tmp/xxx</jsaga:URI></jsaga:Source>	
+     * </jsdl:DataStaging>
+     * 
+     * or
+     * <jsdl:DataStaging>
+     *   <jsdl:FileName>xxx<jsdl:FileName>
+     *   <jsdl:Target/>
+     *   <jsaga:Target><jsaga:URI>file:/tmp/xxx</jsaga:URI></jsaga:Source>	
+     * </jsdl:DataStaging>
+     * 
+     * <jsdl:Source/> means A-REX will wait for the file to be uploaded in the SD
+     * The target will be SD/FileName e;g. https://xxx:2010/arex-x509/XXXXX
+     * 
+     * For PostTransfers, the source URL will be SD/FileName e;g. https://xxx:2010/arex-x509/XXXXX
+     * 
+     * @param nativeJobId the native job identifier
+     * @param jsdl_type the JSDL Job Definition
+     * @param preOrPost PRE_STAGING or POST_STAGING
+     * @return the array of StagingTransfer defined in the JobDescription
+     */
+    protected StagingTransfer[] getStagingTransfers(String nativeJobId, JobDefinition_Type jsdl_type, String preOrPost) throws NoSuccessException{
+    	StagingTransfer[] st = new StagingTransfer[]{};
+    	ArrayList transfers = new ArrayList();
+    	String from, to;
+    	for (DataStaging_Type dst: jsdl_type.getJobDescription().getDataStaging()){
+    		if (preOrPost.equals(PRE_STAGING_TRANSFERS_TAGNAME) && dst.getSource() != null ) {
+    			from = (dst.get_any())[0].getFirstChild().getFirstChild().getNodeValue();
+    			// change scheme https to arex for the engine
+    			URI httpsto, arexto;
+				try {
+					httpsto = new URI(nativeJobId + '/' + dst.getFileName());
+					arexto = new URI(getType(),
+											httpsto.getUserInfo(),
+											httpsto.getHost(),
+											httpsto.getPort(),
+											httpsto.getPath(),
+											httpsto.getQuery(),
+											httpsto.getFragment());
+				} catch (URISyntaxException e) {
+					throw new NoSuccessException(e);
+				}
+				transfers.add(new StagingTransfer(from, arexto.toString(), false));
+    		} else if (preOrPost.equals(POST_STAGING_TRANSFERS_TAGNAME) && dst.getTarget() != null) {
+    			from = nativeJobId + '/' + dst.getFileName();
+    			// change scheme https to arex for the engine
+    			URI httpsfrom, arexfrom;
+    			try {
+					httpsfrom = new URI(from);
+					arexfrom = new URI(getType(),
+										httpsfrom.getUserInfo(),
+										httpsfrom.getHost(),
+										httpsfrom.getPort(),
+										httpsfrom.getPath(),
+										httpsfrom.getQuery(),
+										httpsfrom.getFragment());
+				} catch (URISyntaxException e) {
+					throw new NoSuccessException(e);
+				}
+    			to = (dst.get_any())[0].getFirstChild().getFirstChild().getNodeValue();
+				transfers.add(new StagingTransfer(arexfrom.toString(), to, false));
+    		}
+    	}
+    	return (StagingTransfer[]) transfers.toArray(st);
+    }
+	
+	
+	
+	
+	
 	/*private void changeStatus(String nativeJobId, ActivityStateEnumeration oldStatus, ActivityStateEnumeration newStatus, ActivitySubStateType newSubState) throws PermissionDeniedException, NoSuccessException {
 		//ChangeActivityStatusRequestType request = new ChangeActivityStatusRequestType();
 		//request.setActivityIdentifier(nativeId2ActivityId(nativeJobId));
