@@ -47,6 +47,10 @@ public class HttpsDataAdaptorSocketBased extends HttpDataAdaptorSocketBased impl
         return "https";
     }
 
+    public String getNativeScheme() {
+        return "https";
+    }
+
     public Usage getUsage() {
         return new UOptional(MUTUAL_AUTHENTICATION);
     }
