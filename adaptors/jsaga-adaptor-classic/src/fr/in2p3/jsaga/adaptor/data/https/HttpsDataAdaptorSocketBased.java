@@ -32,10 +32,10 @@ import java.util.Map;
 public class HttpsDataAdaptorSocketBased extends HttpDataAdaptorSocketBased implements FileReaderStreamFactory {
     private static final String MUTUAL_AUTHENTICATION = "MutualAuthentication";
     // security
-    private String m_userID;
+    protected String m_userID;
     private KeyManager[] m_keyManager;
     // conection
-    private SSLSocketFactory m_socketFactory;
+    protected SSLSocketFactory m_socketFactory;
 
     public HttpsDataAdaptorSocketBased() {
         // set default security (no certificate)
