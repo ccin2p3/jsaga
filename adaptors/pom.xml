@@ -30,7 +30,7 @@
         <module>jsaga-adaptor-globus</module>
     	<module>jsaga-adaptor-bes</module>
     	<module>jsaga-adaptor-arc</module>
-    	<module>jsaga-adaptor-bes-unicore</module>
+    	<module>jsaga-adaptor-bes-unicore6</module>
   </modules>
 
     <build>
