@@ -2,7 +2,7 @@
     <parent>
         <groupId>fr.in2p3.jsaga.adaptor</groupId>
         <artifactId>adaptors</artifactId>
-        <version>0.9.11-SNAPSHOT</version>
+        <version>0.9.12-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>jsaga-adaptor-bes</artifactId>
@@ -57,67 +57,20 @@
 		<dependency>
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-classic</artifactId>
-			<version>0.9.11-SNAPSHOT</version>
+			<version>0.9.12-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- <dependency>
-			<groupId>fr.in2p3.jsaga.adaptor</groupId>
-			<artifactId>jsaga-adaptor-voms</artifactId>
-			<version>0.9.11-SNAPSHOT</version>
-			<scope>runtime</scope>
-		</dependency>-->
-		<!--<dependency>
-			<groupId>org.glite</groupId>
-			<artifactId>vomsjapi</artifactId>
-			<version>1.7.22</version>
-		</dependency>-->
-		<!-- <dependency>
-			<groupId>fr.in2p3.jsaga.adaptor</groupId>
-			<artifactId>jsaga-adaptor-globus</artifactId>
-			<version>0.9.11-SNAPSHOT</version>
-			<scope>runtime</scope>
-		</dependency>-->
 		<dependency>
 			<groupId>axis</groupId>
 			<artifactId>axis</artifactId>
 			<version>1.4</version>
 			<scope>compile</scope>
 		</dependency>
-        <!-- <dependency>
-            <groupId>org.ogf</groupId>
-            <artifactId>bes-api-java</artifactId>
-            <version>1.0</version>
-			<scope>runtime</scope>
-        </dependency>-->
         <dependency> <!-- pour ObjectDeserializer de wsrf-core -->
             <groupId>org.globus</groupId>
             <artifactId>wsgram-api</artifactId>
             <version>4.0.0</version>
 			<scope>compile</scope>
         </dependency>
-		<!-- <dependency>
-			<groupId>org.globus</groupId>
-			<artifactId>cog-axis</artifactId>
-			<version>gt4</version>
-			<scope>compile</scope>
-		</dependency>-->
-        <!--<dependency>
-            <groupId>org.apache.xmlbeans</groupId>
-            <artifactId>xmlbeans</artifactId>
-            <version>2.4.0</version>
-            <scope>runtime</scope>
-        </dependency>-->
-		<!-- <dependency>
-			<groupId>org.globus</groupId>
-			<artifactId>cog-url</artifactId>
-			<version>1.4</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.8</version>
-			<scope>provided</scope>
-		</dependency>-->
 	</dependencies>
 </project>
