@@ -63,4 +63,10 @@ public class ArexTestSuite extends JSAGATestSuite {
     public static class ArexJobRunInteractiveTest extends JobRunInteractiveTest {
         public ArexJobRunInteractiveTest() throws Exception {super("arex");}
     }
+    
+    public static class ArexJobRunInfoTest extends JobRunInfoTest {
+    	public ArexJobRunInfoTest() throws Exception {super("arex");}
+    	//public void test_exitcode() {super.ignore("delai pour ?info"); }
+    	public void test_created() {super.ignore("Creation date not supported"); }
+    }
 }
