@@ -151,7 +151,7 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
 		try {
 			int loop = 0;
 			while (loop < 10) {
-			  InputStream _info_xml = _data_adaptor.getInputStream("/arex-x509/", "info");
+			  InputStream _info_xml = _data_adaptor.getInputStream(_bes_url.getPath(), "info");
 			  DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			  DocumentBuilder db = dbf.newDocumentBuilder();
 			  Document doc;
