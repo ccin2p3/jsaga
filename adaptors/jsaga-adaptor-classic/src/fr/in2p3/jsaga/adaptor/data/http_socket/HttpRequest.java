@@ -96,19 +96,15 @@ public class HttpRequest {
         BufferedWriter request = new BufferedWriter(new OutputStreamWriter(m_socket.getOutputStream()));
         request.write(m_type + " " + m_path + " HTTP/" + m_version);
         request.newLine();
-        System.out.println(m_type + " " + m_path + " HTTP/" + m_version);
         if (m_type.equals(TYPE_PUT)) {
             request.write("Accept: */*");
             request.newLine();
-            System.out.println("Accept: */*");
             request.write("Content-Length: " + String.valueOf(m_outputStream.size()));
             request.newLine();
-            System.out.println("Content-Length: " + String.valueOf(m_outputStream.size()));
         }
         request.newLine();
         if (m_type.equals(TYPE_PUT)) {
         	request.write(m_outputStream.toString());
-            System.out.println(m_outputStream.toString());
         }
         request.flush();
 
