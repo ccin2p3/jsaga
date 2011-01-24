@@ -42,6 +42,7 @@
                             <wsdlFiles>
                             	<wsdlFile>a-rex.wsdl</wsdlFile>
                             </wsdlFiles>
+                            <timeout>180</timeout>
                             <!-- <nsExcludes>
                             	<nsExclude>http://schemas.ggf.org/bes/2006/08/bes-factory</nsExclude>
                             </nsExcludes>-->
