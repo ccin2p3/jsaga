@@ -59,11 +59,20 @@ public class CompiledTransformer {
         // thread-safe instanciation not supported by JDK 1.5
 //        tFactory = TransformerFactory.newInstance("org.apache.xalan.xsltc.trax.TransformerFactoryImpl", CompiledTransformer.class.getClassLoader());
         synchronized (this) {
-            String savImpl = System.getProperty("javax.xml.transform.TransformerFactory");
-            if(savImpl==null) savImpl="org.apache.xalan.processor.TransformerFactoryImpl";
-            System.setProperty("javax.xml.transform.TransformerFactory", "org.apache.xalan.xsltc.trax.TransformerFactoryImpl");
+            // save transformer implementation
+            final String TRANSFORMER_IMPL = "javax.xml.transform.TransformerFactory";
+            String savImpl = System.getProperty(TRANSFORMER_IMPL);
+            System.setProperty(TRANSFORMER_IMPL, "org.apache.xalan.xsltc.trax.TransformerFactoryImpl");
+
+            // create transformer factory
             tFactory = TransformerFactory.newInstance();
-            System.setProperty("javax.xml.transform.TransformerFactory", savImpl);
+
+            // restore transformer implementation
+            if (savImpl != null) {
+                System.setProperty(TRANSFORMER_IMPL, savImpl);
+            } else {
+                System.getProperties().remove(TRANSFORMER_IMPL);
+            }
         }
         tFactory.setAttribute("debug", "true");
         tFactory.setAttribute("package-name", packageName);
