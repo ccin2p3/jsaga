@@ -19,6 +19,10 @@ public abstract class BesJobStatus extends JobStatus {
 		super(jobId, activityStatus, activityStatus.getState().getValue());
 	}
 
+	public BesJobStatus(String jobId, ActivityStatusType activityStatus, int returnCode) {
+		super(jobId, activityStatus, activityStatus.getState().getValue(), returnCode);
+	}
+
 	public String getModel() {
         return "BES";
     }
