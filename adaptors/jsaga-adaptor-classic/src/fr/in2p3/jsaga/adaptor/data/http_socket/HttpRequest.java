@@ -23,23 +23,93 @@ import java.util.*;
 public class HttpRequest {
     public static final String TYPE_GET = "GET";
     public static final String TYPE_HEAD = "HEAD";
+    public static final String TYPE_PUT = "PUT";
+    private String m_type;
+    
     private static final String STATUS = "null";
+    
     private static final String CONTENT_LENGTH = "Content-Length";
     private static final String LAST_MODIFIED = "Last-Modified";
     private static final SimpleDateFormat DF = new SimpleDateFormat("EEE, d MMM yyyy KK:mm:ss zzz", Locale.ENGLISH);
-    private Properties m_prop;
+    
+    protected Properties m_prop;
     private InputStream m_inputStream;
+    private ByteArrayOutputStream m_outputStream;
 
+    private String m_path;
+    private Socket m_socket;
+    private String m_version = "1.1";
+    
+    /**
+     * Create a HTTP request and send it
+     * 
+     * @param	type 	The type of request. Supported requests are "GET", "HEAD", "PUT"
+     * @param	path	The path of the file/directory on the HTTP server
+     * @param	socket	The socket to use
+     * @throws	IOException
+     */
     public HttpRequest(String type, String path, Socket socket) throws IOException {
+    	this(type, path, socket, true);
+    }
+    	
+    /**
+     * Create a HTTP request and eventually send it
+     * 
+     * @param	type 	The type of request. Supported requests are "GET", "HEAD", "PUT"
+     * @param	path	The path of the file/directory on the HTTP server
+     * @param	socket	The socket to use
+     * @param	send	Send the request or not. If not, the send() method should be used later
+     * @throws	IOException
+     */
+    public HttpRequest(String type, String path, Socket socket, boolean send) throws IOException {
+    	m_type = type;
+    	m_path = path;
+    	m_socket = socket;
+    	if (TYPE_PUT.equals(m_type)) {
+    		m_outputStream = new ByteArrayOutputStream();
+    	}
+    	if (send) {
+    		send();
+    	}
+    }
+    
+	public void write(int b) throws IOException {
+        try {
+        	m_outputStream.write(b);
+        } catch (NullPointerException e) {
+        }
+	}
+	
+	public void write(byte[] b, int off, int len) throws IOException {
+        try {
+        	m_outputStream.write(b,off,len);
+        } catch (NullPointerException e) {
+        }
+	}
+	
+    public void setVersion(String version) {
+    	m_version = version;
+    }
+    
+    public 	void send() throws IOException {
         // send request
-        BufferedWriter request = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-        request.write(type+" "+path+" HTTP/1.0");
+        BufferedWriter request = new BufferedWriter(new OutputStreamWriter(m_socket.getOutputStream()));
+        request.write(m_type + " " + m_path + " HTTP/" + m_version);
         request.newLine();
-        request.newLine(); // end of HTTP request
+        if (m_type.equals(TYPE_PUT)) {
+            request.write("Accept: */*");
+            request.newLine();
+            request.write("Content-Length: " + String.valueOf(m_outputStream.size()));
+            request.newLine();
+        }
+        request.newLine();
+        if (m_type.equals(TYPE_PUT)) {
+        	request.write(m_outputStream.toString());
+        }
         request.flush();
 
         // get response
-        InputStream response = socket.getInputStream();
+        InputStream response = m_socket.getInputStream();
 
         // set properties
         m_prop = new Properties();
@@ -53,14 +123,14 @@ public class HttpRequest {
             }
         }
 
-        if (type.equals(TYPE_GET)) {
+        if (m_type.equals(TYPE_GET)) {
             // set input stream (with rest of response stream)
             m_inputStream = response;
-        } else if (type.equals(TYPE_HEAD)) {
+        } else if (m_type.equals(TYPE_HEAD) || m_type.equals(TYPE_PUT)) {
             // close response stream
             response.close();
         } else {
-            throw new IOException("[INTERNAL ERROR] Bad request type: "+type);
+            throw new IOException("[INTERNAL ERROR] Bad request type: "+m_type);
         }
     }
 
@@ -98,7 +168,7 @@ public class HttpRequest {
         return !m_prop.contains(LAST_MODIFIED);
     }
 
-    private static String readLine(InputStream in) throws IOException {
+    protected static String readLine(InputStream in) throws IOException {
         byte b;
         StringBuffer buf = new StringBuffer();
         while ((b=(byte) in.read())>0 && b!='\n') {

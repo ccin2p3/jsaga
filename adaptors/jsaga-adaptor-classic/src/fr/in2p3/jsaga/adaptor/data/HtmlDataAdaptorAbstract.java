@@ -27,7 +27,7 @@ public abstract class HtmlDataAdaptorAbstract implements FileReaderStreamFactory
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         // set base URL
         try {
-            m_baseUrl = new URL(this.getType(), host, port, "/");
+            m_baseUrl = new URL(this.getNativeScheme(), host, port, "/");
         } catch (MalformedURLException e) {
             throw new BadParameterException(e);
         }
@@ -77,4 +77,5 @@ public abstract class HtmlDataAdaptorAbstract implements FileReaderStreamFactory
         }
         return bytes.toString();
     }
+    public abstract String getNativeScheme();
 }

@@ -29,7 +29,11 @@ public abstract class HttpDataAdaptorAbstract extends HtmlDataAdaptorAbstract im
     public String getType() {
         return "http";
     }
-
+    
+    public String getNativeScheme() {
+        return "http";
+    }
+    
     public Usage getUsage() {
         return null;    // no usage
     }

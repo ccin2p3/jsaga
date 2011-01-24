@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>adaptors</artifactId>
+    <groupId>fr.in2p3.jsaga.adaptor</groupId>
+    <version>0.9.12-SNAPSHOT</version>
+  </parent>
+  <groupId>fr.in2p3.jsaga.adaptor</groupId>
+  <artifactId>jsaga-adaptor-arc</artifactId>
+  <name>jsaga-adaptor-arc</name>
+  <description>This module provides support for ARC service</description>
+	<developers>
+        <developer>
+            <name>Lionel Schwarz</name>
+            <email>lionel.schwarz@in2p3.fr</email>
+            <organization>CC-IN2P3</organization>
+            <organizationUrl>http://cc.in2p3.fr/</organizationUrl>
+            <properties>
+                <organizationLogoUrl>http://cc.in2p3.fr/plugins/kitcnrs/images/logoCC72.gif</organizationLogoUrl>
+            </properties>
+        </developer>
+	</developers>
+    <build>
+		<plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>axistools-maven-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>wsdl2java</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirectory>${basedir}/resources/wsdl</sourceDirectory>
+                            <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
+                            <timestampDirectory>${project.build.directory}</timestampDirectory>
+                            <fileNamespaceToPackage>${basedir}/resources/wsdl/NStoPkg.properties</fileNamespaceToPackage>
+                            <wsdlFiles>
+                            	<wsdlFile>a-rex.wsdl</wsdlFile>
+                            </wsdlFiles>
+                            <!-- <nsExcludes>
+                            	<nsExclude>http://schemas.ggf.org/bes/2006/08/bes-factory</nsExclude>
+                            </nsExcludes>-->
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin><!-- copy jar -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+            </plugin>
+		</plugins>
+    </build>
+	<dependencies>
+	    <!-- for security context (WARNING: order of dependencies matters) -->
+		<dependency>
+			<groupId>fr.in2p3.jsaga.adaptor</groupId>
+			<artifactId>jsaga-adaptor-classic</artifactId>
+			<version>0.9.12-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>fr.in2p3.jsaga.adaptor</groupId>
+			<artifactId>jsaga-adaptor-bes</artifactId>
+			<version>0.9.12-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>axis</groupId>
+			<artifactId>axis</artifactId>
+			<version>1.4</version>
+			<scope>compile</scope>
+		</dependency>
+	</dependencies>
+</project>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faqs title="Frequently Asked Questions">
+    <part id="module">
+        <title>Adaptor module</title>
+        <faq id="jsaga-help">
+            <question>How do I use this module ?</question>
+            <answer>This module is an abstract adaptor only, it cannot be used. Available adaptors built from this one are Arex and Bes-Unicore
+            </answer>
+        </faq>
+        <faq id="bes-adaptor">
+            <question>How to build a BES adaptor using this module ?</question>
+            <answer>You have to create the following classes:
+            <ul>
+              <li>MyBesJobAdaptor extends BesJobControlAdaptorAbstract</li>
+              <li>MyBesJobMonitorAdaptor extends BesJobMonitorAdaptor</li>
+              <li>MyBesJob extends BesJob</li>
+              <li>MyBesJobStatus extends BesJobStatus</li>
+            </ul>
+            and make your Adaptor depend on the jsaga-adaptor-bes module
+            </answer>
+        </faq>
+    </part>
+</faqs>
