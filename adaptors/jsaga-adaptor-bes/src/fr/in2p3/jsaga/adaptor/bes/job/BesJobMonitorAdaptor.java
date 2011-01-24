@@ -117,7 +117,7 @@ public abstract class BesJobMonitorAdaptor extends BesJobAdaptorAbstract impleme
 	 * @see ArexJobStatus
 	 * @see BesUnicoreJobStatus
 	 */
-	private JobStatus instanciateJobStatusObject(String nativeJobId, ActivityStatusType ast) throws NoSuccessException {
+	protected JobStatus instanciateJobStatusObject(String nativeJobId, ActivityStatusType ast) throws NoSuccessException {
     	try {
     		Constructor c = getJobStatusClass().getConstructor(new Class[]{String.class,ActivityStatusType.class});
 			return (JobStatus)c.newInstance(new Object[]{nativeJobId, ast});
