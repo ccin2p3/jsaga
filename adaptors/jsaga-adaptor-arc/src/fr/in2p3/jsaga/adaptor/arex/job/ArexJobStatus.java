@@ -21,6 +21,10 @@ public class ArexJobStatus extends BesJobStatus {
 	public ArexJobStatus(String jobId, ActivityStatusType activityStatus) {
 		super(jobId, activityStatus);
 	}
+	
+	public ArexJobStatus(String jobId, ActivityStatusType activityStatus, int returnCode) {
+		super(jobId, activityStatus, returnCode);
+	}
 
 	/**
 	 * Gets the A-Rex substate of the job as found in the GetActivityStatusesResponseType message
