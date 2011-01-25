@@ -8,7 +8,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -24,7 +23,6 @@ import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
 
 import fr.in2p3.jsaga.adaptor.arex.data.ArexHttpsDataAdaptor;
-import fr.in2p3.jsaga.adaptor.bes.BesUtils;
 import fr.in2p3.jsaga.adaptor.bes.job.BesJobMonitorAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobInfoAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
@@ -39,13 +37,7 @@ import org.nordugrid.schemas.arex.ARex_PortType;
 import org.nordugrid.schemas.arex.ARex_ServiceLocator;
 
 import org.oasis_open.docs.wsrf.rp_2.QueryExpressionType;
-import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyResponse;
-import org.oasis_open.docs.wsrf.rp_2.GetResourcePropertyDocumentResponse;
 import org.oasis_open.docs.wsrf.rp_2.QueryResourcePropertiesResponse;
-import org.oasis_open.docs.wsrf.rp_2.UnknownQueryExpressionDialectFaultType;
-import org.oasis_open.docs.wsrf.rp_2.QueryEvaluationErrorFaultType;
-import org.oasis_open.docs.wsrf.rp_2.InvalidQueryExpressionFaultType;
-import org.oasis_open.docs.wsrf.rp_2.InvalidResourcePropertyQNameFaultType;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnavailableFaultType;
 import org.w3c.dom.Document;
@@ -53,6 +45,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -68,6 +61,14 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
 	protected ARex_PortType _arex_pt = null;
 	private ArexHttpsDataAdaptor _data_adaptor;
 	private static final Integer NB_TRIES = 10;
+	private static final String AREX_EXITCODE = "ExitCode";
+	private static final String AREX_SUBMISSIONTIME = "SubmissionTime";
+	private static final String AREX_ENDTIME = "EndTime";
+	private static final String AREX_EXECUTIONNODE = "ExecutionNode";
+	private static final String TIME_ISO8601 = "yyyy-MM-dd'T'HH:mm:ssz";
+	
+	// http://www.w3.org/2005/08/addressing
+	private static final String WSA_NS = org.w3.x2005.x08.addressing.AttributedQNameType.getTypeDesc().getXmlType().getNamespaceURI();
 	
 	public String getType() {
         return "arex";
@@ -104,23 +105,23 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
 		_data_adaptor.connect(userInfo, host, port, basePath, attributes);
 		*/
 		
-		//System.out.println(getExitCode("https://interop.grid.niif.hu:2010/arex-x509/1077212955322581395788565"));
-		//String cr_string = getCreated("https://interop.grid.niif.hu:2010/arex-x509/1077212955322581395788565").toString();
-		/*String cr_string = "Thu Jan 20 16:26:10 CET 2011";
-		DateFormat df = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.US);
+		/*
+		String cr_string = getStarted("https://interop.grid.niif.hu:2010/arex-x509/1077212955322581395788565").toString();
+		//String cr_string = "Thu Jan 20 16:26:10 CET 2011";
+		DateFormat df = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", java.util.Locale.US);
 	    Date creationTime;
 		try {
 			creationTime = df.parse(cr_string);
 		} catch (ParseException e) {
 			throw new NoSuccessException(e);
 		}
-	    System.out.println(creationTime.toString());*/
-
-		/*
-		System.out.println(getInfoWSRP("https://interop.grid.niif.hu:2010/arex-x509/1077212958849731186823177","Owner"));
-		System.out.println(getInfoWSRP("https://interop.grid.niif.hu:2010/arex-x509/1077212958849731186823177","Efd"));
-		throw new NoSuccessException("TO BE REMOVED");
+	    System.out.println(creationTime.toString());
 		*/
+		
+		/*System.out.println(getInfoWSRP("https://interop.grid.niif.hu:2010/arex-x509/1077212958849731186823177","Owner",1));
+		//System.out.println(getInfoWSRP("https://interop.grid.niif.hu:2010/arex-x509/1077212958849731186823177","Efd",1));
+		*/
+		//throw new NoSuccessException("TO BE REMOVED");
     }
 
 	public void disconnect() throws NoSuccessException {
@@ -134,7 +135,7 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
 	}
 
 	private Integer getExitCode(String nativeJobId, Integer nbTries) throws NotImplementedException, NoSuccessException {
-		return Integer.parseInt(getInfo(nativeJobId, "ExitCode", nbTries));
+		return Integer.parseInt(getInfo(nativeJobId, AREX_EXITCODE, nbTries));
 	}
 	
 	public Date getCreated(String nativeJobId) throws NotImplementedException,	NoSuccessException {
@@ -142,26 +143,25 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
 	}
 
 	public Date getStarted(String nativeJobId) throws NotImplementedException,	NoSuccessException {
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz"); // TODO : use joda-time http://mvnrepository.com/artifact/joda-time/joda-time/1.6.2
-		try {
-			return df.parse(getInfo(nativeJobId, "SubmissionTime", NB_TRIES).replaceAll("Z","UTC"));
-		} catch (ParseException e) {
-			throw new NoSuccessException(e);
-		}
+		return getTime(nativeJobId, AREX_SUBMISSIONTIME);
 	}
 
 	public Date getFinished(String nativeJobId) throws NotImplementedException,	NoSuccessException {
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz");
-		try {
-			return df.parse(getInfo(nativeJobId, "EndTime", NB_TRIES).replaceAll("Z","UTC"));
-		} catch (ParseException e) {
-			throw new NoSuccessException(e);
-		}
+		return getTime(nativeJobId, AREX_ENDTIME);
 	}
 
+	private Date getTime(String nativeJobId, String whichTime) throws NotImplementedException,	NoSuccessException {
+		DateFormat df = new SimpleDateFormat(TIME_ISO8601);
+		try {
+			return df.parse(getInfo(nativeJobId, whichTime, NB_TRIES).replaceAll("Z","UTC"));
+		} catch (ParseException e) {
+			throw new NoSuccessException(e);
+		}		
+	}
+	
 	public String[] getExecutionHosts(String nativeJobId)	throws NotImplementedException, NoSuccessException {
 		return new String[]{
-				getInfo(nativeJobId, "ExecutionNode", NB_TRIES)
+				getInfo(nativeJobId, AREX_EXECUTIONNODE, NB_TRIES)
 		};
 	}
 
@@ -174,16 +174,17 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
         try {
     		int loop = 0;
     		while (loop < nbTries) {
-	            SOAPHeaderElement she = new SOAPHeaderElement("http://www.w3.org/2005/08/addressing",
+	            SOAPHeaderElement she = new SOAPHeaderElement(WSA_NS,
 	            		"Action",
 	            		"http://docs.oasis-open.org/wsrf/rpw-2/QueryResourceProperties/QueryResourcePropertiesRequest");
+	            		
 	            ((Stub)_arex_pt).clearHeaders();
 	            ((Stub)_arex_pt).setHeader(she);
 	        	
 	        	String xpathQuery = "//glue:Services/glue:ComputingService/glue:ComputingEndpoint/glue:ComputingActivities/glue:ComputingActivity/glue:IDFromEndpoint[.='" + nativeJobId + "']/../glue:" + infoName;
 	
 	        	QueryExpressionType query = new QueryExpressionType();
-	            query.setDialect(new URI("http://www.w3.org/TR/1999/REC-xpath-19991116"));
+	            query.setDialect(new URI(javax.xml.crypto.dsig.Transform.XPATH));
 	            MessageElement me = new MessageElement(new Text(xpathQuery));
 	            query.set_any(new MessageElement[]{me});
 	
