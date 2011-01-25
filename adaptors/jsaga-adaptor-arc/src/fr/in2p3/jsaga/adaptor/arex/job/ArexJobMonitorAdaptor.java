@@ -67,7 +67,8 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
         
 	protected ARex_PortType _arex_pt = null;
 	private ArexHttpsDataAdaptor _data_adaptor;
-
+	private static final Integer NB_TRIES = 10;
+	
 	public String getType() {
         return "arex";
     }
@@ -129,9 +130,13 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
     }
 
 	public Integer getExitCode(String nativeJobId)	throws NotImplementedException, NoSuccessException {
-		return Integer.parseInt(getInfo(nativeJobId, "ExitCode"));
+		return getExitCode(nativeJobId, NB_TRIES);
 	}
 
+	private Integer getExitCode(String nativeJobId, Integer nbTries) throws NotImplementedException, NoSuccessException {
+		return Integer.parseInt(getInfo(nativeJobId, "ExitCode", nbTries));
+	}
+	
 	public Date getCreated(String nativeJobId) throws NotImplementedException,	NoSuccessException {
 		throw new NotImplementedException();
 	}
@@ -139,7 +144,7 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
 	public Date getStarted(String nativeJobId) throws NotImplementedException,	NoSuccessException {
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz"); // TODO : use joda-time http://mvnrepository.com/artifact/joda-time/joda-time/1.6.2
 		try {
-			return df.parse(getInfo(nativeJobId, "SubmissionTime").replaceAll("Z","UTC"));
+			return df.parse(getInfo(nativeJobId, "SubmissionTime", NB_TRIES).replaceAll("Z","UTC"));
 		} catch (ParseException e) {
 			throw new NoSuccessException(e);
 		}
@@ -148,7 +153,7 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
 	public Date getFinished(String nativeJobId) throws NotImplementedException,	NoSuccessException {
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz");
 		try {
-			return df.parse(getInfo(nativeJobId, "EndTime").replaceAll("Z","UTC"));
+			return df.parse(getInfo(nativeJobId, "EndTime", NB_TRIES).replaceAll("Z","UTC"));
 		} catch (ParseException e) {
 			throw new NoSuccessException(e);
 		}
@@ -156,19 +161,19 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
 
 	public String[] getExecutionHosts(String nativeJobId)	throws NotImplementedException, NoSuccessException {
 		return new String[]{
-				getInfo(nativeJobId, "ExecutionNode")
+				getInfo(nativeJobId, "ExecutionNode", NB_TRIES)
 		};
 	}
 
 	// Wrapper for getInfoXML or getInfoWSRF
-	private String getInfo(String nativeJobId, String infoName) throws NotImplementedException, NoSuccessException {
-		return getInfoWSRP( nativeJobId,  infoName);
+	private String getInfo(String nativeJobId, String infoName, Integer nbTries) throws NotImplementedException, NoSuccessException {
+		return getInfoWSRP( nativeJobId,  infoName, nbTries);
 	}
 	
-	private String getInfoWSRP(String nativeJobId, String infoName) throws NotImplementedException, NoSuccessException {
+	private String getInfoWSRP(String nativeJobId, String infoName, Integer nbTries) throws NotImplementedException, NoSuccessException {
         try {
     		int loop = 0;
-    		while (loop < 10) {
+    		while (loop < nbTries) {
 	            SOAPHeaderElement she = new SOAPHeaderElement("http://www.w3.org/2005/08/addressing",
 	            		"Action",
 	            		"http://docs.oasis-open.org/wsrf/rpw-2/QueryResourceProperties/QueryResourcePropertiesRequest");
@@ -195,13 +200,16 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
 	            	return response.get_any()[0].getAsString();
 	            }
 				loop++;
-	    		Thread.sleep(5000);
+				// Do not sleep at last attempty
+	    		if (loop < nbTries) Thread.sleep(5000);
     		}
-			throw new NotImplementedException(infoName + " is not supported");
+			throw new NotImplementedException("Could not get " + infoName);
         } catch (ResourceUnknownFaultType e) {
         	throw new NotImplementedException(e);
         } catch (ResourceUnavailableFaultType e) {
         	throw new NotImplementedException(e);
+        } catch (NotImplementedException nie) {
+        	throw nie;
         } catch (Exception e) {
         	throw new NoSuccessException(e);
         }
@@ -266,8 +274,9 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
 	
 	protected JobStatus instanciateJobStatusObject(String nativeJobId, ActivityStatusType ast) throws NoSuccessException {
 		try {
-			return new ArexJobStatus(nativeJobId, ast, getExitCode(nativeJobId));
-		} catch (Exception e) {
+			Integer exCode = getExitCode(nativeJobId, 1);
+			return new ArexJobStatus(nativeJobId, ast, exCode);
+		} catch (NotImplementedException nie) {
 			return new ArexJobStatus(nativeJobId, ast);
 		}
 	}
