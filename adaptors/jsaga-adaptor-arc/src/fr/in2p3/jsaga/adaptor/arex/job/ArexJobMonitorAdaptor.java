@@ -117,6 +117,7 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
 
 		/*
 		System.out.println(getInfoWSRP("https://interop.grid.niif.hu:2010/arex-x509/1077212958849731186823177","Owner"));
+		System.out.println(getInfoWSRP("https://interop.grid.niif.hu:2010/arex-x509/1077212958849731186823177","Efd"));
 		throw new NoSuccessException("TO BE REMOVED");
 		*/
     }
@@ -171,22 +172,28 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
 	            SOAPHeaderElement she = new SOAPHeaderElement("http://www.w3.org/2005/08/addressing",
 	            		"Action",
 	            		"http://docs.oasis-open.org/wsrf/rpw-2/QueryResourceProperties/QueryResourcePropertiesRequest");
-	            // FIXME : header est duplique
+	            ((Stub)_arex_pt).clearHeaders();
 	            ((Stub)_arex_pt).setHeader(she);
 	        	
-	        	String xpathQuery = "//glue:Services/glue:ComputingService/glue:ComputingEndpoint/glue:ComputingActivities/glue:ComputingActivity/glue:IDFromEndpoint[.='" + nativeJobId + "']/..";
+	        	String xpathQuery = "//glue:Services/glue:ComputingService/glue:ComputingEndpoint/glue:ComputingActivities/glue:ComputingActivity/glue:IDFromEndpoint[.='" + nativeJobId + "']/../glue:" + infoName;
 	
 	        	QueryExpressionType query = new QueryExpressionType();
 	            query.setDialect(new URI("http://www.w3.org/TR/1999/REC-xpath-19991116"));
 	            MessageElement me = new MessageElement(new Text(xpathQuery));
-	             query.set_any(new MessageElement[]{me});
+	            query.set_any(new MessageElement[]{me});
 	
 	            QueryResourcePropertiesResponse response = _arex_pt.queryResourceProperties(query);
-				for (MessageElement grpr_elmt: response.get_any()) {
-					if (infoName.equals(grpr_elmt.getName())) {
-						return grpr_elmt.getFirstChild().getNodeValue();
-					}
-				}
+	            
+	            if (response != null) {
+	            	/* loop for ComputingActivity node
+					for (MessageElement grpr_elmt: response.get_any()) {
+						if (infoName.equals(grpr_elmt.getName())) {
+							return grpr_elmt.getFirstChild().getNodeValue();
+						}
+					}*/
+	            	/* for direct acces to infoName */
+	            	return response.get_any()[0].getAsString();
+	            }
 				loop++;
 	    		Thread.sleep(5000);
     		}
