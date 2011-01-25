@@ -88,7 +88,7 @@ public abstract class JobRunInfoTest extends AbstractJobTest {
     }
     
     /**
-     * Runs simple job and get Creation date
+     * Runs simple job and get start and end date
      */
     public void test_dates() throws Exception {
         
@@ -116,6 +116,29 @@ public abstract class JobRunInfoTest extends AbstractJobTest {
 		}
 
     }
+    
+    /**
+     * Runs simple job and get start and end date
+     */
+    public void test_execution_hosts() throws Exception {
+        
+    	Date now = new Date();
+    	
+    	// prepare
+    	JobDescription desc = createSimpleJob();
+    	
+        // submit
+        Job job = runJob(desc);
+        logger.info(job.getAttribute(Job.JOBID));   // for detecting hang in run()
+
+        // wait for the END
+        job.waitFor();
+        logger.info("Job finished.");               // for detecting hang in waitFor()
+
+        // check execution hosts
+        assertTrue(job.getVectorAttribute(Job.EXECUTIONHOSTS).length > 0);
+    }
+    
     
     private Date parse(String date) throws ParseException {
 		// Parse the CREATED attribute
