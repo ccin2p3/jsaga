@@ -98,6 +98,7 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 		} catch (ServiceException e) {
 			throw new NoSuccessException(e);
 		}
+		// TODO : uncomment to check resources
 		/*try {
 			GetFactoryAttributesDocumentResponseType r = _bes_pt.getFactoryAttributesDocument(new GetFactoryAttributesDocumentType());
 	        FactoryResourceAttributesDocumentType attr = r.getFactoryResourceAttributesDocument();
