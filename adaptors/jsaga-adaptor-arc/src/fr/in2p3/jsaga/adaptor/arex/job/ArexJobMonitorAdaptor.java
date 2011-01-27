@@ -33,6 +33,7 @@ import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.axis.message.Text;
 import org.apache.axis.types.URI;
 import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityStatusType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityStateEnumeration;
 import org.nordugrid.schemas.arex.ARex_PortType;
 import org.nordugrid.schemas.arex.ARex_ServiceLocator;
 
@@ -68,7 +69,7 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
 	private static final String TIME_ISO8601 = "yyyy-MM-dd'T'HH:mm:ssz";
 	
 	// http://www.w3.org/2005/08/addressing
-	private static final String WSA_NS = org.w3.x2005.x08.addressing.AttributedQNameType.getTypeDesc().getXmlType().getNamespaceURI();
+	protected static final String WSA_NS = org.w3.x2005.x08.addressing.AttributedQNameType.getTypeDesc().getXmlType().getNamespaceURI();
 	
 	public String getType() {
         return "arex";
@@ -275,8 +276,11 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
 	
 	protected JobStatus instanciateJobStatusObject(String nativeJobId, ActivityStatusType ast) throws NoSuccessException {
 		try {
-			Integer exCode = getExitCode(nativeJobId, 1);
-			return new ArexJobStatus(nativeJobId, ast, exCode);
+			if (ast.getState().equals(ActivityStateEnumeration.Finished) || ast.getState().equals(ActivityStateEnumeration.Failed)) {
+				return new ArexJobStatus(nativeJobId, ast, getExitCode(nativeJobId, 1));
+			} else {
+				throw new NotImplementedException();
+			}
 		} catch (NotImplementedException nie) {
 			return new ArexJobStatus(nativeJobId, ast);
 		}
