@@ -92,6 +92,9 @@
                         <xsl:for-each select="Environment/value/text()">
                             <posix:Environment name="{substring-before(.,'=')}"><xsl:value-of select="substring-after(.,'=')"/></posix:Environment>
                         </xsl:for-each>
+                        <xsl:for-each select="WallTimeLimit/@value">
+                            <posix:WallTimeLimit><xsl:value-of select="."/></posix:WallTimeLimit>
+                        </xsl:for-each>
                     </posix:POSIXApplication>
                     <xsl:if test="NumberOfProcesses | ProcessesPerHost | ThreadsPerProcess | SPMDVariation">
                         <spmd:SPMDApplication>
@@ -148,11 +151,6 @@
                         <jsdl:TotalPhysicalMemory>
                             <jsdl:UpperBoundedRange exclusiveBound="false"><xsl:value-of select="."/></jsdl:UpperBoundedRange>
                         </jsdl:TotalPhysicalMemory>
-                    </xsl:for-each>
-                    <xsl:for-each select="WallTimeLimit/@value">
-                        <WallTimeLimit>
-                            <jsdl:UpperBoundedRange exclusiveBound="false"><xsl:value-of select="."/></jsdl:UpperBoundedRange>
-                        </WallTimeLimit>
                     </xsl:for-each>
                 </jsdl:Resources>
                 <xsl:for-each select="FileTransfer/value/text()">
