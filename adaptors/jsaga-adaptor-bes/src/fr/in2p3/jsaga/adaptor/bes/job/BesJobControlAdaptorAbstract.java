@@ -164,13 +164,6 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
      */
     protected void checkResources(Resources_Type required_resources) throws BadResource {
 		if (required_resources == null) return;
-		// Check if TotalCPU Time required is too large > 5 days
-		// TODO how to get a variable duration ?
-		if (required_resources.getTotalCPUTime() != null 
-				&& required_resources.getTotalCPUTime().getUpperBoundedRange() != null 
-				&& required_resources.getTotalCPUTime().getUpperBoundedRange().get_value() > 60*60*24*5) {
-			throw new BadResource("Total CPU Time is too large");
-		}
 		// checkMatch, check resources asked (jsdl_type.getJobDescription().getResources()) VS resources available
 		if ( _br != null) {
 			if (required_resources.getCPUArchitecture() != null 
@@ -179,7 +172,17 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
 				throw new BadResource("CPU Architecture not matching");
 			}
 		}
-		// TODO: check resources
+		// TODO: check following resources described in _br
+		/*
+		 * java.lang.String resourceName,
+           org.ggf.schemas.jsdl.x2005.x11.jsdl.OperatingSystem_Type operatingSystem,
+           org.ggf.schemas.jsdl.x2005.x11.jsdl.CPUArchitecture_Type CPUArchitecture,
+           java.lang.Double CPUCount,
+           java.lang.Double CPUSpeed,
+           java.lang.Double physicalMemory,
+           java.lang.Double virtualMemory,
+ 
+		 */
     }
     
     /**
