@@ -96,7 +96,7 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract
 	        jobToSubmit.addField("SOURCE", scriptFilename);
 	        
 	        // get env
-	        if(jobJsdl.getPOSIXApplication().getEnvironmentArray() != null) {
+	        if(jobJsdl.getPOSIXApplication() != null && jobJsdl.getPOSIXApplication().getEnvironmentArray() != null) {
 	        	EnvironmentType[] env = jobJsdl.getPOSIXApplication().getEnvironmentArray();
 	        	for (int i = 0; i < env.length; i++) {
 					jobToSubmit.addField(env[i].getName(), env[i].getStringValue());			        
@@ -108,7 +108,8 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract
     		Calendar terminationTime = Calendar.getInstance();
     		
 	        // verify prerequisite if specified
-	        if(jobJsdl.getValue().getJobDescription().getResources() != null  && 
+	        if(jobJsdl.getValue().getJobDescription() != null &&
+	        		jobJsdl.getValue().getJobDescription().getResources() != null  && 
 	        		(jobJsdl.getValue().getJobDescription().getResources().getCPUArchitecture() != null ||
 	        		jobJsdl.getValue().getJobDescription().getResources().getTotalPhysicalMemory() != null || 
 	        		jobJsdl.getValue().getJobDescription().getResources().getTotalCPUTime() != null || 
@@ -360,21 +361,23 @@ public class U6JobControlAdaptor extends U6JobAdaptorAbstract
 	
 	    	// create input script file
 			String commandLine = "JOBDIR=$PWD; ";
-			// add working directory if specified
-			if(jobJsdl.getPOSIXApplication().getWorkingDirectory() != null && 
-					jobJsdl.getPOSIXApplication().getWorkingDirectory().getStringValue() != null && 
-					!jobJsdl.getPOSIXApplication().getWorkingDirectory().getStringValue().equals("") ) {
-					commandLine = "if [[ !( -d " + jobJsdl.getPOSIXApplication().getWorkingDirectory().getStringValue()+") ]] ;" +
-							" then exit 1; fi;" +
-							" cd "+jobJsdl.getPOSIXApplication().getWorkingDirectory().getStringValue()+";";    			
-			}
-			// add executable
-			commandLine += jobJsdl.getPOSIXApplication().getExecutable().getStringValue(); 
-			// add arguments
-			if(jobJsdl.getPOSIXApplication().getArgumentArray() != null) {
-				ArgumentType[] args = jobJsdl.getPOSIXApplication().getArgumentArray();
-	    		for (int i = 0; i < args.length; i++) {
-	    			commandLine += " " + args[i].getStringValue();
+			if (jobJsdl.getPOSIXApplication() != null) {
+				// add working directory if specified
+				if(jobJsdl.getPOSIXApplication().getWorkingDirectory() != null && 
+						jobJsdl.getPOSIXApplication().getWorkingDirectory().getStringValue() != null && 
+						!jobJsdl.getPOSIXApplication().getWorkingDirectory().getStringValue().equals("") ) {
+						commandLine = "if [[ !( -d " + jobJsdl.getPOSIXApplication().getWorkingDirectory().getStringValue()+") ]] ;" +
+								" then exit 1; fi;" +
+								" cd "+jobJsdl.getPOSIXApplication().getWorkingDirectory().getStringValue()+";";    			
+				}
+				// add executable
+				commandLine += jobJsdl.getPOSIXApplication().getExecutable().getStringValue(); 
+				// add arguments
+				if(jobJsdl.getPOSIXApplication().getArgumentArray() != null) {
+					ArgumentType[] args = jobJsdl.getPOSIXApplication().getArgumentArray();
+		    		for (int i = 0; i < args.length; i++) {
+		    			commandLine += " " + args[i].getStringValue();
+					}
 				}
 			}
 			if(stdinScript != null)
