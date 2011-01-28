@@ -22,7 +22,7 @@
 	<!-- Create jsaga:Source and jsaga:Target to be able to construct transfers URI for pre and post datastaging -->
 	<xsl:template match="jsdl:DataStaging">
 	  <xsl:copy>
-	    <xsl:apply-templates select="@* | *"/>
+	    <xsl:apply-templates select="@* | node()"/>
         <xsl:choose>
           <xsl:when test="jsdl:Source">
      			<jsaga:Source>
@@ -69,9 +69,9 @@
 	<!-- A-REX does not use JobAnnotation which contains queue name -->
 	<xsl:template match="jsdl:JobAnnotation"></xsl:template>
 
-	<xsl:template match="/ | @* | *">
+	<xsl:template match="/ | @* | node()">
 	  <xsl:copy>
-	    <xsl:apply-templates select="@* | *"/>
+	    <xsl:apply-templates select="@* | node()"/>
 	  </xsl:copy>
 	</xsl:template>
 
