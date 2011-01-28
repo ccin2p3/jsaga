@@ -1,6 +1,7 @@
  package fr.in2p3.jsaga.adaptor.arex.job;
 
 import fr.in2p3.jsaga.adaptor.bes.job.BesJobControlAdaptorAbstract;
+import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
@@ -22,15 +23,29 @@ import org.nordugrid.schemas.arex.ChangeActivityStatusResponseType;
 import org.nordugrid.schemas.arex.ActivitySubStateType;
 */
 
+import org.apache.axis.client.Stub;
+import org.apache.axis.message.MessageElement;
+import org.apache.axis.message.SOAPHeaderElement;
+import org.apache.axis.message.Text;
 import org.ggf.schemas.jsdl.x2005.x11.jsdl.DataStaging_Type;
 import org.ggf.schemas.jsdl.x2005.x11.jsdl.JobDefinition_Type;
+import org.ggf.schemas.jsdl.x2005.x11.jsdl.Resources_Type;
 import org.nordugrid.schemas.arex.ARex_PortType;
 import org.nordugrid.schemas.arex.ARex_ServiceLocator;
 
+import org.oasis_open.docs.wsrf.r_2.ResourceUnavailableFaultType;
+import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
+import org.oasis_open.docs.wsrf.rp_2.InvalidQueryExpressionFaultType;
+import org.oasis_open.docs.wsrf.rp_2.InvalidResourcePropertyQNameFaultType;
+import org.oasis_open.docs.wsrf.rp_2.QueryEvaluationErrorFaultType;
+import org.oasis_open.docs.wsrf.rp_2.QueryExpressionType;
+import org.oasis_open.docs.wsrf.rp_2.QueryResourcePropertiesResponse;
+import org.oasis_open.docs.wsrf.rp_2.UnknownQueryExpressionDialectFaultType;
 import org.ogf.saga.error.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.rmi.RemoteException;
 import java.util.*;
 
 import javax.xml.rpc.ServiceException;
@@ -49,6 +64,10 @@ public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract implemen
 	public static final String AREX_NAMESPACE_URI = "http://www.nordugrid.org/schemas/a-rex";
 	
 	protected ARex_PortType _arex_pt = null;
+	//protected QueryResourcePropertiesResponse _arex_resources = null;
+	
+	// TODO : use array of hashtables
+	protected Hashtable _arex_resources = new Hashtable();
 	
     public String getType() {
         return "arex";
@@ -82,6 +101,55 @@ public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract implemen
 		} catch (ServiceException e) {
 			throw new NoSuccessException(e);
 		}
+		
+        try {
+            SOAPHeaderElement she = new SOAPHeaderElement(ArexJobMonitorAdaptor.WSA_NS,
+            		"Action",
+            		"http://docs.oasis-open.org/wsrf/rpw-2/QueryResourceProperties/QueryResourcePropertiesRequest");
+            		
+            ((Stub)_arex_pt).clearHeaders();
+            ((Stub)_arex_pt).setHeader(she);
+
+            String computingShareRoot = "//glue:Services/glue:ComputingService/glue:ComputingShares/glue:ComputingShare/";
+            // solution 1: some specific nodes
+            //String xpathQuery = computingShareRoot + "glue:MaxVirtualMemory";
+        	//xpathQuery += " | " + computingShareRoot + "glue:MaxWallTime";
+        	
+        	// solution 2: all nodes except Associations
+        	//String xpathQuery = "//glue:Services/glue:ComputingService/glue:ComputingShares/glue:ComputingShare/*[not(self::glue:Associations)]";
+        	
+            // Solutions 1 and 2 do not work. XPATH is Ok but any[] has 1 element only
+        	/*QueryExpressionType query = new QueryExpressionType();
+            query.setDialect(new org.apache.axis.types.URI(javax.xml.crypto.dsig.Transform.XPATH));
+            MessageElement me = new MessageElement(new Text(xpathQuery));
+            query.set_any(new MessageElement[]{me});
+
+			_arex_resources = _arex_pt.queryResourceProperties(query);
+						
+			for (MessageElement computingParam: _arex_resources.get_any()) {
+				System.out.println(computingParam.getAsString());
+			}
+			*/
+        	String computingParams[] = new String[]{"MaxVirtualMemory","MaxWallTime"};
+        	for (String p: computingParams) {
+                ((Stub)_arex_pt).clearHeaders();
+                ((Stub)_arex_pt).setHeader(she);
+                String xpathQuery = computingShareRoot + "glue:" + p;
+            	QueryExpressionType query = new QueryExpressionType();
+                query.setDialect(new org.apache.axis.types.URI(javax.xml.crypto.dsig.Transform.XPATH));
+                MessageElement me = new MessageElement(new Text(xpathQuery));
+                query.set_any(new MessageElement[]{me});
+
+                QueryResourcePropertiesResponse resp = _arex_pt.queryResourceProperties(query);
+        		if (resp != null) {
+        			_arex_resources.put(p, resp.get_any()[0].getAsString());
+        		}
+        	}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		//throw new NoSuccessException("TEST");
+        
     }
 
 	public void disconnect() throws NoSuccessException {
@@ -188,6 +256,26 @@ public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract implemen
     }
 	
 	
+    /**
+     * Check required resources against available resources
+     * 
+     * @param required_resources
+     * @throws BadResource if available resources do not match with required resources
+     */
+    protected void checkResources(Resources_Type required_resources) throws BadResource {
+		if (required_resources == null) return;
+		if (_arex_resources.size() == 0) return;
+		// checkMatch, check resources asked (jsdl_type.getJobDescription().getResources()) VS resources available in A-REX
+		if (required_resources.getTotalVirtualMemory() != null &&
+				required_resources.getTotalVirtualMemory().getUpperBoundedRange() != null &&
+				_arex_resources.containsKey("MaxVirtualMemory") &&
+				required_resources.getTotalVirtualMemory().getUpperBoundedRange().get_value() > (Integer)_arex_resources.get("MaxVirtualMemory")) {
+			throw new BadResource("Too much virtual memory required");
+		}
+		// Call generic BES check
+		super.checkResources(required_resources);
+    }
+    
 	
 	
 	
