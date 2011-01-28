@@ -22,7 +22,7 @@
 	<!-- Create jsaga:Source and jsaga:Target to be able to construct transfers URI for pre and post datastaging -->
 	<xsl:template match="jsdl:DataStaging">
 	  <xsl:copy>
-	    <xsl:apply-templates select="@* | node()"/>
+	    <xsl:apply-templates select="@* | *"/>
         <xsl:choose>
           <xsl:when test="jsdl:Source">
      			<jsaga:Source>
@@ -38,33 +38,40 @@
 	  </xsl:copy>
 	</xsl:template>
 
+    <xsl:template match="jsdl:JobDescription">
+	  <xsl:copy>
+	    <!--  copy JobIdentification and Application -->
+	    <xsl:apply-templates select="@* | jsdl:JobIdentification"/>
+	    <xsl:apply-templates select="@* | jsdl:Application"/>
+	    <!-- create Resources to add A-REX extensions -->
+		<jsdl:Resources>
+		    <xsl:copy-of select="jsdl:Resources/*"/>
+			<!-- If JobAnnotation, the queue name is sent to A-REX via JSDL ARC extension -->
+		    <xsl:if test="jsdl:JobIdentification/jsdl:JobAnnotation">
+		      <jsdl-arc:CandidateTarget>
+		        <jsdl-arc:QueueName><xsl:value-of select="jsdl:JobIdentification/jsdl:JobAnnotation/text()"/></jsdl-arc:QueueName>
+		      </jsdl-arc:CandidateTarget>
+		    </xsl:if>
+			<!-- If posix:WallTimeLimit, build <TotalWallTime> for A-REX -->
+		    <xsl:if test="jsdl:Application/posix:POSIXApplication/posix:WallTimeLimit">
+		      <jsdl:TotalWallTime>
+		        <jsdl:Value>
+		          <jsdl:Max><xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:WallTimeLimit/text()"/></jsdl:Max>
+		        </jsdl:Value>
+		      </jsdl:TotalWallTime>
+		    </xsl:if>
+		</jsdl:Resources>
+		<!-- copy remaining nodes: DataStaging and extensions -->
+	    <xsl:apply-templates select="@* | *[local-name()!='JobIdentification' and local-name()!='Application' and local-name()!='Resources']"/>
+	  </xsl:copy>
+    </xsl:template>
+
 	<!-- A-REX does not use JobAnnotation which contains queue name -->
 	<xsl:template match="jsdl:JobAnnotation"></xsl:template>
 
-	<!-- FIXME: if Resources does not exist -->
-	<xsl:template match="jsdl:Resources">
+	<xsl:template match="/ | @* | *">
 	  <xsl:copy>
-	    <xsl:apply-templates select="@* | node()"/>
-		<!-- If JobAnnotation, the queue name is sent to A-REX via JSDL ARC extension -->
-	    <xsl:if test="../jsdl:JobIdentification/jsdl:JobAnnotation">
-	      <jsdl-arc:CandidateTarget>
-	        <jsdl-arc:QueueName><xsl:value-of select="../jsdl:JobIdentification/jsdl:JobAnnotation/text()"/></jsdl-arc:QueueName>
-	      </jsdl-arc:CandidateTarget>
-	    </xsl:if>
-		<!-- If posix:WallTimeLimit, build <TotalWallTime> for A-REX -->
-	    <xsl:if test="../jsdl:Application/posix:POSIXApplication/posix:WallTimeLimit">
-	      <jsdl:TotalWallTime>
-	        <jsdl:Value>
-	          <jsdl:Max><xsl:value-of select="../jsdl:Application/posix:POSIXApplication/posix:WallTimeLimit/text()"/></jsdl:Max>
-	        </jsdl:Value>
-	      </jsdl:TotalWallTime>
-	    </xsl:if>
-	  </xsl:copy>
-	</xsl:template>
-    
-	<xsl:template match="/ | @* | node()">
-	  <xsl:copy>
-	    <xsl:apply-templates select="@* | node()"/>
+	    <xsl:apply-templates select="@* | *"/>
 	  </xsl:copy>
 	</xsl:template>
 
