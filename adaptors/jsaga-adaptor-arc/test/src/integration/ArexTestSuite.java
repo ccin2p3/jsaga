@@ -92,14 +92,33 @@ public class ArexTestSuite extends JSAGATestSuite {
             }
     	        
         }
-        /**
-         * Runs simple job, requests 4096 Mo of memory and expects FAILED status
-         */
+
         public void test_run_memoryRequirement() throws Exception {
+        	super.ignore("TotalPhysicalMemory is ignored"); if (true) return;
             
         	// prepare a job witch requires 8GB of RAM and expect FAILED status
         	Attribute[] attributes = new Attribute[1];
         	attributes[0] = new Attribute(JobDescription.TOTALPHYSICALMEMORY, "8192");
+        	JobDescription desc =  createJob(SIMPLE_JOB_BINARY, attributes, null);
+        	
+        	// submit
+            Job job = runJob(desc);
+            
+            // wait for the end
+            job.waitFor();  
+            
+            // check job status
+            assertEquals(
+                    State.FAILED,
+                    job.getState());       
+        }
+            
+        public void test_run_archi() throws Exception {
+        	super.ignore("CPUArchitecture is ignored"); if (true) return;
+            
+        	// prepare a job witch requires 'sparc' as CPU and expect FAILED status
+        	Attribute[] attributes = new Attribute[1];
+        	attributes[0] = new Attribute(JobDescription.CPUARCHITECTURE, "sparc");
         	JobDescription desc =  createJob(SIMPLE_JOB_BINARY, attributes, null);
         	
         	// submit
