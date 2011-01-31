@@ -10,7 +10,7 @@
   <groupId>fr.in2p3.jsaga.adaptor</groupId>
   <artifactId>jsaga-adaptor-arc</artifactId>
   <name>jsaga-adaptor-arc</name>
-  <description>This module provides support for ARC service</description>
+  <description>This module provides support for A-REX service provided by ARC middleware</description>
 	<developers>
         <developer>
             <name>Lionel Schwarz</name>
