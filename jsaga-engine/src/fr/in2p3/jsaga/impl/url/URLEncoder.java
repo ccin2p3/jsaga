@@ -86,9 +86,10 @@ public class URLEncoder {
         StringBuffer buffer = new StringBuffer();
         if (url.getScheme() != null) {
             buffer.append(url.getScheme());
-            buffer.append("://");
+            buffer.append(":");
         }
         if (url.getHost() != null) {
+            if (url.getScheme() != null) buffer.append("//");
             if (url.getUserInfo() != null) {
                 buffer.append(url.getUserInfo());
                 buffer.append('@');
