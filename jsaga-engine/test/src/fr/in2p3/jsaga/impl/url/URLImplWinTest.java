@@ -20,11 +20,14 @@ public class URLImplWinTest extends URLImplFileTest {
     
     protected void init() {
     	super.init();
-    	 _abs_path = "/c:/path";
-    	 _rel_path = "path";
+    	 _abs_path = "/c:/path/";
     	 _path_with_space = "/c:/path with space";
-    	 _dir = "/c:/dir/";
-    	 _non_normalized_path_base = "/c:/dir1/.././";
-     }
+    }
 
+    public void test_antislash()  throws Exception {
+    	
+        URL url = URLFactory.createURL("c:\\path");
+        // backslash should be changed in slash
+        assertEquals("c:/path", url.getString());
+    }
 }
