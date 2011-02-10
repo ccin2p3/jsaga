@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.impl.url;
 import junit.framework.TestCase;
 
 import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
@@ -24,12 +25,13 @@ public class URLImplTest extends TestCase {
 	protected String _host;
 	protected String _port;
 	protected String _abs_path;
+	protected String _file;
 	protected String _rel_path;
 	protected String _path_with_space;
-	protected String _dir;
+	//protected String _dir;
 	protected String _query;
 	protected String _fragment;
-	protected String _non_normalized_path_base;
+	protected String _non_normalized_path;
 	protected String _url_simple;
 	protected String _url_relative;
 	protected String _url_directory;
@@ -39,11 +41,11 @@ public class URLImplTest extends TestCase {
     public URLImplTest() {
     	super();
     	init();
-    	_url_simple = _uri+_user+_host+_port+_abs_path+_query+_fragment; 	//"uri://userinfo@host.domain:1234/path?query=value#fragment"
-    	_url_relative = _rel_path+_query+_fragment; 						//"path?query=value#fragment"
-    	_url_directory = _uri+_user+_host+_port+_dir; 						//"uri://userinfo@host.domain:1234/dir/"
+    	_url_simple = _uri+_user+_host+_port+_abs_path+_file+_query+_fragment; 	//"uri://userinfo@host.domain:1234/path?query=value#fragment"
+    	_url_relative = _rel_path+_file+_query+_fragment; 						//"path?query=value#fragment"
+    	_url_directory = _uri+_user+_host+_port+_abs_path; 						//"uri://userinfo@host.domain:1234/dir/"
     	_url_space = _uri+_host+_port+_path_with_space; 					//"uri://host.domain:1234/path with spaces"
-    	_url_non_normalized = _uri+_user+_host+_port+_non_normalized_path_base+_rel_path+_query+_fragment;
+    	_url_non_normalized = _uri+_user+_host+_port+_abs_path+_non_normalized_path+_file+_query+_fragment;
     																		//"uri://host.domain:1234/dir1/.././path"
     }
     
@@ -52,22 +54,23 @@ public class URLImplTest extends TestCase {
     	 _user = "userinfo@";
     	 _host = "host.domain";
     	 _port = ":1234";
-    	 _abs_path = "/path";
-    	 _rel_path = "path";
+    	 _file = "file";
+    	 _abs_path = "/path/";
+    	 _rel_path = "relpath/";
     	 _path_with_space = "/path with spaces";
-    	 _dir = "/dir/";
+    	 //_dir = "/dir/";
     	 _query = "?query=value";
     	 _fragment = "#fragment";
-    	 _non_normalized_path_base = "/dir1/.././";
+    	 _non_normalized_path = "/dummy/.././";
     }
 
     public void test_remove() throws Exception {
         URL url;
 
-        /*java.net.URI u = new java.net.URI("file:///");
-        System.out.println(u.toString());
-        java.net.URI u2 = new java.net.URI("file", null, null, null, null);
-        System.out.println(u2.toString());*/
+        /*java.net.URI u2 = new java.net.URI("#fragment");
+        System.out.println(u2.toString());
+        System.out.println(u2.toASCIIString());*/
+        
         
         url = URLFactory.createURL(_url_simple);
         url.setString();
@@ -75,11 +78,11 @@ public class URLImplTest extends TestCase {
 
         url = URLFactory.createURL(_url_simple);
         url.setScheme();
-        assertEquals(_user+_host+_port+_abs_path+_query+_fragment, url.getString());
+        assertEquals(_user+_host+_port+_abs_path+_file+_query+_fragment, url.getString());
 
         url = URLFactory.createURL(_url_simple);
         url.setUserInfo();
-        assertEquals(_uri+_host+_port+_abs_path+_query+_fragment, url.getString());
+        assertEquals(_uri+_host+_port+_abs_path+_file+_query+_fragment, url.getString());
 
         url = URLFactory.createURL(_url_simple);
         url.setUserInfo();
@@ -87,14 +90,14 @@ public class URLImplTest extends TestCase {
         url.setHost();
         // set null authority; the // is automatically removed by URI
         if (_uri.endsWith("//")) {
-        	assertEquals(_uri.replaceAll("//","")+_abs_path+_query+_fragment, url.getString());
+        	assertEquals(_uri.replaceAll("//","")+_abs_path+_file+_query+_fragment, url.getString());
         } else {
-        	assertEquals(_uri+_abs_path+_query+_fragment, url.getString());
+        	assertEquals(_uri+_abs_path+_file+_query+_fragment, url.getString());
         }
 
         url = URLFactory.createURL(_url_simple);
         url.setPort();
-        assertEquals(_uri+_user+_host+_abs_path+_query+_fragment, url.getString());
+        assertEquals(_uri+_user+_host+_abs_path+_file+_query+_fragment, url.getString());
 
         // set Path to null, impossible if host is null
         url = URLFactory.createURL(_url_simple);
@@ -107,11 +110,11 @@ public class URLImplTest extends TestCase {
 
         url = URLFactory.createURL(_url_simple);
         url.setQuery();
-        assertEquals(_uri+_user+_host+_port+_abs_path+_fragment, url.getString());
+        assertEquals(_uri+_user+_host+_port+_abs_path+_file+_fragment, url.getString());
 
         url = URLFactory.createURL(_url_simple);
         url.setFragment();
-        assertEquals(_uri+_user+_host+_port+_abs_path+_query, url.getString());
+        assertEquals(_uri+_user+_host+_port+_abs_path+_file+_query, url.getString());
     }
 
     public void test_replace() throws Exception {
@@ -129,16 +132,16 @@ public class URLImplTest extends TestCase {
         url.setScheme("NEW");
         // If host is null, the // is not printed
         if (_host != "") {
-        	assertEquals("NEW://" + _user+_host+_port+_abs_path+_query+_fragment, url.getString());
+        	assertEquals("NEW://" + _user+_host+_port+_abs_path+_file+_query+_fragment, url.getString());
         } else {
-        	assertEquals("NEW:" + _user+_host+_port+_abs_path+_query+_fragment, url.getString());
+        	assertEquals("NEW:" + _user+_host+_port+_abs_path+_file+_query+_fragment, url.getString());
         }
         
         url = URLFactory.createURL(_url_simple);
         url.setUserInfo("NEW");
         // If host was null, changing user does not change anything
         if (_host != "") {
-	        assertEquals(_uri+"NEW@"+_host+_port+_abs_path+_query+_fragment, url.getString());
+	        assertEquals(_uri+"NEW@"+_host+_port+_abs_path+_file+_query+_fragment, url.getString());
         } else {
         	assertEquals(_url_simple, url.getString());
         }
@@ -147,16 +150,16 @@ public class URLImplTest extends TestCase {
         url.setHost("NEW");
         // If host was null, // is added by URI
         if (_host == "") {
-        	assertEquals(_uri+"//"+_user+"NEW"+_port+_abs_path+_query+_fragment, url.getString());
+        	assertEquals(_uri+"//"+_user+"NEW"+_port+_abs_path+_file+_query+_fragment, url.getString());
         } else {
-        	assertEquals(_uri+_user+"NEW"+_port+_abs_path+_query+_fragment, url.getString());
+        	assertEquals(_uri+_user+"NEW"+_port+_abs_path+_file+_query+_fragment, url.getString());
         }
         
         url = URLFactory.createURL(_url_simple);
         url.setPort(5678);
         // If host was null, chaning port does not change anything
         if (_host != "") {
-        	assertEquals(_uri+_user+_host+":5678"+_abs_path+_query+_fragment, url.getString());
+        	assertEquals(_uri+_user+_host+":5678"+_abs_path+_file+_query+_fragment, url.getString());
         } else {
         	assertEquals(_url_simple, url.getString());
         }
@@ -167,11 +170,11 @@ public class URLImplTest extends TestCase {
 
         url = URLFactory.createURL(_url_simple);
         url.setQuery("NEW=new");
-        assertEquals(_uri+_user+_host+_port+_abs_path+"?NEW=new"+_fragment, url.getString());
+        assertEquals(_uri+_user+_host+_port+_abs_path+_file+"?NEW=new"+_fragment, url.getString());
 
         url = URLFactory.createURL(_url_simple);
         url.setFragment("NEW");
-        assertEquals(_uri+_user+_host+_port+_abs_path+_query+"#NEW", url.getString());
+        assertEquals(_uri+_user+_host+_port+_abs_path+_file+_query+"#NEW", url.getString());
     }
 
     public void test_getString() throws Exception {
@@ -189,9 +192,9 @@ public class URLImplTest extends TestCase {
     	URL translated = url.translate("NEW");
         // If host is null, the // is not printed
         if (_host != "") {
-        	assertEquals("NEW://" + _user+_host+_port+_abs_path+_query+_fragment, translated.getString());
+        	assertEquals("NEW://" + _user+_host+_port+_abs_path+_file+_query+_fragment, translated.getString());
         } else {
-        	assertEquals("NEW:" + _user+_host+_port+_abs_path+_query+_fragment, translated.getString());
+        	assertEquals("NEW:" + _user+_host+_port+_abs_path+_file+_query+_fragment, translated.getString());
         }
     }
     
@@ -206,21 +209,51 @@ public class URLImplTest extends TestCase {
     	URL url = URLFactory.createURL(_url_non_normalized);
     	URL normalized = url.normalize();
     	assertEquals(_url_simple, normalized.getString());
+    	
+    	url = URLFactory.createURL(_url_relative);
+    	normalized = url.normalize();
+    	assertEquals(_url_relative, normalized.getString());
     }
     
     public void test_resolve() throws Exception {
+    	URL url;
+    	URL resolved;
+    	
+    	// resolve ABS against ABS
     	//"uri://userinfo@host:1234/path?query=value#fragment";
-    	URL url = URLFactory.createURL(_url_simple);
+    	url = URLFactory.createURL(_url_simple);
     	String newAP = "NEW://NEWuser@NEWhost:9999";
-    	URL resolved = url.resolve(URLFactory.createURL(newAP));
+    	resolved = url.resolve(URLFactory.createURL(newAP));
     	assertEquals(newAP, resolved.getString());
     	
-    	String newFragment = "#NEWfragment";
-    	resolved = url.resolve(URLFactory.createURL(newFragment));
-    	assertEquals(_uri+_user+_host+_port+_abs_path+_query+newFragment, resolved.getString());
-    	
-    	url = URLFactory.createURL(_url_directory);
+    	// resolve REL with path against ABS
+    	url = URLFactory.createURL(_url_simple);
     	resolved = url.resolve(URLFactory.createURL(_url_relative));
-    	assertEquals(_url_directory + _url_relative, resolved.getString());
+    	assertEquals(_uri+_user+_host+_port+_abs_path+_url_relative, resolved.getString());
+    	
+    	// resolve REL without path and with fragment against ABS
+    	url = URLFactory.createURL(_url_simple);
+    	String newFragment = "NEWfragment";
+    	URL newURL = URLFactory.createURL("");
+    	newURL.setFragment(newFragment);
+    	resolved = url.resolve(newURL);
+    	assertEquals(_uri+_user+_host+_port+_abs_path+_file+_query+"#"+newFragment, resolved.getString());
+    	
+    	// resolve REL against REL
+    	/* Not supported yet
+    	url = URLFactory.createURL(_rel_path+_file);
+    	resolved = url.resolve(newURL);
+    	assertEquals(_rel_path+_file+"#"+newFragment,resolved.getString());
+    	*/
+    	
+    	// resolve ABS against REL: impossible
+    	url = URLFactory.createURL(_url_relative);
+    	try {
+    		resolved = url.resolve(URLFactory.createURL(_url_simple));
+    		fail("NoSuccessException was expected");
+    	} catch (NoSuccessException nse) {
+    	} catch (Exception e) {
+    		fail("NoSuccessException was expected");
+    	}
     }
 }
