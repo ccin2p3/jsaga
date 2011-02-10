@@ -111,7 +111,8 @@ public class RelativeURLImpl extends AbstractSagaObjectImpl implements URL {
 	public void setPath(String path) throws BadParameterException {
 		if (path != null) {
 			// convert '\' to '/'
-			path = path.replace('\\', '/');
+			if (System.getProperty("file.separator") != "/")
+				path = path.replace(System.getProperty("file.separator"), "/");
 			if (Pattern.matches("^[^/]{2,}\\:.*", path)) {
 				throw new BadParameterException("path must be relative");
 			}
