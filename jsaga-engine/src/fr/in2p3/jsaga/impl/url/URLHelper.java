@@ -54,22 +54,32 @@ public class URLHelper {
 
     public static URL createURL(URL base, URL relativePath) throws NotImplementedException, BadParameterException, NoSuccessException {
         // check URL
+    	// TODO: clean this
         boolean isDir = base.getPath().endsWith("/");
         boolean isAbsolute = relativePath.getPath().startsWith("/");
         if (!isDir && !isAbsolute) {
             throw new BadParameterException("INTERNAL ERROR: path must be relative to a directory: "+base);
         }
         // resolve
+        /*
         URLImpl url = new URLImpl(base, relativePath);
         if ( ((URLImpl)relativePath).hasCache() ) {
             FileAttributes cache = ((URLImpl)relativePath).getCache();
             url.setCache(cache);
+        }
+        */
+        AbsoluteURLImpl url = (AbsoluteURLImpl) base.resolve(relativePath);
+        if ( ((RelativeURLImpl)relativePath).hasCache() ) {
+            FileAttributes cache = ((RelativeURLImpl)relativePath).getCache();
+            // TODO: implement cache in absoluteURL
+            //url.setCache(cache);
         }
         return url;
     }
 
     public static URL createURL(URL base, String name) throws NotImplementedException, BadParameterException, NoSuccessException {
         // check URL
+    	/*
         boolean isDir = base.getPath().endsWith("/");
         boolean isAbsolute = name.startsWith("/");
         if (!isDir && !isAbsolute) {
@@ -77,13 +87,15 @@ public class URLHelper {
         }
         // resolve
         return new URLImpl(base, name);
+        */
+    	return createURL(base, new RelativeURLImpl(name));
     }
 
     public static URL getParentURL(URL base) throws NotImplementedException, BadParameterException, NoSuccessException {
         // get parent directory
         String parent = (base.getPath().endsWith("/") ? ".." : ".");
         // resolve
-        return new URLImpl(base, parent);
+        return base.resolve(new RelativeURLImpl(parent));
     }
 
     public static String getName(URL url) throws NotImplementedException {
