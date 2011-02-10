@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.impl.url;
 
-import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.BadParameterException;
@@ -234,20 +233,17 @@ public class AbsoluteURLImpl extends AbstractSagaObjectImpl implements URL {
         if (path == null) {
             path = "";
         }
+		// convert '\' to '/'
+		if (System.getProperty("file.separator") != "/")
+			path = path.replace(System.getProperty("file.separator"), "/");
         try {
-            if (path.startsWith("./")) {
-                //sreynaud: set relative path
-                u = new URI(u.getScheme(), u.getAuthority(),
-                        path.substring(2), u.getQuery(), u.getFragment());
-            } else {
-                //sreynaud: fix absolute path
-                int i;for(i=0; i<path.length() && path.charAt(i)=='/'; i++);
-                if(i>1)path="/"+path.substring(i);
-                if (path == "" && u.getRawAuthority() == null) 
-                	throw new BadParameterException("Path cannot by empty if authority is empty");
-                u = new URI(u.getScheme(), u.getUserInfo(), u.getHost(),
-                        u.getPort(), path, u.getQuery(), u.getFragment());
-            }
+        	// TODO: check why 2 following lines
+            int i;for(i=0; i<path.length() && path.charAt(i)=='/'; i++);
+            if(i>1)path="/"+path.substring(i);
+            if (path == "" && u.getRawAuthority() == null) 
+            	throw new BadParameterException("Path cannot by empty if authority is empty");
+            u = new URI(u.getScheme(), u.getUserInfo(), u.getHost(),
+                    u.getPort(), path, u.getQuery(), u.getFragment());
         } catch(URISyntaxException e) {
             throw new BadParameterException("syntax error in path", e);
         }
