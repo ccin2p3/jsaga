@@ -59,6 +59,7 @@ public class RelativeURLImpl extends AbstractSagaObjectImpl implements URL {
     }
 
 	public void setString(String url) throws BadParameterException {
+		// url is considered as path only (even if contains ? and #)
 		this.setPath(url);
 		url_query = url_fragment = null;
 	}
