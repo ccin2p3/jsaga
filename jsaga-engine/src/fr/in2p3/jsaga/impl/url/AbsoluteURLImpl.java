@@ -9,6 +9,7 @@ import org.ogf.saga.url.URL;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.regex.Pattern;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -45,7 +46,7 @@ public class AbsoluteURLImpl extends AbstractSagaObjectImpl implements URL {
                 url = url.substring(1); // prevent URI to consider root dir as a host
             }*/
             u = new URI(url);
-            this.fixFileURI();  //sreynaud
+            //this.fixFileURI();  //sreynaud
         } catch(URISyntaxException e) {
             throw new BadParameterException("syntax error in url", e);
         }
@@ -80,26 +81,32 @@ public class AbsoluteURLImpl extends AbstractSagaObjectImpl implements URL {
     */
     
     /** Encode the relative path */
-    AbsoluteURLImpl(URL base, String relativePath) {
-        this(   base,
+    AbsoluteURLImpl(URL base, String relativePath) throws BadParameterException {
+        /*this(   base,
                 URLEncoder.encodePathOnly(relativePath),
                 null,
                 null
-        );
+        );*/
+    	this(base, new RelativeURLImpl(relativePath));
     }
 
     /** Encode the URL */
-    AbsoluteURLImpl(URL base, URL relativeUrl) {
-    	// TODO : call resolve
-        this(   base,
+    AbsoluteURLImpl(URL base, URL relativeUrl) throws BadParameterException {
+        /*this(   base,
                 URLEncoder.encodePathOnly(relativeUrl.getPath()),
                 relativeUrl.getQuery()!=null ? relativeUrl.getQuery() : base.getQuery(),
                 relativeUrl.getFragment()!=null ? relativeUrl.getFragment() : base.getFragment()
-        );
+        );*/
+    	if (!(relativeUrl instanceof RelativeURLImpl)) {
+    		throw new BadParameterException("URL must be relative");
+    	}
+    	
     }
 
-    /** DO NOT encode the URL */
-    private AbsoluteURLImpl(URL base, String relativePath, String query, String fragment) {
+    /** DO NOT encode the URL 
+     * @throws BadParameterException */
+    /*
+    private AbsoluteURLImpl(URL base, String relativePath, String query, String fragment) throws BadParameterException {
     	
         //workaround: Windows absolute paths must start with one and only one '/'
         if (isWindowsAbsolutePath(base.getScheme(), relativePath)) {
@@ -116,8 +123,7 @@ public class AbsoluteURLImpl extends AbstractSagaObjectImpl implements URL {
         if (! relativePath.startsWith("/")) {
             relativePath = "./"+relativePath;
         }
-
-    	// TODO: remove lines above and use AbsoluteURLImpl(URL base, URL relativeUrl) with RelativeURLImpl
+    	
         // resolve URI
         URI baseUri = ((AbsoluteURLImpl) base).u;
         String relativeUri = relativePath
@@ -125,7 +131,8 @@ public class AbsoluteURLImpl extends AbstractSagaObjectImpl implements URL {
                 + concatIfNotNull('#', new String[]{fragment, baseUri.getFragment()});
         u = baseUri.resolve(relativeUri);
     }
-
+	*/
+    
     /** DO NOT encode the URL */
     protected AbsoluteURLImpl(URI u) {
         this.u = u;
@@ -144,15 +151,16 @@ public class AbsoluteURLImpl extends AbstractSagaObjectImpl implements URL {
         if (url == null) {
             url = "";
         }
-    	if (url.indexOf(":") >= 0 && url.indexOf(":") < 2) {
+        // Check that url is absolute
+        if (url != "" && ! Pattern.matches("^[^/\\\\]{2,}\\:.*", url)) {
     		throw new BadParameterException("URL must be absolute");
     	}
-        String encodedUrl = (url.startsWith("file://"))
+        String encodedUrl = (url.startsWith("file:/"))
                 ? URLEncoder.encodePathOnly(url)
                 : URLEncoder.encode(url);
         try {
             u = new URI(encodedUrl);
-            this.fixFileURI();  //sreynaud
+            //this.fixFileURI();  //sreynaud
         } catch(URISyntaxException e) {
             throw new BadParameterException("syntax error in url", e);
         }
@@ -212,8 +220,8 @@ public class AbsoluteURLImpl extends AbstractSagaObjectImpl implements URL {
     public String getPath() {
         if (u.getPath() == null) {
             return this.getSchemeSpecificPart().getPath();  //sreynaud
-        } else if (".".equals(u.getAuthority())) {
-            return "."+u.getPath();                         //sreynaud
+        // Obsolete: } else if (".".equals(u.getAuthority())) {
+        //    return "."+u.getPath();                         //sreynaud
         } else if (u.getPath().startsWith("/./") || m_mustRemoveSlash) {
             return u.getPath().substring(1);                //sreynaud
         } else if (u.getPath().startsWith("//")) {
@@ -237,6 +245,9 @@ public class AbsoluteURLImpl extends AbstractSagaObjectImpl implements URL {
 		if (System.getProperty("file.separator") != "/")
 			path = path.replace(System.getProperty("file.separator"), "/");
         try {
+        	// LSZ add leading / in case of Windoze path
+        	if (path.indexOf(':')>0)
+        		path = "/"+path;
         	// TODO: check why 2 following lines
             int i;for(i=0; i<path.length() && path.charAt(i)=='/'; i++);
             if(i>1)path="/"+path.substring(i);
@@ -389,14 +400,15 @@ public class AbsoluteURLImpl extends AbstractSagaObjectImpl implements URL {
     }
 
     ///////////////////////////////////////// private methods /////////////////////////////////////////
-
+    /*
     private boolean isWindowsAbsolutePath(String scheme, String relativePath) {
         return ("file".equals(scheme) || "zip".equals(scheme))
                 && System.getProperty("os.name").startsWith("Windows")
                 && relativePath.length()>=2 && Character.isLetter(relativePath.charAt(0)) && relativePath.charAt(1)==':'
                 && (relativePath.length()==2 || (relativePath.length()>2 && relativePath.charAt(2)=='/'));
     }
-
+	*/
+    
     private void fixFileURI() throws URISyntaxException {
     	// FIXME : u.getAuthority().equals(".")
     	//LSZ relative URL are in RelativeURLImpl
@@ -419,6 +431,7 @@ public class AbsoluteURLImpl extends AbstractSagaObjectImpl implements URL {
         }
     }
 
+    /*
     private static String concatIfNotNull(char prefix, String[] suffix) {
         for (int i=0; suffix!=null && i<suffix.length; i++) {
             if (suffix[i] != null) {
@@ -427,4 +440,5 @@ public class AbsoluteURLImpl extends AbstractSagaObjectImpl implements URL {
         }
         return "";
     }
+    */
 }
