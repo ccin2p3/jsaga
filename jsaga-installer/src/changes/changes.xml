@@ -3,6 +3,11 @@
         <title>JSAGA Release Notes</title>
     </properties>
     <body>
+        <release version="0.9.12" date="2011-02-11" description="New plug-ins for ARC and Unicore">
+            <action dev="lschwarz" type="add">Added adaptor for ARC (A-REX with BES interface)</action>
+            <action dev="lschwarz" type="add">Added adaptor for Unicore (with BES interface)</action>
+            <action dev="jrevillard" type="update">Use external LFC library</action>
+        </release>
         <release version="0.9.11" date="2011-01-13" description="Compatible with SAGA Java Binding v1.1">
             <action dev="sreynaud" type="fix">Fix bugs related to delegation in CREAM adaptor.</action>
             <action dev="jrevillard" type="update">Major performance improvements on LFC adaptor.</action>
