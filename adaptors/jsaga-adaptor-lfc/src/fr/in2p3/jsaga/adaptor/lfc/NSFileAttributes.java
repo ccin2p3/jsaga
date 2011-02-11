@@ -7,6 +7,8 @@ import org.apache.log4j.Logger;
 
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
+import fr.maatg.glite.dm.ns.CNSConnection;
+import fr.maatg.glite.dm.ns.CNSFile;
 
 /**
  * @author Jerome Revillard
@@ -14,19 +16,19 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 public class NSFileAttributes extends FileAttributes {
 	private static Logger s_logger = Logger.getLogger(NSFileAttributes.class);
 	
-    private NSFile m_file;
+    private CNSFile m_file;
     private String m_owner;
     private String m_group;
-    private NSConnection connection;
+    private CNSConnection connection;
 
-    public NSFileAttributes(NSFile file, NSConnection connection) {
+    public NSFileAttributes(CNSFile file, CNSConnection connection) {
         m_file = file;
         m_owner = null;
         m_group = null;
         this.connection = connection;
     }
     
-    public NSFile getLFCFile(){
+    public CNSFile getLFCFile(){
     	return m_file;
     }
 
@@ -52,11 +54,11 @@ public class NSFileAttributes extends FileAttributes {
 
     public PermissionBytes getUserPermission() {
     	List<PermissionBytes> permissionBytesList = new ArrayList<PermissionBytes>();
-		if ((m_file.getFileMode() & NSConnection.S_IRUSR) != 0)
+		if ((m_file.getFileMode() & CNSConnection.S_IRUSR) != 0)
 			permissionBytesList.add(PermissionBytes.READ);
-		if ((m_file.getFileMode() & NSConnection.S_IWUSR) != 0)
+		if ((m_file.getFileMode() & CNSConnection.S_IWUSR) != 0)
 			permissionBytesList.add(PermissionBytes.WRITE);
-		if ((m_file.getFileMode() & NSConnection.S_IXUSR) != 0)
+		if ((m_file.getFileMode() & CNSConnection.S_IXUSR) != 0)
 			permissionBytesList.add(PermissionBytes.EXEC);
     	
 		if(permissionBytesList.isEmpty()){
@@ -72,11 +74,11 @@ public class NSFileAttributes extends FileAttributes {
 
     public PermissionBytes getGroupPermission() {
     	List<PermissionBytes> permissionBytesList = new ArrayList<PermissionBytes>();
-		if ((m_file.getFileMode() & NSConnection.S_IRGRP) != 0)
+		if ((m_file.getFileMode() & CNSConnection.S_IRGRP) != 0)
 			permissionBytesList.add(PermissionBytes.READ);
-		if ((m_file.getFileMode() & NSConnection.S_IWGRP) != 0)
+		if ((m_file.getFileMode() & CNSConnection.S_IWGRP) != 0)
 			permissionBytesList.add(PermissionBytes.WRITE);
-		if ((m_file.getFileMode() & NSConnection.S_IXGRP) != 0)
+		if ((m_file.getFileMode() & CNSConnection.S_IXGRP) != 0)
 			permissionBytesList.add(PermissionBytes.EXEC);
     	
 		if(permissionBytesList.isEmpty()){
@@ -92,11 +94,11 @@ public class NSFileAttributes extends FileAttributes {
 
     public PermissionBytes getAnyPermission() {
     	List<PermissionBytes> permissionBytesList = new ArrayList<PermissionBytes>();
-		if ((m_file.getFileMode() & NSConnection.S_IROTH) != 0)
+		if ((m_file.getFileMode() & CNSConnection.S_IROTH) != 0)
 			permissionBytesList.add(PermissionBytes.READ);
-		if ((m_file.getFileMode() & NSConnection.S_IWOTH) != 0)
+		if ((m_file.getFileMode() & CNSConnection.S_IWOTH) != 0)
 			permissionBytesList.add(PermissionBytes.WRITE);
-		if ((m_file.getFileMode() & NSConnection.S_IXOTH) != 0)
+		if ((m_file.getFileMode() & CNSConnection.S_IXOTH) != 0)
 			permissionBytesList.add(PermissionBytes.EXEC);
     	
 		if(permissionBytesList.isEmpty()){
