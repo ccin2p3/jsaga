@@ -8,6 +8,7 @@ import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.url.URL;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.regex.Pattern;
@@ -26,10 +27,11 @@ import java.util.regex.Pattern;
  */
 public class RelativeURLImpl extends AbstractSagaObjectImpl implements URL {
 
-	protected String url_path;
+	//protected String url_path;
+	protected File m_file;
 	protected String url_query;
 	protected String url_fragment;
-	
+	protected boolean url_isDir;
     protected FileAttributes m_cache;
 	
 	RelativeURLImpl(String url) throws BadParameterException {
@@ -45,7 +47,9 @@ public class RelativeURLImpl extends AbstractSagaObjectImpl implements URL {
 
     public SagaObject clone() throws CloneNotSupportedException {
     	RelativeURLImpl clone = (RelativeURLImpl) super.clone();
-        clone.url_path = url_path;
+        //clone.url_path = url_path;
+        clone.m_file = m_file;
+        clone.url_isDir = url_isDir;
         clone.url_query = url_query;
         clone.url_fragment = url_fragment;
         clone.m_cache = m_cache;
@@ -55,7 +59,46 @@ public class RelativeURLImpl extends AbstractSagaObjectImpl implements URL {
     public URL resolve(URL url) throws NoSuccessException {
     	//TODO: implement Relative
     	// if absolute: throw exception
-      	throw new NoSuccessException("The URL cannot be resolved against this relative URL");
+    	if (url instanceof AbsoluteURLImpl) {
+    		throw new NoSuccessException("The URL cannot be resolved against this relative URL");
+    	}
+    	RelativeURLImpl rel_url = (RelativeURLImpl)url;
+    	// If url is absolute file, return url
+    	if (rel_url.m_file.isAbsolute()) {
+    		return url;
+    	}
+    	String new_url;
+    	// path or parent path
+    	new_url = url_isDir?m_file.getPath():m_file.getParent();
+    	new_url += "/";
+    	// concatenate new path
+    	new_url += rel_url.m_file.getPath();
+    	// add / if new path is a dir
+    	new_url += (rel_url.url_isDir)?"/":"";
+    	// add new query or current query
+    	if (rel_url.url_query != null) {
+    		new_url += "?" + rel_url.url_query;
+        	if (rel_url.url_fragment != null) {
+        		new_url += "#" + rel_url.url_fragment;
+        	}
+    	} else {
+    		if (url_query != null) {
+    			new_url += "?" + url_query;
+    		}
+        	if (rel_url.url_fragment != null) {
+        		new_url += "#" + rel_url.url_fragment;
+        	} else if (url_fragment != null) {
+        		new_url += "#" + url_fragment;
+        	}
+    		
+    	}
+    	// addnew fragment or current fragment
+    	// return resolved URL
+    	try {
+			return new RelativeURLImpl(new_url);
+		} catch (BadParameterException e) {
+			throw new NoSuccessException(e);
+		}
     }
 
 	public void setString(String url) throws BadParameterException {
@@ -69,7 +112,7 @@ public class RelativeURLImpl extends AbstractSagaObjectImpl implements URL {
 	}
 
 	public String getString() {
-		return url_path + (url_query == null?"":"?"+url_query) + (url_fragment == null?"":"#"+url_fragment);
+		return /*url_path*/m_file.getPath() + (url_isDir?"/":"") + (url_query == null?"":"?"+url_query) + (url_fragment == null?"":"#"+url_fragment);
 	}
 
 	public String getEscaped() {
@@ -106,10 +149,11 @@ public class RelativeURLImpl extends AbstractSagaObjectImpl implements URL {
 	}
 
 	public String getPath() {
-		return url_path;
+		return /*url_path*/m_file.getPath();
 	}
 
 	public void setPath(String path) throws BadParameterException {
+		url_isDir=false;
 		if (path != null) {
 			// convert '\' to '/'
 			if (System.getProperty("file.separator") != "/")
@@ -117,12 +161,21 @@ public class RelativeURLImpl extends AbstractSagaObjectImpl implements URL {
 			if (Pattern.matches("^[^/]{2,}\\:.*", path)) {
 				throw new BadParameterException("path must be relative");
 			}
+			if (path.endsWith("/")) url_isDir=true;
+		} else {
+			path = "";
 		}
-		url_path = (path == null?"":path);
+		/*url_path = (path == null?"":path);
 		// remove leading duplicated / 
         while (url_path.startsWith("//")) {
         	url_path = url_path.substring(1);
+        }*/
+		
+		// remove leading duplicated / 
+        while (path.startsWith("//")) {
+        	path = path.substring(1);
         }
+		m_file = new File(path);
 	}
 
 	public void setPath() throws BadParameterException {
@@ -198,6 +251,7 @@ public class RelativeURLImpl extends AbstractSagaObjectImpl implements URL {
 	}
 
 	public URL normalize() {
+		// TODO: use getCanonicalFile
 		return this;
 	}
 	
