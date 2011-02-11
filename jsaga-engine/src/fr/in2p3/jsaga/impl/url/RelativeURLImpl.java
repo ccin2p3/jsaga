@@ -9,6 +9,7 @@ import org.ogf.saga.session.Session;
 import org.ogf.saga.url.URL;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.regex.Pattern;
@@ -251,8 +252,26 @@ public class RelativeURLImpl extends AbstractSagaObjectImpl implements URL {
 	}
 
 	public URL normalize() {
-		// TODO: use getCanonicalFile
-		return this;
+		try {
+			// getCanonicalPath first invoke getAbsolutePath, so we simulate by adding a leading /
+			String canon;
+			if (!m_file.isAbsolute()) {
+				File f = new File("/"+m_file.getPath());
+				canon = f.getCanonicalPath();
+				// remove leading /
+				canon = canon.substring(1);
+			} else {
+				canon = m_file.getCanonicalPath();
+			}
+			RelativeURLImpl newURL = new RelativeURLImpl(canon);
+			newURL.setQuery(url_query);
+			newURL.setFragment(url_fragment);
+			return newURL;
+		} catch (BadParameterException e) {
+			return this;
+		} catch (IOException e) {
+			return this;
+		}
 	}
 	
     ////////////////////////////////////////// cache methods //////////////////////////////////////////
