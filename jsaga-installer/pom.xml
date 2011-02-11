@@ -2,7 +2,7 @@
     <parent>
         <groupId>fr.in2p3.jsaga</groupId>
         <artifactId>jsaga</artifactId>
-        <version>0.9.12-SNAPSHOT</version>
+        <version>0.9.12</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.in2p3.jsaga</groupId>
@@ -281,28 +281,28 @@
         <dependency>
             <groupId>org.ogf.saga</groupId>
             <artifactId>saga-api-test</artifactId>
-            <version>0.9.12-SNAPSHOT</version>
+            <version>0.9.12</version>
         </dependency>
 
         <!-- core -->
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
-            <version>0.9.12-SNAPSHOT</version>
+            <version>0.9.12</version>
             <classifier>config</classifier>
             <type>zip</type>
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga</groupId>
             <artifactId>jsaga-engine</artifactId>
-            <version>0.9.12-SNAPSHOT</version>
+            <version>0.9.12</version>
         </dependency>
 
         <!-- adaptors -->
         <dependency>
             <groupId>fr.in2p3.jsaga.poms</groupId>
             <artifactId>jsaga-adaptors</artifactId>
-            <version>0.9.12-SNAPSHOT</version>
+            <version>0.9.12</version>
             <type>pom</type>
         </dependency>
     </dependencies>
