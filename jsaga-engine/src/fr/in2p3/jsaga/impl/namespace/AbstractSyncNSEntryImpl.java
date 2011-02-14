@@ -300,9 +300,8 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
         }
     }
 
-    public void close(float timeoutInSeconds) throws NotImplementedException, NoSuccessException {
-        this.close();
-    }
+    /** implemented by AbstractNSEntryImpl */
+    public abstract void close(float timeoutInSeconds) throws NotImplementedException, NoSuccessException;
 
     public void permissionsAllowSync(String id, int permissions, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, TimeoutException, NoSuccessException {
         new FlagsHelper(flags).allowed(Flags.DEREFERENCE);

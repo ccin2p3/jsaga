@@ -225,12 +225,7 @@ public abstract class AbstractAsyncNSEntryImpl extends AbstractSyncNSEntryImpl i
     }
 
     public Task<NSEntry, Void> close(TaskMode mode, final float timeoutInSeconds) throws NotImplementedException {
-        return new AbstractThreadedTask<NSEntry,Void>(mode) {
-            public Void invoke() throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-                AbstractAsyncNSEntryImpl.super.close(timeoutInSeconds);
-                return null;
-            }
-        };
+        throw new NotImplementedException("Not supported");
     }
 
     public Task<NSEntry, Void> permissionsAllow(TaskMode mode, final String id, final int permissions, final int flags) throws NotImplementedException {
