@@ -90,7 +90,7 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
             }
         } else if (Flags.CREATEPARENTS.isSet(flags)) {
             this._makeParentDirs();
-        } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !((URLImpl)m_url).hasCache() && m_adaptor instanceof DataReaderAdaptor) {
+        } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !((AbstractURLImpl)m_url).hasCache() && m_adaptor instanceof DataReaderAdaptor) {
             boolean exists = ((DataReaderAdaptor)m_adaptor).exists(m_url.getPath(), m_url.getQuery());
             if (! exists) {
                 throw new DoesNotExistException("Directory does not exist: "+ m_url);
@@ -194,6 +194,7 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
         FileAttributes[] childs = this._listAttributes(m_url.getPath());
         for (int i=0; i<childs.length; i++) {
             // set child relative path
+        	// TODO: use currentRelativePath.resolve
             URL childRelativePath = URLHelper.createURL(currentRelativePath, childs[i].getRelativePath());
             // add child relative path to matching list
             if (p==null || p.matcher(childs[i].getRelativePath()).matches()) {
