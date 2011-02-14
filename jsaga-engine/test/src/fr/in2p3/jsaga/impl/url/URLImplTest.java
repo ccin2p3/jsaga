@@ -192,19 +192,15 @@ public class URLImplTest extends TestCase {
     	url = URLFactory.createURL(_url_simple);
     	try {
     		url.setString(_url_relative);
-    		fail("BadParameterException was expected");
+    		fail("Excepted exception: " + BadParameterException.class);
     	} catch (BadParameterException bpe) {
-    	} catch (Exception e) {
-    		fail("NoSuccessException was expected");
     	}
     	
     	url = URLFactory.createURL(_url_relative);
     	try {
     		url.setString(_url_simple);
-    		fail("BadParameterException was expected");
+    		fail("Excepted exception: " + BadParameterException.class);
     	} catch (BadParameterException bpe) {
-    	} catch (Exception e) {
-    		fail("NoSuccessException was expected");
     	}
     	
     }
@@ -306,10 +302,8 @@ public class URLImplTest extends TestCase {
     	url = URLFactory.createURL(_url_relative);
     	try {
     		resolved = url.resolve(URLFactory.createURL(_url_simple));
-    		fail("NoSuccessException was expected");
+    		fail("Excepted exception: " + NoSuccessException.class);
     	} catch (NoSuccessException nse) {
-    	} catch (Exception e) {
-    		fail("NoSuccessException was expected");
     	}
     }
     
