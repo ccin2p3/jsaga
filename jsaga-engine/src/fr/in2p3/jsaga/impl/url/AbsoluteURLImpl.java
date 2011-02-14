@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl.url;
 
+import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.BadParameterException;
@@ -23,14 +24,20 @@ import java.util.regex.Pattern;
 /**
  *
  */
-public class AbsoluteURLImpl extends AbstractSagaObjectImpl implements URL {
+public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
     protected URI u;
     //protected FileAttributes m_cache;
     private boolean m_mustRemoveSlash;
+    //protected FileAttributes m_cache;
 
     /** MAY encode the URL */
     AbsoluteURLImpl(String url) throws BadParameterException {
     	this(url, true);
+    }
+
+    AbsoluteURLImpl(FileAttributes cache) throws BadParameterException {
+        this(cache.getRelativePath());
+        m_cache = cache;
     }
 
     AbsoluteURLImpl(String url, boolean encode) throws BadParameterException {
@@ -134,7 +141,7 @@ public class AbsoluteURLImpl extends AbstractSagaObjectImpl implements URL {
 	*/
     
     /** DO NOT encode the URL */
-    protected AbsoluteURLImpl(URI u) {
+    protected AbsoluteURLImpl(URI u) throws BadParameterException {
         this.u = u;
     }
 
@@ -143,6 +150,7 @@ public class AbsoluteURLImpl extends AbstractSagaObjectImpl implements URL {
         AbsoluteURLImpl clone = (AbsoluteURLImpl) super.clone();
         clone.u = u;
         clone.m_mustRemoveSlash = m_mustRemoveSlash;
+        clone.m_cache = m_cache;
         return clone;
     }
 
@@ -367,7 +375,11 @@ public class AbsoluteURLImpl extends AbstractSagaObjectImpl implements URL {
     	} else {
     		throw new NoSuccessException("Unknown class: " + url.getClass().getName());
     	}
-        return new AbsoluteURLImpl(uri);
+        try {
+			return new AbsoluteURLImpl(uri);
+		} catch (BadParameterException e) {
+			throw new NoSuccessException(e);
+		}
     }
 
     public boolean isAbsolute() {
@@ -379,7 +391,11 @@ public class AbsoluteURLImpl extends AbstractSagaObjectImpl implements URL {
         if (uri == u) {
             return this;
         }
-        return new AbsoluteURLImpl(uri);
+        try {
+			return new AbsoluteURLImpl(uri);
+		} catch (BadParameterException e) {
+			return this;
+		}
     }
 
     ////////////////////////////////////////// java methods ///////////////////////////////////////////
@@ -441,4 +457,18 @@ public class AbsoluteURLImpl extends AbstractSagaObjectImpl implements URL {
         return "";
     }
     */
+    ////////////////////////////////////////// cache methods //////////////////////////////////////////
+/*
+    public void setCache(FileAttributes cache) {
+        m_cache = cache;
+    }
+
+    public FileAttributes getCache() {
+        return m_cache;
+    }
+
+    public boolean hasCache() {
+        return (m_cache != null);
+    }
+*/
 }
