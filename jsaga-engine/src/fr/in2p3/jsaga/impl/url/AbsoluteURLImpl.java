@@ -26,9 +26,7 @@ import java.util.regex.Pattern;
  */
 public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
     protected URI u;
-    //protected FileAttributes m_cache;
     private boolean m_mustRemoveSlash;
-    //protected FileAttributes m_cache;
 
     /** MAY encode the URL */
     AbsoluteURLImpl(String url) throws BadParameterException {
@@ -49,9 +47,6 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
             }
         }
         try {
-            /*LSZwhile (url.startsWith("//")) {
-                url = url.substring(1); // prevent URI to consider root dir as a host
-            }*/
             u = new URI(url);
             //this.fixFileURI();  //sreynaud
         } catch(URISyntaxException e) {
@@ -149,7 +144,6 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
     public SagaObject clone() throws CloneNotSupportedException {
         AbsoluteURLImpl clone = (AbsoluteURLImpl) super.clone();
         clone.u = u;
-        clone.m_mustRemoveSlash = m_mustRemoveSlash;
         clone.m_cache = m_cache;
         return clone;
     }
@@ -172,9 +166,6 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
         } catch(URISyntaxException e) {
             throw new BadParameterException("syntax error in url", e);
         }
-    }
-    public void setString() throws BadParameterException {
-        this.setString(null);
     }
 
     /** Decode the URL */
@@ -202,12 +193,10 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
             throw new BadParameterException("syntax error in fragment", e);
         }
     }
-    public void setFragment() throws BadParameterException {
-        this.setFragment(null);
-    }
 
     public String getHost() {
         if (u.getHost() == null) {
+        	// TODO: check this
             return this.getSchemeSpecificPart().getHost();   //sreynaud
         }
         return u.getHost();
@@ -221,17 +210,12 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
             throw new BadParameterException("syntax error in host", e);
         }
     }
-    public void setHost() throws BadParameterException {
-        this.setHost(null);
-    }
 
     public String getPath() {
         if (u.getPath() == null) {
             return this.getSchemeSpecificPart().getPath();  //sreynaud
-        // Obsolete: } else if (".".equals(u.getAuthority())) {
-        //    return "."+u.getPath();                         //sreynaud
-        } else if (u.getPath().startsWith("/./") || m_mustRemoveSlash) {
-            return u.getPath().substring(1);                //sreynaud
+        // Obsolete} else if (u.getPath().startsWith("/./") || m_mustRemoveSlash) {
+        //    return u.getPath().substring(1);                //sreynaud
         } else if (u.getPath().startsWith("//")) {
             return trimPath(u.getPath());                   //sreynaud
         }
@@ -267,9 +251,6 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
             throw new BadParameterException("syntax error in path", e);
         }
     }
-    public void setPath() throws BadParameterException {
-        this.setPath(null);
-    }
 
     public int getPort() {
         if (u.getPort() == -1) {
@@ -285,9 +266,6 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
         } catch(URISyntaxException e) {
             throw new BadParameterException("syntax error in port", e);     // ???
         }
-    }
-    public void setPort() throws BadParameterException {
-        this.setPort(-1);
     }
 
     public String getQuery() {
@@ -305,9 +283,6 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
             throw new BadParameterException("syntax error in query", e);
         }
     }
-    public void setQuery() throws BadParameterException {
-        this.setQuery(null);
-    }
 
     public String getScheme() {
         return u.getScheme();
@@ -320,9 +295,6 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
         } catch(URISyntaxException e) {
             throw new BadParameterException("syntax error in scheme", e);
         }
-    }
-    public void setScheme() throws BadParameterException {
-        this.setScheme(null);
     }
 
     public String getUserInfo() {
@@ -340,9 +312,6 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
             throw new BadParameterException("syntax error in query", e);
         }
     }
-    public void setUserInfo() throws BadParameterException {
-        this.setUserInfo(null);
-    }
 
     public URL translate(String scheme) throws BadParameterException, NoSuccessException {
         try {
@@ -355,9 +324,6 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
         } catch(URISyntaxException e) {
             throw new BadParameterException("syntax error in scheme", e);
         }
-    }
-    public URL translate(Session session, String scheme) throws BadParameterException, NoSuccessException {
-        return this.translate(scheme);
     }
 
     public URL resolve(URL url) throws NoSuccessException {
@@ -424,13 +390,13 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
                 && (relativePath.length()==2 || (relativePath.length()>2 && relativePath.charAt(2)=='/'));
     }
 	*/
-    
+    /*
     private void fixFileURI() throws URISyntaxException {
     	// FIXME : u.getAuthority().equals(".")
     	//LSZ relative URL are in RelativeURLImpl
         //boolean isRelative = (u.getHost()==null && u.getAuthority()!=null && !u.getAuthority().equals("."));
         boolean isWindows = (u.getHost()!=null && u.getHost().length()==1 && u.getAuthority()!=null && u.getAuthority().endsWith(":"));
-        if (/*isRelative ||*/ isWindows) {
+        if (isRelative || isWindows) {
             u = new URI(u.getScheme(), u.getUserInfo(),
                     "",                                 // fix number of '/' after scheme
                     u.getPort(),
@@ -438,7 +404,7 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
                     u.getQuery(), u.getFragment());
         }
     }
-
+	*/
     private URI getSchemeSpecificPart() {
         try {
             return new URI(u.getRawSchemeSpecificPart());
@@ -457,18 +423,5 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
         return "";
     }
     */
-    ////////////////////////////////////////// cache methods //////////////////////////////////////////
-/*
-    public void setCache(FileAttributes cache) {
-        m_cache = cache;
-    }
 
-    public FileAttributes getCache() {
-        return m_cache;
-    }
-
-    public boolean hasCache() {
-        return (m_cache != null);
-    }
-*/
 }
