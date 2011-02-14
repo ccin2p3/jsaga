@@ -26,14 +26,12 @@ import java.util.regex.Pattern;
 /**
  *
  */
-public class RelativeURLImpl extends AbstractSagaObjectImpl implements URL {
+public class RelativeURLImpl extends AbstractURLImpl implements URL {
 
-	//protected String url_path;
 	protected File m_file;
 	protected String url_query;
 	protected String url_fragment;
 	protected boolean url_isDir;
-    protected FileAttributes m_cache;
 	
 	RelativeURLImpl(String url) throws BadParameterException {
 		// url is considered as path only (even if contains ? and #)
@@ -48,7 +46,6 @@ public class RelativeURLImpl extends AbstractSagaObjectImpl implements URL {
 
     public SagaObject clone() throws CloneNotSupportedException {
     	RelativeURLImpl clone = (RelativeURLImpl) super.clone();
-        //clone.url_path = url_path;
         clone.m_file = m_file;
         clone.url_isDir = url_isDir;
         clone.url_query = url_query;
@@ -58,7 +55,6 @@ public class RelativeURLImpl extends AbstractSagaObjectImpl implements URL {
     }
 
     public URL resolve(URL url) throws NoSuccessException {
-    	//TODO: implement Relative
     	// if absolute: throw exception
     	if (url instanceof AbsoluteURLImpl) {
     		throw new NoSuccessException("The URL cannot be resolved against this relative URL");
@@ -108,18 +104,18 @@ public class RelativeURLImpl extends AbstractSagaObjectImpl implements URL {
 		url_query = url_fragment = null;
 	}
 
-	public void setString() throws BadParameterException {
-		this.setString(null);
-	}
-
 	public String getString() {
-		return /*url_path*/m_file.getPath() + (url_isDir?"/":"") + (url_query == null?"":"?"+url_query) + (url_fragment == null?"":"#"+url_fragment);
+		return getPath() + (url_query == null?"":"?"+url_query) + (url_fragment == null?"":"#"+url_fragment);
 	}
 
 	public String getEscaped() {
       	// TODO
 		return null;
 	}
+
+    public String toString() {
+        return this.normalize().getString();
+    }
 
 	public String getFragment() {
 		if (url_fragment == null) {
@@ -132,12 +128,7 @@ public class RelativeURLImpl extends AbstractSagaObjectImpl implements URL {
 		url_fragment = fragment;
 	}
 
-	public void setFragment() throws BadParameterException {
-		this.setFragment(null);
-	}
-
 	public String getHost() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -145,12 +136,8 @@ public class RelativeURLImpl extends AbstractSagaObjectImpl implements URL {
       	throw new BadParameterException("Operation not supported");
 	}
 
-	public void setHost() throws BadParameterException {
-		this.setHost(null);
-	}
-
 	public String getPath() {
-		return /*url_path*/m_file.getPath();
+		return m_file.getPath() + (url_isDir?"/":"") ;
 	}
 
 	public void setPath(String path) throws BadParameterException {
@@ -179,21 +166,12 @@ public class RelativeURLImpl extends AbstractSagaObjectImpl implements URL {
 		m_file = new File(path);
 	}
 
-	public void setPath() throws BadParameterException {
-		this.setPath(null);
-	}
-
 	public int getPort() {
-		// TODO Auto-generated method stub
 		return -1;
 	}
 
 	public void setPort(int port) throws BadParameterException {
       	throw new BadParameterException("Operation not supported");
-	}
-
-	public void setPort() throws BadParameterException {
-		this.setPort(-1);
 	}
 
 	public String getQuery() {
@@ -207,12 +185,7 @@ public class RelativeURLImpl extends AbstractSagaObjectImpl implements URL {
 		url_query = query;
 	}
 
-	public void setQuery() throws BadParameterException {
-		this.setQuery(null);
-	}
-
 	public String getScheme() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -220,21 +193,12 @@ public class RelativeURLImpl extends AbstractSagaObjectImpl implements URL {
       	throw new BadParameterException("Operation not supported");
 	}
 
-	public void setScheme() throws BadParameterException {
-		this.setScheme(null);
-	}
-
 	public String getUserInfo() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public void setUserInfo(String userInfo) throws BadParameterException {
       	throw new BadParameterException("Operation not supported");
-	}
-
-	public void setUserInfo() throws BadParameterException {
-		this.setUserInfo(null);
 	}
 
 	public URL translate(String scheme) throws BadParameterException,
@@ -256,7 +220,7 @@ public class RelativeURLImpl extends AbstractSagaObjectImpl implements URL {
 			// getCanonicalPath first invoke getAbsolutePath, so we simulate by adding a leading /
 			String canon;
 			if (!m_file.isAbsolute()) {
-				File f = new File("/"+m_file.getPath());
+				File f = new File("/"+getPath());
 				canon = f.getCanonicalPath();
 				// remove leading /
 				canon = canon.substring(1);
@@ -266,6 +230,7 @@ public class RelativeURLImpl extends AbstractSagaObjectImpl implements URL {
 			RelativeURLImpl newURL = new RelativeURLImpl(canon);
 			newURL.setQuery(url_query);
 			newURL.setFragment(url_fragment);
+			newURL.url_isDir = url_isDir;
 			return newURL;
 		} catch (BadParameterException e) {
 			return this;
@@ -274,19 +239,5 @@ public class RelativeURLImpl extends AbstractSagaObjectImpl implements URL {
 		}
 	}
 	
-    ////////////////////////////////////////// cache methods //////////////////////////////////////////
-
-    public void setCache(FileAttributes cache) {
-        m_cache = cache;
-    }
-
-    public FileAttributes getCache() {
-        return m_cache;
-    }
-
-    public boolean hasCache() {
-        return (m_cache != null);
-    }
-
 
 }
