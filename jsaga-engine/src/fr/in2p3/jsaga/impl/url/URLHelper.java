@@ -68,11 +68,12 @@ public class URLHelper {
             url.setCache(cache);
         }
         */
-        AbsoluteURLImpl url = (AbsoluteURLImpl) base.resolve(relativePath);
-        if ( ((RelativeURLImpl)relativePath).hasCache() ) {
-            FileAttributes cache = ((RelativeURLImpl)relativePath).getCache();
-            // TODO: implement cache in absoluteURL
-            //url.setCache(cache);
+        // FIXME: case of RelativeURLImp
+        URL url;
+        url = base.resolve(relativePath);
+        if ( ((AbstractURLImpl)relativePath).hasCache() ) {
+            FileAttributes cache = ((AbstractURLImpl)relativePath).getCache();
+            ((AbstractURLImpl)url).setCache(cache);
         }
         return url;
     }
