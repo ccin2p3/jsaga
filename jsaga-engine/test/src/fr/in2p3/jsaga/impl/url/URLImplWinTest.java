@@ -28,22 +28,6 @@ public class URLImplWinTest extends URLImplFileTest {
 
     public void test_antislash()  throws Exception {
     	
-    	/*URL zz = URLFactory.createURL("file:/c:/dir/file");
-    	System.out.println(zz.getScheme());
-    	System.out.println(zz.getHost());
-    	System.out.println(zz.getPath());
-    	zz.setString("file:/d:/newdir/newfile");
-    	System.out.println(zz.getScheme());
-    	System.out.println(zz.getHost());
-    	System.out.println(zz.getPath());
-    	zz.setPath("e:/newdir2/newfile2");
-    	System.out.println(zz.getScheme());
-    	System.out.println(zz.getHost());
-    	System.out.println(zz.getPath());*/
-    	
-    	System.out.println(new java.io.File("/tmp/lsz").toURI().toString());
-    	
-    	
     	// Simulate Windows
     	System.setProperty("file.separator", "\\");
         URL url = URLFactory.createURL("c:\\path");

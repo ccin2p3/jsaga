@@ -71,11 +71,6 @@ public class URLImplTest extends TestCase {
     public void test_remove() throws Exception {
         URL url;
 
-        /*java.net.URI u2 = new java.net.URI("#fragment");
-        System.out.println(u2.toString());
-        System.out.println(u2.toASCIIString());*/
-        
-        
         url = URLFactory.createURL(_url_simple);
         url.setString();
         assertEquals("", url.getString());
