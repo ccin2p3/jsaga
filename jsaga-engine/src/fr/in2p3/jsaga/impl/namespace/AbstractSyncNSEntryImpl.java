@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl.namespace;
 
+import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.link.LinkAdaptor;
 import fr.in2p3.jsaga.adaptor.data.link.NotLink;
@@ -37,12 +38,14 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
 
     protected int m_flags;
     private boolean m_disconnectable;
+    private Integer m_implicitCloseTimeout;
 
     /** constructor for factory */
     protected AbstractSyncNSEntryImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session, url, adaptor);
         m_flags = flags;
         m_disconnectable = true;
+        m_implicitCloseTimeout = EngineProperties.getInteger(EngineProperties.DATA_IMPLICIT_CLOSE_TIMEOUT);
     }
 
     /** constructor for NSDirectory.open() */
@@ -50,6 +53,7 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
         super(dir.m_session, _resolveRelativeUrl(dir.m_url, relativeUrl), dir.m_adaptor);
         m_flags = flags;
         m_disconnectable = false;
+        m_implicitCloseTimeout = EngineProperties.getInteger(EngineProperties.DATA_IMPLICIT_CLOSE_TIMEOUT);
     }
     protected static URL _resolveRelativeUrl(URL baseUrl, URL relativeUrl) throws NotImplementedException, IncorrectURLException, BadParameterException, NoSuccessException {
         if (relativeUrl==null) {
@@ -67,6 +71,7 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
         super(entry.m_session, _resolveAbsolutePath(entry.m_url, absolutePath), entry.m_adaptor);
         m_flags = flags;
         m_disconnectable = false;
+        m_implicitCloseTimeout = EngineProperties.getInteger(EngineProperties.DATA_IMPLICIT_CLOSE_TIMEOUT);
     }
     private static URL _resolveAbsolutePath(URL baseUrl, String absolutePath) throws NotImplementedException, IncorrectURLException, BadParameterException, NoSuccessException {
         if (absolutePath==null) {
@@ -80,7 +85,9 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
     /** clone */
     public SagaObject clone() throws CloneNotSupportedException {
         AbstractSyncNSEntryImpl clone = (AbstractSyncNSEntryImpl) super.clone();
+        clone.m_flags = m_flags;
         clone.m_disconnectable = m_disconnectable;
+        clone.m_implicitCloseTimeout = m_implicitCloseTimeout;
         return clone;
     }
 
@@ -333,8 +340,13 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
 
     /** override Object.finalize() to disconnect from server */
     public void finalize() throws Throwable {
-        if (m_disconnectable && !m_disconnected) {
-            s_logger.error("NSEntry objects MUST be closed in order to free resources");
+        if (m_implicitCloseTimeout == null) {
+            // log unclosed
+            if (m_disconnectable && !m_disconnected) {
+                s_logger.error("NSEntry objects MUST be closed in order to free resources");
+            }
+        } else {
+            this.close((float) m_implicitCloseTimeout);
         }
         super.finalize();
     }
