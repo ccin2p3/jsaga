@@ -43,7 +43,7 @@ public abstract class FileReadTest extends AbstractNSEntryReadTest {
             assertEquals(
                     DEFAULT_CONTENT,
                     new String(bytes));
-            reader.close(0);
+            reader.close();
         } else {
             fail("Not an instance of class: File");
         }

@@ -38,7 +38,7 @@ public abstract class LogicalFileWriteTest extends AbstractNSEntryWriteTest {
 	            File physicalFile = (File) m_physicalDir.open(m_physicalFileUrl2, FLAGS_FILE);
 	            Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT2.getBytes());
 	            physicalFile.write(buffer);
-	            physicalFile.close(0);
+	            physicalFile.close();
             }
 
             // add
@@ -80,7 +80,7 @@ public abstract class LogicalFileWriteTest extends AbstractNSEntryWriteTest {
 	            File physicalFile = (File) m_physicalDir.open(m_physicalFileUrl2, FLAGS_FILE);
 	            Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT2.getBytes());
 	            physicalFile.write(buffer);
-	            physicalFile.close(0);
+	            physicalFile.close();
             }
             
             ((LogicalFile)m_file).updateLocation(m_physicalFileUrl, m_physicalFileUrl2);

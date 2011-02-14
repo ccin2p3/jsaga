@@ -45,7 +45,7 @@ public abstract class FileWriteTest extends AbstractNSEntryTest {
             Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT2.getBytes());
             File writer = (File) NSFactory.createNSEntry(m_session, m_fileUrl, Flags.WRITE.getValue());
             writer.write(buffer);
-            writer.close(0);
+            writer.close();
             checkWrited(m_fileUrl, DEFAULT_CONTENT2);
         } else {
             fail("Not an instance of class: File");
@@ -57,7 +57,7 @@ public abstract class FileWriteTest extends AbstractNSEntryTest {
             Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT2.getBytes());
             File writer = (File) NSFactory.createNSEntry(m_session, m_fileUrl, Flags.WRITE.or(Flags.APPEND));
             writer.write(buffer);
-            writer.close(0);
+            writer.close();
             checkWrited(m_fileUrl, DEFAULT_CONTENT+DEFAULT_CONTENT2);
         } else {
             fail("Not an instance of class: File");
