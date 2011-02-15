@@ -1,11 +1,9 @@
 package fr.in2p3.jsaga.impl.url;
 
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
-import org.ogf.saga.session.Session;
 import org.ogf.saga.url.URL;
 
 import java.net.URI;
@@ -26,7 +24,7 @@ import java.util.regex.Pattern;
  */
 public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
     protected URI u;
-    private boolean m_mustRemoveSlash;
+    //private boolean m_mustRemoveSlash;
 
     /** MAY encode the URL */
     AbsoluteURLImpl(String url) throws BadParameterException {
@@ -170,8 +168,37 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
 
     /** Decode the URL */
     public String getString() {
-        return URLEncoder.decode(u, m_mustRemoveSlash);
+        StringBuffer buffer = new StringBuffer();
+        if (getScheme() != null) {
+            buffer.append(getScheme());
+            buffer.append(":");
+        }
+        if (getHost() != null) {
+            if (getScheme() != null) buffer.append("//");
+            if (getUserInfo() != null) {
+                buffer.append(getUserInfo());
+                buffer.append('@');
+            }
+            buffer.append(getHost());
+            if (getPort() != -1) {
+                buffer.append(':');
+                buffer.append(getPort());
+            }
+        }
+        if (getPath() != null) {
+            buffer.append(getPath());
+        }
+        if (getQuery() != null) {
+            buffer.append('?');
+            buffer.append(getQuery());
+        }
+        if (getFragment() != null) {
+            buffer.append('#');
+            buffer.append(getFragment());
+        }
+        return buffer.toString();
     }
+    
     /** DO NOT decode the URL */
     public String getEscaped() {
         return u.toString();
