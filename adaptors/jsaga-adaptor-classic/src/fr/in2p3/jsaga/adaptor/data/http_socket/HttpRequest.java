@@ -96,9 +96,13 @@ public class HttpRequest {
         BufferedWriter request = new BufferedWriter(new OutputStreamWriter(m_socket.getOutputStream()));
         request.write(m_type + " " + m_path + " HTTP/" + m_version);
         request.newLine();
+        request.write("User-Agent: JSAGA");
+        request.newLine();
+        request.write("Host: " + m_socket.getInetAddress().getHostName());
+        request.newLine();
+        request.write("Accept: */*");
+        request.newLine();
         if (m_type.equals(TYPE_PUT)) {
-            request.write("Accept: */*");
-            request.newLine();
             request.write("Content-Length: " + String.valueOf(m_outputStream.size()));
             request.newLine();
         }
