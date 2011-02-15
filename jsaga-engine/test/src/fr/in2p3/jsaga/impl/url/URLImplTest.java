@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.impl.url;
 
 import junit.framework.TestCase;
 
+import org.ogf.saga.AbstractTest;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.url.URL;
@@ -19,7 +20,8 @@ import org.ogf.saga.url.URLFactory;
 /**
  *
  */
-public class URLImplTest extends TestCase {
+public class URLImplTest extends AbstractTest {
+
 	protected String _uri;
 	protected String _user;
 	protected String _host;
@@ -29,7 +31,6 @@ public class URLImplTest extends TestCase {
 	protected String _rel_path;
 	protected String _path_not_encoded;
 	protected String _path_encoded;
-	//protected String _dir;
 	protected String _query;
 	protected String _fragment;
 	protected String _non_normalized_path;
@@ -40,8 +41,12 @@ public class URLImplTest extends TestCase {
 	protected String _url_non_normalized;
 	protected String _url_rel_non_normalized;
 	
-    public URLImplTest() {
-    	super();
+	public URLImplTest() throws Exception {
+		super();
+	}
+
+	public void setUp() throws Exception {
+    	super.setUp();
     	init();
     	_url_simple = _uri+_user+_host+_port+_abs_path+_file+_query+_fragment; 	//"uri://userinfo@host.domain:1234/path?query=value#fragment"
     	_url_relative = _rel_path+_file+_query+_fragment; 						//"path?query=value#fragment"
@@ -271,6 +276,12 @@ public class URLImplTest extends TestCase {
     	url = URLFactory.createURL(_url_simple);
     	resolved = url.resolve(URLFactory.createURL(_url_relative));
     	assertEquals(_uri+_user+_host+_port+_abs_path+_url_relative, resolved.getString());
+    	
+    	// encoding
+    	url = URLFactory.createURL(_url_simple);
+    	resolved = url.resolve(URLFactory.createURL(_path_not_encoded));
+    	assertEquals(_uri+_user+_host+_port+_path_not_encoded,resolved.getString());
+    	assertEquals(_uri+_user+_host+_port+_path_encoded,resolved.toString());
     	
     	// resolve REL without path and with fragment against ABS
     	url = URLFactory.createURL(_url_simple);

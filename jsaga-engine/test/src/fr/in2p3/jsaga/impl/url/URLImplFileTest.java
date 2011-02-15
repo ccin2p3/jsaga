@@ -18,6 +18,10 @@ import org.ogf.saga.url.URLFactory;
  */
 public class URLImplFileTest extends URLImplTest {
     
+	public URLImplFileTest() throws Exception {
+		super();
+	}
+
 	protected void init() {
     	super.init();
 	   	 _uri = "file:";
@@ -35,7 +39,4 @@ public class URLImplFileTest extends URLImplTest {
         assertTrue(url.getHost() == null);
     }
 
-    /*public void test_specialchars() throws Exception {
-    	URL url = URLFactory.createURL();
-    }*/
 }
