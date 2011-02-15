@@ -654,7 +654,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
 				if(anyPermissions == newAnyPermissions){
 					return;
 				}else{
-					setPermissionRequest.setOtherPermission(getSRMPermissions(srmFileAttributes.getAnyPermission().or(permissions)));
+					setPermissionRequest.setOtherPermission(getSRMPermissions(newAnyPermissions));
 				}
 				break;
 			default:
