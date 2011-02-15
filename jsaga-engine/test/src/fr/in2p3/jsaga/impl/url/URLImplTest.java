@@ -156,7 +156,7 @@ public class URLImplTest extends TestCase {
         
         url = URLFactory.createURL(_url_simple);
         url.setPort(5678);
-        // If host was null, chaning port does not change anything
+        // If host was null, changing port does not change anything
         if (_host != "") {
         	assertEquals(_uri+_user+_host+":5678"+_abs_path+_file+_query+_fragment, url.getString());
         } else {
