@@ -24,8 +24,6 @@ public class URLImplWinTest extends AbstractTest {
 	protected String _abs_path;
 	protected String _file;
 	protected String _rel_path;
-	protected String _path_not_encoded;
-	//protected String _path_encoded;
 
 	public URLImplWinTest() throws Exception {
 		super();
@@ -35,9 +33,8 @@ public class URLImplWinTest extends AbstractTest {
 		super.setUp();
     	_abs_path = "c:/path/";
     	_rel_path = "relpath/";
-        _path_not_encoded = "c:/path with#and?and{}and%and\"and[]";
+        _file = "c:/path with#and?and{}and%and\"and[]";
         //_path_encoded = "c:/path%20with%23and%3Fand%7B%7Dand%25and%22and%5B%5D";
-		_file = "contains#init";
 	}
 
     public void test_antislash()  throws Exception {
@@ -79,9 +76,9 @@ public class URLImplWinTest extends AbstractTest {
     }
     
     public void test_specialChars() throws Exception {
-        URL url = URLFactory.createURL(_path_not_encoded);
+        URL url = URLFactory.createURL(_file);
         // # and other chars should not be considered as special characters
-        assertEquals(_path_not_encoded, url.getPath());
+        assertEquals(_file, url.getPath());
         
     }
 
