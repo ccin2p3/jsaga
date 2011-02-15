@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
  */
 public class RelativeURLImpl extends AbstractURLImpl implements URL {
 
-	protected File m_file;
+	protected UniversalFile m_file;
 	protected String url_query;
 	protected String url_fragment;
 	protected boolean url_isDir;
@@ -163,7 +163,7 @@ public class RelativeURLImpl extends AbstractURLImpl implements URL {
         while (path.startsWith("//")) {
         	path = path.substring(1);
         }
-		m_file = new File(path);
+		m_file = new UniversalFile(path);
 	}
 
 	public int getPort() {
@@ -217,10 +217,10 @@ public class RelativeURLImpl extends AbstractURLImpl implements URL {
 
 	public URL normalize() {
 		try {
-			// getCanonicalPath first invoke getAbsolutePath, so we simulate by adding a leading /
+            // add a leading '/' to prevent getCanonicalPath from concatenating to PWD
 			String canon;
 			if (!m_file.isAbsolute()) {
-				File f = new File("/"+getPath());
+				UniversalFile f = new UniversalFile("/"+getPath());
 				canon = f.getCanonicalPath();
 				// remove leading /
 				canon = canon.substring(1);
@@ -238,6 +238,6 @@ public class RelativeURLImpl extends AbstractURLImpl implements URL {
 			return this;
 		}
 	}
-	
+
 
 }
