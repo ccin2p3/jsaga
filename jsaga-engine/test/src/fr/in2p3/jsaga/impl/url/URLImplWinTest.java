@@ -31,9 +31,9 @@ public class URLImplWinTest extends AbstractTest {
 
 	public void setUp() throws Exception {
 		super.setUp();
-    	_abs_path = "c:/path/";
+    	_abs_path = "C:/path/";
     	_rel_path = "relpath/";
-        _file = "file with#and?and{}and%and\"and[]";
+        _file = "file with#and{}and%and[]";
         //_path_encoded = "c:/path%20with%23and%3Fand%7B%7Dand%25and%22and%5B%5D";
 	}
 

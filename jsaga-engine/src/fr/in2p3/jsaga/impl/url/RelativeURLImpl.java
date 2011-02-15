@@ -1,17 +1,13 @@
 package fr.in2p3.jsaga.impl.url;
 
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
-import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.url.URL;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.regex.Pattern;
 
 /* ***************************************************
@@ -202,9 +198,9 @@ public class RelativeURLImpl extends AbstractURLImpl implements URL {
 			newURL.setFragment(url_fragment);
 			return newURL;
 		} catch (BadParameterException e) {
-			return this;
+            throw new RuntimeException(e);
 		} catch (IOException e) {
-			return this;
+            throw new RuntimeException(e);
 		}
 	}
 
