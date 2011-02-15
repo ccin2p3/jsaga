@@ -63,6 +63,7 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
         } else if (relativeUrl.getHost()!=null && !relativeUrl.getHost().equals(baseUrl.getHost())) {
             throw new IncorrectURLException("You must not modify the host of the URL: "+ baseUrl.getHost());
         }
+        // TODO: use baseUrl.resolve(relativeUrl)
         return URLHelper.createURL(baseUrl, relativeUrl);
     }
 
@@ -79,6 +80,7 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
         } else if (! absolutePath.startsWith("/")) {
             throw new IncorrectURLException("URL must contain an absolute path: "+ baseUrl.getPath());
         }
+    	// TODO: use baseUrl.resolve
         return URLHelper.createURL(baseUrl, absolutePath);
     }
 
@@ -161,6 +163,7 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
                 throw new IncorrectStateException("Not a link: "+ m_url, this);
             }
             try {
+            	// TODO: use m_url.resolve
                 return URLHelper.createURL(m_url, absolutePath);
             } catch (BadParameterException e) {
                 throw new IncorrectStateException(e);
@@ -404,6 +407,7 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
 
     protected URL _getEffectiveURL(URL target) throws NotImplementedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (target.getPath().endsWith("/")) {
+        	// TODO: use target.resolve
             return URLHelper.createURL(target, this._getEntryName());
         } else {
             return target;

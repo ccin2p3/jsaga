@@ -38,7 +38,7 @@ public class DataStagingFactory {
             } else if (new File(local).isAbsolute()) {
                 localURL = URLFactory.createURL(new File(local).toURI().toString());
             } else {
-                localURL = URLFactory.createURL("file://./" + local.replaceAll("\\\\", "/"));
+            	localURL = URLFactory.createURL("file:/" + local);
             }
 
             // create DataStaging

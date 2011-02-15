@@ -188,6 +188,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             // move source childs to target directory
             FileAttributes[] sourceChilds = this._listAttributes(m_url.getPath());
             for (int i=0; i<sourceChilds.length; i++) {
+            	// TODO: use effectiveTarget.resolve(URLFactory.createURL(sourceChilds[i].getRelativePath())
                 URL remoteChild = URLHelper.createURL(effectiveTarget, sourceChilds[i].getRelativePath());
                 SyncNSEntry entry = this._openNS(sourceChilds[i]);
                 if (entry instanceof SyncNSDirectory) {
@@ -272,6 +273,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
     /** override super._getEffectiveURL() */
     protected URL _getEffectiveURL(URL target) throws NotImplementedException, IncorrectStateException, BadParameterException, TimeoutException, NoSuccessException {
         if (target.getPath().endsWith("/")) {
+        	// TODO: use target.resolve(URLFactory.createURL(super._getEntryName()+"/"))
             return URLHelper.createURL(target, super._getEntryName()+"/");
         } else {
             return target;

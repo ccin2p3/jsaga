@@ -7,7 +7,7 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.helpers.StringArray;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import fr.in2p3.jsaga.impl.task.AbstractThreadedTask;
-import fr.in2p3.jsaga.impl.url.URLImpl;
+import fr.in2p3.jsaga.impl.url.AbstractURLImpl;
 import fr.in2p3.jsaga.sync.namespace.SyncNSEntry;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
@@ -120,7 +120,7 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
                 throw new BadParameterException("Not supported for this protocol: "+ m_url.getScheme(), this);
             }
             // reset file attributes from cache
-            ((URLImpl)m_url).setCache(null);
+            ((AbstractURLImpl)m_url).setCache(null);
         } else {
             throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
@@ -178,7 +178,7 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
             throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
         // reset file attributes from cache
-        ((URLImpl)m_url).setCache(null);
+        ((AbstractURLImpl)m_url).setCache(null);
     }
 
     public boolean permissionsCheck(String id, int permissions) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
@@ -357,9 +357,9 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
 
     protected FileAttributes _getFileAttributes() throws NotImplementedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         FileAttributes attrs;
-        if ( ((URLImpl)m_url).hasCache() ) {
+        if ( ((AbstractURLImpl)m_url).hasCache() ) {
             // get file attributes from cache
-            attrs = ((URLImpl)m_url).getCache();
+            attrs = ((AbstractURLImpl)m_url).getCache();
         } else if (m_adaptor instanceof DataReaderAdaptor) {
             // query file attributes
             try {
@@ -371,7 +371,7 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
             }
 
             // set file attributes to cache
-            ((URLImpl)m_url).setCache(attrs);
+            ((AbstractURLImpl)m_url).setCache(attrs);
         } else {
             throw new NotImplementedException("Not supported for this protocol: "+m_url.getScheme(), this);
         }
