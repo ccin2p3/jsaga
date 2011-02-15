@@ -50,8 +50,10 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlStagingOnePhaseAda
     }
 
 	public URI getDataStagingUrl(String host, int port, String basePath, Map attributes) throws URISyntaxException {
-		// FIXME : customized Path
-		return new URI("rbyteio://"+host+":"+port+"/DEMO-SITE/services/Registry/Home");
+		// basePath is in the form "/<SITENAME>/services/BESFactory"
+		// The rbyteio URL is in the form "/<SITENAME>/Registry/Home"
+		String rbyteioPath = basePath.split("/")[0] + "/services/Registry/Home";
+		return new URI("rbyteio://"+host+":"+port+rbyteioPath);
 	}
     
 }

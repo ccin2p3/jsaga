@@ -6,7 +6,7 @@ import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
 import fr.in2p3.jsaga.impl.file.copy.*;
 import fr.in2p3.jsaga.impl.namespace.*;
 import fr.in2p3.jsaga.impl.url.URLHelper;
-import fr.in2p3.jsaga.impl.url.URLImpl;
+import fr.in2p3.jsaga.impl.url.AbstractURLImpl;
 import fr.in2p3.jsaga.sync.file.SyncFile;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.buffer.Buffer;
@@ -103,7 +103,7 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
         }
         if (Flags.READ.isSet(flags) || Flags.WRITE.isSet(flags)) {
             // exists check already done
-        } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !((URLImpl)m_url).hasCache() && m_adaptor instanceof DataReaderAdaptor) {
+        } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !((AbstractURLImpl)m_url).hasCache() && m_adaptor instanceof DataReaderAdaptor) {
             boolean exists = ((DataReaderAdaptor)m_adaptor).exists(m_url.getPath(), m_url.getQuery());
             if (! exists) {
                 throw new DoesNotExistException("File does not exist: "+ m_url);

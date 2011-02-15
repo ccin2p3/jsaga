@@ -10,48 +10,53 @@ import org.ogf.saga.url.URL;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.regex.Pattern;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
-* File:   URLImpl
-* Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   20 oct. 2008
+* File:   AbsoluteURLImpl
+* Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
+* Date:   4 fév 2011
 * ***************************************************
 * Description:                                      */
 /**
  *
  */
-public class URLImpl extends AbstractSagaObjectImpl implements URL {
-    private URI u;
-    private FileAttributes m_cache;
+public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
+    protected URI u;
     private boolean m_mustRemoveSlash;
 
     /** MAY encode the URL */
-    URLImpl(String url, boolean encode) throws BadParameterException {
+    AbsoluteURLImpl(String url) throws BadParameterException {
+    	this(url, true);
+    }
+
+    AbsoluteURLImpl(FileAttributes cache) throws BadParameterException {
+        this(cache.getRelativePath());
+        m_cache = cache;
+    }
+
+    AbsoluteURLImpl(String url, boolean encode) throws BadParameterException {
         if (encode) {
-        	// FIXME file:/
-            if (url.startsWith("file://")) {
+            if (url.startsWith("file:/")) {
                 url = URLEncoder.encodePathOnly(url);
             } else {
                 url = URLEncoder.encode(url);
             }
         }
         try {
-            // FIXME: fix absolute path
-            while (url.startsWith("//")) {
-                url = url.substring(1); // prevent URI to consider root dir as a host
-            }
             u = new URI(url);
-            this.fixFileURI();  //sreynaud
+            //this.fixFileURI();  //sreynaud
         } catch(URISyntaxException e) {
             throw new BadParameterException("syntax error in url", e);
         }
     }
 
     /** Encode the relative path */
-    URLImpl(String relativePath) throws BadParameterException {
+    /*
+    AbsoluteURLImpl(String relativePath) throws BadParameterException {
         int colonPos = relativePath.indexOf(':');
         int slashPos = relativePath.indexOf('/');
         m_mustRemoveSlash = colonPos > -1 && (slashPos == -1 || colonPos < slashPos);
@@ -66,34 +71,45 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
             throw new BadParameterException("syntax error in url", e);
         }
     }
-
+    */
+    
     /** Encode the relative path + set the cache */
-    URLImpl(FileAttributes cache) throws BadParameterException {
+    /*
+    AbsoluteURLImpl(FileAttributes cache) throws BadParameterException {
     	// TODO: check FileAttributes.getRelativePath()
         this(cache.getRelativePath());
         m_cache = cache;
     }
-
+    */
+    
     /** Encode the relative path */
-    URLImpl(URL base, String relativePath) {
-        this(   base,
+    AbsoluteURLImpl(URL base, String relativePath) throws BadParameterException {
+        /*this(   base,
                 URLEncoder.encodePathOnly(relativePath),
                 null,
                 null
-        );
+        );*/
+    	this(base, new RelativeURLImpl(relativePath));
     }
 
     /** Encode the URL */
-    URLImpl(URL base, URL relativeUrl) {
-        this(   base,
+    AbsoluteURLImpl(URL base, URL relativeUrl) throws BadParameterException {
+        /*this(   base,
                 URLEncoder.encodePathOnly(relativeUrl.getPath()),
                 relativeUrl.getQuery()!=null ? relativeUrl.getQuery() : base.getQuery(),
                 relativeUrl.getFragment()!=null ? relativeUrl.getFragment() : base.getFragment()
-        );
+        );*/
+    	if (!(relativeUrl instanceof RelativeURLImpl)) {
+    		throw new BadParameterException("URL must be relative");
+    	}
+    	
     }
 
-    /** DO NOT encode the URL */
-    private URLImpl(URL base, String relativePath, String query, String fragment) {
+    /** DO NOT encode the URL 
+     * @throws BadParameterException */
+    /*
+    private AbsoluteURLImpl(URL base, String relativePath, String query, String fragment) throws BadParameterException {
+    	
         //workaround: Windows absolute paths must start with one and only one '/'
         if (isWindowsAbsolutePath(base.getScheme(), relativePath)) {
             relativePath = "/"+relativePath;
@@ -109,26 +125,26 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
         if (! relativePath.startsWith("/")) {
             relativePath = "./"+relativePath;
         }
-
+    	
         // resolve URI
-        URI baseUri = ((URLImpl) base).u;
+        URI baseUri = ((AbsoluteURLImpl) base).u;
         String relativeUri = relativePath
                 + concatIfNotNull('?', new String[]{query, baseUri.getQuery()})
                 + concatIfNotNull('#', new String[]{fragment, baseUri.getFragment()});
         u = baseUri.resolve(relativeUri);
     }
-
+	*/
+    
     /** DO NOT encode the URL */
-    private URLImpl(URI u) {
+    protected AbsoluteURLImpl(URI u) throws BadParameterException {
         this.u = u;
     }
 
     /** clone */
     public SagaObject clone() throws CloneNotSupportedException {
-        URLImpl clone = (URLImpl) super.clone();
+        AbsoluteURLImpl clone = (AbsoluteURLImpl) super.clone();
         clone.u = u;
         clone.m_cache = m_cache;
-        clone.m_mustRemoveSlash = m_mustRemoveSlash;
         return clone;
     }
 
@@ -137,18 +153,19 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
         if (url == null) {
             url = "";
         }
-        String encodedUrl = (url.startsWith("file://"))
+        // Check that url is absolute
+        if (url != "" && ! Pattern.matches("^[^/\\\\]{2,}\\:.*", url)) {
+    		throw new BadParameterException("URL must be absolute");
+    	}
+        String encodedUrl = (url.startsWith("file:/"))
                 ? URLEncoder.encodePathOnly(url)
                 : URLEncoder.encode(url);
         try {
             u = new URI(encodedUrl);
-            this.fixFileURI();  //sreynaud
+            //this.fixFileURI();  //sreynaud
         } catch(URISyntaxException e) {
             throw new BadParameterException("syntax error in url", e);
         }
-    }
-    public void setString() throws BadParameterException {
-        this.setString(null);
     }
 
     /** Decode the URL */
@@ -176,12 +193,10 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
             throw new BadParameterException("syntax error in fragment", e);
         }
     }
-    public void setFragment() throws BadParameterException {
-        this.setFragment(null);
-    }
 
     public String getHost() {
         if (u.getHost() == null) {
+        	// TODO: check this
             return this.getSchemeSpecificPart().getHost();   //sreynaud
         }
         return u.getHost();
@@ -195,17 +210,12 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
             throw new BadParameterException("syntax error in host", e);
         }
     }
-    public void setHost() throws BadParameterException {
-        this.setHost(null);
-    }
 
     public String getPath() {
         if (u.getPath() == null) {
             return this.getSchemeSpecificPart().getPath();  //sreynaud
-        } else if (".".equals(u.getAuthority())) {
-            return "."+u.getPath();                         //sreynaud
-        } else if (u.getPath().startsWith("/./") || m_mustRemoveSlash) {
-            return u.getPath().substring(1);                //sreynaud
+        // Obsolete} else if (u.getPath().startsWith("/./") || m_mustRemoveSlash) {
+        //    return u.getPath().substring(1);                //sreynaud
         } else if (u.getPath().startsWith("//")) {
             return trimPath(u.getPath());                   //sreynaud
         }
@@ -223,26 +233,23 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
         if (path == null) {
             path = "";
         }
+		// convert '\' to '/'
+		if (System.getProperty("file.separator") != "/")
+			path = path.replace(System.getProperty("file.separator"), "/");
         try {
-            if (path.startsWith("./")) {
-                //sreynaud: set relative path
-                u = new URI(u.getScheme(), u.getAuthority(),
-                        path.substring(2), u.getQuery(), u.getFragment());
-            } else {
-                //sreynaud: fix absolute path
-                int i;for(i=0; i<path.length() && path.charAt(i)=='/'; i++);
-                if(i>1)path="/"+path.substring(i);
-                if (path == "" && u.getRawAuthority() == null) 
-                	throw new BadParameterException("Path cannot by empty if authority is empty");
-                u = new URI(u.getScheme(), u.getUserInfo(), u.getHost(),
-                        u.getPort(), path, u.getQuery(), u.getFragment());
-            }
+        	// LSZ add leading / in case of Windoze path
+        	if (path.indexOf(':')>0)
+        		path = "/"+path;
+        	// TODO: check why 2 following lines
+            int i;for(i=0; i<path.length() && path.charAt(i)=='/'; i++);
+            if(i>1)path="/"+path.substring(i);
+            if (path == "" && u.getRawAuthority() == null) 
+            	throw new BadParameterException("Path cannot by empty if authority is empty");
+            u = new URI(u.getScheme(), u.getUserInfo(), u.getHost(),
+                    u.getPort(), path, u.getQuery(), u.getFragment());
         } catch(URISyntaxException e) {
             throw new BadParameterException("syntax error in path", e);
         }
-    }
-    public void setPath() throws BadParameterException {
-        this.setPath(null);
     }
 
     public int getPort() {
@@ -260,9 +267,6 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
             throw new BadParameterException("syntax error in port", e);     // ???
         }
     }
-    public void setPort() throws BadParameterException {
-        this.setPort(-1);
-    }
 
     public String getQuery() {
         if (u.getQuery() == null) {
@@ -279,9 +283,6 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
             throw new BadParameterException("syntax error in query", e);
         }
     }
-    public void setQuery() throws BadParameterException {
-        this.setQuery(null);
-    }
 
     public String getScheme() {
         return u.getScheme();
@@ -294,9 +295,6 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
         } catch(URISyntaxException e) {
             throw new BadParameterException("syntax error in scheme", e);
         }
-    }
-    public void setScheme() throws BadParameterException {
-        this.setScheme(null);
     }
 
     public String getUserInfo() {
@@ -314,9 +312,6 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
             throw new BadParameterException("syntax error in query", e);
         }
     }
-    public void setUserInfo() throws BadParameterException {
-        this.setUserInfo(null);
-    }
 
     public URL translate(String scheme) throws BadParameterException, NoSuccessException {
         try {
@@ -325,26 +320,36 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
             // Not quite correct: the SAGA specs say that NoSuccessException should be
             // thrown when the scheme is not supported. How to check this
             // here ???
-            return new URLImpl(url);
+            return new AbsoluteURLImpl(url);
         } catch(URISyntaxException e) {
             throw new BadParameterException("syntax error in scheme", e);
         }
     }
-    public URL translate(Session session, String scheme) throws BadParameterException, NoSuccessException {
-        return this.translate(scheme);
-    }
 
     public URL resolve(URL url) throws NoSuccessException {
-        URLImpl urlimpl = (URLImpl) url;
-        URI uri = u.resolve(urlimpl.u);
-        if (uri == urlimpl.u) {
-            return url;
-        }
-        return new URLImpl(uri);
+    	URI uri;
+    	if (url instanceof AbsoluteURLImpl) {
+    		AbsoluteURLImpl urlimpl = (AbsoluteURLImpl) url;
+            uri = u.resolve(urlimpl.u);
+            if (uri == urlimpl.u) {
+                return url;
+            }
+    	} else if (url instanceof RelativeURLImpl) {
+        	// if relative: encode url string
+    		String url_string = URLEncoder.encode(url.getString());
+    		uri = u.resolve(url_string);
+    	} else {
+    		throw new NoSuccessException("Unknown class: " + url.getClass().getName());
+    	}
+        try {
+			return new AbsoluteURLImpl(uri);
+		} catch (BadParameterException e) {
+			throw new NoSuccessException(e);
+		}
     }
 
     public boolean isAbsolute() {
-        return u.isAbsolute();
+        return true; //u.isAbsolute();
     }
 
     public URL normalize() {
@@ -352,7 +357,11 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
         if (uri == u) {
             return this;
         }
-        return new URLImpl(uri);
+        try {
+			return new AbsoluteURLImpl(uri);
+		} catch (BadParameterException e) {
+			return this;
+		}
     }
 
     ////////////////////////////////////////// java methods ///////////////////////////////////////////
@@ -365,39 +374,27 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
         if (o == null) {
             return false;
         }
-        if (! (o instanceof URLImpl)) {
+        if (! (o instanceof AbsoluteURLImpl)) {
             return false;
         }
-        URLImpl other = (URLImpl) o;
+        AbsoluteURLImpl other = (AbsoluteURLImpl) o;
         return u.equals(other.u);
     }
 
-    ////////////////////////////////////////// cache methods //////////////////////////////////////////
-
-    public void setCache(FileAttributes cache) {
-        m_cache = cache;
-    }
-
-    public FileAttributes getCache() {
-        return m_cache;
-    }
-
-    public boolean hasCache() {
-        return (m_cache != null);
-    }
-
     ///////////////////////////////////////// private methods /////////////////////////////////////////
-
+    /*
     private boolean isWindowsAbsolutePath(String scheme, String relativePath) {
         return ("file".equals(scheme) || "zip".equals(scheme))
                 && System.getProperty("os.name").startsWith("Windows")
                 && relativePath.length()>=2 && Character.isLetter(relativePath.charAt(0)) && relativePath.charAt(1)==':'
                 && (relativePath.length()==2 || (relativePath.length()>2 && relativePath.charAt(2)=='/'));
     }
-
+	*/
+    /*
     private void fixFileURI() throws URISyntaxException {
     	// FIXME : u.getAuthority().equals(".")
-        boolean isRelative = (u.getHost()==null && u.getAuthority()!=null && !u.getAuthority().equals("."));
+    	//LSZ relative URL are in RelativeURLImpl
+        //boolean isRelative = (u.getHost()==null && u.getAuthority()!=null && !u.getAuthority().equals("."));
         boolean isWindows = (u.getHost()!=null && u.getHost().length()==1 && u.getAuthority()!=null && u.getAuthority().endsWith(":"));
         if (isRelative || isWindows) {
             u = new URI(u.getScheme(), u.getUserInfo(),
@@ -407,7 +404,7 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
                     u.getQuery(), u.getFragment());
         }
     }
-
+	*/
     private URI getSchemeSpecificPart() {
         try {
             return new URI(u.getRawSchemeSpecificPart());
@@ -416,6 +413,7 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
         }
     }
 
+    /*
     private static String concatIfNotNull(char prefix, String[] suffix) {
         for (int i=0; suffix!=null && i<suffix.length; i++) {
             if (suffix[i] != null) {
@@ -424,4 +422,6 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
         }
         return "";
     }
+    */
+
 }

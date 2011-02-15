@@ -9,7 +9,7 @@ import fr.in2p3.jsaga.impl.logicalfile.copy.LogicalFileCopy;
 import fr.in2p3.jsaga.impl.logicalfile.copy.LogicalFileCopyFrom;
 import fr.in2p3.jsaga.impl.namespace.*;
 import fr.in2p3.jsaga.impl.url.URLHelper;
-import fr.in2p3.jsaga.impl.url.URLImpl;
+import fr.in2p3.jsaga.impl.url.AbstractURLImpl;
 import fr.in2p3.jsaga.sync.logicalfile.SyncLogicalFile;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
@@ -72,7 +72,7 @@ public abstract class AbstractSyncLogicalFileImpl extends AbstractNSEntryImplWit
             } else {
                 throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme());
             }
-        } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !((URLImpl)m_url).hasCache() && m_adaptor instanceof DataReaderAdaptor) {
+        } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !((AbstractURLImpl)m_url).hasCache() && m_adaptor instanceof DataReaderAdaptor) {
             boolean exists = ((DataReaderAdaptor)m_adaptor).exists(
                     m_url.getPath(),
                     m_url.getQuery());
