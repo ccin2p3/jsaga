@@ -31,7 +31,6 @@ public class RelativeURLImpl extends AbstractURLImpl implements URL {
 	protected UniversalFile m_file;
 	protected String url_query;
 	protected String url_fragment;
-	protected boolean url_isDir;
 	
 	RelativeURLImpl(String url) throws BadParameterException {
 		// url is considered as path only (even if contains ? and #)
@@ -47,7 +46,6 @@ public class RelativeURLImpl extends AbstractURLImpl implements URL {
     public SagaObject clone() throws CloneNotSupportedException {
     	RelativeURLImpl clone = (RelativeURLImpl) super.clone();
         clone.m_file = m_file;
-        clone.url_isDir = url_isDir;
         clone.url_query = url_query;
         clone.url_fragment = url_fragment;
         clone.m_cache = m_cache;
@@ -66,12 +64,9 @@ public class RelativeURLImpl extends AbstractURLImpl implements URL {
     	}
     	String new_url;
     	// path or parent path
-    	new_url = url_isDir?m_file.getPath():m_file.getParent();
-    	new_url += "/";
-    	// concatenate new path
+    	new_url = m_file.isDirectory()?m_file.getPath():m_file.getParent();
+    	// add new path
     	new_url += rel_url.m_file.getPath();
-    	// add / if new path is a dir
-    	new_url += (rel_url.url_isDir)?"/":"";
     	// add new query or current query
     	if (rel_url.url_query != null) {
     		new_url += "?" + rel_url.url_query;
@@ -89,7 +84,6 @@ public class RelativeURLImpl extends AbstractURLImpl implements URL {
         	}
     		
     	}
-    	// addnew fragment or current fragment
     	// return resolved URL
     	try {
 			return new RelativeURLImpl(new_url);
@@ -137,32 +131,17 @@ public class RelativeURLImpl extends AbstractURLImpl implements URL {
 	}
 
 	public String getPath() {
-		return m_file.getPath() + (url_isDir?"/":"") ;
+		return m_file.getPath();
 	}
 
 	public void setPath(String path) throws BadParameterException {
-		url_isDir=false;
 		if (path != null) {
-			// convert '\' to '/'
-			if (System.getProperty("file.separator") != "/")
-				path = path.replace(System.getProperty("file.separator"), "/");
-			if (Pattern.matches("^[^/]{2,}\\:.*", path)) {
+			if (Pattern.matches("^[^/\\\\]{2,}\\:.*", path)) {
 				throw new BadParameterException("path must be relative");
 			}
-			if (path.endsWith("/")) url_isDir=true;
 		} else {
 			path = "";
 		}
-		/*url_path = (path == null?"":path);
-		// remove leading duplicated / 
-        while (url_path.startsWith("//")) {
-        	url_path = url_path.substring(1);
-        }*/
-		
-		// remove leading duplicated / 
-        while (path.startsWith("//")) {
-        	path = path.substring(1);
-        }
 		m_file = new UniversalFile(path);
 	}
 
@@ -217,20 +196,10 @@ public class RelativeURLImpl extends AbstractURLImpl implements URL {
 
 	public URL normalize() {
 		try {
-            // add a leading '/' to prevent getCanonicalPath from concatenating to PWD
-			String canon;
-			if (!m_file.isAbsolute()) {
-				UniversalFile f = new UniversalFile("/"+getPath());
-				canon = f.getCanonicalPath();
-				// remove leading /
-				canon = canon.substring(1);
-			} else {
-				canon = m_file.getCanonicalPath();
-			}
+			String canon = m_file.getCanonicalPath();
 			RelativeURLImpl newURL = new RelativeURLImpl(canon);
 			newURL.setQuery(url_query);
 			newURL.setFragment(url_fragment);
-			newURL.url_isDir = url_isDir;
 			return newURL;
 		} catch (BadParameterException e) {
 			return this;
