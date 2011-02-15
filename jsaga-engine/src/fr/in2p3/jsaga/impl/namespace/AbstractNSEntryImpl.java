@@ -303,20 +303,36 @@ public abstract class AbstractNSEntryImpl extends AbstractAsyncNSEntryImpl imple
     }
 
     public void close() throws NotImplementedException, NoSuccessException {
-        float timeout = this.getTimeout("close");
-        if (timeout == WAIT_FOREVER) {
-            super.close();
-        } else {
+        if (this.getTimeout("close") != WAIT_FOREVER) {
             throw new NotImplementedException("Configuring user timeout is not supported for method: close");
         }
+
+        super.close();
     }
 
     public void close(float timeoutInSeconds) throws NotImplementedException, NoSuccessException {
-        float timeout = this.getTimeout("close");
-        if (timeout == WAIT_FOREVER) {
-            super.close(timeoutInSeconds);
-        } else {
+        if (this.getTimeout("close") != WAIT_FOREVER) {
             throw new NotImplementedException("Configuring user timeout is not supported for method: close");
+        }
+
+        if (timeoutInSeconds == WAIT_FOREVER) {
+            super.close();
+        } else if (timeoutInSeconds == NO_WAIT) {
+            super.close(TaskMode.ASYNC);
+        } else {
+            try {
+                getResult(super.close(TaskMode.ASYNC), timeoutInSeconds);
+            }
+            catch (TimeoutException e) {throw new NoSuccessException(e);}
+            catch (BadParameterException e) {throw new NoSuccessException(e);}
+            catch (SagaIOException e) {throw new NoSuccessException(e);}
+            catch (AuthorizationFailedException e) {throw new NoSuccessException(e);}
+            catch (AlreadyExistsException e) {throw new NoSuccessException(e);}
+            catch (PermissionDeniedException e) {throw new NoSuccessException(e);}
+            catch (IncorrectStateException e) {throw new NoSuccessException(e);}
+            catch (AuthenticationFailedException e) {throw new NoSuccessException(e);}
+            catch (IncorrectURLException e) {throw new NoSuccessException(e);}
+            catch (DoesNotExistException e) {throw new NoSuccessException(e);}
         }
     }
 

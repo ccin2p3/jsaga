@@ -159,11 +159,6 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
         }
     }
 
-    /** override super.close() in order to close opened input and output streams */
-    public synchronized void close(float timeoutInSeconds) throws NotImplementedException, NoSuccessException {
-        this.close();
-    }
-
     /** override super.removeSync() in order to close opened input and output streams */
     public void removeSync(int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_outStream != null) {

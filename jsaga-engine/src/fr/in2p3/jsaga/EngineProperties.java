@@ -24,6 +24,7 @@ public class EngineProperties {
     public static final String JSAGA_TIMEOUT = "jsaga.timeout";
     public static final String LOG4J_CONFIGURATION = "log4j.configuration";
     public static final String JSAGA_DEFAULT_CONTEXTS_CHECK_CONFLICTS = "jsaga.default.contexts.check.conflicts";
+    public static final String DATA_IMPLICIT_CLOSE_TIMEOUT = "data.implicit.close.timeout";
     public static final String DATA_COPY_BUFFER_SIZE = "data.copy.buffer.size";
     public static final String JOB_MONITOR_POLL_PERIOD = "job.monitor.poll.period";
     public static final String JOB_MONITOR_ERROR_THRESHOLD = "job.monitor.error.threshold";
@@ -42,6 +43,7 @@ public class EngineProperties {
             //s_prop.setProperty(JSAGA_TIMEOUT, "etc/jsaga-timeout.properties");
             //s_prop.setProperty(LOG4J_CONFIGURATION, "etc/log4j.properties");
             s_prop.setProperty(JSAGA_DEFAULT_CONTEXTS_CHECK_CONFLICTS, "true");
+            //s_prop.setProperty(DATA_IMPLICIT_CLOSE_TIMEOUT, "-1");
             s_prop.setProperty(DATA_COPY_BUFFER_SIZE, "16384");
             s_prop.setProperty(JOB_MONITOR_POLL_PERIOD, "1000");
             s_prop.setProperty(JOB_MONITOR_ERROR_THRESHOLD, "3");
@@ -75,7 +77,7 @@ public class EngineProperties {
         if (value != null) {
             return value;
         } else {
-            throw new RuntimeException("[INTERNAL ERROR] Engine property not found: "+name);
+            return null;
         }
     }
 
@@ -130,11 +132,21 @@ public class EngineProperties {
         }
     }
 
-    public static int getInteger(String name) throws NumberFormatException {
-        return Integer.parseInt(getProperty(name));
+    public static Integer getInteger(String name) throws NumberFormatException {
+        String value = getProperty(name);
+        if (value != null) {
+            return Integer.parseInt(value);
+        } else {
+            return null;
+        }
     }
 
-    public static boolean getBoolean(String name) {
-        return "true".equalsIgnoreCase(getProperty(name));
+    public static Boolean getBoolean(String name) {
+        String value = getProperty(name);
+        if (value != null) {
+            return "true".equalsIgnoreCase(value);
+        } else {
+            return null;
+        }
     }
 }

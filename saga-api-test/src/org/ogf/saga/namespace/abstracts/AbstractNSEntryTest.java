@@ -92,7 +92,7 @@ public abstract class AbstractNSEntryTest extends AbstractTest {
                 File physicalFile = (File) m_physicalDir.open(m_physicalFileUrl, FLAGS_FILE);
                 Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT.getBytes());
                 physicalFile.write(buffer);
-                physicalFile.close(0);
+                physicalFile.close();
                 // register it
                 ((LogicalFile)m_file).addLocation(m_physicalFileUrl);
             }
@@ -140,6 +140,6 @@ public abstract class AbstractNSEntryTest extends AbstractTest {
         assertEquals(
                 expected,
                 new String(buffer.getData(), 0, len));
-        reader.close(0);
+        reader.close();
     }
 }

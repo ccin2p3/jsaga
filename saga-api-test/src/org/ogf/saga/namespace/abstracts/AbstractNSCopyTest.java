@@ -74,7 +74,7 @@ public abstract class AbstractNSCopyTest extends AbstractNSDirectoryTest {
                 File physicalFile = (File) m_physicalDir.open(m_physicalFileUrl2, FLAGS_FILE);
                 Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT_2.getBytes());
                 physicalFile.write(buffer);
-                physicalFile.close(0);
+                physicalFile.close();
             }
             if (m_dirUrl2 != null) {
                 // to be removed by this.tearDown()
@@ -125,6 +125,6 @@ public abstract class AbstractNSCopyTest extends AbstractNSDirectoryTest {
         assertEquals(
                 expectedContent,
                 new String(buffer.getData(), 0, len));
-        reader.close(0);
+        reader.close();
     }
 }
