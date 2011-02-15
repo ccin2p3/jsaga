@@ -23,26 +23,27 @@ public class UniversalFileTest extends TestCase {
     private UniversalFile m_directory;
 
     public void setUp() {
-        m_winAbsolute = new UniversalFile("c:/path/to/file");
+        m_winAbsolute = new UniversalFile("C:/path/to/file");
         m_absolute = new UniversalFile("/path/to/file");
         m_relative = new UniversalFile("path/to/file");
         m_directory = new UniversalFile("/dir/");
     }
 
     public void test_getPath() {
-        assertEquals("c:/path/to/file", m_winAbsolute.getPath());
+        assertEquals("C:/path/to/file", m_winAbsolute.getPath());
         assertEquals("/path/to/file", m_absolute.getPath());
         assertEquals("path/to/file", m_relative.getPath());
         assertEquals("/dir/", m_directory.getPath());
+        assertEquals("/path/to/file", new UniversalFile("//path/to/file").getPath());
     }
 
     public void test_getParent() {
-        assertEquals("c:/path/to/", m_winAbsolute.getParent());
+        assertEquals("C:/path/to/", m_winAbsolute.getParent());
         assertEquals("/path/to/", m_absolute.getParent());
         assertEquals("path/to/", m_relative.getParent());
         assertEquals("/", m_directory.getParent());
         assertEquals("/", new UniversalFile("/file").getParent());
-        assertEquals(".", new UniversalFile("file").getParent());
+        assertEquals("./", new UniversalFile("file").getParent());
     }
 
     public void test_getCanonicalPath() throws IOException {
