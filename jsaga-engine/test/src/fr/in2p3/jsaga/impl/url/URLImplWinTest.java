@@ -20,10 +20,10 @@ import org.ogf.saga.url.URLFactory;
 public class URLImplWinTest extends URLImplFileTest {
     
     protected void init() {
+        _abs_path = "c:/path/";
+        _path_not_encoded = "c:/path with#and?and{}and%and\"and[]";
+        _path_encoded = "c:/path%20with%23and%3Fand%7B%7Dand%25and%22and%5B%5D";
     	super.init();
-    	 _abs_path = "/c:/path/";
-    	 _path_not_encoded = "/c:/path with#and?and{}and%and\"and[]";
-    	 _path_encoded = "/c:/path%20with%23and%3Fand%7B%7Dand%25and%22and%5B%5D";
     }
 
     public void test_antislash()  throws Exception {
