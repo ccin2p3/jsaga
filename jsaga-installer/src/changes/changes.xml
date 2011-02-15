@@ -3,6 +3,10 @@
         <title>JSAGA Release Notes</title>
     </properties>
     <body>
+        <release version="0.9.13-SNAPSHOT" date="2011-02-15">
+            <action dev="lschwarz" type="update">New URL implementation RFC-3986 compliant</action>
+            <action dev="sreynaud" type="add">Added configuration attribute "data.implicit.close.timeout"</action>
+        </release>
         <release version="0.9.12" date="2011-02-11" description="New plug-ins for ARC and Unicore">
             <action dev="lschwarz" type="add">Added adaptor for ARC (A-REX with BES interface)</action>
             <action dev="lschwarz" type="add">Added adaptor for Unicore (with BES interface)</action>
