@@ -19,6 +19,8 @@ import org.ogf.saga.error.*;
 
 import java.io.*;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -144,6 +146,10 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
         try {
             return new GsiftpOutputStream(tmpConnection, absolutePath, append);
         } catch (Exception e) {
+            try{tmpConnection.close();} catch (Exception e2) {
+                /*Ignore it to throw the primary execption*/
+                Logger.getLogger(GsiftpDataAdaptorAbstract.class.getName()).log(Level.FINE, "Exception ignored when closing connection.", e2);
+            }
             try {
                 throw rethrowExceptionFull(e);
             } catch (DoesNotExistException e2) {
