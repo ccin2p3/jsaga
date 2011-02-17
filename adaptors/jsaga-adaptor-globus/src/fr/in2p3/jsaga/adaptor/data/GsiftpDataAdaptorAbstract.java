@@ -9,6 +9,8 @@ import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.globus.common.ChainedIOException;
 import org.globus.ftp.*;
 import org.globus.ftp.exception.*;
@@ -144,6 +146,10 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
         try {
             return new GsiftpOutputStream(tmpConnection, absolutePath, append);
         } catch (Exception e) {
+            try{tmpConnection.close();} catch (Exception e2) {
+                /*Ignore it to throw the primary execption*/
+                Logger.getLogger(GsiftpDataAdaptorAbstract.class.getName()).log(Level.DEBUG, "Exception ignored when closing connection.", e2);
+            }
             try {
                 throw rethrowExceptionFull(e);
             } catch (DoesNotExistException e2) {
