@@ -51,7 +51,6 @@ import fr.maatg.glite.dm.CNSConnector;
 import fr.maatg.glite.dm.connection.DMError;
 import fr.maatg.glite.dm.connection.ReceiveException;
 import fr.maatg.glite.dm.ns.CNSConnection;
-import fr.maatg.glite.dm.ns.CNSConnections;
 import fr.maatg.glite.dm.ns.CNSFileReaddir;
 import fr.maatg.glite.dm.ns.CNSFileStat;
 import fr.maatg.glite.dm.ns.CNSPermissions;
@@ -94,8 +93,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		
 		try {
 			connection = m_lfcConnector.getNewConnection();
-			m_lfcConnector.startSession(connection, null);
-			connection = CNSConnections.getCNSConnectionTimeout(connection);
+			m_lfcConnector.startSession(connection);
 		} catch (IOException e) {
 			logger.debug("ERROR: connect("+userInfo+", "+host+", "+port+"): "+e.getMessage());
 			throw new NoSuccessException(e);
@@ -261,14 +259,14 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 			boolean done = false;
 			try {
 				m_lfcConnector.addReplica(connection, guid, new java.net.URI(replicaEntry.getString()));
-				m_lfcConnector.setFileSize(connection, logicalEntry, 0L, fileSize, null, null);
+				m_lfcConnector.setFileSize(connection, logicalEntry, fileSize, null, null);
 				m_lfcConnector.endTransaction(connection);
 				done = true;
 			} catch (URISyntaxException e) {
 				//Cannot happen
 			}finally{
 				if(!done){
-					m_lfcConnector.abortTransaction(connection);
+					m_lfcConnector.abordTransaction(connection);
 				}
 			}
 			logger.debug("DONE: addLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+")");
@@ -900,11 +898,16 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 	}
 	
 
-	public void setGroup(String absolutePath, String id) throws DoesNotExistException, PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
+	public void setGroup(String id) throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
 		// TODO Auto-generated method stub
 		throw new NoSuccessException("Not implemented");
 	}
 
+	
+	public void setOwner(String id) throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
+		// TODO Auto-generated method stub
+		throw new NoSuccessException("Not implemented");
+	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public String[] getGroupsOf(String id) throws BadParameterException, NoSuccessException {
