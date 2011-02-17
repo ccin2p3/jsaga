@@ -24,11 +24,6 @@ public class URLFactoryImpl extends URLFactory {
     	return (Pattern.matches("^[^/\\\\]{2,}\\:.*", url))?new AbsoluteURLImpl(url):new RelativeURLImpl(url);
     }
 
-    public static URL createUnencodedURL(String url) throws BadParameterException {
-    	// TODO: check why no encoding
-        return new URLImpl(url, false); // encode = false
-    }
-
     public static URL createRelativePath(String relativePath) throws BadParameterException {
         return new RelativeURLImpl(relativePath);
     }

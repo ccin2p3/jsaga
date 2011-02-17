@@ -17,6 +17,9 @@ import org.ogf.saga.url.URL;
  *
  */
 public class URLHelper {
+	
+	private static String[] localSchemes={"file","zip"};
+	
     public static boolean isDirectory(URL url) throws NotImplementedException {
         return isDirectory(url.getPath());
     }
@@ -37,13 +40,6 @@ public class URLHelper {
         return path;
     }
 
-    public static URL toDirectoryURL(URL url) throws NotImplementedException, BadParameterException {
-        String path = url.getPath();
-        if (!path.endsWith("/")) {
-            url.setPath(path+"/");
-        }
-        return url;
-    }
     public static String toDirectoryPath(String path) throws NotImplementedException, BadParameterException {
         if (!path.endsWith("/")) {
             return path+"/";
@@ -54,21 +50,11 @@ public class URLHelper {
 
     public static URL createURL(URL base, URL relativePath) throws NotImplementedException, BadParameterException, NoSuccessException {
         // check URL
-    	// TODO: clean this
         boolean isDir = base.getPath().endsWith("/");
         boolean isAbsolute = relativePath.getPath().startsWith("/");
         if (!isDir && !isAbsolute) {
             throw new BadParameterException("INTERNAL ERROR: path must be relative to a directory: "+base);
         }
-        // resolve
-        /*
-        URLImpl url = new URLImpl(base, relativePath);
-        if ( ((URLImpl)relativePath).hasCache() ) {
-            FileAttributes cache = ((URLImpl)relativePath).getCache();
-            url.setCache(cache);
-        }
-        */
-        // FIXME: case of RelativeURLImp
         URL url;
         url = base.resolve(relativePath);
         if ( ((AbstractURLImpl)relativePath).hasCache() ) {
@@ -79,16 +65,6 @@ public class URLHelper {
     }
 
     public static URL createURL(URL base, String name) throws NotImplementedException, BadParameterException, NoSuccessException {
-        // check URL
-    	/*
-        boolean isDir = base.getPath().endsWith("/");
-        boolean isAbsolute = name.startsWith("/");
-        if (!isDir && !isAbsolute) {
-            throw new BadParameterException("INTERNAL ERROR: path must be relative to a directory: "+base);
-        }
-        // resolve
-        return new URLImpl(base, name);
-        */
     	return createURL(base, new RelativeURLImpl(name));
     }
 
@@ -112,4 +88,15 @@ public class URLHelper {
         }
         return name;
     }
+    
+    public static boolean startsWithLocalScheme(String url) {
+    	if (url == null || url == "") {
+    		return false;
+    	}
+    	for (String scheme : localSchemes) {
+    		if (url.startsWith(scheme+":/")) return true;
+    	}
+    	return false;
+    }
+
 }
