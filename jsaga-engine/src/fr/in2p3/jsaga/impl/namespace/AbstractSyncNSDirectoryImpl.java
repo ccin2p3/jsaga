@@ -194,7 +194,6 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
         FileAttributes[] childs = this._listAttributes(m_url.getPath());
         for (int i=0; i<childs.length; i++) {
             // set child relative path
-        	// TODO: use currentRelativePath.resolve
             URL childRelativePath = URLHelper.createURL(currentRelativePath, childs[i].getRelativePath());
             // add child relative path to matching list
             if (p==null || p.matcher(childs[i].getRelativePath()).matches()) {
