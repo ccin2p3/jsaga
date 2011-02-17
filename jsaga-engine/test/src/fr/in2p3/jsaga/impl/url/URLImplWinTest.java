@@ -52,11 +52,28 @@ public class URLImplWinTest extends AbstractTest {
     		super.ignore("Not on Windows");
     		return;
     	}*/
-        URL url = URLFactory.createURL(_abs_path+_file);
+        URL url;
         String newWinFile = "e:/data/file.txt";
+        
+        url = URLFactory.createURL(_abs_path+_file);
         url.setPath(newWinFile);
-        // a / should be added
         assertEquals(newWinFile, url.getString());
+        
+        url = URLFactory.createURL("file:/"+_abs_path+_file);
+        url.setPath(newWinFile);
+        assertEquals("file:/" + newWinFile, url.getString());
+        assertEquals("/"+newWinFile, url.getPath());
+
+        url = URLFactory.createURL("file:///"+_abs_path+_file);
+        url.setPath(newWinFile);
+        assertEquals("file:/" + newWinFile, url.getString());
+        assertEquals("/"+newWinFile, url.getPath());
+
+    
+        url = URLFactory.createURL("file:/"+_abs_path+_file);
+        url.setPath("////" + newWinFile);
+        assertEquals("file:/" + newWinFile, url.getString());
+        assertEquals("/"+newWinFile, url.getPath());
     }
     
     public void test_relative() throws Exception {
