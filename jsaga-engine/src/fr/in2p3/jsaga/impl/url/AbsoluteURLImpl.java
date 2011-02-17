@@ -24,11 +24,10 @@ import java.util.regex.Pattern;
  */
 public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
     protected URI u;
-    //private boolean m_mustRemoveSlash;
-
+    
     /** MAY encode the URL */
     AbsoluteURLImpl(String url) throws BadParameterException {
-    	this(url, true);
+    	this.setString(url);
     }
 
     AbsoluteURLImpl(FileAttributes cache) throws BadParameterException {
@@ -36,103 +35,6 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
         m_cache = cache;
     }
 
-    AbsoluteURLImpl(String url, boolean encode) throws BadParameterException {
-        if (encode) {
-            if (url.startsWith("file:/")) {
-                url = URLEncoder.encodePathOnly(url);
-            } else {
-                url = URLEncoder.encode(url);
-            }
-        }
-        try {
-            u = new URI(url);
-            //this.fixFileURI();  //sreynaud
-        } catch(URISyntaxException e) {
-            throw new BadParameterException("syntax error in url", e);
-        }
-    }
-
-    /** Encode the relative path */
-    /*
-    AbsoluteURLImpl(String relativePath) throws BadParameterException {
-        int colonPos = relativePath.indexOf(':');
-        int slashPos = relativePath.indexOf('/');
-        m_mustRemoveSlash = colonPos > -1 && (slashPos == -1 || colonPos < slashPos);
-        if (m_mustRemoveSlash) {
-            relativePath = URLEncoder.encodePathOnly("/"+relativePath);
-        } else {
-            relativePath = URLEncoder.encodePathOnly(relativePath);
-        }
-        try {
-            u = new URI(relativePath);
-        } catch (URISyntaxException e) {
-            throw new BadParameterException("syntax error in url", e);
-        }
-    }
-    */
-    
-    /** Encode the relative path + set the cache */
-    /*
-    AbsoluteURLImpl(FileAttributes cache) throws BadParameterException {
-    	// TODO: check FileAttributes.getRelativePath()
-        this(cache.getRelativePath());
-        m_cache = cache;
-    }
-    */
-    
-    /** Encode the relative path */
-    AbsoluteURLImpl(URL base, String relativePath) throws BadParameterException {
-        /*this(   base,
-                URLEncoder.encodePathOnly(relativePath),
-                null,
-                null
-        );*/
-    	this(base, new RelativeURLImpl(relativePath));
-    }
-
-    /** Encode the URL */
-    AbsoluteURLImpl(URL base, URL relativeUrl) throws BadParameterException {
-        /*this(   base,
-                URLEncoder.encodePathOnly(relativeUrl.getPath()),
-                relativeUrl.getQuery()!=null ? relativeUrl.getQuery() : base.getQuery(),
-                relativeUrl.getFragment()!=null ? relativeUrl.getFragment() : base.getFragment()
-        );*/
-    	if (!(relativeUrl instanceof RelativeURLImpl)) {
-    		throw new BadParameterException("URL must be relative");
-    	}
-    	
-    }
-
-    /** DO NOT encode the URL 
-     * @throws BadParameterException */
-    /*
-    private AbsoluteURLImpl(URL base, String relativePath, String query, String fragment) throws BadParameterException {
-    	
-        //workaround: Windows absolute paths must start with one and only one '/'
-        if (isWindowsAbsolutePath(base.getScheme(), relativePath)) {
-            relativePath = "/"+relativePath;
-        }
-
-        // remove redondant '/'
-        if (relativePath.startsWith("//")) {
-            int i;for(i=0; i<relativePath.length() && relativePath.charAt(i)=='/'; i++);
-            if(i>1)relativePath="/"+relativePath.substring(i);
-        }
-
-        //workaround: force to be interpreted as a relative path (even if path contains character ':')
-        if (! relativePath.startsWith("/")) {
-            relativePath = "./"+relativePath;
-        }
-    	
-        // resolve URI
-        URI baseUri = ((AbsoluteURLImpl) base).u;
-        String relativeUri = relativePath
-                + concatIfNotNull('?', new String[]{query, baseUri.getQuery()})
-                + concatIfNotNull('#', new String[]{fragment, baseUri.getFragment()});
-        u = baseUri.resolve(relativeUri);
-    }
-	*/
-    
     /** DO NOT encode the URL */
     protected AbsoluteURLImpl(URI u) throws BadParameterException {
         this.u = u;
@@ -155,12 +57,11 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
         if (url != "" && ! Pattern.matches("^[^/\\\\]{2,}\\:.*", url)) {
     		throw new BadParameterException("URL must be absolute");
     	}
-        String encodedUrl = (url.startsWith("file:/"))
+        String encodedUrl = (URLHelper.startsWithLocalScheme(url))
                 ? URLEncoder.encodePathOnly(url)
                 : URLEncoder.encode(url);
         try {
             u = new URI(encodedUrl);
-            //this.fixFileURI();  //sreynaud
         } catch(URISyntaxException e) {
             throw new BadParameterException("syntax error in url", e);
         }
@@ -241,13 +142,14 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
     public String getPath() {
         if (u.getPath() == null) {
             return this.getSchemeSpecificPart().getPath();  //sreynaud
-        // Obsolete} else if (u.getPath().startsWith("/./") || m_mustRemoveSlash) {
-        //    return u.getPath().substring(1);                //sreynaud
-        } else if (u.getPath().startsWith("//")) {
-            return trimPath(u.getPath());                   //sreynaud
+        //} else if (u.getPath().startsWith("//")) {
+        	// TODO: clean: should never happen
+        //    return trimPath(u.getPath());                   //sreynaud
         }
         return u.getPath();
     }
+
+    /*
     private static String trimPath(String path) {
         if (path.startsWith("//")) {
             return trimPath(path.substring(1));
@@ -255,7 +157,8 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
             return path;
         }
     }
-
+	*/
+    
     public void setPath(String path) throws BadParameterException {
         if (path == null) {
             path = "";
@@ -264,12 +167,12 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
 		if (System.getProperty("file.separator") != "/")
 			path = path.replace(System.getProperty("file.separator"), "/");
         try {
-        	// LSZ add leading / in case of Windoze path
-        	if (path.indexOf(':')>0)
-        		path = "/"+path;
-        	// TODO: check why 2 following lines
+        	// TODO: check why 2 following lines: remove duplicate leading /
             int i;for(i=0; i<path.length() && path.charAt(i)=='/'; i++);
             if(i>1)path="/"+path.substring(i);
+        	// add leading / in case of Windoze path like X:/...
+        	if (Pattern.matches("^[^/\\\\]{1}\\:.*", path))
+        		path = "/"+path;
             if (path == "" && u.getRawAuthority() == null) 
             	throw new BadParameterException("Path cannot by empty if authority is empty");
             u = new URI(u.getScheme(), u.getUserInfo(), u.getHost(),
@@ -408,30 +311,6 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
         return u.equals(other.u);
     }
 
-    ///////////////////////////////////////// private methods /////////////////////////////////////////
-    /*
-    private boolean isWindowsAbsolutePath(String scheme, String relativePath) {
-        return ("file".equals(scheme) || "zip".equals(scheme))
-                && System.getProperty("os.name").startsWith("Windows")
-                && relativePath.length()>=2 && Character.isLetter(relativePath.charAt(0)) && relativePath.charAt(1)==':'
-                && (relativePath.length()==2 || (relativePath.length()>2 && relativePath.charAt(2)=='/'));
-    }
-	*/
-    /*
-    private void fixFileURI() throws URISyntaxException {
-    	// FIXME : u.getAuthority().equals(".")
-    	//LSZ relative URL are in RelativeURLImpl
-        //boolean isRelative = (u.getHost()==null && u.getAuthority()!=null && !u.getAuthority().equals("."));
-        boolean isWindows = (u.getHost()!=null && u.getHost().length()==1 && u.getAuthority()!=null && u.getAuthority().endsWith(":"));
-        if (isRelative || isWindows) {
-            u = new URI(u.getScheme(), u.getUserInfo(),
-                    "",                                 // fix number of '/' after scheme
-                    u.getPort(),
-                    "/"+u.getAuthority()+u.getPath(),   // fix path
-                    u.getQuery(), u.getFragment());
-        }
-    }
-	*/
     private URI getSchemeSpecificPart() {
         try {
             return new URI(u.getRawSchemeSpecificPart());
@@ -439,16 +318,5 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
             return u;
         }
     }
-
-    /*
-    private static String concatIfNotNull(char prefix, String[] suffix) {
-        for (int i=0; suffix!=null && i<suffix.length; i++) {
-            if (suffix[i] != null) {
-                return prefix + suffix[i];
-            }
-        }
-        return "";
-    }
-    */
 
 }
