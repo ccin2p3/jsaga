@@ -35,13 +35,13 @@ import java.util.regex.Pattern;
 public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl implements SyncNSDirectory {
     /** constructor for factory */
     protected AbstractSyncNSDirectoryImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(session, URLHelper.toDirectoryURL(url), adaptor, flags);
+        super(session, url, adaptor, flags);
         this.init(flags);
     }
 
     /** constructor for NSDirectory.open() */
     protected AbstractSyncNSDirectoryImpl(AbstractNSDirectoryImpl dir, URL relativeUrl, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        super(dir, URLHelper.toDirectoryURL(relativeUrl), flags);
+        super(dir, relativeUrl, flags);
         this.init(flags);
     }
 
