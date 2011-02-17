@@ -35,6 +35,7 @@ public class UniversalFileTest extends TestCase {
         assertEquals("path/to/file", m_relative.getPath());
         assertEquals("/dir/", m_directory.getPath());
         assertEquals("/path/to/file", new UniversalFile("//path/to/file").getPath());
+        assertEquals("/path/to/file", new UniversalFile("///////path/to/file").getPath());
     }
 
     public void test_getParent() {
