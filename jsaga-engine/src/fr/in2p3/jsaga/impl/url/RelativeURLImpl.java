@@ -99,7 +99,6 @@ public class RelativeURLImpl extends AbstractURLImpl implements URL {
 	}
 
 	public String getEscaped() {
-      	// TODO
 		return null;
 	}
 
