@@ -93,7 +93,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		
 		try {
 			connection = m_lfcConnector.getNewConnection();
-			m_lfcConnector.startSession(connection);
+			m_lfcConnector.startSession(connection, null);
 		} catch (IOException e) {
 			logger.debug("ERROR: connect("+userInfo+", "+host+", "+port+"): "+e.getMessage());
 			throw new NoSuccessException(e);
@@ -266,7 +266,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 				//Cannot happen
 			}finally{
 				if(!done){
-					m_lfcConnector.abordTransaction(connection);
+					m_lfcConnector.abortTransaction(connection);
 				}
 			}
 			logger.debug("DONE: addLocation("+logicalEntry+", "+replicaEntry+", "+additionalArgs+")");
