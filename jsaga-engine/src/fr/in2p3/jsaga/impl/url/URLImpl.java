@@ -31,7 +31,6 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
     /** MAY encode the URL */
     URLImpl(String url, boolean encode) throws BadParameterException {
         if (encode) {
-        	// FIXME file:/
             if (url.startsWith("file://")) {
                 url = URLEncoder.encodePathOnly(url);
             } else {
@@ -39,7 +38,6 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
             }
         }
         try {
-            // FIXME: fix absolute path
             while (url.startsWith("//")) {
                 url = url.substring(1); // prevent URI to consider root dir as a host
             }
@@ -69,7 +67,6 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
 
     /** Encode the relative path + set the cache */
     URLImpl(FileAttributes cache) throws BadParameterException {
-    	// TODO: check FileAttributes.getRelativePath()
         this(cache.getRelativePath());
         m_cache = cache;
     }
@@ -396,7 +393,6 @@ public class URLImpl extends AbstractSagaObjectImpl implements URL {
     }
 
     private void fixFileURI() throws URISyntaxException {
-    	// FIXME : u.getAuthority().equals(".")
         boolean isRelative = (u.getHost()==null && u.getAuthority()!=null && !u.getAuthority().equals("."));
         boolean isWindows = (u.getHost()!=null && u.getHost().length()==1 && u.getAuthority()!=null && u.getAuthority().endsWith(":"));
         if (isRelative || isWindows) {
