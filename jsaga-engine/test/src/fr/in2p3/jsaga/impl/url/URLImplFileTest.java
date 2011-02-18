@@ -33,4 +33,7 @@ public class URLImplFileTest extends URLImplTest {
     	 _fragment = "";
      }
 
+    public void test_redondantslashes()  throws Exception {
+        super.ignore("To skip");
+    }
 }
