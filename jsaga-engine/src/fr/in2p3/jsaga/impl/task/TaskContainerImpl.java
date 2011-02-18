@@ -67,6 +67,8 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
 
     public void run() throws NotImplementedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         synchronized(m_tasks) {
+        	if (m_tasks.isEmpty())
+        		throw new DoesNotExistException("Container is empty");
             for (Task task : m_tasks.values()) {
                 task.run();
             }
