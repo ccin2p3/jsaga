@@ -142,6 +142,8 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
 
     public void cancel() throws NotImplementedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         synchronized(m_tasks) {
+        	if (m_tasks.isEmpty())
+        		throw new DoesNotExistException("Container is empty");
             for (Task task : m_tasks.values()) {
                 task.cancel();
             }
@@ -150,6 +152,8 @@ public class TaskContainerImpl extends AbstractMonitorableImpl implements TaskCo
 
     public void cancel(float timeoutInSeconds) throws NotImplementedException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         synchronized(m_tasks) {
+        	if (m_tasks.isEmpty())
+        		throw new DoesNotExistException("Container is empty");
             for (Task task : m_tasks.values()) {
                 task.cancel(timeoutInSeconds);
             }
