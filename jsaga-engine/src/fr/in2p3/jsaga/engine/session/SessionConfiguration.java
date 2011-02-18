@@ -31,8 +31,8 @@ import java.net.URL;
  */
 public class SessionConfiguration {
     private static final String XSD = "schema/jsaga-default-contexts.xsd";
-    private static final String MERGE = "xsl/jsaga-default-contexts-merge.xsl";
-    private static final String XSL = "xsl/jsaga-default-contexts.xsl";
+    protected static final String MERGE = "xsl/jsaga-default-contexts-merge.xsl";
+    protected static final String XSL = "xsl/jsaga-default-contexts.xsl";
     private static final File DEBUG = new File(Base.JSAGA_VAR, "jsaga-default-contexts.xml");
 
     protected JsagaDefault m_config;
