@@ -52,7 +52,6 @@ public class CacheDataAdaptor implements FileReaderStreamFactory, FileWriter {
         String tmp = System.getProperty("java.io.tmpdir");
         if(System.getProperty("os.name").startsWith("Windows")) tmp = "/"+tmp.replaceAll("\\\\","/");
         return new Default[] {
-        		// FIXME file:/tmp
                 new Default(BASE_URL, "file://"+tmp+"/cache"),
                 new Default(AUTO_REFRESH, "false")};
     }

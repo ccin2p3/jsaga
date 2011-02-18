@@ -33,10 +33,4 @@ public class URLImplFileTest extends URLImplTest {
     	 _fragment = "";
      }
 
-    public void test_redondantslashes()  throws Exception {
-        URL url = URLFactory.createURL("//path/subdir");
-        // path should not be considered as HOST
-        assertTrue(url.getHost() == null);
-    }
-
 }

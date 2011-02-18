@@ -62,6 +62,8 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
                 : URLEncoder.encode(url);
         try {
             u = new URI(encodedUrl);
+            // fix path
+            setPath(getPath());
         } catch(URISyntaxException e) {
             throw new BadParameterException("syntax error in url", e);
         }
@@ -142,23 +144,10 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
     public String getPath() {
         if (u.getPath() == null) {
             return this.getSchemeSpecificPart().getPath();  //sreynaud
-        //} else if (u.getPath().startsWith("//")) {
-        	// TODO: clean: should never happen
-        //    return trimPath(u.getPath());                   //sreynaud
         }
         return u.getPath();
     }
 
-    /*
-    private static String trimPath(String path) {
-        if (path.startsWith("//")) {
-            return trimPath(path.substring(1));
-        } else {
-            return path;
-        }
-    }
-	*/
-    
     public void setPath(String path) throws BadParameterException {
         if (path == null) {
             path = "";
@@ -167,7 +156,7 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
 		if (System.getProperty("file.separator") != "/")
 			path = path.replace(System.getProperty("file.separator"), "/");
         try {
-        	// TODO: check why 2 following lines: remove duplicate leading /
+        	// remove duplicate leading /
             int i;for(i=0; i<path.length() && path.charAt(i)=='/'; i++);
             if(i>1)path="/"+path.substring(i);
         	// add leading / in case of Windoze path like X:/...
@@ -279,7 +268,7 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
     }
 
     public boolean isAbsolute() {
-        return true; //u.isAbsolute();
+        return true;
     }
 
     public URL normalize() {
