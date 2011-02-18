@@ -336,4 +336,23 @@ public class URLImplTest extends AbstractTest {
     	url = URLHelper.getParentURL(baseUrl);
     	assertEquals(_uri+_user+_host+_port+_abs_path, url.getString());
     }
+
+    public void test_redondantslashes()  throws Exception {
+        URL url;
+
+        url = URLFactory.createURL(_uri+_user+_host+_port+"////"+_abs_path+_file);
+        // path should not be considered as HOST
+        assertEquals(_abs_path+_file, url.getPath());
+
+        url = URLFactory.createURL(_uri+_user+_host+_port);
+        url.setPath("////"+_abs_path+_file);
+        // path should not be considered as HOST
+        assertEquals(_abs_path+_file, url.getPath());
+
+        url = URLFactory.createURL("DUMMY:///");
+        url.setString(_uri+_user+_host+_port+"////"+_abs_path+_file);
+        // path should not be considered as HOST
+        assertEquals(_abs_path+_file, url.getPath());
+    }
+
 }
