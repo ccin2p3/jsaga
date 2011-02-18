@@ -156,7 +156,7 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
 		if (System.getProperty("file.separator") != "/")
 			path = path.replace(System.getProperty("file.separator"), "/");
         try {
-        	// TODO: check why 2 following lines: remove duplicate leading /
+        	// remove duplicate leading /
             int i;for(i=0; i<path.length() && path.charAt(i)=='/'; i++);
             if(i>1)path="/"+path.substring(i);
         	// add leading / in case of Windoze path like X:/...
@@ -268,7 +268,7 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
     }
 
     public boolean isAbsolute() {
-        return true; //u.isAbsolute();
+        return true;
     }
 
     public URL normalize() {
