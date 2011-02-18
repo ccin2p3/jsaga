@@ -23,16 +23,55 @@ public abstract class PermissionsTest extends AbstractNSEntryTest {
         super(protocol);
     }
 
-    public void test_enablePermissions() throws Exception {
-        assertFalse(m_file.permissionsCheck(null, Permission.EXEC.getValue()));
-        m_file.permissionsAllow(null, Permission.EXEC.getValue());
-        assertTrue(m_file.permissionsCheck(null, Permission.EXEC.getValue()));
+    public void test_ownerEXECPermissions() throws Exception {
+    	test_permissions(null, Permission.EXEC);
     }
-
-    public void test_disablePermissions() throws Exception {
-        assertTrue(m_file.permissionsCheck(null, Permission.READ.getValue()));
-        m_file.permissionsDeny(null, Permission.READ.getValue());
-        assertFalse(m_file.permissionsCheck(null, Permission.READ.getValue()));
+    
+    public void test_ownerREADPermissions() throws Exception {
+    	test_permissions(null, Permission.READ);
+    }
+    
+    public void test_ownerWRITEPermissions() throws Exception {
+    	test_permissions(null, Permission.WRITE);
+    }
+    
+    public void test_groupEXECPermissions() throws Exception {
+    	test_permissions("group-" + m_file.getGroup(), Permission.EXEC);
+    }
+    
+    public void test_groupREADPermissions() throws Exception {
+    	test_permissions("group-" + m_file.getGroup(), Permission.READ);
+    }
+    
+    public void test_groupWRITEPermissions() throws Exception {
+    	test_permissions("group-" + m_file.getGroup(), Permission.WRITE);
+    }
+    
+    public void test_otherEXECPermissions() throws Exception {
+    	test_permissions("*", Permission.EXEC);
+    }
+    
+    public void test_otherREADPermissions() throws Exception {
+    	test_permissions("*", Permission.READ);
+    }
+    
+    public void test_otherWRITEPermissions() throws Exception {
+    	test_permissions("*", Permission.WRITE);
+    }
+    
+    private void test_permissions(String id, Permission permission)throws Exception {
+    	boolean toreset = false;
+    	if(m_file.permissionsCheck(id, permission.getValue())){
+    		m_file.permissionsDeny(id, permission.getValue());
+    		assertFalse(m_file.permissionsCheck(id, permission.getValue()));
+    		toreset = true;
+    	}
+        m_file.permissionsAllow(id, permission.getValue());
+        assertTrue(m_file.permissionsCheck(id, permission.getValue()));
+        if(toreset){
+        	m_file.permissionsDeny(id, permission.getValue());
+    		assertFalse(m_file.permissionsCheck(id, permission.getValue()));
+        }
     }
 
     public void test_getOwner() throws Exception {

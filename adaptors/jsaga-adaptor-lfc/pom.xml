@@ -31,6 +31,8 @@
 			<url>http://nexus.maatg.fr/content/repositories/maatg-fr-snapshots</url>
 			<snapshots>
 				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+				<checksumPolicy>fail</checksumPolicy>
 			</snapshots>
 		</repository>
 	</repositories>
@@ -60,7 +62,7 @@
 		<dependency>
 			<groupId>fr.maatg</groupId>
 			<artifactId>glite.dm</artifactId>
-			<version>0.2</version>
+			<version>0.3-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
