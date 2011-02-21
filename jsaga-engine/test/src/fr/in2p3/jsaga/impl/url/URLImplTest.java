@@ -179,6 +179,12 @@ public class URLImplTest extends AbstractTest {
         url = URLFactory.createURL(_url_simple);
         url.setFragment("NEW");
         assertEquals(_uri+_user+_host+_port+_abs_path+_file+_query+"#NEW", url.getString());
+        
+        // change path to a directory
+        url = URLFactory.createURL(_uri+_user+_host+_port+_abs_path+_file);
+        url.setPath(url.getPath() + "/");
+        assertEquals(_uri+_user+_host+_port+_abs_path+_file+"/", url.getString());
+        
     }
 
     public void test_relative() throws Exception {
