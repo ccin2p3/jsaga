@@ -33,6 +33,13 @@ public class URLHelper {
         }
         return url;
     }
+    public static URL toDirectoryURL(URL url) throws NotImplementedException, BadParameterException {
+        String path = url.getPath();
+        if (!path.endsWith("/")) {
+            url.setPath(path+"/");
+        }
+        return url;
+    }
     public static String toFilePath(String path) throws NotImplementedException, BadParameterException {
         if (isDirectory(path)) {
             throw new BadParameterException("File path must not end with slash: "+path);
