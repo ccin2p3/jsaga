@@ -53,7 +53,8 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
     }
 
     private void init(int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        if(Flags.CREATEPARENTS.isSet(flags)) flags=Flags.CREATE.or(flags);
+    	if(Flags.READ.isSet(flags) && Flags.WRITE.isSet(flags)) throw new NotImplementedException("Flag READWRITE not supported");
+    	if(Flags.CREATEPARENTS.isSet(flags)) flags=Flags.CREATE.or(flags);
         if(Flags.CREATE.isSet(flags)) flags=Flags.WRITE.or(flags);
         new FlagsHelper(flags).allowed(JSAGAFlags.BYPASSEXIST, Flags.ALLFILEFLAGS);
         if (Flags.READ.isSet(flags)) {
