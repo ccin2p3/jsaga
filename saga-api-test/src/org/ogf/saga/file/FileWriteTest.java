@@ -3,9 +3,14 @@ package org.ogf.saga.file;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.error.AlreadyExistsException;
+import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
+import org.ogf.saga.session.Session;
+import org.ogf.saga.session.SessionFactory;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -25,6 +30,18 @@ public abstract class FileWriteTest extends AbstractNSEntryTest {
 
     protected FileWriteTest(String protocol) throws Exception {
         super(protocol);
+    }
+
+    public void test_read_write()throws Exception {
+        if (m_file instanceof File) {
+            try {
+                NSFactory.createNSEntry(m_session, m_fileUrl, Flags.READWRITE.getValue());
+                fail("Expected NotImplemented exception");
+            } catch(NotImplementedException e) {
+            }
+        } else {
+            fail("Not an instance of class: File");
+        }
     }
 
     public void test_write_nooverwrite() throws Exception {
