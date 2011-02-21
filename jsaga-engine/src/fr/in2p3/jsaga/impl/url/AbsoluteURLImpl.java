@@ -254,9 +254,12 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
                 return url;
             }
     	} else if (url instanceof RelativeURLImpl) {
-        	// if relative: encode url string
-    		String url_string = ((RelativeURLImpl)url).getEncodedPathOnly();
-    		uri = u.resolve(url_string);
+        	// if relative: encode url path only or all string
+    		// depending on local scheme or not
+            String encodedUrl = (URLHelper.startsWithLocalScheme(getString()))
+            ? ((RelativeURLImpl)url).getEncodedPathOnly()
+            : URLEncoder.encode(url.getString());
+    		uri = u.resolve(encodedUrl);
     	} else {
     		throw new NoSuccessException("Unknown class: " + url.getClass().getName());
     	}
