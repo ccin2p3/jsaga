@@ -48,6 +48,12 @@ public class RelativeURLImpl extends AbstractURLImpl implements URL {
         return clone;
     }
 
+    public String getEncodedPathOnly() {
+    	String encoded_path = URLEncoder.encodePathOnly(getPath());
+		return encoded_path + (url_query == null?"":"?"+url_query) + (url_fragment == null?"":"#"+url_fragment);
+    	
+    }
+    
     public URL resolve(URL url) throws NoSuccessException {
     	// if absolute: throw exception
     	if (url instanceof AbsoluteURLImpl) {
