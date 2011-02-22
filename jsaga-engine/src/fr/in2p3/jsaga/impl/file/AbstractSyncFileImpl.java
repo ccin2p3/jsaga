@@ -276,13 +276,6 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
                 try {m_inStream.close();} catch (IOException e1) {/*ignore*/}
                 throw new SagaIOException(e);
             }
-            if (readlen == EOF) {
-                try {
-                    m_inStream.close();
-                } catch (IOException e) {
-                    throw new SagaIOException(e);
-                }
-            }
             return readlen;
         } else {
             throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
