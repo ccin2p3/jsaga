@@ -3,8 +3,10 @@ package org.ogf.saga.file;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.error.AlreadyExistsException;
+import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.namespace.Flags;
+import org.ogf.saga.namespace.NSEntry;
 import org.ogf.saga.namespace.NSFactory;
 import org.ogf.saga.namespace.abstracts.AbstractNSEntryTest;
 import org.ogf.saga.session.Session;
@@ -32,12 +34,12 @@ public abstract class FileWriteTest extends AbstractNSEntryTest {
         super(protocol);
     }
 
-    public void test_read_write()throws Exception {
+    public void test_write_nocreate()throws Exception {
         if (m_file instanceof File) {
             try {
-                NSFactory.createNSEntry(m_session, m_fileUrl, Flags.READWRITE.getValue());
-                fail("Expected NotImplemented exception");
-            } catch(NotImplementedException e) {
+                NSFactory.createNSEntry(m_session, createURL(m_dirUrl, "ThisFileDoesNotExist"), Flags.WRITE.getValue());
+                fail("Expected DoesNotExist exception");
+            } catch(DoesNotExistException e) {
             }
         } else {
             fail("Not an instance of class: File");
