@@ -53,17 +53,19 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
     }
 
     private void init(int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-    	if(Flags.READ.isSet(flags) && Flags.WRITE.isSet(flags)) throw new NotImplementedException("Flag READWRITE not supported");
-    	if(Flags.CREATEPARENTS.isSet(flags)) flags=Flags.CREATE.or(flags);
+        if(Flags.CREATEPARENTS.isSet(flags)) flags=Flags.CREATE.or(flags);
         if(Flags.CREATE.isSet(flags)) flags=Flags.WRITE.or(flags);
+    	//if(Flags.READ.isSet(flags) && Flags.WRITE.isSet(flags)) throw new NotImplementedException("Flag READWRITE not supported");
         new FlagsHelper(flags).allowed(JSAGAFlags.BYPASSEXIST, Flags.ALLFILEFLAGS);
-        if (Flags.READ.isSet(flags)) {
-            m_inStream = FileFactoryImpl.openFileInputStream(m_session, m_url, m_adaptor);
-        }
         if (Flags.WRITE.isSet(flags)) {
+            if (!Flags.CREATE.isSet(flags)) {
+	            if (m_adaptor instanceof DataReaderAdaptor && !((DataReaderAdaptor)m_adaptor).exists(m_url.getPath(), m_url.getQuery())) {
+	                throw new DoesNotExistException("File does not exist: "+ m_url);
+	            }
+            }
             try {
                 this.tryToOpen(flags);
-            } catch (DoesNotExistException e) {
+            } catch (DoesNotExistException e) {  // thrown if parent does not exist
                 if (Flags.CREATEPARENTS.isSet(flags)) {
                     // make parent directories
                     this._makeParentDirs();
@@ -73,34 +75,26 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
                     throw e;
                 }
             } catch (AlreadyExistsException e) {
-            	if (Flags.EXCL.isSet(flags)) {
+                if (Flags.EXCL.isSet(flags)) {
                     throw e;
                 } else {
-            		if (!Flags.APPEND.isSet(flags)) {
-            			// delete file first
+                    if (!Flags.APPEND.isSet(flags)) {
+                        // delete file first
                         try {
                             this.remove();
                         } catch (IncorrectStateException e1) {
                             throw e;
                         }
+                    } else {
+                    	throw new NoSuccessException("Adaptor should now throw AlreadExistsException with flag APPEND");
                     }
-            		// retry
-            		this.tryToOpen(flags);
-            	}
-            }
-        } else if (Flags.CREATE.isSet(flags)) {
-            try {
-                this.tryToCreate(flags);
-            } catch (DoesNotExistException e) {
-                if (Flags.CREATEPARENTS.isSet(flags)) {
-                    // make parent directories
-                    this._makeParentDirs();
                     // retry
-                    this.tryToCreate(flags);
-                } else {
-                    throw e;
+                    this.tryToOpen(flags);
                 }
             }
+        }
+        if (Flags.READ.isSet(flags)) {
+            m_inStream = FileFactoryImpl.openFileInputStream(m_session, m_url, m_adaptor);
         }
         if (Flags.READ.isSet(flags) || Flags.WRITE.isSet(flags)) {
             // exists check already done
@@ -120,7 +114,7 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
             throw new DoesNotExistException("Failed to create parent directory", e.getCause());
         }
     }
-    private void tryToCreate(int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
+    /*private void tryToCreate(int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         boolean append = true;
         boolean exclusive = Flags.EXCL.isSet(flags);
         try {
@@ -131,7 +125,7 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
         } catch (IOException e) {
             throw new NoSuccessException(e);
         }
-    }
+    }*/
 
     /** clone */
     public SagaObject clone() throws CloneNotSupportedException {
