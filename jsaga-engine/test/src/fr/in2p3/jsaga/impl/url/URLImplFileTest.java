@@ -28,7 +28,7 @@ public class URLImplFileTest extends URLImplTest {
 		 _user = "";
 		 _host = "";
 		 _port = "";
-		 _file = "Music &#39;erFraeFr ancebyAranyZoltán.mp3";
+		 _file = "Music &#39;erFraeFr ancebyAranyZoltn.mp3";
     	 _query = "";
     	 _fragment = "";
      }
