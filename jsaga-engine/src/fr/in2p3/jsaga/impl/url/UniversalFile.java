@@ -93,7 +93,7 @@ public class UniversalFile {
     			} else {
     				path.pop();
     			}
-    		} else if (! pathElement.equals(".") && !pathElement.isEmpty()) { // NOT "." and not ""
+    		} else if (! pathElement.equals(".") && !pathElement.equals("")) { // NOT "." and not ""
     			path.add(pathElement);
     		} // otherwise (".." or ""): nothing to do
     	}
@@ -111,7 +111,7 @@ public class UniversalFile {
     		}
     	}
     	// if everything was removed, it means the path is "./"
-        if (canon.isEmpty()) { canon = "./";}
+        if (canon.equals("")) { canon = "./";}
         return canon;
     }
 
