@@ -24,7 +24,8 @@ public class URLImplWinTest extends AbstractTest {
 	protected String _abs_path;
 	protected String _file;
 	protected String _rel_path;
-
+	protected String _file_encoded;
+	
 	public URLImplWinTest() throws Exception {
 		super();
 	}
@@ -33,8 +34,8 @@ public class URLImplWinTest extends AbstractTest {
 		super.setUp();
     	_abs_path = "C:/path/";
     	_rel_path = "relpath/";
-        _file = "file with#and{}and%and[]";
-        //_path_encoded = "c:/path%20with%23and%3Fand%7B%7Dand%25and%22and%5B%5D";
+        _file = "file with# and{}and%and[]and?end";
+        _file_encoded = "file%20with%23%20and%7B%7Dand%25and%5B%5Dand%3Fend";
 	}
 
     public void test_antislash()  throws Exception {
@@ -99,6 +100,12 @@ public class URLImplWinTest extends AbstractTest {
         
     }
 
+    public void test_getEscaped() throws Exception {
+        URL url = URLFactory.createURL("file:/"+_abs_path+_file);
+        assertEquals("file:/"+_abs_path+_file_encoded, url.getEscaped());
+        
+    }
+    
     public void test_isabsolute() throws Exception {
     	URL url = URLFactory.createURL(_abs_path+_file);
     	assertFalse(url.isAbsolute());
