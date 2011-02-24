@@ -48,10 +48,30 @@ public class UniversalFileTest extends TestCase {
     }
 
     public void test_getCanonicalPath() throws IOException {
+    	
         assertEquals("C:/path/to/file", m_winAbsolute.getCanonicalPath());
         assertEquals("/path/to/file", m_absolute.getCanonicalPath());
         assertEquals("path/to/file", m_relative.getCanonicalPath());
         assertEquals("/dir/", m_directory.getCanonicalPath());
+        assertEquals("/", new UniversalFile("/").getCanonicalPath());
+        // Useless ../
+        assertEquals("dir/", new UniversalFile("dir1/../dir/").getCanonicalPath());
+        assertEquals("dir/", new UniversalFile("dir.1/../dir/").getCanonicalPath());
+        assertEquals("dir/", new UniversalFile("dir1/../dir2/dir3/../../dir/").getCanonicalPath());
+        // useful ../
+        assertEquals("../", new UniversalFile("../").getCanonicalPath());
+        assertEquals("../../dir/file", new UniversalFile("../../dir/file").getCanonicalPath());
+        // ./
+        assertEquals("./", new UniversalFile("./").getCanonicalPath());
+        assertEquals("file", new UniversalFile("./file").getCanonicalPath());
+        assertEquals("dir/", new UniversalFile("././dir/").getCanonicalPath());
+        assertEquals("dir./", new UniversalFile("dir./././").getCanonicalPath());
+        assertEquals("dir/", new UniversalFile("dir/././").getCanonicalPath());
+        assertEquals("dir/dir2/", new UniversalFile("dir//./dir2/").getCanonicalPath());
+        // mixed ./ and ../
+        assertEquals("dir/", new UniversalFile("dir1/./../dir/").getCanonicalPath());
+        // this gets ridiculous ...
+        assertEquals("/dir/", new UniversalFile("/./dir/../dir2/./dir3/../.././dir/").getCanonicalPath());
     }
 
     public void test_isAbsolute() {
