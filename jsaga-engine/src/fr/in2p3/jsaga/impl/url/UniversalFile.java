@@ -72,40 +72,47 @@ public class UniversalFile {
 
     /**
      * returns the canonical path of the file with all separators converted as / 
-     * and with a trailing / if the file is a directory
+     * and with a trailing / if the file is a directory. 
+     * It removes all "./" and remove recursively all "dir/../" sets
      * @return the canonical path of the file
      * @throws IOException
      * 
-     * To compute the canonical path, the method java.io.File.getCanonicalPath() is used.
-     * This method first converts this pathname to absolute form if necessary, as if by 
-     * invoking the getAbsolutePath() method.
+     * To compute the canonical path, the method java.io.File.getCanonicalPath() is not used
+     * because this method first converts this pathname to absolute form if necessary, as if by 
+     * invoking the getAbsolutePath() method and some characters are not supported by Windows
      * 
-     * Description of the getCanonicalPath() on Windows:
-     * 1) c:/path/to/file -> C:\path\to\file
-     * 2) /path/to/file   -> E:\path\to\file (where E: is the drive containing the current directory)
-     * 3) path/to/file    -> E:\currentdir\path\to\file (where E:currentdir is the current directory)
-     * 
-     * Description of the getCanonicalPath() on Unix:
-     * 4) /path/to/file   -> /path/to/file
-     * 5) path/to/file    -> /currentdir/path/to/file (where /currentdir is the current directory)
-     * 
-     * the current directory is defined in the "user.dir" property
      */
     public String getCanonicalPath() throws IOException {
-        String canon;
-        if (m_file.isAbsolute()) { // cases 1) and 4)
-            canon = m_file.getCanonicalPath();
-        } else if (System.getProperty("os.name").startsWith("Windows") && m_isAbsolute) { // case 2)
-            canon = m_file.getCanonicalPath().substring(2);
-        } else { // cases 3) and 5)
-        	// get the canonical path of the current directory
-            String pwd = new File(System.getProperty("user.dir")).getCanonicalPath();
-            // get the canonical (absolute) path of the file
-            canon = m_file.getCanonicalPath();
-        	// remove the canonicalized part of the current directory
-            canon = canon.substring(pwd.length()+1);
-        }
-        return canon.replace("\\", "/") + (m_isDir?"/":"");
+    	String canon;
+    	java.util.Stack path = new java.util.Stack();
+    	for (String pathElement : getPath().split("/")) {
+    		if (pathElement.equals("..")) {  
+    			// remove last element if stack is not empty and last element is not ".." itself
+    			if (path.empty() || path.peek().equals("..")) {
+    				path.add(pathElement);
+    			} else {
+    				path.pop();
+    			}
+    		} else if (! pathElement.equals(".") && !pathElement.isEmpty()) { // NOT "." and not ""
+    			path.add(pathElement);
+    		} // otherwise (".." or ""): nothing to do
+    	}
+    	if (getPath().startsWith("/")) {
+    		canon = "/";
+    	} else {
+    		canon = "";
+    	}
+    	for (int i = 0; i < path.size(); i++) {
+    		canon += (String)path.get(i);
+    		if (i == path.size()-1) { // last element : add / only for Dir
+    			canon += m_isDir?"/":"";
+    		} else {
+    			canon += "/";
+    		}
+    	}
+    	// if everything was removed, it means the path is "./"
+        if (canon.isEmpty()) { canon = "./";}
+        return canon;
     }
 
     public boolean isAbsolute() {
