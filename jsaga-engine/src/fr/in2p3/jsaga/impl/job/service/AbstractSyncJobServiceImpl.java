@@ -90,7 +90,7 @@ public abstract class AbstractSyncJobServiceImpl extends AbstractSagaObjectImpl 
             JobDescription desc = JobFactory.createJobDescription();
             desc.setAttribute(JobDescription.EXECUTABLE, commandLine);
             desc.setAttribute(JobDescription.INTERACTIVE, ""+interactive);
-            desc.setAttribute(JobDescription.CANDIDATEHOSTS, ""+host);
+            desc.setVectorAttribute(JobDescription.CANDIDATEHOSTS, new String[]{""+host});
 
             // submit job
             Job job = this.createJobSync(desc);
