@@ -49,6 +49,9 @@
                         >Environment=<xsl:for-each select="posix:Environment"><xsl:value-of select="text()"/>
                     <xsl:text> </xsl:text></xsl:for-each><xsl:value-of select="$lf"/>
                 </xsl:if>
+                <xsl:for-each select="posix:WallTimeLimit"
+                        >WallTimeLimit=<xsl:value-of select="concat(text(),$lf)"/>
+                </xsl:for-each>
             </xsl:for-each>
             <xsl:for-each select="spmd:SPMDApplication">
                 <xsl:for-each select="spmd:NumberOfProcesses"
@@ -89,9 +92,6 @@
             </xsl:for-each>
             <xsl:for-each select="jsdl:TotalPhysicalMemory/*"
                     >TotalPhysicalMemory=<xsl:value-of select="concat(text(),$lf)"/>
-            </xsl:for-each>
-            <xsl:for-each select="WallTimeLimit/*"
-                    >WallTimeLimit=<xsl:value-of select="concat(text(),$lf)"/>
             </xsl:for-each>
         </xsl:for-each>
         <xsl:if test="jsdl:DataStaging"
