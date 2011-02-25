@@ -19,7 +19,7 @@ import org.ogf.saga.job.JobDescription;
 public class SAGALanguageAdaptor extends AbstractLanguageAdaptorProperties implements LanguageAdaptor {
     private static final String[] REQUIRED_PROPERTY_NAMES = new String[] {
             JobDescription.EXECUTABLE};
-    private static final String[] OPTIONAL_PROPERTY_NAMES = new String[] {
+    public static final String[] OPTIONAL_PROPERTY_NAMES = new String[] {
             JobDescription.SPMDVARIATION,
             JobDescription.TOTALCPUCOUNT,
             JobDescription.NUMBEROFPROCESSES,
@@ -40,7 +40,7 @@ public class SAGALanguageAdaptor extends AbstractLanguageAdaptorProperties imple
             JobDescription.JOBPROJECT,
             JobDescription.QUEUE};
     private static final String[] REQUIRED_VECTOR_PROPERTY_NAMES = new String[] {};
-    private static final String[] OPTIONAL_VECTOR_PROPERTY_NAMES = new String[] {
+    public static final String[] OPTIONAL_VECTOR_PROPERTY_NAMES = new String[] {
             JobDescription.ARGUMENTS,
             JobDescription.ENVIRONMENT,
             JobDescription.FILETRANSFER,
