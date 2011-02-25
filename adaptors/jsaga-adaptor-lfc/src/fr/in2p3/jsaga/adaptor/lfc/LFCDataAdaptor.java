@@ -51,6 +51,7 @@ import fr.maatg.glite.dm.CNSConnector;
 import fr.maatg.glite.dm.connection.DMError;
 import fr.maatg.glite.dm.connection.ReceiveException;
 import fr.maatg.glite.dm.ns.CNSConnection;
+import fr.maatg.glite.dm.ns.CNSConnections;
 import fr.maatg.glite.dm.ns.CNSFileReaddir;
 import fr.maatg.glite.dm.ns.CNSFileStat;
 import fr.maatg.glite.dm.ns.CNSPermissions;
@@ -94,6 +95,7 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 		try {
 			connection = m_lfcConnector.getNewConnection();
 			m_lfcConnector.startSession(connection, null);
+			connection = CNSConnections.getCNSConnectionTimeout(connection);
 		} catch (IOException e) {
 			logger.debug("ERROR: connect("+userInfo+", "+host+", "+port+"): "+e.getMessage());
 			throw new NoSuccessException(e);
