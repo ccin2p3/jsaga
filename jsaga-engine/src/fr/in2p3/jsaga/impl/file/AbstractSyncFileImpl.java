@@ -55,7 +55,6 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
     private void init(int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         if(Flags.CREATEPARENTS.isSet(flags)) flags=Flags.CREATE.or(flags);
         if(Flags.CREATE.isSet(flags)) flags=Flags.WRITE.or(flags);
-    	//if(Flags.READ.isSet(flags) && Flags.WRITE.isSet(flags)) throw new NotImplementedException("Flag READWRITE not supported");
         new FlagsHelper(flags).allowed(JSAGAFlags.BYPASSEXIST, Flags.ALLFILEFLAGS);
         if (Flags.WRITE.isSet(flags)) {
             if (!Flags.CREATE.isSet(flags)) {
@@ -245,7 +244,7 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
     public long getSizeSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof FileReader) {
             if (m_outStream != null) {
-                try {m_outStream.close();} catch (IOException e) {/*ignore*/}
+                try {m_outStream.close();} catch (IOException e) {/*ignore*/} // FIXME 
             }
         }
         FileAttributes attrs = this._getFileAttributes();
