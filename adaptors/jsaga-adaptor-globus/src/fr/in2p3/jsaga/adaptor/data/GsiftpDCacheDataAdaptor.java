@@ -36,7 +36,7 @@ public class GsiftpDCacheDataAdaptor extends Gsiftp2DataAdaptor {
 
     protected void rethrowParsedException(UnexpectedReplyCodeException e) throws DoesNotExistException, AlreadyExistsException, PermissionDeniedException, NoSuccessException {
         String message = e.getReply().getMessage();
-        if (message.indexOf("not a plain file") > -1 || message.indexOf("Local error") > -1) {
+        if (message.indexOf("not a plain file") > -1 || message.indexOf("Local error") > -1 || message.indexOf("File not found") > -1) {
             throw new DoesNotExistException(e);
         } else if (message.indexOf("exists") > -1) {
             throw new AlreadyExistsException(e);
