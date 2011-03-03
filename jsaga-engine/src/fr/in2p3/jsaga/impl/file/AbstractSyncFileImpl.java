@@ -244,7 +244,7 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
     public long getSizeSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof FileReader) {
             if (m_outStream != null) {
-                try {m_outStream.close();} catch (IOException e) {/*ignore*/} // FIXME 
+                try {m_outStream.close();} catch (IOException e) {/*ignore*/}
             }
         }
         FileAttributes attrs = this._getFileAttributes();
