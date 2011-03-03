@@ -327,6 +327,9 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         }
     }
     public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
+        // APPEND is not supported by SRM : server sends SRM_DUPLICATION_ERROR on SrmPrepareToPut()
+    	// BadParameterException is thrown in this case, but this is a deviation from SAGA
+    	if (append) {throw new BadParameterException("APPEND is not supported by this adaptor");}
         // send srmPrepareToPut message
         String absolutePath = parentAbsolutePath+"/"+fileName;
         SRMResponse srmResponse = this.srmPrepareToPut(absolutePath);
