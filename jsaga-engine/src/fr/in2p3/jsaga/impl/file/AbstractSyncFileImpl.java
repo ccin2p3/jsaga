@@ -85,7 +85,7 @@ public abstract class AbstractSyncFileImpl extends AbstractNSEntryImplWithStream
                             throw e;
                         }
                     } else {
-                    	throw new NoSuccessException("Adaptor should now throw AlreadExistsException with flag APPEND");
+                    	throw new NoSuccessException("Adaptor should not throw AlreadExistsException with flag APPEND");
                     }
                     // retry
                     this.tryToOpen(flags);
