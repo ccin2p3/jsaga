@@ -82,4 +82,26 @@ public abstract class FileWriteTest extends AbstractNSEntryTest {
             fail("Not an instance of class: File");
         }
     }
+    
+    public void test_read_and_write() throws Exception {
+        if (m_file instanceof File) {
+            Buffer buffer;
+            buffer = BufferFactory.createBuffer(DEFAULT_CONTENT.getBytes());
+            File reader = (File) NSFactory.createNSEntry(m_session, m_fileUrl, Flags.READ.or(Flags.WRITE.or(Flags.CREATE.getValue())));
+            // read
+            reader.read(buffer);
+            // check size
+            //assertEquals(0, reader.getSize());
+            // write
+            buffer = BufferFactory.createBuffer(DEFAULT_CONTENT2.getBytes());
+            reader.write(buffer);
+            // check new size
+            assertEquals(DEFAULT_CONTENT2.length(), reader.getSize());
+            // check new content
+            reader.close();
+            checkWrited(m_fileUrl, DEFAULT_CONTENT2);
+        } else {
+            fail("Not an instance of class: File");
+        }
+    }
 }
