@@ -68,7 +68,7 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
             m_session = SessionFactory.createSession(false);
             m_session.addContext(context);
             m_rootUrl = URLFactory.createURL(url.resolve(".").toString());
-            m_rootUrl.setFragment("InMemoryProxy");
+            m_rootUrl.setScheme(context.getAttribute("UrlPrefix") + "-" + m_rootUrl.getScheme());
 
             // for releasing SRM file
             m_token = token;
@@ -128,10 +128,10 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
     }
 
     public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
-        NSEntry entry;
+    	NSEntry entry;
         try {
             URL url = this.toURL(parentAbsolutePath+"/"+fileName);
-            int flags = Flags.WRITE
+            int flags = Flags.CREATE
                     .or((exclusive ? Flags.EXCL : Flags.NONE)
                     .or(append ? Flags.APPEND : Flags.NONE));
             entry = NSFactory.createNSEntry(m_session, url, flags);
