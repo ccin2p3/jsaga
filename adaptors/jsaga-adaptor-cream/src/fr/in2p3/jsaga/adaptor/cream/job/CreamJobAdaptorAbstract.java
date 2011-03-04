@@ -11,6 +11,7 @@ import org.ietf.jgss.GSSException;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 
+import java.io.File;
 import java.util.Map;
 
 /* ***************************************************
@@ -30,6 +31,7 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
 
     protected GSSCredential m_credential;
     protected String m_vo;
+    protected File m_certRepository;
 
     protected String m_delegationId;
     protected CreamStub m_creamStub;
@@ -46,6 +48,7 @@ public class CreamJobAdaptorAbstract implements ClientAdaptor {
         m_credential = ((GSSCredentialSecurityCredential) credential).getGSSCredential();
         try {
             m_vo = credential.getAttribute(Context.USERVO);
+            m_certRepository = ((GSSCredentialSecurityCredential) credential).getCertRepository();
         } catch (Exception e) {
             /* ignore */
         }

@@ -48,6 +48,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     private String m_delegProxy;
 
     /** override super.getUsage() */
+    // TODO: remove : useless attribute
     public Usage getUsage() {
         return new UAnd(new Usage[]{
                 super.getUsage(),
@@ -56,6 +57,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     }
 
     /** override super.getDefaults() */
+    // TODO: remove : useless attribute
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return new Default[]{
                 new Default(SSL_CA_FILES, new File(new File(new File(System.getProperty("user.home"),".globus"),"certificates"),"*.0").getAbsolutePath())
@@ -72,7 +74,7 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         super.connect(userInfo, host, port, basePath, attributes);
 
         // set SSL_CA_FILES
-        System.setProperty("sslCAFiles", (String) attributes.get(SSL_CA_FILES));
+        System.setProperty(SSL_CA_FILES, m_certRepository.getPath() + "/*.0");
 
         // extract parameters from basePath
         Matcher m = Pattern.compile("/cream-(.*)-(.*)").matcher(basePath);
