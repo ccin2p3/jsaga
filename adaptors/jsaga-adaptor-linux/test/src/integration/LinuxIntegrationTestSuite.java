@@ -25,8 +25,18 @@ public class LinuxIntegrationTestSuite extends TestSuite {
 
     /** test cases */
     public static class LinuxNSEntryTest extends NSEntryTest {
-        public LinuxNSEntryTest() throws Exception {super("linux");}
+    	public LinuxNSEntryTest() throws Exception {super("linux");}
         public void test_unexisting() { super.ignore("not yet implemented"); }
+        public void test_owner() throws Exception {
+        	assertEquals(System.getProperty("user.name"), m_file.getOwner());
+        }
+        public void test_group() throws Exception {
+        	//com.sun.security.auth.module.UnixSystem thisSystem = new com.sun.security.auth.module.UnixSystem();
+        	//assertEquals(thisSystem.getGroups()[0], m_file.getGroup());
+        	// FIXME: this test needs user name == group name
+        	assertEquals(System.getProperty("user.name"), m_file.getGroup());
+        }
+        
     }
     public static class LinuxDirectoryListTest extends DirectoryListTest {
         public LinuxDirectoryListTest() throws Exception {super("linux");}
