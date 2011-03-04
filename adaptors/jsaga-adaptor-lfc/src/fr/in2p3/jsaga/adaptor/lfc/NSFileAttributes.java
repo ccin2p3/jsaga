@@ -117,7 +117,7 @@ public class NSFileAttributes extends FileAttributes {
     public synchronized String getOwner() {
         if (m_owner == null) {
             try {
-                m_owner = m_file.owner(connection).getName();
+                m_owner = m_file.owner(connection).getCertificateHeader();
             } catch (Exception e) {
                 s_logger.error("Unable to get the owner of "+getName()+":"+e.getMessage());
                 return ID_UNKNOWN;
