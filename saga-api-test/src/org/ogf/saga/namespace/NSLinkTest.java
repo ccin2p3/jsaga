@@ -58,6 +58,7 @@ public abstract class NSLinkTest extends AbstractNSEntryTest {
         assertEquals(
                 m_linkUrl.toString(),
                 link2.readLink().toString());
+        link2.remove();
     }
 
     public void test_link_dereferenced() throws Exception {
@@ -66,5 +67,6 @@ public abstract class NSLinkTest extends AbstractNSEntryTest {
         assertEquals(
                 m_fileUrl.toString(),
                 link2.readLink().toString());
+        link2.remove();
     }
 }
