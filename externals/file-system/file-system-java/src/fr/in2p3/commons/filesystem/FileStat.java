@@ -33,6 +33,7 @@ public class FileStat {
     public int group_perms;
     public int other_perms;
 
+    public String target;
     public String owner;
     public String group;
 
@@ -81,6 +82,9 @@ public class FileStat {
         buf.append((' '));
         buf.append(name);
         if(isdir) buf.append('/');
+        if (target != null) {
+        	buf.append(" -> ").append(target);
+        }
         return buf.toString();
     }
 }
