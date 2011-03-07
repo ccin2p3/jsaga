@@ -39,6 +39,10 @@ public class LinuxFileAttributes extends FileAttributes {
         }
     }
 
+    public boolean isLink() {
+    	return m_stat.islink;
+    }
+    
     public long getSize() {
         return m_stat.size;
     }
