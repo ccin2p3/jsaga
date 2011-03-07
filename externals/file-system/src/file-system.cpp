@@ -21,7 +21,7 @@ JNIEXPORT jboolean JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_stat
 {
     const char *cPath = env->GetStringUTFChars(jPath, 0);
     struct stat buf;
-    int ret = stat(cPath, &buf);
+    int ret = lstat(cPath, &buf);
     env->ReleaseStringUTFChars(jPath, cPath);
 
     //file does not exist
