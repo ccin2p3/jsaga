@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.data;
 
 import fr.in2p3.commons.filesystem.FileStat;
+import fr.in2p3.jsaga.adaptor.data.link.NotLink;
 import fr.in2p3.jsaga.adaptor.data.permission.PermissionBytes;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 
@@ -27,6 +28,13 @@ public class LinuxFileAttributes extends FileAttributes {
         return m_stat.name;
     }
 
+    public String readLink() throws NotLink {
+    	if (! isLink()) {
+    		throw new NotLink("Not a link: " + m_stat.name);
+    	}
+    	return m_stat.target;
+    }
+    
     public int getType() {
         if (m_stat.isdir) {
             return TYPE_DIRECTORY;
