@@ -6,6 +6,7 @@ import junit.framework.TestSuite;
 import org.ogf.saga.file.DirectoryListTest;
 import org.ogf.saga.namespace.NSEntryTest;
 import org.ogf.saga.namespace.NSLinkTest;
+import org.ogf.saga.permissions.PermissionsTest;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -28,16 +29,6 @@ public class LinuxIntegrationTestSuite extends TestSuite {
     /** test cases */
     public static class LinuxNSEntryTest extends NSEntryTest {
     	public LinuxNSEntryTest() throws Exception {super("linux");}
-
-        public void test_owner() throws Exception {
-        	assertEquals(System.getProperty("user.name"), m_file.getOwner());
-        }
-        public void test_group() throws Exception {
-        	//com.sun.security.auth.module.UnixSystem thisSystem = new com.sun.security.auth.module.UnixSystem();
-        	//assertEquals(thisSystem.getGroups()[0], m_file.getGroup());
-        	// FIXME: this test needs user name == group name
-        	assertEquals(System.getProperty("user.name"), m_file.getGroup());
-        }
     }
     
     public static class LinuxLinkTest extends NSLinkTest {
@@ -47,4 +38,17 @@ public class LinuxIntegrationTestSuite extends TestSuite {
         public LinuxDirectoryListTest() throws Exception {super("linux");}
     }
     
+    public static class LinuxPermissionsTest extends PermissionsTest {
+		public LinuxPermissionsTest() throws Exception {super("linux");	}
+        public void test_getOwner() throws Exception {
+        	assertEquals(System.getProperty("user.name"), m_file.getOwner());
+        }
+        // TODO: check group
+        /*public void test_group() throws Exception {
+        	//com.sun.security.auth.module.UnixSystem thisSystem = new com.sun.security.auth.module.UnixSystem();
+        	//assertEquals(thisSystem.getGroups()[0], m_file.getGroup());
+        	// FIXME: this test needs user name == group name
+        	assertEquals(System.getProperty("user.name"), m_file.getGroup());
+        }*/
+    }
 }
