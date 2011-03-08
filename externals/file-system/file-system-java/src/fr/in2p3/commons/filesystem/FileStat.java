@@ -16,9 +16,9 @@ import java.util.Date;
  *
  */
 public class FileStat {
-    private static final int READ = 4;
-    private static final int WRITE = 2;
-    private static final int EXEC = 1;
+    public static final int READ = 4;
+    public static final int WRITE = 2;
+    public static final int EXEC = 1;
     private static final SimpleDateFormat m_formatter = new SimpleDateFormat("MMM dd HH:mm");
 
     public String name;
