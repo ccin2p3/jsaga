@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <malloc.h>
+#include <string.h>
 
 //WARNING: not compatible with -mno-cygwin
 #ifndef WIN32
@@ -17,11 +18,13 @@ using namespace std;
 #define DEFAULT_MODE 32768
 #define TRUE  1
 #define FALSE 0
-#define SYMLINK_ERRNO_PERMISSIONDENIED -1
-#define SYMLINK_ERRNO_DOESNOTEXIST -2
-#define SYMLINK_ERRNO_ALREADYEXISTS -3
-#define SYMLINK_ERRNO_INTERNALERROR -4
-
+#define PERMISSIONDENIED -1
+#define FILEDOESNOTEXIST -2
+#define FILEALREADYEXISTS -3
+#define INTERNALERROR -4
+#define USERDOESNOTEXIST -5
+#define GROUPDOESNOTEXIST -6
+#define NOTSUPPORTED -7
 
 JNIEXPORT jboolean JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_stat
   (JNIEnv *env, jobject, jstring jPath, jobject obj)
@@ -116,18 +119,98 @@ JNIEXPORT jint JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_symlink
        case EFAULT:
        case EROFS:
        case EPERM:
-         return SYMLINK_ERRNO_PERMISSIONDENIED;
+         return PERMISSIONDENIED;
          break;
        case ENOENT:
-         return SYMLINK_ERRNO_DOESNOTEXIST;
+         return FILEDOESNOTEXIST;
          break;
        case EEXIST:
-         return SYMLINK_ERRNO_ALREADYEXISTS;
+         return FILEALREADYEXISTS;
          break;
        default:
-         return SYMLINK_ERRNO_INTERNALERROR;
+         return INTERNALERROR;
          break;
     }
+}
+
+JNIEXPORT jint JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_chown
+  (JNIEnv *env, jobject, jstring jPath, jstring jUsername, jstring jUsergroup)
+{
+//WARNING: not compatible with -mno-cygwin
+#ifndef WIN32
+
+
+    int ngroups = 5;
+    gid_t *groups;
+    /*groups = malloc(5 * sizeof (gid_t));*/
+    getgrouplist("schwarz", 1000, groups, &ngroups);
+
+
+    const char *cUsername = env->GetStringUTFChars(jUsername, 0);
+    uid_t newUid = -1;
+    if (strlen(cUsername) > 0) {
+      struct passwd *pws = getpwnam(cUsername);
+      if (pws == NULL) {
+        env->ReleaseStringUTFChars(jUsername, cUsername);
+        switch (errno) {
+          case ESRCH:
+          case EBADF:
+          case EPERM:
+          case ENOENT:
+            return USERDOESNOTEXIST;
+            break;
+          default:
+            return INTERNALERROR;
+            break;
+        }
+      }
+      newUid = pws->pw_uid;
+    }
+    env->ReleaseStringUTFChars(jUsername, cUsername);
+
+    const char *cUsergroup = env->GetStringUTFChars(jUsergroup, 0);
+    gid_t newGid = -1;
+    if (strlen(cUsergroup) > 0) {
+      struct group *grp = getgrnam(cUsergroup);
+      if (grp == NULL) {
+        env->ReleaseStringUTFChars(jUsergroup, cUsergroup);
+        switch (errno) {
+          case ESRCH:
+          case EBADF:
+          case EPERM:
+          case ENOENT:
+            return GROUPDOESNOTEXIST;
+            break;
+          default:
+            return INTERNALERROR;
+            break;
+        }
+      }
+      newGid = grp->gr_gid;
+    }
+    env->ReleaseStringUTFChars(jUsergroup, cUsergroup);
+
+    const char *cPath = env->GetStringUTFChars(jPath, 0);
+    int ret = chown(cPath, newUid, newGid);
+    env->ReleaseStringUTFChars(jPath, cPath);
+    if (ret == 0) { return 0; }
+    switch (errno) {
+       case EACCES:
+       case EFAULT:
+       case EROFS:
+       case EPERM:
+         return PERMISSIONDENIED;
+         break;
+       case ENOENT:
+         return FILEDOESNOTEXIST;
+         break;
+       default:
+         return INTERNALERROR;
+         break;
+    }
+#else
+    return NOTSUPPORTED;
+#endif
 }
 
 
