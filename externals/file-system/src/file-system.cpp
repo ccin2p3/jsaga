@@ -63,6 +63,18 @@ JNIEXPORT jboolean JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_stat
            }
            if (nchars < size) {
                buffer[nchars] = '\0';
+               // If target is a directory, add / at the end
+               //struct stat targetstat;
+               //int targetret = lstat(buffer, &targetstat);
+               ret = stat(cPath, &buf);
+               //target exist
+               if (buf.st_mode!=0 && buf.st_mode!=7) {
+                   if (S_ISDIR(buf.st_mode)) {
+                       buffer[nchars] = '/';
+                       buffer[nchars+1] = '\0';
+                   }
+               }
+               
                env->SetObjectField(obj, env->GetFieldID(cls, "target", "Ljava/lang/String;"), env->NewStringUTF(buffer));
                free (buffer);
                break; /*return buffer;*/
