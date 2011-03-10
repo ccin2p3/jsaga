@@ -139,6 +139,25 @@ public class LinuxDataAdaptor extends FileDataAdaptor implements LinkAdaptor, Pe
 		throw new BadParameterException("To implement");
 	}
 
+	public void setGroup(String absolutePath, String id) throws PermissionDeniedException,
+		TimeoutException, BadParameterException, NoSuccessException {
+		try {
+			_linuxFs.chgrp(super.newEntry(absolutePath), id);
+		} catch (FileNotFoundException e) {
+			throw new BadParameterException(e);
+		} catch (IllegalArgumentException e) {
+			throw new BadParameterException(e);
+		} catch (DoesNotExistException e) {
+			throw new BadParameterException(e);
+		} catch (GeneralSecurityException e) {
+			throw new PermissionDeniedException(e);
+		} catch (IllegalAccessException e) {
+			throw new BadParameterException("Not implemented");
+		} catch (Exception e) {
+			throw new NoSuccessException(e);
+		}
+	}
+	
 	public String[] getGroupsOf(String id) throws BadParameterException, NoSuccessException {
 		try {
     		return _linuxFs.getUserGroups(id);
