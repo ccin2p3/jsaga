@@ -167,21 +167,20 @@ JNIEXPORT void JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_chown
     if (strlen(cUsername) > 0) {
       struct passwd *pws = getpwnam(cUsername);
       if (pws == NULL) {
-        int thisError = errno;
-        env->ReleaseStringUTFChars(jUsername, cUsername);
-        switch (thisError) {
+        switch (errno) {
+          case 0:
           case ESRCH:
           case EBADF:
           case EPERM:
           case ENOENT:
             env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"), "\nUser does not exist");
-            //return USERDOESNOTEXIST;
             break;
           default:
             env->ThrowNew(env->FindClass("java/lang/Exception"), "\nCould not getpwnam");
-            //return INTERNALERROR;
             break;
         }
+        env->ReleaseStringUTFChars(jUsername, cUsername);
+        return;
       }
       newUid = pws->pw_uid;
     }
@@ -192,21 +191,20 @@ JNIEXPORT void JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_chown
     if (strlen(cUsergroup) > 0) {
       struct group *grp = getgrnam(cUsergroup);
       if (grp == NULL) {
-        int thisError = errno;
-        env->ReleaseStringUTFChars(jUsergroup, cUsergroup);
-        switch (thisError) {
+        switch (errno) {
+          case 0:
           case ESRCH:
           case EBADF:
           case EPERM:
           case ENOENT:
             env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"), "\nGroup does not exist");
-            //return GROUPDOESNOTEXIST;
             break;
           default:
             env->ThrowNew(env->FindClass("java/lang/Exception"), "\nCould not getgrnam");
-            //return INTERNALERROR;
             break;
         }
+        env->ReleaseStringUTFChars(jUsergroup, cUsergroup);
+        return;
       }
       newGid = grp->gr_gid;
     }
@@ -223,14 +221,12 @@ JNIEXPORT void JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_chown
        case EROFS:
        case EPERM:
          env->ThrowNew(env->FindClass("java/security/GeneralSecurityException"), "\nPermission denied");
-         //return PERMISSIONDENIED;
          break;
        case ENOENT:
          env->ThrowNew(env->FindClass("java/io/FileNotFoundException"), "\nFile not found");
          break;
        default:
          env->ThrowNew(env->FindClass("java/lang/Exception"), "\nCould not chown");
-         //return INTERNALERROR;
          break;
     }
 #else
