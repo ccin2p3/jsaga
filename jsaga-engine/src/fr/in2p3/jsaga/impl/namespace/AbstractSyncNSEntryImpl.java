@@ -161,7 +161,7 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
                 throw new IncorrectStateException("Not a link: "+ m_url, this);
             }
             try {
-                return URLHelper.createURL(m_url, absolutePath);
+                return URLHelper.createURL(URLHelper.getParentURL(m_url), absolutePath);
             } catch (BadParameterException e) {
                 throw new IncorrectStateException(e);
             }
