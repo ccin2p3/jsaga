@@ -2,6 +2,8 @@ package fr.in2p3.jsaga.adaptor.data;
 
 import fr.in2p3.commons.filesystem.FileStat;
 import fr.in2p3.commons.filesystem.FileSystem;
+import fr.in2p3.commons.filesystem.GroupNotFoundException;
+import fr.in2p3.commons.filesystem.UserNotFoundException;
 import fr.in2p3.jsaga.adaptor.data.file.FileDataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.link.LinkAdaptor;
 import fr.in2p3.jsaga.adaptor.data.link.NotLink;
@@ -14,6 +16,7 @@ import org.ogf.saga.permissions.Permission;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.Map;
 
 /* ***************************************************
@@ -103,10 +106,8 @@ public class LinuxDataAdaptor extends FileDataAdaptor implements LinkAdaptor, Pe
 			_linuxFs.symlink(sourceEntry, linkAbsolutePath);
 		} catch (FileNotFoundException fnfe) {
 			throw new DoesNotExistException(fnfe);
-		} catch (fr.in2p3.commons.filesystem.FileAlreadyExistsException faee) {
-			throw new AlreadyExistsException("File already exists: " + linkAbsolutePath);
-		} catch (fr.in2p3.commons.filesystem.PermissionDeniedException pde) {
-			throw new PermissionDeniedException(pde);
+		} catch (GeneralSecurityException e) {
+			throw new PermissionDeniedException(e);
 		} catch (IOException ioe) {
 			throw new NoSuccessException(ioe);
 		}
@@ -122,102 +123,34 @@ public class LinuxDataAdaptor extends FileDataAdaptor implements LinkAdaptor, Pe
 
 	public void setOwner(String id) throws PermissionDeniedException,
 			TimeoutException, BadParameterException, NoSuccessException {
-		// TODO Auto-generated method stub
-		
+		/*
+		 	_linuxFs.chown(file, id);
+		*/
+		// TODO setOwner
+		throw new BadParameterException("To implement");
 	}
 
 	public void setGroup(String id) throws PermissionDeniedException,
 			TimeoutException, BadParameterException, NoSuccessException {
-		// TODO Auto-generated method stub
-		
+		/*
+			_linuxFs.chgrp(file, id);
+		*/
+		// TODO setGroup
+		throw new BadParameterException("To implement");
 	}
 
-	public String[] getGroupsOf(String id) throws BadParameterException,
-			NoSuccessException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-/*
-	public void permissionsAllow(String absolutePath, int scope,
-			PermissionBytes permissions) throws PermissionDeniedException,
-			TimeoutException, NoSuccessException {
-        try {
-    		LinuxFileAttributes current_perms = (LinuxFileAttributes) getAttributes(absolutePath,null);
-    		int user_perms = current_perms.getLinuxUserPermission();
-    		int group_perms = current_perms.getLinuxGroupPermission();
-    		int other_perms = current_perms.getLinuxOtherPermission();
-    		File entry;
-			entry = super.newEntry(absolutePath);
-			if (scope == SCOPE_ANY) {
-				if (permissions.contains(Permission.READ) && !current_perms.getAnyPermission().contains(Permission.READ))
-					other_perms += FileSystem.PERM_READ;
-				if (permissions.contains(Permission.WRITE) && !current_perms.getAnyPermission().contains(Permission.WRITE))
-					other_perms += FileSystem.PERM_WRITE;
-				if (permissions.contains(Permission.EXEC) && !current_perms.getAnyPermission().contains(Permission.EXEC))
-					other_perms += FileSystem.PERM_EXEC;
-			} else if (scope == SCOPE_GROUP) {
-				if (permissions.contains(Permission.READ) && !current_perms.getGroupPermission().contains(Permission.READ))
-					group_perms += FileSystem.PERM_READ;
-				if (permissions.contains(Permission.WRITE) && !current_perms.getGroupPermission().contains(Permission.WRITE))
-					group_perms += FileSystem.PERM_WRITE;
-				if (permissions.contains(Permission.EXEC) && !current_perms.getGroupPermission().contains(Permission.EXEC))
-					group_perms += FileSystem.PERM_EXEC;
-			} else {
-				if (permissions.contains(Permission.READ) && !current_perms.getUserPermission().contains(Permission.READ))
-					user_perms += FileSystem.PERM_READ;
-				if (permissions.contains(Permission.WRITE) && !current_perms.getUserPermission().contains(Permission.WRITE))
-					user_perms += FileSystem.PERM_WRITE;
-				if (permissions.contains(Permission.EXEC) && !current_perms.getUserPermission().contains(Permission.EXEC))
-					user_perms += FileSystem.PERM_EXEC;
-			}
-			_linuxFs.chmod(entry, user_perms, group_perms, other_perms);
-		} catch (DoesNotExistException e) {
-			throw new NoSuccessException("File not found: " + absolutePath);
-		} catch (FileNotFoundException e) {
-			throw new NoSuccessException("File not found: " + absolutePath);
-		}
+	public String[] getGroupsOf(String id) throws BadParameterException, NoSuccessException {
+		try {
+    		return _linuxFs.getUserGroups(id);
+		} catch (IllegalArgumentException e) { // User not found
+			throw new BadParameterException(e);
+		} catch (IllegalAccessException e) { // Not implemented
+			throw new BadParameterException(e);
+		} catch (Exception e) { // Internal error in JNI
+			throw new NoSuccessException(e);
+		}    		
 	}
 
-	public void permissionsDeny(String absolutePath, int scope,
-			PermissionBytes permissions) throws PermissionDeniedException,
-			TimeoutException, NoSuccessException {
-        try {
-    		LinuxFileAttributes current_perms = (LinuxFileAttributes) getAttributes(absolutePath,null);
-    		int user_perms = current_perms.getLinuxUserPermission();
-    		int group_perms = current_perms.getLinuxGroupPermission();
-    		int other_perms = current_perms.getLinuxOtherPermission();
-    		File entry;
-			entry = super.newEntry(absolutePath);
-			if (scope == SCOPE_ANY) {
-				if (permissions.contains(Permission.READ) && current_perms.getAnyPermission().contains(Permission.READ))
-					other_perms -= FileSystem.PERM_READ;
-				if (permissions.contains(Permission.WRITE) && current_perms.getAnyPermission().contains(Permission.WRITE))
-					other_perms -= FileSystem.PERM_WRITE;
-				if (permissions.contains(Permission.EXEC) && current_perms.getAnyPermission().contains(Permission.EXEC))
-					other_perms -= FileSystem.PERM_EXEC;
-			} else if (scope == SCOPE_GROUP) {
-				if (permissions.contains(Permission.READ) && current_perms.getGroupPermission().contains(Permission.READ))
-					group_perms -= FileSystem.PERM_READ;
-				if (permissions.contains(Permission.WRITE) && current_perms.getGroupPermission().contains(Permission.WRITE))
-					group_perms -= FileSystem.PERM_WRITE;
-				if (permissions.contains(Permission.EXEC) && current_perms.getGroupPermission().contains(Permission.EXEC))
-					group_perms -= FileSystem.PERM_EXEC;
-			} else {
-				if (permissions.contains(Permission.READ) && current_perms.getUserPermission().contains(Permission.READ))
-					user_perms -= FileSystem.PERM_READ;
-				if (permissions.contains(Permission.WRITE) && current_perms.getUserPermission().contains(Permission.WRITE))
-					user_perms -= FileSystem.PERM_WRITE;
-				if (permissions.contains(Permission.EXEC) && current_perms.getUserPermission().contains(Permission.EXEC))
-					user_perms -= FileSystem.PERM_EXEC;
-			}
-			_linuxFs.chmod(entry, user_perms, group_perms, other_perms);
-		} catch (DoesNotExistException e) {
-			throw new NoSuccessException("File not found: " + absolutePath);
-		} catch (FileNotFoundException e) {
-			throw new NoSuccessException("File not found: " + absolutePath);
-		}
-	}
-*/
 	public void permissionsAllow(String absolutePath, int scope,
 			PermissionBytes permissions) throws PermissionDeniedException,
 			TimeoutException, NoSuccessException {
