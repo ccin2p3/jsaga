@@ -61,7 +61,11 @@ public class FileStat {
 
     public String toString() {
         StringBuffer buf = new StringBuffer();
-        buf.append(isdir ? 'd' : '-');
+        if (islink) {
+        	buf.append('l');
+        } else {
+        	buf.append(isdir ? 'd' : '-');
+        }
         buf.append(isReadable(user_perms) ? 'r' : '-');
         buf.append(isWritable(user_perms) ? 'w' : '-');
         buf.append(isExecutable(user_perms) ? 'x' : '-');
