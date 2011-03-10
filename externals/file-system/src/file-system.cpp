@@ -18,13 +18,6 @@ using namespace std;
 #define DEFAULT_MODE 32768
 #define TRUE  1
 #define FALSE 0
-#define PERMISSIONDENIED -1
-#define FILEDOESNOTEXIST -2
-#define FILEALREADYEXISTS -3
-#define INTERNALERROR -4
-#define USERDOESNOTEXIST -5
-#define GROUPDOESNOTEXIST -6
-#define NOTSUPPORTED -7
 
 JNIEXPORT jboolean JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_stat
   (JNIEnv *env, jobject, jstring jPath, jobject obj)
@@ -105,7 +98,37 @@ JNIEXPORT jboolean JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_chmod
     return TRUE;
 }
 
-JNIEXPORT jint JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_symlink
+JNIEXPORT void JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_symlink
+  (JNIEnv *env, jobject, jstring jOldPath, jstring jNewPath)
+{
+    const char *cOldPath = env->GetStringUTFChars(jOldPath, 0);
+    const char *cNewPath = env->GetStringUTFChars(jNewPath, 0);
+    int ret = symlink(cOldPath, cNewPath);
+    int thisError = errno;
+    env->ReleaseStringUTFChars(jOldPath, cOldPath);
+    env->ReleaseStringUTFChars(jNewPath, cNewPath);
+    if (ret == 0) { return ; }
+    switch (thisError) {
+       case EACCES:
+       case EFAULT:
+       case EROFS:
+       case EPERM:
+         env->ThrowNew(env->FindClass("java/security/GeneralSecurityException"), "\nPermission denied");
+         break;
+       case ENOENT:
+         env->ThrowNew(env->FindClass("java/io/FileNotFoundException"), "\nFile not found");
+         break;
+       case EEXIST:
+         env->ThrowNew(env->FindClass("java/io/IOException"), "\nFile already exists");
+         break;
+       default:
+         env->ThrowNew(env->FindClass("java/io/IOException"), "\nInternal I/O error");
+         break;
+    }
+}
+
+/*
+JNIEXPORT jint JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_symlinkold
   (JNIEnv *env, jobject, jstring jOldPath, jstring jNewPath)
 {
     const char *cOldPath = env->GetStringUTFChars(jOldPath, 0);
@@ -132,35 +155,31 @@ JNIEXPORT jint JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_symlink
          break;
     }
 }
+*/
 
-JNIEXPORT jint JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_chown
+JNIEXPORT void JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_chown
   (JNIEnv *env, jobject, jstring jPath, jstring jUsername, jstring jUsergroup)
 {
 //WARNING: not compatible with -mno-cygwin
 #ifndef WIN32
-
-
-    int ngroups = 5;
-    gid_t *groups;
-    /*groups = malloc(5 * sizeof (gid_t));*/
-    getgrouplist("schwarz", 1000, groups, &ngroups);
-
-
     const char *cUsername = env->GetStringUTFChars(jUsername, 0);
     uid_t newUid = -1;
     if (strlen(cUsername) > 0) {
       struct passwd *pws = getpwnam(cUsername);
       if (pws == NULL) {
+        int thisError = errno;
         env->ReleaseStringUTFChars(jUsername, cUsername);
-        switch (errno) {
+        switch (thisError) {
           case ESRCH:
           case EBADF:
           case EPERM:
           case ENOENT:
-            return USERDOESNOTEXIST;
+            env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"), "\nUser does not exist");
+            //return USERDOESNOTEXIST;
             break;
           default:
-            return INTERNALERROR;
+            env->ThrowNew(env->FindClass("java/lang/Exception"), "\nCould not getpwnam");
+            //return INTERNALERROR;
             break;
         }
       }
@@ -173,16 +192,19 @@ JNIEXPORT jint JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_chown
     if (strlen(cUsergroup) > 0) {
       struct group *grp = getgrnam(cUsergroup);
       if (grp == NULL) {
+        int thisError = errno;
         env->ReleaseStringUTFChars(jUsergroup, cUsergroup);
-        switch (errno) {
+        switch (thisError) {
           case ESRCH:
           case EBADF:
           case EPERM:
           case ENOENT:
-            return GROUPDOESNOTEXIST;
+            env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"), "\nGroup does not exist");
+            //return GROUPDOESNOTEXIST;
             break;
           default:
-            return INTERNALERROR;
+            env->ThrowNew(env->FindClass("java/lang/Exception"), "\nCould not getgrnam");
+            //return INTERNALERROR;
             break;
         }
       }
@@ -192,27 +214,165 @@ JNIEXPORT jint JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_chown
 
     const char *cPath = env->GetStringUTFChars(jPath, 0);
     int ret = chown(cPath, newUid, newGid);
+    int thisError = errno;
     env->ReleaseStringUTFChars(jPath, cPath);
-    if (ret == 0) { return 0; }
-    switch (errno) {
+    if (ret == 0) { return ; }
+    switch (thisError) {
        case EACCES:
        case EFAULT:
        case EROFS:
        case EPERM:
-         return PERMISSIONDENIED;
+         env->ThrowNew(env->FindClass("java/security/GeneralSecurityException"), "\nPermission denied");
+         //return PERMISSIONDENIED;
          break;
        case ENOENT:
-         return FILEDOESNOTEXIST;
+         env->ThrowNew(env->FindClass("java/io/FileNotFoundException"), "\nFile not found");
          break;
        default:
-         return INTERNALERROR;
+         env->ThrowNew(env->FindClass("java/lang/Exception"), "\nCould not chown");
+         //return INTERNALERROR;
          break;
     }
+#else
+    env->ThrowNew(env->FindClass("java/lang/IllegalAccessException"), "\nNot implemented");
+    //return NOTSUPPORTED;
+#endif
+}
+
+JNIEXPORT jobjectArray JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_getgrouplist
+  (JNIEnv *env, jobject, jstring jUsername)
+{
+//WARNING: not compatible with -mno-cygwin
+#ifndef WIN32
+    const char *cUsername = env->GetStringUTFChars(jUsername, 0);
+    if (strlen(cUsername) == 0) {
+      env->ReleaseStringUTFChars(jUsername, cUsername);
+      env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"), "\nUser is empty");
+      return NULL;
+    }
+    struct passwd *pws = getpwnam(cUsername);
+    if (pws == NULL) {
+        int thisError = errno;
+        env->ReleaseStringUTFChars(jUsername, cUsername);
+        switch (thisError) {
+          case 0:
+          case ESRCH:
+          case EBADF:
+          case EPERM:
+          case ENOENT:
+            env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"), "\nUser does not exist");
+            break;
+          default:
+            env->ThrowNew(env->FindClass("java/lang/Exception"), "\nCould not getpwnam");
+            break;
+        }
+        return NULL;
+    }
+    int j,ngroups;
+    gid_t *groups;
+    struct group *gr;
+
+#define STEP 1
+#define MAXGROUPS 20
+
+    ngroups = STEP;
+    groups = (gid_t *) malloc(ngroups * sizeof (gid_t));
+
+    while (ngroups < MAXGROUPS && getgrouplist(cUsername, pws->pw_gid, groups, &ngroups) == -1) {
+      ngroups += STEP;
+      groups = (gid_t *) malloc(ngroups * sizeof (gid_t));
+      if (groups == NULL) {
+          env->ReleaseStringUTFChars(jUsername, cUsername);
+          env->ThrowNew(env->FindClass("java/lang/Exception"), "\nCould not malloc");
+          return NULL;
+      }
+    }
+
+    env->ReleaseStringUTFChars(jUsername, cUsername);
+
+    if (ngroups >= MAXGROUPS) {
+        env->ThrowNew(env->FindClass("java/lang/Exception"), "\nToo many groups");
+        return NULL;
+    }
+    jobjectArray jGroupsArray = (jobjectArray)env->NewObjectArray(ngroups, env->FindClass("java/lang/String"),env->NewStringUTF("ee"));
+
+    for (j = 0; j < ngroups; j++) {
+        gr = getgrgid(groups[j]);
+        if (gr != NULL)
+            env->SetObjectArrayElement(jGroupsArray, j, env->NewStringUTF(gr->gr_name));
+    }
+
+    return jGroupsArray;
+#else
+    env->ThrowNew(env->FindClass("java/lang/IllegalAccessException"), "\nNot implemented");
+    return NULL;
+#endif
+}
+
+/*
+JNIEXPORT jint JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_getgrouplistold
+  (JNIEnv *env, jobject, jstring jUsername, jobjectArray jGroupsArray)
+{
+//WARNING: not compatible with -mno-cygwin
+#ifndef WIN32
+    const char *cUsername = env->GetStringUTFChars(jUsername, 0);
+    if (strlen(cUsername) == 0) {
+      env->ReleaseStringUTFChars(jUsername, cUsername);
+      return USERDOESNOTEXIST;
+    }
+    struct passwd *pws = getpwnam(cUsername);
+    if (pws == NULL) {
+        env->ReleaseStringUTFChars(jUsername, cUsername);
+        switch (errno) {
+          case ESRCH:
+          case EBADF:
+          case EPERM:
+          case ENOENT:
+            return USERDOESNOTEXIST;
+            break;
+          default:
+            return INTERNALERROR;
+            break;
+        }
+    }
+    int j,ngroups;
+    gid_t *groups;
+    struct group *gr;
+
+#define STEP 1
+#define MAXGROUPS 20
+
+    ngroups = STEP;
+    groups = (gid_t *) malloc(ngroups * sizeof (gid_t));
+
+    while (ngroups < MAXGROUPS && getgrouplist(cUsername, pws->pw_gid, groups, &ngroups) == -1) {
+      ngroups += STEP;
+      groups = (gid_t *) malloc(ngroups * sizeof (gid_t));
+      if (groups == NULL) {
+          env->ReleaseStringUTFChars(jUsername, cUsername);
+          return INTERNALERROR;
+      }
+    }
+
+    env->ReleaseStringUTFChars(jUsername, cUsername);
+
+    if (ngroups >= MAXGROUPS) {
+        return INTERNALERROR;
+    }
+    jGroupsArray = (jobjectArray)env->NewObjectArray(ngroups, env->FindClass("java/lang/String"),env->NewStringUTF("ee"));
+
+    for (j = 0; j < ngroups; j++) {
+        gr = getgrgid(groups[j]);
+        if (gr != NULL)
+            env->SetObjectArrayElement(jGroupsArray, j, env->NewStringUTF(gr->gr_name));
+    }
+
+    return 0;
 #else
     return NOTSUPPORTED;
 #endif
 }
-
+*/
 
 JNIEXPORT void JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_intArray
   (JNIEnv *env, jobject, jintArray arr)
