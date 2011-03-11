@@ -686,11 +686,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         }
 	}
 
-	public void setGroup(String id) throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
-		throw new PermissionDeniedException("Only root can do that on SRM.");
-	}
-
-	public void setOwner(String id) throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
+	public void setGroup(String absolutePath, String id) throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
 		throw new PermissionDeniedException("Only root can do that on SRM.");
 	}
 

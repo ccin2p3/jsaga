@@ -72,10 +72,14 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
                 if (_permissions.contains(Permission.OWNER)) {
                     switch (_scope) {
                         case PermissionAdaptor.SCOPE_USER:
-                            adaptor.setOwner(_identifier);
+                            if (adaptor instanceof PermissionAdaptorFull) {
+                                ((PermissionAdaptorFull)adaptor).setOwner(m_url.getPath(), _identifier);
+                            } else {
+                                throw new BadParameterException("Not supported for this protocol: "+m_url.getScheme(), this);
+                            }
                             break;
                         case PermissionAdaptor.SCOPE_GROUP:
-                            adaptor.setGroup(_identifier);
+                            adaptor.setGroup(m_url.getPath(), _identifier);
                             break;
                         case PermissionAdaptor.SCOPE_ANY:
                             throw new BadParameterException("Setting * as OWNER is not allowed");
@@ -95,19 +99,10 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
                     try{attrs=this._getFileAttributes();} catch(IncorrectStateException e){throw new NoSuccessException(e);}
 
                     // may throw exception for unsupported use-cases
-                    if (_identifier != null) {
-                        switch (_scope) {
-                            case PermissionAdaptor.SCOPE_USER:
-                                if (attrs.getOwner()==null || !attrs.getOwner().equals(_identifier)) {
-                                    throw new BadParameterException("Not supported for this protocol: "+m_url.getScheme(), this);
-                                }
-                                break;
-                            case PermissionAdaptor.SCOPE_GROUP:
-                                if (attrs.getGroup()==null || !attrs.getGroup().equals(_identifier)) {
-                                    throw new BadParameterException("Not supported for this protocol: "+m_url.getScheme(), this);
-                                }
-                                break;
-                        }
+                    if (_identifier!=null && _scope==PermissionAdaptor.SCOPE_USER &&
+                            (attrs.getOwner()==null || !attrs.getOwner().equals(_identifier)))
+                    {
+                        throw new BadParameterException("Not supported for this protocol: "+m_url.getScheme(), this);
                     }
 
                     // set them

@@ -900,16 +900,11 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 	}
 	
 
-	public void setGroup(String id) throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
+	public void setGroup(String absolutePath, String id) throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
 		// TODO Auto-generated method stub
 		throw new NoSuccessException("Not implemented");
 	}
 
-	
-	public void setOwner(String id) throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
-		// TODO Auto-generated method stub
-		throw new NoSuccessException("Not implemented");
-	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public String[] getGroupsOf(String id) throws BadParameterException, NoSuccessException {

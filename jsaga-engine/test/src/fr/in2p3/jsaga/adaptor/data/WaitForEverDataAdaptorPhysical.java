@@ -72,11 +72,7 @@ public class WaitForEverDataAdaptorPhysical extends WaitForEverDataAdaptorAbstra
         hang();
     }
 
-    public void setOwner(String id) throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
-        hang();
-    }
-
-    public void setGroup(String id) throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
+    public void setGroup(String absolutePath, String id) throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException {
         hang();
     }
 }

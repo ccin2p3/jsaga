@@ -27,18 +27,11 @@ public abstract interface PermissionAdaptor extends DataAdaptor {
     public int[] getSupportedScopes();
 
     /**
-     * Change owner of the entry.
-     * @param id the identifier of the new owner.
-     * @throws BadParameterException if the given id is unknown or if changing owner is not supported
-     */
-    public void setOwner(String id)
-            throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException;
-
-    /**
      * Change group of the entry.
+     * @param absolutePath the absolute path of the entry.
      * @param id the identifier of the new group.
      * @throws BadParameterException if the given id is unknown or if changing group is not supported
      */
-    public void setGroup(String id)
+    public void setGroup(String absolutePath, String id)
             throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException;
 }
