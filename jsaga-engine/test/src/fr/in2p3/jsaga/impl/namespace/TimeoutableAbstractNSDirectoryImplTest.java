@@ -45,6 +45,8 @@ public class TimeoutableAbstractNSDirectoryImplTest extends AbstractTest {
     public void test_changeDir() throws Exception {
         // can not hang...
         m_directory.changeDir(URLFactory.createURL("new_directory/"));
+        // TODO uncomment this when changeDir will be possible on absolute URLs
+        //m_directory.changeDir(URLFactory.createURL("waitforever://host/new_directory/"));
     }
 
     public void test_list() throws Exception {
