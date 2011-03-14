@@ -79,7 +79,11 @@ public abstract class AbstractDataPermissionsImpl extends AbstractSagaObjectImpl
                             }
                             break;
                         case PermissionAdaptor.SCOPE_GROUP:
-                            adaptor.setGroup(m_url.getPath(), _identifier);
+						    try {
+							    adaptor.setGroup(m_url.getPath(), _identifier);
+						    } catch (DoesNotExistException e) {
+							    throw new NoSuccessException("File not found: " +m_url.getPath(), this);
+						    }
                             break;
                         case PermissionAdaptor.SCOPE_ANY:
                             throw new BadParameterException("Setting * as OWNER is not allowed");
