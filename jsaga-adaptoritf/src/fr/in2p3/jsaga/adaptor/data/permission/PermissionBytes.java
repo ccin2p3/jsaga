@@ -39,6 +39,10 @@ public class PermissionBytes {
         return new PermissionBytes(this.value | perm.value);
     }
 
+    public PermissionBytes xor(PermissionBytes perm) {
+        return new PermissionBytes(this.value ^ perm.value);
+    }
+    
     public boolean contains(final Permission ref) {
         return (value & ref.getValue()) == ref.getValue();
     }
