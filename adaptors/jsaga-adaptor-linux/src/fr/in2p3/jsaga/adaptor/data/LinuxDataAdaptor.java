@@ -2,8 +2,7 @@ package fr.in2p3.jsaga.adaptor.data;
 
 import fr.in2p3.commons.filesystem.FileStat;
 import fr.in2p3.commons.filesystem.FileSystem;
-import fr.in2p3.commons.filesystem.GroupNotFoundException;
-import fr.in2p3.commons.filesystem.UserNotFoundException;
+import fr.in2p3.commons.filesystem.FileSystemException;
 import fr.in2p3.jsaga.adaptor.data.file.FileDataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.link.LinkAdaptor;
 import fr.in2p3.jsaga.adaptor.data.link.NotLink;
@@ -80,7 +79,7 @@ public class LinuxDataAdaptor extends FileDataAdaptor implements LinkAdaptor, Pe
 	public boolean isLink(String absolutePath)
 			throws PermissionDeniedException, DoesNotExistException,
 			TimeoutException, NoSuccessException {
-        return ((LinuxFileAttributes)getAttributes(absolutePath, null)).isLink();
+        return (((LinuxFileAttributes)getAttributes(absolutePath, null)).getType() == LinuxFileAttributes.TYPE_LINK);
 	}
 
 	public String readLink(String absolutePath) throws NotLink,
@@ -104,12 +103,13 @@ public class LinuxDataAdaptor extends FileDataAdaptor implements LinkAdaptor, Pe
 		}
 		try {
 			_linuxFs.symlink(sourceEntry, linkAbsolutePath);
-		} catch (FileNotFoundException fnfe) {
-			throw new DoesNotExistException(fnfe);
-		} catch (GeneralSecurityException e) {
-			throw new PermissionDeniedException(e);
-		} catch (IOException ioe) {
-			throw new NoSuccessException(ioe);
+		} catch (FileSystemException fse) {
+			int error_code = fse.getError();
+			if (error_code == FileSystemException.FILENOTFOUND) { throw new DoesNotExistException(fse); }
+			if (error_code == FileSystemException.FILEEXISTS) { throw new AlreadyExistsException(fse); }
+			if (error_code == FileSystemException.PERMISSIONDENIED) { throw new PermissionDeniedException(fse); }
+			throw new NoSuccessException(fse);
+			//rethrowSAGAException(fse);
 		}
 	}
 	
@@ -143,30 +143,23 @@ public class LinuxDataAdaptor extends FileDataAdaptor implements LinkAdaptor, Pe
 		TimeoutException, BadParameterException, NoSuccessException {
 		try {
 			_linuxFs.chgrp(super.newEntry(absolutePath), id);
-		} catch (FileNotFoundException e) {
-			throw new BadParameterException(e);
-		} catch (IllegalArgumentException e) {
-			throw new BadParameterException(e);
+		} catch (FileSystemException fse) {
+			int error_code = fse.getError();
+			if (error_code == FileSystemException.PERMISSIONDENIED) { throw new PermissionDeniedException(fse); }
+			if (error_code == FileSystemException.USERNOTFOUND) { throw new BadParameterException(fse); }
+			if (error_code == FileSystemException.GROUPNOTFOUND) { throw new BadParameterException(fse); }
+			throw new NoSuccessException(fse);
 		} catch (DoesNotExistException e) {
-			throw new BadParameterException(e);
-		} catch (GeneralSecurityException e) {
-			throw new PermissionDeniedException(e);
-		} catch (IllegalAccessException e) {
-			throw new BadParameterException("Not implemented");
-		} catch (Exception e) {
-			throw new NoSuccessException(e);
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
 	public String[] getGroupsOf(String id) throws BadParameterException, NoSuccessException {
 		try {
     		return _linuxFs.getUserGroups(id);
-		} catch (IllegalArgumentException e) { // User not found
+		} catch (FileSystemException e) { // Internal error in JNI
 			throw new BadParameterException(e);
-		} catch (IllegalAccessException e) { // Not implemented
-			throw new BadParameterException(e);
-		} catch (Exception e) { // Internal error in JNI
-			throw new NoSuccessException(e);
 		}    		
 	}
 
@@ -243,4 +236,17 @@ public class LinuxDataAdaptor extends FileDataAdaptor implements LinkAdaptor, Pe
 		perms += pb.contains(Permission.EXEC) ? FileStat.EXEC:0;
 		return perms;		
 	}
+	
+	private void rethrowSAGAException(FileSystemException fse) throws SagaException {
+		int error_code = fse.getError();
+		if (error_code == FileSystemException.FILENOTFOUND) { throw new DoesNotExistException(fse); }
+		if (error_code == FileSystemException.FILEEXISTS) { throw new AlreadyExistsException(fse); }
+		if (error_code == FileSystemException.PERMISSIONDENIED) { throw new PermissionDeniedException(fse); }
+		if (error_code == FileSystemException.USERNOTFOUND) { throw new BadParameterException(fse); }
+		if (error_code == FileSystemException.GROUPNOTFOUND) { throw new BadParameterException(fse); }
+		if (error_code == FileSystemException.NOTSUPPORTED) { throw new NotImplementedException(fse); }
+		throw new NoSuccessException(fse);
+		
+	}
+	
 }
