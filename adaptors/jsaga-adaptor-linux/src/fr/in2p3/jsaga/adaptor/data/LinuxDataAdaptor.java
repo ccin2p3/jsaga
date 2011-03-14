@@ -102,12 +102,13 @@ public class LinuxDataAdaptor extends FileDataAdaptor implements LinkAdaptor, Pe
 		try {
 			_linuxFs.symlink(sourceEntry, linkAbsolutePath);
 		} catch (FileSystemException fse) {
-			int error_code = fse.getError();
-			if (error_code == FileSystemException.FILENOTFOUND) { throw new DoesNotExistException(fse); }
-			if (error_code == FileSystemException.FILEEXISTS) { throw new AlreadyExistsException(fse); }
-			if (error_code == FileSystemException.PERMISSIONDENIED) { throw new PermissionDeniedException(fse); }
-			throw new NoSuccessException(fse);
-			//rethrowSAGAException(fse);
+			try {
+				rethrowSAGAException(fse);
+			} catch (BadParameterException e) {
+				throw new NoSuccessException(e);
+			} catch (NotImplementedException e) {
+				throw new NoSuccessException(e);
+			}
 		}
 	}
 	
@@ -124,11 +125,13 @@ public class LinuxDataAdaptor extends FileDataAdaptor implements LinkAdaptor, Pe
 		try {
 			_linuxFs.chgrp(super.newEntry(absolutePath), id);
 		} catch (FileSystemException fse) {
-			int error_code = fse.getError();
-			if (error_code == FileSystemException.PERMISSIONDENIED) { throw new PermissionDeniedException(fse); }
-			if (error_code == FileSystemException.USERNOTFOUND) { throw new BadParameterException(fse); }
-			if (error_code == FileSystemException.GROUPNOTFOUND) { throw new BadParameterException(fse); }
-			throw new NoSuccessException(fse);
+			try {
+				rethrowSAGAException(fse);
+			} catch (AlreadyExistsException e) {
+				throw new NoSuccessException(e);
+			} catch (NotImplementedException e) {
+				throw new NoSuccessException(e);
+			}
 		}
 	}
 	
@@ -214,7 +217,8 @@ public class LinuxDataAdaptor extends FileDataAdaptor implements LinkAdaptor, Pe
 		return perms;		
 	}
 	
-	private void rethrowSAGAException(FileSystemException fse) throws SagaException {
+	private void rethrowSAGAException(FileSystemException fse) throws DoesNotExistException, AlreadyExistsException, 
+						PermissionDeniedException, BadParameterException, NotImplementedException, NoSuccessException {
 		int error_code = fse.getError();
 		if (error_code == FileSystemException.FILENOTFOUND) { throw new DoesNotExistException(fse); }
 		if (error_code == FileSystemException.FILEEXISTS) { throw new AlreadyExistsException(fse); }
