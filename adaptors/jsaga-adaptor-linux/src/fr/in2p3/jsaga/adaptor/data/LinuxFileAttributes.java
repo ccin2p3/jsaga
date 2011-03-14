@@ -29,28 +29,24 @@ public class LinuxFileAttributes extends FileAttributes {
     }
 
     public String readLink() throws NotLink {
-    	if (! isLink()) {
+    	if (!m_stat.islink ) {
     		throw new NotLink("Not a link: " + m_stat.name);
     	}
     	return m_stat.target;
     }
     
     public int getType() {
-        if (m_stat.isdir) {
-            return TYPE_DIRECTORY;
+        if (m_stat.islink) {
+            return TYPE_LINK;
         } else if (m_stat.isfile) {
             return TYPE_FILE;
-        } else if (m_stat.islink) {
-            return TYPE_LINK;
+        } else if (m_stat.isdir) {
+            return TYPE_DIRECTORY;
         } else {
             return TYPE_UNKNOWN;
         }
     }
 
-    public boolean isLink() {
-    	return m_stat.islink;
-    }
-    
     public long getSize() {
         return m_stat.size;
     }
