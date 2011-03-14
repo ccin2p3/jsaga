@@ -2,8 +2,6 @@ package fr.in2p3.commons.filesystem;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -25,14 +23,11 @@ public class FileSystem {
     private native boolean stat(String path, FileStat stat);
     private native boolean chmod(String path, int user_perms, int group_perms, int other_perms);
     //private native int symlink(String filename, String linkname);
-    private native void symlink(String filename, String linkname) throws GeneralSecurityException, 
-    	FileNotFoundException, IOException ;
+    private native void symlink(String filename, String linkname) throws FileSystemException ;
     //private native int chown(String filename, String user, String group);
-    private native void chown(String filename, String user, String group) throws GeneralSecurityException, 
-    	FileNotFoundException,IllegalAccessException, IllegalArgumentException, Exception;
+    private native void chown(String filename, String user, String group) throws FileSystemException;
     //private native int getgrouplist(String user, String[] groups);
-    private native String[] getgrouplist(String user) throws IllegalAccessException, 
-    	IllegalArgumentException, Exception ;
+    private native String[] getgrouplist(String user) throws FileSystemException ;
     
     public native void intArray(int arr[]);
     public native void stringArray(String arr[]);
@@ -50,55 +45,23 @@ public class FileSystem {
             throw new FileNotFoundException("File not found: "+file);
         }
     }
-    public void symlink(File file, String link) throws GeneralSecurityException, FileNotFoundException, IOException {
-    	/*int ret = this.symlink(file.getAbsolutePath(),link);
-    	if (ret == PERMISSIONDENIED) {
-    		throw new PermissionDeniedException();
-    	}
-    	if (ret == FILEDOESNOTEXIST) {
-    		throw new FileNotFoundException();
-    	}
-    	if (ret == FILEALREADYEXISTS) {
-    		throw new FileAlreadyExistsException();
-    	}
-    	if (ret == INTERNALERROR) {
-    		throw new IOException();
-    	}*/
+    public void symlink(File file, String link) throws FileSystemException {
     	this.symlink(file.getAbsolutePath(),link);
     }
 
-    public void chown(File file, String user) throws GeneralSecurityException, 
-		FileNotFoundException,IllegalAccessException, IllegalArgumentException, Exception {//throws PermissionDeniedException, FileNotFoundException, UserNotFoundException, IOException {
+    public void chown(File file, String user) throws FileSystemException {
     	chown(file, user, null);
     }
 
-    public void chgrp(File file, String group) throws GeneralSecurityException, 
-		FileNotFoundException,IllegalAccessException, IllegalArgumentException, Exception { //throws PermissionDeniedException, FileNotFoundException, GroupNotFoundException, IOException {
+    public void chgrp(File file, String group) throws FileSystemException {
     	chown(file, null, group);
     }
 
-    public void chown(File file, String user, String group) throws GeneralSecurityException, 
-		FileNotFoundException,IllegalAccessException, IllegalArgumentException, Exception {//throws PermissionDeniedException, FileNotFoundException, UserNotFoundException, GroupNotFoundException, IOException {
-    	/*int ret = this.chown(file.getAbsolutePath(), user!=null?user:"", group!=null?group:"");
-    	if (ret == PERMISSIONDENIED) {
-    		throw new PermissionDeniedException();
-    	}
-    	if (ret == FILEDOESNOTEXIST) {
-    		throw new FileNotFoundException("File not found: " + file.getAbsolutePath());
-    	}
-    	if (ret == USERDOESNOTEXIST) {
-    		throw new UserNotFoundException("User not found: " + user);
-    	}
-    	if (ret == GROUPDOESNOTEXIST) {
-    		throw new GroupNotFoundException("Group not found: " + group);
-    	}
-    	if (ret == INTERNALERROR) {
-    		throw new IOException();
-    	}*/
+    public void chown(File file, String user, String group) throws FileSystemException {
     	this.chown(file.getAbsolutePath(), user!=null?user:"", group!=null?group:"");
     }
     
-    public String[] getUserGroups(String user) throws IllegalArgumentException, IllegalAccessException, Exception {
+    public String[] getUserGroups(String user) throws FileSystemException {
 		return this.getgrouplist(user);
     }
 }
