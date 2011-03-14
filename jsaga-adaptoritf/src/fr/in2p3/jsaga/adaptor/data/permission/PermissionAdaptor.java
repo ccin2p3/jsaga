@@ -31,7 +31,9 @@ public abstract interface PermissionAdaptor extends DataAdaptor {
      * @param absolutePath the absolute path of the entry.
      * @param id the identifier of the new group.
      * @throws BadParameterException if the given id is unknown or if changing group is not supported
+     * @throws DoesNotExistException if the given file does not exist
+     * @throws PermissionDeniedException if setting the group to the file was not allowed
      */
     public void setGroup(String absolutePath, String id)
-            throws PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException;
+            throws DoesNotExistException, PermissionDeniedException, TimeoutException, BadParameterException, NoSuccessException;
 }

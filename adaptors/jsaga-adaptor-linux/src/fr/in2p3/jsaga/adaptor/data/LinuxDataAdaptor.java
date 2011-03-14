@@ -121,25 +121,7 @@ public class LinuxDataAdaptor extends FileDataAdaptor implements LinkAdaptor, Pe
 		return new int[] {SCOPE_USER, SCOPE_GROUP, SCOPE_ANY};
 	}
 
-	public void setOwner(String id) throws PermissionDeniedException,
-			TimeoutException, BadParameterException, NoSuccessException {
-		/*
-		 	_linuxFs.chown(file, id);
-		*/
-		// TODO setOwner
-		throw new BadParameterException("To implement");
-	}
-
-	public void setGroup(String id) throws PermissionDeniedException,
-			TimeoutException, BadParameterException, NoSuccessException {
-		/*
-			_linuxFs.chgrp(file, id);
-		*/
-		// TODO setGroup
-		throw new BadParameterException("To implement");
-	}
-
-	public void setGroup(String absolutePath, String id) throws PermissionDeniedException,
+	public void setGroup(String absolutePath, String id) throws DoesNotExistException, PermissionDeniedException,
 		TimeoutException, BadParameterException, NoSuccessException {
 		try {
 			_linuxFs.chgrp(super.newEntry(absolutePath), id);
@@ -149,9 +131,6 @@ public class LinuxDataAdaptor extends FileDataAdaptor implements LinkAdaptor, Pe
 			if (error_code == FileSystemException.USERNOTFOUND) { throw new BadParameterException(fse); }
 			if (error_code == FileSystemException.GROUPNOTFOUND) { throw new BadParameterException(fse); }
 			throw new NoSuccessException(fse);
-		} catch (DoesNotExistException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 	
