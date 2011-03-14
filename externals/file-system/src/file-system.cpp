@@ -125,16 +125,16 @@ JNIEXPORT void JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_symlink
        case EFAULT:
        case EROFS:
        case EPERM:
-         env->ThrowNew(env->FindClass("java/security/GeneralSecurityException"), "\nPermission denied");
+         env->ThrowNew(env->FindClass("fr/in2p3/commons/filesystem/FileSystemException"), "5:Permission denied");
          break;
        case ENOENT:
-         env->ThrowNew(env->FindClass("java/io/FileNotFoundException"), "\nFile not found");
+         env->ThrowNew(env->FindClass("fr/in2p3/commons/filesystem/FileSystemException"), "1:File not found");
          break;
        case EEXIST:
-         env->ThrowNew(env->FindClass("java/io/IOException"), "\nFile already exists");
+         env->ThrowNew(env->FindClass("fr/in2p3/commons/filesystem/FileSystemException"), "2:File already exists");
          break;
        default:
-         env->ThrowNew(env->FindClass("java/io/IOException"), "\nInternal I/O error");
+         env->ThrowNew(env->FindClass("fr/in2p3/commons/filesystem/FileSystemException"), "8:Internal I/O error");
          break;
     }
 }
@@ -185,10 +185,10 @@ JNIEXPORT void JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_chown
           case EBADF:
           case EPERM:
           case ENOENT:
-            env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"), "\nUser does not exist");
+            env->ThrowNew(env->FindClass("fr/in2p3/commons/filesystem/FileSystemException"), "3:User does not exist");
             break;
           default:
-            env->ThrowNew(env->FindClass("java/lang/Exception"), "\nCould not getpwnam");
+            env->ThrowNew(env->FindClass("fr/in2p3/commons/filesystem/FileSystemException"), "8:Could not getpwnam");
             break;
         }
         env->ReleaseStringUTFChars(jUsername, cUsername);
@@ -209,10 +209,10 @@ JNIEXPORT void JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_chown
           case EBADF:
           case EPERM:
           case ENOENT:
-            env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"), "\nGroup does not exist");
+            env->ThrowNew(env->FindClass("fr/in2p3/commons/filesystem/FileSystemException"), "4:Group does not exist");
             break;
           default:
-            env->ThrowNew(env->FindClass("java/lang/Exception"), "\nCould not getgrnam");
+            env->ThrowNew(env->FindClass("fr/in2p3/commons/filesystem/FileSystemException"), "8:Could not getgrnam");
             break;
         }
         env->ReleaseStringUTFChars(jUsergroup, cUsergroup);
@@ -232,17 +232,17 @@ JNIEXPORT void JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_chown
        case EFAULT:
        case EROFS:
        case EPERM:
-         env->ThrowNew(env->FindClass("java/security/GeneralSecurityException"), "\nPermission denied");
+         env->ThrowNew(env->FindClass("fr/in2p3/commons/filesystem/FileSystemException"), "5:Permission denied");
          break;
        case ENOENT:
-         env->ThrowNew(env->FindClass("java/io/FileNotFoundException"), "\nFile not found");
+         env->ThrowNew(env->FindClass("fr/in2p3/commons/filesystem/FileSystemException"), "1:File not found");
          break;
        default:
-         env->ThrowNew(env->FindClass("java/lang/Exception"), "\nCould not chown");
+         env->ThrowNew(env->FindClass("fr/in2p3/commons/filesystem/FileSystemException"), "8:Could not chown");
          break;
     }
 #else
-    env->ThrowNew(env->FindClass("java/lang/IllegalAccessException"), "\nNot implemented");
+    env->ThrowNew(env->FindClass("fr/in2p3/commons/filesystem/FileSystemException"), "6:Not implemented");
     //return NOTSUPPORTED;
 #endif
 }
@@ -252,10 +252,17 @@ JNIEXPORT jobjectArray JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_getgr
 {
 //WARNING: not compatible with -mno-cygwin
 #ifndef WIN32
+    //jthrowable exception = 0;
+    //jclass exc_class;
+    //jmethodID cid;
+    
+    //exc_class = env->FindClass("fr/in2p3/commons/filesystem/FileSystemException");
+    //cid = env->GetMethodID(exc_class,"<init>","(ILjava/lang/String;)V");
+    
     const char *cUsername = env->GetStringUTFChars(jUsername, 0);
     if (strlen(cUsername) == 0) {
       env->ReleaseStringUTFChars(jUsername, cUsername);
-      env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"), "\nUser is empty");
+      env->ThrowNew(env->FindClass("fr/in2p3/commons/filesystem/FileSystemException"), "3:User is empty");
       return NULL;
     }
     struct passwd *pws = getpwnam(cUsername);
@@ -268,10 +275,10 @@ JNIEXPORT jobjectArray JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_getgr
           case EBADF:
           case EPERM:
           case ENOENT:
-            env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"), "\nUser does not exist");
+            env->ThrowNew(env->FindClass("fr/in2p3/commons/filesystem/FileSystemException"), "3:User does not exist");
             break;
           default:
-            env->ThrowNew(env->FindClass("java/lang/Exception"), "\nCould not getpwnam");
+            env->ThrowNew(env->FindClass("fr/in2p3/commons/filesystem/FileSystemException"), "8:Could not getpwnam");
             break;
         }
         return NULL;
@@ -291,7 +298,7 @@ JNIEXPORT jobjectArray JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_getgr
       groups = (gid_t *) malloc(ngroups * sizeof (gid_t));
       if (groups == NULL) {
           env->ReleaseStringUTFChars(jUsername, cUsername);
-          env->ThrowNew(env->FindClass("java/lang/Exception"), "\nCould not malloc");
+          env->ThrowNew(env->FindClass("fr/in2p3/commons/filesystem/FileSystemException"), "8:Could not malloc");
           return NULL;
       }
     }
@@ -299,7 +306,7 @@ JNIEXPORT jobjectArray JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_getgr
     env->ReleaseStringUTFChars(jUsername, cUsername);
 
     if (ngroups >= MAXGROUPS) {
-        env->ThrowNew(env->FindClass("java/lang/Exception"), "\nToo many groups");
+        env->ThrowNew(env->FindClass("fr/in2p3/commons/filesystem/FileSystemException"), "8:Too many groups");
         return NULL;
     }
     jobjectArray jGroupsArray = (jobjectArray)env->NewObjectArray(ngroups, env->FindClass("java/lang/String"),env->NewStringUTF("ee"));
@@ -312,7 +319,7 @@ JNIEXPORT jobjectArray JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_getgr
 
     return jGroupsArray;
 #else
-    env->ThrowNew(env->FindClass("java/lang/IllegalAccessException"), "\nNot implemented");
+    env->ThrowNew(env->FindClass("fr/in2p3/commons/filesystem/FileSystemException"), "6:Not implemented");
     return NULL;
 #endif
 }
