@@ -58,12 +58,12 @@ public class LinuxIntegrationTestSuite extends TestSuite {
         public void test_getOwner() throws Exception {
         	assertEquals(System.getProperty("user.name"), m_file.getOwner());
         }
-        // TODO: check group
-        /*public void test_group() throws Exception {
-        	//com.sun.security.auth.module.UnixSystem thisSystem = new com.sun.security.auth.module.UnixSystem();
-        	//assertEquals(thisSystem.getGroups()[0], m_file.getGroup());
-        	assertEquals(System.getProperty("user.name"), m_file.getGroup());
-        }*/
+        public void test_getGroups() throws Exception {
+            LinuxDataAdaptor lda = new LinuxDataAdaptor();
+            lda.connect(null, null, 0, null, null);
+            assertTrue(lda.getGroupsOf(System.getProperty("user.name")).length > 0);
+            lda.disconnect();
+        }
         public void test_chgrp() throws Exception {
         	LinuxDataAdaptor lda = new LinuxDataAdaptor();
         	lda.connect(null, null, 0, null, null);

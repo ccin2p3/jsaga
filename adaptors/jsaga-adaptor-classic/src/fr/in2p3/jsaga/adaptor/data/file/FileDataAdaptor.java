@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  * ***************************************************
  * Description:                                      */
 /**
- *
+ * todo: implements Permissions with System.getProperty("user.name") and com.sun.security.auth.module.UnixSystem
  */
 public class FileDataAdaptor implements FileReaderStreamFactory, FileWriterStreamFactory, DataRename, DataWriterTimes {
     private static final boolean s_isWindows = System.getProperty("os.name").startsWith("Windows");

@@ -20,10 +20,4 @@ public class LinuxDataAdaptorTest extends TestCase {
                 "linux",
                 new LinuxDataAdaptor().getType());
     }
-    public void test_getGroups() throws Exception {
-    	LinuxDataAdaptor lda = new LinuxDataAdaptor();
-    	lda.connect(null, null, 0, null, null);
-    	assertTrue(lda.getGroupsOf(System.getProperty("user.name")).length > 0);
-    	lda.disconnect();
-    }
 }
