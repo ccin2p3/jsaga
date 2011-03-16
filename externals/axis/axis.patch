@@ -1,0 +1,1131 @@
+diff -Naur axis-1_4/src/org/apache/axis/encoding/ReadWriteLock.java axis-1_4_patched/src/org/apache/axis/encoding/ReadWriteLock.java
+--- axis-1_4/src/org/apache/axis/encoding/ReadWriteLock.java	1970-01-01 01:00:00.000000000 +0100
++++ axis-1_4_patched/src/org/apache/axis/encoding/ReadWriteLock.java	2011-03-06 00:53:01.765989001 +0100
+@@ -0,0 +1,110 @@
++package org.apache.axis.encoding;
++
++import java.util.HashMap;
++import java.util.Map;
++
++public class ReadWriteLock{
++
++  private Map readingThreads = new HashMap();
++
++   private int writeAccesses    = 0;
++   private int writeRequests    = 0;
++   private Thread writingThread = null;
++
++
++  public synchronized void lockRead() throws InterruptedException{
++    Thread callingThread = Thread.currentThread();
++    while(! canGrantReadAccess(callingThread)){
++      wait();
++    }
++
++    readingThreads.put(callingThread, new Integer(getReadAccessCount(callingThread) + 1));
++  }
++
++  private boolean canGrantReadAccess(Thread callingThread){
++    if( isWriter(callingThread) ) return true;
++    if( hasWriter()             ) return false;
++    if( isReader(callingThread) ) return true;
++    if( hasWriteRequests()      ) return false;
++    return true;
++  }
++
++
++  public synchronized void unlockRead(){
++    Thread callingThread = Thread.currentThread();
++    if(!isReader(callingThread)){
++      throw new IllegalMonitorStateException("Calling Thread does not" +
++        " hold a read lock on this ReadWriteLock");
++    }
++    int accessCount = getReadAccessCount(callingThread);
++    if(accessCount == 1){ readingThreads.remove(callingThread); }
++    else { readingThreads.put(callingThread, new Integer(accessCount -1)); }
++    notifyAll();
++  }
++
++  public synchronized void lockWrite() throws InterruptedException{
++    writeRequests++;
++    Thread callingThread = Thread.currentThread();
++    while(! canGrantWriteAccess(callingThread)){
++      wait();
++    }
++    writeRequests--;
++    writeAccesses++;
++    writingThread = callingThread;
++  }
++
++  public synchronized void unlockWrite() throws InterruptedException{
++    Thread current = Thread.currentThread();
++    if(!isWriter(current)) {
++      throw new IllegalMonitorStateException("Calling Thread does not hold the write lock on this ReadWriteLock");
++    }
++    writeAccesses--;
++    if(writeAccesses == 0){
++      writingThread = null;
++    }
++    notifyAll();
++  }
++
++  private boolean canGrantWriteAccess(Thread callingThread){
++    if(isOnlyReader(callingThread))    return true;
++    if(hasReaders())                   return false;
++    if(writingThread == null)          return true;
++    if(!isWriter(callingThread))       return false;
++    return true;
++  }
++
++
++  private int getReadAccessCount(Thread callingThread){
++    Integer accessCount = (Integer) readingThreads.get(callingThread);
++    if(accessCount == null) return 0;
++    return accessCount.intValue();
++  }
++
++
++  private boolean hasReaders(){
++    return readingThreads.size() > 0;
++  }
++
++  private boolean isReader(Thread callingThread){
++    return readingThreads.get(callingThread) != null;
++  }
++
++  private boolean isOnlyReader(Thread callingThread){
++    return readingThreads.size() == 1 &&
++           readingThreads.get(callingThread) != null;
++  }
++
++  private boolean hasWriter(){
++    return writingThread != null;
++  }
++
++  private boolean isWriter(Thread callingThread){
++    return writingThread == callingThread;
++  }
++
++  private boolean hasWriteRequests(){
++      return this.writeRequests > 0;
++  }
++
++}
++
+diff -Naur axis-1_4/src/org/apache/axis/encoding/TypeMappingImpl.java axis-1_4_patched/src/org/apache/axis/encoding/TypeMappingImpl.java
+--- axis-1_4/src/org/apache/axis/encoding/TypeMappingImpl.java	2006-04-22 18:57:28.000000000 +0200
++++ axis-1_4_patched/src/org/apache/axis/encoding/TypeMappingImpl.java	2011-03-06 02:24:57.125989002 +0100
+@@ -13,7 +13,6 @@
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
+-
+ package org.apache.axis.encoding;
+ 
+ import org.apache.axis.Constants;
+@@ -43,6 +42,7 @@
+ import java.util.HashMap;
+ import java.util.List;
+ import java.io.Serializable;
++import java.lang.InterruptedException;
+ 
+ /**
+  * <p>
+@@ -72,11 +72,10 @@
+  *
+  * @author Rich Scheuerle (scheu@us.ibm.com)
+  */
+-public class TypeMappingImpl implements Serializable
+-{
+-    protected static Log log =
+-        LogFactory.getLog(TypeMappingImpl.class.getName());
++public class TypeMappingImpl implements Serializable {
+ 
++    protected static Log log =
++            LogFactory.getLog(TypeMappingImpl.class.getName());
+     /**
+      * Work around a .NET bug with soap encoded types.
+      * This is a static property of the type mapping that will
+@@ -86,23 +85,29 @@
+     public static boolean dotnet_soapenc_bugfix = false;
+ 
+     public static class Pair implements Serializable {
++
+         public Class javaType;
+         public QName xmlType;
++
+         public Pair(Class javaType, QName xmlType) {
+             this.javaType = javaType;
+             this.xmlType = xmlType;
+         }
++
+         public boolean equals(Object o) {
+-            if (o == null) return false;
++            if (o == null) {
++                return false;
++            }
+             Pair p = (Pair) o;
+             // Test straight equality
+-            if (p.xmlType == this.xmlType &&
+-                p.javaType == this.javaType) {
++            if (p.xmlType == this.xmlType
++                    && p.javaType == this.javaType) {
+                 return true;
+             }
+-            return (p.xmlType.equals(this.xmlType) &&
+-                    p.javaType.equals(this.javaType));
++            return (p.xmlType.equals(this.xmlType)
++                    && p.javaType.equals(this.javaType));
+         }
++
+         public int hashCode() {
+             int hashcode = 0;
+             if (javaType != null) {
+@@ -114,34 +119,31 @@
+             return hashcode;
+         }
+     }
+-
+     private HashMap qName2Pair;     // QName to Pair Mapping
+     private HashMap class2Pair;     // Class Name to Pair Mapping
+     private HashMap pair2SF;        // Pair to Serialization Factory
+     private HashMap pair2DF;        // Pair to Deserialization Factory
+     private ArrayList namespaces;   // Supported namespaces
+-
+     protected Boolean doAutoTypes = null;
++    final private ReadWriteLock mapsLock = new ReadWriteLock();
++    final private ReadWriteLock nsLock = new ReadWriteLock();
+ 
+     /**
+      * Construct TypeMapping
+      */
+     public TypeMappingImpl() {
+-        qName2Pair  = new HashMap();
+-        class2Pair  = new HashMap();
+-        pair2SF     = new HashMap();
+-        pair2DF     = new HashMap();
+-        namespaces  = new ArrayList();
++        qName2Pair = new HashMap();
++        class2Pair = new HashMap();
++        pair2SF = new HashMap();
++        pair2DF = new HashMap();
++        namespaces = new ArrayList();
+     }
+ 
+-    private static boolean isArray(Class clazz)
+-    {
++    private static boolean isArray(Class clazz) {
+         return clazz.isArray() || java.util.Collection.class.isAssignableFrom(clazz);
+     }
+ 
+-
+     /********* JAX-RPC Compliant Method Definitions *****************/
+-
+     /**
+      * Gets the list of encoding styles supported by this TypeMapping object.
+      *
+@@ -149,8 +151,17 @@
+      * styles and XML schema namespaces.
+      */
+     public String[] getSupportedEncodings() {
+-        String[] stringArray = new String[namespaces.size()];
+-        return (String[]) namespaces.toArray(stringArray);
++        try {
++            nsLock.lockRead();
++        } catch (InterruptedException e) {
++            throw new RuntimeException(e);
++        }
++        try {
++            String[] stringArray = new String[namespaces.size()];
++            return (String[]) namespaces.toArray(stringArray);
++        } finally {
++            nsLock.unlockRead();
++        }
+     }
+ 
+     /**
+@@ -161,10 +172,23 @@
+      * @param namespaceURIs String[] of namespace URI's
+      */
+     public void setSupportedEncodings(String[] namespaceURIs) {
+-        namespaces.clear();
+-        for (int i =0; i< namespaceURIs.length; i++) {
+-            if (!namespaces.contains(namespaceURIs[i])) {
+-                namespaces.add(namespaceURIs[i]);
++        try {
++            nsLock.lockWrite();
++        } catch (InterruptedException e) {
++            throw new RuntimeException(e);
++        }
++        try {
++            namespaces.clear();
++            for (int i = 0; i < namespaceURIs.length; i++) {
++                if (!namespaces.contains(namespaceURIs[i])) {
++                    namespaces.add(namespaceURIs[i]);
++                }
++            }
++        } finally {
++            try {
++                nsLock.unlockWrite();
++            } catch (InterruptedException e) {
++                throw new RuntimeException(e);
+             }
+         }
+     }
+@@ -189,13 +213,23 @@
+             // REMOVED_FOR_TCK
+             // return false;
+             throw new JAXRPCException(
+-                    Messages.getMessage(javaType == null ?
+-                                         "badJavaType" : "badXmlType"));
++                    Messages.getMessage(javaType == null
++                    ? "badJavaType" : "badXmlType"));
+         }
+-        if (pair2SF.keySet().contains(new Pair(javaType, xmlType))) {
+-            return true;
++
++        try {
++            mapsLock.lockRead();
++        } catch (InterruptedException e) {
++            throw new RuntimeException(e);
++        }
++        try {
++            if (pair2SF.keySet().contains(new Pair(javaType, xmlType))) {
++                return true;
++            }
++            return false;
++        } finally {
++            mapsLock.unlockRead();
+         }
+-        return false;
+     }
+ 
+     /**
+@@ -210,9 +244,9 @@
+      * @throws JAXRPCException - If any error during the registration
+      */
+     public void register(Class javaType, QName xmlType,
+-                         javax.xml.rpc.encoding.SerializerFactory sf,
+-                         javax.xml.rpc.encoding.DeserializerFactory dsf)
+-        throws JAXRPCException {
++            javax.xml.rpc.encoding.SerializerFactory sf,
++            javax.xml.rpc.encoding.DeserializerFactory dsf)
++            throws JAXRPCException {
+         // At least a serializer or deserializer factory must be specified.
+         if (sf == null && dsf == null) {
+             throw new JAXRPCException(Messages.getMessage("badSerFac"));
+@@ -231,14 +265,14 @@
+      * @throws JAXRPCException
+      */
+     protected void internalRegister(Class javaType, QName xmlType,
+-                         javax.xml.rpc.encoding.SerializerFactory sf,
+-                         javax.xml.rpc.encoding.DeserializerFactory dsf)
++            javax.xml.rpc.encoding.SerializerFactory sf,
++            javax.xml.rpc.encoding.DeserializerFactory dsf)
+             throws JAXRPCException {
+         // Both javaType and xmlType must be specified.
+         if (javaType == null || xmlType == null) {
+             throw new JAXRPCException(
+-                    Messages.getMessage(javaType == null ?
+-                                         "badJavaType" : "badXmlType"));
++                    Messages.getMessage(javaType == null
++                    ? "badJavaType" : "badXmlType"));
+         }
+ 
+         //REMOVED_FOR_TCK
+@@ -260,13 +294,30 @@
+         // In particular, the mapping for java.lang.Object --> anyType
+         // was coming out in WSDL generation under the 1999 XML Schema
+         // namespace, which .NET doesn't understand (and is not great anyway).
+-        qName2Pair.put(xmlType, pair);
+-        class2Pair.put(javaType, pair);
+ 
+-        if (sf != null)
+-            pair2SF.put(pair, sf);
+-        if (dsf != null)
+-            pair2DF.put(pair, dsf);
++        try {
++            mapsLock.lockWrite();
++        } catch (InterruptedException e) {
++            throw new RuntimeException(e);
++        }
++        try {
++            qName2Pair.put(xmlType, pair);
++            class2Pair.put(javaType, pair);
++
++            if (sf != null) {
++                pair2SF.put(pair, sf);
++            }
++            if (dsf != null) {
++                pair2DF.put(pair, dsf);
++            }
++        } finally {
++            try {
++                mapsLock.unlockWrite();
++            } catch (InterruptedException e) {
++                throw new RuntimeException(e);
++            }
++        }
++
+     }
+ 
+     /**
+@@ -283,9 +334,8 @@
+      * java.lang.IllegalArgumentException -
+      * If invalid or unsupported XML/Java type is specified
+      */
+-    public javax.xml.rpc.encoding.SerializerFactory
+-        getSerializer(Class javaType, QName xmlType)
+-        throws JAXRPCException {
++    public javax.xml.rpc.encoding.SerializerFactory getSerializer(Class javaType, QName xmlType)
++            throws JAXRPCException {
+ 
+         javax.xml.rpc.encoding.SerializerFactory sf = null;
+ 
+@@ -299,76 +349,96 @@
+             }
+         }
+ 
+-        // Try to get the serializer associated with this pair
+-        Pair pair = new Pair(javaType, xmlType);
++        try {
++            mapsLock.lockRead();
++        } catch (InterruptedException e) {
++            throw new RuntimeException(e);
++        }
++        try {
+ 
+-        // Now get the serializer with the pair
+-        sf = (javax.xml.rpc.encoding.SerializerFactory) pair2SF.get(pair);
++            // Try to get the serializer associated with this pair
++            Pair pair = new Pair(javaType, xmlType);
+ 
+-        // Need to look into hierarchy of component type.
+-        // ex) java.util.GregorianCalendar[]
+-        //     -> java.util.Calendar[]
+-        if (sf == null && javaType.isArray()) {
+-            int dimension = 1;
+-            Class componentType = javaType.getComponentType();
+-            while (componentType.isArray()) {
+-                dimension += 1;
+-                componentType = componentType.getComponentType();
+-            }
+-            int[] dimensions = new int[dimension];
+-            componentType = componentType.getSuperclass();
+-            Class superJavaType = null;
+-            while (componentType != null) {
+-    			superJavaType = Array.newInstance(componentType, dimensions).getClass();
+-                pair = new Pair(superJavaType, xmlType);
+-                sf = (javax.xml.rpc.encoding.SerializerFactory) pair2SF.get(pair);
+-                if (sf != null) {
+-                    break;
++            // Now get the serializer with the pair
++            sf = (javax.xml.rpc.encoding.SerializerFactory) pair2SF.get(pair);
++
++            // Need to look into hierarchy of component type.
++            // ex) java.util.GregorianCalendar[]
++            //     -> java.util.Calendar[]
++            if (sf == null && javaType.isArray()) {
++                int dimension = 1;
++                Class componentType = javaType.getComponentType();
++                while (componentType.isArray()) {
++                    dimension += 1;
++                    componentType = componentType.getComponentType();
+                 }
++                int[] dimensions = new int[dimension];
+                 componentType = componentType.getSuperclass();
++                Class superJavaType = null;
++                while (componentType != null) {
++                    superJavaType = Array.newInstance(componentType, dimensions).getClass();
++                    pair = new Pair(superJavaType, xmlType);
++                    sf = (javax.xml.rpc.encoding.SerializerFactory) pair2SF.get(pair);
++                    if (sf != null) {
++                        break;
++                    }
++                    componentType = componentType.getSuperclass();
++                }
+             }
+-        }
+-        
+-        // check if ArrayOfT(xml)->T[](java) conversion is possible
+-        if (sf == null && javaType.isArray() && xmlType != null) {
+-            Pair pair2 = (Pair) qName2Pair.get(xmlType);
+-            if (pair2 != null 
+-                    && pair2.javaType != null
+-                    && !pair2.javaType.isPrimitive() 
+-                    && ArrayUtil.isConvertable(pair2.javaType, javaType)) {
+-                sf = (javax.xml.rpc.encoding.SerializerFactory) pair2SF.get(pair2);
+-            }
+-        }
+-        
+-        // find serializer with xmlType
+-        if (sf == null && !javaType.isArray() 
+-                && !Constants.isSchemaXSD(xmlType.getNamespaceURI()) 
+-                && !Constants.isSOAP_ENC(xmlType.getNamespaceURI())) {
+-            Pair pair2 = (Pair) qName2Pair.get(xmlType);
+-            if (pair2 != null && pair2.javaType != null 
+-                    && !pair2.javaType.isArray()                         // for array
+-                    && (javaType.isAssignableFrom(pair2.javaType) || 
+-                       (pair2.javaType.isPrimitive() && javaType == JavaUtils.getWrapperClass(pair2.javaType))))       // for derived type (xsd:restriction) 
+-            {
+-                sf = (javax.xml.rpc.encoding.SerializerFactory) pair2SF.get(pair2);
++
++            // check if ArrayOfT(xml)->T[](java) conversion is possible
++            if (sf == null && javaType.isArray() && xmlType != null) {
++                Pair pair2 = (Pair) qName2Pair.get(xmlType);
++                if (pair2 != null
++                        && pair2.javaType != null
++                        && !pair2.javaType.isPrimitive()
++                        && ArrayUtil.isConvertable(pair2.javaType, javaType)) {
++                    sf = (javax.xml.rpc.encoding.SerializerFactory) pair2SF.get(pair2);
++                }
++            }
++
++            // find serializer with xmlType
++            if (sf == null && !javaType.isArray()
++                    && !Constants.isSchemaXSD(xmlType.getNamespaceURI())
++                    && !Constants.isSOAP_ENC(xmlType.getNamespaceURI())) {
++                Pair pair2 = (Pair) qName2Pair.get(xmlType);
++                if (pair2 != null && pair2.javaType != null
++                        && !pair2.javaType.isArray() // for array
++                        && (javaType.isAssignableFrom(pair2.javaType)
++                        || (pair2.javaType.isPrimitive() && javaType == JavaUtils.getWrapperClass(pair2.javaType)))) // for derived type (xsd:restriction) 
++                {
++                    sf = (javax.xml.rpc.encoding.SerializerFactory) pair2SF.get(pair2);
++                }
+             }
++
++            return sf;
++        } finally {
++            mapsLock.unlockRead();
+         }
+-        
+-        return sf;
+     }
+-    
++
+     public SerializerFactory finalGetSerializer(Class javaType) {
+-        Pair pair;
+-        if (isArray(javaType)) {
+-            pair = (Pair) qName2Pair.get(Constants.SOAP_ARRAY);
+-        } else {
+-            pair = (Pair) class2Pair.get(javaType);
+-        }
+-        if (pair != null) {
+-            return (SerializerFactory)pair2SF.get(pair);
+-        }
+ 
+-        return null;
++        try {
++            mapsLock.lockRead();
++        } catch (InterruptedException e) {
++            throw new RuntimeException(e);
++        }
++        try {
++            Pair pair;
++            if (isArray(javaType)) {
++                pair = (Pair) qName2Pair.get(Constants.SOAP_ARRAY);
++            } else {
++                pair = (Pair) class2Pair.get(javaType);
++            }
++            if (pair != null) {
++                return (SerializerFactory) pair2SF.get(pair);
++            }
++
++            return null;
++        } finally {
++            mapsLock.unlockRead();
++        }
+     }
+ 
+     /**
+@@ -389,8 +459,7 @@
+      * @throws JAXRPCException
+      */
+     public QName getXMLType(Class javaType, QName xmlType, boolean encoded)
+-        throws JAXRPCException
+-    {
++            throws JAXRPCException {
+         javax.xml.rpc.encoding.SerializerFactory sf = null;
+ 
+         // If the xmlType was not provided, get one
+@@ -404,33 +473,44 @@
+             }
+         }
+ 
+-        // Try to get the serializer associated with this pair
+-        Pair pair = new Pair(javaType, xmlType);
++        try {
++            mapsLock.lockRead();
++        } catch (InterruptedException e) {
++            throw new RuntimeException(e);
++        }
++        try {
+ 
+-        // Now get the serializer with the pair
+-        sf = (javax.xml.rpc.encoding.SerializerFactory) pair2SF.get(pair);
+-        if (sf != null)
+-            return xmlType;
++            // Try to get the serializer associated with this pair
++            Pair pair = new Pair(javaType, xmlType);
+ 
+-        // If not successful, use the xmlType to get
+-        // another pair.  For some xmlTypes (like SOAP_ARRAY)
+-        // all of the possible javaTypes are not registered.
+-        if (isArray(javaType)) {
+-            if (encoded) {
+-                return Constants.SOAP_ARRAY;
+-            } else {
+-                pair = (Pair) qName2Pair.get(xmlType);
++            // Now get the serializer with the pair
++            sf = (javax.xml.rpc.encoding.SerializerFactory) pair2SF.get(pair);
++            if (sf != null) {
++                return xmlType;
+             }
+-        }
+ 
+-        if (pair == null) {
+-            pair = (Pair) class2Pair.get(javaType);
+-        }
++            // If not successful, use the xmlType to get
++            // another pair.  For some xmlTypes (like SOAP_ARRAY)
++            // all of the possible javaTypes are not registered.
++            if (isArray(javaType)) {
++                if (encoded) {
++                    return Constants.SOAP_ARRAY;
++                } else {
++                    pair = (Pair) qName2Pair.get(xmlType);
++                }
++            }
+ 
+-        if (pair != null) {
+-            xmlType = pair.xmlType;
++            if (pair == null) {
++                pair = (Pair) class2Pair.get(javaType);
++            }
++
++            if (pair != null) {
++                xmlType = pair.xmlType;
++            }
++            return xmlType;
++        } finally {
++            mapsLock.unlockRead();
+         }
+-        return xmlType;
+     }
+ 
+     /**
+@@ -447,9 +527,8 @@
+      * java.lang.IllegalArgumentException -
+      * If invalid or unsupported XML/Java type is specified
+      */
+-    public javax.xml.rpc.encoding.DeserializerFactory
+-        getDeserializer(Class javaType, QName xmlType, TypeMappingDelegate start)
+-        throws JAXRPCException {
++    public javax.xml.rpc.encoding.DeserializerFactory getDeserializer(Class javaType, QName xmlType, TypeMappingDelegate start)
++            throws JAXRPCException {
+         if (javaType == null) {
+             javaType = start.getClassForQName(xmlType);
+             // If we don't have a mapping, we're hosed since getClassForQName()
+@@ -458,43 +537,62 @@
+                 return null;
+             }
+         }
++        try {
++            mapsLock.lockRead();
++        } catch (InterruptedException e) {
++            throw new RuntimeException(e);
++        }
++        try {
+ 
+-        Pair pair = new Pair(javaType, xmlType);
++            Pair pair = new Pair(javaType, xmlType);
+ 
+-        return (javax.xml.rpc.encoding.DeserializerFactory) pair2DF.get(pair);
++            return (javax.xml.rpc.encoding.DeserializerFactory) pair2DF.get(pair);
++        } finally {
++            mapsLock.unlockRead();
++        }
+     }
+-    
++
+     public DeserializerFactory finalGetDeserializer(Class javaType,
+-                                                    QName xmlType,
+-                                                    TypeMappingDelegate start) {
+-        DeserializerFactory df = null;
+-        if (javaType != null && javaType.isArray()) {
+-            Class componentType = javaType.getComponentType();
+-
+-            // HACK ALERT - Don't return the ArrayDeserializer IF
+-            // the xmlType matches the component type of the array
+-	    // or if the componentType is the wrappertype of the
+-	    // xmlType, because that means we're using maxOccurs 
+-	    // and/or nillable and we'll want the higher layers to 
+-	    // get the component type deserializer... (sigh)
+-            if (xmlType != null) {
+-                Class actualClass = start.getClassForQName(xmlType);
+-                if (actualClass == componentType
+-                    || (actualClass != null && (componentType.isAssignableFrom(actualClass)
+-                        || Utils.getWrapperType(actualClass.getName()).equals(componentType.getName())))) {
+-			return null;
++            QName xmlType,
++            TypeMappingDelegate start) {
++
++        try {
++            mapsLock.lockRead();
++        } catch (InterruptedException e) {
++            throw new RuntimeException(e);
++        }
++        try {
++            DeserializerFactory df = null;
++            if (javaType != null && javaType.isArray()) {
++                Class componentType = javaType.getComponentType();
++
++                // HACK ALERT - Don't return the ArrayDeserializer IF
++                // the xmlType matches the component type of the array
++                // or if the componentType is the wrappertype of the
++                // xmlType, because that means we're using maxOccurs 
++                // and/or nillable and we'll want the higher layers to 
++                // get the component type deserializer... (sigh)
++                if (xmlType != null) {
++                    Class actualClass = start.getClassForQName(xmlType);
++                    if (actualClass == componentType
++                            || (actualClass != null && (componentType.isAssignableFrom(actualClass)
++                            || Utils.getWrapperType(actualClass.getName()).equals(componentType.getName())))) {
++                        return null;
++                    }
+                 }
+-            }
+-            Pair pair = (Pair) qName2Pair.get(Constants.SOAP_ARRAY);
+-            df = (DeserializerFactory) pair2DF.get(pair);
+-            if (df instanceof ArrayDeserializerFactory && javaType.isArray()) {
+-                QName componentXmlType = start.getTypeQName(componentType);
+-                if (componentXmlType != null) {
+-                    df = new ArrayDeserializerFactory(componentXmlType);
++                Pair pair = (Pair) qName2Pair.get(Constants.SOAP_ARRAY);
++                df = (DeserializerFactory) pair2DF.get(pair);
++                if (df instanceof ArrayDeserializerFactory && javaType.isArray()) {
++                    QName componentXmlType = start.getTypeQName(componentType);
++                    if (componentXmlType != null) {
++                        df = new ArrayDeserializerFactory(componentXmlType);
++                    }
+                 }
+             }
++            return df;
++        } finally {
++            mapsLock.unlockRead();
+         }
+-        return df;
+     }
+ 
+     /**
+@@ -508,15 +606,28 @@
+      * removing the registered SerializerFactory
+      */
+     public void removeSerializer(Class javaType, QName xmlType)
+-        throws JAXRPCException {
++            throws JAXRPCException {
+         if (javaType == null || xmlType == null) {
+             throw new JAXRPCException(
+-                    Messages.getMessage(javaType == null ?
+-                                         "badJavaType" : "badXmlType"));
++                    Messages.getMessage(javaType == null
++                    ? "badJavaType" : "badXmlType"));
+         }
+ 
+-        Pair pair = new Pair(javaType, xmlType);
+-        pair2SF.remove(pair);
++        try {
++            mapsLock.lockWrite();
++        } catch (InterruptedException e) {
++            throw new RuntimeException(e);
++        }
++        try {
++            Pair pair = new Pair(javaType, xmlType);
++            pair2SF.remove(pair);
++        } finally {
++            try {
++                mapsLock.unlockWrite();
++            } catch (InterruptedException e) {
++                throw new RuntimeException(e);
++            }
++        }
+     }
+ 
+     /**
+@@ -530,19 +641,31 @@
+      * removing the registered DeserializerFactory
+      */
+     public void removeDeserializer(Class javaType, QName xmlType)
+-        throws JAXRPCException {
++            throws JAXRPCException {
+         if (javaType == null || xmlType == null) {
+             throw new JAXRPCException(
+-                    Messages.getMessage(javaType == null ?
+-                                         "badJavaType" : "badXmlType"));
++                    Messages.getMessage(javaType == null
++                    ? "badJavaType" : "badXmlType"));
+         }
+-        Pair pair = new Pair(javaType, xmlType);
+-        pair2DF.remove(pair);
+-    }
+-
+ 
+-     /********* End JAX-RPC Compliant Method Definitions *****************/
++        try {
++            mapsLock.lockWrite();
++        } catch (InterruptedException e) {
++            throw new RuntimeException(e);
++        }
++        try {
++            Pair pair = new Pair(javaType, xmlType);
++            pair2DF.remove(pair);
++        } finally {
++            try {
++                mapsLock.unlockWrite();
++            } catch (InterruptedException e) {
++                throw new RuntimeException(e);
++            }
++        }
++    }
+ 
++    /********* End JAX-RPC Compliant Method Definitions *****************/
+     /**
+      * Gets the QName for the type mapped to Class.
+      * @param javaType class or type
+@@ -552,17 +675,19 @@
+         QName ret = null;
+         while (javaType != null) {
+             ret = getTypeQName(javaType, null);
+-            if (ret != null)
++            if (ret != null) {
+                 return ret;
++            }
+ 
+             // Walk my interfaces...
+-            Class [] interfaces = javaType.getInterfaces();
++            Class[] interfaces = javaType.getInterfaces();
+             if (interfaces != null) {
+                 for (int i = 0; i < interfaces.length; i++) {
+                     Class iface = interfaces[i];
+                     ret = getTypeQName(iface, null);
+-                    if (ret != null)
++                    if (ret != null) {
+                         return ret;
++                    }
+                 }
+             }
+ 
+@@ -579,35 +704,44 @@
+      * @param javaType
+      * @return
+      */
+-    public QName getTypeQNameExact(Class javaType, TypeMappingDelegate next) {
+-        if (javaType == null)
++    synchronized public QName getTypeQNameExact(Class javaType, TypeMappingDelegate next) {
++        if (javaType == null) {
+             return null;
+-       
+-        QName xmlType = null;
+-        Pair pair = (Pair) class2Pair.get(javaType);
++        }
++        try {
++            mapsLock.lockRead();
++        } catch (InterruptedException e) {
++            throw new RuntimeException(e);
++        }
++        try {
++            QName xmlType = null;
++            Pair pair = (Pair) class2Pair.get(javaType);
++
++            if (isDotNetSoapEncFixNeeded() && pair != null) {
++                // Hack alert!
++                // If we are in .NET bug compensation mode, skip over any
++                // SOAP Encoded types we my find and prefer XML Schema types
++                xmlType = pair.xmlType;
++                if (Constants.isSOAP_ENC(xmlType.getNamespaceURI())
++                        && !xmlType.getLocalPart().equals("Array")) {
++                    pair = null;
++                }
++            }
+ 
+-        if (isDotNetSoapEncFixNeeded() && pair != null ) {
+-            // Hack alert!
+-            // If we are in .NET bug compensation mode, skip over any
+-            // SOAP Encoded types we my find and prefer XML Schema types
+-            xmlType = pair.xmlType;
+-            if (Constants.isSOAP_ENC(xmlType.getNamespaceURI()) &&
+-                    !xmlType.getLocalPart().equals("Array")) {
+-                pair = null;
++            if (pair == null && next != null) {
++                // Keep checking up the stack...
++                xmlType = next.delegate.getTypeQNameExact(javaType,
++                        next.next);
+             }
+-        }
+ 
+-        if (pair == null && next != null) {
+-            // Keep checking up the stack...
+-            xmlType = next.delegate.getTypeQNameExact(javaType,
+-                                                      next.next);
+-        }
++            if (pair != null) {
++                xmlType = pair.xmlType;
++            }
+ 
+-        if (pair != null) {
+-            xmlType = pair.xmlType;
++            return xmlType;
++        } finally {
++            mapsLock.unlockRead();
+         }
+-
+-        return xmlType;
+     }
+ 
+     /**
+@@ -637,55 +771,63 @@
+          * register it's javaType and xmlType. List classes and derivitives
+          * can't be used because they should be serialized as an anyType array.
+          */
+-        if ( shouldDoAutoTypes() &&
+-             javaType != List.class &&
+-             !List.class.isAssignableFrom(javaType) &&
+-             xmlType != null &&
+-             xmlType.equals(Constants.SOAP_ARRAY) )
+-        {
++        if (shouldDoAutoTypes()
++                && javaType != List.class
++                && !List.class.isAssignableFrom(javaType)
++                && xmlType != null
++                && xmlType.equals(Constants.SOAP_ARRAY)) {
+             xmlType = new QName(
+-                Namespaces.makeNamespace( javaType.getName() ),
+-                Types.getLocalNameFromFullName( javaType.getName() ) );
++                    Namespaces.makeNamespace(javaType.getName()),
++                    Types.getLocalNameFromFullName(javaType.getName()));
+ 
+-            internalRegister( javaType,
+-                              xmlType,
+-                              new ArraySerializerFactory(),
+-                              new ArrayDeserializerFactory() );
+-        }
+-
+-        // Can only detect arrays via code
+-        if (xmlType == null && isArray(javaType)) {
+-
+-            // get the registered array if any
+-            Pair pair = (Pair) class2Pair.get(Object[].class);
+-            // TODO: it always returns the last registered one,
+-            //  so that's why the soap 1.2 typemappings have to 
+-            //  move to an other registry to differentiate them
+-            if (pair != null) {
+-                xmlType = pair.xmlType;
+-            } else {
+-                xmlType = Constants.SOAP_ARRAY;
++            internalRegister(javaType,
++                    xmlType,
++                    new ArraySerializerFactory(),
++                    new ArrayDeserializerFactory());
++        }
++
++        try {
++            mapsLock.lockRead();
++        } catch (InterruptedException e) {
++            throw new RuntimeException(e);
++        }
++        try {
++
++            // Can only detect arrays via code
++            if (xmlType == null && isArray(javaType)) {
++
++                // get the registered array if any
++                Pair pair = (Pair) class2Pair.get(Object[].class);
++                // TODO: it always returns the last registered one,
++                //  so that's why the soap 1.2 typemappings have to 
++                //  move to an other registry to differentiate them
++                if (pair != null) {
++                    xmlType = pair.xmlType;
++                } else {
++                    xmlType = Constants.SOAP_ARRAY;
++                }
+             }
++        } finally {
++            mapsLock.unlockRead();
+         }
+ 
+         /* If the class isn't an array or List and auto-typing is turned on,
+-        * register the class and it's type as beans.
+-        */
+-        if (xmlType == null && shouldDoAutoTypes())
+-        {
++         * register the class and it's type as beans.
++         */
++        if (xmlType == null && shouldDoAutoTypes()) {
+             xmlType = new QName(
+-                Namespaces.makeNamespace( javaType.getName() ),
+-                Types.getLocalNameFromFullName( javaType.getName() ) );
++                    Namespaces.makeNamespace(javaType.getName()),
++                    Types.getLocalNameFromFullName(javaType.getName()));
+ 
+             /* If doAutoTypes is set, register a new type mapping for the
+-            * java class with the above QName.  This way, when getSerializer()
+-            * and getDeserializer() are called, this QName is returned and
+-            * these methods do not need to worry about creating a serializer.
+-            */
+-            internalRegister( javaType,
+-                              xmlType,
+-                              new BeanSerializerFactory(javaType, xmlType),
+-                              new BeanDeserializerFactory(javaType, xmlType) );
++             * java class with the above QName.  This way, when getSerializer()
++             * and getDeserializer() are called, this QName is returned and
++             * these methods do not need to worry about creating a serializer.
++             */
++            internalRegister(javaType,
++                    xmlType,
++                    new BeanSerializerFactory(javaType, xmlType),
++                    new BeanDeserializerFactory(javaType, xmlType));
+         }
+ 
+         //log.debug("getTypeQName xmlType =" + xmlType);
+@@ -693,36 +835,43 @@
+     }
+ 
+     public Class getClassForQName(QName xmlType, Class javaType,
+-                                  TypeMappingDelegate next) {
++            TypeMappingDelegate next) {
+         if (xmlType == null) {
+             return null;
+         }
+ 
+         //log.debug("getClassForQName xmlType =" + xmlType);
+-
+-        if (javaType != null) {
+-            // Looking for an exact match first
+-            Pair pair = new Pair(javaType, xmlType);
+-            if (pair2DF.get(pair) == null) {
+-                if (next != null) {
+-                    javaType = next.getClassForQName(xmlType, javaType);
++        try {
++            mapsLock.lockRead();
++        } catch (InterruptedException e) {
++            throw new RuntimeException(e);
++        }
++        try {
++            if (javaType != null) {
++                // Looking for an exact match first
++                Pair pair = new Pair(javaType, xmlType);
++                if (pair2DF.get(pair) == null) {
++                    if (next != null) {
++                        javaType = next.getClassForQName(xmlType, javaType);
++                    }
+                 }
+             }
+-        }
+ 
+-        if (javaType == null) {
+-            //look for it in our map
+-            Pair pair = (Pair) qName2Pair.get(xmlType);
+-            if (pair == null && next != null) {
+-                //on no match, delegate
+-                javaType = next.getClassForQName(xmlType);
+-            } else if (pair != null) {
+-                javaType = pair.javaType;
++            if (javaType == null) {
++                //look for it in our map
++                Pair pair = (Pair) qName2Pair.get(xmlType);
++                if (pair == null && next != null) {
++                    //on no match, delegate
++                    javaType = next.getClassForQName(xmlType);
++                } else if (pair != null) {
++                    javaType = pair.javaType;
++                }
+             }
++        } finally {
++            mapsLock.unlockRead();
+         }
+-        
+         //log.debug("getClassForQName javaType =" + javaType);
+-        if(javaType == null && shouldDoAutoTypes()) {
++        if (javaType == null && shouldDoAutoTypes()) {
+             String pkg = Namespaces.getPackage(xmlType.getNamespaceURI());
+             if (pkg != null) {
+                 String className = xmlType.getLocalPart();
+@@ -732,9 +881,9 @@
+                 try {
+                     javaType = ClassUtils.forName(className);
+                     internalRegister(javaType,
+-                                     xmlType,
+-                                     new BeanSerializerFactory(javaType, xmlType),
+-                                     new BeanDeserializerFactory(javaType, xmlType));
++                            xmlType,
++                            new BeanSerializerFactory(javaType, xmlType),
++                            new BeanDeserializerFactory(javaType, xmlType));
+                 } catch (ClassNotFoundException e) {
+                 }
+             }
+@@ -745,23 +894,22 @@
+     public void setDoAutoTypes(boolean doAutoTypes) {
+         this.doAutoTypes = doAutoTypes ? Boolean.TRUE : Boolean.FALSE;
+     }
+-    
+-    public boolean shouldDoAutoTypes() {
+-        if(doAutoTypes != null) {
++
++    synchronized public boolean shouldDoAutoTypes() {
++        if (doAutoTypes != null) {
+             return doAutoTypes.booleanValue();
+         }
+         MessageContext msgContext = MessageContext.getCurrentContext();
+-        if(msgContext != null) {
+-            if (msgContext.isPropertyTrue("axis.doAutoTypes") ||
+-                    (msgContext.getAxisEngine() != null && JavaUtils.isTrue(msgContext.getAxisEngine().getOption("axis.doAutoTypes")))) {
++        if (msgContext != null) {
++            if (msgContext.isPropertyTrue("axis.doAutoTypes")
++                    || (msgContext.getAxisEngine() != null && JavaUtils.isTrue(msgContext.getAxisEngine().getOption("axis.doAutoTypes")))) {
+                 doAutoTypes = Boolean.TRUE;
+             }
+         }
+-        if(doAutoTypes == null){
++        if (doAutoTypes == null) {
+             doAutoTypes = AxisProperties.getProperty("axis.doAutoTypes",
+-                    "false")
+-                    .equals("true") ?
+-                    Boolean.TRUE : Boolean.FALSE;
++                    "false").equals("true")
++                    ? Boolean.TRUE : Boolean.FALSE;
+         }
+         return doAutoTypes.booleanValue();
+     }
+@@ -769,14 +917,21 @@
+     /**
+      * Returns an array of all the classes contained within this mapping
+      */
+-    public Class [] getAllClasses(TypeMappingDelegate next)
+-    {
+-        java.util.HashSet temp = new java.util.HashSet();
+-        if (next != null)
+-        {
+-            temp.addAll(java.util.Arrays.asList(next.getAllClasses()));
++    public Class[] getAllClasses(TypeMappingDelegate next) {
++        try {
++            mapsLock.lockRead();
++        } catch (InterruptedException e) {
++            throw new RuntimeException(e);
++        }
++        try {
++            java.util.HashSet temp = new java.util.HashSet();
++            if (next != null) {
++                temp.addAll(java.util.Arrays.asList(next.getAllClasses()));
++            }
++            temp.addAll(class2Pair.keySet());
++            return (Class[]) temp.toArray(new Class[temp.size()]);
++        } finally {
++            mapsLock.unlockRead();
+         }
+-        temp.addAll(class2Pair.keySet());
+-        return (Class[])temp.toArray(new Class[temp.size()]);
+     }
+-}
+\ Pas de fin de ligne à la fin du fichier.
++}
