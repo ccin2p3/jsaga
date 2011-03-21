@@ -60,6 +60,8 @@ public abstract class NSCopyTest extends AbstractNSCopyTest {
             entry.copy(m_subDirUrl2, Flags.NONE.getValue());
             fail("Expected exception: "+ IncorrectStateException.class);
         } catch(IncorrectStateException e) {
+        } finally {
+        	entry.close();
         }
         try {
             NSFactory.createNSEntry(m_session, createURL(m_subDirUrl2, "unexisting.txt"), Flags.NONE.getValue());
