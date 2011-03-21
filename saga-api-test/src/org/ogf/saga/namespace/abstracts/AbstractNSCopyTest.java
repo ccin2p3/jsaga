@@ -126,5 +126,6 @@ public abstract class AbstractNSCopyTest extends AbstractNSDirectoryTest {
                 expectedContent,
                 new String(buffer.getData(), 0, len));
         reader.close();
+        entry.close();
     }
 }
