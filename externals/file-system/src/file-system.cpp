@@ -24,7 +24,11 @@ JNIEXPORT jboolean JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_stat
 {
     const char *cPath = env->GetStringUTFChars(jPath, 0);
     struct stat buf;
+#ifdef S_ISLNK
     int ret = lstat(cPath, &buf);
+#else
+    int ret = stat(cPath, &buf);
+#endif
 
     //file does not exist
     if (buf.st_mode==0 || buf.st_mode==7) {
@@ -53,6 +57,7 @@ JNIEXPORT jboolean JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_stat
     env->SetIntField(obj, env->GetFieldID(cls, "user_perms", "I"), user_perms);
     env->SetIntField(obj, env->GetFieldID(cls, "group_perms", "I"), group_perms);
     env->SetIntField(obj, env->GetFieldID(cls, "other_perms", "I"), other_perms);
+#ifdef S_ISLNK
     if (islink == TRUE) {
        int size = 100;
        while (1) {
@@ -83,6 +88,8 @@ JNIEXPORT jboolean JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_stat
            size *= 2;
         }
     }
+#endif
+
 //WARNING: not compatible with -mno-cygwin
 #ifndef WIN32
     struct passwd *pws = getpwuid(buf.st_uid);
@@ -113,6 +120,7 @@ JNIEXPORT jboolean JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_chmod
 JNIEXPORT void JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_symlink
   (JNIEnv *env, jobject, jstring jOldPath, jstring jNewPath)
 {
+#ifdef S_ISLNK
     const char *cOldPath = env->GetStringUTFChars(jOldPath, 0);
     const char *cNewPath = env->GetStringUTFChars(jNewPath, 0);
     int ret = symlink(cOldPath, cNewPath);
@@ -137,37 +145,10 @@ JNIEXPORT void JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_symlink
          env->ThrowNew(env->FindClass("fr/in2p3/commons/filesystem/FileSystemException"), "8:Internal I/O error");
          break;
     }
+#else
+    env->ThrowNew(env->FindClass("fr/in2p3/commons/filesystem/FileSystemException"), "6:Not supported on Windows");
+#endif
 }
-
-/*
-JNIEXPORT jint JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_symlinkold
-  (JNIEnv *env, jobject, jstring jOldPath, jstring jNewPath)
-{
-    const char *cOldPath = env->GetStringUTFChars(jOldPath, 0);
-    const char *cNewPath = env->GetStringUTFChars(jNewPath, 0);
-    int ret = symlink(cOldPath, cNewPath);
-    env->ReleaseStringUTFChars(jOldPath, cOldPath);
-    env->ReleaseStringUTFChars(jNewPath, cNewPath);
-    if (ret == 0) { return 0; }
-    switch (errno) {
-       case EACCES:
-       case EFAULT:
-       case EROFS:
-       case EPERM:
-         return PERMISSIONDENIED;
-         break;
-       case ENOENT:
-         return FILEDOESNOTEXIST;
-         break;
-       case EEXIST:
-         return FILEALREADYEXISTS;
-         break;
-       default:
-         return INTERNALERROR;
-         break;
-    }
-}
-*/
 
 JNIEXPORT void JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_chown
   (JNIEnv *env, jobject, jstring jPath, jstring jUsername, jstring jUsergroup)
@@ -243,7 +224,6 @@ JNIEXPORT void JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_chown
     }
 #else
     env->ThrowNew(env->FindClass("fr/in2p3/commons/filesystem/FileSystemException"), "6:Not implemented");
-    //return NOTSUPPORTED;
 #endif
 }
 
@@ -323,71 +303,6 @@ JNIEXPORT jobjectArray JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_getgr
     return NULL;
 #endif
 }
-
-/*
-JNIEXPORT jint JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_getgrouplistold
-  (JNIEnv *env, jobject, jstring jUsername, jobjectArray jGroupsArray)
-{
-//WARNING: not compatible with -mno-cygwin
-#ifndef WIN32
-    const char *cUsername = env->GetStringUTFChars(jUsername, 0);
-    if (strlen(cUsername) == 0) {
-      env->ReleaseStringUTFChars(jUsername, cUsername);
-      return USERDOESNOTEXIST;
-    }
-    struct passwd *pws = getpwnam(cUsername);
-    if (pws == NULL) {
-        env->ReleaseStringUTFChars(jUsername, cUsername);
-        switch (errno) {
-          case ESRCH:
-          case EBADF:
-          case EPERM:
-          case ENOENT:
-            return USERDOESNOTEXIST;
-            break;
-          default:
-            return INTERNALERROR;
-            break;
-        }
-    }
-    int j,ngroups;
-    gid_t *groups;
-    struct group *gr;
-
-#define STEP 1
-#define MAXGROUPS 20
-
-    ngroups = STEP;
-    groups = (gid_t *) malloc(ngroups * sizeof (gid_t));
-
-    while (ngroups < MAXGROUPS && getgrouplist(cUsername, pws->pw_gid, groups, &ngroups) == -1) {
-      ngroups += STEP;
-      groups = (gid_t *) malloc(ngroups * sizeof (gid_t));
-      if (groups == NULL) {
-          env->ReleaseStringUTFChars(jUsername, cUsername);
-          return INTERNALERROR;
-      }
-    }
-
-    env->ReleaseStringUTFChars(jUsername, cUsername);
-
-    if (ngroups >= MAXGROUPS) {
-        return INTERNALERROR;
-    }
-    jGroupsArray = (jobjectArray)env->NewObjectArray(ngroups, env->FindClass("java/lang/String"),env->NewStringUTF("ee"));
-
-    for (j = 0; j < ngroups; j++) {
-        gr = getgrgid(groups[j]);
-        if (gr != NULL)
-            env->SetObjectArrayElement(jGroupsArray, j, env->NewStringUTF(gr->gr_name));
-    }
-
-    return 0;
-#else
-    return NOTSUPPORTED;
-#endif
-}
-*/
 
 JNIEXPORT void JNICALL Java_fr_in2p3_commons_filesystem_FileSystem_intArray
   (JNIEnv *env, jobject, jintArray arr)
