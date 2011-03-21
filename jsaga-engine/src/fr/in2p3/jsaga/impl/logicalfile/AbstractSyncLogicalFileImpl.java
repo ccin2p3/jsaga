@@ -36,7 +36,33 @@ public abstract class AbstractSyncLogicalFileImpl extends AbstractNSEntryImplWit
     /** constructor for factory */
     public AbstractSyncLogicalFileImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session, URLHelper.toFileURL(url), adaptor, new FlagsHelper(flags).keep(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS));
-        this.init(flags);
+        boolean initOK = false;
+        try {
+        	this.init(flags);
+        	initOK = true;
+        } catch (NotImplementedException e) {
+        	throw e;
+        } catch (IncorrectURLException e) {
+        	throw e;
+        } catch (AuthenticationFailedException e) {
+        	throw e;
+        } catch (AuthorizationFailedException e) {
+        	throw e;
+        } catch (PermissionDeniedException e) {
+        	throw e;
+        } catch (BadParameterException e) {
+        	throw e;
+        } catch (AlreadyExistsException e) {
+        	throw e;
+        } catch (DoesNotExistException e) {
+        	throw e;
+        } catch (TimeoutException e) {
+        	throw e;
+        } catch (NoSuccessException e) {
+        	throw e;
+        } finally {
+        	if (!initOK) this.close();
+        }
     }
 
     /** constructor for NSDirectory.open() */

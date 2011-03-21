@@ -36,7 +36,33 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
     /** constructor for factory */
     protected AbstractSyncNSDirectoryImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session, URLHelper.toDirectoryURL(url), adaptor, flags);
-        this.init(flags);
+        boolean initOK = false;
+        try {
+        	this.init(flags);
+        	initOK = true;
+        } catch (NotImplementedException e) {
+        	throw e;
+        } catch (IncorrectURLException e) {
+        	throw e;
+        } catch (AuthenticationFailedException e) {
+        	throw e;
+        } catch (AuthorizationFailedException e) {
+        	throw e;
+        } catch (PermissionDeniedException e) {
+        	throw e;
+        } catch (BadParameterException e) {
+        	throw e;
+        } catch (AlreadyExistsException e) {
+        	throw e;
+        } catch (DoesNotExistException e) {
+        	throw e;
+        } catch (TimeoutException e) {
+        	throw e;
+        } catch (NoSuccessException e) {
+        	throw e;
+        } finally {
+        	if (!initOK) this.close();
+        }
     }
 
     /** constructor for NSDirectory.open() */
