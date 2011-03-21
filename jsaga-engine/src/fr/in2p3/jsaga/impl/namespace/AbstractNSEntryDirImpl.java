@@ -344,6 +344,6 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         }
 
         // makeDir
-        NSFactory.createNSDirectory(m_session, target, makeDirFlags);
+        NSFactory.createNSDirectory(m_session, target, makeDirFlags).close();
     }
 }
