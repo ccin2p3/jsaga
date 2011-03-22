@@ -23,7 +23,7 @@ public class JobMetrics {
     MetricImpl<State> m_State;
     MetricImpl<String> m_StateDetail;
     /** deviation from SAGA specification */
-    MetricImpl<String> m_SubState;
+    //MetricImpl<String> m_SubState;
 
     /** constructor */
     JobMetrics(AbstractSyncJobImpl job) throws NotImplementedException {
@@ -41,13 +41,13 @@ public class JobMetrics {
                 "1",
                 MetricType.String,
                 "Unknown:Unknown");
-        m_SubState = new TaskStateMetricFactoryImpl<String>(job).createAndRegister(
+        /*m_SubState = new TaskStateMetricFactoryImpl<String>(job).createAndRegister(
                 AbstractSyncJobImpl.JOB_SUBSTATE,
                 "fires on sub-state changes of the job (deviation from SAGA specification)",
                 MetricMode.ReadOnly,
                 "1",
                 MetricType.String,
-                SubState.NEW_CREATED.toString());
+                SubState.NEW_CREATED.toString());*/
     }
 
     /** clone */
@@ -55,7 +55,7 @@ public class JobMetrics {
         JobMetrics clone = (JobMetrics) super.clone();
         clone.m_State = m_State.clone();
         clone.m_StateDetail = m_StateDetail.clone();
-        clone.m_SubState = m_SubState.clone();
+        //clone.m_SubState = m_SubState.clone();
         return clone;
     }
 }

@@ -120,7 +120,8 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             String nativeJobDesc = m_attributes.m_NativeJobDescription.getObject();
 
             // pre-staging (before job submit)
-            m_metrics.m_SubState.setValue(SubState.RUNNING_PRE_STAGING.toString());
+            //m_metrics.m_SubState.setValue(SubState.RUNNING_PRE_STAGING.toString());
+            m_metrics.m_StateDetail.setValue("JSAGA:" + SubState.RUNNING_PRE_STAGING.toString());
             if (m_stagingMgr instanceof DataStagingManagerThroughStream) {
                 ((DataStagingManagerThroughStream)m_stagingMgr).preStaging(this);
             } else if (m_stagingMgr instanceof DataStagingManagerThroughSandboxOnePhase) {
@@ -529,7 +530,8 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             // update metrics
             m_metrics.m_State.setValue(state);
             m_metrics.m_StateDetail.setValue(stateDetail);
-            m_metrics.m_SubState.setValue(subState.toString());
+            //m_metrics.m_SubState.setValue(subState.toString());
+            m_metrics.m_StateDetail.setValue("JSAGA:" + subState.toString());
         }
     }
 
