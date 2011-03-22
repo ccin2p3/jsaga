@@ -174,12 +174,23 @@ public abstract class JobRunInteractiveTest extends AbstractJobTest {
 	public void test_run_environnement() throws Exception {
 	    
 		// prepare
-		String env0 = "MYVAR0=Testing0";
-		String env1 = "MYVAR1=Testing 1";
-		String env2 = "MYVAR2=Testing two";
+		String myvar0="Testing0";
+		String myvar1="\"Testing 1\"";
+		String[] _myenv;
+		if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
+			_myenv = new String[] {
+					"MYVAR0="+myvar0,
+					"MYVAR1=\\"+myvar1+"\\"
+			};
+		} else {
+			_myenv = new String[] {
+					"MYVAR0="+myvar0,
+					"MYVAR1="+myvar1
+			};
+		};
 		AttributeVector[] attributesV = new AttributeVector[1];
-		attributesV[0] = new AttributeVector(JobDescription.ENVIRONMENT, new String[]{env0, env1, env2});
-		JobDescription desc =  createJob("/bin/env", null, attributesV);
+		attributesV[0] = new AttributeVector(JobDescription.ENVIRONMENT, _myenv);
+		JobDescription desc =  createJob("echo $MYVAR0:$MYVAR1", null, attributesV);
 		desc.setAttribute(JobDescription.INTERACTIVE, JobDescription.TRUE);
     	
 		// submit
@@ -191,25 +202,13 @@ public abstract class JobRunInteractiveTest extends AbstractJobTest {
 	    checkStatus(job.getState(), State.DONE);
 	    
 	    // check stdout
-	    boolean containsEnv0 = false, containsEnv1 = false, containsEnv2 = false;
     	BufferedReader jobStdoutReader = new BufferedReader( new InputStreamReader(job.getStdout()));       
 	    String input;
-	    while ((input = jobStdoutReader.readLine()) !=null ){
-        	if(input.indexOf(env0) > -1) {
-        		containsEnv0 = true;
-        	}
-        	if(input.indexOf(env1) > -1) {
-        		containsEnv1 = true;
-        	}
-        	if(input.indexOf(env2) > -1) {
-        		containsEnv2 = true;
-        	}
-        }
 	    
     	// check
         assertEquals(
-        		true,
-        		containsEnv0 && containsEnv1 && containsEnv2);
+        		jobStdoutReader.readLine(),
+        		myvar0 + ":" + myvar1);
 	}
 	
 	/**
