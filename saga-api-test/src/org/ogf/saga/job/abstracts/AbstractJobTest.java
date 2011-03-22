@@ -187,6 +187,7 @@ public abstract class AbstractJobTest extends AbstractTest {
     private String m_subState;
     protected boolean waitForSubState(Job job, String subState) throws Exception {
     	float timeoutInSeconds = Float.valueOf(MAX_QUEUING_TIME);
+    	// TODO: use STATEDETAIL
     	int cookie = job.addCallback("job.sub_state", new Callback(){
             public boolean cb(Monitorable mt, Metric metric, Context ctx) throws NotImplementedException, AuthorizationFailedException {
                 try {
