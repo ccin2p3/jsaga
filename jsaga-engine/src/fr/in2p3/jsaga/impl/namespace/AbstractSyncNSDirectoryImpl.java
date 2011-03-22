@@ -40,26 +40,6 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
         try {
         	this.init(flags);
         	initOK = true;
-        } catch (NotImplementedException e) {
-        	throw e;
-        } catch (IncorrectURLException e) {
-        	throw e;
-        } catch (AuthenticationFailedException e) {
-        	throw e;
-        } catch (AuthorizationFailedException e) {
-        	throw e;
-        } catch (PermissionDeniedException e) {
-        	throw e;
-        } catch (BadParameterException e) {
-        	throw e;
-        } catch (AlreadyExistsException e) {
-        	throw e;
-        } catch (DoesNotExistException e) {
-        	throw e;
-        } catch (TimeoutException e) {
-        	throw e;
-        } catch (NoSuccessException e) {
-        	throw e;
         } finally {
         	if (!initOK) this.close();
         }
