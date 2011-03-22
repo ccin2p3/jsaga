@@ -87,7 +87,7 @@ public class DataStagingManagerThroughStream implements DataStagingManager {
                 newJobDesc.setAttribute(JobDescription.INTERACTIVE, "true");
 
                 m_executable = jobDesc.getAttribute(JobDescription.EXECUTABLE);
-                newJobDesc.setAttribute(JobDescription.EXECUTABLE, "/bin/sh");
+                newJobDesc.setAttribute(JobDescription.EXECUTABLE, "/bin/bash");
 
                 try {
                     m_arguments = jobDesc.getVectorAttribute(JobDescription.ARGUMENTS);
