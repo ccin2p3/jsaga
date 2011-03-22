@@ -12,8 +12,13 @@ import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobInteractiveGe
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.ogf.saga.error.*;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Map;
+import java.util.Properties;
 import java.util.UUID;
 
 /* ***************************************************
@@ -58,38 +63,117 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
         return translator;
     }
 
-    public String submit(String commandLine, boolean checkMatch, String uniqId)
-			throws PermissionDeniedException, TimeoutException, NoSuccessException {
+    private String submit(String commandLine, boolean isInteractive) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+		String jobId = UUID.randomUUID().toString();
 		try {
 
+			Properties jobProps = new Properties();
+			jobProps.load(new StringReader(commandLine));
+			File _workDir = null;
+			String cde = null;
+            Enumeration e = jobProps.propertyNames();
+			ArrayList _envParams = new ArrayList();
+            while (e.hasMoreElements()){
+                   String key = (String)e.nextElement();
+                   String val = (String)jobProps.getProperty(key);
+                   if (key.equals("_WorkingDirectory")) { _workDir = new File(val);}
+                   else if (key.equals("_Executable")) { 
+                	   if (!isInteractive) {
+                		   cde = prepareCde(val, jobId);
+                	   } else {
+                		   cde = val;
+                	   }
+                   } else {
+                	   _envParams.add(key + "=" + val);
+                   }
+            }
+			
+			Process p = Runtime.getRuntime().exec(new String[]{m_shellPath, "-c", cde}, 
+													(String[])_envParams.toArray(new String[]{}), 
+													_workDir);
+			// add process in sessionMap
+			LocalAdaptorAbstract.sessionMap.put(jobId, p);
+			return jobId;
+		} catch (IOException ioe) {
+			LocalAdaptorAbstract.sessionMap.put(jobId, new LocalJobProcess());
+			return jobId;
+		} catch (Exception e) {
+			throw new NoSuccessException(e);
+		}
+    	
+    }
+
+    public String submit(String commandLine, boolean checkMatch, String uniqId)
+			throws PermissionDeniedException, TimeoutException, NoSuccessException {
+		/*try {
 			String jobId = UUID.randomUUID().toString();
-			String cde = prepareCde(commandLine, jobId);
-			Process p = Runtime.getRuntime().exec(new String[]{m_shellPath, "-c", cde});
+
+			Properties jobProps = new Properties();
+			jobProps.load(new StringReader(commandLine));
+			File _workDir = null;
+			String cde = null;
+            Enumeration e = jobProps.propertyNames();
+			ArrayList _envParams = new ArrayList();
+            while (e.hasMoreElements()){
+                   String key = (String)e.nextElement();
+                   String val = (String)jobProps.getProperty(key);
+                   if (key.equals("_WorkingDirectory")) { _workDir = new File(val);}
+                   else if (key.equals("_Executable")) { cde = prepareCde(val, jobId);}
+                   else {
+                	   _envParams.add(key + "=" + val);
+                   }
+            }
+			
+			 
+			Process p = Runtime.getRuntime().exec(new String[]{m_shellPath, "-c", cde}, 
+													(String[])_envParams.toArray(new String[]{}), 
+													_workDir);
 			// add process in sessionMap
 			LocalAdaptorAbstract.sessionMap.put(jobId, p);
 			return jobId;
 			
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
-		}
+		}*/
+    	return this.submit(commandLine, false);
 	}
 	
 	public JobIOGetterInteractive submitInteractive(String commandLine,
 			boolean checkMatch) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		
-		try {
-		
+/*		try {
 			String jobId = UUID.randomUUID().toString();
+
+			Properties jobProps = new Properties();
+			jobProps.load(new StringReader(commandLine));
+			File _workDir = null;
+			String cde = null;
+            Enumeration e = jobProps.propertyNames();
+			ArrayList _envParams = new ArrayList();
+            while (e.hasMoreElements()){
+                   String key = (String)e.nextElement();
+                   String val = (String)jobProps.getProperty(key);
+                   if (key.equals("_WorkingDirectory")) { _workDir = new File(val);}
+                   else if (key.equals("_Executable")) { cde = val;}
+                   else {
+                	   _envParams.add(key + "=" + val);
+                   }
+            }
+		
             //fixme: workaround for passing stdin to the user command
 //			String cde = prepareCde(commandLine, jobId);
             //warning: this is not equivalent to exec(m_shellPath+" -c \""+commandLine+"\"")
-			Process p = Runtime.getRuntime().exec(new String[]{m_shellPath, "-c", commandLine});
+			Process p = Runtime.getRuntime().exec(new String[]{m_shellPath, "-c", cde}, 
+													(String[])_envParams.toArray(new String[]{}), 
+													_workDir);
 			// add process in sessionMap
 			LocalAdaptorAbstract.sessionMap.put(jobId, p);
 			return new LocalJobIOHandler(p, jobId);
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
-		}
+		}*/
+		String jobId = this.submit(commandLine, true);
+		return new LocalJobIOHandler((Process)LocalAdaptorAbstract.sessionMap.get(jobId), jobId);
 	}
 
 	private String prepareCde(String commandLine, String jobId) {
