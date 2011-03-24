@@ -176,18 +176,10 @@ public abstract class JobRunInteractiveTest extends AbstractJobTest {
 		// prepare
 		String myvar0="Testing0";
 		String myvar1="\"Testing 1\"";
-		String[] _myenv;
-		if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
-			_myenv = new String[] {
-					"MYVAR0="+myvar0,
-					"MYVAR1=\\"+myvar1+"\\"
-			};
-		} else {
-			_myenv = new String[] {
-					"MYVAR0="+myvar0,
-					"MYVAR1="+myvar1
-			};
-		};
+        String[] _myenv = new String[] {
+                "MYVAR0="+myvar0,
+                "MYVAR1="+myvar1
+        };
 		AttributeVector[] attributesV = new AttributeVector[1];
 		attributesV[0] = new AttributeVector(JobDescription.ENVIRONMENT, _myenv);
 		JobDescription desc =  createJob("echo $MYVAR0:$MYVAR1", null, attributesV);
