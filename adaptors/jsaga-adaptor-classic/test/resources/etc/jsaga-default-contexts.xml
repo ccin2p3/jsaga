@@ -17,7 +17,7 @@
         </context>
         <context type="None">
             <job type="local">
-                <attribute name="ShellPath" value="f:/cygwin/bin/sh.exe"/>
+                <attribute name="ShellPath" value="f:/cygwin/bin/bash.exe"/>
             </job>
         </context>
     </session>
