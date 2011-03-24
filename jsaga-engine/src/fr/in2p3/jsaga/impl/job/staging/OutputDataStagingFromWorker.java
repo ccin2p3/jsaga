@@ -43,7 +43,7 @@ public class OutputDataStagingFromWorker extends AbstractDataStagingWorker {
         int append = (m_append ? Flags.APPEND : Flags.NONE).getValue();
         Buffer buffer = BufferFactory.createBuffer(decoded);
         try {
-            org.ogf.saga.file.File localFile = FileFactory.createFile(session, m_localURL, Flags.WRITE.or(append));
+            org.ogf.saga.file.File localFile = FileFactory.createFile(session, m_localURL, Flags.CREATE.or(append));
             localFile.write(buffer);
             localFile.close();
         } catch (SagaIOException e) {
