@@ -26,7 +26,7 @@ import java.util.UUID;
  */
 public abstract class JobRunSandboxTest extends AbstractJobTest {
     private static final String SCRIPT_IMPLICIT = "/usr/bin/tr 'ou' 'ui'";
-    private static final String SCRIPT_EXPLICIT = "#!/bin/sh\n/bin/cat ${1##file:/} | "+SCRIPT_IMPLICIT+" > ${2##file:/}";
+    private static final String SCRIPT_EXPLICIT = "#!/bin/bash\n/bin/cat ${1##file:} | "+SCRIPT_IMPLICIT+" > ${2##file:}";
     private static final String INPUT_CONTENT = "coucou";
     private static final String OUTPUT_CONTENT = "cuicui";
     private static final File TMP = new File(System.getProperty("java.io.tmpdir"));
@@ -141,6 +141,7 @@ public abstract class JobRunSandboxTest extends AbstractJobTest {
         // wait
         job.waitFor();
 
+        
         // for debugging
         if (State.FAILED.equals(job.getState())) {
             // print stderr
@@ -170,7 +171,7 @@ public abstract class JobRunSandboxTest extends AbstractJobTest {
             out.close();
         } else if (location instanceof URI) {
             URI uri = (URI) location;
-            org.ogf.saga.file.File file = FileFactory.createFile(m_session, URLFactory.createURL(uri.toString()), Flags.WRITE.getValue());
+            org.ogf.saga.file.File file = FileFactory.createFile(m_session, URLFactory.createURL(uri.toString()), Flags.CREATE.getValue());
             file.write(BufferFactory.createBuffer(content));
             file.close();
         } else {
