@@ -187,8 +187,7 @@ public abstract class AbstractJobTest extends AbstractTest {
     private String m_subState;
     protected boolean waitForSubState(Job job, String subState) throws Exception {
     	float timeoutInSeconds = Float.valueOf(MAX_QUEUING_TIME);
-    	// TODO: use STATEDETAIL
-    	int cookie = job.addCallback("job.sub_state", new Callback(){
+    	int cookie = job.addCallback(Job.JOB_STATEDETAIL, new Callback(){
             public boolean cb(Monitorable mt, Metric metric, Context ctx) throws NotImplementedException, AuthorizationFailedException {
                 try {
                 	m_subState = metric.getAttribute(Metric.VALUE);
@@ -198,7 +197,7 @@ public abstract class AbstractJobTest extends AbstractTest {
                 return true;
             }
         });
-    	m_subState = job.getMetric("job.sub_state").getAttribute(Metric.VALUE);        
+    	m_subState = job.getMetric(Job.JOB_STATEDETAIL).getAttribute(Metric.VALUE);        
         try {
             boolean forever;
             long endTime;
@@ -216,15 +215,15 @@ public abstract class AbstractJobTest extends AbstractTest {
             	Thread.currentThread().sleep(100);
             }
         } catch (InterruptedException e) {/*ignore*/}
-        job.removeCallback("job.sub_state", cookie);
+        job.removeCallback(Job.JOB_STATEDETAIL, cookie);
         return this.isEndedOrSubState(subState);
     }
     
     private boolean isEndedOrSubState( String subState) {
     	return m_subState.equals(subState) ||
-    		m_subState.equals("CANCELED") ||
-    		m_subState.equals("DONE") ||    		
-    		m_subState.equals("FAILED_ERROR") ||
-    		m_subState.equals("FAILED_ABORTED");
+    		m_subState.equals("JSAGA:CANCELED") ||
+    		m_subState.equals("JSAGA:DONE") ||    		
+    		m_subState.equals("JSAGA:FAILED_ERROR") ||
+    		m_subState.equals("JSAGA:FAILED_ABORTED");
     }
 }
