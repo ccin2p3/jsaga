@@ -1,23 +1,31 @@
 package fr.in2p3.jsaga.adaptor.job.local;
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 public class LocalJobProcess extends Process {
+    private String m_message;
+
+    public LocalJobProcess(String message) {
+        if (message != null) {
+            m_message = message;
+        } else {
+            m_message = "Unknown cause";
+        }
+    }
 
 	@Override
 	public OutputStream getOutputStream() {
-		return null;
+		return new DevNullOutputStream();
 	}
 
 	@Override
 	public InputStream getInputStream() {
-		return null;
+        return new ByteArrayInputStream("".getBytes());
 	}
 
 	@Override
 	public InputStream getErrorStream() {
-		return null;
+		return new ByteArrayInputStream(m_message.getBytes());
 	}
 
 	@Override

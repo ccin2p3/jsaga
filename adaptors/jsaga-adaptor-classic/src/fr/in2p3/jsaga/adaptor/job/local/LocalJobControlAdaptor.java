@@ -12,9 +12,7 @@ import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobInteractiveGe
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import org.ogf.saga.error.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Map;
@@ -68,7 +66,7 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 		try {
 
 			Properties jobProps = new Properties();
-			jobProps.load(new StringReader(commandLine));
+			jobProps.load(new ByteArrayInputStream(commandLine.getBytes()));
 			File _workDir = null;
 			String cde = null;
             Enumeration e = jobProps.propertyNames();
@@ -95,7 +93,7 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 			LocalAdaptorAbstract.sessionMap.put(jobId, p);
 			return jobId;
 		} catch (IOException ioe) {
-			LocalAdaptorAbstract.sessionMap.put(jobId, new LocalJobProcess());
+			LocalAdaptorAbstract.sessionMap.put(jobId, new LocalJobProcess(ioe.getMessage()));
 			return jobId;
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
