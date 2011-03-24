@@ -105,73 +105,12 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 
     public String submit(String commandLine, boolean checkMatch, String uniqId)
 			throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		/*try {
-			String jobId = UUID.randomUUID().toString();
-
-			Properties jobProps = new Properties();
-			jobProps.load(new StringReader(commandLine));
-			File _workDir = null;
-			String cde = null;
-            Enumeration e = jobProps.propertyNames();
-			ArrayList _envParams = new ArrayList();
-            while (e.hasMoreElements()){
-                   String key = (String)e.nextElement();
-                   String val = (String)jobProps.getProperty(key);
-                   if (key.equals("_WorkingDirectory")) { _workDir = new File(val);}
-                   else if (key.equals("_Executable")) { cde = prepareCde(val, jobId);}
-                   else {
-                	   _envParams.add(key + "=" + val);
-                   }
-            }
-			
-			 
-			Process p = Runtime.getRuntime().exec(new String[]{m_shellPath, "-c", cde}, 
-													(String[])_envParams.toArray(new String[]{}), 
-													_workDir);
-			// add process in sessionMap
-			LocalAdaptorAbstract.sessionMap.put(jobId, p);
-			return jobId;
-			
-		} catch (Exception e) {
-			throw new NoSuccessException(e);
-		}*/
     	return this.submit(commandLine, false);
 	}
 	
 	public JobIOGetterInteractive submitInteractive(String commandLine,
 			boolean checkMatch) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		
-/*		try {
-			String jobId = UUID.randomUUID().toString();
-
-			Properties jobProps = new Properties();
-			jobProps.load(new StringReader(commandLine));
-			File _workDir = null;
-			String cde = null;
-            Enumeration e = jobProps.propertyNames();
-			ArrayList _envParams = new ArrayList();
-            while (e.hasMoreElements()){
-                   String key = (String)e.nextElement();
-                   String val = (String)jobProps.getProperty(key);
-                   if (key.equals("_WorkingDirectory")) { _workDir = new File(val);}
-                   else if (key.equals("_Executable")) { cde = val;}
-                   else {
-                	   _envParams.add(key + "=" + val);
-                   }
-            }
-		
-            //fixme: workaround for passing stdin to the user command
-//			String cde = prepareCde(commandLine, jobId);
-            //warning: this is not equivalent to exec(m_shellPath+" -c \""+commandLine+"\"")
-			Process p = Runtime.getRuntime().exec(new String[]{m_shellPath, "-c", cde}, 
-													(String[])_envParams.toArray(new String[]{}), 
-													_workDir);
-			// add process in sessionMap
-			LocalAdaptorAbstract.sessionMap.put(jobId, p);
-			return new LocalJobIOHandler(p, jobId);
-		} catch (Exception e) {
-			throw new NoSuccessException(e);
-		}*/
 		String jobId = this.submit(commandLine, true);
 		return new LocalJobIOHandler((Process)LocalAdaptorAbstract.sessionMap.get(jobId), jobId);
 	}
