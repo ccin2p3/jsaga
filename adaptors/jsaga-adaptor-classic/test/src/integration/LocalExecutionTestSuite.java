@@ -54,6 +54,13 @@ public class LocalExecutionTestSuite extends JSAGATestSuite {
     public static class LocalJobRunSandboxTest extends JobRunSandboxTest {
         public LocalJobRunSandboxTest() throws Exception {super("local");}
 
+        @Override
+        public void setUp() {
+            if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
+                m_scriptExplicit = m_scriptExplicit.replace("file:", "file:/");
+            }
+        }
+
         // additional tests to/from remote
         public void test_input_local_to_remote() throws Exception {
             super.runJobExplicit(getLocal("input"), getRemote("input"), getLocal("output"), getWorker("output"));

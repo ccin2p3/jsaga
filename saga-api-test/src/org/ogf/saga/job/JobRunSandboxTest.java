@@ -26,7 +26,7 @@ import java.util.UUID;
  */
 public abstract class JobRunSandboxTest extends AbstractJobTest {
     private static final String SCRIPT_IMPLICIT = "/usr/bin/tr 'ou' 'ui'";
-    private static final String SCRIPT_EXPLICIT = "#!/bin/bash\n/bin/cat ${1##file:} | "+SCRIPT_IMPLICIT+" > ${2##file:}";
+    protected String m_scriptExplicit = "#!/bin/bash\n/bin/cat ${1##file:} | "+SCRIPT_IMPLICIT+" > ${2##file:}";
     private static final String INPUT_CONTENT = "coucou";
     private static final String OUTPUT_CONTENT = "cuicui";
     private static final File TMP = new File(System.getProperty("java.io.tmpdir"));
@@ -113,7 +113,7 @@ public abstract class JobRunSandboxTest extends AbstractJobTest {
                 localOutput+" < "+workerOutput
         });
         if (explicitRedirect) {
-            this.put(localScript, SCRIPT_EXPLICIT.getBytes());
+            this.put(localScript, m_scriptExplicit.getBytes());
             desc.setVectorAttribute(JobDescription.ARGUMENTS, new String[]{workerInput.toString(), workerOutput.toString()});
         } else {
             this.put(localScript, SCRIPT_IMPLICIT.getBytes());
