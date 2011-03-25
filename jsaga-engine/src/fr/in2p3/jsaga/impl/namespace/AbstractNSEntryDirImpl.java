@@ -7,6 +7,7 @@ import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.write.DataWriterAdaptor;
 import fr.in2p3.jsaga.impl.file.FileImpl;
 import fr.in2p3.jsaga.impl.file.copy.AbstractCopyTask;
+import fr.in2p3.jsaga.impl.url.AbstractURLImpl;
 import fr.in2p3.jsaga.impl.url.URLHelper;
 import fr.in2p3.jsaga.sync.namespace.SyncNSDirectory;
 import fr.in2p3.jsaga.sync.namespace.SyncNSEntry;
@@ -163,7 +164,15 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             this._dereferenceDir().moveSync(target, flags - Flags.DEREFERENCE.getValue());
             return; //==========> EXIT
         }
-        URL effectiveTarget = this._getEffectiveURL(target);
+        URL effectiveTarget;
+    	try {
+    		NSFactory.createNSDirectory(m_session, target, Flags.NONE.getValue());
+    		// Target Directory already exists, operation is MOVE
+        	effectiveTarget = this._getEffectiveURL(target);
+    	} catch (DoesNotExistException dnee) {
+    		// Target directory does not exist: operation is RENAME
+        	effectiveTarget = target;
+    	}
         if (m_adaptor instanceof DataRename
                 && m_url.getScheme().equals(effectiveTarget.getScheme())
                 && (m_url.getUserInfo()==null || m_url.getUserInfo().equals(effectiveTarget.getUserInfo()))
@@ -182,6 +191,9 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             } catch (AlreadyExistsException alreadyExists) {
                 throw new AlreadyExistsException("Target entry already exists: "+effectiveTarget, alreadyExists.getCause());
             }
+            if (m_url instanceof AbstractURLImpl) {
+            	((AbstractURLImpl)m_url).setCache(null);
+            }
         } else if (m_adaptor instanceof DataReaderAdaptor) {
             // make target directory
             this._makeDir(effectiveTarget, flags);
@@ -199,6 +211,9 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             }
             // remove source directory
             this.removeSync(flags);
+            if (m_url instanceof AbstractURLImpl) {
+            	((AbstractURLImpl)m_url).setCache(null);
+            }
         } else {
             throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
         }
