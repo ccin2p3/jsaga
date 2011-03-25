@@ -82,6 +82,8 @@ public class ZipDataAdaptor implements FileReaderStreamFactory{//, FileWriterPut
             m_zipReader.close();
         } catch (IOException e) {
             throw new NoSuccessException(e);
+        } catch (NullPointerException npe) {
+        	// Nothing to do
         }
     }
 
