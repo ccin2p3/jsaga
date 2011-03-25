@@ -35,7 +35,7 @@ Where:
                 And insert your PKCS12 certificate:
                 <pre>java -Djavax.net.ssl.keyStore=usercert.jks -Djavax.net.ssl.keyStorePassword=changeit \
      -cp $JSAGA_HOME/lib/jsaga-adaptor-classic-*.jar fr.in2p3.jsaga.adaptor.security.JKSImportCert \
-     usercert.p12 changeit</pre>
+     usercert.p12 YOUR_PKCS12_PASSPHRASE</pre>
                 Remember to choose a password with at least 6 characters.
             </answer>
         </faq>

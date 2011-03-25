@@ -76,8 +76,8 @@ public abstract class JobRunRequiredTest extends AbstractJobTest {
         // submit
         Job job = runJob(desc);
         
-        // wait for RUNNING state (deviation from SAGA specification)
-        if (! super.waitForSubState(job, "RUNNING_ACTIVE")) {
+        // wait for RUNNING Jsaga substate
+        if (! super.waitForSubState(job, "JSAGA:RUNNING_ACTIVE")) {
         	job.waitFor(Float.valueOf(FINALY_TIMEOUT));
             fail("Job did not enter RUNNING_ACTIVE state within "+MAX_QUEUING_TIME+" seconds");
         }
