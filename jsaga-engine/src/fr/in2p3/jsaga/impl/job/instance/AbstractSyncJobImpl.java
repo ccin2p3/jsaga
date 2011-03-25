@@ -54,7 +54,8 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     private Stdout m_stdout;
     private Stdout m_stderr;
     private boolean m_willStartListening;
-
+    private String m_currentModelState;
+    
     /** constructor for submission */
     protected AbstractSyncJobImpl(Session session, String nativeJobDesc, JobDescription jobDesc, DataStagingManager stagingMgr, String uniqId, AbstractSyncJobServiceImpl service) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         this(session, service, true);
@@ -63,6 +64,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         m_stagingMgr = stagingMgr;
         m_uniqId = uniqId;
         m_nativeJobId = null;
+        m_currentModelState = null;
     }
 
     /** constructor for control and monitoring only */
@@ -73,6 +75,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         m_stagingMgr = stagingMgr;
         m_uniqId = null;
         m_nativeJobId = nativeJobId;
+        m_currentModelState = null;
     }
 
     /** common to all contructors */
@@ -88,6 +91,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         m_stdout = null;
         m_stderr = null;
         m_willStartListening = false;
+        m_currentModelState = null;
     }
 
     /** clone */
@@ -231,7 +235,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         }
         try {
             m_controlAdaptor.cancel(m_nativeJobId);
-            this.setState(State.CANCELED, "Canceled by user", SubState.CANCELED, new IncorrectStateException("Canceled by user"));
+            this.setState(State.CANCELED, "USER:Canceled", SubState.CANCEL_REQUESTED, new IncorrectStateException("Canceled by user"));
         } catch (SagaException e) {
             // do nothing (failed to cancel task)
             s_logger.warn(e);
@@ -505,7 +509,8 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
      */
     public void setState(State state, String stateDetail, SubState subState, SagaException cause) {
         // log
-        if (! stateDetail.equals(m_metrics.m_StateDetail.getValue())) {
+    	if (m_currentModelState == null || !m_currentModelState.equals(stateDetail)) {
+    		m_currentModelState = stateDetail;
             m_monitorService.getStateLogger().debug("State changed to "+stateDetail+" for job "+m_attributes.m_JobId.getObject());
         }
         // set job state

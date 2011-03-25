@@ -24,6 +24,7 @@ public class SubState {
     private static final int R_POST=24; public static final SubState RUNNING_POST_STAGING=new SubState(R_POST, "RUNNING_POST_STAGING");
 
     private static final int _DONE_=30; public static final SubState DONE=new SubState(_DONE_, "DONE");
+    private static final int CANC_R=39; public static final SubState CANCEL_REQUESTED=new SubState(CANC_R, "CANCEL_REQUESTED");
     private static final int CANCEL=40; public static final SubState CANCELED=new SubState(CANCEL, "CANCELED");
     private static final int FAIL_E=50; public static final SubState FAILED_ERROR=new SubState(FAIL_E, "FAILED_ERROR");
     private static final int FAIL_A=51; public static final SubState FAILED_ABORTED=new SubState(FAIL_A, "FAILED_ABORTED");
