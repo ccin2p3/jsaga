@@ -53,4 +53,16 @@ public abstract class NSMoveTest extends AbstractNSCopyTest {
         } catch(DoesNotExistException e) {
         }
     }
+
+    public void test_rename_directory() throws Exception {
+    	URL newSubDirUrl = createURL(m_dirUrl,"newsubdir/");
+        URL target = createURL(newSubDirUrl, DEFAULT_FILENAME);
+        m_subDir.move(newSubDirUrl, Flags.RECURSIVE.getValue());
+        checkCopied(target, DEFAULT_CONTENT);
+        try {
+            NSFactory.createNSDirectory(m_session, m_subDirUrl, Flags.NONE.getValue());
+            fail("Expected exception: "+ DoesNotExistException.class);
+        } catch(DoesNotExistException e) {
+        }
+    }
 }
