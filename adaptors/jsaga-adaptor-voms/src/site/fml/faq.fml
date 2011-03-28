@@ -22,6 +22,12 @@ mv ca.crt $HASH.0
 chmod 664 $HASH.0</pre>
             </answer>
         </faq>
+        <faq id="p12">
+        	<question>How to use a PKCS12 certificate ?</question>
+        	<answer>You need to install the JCE (Java Cryptography Extension) Unlimited Strength 
+        	Jurisdiction Policy Files (JAR Files) into your JRE (in the lib/security directory).
+        	You can download these files on the official Java website.</answer>
+        </faq>
         <faq id="other">
             <question>Is there some other FAQ about this plug-in ?</question>
             <answer>Yes, VOMS is based on Globus Security Infrastructure, so please also check
