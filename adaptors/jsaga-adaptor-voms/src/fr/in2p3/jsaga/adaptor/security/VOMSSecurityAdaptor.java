@@ -27,7 +27,7 @@ import java.util.Map;
  * ***************************************************
  * File:   VOMSSecurityAdaptor
  * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
- * Date:   11 août 2007
+ * Date:   11 aoï¿½t 2007
  * ***************************************************
  * Description:                                      */
 /**
@@ -52,7 +52,7 @@ public class VOMSSecurityAdaptor implements ExpirableSecurityAdaptor {
                 new UOr(new Usage[]{
                         new UAnd(new Usage[]{
                                 new UOr(new Usage[]{
-                                        new UFile(USAGE_INIT_PKCS12, VOMSContext.USERCERTKEY),
+                                        new UFilePath(USAGE_INIT_PKCS12, VOMSContext.USERCERTKEY),
                                         new UAnd(USAGE_INIT_PEM, new Usage[]{new UFile(Context.USERCERT), new UFile(Context.USERKEY)})
                                 }),
                                 new UFilePath(Context.USERPROXY), new UHidden(Context.USERPASS),
