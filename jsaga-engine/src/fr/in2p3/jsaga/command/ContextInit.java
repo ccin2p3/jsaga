@@ -1,9 +1,12 @@
 package fr.in2p3.jsaga.command;
 
+import fr.in2p3.jsaga.EngineProperties;
+import fr.in2p3.jsaga.engine.session.SessionConfiguration;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import fr.in2p3.jsaga.impl.session.SessionImpl;
 import org.apache.commons.cli.*;
 import org.ogf.saga.context.Context;
+import org.ogf.saga.context.ContextFactory;
 import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
@@ -39,7 +42,7 @@ public class ContextInit extends AbstractCommand {
         }
         else if (command.m_nonOptionValues.length == 0)
         {
-            Session session = SessionFactory.createSession(true);
+            /*Session session = SessionFactory.createSession(true);
             Context[] contexts = session.listContexts();
             for (int i=0; i<contexts.length; i++) {
                 try {
@@ -47,12 +50,28 @@ public class ContextInit extends AbstractCommand {
                 } catch (Exception e) {
                     throw new Exception("Exception occured for context: "+contexts[i].getAttribute(Context.TYPE), e);
                 }
+            }*/
+            // create empty session
+        	Session session = SessionFactory.createSession(false);
+        	// create config object
+        	SessionConfiguration config = new SessionConfiguration(EngineProperties.getURL(EngineProperties.JSAGA_DEFAULT_CONTEXTS));
+        	// for each context in config
+            for (fr.in2p3.jsaga.generated.session.Context contextCfg : config.getSessionContextsCfg()) {
+            	// create SAGA context
+                Context context = ContextFactory.createContext(contextCfg.getType());
+            	// set attributes
+                SessionConfiguration.setDefaultContext(context, contextCfg);
+                // set password
+                setUserPass(context);
+                // add context to session (and init context)
+                session.addContext(context);
             }
             session.close();
         }
         else if (command.m_nonOptionValues.length == 1)
         {
             String id = command.m_nonOptionValues[0];
+            /*
             SessionImpl session = (SessionImpl) SessionFactory.createSession(true);
             ContextImpl context = session.findContext(URLFactory.createURL(id+"-any://host"));
             if (context != null) {
@@ -61,6 +80,24 @@ public class ContextInit extends AbstractCommand {
             } else {
                 throw new Exception("Context not found: "+id);
             }
+            */
+            // create empty session
+        	Session session = SessionFactory.createSession(false);
+        	// create config object
+        	SessionConfiguration config = new SessionConfiguration(EngineProperties.getURL(EngineProperties.JSAGA_DEFAULT_CONTEXTS));
+        	// create SAGA context
+        	Context context = ContextFactory.createContext(id);
+        	// get required context config object
+        	fr.in2p3.jsaga.generated.session.Context contextCfg = config.findContextCfg(context);
+        	if (contextCfg == null) {
+        		throw new Exception("Context not found: "+id);
+        	}
+        	// set attributes
+            SessionConfiguration.setDefaultContext(context, contextCfg);
+            // set password
+            setUserPass(context);
+            // add context to session (and init context)
+            session.addContext(context);
         }
     }
 
@@ -79,7 +116,8 @@ public class ContextInit extends AbstractCommand {
             }
         }
         // trigger initialization of context
-        context.getAttribute(Context.USERID);
+        // TODO: remove this, will be done in session.addContext()
+        //context.getAttribute(Context.USERID);
     }
 
     private static volatile boolean s_stopped;
