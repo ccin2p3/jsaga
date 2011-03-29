@@ -32,7 +32,7 @@ public abstract class ContextInfoTest extends AbstractTest {
 
             // trigger initialization of context
             try {
-                context.getAttribute(Context.USERID);
+            	session.addContext(context);
             } catch(Exception e) {
                 System.out.println("  Context not initialized ["+e.getMessage()+"]");
             }
