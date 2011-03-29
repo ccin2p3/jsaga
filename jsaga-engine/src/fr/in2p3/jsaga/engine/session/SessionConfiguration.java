@@ -99,7 +99,15 @@ public class SessionConfiguration {
         }
     }
 
-    private fr.in2p3.jsaga.generated.session.Context findContextCfg(Context context) throws NotImplementedException, NoSuccessException {
+    public fr.in2p3.jsaga.generated.session.Context[] getSessionContextsCfg() {
+        fr.in2p3.jsaga.generated.session.Session sessionCfg = m_config.getSession();
+        if (sessionCfg != null) {
+            return sessionCfg.getContext();
+        }
+        return new fr.in2p3.jsaga.generated.session.Context[]{};
+    }
+
+    public fr.in2p3.jsaga.generated.session.Context findContextCfg(Context context) throws NotImplementedException, NoSuccessException {
         // get type
         String type;
         try {
@@ -121,7 +129,7 @@ public class SessionConfiguration {
         return null;
     }
 
-    private static void setDefaultContext(Context context, fr.in2p3.jsaga.generated.session.Context config) throws NoSuccessException {
+    public static void setDefaultContext(Context context, fr.in2p3.jsaga.generated.session.Context config) throws NoSuccessException {
         try {
             for (Attribute attributeCfg : config.getAttribute()) {
                 if (attributeCfg.getValue() != null) {
