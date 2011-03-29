@@ -42,15 +42,6 @@ public class ContextInit extends AbstractCommand {
         }
         else if (command.m_nonOptionValues.length == 0)
         {
-            /*Session session = SessionFactory.createSession(true);
-            Context[] contexts = session.listContexts();
-            for (int i=0; i<contexts.length; i++) {
-                try {
-                    setUserPass(contexts[i]);
-                } catch (Exception e) {
-                    throw new Exception("Exception occured for context: "+contexts[i].getAttribute(Context.TYPE), e);
-                }
-            }*/
             // create empty session
         	Session session = SessionFactory.createSession(false);
         	// create config object
@@ -71,16 +62,6 @@ public class ContextInit extends AbstractCommand {
         else if (command.m_nonOptionValues.length == 1)
         {
             String id = command.m_nonOptionValues[0];
-            /*
-            SessionImpl session = (SessionImpl) SessionFactory.createSession(true);
-            ContextImpl context = session.findContext(URLFactory.createURL(id+"-any://host"));
-            if (context != null) {
-                setUserPass(context);
-                context.close();
-            } else {
-                throw new Exception("Context not found: "+id);
-            }
-            */
             // create empty session
         	Session session = SessionFactory.createSession(false);
         	// create config object
@@ -115,9 +96,6 @@ public class ContextInit extends AbstractCommand {
                 context.setAttribute(Context.USERPASS, userPass);
             }
         }
-        // trigger initialization of context
-        // TODO: remove this, will be done in session.addContext()
-        //context.getAttribute(Context.USERID);
     }
 
     private static volatile boolean s_stopped;

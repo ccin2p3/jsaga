@@ -87,7 +87,6 @@ public class ContextInfo extends AbstractCommand {
                     System.out.println("  Attribute not supported ["+e.getMessage()+"]");
                 }
             } else {
-                //context.getAttribute(Context.USERID);   // this triggers initialization of context
                 session.addContext(context); // this triggers initialization of context
                 System.out.print(context);
             }
