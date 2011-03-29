@@ -79,6 +79,7 @@ public class ContextInit extends AbstractCommand {
             setUserPass(context);
             // add context to session (and init context)
             session.addContext(context);
+            session.close();
         }
     }
 
