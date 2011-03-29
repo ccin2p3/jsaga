@@ -36,6 +36,8 @@ import java.io.*;
  *
  */
 public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl implements SyncJob, JobMonitorCallback {
+    /** Job state detail engine model */
+    private static final String MODEL = "JSAGA";
     /** Job attribute (deviation from SAGA specification) */
     public static final String NATIVEJOBDESCRIPTION = "NativeJobDescription";
     /** logger */
@@ -122,7 +124,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             String nativeJobDesc = m_attributes.m_NativeJobDescription.getObject();
 
             // pre-staging (before job submit)
-            m_metrics.m_StateDetail.setValue("JSAGA:" + SubState.RUNNING_PRE_STAGING.toString());
+            m_metrics.m_StateDetail.setValue(MODEL+":" + SubState.RUNNING_PRE_STAGING.toString());
             if (m_stagingMgr instanceof DataStagingManagerThroughStream) {
                 ((DataStagingManagerThroughStream)m_stagingMgr).preStaging(this);
             } else if (m_stagingMgr instanceof DataStagingManagerThroughSandboxOnePhase) {
@@ -532,7 +534,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             // update metrics
             m_metrics.m_State.setValue(state);
             m_metrics.m_StateDetail.setValue(stateDetail);
-            m_metrics.m_StateDetail.setValue("JSAGA:" + subState.toString());
+            m_metrics.m_StateDetail.setValue(MODEL+":" + subState.toString());
         }
     }
 

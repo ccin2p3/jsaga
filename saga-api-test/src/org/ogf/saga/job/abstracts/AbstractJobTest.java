@@ -27,6 +27,7 @@ import java.util.Date;
 * Description:                                      */
 
 public abstract class AbstractJobTest extends AbstractTest {
+    protected static final String MODEL = "JSAGA";
 	
 	// values
     protected String CANDIDATE_HOST             = "candidate.host";
@@ -221,9 +222,9 @@ public abstract class AbstractJobTest extends AbstractTest {
     
     private boolean isEndedOrSubState( String subState) {
     	return m_subState.equals(subState) ||
-    		m_subState.equals("JSAGA:CANCELED") ||
-    		m_subState.equals("JSAGA:DONE") ||    		
-    		m_subState.equals("JSAGA:FAILED_ERROR") ||
-    		m_subState.equals("JSAGA:FAILED_ABORTED");
+    		m_subState.equals(MODEL+":CANCELED") ||
+    		m_subState.equals(MODEL+":DONE") ||
+    		m_subState.equals(MODEL+":FAILED_ERROR") ||
+    		m_subState.equals(MODEL+":FAILED_ABORTED");
     }
 }
