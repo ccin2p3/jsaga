@@ -1,6 +1,8 @@
 package org.ogf.saga.context;
 
 import org.ogf.saga.AbstractTest;
+import org.ogf.saga.session.Session;
+import org.ogf.saga.session.SessionFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,13 +34,15 @@ public abstract class ContextInitTest extends AbstractTest {
     }
 
     /**
-     * Override this method to add context-specific attribtues at run-time.
+     * Override this method to add context-specific attributes at run-time.
      */
     protected void updateContextAttributes(Context context) throws Exception {
         // do nothing
     }
 
     public void test_init() throws Exception {
+    	// create empty session
+    	Session session = SessionFactory.createSession(false);
         // create context
         Context context = ContextFactory.createContext();
         context.setAttribute(Context.TYPE, m_contextId);
@@ -68,7 +72,7 @@ public abstract class ContextInitTest extends AbstractTest {
         // set context-specific attributes
         this.updateContextAttributes(context);
 
-        // throw exception if context is still not initialized
-        context.getAttribute(Context.USERID);
+        // init context
+        session.addContext(context);
     }
 }

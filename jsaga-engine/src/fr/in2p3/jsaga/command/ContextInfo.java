@@ -1,9 +1,12 @@
 package fr.in2p3.jsaga.command;
 
+import fr.in2p3.jsaga.EngineProperties;
+import fr.in2p3.jsaga.engine.session.SessionConfiguration;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import fr.in2p3.jsaga.impl.session.SessionImpl;
 import org.apache.commons.cli.*;
 import org.ogf.saga.context.Context;
+import org.ogf.saga.context.ContextFactory;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.SagaException;
 import org.ogf.saga.session.Session;
@@ -48,7 +51,7 @@ public class ContextInfo extends AbstractCommand {
                 System.out.println("Security context: "+getLabel(context));
 
                 // print context
-                print(context, line);
+                print(session, context, line);
             }
             session.close();
         }
@@ -62,7 +65,7 @@ public class ContextInfo extends AbstractCommand {
                 System.out.println("Security context: "+getLabel(context));
 
                 // print context
-                print(context, line);
+                print(session, context, line);
 
                 // close context
                 context.close();
@@ -75,7 +78,7 @@ public class ContextInfo extends AbstractCommand {
     public static String getLabel(Context context) throws SagaException {
         return context.getAttribute(ContextImpl.URL_PREFIX)+" ("+context.getAttribute(Context.TYPE)+")";
     }
-    private static void print(Context context, CommandLine line) {
+    private static void print(Session session, Context context, CommandLine line) {
         try {
             if (line.hasOption(OPT_ATTRIBUTE)) {
                 try {
@@ -84,7 +87,7 @@ public class ContextInfo extends AbstractCommand {
                     System.out.println("  Attribute not supported ["+e.getMessage()+"]");
                 }
             } else {
-                context.getAttribute(Context.USERID);   // this triggers initialization of context
+                session.addContext(context); // this triggers initialization of context
                 System.out.print(context);
             }
         } catch(Exception e) {
