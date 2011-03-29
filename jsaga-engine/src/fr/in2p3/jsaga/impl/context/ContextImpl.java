@@ -117,24 +117,23 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
         try {
             return m_attributes.getScalarAttribute(key).getValue();
         } catch (DoesNotExistException e) {
-            /*if (Context.USERID.equals(key)) {
-                try {
-                    // try to get from credential
-                    SecurityCredential credential = this.getCredential();
-                    return credential.getUserID();
-                } catch (Exception e2) {
-                    throw new NoSuccessException(e2);
+            // try to get from credential
+            SecurityCredential credential = null;
+            try{credential=this.getCredential();} catch(IncorrectStateException e2){/* ignore "Missing attribute" */}
+            if (credential != null) {
+                if (Context.USERID.equals(key)) {
+                    try {
+                        // try to get from credential
+                        return credential.getUserID();
+                    } catch (Exception e2) {
+                        throw new NoSuccessException(e2);
+                    }
+                } else {
+                	try{return credential.getAttribute(key);} catch(NotImplementedException e2){/* ignore "Unsupported attribute" */}
                 }
-            } else {*/
-                // try to get from credential
-                SecurityCredential credential = null;
-                try{credential=this.getCredential();} catch(IncorrectStateException e2){/* ignore "Missing attribute" */}
-                if (credential != null) {
-                    try{return credential.getAttribute(key);} catch(NotImplementedException e2){/* ignore "Unsupported attribute" */}
-                }
-                // else try to get from parent class
-                return super.getAttribute(key);
-            //}
+            }
+            // else try to get from parent class
+            return super.getAttribute(key);
         }
     }
 
@@ -252,32 +251,6 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
             throw new IncorrectStateException("Attribute MUST be set before using context: "+Context.TYPE, this);
         }
 
-        // create adaptor if needed
-        /*if (m_credential== null) {
-            Usage usage = m_adaptor.getUsage();
-            Map attributes = super._getAttributesMap();
-            int matching;
-            try {
-                matching = (usage!=null ? usage.getFirstMatchingUsage(attributes) : -1);
-            } catch(DoesNotExistException e) {
-                Usage missing = (usage!=null ? usage.getMissingValues(attributes) : null);
-                if (missing != null) {
-                    throw new IncorrectStateException("Missing attribute(s): "+missing.toString(), this);
-                } else {
-                    throw new NoSuccessException("[INTERNAL ERROR] Unexpected exception", this);
-                }
-            }
-            m_credential = m_adaptor.createSecurityCredential(
-                    matching, attributes, m_attributes.m_type.getValue());
-            if (m_credential== null) {
-                throw new NotImplementedException("[INTERNAL ERROR] Method createSecurityCredential should never return 'null'");
-            }
-
-            // reset the job services using this context
-            Set<JobServiceImpl> jobServices = new HashSet<JobServiceImpl>();
-            jobServices.addAll(m_jobServices.keySet());
-            new Thread(new JobServiceReset(jobServices, m_credential)).start();
-        }*/
         return m_credential;
     }
 
