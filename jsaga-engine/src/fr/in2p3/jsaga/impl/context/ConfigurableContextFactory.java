@@ -11,22 +11,21 @@ import fr.in2p3.jsaga.engine.session.SessionConfiguration;
 
 public class ConfigurableContextFactory {
 	
-    public static String[] listContextUrlPrefix() throws ConfigurationException {
+    public static ConfiguredContext[] listConfiguredContext() throws ConfigurationException {
     	SessionConfiguration cfg = new SessionConfiguration(EngineProperties.getURL(EngineProperties.JSAGA_DEFAULT_CONTEXTS));
     	fr.in2p3.jsaga.generated.session.Context[] sessionContextsCfg = cfg.getSessionContextsCfg();
-    	String[] urlPrefixes = new String[sessionContextsCfg.length];
+    	ConfiguredContext[] cfgContexts = new ConfiguredContext[sessionContextsCfg.length];
     	for (int i=0; i<sessionContextsCfg.length; i++) {
-    		urlPrefixes[i] = sessionContextsCfg[i].getAttribute()[0].getValue();
+    		cfgContexts[i] = new ConfiguredContext(sessionContextsCfg[i].getAttribute()[0].getValue(), sessionContextsCfg[i].getType());
     	}
-    	return urlPrefixes;
+    	return cfgContexts;
     }
     
-    public static Context createContext(String id) throws IncorrectStateException, TimeoutException, NoSuccessException {
+    public static Context createContext(ConfiguredContext ctx) throws IncorrectStateException, TimeoutException, NoSuccessException {
     	SessionConfiguration cfg = new SessionConfiguration(EngineProperties.getURL(EngineProperties.JSAGA_DEFAULT_CONTEXTS));
     	fr.in2p3.jsaga.generated.session.Context[] sessionContextsCfg = cfg.getSessionContextsCfg();
     	for (int i=0; i<sessionContextsCfg.length; i++) {
-        	//if (id.equals(sessionContextsCfg[i].getId()) || id.equals(sessionContextsCfg[i].getType() + String.valueOf(i+1))) {
-          	if (id.equals(sessionContextsCfg[i].getAttribute()[0].getValue())) {
+          	if (ctx.getUrlPrefix().equals(sessionContextsCfg[i].getAttribute()[0].getValue())) {
         		// create SAGA context
         		Context context = ContextFactory.createContext(sessionContextsCfg[i].getType());
         		// set attributes
@@ -34,7 +33,7 @@ public class ConfigurableContextFactory {
         		return context;
         	}
         }
-    	throw new NoSuccessException("No context with id: " + id);
+    	throw new NoSuccessException("No context with id: " + ctx.getUrlPrefix());
     }
 
 }

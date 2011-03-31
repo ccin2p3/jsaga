@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.engine.session.SessionConfiguration;
 import fr.in2p3.jsaga.impl.SagaFactoryImpl;
+import fr.in2p3.jsaga.impl.context.ConfiguredContext;
 import fr.in2p3.jsaga.impl.context.ConfigurableContextFactory;
 import fr.in2p3.jsaga.impl.context.ContextFactoryImpl;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
@@ -48,14 +49,13 @@ public class ContextInfo extends AbstractCommand {
         else {
             // create empty session
             Session session = SessionFactory.createSession(false);
-            String[] contextUrlPrefix = ConfigurableContextFactory.listContextUrlPrefix();
-
-            for (int i=0; i<contextUrlPrefix.length; i++) {
+            ConfiguredContext[] configContexts = ConfigurableContextFactory.listConfiguredContext();
+            for (int i=0; i<configContexts.length; i++) {
                 if (command.m_nonOptionValues.length==0
-                    || command.m_nonOptionValues[0].equals(contextUrlPrefix[i])
-                    /*|| command.m_nonOptionValues[0].equals(ConfigurableContextFactory.getType(contextIds[i])*/)
+                    || command.m_nonOptionValues[0].equals(configContexts[i].getUrlPrefix())
+                    || command.m_nonOptionValues[0].equals(configContexts[i].getType()))
                 {
-                    Context context = ConfigurableContextFactory.createContext(contextUrlPrefix[i]);
+                    Context context = ConfigurableContextFactory.createContext(configContexts[i]);
                     // print title
                     System.out.println("Security context: "+getLabel(context));
                     // print context
@@ -64,42 +64,6 @@ public class ContextInfo extends AbstractCommand {
             }
             session.close();
         }
-        
-        /*
-        else if (command.m_nonOptionValues.length == 0)
-        {
-            SessionImpl session = (SessionImpl) SessionFactory.createSession(false);
-            ContextFactoryImpl contextFact = (ContextFactoryImpl) new SagaFactoryImpl().createContextFactory();
-            
-            String[] contextIds = contextFact.listContextIds();
-            for (String id : contextIds) {
-            	Context context = contextFact.createContextWithId(id);
-                // print title
-                System.out.println("Security context: "+getLabel(context));
-                // print context
-                print(session, context, line);
-            }
-            session.close();
-        }
-        else if (command.m_nonOptionValues.length == 1)
-        {
-            String id = command.m_nonOptionValues[0];
-            SessionImpl session = (SessionImpl) SessionFactory.createSession(true);
-            ContextImpl context = session.findContext(URLFactory.createURL(id+"-any://host"));
-            if (context != null) {
-                // print title
-                System.out.println("Security context: "+getLabel(context));
-
-                // print context
-                print(session, context, line);
-
-                // close context
-                context.close();
-            } else {
-                throw new Exception("Context not found: "+id);
-            }
-        }
-        */
     }
 
     public static String getLabel(Context context) throws SagaException {
