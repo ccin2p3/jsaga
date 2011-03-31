@@ -6,6 +6,10 @@
         <release version="0.9.13-SNAPSHOT" date="2011-02-15">
             <action dev="lschwarz" type="update">New URL implementation RFC-3986 compliant</action>
             <action dev="sreynaud" type="add">Added configuration attribute "data.implicit.close.timeout"</action>
+            <action dev="lschwarz" type="add">Added supported features in jsaga-adaptor-linux module</action>
+            <action dev="lschwarz" type="update">Replace metric "job.sub_state" with standard metric "job.state_detail" with model "JSAGA"</action>
+            <action dev="lschwarz" type="update">Method Session.addContext() now initializes the context</action>
+            <action dev="lschwarz" type="fix">Many bugfixes</action>
         </release>
         <release version="0.9.12" date="2011-02-11" description="New plug-ins for ARC and Unicore">
             <action dev="lschwarz" type="add">Added adaptor for ARC (A-REX with BES interface)</action>
