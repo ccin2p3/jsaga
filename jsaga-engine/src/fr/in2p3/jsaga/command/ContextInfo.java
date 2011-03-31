@@ -1,7 +1,13 @@
 package fr.in2p3.jsaga.command;
 
+import java.util.regex.Pattern;
+
 import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.engine.session.SessionConfiguration;
+import fr.in2p3.jsaga.impl.SagaFactoryImpl;
+import fr.in2p3.jsaga.impl.context.ConfiguredContext;
+import fr.in2p3.jsaga.impl.context.ConfigurableContextFactory;
+import fr.in2p3.jsaga.impl.context.ContextFactoryImpl;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import fr.in2p3.jsaga.impl.session.SessionImpl;
 import org.apache.commons.cli.*;
@@ -40,38 +46,23 @@ public class ContextInfo extends AbstractCommand {
         {
             command.printHelpAndExit(null);
         }
-        else if (command.m_nonOptionValues.length == 0)
-        {
-            Session session = SessionFactory.createSession(true);
-            Context[] contexts = session.listContexts();
-            for (int i=0; i<contexts.length; i++) {
-                Context context = contexts[i];
-
-                // print title
-                System.out.println("Security context: "+getLabel(context));
-
-                // print context
-                print(session, context, line);
+        else {
+            // create empty session
+            Session session = SessionFactory.createSession(false);
+            ConfiguredContext[] configContexts = ConfigurableContextFactory.listConfiguredContext();
+            for (int i=0; i<configContexts.length; i++) {
+                if (command.m_nonOptionValues.length==0
+                    || command.m_nonOptionValues[0].equals(configContexts[i].getUrlPrefix())
+                    || command.m_nonOptionValues[0].equals(configContexts[i].getType()))
+                {
+                    Context context = ConfigurableContextFactory.createContext(configContexts[i]);
+                    // print title
+                    System.out.println("Security context: "+getLabel(context));
+                    // print context
+                    print(session, context, line);
+                }
             }
             session.close();
-        }
-        else if (command.m_nonOptionValues.length == 1)
-        {
-            String id = command.m_nonOptionValues[0];
-            SessionImpl session = (SessionImpl) SessionFactory.createSession(true);
-            ContextImpl context = session.findContext(URLFactory.createURL(id+"-any://host"));
-            if (context != null) {
-                // print title
-                System.out.println("Security context: "+getLabel(context));
-
-                // print context
-                print(session, context, line);
-
-                // close context
-                context.close();
-            } else {
-                throw new Exception("Context not found: "+id);
-            }
         }
     }
 

@@ -2,17 +2,17 @@ package fr.in2p3.jsaga.command;
 
 import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.engine.session.SessionConfiguration;
-import fr.in2p3.jsaga.impl.context.ContextImpl;
-import fr.in2p3.jsaga.impl.session.SessionImpl;
+import fr.in2p3.jsaga.impl.context.ConfiguredContext;
+import fr.in2p3.jsaga.impl.context.ConfigurableContextFactory;
+
 import org.apache.commons.cli.*;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.context.ContextFactory;
 import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
-import org.ogf.saga.url.URLFactory;
-
 import java.io.*;
+import java.util.regex.Pattern;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -40,45 +40,25 @@ public class ContextInit extends AbstractCommand {
         {
             command.printHelpAndExit(null);
         }
-        else if (command.m_nonOptionValues.length == 0)
-        {
-            // create empty session
-        	Session session = SessionFactory.createSession(false);
-        	// create config object
-        	SessionConfiguration config = new SessionConfiguration(EngineProperties.getURL(EngineProperties.JSAGA_DEFAULT_CONTEXTS));
-        	// for each context in config
-            for (fr.in2p3.jsaga.generated.session.Context contextCfg : config.getSessionContextsCfg()) {
-            	// create SAGA context
-                Context context = ContextFactory.createContext(contextCfg.getType());
-            	// set attributes
-                SessionConfiguration.setDefaultContext(context, contextCfg);
-                // set password
-                setUserPass(context);
-                // add context to session (and init context)
-                session.addContext(context);
+        else {
+            // create an empty SAGA session
+            Session session = SessionFactory.createSession(false);
+            // use JSAGA specific classes: lis of ConfigurableContext extracted by the JSAGA configuration
+            // by ConfigurableContextFactory
+            ConfiguredContext[] configContexts = ConfigurableContextFactory.listConfiguredContext();
+            for (int i=0; i<configContexts.length; i++) {
+                if (command.m_nonOptionValues.length==0
+                    || command.m_nonOptionValues[0].equals(configContexts[i].getUrlPrefix())
+                    || command.m_nonOptionValues[0].equals(configContexts[i].getType()))
+                {
+                	// Build the SAGA context
+                    Context context = ConfigurableContextFactory.createContext(configContexts[i]);
+                    // set password
+                    setUserPass(context);
+                    // add context to session (and init context)
+                    session.addContext(context);
+                }
             }
-            session.close();
-        }
-        else if (command.m_nonOptionValues.length == 1)
-        {
-            String id = command.m_nonOptionValues[0];
-            // create empty session
-        	Session session = SessionFactory.createSession(false);
-        	// create config object
-        	SessionConfiguration config = new SessionConfiguration(EngineProperties.getURL(EngineProperties.JSAGA_DEFAULT_CONTEXTS));
-        	// create SAGA context
-        	Context context = ContextFactory.createContext(id);
-        	// get required context config object
-        	fr.in2p3.jsaga.generated.session.Context contextCfg = config.findContextCfg(context);
-        	if (contextCfg == null) {
-        		throw new Exception("Context not found: "+id);
-        	}
-        	// set attributes
-            SessionConfiguration.setDefaultContext(context, contextCfg);
-            // set password
-            setUserPass(context);
-            // add context to session (and init context)
-            session.addContext(context);
             session.close();
         }
     }
