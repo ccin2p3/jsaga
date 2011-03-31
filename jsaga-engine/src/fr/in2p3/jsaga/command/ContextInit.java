@@ -2,17 +2,16 @@ package fr.in2p3.jsaga.command;
 
 import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.engine.session.SessionConfiguration;
-import fr.in2p3.jsaga.impl.context.ContextImpl;
-import fr.in2p3.jsaga.impl.session.SessionImpl;
+import fr.in2p3.jsaga.impl.context.ConfigurableContextFactory;
+
 import org.apache.commons.cli.*;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.context.ContextFactory;
 import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
-import org.ogf.saga.url.URLFactory;
-
 import java.io.*;
+import java.util.regex.Pattern;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -40,6 +39,27 @@ public class ContextInit extends AbstractCommand {
         {
             command.printHelpAndExit(null);
         }
+        else {
+            // create empty session
+            Session session = SessionFactory.createSession(false);
+            String[] contextUrlPrefix = ConfigurableContextFactory.listContextUrlPrefix();
+            for (int i=0; i<contextUrlPrefix.length; i++) {
+                if (command.m_nonOptionValues.length==0
+                    || command.m_nonOptionValues[0].equals(contextUrlPrefix[i])
+                    // TODO: implement for all contexts of type
+                    /*|| Pattern.matches(contextUrlPrefix[i] + "\\d", command.m_nonOptionValues[0])*/
+                    /*|| command.m_nonOptionValues[0].equals(ConfigurableContextFactory.getType(contextIds[i])*/)
+                {
+                    Context context = ConfigurableContextFactory.createContext(contextUrlPrefix[i]);
+                    // set password
+                    setUserPass(context);
+                    // add context to session (and init context)
+                    session.addContext(context);
+                }
+            }
+            session.close();
+        }
+        /*
         else if (command.m_nonOptionValues.length == 0)
         {
             // create empty session
@@ -81,6 +101,7 @@ public class ContextInit extends AbstractCommand {
             session.addContext(context);
             session.close();
         }
+        */
     }
 
     private static void setUserPass(Context context) throws Exception {

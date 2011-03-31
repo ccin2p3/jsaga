@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.command;
 
+import fr.in2p3.jsaga.impl.context.ConfigurableContextFactory;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import fr.in2p3.jsaga.impl.session.SessionImpl;
 import org.apache.commons.cli.*;
@@ -34,6 +35,24 @@ public class ContextDestroy extends AbstractCommand {
         {
             command.printHelpAndExit(null);
         }
+        else {
+            // create empty session
+            Session session = SessionFactory.createSession(false);
+            String[] contextUrlPrefix = ConfigurableContextFactory.listContextUrlPrefix();
+
+            for (int i=0; i<contextUrlPrefix.length; i++) {
+                if (command.m_nonOptionValues.length==0
+                    || command.m_nonOptionValues[0].equals(contextUrlPrefix[i])
+                    /*|| command.m_nonOptionValues[0].equals(ConfigurableContextFactory.getType(contextIds[i])*/)
+                {
+                    Context context = ConfigurableContextFactory.createContext(contextUrlPrefix[i]);
+                    ((ContextImpl) context).destroy();
+                    ((ContextImpl) context).close();
+                }
+            }
+            session.close();
+        }
+        /*
         else if (command.m_nonOptionValues.length == 0)
         {
             Session session = SessionFactory.createSession(true);
@@ -55,6 +74,7 @@ public class ContextDestroy extends AbstractCommand {
                 throw new Exception("Context not found: "+id);
             }
         }
+        */
     }
 
     protected Options createOptions() {
