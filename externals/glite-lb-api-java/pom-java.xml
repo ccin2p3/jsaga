@@ -33,6 +33,9 @@
                             <sourceDirectory>${basedir}/resources/wsdl</sourceDirectory>
                             <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
                             <timestampDirectory>${project.build.directory}</timestampDirectory>
+                            <wsdlFiles>
+                            	<wsdlFile>LB.wsdl</wsdlFile>
+                            </wsdlFiles>
                         </configuration>
                     </execution>
                 </executions>
