@@ -52,6 +52,22 @@
                 </ul>
             </answer>
         </faq>
+        <faq id="soap-debug">
+        	<question>How to print Web service messages to a local file ?</question>
+        	<answer>Add the following lines
+        		<pre>log4j.rootLogger=DEBUG, A1
+
+log4j.logger.org.apache.axis.transport.http.HTTPSender=DEBUG
+log4j.appender.A1=org.apache.log4j.FileAppender
+log4j.appender.A1.File=/tmp/ws.log
+log4j.appender.A1.layout=org.apache.log4j.PatternLayout
+log4j.appender.A1.layout.ConversionPattern=%-4r [%t] %-5p %c %x  %m%n
+        		
+        		</pre>to the LOG4J configuration file
+        		<pre>etc/log4j.properties</pre>
+        		This will printout all web service messages into /tmp/ws.log. You can use another Appender.
+        	</answer>
+        </faq>
         <faq id="git">
             <question>How to push my contribution to GIT ?</question>
             <answer>First, request for access to the jsaga-contrib repository and configure your SSH client
