@@ -55,16 +55,16 @@ public class SessionImpl extends AbstractSagaObjectImpl implements Session {
                 }
                 // set UrlPrefix (if needed)
                 ctxImpl.setUrlPrefix(m_contexts.size()+1);
-                // create credential
-                try {
-					ctxImpl.createCredential();
-				} catch (NotImplementedException e) {
-					throw new NoSuccessException(e);
-				} catch (IncorrectStateException e) {
-					throw new NoSuccessException(e);
-				}
                 // add context
                 m_contexts.add(ctxImpl);
+            }
+            // create or renew credential
+            try {
+                ctxImpl.createCredential();
+            } catch (NotImplementedException e) {
+                throw new NoSuccessException(e);
+            } catch (IncorrectStateException e) {
+                throw new NoSuccessException(e);
             }
         } else {
             throw new NoSuccessException("Unsupported context implementation: "+context.getClass());
