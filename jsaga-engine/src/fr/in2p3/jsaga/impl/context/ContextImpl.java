@@ -133,7 +133,17 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
                 }
             }
             // else try to get from parent class
-            return super.getAttribute(key);
+            try {
+                return super.getAttribute(key);
+            } catch (DoesNotExistException dnee) {
+                if (m_adaptor.getUsage().toString().contains(key)) {
+                    throw dnee;
+                } else if (Context.USERID.equals(key)) {
+                    throw new IncorrectStateException("Attribute not yet initialized. Please first add context to a session.");
+                } else {
+                    throw new NoSuccessException("Attribute not supported for this adaptor (or not yet initialized)");
+                }
+            }
         }
     }
 
