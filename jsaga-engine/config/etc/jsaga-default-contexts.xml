@@ -11,7 +11,7 @@
     </contexts>
     <session>
         <context type="VOMS">
-            <attribute name="Server" value="voms://lcg-voms.cern.ch:15004/DC=ch/DC=cern/OU=computers/CN=lcg-voms.cern.ch"/>
+            <attribute name="Server" value="voms://voms.hellasgrid.gr:15004/C=GR/O=HellasGrid/OU=hellasgrid.gr/CN=voms.hellasgrid.gr"/>
             <attribute name="VomsDir" value="etc/vomsdir"/>
         </context>
 <!--
