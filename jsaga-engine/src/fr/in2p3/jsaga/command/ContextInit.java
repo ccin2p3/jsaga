@@ -115,12 +115,6 @@ public class ContextInit extends AbstractCommand {
                 .withLongOpt(LONGOPT_HELP)
                 .create(OPT_HELP));
 
-        // system properties
-        opt.addOption(OptionBuilder.withDescription("Set context instance attribute (e.g. -DVOMS[0].UserVO=dteam)")
-                .withArgName("ctxId>.<attr>=<value")
-                .hasArg()
-                .withValueSeparator()
-                .create("D"));
         return opt;
     }
 }
