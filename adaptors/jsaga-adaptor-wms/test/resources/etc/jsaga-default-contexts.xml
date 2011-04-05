@@ -10,7 +10,7 @@
 
             <!--<attribute name="CertRepository" value="${user.home}/.jsaga/contexts/voms/certificates/"/>-->
             <attribute name="VomsDir" value="${user.home}/.jsaga/contexts/voms/vomsdir/"/>
-            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/ra_cred.txt"/>
+            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/voms_cred.txt"/>
 
             <job type="wms">
                 <!--<attribute name="DefaultJdlFile" value="etc/glite_wms.conf"/>-->
