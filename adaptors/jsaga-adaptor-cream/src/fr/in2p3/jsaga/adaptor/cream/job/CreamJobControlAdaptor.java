@@ -11,6 +11,7 @@ import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
+
 import org.glite.ce.creamapi.ws.cream2.CREAMPort;
 import org.glite.ce.creamapi.ws.cream2.types.*;
 import org.globus.ftp.GridFTPClient;
@@ -162,43 +163,24 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     }
 
     public String getStagingDirectory(String nativeJobId) throws TimeoutException, NoSuccessException {
-        JobInfo jobInfo = this.getJobInfo(nativeJobId);
-        Properties jobDesc = parseJobDescription(jobInfo.getJDL());
-        return getStringValue_IfExists(jobDesc, "SandboxDirectory");
+        return null;    // use the CREAM default staging directory
     }
 
     public StagingTransfer[] getInputStagingTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {
         JobInfo jobInfo = this.getJobInfo(nativeJobId);
-        //String baseUri = jobInfo.getCREAMInputSandboxURI()+"/";
-        String baseUri = "";
-        Properties jobDesc = parseJobDescription(jobInfo.getJDL());
-        int transfersLength = getIntValue_IfExists(jobDesc, "InputSandboxPreStaging");
-        StagingTransfer[] transfers = new StagingTransfer[transfersLength];
-        for (int i=0; i<transfersLength; i++) {
-            transfers[i] = new StagingTransfer(
-                    getStringValue(jobDesc, "InputSandboxPreStaging_"+i+"_From"),
-                    baseUri+getStringValue(jobDesc, "InputSandboxPreStaging_"+i+"_To"),
-                    getBooleanValue(jobDesc, "InputSandboxPreStaging_"+i+"_Append"));
-        }
-        return transfers;
+        String jdl = jobInfo.getJDL();
+        StagingJDL parsedJdl = new StagingJDL(jdl);
+        return parsedJdl.getInputStagingTransfer(jobInfo.getCREAMInputSandboxURI()+"/");
     }
-
+    
     public StagingTransfer[] getOutputStagingTransfer(String nativeJobId) throws TimeoutException, NoSuccessException {
         JobInfo jobInfo = this.getJobInfo(nativeJobId);
+        String jdl = jobInfo.getJDL();
+        StagingJDL parsedJdl = new StagingJDL(jdl);
         //String baseUri = jobInfo.getCREAMOutputSandboxURI()+"/";
-        String baseUri = "";
-        Properties jobDesc = parseJobDescription(jobInfo.getJDL());
-        int transfersLength = getIntValue_IfExists(jobDesc, "OutputSandboxPostStaging");
-        StagingTransfer[] transfers = new StagingTransfer[transfersLength];
-        for (int i=0; i<transfersLength; i++) {
-            transfers[i] = new StagingTransfer(
-                    baseUri+getStringValue(jobDesc, "OutputSandboxPostStaging_"+i+"_From"),
-                    getStringValue(jobDesc, "OutputSandboxPostStaging_"+i+"_To"),
-                    getBooleanValue(jobDesc, "OutputSandboxPostStaging_"+i+"_Append"));
-        }
-        return transfers;
+        return parsedJdl.getOutputStagingTransfers(jobInfo.getCREAMOutputSandboxURI()+"/");
     }
-
+    
     private JobInfo getJobInfo(String nativeJobId) throws TimeoutException, NoSuccessException {
         JobFilter filter = this.getJobFilter(nativeJobId);
 
