@@ -14,12 +14,11 @@
     <!-- Adaptor-specific parameters -->
     <xsl:param name="BatchSystem"/>
     <xsl:param name="QueueName"/>
+    <xsl:param name="rank"/>
 
     <!-- constants -->
     <xsl:variable name="SupportedProtocols">/gsiftp/</xsl:variable>
-    <xsl:variable name="IntermediaryURL">
-        <xsl:text/>gsiftp://<xsl:value-of select="$HostName"/>:2811/tmp/<xsl:value-of select="$UniqId"/>
-    </xsl:variable>
+    <xsl:variable name="SANDBOX_BASE_URI">gsiftp://localhost/</xsl:variable>
 
     <!-- entry point (MUST BE RELATIVE) -->
     <xsl:template match="jsdl:JobDefinition">
@@ -28,43 +27,92 @@
     </xsl:template>
 
     <xsl:template match="jsdl:JobDescription">[
-  Type = "Job";<xsl:text/>
-
-        <xsl:if test="$BatchSystem">
-  BatchSystem	= "<xsl:value-of select="$BatchSystem"/>";
-        </xsl:if>
-        <xsl:if test="$QueueName">
-  QueueName	= "<xsl:value-of select="$QueueName"/>";
-        </xsl:if>
+Type = "Job";<xsl:text/>
 
         <!-- executable and arguments -->
-  Executable = "<xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Executable/text()"/>";<xsl:text/>
+Executable = "<xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Executable/text()"/>";<xsl:text/>
         <xsl:if test="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
-  Arguments = "<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
+Arguments = "<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
                     <xsl:text> </xsl:text><xsl:value-of select="."/>
                 </xsl:for-each>";<xsl:text/>
 		</xsl:if>
 
-        <!-- environment -->
+        <!-- other -->
         <xsl:if test="count(jsdl:Application/posix:POSIXApplication/posix:Environment) > 0">
-  Environment = {<xsl:text/>
-            <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Environment">
-                <xsl:if test="contains(text(),' ')">
-                    <xsl:message terminate="yes">Unsupported space in environment value : <xsl:value-of select="text()"/></xsl:message>
-                </xsl:if>
-                <xsl:text>"</xsl:text>
+Environment = {<xsl:text/>
+      		<xsl:for-each
+               select="jsdl:Application/posix:POSIXApplication/posix:Environment">
+               	<xsl:if test="contains(text(),' ')">
+               		<xsl:message terminate="yes">Unsupported space in environment value : <xsl:value-of select="text()"/></xsl:message>
+               	</xsl:if>
                 <xsl:if test="position()>1">, </xsl:if>
+                <xsl:text>"</xsl:text>
                 <xsl:value-of select="@name"/>=<xsl:value-of select="text()"/>
                 <xsl:text>"</xsl:text>
-            </xsl:for-each>};<xsl:text/>
+            </xsl:for-each>
+};<xsl:text/>
           </xsl:if>
+
+<!--  Requirements -->
+Requirements = true <xsl:text/>
+        <xsl:for-each select="jsdl:JobIdentification/JDLRequirements/text()">
+&amp;&amp; <xsl:value-of select="."/> <xsl:text/>
+        </xsl:for-each>
+        <xsl:for-each select="jsdl:Resources/jsdl:TotalCPUTime/jsdl:UpperBoundedRange/text()">
+&amp;&amp; other.GlueCEPolicyMaxCPUTime >= <xsl:value-of select="."/> <xsl:text/>
+        </xsl:for-each>
+		<xsl:for-each select="jsdl:Resources/jsdl:TotalPhysicalMemory/jsdl:UpperBoundedRange/text()">
+&amp;&amp; other.GlueHostMainMemoryRAMSize >= <xsl:value-of select="."/> <xsl:text/>
+		</xsl:for-each>
+ 		<xsl:for-each select="jsdl:Resources/jsdl:CandidateHosts/jsdl:HostName/text()">
+             <xsl:choose>
+                 <xsl:when test="contains(.,'/')">
+&amp;&amp; other.GlueCEUniqueID == "<xsl:value-of select="."/>" <xsl:text/>
+                 </xsl:when>
+                 <xsl:otherwise>
+&amp;&amp; other.GlueCEInfoHostName == "<xsl:value-of select="."/>" <xsl:text/>
+                 </xsl:otherwise>
+             </xsl:choose>
+		</xsl:for-each>
+		<xsl:for-each select="jsdl:Application/spmd:SPMDApplication/spmd:ProcessesPerHost/text()">
+&amp;&amp; other.GlueCEInfoTotalCPUs >= <xsl:value-of select="."/> <xsl:text/>
+		</xsl:for-each>
+		<xsl:for-each select="jsdl:JobIdentification/jsdl:JobAnnotation/text()">
+&amp;&amp; other.GlueCEUniqueID == "<xsl:value-of select="."/>" <xsl:text/>
+		</xsl:for-each>
+ 		<xsl:for-each select="jsdl:Resources/jsdl:CPUArchitecture/jsdl:CPUArchitectureName/text()">
+&amp;&amp;  other.GlueHostArchitecturePlatformType == "<xsl:value-of select="."/>" <xsl:text/>
+		</xsl:for-each>
+		<xsl:for-each select="jsdl:Resources/jsdl:OperatingSystem/jsdl:OperatingSystemType/jsdl:OperatingSystemName/text()">
+&amp;&amp;  other.OperatingSystemName == "<xsl:value-of select="."/>" <xsl:text/>
+		</xsl:for-each>
+<xsl:text/>;
+
+        <xsl:if test="$rank">
+Rank = <xsl:value-of select="$rank"/>;<xsl:text/>
+        </xsl:if>
+
+        <!-- TODO : To test when input sandbox will work -->
+        <xsl:for-each select="jsdl:Application/spmd:SPMDApplication/spmd:SPMDVariation/text()[not(. = 'None')]">
+            <xsl:choose>
+	            <xsl:when test=". = 'MPI' or . = 'MPICH1' or . = 'MPICH2'">
+JobType = "MPICH";<xsl:text/>
+		        <xsl:for-each select="../../spmd:NumberOfProcesses/text()">
+NodeNumber = <xsl:value-of select="."/>;<xsl:text/>
+	    	    </xsl:for-each>
+	            </xsl:when>
+    	        <xsl:otherwise>
+	    	        <xsl:message terminate="yes">Unsupported SPMDVariation : <xsl:value-of select="."/></xsl:message>
+            	</xsl:otherwise>
+        	</xsl:choose>
+        </xsl:for-each>
 
         <!-- streams -->
         <xsl:variable name="isInteractive" select="jsdl:Application/posix:POSIXApplication/@name='interactive'"/>
         <xsl:choose>
             <xsl:when test="$isInteractive">
-  StdOutput = "<xsl:value-of select="$UniqId"/>-output.txt";
-  StdError = "<xsl:value-of select="$UniqId"/>-error.txt";
+StdOutput = "<xsl:value-of select="$UniqId"/>-output.txt";
+StdError = "<xsl:value-of select="$UniqId"/>-error.txt";
             </xsl:when>
             <xsl:otherwise>
                 <xsl:for-each select="jsdl:Application/posix:POSIXApplication">
@@ -72,37 +120,35 @@
                         <xsl:if test="starts-with(text(),'/')">
                             <xsl:message terminate="no">Absolute path in attribute Input means for JDL that file is already available on the worker node</xsl:message>
                         </xsl:if>
-  StdInput = "<xsl:value-of select="text()"/>";<xsl:text/>
+StdInput = "<xsl:value-of select="text()"/>";<xsl:text/>
                     </xsl:for-each>
                     <xsl:for-each select="posix:Output">
                         <xsl:if test="starts-with(text(),'/')">
                             <xsl:message terminate="yes">Absolute path in attribute Output is not supported by JDL</xsl:message>
                         </xsl:if>
-  StdOutput = "<xsl:value-of select="text()"/>";<xsl:text/>
+StdOutput = "<xsl:value-of select="text()"/>";<xsl:text/>
                     </xsl:for-each>
                     <xsl:for-each select="posix:Error">
                         <xsl:if test="starts-with(text(),'/')">
                             <xsl:message terminate="yes">Absolute path in attribute Error is not supported by JDL</xsl:message>
                         </xsl:if>
-  StdError = "<xsl:value-of select="text()"/>";<xsl:text/>
+StdError = "<xsl:value-of select="text()"/>";<xsl:text/>
                     </xsl:for-each>
                 </xsl:for-each>
             </xsl:otherwise>
         </xsl:choose>
 
-        <xsl:if test="jsdl:DataStaging">
-  SandboxDirectory = "<xsl:value-of select="$IntermediaryURL"/>";<xsl:text/>
-        </xsl:if>
-
         <xsl:if test="jsdl:DataStaging[jsdl:Source]">
-            <xsl:variable name="UnsupportedURI" select="jsdl:DataStaging[jsdl:Source][
-                not(contains($SupportedProtocols,concat('/',substring-before(jsdl:Source/jsdl:URI/text(),'://'),'/')))]"/>
-  InputSandboxPreStaging = <xsl:value-of select="count($UnsupportedURI)"/>;<xsl:text/>
-            <xsl:for-each select="$UnsupportedURI">
-  InputSandboxPreStaging_<xsl:value-of select="position()-1"/>_From = "<xsl:value-of select="translate(jsdl:Source/jsdl:URI/text(),'\','/')"/>";<xsl:text/>
-  InputSandboxPreStaging_<xsl:value-of select="position()-1"/>_To = "<xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="jsdl:FileName/text()"/>";<xsl:text/>
-  InputSandboxPreStaging_<xsl:value-of select="position()-1"/>_Append = "<xsl:value-of select="string(jsdl:CreationFlag/text()='append')"/>";<xsl:text/>
+  InputSandboxPreStaging = {<xsl:text/>
+            <xsl:for-each select="jsdl:DataStaging[jsdl:Source][
+                    not(contains($SupportedProtocols,concat('/',substring-before(jsdl:Source/jsdl:URI/text(),'://'),'/')))]">
+    [
+        From = "<xsl:value-of select="translate(jsdl:Source/jsdl:URI/text(),'\','/')"/>";<xsl:text/>
+        To = "<xsl:value-of select="$SANDBOX_BASE_URI"/><xsl:value-of select="jsdl:FileName/text()"/>";<xsl:text/>
+        Append = "<xsl:value-of select="string(jsdl:CreationFlag/text()='append')"/>";<xsl:text/>
+    ]<xsl:if test="position()!=last()">,</xsl:if>
             </xsl:for-each>
+  };
   InputSandbox = {<xsl:text/>
             <xsl:for-each select="jsdl:DataStaging[jsdl:Source]">
                 <xsl:if test="position()>1">,</xsl:if>
@@ -112,7 +158,7 @@
                         <xsl:value-of select="jsdl:Source/jsdl:URI/text()"/>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="jsdl:FileName/text()"/>
+                        <xsl:value-of select="jsdl:FileName/text()"/>
                     </xsl:otherwise>
                 </xsl:choose>
                 <xsl:text>"</xsl:text>
@@ -120,14 +166,16 @@
         </xsl:if>
 
         <xsl:if test="jsdl:DataStaging[jsdl:Target] or $isInteractive">
-            <xsl:variable name="UnsupportedURI" select="jsdl:DataStaging[jsdl:Target][
-                not(contains($SupportedProtocols,concat('/',substring-before(jsdl:Target/jsdl:URI/text(),'://'),'/')))]"/>
-  OutputSandboxPostStaging = <xsl:value-of select="count($UnsupportedURI)"/>;<xsl:text/>
-            <xsl:for-each select="$UnsupportedURI">
-  OutputSandboxPostStaging_<xsl:value-of select="position()-1"/>_From = "<xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="jsdl:FileName/text()"/>";<xsl:text/>
-  OutputSandboxPostStaging_<xsl:value-of select="position()-1"/>_To = "<xsl:value-of select="translate(jsdl:Target/jsdl:URI/text(),'\','/')"/>";<xsl:text/>
-  OutputSandboxPostStaging_<xsl:value-of select="position()-1"/>_Append = "<xsl:value-of select="string(jsdl:CreationFlag/text()='append')"/>";<xsl:text/>
+  OutputSandboxPostStaging = {<xsl:text/>
+            <xsl:for-each select="jsdl:DataStaging[jsdl:Target][
+                not(contains($SupportedProtocols,concat('/',substring-before(jsdl:Target/jsdl:URI/text(),'://'),'/')))]">
+    [
+        From = "<xsl:value-of select="$SANDBOX_BASE_URI"/><xsl:value-of select="jsdl:FileName/text()"/>";<xsl:text/>
+        To = "<xsl:value-of select="translate(jsdl:Target/jsdl:URI/text(),'\','/')"/>";<xsl:text/>
+        Append = "<xsl:value-of select="string(jsdl:CreationFlag/text()='append')"/>";<xsl:text/>
+    ]<xsl:if test="position()!=last()">,</xsl:if>
             </xsl:for-each>
+  };
   OutputSandbox = {<xsl:text/>
             <xsl:if test="$isInteractive">
                 "<xsl:value-of select="$UniqId"/>-output.txt",
@@ -150,64 +198,72 @@
                         <xsl:value-of select="jsdl:Target/jsdl:URI/text()"/>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="jsdl:FileName/text()"/>
+                        <xsl:value-of select="$SANDBOX_BASE_URI"/><xsl:value-of select="jsdl:FileName/text()"/>
                     </xsl:otherwise>
                 </xsl:choose>
                 <xsl:text>"</xsl:text>
             </xsl:for-each>};
         </xsl:if>
 
-<!--  Requirements -->
-  Requirements = true <xsl:text/>
-        <xsl:for-each select="jsdl:JobIdentification/JDLRequirements/text()">
-  &amp;&amp; <xsl:value-of select="."/> <xsl:text/>
-        </xsl:for-each>
-		<xsl:for-each select="jsdl:Resources/jsdl:TotalPhysicalMemory/jsdl:UpperBoundedRange/text()">
-  &amp;&amp; other.GlueHostMainMemoryRAMSize >= <xsl:value-of select="."/> <xsl:text/>
-		</xsl:for-each>
- 		<xsl:for-each select="jsdl:Resources/jsdl:CandidateHosts/jsdl:HostName/text()">
-  &amp;&amp; other.GlueCEInfoHostName == "<xsl:value-of select="."/>" <xsl:text/>
-		</xsl:for-each>
-		<xsl:for-each select="jsdl:Application/spmd:SPMDApplication/spmd:ProcessesPerHost/text()">
-  &amp;&amp; other.GlueCEInfoTotalCPUs >= <xsl:value-of select="."/> <xsl:text/>
-		</xsl:for-each>
-		<xsl:for-each select="jsdl:JobIdentification/jsdl:JobAnnotation/text()">
-  &amp;&amp; other.GlueCEUniqueID == "<xsl:value-of select="."/>" <xsl:text/>
-		</xsl:for-each>
-		<!-- Value to use ?
- 		<xsl:for-each select="jsdl:Resources/jsdl:CPUArchitecture/jsdl:CPUArchitectureName/text()">
-&amp;&amp;  other.GlueSubClusterPlatformType == "<xsl:value-of select="."/>" <xsl:text/>
-		</xsl:for-each>
-		<xsl:for-each select="jsdl:Resources/jsdl:OperatingSystem/jsdl:OperatingSystemType/jsdl:OperatingSystemName/text()">
-&amp;&amp;  other.OperatingSystemName == "<xsl:value-of select="."/>" <xsl:text/>
-		</xsl:for-each>   -->
-<xsl:text/>;
-
-        <xsl:if test="not(contains(ext:Extension,'Rank'))">
-  Rank = -other.GlueCEStateEstimatedResponseTime ;<xsl:text/>
+        <xsl:if test="$BatchSystem">
+BatchSystem	= "<xsl:value-of select="$BatchSystem"/>";
         </xsl:if>
-        <xsl:if test="not(contains(ext:Extension,'RetryCount'))">
-  RetryCount = 0;<xsl:text/>
+        <xsl:if test="$QueueName">
+QueueName = "<xsl:value-of select="$QueueName"/>";
         </xsl:if>
-
-        <!-- TODO : To test when input sandbox will work -->
-        <xsl:for-each select="jsdl:Application/spmd:SPMDApplication/spmd:SPMDVariation/text()[not(. = 'None')]">
-            <xsl:choose>
-	            <xsl:when test=". = 'MPI' or . = 'MPICH1' or . = 'MPICH2'">
-  JobType = "MPICH";<xsl:text/>
-		        <xsl:for-each select="../../spmd:NumberOfProcesses/text()">
-  NodeNumber = <xsl:value-of select="."/>;<xsl:text/>
-	    	    </xsl:for-each>
-	            </xsl:when>
-    	        <xsl:otherwise>
-	    	        <xsl:message terminate="yes">Unsupported SPMDVariation : <xsl:value-of select="."/></xsl:message>
-            	</xsl:otherwise>
-        	</xsl:choose>
-        </xsl:for-each>
 ]
+    </xsl:template>
+
+    <xsl:template match="posix:Input | posix:Output | posix:Error">
+        <!-- add path -->
+        <xsl:call-template name="VALUE_OF_TEXT"/>
+    </xsl:template>
+
+    <xsl:template match="jsdl:Source/jsdl:URI">
+        <!-- check file not renamed -->
+        <xsl:variable name="sourceFilename">
+            <xsl:call-template name="FILENAME"><xsl:with-param name="uri" select="text()"/></xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="targetFilename" select="ancestor::jsdl:DataStaging/jsdl:FileName/text()"/>
+        <xsl:if test="$sourceFilename != $targetFilename">
+            <xsl:message terminate="yes">Renaming file is not supported: <xsl:value-of
+                    select="$sourceFilename"/> / <xsl:value-of select="$targetFilename"/></xsl:message>
+        </xsl:if>
+        <!-- add URI -->
+        <xsl:call-template name="VALUE_OF_TEXT"/>
+    </xsl:template>
+    <xsl:template match="jsdl:DataStaging[jsdl:Target/jsdl:URI]/jsdl:FileName">
+        <!-- add FileName -->
+        <xsl:call-template name="VALUE_OF_TEXT"/>
+    </xsl:template>
+    <xsl:template match="jsdl:Target/jsdl:URI">
+        <!-- add URI -->
+        <xsl:call-template name="VALUE_OF_TEXT"/>
     </xsl:template>
 
     <xsl:template match="ext:Extension">  # Extension:
 <xsl:value-of select="text()"/>
+    </xsl:template>
+
+
+    <xsl:template name="VALUE_OF_TEXT">
+        <xsl:if test="position() > 1">
+            <xsl:text>, </xsl:text>
+        </xsl:if>
+        <xsl:text>"</xsl:text><xsl:value-of select="text()"/><xsl:text>"</xsl:text>
+    </xsl:template>
+
+    <xsl:template name="FILENAME">
+        <xsl:param name="uri"/>
+        <xsl:choose>
+            <xsl:when test="contains($uri,'/')">
+                <xsl:call-template name="FILENAME">
+                    <xsl:with-param name="uri" select="substring-after($uri,'/')"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$uri"/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 </xsl:stylesheet>
