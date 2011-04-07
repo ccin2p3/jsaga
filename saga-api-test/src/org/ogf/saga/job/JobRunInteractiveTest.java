@@ -49,6 +49,7 @@ public abstract class JobRunInteractiveTest extends AbstractJobTest {
 
         // check job for DONE status
         checkStatus(job.getState(), State.FAILED);
+    	// TODO: remove this test as the status depends on the middleware
     }
 
 	/**
@@ -149,10 +150,7 @@ public abstract class JobRunInteractiveTest extends AbstractJobTest {
         // wait for the end
         job.waitFor();
 
-        // check job for FAILED status
-        checkStatus(job.getState(), State.FAILED);
-
-      	String stderrEmpty = "";
+       	String stderrEmpty = "";
         //test stderr
         BufferedReader jobStdoutReader = new BufferedReader( new InputStreamReader( job.getStderr()));
         String firstLine = jobStdoutReader.readLine();
