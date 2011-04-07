@@ -12,6 +12,8 @@ import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
 import fr.in2p3.jsaga.impl.job.instance.stream.*;
 import fr.in2p3.jsaga.impl.job.service.AbstractSyncJobServiceImpl;
 import fr.in2p3.jsaga.impl.job.staging.mgr.*;
+import fr.in2p3.jsaga.impl.job.streaming.GenericStreamableJobAdaptor;
+import fr.in2p3.jsaga.impl.job.streaming.mgr.StreamingManagerThroughSandboxTwoPhase;
 import fr.in2p3.jsaga.impl.permissions.AbstractJobPermissionsImpl;
 import fr.in2p3.jsaga.sync.job.SyncJob;
 import org.apache.log4j.Logger;
@@ -44,6 +46,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     private static Logger s_logger = Logger.getLogger(AbstractSyncJobImpl.class);
 
     private JobControlAdaptor m_controlAdaptor;
+    private GenericStreamableJobAdaptor m_genericStreamableJobAdaptor;
     private JobMonitorService m_monitorService;
     private JobAttributes m_attributes;
     private JobMetrics m_metrics;
@@ -67,6 +70,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         m_uniqId = uniqId;
         m_nativeJobId = null;
         m_currentModelState = null;
+        m_genericStreamableJobAdaptor = null;
     }
 
     /** constructor for control and monitoring only */
@@ -78,6 +82,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         m_uniqId = null;
         m_nativeJobId = nativeJobId;
         m_currentModelState = null;
+        m_genericStreamableJobAdaptor = null;
     }
 
     /** common to all contructors */
@@ -94,6 +99,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         m_stderr = null;
         m_willStartListening = false;
         m_currentModelState = null;
+        m_genericStreamableJobAdaptor = null;
     }
 
     /** clone */
@@ -111,6 +117,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         clone.m_stdin = m_stdin;
         clone.m_stdout = m_stdout;
         clone.m_stderr = m_stderr;
+        clone.m_genericStreamableJobAdaptor = m_genericStreamableJobAdaptor;
         return clone;
     }
 
@@ -122,7 +129,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         try {
             // get native job description
             String nativeJobDesc = m_attributes.m_NativeJobDescription.getObject();
-
+            
             // pre-staging (before job submit)
             m_metrics.m_StateDetail.setValue(MODEL+":" + SubState.RUNNING_PRE_STAGING.toString());
             if (m_stagingMgr instanceof DataStagingManagerThroughStream) {
@@ -196,7 +203,25 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
                     throw new NotImplementedException("Interactive jobs are not supported by this adaptor: "+m_controlAdaptor.getClass().getName());
                 }
             } else {
-                m_nativeJobId = m_controlAdaptor.submit(nativeJobDesc, s_checkMatch, m_uniqId);
+            	if (m_stagingMgr instanceof StreamingManagerThroughSandboxTwoPhase) {
+                	m_genericStreamableJobAdaptor = new GenericStreamableJobAdaptor(m_controlAdaptor);
+                    // set stdin
+                    InputStream stdin;
+                    if (m_stdin!=null && m_stdin.getBuffer().length>0) {
+                        stdin = new ByteArrayInputStream(m_stdin.getBuffer());
+                    } else {
+                        stdin = null;
+                    }
+
+                    // submit
+                    m_IOHandler = m_genericStreamableJobAdaptor.submit(nativeJobDesc, s_checkMatch, m_uniqId, stdin);
+                    if (m_IOHandler == null) {
+                        throw new NotImplementedException("ADAPTOR ERROR: Method submit() must not return null: "+m_genericStreamableJobAdaptor.getClass().getName());
+                    }
+                    m_nativeJobId = m_IOHandler.getJobId();
+            	} else {
+            		m_nativeJobId = m_controlAdaptor.submit(nativeJobDesc, s_checkMatch, m_uniqId);
+            	}
             }
             String monitorUrl = m_monitorService.getURL().getString();
             String sagaJobId = "["+monitorUrl+"]-["+m_nativeJobId+"]";
@@ -274,13 +299,19 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         }
         m_monitorService.stopListening(m_nativeJobId);
 
-        // close job output and error streams
-        this.closeStreamsIfDoneAndInteractive();
-
+        if (!(m_stagingMgr instanceof StreamingManagerThroughSandboxTwoPhase)) { // TODO add StreamingManagerThroughSandboxOnePhase
+        	// close job output and error streams
+        	this.closeStreamsIfDoneAndInteractive();
+        }
+        
         if (this.isFinalState()) {
             // post-staging
             try {
                 this.postStaging();
+                if (m_stagingMgr instanceof StreamingManagerThroughSandboxTwoPhase) {// TODO add StreamingManagerThroughSandboxOnePhase
+                	// close job output and error streams after data staging
+                	this.closeStreamsIfDoneAndInteractive();
+                }
             } catch (PermissionDeniedException e) {
                 throw new NoSuccessException(e);
             } catch (IncorrectStateException e) {
@@ -298,7 +329,8 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     private void closeStreamsIfDoneAndInteractive() {
         boolean isDone = (State.DONE.compareTo(m_metrics.m_State.getValue()) == 0);
         if (isDone && m_IOHandler!=null) {  //if job is done and interactive
-            if (m_controlAdaptor instanceof StreamableJobInteractiveGet || m_controlAdaptor instanceof StreamableJobBatch) {
+            if (m_controlAdaptor instanceof StreamableJobInteractiveGet || m_controlAdaptor instanceof StreamableJobBatch || m_stagingMgr instanceof StreamingManagerThroughSandboxTwoPhase) {
+            	// TODO add StreamingManagerThroughSandboxOnePhase
                 try {
                     if (m_stdout == null) {
                         m_stdout = new JobStdoutInputStream(this, m_IOHandler);
@@ -375,7 +407,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
 
     public OutputStream getStdinSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         m_monitorService.checkState();
-        if (this.isInteractive()) {
+        if (this.isInteractive() || m_stagingMgr instanceof StreamingManagerThroughSandboxTwoPhase) {
             if (m_stdin == null) {
                 if (m_controlAdaptor instanceof StreamableJobInteractiveSet) {
                     m_stdin = new PostconnectedStdinOutputStream(this);
@@ -391,7 +423,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
 
     public InputStream getStdoutSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         m_monitorService.checkState();
-        if (this.isInteractive()) {
+        if (this.isInteractive() || m_stagingMgr instanceof StreamingManagerThroughSandboxTwoPhase) {
             if (m_stdout == null) {
                 m_stdout = new JobStdoutInputStream(this, m_IOHandler);
             }
@@ -403,7 +435,8 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
 
     public InputStream getStderrSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         m_monitorService.checkState();
-        if (this.isInteractive()) {
+        if (this.isInteractive() || m_stagingMgr instanceof StreamingManagerThroughSandboxTwoPhase) {
+        	// TODO add StreamingManagerThroughSandboxOnePhase
             if (m_stderr == null) {
                 m_stderr = new JobStderrInputStream(this, m_IOHandler);
             }

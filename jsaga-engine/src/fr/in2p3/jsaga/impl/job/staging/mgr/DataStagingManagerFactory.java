@@ -4,6 +4,8 @@ import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorOnePhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
+import fr.in2p3.jsaga.impl.job.streaming.mgr.StreamingManagerThroughSandboxTwoPhase;
+
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.JobDescription;
 
@@ -29,13 +31,23 @@ public class DataStagingManagerFactory {
             if (adaptor instanceof StagingJobAdaptorOnePhase) {
                 return new DataStagingManagerThroughSandboxOnePhase((StagingJobAdaptorOnePhase) adaptor, uniqId);
             } else if (adaptor instanceof StagingJobAdaptorTwoPhase) {
-                return new DataStagingManagerThroughSandboxTwoPhase((StagingJobAdaptorTwoPhase) adaptor, uniqId);
+           		return new DataStagingManagerThroughSandboxTwoPhase((StagingJobAdaptorTwoPhase) adaptor, uniqId);
             } else if (adaptor instanceof StreamableJobAdaptor) {
                 return new DataStagingManagerThroughStream(fileTransfer);
             } else {
                 throw new NotImplementedException("Adaptor can not handle attribute FileTransfer: "+adaptor.getClass());
             }
         } catch (DoesNotExistException e) {
+        	// If job is interactive and adaptor does not implement streaming, we use the streaming manager
+        	try {
+				if ("true".equalsIgnoreCase(jobDesc.getAttribute(JobDescription.INTERACTIVE))) {
+					if (adaptor instanceof StagingJobAdaptorTwoPhase) {
+						return new StreamingManagerThroughSandboxTwoPhase((StagingJobAdaptorTwoPhase) adaptor, uniqId);
+					}
+				}
+			} catch (IncorrectStateException e1) {
+			} catch (DoesNotExistException e1) {
+			}
             // create data staging manager
             return new DataStagingManagerDummy();
         } catch (IncorrectStateException e) {
