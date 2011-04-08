@@ -12,6 +12,17 @@ import org.ogf.saga.error.TimeoutException;
 
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOGetterInteractive;
 
+/* ***************************************************
+* *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
+* ***             http://cc.in2p3.fr/             ***
+* ***************************************************
+* File:   GenericJobIOHandler
+* Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
+* Date:   7 avril 2011
+* ***************************************************
+* Description:                                      */
+
+
 public class GenericJobIOHandler implements JobIOGetterInteractive {
 
 	private String m_jobId;

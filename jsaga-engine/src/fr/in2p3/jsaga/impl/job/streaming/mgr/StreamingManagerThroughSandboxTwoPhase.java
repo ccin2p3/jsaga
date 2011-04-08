@@ -22,6 +22,16 @@ import fr.in2p3.jsaga.impl.job.staging.mgr.DataStagingManager;
 import fr.in2p3.jsaga.impl.job.staging.mgr.DataStagingManagerThroughSandboxTwoPhase;
 import fr.in2p3.jsaga.impl.job.streaming.LocalFileFactory;
 
+/* ***************************************************
+* *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
+* ***             http://cc.in2p3.fr/             ***
+* ***************************************************
+* File:   StreamingManagerThroughSandboxTwoPhase
+* Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
+* Date:   7 avril 2011
+* ***************************************************
+* Description:                                      */
+
 public class StreamingManagerThroughSandboxTwoPhase extends DataStagingManagerThroughSandboxTwoPhase {
 
     private String m_uuid;
@@ -46,25 +56,18 @@ public class StreamingManagerThroughSandboxTwoPhase extends DataStagingManagerTh
 
             // build FileTransfer
             newJobDesc.setVectorAttribute(JobDescription.FILETRANSFER, new String[]{
-                    //getLocal("sh") + " > " + getWorker("sh"),
             		LocalFileFactory.getLocalInputFile(m_uuid) + " > " + getWorker("input"),
             		LocalFileFactory.getLocalOutputFile(m_uuid) + " < " + getWorker("output"),
             		LocalFileFactory.getLocalErrorFile(m_uuid) + " < " + getWorker("error")
             });
-            String jobCode = jobDesc.getAttribute(JobDescription.EXECUTABLE);
             
+            // set INPUT OUTPUT and ERROR
             newJobDesc.setAttribute(JobDescription.INPUT, getWorker("input").toString());
-            
-            // get OUTPUT and build OutputSandbox
             newJobDesc.setAttribute(JobDescription.OUTPUT, getWorker("output").toString());
             newJobDesc.setAttribute(JobDescription.ERROR, getWorker("error").toString());
 
 			return newJobDesc;
 		} catch (CloneNotSupportedException e) {
-            throw new NoSuccessException(e);
-		} catch (IncorrectStateException e) {
-            throw new NoSuccessException(e);
-		} catch (DoesNotExistException e) {
             throw new NoSuccessException(e);
 		} catch (Exception e) {
             throw new NoSuccessException(e);
