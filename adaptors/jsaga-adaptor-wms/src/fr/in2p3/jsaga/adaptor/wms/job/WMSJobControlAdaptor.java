@@ -74,12 +74,11 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
  * TODO : Test MPI jobs
  */
 public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
-        implements StagingJobAdaptorTwoPhase, CleanableJobAdaptor, StreamableJobBatch {
+        implements StagingJobAdaptorTwoPhase, CleanableJobAdaptor {
 
     private static final String DEFAULT_JDL_FILE = "DefaultJdlFile";
     private WMProxy_PortType m_client;
     private String m_delegationId = "myId";
-    private String m_wmsServerHost;
     private String m_wmsServerUrl;
     private String m_LBAddress;
 
@@ -132,8 +131,6 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             }
         }
 
-        // set WMS url
-        m_wmsServerHost = host;
         m_wmsServerUrl = "https://" + host + ":" + port + basePath;
         m_LBAddress = (String) attributes.get("LBAddress");
 
@@ -264,24 +261,6 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
             throw new NoSuccessException(e);
         }
     }
-    private String m_stagingPrefix;
-
-    public JobIOHandler submit(String jobDesc, boolean checkMatch, String uniqId, InputStream stdin) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-        m_stagingPrefix = "/tmp/" + uniqId;
-
-        // connect to gsiftp
-        GridFTPClient stagingClient;
-        try {
-            stagingClient = new GridFTPClient(m_wmsServerHost, 2811);
-            stagingClient.authenticate(m_credential);
-        } catch (Exception e) {
-            throw new NoSuccessException("Failed to connect to GridFTP server: " + m_wmsServerHost, e);
-        }
-
-        // submit
-        String jobId = this.submit(jobDesc, checkMatch, uniqId);
-        return new WMSJobIOHandler(stagingClient, m_stagingPrefix, jobId);
-    }
 
     private void checkJDLAndMatch(String jobDesc, WMProxy_PortType m_client2) throws NoSuccessException, ServerOverloadedFaultType, AuthorizationFaultType, GenericFaultType, AuthenticationFaultType, NoSuitableResourcesFaultType, InvalidArgumentFaultType, RemoteException {
         // parse JDL
@@ -383,21 +362,6 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 //        if(m_tmpProxyFile != null && m_tmpProxyFile.exists()) {
 //            m_tmpProxyFile.delete(); // warning: file not deleted (deletion managed by JVM)
 //        }
-
-        if (m_stagingPrefix != null) {
-            try {
-                GridFTPClient client = new GridFTPClient(m_wmsServerHost, 2811);
-                try {
-                    client.authenticate(m_credential);
-                    client.deleteFile(m_stagingPrefix + "-" + WMSJobIOHandler.OUTPUT_SUFFIX);
-                    client.deleteFile(m_stagingPrefix + "-" + WMSJobIOHandler.ERROR_SUFFIX);
-                } finally {
-                    client.close();
-                }
-            } catch (Exception e) {
-                throw new NoSuccessException("Failed to cleanup job: " + nativeJobId, e);
-            }
-        }
 
         // purge job
         try {
