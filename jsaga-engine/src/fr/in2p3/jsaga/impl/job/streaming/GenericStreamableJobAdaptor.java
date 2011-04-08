@@ -56,14 +56,15 @@ public class GenericStreamableJobAdaptor implements StreamableJobBatch {
         OutputStream out;
 		try {
 			out = new FileOutputStream(input);
-			if (stdin != null) { // No input, we write an empty file
+			if (stdin != null) {
 				int n;
 				byte[] buffer = new byte[1024];
 				while ((n = stdin.read(buffer)) != -1) {
 					out.write(buffer, 0, n);
 				}
-			} 
-			// if null input was provided, the file is empty
+			} else  {
+				out.write(' ');	// if null input was provided, write a char as middleware may not support empty input files (e.g ARC)
+			}
 	        out.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
