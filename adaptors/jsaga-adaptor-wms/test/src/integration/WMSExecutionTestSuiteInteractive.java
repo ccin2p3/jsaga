@@ -24,7 +24,7 @@ public class WMSExecutionTestSuiteInteractive extends JSAGATestSuite {
     /** test cases */
     public static class WMSJobRunInteractiveTest extends JobRunInteractiveTest {
         public WMSJobRunInteractiveTest() throws Exception {super("wms");}
-        public void test_getStderr() { super.ignore("WMS does not support this: the job is failed but the stderr is empty"); }
+        public void test_setStdin_error() throws Exception { super.ignore("WMS status is DONE"); }
         public void test_run_environnement() { super.ignore("JDL does not support space in environment value"); }
     }
 }
