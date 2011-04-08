@@ -27,10 +27,24 @@ import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 
+/* ***************************************************
+* *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
+* ***             http://cc.in2p3.fr/             ***
+* ***************************************************
+* File:   GenericStreamableJobAdaptor
+* Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
+* Date:   7 avril 2011
+* ***************************************************
+* Description:                                      */
+
+/**
+ * This class is a wrapper to a JobControlAdaptor for emulating streaming via data staging
+ */
 public class GenericStreamableJobAdaptor implements StreamableJobBatch {
 
 	private JobControlAdaptor m_adaptor;
 
+	// TODO: restrict to adaptors that implement data staging
 	public GenericStreamableJobAdaptor(JobControlAdaptor adaptor) {
 		m_adaptor = adaptor;
 	}
