@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
 /**
  *
  */
-public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements StagingJobAdaptorTwoPhase, StreamableJobBatch, CleanableJobAdaptor {
+public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements StagingJobAdaptorTwoPhase, CleanableJobAdaptor {
     // parameters configured
     private static final String SSL_CA_FILES = "sslCAFiles";
 
@@ -106,25 +106,8 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         translator.setAttribute(QUEUE_NAME, m_queueName);
         return translator;
     }
-
-    private String m_stagingPrefix;
-    public JobIOHandler submit(String jobDesc, boolean checkMatch, String uniqId, InputStream stdin) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-        m_stagingPrefix = "/tmp/"+uniqId;
-
-        // connect to gsiftp
-        GridFTPClient stagingClient;
-        try {
-            stagingClient = new GridFTPClient(m_creamStub.getURI().getHost(), 2811);
-            stagingClient.authenticate(m_credential);
-        } catch (Exception e) {
-            throw new NoSuccessException("Failed to connect to GridFTP server: "+m_creamStub.getURI().getHost(), e);
-        }
-
-        // submit
-        String jobId = this.submit(jobDesc, checkMatch, uniqId);
-        return new CreamJobIOHandler(stagingClient, m_stagingPrefix, jobId);
-    }
-
+    
+    
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
         // create job description
         JobDescription jd = new JobDescription();
@@ -177,7 +160,6 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         JobInfo jobInfo = this.getJobInfo(nativeJobId);
         String jdl = jobInfo.getJDL();
         StagingJDL parsedJdl = new StagingJDL(jdl);
-        //String baseUri = jobInfo.getCREAMOutputSandboxURI()+"/";
         return parsedJdl.getOutputStagingTransfers(jobInfo.getCREAMOutputSandboxURI()+"/");
     }
     
@@ -241,18 +223,6 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
     }
 
     public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-        if (m_stagingPrefix != null) {
-            try {
-                GridFTPClient client = new GridFTPClient(m_creamStub.getURI().getHost(), 2811);
-                client.authenticate(m_credential);
-                client.deleteFile(m_stagingPrefix+"-"+CreamJobIOHandler.OUTPUT_SUFFIX);
-                client.deleteFile(m_stagingPrefix+"-"+CreamJobIOHandler.ERROR_SUFFIX);
-                client.close();
-            } catch (Exception e) {
-                throw new NoSuccessException("Failed to cleanup job: "+nativeJobId, e);
-            }
-        }
-
         JobFilter filter = this.getJobFilter(nativeJobId);
 
         // purge job
@@ -276,68 +246,5 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         filter.setDelegationId(m_delegationId);
         filter.setJobId(new JobId[]{jobId});
         return filter;
-    }
-
-    private static Properties parseJobDescription(String jdl) throws NoSuccessException {
-        Properties jobDesc = new Properties();
-        try {
-            jobDesc.load(new ByteArrayInputStream(jdl.getBytes()));
-        } catch (IOException e) {
-            throw new NoSuccessException("Failed to retrieve JDL", e);
-        }
-        return jobDesc;
-    }
-    private static String getValue(Properties jobDesc, String key) throws NoSuccessException {
-        String value = jobDesc.getProperty(key);
-        if (value!=null) {
-            String trimmed = value.trim();
-            if (trimmed.endsWith(";")) {
-                return trimmed.substring(0, trimmed.length()-1);
-            } else {
-                throw new NoSuccessException("Failed to parse JDL attribute: "+value);
-            }
-        } else {
-            return null;
-        }
-    }
-    private static String getStringValue(Properties jobDesc, String key) throws NoSuccessException {
-        String value = getValue(jobDesc, key);
-        if (value!=null && value.startsWith("\"") && value.endsWith("\"")) {
-            return value.substring(1, value.length()-1);
-        } else {
-            throw new NoSuccessException("Failed to parse JDL attribute: "+value);
-        }
-    }
-    private static String getStringValue_IfExists(Properties jobDesc, String key) throws NoSuccessException {
-        String value = getValue(jobDesc, key);
-        if (value!=null) {
-            if (value.startsWith("\"") && value.endsWith("\"")) {
-                return value.substring(1, value.length()-1);
-            } else {
-                throw new NoSuccessException("Failed to parse JDL attribute: "+value);
-            }
-        } else {
-            return null;
-        }
-    }
-    private static int getIntValue_IfExists(Properties jobDesc, String key) throws NoSuccessException {
-        String value = getValue(jobDesc, key);
-        if (value!=null) {
-            try {
-                return Integer.parseInt(value);
-            } catch (NumberFormatException e) {
-                throw new NoSuccessException("Failed to parse JDL attribute: "+value, e);
-            }
-        } else {
-            return 0;
-        }
-    }
-    private static boolean getBooleanValue(Properties jobDesc, String key) throws NoSuccessException {
-        String value = getValue(jobDesc, key);
-        if (value!=null) {
-            return Boolean.parseBoolean(value);
-        } else {
-            throw new NoSuccessException("Failed to parse JDL attribute: "+value);
-        }
     }
 }
