@@ -26,6 +26,12 @@
             </roles>
         </developer>
         <developer>
+            <name>Lionel Schwarz</name>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
+        <developer>
             <name>See contributors list</name>
             <url>http://grid.in2p3.fr/software/jsaga-dev/contributors.html</url>
             <roles>
