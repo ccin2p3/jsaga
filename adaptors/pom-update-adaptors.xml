@@ -10,23 +10,26 @@
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
-                <artifactId>xslt-maven-plugin</artifactId>
-                <version>1.0</version>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>transform</goal>
-                        </goals>
-                        <configuration>
-                            <srcDir>./</srcDir>
-                            <srcIncludes>pom.xml</srcIncludes>
-                            <xslFile>src/aggregate.xsl</xslFile>
-                            <destDir>../jsaga-adaptors/</destDir>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+		        <artifactId>xml-maven-plugin</artifactId>
+		        <executions>
+		          <execution>
+                    <phase>validate</phase>
+		            <goals>
+		              <goal>transform</goal>
+		            </goals>
+		          </execution>
+		        </executions>
+		        <configuration>
+		          <transformationSets>
+		            <transformationSet>
+		              <dir>.</dir>
+		              <includes><include>pom.xml</include></includes>
+		              <stylesheet>src/aggregate.xsl</stylesheet>
+		              <outputDir>../jsaga-adaptors/</outputDir>
+		            </transformationSet>
+		          </transformationSets>
+		        </configuration>
+		      </plugin>
         </plugins>
     </build>
 </project>
