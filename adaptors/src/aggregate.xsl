@@ -10,7 +10,7 @@
             <parent>
                 <groupId>fr.in2p3.jsaga</groupId>
                 <artifactId>jsaga</artifactId>
-                <version><xsl:value-of select="pom:version/text()"/></version>
+                <version><xsl:value-of select="pom:parent/pom:version/text()"/></version>
             </parent>
             <modelVersion>4.0.0</modelVersion>
             <groupId>fr.in2p3.jsaga.poms</groupId>
@@ -24,16 +24,16 @@
     </xsl:template>
 
     <xsl:template match="pom:module">
-        <xsl:variable name="module" select="document(concat(text(),'/pom.xml'))/pom:project"/>
+        <xsl:variable name="module" select="document(concat('../',text(),'/pom.xml'))/pom:project"/>
         <dependency>
-            <groupId><xsl:value-of select="$module/pom:groupId/text()"/></groupId>
+            <groupId><xsl:value-of select="$module/pom:parent/pom:groupId/text()"/></groupId>
             <artifactId><xsl:value-of select="$module/pom:artifactId/text()"/></artifactId>
-            <version><xsl:value-of select="$module/pom:version/text()"/></version>
+            <version><xsl:value-of select="$module/pom:parent/pom:version/text()"/></version>
         </dependency>
         <dependency>
-            <groupId><xsl:value-of select="$module/pom:groupId/text()"/></groupId>
+            <groupId><xsl:value-of select="$module/pom:parent/pom:groupId/text()"/></groupId>
             <artifactId><xsl:value-of select="$module/pom:artifactId/text()"/></artifactId>
-            <version><xsl:value-of select="$module/pom:version/text()"/></version>
+            <version><xsl:value-of select="$module/pom:parent/pom:version/text()"/></version>
             <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
