@@ -44,6 +44,7 @@ public class DataStagingManagerFactory {
 					if (adaptor instanceof StagingJobAdaptorTwoPhase) {
 						return new StreamingManagerThroughSandboxTwoPhase((StagingJobAdaptorTwoPhase) adaptor, uniqId);
 					}
+					// TODO: support StagingJobAdaptorOnePhase
 				}
 			} catch (IncorrectStateException e1) {
 			} catch (DoesNotExistException e1) {
