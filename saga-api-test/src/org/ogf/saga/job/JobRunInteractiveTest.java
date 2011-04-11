@@ -178,9 +178,10 @@ public abstract class JobRunInteractiveTest extends AbstractJobTest {
                 "MYVAR0="+myvar0,
                 "MYVAR1="+myvar1
         };
-		AttributeVector[] attributesV = new AttributeVector[1];
+		AttributeVector[] attributesV = new AttributeVector[2];
 		attributesV[0] = new AttributeVector(JobDescription.ENVIRONMENT, _myenv);
-		JobDescription desc =  createJob("echo $MYVAR0:$MYVAR1", null, attributesV);
+    	attributesV[1] = new AttributeVector(JobDescription.ARGUMENTS,new String[]{"$MYVAR0:$MYVAR1"});    	
+		JobDescription desc =  createJob("/bin/echo", null, attributesV);
 		desc.setAttribute(JobDescription.INTERACTIVE, JobDescription.TRUE);
     	
 		// submit
@@ -193,9 +194,7 @@ public abstract class JobRunInteractiveTest extends AbstractJobTest {
 	    
 	    // check stdout
     	BufferedReader jobStdoutReader = new BufferedReader( new InputStreamReader(job.getStdout()));       
-	    String input;
-	    
-    	// check
+	    // check
         assertEquals(
         		jobStdoutReader.readLine(),
         		myvar0 + ":" + myvar1);
