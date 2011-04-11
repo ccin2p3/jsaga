@@ -32,7 +32,7 @@ import fr.in2p3.jsaga.impl.job.streaming.LocalFileFactory;
 * ***************************************************
 * Description:                                      */
 
-public class StreamingManagerThroughSandboxTwoPhase extends DataStagingManagerThroughSandboxTwoPhase {
+public class StreamingManagerThroughSandboxTwoPhase extends DataStagingManagerThroughSandboxTwoPhase implements StreamingManagerThroughSandbox {
 
     private String m_uuid;
 
