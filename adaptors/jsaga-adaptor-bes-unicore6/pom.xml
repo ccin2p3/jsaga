@@ -6,7 +6,6 @@
         <version>0.9.13-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>fr.in2p3.jsaga.adaptor</groupId>
     <artifactId>jsaga-adaptor-bes-unicore6</artifactId>
     <name>jsaga-adaptor-bes-unicore6</name>
     <description>This module provides support for Unicore6 via BES (Basic Execution Service) interface</description>
