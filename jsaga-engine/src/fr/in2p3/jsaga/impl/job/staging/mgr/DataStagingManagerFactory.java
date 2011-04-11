@@ -4,6 +4,7 @@ import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorOnePhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
+import fr.in2p3.jsaga.impl.job.streaming.mgr.StreamingManagerThroughSandboxOnePhase;
 import fr.in2p3.jsaga.impl.job.streaming.mgr.StreamingManagerThroughSandboxTwoPhase;
 
 import org.ogf.saga.error.*;
@@ -43,8 +44,9 @@ public class DataStagingManagerFactory {
 				if ("true".equalsIgnoreCase(jobDesc.getAttribute(JobDescription.INTERACTIVE))) {
 					if (adaptor instanceof StagingJobAdaptorTwoPhase) {
 						return new StreamingManagerThroughSandboxTwoPhase((StagingJobAdaptorTwoPhase) adaptor, uniqId);
+					} else if (adaptor instanceof StagingJobAdaptorOnePhase) {
+						return new StreamingManagerThroughSandboxOnePhase((StagingJobAdaptorOnePhase) adaptor, uniqId);
 					}
-					// TODO: support StagingJobAdaptorOnePhase
 				}
 			} catch (IncorrectStateException e1) {
 			} catch (DoesNotExistException e1) {
