@@ -48,23 +48,6 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
 
     private String m_delegProxy;
 
-    /** override super.getUsage() */
-    // TODO: remove : useless attribute
-    public Usage getUsage() {
-        return new UAnd(new Usage[]{
-                super.getUsage(),
-                new U(SSL_CA_FILES),
-        });
-    }
-
-    /** override super.getDefaults() */
-    // TODO: remove : useless attribute
-    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-        return new Default[]{
-                new Default(SSL_CA_FILES, new File(new File(new File(System.getProperty("user.home"),".globus"),"certificates"),"*.0").getAbsolutePath())
-        };
-    }
-
     public JobMonitorAdaptor getDefaultJobMonitor() {
         // use CREAM portType as default monitoring service (instead of CEMon portType)
         return new CreamJobMonitorAdaptor();
