@@ -24,6 +24,7 @@ import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 
@@ -42,10 +43,9 @@ import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
  */
 public class GenericStreamableJobAdaptor implements StreamableJobBatch {
 
-	private JobControlAdaptor m_adaptor;
+	private StagingJobAdaptor m_adaptor;
 
-	// TODO: restrict to adaptors that implement data staging
-	public GenericStreamableJobAdaptor(JobControlAdaptor adaptor) {
+	public GenericStreamableJobAdaptor(StagingJobAdaptor adaptor) {
 		m_adaptor = adaptor;
 	}
 	
