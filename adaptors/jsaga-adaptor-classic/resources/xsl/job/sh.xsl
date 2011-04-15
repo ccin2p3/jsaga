@@ -26,11 +26,11 @@ _Executable=<xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:
              <xsl:text> </xsl:text><xsl:value-of select="."/><xsl:text/>
         </xsl:for-each>
         <!-- needed when job attribute FileTransfer is not set -->
-		<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Output/text()">
+		<!-- <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Output/text()">
             <xsl:text> &gt;</xsl:text><xsl:value-of select="."/><xsl:text/>
 		</xsl:for-each>
 		<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Error/text()">
             <xsl:text> 2&gt;</xsl:text><xsl:value-of select="."/><xsl:text/>
-		</xsl:for-each>
+		</xsl:for-each>-->
 	</xsl:template>
 </xsl:stylesheet>
