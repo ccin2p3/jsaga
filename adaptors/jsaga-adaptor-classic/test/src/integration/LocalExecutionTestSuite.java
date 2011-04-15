@@ -51,7 +51,6 @@ public class LocalExecutionTestSuite extends JSAGATestSuite {
     }
 
     // test cases
-    /*
     public static class LocalJobRunSandboxTest extends JobRunSandboxTest {
         public LocalJobRunSandboxTest() throws Exception {super("local");}
 
@@ -60,6 +59,7 @@ public class LocalExecutionTestSuite extends JSAGATestSuite {
             if (System.getProperty("os.name").toLowerCase().startsWith("windows")) {
                 m_scriptExplicit = m_scriptExplicit.replace("file:", "file:/");
             }
+            super.setUp();
         }
 
         // additional tests to/from remote
@@ -76,7 +76,6 @@ public class LocalExecutionTestSuite extends JSAGATestSuite {
             super.runJobExplicit(getLocal("input"), getWorker("input"), getRemote("output"), getRemote("o_target"));
         }
     }
-    */
     
     // test cases
     public static class LocalJobRunOptionalTest extends JobRunOptionalTest {
@@ -97,11 +96,9 @@ public class LocalExecutionTestSuite extends JSAGATestSuite {
     }
     
     // test cases
-    /*
     public static class LocalJobRunInteractiveTest extends JobRunInteractiveTest {
         public LocalJobRunInteractiveTest() throws Exception {super("local");}
     }
-    */
     
     // test cases
     public static class LocalJobRunInfoTest extends JobRunInfoTest {
