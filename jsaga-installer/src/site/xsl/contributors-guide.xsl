@@ -273,6 +273,10 @@
                         optional interface.
                     </p><br/>
 
+                    <p>A job monitor adaptor <b>may</b> implement the <xsl:apply-templates select="jelclass[@type='ListableJobAdaptor']"/>
+                        interface in order to list user jobs known by the targeted scheduler service.
+                    </p><br/>
+
                     <i>Copy-paste required methods to your adaptor class, and implement them.</i>
                     <pre>
                         <xsl:for-each select="jelclass[@type='Adaptor' or @type='ClientAdaptor'
@@ -320,10 +324,6 @@
 
 
                     <h4>Job management</h4>
-
-                    <p>A job control adaptor <b>may</b> implement the <xsl:apply-templates select="jelclass[@type='ListableJobAdaptor']"/>
-                        interface in order to list user jobs known by the targeted scheduler service.
-                    </p><br/>
 
                     <p>A job control adaptor <b>may</b> implement the <xsl:apply-templates select="jelclass[@type='PurgeableJobAdaptor']"/>
                         interface in order to purge jobs that are in a final state.
