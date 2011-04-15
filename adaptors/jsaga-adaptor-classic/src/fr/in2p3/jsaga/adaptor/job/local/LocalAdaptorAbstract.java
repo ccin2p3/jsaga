@@ -10,6 +10,14 @@ import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,8 +33,10 @@ import java.util.Map;
 
 public abstract class LocalAdaptorAbstract implements ClientAdaptor {
 	
+	// TODO remove sessionMap
 	protected static Map sessionMap = new HashMap();
-
+	private static final String _rootDir = "/tmp/jsaga/adaptor/";
+	
     public Class[] getSupportedSecurityCredentialClasses() {
         return null;
     }
@@ -43,8 +53,74 @@ public abstract class LocalAdaptorAbstract implements ClientAdaptor {
     }
         
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+    	// create temp directory
+    	new File(_rootDir + getType()).mkdirs();
     }
 
     public void disconnect() throws NoSuccessException {
     }
+
+    public String getPidFile(String nativeJobId) {
+    	return getFile(nativeJobId, "pid");
+    }
+    
+    public String getStdinFile(String nativeJobId) {
+    	return getFile(nativeJobId, "in");
+    }
+    
+    public String getStdoutFile(String nativeJobId) {
+    	return getFile(nativeJobId, "out");
+    }
+    
+    public String getStderrFile(String nativeJobId) {
+    	return getFile(nativeJobId, "err");
+    }
+    
+    public String getEndcodeFile(String nativeJobId) {
+    	return getFile(nativeJobId, "endcode");
+    }
+    
+    public String getRootDir() {
+    	return _rootDir + getType();
+    }
+    public String getFile(String nativeJobId, String suffix) {
+    	return getRootDir() + "/" + nativeJobId + "." + suffix;
+    }
+    /*
+    public static void store(Process p, String nativeJobId) throws IOException {
+    	byte[] buf = serialize(p);
+    	FileOutputStream f = new FileOutputStream(new File("/tmp/" + nativeJobId + ".process"));
+    	f.write(buf);
+    	f.close();
+    }
+    
+    private static byte[] serialize(Object obj) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(buffer);
+        oos.writeObject(obj);
+        oos.close();
+        return buffer.toByteArray();
+    }
+
+    public static Process restore(String nativeJobId) throws IOException, ClassNotFoundException {
+    	File f = new File("/tmp/" + nativeJobId + ".process");
+    	FileInputStream fis = new FileInputStream(f);
+    	byte[] buf = new byte[(int)f.length()];
+    	int len = fis.read(buf);
+    	fis.close();
+    	return (Process)deserialize(buf);
+    }
+    
+    private static Object deserialize(byte[] bytes)
+            throws ClassNotFoundException {
+        try {
+            ByteArrayInputStream input = new ByteArrayInputStream(bytes);
+            ObjectInputStream ois = new ObjectInputStream(input);
+            return ois.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("error reading from byte-array!");
+        }
+    }
+    */
 }
