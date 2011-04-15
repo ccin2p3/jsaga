@@ -7,10 +7,9 @@ import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOGetterInteractive;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobInteractiveGet;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
-
 import org.apache.log4j.Logger;
 import org.ogf.saga.error.*;
 
@@ -20,7 +19,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
-import java.util.UUID;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -35,7 +33,7 @@ import java.util.UUID;
  * TODO : Support of pre-requisite
  */
 public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
-        JobControlAdaptor, CleanableJobAdaptor, StreamableJobInteractiveGet {
+        JobControlAdaptor, CleanableJobAdaptor, StreamableJobBatch {
 
 	private static Logger s_logger = Logger.getLogger(LocalJobControlAdaptor.class);
 	
@@ -66,20 +64,42 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
         return translator;
     }
 
-    private LocalJobProcess submit(String jobDesc, String uniqId/*, boolean isInteractive*/) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+    private LocalJobProcess submit(String jobDesc, String uniqId, InputStream stdin) throws PermissionDeniedException, TimeoutException, NoSuccessException {
     	LocalJobProcess ljp = new LocalJobProcess(uniqId);
 		try {
-			File input = new File(ljp.getInfile());
-	        OutputStream out;
+  s_logger.warn(jobDesc);
+
+            File input = new File(ljp.getInfile());
 			try {
-				new File(ljp.getInfile()).createNewFile();
+				if (stdin == null) {
+					input.createNewFile();
+				} else {
+			        OutputStream out = new FileOutputStream(input);
+					int n;
+					byte[] buffer = new byte[1024];
+					while ((n = stdin.read(buffer)) != -1) {
+						out.write(buffer, 0, n);
+					}
+			        out.close();
+				}
 			} catch (IOException e) {
 				throw new NoSuccessException("Standard input could not be written to local file: " + input);
 			}
+			/*try {
+				new File(ljp.getOutfile()).createNewFile();
+			} catch (IOException e) {
+				// ignore
+			}
+			try {
+				new File(ljp.getErrfile()).createNewFile();
+			} catch (IOException e) {
+				// ignore
+			}*/
 			Properties jobProps = new Properties();
 			jobProps.load(new ByteArrayInputStream(jobDesc.getBytes()));
 			File _workDir = null;
 			String cde = null;
+			String executable = null;
             Enumeration e = jobProps.propertyNames();
 			ArrayList _envParams = new ArrayList();
             while (e.hasMoreElements()){
@@ -87,30 +107,27 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
                    String val = (String)jobProps.getProperty(key);
                    if (key.equals("_WorkingDirectory")) { _workDir = new File(val);}
                    else if (key.equals("_Executable")) { 
-                	   //if (!isInteractive) {
-                		   cde = "eval '" + val + " < " + ljp.getInfile() +
-                			" > " + ljp.getOutfile() + 
-                			" 2> " + ljp.getErrfile() + "&' ; " +
-                			"MYPID=$! ; " +
-                			"echo $MYPID > " + ljp.getPidfile() + " ;" +
-                			"wait $MYPID;" +
-                			"ENDCODE=$?;" +
-                			"echo $ENDCODE > " + ljp.getEndcodefile() + " ;" +
-                			//"/bin/rm -f "+ ljp.getPidfile() + ";"  +
-                			"exit $ENDCODE;";
-                	   //} else {
-                		//   cde = val;
-                	   //}
+                	   executable = val;
                    } else {
                 	   _envParams.add(key + "=" + val);
-                	   // TODO: set stdout stderr to LocalJobprocess object
                    }
             }
+ 		   cde = "eval ' " + executable + " < " + ljp.getInfile() +
+			" > " + ljp.getOutfile() + 
+			" 2> " + ljp.getErrfile() + " &' ; " +
+			"MYPID=$! ; " +
+			"echo $MYPID > " + ljp.getPidfile() + " ;" +
+			"wait $MYPID;" +
+			"ENDCODE=$?;" +
+			"echo $ENDCODE > " + ljp.getEndcodefile() + " ;" +
+			//"/bin/rm -f "+ ljp.getPidfile() + ";"  +
+			"exit $ENDCODE;";
+s_logger.warn(cde);
             ljp.setCreated(new Date());
+			LocalAdaptorAbstract.store(ljp);
 			Process p = Runtime.getRuntime().exec(new String[]{m_shellPath, "-c", cde}, 
 													(String[])_envParams.toArray(new String[]{}), 
 													_workDir);
-			LocalAdaptorAbstract.store(ljp);
 			return ljp;
 		} catch (IOException ioe) {
 			ljp.setReturnCode(2);
@@ -139,16 +156,15 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 
     public String submit(String commandLine, boolean checkMatch, String uniqId)
 			throws PermissionDeniedException, TimeoutException, NoSuccessException {
-    	return this.submit(commandLine, uniqId).getJobId();
+    	return this.submit(commandLine, uniqId, null).getJobId();
     	
 	}
 
-	public JobIOGetterInteractive submitInteractive(String commandLine,
-			boolean checkMatch) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		
-		LocalJobProcess ljp = this.submit(commandLine, UUID.randomUUID().toString()/*, true*/);
+	public JobIOHandler submit(String jobDesc, boolean checkMatch,
+			String uniqId, InputStream stdin) throws PermissionDeniedException,
+			TimeoutException, NoSuccessException {
+		LocalJobProcess ljp = this.submit(jobDesc, uniqId, stdin);
 		return new LocalJobIOHandler(ljp);
-		
 	}
 
 	public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException,
