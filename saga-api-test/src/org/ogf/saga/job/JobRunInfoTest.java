@@ -63,7 +63,7 @@ public abstract class JobRunInfoTest extends AbstractJobTest {
      */
     public void test_created() throws Exception {
         
-    	Date now = new Date();
+    	Date now = new Date(new Date().getTime()/1000*1000); // ignore milliseconds as they are lost by getAttribute
     	
     	// prepare
     	JobDescription desc = createSimpleJob();
@@ -79,8 +79,7 @@ public abstract class JobRunInfoTest extends AbstractJobTest {
         // check creation date
 		try {
 	        Date creationTime = parse(job.getAttribute(Job.CREATED));
-	        // Compare to now
-	        assertTrue(creationTime.after(now));
+	        assertFalse(creationTime.before(now));
 		} catch (ParseException e) {
 			fail(e.getMessage());
 		}
@@ -92,7 +91,7 @@ public abstract class JobRunInfoTest extends AbstractJobTest {
      */
     public void test_dates() throws Exception {
         
-    	Date now = new Date();
+    	Date now = new Date(new Date().getTime()/1000*1000); // ignore milliseconds as they are lost by getAttribute
     	
     	// prepare
     	JobDescription desc = createSimpleJob();
@@ -110,7 +109,7 @@ public abstract class JobRunInfoTest extends AbstractJobTest {
 	        Date startTime = parse(job.getAttribute(Job.STARTED));
 	        Date endTime = parse(job.getAttribute(Job.FINISHED));
 	        // Compare to now
-	        assertTrue(startTime.after(now) && startTime.before(endTime));
+	        assertTrue(!startTime.before(now) && !startTime.after(endTime));
 		} catch (ParseException e) {
 			fail(e.getMessage());
 		}
@@ -122,8 +121,6 @@ public abstract class JobRunInfoTest extends AbstractJobTest {
      */
     public void test_execution_hosts() throws Exception {
         
-    	Date now = new Date();
-    	
     	// prepare
     	JobDescription desc = createSimpleJob();
     	
