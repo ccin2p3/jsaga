@@ -18,7 +18,7 @@ public class LocalJobStatus extends JobStatus {
     }
 
 	public String getModel() {
-        return "TODO";
+        return "local";
     }
 
     public SubState getSubState() {
