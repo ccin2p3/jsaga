@@ -7,14 +7,20 @@ import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOGetterInteractive;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobInteractiveGet;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
+
+import org.apache.log4j.Logger;
 import org.ogf.saga.error.*;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -29,8 +35,10 @@ import java.util.Properties;
  * TODO : Support of pre-requisite
  */
 public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
-        JobControlAdaptor, CleanableJobAdaptor {
+        JobControlAdaptor, CleanableJobAdaptor, StreamableJobInteractiveGet {
 
+	private static Logger s_logger = Logger.getLogger(LocalJobControlAdaptor.class);
+	
 	private static final String SHELLPATH = "ShellPath";
     private String m_shellPath;
 
@@ -58,10 +66,16 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
         return translator;
     }
 
-    private String submit(String jobDesc, String uniqId/*, boolean isInteractive*/) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-    	// TODO create object LocalJobProcess with uniqId
+    private LocalJobProcess submit(String jobDesc, String uniqId/*, boolean isInteractive*/) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+    	LocalJobProcess ljp = new LocalJobProcess(uniqId);
 		try {
-System.out.println(jobDesc);
+			File input = new File(ljp.getInfile());
+	        OutputStream out;
+			try {
+				new File(ljp.getInfile()).createNewFile();
+			} catch (IOException e) {
+				throw new NoSuccessException("Standard input could not be written to local file: " + input);
+			}
 			Properties jobProps = new Properties();
 			jobProps.load(new ByteArrayInputStream(jobDesc.getBytes()));
 			File _workDir = null;
@@ -74,7 +88,16 @@ System.out.println(jobDesc);
                    if (key.equals("_WorkingDirectory")) { _workDir = new File(val);}
                    else if (key.equals("_Executable")) { 
                 	   //if (!isInteractive) {
-                		   cde = prepareCde(val, uniqId);
+                		   cde = "eval '" + val + " < " + ljp.getInfile() +
+                			" > " + ljp.getOutfile() + 
+                			" 2> " + ljp.getErrfile() + "&' ; " +
+                			"MYPID=$! ; " +
+                			"echo $MYPID > " + ljp.getPidfile() + " ;" +
+                			"wait $MYPID;" +
+                			"ENDCODE=$?;" +
+                			"echo $ENDCODE > " + ljp.getEndcodefile() + " ;" +
+                			//"/bin/rm -f "+ ljp.getPidfile() + ";"  +
+                			"exit $ENDCODE;";
                 	   //} else {
                 		//   cde = val;
                 	   //}
@@ -83,50 +106,31 @@ System.out.println(jobDesc);
                 	   // TODO: set stdout stderr to LocalJobprocess object
                    }
             }
-			//System.out.println(m_shellPath);
-			//System.out.println("-c");
-			//System.out.println(cde);
-			//System.out.println(_envParams);
+            ljp.setCreated(new Date());
 			Process p = Runtime.getRuntime().exec(new String[]{m_shellPath, "-c", cde}, 
 													(String[])_envParams.toArray(new String[]{}), 
 													_workDir);
-			// TODO: store LocalJobProcess
-			return uniqId;
+			LocalAdaptorAbstract.store(ljp);
+			return ljp;
 		} catch (IOException ioe) {
-			//LocalAdaptorAbstract.sessionMap.put(jobId, new LocalJobProcess(ioe.getMessage()));
-			/*try {
-				LocalAdaptorAbstract.store(new LocalJobProcess(ioe.getMessage()), jobId);
-			} catch (IOException e1) {
-				throw new NoSuccessException(e1);
-			}*/
-			// 
-			FileOutputStream endcode;
-			try {
-				endcode = new FileOutputStream(new File(getEndcodeFile(uniqId)));
-				endcode.write('2');
-				endcode.write('\n');
-				endcode.close();
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			ljp.setReturnCode(2);
+			
 			FileOutputStream error;
 			try {
-				error = new FileOutputStream(new File(getStderrFile(uniqId)));
+				error = new FileOutputStream(new File(ljp.getErrfile()));
 				error.write(ioe.getMessage().getBytes());
 		        error.close();
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+                s_logger.warn("Could not write stderr: ", e);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+                s_logger.warn("Could not write stderr: ", e);
 			}
-			// TODO: set stdout and stderr to LocalJobprocess and store it
-			return uniqId;
+			try {
+				LocalAdaptorAbstract.store(ljp);
+			} catch (IOException e) {
+				throw new NoSuccessException(e);
+			}
+			return ljp;
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
@@ -135,118 +139,45 @@ System.out.println(jobDesc);
 
     public String submit(String commandLine, boolean checkMatch, String uniqId)
 			throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		File input = new File(getStdinFile(uniqId));
-        OutputStream out;
-		try {
-			new File(getStdinFile(uniqId)).createNewFile();
-			// TODO set stdin to LocalJobProcess ????
-		} catch (IOException e) {
-			throw new NoSuccessException("Standard input could not be written to local file: " + input);
-		}
-    	return this.submit(commandLine, uniqId/*, false*/);
+    	return this.submit(commandLine, uniqId).getJobId();
+    	
 	}
 
-    /*
-	public JobIOHandler submit(String commandLine, boolean checkMatch,
-			String uniqId, InputStream stdin) throws PermissionDeniedException,
-			TimeoutException, NoSuccessException {
-		String jobId = UUID.randomUUID().toString();
-		File input = new File(getStdinFile(uniqId));
-        OutputStream out;
-		try {
-			out = new FileOutputStream(input);
-			if (stdin != null) {
-				int n;
-				byte[] buffer = new byte[1024];
-				while ((n = stdin.read(buffer)) != -1) {
-					out.write(buffer, 0, n);
-				}
-			} else  {
-				// TODO check this
-				out.write(' ');
-			}
-	        out.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			throw new NoSuccessException("Standard input could not be written to local file: " + input);
-		}
-		// TODO create stdout and stderr
-		try {
-			new File(getStdoutFile(jobId)).createNewFile();
-			new File(getStderrFile(jobId)).createNewFile();
-		} catch (IOException e) {
-			throw new NoSuccessException(e);
-		}
-		jobId = this.submit(commandLine, jobId, true);
-		return new LocalJobIOHandler(jobId);
-	}
-	*/
-
-    /*
 	public JobIOGetterInteractive submitInteractive(String commandLine,
 			boolean checkMatch) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		
-		String jobId = this.submit(commandLine, UUID.randomUUID().toString(), true);
-		// TODO create stdout and stderr
-		try {
-			new File(getStdoutFile(jobId)).createNewFile();
-			new File(getStderrFile(jobId)).createNewFile();
-		} catch (IOException e) {
-			throw new NoSuccessException(e);
-		}
-		return new LocalJobIOHandler(jobId);
+		LocalJobProcess ljp = this.submit(commandLine, UUID.randomUUID().toString()/*, true*/);
+		return new LocalJobIOHandler(ljp);
 		
-	}
-	*/
-    
-	private String prepareCde(String commandLine, String jobId) {
-		// TODO xsl
-		return 	"eval '" + commandLine + " < " + getStdinFile(jobId) +
-			" > " + getStdoutFile(jobId) + 
-			" 2> " + getStderrFile(jobId) + "&' ; " +
-			"MYPID=$! ; " +
-			"echo $MYPID > " + getPidFile(jobId) + " ;" +
-			"wait $MYPID;" +
-			"ENDCODE=$?;" +
-			"echo $ENDCODE > " + getEndcodeFile(jobId) + " ;" +
-			"/bin/rm -f "+ getPidFile(jobId) + ";"  +
-			"exit $ENDCODE;";
 	}
 
 	public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException,
             NoSuccessException {
 		try {			
-			String cde = m_shellPath+" -c 'echo \"MYPID=`cat " + getPidFile(nativeJobId) + "`; kill $MYPID ;'";
-			Process p = Runtime.getRuntime().exec(cde);
+			LocalJobProcess ljp = LocalAdaptorAbstract.restore(nativeJobId);
+			String cde = "kill " + ljp.getPid();
+			Process p = Runtime.getRuntime().exec(new String[]{m_shellPath, "-c", cde});
 			p.waitFor();
 		} catch (IOException e) {
 			throw new NoSuccessException(e);
 		} catch (InterruptedException e) {
+			throw new NoSuccessException(e);
+		} catch (ClassNotFoundException e) {
 			throw new NoSuccessException(e);
 		}
 	}
 
 	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException,
             NoSuccessException {
-		//Process p = (Process) LocalAdaptorAbstract.sessionMap.get(nativeJobId);
-		/*Process p;
+		LocalJobProcess ljp;
 		try {
-			p = LocalAdaptorAbstract.restore(nativeJobId);
+			ljp = LocalAdaptorAbstract.restore(nativeJobId);
+			ljp.clean();
 		} catch (IOException e) {
 			throw new NoSuccessException(e);
 		} catch (ClassNotFoundException e) {
 			throw new NoSuccessException(e);
 		}
-		*/
-		//p.destroy();
-		//LocalAdaptorAbstract.sessionMap.remove(p);
-		// TODO get files from LocalJobprocess
-		new File(getPidFile(nativeJobId)).delete();
-		new File(getStdinFile(nativeJobId)).delete();
-		new File(getStdoutFile(nativeJobId)).delete();
-		new File(getStderrFile(nativeJobId)).delete();
-		new File(getEndcodeFile(nativeJobId)).delete();
 	}
 
 }
