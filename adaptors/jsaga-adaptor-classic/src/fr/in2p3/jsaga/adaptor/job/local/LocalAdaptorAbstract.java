@@ -33,10 +33,6 @@ import java.util.Map;
 
 public abstract class LocalAdaptorAbstract implements ClientAdaptor {
 	
-	// TODO remove sessionMap
-	protected static Map sessionMap = new HashMap();
-	private static final String _rootDir = "/tmp/jsaga/adaptor/";
-	
     public Class[] getSupportedSecurityCredentialClasses() {
         return null;
     }
@@ -54,42 +50,18 @@ public abstract class LocalAdaptorAbstract implements ClientAdaptor {
         
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     	// create temp directory
-    	new File(_rootDir + getType()).mkdirs();
+    	new File(LocalJobProcess.getRootDir()).mkdirs();
     }
 
     public void disconnect() throws NoSuccessException {
     }
 
-    public String getPidFile(String nativeJobId) {
-    	return getFile(nativeJobId, "pid");
+    public static void store(LocalJobProcess p) throws IOException {
+    	store(p, p.getJobId());
     }
-    
-    public String getStdinFile(String nativeJobId) {
-    	return getFile(nativeJobId, "in");
-    }
-    
-    public String getStdoutFile(String nativeJobId) {
-    	return getFile(nativeJobId, "out");
-    }
-    
-    public String getStderrFile(String nativeJobId) {
-    	return getFile(nativeJobId, "err");
-    }
-    
-    public String getEndcodeFile(String nativeJobId) {
-    	return getFile(nativeJobId, "endcode");
-    }
-    
-    public String getRootDir() {
-    	return _rootDir + getType();
-    }
-    public String getFile(String nativeJobId, String suffix) {
-    	return getRootDir() + "/" + nativeJobId + "." + suffix;
-    }
-    /*
-    public static void store(Process p, String nativeJobId) throws IOException {
+    public static void store(LocalJobProcess p, String nativeJobId) throws IOException {
     	byte[] buf = serialize(p);
-    	FileOutputStream f = new FileOutputStream(new File("/tmp/" + nativeJobId + ".process"));
+    	FileOutputStream f = new FileOutputStream(new File(LocalJobProcess.getRootDir() + "/" + nativeJobId + ".process"));
     	f.write(buf);
     	f.close();
     }
@@ -102,13 +74,13 @@ public abstract class LocalAdaptorAbstract implements ClientAdaptor {
         return buffer.toByteArray();
     }
 
-    public static Process restore(String nativeJobId) throws IOException, ClassNotFoundException {
-    	File f = new File("/tmp/" + nativeJobId + ".process");
+    public static LocalJobProcess restore(String nativeJobId) throws IOException, ClassNotFoundException {
+    	File f = new File(LocalJobProcess.getRootDir() + "/" + nativeJobId + ".process");
     	FileInputStream fis = new FileInputStream(f);
     	byte[] buf = new byte[(int)f.length()];
     	int len = fis.read(buf);
     	fis.close();
-    	return (Process)deserialize(buf);
+    	return (LocalJobProcess)deserialize(buf);
     }
     
     private static Object deserialize(byte[] bytes)
@@ -122,5 +94,5 @@ public abstract class LocalAdaptorAbstract implements ClientAdaptor {
             throw new RuntimeException("error reading from byte-array!");
         }
     }
-    */
+    
 }
