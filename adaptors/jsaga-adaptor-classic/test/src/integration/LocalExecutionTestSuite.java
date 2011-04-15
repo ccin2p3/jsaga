@@ -51,6 +51,7 @@ public class LocalExecutionTestSuite extends JSAGATestSuite {
     }
 
     // test cases
+    /*
     public static class LocalJobRunSandboxTest extends JobRunSandboxTest {
         public LocalJobRunSandboxTest() throws Exception {super("local");}
 
@@ -75,6 +76,7 @@ public class LocalExecutionTestSuite extends JSAGATestSuite {
             super.runJobExplicit(getLocal("input"), getWorker("input"), getRemote("output"), getRemote("o_target"));
         }
     }
+    */
     
     // test cases
     public static class LocalJobRunOptionalTest extends JobRunOptionalTest {
@@ -83,7 +85,6 @@ public class LocalExecutionTestSuite extends JSAGATestSuite {
         public void test_resume_running() { super.ignore("not supported"); }
         public void test_suspend_done() { super.ignore("not supported"); }
         public void test_suspend_running() { super.ignore("not supported"); }
-        public void test_listJob() { super.ignore("not supported but MUST BE REACTIVATED when the jsaga-engine will support this"); }
         public void test_simultaneousLongJob() throws Exception {super.ignore("test working but too long");}        
     }
     
@@ -96,7 +97,14 @@ public class LocalExecutionTestSuite extends JSAGATestSuite {
     }
     
     // test cases
+    /*
     public static class LocalJobRunInteractiveTest extends JobRunInteractiveTest {
         public LocalJobRunInteractiveTest() throws Exception {super("local");}
+    }
+    */
+    
+    // test cases
+    public static class LocalJobRunInfoTest extends JobRunInfoTest {
+		public LocalJobRunInfoTest() throws Exception {super("local");}
     }
 }
