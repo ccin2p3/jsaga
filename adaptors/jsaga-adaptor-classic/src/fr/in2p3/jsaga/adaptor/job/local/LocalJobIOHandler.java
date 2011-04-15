@@ -24,40 +24,35 @@ import java.io.OutputStream;
 * ***************************************************/
 public class LocalJobIOHandler implements JobIOGetterInteractive {
 
-	//private Process p;
-	private String jobId;
+	private LocalJobProcess m_ljp;
 
-	public LocalJobIOHandler(String jobId) {
-		//this.p = p;
-		this.jobId = jobId;
+	public LocalJobIOHandler(LocalJobProcess p) {
+		this.m_ljp = p;
 	}
 
 	public String getJobId() {
-		return jobId;
+		return m_ljp.getJobId();
 	}
 
 	public InputStream getStderr() throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		//return p.getErrorStream();
 		try {
-			return new FileInputStream(new File(/*LocalAdaptorAbstract.getStderrFile(jobId)*/""));
+			return new FileInputStream(new File(m_ljp.getErrfile()));
 		} catch (FileNotFoundException e) {
 			throw new NoSuccessException(e);
 		}
 	}
 
 	public OutputStream getStdin() throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		//return p.getOutputStream();
 		try {
-			return new FileOutputStream(new File(/*LocalAdaptorAbstract.getStdinFile(jobId)*/""));
+			return new FileOutputStream(new File(m_ljp.getInfile()));
 		} catch (FileNotFoundException e) {
 			throw new NoSuccessException(e);
 		}
 	}
 
 	public InputStream getStdout() throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		//return p.getInputStream();
 		try {
-			return new FileInputStream(new File(/*LocalAdaptorAbstract.getStdoutFile(jobId)*/""));
+			return new FileInputStream(new File(m_ljp.getOutfile()));
 		} catch (FileNotFoundException e) {
 			throw new NoSuccessException(e);
 		}
