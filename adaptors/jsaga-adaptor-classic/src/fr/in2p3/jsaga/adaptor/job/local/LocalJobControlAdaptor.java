@@ -41,6 +41,8 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 	
 	private static final String SHELLPATH = "ShellPath";
     private String m_shellPath;
+    
+    private static final String ROOTDIR = "RootDir";
 
     private static final int SIGNAL_TERM = 15;
     private static final int SIGNAL_STOP = 19;
@@ -67,6 +69,7 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
     public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
         JobDescriptionTranslator translator = new JobDescriptionTranslatorXSLT("xsl/job/sh.xsl");
         translator.setAttribute(SHELLPATH, m_shellPath);
+        translator.setAttribute(ROOTDIR, LocalJobProcess.getRootDir());
         return translator;
     }
 
@@ -102,21 +105,11 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
                    String val = (String)jobProps.getProperty(key);
                    if (key.equals("_WorkingDirectory")) { _workDir = new File(val);}
                    else if (key.equals("_Executable")) { 
-                	   executable = val;
+                	   cde = val;
                    } else {
                 	   _envParams.add(key + "=" + val);
                    }
             }
- 		   cde = "eval ' " + executable + " < " + ljp.getInfile() +
-			" > " + ljp.getOutfile() + 
-			" 2> " + ljp.getErrfile() + " &' ; " +
-			"MYPID=$! ; " +
-			"echo $MYPID > " + ljp.getPidfile() + " ;" +
-			"wait $MYPID;" +
-			"ENDCODE=$?;" +
-			"echo $ENDCODE > " + ljp.getEndcodefile() + " ;" +
-			//"/bin/rm -f "+ ljp.getPidfile() + ";"  +
-			"exit $ENDCODE;";
             ljp.setCreated(new Date());
 			LocalAdaptorAbstract.store(ljp);
 			Process p = Runtime.getRuntime().exec(new String[]{m_shellPath, "-c", cde}, 
