@@ -36,7 +36,7 @@ public class LocalJobProcess implements Serializable {
 	public LocalJobProcess(String jobId) {
 		m_jobId = jobId;
 		m_outfile = getFile("out");
-		setInfile(getFile("in"));
+		m_infile = getFile("in");
 		m_errfile = getFile("err");
 		m_returnCode = -1;
 		m_pid = null;
@@ -73,24 +73,14 @@ public class LocalJobProcess implements Serializable {
 		return m_pid;
 	}
 
-	public void setInfile(String infile) {
-		this.m_infile = infile;
-	}
-
 	public String getInfile() {
 		return m_infile;
 	}
 
-	public void setOutfile(String outfile) {
-		this.m_outfile = outfile;
-	}
 	public String getOutfile() {
 		return m_outfile;
 	}
 
-	public void setErrfile(String errfile) {
-		this.m_errfile = errfile;
-	}
 	public String getErrfile() {
 		return m_errfile;
 	}
