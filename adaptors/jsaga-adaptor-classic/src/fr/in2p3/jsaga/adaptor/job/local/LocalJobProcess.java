@@ -28,6 +28,10 @@ public class LocalJobProcess implements Serializable {
 	private Date m_created;
 	
 	private static final String _rootDir = "/tmp/jsaga/adaptor/local";
+	
+	public static final int PROCESS_DONE_OK = 0;
+	public static final int PROCESS_RUNNING = -1;
+	public static final int PROCESS_SUSPENDED = -2;
 
 	public LocalJobProcess(String jobId) {
 		m_jobId = jobId;
@@ -95,7 +99,7 @@ public class LocalJobProcess implements Serializable {
 	}
 
 	public int getReturnCode() throws NoSuccessException {
-		if (m_returnCode != -1) return m_returnCode;
+		if (m_returnCode >= 0) return m_returnCode; // final state
     	File f = new File(getEndcodefile());
     	FileInputStream fis;
 		try {
@@ -117,7 +121,11 @@ public class LocalJobProcess implements Serializable {
 	}
 	
 	public JobStatus getJobStatus() throws NoSuccessException {
-		return new LocalJobStatus(m_jobId, getReturnCode());						
+		int status = getReturnCode();
+		if (status <0) { // either running or suspended
+			status = getProcessStatus();
+		}
+		return new LocalJobStatus(m_jobId, status);						
 	}
 	
 	
@@ -165,5 +173,21 @@ public class LocalJobProcess implements Serializable {
 		//new File(getEndcodefile()).delete();
 		//new File(getSerializefile()).delete();
     }
+
+	public int getProcessStatus() throws NoSuccessException {
+		BufferedReader br;
+		try {
+			br = new BufferedReader(new InputStreamReader(new FileInputStream(new File("/proc/"+getPid()+"/stat"))));
+			String status = br.readLine().split(" ")[2];
+			if (status.startsWith("S")) { return PROCESS_RUNNING;}
+			if (status.startsWith("T")) { return PROCESS_SUSPENDED;}
+			throw new NoSuccessException("Unknown status: "+status);
+		} catch (FileNotFoundException e) {
+			throw new NoSuccessException(e);
+		} catch (IOException e) {
+			throw new NoSuccessException(e);
+		}
+	}
+	
 
 }

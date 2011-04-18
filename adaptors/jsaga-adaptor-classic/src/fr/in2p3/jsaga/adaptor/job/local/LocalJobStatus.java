@@ -13,8 +13,8 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 * ***************************************************/
 
 public class LocalJobStatus extends JobStatus {
-    public LocalJobStatus(String jobId, int returnCode) {
-        super(jobId, Integer.valueOf(returnCode), "unknown", returnCode);
+    public LocalJobStatus(String jobId, int processStatus) {
+        super(jobId, Integer.valueOf(processStatus), "unknown", processStatus);
     }
 
 	public String getModel() {
@@ -24,10 +24,12 @@ public class LocalJobStatus extends JobStatus {
     public SubState getSubState() {
     	// select status with exitCode
         switch(((Integer)m_nativeStateCode).intValue()) {
-            case 0:
+            case LocalJobProcess.PROCESS_DONE_OK:
                 return SubState.DONE;
-            case -1:
+            case LocalJobProcess.PROCESS_RUNNING:
                 return SubState.RUNNING_ACTIVE;
+            case LocalJobProcess.PROCESS_SUSPENDED:
+            	return SubState.SUSPENDED_ACTIVE;
             default:
                 return SubState.FAILED_ERROR;
         }
