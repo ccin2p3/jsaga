@@ -81,9 +81,7 @@ public class LocalExecutionTestSuite extends JSAGATestSuite {
     public static class LocalJobRunOptionalTest extends JobRunOptionalTest {
         public LocalJobRunOptionalTest() throws Exception {super("local");}
         public void test_resume_done() { super.ignore("not supported"); }
-        public void test_resume_running() { super.ignore("not supported"); }
         public void test_suspend_done() { super.ignore("not supported"); }
-        public void test_suspend_running() { super.ignore("not supported"); }
         public void test_simultaneousLongJob() throws Exception {super.ignore("test working but too long");}        
     }
     

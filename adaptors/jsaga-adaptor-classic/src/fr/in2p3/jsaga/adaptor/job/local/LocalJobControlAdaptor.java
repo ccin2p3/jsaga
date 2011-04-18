@@ -5,6 +5,8 @@ import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.SignalableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.SuspendableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
@@ -33,13 +35,17 @@ import java.util.Properties;
  * TODO : Support of pre-requisite
  */
 public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
-        JobControlAdaptor, CleanableJobAdaptor, StreamableJobBatch {
+        JobControlAdaptor, CleanableJobAdaptor, StreamableJobBatch, SignalableJobAdaptor, SuspendableJobAdaptor  {
 
 	private static Logger s_logger = Logger.getLogger(LocalJobControlAdaptor.class);
 	
 	private static final String SHELLPATH = "ShellPath";
     private String m_shellPath;
 
+    private static final int SIGNAL_TERM = 15;
+    private static final int SIGNAL_STOP = 19;
+    private static final int SIGNAL_CONT = 18;
+    
 	public Usage getUsage() {
         return new UOptional(SHELLPATH);
     }
@@ -67,8 +73,6 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
     private LocalJobProcess submit(String jobDesc, String uniqId, InputStream stdin) throws PermissionDeniedException, TimeoutException, NoSuccessException {
     	LocalJobProcess ljp = new LocalJobProcess(uniqId);
 		try {
-  s_logger.warn(jobDesc);
-
             File input = new File(ljp.getInfile());
 			try {
 				if (stdin == null) {
@@ -85,16 +89,7 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 			} catch (IOException e) {
 				throw new NoSuccessException("Standard input could not be written to local file: " + input);
 			}
-			/*try {
-				new File(ljp.getOutfile()).createNewFile();
-			} catch (IOException e) {
-				// ignore
-			}
-			try {
-				new File(ljp.getErrfile()).createNewFile();
-			} catch (IOException e) {
-				// ignore
-			}*/
+
 			Properties jobProps = new Properties();
 			jobProps.load(new ByteArrayInputStream(jobDesc.getBytes()));
 			File _workDir = null;
@@ -122,7 +117,6 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 			"echo $ENDCODE > " + ljp.getEndcodefile() + " ;" +
 			//"/bin/rm -f "+ ljp.getPidfile() + ";"  +
 			"exit $ENDCODE;";
-s_logger.warn(cde);
             ljp.setCreated(new Date());
 			LocalAdaptorAbstract.store(ljp);
 			Process p = Runtime.getRuntime().exec(new String[]{m_shellPath, "-c", cde}, 
@@ -169,6 +163,7 @@ s_logger.warn(cde);
 
 	public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException,
             NoSuccessException {
+		/*
 		try {			
 			LocalJobProcess ljp = LocalAdaptorAbstract.restore(nativeJobId);
 			String cde = "kill " + ljp.getPid();
@@ -180,7 +175,8 @@ s_logger.warn(cde);
 			throw new NoSuccessException(e);
 		} catch (ClassNotFoundException e) {
 			throw new NoSuccessException(e);
-		}
+		}*/
+		this.signal(nativeJobId, this.SIGNAL_TERM);
 	}
 
 	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException,
@@ -196,4 +192,70 @@ s_logger.warn(cde);
 		}
 	}
 
+	public boolean signal(String nativeJobId, int signum)
+			throws PermissionDeniedException, TimeoutException,
+			NoSuccessException {
+		try {			
+			LocalJobProcess ljp = LocalAdaptorAbstract.restore(nativeJobId);
+			int ret = this.killProcess(Integer.parseInt(ljp.getPid()), signum);
+			// could not run kill
+			if (ret != 0) { return false;}
+			// check if STOP or CONT worked
+			if (signum == this.SIGNAL_CONT || signum == this.SIGNAL_STOP) {
+				int processStatus = ljp.getProcessStatus();
+				if (signum == this.SIGNAL_STOP && processStatus == LocalJobProcess.PROCESS_SUSPENDED) { return true;}
+				if (signum == this.SIGNAL_CONT && processStatus == LocalJobProcess.PROCESS_RUNNING) { return true;}
+				return false;
+			}
+			// OK
+			return true;
+		} catch (IOException e) {
+			throw new NoSuccessException(e);
+		} catch (InterruptedException e) {
+			throw new NoSuccessException(e);
+		} catch (ClassNotFoundException e) {
+			throw new NoSuccessException(e);
+		}
+	}
+
+	public boolean suspend(String nativeJobId)
+			throws PermissionDeniedException, TimeoutException,
+			NoSuccessException {
+		return this.signal(nativeJobId, this.SIGNAL_STOP);
+	}
+
+	public boolean resume(String nativeJobId) throws PermissionDeniedException,
+			TimeoutException, NoSuccessException {
+		return this.signal(nativeJobId, this.SIGNAL_CONT);
+	}
+
+	private int killProcess(int pid, int signum) throws IOException, InterruptedException {
+		String cde = "kill -" + String.valueOf(signum) + " " + String.valueOf(pid);
+		Process p = Runtime.getRuntime().exec(new String[]{m_shellPath, "-c", cde});
+		p.waitFor();
+		int ret = p.exitValue();
+		if (ret != 0) {
+			BufferedReader br = new BufferedReader(new InputStreamReader(p.getErrorStream()));  
+            s_logger.warn("Could not kill process: " +br.readLine());
+		}
+		return ret;
+	}
+	
+	private boolean checkProcessStatus(int pid, int signum) throws IOException, InterruptedException {
+/*		String cde = "ps h -o stat -p " + String.valueOf(pid);
+		Process p = Runtime.getRuntime().exec(new String[]{m_shellPath, "-c", cde});
+		p.waitFor();
+System.out.println("exitCode="+p.exitValue()+"**");
+		if (p.exitValue() != 0) { return false;}
+		BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));  
+		//StringBuffer sb = new StringBuffer();  
+		String status = br.readLine();
+System.out.println("status="+status+"**");
+		//String status = sb.toString();
+		*/
+		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File("/proc/"+String.valueOf(pid)+"/stat"))));
+		String status = br.readLine().split(" ")[2];
+
+		return false;
+	}
 }
