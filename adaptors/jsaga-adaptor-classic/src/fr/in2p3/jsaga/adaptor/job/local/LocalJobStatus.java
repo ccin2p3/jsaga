@@ -28,7 +28,7 @@ public class LocalJobStatus extends JobStatus {
                 return SubState.DONE;
             case LocalJobProcess.PROCESS_RUNNING:
                 return SubState.RUNNING_ACTIVE;
-            case LocalJobProcess.PROCESS_SUSPENDED:
+            case LocalJobProcess.PROCESS_STOPPED:
             	return SubState.SUSPENDED_ACTIVE;
             default:
                 return SubState.FAILED_ERROR;

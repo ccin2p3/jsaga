@@ -31,7 +31,7 @@ public class LocalJobProcess implements Serializable {
 	
 	public static final int PROCESS_DONE_OK = 0;
 	public static final int PROCESS_RUNNING = -1;
-	public static final int PROCESS_SUSPENDED = -2;
+	public static final int PROCESS_STOPPED = -2;
 
 	public LocalJobProcess(String jobId) {
 		m_jobId = jobId;
@@ -179,8 +179,8 @@ public class LocalJobProcess implements Serializable {
 		try {
 			br = new BufferedReader(new InputStreamReader(new FileInputStream(new File("/proc/"+getPid()+"/stat"))));
 			String status = br.readLine().split(" ")[2];
-			if (status.startsWith("S")) { return PROCESS_RUNNING;}
-			if (status.startsWith("T")) { return PROCESS_SUSPENDED;}
+			if (status.startsWith("S") || status.startsWith("R")) { return PROCESS_RUNNING;}
+			if (status.startsWith("T")) { return PROCESS_STOPPED;}
 			throw new NoSuccessException("Unknown status: "+status);
 		} catch (FileNotFoundException e) {
 			throw new NoSuccessException(e);
