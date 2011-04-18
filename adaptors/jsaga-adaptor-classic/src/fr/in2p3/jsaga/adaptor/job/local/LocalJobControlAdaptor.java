@@ -163,20 +163,7 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 
 	public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException,
             NoSuccessException {
-		/*
-		try {			
-			LocalJobProcess ljp = LocalAdaptorAbstract.restore(nativeJobId);
-			String cde = "kill " + ljp.getPid();
-			Process p = Runtime.getRuntime().exec(new String[]{m_shellPath, "-c", cde});
-			p.waitFor();
-		} catch (IOException e) {
-			throw new NoSuccessException(e);
-		} catch (InterruptedException e) {
-			throw new NoSuccessException(e);
-		} catch (ClassNotFoundException e) {
-			throw new NoSuccessException(e);
-		}*/
-		this.signal(nativeJobId, this.SIGNAL_TERM);
+		this.signal(nativeJobId, LocalJobControlAdaptor.SIGNAL_TERM);
 	}
 
 	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException,
@@ -201,10 +188,10 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 			// could not run kill
 			if (ret != 0) { return false;}
 			// check if STOP or CONT worked
-			if (signum == this.SIGNAL_CONT || signum == this.SIGNAL_STOP) {
+			if (signum == LocalJobControlAdaptor.SIGNAL_CONT || signum == LocalJobControlAdaptor.SIGNAL_STOP) {
 				int processStatus = ljp.getProcessStatus();
-				if (signum == this.SIGNAL_STOP && processStatus == LocalJobProcess.PROCESS_SUSPENDED) { return true;}
-				if (signum == this.SIGNAL_CONT && processStatus == LocalJobProcess.PROCESS_RUNNING) { return true;}
+				if (signum == LocalJobControlAdaptor.SIGNAL_STOP && processStatus == LocalJobProcess.PROCESS_STOPPED) { return true;}
+				if (signum == LocalJobControlAdaptor.SIGNAL_CONT && processStatus == LocalJobProcess.PROCESS_RUNNING) { return true;}
 				return false;
 			}
 			// OK
@@ -221,12 +208,12 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 	public boolean suspend(String nativeJobId)
 			throws PermissionDeniedException, TimeoutException,
 			NoSuccessException {
-		return this.signal(nativeJobId, this.SIGNAL_STOP);
+		return this.signal(nativeJobId, LocalJobControlAdaptor.SIGNAL_STOP);
 	}
 
 	public boolean resume(String nativeJobId) throws PermissionDeniedException,
 			TimeoutException, NoSuccessException {
-		return this.signal(nativeJobId, this.SIGNAL_CONT);
+		return this.signal(nativeJobId, LocalJobControlAdaptor.SIGNAL_CONT);
 	}
 
 	private int killProcess(int pid, int signum) throws IOException, InterruptedException {
@@ -239,23 +226,5 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
             s_logger.warn("Could not kill process: " +br.readLine());
 		}
 		return ret;
-	}
-	
-	private boolean checkProcessStatus(int pid, int signum) throws IOException, InterruptedException {
-/*		String cde = "ps h -o stat -p " + String.valueOf(pid);
-		Process p = Runtime.getRuntime().exec(new String[]{m_shellPath, "-c", cde});
-		p.waitFor();
-System.out.println("exitCode="+p.exitValue()+"**");
-		if (p.exitValue() != 0) { return false;}
-		BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));  
-		//StringBuffer sb = new StringBuffer();  
-		String status = br.readLine();
-System.out.println("status="+status+"**");
-		//String status = sb.toString();
-		*/
-		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File("/proc/"+String.valueOf(pid)+"/stat"))));
-		String status = br.readLine().split(" ")[2];
-
-		return false;
 	}
 }
