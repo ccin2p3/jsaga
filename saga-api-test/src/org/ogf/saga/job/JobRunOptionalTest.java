@@ -52,6 +52,17 @@ public abstract class JobRunOptionalTest extends AbstractJobTest {
 	        assertEquals(
 	                State.SUSPENDED,
 	                job.getState());
+
+	        // resume job
+	        job.resume();
+	        
+	        // wait for 1 second
+	        job.waitFor(1);
+	        
+	        // check job status
+	        assertEquals(
+	                State.RUNNING,
+	                job.getState());
         }
         finally {
         	job.waitFor(Float.valueOf(FINALY_TIMEOUT));
@@ -91,7 +102,8 @@ public abstract class JobRunOptionalTest extends AbstractJobTest {
      * Runs a long job, waits for running state, suspends it and resume it.
      */
     public void test_resume_running() throws Exception {
-        
+        super.ignore("This test is done in test_suspend_running");
+        /*
     	// prepare
     	JobDescription desc = createLongJob();
     	
@@ -135,7 +147,7 @@ public abstract class JobRunOptionalTest extends AbstractJobTest {
         }
         finally {
         	job.waitFor(Float.valueOf(FINALY_TIMEOUT));
-        }
+        }*/
     }
     
     /**
