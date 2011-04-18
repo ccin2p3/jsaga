@@ -41,7 +41,6 @@ public class LocalJobMonitorAdaptor extends LocalAdaptorAbstract implements Quer
     }
 
     public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
-    	// TODO: use LocalJobProcess.getStatus()
     	try {
 			LocalJobProcess ljp = LocalAdaptorAbstract.restore(nativeJobId);
 			return ljp.getJobStatus();
@@ -50,31 +49,9 @@ public class LocalJobMonitorAdaptor extends LocalAdaptorAbstract implements Quer
 		} catch (ClassNotFoundException e) {
 			throw new NoSuccessException(e);
 		}
-    	/*
-    	File f = new File(getEndcodeFile(nativeJobId));
-    	FileInputStream fis;
-		try {
-			fis = new FileInputStream(f);
-		} catch (FileNotFoundException e) {
-			// PROCESS Is not finished
-			return new LocalJobStatus(nativeJobId, -1);
-		}
-    	byte[] buf = new byte[(int)f.length()];
-    	try {
-			int len = fis.read(buf);
-        	fis.close();
-		} catch (IOException e) {
-			throw new NoSuccessException(e);
-		}
-		// Get return code reading xxx.endcode file minus last character (carriage return)
-		return new LocalJobStatus(nativeJobId, Integer.valueOf(new String(buf).substring(0, buf.length-1)));	
-		*/					
     }
 
 	public String[] list() throws PermissionDeniedException, TimeoutException,	NoSuccessException {
-		// Find all local files named *.pid: running jobs
-		// Find all local files named *.endcode: finished jobs
-		// TODO: search Process Files *.process
 		String filter = "(\\w*).process";
 		Pattern p = Pattern.compile(filter);
 		String[] files = new File(LocalJobProcess.getRootDir()).list();
@@ -83,11 +60,9 @@ public class LocalJobMonitorAdaptor extends LocalAdaptorAbstract implements Quer
 			Matcher m = p.matcher(files[i]);
 			if ( m.matches()) {
 				listeFichiers.add(files[i].substring(0, files[i].lastIndexOf('.')));
-				//files[i] = files[i].substring(0, files[i].lastIndexOf('.'));
 			}
 		}
 		return (String[]) listeFichiers.toArray(new String[]{});
-		//return files;
 	}
 
 	public Integer getExitCode(String nativeJobId)
