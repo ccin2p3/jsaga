@@ -35,7 +35,7 @@ public abstract class JobRunOptionalTest extends AbstractJobTest {
         Job job = runJob(desc);
         
         // wait for RUNNING state (deviation from SAGA specification)
-        if (! super.waitForSubState(job, "RUNNING_ACTIVE")) {
+        if (! super.waitForSubState(job, MODEL+":RUNNING_ACTIVE")) {
         	job.waitFor(Float.valueOf(FINALY_TIMEOUT));
             fail("Job did not enter RUNNING_ACTIVE state within "+MAX_QUEUING_TIME+" seconds");
         }
@@ -99,7 +99,7 @@ public abstract class JobRunOptionalTest extends AbstractJobTest {
         Job job = runJob(desc);
         
        // wait for RUNNING state (deviation from SAGA specification)
-        if (! super.waitForSubState(job, "RUNNING_ACTIVE")) {
+        if (! super.waitForSubState(job, MODEL+":RUNNING_ACTIVE")) {
         	job.waitFor(Float.valueOf(FINALY_TIMEOUT));
             fail("Job did not enter RUNNING_ACTIVE state within "+MAX_QUEUING_TIME+" seconds");
         }
@@ -114,7 +114,7 @@ public abstract class JobRunOptionalTest extends AbstractJobTest {
         }
         
         // wait for SUSPENDED state
-        if (! super.waitForSubState(job, "SUSPENDED")) {
+        if (! super.waitForSubState(job, MODEL+":SUSPENDED_ACTIVE")) {
         	job.waitFor(Float.valueOf(FINALY_TIMEOUT));
             fail("Job did not enter SUSPENDED state within "+MAX_QUEUING_TIME+" seconds");
         }
