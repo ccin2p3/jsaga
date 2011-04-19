@@ -2,7 +2,7 @@
 <jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
     <contexts>
         <context type="SSH">
-            <attribute name="UserID" value="sreynaud"/><!-- optional -->
+            <!-- <attribute name="UserID" value="sreynaud"/>--><!-- optional -->
             <attribute name="UserKey" value="${user.home}/.jsaga/contexts/ssh/id_rsa"/>
             <data type="sftp"/>
             <job type="ssh"/>
