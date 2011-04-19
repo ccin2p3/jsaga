@@ -27,11 +27,12 @@ public class LocalJobProcess implements Serializable {
 	private int m_returnCode;
 	private Date m_created;
 	
-	private static final String _rootDir = "/tmp/jsaga/adaptor/local";
+	private static final String _rootDir = System.getProperty("java.io.tmpdir") + "/jsaga/adaptor/local";
 	
 	public static final int PROCESS_DONE_OK = 0;
 	public static final int PROCESS_RUNNING = -1;
 	public static final int PROCESS_STOPPED = -2;
+	public static final int PROCESS_UNKNOWNSTATE = -99;
 
 	public LocalJobProcess(String jobId) {
 		m_jobId = jobId;
@@ -113,7 +114,11 @@ public class LocalJobProcess implements Serializable {
 	public JobStatus getJobStatus() throws NoSuccessException {
 		int status = getReturnCode();
 		if (status <0) { // either running or suspended
-			status = getProcessStatus();
+			try {
+				status = getProcessStatus();
+			} catch (Exception e) {
+				return new LocalJobStatus(m_jobId, LocalJobProcess.PROCESS_UNKNOWNSTATE);						
+			}
 		}
 		return new LocalJobStatus(m_jobId, status);						
 	}
