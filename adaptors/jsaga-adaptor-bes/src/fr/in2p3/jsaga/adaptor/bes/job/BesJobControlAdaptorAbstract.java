@@ -58,7 +58,7 @@ import java.util.Map;
 /**
  * This class is the abstract class for the JobControl specific to a BES implementation
  */
-public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract implements JobControlAdaptor, CleanableJobAdaptor {
+public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract implements JobControlAdaptor {
 
     protected static final String STAGING_DIRECTORY_TAGNAME = "StagingDirectory";
     protected static final String DATA_STAGING_TAGNAME = "DataStaging";
@@ -141,17 +141,6 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
 		}
 	}
 
-    ////////////////////////////////////////////////////
-    // Implementation of the CleanableJobAdaptor interface
-    ////////////////////////////////////////////////////
-
-    public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-	}
-
-    
-    
-    
-    
     ////////////////////////////////////////////////////
     // Private methods
     ////////////////////////////////////////////////////
