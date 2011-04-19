@@ -5,8 +5,10 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.job.local.LocalJobProcess;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
+import fr.in2p3.jsaga.adaptor.ssh.job.SSHJobProcess;
 import fr.in2p3.jsaga.adaptor.ssh.security.SSHSecurityCredential;
 
 import org.ogf.saga.error.AuthenticationFailedException;
@@ -23,7 +25,14 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -150,4 +159,43 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
     	session.disconnect();
         session = null;
     }
+    
+    // TODO: store via SSH
+    public static void store(SSHJobProcess p, String nativeJobId) throws IOException {
+    	byte[] buf = serialize(p);
+    	FileOutputStream f = new FileOutputStream(new File(SSHJobProcess.getRootDir() + "/" + nativeJobId + ".process"));
+    	f.write(buf);
+    	f.close();
+    }
+    
+    private static byte[] serialize(Object obj) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(buffer);
+        oos.writeObject(obj);
+        oos.close();
+        return buffer.toByteArray();
+    }
+
+    // TODO: restore via SSH
+    public static SSHJobProcess restore(String nativeJobId) throws IOException, ClassNotFoundException {
+    	File f = new File(LocalJobProcess.getRootDir() + "/" + nativeJobId + ".process");
+    	FileInputStream fis = new FileInputStream(f);
+    	byte[] buf = new byte[(int)f.length()];
+    	int len = fis.read(buf);
+    	fis.close();
+    	return (SSHJobProcess)deserialize(buf);
+    }
+    
+    private static Object deserialize(byte[] bytes)
+            throws ClassNotFoundException {
+        try {
+            ByteArrayInputStream input = new ByteArrayInputStream(bytes);
+            ObjectInputStream ois = new ObjectInputStream(input);
+            return ois.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("error reading from byte-array!");
+        }
+    }
+    
 }
