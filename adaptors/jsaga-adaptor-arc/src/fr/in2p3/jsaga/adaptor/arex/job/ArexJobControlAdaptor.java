@@ -32,6 +32,14 @@ import org.ggf.schemas.jsdl.x2005.x11.jsdl.JobDefinition_Type;
 import org.ggf.schemas.jsdl.x2005.x11.jsdl.Resources_Type;
 import org.nordugrid.schemas.arex.ARex_PortType;
 import org.nordugrid.schemas.arex.ARex_ServiceLocator;
+import org.nordugrid.schemas.arex.ActivitySubStateType;
+import org.nordugrid.schemas.besFactory.ActivityStateEnumeration;
+import org.nordugrid.schemas.besFactory.ActivityStatusType;
+import org.nordugrid.schemas.besFactory.CantApplyOperationToCurrentStateFaultType;
+import org.nordugrid.schemas.besFactory.InvalidActivityIdentifierFaultType;
+import org.nordugrid.schemas.besFactory.NotAuthorizedFaultType;
+import org.nordugrid.schemas.besFactory.OperationWillBeAppliedEventuallyFaultType;
+import org.nordugrid.schemas.besFactory.holders.ActivityStatusTypeHolder;
 
 import org.oasis_open.docs.wsrf.r_2.ResourceUnavailableFaultType;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
@@ -279,22 +287,20 @@ public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract implemen
 	
 	
 	
-	/*private void changeStatus(String nativeJobId, ActivityStateEnumeration oldStatus, ActivityStateEnumeration newStatus, ActivitySubStateType newSubState) throws PermissionDeniedException, NoSuccessException {
-		//ChangeActivityStatusRequestType request = new ChangeActivityStatusRequestType();
-		//request.setActivityIdentifier(nativeId2ActivityId(nativeJobId));
-		ActivityStatusType oldAst = new ActivityStatusType();
-		oldAst.setState(oldStatus);
+	private void changeStatus(String nativeJobId, ActivityStateEnumeration oldStatus, ActivityStateEnumeration newStatus, ActivitySubStateType newSubState) throws PermissionDeniedException, NoSuccessException {
+		//ActivityStatusType oldAst = new ActivityStatusType();
+		//oldAst.setState(oldStatus);
 		ActivityStatusType newAst = new ActivityStatusType();
 		newAst.setState(newStatus);
-		MessageElement substate = new MessageElement();
-		substate.setName("state");
-		substate.setNamespaceURI(AREX_NAMESPACE_URI);
-		substate.addTextNode(newSubState.toString());
-		MessageElement[] any = new MessageElement[]{substate};
-		newAst.setAny(any);
+		//MessageElement substate = new MessageElement();
+		//substate.setName("state");
+		//substate.setNamespaceURI(AREX_NAMESPACE_URI);
+		//substate.addTextNode(newSubState.toString());
+		//MessageElement[] any = new MessageElement[]{substate};
+		//newAst.setAny(any);
 		//request.setNewStatus(newAst);
 		try {
-			_arex_pt.changeActivityStatus(nativeId2ActivityId(nativeJobId),	oldAst, new ActivityStatusTypeHolder(newAst)) ;
+			_arex_pt.changeActivityStatus(nativeId2ActivityId(nativeJobId),	null, new ActivityStatusTypeHolder(newAst)) ;
 		} catch (OperationWillBeAppliedEventuallyFaultType e) {
 			throw new NoSuccessException(e);
 		} catch (CantApplyOperationToCurrentStateFaultType e) {
@@ -306,5 +312,5 @@ public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract implemen
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
-	}*/
+	}
 }
