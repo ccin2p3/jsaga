@@ -30,6 +30,8 @@ public class LocalJobStatus extends JobStatus {
                 return SubState.RUNNING_ACTIVE;
             case LocalJobProcess.PROCESS_STOPPED:
             	return SubState.SUSPENDED_ACTIVE;
+            case LocalJobProcess.PROCESS_UNKNOWNSTATE:
+            	return SubState.NEW_CREATED;
             default:
                 return SubState.FAILED_ERROR;
         }
