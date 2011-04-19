@@ -10,6 +10,8 @@ import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
 import fr.in2p3.jsaga.adaptor.job.monitor.*;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorCallback;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
+import fr.in2p3.jsaga.impl.attributes.ScalarAttributeImpl;
+import fr.in2p3.jsaga.impl.attributes.VectorAttributeImpl;
 import fr.in2p3.jsaga.impl.job.instance.stream.*;
 import fr.in2p3.jsaga.impl.job.service.AbstractSyncJobServiceImpl;
 import fr.in2p3.jsaga.impl.job.staging.mgr.*;
@@ -26,6 +28,7 @@ import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
 
 import java.io.*;
+import java.util.Date;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -393,7 +396,18 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         } catch (DoesNotExistException e) {
             throw new NoSuccessException(e);
         }
-
+        
+        try {
+        	JobInfoAdaptor jia = getJobInfoAdaptor();
+        	setStaticValue(m_attributes.m_Created, jia.getCreated(m_nativeJobId));
+        	setStaticValue(m_attributes.m_Started, jia.getStarted(m_nativeJobId));
+        	setStaticValue(m_attributes.m_Finished, jia.getFinished(m_nativeJobId));
+        	setStaticValue(m_attributes.m_ExitCode, jia.getExitCode(m_nativeJobId));
+        	setStaticValues(m_attributes.m_ExecutionHosts, jia.getExecutionHosts(m_nativeJobId));
+        } catch (NotImplementedException nie) {
+        	// Do not cache
+        }
+        
         // cleanup job
         if (m_controlAdaptor instanceof CleanableJobAdaptor) {
             ((CleanableJobAdaptor)m_controlAdaptor).clean(m_nativeJobId);
@@ -402,6 +416,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         }
     }
 
+    
     ////////////////////////////////////// implementation of Job //////////////////////////////////////
 
     public JobDescription getJobDescriptionSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
@@ -614,4 +629,29 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             return false;
         }
     }
+
+    private void setStaticValue(ScalarAttributeImpl<Date> attr, final Date value) {
+    	attr = _addAttribute(new ScalarAttributeImpl<Date> (attr.getKey(), null, attr.getMode(), attr.getType(), new Date()) {
+                public String getValue() {
+                	return value.toString();
+                }
+            });
+    }
+
+    private void setStaticValue(ScalarAttributeImpl<Integer> attr, final Integer value) {
+    	attr = _addAttribute(new ScalarAttributeImpl<Integer> (attr.getKey(), null, attr.getMode(), attr.getType(), null) {
+                public String getValue() {
+                	return value.toString();
+                }
+            });
+    }
+    
+    private void setStaticValues(VectorAttributeImpl<String> attr, final String[] values) {
+    	attr = _addVectorAttribute(new VectorAttributeImpl<String> (attr.getKey(), null, attr.getMode(), attr.getType(), null) {
+                public String[] getValues() {
+                	return values;
+                }
+            });
+    }
+    
 }
