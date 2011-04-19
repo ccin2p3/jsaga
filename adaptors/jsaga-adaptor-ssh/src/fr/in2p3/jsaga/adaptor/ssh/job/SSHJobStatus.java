@@ -19,7 +19,7 @@ public class SSHJobStatus extends JobStatus {
     }
 
 	public String getModel() {
-        return "TODO";
+        return "ssh";
     }
 
     public SubState getSubState() {
