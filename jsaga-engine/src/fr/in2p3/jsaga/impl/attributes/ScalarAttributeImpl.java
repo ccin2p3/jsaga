@@ -54,6 +54,14 @@ public class ScalarAttributeImpl<E> implements AttributeScalar {
         return m_key;
     }
 
+    public MetricMode getMode() {
+    	return m_mode;
+    }
+    
+    public MetricType getType() {
+    	return m_type;
+    }
+    
     public boolean isReadOnly() {
         switch(m_mode) {
             case ReadOnly:

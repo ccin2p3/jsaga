@@ -59,6 +59,14 @@ public class VectorAttributeImpl<E> implements AttributeVector {
         return m_key;
     }
 
+    public MetricMode getMode() {
+    	return m_mode;
+    }
+    
+    public MetricType getType() {
+    	return m_type;
+    }
+    
     public boolean isReadOnly() {
         switch(m_mode) {
             case ReadOnly:
