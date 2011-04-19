@@ -155,13 +155,36 @@ public class LocalJobProcess implements Serializable {
     }
     
     public void clean() {
-    	// TODO: uncomment when engine will cache this info before calling cleanUp()
-		//new File(getPidfile()).delete();
-		//new File(getInfile()).delete();
-		//new File(getOutfile()).delete();
-		//new File(getErrfile()).delete();
-		//new File(getEndcodefile()).delete();
-		//new File(getSerializefile()).delete();
+    	try {
+    		new File(getInfile()).delete();
+    	} catch (Exception e) {
+    		// ignore
+    	}
+    	try {
+    		new File(getOutfile()).delete();
+    	} catch (Exception e) {
+    		// ignore
+    	}
+    	try {
+    		new File(getErrfile()).delete();
+    	} catch (Exception e) {
+    		// ignore
+    	}
+    	try {
+    		new File(getPidfile()).delete();
+    	} catch (Exception e) {
+    		// ignore
+    	}
+    	try {
+    		new File(getEndcodefile()).delete();
+    	} catch (Exception e) {
+    		// ignore
+    	}
+    	try {
+    		new File(getSerializefile()).delete();
+    	} catch (Exception e) {
+    		// ignore
+    	}
     }
 
 	public int getProcessStatus() throws NoSuccessException {
