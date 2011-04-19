@@ -19,15 +19,15 @@ public class LocalJobProcess implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 442420832799282097L;
-	private String m_pid;
-	private String m_jobId;
-	private String m_outfile;
-	private String m_infile;
-	private String m_errfile;
-	private int m_returnCode;
-	private Date m_created;
+	protected String m_pid;
+	protected String m_jobId;
+	protected String m_outfile;
+	protected String m_infile;
+	protected String m_errfile;
+	protected int m_returnCode;
+	protected Date m_created;
 	
-	private static final String _rootDir = System.getProperty("java.io.tmpdir") + "/jsaga/adaptor/local";
+	protected static final String _rootDir = System.getProperty("java.io.tmpdir") + "/jsaga/adaptor/local";
 	
 	public static final int PROCESS_DONE_OK = 0;
 	public static final int PROCESS_RUNNING = -1;
