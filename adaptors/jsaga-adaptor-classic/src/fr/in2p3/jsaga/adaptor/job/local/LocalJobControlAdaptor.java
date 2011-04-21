@@ -69,7 +69,7 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
     public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
         JobDescriptionTranslator translator = new JobDescriptionTranslatorXSLT("xsl/job/sh.xsl");
         translator.setAttribute(SHELLPATH, m_shellPath);
-        translator.setAttribute(ROOTDIR, LocalJobProcess.getRootDir());
+        translator.setAttribute(ROOTDIR, LocalJobProcess.getRootDir_Bash());
         return translator;
     }
 
