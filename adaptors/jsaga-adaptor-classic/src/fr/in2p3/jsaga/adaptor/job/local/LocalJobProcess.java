@@ -43,6 +43,14 @@ public class LocalJobProcess implements Serializable {
 		m_pid = null;
 	}
 	
+    public static String getRootDir_Bash() {
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            String path = new File(_rootDir).toURI().getPath();
+            return "/cygdrive/"+path.charAt(1)+path.substring(3);
+        } else {
+            return _rootDir;
+        }
+    }
     public static String getRootDir() {
     	return _rootDir;
     }
@@ -70,7 +78,7 @@ public class LocalJobProcess implements Serializable {
 			throw new NoSuccessException(e);
 		}
 		// Get PID reading xxx.pid file minus last character (carriage return)
-		m_pid = new String(buf).substring(0, buf.length-1);
+		m_pid = new String(buf).trim();
 		return m_pid;
 	}
 
@@ -107,7 +115,7 @@ public class LocalJobProcess implements Serializable {
 			throw new NoSuccessException(e);
 		}
 		// Get return code reading xxx.endcode file minus last character (carriage return)
-		m_returnCode = Integer.valueOf(new String(buf).substring(0, buf.length-1));
+		m_returnCode = Integer.valueOf(new String(buf).trim());
 		return m_returnCode;
 	}
 	
