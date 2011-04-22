@@ -65,9 +65,9 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
             channelSftp.setFilenameEncoding("ISO-8859-1");
 			channelSftp.get(absolutePath, stream);
 		} catch (SftpException e) {
-			if (e.getid() == ChannelSftp.SSH_FX_NO_SUCH_FILE)
+			if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE)
 				throw new DoesNotExistException(e);
-			else if (e.getid() == ChannelSftp.SSH_FX_PERMISSION_DENIED)
+			else if (e.id == ChannelSftp.SSH_FX_PERMISSION_DENIED)
 				throw new PermissionDeniedException(e);
 			else
 				throw new NoSuccessException(e);
@@ -79,7 +79,7 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 		try {
             return (channelSftp.lstat(absolutePath) != null);
         } catch (SftpException e) {
-			if (e.getid() == ChannelSftp.SSH_FX_NO_SUCH_FILE)
+			if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE)
 				return false;
 			else
 				throw new NoSuccessException(e);
@@ -92,9 +92,9 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
             SftpATTRS attrs = channelSftp.lstat(absolutePath);
             return new SFTPFileAttributes(filename, attrs);
         } catch (SftpException e) {
-            if (e.getid() == ChannelSftp.SSH_FX_NO_SUCH_FILE)
+            if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE)
                 throw new DoesNotExistException(e);
-            if (e.getid() == ChannelSftp.SSH_FX_PERMISSION_DENIED)
+            if (e.id == ChannelSftp.SSH_FX_PERMISSION_DENIED)
                 throw new PermissionDeniedException(e);
             throw new NoSuccessException(e);
         }
@@ -120,9 +120,9 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 				return new SFTPFileAttributes[0];
 			}
 		} catch (SftpException e) {
-			if (e.getid() == ChannelSftp.SSH_FX_NO_SUCH_FILE)
+			if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE)
 				throw new DoesNotExistException(e);
-			if (e.getid() == ChannelSftp.SSH_FX_PERMISSION_DENIED)
+			if (e.id == ChannelSftp.SSH_FX_PERMISSION_DENIED)
 				throw new PermissionDeniedException(e);
 			throw new NoSuccessException(e);
 		}
@@ -140,7 +140,7 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 		} catch (SftpException e) {
 			if (!exists(absolutePath, additionalArgs))
 				throw new AlreadyExistsException(e);
-			if (e.getid() == ChannelSftp.SSH_FX_PERMISSION_DENIED)
+			if (e.id == ChannelSftp.SSH_FX_PERMISSION_DENIED)
 				throw new PermissionDeniedException(e);
 			throw new NoSuccessException(e);
 		}
@@ -153,7 +153,7 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 		try {
 			channelSftp.mkdir(absolutePath);
 		} catch (SftpException e) {
-            switch(e.getid()) {
+            switch(e.id) {
                 case ChannelSftp.SSH_FX_PERMISSION_DENIED:
                     throw new PermissionDeniedException(e);
                 case ChannelSftp.SSH_FX_NO_SUCH_FILE:
@@ -194,7 +194,7 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 		try {
 			channelSftp.rmdir(absolutePath);
 		} catch (SftpException e) {
-            switch(e.getid()) {
+            switch(e.id) {
                 case ChannelSftp.SSH_FX_PERMISSION_DENIED:
                     throw new PermissionDeniedException(e);
                 case ChannelSftp.SSH_FX_NO_SUCH_FILE:
@@ -225,7 +225,7 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
         try {
 			channelSftp.rm(absolutePath);
 		} catch (SftpException e) {
-            switch(e.getid()) {
+            switch(e.id) {
                 case ChannelSftp.SSH_FX_PERMISSION_DENIED:
                     try {
                         switch(this.getAttributes(absolutePath, additionalArgs).getType()) {
@@ -254,9 +254,9 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 		try {
 			channelSftp.rename(sourceAbsolutePath, targetAbsolutePath);
 		} catch (SftpException e) {
-			if (e.getid() == ChannelSftp.SSH_FX_NO_SUCH_FILE)
+			if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE)
 				throw new DoesNotExistException(e);
-			if (e.getid() == ChannelSftp.SSH_FX_PERMISSION_DENIED)
+			if (e.id == ChannelSftp.SSH_FX_PERMISSION_DENIED)
 				throw new PermissionDeniedException(e);
 			throw new NoSuccessException(e);
 		}
