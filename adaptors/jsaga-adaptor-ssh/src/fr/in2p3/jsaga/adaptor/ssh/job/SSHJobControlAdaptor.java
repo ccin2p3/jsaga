@@ -1,16 +1,35 @@
 package fr.in2p3.jsaga.adaptor.ssh.job;
 
 import com.jcraft.jsch.ChannelExec;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.SftpException;
+
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
+import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobInteractiveSet;
 import fr.in2p3.jsaga.adaptor.job.local.LocalAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.job.local.LocalJobProcess;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
+import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
 import fr.in2p3.jsaga.adaptor.ssh.SSHAdaptorAbstract;
+import fr.in2p3.jsaga.adaptor.ssh.security.SSHSecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.ssh.security.SSHSecurityCredential;
+
+import org.ogf.saga.context.Context;
+import org.ogf.saga.context.ContextFactory;
 import org.ogf.saga.error.*;
+import org.ogf.saga.namespace.Flags;
+import org.ogf.saga.namespace.NSDirectory;
+import org.ogf.saga.namespace.NSFactory;
+import org.ogf.saga.session.Session;
+import org.ogf.saga.session.SessionFactory;
+import org.ogf.saga.url.URLFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -21,6 +40,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -37,10 +58,75 @@ import java.util.UUID;
  * TODO : Support of pre-requisite
  */
 public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
-		JobControlAdaptor, CleanableJobAdaptor/*, StreamableJobInteractiveSet*/ {
+		JobControlAdaptor, CleanableJobAdaptor, StreamableJobInteractiveSet/*StreamableJobBatch*/{
 
     private static final String ROOTDIR = "RootDir";
 
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+    	super.connect(userInfo, host, port, basePath, attributes);
+		// Create temp directories on server
+		try {
+			ChannelSftp channelMkdir = (ChannelSftp) session.openChannel("sftp");
+			channelMkdir.connect();
+			String fullUrl = "";
+			for (String d: SSHJobProcess.getRootDir().split("/")) {
+				fullUrl += d + "/";
+				try {
+					channelMkdir.mkdir(fullUrl);
+				} catch (SftpException e) {
+					if (e.id == ChannelSftp.SSH_FX_FAILURE) { // Already Exists
+						// ignore
+					} else if (e.id == ChannelSftp.SSH_FX_PERMISSION_DENIED) {
+						throw new AuthorizationFailedException(e);
+					} else {
+						throw new NoSuccessException(e); 
+					}
+				}
+			}
+			channelMkdir.disconnect();
+		} catch (JSchException e) {
+			throw new NoSuccessException(e); 
+		}
+		
+    	/*
+        Context _context;
+		try {
+			_context = ContextFactory.createContext();
+	        _context.setAttribute(Context.TYPE, "SSH");
+			if(credential instanceof UserPassSecurityCredential) {
+		        _context.setAttribute(Context.USERID, ((UserPassSecurityCredential) credential).getUserID());
+		        _context.setAttribute(Context.USERPASS, ((UserPassSecurityCredential) credential).getUserPass());
+	    	} else if(credential instanceof SSHSecurityCredential) {
+		        _context.setAttribute(Context.USERID, ((SSHSecurityCredential) credential).getUserID());
+		        _context.setAttribute(Context.USERPASS, ((SSHSecurityCredential) credential).getUserPass());
+	    	}
+			Iterator it = attributes.entrySet().iterator();
+			while (it.hasNext()) {
+			    Map.Entry pairs = (Map.Entry)it.next();
+			    _context.setAttribute((String)pairs.getKey(), (String)pairs.getValue());
+			}
+			Session _session = SessionFactory.createSession(false);
+	        _session.addContext(_context);
+	        String _url = "sftp://" + host;
+	        if (port != -1) {
+	        	_url += ":" + port;
+	        }
+	        _url += "/" + SSHJobProcess.getRootDir();
+	    	NSFactory.createNSDirectory(_session, URLFactory.createURL(_url), Flags.CREATE.or(Flags.CREATEPARENTS));
+		} catch (IncorrectStateException e) {
+			throw new NoSuccessException(e);
+		} catch (PermissionDeniedException e) {
+			throw new AuthorizationFailedException(e);
+		} catch (DoesNotExistException e) {
+			throw new NoSuccessException(e);
+		} catch (IncorrectURLException e) {
+			throw new NoSuccessException(e);
+		} catch (AlreadyExistsException e) {
+			// ignore
+		}
+		*/
+    }
+    
     public String getType() {
 		return "ssh";
 	}
@@ -55,25 +141,21 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
         return translator;
     }
 
-    private SSHJobProcess submit(String jobDesc, String uniqId, InputStream stdin)
+    private SSHJobProcess submit(String jobDesc, String uniqId, InputStream stdin, OutputStream stdout, OutputStream stderr)
 			throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		try {
 
 			ChannelExec channel = (ChannelExec) session.openChannel("exec");
 
-	    	SSHJobProcess sjp = new SSHJobProcess(uniqId, channel);
+	    	SSHJobProcess sjp = new SSHJobProcess(uniqId);
 	    	
             sjp.setCreated(new Date());
-            SSHAdaptorAbstract.store(sjp, uniqId);
+            store(sjp, uniqId);
 
-			//LSString jobId = UUID.randomUUID().toString();
-			
-			//commandLine
 			Properties jobProps = new Properties();
 			jobProps.load(new ByteArrayInputStream(jobDesc.getBytes()));
 			File _workDir = null;
 			String cde = null;
-			String executable = null;
             Enumeration e = jobProps.propertyNames();
 			Hashtable _envParams = new Hashtable();
             while (e.hasMoreElements()){
@@ -83,19 +165,40 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
                    else if (key.equals("_Script")) { 
                 	   cde = val;
                    } else {
+						// setEnv does not work
+                       //channel.setEnv(key.getBytes(), val.getBytes());
                 	   _envParams.put(key, val);
                    }
             }
-			//LSchannel.setCommand(prepareCde(commandLine, uniqId));
-            channel.setCommand(cde);
-            channel.setEnv(_envParams);
-	    	// TODO : scp input file
+            // setEnv does not work
+			//channel.setEnv("JOBID".getBytes(), uniqId.getBytes());
+            // so we have to do this
+            cde = "JOBID="+uniqId+"; "+cde;
+            // and this
+            Iterator i = _envParams.entrySet().iterator();
 
-			// start job
-			channel.connect();	
+            while(i.hasNext()){
+              Map.Entry me = (Map.Entry)i.next();
+              cde = me.getKey() + "=" + me.getValue() + "; " + cde;
+            }
+            
+            
+            //System.out.println(cde);            
+            channel.setCommand(cde);
+
+			channel.setOutputStream(stdout);
+			channel.setErrStream(stderr);
+			// set input stream before job starts
+			if (stdin != null) {
+				channel.setInputStream(stdin);
+			}
+			channel.connect();
+			// close null stdin after job started
+			if (stdin == null) {
+				channel.getOutputStream().close();
+			}
+			//SSHJobIOHandler jioh = new SSHJobIOHandler(channel, sjp);
 			
-			// add channel in sessionMap
-			//SSHAdaptorAbstract.sessionMap.put(uniqId, channel);
 			return sjp;
 			
 		} catch (Exception e) {
@@ -103,63 +206,21 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 		}
 	}
 
-    public String submit(String commandLine, boolean checkMatch, String uniqId)
+    public String submit(String jobDesc, boolean checkMatch, String uniqId)
 			throws PermissionDeniedException, TimeoutException, NoSuccessException {
-    	return this.submit(commandLine, uniqId, null).getJobId();
+    	return this.submit(jobDesc, uniqId, null, null, null).getJobId();
     }
 
-    /*
-    public String submitInteractive(String commandLine, boolean checkMatch, InputStream stdin, OutputStream stdout, OutputStream stderr) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-		try {
-			ChannelExec channel = (ChannelExec) session.openChannel("exec");
-
-			String jobId = UUID.randomUUID().toString();
-			
-			// TODO: must use prepareCde, else no cancel possible
-			//channel.setCommand(prepareCde(commandLine, jobId));
-			channel.setCommand(commandLine);
-			
-            // set streams
-            if (stdin != null) {
-                channel.setInputStream(stdin);
-            }
-            channel.setOutputStream(stdout);
-            channel.setErrStream(stderr);
-
-            // start job
-			channel.connect();
-			
-			// add channel in sessionMap
-			SSHAdaptorAbstract.sessionMap.put(jobId, channel);
-			return jobId;
-		} catch (Exception e) {
-			throw new NoSuccessException(e);
-		}
+    public String submitInteractive(String jobDesc, boolean checkMatch, InputStream stdin, OutputStream stdout, OutputStream stderr) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+    	SSHJobProcess sjp = this.submit(jobDesc, UUID.randomUUID().toString(), stdin, stdout, stderr);
+    	return sjp.getJobId();
 	}
-	*/
 
-    /*
-	private String prepareCde(String commandLine, String jobId) {
-		return 	"eval '"+commandLine+" &' ; " +
-			"MYPID=$! ; " +
-			"echo $MYPID > ."+jobId+" ;" +
-			"wait $MYPID;" +
-			"ENDCODE=$?;" +
-			"rm -f ."+ jobId + ";"  +
-			"exit $ENDCODE;";
-	}
-	*/
-    
 	public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException,
             NoSuccessException {
-		SSHJobProcess sjp;
 		try {
-			sjp = SSHAdaptorAbstract.restore(nativeJobId);
-			//sjp.kill();
 			ChannelExec channelCancel = (ChannelExec) session.openChannel("exec");
-			//channelCancel.setCommand("MYPID=`cat ."+nativeJobId+"`; kill $MYPID ;");
-			channelCancel.setCommand("kill " + sjp.getPid());
-			// start cancel
+			channelCancel.setCommand("MYPID=`cat " + SSHJobProcess.getRootDir() + "/" + nativeJobId+".pid`; kill $MYPID ;");
 			channelCancel.connect();
 			while(!channelCancel.isClosed()) {
 				Thread.sleep(100);
@@ -172,14 +233,9 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 
 	public void clean(String nativeJobId) throws PermissionDeniedException, TimeoutException,
             NoSuccessException {
-		SSHJobProcess sjp;
 		try {
-			sjp = SSHAdaptorAbstract.restore(nativeJobId);
-			//sjp.clean();
 			ChannelExec channelClean = (ChannelExec) session.openChannel("exec");
-			//channelCancel.setCommand("MYPID=`cat ."+nativeJobId+"`; kill $MYPID ;");
-			channelClean.setCommand("/bin/rm -rf " + SSHJobProcess.getRootDir() + "/" + sjp.getJobId() + ".*");
-			// start cancel
+			channelClean.setCommand("/bin/rm -rf " + SSHJobProcess.getRootDir() + "/" + nativeJobId + ".*");
 			channelClean.connect();
 			while(!channelClean.isClosed()) {
 				Thread.sleep(100);
@@ -188,13 +244,6 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
-		/*		
-		ChannelExec channel = (ChannelExec) SSHAdaptorAbstract.sessionMap.get(nativeJobId);
-        if (channel == null) {
-            throw new NoSuccessException("Job id not found in current JVM: "+nativeJobId);
-        }
-		channel.disconnect();
-		SSHAdaptorAbstract.sessionMap.remove(channel);
-		*/
 	}
+
 }
