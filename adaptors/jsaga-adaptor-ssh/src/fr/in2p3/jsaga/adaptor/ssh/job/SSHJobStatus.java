@@ -14,8 +14,24 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 * ***************************************************/
 
 public class SSHJobStatus extends JobStatus {
+
+    public SSHJobStatus(String jobId, Boolean isStillRunning, String state, int retCode) {
+    	super(jobId, isStillRunning, state, retCode);
+    }
+    
+	public SSHJobStatus(String jobId, int retCode) {
+		this(jobId, null, "unknown", retCode);
+		if (retCode == SSHJobProcess.PROCESS_RUNNING) {
+			this.m_nativeStateCode = true;
+			this.m_nativeStateString = "Running";
+		} else if (retCode >= SSHJobProcess.PROCESS_DONE_OK) {
+			this.m_nativeStateCode = false;
+			this.m_nativeStateString = (retCode == SSHJobProcess.PROCESS_DONE_OK)?"Done":"Failed";
+		}
+    }
+    
     public SSHJobStatus(String jobId, Channel channel) {
-        super(jobId, channel.isConnected(), "unknown", channel.getExitStatus());
+    	this(jobId, channel.isConnected(), "unknown", channel.getExitStatus());
     }
 
 	public String getModel() {
