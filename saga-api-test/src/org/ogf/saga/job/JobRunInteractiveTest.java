@@ -196,8 +196,8 @@ public abstract class JobRunInteractiveTest extends AbstractJobTest {
     	BufferedReader jobStdoutReader = new BufferedReader( new InputStreamReader(job.getStdout()));       
 	    // check
         assertEquals(
-        		jobStdoutReader.readLine(),
-        		myvar0 + ":" + myvar1);
+        		myvar0 + ":" + myvar1,
+        		jobStdoutReader.readLine());
 	}
 	
 	/**
