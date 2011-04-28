@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.adaptor.ssh.job;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Vector;
@@ -17,7 +18,6 @@ import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
 
-import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.JSchException;
@@ -42,7 +42,7 @@ public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryInd
         return "ssh";
     }
     
-    // Already connected
+
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     	super.connect(userInfo, host, port, basePath, attributes);
 		try {
@@ -63,7 +63,16 @@ public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryInd
     		return new SSHJobStatus(nativeJobId, new Integer(new String(buf).trim()));
 					
     	} catch (SftpException sftpe) {
-			// if endcode does not exist, SSHJobStatus(nativeJobId, true, null);
+    		// try first to get serialized object
+    		try {
+				SSHJobProcess sjp = this.restore(nativeJobId);
+				return new SSHJobStatus(nativeJobId, sjp.getReturnCode());
+			} catch (IOException e) {
+			} catch (ClassNotFoundException e) {
+			} catch (JSchException e) {
+			} catch (SftpException e) {
+			} catch (InterruptedException e) {
+			}
     		return new SSHJobStatus(nativeJobId, SSHJobProcess.PROCESS_RUNNING);
     	} catch (Exception e) {
     		throw new NoSuccessException(e);

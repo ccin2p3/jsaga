@@ -108,13 +108,6 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
         		byte[] privateKey = ((SSHSecurityCredential) credential).getPrivateKey().clone();
         		byte[] publicKey = ((SSHSecurityCredential) credential).getPublicKey();
 
-        		// create identity 0.1.38
-        		/*Identity identity = IdentityFile.newInstance(userId, privateKey, publicKey, jsch);
-        		if(passPhrase != null)
-        			jsch.addIdentity(identity, passPhrase.getBytes());
-        		else
-        			jsch.addIdentity(identity, null);*/
-        		// with 0.1.43
         		if (passPhrase != null) {
         			jsch.addIdentity(userId, privateKey, publicKey, passPhrase.getBytes());
         		} else {

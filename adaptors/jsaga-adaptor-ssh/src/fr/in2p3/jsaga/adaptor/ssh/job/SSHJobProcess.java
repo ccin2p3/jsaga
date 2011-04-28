@@ -1,5 +1,7 @@
 package fr.in2p3.jsaga.adaptor.ssh.job;
 
+import org.ogf.saga.error.NoSuccessException;
+
 import fr.in2p3.jsaga.adaptor.job.local.LocalJobProcess;
 
 /* ***************************************************
@@ -17,7 +19,7 @@ public class SSHJobProcess extends LocalJobProcess {
 	 * 
 	 */
 	private static final long serialVersionUID = 3723657591636633186L;
-
+	
 	public SSHJobProcess(String jobId) {
 		super(jobId);
 	}
@@ -26,4 +28,7 @@ public class SSHJobProcess extends LocalJobProcess {
     	return ".jsaga/var/adaptor/ssh";
     }
 
+	public int getReturnCode() throws NoSuccessException {
+		return m_returnCode;
+	}
 }

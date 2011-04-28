@@ -9,34 +9,14 @@ import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobInteractiveSet;
-import fr.in2p3.jsaga.adaptor.job.local.LocalAdaptorAbstract;
-import fr.in2p3.jsaga.adaptor.job.local.LocalJobProcess;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
-import fr.in2p3.jsaga.adaptor.security.impl.InMemoryProxySecurityCredential;
-import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
 import fr.in2p3.jsaga.adaptor.ssh.SSHAdaptorAbstract;
-import fr.in2p3.jsaga.adaptor.ssh.security.SSHSecurityAdaptor;
-import fr.in2p3.jsaga.adaptor.ssh.security.SSHSecurityCredential;
-
-import org.ogf.saga.context.Context;
-import org.ogf.saga.context.ContextFactory;
 import org.ogf.saga.error.*;
-import org.ogf.saga.namespace.Flags;
-import org.ogf.saga.namespace.NSDirectory;
-import org.ogf.saga.namespace.NSFactory;
-import org.ogf.saga.session.Session;
-import org.ogf.saga.session.SessionFactory;
-import org.ogf.saga.url.URLFactory;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -58,7 +38,7 @@ import java.util.UUID;
  * TODO : Support of pre-requisite
  */
 public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
-		JobControlAdaptor, CleanableJobAdaptor, StreamableJobInteractiveSet/*StreamableJobBatch*/{
+		JobControlAdaptor, CleanableJobAdaptor, StreamableJobInteractiveSet {
 
     private static final String ROOTDIR = "RootDir";
 
@@ -77,8 +57,10 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 					if (e.id == ChannelSftp.SSH_FX_FAILURE) { // Already Exists
 						// ignore
 					} else if (e.id == ChannelSftp.SSH_FX_PERMISSION_DENIED) {
+						channelMkdir.disconnect();
 						throw new AuthorizationFailedException(e);
 					} else {
+						channelMkdir.disconnect();
 						throw new NoSuccessException(e); 
 					}
 				}
@@ -88,43 +70,6 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 			throw new NoSuccessException(e); 
 		}
 		
-    	/*
-        Context _context;
-		try {
-			_context = ContextFactory.createContext();
-	        _context.setAttribute(Context.TYPE, "SSH");
-			if(credential instanceof UserPassSecurityCredential) {
-		        _context.setAttribute(Context.USERID, ((UserPassSecurityCredential) credential).getUserID());
-		        _context.setAttribute(Context.USERPASS, ((UserPassSecurityCredential) credential).getUserPass());
-	    	} else if(credential instanceof SSHSecurityCredential) {
-		        _context.setAttribute(Context.USERID, ((SSHSecurityCredential) credential).getUserID());
-		        _context.setAttribute(Context.USERPASS, ((SSHSecurityCredential) credential).getUserPass());
-	    	}
-			Iterator it = attributes.entrySet().iterator();
-			while (it.hasNext()) {
-			    Map.Entry pairs = (Map.Entry)it.next();
-			    _context.setAttribute((String)pairs.getKey(), (String)pairs.getValue());
-			}
-			Session _session = SessionFactory.createSession(false);
-	        _session.addContext(_context);
-	        String _url = "sftp://" + host;
-	        if (port != -1) {
-	        	_url += ":" + port;
-	        }
-	        _url += "/" + SSHJobProcess.getRootDir();
-	    	NSFactory.createNSDirectory(_session, URLFactory.createURL(_url), Flags.CREATE.or(Flags.CREATEPARENTS));
-		} catch (IncorrectStateException e) {
-			throw new NoSuccessException(e);
-		} catch (PermissionDeniedException e) {
-			throw new AuthorizationFailedException(e);
-		} catch (DoesNotExistException e) {
-			throw new NoSuccessException(e);
-		} catch (IncorrectURLException e) {
-			throw new NoSuccessException(e);
-		} catch (AlreadyExistsException e) {
-			// ignore
-		}
-		*/
     }
     
     public String getType() {
@@ -181,13 +126,13 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
               Map.Entry me = (Map.Entry)i.next();
               cde = me.getKey() + "=" + me.getValue() + "; " + cde;
             }
-            
-            
-            //System.out.println(cde);            
+			//cde = "#!/bin/bash\r\n " + cde;
+            //cde = "echo '" + cde + "' | /bin/bash ";
+System.out.println(cde);
             channel.setCommand(cde);
 
-			channel.setOutputStream(stdout);
-			channel.setErrStream(stderr);
+			if (stdout != null) channel.setOutputStream(stdout);
+			if (stderr != null) channel.setErrStream(stderr);
 			// set input stream before job starts
 			if (stdin != null) {
 				channel.setInputStream(stdin);
@@ -197,8 +142,23 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 			if (stdin == null) {
 				channel.getOutputStream().close();
 			}
-			//SSHJobIOHandler jioh = new SSHJobIOHandler(channel, sjp);
 			
+			Thread.sleep(500);
+			if (channel.isClosed()) {
+				int error = channel.getExitStatus();
+				// It is possible that the wrapper script failed without writing any .endcode file
+				// Here this is simulated by storing returnCode into the serialized object
+				sjp.setReturnCode(error);
+	            store(sjp, uniqId);
+				System.out.println("channel is closed and return = " + error);
+				/*if (error != 0) {
+					InputStream err = channel.getErrStream();
+					byte[] buf = new byte[2048];
+					int len = err.read(buf);
+					err.close();
+					System.out.println(new String(buf).trim());
+				}*/
+			}
 			return sjp;
 			
 		} catch (Exception e) {
