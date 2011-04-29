@@ -4,7 +4,7 @@
         <context type="SSH">
             <!-- <attribute name="UserID" value="sreynaud"/>--><!-- optional -->
             <attribute name="UserKey" value="${user.home}/.jsaga/contexts/ssh/id_rsa"/>
-            <attribute name="UserPass" value="xxx"/>
+            <attribute name="UserPass" value="XXX"/>
             <data type="sftp"/>
             <job type="ssh"/>
             <include host="localhost"/>
@@ -17,7 +17,15 @@
             <attribute name="UserKey" value="${user.home}/.jsaga/contexts/ssh/sreynaud"/>
             <data type="sftp"/>
             <job type="ssh"/>
-            <include host="ccsyre.in2p3.fr"/>
+            <include host="ccsyre*.in2p3.fr"/>
+            <exclude host="localhost"/>
+	    </context>
+	    <context type="UserPass" id="AFS">
+            <attribute name="UserID" value="${user.name}"/>
+            <attribute name="UserPass" value="XXX"/>
+            <data type="sftp"/>
+            <job type="ssh"/>
+            <include host="ccali60.in2p3.fr"/>
             <exclude host="localhost"/>
 	    </context>
     </session>
