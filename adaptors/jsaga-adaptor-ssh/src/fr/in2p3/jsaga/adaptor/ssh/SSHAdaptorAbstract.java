@@ -17,17 +17,22 @@ import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
+
+import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
+import com.jcraft.jsch.UserInfo;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
@@ -56,7 +61,8 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
 	protected static Map sessionMap = new HashMap();
 	protected SecurityCredential credential;
 	private int compression_level = 0;
-
+	protected ChannelSftp m_sftp;
+	
     public Class[] getSupportedSecurityCredentialClasses() {
         return new Class[]{UserPassSecurityCredential.class, SSHSecurityCredential.class};
     }
@@ -145,6 +151,8 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
 			}
 			// oonnect
     		session.connect();
+    		m_sftp = (ChannelSftp) session.openChannel("sftp");
+    		m_sftp.connect();
 
     	} catch (JSchException e) {
     		if(e.getMessage().equals("Auth fail"))
@@ -154,22 +162,17 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
     }
 
     public void disconnect() throws NoSuccessException {
+    	m_sftp.disconnect();
+    	m_sftp = null;
     	session.disconnect();
         session = null;
     }
     
     public  void store(SSHJobProcess p, String nativeJobId) throws SftpException, IOException, JSchException, InterruptedException {
     	byte[] buf = serialize(p);
-    	//FileOutputStream f = new FileOutputStream(new File());
-		ChannelSftp channelPut = (ChannelSftp) session.openChannel("sftp");
-		channelPut.connect();
-		OutputStream os = channelPut.put(SSHJobProcess.getRootDir() + "/" + nativeJobId + ".process");
+		OutputStream os = m_sftp.put(SSHJobProcess.getRootDir() + "/" + nativeJobId + ".process");
     	os.write(buf);
     	os.close();
-		/*while(!channelPut.isClosed()) {
-			Thread.sleep(100);
-		}*/
-		channelPut.disconnect();
     }
     
     private static byte[] serialize(Object obj) throws IOException {
@@ -181,17 +184,10 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
     }
 
     public SSHJobProcess restore(String nativeJobId) throws IOException, ClassNotFoundException, JSchException, SftpException, InterruptedException {
-		ChannelSftp channelGet = (ChannelSftp) session.openChannel("sftp");
-		channelGet.connect();
-		InputStream is = channelGet.get(SSHJobProcess.getRootDir() + "/" + nativeJobId + ".process");
-		// start cancel
-		/*while(!channelGet.isClosed()) {
-			Thread.sleep(100);
-		}*/
+		InputStream is = m_sftp.get(SSHJobProcess.getRootDir() + "/" + nativeJobId + ".process");
     	byte[] buf = new byte[1024];
     	int len = is.read(buf);
     	is.close();
-		channelGet.disconnect();
 
     	return (SSHJobProcess)deserialize(buf);
     }
