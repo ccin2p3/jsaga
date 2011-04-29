@@ -51,8 +51,7 @@ public class UserPassSecurityAdaptor implements ExpirableSecurityAdaptor {
 
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
         return new Default[]{
-                new Default(Context.USERID, "anonymous"),
-                new Default(Context.USERPASS, "anon")
+                new Default(Context.USERID, System.getProperty("user.name"))
         };
     }
 
