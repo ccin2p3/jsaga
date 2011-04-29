@@ -15,18 +15,27 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 
 public class SSHJobStatus extends JobStatus {
 
+	private int m_returnCode;
+	public static final int PROCESS_CANCELED = 143;
+
     public SSHJobStatus(String jobId, Boolean isStillRunning, String state, int retCode) {
     	super(jobId, isStillRunning, state, retCode);
     }
     
 	public SSHJobStatus(String jobId, int retCode) {
 		this(jobId, null, "unknown", retCode);
+		// retCode is not saved into m_nativeCause
+		m_returnCode = retCode;
 		if (retCode == SSHJobProcess.PROCESS_RUNNING) {
 			this.m_nativeStateCode = true;
 			this.m_nativeStateString = "Running";
 		} else if (retCode >= SSHJobProcess.PROCESS_DONE_OK) {
 			this.m_nativeStateCode = false;
-			this.m_nativeStateString = (retCode == SSHJobProcess.PROCESS_DONE_OK)?"Done":"Failed";
+			if (retCode == PROCESS_CANCELED) {
+				this.m_nativeStateString = "Canceled";
+			} else {
+				this.m_nativeStateString = (retCode == SSHJobProcess.PROCESS_DONE_OK)?"Done":"Failed";
+			}
 		}
     }
     
@@ -43,7 +52,11 @@ public class SSHJobStatus extends JobStatus {
         if (isConnected) {
             return SubState.RUNNING_ACTIVE;
         } else if (m_nativeCause != null) {
-            return SubState.FAILED_ERROR;
+        	if (m_returnCode == PROCESS_CANCELED) {
+        		return SubState.CANCELED;
+        	} else {
+        		return SubState.FAILED_ERROR;
+        	}
         } else {
             return SubState.DONE;
         }
