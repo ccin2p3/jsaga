@@ -21,25 +21,14 @@
 <xsl:value-of select="@name"/>='<xsl:value-of select="text()"/><xsl:text>'
 </xsl:text>
         </xsl:for-each>
-		
-_Script=<xsl:text>errcode=0;</xsl:text>
-		<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:WorkingDirectory/text()">
-			<xsl:text> cd </xsl:text><xsl:value-of select="."/><xsl:text> ; errcode=$?;</xsl:text>
-		</xsl:for-each>
-		<xsl:text> if [ $errcode -eq 0 ] ; then </xsl:text>
-		<xsl:text> eval &apos; /bin/cat | </xsl:text>
-		<xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Executable/text()"/><xsl:text/>
+	
+_Executable=<xsl:value-of select="jsdl:Application/posix:POSIXApplication/posix:Executable/text()"/><xsl:text/>
         <xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:Argument/text()">
              <xsl:text> </xsl:text><xsl:value-of select="."/><xsl:text/>
         </xsl:for-each>
-		<xsl:text>  &amp;  &apos;; </xsl:text>
-		<xsl:text>MYPID=$!;</xsl:text>
-		<xsl:text>echo $MYPID &gt; $HOME/</xsl:text><xsl:value-of select="$RootDir"/><xsl:text>/${JOBID}.pid ;</xsl:text>
-		<xsl:text>wait $MYPID ; </xsl:text>
-		<xsl:text>errcode=$?; </xsl:text>
-		<xsl:text>fi ; </xsl:text>
-		<xsl:text>echo $errcode &gt; $HOME/</xsl:text><xsl:value-of select="$RootDir"/><xsl:text>/${JOBID}.endcode ;</xsl:text>
-		<xsl:text>exit $errcode; </xsl:text>
+		<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:WorkingDirectory/text()">
+_WorkingDirectory=<xsl:value-of select="."/>
+		</xsl:for-each>
 <!--<xsl:text>" | sh</xsl:text>-->
 
 	</xsl:template>
