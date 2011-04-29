@@ -36,27 +36,14 @@ import com.jcraft.jsch.SftpException;
 
 public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryIndividualJob, ListableJobAdaptor {
 
-	private ChannelSftp channelGet = null;
-	
     public String getType() {
         return "ssh";
-    }
-    
-
-    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
-    	super.connect(userInfo, host, port, basePath, attributes);
-		try {
-			channelGet = (ChannelSftp) session.openChannel("sftp");
-			channelGet.connect();
-		} catch (JSchException e) {
-			throw new NoSuccessException(e);
-		}
     }
     
     public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
 
     	try {    	
-			InputStream is = channelGet.get(SSHJobProcess.getRootDir() + "/" + nativeJobId + ".endcode");
+			InputStream is = m_sftp.get(SSHJobProcess.getRootDir() + "/" + nativeJobId + ".endcode");
 	    	byte[] buf = new byte[4];
 	    	int len = is.read(buf);
 	    	is.close();
@@ -79,16 +66,10 @@ public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryInd
 		}
     }        
 
-    public void disconnect() throws NoSuccessException {
-		channelGet.disconnect();
-		channelGet = null;
-		super.disconnect();
-    }
-
 	public String[] list() throws PermissionDeniedException, TimeoutException,
 			NoSuccessException {
 		try {
-			Vector v = channelGet.ls(SSHJobProcess.getRootDir() + "/*.process");
+			Vector v = m_sftp.ls(SSHJobProcess.getRootDir() + "/*.process");
 			String[] listOfJobs = new String[v.size()];
 			for (int i=0; i<v.size(); i++) {
 				String file = ((LsEntry)v.elementAt(i)).getFilename();
