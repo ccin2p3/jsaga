@@ -31,4 +31,8 @@ public class SSHJobProcess extends LocalJobProcess {
 	public int getReturnCode() throws NoSuccessException {
 		return m_returnCode;
 	}
+
+    public String getFile(String suffix) {
+    	return getRootDir() + "/" + m_jobId + "." + suffix;
+    }
 }
