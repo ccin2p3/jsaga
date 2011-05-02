@@ -7,6 +7,7 @@ import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.UserPassStoreSecurityCredential;
 import fr.in2p3.jsaga.adaptor.ssh.job.SSHJobProcess;
 import fr.in2p3.jsaga.adaptor.ssh.security.SSHSecurityCredential;
 
@@ -18,21 +19,16 @@ import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
 
-import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
-import com.jcraft.jsch.UserInfo;
-
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
@@ -64,7 +60,7 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
 	protected ChannelSftp m_sftp;
 	
     public Class[] getSupportedSecurityCredentialClasses() {
-        return new Class[]{UserPassSecurityCredential.class, SSHSecurityCredential.class};
+        return new Class[]{UserPassSecurityCredential.class, UserPassStoreSecurityCredential.class, SSHSecurityCredential.class};
     }
 
     public void setSecurityCredential(SecurityCredential credential) {
@@ -120,6 +116,15 @@ public abstract class SSHAdaptorAbstract implements ClientAdaptor {
         			jsch.addIdentity(userId, privateKey, publicKey, null);
         		}
     			session = jsch.getSession(userId, host, port);
+        	} else if (credential instanceof UserPassStoreSecurityCredential) {
+				try {
+	        		String userId = ((UserPassStoreSecurityCredential) credential).getUserID(host);
+	        		String password = ((UserPassStoreSecurityCredential) credential).getUserPass(host);
+	        		session = jsch.getSession(userId, host, port);
+	        		session.setPassword(password);
+				} catch (Exception e) {
+	        		throw new AuthenticationFailedException(e);
+				}
         	}
         	else {
         		throw new AuthenticationFailedException("Invalid security instance.");
