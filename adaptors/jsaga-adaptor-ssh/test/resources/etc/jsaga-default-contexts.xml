@@ -25,6 +25,12 @@
             <attribute name="UserPass" value="XXX"/>
             <data type="sftp"/>
             <job type="ssh"/>
+            <include host="ccali61.in2p3.fr"/>
+            <exclude host="localhost"/>
+	    </context>
+	    <context type="UserPassStore" id="netrc">
+            <data type="sftp"/>
+            <job type="ssh"/>
             <include host="ccali60.in2p3.fr"/>
             <exclude host="localhost"/>
 	    </context>
