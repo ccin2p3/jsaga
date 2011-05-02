@@ -11,6 +11,15 @@ import org.ogf.saga.error.NotImplementedException;
 
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 
+/* ***************************************************
+* *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
+* ***             http://cc.in2p3.fr/             ***
+* ***************************************************
+* File:   UserPassStoreSecurityCredential
+* Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
+* Date:   2 mai 2011
+* ***************************************************/
+
 public class UserPassStoreSecurityCredential implements SecurityCredential {
 
 	private String m_host = null;
@@ -21,26 +30,40 @@ public class UserPassStoreSecurityCredential implements SecurityCredential {
 	}
 	
 	public String getUserID() throws Exception {
-		if (m_host == null) throw new Exception("Host is not defined yet, UserID is not available");
-		if (m_creds == null) throw new Exception("Store is not initialized");
-		if (!m_creds.containsKey(m_host)) throw new Exception("Not found in store:" + m_host);
-		UserPassSecurityCredential upsc = (UserPassSecurityCredential)m_creds.get(m_host);
-		return upsc.getUserID();
+		return this.getUPCred().getUserID();
 	}
 
+	public String getUserPass() throws Exception {
+		return this.getUPCred().getUserPass();
+	}
+	
+	public String getUserID(String host) throws Exception {
+		this.setHost(host);
+		return this.getUserID();
+	}
+	
+	public String getUserPass(String host) throws Exception {
+		this.setHost(host);
+		return this.getUserPass();
+	}
+	
 	public String getAttribute(String key) throws NotImplementedException,
 			NoSuccessException {
         if (Context.USERPASS.equals(key)) {
-    		if (m_host == null) throw new NoSuccessException("Host is not defined yet, UserID is not available");
-    		if (m_creds == null) throw new NoSuccessException("Store is not initialized");
-    		if (!m_creds.containsKey(m_host)) throw new NoSuccessException("Not found in store:" + m_host);
-    		UserPassSecurityCredential upsc = (UserPassSecurityCredential)m_creds.get(m_host);
-    		return upsc.getUserPass();
+    		return this.getUPCred().getUserPass();
         } else {
             throw new NotImplementedException("Attribute not supported: "+key);
         }
 	}
 
+	private UserPassSecurityCredential getUPCred() throws NoSuccessException {
+		if (m_host == null) throw new NoSuccessException("Host is not defined yet, UserPass is not available");
+		if (m_creds == null) throw new NoSuccessException("Store is not initialized");
+		if (m_creds.containsKey(m_host)) return (UserPassSecurityCredential)m_creds.get(m_host);
+		if (m_creds.containsKey("default")) return (UserPassSecurityCredential)m_creds.get("default");
+		throw new NoSuccessException("Not found in store:" + m_host);
+	}
+	
 	public void close() throws Exception {
 		// nothing
 	}
@@ -56,5 +79,9 @@ public class UserPassStoreSecurityCredential implements SecurityCredential {
 
 	public void addUserPassCredential(String host, String user, String pass) {
 		m_creds.put(host, new UserPassSecurityCredential(user,pass));
+	}
+	
+	public void setHost(String host) {
+		m_host = host;
 	}
 }
