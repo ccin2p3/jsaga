@@ -24,7 +24,7 @@ import org.ogf.saga.job.JobService;
 public class BatchSSHJobAdaptorTest extends TestCase {
     public void test_getScheme() {
         assertEquals(
-                "pbs+ssh",
+                "pbs-ssh",
                 new BatchSSHJobAdaptor().getType());
     }
 }
