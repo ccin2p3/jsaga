@@ -32,6 +32,14 @@ import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
  ****************************************************/
 public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
 
+    public String getType() {
+        return "pbs-ssh";
+    }
+
+    public int getDefaultPort() {
+        return 22;
+    }
+
 	// TODO : remove COMPRESSION_LEVEL
     protected static final String COMPRESSION_LEVEL = "CompressionLevel";
     protected static final String KNOWN_HOSTS = "KnownHosts";
