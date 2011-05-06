@@ -6,6 +6,8 @@
                 xmlns:spmd="http://schemas.ogf.org/jsdl/2007/02/jsdl-spmd"
                 xmlns:ext="http://www.in2p3.fr/jsdl-extension">
     <xsl:output method="text"/>
+	<xsl:param name="stagingDir"/>
+
     <xsl:variable name="ATTRIBUTE_SEPARATOR">;</xsl:variable>
     <!-- entry point (MUST BE RELATIVE) -->
 	 <xsl:template match="jsdl:JobDefinition">
@@ -15,13 +17,16 @@
     <xsl:template match="jsdl:JobDescription">
         <xsl:variable name="lf"><xsl:text>
 </xsl:text></xsl:variable>
+		<xsl:if test="$stagingDir">
+	        <xsl:text>#PBS -d </xsl:text><xsl:value-of select="concat($stagingDir,$lf)"/>
+		</xsl:if>
         <xsl:for-each select="jsdl:Application">
             <xsl:for-each select="posix:POSIXApplication">
                 <xsl:for-each select="posix:Output"
                         >#PBS -o <xsl:value-of select="concat(text(),$lf)"/>
                 </xsl:for-each>
                 <xsl:for-each select="posix:Error"
-                        >#PBS -e<xsl:value-of select="concat(text(),$lf)"/>
+                        >#PBS -e <xsl:value-of select="concat(text(),$lf)"/>
                 </xsl:for-each>
             </xsl:for-each>
         </xsl:for-each>
@@ -44,7 +49,8 @@
         <xsl:for-each select="jsdl:Application">
             <xsl:for-each select="posix:POSIXApplication">
                 <xsl:for-each select="posix:WorkingDirectory"
-                        >cd <xsl:value-of select="concat(text(),$lf)"/>
+                        ><xsl:text>cd </xsl:text><xsl:value-of select="text()"/><xsl:text> || exit $?
+</xsl:text>
                 </xsl:for-each>
                 <xsl:for-each select="posix:Executable"
                         > <xsl:value-of select="text()"/><xsl:text> </xsl:text>
