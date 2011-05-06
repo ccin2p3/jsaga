@@ -1,10 +1,13 @@
 package fr.in2p3.jsaga.adaptor.batchssh.job;
 
 import ch.ethz.ssh2.ChannelCondition;
+import ch.ethz.ssh2.SFTPv3Client;
+import ch.ethz.ssh2.SFTPv3FileHandle;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.HoldableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.SuspendableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
@@ -21,10 +24,12 @@ import org.ogf.saga.error.*;
  * Author: Taha BENYEZZA & Yassine BACHAR
  * Date:   07 December 2010
  * ***************************************************/
-public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobControlAdaptor, SuspendableJobAdaptor {
+public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobControlAdaptor, SuspendableJobAdaptor, HoldableJobAdaptor {
 
+	// TODO : implement CleanableJobAdaptor
+	
     public String getType() {
-        return "pbs+ssh";
+        return "pbs-ssh";
     }
 
     public JobMonitorAdaptor getDefaultJobMonitor() {
@@ -42,17 +47,22 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
         StringBuilder sb = new StringBuilder("#!/bin/bash\n");
         sb.append(jobDesc);
         // the script file creating command
-        String CreateCommand = "echo '" + sb.toString() + "' > " + FileName;
+        //String CreateCommand = "echo '" + sb.toString() + "' > " + FileName;
+        //String CreateCommand = "cat << EOF  > /tmp/" + FileName + "\n";
+        //CreateCommand += sb.toString();
+        //CreateCommand += "EOF\n";
+//System.out.println(CreateCommand);
         // the submission command
         String SubmitCommand = "qsub " + FileName;
         // the file deleting command
-        String DeleteCommand = "rm " + FileName;
+        //String DeleteCommand = "rm " + FileName;
         String JobId = null;
         // a new ganymed session instance
         Session session = null;
         InputStream stdout;
         BufferedReader br;
 
+        /*
         try {
             session = connexion.openSession();
             // creating the pbs file
@@ -71,37 +81,49 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
             // closing the first session
             session.close();
         }
+		*/
+        SFTPv3Client sftp;
+        try {
+			sftp = new SFTPv3Client(connexion);
+			SFTPv3FileHandle script = sftp.createFile(FileName);
+			sftp.write(script, 0, sb.toString().getBytes(), 0, sb.length());
+			sftp.closeFile(script);
+		} catch (IOException e1) {
+			throw new NoSuccessException("Unable to send script via SFTP", e1);
+		}
 
-        // Openning a new session
+		// Openning a new session
         try {
             session = connexion.openSession();
 
-            //submitting the job
-            try {
-                session.execCommand(SubmitCommand);
-            } catch (IOException ex) {
-                System.out.println("Executing command error :" + ex.getMessage());
-            }
+            session.execCommand(SubmitCommand);
+            
             // waiting for the qsub command to end
             int conditions = session.waitForCondition(ChannelCondition.STDOUT_DATA | ChannelCondition.STDERR_DATA
                     | ChannelCondition.EOF | ChannelCondition.EXIT_SIGNAL, 0);
 
+            // TODO : test exit_status
             // Retrieving the standard output
-            try {
-                stdout = new StreamGobbler(session.getStdout());
-                br = new BufferedReader(new InputStreamReader(stdout));
-
-                JobId = br.readLine();
-            } catch (Exception e) {
-                throw new NoSuccessException(e);
-            }
+            stdout = new StreamGobbler(session.getStdout());
+            br = new BufferedReader(new InputStreamReader(stdout));
+            
+            // TODO test if JobId is null
+            JobId = br.readLine();
 
         } catch (IOException ex) {
-            System.out.println("Opening session error :" + ex.getMessage());
+			throw new NoSuccessException("Unable to submit job", ex);
         } finally {
             // closing the second session
             session.close();
+            // remove the script and close the SFTP
+            try {
+				sftp.rm(FileName);
+			} catch (IOException e) {
+				// Ignore
+			}
+            sftp.close();
         }
+        /*
         // Openning a new session
         try {
             session = connexion.openSession();
@@ -120,6 +142,7 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
             // closing the third session
             session.close();
         }
+        */
 
         return JobId;
     }
@@ -134,16 +157,12 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
             session = connexion.openSession();
 
             //Canceling the job
-            try {
-                session.execCommand(CancelCommand);
-            } catch (IOException ex) {
-                System.out.println("Exuctuting command error :" + ex.getMessage());
-            }
+            session.execCommand(CancelCommand);
             // waiting for the delete command to end
             int conditions = session.waitForCondition(ChannelCondition.STDOUT_DATA | ChannelCondition.STDERR_DATA
                     | ChannelCondition.EOF | ChannelCondition.EXIT_SIGNAL, 0);
         } catch (IOException ex) {
-            System.out.println("Opening session error :" + ex.getMessage());
+			throw new NoSuccessException("Unable to cancel job", ex);
         } finally {
             // closing the session
             session.close();
@@ -157,6 +176,7 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
         // the holding command
         String HoldCommand = "qhold " + nativeJobId;
 
+        // TODO : remove included try catch
         // Openning a new session
         try {
             session = connexion.openSession();
@@ -169,9 +189,11 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
                 ok = false;
             }
             // waiting for the delete command to end
-            int conditions = session.waitForCondition(ChannelCondition.STDOUT_DATA | ChannelCondition.STDERR_DATA
-                    | ChannelCondition.EOF | ChannelCondition.EXIT_SIGNAL, 0);
-
+            int conditions = session.waitForCondition(ChannelCondition.EXIT_STATUS, 0);
+            int exitStatus = session.getExitStatus();
+            if (exitStatus != 0) {
+            	ok = false;
+            }
         } catch (IOException ex) {
             System.out.println("Opening session error :" + ex.getMessage());
             ok = false;
@@ -190,6 +212,7 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
         // the releasing command
         String ReleaseCommand = "qrls " + nativeJobId;
 
+        // TODO : remove included try catch
         // Openning a new session
         try {
             session = connexion.openSession();
@@ -201,8 +224,11 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
                 ok = false;
             }
             // waiting for the delete command to end
-            int conditions = session.waitForCondition(ChannelCondition.STDOUT_DATA | ChannelCondition.STDERR_DATA
-                    | ChannelCondition.EOF | ChannelCondition.EXIT_SIGNAL, 0);
+            int conditions = session.waitForCondition(ChannelCondition.EXIT_STATUS, 0);
+            int exitStatus = session.getExitStatus();
+            if (exitStatus != 0) {
+            	ok = false;
+            }
         } catch (IOException ex) {
             System.out.println("Opening session error :" + ex.getMessage());
             ok = false;
@@ -217,4 +243,15 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
     public int getDefaultPort() {
         return 22;
     }
+
+	public boolean hold(String nativeJobId) throws PermissionDeniedException,
+			TimeoutException, NoSuccessException {
+		return this.suspend(nativeJobId);
+	}
+
+	public boolean release(String nativeJobId)
+			throws PermissionDeniedException, TimeoutException,
+			NoSuccessException {
+		return this.release(nativeJobId);
+	}
 }
