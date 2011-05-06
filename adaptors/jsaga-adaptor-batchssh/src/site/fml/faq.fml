@@ -11,5 +11,18 @@
                 please contact us so that we can fill out this FAQ.
             </answer>
         </faq>
+        <faq id="url">
+            <question>What is the URL syntax understood by this plug-in ?</question>
+            <answer>The URL must be:
+                <pre><![CDATA[pbs-ssh://<HOSTNAME>[:<PORT>][/?statingDir=<REMOTE_STAGING_DIR>]
+Where:
+    <HOSTNAME> is the name of the host running the SSH daemon,
+    <PORT> is 22 by default,
+    <REMOTE_STAGING_DIRECTORY> is a directory where PBS will be able to write job outputs on the SSH server.
+    By default, PBS will write into your HOME on the server. Use this parameter only if the PBS server will not have
+    appropriate permissions to write into your HOME.
+]]></pre>
+            </answer>
+        </faq>
     </part>
 </faqs>
