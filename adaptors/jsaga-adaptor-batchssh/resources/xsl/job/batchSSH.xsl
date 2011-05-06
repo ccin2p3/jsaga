@@ -42,8 +42,14 @@
             <xsl:for-each select="jsdl:TotalCPUCount/*"
                     >#PBS -l nodes=<xsl:value-of select="concat(text(),$lf)"/>
             </xsl:for-each>
+            <xsl:for-each select="jsdl:TotalCPUTime/*"
+                    >#PBS -l cput=<xsl:value-of select="concat(text(),$lf)"/>
+            </xsl:for-each>
             <xsl:for-each select="jsdl:TotalPhysicalMemory/*"
                     >#PBS -l pmem=<xsl:value-of select="concat(text(),$lf)"/>
+            </xsl:for-each>
+            <xsl:for-each select="jsdl:Queue/*"
+                    >#PBS -q <xsl:value-of select="concat(text(),$lf)"/>
             </xsl:for-each>
         </xsl:for-each>
         <xsl:for-each select="jsdl:Application">

@@ -43,7 +43,7 @@ public class BatchSSHJobAdaptorTestSuite extends JSAGATestSuite {
         //public void test_error() { super.ignore("not supported"); }
         public void test_fileTransfer() { super.ignore("not supported"); }
         public void test_cleanup() { super.ignore("not supported"); }
-        public void test_totalCPUTime() { super.ignore("not supported"); }
+        //public void test_totalCPUTime() { super.ignore("not supported"); }
         //public void test_totalPhysicalMemory() { super.ignore("not supported"); }
         public void test_cpuArchitecture() { super.ignore("not supported"); }
         public void test_operatingSystemType() { super.ignore("not supported"); }
@@ -62,7 +62,7 @@ public class BatchSSHJobAdaptorTestSuite extends JSAGATestSuite {
     }
 
     // test cases
-    //public static class BatchSSHJobRunSandboxTest extends JobRunSandboxTest {
+    //TODO: public static class BatchSSHJobRunSandboxTest extends JobRunSandboxTest {
     //    public BatchSSHJobRunSandboxTest() throws Exception {super("pbs-ssh");}
     //}
     
@@ -79,13 +79,12 @@ public class BatchSSHJobAdaptorTestSuite extends JSAGATestSuite {
  	// test cases
     public static class BatchSSHJobRunDescriptionTest extends JobRunDescriptionTest {
         public BatchSSHJobRunDescriptionTest() throws Exception {super("pbs-ssh");}
-        public void test_run_queueRequirement() { super.ignore("not supported"); }
-        public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
-        public void test_run_memoryRequirement() { super.ignore("not supported"); }
+        // TODO: public void test_run_queueRequirement() { super.ignore("not supported"); }
+        // TODO: public void test_run_memoryRequirement() { super.ignore("not supported"); }
     }
     
     // test cases
-    //public static class BatchSSHJobRunInteractiveTest extends JobRunInteractiveTest {
+    //TODO: public static class BatchSSHJobRunInteractiveTest extends JobRunInteractiveTest {
     //    public BatchSSHJobRunInteractiveTest() throws Exception {super("pbs-ssh");}
     //    public void test_simultaneousStdin()  { super.ignore("Not supported");}
     //}
