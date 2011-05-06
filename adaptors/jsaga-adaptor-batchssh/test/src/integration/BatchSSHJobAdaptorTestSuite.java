@@ -74,7 +74,6 @@ public class BatchSSHJobAdaptorTestSuite extends JSAGATestSuite {
         public void test_suspend_running() { super.ignore("not supported"); }
         public void test_simultaneousShortJob() throws Exception { super.ignore("not working");}
         public void test_simultaneousLongJob() throws Exception { super.ignore("not working");}
-        public void test_listJob() { super.ignore("not supported"); }
     }
     
  	// test cases

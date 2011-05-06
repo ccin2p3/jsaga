@@ -7,15 +7,16 @@ package fr.in2p3.jsaga.adaptor.batchssh.job;
 import ch.ethz.ssh2.ChannelCondition;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
-import fr.in2p3.jsaga.adaptor.job.SubState;
+import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
 import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.regex.MatchResult;
 
@@ -24,10 +25,8 @@ import java.util.regex.MatchResult;
  * Author: Taha BENYEZZA & Yassine BACHAR
  * Date:   07 December 2010
  * ***************************************************/
-public class BatchSSHMonitorAdaptor extends BatchSSHAdaptorAbstract implements JobMonitorAdaptor, QueryIndividualJob {
+public class BatchSSHMonitorAdaptor extends BatchSSHAdaptorAbstract implements JobMonitorAdaptor, QueryIndividualJob, ListableJobAdaptor {
 
-	// TODO: implement listableJobAdaptor
-	
     public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
         Session session = null;
         String StatusCommand = "qstat -f " + nativeJobId;
@@ -37,34 +36,18 @@ public class BatchSSHMonitorAdaptor extends BatchSSHAdaptorAbstract implements J
         String exit_code = null;
         String job_state = null;
         try {
-            session = connexion.openSession();
-
-            //executing the qstat command
-            try {
-                session.execCommand(StatusCommand);
-            } catch (IOException ex) {
-                System.out.println("Executing command error :" + ex.getMessage());
+        	session = this.sendCommand(StatusCommand);
+            stdout = new StreamGobbler(session.getStdout());
+            br = new BufferedReader(new InputStreamReader(stdout));
+            String line;
+            while ((line = br.readLine()) != null) {
+                qstatOutput += line;
             }
-
-            try {
-                stdout = new StreamGobbler(session.getStdout());
-                br = new BufferedReader(new InputStreamReader(stdout));
-                String line;
-                while ((line = br.readLine()) != null) {
-                    qstatOutput += line;
-                }
-                br.close();
-            } catch (IOException e) {
-                System.out.println(e.toString());
-            }
+            br.close();
 
             qstatOutput = qstatOutput.toUpperCase();
-            
-            // waiting for the delete command to end
-            int conditions = session.waitForCondition(ChannelCondition.STDOUT_DATA | ChannelCondition.STDERR_DATA
-                    | ChannelCondition.EOF | ChannelCondition.EXIT_SIGNAL, 0);
         } catch (IOException ex) {
-            System.out.println("Oppening session error :" + ex.getMessage());
+			throw new NoSuccessException("Unable to query job status", ex);
         } finally {
             // clossing the second session
             session.close();
@@ -90,4 +73,30 @@ public class BatchSSHMonitorAdaptor extends BatchSSHAdaptorAbstract implements J
 
     }
 
+	public String[] list() throws PermissionDeniedException, TimeoutException,
+			NoSuccessException {
+        Session session = null;
+        InputStream stdout;
+        BufferedReader br;
+		List<String> urls = new ArrayList<String>();
+        try {
+        	// there is no qstat option to get non-truncated hostname !!!
+        	session = this.sendCommand("qstat -f -1 | grep 'Job Id:'");
+            stdout = new StreamGobbler(session.getStdout());
+            br = new BufferedReader(new InputStreamReader(stdout));
+            String line;
+            while ((line = br.readLine()) != null) {
+            	String jobid = line.split(":")[1].trim();
+    			urls.add(jobid);
+    			System.out.println(jobid);
+            }
+            br.close();
+
+        } catch (IOException ex) {
+			throw new NoSuccessException("Unable to query job list", ex);
+        } finally {
+            session.close();
+        }
+		return (String[])urls.toArray(new String[urls.size()]);
+	}
 }
