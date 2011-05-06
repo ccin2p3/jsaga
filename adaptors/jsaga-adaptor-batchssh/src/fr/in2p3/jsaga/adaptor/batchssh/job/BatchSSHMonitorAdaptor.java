@@ -4,7 +4,6 @@
  */
 package fr.in2p3.jsaga.adaptor.batchssh.job;
 
-import ch.ethz.ssh2.ChannelCondition;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
 import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
@@ -88,7 +87,6 @@ public class BatchSSHMonitorAdaptor extends BatchSSHAdaptorAbstract implements J
             while ((line = br.readLine()) != null) {
             	String jobid = line.split(":")[1].trim();
     			urls.add(jobid);
-    			System.out.println(jobid);
             }
             br.close();
 
