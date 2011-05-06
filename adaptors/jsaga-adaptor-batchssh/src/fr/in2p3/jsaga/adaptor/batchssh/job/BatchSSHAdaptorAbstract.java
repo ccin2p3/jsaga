@@ -32,8 +32,16 @@ import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
  ****************************************************/
 public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
 
+	// TODO : remove COMPRESSION_LEVEL
     protected static final String COMPRESSION_LEVEL = "CompressionLevel";
     protected static final String KNOWN_HOSTS = "KnownHosts";
+    
+    // used if no working directory is defined in the job description
+    // to write stdout and stderr
+    // set as #PBS -d <dir>
+    // If not defined, PBS will use $PBS_O_HOME which is $HOME with SSH
+    protected static final String STAGING_DIRECTORY = "stagingDir";
+    
     public static final String USER_PUBLICKEY = "UserPublicKey";
     protected static KnownHosts KnownHosts = new KnownHosts();
     protected Connection connexion;
@@ -44,6 +52,7 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
         return new UAnd(
                 new Usage[]{
                     new UOptional(KNOWN_HOSTS),
+                    new UOptional(STAGING_DIRECTORY),
                     new UOptional(COMPRESSION_LEVEL)});
     }
 
