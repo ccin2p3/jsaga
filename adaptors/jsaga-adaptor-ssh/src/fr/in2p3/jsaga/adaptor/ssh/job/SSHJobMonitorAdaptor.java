@@ -32,7 +32,6 @@ import com.jcraft.jsch.SftpException;
 * Author: Nicolas DEMESY (nicolas.demesy@bt.com)
 * Date:   11 avril 2008
 * ***************************************************/
-// TODO: implement ListableJobAdaptor
 
 public class SSHJobMonitorAdaptor extends SSHAdaptorAbstract implements QueryIndividualJob, ListableJobAdaptor {
 
