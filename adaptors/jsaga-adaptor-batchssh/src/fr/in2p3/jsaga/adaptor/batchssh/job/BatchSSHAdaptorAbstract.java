@@ -1,7 +1,9 @@
 package fr.in2p3.jsaga.adaptor.batchssh.job;
 
+import ch.ethz.ssh2.ChannelCondition;
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.KnownHosts;
+import ch.ethz.ssh2.Session;
 import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
@@ -40,8 +42,6 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
         return 22;
     }
 
-	// TODO : remove COMPRESSION_LEVEL
-    protected static final String COMPRESSION_LEVEL = "CompressionLevel";
     protected static final String KNOWN_HOSTS = "KnownHosts";
     
     // used if no working directory is defined in the job description
@@ -61,7 +61,7 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
                 new Usage[]{
                     new UOptional(KNOWN_HOSTS),
                     new UOptional(STAGING_DIRECTORY),
-                    new UOptional(COMPRESSION_LEVEL)});
+                });
     }
 
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
@@ -143,5 +143,20 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
     public void disconnect() throws NoSuccessException {
         // Closing the connection
         connexion.close();
+    }
+    
+    protected Session sendCommand(String command) throws IOException {
+        Session session = connexion.openSession();
+
+        session.execCommand(command);
+        
+        // waiting for the qsub command to end
+        int conditions = session.waitForCondition( ChannelCondition.EXIT_STATUS, 0);
+
+        int exitStatus = session.getExitStatus();
+        if (exitStatus != 0) {
+        	throw new IOException(command + ", errno=" + exitStatus);
+        }
+        return session;
     }
 }
