@@ -26,28 +26,34 @@ import java.util.regex.MatchResult;
  * ***************************************************/
 public class BatchSSHMonitorAdaptor extends BatchSSHAdaptorAbstract implements JobMonitorAdaptor, QueryIndividualJob {
 
-    private static Map<String, SubState> StatusMap = new HashMap<String, SubState>();
+	// TODO: implement listableJobAdaptor
+	
+    //private static Map<String, SubState> StatusMap = new HashMap<String, SubState>();
 
+	// TODO: move this to Abstract
     public String getType() {
-        return "pbs+ssh";
+        return "pbs-ssh";
     }
 
+	// TODO: move this to Abstract
     public int getDefaultPort() {
         return 22;
     }
 
     public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
         // initialisinf the StatusMap
-        initMap();
-        String JobState = null;
+        //initMap();
+        //String JobState = null;
         Session session = null;
         // the qstat Command
+        // TODO : set back to "qstat" and change path on server side
         String StatusCommand = "qstat -f " + nativeJobId;
         InputStream stdout;
         BufferedReader br;
         String qstatOutput = "";
-        String outKey = "";
-
+        //String outKey = "";
+        String exit_code = null;
+        String job_state = null;
         try {
             session = connexion.openSession();
 
@@ -71,8 +77,8 @@ public class BatchSSHMonitorAdaptor extends BatchSSHAdaptorAbstract implements J
                 System.out.println(e.toString());
             }
 
-
             qstatOutput = qstatOutput.toUpperCase();
+            
             // waiting for the delete command to end
             int conditions = session.waitForCondition(ChannelCondition.STDOUT_DATA | ChannelCondition.STDERR_DATA
                     | ChannelCondition.EOF | ChannelCondition.EXIT_SIGNAL, 0);
@@ -82,67 +88,25 @@ public class BatchSSHMonitorAdaptor extends BatchSSHAdaptorAbstract implements J
             // clossing the second session
             session.close();
         }
-
         try {
-            session = connexion.openSession();
-
-            try {
-                session.execCommand("echo $?");
-            } catch (IOException ex) {
-                System.out.println("Executing command error :" + ex.getMessage());
-            }
-
-            try {
-                stdout = new StreamGobbler(session.getStdout());
-                br = new BufferedReader(new InputStreamReader(stdout));
-                outKey = br.readLine();
-                br.close();
-
-            } catch (Exception ex) {
-                System.out.println(ex.toString());
-            }
-
-            if (!outKey.equals("0")) {
-                if (outKey.equals("127")) {
-                    throw new NoSuccessException("Command not found");
-                } else {
-                    JobState = "E";
-                }
-            } else {
-                try {
-                    Scanner s = new Scanner(qstatOutput);
-                    s.findInLine(".*JOB_STATE\\s*=\\s*([CEHQSWR]).*");
-                    MatchResult result = s.match();
-                    JobState = result.group(1);
-                } catch (Exception ex) {
-                    System.out.println(ex.toString());
-                }
-            }
-        } catch (IOException ex) {
-            System.out.println("Oppening session error :" + ex.getMessage());
-        } finally {
-            //closing the session
-            session.close();
+            Scanner s = new Scanner(qstatOutput);
+	        s.findInLine(".*JOB_STATE\\s*=\\s*([CEHQSWR]).*");
+	        MatchResult result = s.match();
+	        job_state = result.group(1);
+        } catch (IllegalStateException ise) {
+        	throw new NoSuccessException("Unable to get status", ise);
         }
-
-        // a new Substate instance
-        SubState status;
-        // getting the appropriate state
-        status = StatusMap.get(JobState);
-        return new BatchSSHJobStatus(nativeJobId, status);
-
-    }
-
-    public static void initMap() {
-
-        // the mapping between the caractere and the appropriate state.
-        StatusMap.put("C", SubState.DONE);
-        StatusMap.put("E", SubState.DONE);
-        StatusMap.put("H", SubState.SUSPENDED_ACTIVE);
-        StatusMap.put("Q", SubState.RUNNING_QUEUED);
-        StatusMap.put("S", SubState.SUSPENDED_QUEUED);
-        StatusMap.put("W", SubState.SUSPENDED_QUEUED);
-        StatusMap.put("R", SubState.RUNNING_ACTIVE);
+        try {
+            Scanner s = new Scanner(qstatOutput);
+	        s.findInLine(".*EXIT_STATUS\\s*=\\s*(\\d+).*");
+	        MatchResult result = s.match();
+	        exit_code = result.group(1);
+            return new BatchSSHJobStatus(nativeJobId, job_state, new Integer(exit_code).intValue());
+        } catch (IllegalStateException ise) {
+            return new BatchSSHJobStatus(nativeJobId, job_state);
+        }
+        
 
     }
+
 }
