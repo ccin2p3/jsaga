@@ -28,30 +28,12 @@ public class BatchSSHMonitorAdaptor extends BatchSSHAdaptorAbstract implements J
 
 	// TODO: implement listableJobAdaptor
 	
-    //private static Map<String, SubState> StatusMap = new HashMap<String, SubState>();
-
-	// TODO: move this to Abstract
-    public String getType() {
-        return "pbs-ssh";
-    }
-
-	// TODO: move this to Abstract
-    public int getDefaultPort() {
-        return 22;
-    }
-
     public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
-        // initialisinf the StatusMap
-        //initMap();
-        //String JobState = null;
         Session session = null;
-        // the qstat Command
-        // TODO : set back to "qstat" and change path on server side
         String StatusCommand = "qstat -f " + nativeJobId;
         InputStream stdout;
         BufferedReader br;
         String qstatOutput = "";
-        //String outKey = "";
         String exit_code = null;
         String job_state = null;
         try {
@@ -69,7 +51,6 @@ public class BatchSSHMonitorAdaptor extends BatchSSHAdaptorAbstract implements J
                 br = new BufferedReader(new InputStreamReader(stdout));
                 String line;
                 while ((line = br.readLine()) != null) {
-                    //System.out.println(ligne);
                     qstatOutput += line;
                 }
                 br.close();

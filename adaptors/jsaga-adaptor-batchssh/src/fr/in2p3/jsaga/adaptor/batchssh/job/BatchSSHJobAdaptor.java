@@ -28,10 +28,6 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
 
 	// TODO : implement CleanableJobAdaptor
 	
-    public String getType() {
-        return "pbs-ssh";
-    }
-
     public JobMonitorAdaptor getDefaultJobMonitor() {
         return new BatchSSHMonitorAdaptor();
     }
@@ -238,10 +234,6 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
         }
 
         return ok;
-    }
-
-    public int getDefaultPort() {
-        return 22;
     }
 
 	public boolean hold(String nativeJobId) throws PermissionDeniedException,
