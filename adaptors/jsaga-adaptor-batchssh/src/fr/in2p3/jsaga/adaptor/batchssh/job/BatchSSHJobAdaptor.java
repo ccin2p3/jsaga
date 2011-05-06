@@ -42,42 +42,13 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
         // the scpript's contenent
         StringBuilder sb = new StringBuilder("#!/bin/bash\n");
         sb.append(jobDesc);
-        // the script file creating command
-        //String CreateCommand = "echo '" + sb.toString() + "' > " + FileName;
-        //String CreateCommand = "cat << EOF  > /tmp/" + FileName + "\n";
-        //CreateCommand += sb.toString();
-        //CreateCommand += "EOF\n";
-//System.out.println(CreateCommand);
         // the submission command
         String SubmitCommand = "qsub " + FileName;
-        // the file deleting command
-        //String DeleteCommand = "rm " + FileName;
         String JobId = null;
-        // a new ganymed session instance
         Session session = null;
         InputStream stdout;
         BufferedReader br;
 
-        /*
-        try {
-            session = connexion.openSession();
-            // creating the pbs file
-            try {
-                session.execCommand(CreateCommand);
-            } catch (IOException ex) {
-                System.out.println("Executing command error :" + ex.getMessage());
-            }
-            // waiting for the creating command to end
-            int conditions = session.waitForCondition(ChannelCondition.STDOUT_DATA | ChannelCondition.STDERR_DATA
-                    | ChannelCondition.EOF | ChannelCondition.EXIT_SIGNAL, 0);
-
-        } catch (IOException ex) {
-            System.out.println("Opening session error :" + ex.getMessage());
-        } finally {
-            // closing the first session
-            session.close();
-        }
-		*/
         SFTPv3Client sftp;
         try {
 			sftp = new SFTPv3Client(connexion);
@@ -90,17 +61,7 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
 
 		// Openning a new session
         try {
-            session = connexion.openSession();
-
-            session.execCommand(SubmitCommand);
-            
-            // waiting for the qsub command to end
-            int conditions = session.waitForCondition( ChannelCondition.EXIT_STATUS, 0);
-
-            int exitStatus = session.getExitStatus();
-            if (exitStatus != 0) {
-            	throw new IOException("qsub returned: " + exitStatus);
-            }
+        	session = this.sendCommand(SubmitCommand);
             // Retrieving the standard output
             stdout = new StreamGobbler(session.getStdout());
             br = new BufferedReader(new InputStreamReader(stdout));
@@ -112,8 +73,7 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
         } catch (IOException ex) {
 			throw new NoSuccessException("Unable to submit job", ex);
         } finally {
-            // closing the second session
-            session.close();
+            if (session != null) session.close();
             // remove the script and close the SFTP
             try {
 				sftp.rm(FileName);
@@ -122,26 +82,6 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
 			}
             sftp.close();
         }
-        /*
-        // Openning a new session
-        try {
-            session = connexion.openSession();
-            //Deletting the pbs file
-            try {
-                session.execCommand(DeleteCommand);
-            } catch (IOException ex) {
-                System.out.println("Exuctuting command error :" + ex.getMessage());
-            }
-            // waiting for the delete command to end
-            int conditions = session.waitForCondition(ChannelCondition.STDOUT_DATA | ChannelCondition.STDERR_DATA
-                    | ChannelCondition.EOF | ChannelCondition.EXIT_SIGNAL, 0);
-        } catch (IOException ex) {
-            System.out.println("Opening session error :" + ex.getMessage());
-        } finally {
-            // closing the third session
-            session.close();
-        }
-        */
 
         return JobId;
     }
@@ -153,18 +93,11 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
 
         // Openning a new session
         try {
-            session = connexion.openSession();
-
-            //Canceling the job
-            session.execCommand(CancelCommand);
-            // waiting for the delete command to end
-            int conditions = session.waitForCondition(ChannelCondition.STDOUT_DATA | ChannelCondition.STDERR_DATA
-                    | ChannelCondition.EOF | ChannelCondition.EXIT_SIGNAL, 0);
+            session = this.sendCommand(CancelCommand);
         } catch (IOException ex) {
 			throw new NoSuccessException("Unable to cancel job", ex);
         } finally {
-            // closing the session
-            session.close();
+            if (session != null) session.close();
         }
     }
 
@@ -175,30 +108,17 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
         // the holding command
         String HoldCommand = "qhold " + nativeJobId;
 
-        // TODO : remove included try catch
         // Openning a new session
         try {
-            session = connexion.openSession();
-
-            //holding the job
-            try {
-                session.execCommand(HoldCommand);
-            } catch (IOException ex) {
-                System.out.println("Exuctuting command error :" + ex.getMessage());
-                ok = false;
-            }
-            // waiting for the delete command to end
-            int conditions = session.waitForCondition(ChannelCondition.EXIT_STATUS, 0);
-            int exitStatus = session.getExitStatus();
-            if (exitStatus != 0) {
-            	ok = false;
-            }
+        	session = this.sendCommand(HoldCommand);
         } catch (IOException ex) {
-            System.out.println("Opening session error :" + ex.getMessage());
-            ok = false;
+        	if (ex.getMessage().contains("errno=168")) { // qhold on a finished job
+        		ok=false;
+        	} else {
+        		throw new NoSuccessException("Unable to suspend/hold job", ex);
+        	}
         } finally {
-            // clossing the second session
-            session.close();
+            if (session != null) session.close();
         }
 
         return ok;
@@ -206,34 +126,21 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
 
     public boolean resume(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         Session session = null;
-        // ok = true if the command is executed successfuly and false if not
         Boolean ok = true;
         // the releasing command
         String ReleaseCommand = "qrls " + nativeJobId;
 
-        // TODO : remove included try catch
         // Openning a new session
         try {
-            session = connexion.openSession();
-            //Releasing the job
-            try {
-                session.execCommand(ReleaseCommand);
-            } catch (IOException ex) {
-                System.out.println("Exuctuting command error :" + ex.getMessage());
-                ok = false;
-            }
-            // waiting for the delete command to end
-            int conditions = session.waitForCondition(ChannelCondition.EXIT_STATUS, 0);
-            int exitStatus = session.getExitStatus();
-            if (exitStatus != 0) {
-            	ok = false;
-            }
+        	session = this.sendCommand(ReleaseCommand);
         } catch (IOException ex) {
-            System.out.println("Opening session error :" + ex.getMessage());
-            ok = false;
+        	if (ex.getMessage().contains("errno=168")) { // qrls on a finished job
+        		ok=false;
+        	} else {
+        		throw new NoSuccessException("Unable to resume/release job", ex);
+        	}
         } finally {
-            // clossing the second session
-            session.close();
+            if (session != null) session.close();
         }
 
         return ok;
