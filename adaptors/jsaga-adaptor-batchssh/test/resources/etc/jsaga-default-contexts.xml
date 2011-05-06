@@ -1,2 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jsaga-default xmlns="http://www.in2p3.fr/jsaga/session"/>
+<jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
+    <session>
+	    <context type="UserPass">
+            <attribute name="UserPass" value="XXX"/>
+            <job type="pbs-ssh"/>
+	    </context>
+    </session>
+</jsaga-default>
