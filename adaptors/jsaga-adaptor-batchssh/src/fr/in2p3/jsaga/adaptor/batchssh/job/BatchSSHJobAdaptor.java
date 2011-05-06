@@ -95,17 +95,20 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
             session.execCommand(SubmitCommand);
             
             // waiting for the qsub command to end
-            int conditions = session.waitForCondition(ChannelCondition.STDOUT_DATA | ChannelCondition.STDERR_DATA
-                    | ChannelCondition.EOF | ChannelCondition.EXIT_SIGNAL, 0);
+            int conditions = session.waitForCondition( ChannelCondition.EXIT_STATUS, 0);
 
-            // TODO : test exit_status
+            int exitStatus = session.getExitStatus();
+            if (exitStatus != 0) {
+            	throw new IOException("qsub returned: " + exitStatus);
+            }
             // Retrieving the standard output
             stdout = new StreamGobbler(session.getStdout());
             br = new BufferedReader(new InputStreamReader(stdout));
             
-            // TODO test if JobId is null
             JobId = br.readLine();
-
+            if (JobId == null) {
+            	throw new IOException("qsub did not return a JobID");
+            }
         } catch (IOException ex) {
 			throw new NoSuccessException("Unable to submit job", ex);
         } finally {
