@@ -24,6 +24,7 @@ public class UserPassStoreSecurityCredential implements SecurityCredential {
 
 	private String m_host = null;
 	private Hashtable m_creds = null;
+	private final String DEFAULT_HOST_TOKEN = "default";
 	
 	public UserPassStoreSecurityCredential() {
 		m_creds = new Hashtable();
@@ -60,7 +61,7 @@ public class UserPassStoreSecurityCredential implements SecurityCredential {
 		if (m_host == null) throw new NoSuccessException("Host is not defined yet, UserPass is not available");
 		if (m_creds == null) throw new NoSuccessException("Store is not initialized");
 		if (m_creds.containsKey(m_host)) return (UserPassSecurityCredential)m_creds.get(m_host);
-		if (m_creds.containsKey("default")) return (UserPassSecurityCredential)m_creds.get("default");
+		if (m_creds.containsKey(this.DEFAULT_HOST_TOKEN)) return (UserPassSecurityCredential)m_creds.get(this.DEFAULT_HOST_TOKEN);
 		throw new NoSuccessException("Not found in store:" + m_host);
 	}
 	
