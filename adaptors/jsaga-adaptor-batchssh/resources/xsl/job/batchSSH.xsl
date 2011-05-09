@@ -20,6 +20,11 @@
 		<xsl:if test="$stagingDir">
 	        <xsl:text>#PBS -d </xsl:text><xsl:value-of select="concat($stagingDir,$lf)"/>
 		</xsl:if>
+        <xsl:for-each select="jsdl:JobIdentification">
+            <xsl:for-each select="jsdl:JobAnnotation"
+            	>#PBS -q <xsl:value-of select="concat(text(),$lf)"/>
+            </xsl:for-each>
+        </xsl:for-each>
         <xsl:for-each select="jsdl:Application">
             <xsl:for-each select="posix:POSIXApplication">
                 <xsl:for-each select="posix:Output"
