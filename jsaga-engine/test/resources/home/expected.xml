@@ -39,6 +39,8 @@
     </contexts>
     <session>
         <context type="UserPass">
+            <attribute name="UserID" value="anonymous"/>
+            <attribute name="UserPass" value="anon"/>
             <attribute name="UrlPrefix" value="STestContext"/>
         </context>
     </session>
