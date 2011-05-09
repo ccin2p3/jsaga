@@ -47,7 +47,9 @@ public class BatchSSHMonitorAdaptor extends BatchSSHAdaptorAbstract implements J
             qstatOutput = qstatOutput.toUpperCase();
         } catch (IOException ex) {
 			throw new NoSuccessException("Unable to query job status", ex);
-        } finally {
+        } catch (BatchSSHCommandFailedException e) {
+			throw new NoSuccessException("Unable to query job status", e);
+		} finally {
             // clossing the second session
             session.close();
         }
@@ -92,6 +94,8 @@ public class BatchSSHMonitorAdaptor extends BatchSSHAdaptorAbstract implements J
 
         } catch (IOException ex) {
 			throw new NoSuccessException("Unable to query job list", ex);
+        } catch (BatchSSHCommandFailedException e) {
+			throw new NoSuccessException("Unable to query job list", e);
         } finally {
             session.close();
         }

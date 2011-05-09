@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.adaptor.batchssh.job;
 
-import ch.ethz.ssh2.ChannelCondition;
 import ch.ethz.ssh2.SFTPv3Client;
 import ch.ethz.ssh2.SFTPv3FileHandle;
 import ch.ethz.ssh2.Session;
@@ -26,8 +25,6 @@ import org.ogf.saga.error.*;
  * ***************************************************/
 public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobControlAdaptor, SuspendableJobAdaptor, HoldableJobAdaptor {
 
-	// TODO : implement CleanableJobAdaptor
-	
     public JobMonitorAdaptor getDefaultJobMonitor() {
         return new BatchSSHMonitorAdaptor();
     }
@@ -40,6 +37,7 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
         // Creating the pbs script file's name using the randomUUID
         String FileName = UUID.randomUUID().toString() + ".pbs";
         // the scpript's contenent
+//System.out.println(jobDesc);        
         StringBuilder sb = new StringBuilder("#!/bin/bash\n");
         sb.append(jobDesc);
         // the submission command
@@ -72,6 +70,11 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
             }
         } catch (IOException ex) {
 			throw new NoSuccessException("Unable to submit job", ex);
+        } catch (BatchSSHCommandFailedException e) {
+        	if (e.isErrorTypeOfBadResource()) {
+        		throw new BadResource("Error in Job description", e);
+        	}
+			throw new NoSuccessException("Unable to submit job", e);
         } finally {
             if (session != null) session.close();
             // remove the script and close the SFTP
@@ -96,6 +99,8 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
             session = this.sendCommand(CancelCommand);
         } catch (IOException ex) {
 			throw new NoSuccessException("Unable to cancel job", ex);
+        } catch (BatchSSHCommandFailedException e) {
+			throw new NoSuccessException("Unable to cancel job", e);
         } finally {
             if (session != null) session.close();
         }
@@ -112,7 +117,9 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
         try {
         	session = this.sendCommand(HoldCommand);
         } catch (IOException ex) {
-        	if (ex.getMessage().contains("errno=168")) { // qhold on a finished job
+    		throw new NoSuccessException("Unable to suspend/hold job", ex);
+        } catch (BatchSSHCommandFailedException ex) {
+        	if (ex.getErrno() == BatchSSHCommandFailedException.PBS_QHOLD_E_JOB_INVALID_STATE) { // qhold on a finished job
         		ok=false;
         	} else {
         		throw new NoSuccessException("Unable to suspend/hold job", ex);
@@ -134,7 +141,9 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
         try {
         	session = this.sendCommand(ReleaseCommand);
         } catch (IOException ex) {
-        	if (ex.getMessage().contains("errno=168")) { // qrls on a finished job
+    		throw new NoSuccessException("Unable to resume/release job", ex);
+        } catch (BatchSSHCommandFailedException ex) {
+        	if (ex.getErrno() == BatchSSHCommandFailedException.PBS_QHOLD_E_JOB_INVALID_STATE) { // qrls on a finished job
         		ok=false;
         	} else {
         		throw new NoSuccessException("Unable to resume/release job", ex);
