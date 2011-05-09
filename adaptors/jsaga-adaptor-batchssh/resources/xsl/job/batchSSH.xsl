@@ -33,6 +33,9 @@
                 <xsl:for-each select="posix:Error"
                         >#PBS -e <xsl:value-of select="concat(text(),$lf)"/>
                 </xsl:for-each>
+                <xsl:for-each select="posix:Environment"
+                        ><xsl:value-of select="@name"/>=<xsl:value-of select="concat(text(),$lf)"/>
+                </xsl:for-each>
             </xsl:for-each>
         </xsl:for-each>
         <xsl:for-each select="jsdl:Resources">
