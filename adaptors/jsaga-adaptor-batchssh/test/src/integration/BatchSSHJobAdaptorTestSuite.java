@@ -79,8 +79,6 @@ public class BatchSSHJobAdaptorTestSuite extends JSAGATestSuite {
  	// test cases
     public static class BatchSSHJobRunDescriptionTest extends JobRunDescriptionTest {
         public BatchSSHJobRunDescriptionTest() throws Exception {super("pbs-ssh");}
-        // TODO: public void test_run_queueRequirement() { super.ignore("not supported"); }
-        // TODO: public void test_run_memoryRequirement() { super.ignore("not supported"); }
     }
     
     // test cases
