@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <!-- TODO : check at http://maven.iscpif.fr/public/ch/ethz/ganymed/ganymed-ssh2 
+    if Ganymed build251 is provided as a maven module -->
+    <parent>
+        <groupId>fr.in2p3.jsaga</groupId>
+        <artifactId>externals</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>ch.ethz.ganymed</groupId>
+    <artifactId>ganymed-ssh2</artifactId>
+    <name>Ganymed SSH-2</name>
+    <description>A library which implements the SSH-2 protocol</description>
+    <version>build251</version>
+    <url>http://www.cleondris.ch/opensource/ssh2/</url>
+    <licenses>
+        <license>
+            <name>BSD</name>
+        </license>
+    </licenses>
+    <build>
+        <plugins>
+            <plugin><!-- copy jar -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
