@@ -4,16 +4,21 @@ import ch.ethz.ssh2.ChannelCondition;
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.KnownHosts;
 import ch.ethz.ssh2.Session;
+import ch.ethz.ssh2.StreamGobbler;
 import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.UserPassStoreSecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.NoneSecurityCredential;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import org.ogf.saga.context.Context;
@@ -80,7 +85,7 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
     }
 
     public Class[] getSupportedSecurityCredentialClasses() {
-        return new Class[]{UserPassSecurityCredential.class, NoneSecurityCredential.class};
+        return new Class[]{UserPassSecurityCredential.class, /*UserPassStoreSecurityCredential.class,*/ NoneSecurityCredential.class};
     }
 
     public void setSecurityCredential(SecurityCredential credential) {
@@ -116,6 +121,20 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
                 if (isAuthenticated == false) {
                     throw new AuthenticationFailedException("Authentication failed.");
                 }
+            /* TODO add dependance adaptor-classic to support UserPassStoreSecurityCredential
+            } else if (credential instanceof UserPassStoreSecurityCredential) {
+				try {
+	        		String userId = ((UserPassStoreSecurityCredential) credential).getUserID(host);
+	        		String password = ((UserPassStoreSecurityCredential) credential).getUserPass(host);
+	                boolean isAuthenticated = connexion.authenticateWithPassword(userId, password);
+
+	                if (isAuthenticated == false) {
+	                    throw new AuthenticationFailedException("Authentication failed.");
+	                }
+				} catch (Exception e) {
+	        		throw new AuthenticationFailedException(e);
+				}
+			*/	
             } //connecting using private and public keys
             else if (attributes.containsKey(Context.USERKEY)) {
                 //getting the private key file
@@ -145,7 +164,7 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
         connexion.close();
     }
     
-    protected Session sendCommand(String command) throws IOException {
+    protected Session sendCommand(String command) throws IOException, BatchSSHCommandFailedException {
         Session session = connexion.openSession();
 
         session.execCommand(command);
@@ -155,7 +174,18 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
 
         int exitStatus = session.getExitStatus();
         if (exitStatus != 0) {
-        	throw new IOException(command + ", errno=" + exitStatus);
+        	// try to read stderr
+        	try {
+	            InputStream stdout;
+	            BufferedReader br;
+	            br = new BufferedReader(new InputStreamReader(new StreamGobbler(session.getStderr())));
+	            
+	            String msg = br.readLine().split("MSG=")[1];
+	        	
+	        	throw new BatchSSHCommandFailedException(command , exitStatus, msg);
+        	} catch (Exception e) {
+	        	throw new BatchSSHCommandFailedException(command , exitStatus, "Unable to get error message");
+        	}
         }
         return session;
     }
