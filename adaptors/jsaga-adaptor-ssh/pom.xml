@@ -26,11 +26,11 @@ execution management technology (SSH).</description>
         </developer>
     </developers>
     <dependencies>
-        <dependency><!-- for data staging -->
+        <dependency><!-- for data staging (scope runtime) and for class LocalJobProcess (scope compile) -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-classic</artifactId>
             <version>0.9.13-SNAPSHOT</version>
-            <scope>runtime</scope>
+            <scope>compile</scope>
         </dependency>
 		<dependency>
 			<groupId>com.jcraft</groupId>
