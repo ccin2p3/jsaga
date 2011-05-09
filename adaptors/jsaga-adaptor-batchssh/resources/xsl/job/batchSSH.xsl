@@ -46,10 +46,7 @@
                     >#PBS -l cput=<xsl:value-of select="concat(text(),$lf)"/>
             </xsl:for-each>
             <xsl:for-each select="jsdl:TotalPhysicalMemory/*"
-                    >#PBS -l pmem=<xsl:value-of select="concat(text(),$lf)"/>
-            </xsl:for-each>
-            <xsl:for-each select="jsdl:Queue/*"
-                    >#PBS -q <xsl:value-of select="concat(text(),$lf)"/>
+                    >#PBS -l pmem=<xsl:value-of select="concat(text(),'Mb',$lf)"/>
             </xsl:for-each>
         </xsl:for-each>
         <xsl:for-each select="jsdl:Application">
