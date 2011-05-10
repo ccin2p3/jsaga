@@ -1,14 +1,12 @@
 package fr.in2p3.jsaga.impl.context;
 
-import org.ogf.saga.context.Context;
-import org.ogf.saga.context.ContextFactory;
-import org.ogf.saga.error.IncorrectStateException;
-import org.ogf.saga.error.NoSuccessException;
-import org.ogf.saga.error.TimeoutException;
 import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.session.SessionConfiguration;
 import fr.in2p3.jsaga.generated.session.Attribute;
+import org.ogf.saga.context.Context;
+import org.ogf.saga.context.ContextFactory;
+import org.ogf.saga.error.*;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -21,6 +19,18 @@ import fr.in2p3.jsaga.generated.session.Attribute;
 * Description:                                      */
 
 public class ConfigurableContextFactory {
+    public static Context[] getContextsOfDefaultSession() throws IncorrectStateException, TimeoutException, NoSuccessException {
+        SessionConfiguration cfg = new SessionConfiguration(EngineProperties.getURL(EngineProperties.JSAGA_DEFAULT_CONTEXTS));
+        fr.in2p3.jsaga.generated.session.Context[] sessionContextsCfg = cfg.getSessionContextsCfg();
+        Context[] sessionContexts = new Context[sessionContextsCfg.length];
+        for (int i=0; i<sessionContextsCfg.length; i++) {
+            // create SAGA context
+            sessionContexts[i] = ContextFactory.createContext(sessionContextsCfg[i].getType());
+            // set attributes
+            SessionConfiguration.setDefaultContext(sessionContexts[i], sessionContextsCfg[i]);
+        }
+        return sessionContexts;
+    }
 	
     public static ConfiguredContext[] listConfiguredContext() throws ConfigurationException {
     	SessionConfiguration cfg = new SessionConfiguration(EngineProperties.getURL(EngineProperties.JSAGA_DEFAULT_CONTEXTS));
