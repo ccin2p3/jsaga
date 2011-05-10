@@ -108,8 +108,8 @@ public abstract class JobRunInfoTest extends AbstractJobTest {
 		try {
 	        Date startTime = parse(job.getAttribute(Job.STARTED));
 	        Date endTime = parse(job.getAttribute(Job.FINISHED));
-	        // Compare to now
-	        assertTrue(!startTime.before(now) && !startTime.after(endTime));
+	        // Compare both dates
+	        assertFalse(startTime.after(endTime));
 		} catch (ParseException e) {
 			fail(e.getMessage());
 		}
