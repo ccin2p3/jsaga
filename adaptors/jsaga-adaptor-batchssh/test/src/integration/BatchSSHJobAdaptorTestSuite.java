@@ -4,7 +4,9 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.ogf.saga.job.JobDescriptionTest;
+import org.ogf.saga.job.JobListTest;
 import org.ogf.saga.job.JobRunDescriptionTest;
+import org.ogf.saga.job.JobRunInfoTest;
 import org.ogf.saga.job.JobRunInteractiveTest;
 import org.ogf.saga.job.JobRunMinimalTest;
 import org.ogf.saga.job.JobRunOptionalTest;
@@ -17,8 +19,8 @@ import org.ogf.saga.namespace.NSEntryTest;
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
 * File:   BatchSSHJobAdaptorTestSuite
-* Author:
-* Date:
+* Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
+* Date:   10 mai 2011
 * ***************************************************
 * Description:                                      */
 /**
@@ -61,6 +63,16 @@ public class BatchSSHJobAdaptorTestSuite extends JSAGATestSuite {
         public BatchSSHJobRunRequiredTest() throws Exception {super("pbs-ssh");}
     }
 
+    // test cases
+    public static class BatchSSHJobListTest extends JobListTest {
+        public BatchSSHJobListTest() throws Exception {super("pbs-ssh");}
+    }
+    
+    // test cases
+    public static class BatchSSHJobRunInfoTest extends JobRunInfoTest {
+        public BatchSSHJobRunInfoTest() throws Exception {super("pbs-ssh");}
+    }
+    
     // test cases
     //TODO: public static class BatchSSHJobRunSandboxTest extends JobRunSandboxTest {
     //    public BatchSSHJobRunSandboxTest() throws Exception {super("pbs-ssh");}
