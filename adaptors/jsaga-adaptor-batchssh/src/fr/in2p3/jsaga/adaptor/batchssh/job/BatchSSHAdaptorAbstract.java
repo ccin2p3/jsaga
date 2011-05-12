@@ -10,7 +10,9 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.security.impl.SSHSecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.UserPassStoreSecurityCredential;
 //import fr.in2p3.jsaga.adaptor.security.impl.UserPassStoreSecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.NoneSecurityCredential;
 
@@ -56,7 +58,7 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
     // If not defined, PBS will use $PBS_O_HOME which is $HOME with SSH
     protected static final String STAGING_DIRECTORY = "stagingDir";
     
-    public static final String USER_PUBLICKEY = "UserPublicKey";
+    //public static final String USER_PUBLICKEY = "UserPublicKey";
     protected static KnownHosts KnownHosts = new KnownHosts();
     protected Connection connexion;
     private SecurityCredential credential;
@@ -73,19 +75,19 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
         return new Default[]{
                     new Default(KNOWN_HOSTS, new File[]{
                         new File(System.getProperty("user.home") + "/.ssh/known_hosts")}),
-                    new Default(Context.USERKEY, new File[]{
+                    /*new Default(Context.USERKEY, new File[]{
                         new File(System.getProperty("user.home") + "/.ssh/id_rsa"),
-                        new File(System.getProperty("user.home") + "/.ssh/id_dsa")}),
-                    new Default(USER_PUBLICKEY, new File[]{
+                        new File(System.getProperty("user.home") + "/.ssh/id_dsa")}),*/
+                    /*new Default(USER_PUBLICKEY, new File[]{
                         new File(System.getProperty("user.home") + "/.ssh/id_rsa.pub"),
-                        new File(System.getProperty("user.home") + "/.ssh/id_dsa.pub")}),
+                        new File(System.getProperty("user.home") + "/.ssh/id_dsa.pub")}),*/
                     new Default(Context.USERID,
                     System.getProperty("user.name"))
                 };
     }
-
+    
     public Class[] getSupportedSecurityCredentialClasses() {
-        return new Class[]{UserPassSecurityCredential.class, /*UserPassStoreSecurityCredential.class,*/ NoneSecurityCredential.class};
+        return new Class[]{UserPassSecurityCredential.class, UserPassStoreSecurityCredential.class, SSHSecurityCredential.class};
     }
 
     public void setSecurityCredential(SecurityCredential credential) {
@@ -121,7 +123,6 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
                 if (isAuthenticated == false) {
                     throw new AuthenticationFailedException("Authentication failed.");
                 }
-            /* TODO add dependance adaptor-classic to support UserPassStoreSecurityCredential
             } else if (credential instanceof UserPassStoreSecurityCredential) {
 				try {
 	        		String userId = ((UserPassStoreSecurityCredential) credential).getUserID(host);
@@ -134,9 +135,20 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
 				} catch (Exception e) {
 	        		throw new AuthenticationFailedException(e);
 				}
-			*/	
             } //connecting using private and public keys
-            else if (attributes.containsKey(Context.USERKEY)) {
+        	else if(credential instanceof SSHSecurityCredential) {
+        		String userId = ((SSHSecurityCredential) credential).getUserID();
+        		String passPhrase = ((SSHSecurityCredential) credential).getUserPass();
+        		// clone private key because the object will be reset
+        		//byte[] privateKey = ((SSHSecurityCredential) credential).getPrivateKey().clone();
+        		//byte[] publicKey = ((SSHSecurityCredential) credential).getPublicKey();
+        		File Key = ((SSHSecurityCredential) credential).getPrivateKeyFile();
+
+                if (!connexion.authenticateWithPublicKey(userId, Key, passPhrase)) {
+                    throw new AuthenticationFailedException("Authentication failed.");
+                }
+            // TODO: The following block is useless
+        	} else if (attributes.containsKey(Context.USERKEY)) {
                 //getting the private key file
                 File Key = new File((String) attributes.get(Context.USERKEY));
 
