@@ -6,10 +6,10 @@ import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.SSHSecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassStoreSecurityCredential;
 import fr.in2p3.jsaga.adaptor.ssh.job.SSHJobProcess;
-import fr.in2p3.jsaga.adaptor.ssh.security.SSHSecurityCredential;
 
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;

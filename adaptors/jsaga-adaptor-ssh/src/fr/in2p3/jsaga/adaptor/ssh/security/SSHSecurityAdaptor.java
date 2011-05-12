@@ -4,6 +4,7 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.SecurityAdaptor;
+import fr.in2p3.jsaga.adaptor.security.impl.SSHSecurityCredential;
 
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
