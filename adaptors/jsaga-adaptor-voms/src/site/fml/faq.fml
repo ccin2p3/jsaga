@@ -28,6 +28,12 @@ chmod 664 $HASH.0</pre>
         	Jurisdiction Policy Files (JAR Files) into your JRE (in the lib/security directory).
         	You can download these files on the official Java website.</answer>
         </faq>
+        <faq id="verbose">
+            <question>How to prevent verbose hexadecimal information to be output by security API ?</question>
+            <answer>Add this line to file etc/log4j.properties :
+                <pre>log4j.logger.org.globus=FATAL</pre>
+            </answer>
+        </faq>
         <faq id="other">
             <question>Is there some other FAQ about this plug-in ?</question>
             <answer>Yes, VOMS is based on Globus Security Infrastructure, so please also check

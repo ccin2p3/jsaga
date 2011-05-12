@@ -13,6 +13,9 @@
         </context>
     </contexts>
     <session>
-        <context type="UserPass" id="STestContext"/>
+        <context type="UserPass" id="STestContext">
+            <attribute name="UserID" value="anonymous"/>
+            <attribute name="UserPass" value="anon"/>
+        </context>
     </session>
 </jsaga-default>
