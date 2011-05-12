@@ -34,11 +34,6 @@
       <artifactId>ganymed-ssh2</artifactId>
       <version>build251</version>
     </dependency>
-    <dependency>
-      <groupId>fr.in2p3.jsaga</groupId>
-      <artifactId>jsaga-engine</artifactId>
-      <version>0.9.13-SNAPSHOT</version>
-    </dependency>
   </dependencies>
 
   <repositories>
