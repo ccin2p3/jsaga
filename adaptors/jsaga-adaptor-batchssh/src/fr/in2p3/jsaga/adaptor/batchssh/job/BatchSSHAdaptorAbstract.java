@@ -11,7 +11,7 @@ import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
-import fr.in2p3.jsaga.adaptor.security.impl.UserPassStoreSecurityCredential;
+//import fr.in2p3.jsaga.adaptor.security.impl.UserPassStoreSecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.NoneSecurityCredential;
 
 import java.io.BufferedReader;
@@ -35,6 +35,7 @@ import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 /******************************************************
  * File:   BatchSSHAdaptorAbstract
  * Author: Taha BENYEZZA & Yassine BACHAR
+ * Author: Lionel Schwarz
  * Date:   10 December 2010
  ****************************************************/
 public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
@@ -58,7 +59,6 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
     public static final String USER_PUBLICKEY = "UserPublicKey";
     protected static KnownHosts KnownHosts = new KnownHosts();
     protected Connection connexion;
-    protected static Map sessionMap = new HashMap();
     private SecurityCredential credential;
 
     public Usage getUsage() {
