@@ -145,6 +145,18 @@
         </dependency>
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-batchssh</artifactId>
+            <version>0.9.13-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
+            <artifactId>jsaga-adaptor-batchssh</artifactId>
+            <version>0.9.13-SNAPSHOT</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-ssh</artifactId>
             <version>0.9.13-SNAPSHOT</version>
         </dependency>
@@ -175,18 +187,6 @@
         <dependency>
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
             <artifactId>jsaga-adaptor-mail</artifactId>
-            <version>0.9.13-SNAPSHOT</version>
-            <classifier>tests</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>fr.in2p3.jsaga.adaptor</groupId>
-            <artifactId>jsaga-adaptor-batchssh</artifactId>
-            <version>0.9.13-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.in2p3.jsaga.adaptor</groupId>
-            <artifactId>jsaga-adaptor-batchssh</artifactId>
             <version>0.9.13-SNAPSHOT</version>
             <classifier>tests</classifier>
             <scope>test</scope>
