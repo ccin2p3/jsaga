@@ -24,10 +24,10 @@
         <module>jsaga-adaptor-bes</module>
         <module>jsaga-adaptor-unicore6</module>
         <module>jsaga-adaptor-naregi</module>
+        <module>jsaga-adaptor-batchssh</module>
         <module>jsaga-adaptor-ssh</module>
         <module>jsaga-adaptor-irods</module>
         <module>jsaga-adaptor-mail</module>
-        <module>jsaga-adaptor-batchssh</module>
         <!-- adaptors which are used as dependencies of other adaptors must be declared at the end -->
         <module>jsaga-adaptor-classic</module>
         <module>jsaga-adaptor-voms</module>
