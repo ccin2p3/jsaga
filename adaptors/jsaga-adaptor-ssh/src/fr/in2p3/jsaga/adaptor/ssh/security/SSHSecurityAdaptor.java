@@ -61,53 +61,9 @@ public class SSHSecurityAdaptor implements SecurityAdaptor {
         try {
         	// load private key
         	String privateKeyPath = (String) attributes.get(Context.USERKEY);
-			byte[] privateKey = null;
-			FileInputStream fisPrivateKey = null;
-			try {
-				fisPrivateKey = new FileInputStream(privateKeyPath);
-				privateKey = new byte[(int) (new File(privateKeyPath).length())];
-				int len = 0;
-				while (true) {
-					int i = fisPrivateKey.read(privateKey, len, privateKey.length - len);
-					if (i <= 0)
-						break;
-					len += i;
-				}
-				fisPrivateKey.close();
-			} catch (Exception e) {
-				try {
-					if (fisPrivateKey != null)
-						fisPrivateKey.close();
-				} catch (Exception ee) {
-				}
-				throw e;
-			}
-
-			
-			// load public key
-			byte[] publicKey = null;
+			String publicKeyPath = null;
 			if (attributes.containsKey(USER_PUBLICKEY)) {
-	        	String publicKeyPath = (String) attributes.get(USER_PUBLICKEY);
-				FileInputStream fisPublicKey = null;
-				try {
-					fisPublicKey = new FileInputStream(publicKeyPath);
-					publicKey = new byte[(int) (new File(publicKeyPath).length())];
-					int len = 0;
-					while (true) {
-						int i = fisPublicKey.read(publicKey, len, publicKey.length - len);
-						if (i <= 0)
-							break;
-						len += i;
-					}
-					fisPublicKey.close();
-				} catch (Exception e) {
-					try {
-						if (fisPublicKey != null)
-							fisPublicKey.close();
-					} catch (Exception ee) {
-					}
-					throw e;
-				}
+	        	publicKeyPath = (String) attributes.get(USER_PUBLICKEY);
 			}
 			
 			// get UserPass
@@ -116,7 +72,7 @@ public class SSHSecurityAdaptor implements SecurityAdaptor {
 				userPass = (String) attributes.get(Context.USERPASS);
 			}
 						
-		    return new SSHSecurityCredential(privateKey, publicKey, userPass, (String) attributes.get(Context.USERID));
+		    return new SSHSecurityCredential(privateKeyPath, publicKeyPath, userPass, (String) attributes.get(Context.USERID));
         } catch(Exception e) {
             throw new NoSuccessException(e);
         }

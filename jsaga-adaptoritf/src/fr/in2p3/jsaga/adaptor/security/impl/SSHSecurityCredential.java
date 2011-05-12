@@ -5,6 +5,8 @@ import org.ogf.saga.context.Context;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.PrintStream;
 
 /* ***************************************************
@@ -20,14 +22,62 @@ public class SSHSecurityCredential implements SecurityCredential {
 	
 	private byte[] privateKey;
 	private byte[] publicKey;
+	private String publicKeyFilename;
+	private String privateKeyFilename;
 	private String password;
 	private String userId;
 	
-    public SSHSecurityCredential(byte[] privateKey, byte[] publicKey, String password, String userId) throws NoSuccessException {
-    	this.privateKey = privateKey;
-    	this.publicKey = publicKey;
+    public SSHSecurityCredential(String privateKeyFile, String publicKeyFile, String password, String userId) throws NoSuccessException {
+    	this.privateKeyFilename = privateKeyFile;
+    	this.publicKeyFilename = publicKeyFile;
+    	//this.privateKey = privateKey;
+    	//this.publicKey = publicKey;
     	this.password = password;
     	this.userId = userId;
+		FileInputStream fisPrivateKey = null;
+		try {
+			fisPrivateKey = new FileInputStream(privateKeyFilename);
+			privateKey = new byte[(int) (new File(privateKeyFilename).length())];
+			int len = 0;
+			while (true) {
+				int i = fisPrivateKey.read(privateKey, len, privateKey.length - len);
+				if (i <= 0)
+					break;
+				len += i;
+			}
+			fisPrivateKey.close();
+		} catch (Exception e) {
+			try {
+				if (fisPrivateKey != null)
+					fisPrivateKey.close();
+			} catch (Exception ee) {
+			}
+			throw new NoSuccessException(e);
+		}
+
+		// load public key
+		if (publicKeyFilename != null) {
+			FileInputStream fisPublicKey = null;
+			try {
+				fisPublicKey = new FileInputStream(publicKeyFilename);
+				publicKey = new byte[(int) (new File(publicKeyFilename).length())];
+				int len = 0;
+				while (true) {
+					int i = fisPublicKey.read(publicKey, len, publicKey.length - len);
+					if (i <= 0)
+						break;
+					len += i;
+				}
+				fisPublicKey.close();
+			} catch (Exception e) {
+				try {
+					if (fisPublicKey != null)
+						fisPublicKey.close();
+				} catch (Exception ee) {
+				}
+				throw new NoSuccessException(e);
+			}
+		}
     }
 
     public void dump(PrintStream out) throws Exception {
@@ -84,6 +134,14 @@ public class SSHSecurityCredential implements SecurityCredential {
 		return publicKey;
 	}
 
+	public File getPrivateKeyFile() {
+		return new File(this.privateKeyFilename);
+	}
+	
+	public File getPublicKeyFile() {
+		return (this.publicKeyFilename == null)?null:new File(this.publicKeyFilename);
+	}
+	
 	public String getUserId() {
 		return userId;
 	}
