@@ -257,8 +257,12 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
         	// if relative: encode url path only or all string
     		// depending on local scheme or not
             String encodedUrl = (URLHelper.startsWithLocalScheme(getString()))
-            ? ((RelativeURLImpl)url).getEncodedPathOnly()
-            : URLEncoder.encode(url.getString());
+                ? ((RelativeURLImpl)url).getEncodedPathOnly()
+                : URLEncoder.encode(url.getString());
+            if (System.getProperty("os.name").startsWith("Windows") &&
+                    encodedUrl.length()>1 && encodedUrl.charAt(1)==':') {
+                encodedUrl = "/"+encodedUrl;
+            }
     		uri = u.resolve(encodedUrl);
     	} else {
     		throw new NoSuccessException("Unknown class: " + url.getClass().getName());
