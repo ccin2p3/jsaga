@@ -1,4 +1,4 @@
-package fr.in2p3.jsaga.adaptor.ssh.security;
+package fr.in2p3.jsaga.adaptor.security.impl;
 
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import org.ogf.saga.context.Context;
