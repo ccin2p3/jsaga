@@ -2,6 +2,7 @@
 <jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
     <session>
 	    <context type="UserPassStore">
+            <data type="sftp"/>
             <job type="pbs-ssh"/>
 	    </context>
     </session>
