@@ -13,8 +13,6 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.impl.SSHSecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.UserPassStoreSecurityCredential;
-//import fr.in2p3.jsaga.adaptor.security.impl.UserPassStoreSecurityCredential;
-import fr.in2p3.jsaga.adaptor.security.NoneSecurityCredential;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -22,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.ogf.saga.context.Context;

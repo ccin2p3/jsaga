@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package fr.in2p3.jsaga.adaptor.batchssh.job;
 
 import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
