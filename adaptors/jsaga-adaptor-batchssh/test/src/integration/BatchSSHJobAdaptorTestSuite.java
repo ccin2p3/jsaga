@@ -74,9 +74,9 @@ public class BatchSSHJobAdaptorTestSuite extends JSAGATestSuite {
     }
     
     // test cases
-    //TODO: public static class BatchSSHJobRunSandboxTest extends JobRunSandboxTest {
-    //    public BatchSSHJobRunSandboxTest() throws Exception {super("pbs-ssh");}
-    //}
+    public static class BatchSSHJobRunSandboxTest extends JobRunSandboxTest {
+        public BatchSSHJobRunSandboxTest() throws Exception {super("pbs-ssh");}
+    }
     
     // test cases
     public static class BatchSSHJobRunOptionalTest extends JobRunOptionalTest {
