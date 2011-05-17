@@ -21,7 +21,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.ogf.saga.context.Context;
 
@@ -62,7 +64,8 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
     protected static KnownHosts KnownHosts = new KnownHosts();
     protected Connection connexion;
     private SecurityCredential credential;
-
+    protected String m_stagingDirectory = null;
+    
     public Usage getUsage() {
         return new UAnd(
                 new Usage[]{
@@ -97,7 +100,8 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
 
         try {
-
+        	if (attributes.containsKey(STAGING_DIRECTORY)) 
+        		this.m_stagingDirectory = (String) attributes.get(STAGING_DIRECTORY);
             // Creating a connection instance
             connexion = new Connection(host);
             // Now connect
@@ -188,7 +192,6 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
         if (exitStatus != 0) {
         	// try to read stderr
         	try {
-	            InputStream stdout;
 	            BufferedReader br;
 	            br = new BufferedReader(new InputStreamReader(new StreamGobbler(session.getStderr())));
 	            
@@ -201,4 +204,57 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
         }
         return session;
     }
+    
+    protected List<BatchSSHJob> getAttributes(String nativeJobIdArray[]) throws NoSuccessException {
+    	return this.getAttributes(nativeJobIdArray, null);
+    }
+    
+    protected List<BatchSSHJob> getAttributes(String nativeJobIdArray[], String[] keys) throws NoSuccessException {
+        //BatchSSHJob[] bj = new BatchSSHJob[nativeJobIdArray.length];
+		List<BatchSSHJob> bj = new ArrayList<BatchSSHJob>();
+
+        Session session = null;
+    	String command = "qstat -f -1 ";
+    	for (String jobId: nativeJobIdArray) {
+    		command += jobId + " ";
+    	}
+        InputStream stdout;
+        BufferedReader br;
+        BatchSSHJob job = null;
+        int i=0;
+        try {
+        	session = this.sendCommand(command);
+            stdout = new StreamGobbler(session.getStdout());
+            br = new BufferedReader(new InputStreamReader(stdout));
+            String line;
+            while ((line = br.readLine()) != null) {
+            	line = line.trim();
+            	if (line.startsWith("Job Id:")) {
+                	String jobid = line.split(":")[1].trim();
+                	job = new BatchSSHJob(jobid);
+            	} else if (line.length() == 0) { // end of Job
+            		//bj[i] = job;
+            		bj.add(job);
+            		i++;
+            	} else { // attributes
+            		String[] arr = line.split("=",2);
+            		if (arr.length == 2) {
+            			job.setAttribute(arr[0].trim().toUpperCase(), arr[1].trim());
+            		}
+            	}
+            }
+            br.close();
+
+        } catch (IOException ex) {
+			throw new NoSuccessException("Unable to query job status", ex);
+        } catch (BatchSSHCommandFailedException e) {
+			throw new NoSuccessException("Unable to query job status", e);
+		} finally {
+            if (session != null) session.close();
+        }
+		return bj;
+		//return (BatchSSHJob[])bj.toArray(new BatchSSHJob[bj.size()]);
+
+    }
+
 }
