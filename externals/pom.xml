@@ -28,6 +28,7 @@
         <module>cryptix-asn1</module>
         <module>cryptix32</module>
         <module>file-system</module>
+        <module>ganymed-ssh2</module>
         <module>glite-security</module>
         <module>glite-jdl-api-java</module>
         <module>glite-wms-wmproxy-api-java</module>
