@@ -10,8 +10,6 @@ import java.util.Locale;
 
 import org.ogf.saga.error.NoSuccessException;
 
-import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
-
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
 * ***             http://cc.in2p3.fr/             ***

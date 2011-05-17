@@ -11,7 +11,6 @@ import fr.in2p3.jsaga.adaptor.job.control.advanced.SuspendableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
-import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorOnePhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import java.io.BufferedReader;
@@ -19,7 +18,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
