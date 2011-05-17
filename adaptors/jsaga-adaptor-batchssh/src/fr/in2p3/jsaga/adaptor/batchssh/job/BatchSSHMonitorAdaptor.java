@@ -4,8 +4,6 @@
  */
 package fr.in2p3.jsaga.adaptor.batchssh.job;
 
-import ch.ethz.ssh2.Session;
-import ch.ethz.ssh2.StreamGobbler;
 import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobInfoAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
@@ -17,16 +15,8 @@ import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
-import java.io.*;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Scanner;
-import java.util.regex.MatchResult;
 
 /******************************************************
  * File:   BatchSSHMonitorAdaptor
@@ -93,61 +83,5 @@ public class BatchSSHMonitorAdaptor extends BatchSSHAdaptorAbstract implements J
 			bj.get(0).getAttribute(BatchSSHJob.ATTR_EXEC_HOST)
 		};
 	}
-	
-	/*********************************************************************
-	 * Private methods
-	 *********************************************************************/
-	
-    private List<BatchSSHJob> getAttributes(String nativeJobIdArray[]) throws NoSuccessException {
-    	return this.getAttributes(nativeJobIdArray, null);
-    }
-    
-    private List<BatchSSHJob> getAttributes(String nativeJobIdArray[], String[] keys) throws NoSuccessException {
-        //BatchSSHJob[] bj = new BatchSSHJob[nativeJobIdArray.length];
-		List<BatchSSHJob> bj = new ArrayList<BatchSSHJob>();
-
-        Session session = null;
-    	String command = "qstat -f -1 ";
-    	for (String jobId: nativeJobIdArray) {
-    		command += jobId + " ";
-    	}
-        InputStream stdout;
-        BufferedReader br;
-        BatchSSHJob job = null;
-        int i=0;
-        try {
-        	session = this.sendCommand(command);
-            stdout = new StreamGobbler(session.getStdout());
-            br = new BufferedReader(new InputStreamReader(stdout));
-            String line;
-            while ((line = br.readLine()) != null) {
-            	line = line.trim();
-            	if (line.startsWith("Job Id:")) {
-                	String jobid = line.split(":")[1].trim();
-                	job = new BatchSSHJob(jobid);
-            	} else if (line.length() == 0) { // end of Job
-            		//bj[i] = job;
-            		bj.add(job);
-            		i++;
-            	} else { // attributes
-            		String[] arr = line.split("=",2);
-            		if (arr.length == 2) {
-            			job.setAttribute(arr[0].trim().toUpperCase(), arr[1].trim());
-            		}
-            	}
-            }
-            br.close();
-
-        } catch (IOException ex) {
-			throw new NoSuccessException("Unable to query job status", ex);
-        } catch (BatchSSHCommandFailedException e) {
-			throw new NoSuccessException("Unable to query job status", e);
-		} finally {
-            if (session != null) session.close();
-        }
-		return bj;
-		//return (BatchSSHJob[])bj.toArray(new BatchSSHJob[bj.size()]);
-
-    }
-
+		
 }
