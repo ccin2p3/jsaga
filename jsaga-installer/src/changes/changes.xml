@@ -9,6 +9,7 @@
             <action dev="lschwarz" type="fix">CREAM adaptor now uses the standard staging directory</action>
             <action dev="lschwarz" type="update">SSH and local adaptors now support offline monitoring</action>
             <action dev="lschwarz" type="add">New security adaptor UserPassStore (based on Linux .netrc)</action>
+            <action dev="jrevillard" type="update">Remove dependency on JDK 1.6</action>
             <action dev="sreynaud" type="add">Added configuration attribute "data.implicit.close.timeout"</action>
             <action dev="lschwarz" type="add">Added supported features in jsaga-adaptor-linux module</action>
             <action dev="lschwarz" type="update">Replace metric "job.sub_state" with standard metric "job.state_detail" with model "JSAGA"</action>
