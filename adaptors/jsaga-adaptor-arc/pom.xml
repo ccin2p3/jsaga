@@ -4,7 +4,7 @@
   <parent>
     <artifactId>adaptors</artifactId>
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
-    <version>0.9.13</version>
+    <version>0.9.14-SNAPSHOT</version>
   </parent>
   <artifactId>jsaga-adaptor-arc</artifactId>
   <name>jsaga-adaptor-arc</name>
@@ -59,13 +59,13 @@
 		<dependency>
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-classic</artifactId>
-			<version>0.9.13</version>
+			<version>0.9.14-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-bes</artifactId>
-			<version>0.9.13</version>
+			<version>0.9.14-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
