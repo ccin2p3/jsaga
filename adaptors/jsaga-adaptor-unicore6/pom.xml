@@ -2,7 +2,7 @@
     <parent>
         <groupId>fr.in2p3.jsaga.adaptor</groupId>
         <artifactId>adaptors</artifactId>
-        <version>0.9.13</version>
+        <version>0.9.14-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>jsaga-adaptor-unicore6</artifactId>
@@ -28,7 +28,7 @@ execution management technology (Unicore Gateway).</description>
 		<dependency><!-- for security context (WARNING: order of dependencies matters) -->
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-classic</artifactId>
-			<version>0.9.13</version>
+			<version>0.9.14-SNAPSHOT</version>
 			<scope>runtime</scope>
 		</dependency>
         <dependency>
