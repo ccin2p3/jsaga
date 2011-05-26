@@ -23,7 +23,7 @@ import java.util.Map;
  * ***************************************************
  * Description:                                      */
 
-/**
+/*
  <plugins>
      <plugin>
          <groupId>org.codehaus.mojo</groupId>
