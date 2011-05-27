@@ -89,7 +89,7 @@
                     >#PBS -l mem=<xsl:value-of select="concat(text(),'Mb',$lf)"/>
             </xsl:for-each>
         </xsl:for-each>
-    <xsl:for-each select="jsdl:DataStaging">
+    <!-- <xsl:for-each select="jsdl:DataStaging">
         <xsl:choose>
             <xsl:when test="jsdl:Source and jsdl:CreationFlag='Append'">
                 <xsl:value-of select="jsdl:Source/jsdl:URI/text()"/> &gt;&gt; <xsl:text/>
@@ -124,7 +124,7 @@
 </xsl:text>       
             </xsl:when>
         </xsl:choose>
-    </xsl:for-each>
+    </xsl:for-each>-->
         <xsl:for-each select="jsdl:Application">
             <xsl:for-each select="posix:POSIXApplication">
                 <xsl:for-each select="posix:WorkingDirectory"

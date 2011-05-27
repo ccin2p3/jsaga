@@ -11,6 +11,7 @@ import fr.in2p3.jsaga.adaptor.job.control.advanced.SuspendableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
+import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorOnePhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import java.io.BufferedReader;
@@ -30,7 +31,7 @@ import org.ogf.saga.error.*;
  * Date:   07 December 2010
  * ***************************************************/
 public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobControlAdaptor, /*StreamableJobBatch,*/
-	SuspendableJobAdaptor, HoldableJobAdaptor/*, StagingJobAdaptorOnePhase*/ {
+	SuspendableJobAdaptor, HoldableJobAdaptor, StagingJobAdaptorOnePhase {
 
     public JobMonitorAdaptor getDefaultJobMonitor() {
         return new BatchSSHMonitorAdaptor();
@@ -129,7 +130,7 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
         // Creating the pbs script file's name using the randomUUID
         String FileName = uniqId + ".pbs";
         // the scpript's contenent
-//System.out.println(jobDesc);        
+System.out.println(jobDesc);        
         StringBuilder sb = new StringBuilder("#!/bin/bash\n");
         sb.append(jobDesc);
         // the submission command
@@ -338,6 +339,6 @@ System.out.println("TR " + from + " => " + to);
 	}
 
 	private String makeTURL(String filename) {
-    	return "sftp://" + connexion.getHostname() + ":" + connexion.getPort() + "/" + filename;
+    	return "sftp://cccetest01.in2p3.fr" + /*connexion.getHostname() +*/ ":" + connexion.getPort() + "/" + filename;
 	}
 }
