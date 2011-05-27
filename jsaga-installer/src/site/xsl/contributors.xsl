@@ -36,7 +36,7 @@
                 </xsl:for-each>
             </td>
             <td>
-                <xsl:for-each select="$developers/mvn:developer[not(mvn:organization/text()=preceding-sibling::mvn:organization/text())]/mvn:organizationUrl">
+                <xsl:for-each select="$developers/mvn:developer[not(mvn:organization/text()=preceding-sibling::mvn:developer/mvn:organization/text())]/mvn:organizationUrl">
                     <div><a href="{text()}">
                         <img src="{../mvn:properties/mvn:organizationLogoUrl/text()}"
                              alt="{../mvn:properties/mvn:organization/text()}"
@@ -45,7 +45,7 @@
                 </xsl:for-each>
             </td>
             <td>
-                <xsl:for-each select="$developers/mvn:developer[not(mvn:project/text()=preceding-sibling::mvn:project/text())]/mvn:properties/mvn:projectUrl">
+                <xsl:for-each select="$developers/mvn:developer[not(mvn:project/text()=preceding-sibling::mvn:developer/mvn:project/text())]/mvn:properties/mvn:projectUrl">
                     <div><a href="{text()}">
                         <img src="{../mvn:projectLogoUrl/text()}"
                              alt="{../mvn:project/text()}"
