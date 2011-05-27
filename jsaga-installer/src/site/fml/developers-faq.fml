@@ -177,5 +177,23 @@ git push workingBranch
                 </pre>
             </answer>
         </faq>
+        <faq id="fix-release">
+            <question>How to fix a small problem (e.g. typo in generated web page) in a release, without creating a new release ?</question>
+            <answer>
+                <pre># Update the release tag
+git checkout &lt;release_tag&gt;
+git show
+git checkout -b &lt;release_tag&gt;
+git show
+vim pom.xml
+git diff
+git commit -m 'tag bis' pom.xml
+git tag -f &lt;release_tag&gt;
+git push origin --tags
+git branch -D &lt;release_tag&gt;
+                </pre>
+                DO NOT FORGET TO DO THE SAME FIX IN BRANCH 'master' !
+            </answer>
+        </faq>
     </part>
 </faqs>
