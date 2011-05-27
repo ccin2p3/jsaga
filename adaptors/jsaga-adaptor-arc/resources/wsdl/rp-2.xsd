@@ -23,7 +23,7 @@ This document and the information contained herein is provided on an "AS IS" bas
 >
   <xsd:import 
        namespace="http://docs.oasis-open.org/wsrf/bf-2"
-       schemaLocation="http://docs.oasis-open.org/wsrf/bf-2.xsd"
+       schemaLocation="./bf-2.xsd"
    /> 
 <!-- =============== Resource Property Related  =================== --> 
 <!-- ====== Resource Properties for QueryResourceProperties ======= -->
