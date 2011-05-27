@@ -25,6 +25,9 @@
       <email>bachar@poste.isima.fr</email>
       <organization>ISIMA</organization>
       <organizationUrl>http://www.isima.fr/</organizationUrl>
+      <properties>
+          <organizationLogoUrl>http://www.cdefi.fr/images/photos/0004/img_1251465429479.jpg</organizationLogoUrl>
+      </properties>
     </developer>
     <developer>
       <name>Lionel Schwarz</name>
