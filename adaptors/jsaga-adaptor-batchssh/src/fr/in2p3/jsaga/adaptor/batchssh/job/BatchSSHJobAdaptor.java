@@ -10,7 +10,6 @@ import fr.in2p3.jsaga.adaptor.job.control.advanced.HoldableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.SuspendableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorOnePhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
@@ -182,7 +181,7 @@ System.out.println(jobDesc);
 	public boolean release(String nativeJobId)
 			throws PermissionDeniedException, TimeoutException,
 			NoSuccessException {
-		return this.release(nativeJobId);
+		return this.resume(nativeJobId);
 	}
 
 	public String getStagingDirectory(String nativeJobId)
