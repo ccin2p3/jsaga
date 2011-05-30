@@ -38,6 +38,7 @@ public class BatchSSHJob {
 	public static String ATTR_VAR_WORKDIR = "PBS_O_WORKDIR";
 	public static String ATTR_VAR_JSAGA_STAGEOUT = "PBS_JSAGASTAGEOUT";
 	public static String ATTR_VAR_JSAGA_STAGEIN = "PBS_JSAGASTAGEIN";
+	public static String ATTR_VAR_JSAGA_EXECUTABLE = "PBS_JSAGAEXECUTABLE";
 	
 	public BatchSSHJob(String nativeJobId) {
 		this.m_id = nativeJobId;
@@ -99,46 +100,32 @@ public class BatchSSHJob {
 		return this.m_attributes.get(varname);
 	}
 	
-	public String[][] getStagingTransfers(boolean input) throws NoSuccessException {
-		String[][] path_pairs = new String[][]{};
+	public ArrayList<String[]> getStagingTransfers(boolean input) throws NoSuccessException {
+    	ArrayList<String[]> vars = new ArrayList<String[]>();
 		String crit;
-    	//StagingTransfer[] st = new StagingTransfer[]{};
-    	ArrayList transfers = new ArrayList();
 		if (input) {
 	    	crit = ATTR_VAR_JSAGA_STAGEIN;
 		} else {
 	    	crit = ATTR_VAR_JSAGA_STAGEOUT;
 		}
-		transfers = BatchSSHJob.getFilteredVars(this.getAttribute(ATTR_VARS), crit);
-		/*
-		String[] assignations = this.getAttribute(ATTR_VARS).split(",");
-		for (int i=0; i<assignations.length; i++) {
-			String [] arr = assignations[i].split("=",2);
-			if (arr[0].trim().toUpperCase().startsWith(crit)) {
-				String [] path_pair = arr[1].trim().split("#",2);
-		    	to = path_pair[0]; // local 
-		    	from = path_pair[1]; // remote sftp://
-				transfers.add(new String[] {from, to});
-				//transfers.add(new StagingTransfer(from, to, false));
-			}
-		}
-		*/
-    	return (String[][]) transfers.toArray(path_pairs);
+		return BatchSSHJob.getFilteredVars(this.getAttribute(ATTR_VARS), crit);
+    	//return (String[][]) transfers.toArray(vars);
 	}
 	
-	public static ArrayList getFilteredVars(String var_string, String filter) {
-    	ArrayList transfers = new ArrayList();
+	public static ArrayList<String[]> getFilteredVars(String var_string, String filter) {
+    	ArrayList<String[]> vars = new ArrayList<String[]>();
 		String[] assignations = var_string.split(",");
-		String to, from;
+		//String to, from;
 		for (int i=0; i<assignations.length; i++) {
 			String [] arr = assignations[i].split("=",2);
 			if (arr[0].trim().toUpperCase().startsWith(filter)) {
-				String [] path_pair = arr[1].trim().split("@",2);
+				/*String [] path_pair = arr[1].trim().split("@",2);
 		    	to = path_pair[0]; // local 
 		    	from = path_pair[1]; // remote sftp://
-				transfers.add(new String[] {from, to});
+				vars.add(new String[] {from, to});*/
+				vars.add(arr[1].trim().split("@",2));
 			}
 		}
-		return transfers;
+		return vars;
 	}
 }

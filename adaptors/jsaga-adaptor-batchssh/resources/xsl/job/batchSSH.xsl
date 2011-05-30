@@ -18,7 +18,15 @@
     <xsl:template match="jsdl:JobDescription">
         <xsl:variable name="lf"><xsl:text>
 </xsl:text></xsl:variable>
-		<xsl:text>#PBS -v DUMMY=DUMMY</xsl:text>
+		<xsl:text>#PBS -v </xsl:text>
+        <xsl:for-each select="jsdl:Application">
+            <xsl:for-each select="posix:POSIXApplication">
+                <xsl:for-each select="posix:Executable"> 
+					<xsl:text>PBS_JSAGAEXECUTABLE=</xsl:text>
+	                <xsl:value-of select="text()"/>
+                </xsl:for-each>
+            </xsl:for-each>
+        </xsl:for-each>
 	    <xsl:for-each select="jsdl:DataStaging">
 			<xsl:text>,</xsl:text>
 	        <xsl:choose>
@@ -37,12 +45,12 @@
 					<xsl:text>PBS_JSAGASTAGEOUT</xsl:text>
 					<xsl:value-of select="position()"/>
 					<xsl:text>=</xsl:text>
+					<xsl:value-of select="jsdl:Target/jsdl:URI/text()"/>
+					<xsl:text>@</xsl:text>
 					<xsl:if test="$stagingDir">
 				        <xsl:value-of select="$stagingDir"/><xsl:text>/</xsl:text>
 					</xsl:if>
 					<xsl:value-of select="jsdl:FileName/text()"/>
-					<xsl:text>@</xsl:text>
-					<xsl:value-of select="jsdl:Target/jsdl:URI/text()"/>
 	            </xsl:when>
 	        </xsl:choose>
 	    </xsl:for-each>
@@ -127,17 +135,24 @@
     </xsl:for-each>-->
         <xsl:for-each select="jsdl:Application">
             <xsl:for-each select="posix:POSIXApplication">
-                <xsl:for-each select="posix:WorkingDirectory"
-                        ><xsl:text>cd </xsl:text><xsl:value-of select="text()"/><xsl:text> || exit $?
-</xsl:text>
+            	<xsl:text>PATH=.:${PATH}</xsl:text>
+                <xsl:value-of select="$lf"/>
+                <xsl:for-each select="posix:WorkingDirectory">
+                	<xsl:text>cd </xsl:text><xsl:value-of select="text()"/><xsl:text> || exit $?</xsl:text>
+                	<xsl:value-of select="$lf"/>
                 </xsl:for-each>
-                <xsl:for-each select="posix:Executable"
-                        > <xsl:value-of select="text()"/><xsl:text> </xsl:text>
+                <xsl:for-each select="posix:Executable"> 
+                	<xsl:value-of select="text()"/>
                 </xsl:for-each>
-                <xsl:if test="posix:Argument"
-                        > <xsl:for-each select="posix:Argument"><xsl:value-of select="text()"/>
-                    <xsl:text> </xsl:text></xsl:for-each><xsl:value-of select="$lf"/>
-                </xsl:if>
+               	<xsl:for-each select="posix:Argument">
+                	<xsl:text> </xsl:text>
+               		<xsl:value-of select="text()"/>
+                </xsl:for-each>
+                <xsl:for-each select="posix:Input">
+	                <xsl:text> &lt; </xsl:text>
+    	            <xsl:value-of select="text()"/>
+                </xsl:for-each>
+                <xsl:value-of select="$lf"/>
             </xsl:for-each>
         </xsl:for-each>
   </xsl:template>
