@@ -54,8 +54,7 @@
 	            </xsl:when>
 	        </xsl:choose>
 	    </xsl:for-each>
-		<xsl:text>
-</xsl:text>        
+        <xsl:value-of select="$lf"/>
 
 		<xsl:if test="$stagingDir">
 	        <xsl:text>#PBS -d </xsl:text><xsl:value-of select="concat($stagingDir,$lf)"/>
@@ -72,9 +71,6 @@
                 </xsl:for-each>
                 <xsl:for-each select="posix:Error"
                         >#PBS -e <xsl:value-of select="concat(text(),$lf)"/>
-                </xsl:for-each>
-                <xsl:for-each select="posix:Environment"
-                        ><xsl:value-of select="@name"/>=<xsl:value-of select="concat(text(),$lf)"/>
                 </xsl:for-each>
             </xsl:for-each>
         </xsl:for-each>
@@ -137,6 +133,9 @@
             <xsl:for-each select="posix:POSIXApplication">
             	<xsl:text>PATH=.:${PATH}</xsl:text>
                 <xsl:value-of select="$lf"/>
+                <xsl:for-each select="posix:Environment">
+                	<xsl:value-of select="@name"/>=<xsl:value-of select="concat(text(),$lf)"/>
+                </xsl:for-each>
                 <xsl:for-each select="posix:WorkingDirectory">
                 	<xsl:text>cd </xsl:text><xsl:value-of select="text()"/><xsl:text> || exit $?</xsl:text>
                 	<xsl:value-of select="$lf"/>
