@@ -85,7 +85,7 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
 			throws PermissionDeniedException, TimeoutException, NoSuccessException {
     	SSHJobProcess sjp = new SSHJobProcess(uniqId);
 		try {
-			System.out.println(sjp.getInfile());
+//System.out.println(jobDesc);
 			if (stdin != null) {
 				m_sftp.put(stdin, sjp.getInfile());
 			} else {
@@ -140,7 +140,7 @@ public class SSHJobControlAdaptor extends SSHAdaptorAbstract implements
         	command.append("exit \\$errcode");
 
 			String cde = "cat << EOS | bash -s \n" + command.toString() + "EOS\n";
-			//System.out.println("NEW command="+cde);
+//System.out.println("NEW command="+cde);
             channel.setCommand(cde);
 
 			if (stdout != null) channel.setOutputStream(stdout);
