@@ -39,6 +39,7 @@ public class StreamingManagerThroughSandboxOnePhase extends
 			throws NotImplementedException, BadParameterException,
 			NoSuccessException {
 		super(adaptor, uniqId);
+		this.m_uuid = uniqId;
 	}
 
     @Override
