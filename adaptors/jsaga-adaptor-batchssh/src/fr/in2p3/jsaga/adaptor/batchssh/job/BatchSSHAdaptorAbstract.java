@@ -3,6 +3,8 @@ package fr.in2p3.jsaga.adaptor.batchssh.job;
 import ch.ethz.ssh2.ChannelCondition;
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.KnownHosts;
+import ch.ethz.ssh2.SFTPv3Client;
+import ch.ethz.ssh2.SFTPv3FileHandle;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
 import fr.in2p3.jsaga.adaptor.ClientAdaptor;
@@ -51,10 +53,14 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
 
     protected static final String KNOWN_HOSTS = "KnownHosts";
     
-    // used if no working directory is defined in the job description
-    // to write stdout and stderr
-    // set as #PBS -d <dir>
-    // If not defined, PBS will use $PBS_O_HOME which is $HOME with SSH
+    /**
+     * the staging directory for the job, either absolute path defined in the configuration
+     * or ".jsaga/var/adaptor/pbs-ssh" under the remote $HOME directory
+     * It is passed to PBS as:
+     * #PBS -v dir
+     * It can be retrieved in job attributes (with qstat -f) in the variable called
+     * PBS_O_WORKDIR
+     */
     protected static final String STAGING_DIRECTORY = "stagingDir";
     
     //public static final String USER_PUBLICKEY = "UserPublicKey";
@@ -91,8 +97,6 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
 
         try {
-        	if (attributes.containsKey(STAGING_DIRECTORY)) 
-        		this.m_stagingDirectory = (String) attributes.get(STAGING_DIRECTORY);
             // Creating a connection instance
             connexion = new Connection(host);
             // Now connect
@@ -146,7 +150,6 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
         } catch (IOException ex) {
             throw new AuthenticationFailedException(ex);
         }
-
     }
 
     public void disconnect() throws NoSuccessException {

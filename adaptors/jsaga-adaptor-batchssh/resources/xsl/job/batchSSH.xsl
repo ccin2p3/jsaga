@@ -36,9 +36,6 @@
 					<xsl:text>=</xsl:text>
 					<xsl:value-of select="jsdl:Source/jsdl:URI/text()"/>
 					<xsl:text>@</xsl:text>
-					<xsl:if test="$stagingDir">
-			        	<xsl:value-of select="$stagingDir"/><xsl:text>/</xsl:text>
-					</xsl:if>
 					<xsl:value-of select="jsdl:FileName/text()"/>
 	            </xsl:when>
 	            <xsl:when test="jsdl:Target">
@@ -47,9 +44,6 @@
 					<xsl:text>=</xsl:text>
 					<xsl:value-of select="jsdl:Target/jsdl:URI/text()"/>
 					<xsl:text>@</xsl:text>
-					<xsl:if test="$stagingDir">
-				        <xsl:value-of select="$stagingDir"/><xsl:text>/</xsl:text>
-					</xsl:if>
 					<xsl:value-of select="jsdl:FileName/text()"/>
 	            </xsl:when>
 	        </xsl:choose>

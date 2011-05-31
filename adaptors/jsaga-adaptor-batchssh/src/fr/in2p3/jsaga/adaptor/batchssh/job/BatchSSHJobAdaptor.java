@@ -1,11 +1,13 @@
 package fr.in2p3.jsaga.adaptor.batchssh.job;
 
+import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.SFTPv3Client;
 import ch.ethz.ssh2.SFTPv3FileHandle;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.HoldableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.SuspendableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
@@ -13,11 +15,17 @@ import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXS
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorOnePhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
+import fr.in2p3.jsaga.adaptor.security.impl.SSHSecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.UserPassSecurityCredential;
+import fr.in2p3.jsaga.adaptor.security.impl.UserPassStoreSecurityCredential;
+
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -30,25 +38,63 @@ import org.ogf.saga.error.*;
  * Date:   07 December 2010
  * ***************************************************/
 public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobControlAdaptor, 
-	SuspendableJobAdaptor, HoldableJobAdaptor, StagingJobAdaptorOnePhase {
+	CleanableJobAdaptor, SuspendableJobAdaptor, HoldableJobAdaptor, StagingJobAdaptorOnePhase {
 
     public JobMonitorAdaptor getDefaultJobMonitor() {
         return new BatchSSHMonitorAdaptor();
     }
 
     public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
-        return new JobDescriptionTranslatorXSLT("xsl/job/batchSSH.xsl");
+    	JobDescriptionTranslatorXSLT tr = new JobDescriptionTranslatorXSLT("xsl/job/batchSSH.xsl");
+    	tr.setAttribute(STAGING_DIRECTORY, this.m_stagingDirectory);
+        return tr;
+    }
+
+    /* override to dynamically mkdir staging direcory */
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+    	super.connect(userInfo, host, port, basePath, attributes);
+        // create SFTP connection
+        SFTPv3Client sftp;
+        try {
+			sftp = new SFTPv3Client(connexion);
+		} catch (IOException e1) {
+			throw new NoSuccessException("Unable create SFTP connection", e1);
+		}
+		
+		// define staging root directory
+    	if (attributes.containsKey(STAGING_DIRECTORY)) {
+    		this.m_stagingDirectory = (String) attributes.get(STAGING_DIRECTORY);
+    	} else {
+    		this.m_stagingDirectory = ".jsaga/var/adaptor/" + this.getType();
+    	}
+		String dirToCreate = "";
+		for (String dir : this.m_stagingDirectory.split("/")) {
+			dirToCreate += dir + "/";
+			try {
+				sftp.mkdir(dirToCreate, 0700);
+			} catch (Exception e){
+//				System.out.println(dirToCreate);
+//				e.printStackTrace();
+			}
+		}
+		// set m_stagingDirectory to canonical path
+		try {
+			this.m_stagingDirectory = sftp.canonicalPath(this.m_stagingDirectory);
+//System.out.println(this.m_stagingDirectory);
+		} catch (IOException e) {
+			throw new NoSuccessException("Unable to build staging root directory", e);
+		}
+		sftp.close();
     }
 
 	public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
         // Get executable name for chmod
     	ArrayList<String[]> transfers = getCustomizedParams(jobDesc, BatchSSHJob.ATTR_VAR_JSAGA_EXECUTABLE);
-    	String executableFileName = (this.m_stagingDirectory != null)?this.m_stagingDirectory + "/":"";
-    	executableFileName += transfers.get(0)[0];
+    	String executableFileName = this.m_stagingDirectory + "/" + transfers.get(0)[0];
 		// Creating the pbs script file's name using the randomUUID
         String FileName = uniqId + ".pbs";
         // the script's content
-//System.out.println(jobDesc);        
+System.out.println(jobDesc);        
         StringBuilder sb = new StringBuilder("#!/bin/bash\n");
         sb.append(jobDesc);
         // the submission command
@@ -107,6 +153,34 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
         return JobId;
     }
 
+	public void clean(String nativeJobId) throws PermissionDeniedException,	TimeoutException, NoSuccessException {
+        SFTPv3Client sftp;
+        try {
+			sftp = new SFTPv3Client(connexion);
+		} catch (IOException e1) {
+			throw new NoSuccessException("Unable to clean stdout and stderr via SFTP", e1);
+		}
+        BatchSSHJob bj = this.getAttributes(new String[]{nativeJobId}).get(0);
+        try {
+	        // get stdout_path (remove host before ':')
+	        String outfile = bj.getAttribute(BatchSSHJob.ATTR_OUTPUT).split(":")[1];
+			sftp.rm(outfile);
+		} catch (IOException e1) {
+			sftp.close();
+			throw new NoSuccessException("Unable to clean stdout via SFTP", e1);
+		} catch (Exception e1) {
+		}
+        try {
+	        String errfile = bj.getAttribute(BatchSSHJob.ATTR_ERROR).split(":")[1];
+			sftp.rm(errfile);
+		} catch (IOException e1) {
+			sftp.close();
+			throw new NoSuccessException("Unable to clean stderr via SFTP", e1);
+		} catch (Exception e1) {
+		}
+		sftp.close();
+	}
+	
     public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         Session session = null;
         // the cancel command
@@ -199,14 +273,13 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
 		// Get the job attributes
         BatchSSHJob bj = this.getAttributes(new String[]{nativeJobId}).get(0);
         // build the SFTP URL with the value of PBS_O_WORKDIR
-        return makeTURL(bj.getAttribute(BatchSSHJob.ATTR_VAR_WORKDIR));
+        return this.makeTURL(bj.getAttribute(BatchSSHJob.ATTR_VAR_WORKDIR));
 	}
 
 	public String getStagingDirectory(String nativeJobDescription, String uniqId)
 			throws PermissionDeniedException, TimeoutException,	NoSuccessException {
-		// TODO: how to get the $HOME ???
 		// build the SFTP URL with this.m_stagingDirectory
-		return this.makeTURL(this.m_stagingDirectory!=null?this.m_stagingDirectory:"");
+		return this.makeTURL(this.m_stagingDirectory);
 	}
 
 	public StagingTransfer[] getInputStagingTransfer(String nativeJobId)
@@ -260,10 +333,10 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
 			String[] path_pair = (String[])transfers.get(i);
 			String from, to;
 			if (input) {
-				to = this.makeTURL(path_pair[1]); // remote sftp:// 
+				to = this.makeTURL(this.m_stagingDirectory + "/" + path_pair[1]); // remote sftp:// 
 				from = path_pair[0]; // local
 			} else {
-				from = this.makeTURL(path_pair[1]); // remote sftp:// 
+				from = this.makeTURL(this.m_stagingDirectory + "/" + path_pair[1]); // remote sftp:// 
 				to = path_pair[0]; // local
 			}
 //System.out.println("TR " + from + " => " + to);	    	
@@ -295,6 +368,8 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
 	}
 	
 	private String makeTURL(String filename) {
-    	return "sftp://" + connexion.getHostname() + ":" + connexion.getPort() + "/" + filename;
+		// TODO : add uniqId
+    	return "sftp://" + connexion.getHostname() + ":" + connexion.getPort() + filename;
 	}
+
 }
