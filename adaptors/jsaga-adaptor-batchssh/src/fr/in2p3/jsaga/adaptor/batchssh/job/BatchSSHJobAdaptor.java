@@ -29,7 +29,7 @@ import org.ogf.saga.error.*;
  * Author: Lionel Schwarz
  * Date:   07 December 2010
  * ***************************************************/
-public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobControlAdaptor, /*StreamableJobBatch,*/
+public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobControlAdaptor, 
 	SuspendableJobAdaptor, HoldableJobAdaptor, StagingJobAdaptorOnePhase {
 
     public JobMonitorAdaptor getDefaultJobMonitor() {
@@ -48,7 +48,7 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
 		// Creating the pbs script file's name using the randomUUID
         String FileName = uniqId + ".pbs";
         // the script's content
-System.out.println(jobDesc);        
+//System.out.println(jobDesc);        
         StringBuilder sb = new StringBuilder("#!/bin/bash\n");
         sb.append(jobDesc);
         // the submission command
@@ -184,49 +184,76 @@ System.out.println(jobDesc);
 		return this.resume(nativeJobId);
 	}
 
+	/*
+	 * StagingJobAdaptorOnePhase interface
+	 */
+	
+	/**
+	 * The staging directory is defined by 
+	 * #PBS -d DIR
+	 * and can be retrieved by qstat -f -1
+	 * PBS_O_WORKDIR=DIR
+	 */
 	public String getStagingDirectory(String nativeJobId)
-			throws PermissionDeniedException, TimeoutException,
-			NoSuccessException {
+			throws PermissionDeniedException, TimeoutException,	NoSuccessException {
+		// Get the job attributes
         BatchSSHJob bj = this.getAttributes(new String[]{nativeJobId}).get(0);
+        // build the SFTP URL with the value of PBS_O_WORKDIR
         return makeTURL(bj.getAttribute(BatchSSHJob.ATTR_VAR_WORKDIR));
 	}
 
+	public String getStagingDirectory(String nativeJobDescription, String uniqId)
+			throws PermissionDeniedException, TimeoutException,	NoSuccessException {
+		// TODO: how to get the $HOME ???
+		// build the SFTP URL with this.m_stagingDirectory
+		return this.makeTURL(this.m_stagingDirectory!=null?this.m_stagingDirectory:"");
+	}
+
 	public StagingTransfer[] getInputStagingTransfer(String nativeJobId)
-			throws PermissionDeniedException, TimeoutException,
-			NoSuccessException {
+			throws PermissionDeniedException, TimeoutException,	NoSuccessException {
 		return this.getStagingTransfers(nativeJobId, true);
 	}
 
 	public StagingTransfer[] getOutputStagingTransfer(String nativeJobId)
-			throws PermissionDeniedException, TimeoutException,
-			NoSuccessException {
+			throws PermissionDeniedException, TimeoutException,	NoSuccessException {
 		return this.getStagingTransfers(nativeJobId, false);
 	}
 
-	private StagingTransfer[] getStagingTransfers(String nativeJobId, boolean input) throws NoSuccessException {
-        BatchSSHJob bj = this.getAttributes(new String[]{nativeJobId}).get(0);
-    	ArrayList<String[]> transfers = bj.getStagingTransfers(input);
-		return this.arrayListToStagingTransfers(transfers, input);
-	}
-	
-	public String getStagingDirectory(String nativeJobDescription, String uniqId)
-			throws PermissionDeniedException, TimeoutException,
-			NoSuccessException {
-		String dirUrl = "sftp://" + connexion.getHostname() + ":" + connexion.getPort(); 
-        if (this.m_stagingDirectory != null)
-        	// TODO: how to get the $HOME ???
-        	dirUrl += "/" + this.m_stagingDirectory;
-        return dirUrl;
-	}
-
-	public StagingTransfer[] getInputStagingTransfer(
-			String nativeJobDescription, String uniqId)
-			throws PermissionDeniedException, TimeoutException,
-			NoSuccessException {
+	public StagingTransfer[] getInputStagingTransfer(String nativeJobDescription, String uniqId)
+			throws PermissionDeniedException, TimeoutException,	NoSuccessException {
     	ArrayList<String[]> transfers = getCustomizedParams(nativeJobDescription, BatchSSHJob.ATTR_VAR_JSAGA_STAGEIN);
 		return this.arrayListToStagingTransfers(transfers, true);
 	}
 
+	/* 
+	 * Private methods 
+	 */
+	/**
+	 * Get the array of INPUT or OUTPUT StagingTransfer for a job
+	 * 
+	 * @param nativeJobId the job ID
+	 * @param input true for INPUT, false for OUTPUT
+	 * @return the array of StagingTransfer
+	 */
+	private StagingTransfer[] getStagingTransfers(String nativeJobId, boolean input) throws NoSuccessException {
+		// get the job attributes
+        BatchSSHJob bj = this.getAttributes(new String[]{nativeJobId}).get(0);
+        // get the list of INPUT or OUTPUT transfers in the form String[]{local,remote}
+    	ArrayList<String[]> transfers = bj.getStagingTransfers(input);
+    	// transform into array
+		return this.arrayListToStagingTransfers(transfers, input);
+	}
+	
+	/**
+	 * transform a list of transfers in the form String[]{local_file,remote_file}
+	 * into an array of StagingTransfer
+	 * if INPUT: StagingTransfer(from_local_file,to_remote_SFTP_URL)
+	 * if OUTPUT: StagingTransfer(from_remote_SFTP_URL,to_loca_file)
+	 * 
+	 * @param transfers the list of transfers
+	 * @param input true for INPUT, false for OUTPUT
+	 * @return the array of StagingTransfer
+	 */
 	private StagingTransfer[] arrayListToStagingTransfers(ArrayList<String[]> transfers, boolean input) {
     	StagingTransfer[] st = new StagingTransfer[transfers.size()];
 		for (int i=0; i<transfers.size(); i++) {
@@ -239,14 +266,22 @@ System.out.println(jobDesc);
 				from = this.makeTURL(path_pair[1]); // remote sftp:// 
 				to = path_pair[0]; // local
 			}
-System.out.println("TR " + from + " => " + to);	    	
+//System.out.println("TR " + from + " => " + to);	    	
 			st[i] = new StagingTransfer(from, to, false);
 		}
 		return st;
 	}
 
+	/**
+	 * Extract the values from the job description defined by
+	 * #PBS -v
+	 * which variable name match a filter
+	 * @param nativeJobDescription
+	 * @param filter
+	 * @return
+	 * @throws NoSuchElementException
+	 */
 	private ArrayList<String[]> getCustomizedParams(String nativeJobDescription, String filter) throws NoSuchElementException {
-//    	ArrayList params = new ArrayList();
 		Scanner sc = new Scanner(nativeJobDescription);
 		String line;
 		while (sc.hasNextLine()) {

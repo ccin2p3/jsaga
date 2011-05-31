@@ -23,11 +23,13 @@ import java.util.List;
 public class BatchSSHMonitorAdaptor extends BatchSSHAdaptorAbstract implements JobMonitorAdaptor, QueryIndividualJob, 
 	QueryListJob, ListableJobAdaptor, JobInfoAdaptor  {
 
+	/* QueryIndividualJob */
     public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
         List<BatchSSHJob> bj = this.getAttributes(new String[]{nativeJobId});
         return bj.get(0).getJobStatus();
     }
 
+    /* ListableJobAdaptor */
 	public String[] list() throws PermissionDeniedException, TimeoutException,
 			NoSuccessException {
         List<BatchSSHJob> bj = this.getAttributes(new String[]{});
@@ -38,6 +40,7 @@ public class BatchSSHMonitorAdaptor extends BatchSSHAdaptorAbstract implements J
         return list;
 	}
 
+	/* QueryListJob */
 	public JobStatus[] getStatusList(String[] nativeJobIdArray)
 			throws TimeoutException, NoSuccessException {
         List<BatchSSHJob> bj = this.getAttributes(nativeJobIdArray);
@@ -48,6 +51,7 @@ public class BatchSSHMonitorAdaptor extends BatchSSHAdaptorAbstract implements J
         return jb;
 	}
 
+	/* JobInfoAdaptor */
 	public Integer getExitCode(String nativeJobId)
 			throws NotImplementedException, NoSuccessException {
         List<BatchSSHJob> bj = this.getAttributes(new String[]{nativeJobId});

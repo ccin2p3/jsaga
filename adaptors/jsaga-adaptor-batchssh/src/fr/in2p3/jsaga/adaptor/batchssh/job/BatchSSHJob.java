@@ -100,6 +100,12 @@ public class BatchSSHJob {
 		return this.m_attributes.get(varname);
 	}
 	
+	/**
+	 * Get the list of INPUT or OUTPUT transfers (String[2] in the form [local,remote])
+	 * @param input true for INPUT transfers, false for OUTPUT
+	 * @return the list of transfers
+	 * @throws NoSuccessException
+	 */
 	public ArrayList<String[]> getStagingTransfers(boolean input) throws NoSuccessException {
     	ArrayList<String[]> vars = new ArrayList<String[]>();
 		String crit;
@@ -109,20 +115,21 @@ public class BatchSSHJob {
 	    	crit = ATTR_VAR_JSAGA_STAGEOUT;
 		}
 		return BatchSSHJob.getFilteredVars(this.getAttribute(ATTR_VARS), crit);
-    	//return (String[][]) transfers.toArray(vars);
 	}
 	
+	/**
+	 * Get the list of variables matching the filter (String[2])
+	 * If the variable contains a '@' (transfers), it is cut in 2 parts
+	 * @param var_string the variable to parse in the form VAR1=text,VAR2=value,VAR3=local@remote,...
+	 * @param filter the string that a variable name should start with
+	 * @return the list of matching variables values
+	 */
 	public static ArrayList<String[]> getFilteredVars(String var_string, String filter) {
     	ArrayList<String[]> vars = new ArrayList<String[]>();
 		String[] assignations = var_string.split(",");
-		//String to, from;
 		for (int i=0; i<assignations.length; i++) {
 			String [] arr = assignations[i].split("=",2);
 			if (arr[0].trim().toUpperCase().startsWith(filter)) {
-				/*String [] path_pair = arr[1].trim().split("@",2);
-		    	to = path_pair[0]; // local 
-		    	from = path_pair[1]; // remote sftp://
-				vars.add(new String[] {from, to});*/
 				vars.add(arr[1].trim().split("@",2));
 			}
 		}

@@ -75,12 +75,6 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
         return new Default[]{
                     new Default(KNOWN_HOSTS, new File[]{
                         new File(System.getProperty("user.home") + "/.ssh/known_hosts")}),
-                    /*new Default(Context.USERKEY, new File[]{
-                        new File(System.getProperty("user.home") + "/.ssh/id_rsa"),
-                        new File(System.getProperty("user.home") + "/.ssh/id_dsa")}),*/
-                    /*new Default(USER_PUBLICKEY, new File[]{
-                        new File(System.getProperty("user.home") + "/.ssh/id_rsa.pub"),
-                        new File(System.getProperty("user.home") + "/.ssh/id_dsa.pub")}),*/
                     new Default(Context.USERID,
                     System.getProperty("user.name"))
                 };
@@ -140,26 +134,9 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
         	else if(credential instanceof SSHSecurityCredential) {
         		String userId = ((SSHSecurityCredential) credential).getUserID();
         		String passPhrase = ((SSHSecurityCredential) credential).getUserPass();
-        		// clone private key because the object will be reset
-        		//byte[] privateKey = ((SSHSecurityCredential) credential).getPrivateKey().clone();
-        		//byte[] publicKey = ((SSHSecurityCredential) credential).getPublicKey();
         		File Key = ((SSHSecurityCredential) credential).getPrivateKeyFile();
 
                 if (!connexion.authenticateWithPublicKey(userId, Key, passPhrase)) {
-                    throw new AuthenticationFailedException("Authentication failed.");
-                }
-            // TODO: The following block is useless
-        	} else if (attributes.containsKey(Context.USERKEY)) {
-                //getting the private key file
-                File Key = new File((String) attributes.get(Context.USERKEY));
-
-                if (!Key.exists()) {
-                    throw new BadParameterException("Unable to find the selected known host file.");
-                }
-
-                boolean isAuthenticated = connexion.authenticateWithPublicKey((String) attributes.get(Context.USERID), Key, (String) attributes.get(Context.USERPASS));
-
-                if (isAuthenticated == false) {
                     throw new AuthenticationFailedException("Authentication failed.");
                 }
             } else {
@@ -167,7 +144,7 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
             }
 
         } catch (IOException ex) {
-            System.out.println("Authentification error :"+ex.getMessage());
+            throw new AuthenticationFailedException(ex);
         }
 
     }
@@ -207,7 +184,6 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
     }
     
     protected List<BatchSSHJob> getAttributes(String nativeJobIdArray[], String[] keys) throws NoSuccessException {
-        //BatchSSHJob[] bj = new BatchSSHJob[nativeJobIdArray.length];
 		List<BatchSSHJob> bj = new ArrayList<BatchSSHJob>();
 
         Session session = null;
@@ -230,7 +206,6 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
                 	String jobid = line.split(":")[1].trim();
                 	job = new BatchSSHJob(jobid);
             	} else if (line.length() == 0) { // end of Job
-            		//bj[i] = job;
             		bj.add(job);
             		i++;
             	} else { // attributes
@@ -250,7 +225,6 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
             if (session != null) session.close();
         }
 		return bj;
-		//return (BatchSSHJob[])bj.toArray(new BatchSSHJob[bj.size()]);
 
     }
 
