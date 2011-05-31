@@ -1,5 +1,14 @@
 package fr.in2p3.jsaga.adaptor.batchssh.job;
 
+/* ***************************************************
+* *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
+* ***             http://cc.in2p3.fr/             ***
+* ***************************************************
+* File:   BatchSSHCommandFailedException
+* Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
+* Date:   10 mai 2011
+* ***************************************************
+* Description:                                      */
 public class BatchSSHCommandFailedException extends Exception {
 
 	/**
