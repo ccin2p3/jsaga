@@ -32,6 +32,7 @@ public class BatchSSHJob {
 	public static String ATTR_END_TIME = "MTIME";
 	public static String ATTR_EXEC_HOST = "EXEC_HOST";
 	public static String ATTR_OUTPUT = "OUTPUT_PATH";
+	public static String ATTR_ERROR = "ERROR_PATH";
 	public static String ATTR_STAGEOUT = "STAGEOUT";
 	public static String ATTR_SERVER = "SERVER";
 	public static String ATTR_VARS = "VARIABLE_LIST";
