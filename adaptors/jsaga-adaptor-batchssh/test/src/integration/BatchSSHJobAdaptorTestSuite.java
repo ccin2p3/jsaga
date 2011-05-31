@@ -94,8 +94,8 @@ public class BatchSSHJobAdaptorTestSuite extends JSAGATestSuite {
     }
     
     // test cases
-    public static class BatchSSHJobRunInteractiveTest extends JobRunInteractiveTest {
+    /*public static class BatchSSHJobRunInteractiveTest extends JobRunInteractiveTest {
         public BatchSSHJobRunInteractiveTest() throws Exception {super("pbs-ssh");}
         public void test_simultaneousStdin()  { super.ignore("Not supported");}
-    }
+    }*/
 }
