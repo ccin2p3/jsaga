@@ -41,7 +41,7 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
         }
     }
 
-    public void cleanup(AbstractSyncJobImpl job, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+    public Directory cleanup(AbstractSyncJobImpl job, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         // for each input file
         for (StagingTransfer transfer : m_adaptor.getInputStagingTransfer(nativeJobId)) {
             remove(job.getSession(), transfer.getTo());
@@ -59,17 +59,14 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
             Directory dir = null;
             try {
                 dir = FileFactory.createDirectory(job.getSession(), url);
-                dir.remove(Flags.NONE.getValue());
+                return dir;
             } catch (IncorrectURLException e) {
                 throw new NoSuccessException(e);
             } catch (AlreadyExistsException e) {
                 throw new NoSuccessException(e);
-            } finally {
-                if (dir != null) {
-                    dir.close();
-                }
             }
         }
+        return null;
     }
 
     protected static void transfer(Session session, StagingTransfer transfer) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {

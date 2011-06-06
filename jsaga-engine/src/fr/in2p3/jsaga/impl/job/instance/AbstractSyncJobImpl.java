@@ -23,6 +23,7 @@ import fr.in2p3.jsaga.sync.job.SyncJob;
 import org.apache.log4j.Logger;
 import org.ogf.saga.SagaObject;
 import org.ogf.saga.error.*;
+import org.ogf.saga.file.Directory;
 import org.ogf.saga.job.JobDescription;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.task.State;
@@ -385,8 +386,11 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
     }
     private void cleanUp() throws NotImplementedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         // cleanup staged files
+    	Directory dir = null;
+    	
+    	// remove staging files
         try {
-            m_stagingMgr.cleanup(this, m_nativeJobId);
+            dir = m_stagingMgr.cleanup(this, m_nativeJobId);
         } catch (AuthenticationFailedException e) {
             throw new NoSuccessException(e);
         } catch (AuthorizationFailedException e) {
@@ -397,7 +401,7 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             throw new NoSuccessException(e);
         }
         
-        // cleanup job
+        // adaptor's cleanup
         if (m_controlAdaptor instanceof CleanableJobAdaptor) {
             try {
             	JobInfoAdaptor jia = getJobInfoAdaptor();
@@ -431,7 +435,24 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
             }
             
             ((CleanableJobAdaptor)m_controlAdaptor).clean(m_nativeJobId);
-        } else {
+        }
+        
+        // remove staging directory
+        if (dir != null) {
+            try {
+				dir.remove();
+				dir.close();
+			} catch (AuthenticationFailedException e) {
+				throw new NoSuccessException(e);
+			} catch (AuthorizationFailedException e) {
+				throw new NoSuccessException(e);
+			} catch (BadParameterException e) {
+				throw new NoSuccessException(e);
+			}
+        }
+
+        // throw NotImplementedException if adaptor not instance of CleanableJobAdaptor
+        if (! (m_controlAdaptor instanceof CleanableJobAdaptor)) {
             throw new NotImplementedException("Cleanup is not supported by this adaptor: "+m_controlAdaptor.getClass().getName());
         }
     }
