@@ -97,9 +97,8 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 			jobProps.load(new ByteArrayInputStream(jobDesc.getBytes()));
 			File _workDir = null;
 			String cde = null;
-			String executable = null;
-            Enumeration e = jobProps.propertyNames();
-			ArrayList _envParams = new ArrayList();
+			Enumeration e = jobProps.propertyNames();
+			ArrayList<String> _envParams = new ArrayList<String>();
             while (e.hasMoreElements()){
                    String key = (String)e.nextElement();
                    String val = (String)jobProps.getProperty(key);
@@ -115,6 +114,17 @@ public class LocalJobControlAdaptor extends LocalAdaptorAbstract implements
 			Process p = Runtime.getRuntime().exec(new String[]{m_shellPath, "-c", cde}, 
 													(String[])_envParams.toArray(new String[]{}), 
 													_workDir);
+			try {
+				// wait 100ms and try to get exitCode
+				// if the process has not finished yet, IllegalThreadStateException is thrown
+				// If the process has finished with code 255, simulate the IOException
+				Thread.sleep(100);
+				if (p.exitValue() == 255) {
+					throw new IOException("Abnormal termintation");
+				}
+			} catch (IllegalThreadStateException itse) {
+				// ignore: the process is not finished
+			}
 			return ljp;
 		} catch (IOException ioe) {
 			ljp.setReturnCode(2);
