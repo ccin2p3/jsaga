@@ -4,6 +4,7 @@ import fr.in2p3.jsaga.helpers.StringArray;
 import fr.in2p3.jsaga.impl.job.instance.AbstractSyncJobImpl;
 import fr.in2p3.jsaga.impl.job.staging.*;
 import org.ogf.saga.error.*;
+import org.ogf.saga.file.Directory;
 import org.ogf.saga.job.JobDescription;
 
 import java.io.*;
@@ -215,7 +216,7 @@ public class DataStagingManagerThroughStream implements DataStagingManager {
         }
     }
 
-    public void cleanup(AbstractSyncJobImpl job, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+    public Directory cleanup(AbstractSyncJobImpl job, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         // for each inputToRemote
         for (InputDataStagingToRemote staging : m_inputToRemote) {
             staging.cleanup(job.getSession());
@@ -225,6 +226,7 @@ public class DataStagingManagerThroughStream implements DataStagingManager {
         for (OutputDataStagingFromRemote staging : m_outputFromRemote) {
             staging.cleanup(job.getSession());
         }
+        return null;
     }
 
     private boolean needsStdin() {

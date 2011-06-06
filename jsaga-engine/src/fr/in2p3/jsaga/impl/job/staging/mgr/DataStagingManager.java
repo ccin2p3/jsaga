@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.impl.job.staging.mgr;
 
 import fr.in2p3.jsaga.impl.job.instance.AbstractSyncJobImpl;
 import org.ogf.saga.error.*;
+import org.ogf.saga.file.Directory;
 import org.ogf.saga.job.JobDescription;
 
 /* ***************************************************
@@ -19,5 +20,5 @@ import org.ogf.saga.job.JobDescription;
 public interface DataStagingManager {
     public JobDescription modifyJobDescription(final JobDescription jobDesc) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException;
     public void postStaging(AbstractSyncJobImpl job, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException;
-    public void cleanup(AbstractSyncJobImpl job, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException;
+    public Directory cleanup(AbstractSyncJobImpl job, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException;
 }

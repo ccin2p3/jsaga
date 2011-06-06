@@ -14,6 +14,7 @@ import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
+import org.ogf.saga.file.Directory;
 import org.ogf.saga.job.JobDescription;
 
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
@@ -75,7 +76,7 @@ public class StreamingManagerThroughSandboxTwoPhase extends DataStagingManagerTh
 	}
 
     @Override
-    public void cleanup(AbstractSyncJobImpl job, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
+    public Directory cleanup(AbstractSyncJobImpl job, String nativeJobId) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
     	try {
     		File input = LocalFileFactory.getLocalInputFile(m_uuid);
     		input.delete();
@@ -91,7 +92,7 @@ public class StreamingManagerThroughSandboxTwoPhase extends DataStagingManagerTh
     		error.delete();
     	} catch (Exception e) {
     	}
-    	super.cleanup(job, nativeJobId);
+    	return super.cleanup(job, nativeJobId);
     }	
 
     protected String getWorker(String suffix) {
