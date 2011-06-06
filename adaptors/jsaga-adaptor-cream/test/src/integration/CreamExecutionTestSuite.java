@@ -35,7 +35,6 @@ public class CreamExecutionTestSuite extends JSAGATestSuite {
     
     public static class CreamJobRunInteractiveTest extends JobRunInteractiveTest {
     	public CreamJobRunInteractiveTest() throws Exception {super("cream");}
-        public void test_setStdin_error() throws Exception { super.ignore("Cream status is DONE-OK"); }
     	public void test_run_environnement() throws Exception { super.ignore("Space is not supported in environment");   }
     }
 }
