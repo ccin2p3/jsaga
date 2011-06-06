@@ -8,6 +8,7 @@
     <xsl:output method="text"/>
 	<xsl:param name="stagingDir"/>
 	<xsl:param name="HostName"/>
+	<xsl:param name="UniqId"/>
 
     <xsl:variable name="ATTRIBUTE_SEPARATOR">;</xsl:variable>
     <!-- entry point (MUST BE RELATIVE) -->
@@ -51,7 +52,7 @@
         <xsl:value-of select="$lf"/>
 
 		<xsl:if test="$stagingDir">
-	        <xsl:text>#PBS -d </xsl:text><xsl:value-of select="concat($stagingDir,$lf)"/>
+	        <xsl:text>#PBS -d </xsl:text><xsl:value-of select="concat($stagingDir,'/',$UniqId,$lf)"/>
 		</xsl:if>
         <xsl:for-each select="jsdl:JobIdentification">
             <xsl:for-each select="jsdl:JobAnnotation"
