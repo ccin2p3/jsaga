@@ -1,23 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
     <session>
-        <context type="X509">
+        <!-- <context type="X509">
             <attribute name="UserCert" value="${user.home}/.jsaga/contexts/https/mycert.p12"/>
             <attribute name="UserPass" value="toto"/>
             <data type="https"/>
-        </context>
+        </context> -->
         <context type="JKS">
             <attribute name="Keystore" value="${user.home}/.jsaga/contexts/https/mycert.jks"/>
             <attribute name="KeystorePass" value="changeit"/>
-<!--
-            <data type="https">
-                <attribute name="MutualAuthentication" value="true"/>
-            </data>
--->
+        </context>
+        <context type="UserPassStore">
         </context>
         <context type="None">
             <job type="local">
-                <attribute name="ShellPath" value="f:/cygwin/bin/bash.exe"/>
+                <!-- <attribute name="ShellPath" value="f:/cygwin/bin/bash.exe"/> -->
             </job>
         </context>
     </session>
