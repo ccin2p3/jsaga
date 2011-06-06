@@ -52,22 +52,22 @@ public abstract class BatchSSHAdaptorAbstract implements ClientAdaptor {
     }
 
     protected static final String KNOWN_HOSTS = "KnownHosts";
+    protected static KnownHosts KnownHosts = new KnownHosts();
     
     /**
-     * the staging directory for the job, either absolute path defined in the configuration
+     * the staging root directory, either absolute path defined in the configuration
      * or ".jsaga/var/adaptor/pbs-ssh" under the remote $HOME directory
+     * The staging directory for the job is the concat of the root directory and the unique job id.
      * It is passed to PBS as:
      * #PBS -v dir
      * It can be retrieved in job attributes (with qstat -f) in the variable called
      * PBS_O_WORKDIR
      */
     protected static final String STAGING_DIRECTORY = "stagingDir";
+    protected String m_stagingDirectory = null;
     
-    //public static final String USER_PUBLICKEY = "UserPublicKey";
-    protected static KnownHosts KnownHosts = new KnownHosts();
     protected Connection connexion;
     private SecurityCredential credential;
-    protected String m_stagingDirectory = null;
     
     public Usage getUsage() {
         return new UAnd(

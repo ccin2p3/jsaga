@@ -50,7 +50,7 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
         return tr;
     }
 
-    /* override to dynamically mkdir staging direcory */
+    /* override to dynamically mkdir staging directory */
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     	super.connect(userInfo, host, port, basePath, attributes);
         // create SFTP connection
@@ -70,17 +70,11 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
 		String dirToCreate = "";
 		for (String dir : this.m_stagingDirectory.split("/")) {
 			dirToCreate += dir + "/";
-			try {
-				sftp.mkdir(dirToCreate, 0700);
-			} catch (Exception e){
-//				System.out.println(dirToCreate);
-//				e.printStackTrace();
-			}
+			try {sftp.mkdir(dirToCreate, 0700);	} catch (Exception e){}
 		}
 		// set m_stagingDirectory to canonical path
 		try {
 			this.m_stagingDirectory = sftp.canonicalPath(this.m_stagingDirectory);
-//System.out.println(this.m_stagingDirectory);
 		} catch (IOException e) {
 			throw new NoSuccessException("Unable to build staging root directory", e);
 		}
@@ -90,11 +84,11 @@ public class BatchSSHJobAdaptor extends BatchSSHAdaptorAbstract implements JobCo
 	public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
         // Get executable name for chmod
     	ArrayList<String[]> transfers = getCustomizedParams(jobDesc, BatchSSHJob.ATTR_VAR_JSAGA_EXECUTABLE);
-    	String executableFileName = this.m_stagingDirectory + "/" + transfers.get(0)[0];
+    	String executableFileName = this.m_stagingDirectory + "/" + uniqId + "/" + transfers.get(0)[0];
 		// Creating the pbs script file's name using the randomUUID
-        String FileName = uniqId + ".pbs";
+        String FileName = this.m_stagingDirectory + "/" + uniqId + "/" + "description.pbs";
         // the script's content
-System.out.println(jobDesc);        
+//System.out.println(jobDesc);        
         StringBuilder sb = new StringBuilder("#!/bin/bash\n");
         sb.append(jobDesc);
         // the submission command
@@ -107,6 +101,15 @@ System.out.println(jobDesc);
         SFTPv3Client sftp;
         try {
 			sftp = new SFTPv3Client(connexion);
+		} catch (IOException e1) {
+			throw new NoSuccessException("Unable to create SFTP connection", e1);
+		}
+        try {
+			sftp.mkdir(this.m_stagingDirectory + "/" + uniqId, 0755);
+		} catch (IOException e1) {
+			// ignore : exception thrown even if the directory is created
+		}
+        try {
 			SFTPv3FileHandle script = sftp.createFile(FileName);
 			sftp.write(script, 0, sb.toString().getBytes(), 0, sb.length());
 			sftp.closeFile(script);
@@ -141,12 +144,12 @@ System.out.println(jobDesc);
 			throw new NoSuccessException("Unable to submit job", e);
         } finally {
             if (session != null) session.close();
-            // remove the script and close the SFTP
-            try {
-				sftp.rm(FileName);
-			} catch (IOException e) {
-				// Ignore
-			}
+            // remove the script
+            try {sftp.rm(FileName);	} catch (IOException e) {}
+            // if no job was submitted, delete the directory
+            if (JobId == null) {
+            	try {sftp.rmdir(this.m_stagingDirectory + "/" + uniqId);	} catch (IOException e) {}
+            }
             sftp.close();
         }
 
@@ -165,17 +168,16 @@ System.out.println(jobDesc);
 	        // get stdout_path (remove host before ':')
 	        String outfile = bj.getAttribute(BatchSSHJob.ATTR_OUTPUT).split(":")[1];
 			sftp.rm(outfile);
-		} catch (IOException e1) {
-			sftp.close();
-			throw new NoSuccessException("Unable to clean stdout via SFTP", e1);
 		} catch (Exception e1) {
 		}
         try {
 	        String errfile = bj.getAttribute(BatchSSHJob.ATTR_ERROR).split(":")[1];
 			sftp.rm(errfile);
-		} catch (IOException e1) {
-			sftp.close();
-			throw new NoSuccessException("Unable to clean stderr via SFTP", e1);
+		} catch (Exception e1) {
+		}
+        try {
+	        String workdir = bj.getAttribute(BatchSSHJob.ATTR_VAR_WORKDIR);
+			sftp.rmdir(workdir);
 		} catch (Exception e1) {
 		}
 		sftp.close();
@@ -183,10 +185,8 @@ System.out.println(jobDesc);
 	
     public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         Session session = null;
-        // the cancel command
         String CancelCommand = "qdel " + nativeJobId;
 
-        // Openning a new session
         try {
             session = this.sendCommand(CancelCommand);
         } catch (IOException ex) {
@@ -202,10 +202,9 @@ System.out.println(jobDesc);
         Session session = null;
         // ok = true if the command is executed successfuly and false if not
         Boolean ok = true;
-        // the holding command
+
         String HoldCommand = "qhold " + nativeJobId;
 
-        // Openning a new session
         try {
         	session = this.sendCommand(HoldCommand);
         } catch (IOException ex) {
@@ -219,17 +218,15 @@ System.out.println(jobDesc);
         } finally {
             if (session != null) session.close();
         }
-
         return ok;
     }
 
     public boolean resume(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         Session session = null;
         Boolean ok = true;
-        // the releasing command
+
         String ReleaseCommand = "qrls " + nativeJobId;
 
-        // Openning a new session
         try {
         	session = this.sendCommand(ReleaseCommand);
         } catch (IOException ex) {
@@ -243,18 +240,14 @@ System.out.println(jobDesc);
         } finally {
             if (session != null) session.close();
         }
-
         return ok;
     }
 
-	public boolean hold(String nativeJobId) throws PermissionDeniedException,
-			TimeoutException, NoSuccessException {
+	public boolean hold(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		return this.suspend(nativeJobId);
 	}
 
-	public boolean release(String nativeJobId)
-			throws PermissionDeniedException, TimeoutException,
-			NoSuccessException {
+	public boolean release(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		return this.resume(nativeJobId);
 	}
 
@@ -268,8 +261,7 @@ System.out.println(jobDesc);
 	 * and can be retrieved by qstat -f -1
 	 * PBS_O_WORKDIR=DIR
 	 */
-	public String getStagingDirectory(String nativeJobId)
-			throws PermissionDeniedException, TimeoutException,	NoSuccessException {
+	public String getStagingDirectory(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
 		// Get the job attributes
         BatchSSHJob bj = this.getAttributes(new String[]{nativeJobId}).get(0);
         // build the SFTP URL with the value of PBS_O_WORKDIR
@@ -279,7 +271,7 @@ System.out.println(jobDesc);
 	public String getStagingDirectory(String nativeJobDescription, String uniqId)
 			throws PermissionDeniedException, TimeoutException,	NoSuccessException {
 		// build the SFTP URL with this.m_stagingDirectory
-		return this.makeTURL(this.m_stagingDirectory);
+		return this.makeTURL(this.m_stagingDirectory + "/" + uniqId);
 	}
 
 	public StagingTransfer[] getInputStagingTransfer(String nativeJobId)
@@ -295,7 +287,7 @@ System.out.println(jobDesc);
 	public StagingTransfer[] getInputStagingTransfer(String nativeJobDescription, String uniqId)
 			throws PermissionDeniedException, TimeoutException,	NoSuccessException {
     	ArrayList<String[]> transfers = getCustomizedParams(nativeJobDescription, BatchSSHJob.ATTR_VAR_JSAGA_STAGEIN);
-		return this.arrayListToStagingTransfers(transfers, true);
+		return this.arrayListToStagingTransfers(transfers,this.m_stagingDirectory + "/" + uniqId, true);
 	}
 
 	/* 
@@ -314,7 +306,7 @@ System.out.println(jobDesc);
         // get the list of INPUT or OUTPUT transfers in the form String[]{local,remote}
     	ArrayList<String[]> transfers = bj.getStagingTransfers(input);
     	// transform into array
-		return this.arrayListToStagingTransfers(transfers, input);
+		return this.arrayListToStagingTransfers(transfers, bj.getAttribute(BatchSSHJob.ATTR_VAR_WORKDIR), input);
 	}
 	
 	/**
@@ -324,22 +316,22 @@ System.out.println(jobDesc);
 	 * if OUTPUT: StagingTransfer(from_remote_SFTP_URL,to_loca_file)
 	 * 
 	 * @param transfers the list of transfers
+	 * @param stagingDir the staging directory
 	 * @param input true for INPUT, false for OUTPUT
 	 * @return the array of StagingTransfer
 	 */
-	private StagingTransfer[] arrayListToStagingTransfers(ArrayList<String[]> transfers, boolean input) {
+	private StagingTransfer[] arrayListToStagingTransfers(ArrayList<String[]> transfers, String stagingDir, boolean input) {
     	StagingTransfer[] st = new StagingTransfer[transfers.size()];
 		for (int i=0; i<transfers.size(); i++) {
 			String[] path_pair = (String[])transfers.get(i);
 			String from, to;
 			if (input) {
-				to = this.makeTURL(this.m_stagingDirectory + "/" + path_pair[1]); // remote sftp:// 
+				to = this.makeTURL(stagingDir + "/" + path_pair[1]); // remote sftp:// 
 				from = path_pair[0]; // local
 			} else {
-				from = this.makeTURL(this.m_stagingDirectory + "/" + path_pair[1]); // remote sftp:// 
+				from = this.makeTURL(stagingDir + "/" + path_pair[1]); // remote sftp:// 
 				to = path_pair[0]; // local
 			}
-//System.out.println("TR " + from + " => " + to);	    	
 			st[i] = new StagingTransfer(from, to, false);
 		}
 		return st;
@@ -368,7 +360,6 @@ System.out.println(jobDesc);
 	}
 	
 	private String makeTURL(String filename) {
-		// TODO : add uniqId
     	return "sftp://" + connexion.getHostname() + ":" + connexion.getPort() + filename;
 	}
 
