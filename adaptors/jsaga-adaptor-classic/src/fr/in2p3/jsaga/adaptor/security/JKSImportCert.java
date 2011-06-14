@@ -62,7 +62,7 @@ public class JKSImportCert {
         }
 
         // Add certificate to JKS
-        ks.setKeyEntry("CERT", privKey, keystorePassword, certChain);
+        ks.setKeyEntry(alias, privKey, keystorePassword, certChain);
 
         // Save JKS
         OutputStream out = new FileOutputStream(keystoreFile);
