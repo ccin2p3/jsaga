@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
     <session>
-        <context type="BESJKS" id="Demo">
+        <context type="JKS" id="Demo">
             <attribute name="Keystore" value="${user.home}/.jsaga/contexts/unicore6/demouser.jks"/>
             <attribute name="KeystorePass" value="the!user"/>
             <data type="rbyteio"/>
@@ -10,13 +10,13 @@
             <exclude host="localhost6" domain="hu" />
             <exclude host="localhost6" domain="de" />
         </context>
-        <context type="BESJKS" id="Arc">
+        <context type="JKS" id="Arc">
             <attribute name="Keystore" value="${user.home}/.jsaga/contexts/arc/grid2-fr.jks"/>
             <attribute name="KeystorePass" value="changeit"/>
             <job type="arex"/>
             <include domain="hu"/>
         </context>
-        <context type="BESJKS" id="DGrid">
+        <context type="JKS" id="DGrid">
             <attribute name="Keystore" value="${user.home}/.jsaga/contexts/d-grid/dgrid.jks"/>
             <attribute name="KeystorePass" value="changeit"/>
             <job type="bes-unicore"/>
