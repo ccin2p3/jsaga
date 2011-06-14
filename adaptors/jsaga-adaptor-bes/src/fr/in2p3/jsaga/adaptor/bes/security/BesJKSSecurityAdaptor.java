@@ -18,7 +18,7 @@ import java.util.*;
 
 public class BesJKSSecurityAdaptor extends JKSSecurityAdaptor {
 
-	// TODO : insert this code into JKSSecurityAdaptor ?
+	// TODO : delete this class
 	
 	private static final String KEYSTORE = "Keystore";
 	private static final String KEYSTORE_PASS = "KeystorePass";
@@ -26,15 +26,16 @@ public class BesJKSSecurityAdaptor extends JKSSecurityAdaptor {
     public String getType() {
     	return "BESJKS";
     }
-
+    
+    /*
     public SecurityCredential createSecurityCredential(int usage, Map attributes, String contextId) throws IncorrectStateException, NoSuccessException {
     		String keyStorePass = (String) attributes.get(KEYSTORE_PASS);
 			String keyStorePath = (String) attributes.get(KEYSTORE);
+			// FIXME: this is not thread safe
     		System.setProperty("javax.net.ssl.keyStore", keyStorePath);
     		System.setProperty("javax.net.ssl.keyStorePassword", keyStorePass);
     		System.setProperty("javax.net.ssl.trustStore", keyStorePath);
-    		//System.setProperty("javax.net.ssl.trustStorePassword", keyStorePass);
-    		//System.setProperty("javax.net.debug", "ssl:handshake");
     		return super.createSecurityCredential(usage, attributes, contextId);
     }
+    */
 }
