@@ -119,6 +119,9 @@ NodeNumber = <xsl:value-of select="."/>;<xsl:text/>
             	</xsl:otherwise>
         	</xsl:choose>
         </xsl:for-each>
+        <xsl:for-each select="jsdl:Resources/jsdl:TotalCPUCount/jsdl:Exact/text()">
+CPUNumber = <xsl:value-of select="."/>;<xsl:text/>
+        </xsl:for-each>
 
         <!-- streams -->
         <xsl:variable name="isInteractive" select="jsdl:Application/posix:POSIXApplication/@name='interactive'"/>
