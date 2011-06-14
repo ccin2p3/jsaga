@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
     <session>
-        <context type="BESJKS" id="Demo">
-            <attribute name="Keystore" value="${user.home}/.jsaga/contexts/unicore6/demouser.jks"/>
+        <context type="JKS" id="Demo">
+            <attribute name="Keystore" value="${user.home}/.jsaga/contexts/unicore6/test.jks"/>
             <attribute name="KeystorePass" value="the!user"/>
+            <attribute name="UserAlias" value="zzz"/>
             <data type="rbyteio"/>
             <job type="bes-unicore"/>
             <include host="localhost6"/>
             <exclude host="localhost6" domain="de" />
             <exclude host="localhost6" domain="org" />
         </context>
-        <context type="BESJKS" id="DGrid">
+        <context type="JKS" id="DGrid">
             <attribute name="Keystore" value="${user.home}/.jsaga/contexts/d-grid/dgrid.jks"/>
             <attribute name="KeystorePass" value="changeit"/>
             <job type="bes-unicore"/>
             <include domain="de"/>
         </context>
-        <context type="BESJKS" id="ZZZZZ">
+        <context type="JKS" id="ZZZZZ">
             <attribute name="Keystore" value="${user.home}/.jsaga/contexts/d-grid/dgrid.jks"/>
             <attribute name="KeystorePass" value="changeit"/>
             <job type="bes-unicore"/>
