@@ -62,7 +62,7 @@ public class URLImplTest extends AbstractTest {
     	 _user = "userinfo@";
     	 _host = "host.domain";
     	 _port = ":1234";
-    	 _file = "file:1";
+    	 _file = "file.ext:1";
     	 _abs_path = "/path/";
     	 _rel_path = "relpath/";
     	 _path_not_encoded = "/path with spaces";
