@@ -49,7 +49,7 @@ public class RelativeURLImpl extends AbstractURLImpl implements URL {
     }
 
     public String getEncodedPathOnly() {
-    	String encoded_path = URLEncoder.encodeFilePathOnly(getPath());
+    	String encoded_path = URLEncoder.encodePathOnly(getPath());
 		return encoded_path + (url_query == null?"":"?"+url_query) + (url_fragment == null?"":"#"+url_fragment);
     	
     }
