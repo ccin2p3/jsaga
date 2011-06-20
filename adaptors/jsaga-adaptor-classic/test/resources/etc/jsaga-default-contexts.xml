@@ -7,6 +7,7 @@
             <data type="https"/>
         </context> -->
         <context type="JKS">
+        	<!--TODO remove 2 lines and add UserAlias --> 
             <attribute name="Keystore" value="${user.home}/.jsaga/contexts/https/mycert.jks"/>
             <attribute name="KeystorePass" value="changeit"/>
         </context>
