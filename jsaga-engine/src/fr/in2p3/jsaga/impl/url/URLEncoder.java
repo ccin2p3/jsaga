@@ -50,6 +50,36 @@ public class URLEncoder {
         }
         return buffer.toString();
     }
+
+    /**
+     * This is specific for file: scheme where we can support additional charachers as ':' ...
+     * @param path
+     * @return
+     */
+    static String encodeFilePathOnly(String path) {
+        StringBuffer buffer = new StringBuffer();
+        char[] array = path.toCharArray();
+        for (int i=0; i<array.length; i++) {
+            char c = array[i];
+            if (c < 128) {      // ASCII
+                if (c=='%' && (isEncodedQuestionMark(array,i) || isEncodedSharp(array,i))) {
+                    buffer.append(c);   // allow already encoded '?' or '#'
+                } else if (isReservedASCII(c)) {
+                    appendHex(buffer, c);
+                } else {
+                    buffer.append(c);
+                }
+            } else {            // non-ASCII (must be converted to UTF-8 before encoding)
+                if (c <= 160) { // isIllegal
+                    appendHex(buffer, 0xC0 | (c >> 6));
+                    appendHex(buffer, 0x80 | (c & 0x3F));
+                } else {
+                    buffer.append(c);
+                }
+            }
+        }
+        return buffer.toString();
+    }
     private static boolean isIllegalASCII(char c) {
         if (c <= 32) {
             return true;
@@ -66,6 +96,17 @@ public class URLEncoder {
                 default:
                     return false;
             }
+        }
+    }
+    private static boolean isReservedASCII(char c) {
+    	if (isIllegalASCII(c)) return true;
+        switch(c) {
+            // additional reserved characters for file: scheme
+            case ':':
+                return true;
+            // other characters
+            default:
+                return isIllegalASCII(c);
         }
     }
     private static boolean isEncodedQuestionMark(char[] array, int pos) {

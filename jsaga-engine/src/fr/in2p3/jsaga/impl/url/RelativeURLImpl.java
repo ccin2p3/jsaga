@@ -49,7 +49,7 @@ public class RelativeURLImpl extends AbstractURLImpl implements URL {
     }
 
     public String getEncodedPathOnly() {
-    	String encoded_path = URLEncoder.encodePathOnly(getPath());
+    	String encoded_path = URLEncoder.encodeFilePathOnly(getPath());
 		return encoded_path + (url_query == null?"":"?"+url_query) + (url_fragment == null?"":"#"+url_fragment);
     	
     }
@@ -137,7 +137,7 @@ public class RelativeURLImpl extends AbstractURLImpl implements URL {
 
 	public void setPath(String path) throws BadParameterException {
 		if (path != null) {
-			if (Pattern.matches("^[^/\\\\]{2,}\\:.*", path)) {
+			if (Pattern.matches(AbsoluteURLImpl.ABSOLUTE_URL_REGEXP, path)) {
 				throw new BadParameterException("path must be relative");
 			}
 		} else {
