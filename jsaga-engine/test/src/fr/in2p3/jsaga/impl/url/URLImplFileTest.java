@@ -30,7 +30,7 @@ public class URLImplFileTest extends URLImplTest {
 		 _port = "";
     	 _path_not_encoded = "/path with# spaces";
     	 _path_encoded = "/path%20with%23%20spaces";
-		 _file = "Music &#39;erFraeFrance byAranyZoltn.mp3";
+		 _file = "Music &#39;erFraeFrance byAranyZoltn.mp3:1011";
     	 _query = "";
     	 _fragment = "";
      }
@@ -51,4 +51,13 @@ public class URLImplFileTest extends URLImplTest {
     
     }
 
+    public void test_isabsolute() throws Exception {
+    	URL url = URLFactory.createURL(_url_simple);
+    	assertTrue(url.isAbsolute());
+    	url = URLFactory.createURL(_url_relative);
+    	assertFalse(url.isAbsolute());
+    	url = URLFactory.createURL(_file);
+    	assertFalse(url.isAbsolute());
+    }
+    
 }
