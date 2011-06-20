@@ -62,7 +62,7 @@ public class URLImplTest extends AbstractTest {
     	 _user = "userinfo@";
     	 _host = "host.domain";
     	 _port = ":1234";
-    	 _file = "file";
+    	 _file = "file:1";
     	 _abs_path = "/path/";
     	 _rel_path = "relpath/";
     	 _path_not_encoded = "/path with spaces";
@@ -266,7 +266,7 @@ public class URLImplTest extends AbstractTest {
     }
     
     public void test_resolve() throws Exception {
-    	URL url;
+    	URL url, newURL;
     	URL resolved;
     	String newFragment = "NEWfragment";
     	String newQuery = "query=value";
@@ -291,7 +291,7 @@ public class URLImplTest extends AbstractTest {
     	
     	// resolve REL without path and with fragment against ABS
     	url = URLFactory.createURL(_url_simple);
-    	URL newURL = URLFactory.createURL("");
+    	newURL = URLFactory.createURL("");
     	newURL.setFragment(newFragment);
     	resolved = url.resolve(newURL);
     	assertEquals(_uri+_user+_host+_port+_abs_path+_file+_query+"#"+newFragment, resolved.getString());
