@@ -34,6 +34,7 @@
             </answer>
         </faq>
         <faq id="jks">
+        <!--  TODO document .keystore file -->
             <question>How to import certificates into the Java Keystore ?</question>
             <answer>Use the "keytool" command line interface from Java distribution:
                 <ul>
