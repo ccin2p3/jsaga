@@ -56,7 +56,7 @@ public class URLEncoder {
      * @param path
      * @return
      */
-    static String encodeFilePathOnly(String path) {
+    /*static String encodeFilePathOnly(String path) {
         StringBuffer buffer = new StringBuffer();
         char[] array = path.toCharArray();
         for (int i=0; i<array.length; i++) {
@@ -79,7 +79,7 @@ public class URLEncoder {
             }
         }
         return buffer.toString();
-    }
+    }*/
     private static boolean isIllegalASCII(char c) {
         if (c <= 32) {
             return true;
@@ -98,6 +98,7 @@ public class URLEncoder {
             }
         }
     }
+    /*
     private static boolean isReservedASCII(char c) {
     	if (isIllegalASCII(c)) return true;
         switch(c) {
@@ -109,6 +110,7 @@ public class URLEncoder {
                 return isIllegalASCII(c);
         }
     }
+    */
     private static boolean isEncodedQuestionMark(char[] array, int pos) {
         return pos+2<array.length && array[pos+1]=='3' && array[pos+2]=='F';
     }
