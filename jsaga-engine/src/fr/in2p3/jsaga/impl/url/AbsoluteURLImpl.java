@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
  */
 public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
     protected URI u;
+    public final static String ABSOLUTE_URL_REGEXP = "^[^/\\\\]{2,}\\:/.*";
     
     /** MAY encode the URL */
     AbsoluteURLImpl(String url) throws BadParameterException {
@@ -54,7 +55,7 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
             url = "";
         }
         // Check that url is absolute
-        if (url != "" && ! Pattern.matches("^[^/\\\\]{2,}\\:.*", url)) {
+        if (url != "" && ! Pattern.matches(ABSOLUTE_URL_REGEXP, url)) {
     		throw new BadParameterException("URL must be absolute");
     	}
         String encodedUrl = (URLHelper.startsWithLocalScheme(url))
