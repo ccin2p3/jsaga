@@ -21,7 +21,7 @@ import org.ogf.saga.url.URLFactory;
  */
 public class URLFactoryImpl extends URLFactory {
     protected URL doCreateURL(String url) throws BadParameterException, NoSuccessException {
-    	return (Pattern.matches("^[^/\\\\]{2,}\\:.*", url))?new AbsoluteURLImpl(url):new RelativeURLImpl(url);
+    	return (Pattern.matches(AbsoluteURLImpl.ABSOLUTE_URL_REGEXP, url))?new AbsoluteURLImpl(url):new RelativeURLImpl(url);
     }
 
     public static URL createRelativePath(String relativePath) throws BadParameterException {
