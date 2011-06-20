@@ -363,7 +363,7 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
 
     public void makeDirSync(URL target, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         int makeDirFlags = Flags.CREATE.or(flags);
-        NSFactory.createNSDirectory(m_session, target, makeDirFlags);
+        NSFactory.createNSDirectory(m_session, target, makeDirFlags).close();
     }
     public void makeDirSync(URL target) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         this.makeDirSync(target, Flags.NONE.getValue());

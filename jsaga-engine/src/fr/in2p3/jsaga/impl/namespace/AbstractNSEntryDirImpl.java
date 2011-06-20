@@ -148,6 +148,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
             try {
                 NSDirectory sourceDir = NSFactory.createNSDirectory(m_session, source);
                 sourceDir.copy(m_url, flags);
+                sourceDir.close();
             } catch (AlreadyExistsException e) {
                 throw new IncorrectStateException("Unexpected exception", e);
             }
@@ -166,7 +167,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         }
         URL effectiveTarget;
     	try {
-    		NSFactory.createNSDirectory(m_session, target, Flags.NONE.getValue());
+    		NSFactory.createNSDirectory(m_session, target, Flags.NONE.getValue()).close();
     		// Target Directory already exists, operation is MOVE
         	effectiveTarget = this._getEffectiveURL(target);
     	} catch (DoesNotExistException dnee) {
