@@ -31,7 +31,9 @@ public class EntryLongFormat {
 
     public String toString(URL url) throws SagaException {
         NSEntry entry = m_parentDir.open(url, Flags.NONE.getValue());
-        return this.toString(entry);
+        String entry_str = this.toString(entry);
+        entry.close();
+        return entry_str;
     }
 
     public String toString(NSEntry entry) throws SagaException {
