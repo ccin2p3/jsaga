@@ -252,6 +252,7 @@ public abstract class AbstractSyncLogicalFileImpl extends AbstractNSEntryImplWit
             URL physicalSource = locations.get(0);
             NSEntry physicalSourceEntry = NSFactory.createNSEntry(m_session, physicalSource, Flags.NONE.getValue());
             physicalSourceEntry.copy(physicalTarget, flags);
+            physicalSourceEntry.close();
         }
         catch (NotImplementedException e) {throw new NotImplementedException(MESSAGE, e);}
         catch (IncorrectURLException e) {throw new IncorrectURLException(MESSAGE, e);}
