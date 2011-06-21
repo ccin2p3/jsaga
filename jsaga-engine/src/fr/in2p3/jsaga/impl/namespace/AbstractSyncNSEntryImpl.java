@@ -451,6 +451,8 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
         } catch(AlreadyExistsException e) {
             throw new NoSuccessException("Unexpected exception", e);
         }
-        return sourceEntry.getMTime();
+        long mtime = sourceEntry.getMTime();
+        sourceEntry.close();
+        return mtime;
     }
 }
