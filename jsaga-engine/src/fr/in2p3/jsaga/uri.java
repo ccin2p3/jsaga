@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga;
 
+import fr.in2p3.jsaga.impl.SagaFactoryImpl;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
@@ -16,12 +17,14 @@ import org.ogf.saga.url.URLFactory;
  *
  */
 public class uri {
+    private static final String JSAGA_FACTORY = SagaFactoryImpl.class.getName();
+
     public static String protocol(String uri) throws Exception {
-        return URLFactory.createURL(uri).getScheme();
+        return URLFactory.createURL(JSAGA_FACTORY, uri).getScheme();
     }
 
     public static String host(String uri) throws Exception {
-        String host = URLFactory.createURL(uri).getHost();
+        String host = URLFactory.createURL(JSAGA_FACTORY, uri).getHost();
         if (host != null) {
             return host;
         } else {
@@ -30,28 +33,28 @@ public class uri {
     }
 
     public static String basedirURI(String uri) throws Exception {
-        URL u = URLFactory.createURL(uri);
+        URL u = URLFactory.createURL(JSAGA_FACTORY, uri);
         return new java.net.URI(u.getScheme(), u.getUserInfo(), u.getHost(), u.getPort(), _basedirPath(u), null, null).toString();
     }
 
     public static String basedirPath(String uri) throws Exception {
-        return _basedirPath(URLFactory.createURL(uri));
+        return _basedirPath(URLFactory.createURL(JSAGA_FACTORY, uri));
     }
 
     public static String filename(String uri) throws Exception {
-        return _filename(URLFactory.createURL(uri));
+        return _filename(URLFactory.createURL(JSAGA_FACTORY, uri));
     }
 
     public static String context(String uri) throws Exception {
-        return URLFactory.createURL(uri).getFragment();
+        return URLFactory.createURL(JSAGA_FACTORY, uri).getFragment();
     }
 
     public static boolean isDirectory(String uri) throws Exception {
-        return URLFactory.createURL(uri).getPath().endsWith("/");
+        return URLFactory.createURL(JSAGA_FACTORY, uri).getPath().endsWith("/");
     }
 
     public static boolean isRelative(String uri) throws Exception {
-        return URLFactory.createURL(uri).getPath().startsWith("/");
+        return URLFactory.createURL(JSAGA_FACTORY, uri).getPath().startsWith("/");
     }
 
     private static String _basedirPath(URL uri) throws Exception {

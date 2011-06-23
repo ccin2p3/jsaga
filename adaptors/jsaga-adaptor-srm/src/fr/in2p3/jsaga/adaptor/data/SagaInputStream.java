@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.adaptor.data;
 
+import fr.in2p3.jsaga.adaptor.Adaptor;
 import org.ogf.saga.buffer.Buffer;
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.file.File;
@@ -38,7 +39,7 @@ public class SagaInputStream extends InputStream {
 
     public int read() throws IOException {
         try {
-            Buffer buffer = BufferFactory.createBuffer(1);
+            Buffer buffer = BufferFactory.createBuffer(Adaptor.JSAGA_FACTORY, 1);
             if (m_file.read(buffer, 1) == 1) {
                 byte b = buffer.getData()[0];
                 return (int) b & 0x000000FF;
@@ -52,7 +53,7 @@ public class SagaInputStream extends InputStream {
 
     public int read(byte[] bytes, int off, int len) throws IOException {
         try {
-            Buffer buffer = BufferFactory.createBuffer(bytes);
+            Buffer buffer = BufferFactory.createBuffer(Adaptor.JSAGA_FACTORY, bytes);
             return m_file.read(buffer, len);
         } catch (Exception e) {
             throw new IOException(e.getMessage());

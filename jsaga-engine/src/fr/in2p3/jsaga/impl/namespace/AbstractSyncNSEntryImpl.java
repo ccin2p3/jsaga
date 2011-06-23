@@ -99,7 +99,7 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
 
     public URL getCWDSync() throws NotImplementedException, IncorrectStateException, TimeoutException, NoSuccessException {
         try {
-            return m_url.resolve(URLFactory.createURL("."));
+            return m_url.resolve(URLFactory.createURL(JSAGA_FACTORY, "."));
         } catch (BadParameterException e) {
             throw new NoSuccessException(e);
         }
@@ -431,7 +431,7 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
     protected AbstractNSEntryImpl _getTargetEntry_checkPreserveTimes(URL target) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, TimeoutException, NoSuccessException {
         AbstractNSEntryImpl targetEntry;
         try {
-            targetEntry = (AbstractNSEntryImpl) NSFactory.createNSEntry(m_session, target, JSAGAFlags.BYPASSEXIST.getValue());
+            targetEntry = (AbstractNSEntryImpl) NSFactory.createNSEntry(JSAGA_FACTORY, m_session, target, JSAGAFlags.BYPASSEXIST.getValue());
         } catch (DoesNotExistException e) {
             throw new NoSuccessException("Unexpected exception", e);
         }
@@ -447,7 +447,7 @@ public abstract class AbstractSyncNSEntryImpl extends AbstractDataPermissionsImp
         }
         AbstractNSEntryImpl sourceEntry;
         try {
-            sourceEntry = (AbstractNSEntryImpl) NSFactory.createNSEntry(m_session, source);
+            sourceEntry = (AbstractNSEntryImpl) NSFactory.createNSEntry(JSAGA_FACTORY, m_session, source);
         } catch(AlreadyExistsException e) {
             throw new NoSuccessException("Unexpected exception", e);
         }

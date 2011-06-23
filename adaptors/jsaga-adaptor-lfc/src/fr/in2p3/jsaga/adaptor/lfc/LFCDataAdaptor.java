@@ -231,16 +231,15 @@ public class LFCDataAdaptor implements LogicalReader, LogicalWriter, LinkAdaptor
 			org.ogf.saga.file.File replicaFile;
 			try {
 				if(m_session == null){
-					Context context = ContextFactory.createContext();
-			        context.setAttribute(Context.TYPE, "InMemoryProxy");
+					Context context = ContextFactory.createContext(JSAGA_FACTORY, "InMemoryProxy");
 			        context.setAttribute(Context.USERPROXY, InMemoryProxySecurityCredential.toBase64(m_globuscredential.getGSSCredential()));
 			        context.setAttribute(Context.CERTREPOSITORY, m_globuscredential.getCertRepository().getAbsolutePath());
-			        m_session = SessionFactory.createSession(false);
+			        m_session = SessionFactory.createSession(JSAGA_FACTORY, false);
 			        m_session.addContext(context);
 				}
-				URL new_replicaEntry = URLFactory.createURL(replicaEntry.getString());
+				URL new_replicaEntry = URLFactory.createURL(JSAGA_FACTORY, replicaEntry.getString());
 				new_replicaEntry.setFragment("InMemoryProxy");
-				replicaFile = FileFactory.createFile(m_session, new_replicaEntry);
+				replicaFile = FileFactory.createFile(JSAGA_FACTORY, m_session, new_replicaEntry);
 			} catch (Exception e) {
 				throw new NoSuccessException(e);
 			}

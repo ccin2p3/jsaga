@@ -6,6 +6,7 @@ import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyDelegated;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterPutter;
+import fr.in2p3.jsaga.impl.SagaFactoryImpl;
 import fr.in2p3.jsaga.impl.file.AbstractSyncFileImpl;
 import fr.in2p3.jsaga.impl.logicalfile.AbstractSyncLogicalFileImpl;
 import fr.in2p3.jsaga.impl.namespace.FlagsHelper;
@@ -33,6 +34,8 @@ import java.util.List;
  *
  */
 public class FileCopyFrom {
+    private static final String JSAGA_FACTORY = SagaFactoryImpl.class.getName();
+
     private static final int DEFAULT_BUFFER_SIZE = 16384;
     private Session m_session;
     private AbstractSyncFileImpl m_targetFile;
@@ -180,7 +183,7 @@ public class FileCopyFrom {
 
     private AbstractSyncFileImpl createSourceFile(URL source) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
         try {
-            return (AbstractSyncFileImpl) FileFactory.createFile(m_session, source, Flags.READ.getValue());
+            return (AbstractSyncFileImpl) FileFactory.createFile(JSAGA_FACTORY, m_session, source, Flags.READ.getValue());
         } catch (AlreadyExistsException e) {
             throw new NoSuccessException("Unexpected exception", e);
         } catch (DoesNotExistException doesNotExist) {
@@ -192,7 +195,7 @@ public class FileCopyFrom {
         int correctedFlags = flags;
         correctedFlags = new FlagsHelper(correctedFlags).remove(JSAGAFlags.PRESERVETIMES, Flags.OVERWRITE);
         try {
-            return (AbstractSyncLogicalFileImpl) LogicalFileFactory.createLogicalFile(m_session, source, correctedFlags);
+            return (AbstractSyncLogicalFileImpl) LogicalFileFactory.createLogicalFile(JSAGA_FACTORY, m_session, source, correctedFlags);
         } catch (AlreadyExistsException e) {
             throw new NoSuccessException("Unexpected exception", e);
         }

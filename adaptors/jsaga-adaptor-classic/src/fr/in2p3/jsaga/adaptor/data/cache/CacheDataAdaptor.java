@@ -61,16 +61,16 @@ public class CacheDataAdaptor implements FileReaderStreamFactory, FileWriter {
     public int getDefaultPort() {return NO_PORT;}
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
-        m_baseURL = URLFactory.createURL((String) attributes.get(BASE_URL));
+        m_baseURL = URLFactory.createURL(JSAGA_FACTORY, (String) attributes.get(BASE_URL));
         URL remoteUrl;
         try {
             String protocol = "http";   //todo: read protocol from attributes
-            remoteUrl = URLFactory.createURL(new URI(protocol, userInfo, host, port, basePath, null, null).toString());
+            remoteUrl = URLFactory.createURL(JSAGA_FACTORY, new URI(protocol, userInfo, host, port, basePath, null, null).toString());
         }
         catch (URISyntaxException e) {throw new BadParameterException(e);}
         try {
-            m_cache = FileFactory.createDirectory(m_baseURL);
-            m_connection = FileFactory.createDirectory(remoteUrl);
+            m_cache = FileFactory.createDirectory(JSAGA_FACTORY, m_baseURL);
+            m_connection = FileFactory.createDirectory(JSAGA_FACTORY, remoteUrl);
         }
         catch (IncorrectURLException e) {throw new BadParameterException(e);}
         catch (PermissionDeniedException e) {throw new AuthorizationFailedException(e);}
@@ -196,7 +196,7 @@ public class CacheDataAdaptor implements FileReaderStreamFactory, FileWriter {
     }
 
     private static URL getURL(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
-        return URLFactory.createURL(additionalArgs!=null
+        return URLFactory.createURL(JSAGA_FACTORY, additionalArgs!=null
                 ? absolutePath+"?"+additionalArgs
                 : absolutePath);
     }

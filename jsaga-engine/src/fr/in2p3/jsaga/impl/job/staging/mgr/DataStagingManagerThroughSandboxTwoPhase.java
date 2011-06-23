@@ -33,9 +33,9 @@ public class DataStagingManagerThroughSandboxTwoPhase extends DataStagingManager
         // create intermediary directory
         String stagingDir = adaptor.getStagingDirectory(nativeJobId);
         if (stagingDir != null) {
-            URL url = URLFactory.createURL(stagingDir);
+            URL url = URLFactory.createURL(JSAGA_FACTORY, stagingDir);
             try {
-                Directory dir = FileFactory.createDirectory(job.getSession(), url, Flags.CREATE.getValue());
+                Directory dir = FileFactory.createDirectory(JSAGA_FACTORY, job.getSession(), url, Flags.CREATE.getValue());
                 dir.close();
             } catch (IncorrectURLException e) {
                 throw new NoSuccessException(e);

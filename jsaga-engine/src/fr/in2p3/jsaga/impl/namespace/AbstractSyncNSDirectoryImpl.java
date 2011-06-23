@@ -209,7 +209,7 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
             if (Flags.RECURSIVE.isSet(flags) && childs[i].getType()==FileAttributes.TYPE_DIRECTORY) {
                 AbstractSyncNSDirectoryImpl childDir;
                 try {
-                    URL childDirName = URLFactory.createURL(childs[i].getRelativePath());
+                    URL childDirName = URLFactory.createURL(JSAGA_FACTORY, childs[i].getRelativePath());
                     childDir = (AbstractSyncNSDirectoryImpl) this._openNSDir(childDirName);
                 } catch (IncorrectURLException e) {
                     throw new NoSuccessException(e);
@@ -265,7 +265,7 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
             }
             if (entry < m_entriesCache.length) {
                 try {
-                    return URLFactory.createURL(m_entriesCache[entry]);
+                    return URLFactory.createURL(JSAGA_FACTORY, m_entriesCache[entry]);
                 } catch (BadParameterException e) {
                     throw new NoSuccessException(e);
                 }
@@ -290,7 +290,7 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
                 this._openNSEntry(source).copySync(target, flags);
             }
         } else {
-            URL source = URLFactory.createURL(sourcePattern);
+            URL source = URLFactory.createURL(JSAGA_FACTORY, sourcePattern);
             this._openNSEntry(source).copySync(target, flags);
         }
     }
@@ -311,7 +311,7 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
                 this._openNSEntry(source);
             }
         } else {
-            URL source = URLFactory.createURL(sourcePattern);
+            URL source = URLFactory.createURL(JSAGA_FACTORY, sourcePattern);
             this._openNSEntry(source).linkSync(target, flags);
         }
     }
@@ -332,7 +332,7 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
                 this._openNSEntry(source);
             }
         } else {
-            URL source = URLFactory.createURL(sourcePattern);
+            URL source = URLFactory.createURL(JSAGA_FACTORY, sourcePattern);
             this._openNSEntry(source).moveSync(target, flags);
         }
     }
@@ -353,7 +353,7 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
                 this._openNSEntry(target).removeSync(flags);
             }
         } else {
-            URL target = URLFactory.createURL(targetPattern);
+            URL target = URLFactory.createURL(JSAGA_FACTORY, targetPattern);
             this._openNSEntry(target).removeSync(flags);
         }
     }
@@ -363,7 +363,7 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
 
     public void makeDirSync(URL target, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         int makeDirFlags = Flags.CREATE.or(flags);
-        NSFactory.createNSDirectory(m_session, target, makeDirFlags).close();
+        NSFactory.createNSDirectory(JSAGA_FACTORY, m_session, target, makeDirFlags).close();
     }
     public void makeDirSync(URL target) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         this.makeDirSync(target, Flags.NONE.getValue());
@@ -384,7 +384,7 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
                 }
             } catch(IncorrectURLException e) {throw new NoSuccessException(e);}
         } else {
-            URL target = URLFactory.createURL(targetPattern);
+            URL target = URLFactory.createURL(JSAGA_FACTORY, targetPattern);
             this._openNSEntry(target, flags).permissionsAllow(id, permissions);
         }
     }
@@ -408,7 +408,7 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
             } catch(IncorrectURLException e) {throw new NoSuccessException(e);
             } catch(IncorrectStateException e) {throw new NoSuccessException(e);}
         } else {
-            URL target = URLFactory.createURL(targetPattern);
+            URL target = URLFactory.createURL(JSAGA_FACTORY, targetPattern);
             this._openNSEntry(target, flags).permissionsDeny(id, permissions);
         }
     }
@@ -421,7 +421,7 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
     protected static URL CURRENT_DIR_RELATIVE_PATH;
     static {
         try {
-            CURRENT_DIR_RELATIVE_PATH = URLFactory.createURL("./");
+            CURRENT_DIR_RELATIVE_PATH = URLFactory.createURL(JSAGA_FACTORY, "./");
         } catch (Exception e) {
             e.printStackTrace();
         }

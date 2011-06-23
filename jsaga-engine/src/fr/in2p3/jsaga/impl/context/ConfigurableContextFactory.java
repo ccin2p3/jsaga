@@ -4,6 +4,7 @@ import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.session.SessionConfiguration;
 import fr.in2p3.jsaga.generated.session.Attribute;
+import fr.in2p3.jsaga.impl.SagaFactoryImpl;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.context.ContextFactory;
 import org.ogf.saga.error.*;
@@ -19,13 +20,15 @@ import org.ogf.saga.error.*;
 * Description:                                      */
 
 public class ConfigurableContextFactory {
+    private static final String JSAGA_FACTORY = SagaFactoryImpl.class.getName();
+
     public static Context[] getContextsOfDefaultSession() throws IncorrectStateException, TimeoutException, NoSuccessException {
         SessionConfiguration cfg = new SessionConfiguration(EngineProperties.getURL(EngineProperties.JSAGA_DEFAULT_CONTEXTS));
         fr.in2p3.jsaga.generated.session.Context[] sessionContextsCfg = cfg.getSessionContextsCfg();
         Context[] sessionContexts = new Context[sessionContextsCfg.length];
         for (int i=0; i<sessionContextsCfg.length; i++) {
             // create SAGA context
-            sessionContexts[i] = ContextFactory.createContext(sessionContextsCfg[i].getType());
+            sessionContexts[i] = ContextFactory.createContext(JSAGA_FACTORY, sessionContextsCfg[i].getType());
             // set attributes
             SessionConfiguration.setDefaultContext(sessionContexts[i], sessionContextsCfg[i]);
         }
@@ -55,7 +58,7 @@ public class ConfigurableContextFactory {
     			if (ContextImpl.URL_PREFIX.equals(attr.getName())) {
 		          	if (ctx.getUrlPrefix().equals(attr.getValue())) {
 		        		// create SAGA context
-		        		Context context = ContextFactory.createContext(sessionContextsCfg[i].getType());
+		        		Context context = ContextFactory.createContext(JSAGA_FACTORY, sessionContextsCfg[i].getType());
 		        		// set attributes
 		        		SessionConfiguration.setDefaultContext(context, sessionContextsCfg[i]);
 		        		return context;

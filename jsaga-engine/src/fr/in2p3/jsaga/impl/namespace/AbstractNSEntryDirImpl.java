@@ -146,7 +146,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         }
         if (m_adaptor instanceof DataWriterAdaptor) {
             try {
-                NSDirectory sourceDir = NSFactory.createNSDirectory(m_session, source);
+                NSDirectory sourceDir = NSFactory.createNSDirectory(JSAGA_FACTORY, m_session, source);
                 sourceDir.copy(m_url, flags);
                 sourceDir.close();
             } catch (AlreadyExistsException e) {
@@ -167,7 +167,7 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         }
         URL effectiveTarget;
     	try {
-    		NSFactory.createNSDirectory(m_session, target, Flags.NONE.getValue()).close();
+    		NSFactory.createNSDirectory(JSAGA_FACTORY, m_session, target, Flags.NONE.getValue()).close();
     		// Target Directory already exists, operation is MOVE
         	effectiveTarget = this._getEffectiveURL(target);
     	} catch (DoesNotExistException dnee) {
@@ -312,15 +312,15 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
     protected SyncNSEntry _openNS(FileAttributes attr) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
         switch(attr.getType()) {
             case FileAttributes.TYPE_DIRECTORY:
-                return this._openNSDir(URLFactory.createURL(attr.getRelativePath()));
+                return this._openNSDir(URLFactory.createURL(JSAGA_FACTORY, attr.getRelativePath()));
             case FileAttributes.TYPE_FILE:
             case FileAttributes.TYPE_LINK:
-                return this._openNSEntry(URLFactory.createURL(attr.getRelativePath()));
+                return this._openNSEntry(URLFactory.createURL(JSAGA_FACTORY, attr.getRelativePath()));
             case FileAttributes.TYPE_UNKNOWN:
             default:
-                SyncNSEntry entry = this._openNSEntry(URLFactory.createURL(attr.getRelativePath()));
+                SyncNSEntry entry = this._openNSEntry(URLFactory.createURL(JSAGA_FACTORY, attr.getRelativePath()));
                 if (entry.isDirSync()) {
-                    return this._openNSDir(URLFactory.createURL(attr.getRelativePath()));
+                    return this._openNSDir(URLFactory.createURL(JSAGA_FACTORY, attr.getRelativePath()));
                 } else {
                     return entry;
                 }
@@ -360,6 +360,6 @@ public abstract class AbstractNSEntryDirImpl extends AbstractNSEntryImpl impleme
         }
 
         // makeDir
-        NSFactory.createNSDirectory(m_session, target, makeDirFlags).close();
+        NSFactory.createNSDirectory(JSAGA_FACTORY, m_session, target, makeDirFlags).close();
     }
 }

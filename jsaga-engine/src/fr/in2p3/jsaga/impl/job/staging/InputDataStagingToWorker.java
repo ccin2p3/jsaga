@@ -39,12 +39,12 @@ public class InputDataStagingToWorker extends AbstractDataStagingWorker {
         // read fully
         Buffer buffer;
         try {
-            File localFile = FileFactory.createFile(session, m_localURL, Flags.READ.getValue());
+            File localFile = FileFactory.createFile(JSAGA_FACTORY, session, m_localURL, Flags.READ.getValue());
             long size = localFile.getSize();
             if (size > Integer.MAX_VALUE) {
                 throw new NotImplementedException("Attribute "+ JobDescription.FILETRANSFER+" is not supported for large files: "+size);
             }
-            buffer = BufferFactory.createBuffer((int) size);
+            buffer = BufferFactory.createBuffer(JSAGA_FACTORY, (int) size);
             localFile.read(buffer, (int) size);
             localFile.close();
         } catch (SagaIOException e) {

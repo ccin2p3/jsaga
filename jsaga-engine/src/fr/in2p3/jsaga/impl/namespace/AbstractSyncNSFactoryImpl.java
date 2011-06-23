@@ -6,6 +6,7 @@ import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriter;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
 import fr.in2p3.jsaga.engine.factories.DataAdaptorFactory;
+import fr.in2p3.jsaga.impl.SagaFactoryImpl;
 import fr.in2p3.jsaga.impl.file.DirectoryImpl;
 import fr.in2p3.jsaga.impl.file.FileImpl;
 import fr.in2p3.jsaga.impl.logicalfile.LogicalDirectoryImpl;
@@ -29,6 +30,8 @@ import org.ogf.saga.url.URL;
  *
  */
 public abstract class AbstractSyncNSFactoryImpl extends NSFactory implements SyncNSFactory {
+    protected static final String JSAGA_FACTORY = SagaFactoryImpl.class.getName();
+
     private static final boolean PLUGIN_TYPE = DataAdaptorFactory.PHYSICAL;
     private DataAdaptorFactory m_adaptorFactory;
 

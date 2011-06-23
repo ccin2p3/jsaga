@@ -8,6 +8,7 @@ import fr.in2p3.jsaga.adaptor.data.read.LogicalReader;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
 import fr.in2p3.jsaga.engine.descriptors.AdaptorDescriptors;
 import fr.in2p3.jsaga.engine.factories.DataAdaptorFactory;
+import fr.in2p3.jsaga.impl.SagaFactoryImpl;
 import fr.in2p3.jsaga.impl.logicalfile.AbstractSyncLogicalFileImpl;
 import fr.in2p3.jsaga.impl.namespace.FlagsHelper;
 import fr.in2p3.jsaga.impl.namespace.JSAGAFlags;
@@ -34,6 +35,8 @@ import java.util.List;
  *
  */
 public class LogicalFileCopy {
+    private static final String JSAGA_FACTORY = SagaFactoryImpl.class.getName();
+
     private Session m_session;
     private AbstractSyncLogicalFileImpl m_sourceFile;
     private DataAdaptor m_adaptor;
@@ -66,7 +69,7 @@ public class LogicalFileCopy {
                         effectiveTarget.getHost(), effectiveTarget.getPort(), effectiveTarget.getPath(),
                         overwrite, source.getQuery());
             } catch (ParentDoesNotExist parentDoesNotExist) {
-                throw new DoesNotExistException("Target parent directory does not exist: "+effectiveTarget.resolve(URLFactory.createURL(".")), parentDoesNotExist);
+                throw new DoesNotExistException("Target parent directory does not exist: "+effectiveTarget.resolve(URLFactory.createURL(JSAGA_FACTORY, ".")), parentDoesNotExist);
             } catch (DoesNotExistException doesNotExist) {
                 throw new IncorrectStateException("Logical file does not exist: "+source, doesNotExist);
             } catch (AlreadyExistsException alreadyExists) {
@@ -138,7 +141,7 @@ public class LogicalFileCopy {
 
     private NSEntry createSourceNSEntry(URL source) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
         try {
-            return NSFactory.createNSEntry(m_session, source, Flags.NONE.getValue());
+            return NSFactory.createNSEntry(JSAGA_FACTORY, m_session, source, Flags.NONE.getValue());
         } catch (AlreadyExistsException e) {
             throw new NoSuccessException("Unexpected exception", e);
         } catch (DoesNotExistException doesNotExist) {
@@ -156,7 +159,7 @@ public class LogicalFileCopy {
             correctedFlags = correctedFlags + Flags.EXCL.getValue();
         }
         try {
-            return LogicalFileFactory.createLogicalFile(m_session, target, correctedFlags);
+            return LogicalFileFactory.createLogicalFile(JSAGA_FACTORY, m_session, target, correctedFlags);
         } catch (DoesNotExistException e) {
             throw new NoSuccessException("Unexpected exception", e);
         } catch (AlreadyExistsException alreadyExists) {

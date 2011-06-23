@@ -61,13 +61,12 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
 
     public SagaDataAdaptor(URI url, GSSCredential cred, java.io.File certRepository, String token, String srmPath, StreamCallback callback) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         try {
-            Context context = ContextFactory.createContext();
-            context.setAttribute(Context.TYPE, "InMemoryProxy");
+            Context context = ContextFactory.createContext(JSAGA_FACTORY, "InMemoryProxy");
             context.setAttribute(Context.USERPROXY, InMemoryProxySecurityCredential.toBase64(cred));
             context.setAttribute(Context.CERTREPOSITORY, certRepository.getAbsolutePath());
-            m_session = SessionFactory.createSession(false);
+            m_session = SessionFactory.createSession(JSAGA_FACTORY, false);
             m_session.addContext(context);
-            m_rootUrl = URLFactory.createURL(url.resolve(".").toString());
+            m_rootUrl = URLFactory.createURL(JSAGA_FACTORY, url.resolve(".").toString());
             m_rootUrl.setScheme(context.getAttribute("UrlPrefix") + "-" + m_rootUrl.getScheme());
 
             // for releasing SRM file
@@ -115,7 +114,7 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         try {
             URL url = this.toURL(absolutePath);
             int flags = Flags.READ.getValue();
-            entry = NSFactory.createNSEntry(m_session, url, flags);
+            entry = NSFactory.createNSEntry(JSAGA_FACTORY, m_session, url, flags);
         } catch (Exception e) {
             throw new NoSuccessException(e);
         }
@@ -134,7 +133,7 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
             int flags = Flags.CREATE
                     .or((exclusive ? Flags.EXCL : Flags.NONE)
                     .or(append ? Flags.APPEND : Flags.NONE));
-            entry = NSFactory.createNSEntry(m_session, url, flags);
+            entry = NSFactory.createNSEntry(JSAGA_FACTORY, m_session, url, flags);
         } catch (Exception e) {
             throw new NoSuccessException(e);
         }
@@ -150,7 +149,7 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         URL targetUrl;
         try {
             String protocol = m_rootUrl.getScheme();
-            targetUrl = URLFactory.createURL(getURLString(protocol, targetHost, targetPort, targetAbsolutePath));
+            targetUrl = URLFactory.createURL(JSAGA_FACTORY, getURLString(protocol, targetHost, targetPort, targetAbsolutePath));
         } catch (IncorrectURLException e) {
             throw new NoSuccessException(e);
         }
@@ -173,7 +172,7 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         URL sourceUrl;
         try {
             String protocol = m_rootUrl.getScheme();
-            sourceUrl = URLFactory.createURL(getURLString(protocol, sourceHost, sourcePort, sourceAbsolutePath));
+            sourceUrl = URLFactory.createURL(JSAGA_FACTORY, getURLString(protocol, sourceHost, sourcePort, sourceAbsolutePath));
         } catch (IncorrectURLException e) {
             throw new NoSuccessException(e);
         }
@@ -199,7 +198,7 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         try {
             int flags = (overwrite ? Flags.OVERWRITE : Flags.NONE).getValue();
             entry.move(
-                    URLFactory.createURL(targetAbsolutePath),
+                    URLFactory.createURL(JSAGA_FACTORY, targetAbsolutePath),
                     flags);
         } catch (NotImplementedException e) {
             throw new NoSuccessException(e);
@@ -253,7 +252,7 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
         try {
             URL url = this.toURL(absolutePath);
             int flags = Flags.NONE.getValue();
-            return NSFactory.createNSEntry(m_session, url, flags);
+            return NSFactory.createNSEntry(JSAGA_FACTORY, m_session, url, flags);
         } catch (Exception e) {
             throw new NoSuccessException(e);
         }
@@ -269,7 +268,7 @@ public class SagaDataAdaptor implements FileReaderStreamFactory, FileWriterStrea
     }
 
     private URL toURL(String absolutePath) throws NotImplementedException, BadParameterException, NoSuccessException {
-        URL url = m_rootUrl.resolve(URLFactory.createURL(absolutePath));
+        URL url = m_rootUrl.resolve(URLFactory.createURL(JSAGA_FACTORY, absolutePath));
         url.setFragment(m_rootUrl.getFragment());
         return url;
     }

@@ -129,7 +129,7 @@ public class SessionImpl extends AbstractSagaObjectImpl implements Session {
             return m_contexts.get(0);
         } else {
             try {
-                return (ContextImpl) ContextFactory.createContext("None");
+                return (ContextImpl) ContextFactory.createContext(JSAGA_FACTORY, "None");
             } catch (IncorrectStateException e) {
                 throw new NoSuccessException(e);
             }

@@ -34,7 +34,7 @@ public abstract class AbstractDataStagingRemote extends AbstractDataStaging {
     protected void copy(Session session, URL sourceUrl, URL targetUrl) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         int append = (m_append ? Flags.APPEND : Flags.OVERWRITE).getValue();
         try {
-            File file = FileFactory.createFile(session, sourceUrl, Flags.NONE.getValue());
+            File file = FileFactory.createFile(JSAGA_FACTORY, session, sourceUrl, Flags.NONE.getValue());
             file.copy(targetUrl, append);
             file.close();
         } catch (AlreadyExistsException e) {
@@ -46,7 +46,7 @@ public abstract class AbstractDataStagingRemote extends AbstractDataStaging {
 
     public void cleanup(Session session) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         try {
-            File file = FileFactory.createFile(session, m_workerURL, Flags.NONE.getValue());
+            File file = FileFactory.createFile(JSAGA_FACTORY, session, m_workerURL, Flags.NONE.getValue());
             file.remove();
             file.close();
         } catch (AlreadyExistsException e) {

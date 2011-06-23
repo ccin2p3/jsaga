@@ -6,6 +6,7 @@ import fr.in2p3.jsaga.generated.session.Attribute;
 import fr.in2p3.jsaga.generated.session.JsagaDefault;
 import fr.in2p3.jsaga.helpers.XMLFileParser;
 import fr.in2p3.jsaga.helpers.xslt.XSLTransformerFactory;
+import fr.in2p3.jsaga.impl.SagaFactoryImpl;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.xml.*;
 import org.ogf.saga.context.Context;
@@ -30,6 +31,7 @@ import java.net.URL;
  *
  */
 public class SessionConfiguration {
+    private static final String JSAGA_FACTORY = SagaFactoryImpl.class.getName();
     private static final String XSD = "schema/jsaga-default-contexts.xsd";
     protected static final String MERGE = "xsl/jsaga-default-contexts-merge.xsl";
     protected static final String XSL = "xsl/jsaga-default-contexts.xsl";
@@ -91,7 +93,7 @@ public class SessionConfiguration {
         fr.in2p3.jsaga.generated.session.Session sessionCfg = m_config.getSession();
         if (sessionCfg != null) {
             for (fr.in2p3.jsaga.generated.session.Context contextCfg : sessionCfg.getContext()) {
-                Context context = ContextFactory.createContext(contextCfg.getType());
+                Context context = ContextFactory.createContext(JSAGA_FACTORY, contextCfg.getType());
                 // set CONFIGURATION defaults (/jsaga-defaults/session)
                 setDefaultContext(context, contextCfg);
                 session.addContext(context);
