@@ -100,8 +100,7 @@ public class SagaFactoryImpl implements SagaFactory {
         	}
         }
         /* set javax.net.ssl.keyStorePassword */
-        // FIXME
-        String keystore_pass = "the!user"; //EngineProperties.getProperty(EngineProperties.JAVAX_NET_SSL_KEYSTOREPASSWORD);
+        String keystore_pass = EngineProperties.getProperty(EngineProperties.JAVAX_NET_SSL_KEYSTOREPASSWORD);
         if (keystore_pass != null) System.setProperty(EngineProperties.JAVAX_NET_SSL_KEYSTOREPASSWORD, keystore_pass);
         
         /* set javax.net.ssl.trustStore
@@ -125,8 +124,7 @@ public class SagaFactoryImpl implements SagaFactory {
         	}
         }
         /* set javax.net.ssl.trustStorePassword */
-        // FIXME
-        String truststore_pass = "the!user"; //EngineProperties.getProperty(EngineProperties.JAVAX_NET_SSL_TRUSTSTOREPASSWORD);
+        String truststore_pass = EngineProperties.getProperty(EngineProperties.JAVAX_NET_SSL_TRUSTSTOREPASSWORD);
         if (truststore_pass != null) System.setProperty(EngineProperties.JAVAX_NET_SSL_TRUSTSTOREPASSWORD, truststore_pass);
         
         
