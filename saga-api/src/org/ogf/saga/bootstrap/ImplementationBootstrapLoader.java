@@ -1,7 +1,7 @@
 package org.ogf.saga.bootstrap;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Properties;
+import java.util.*;
 
 import org.ogf.saga.buffer.BufferFactory;
 import org.ogf.saga.context.ContextFactory;
@@ -21,172 +21,278 @@ import org.ogf.saga.task.TaskFactory;
 import org.ogf.saga.url.URLFactory;
 
 /**
- * The idea of this class is that the SAGA user sets the environment variable
- * (Java property) <code>saga.factory</code> to the classname of an
- * implementation of the {@link SagaFactory} interface. The
+ * This class allows the user to have one or more {@link SagaFactory SagaFactories},
+ * one for each Java Saga implementation that is to be used. A {@link SagaFactory}
+ * must be used to actually create Saga objects. All factory creation methods have an optional
+ * parameter, the classname of the Saga factory. When this parameter is not specified,
+ * a default Saga factory is used.
+ * <p>
+ * The classname of the default Saga factory is to be provided by the
+ * the environment variable (Java property) <code>saga.factory</code>.
+ * <p>
+ * The
  * <code>ImplementationBootstrapLoader</code> instantiates
- * exactly one instance of this class, which must have a public parameter-less
+ * exactly one instance of each Saga factory classname. A Saga factory must have a public parameter-less
  * constructor.
  */
 public class ImplementationBootstrapLoader {
 
-    private static SagaFactory factory;
+    /** One ImplementationBootstrapLoader for each SagaFactory class. */
+    private static Map<String, ImplementationBootstrapLoader> s_loaders = new HashMap<String, ImplementationBootstrapLoader>();
 
-    private static synchronized void initFactory() throws NoSuccessException {
+    /** The saga factory instance, specific for a Saga implementation. */
+    private SagaFactory sagaFactory;
 
-        if (factory == null) {
+    private BufferFactory bufferFactory;
+    
+    private ContextFactory contextFactory;
+    
+    private FileFactory fileFactory;
+    
+    private ISNFactory ISNFactory;
+    
+    private JobFactory jobFactory;
+    
+    private LogicalFileFactory logicalFileFactory;
+    
+    private MonitoringFactory monitoringFactory;
+    
+    private NSFactory NSFactory;
+    
+    private RPCFactory RPCFactory;
+    
+    private SDFactory SDFactory;
+    
+    private SessionFactory sessionFactory;
+    
+    private StreamFactory streamFactory;
+    
+    private TaskFactory taskFactory;
+    
+    private URLFactory URLFactory;
+    
+    private static synchronized ImplementationBootstrapLoader getLoader(String factoryName) throws NoSuccessException {
+        
+	// Deterimine SagaFactory classname if not specified.
+        if (factoryName == null) {
             Properties sagaProperties = SagaProperties.getDefaultProperties();
             // Obtain the name of the SAGA factory.
-            String factoryName = sagaProperties.getProperty(SagaProperties.FACTORY);
+            factoryName = sagaProperties.getProperty(SagaProperties.FACTORY);
             if (factoryName == null) {
                 throw new NoSuccessException("No SAGA factory name specified");
             }
+        }
 
-            // Try to obtain a class instance of it, using the current
-            // class loader, and running the static initializers.
-            Class<?> factoryClass;
-            try {
-                factoryClass = Class.forName(factoryName);
-            } catch (ClassNotFoundException e) {
-                throw new NoSuccessException("Could not load class "
-                        + factoryName, e);
-            }
+        // See if this factory is already available.
+        ImplementationBootstrapLoader loader = s_loaders.get(factoryName);
+        if (loader == null) {
+            // Nope. Create it.
+            loader = new ImplementationBootstrapLoader(factoryName);
 
-            // Now try to obtain an instance of this class, using a
-            // parameter-less constructor.
-            try {
-                factory = (SagaFactory) factoryClass.getConstructor()
-                        .newInstance();
-            } catch (NoSuchMethodException e) {
-                throw new NoSuccessException("Factory " + factoryName
-                        + " has no public noargs constructor", e);
-            } catch (InvocationTargetException e1) {
-                throw new NoSuccessException("Constructor of " + factoryName
-                        + " threw an exception", e1.getCause());
-            } catch (Throwable e2) {
-                throw new NoSuccessException("Instantiation of " + factoryName
-                        + " failed", e2);
-            }
+            // Put instance in map
+            s_loaders.put(factoryName, loader);
+        }
+        
+        return loader;
+    }
+    
+    private ImplementationBootstrapLoader(String factoryName) throws NoSuccessException {
+	
+        // Try to obtain a class instance of it, using the current
+        // class loader, and running the static initializers.
+	
+        Class<?> factoryClass;
+        try {
+            factoryClass = Class.forName(factoryName);
+        } catch (ClassNotFoundException e) {
+            throw new NoSuccessException("Could not load class "
+                    + factoryName, e);
+        }
+
+        // Now try to obtain an instance of this class, using a
+        // parameter-less constructor. All SagaFactory implementations should have that,
+        // and it should be public.
+        try {
+            sagaFactory = (SagaFactory) factoryClass.getConstructor()
+                    .newInstance();
+        } catch (NoSuchMethodException e) {
+            throw new NoSuccessException("Factory " + factoryName
+                    + " has no public noargs constructor", e);
+        } catch (InvocationTargetException e1) {
+            throw new NoSuccessException("Constructor of " + factoryName
+                    + " threw an exception", e1.getCause());
+        } catch (Throwable e2) {
+            throw new NoSuccessException("Instantiation of " + factoryName
+                    + " failed", e2);
         }
     }
 
     /**
-     * Creates a buffer factory.
+     * Creates a buffer factory, using the specified SagaFactory.
      * 
+     * @param factoryName classname of the Saga factory to be used, or null.
      * @return a buffer factory.
      * @throws NoSuccessException
      *             is thrown when the Saga factory could not be created.
      */
-    public static BufferFactory createBufferFactory()
+    public static BufferFactory getBufferFactory(String factoryName)
             throws NoSuccessException {
-        initFactory();
-        return factory.createBufferFactory();
+	ImplementationBootstrapLoader l = getLoader(factoryName);
+	synchronized(l) {
+	    if (l.bufferFactory == null) {
+		l.bufferFactory = l.sagaFactory.createBufferFactory();
+	    }
+	    return l.bufferFactory;
+	}
     }
-
+    
     /**
-     * Creates a context factory. Cannot throw NotImplemented.
+     * Creates a context factory, using the specified SagaFactory.
      * 
+     * @param factoryName classname of the Saga factory to be used, or null.
      * @return a context factory.
      * @throws NoSuccessException
      *             is thrown when the Saga factory could not be created.
      */
-    public static ContextFactory createContextFactory()
+    public static ContextFactory getContextFactory(String factoryName)
             throws NoSuccessException {
-        initFactory();
-        return factory.createContextFactory();
+	ImplementationBootstrapLoader l = getLoader(factoryName);
+	synchronized(l) {
+	    if (l.contextFactory == null) {
+		l.contextFactory = l.sagaFactory.createContextFactory();
+	    }
+	    return l.contextFactory;
+	}
     }
-
+    
     /**
-     * Creates a file factory. Cannot throw NotImplemented, because the IOVec
+     * Creates a session factory, using the specified SagaFactory.
+     * 
+     * @param factoryName classname of the Saga factory to be used, or null.
+     * @return a session factory.
+     * @throws NoSuccessException
+     *             is thrown when the Saga factory could not be created.
+     */
+    public static SessionFactory getSessionFactory(String factoryName)
+            throws NoSuccessException {
+	ImplementationBootstrapLoader l = getLoader(factoryName);
+	synchronized(l) {
+	    if (l.sessionFactory == null) {
+		l.sessionFactory = l.sagaFactory.createSessionFactory();
+	    }
+	    return l.sessionFactory;
+	}
+    }
+        
+    /**
+     * Creates a file factory, using the specified SagaFactory.
+     * This method annot throw NotImplemented, because the IOVec
      * constructor cannot (according to the SAGA specs).
      * 
+     * @param factoryName classname of the Saga factory to be used, or null.
      * @return a file factory.
      * @throws NoSuccessException
      *             is thrown when the Saga factory could not be created.
      */
-    public static FileFactory createFileFactory() throws NoSuccessException {
-        initFactory();
-        return factory.createFileFactory();
+    public static FileFactory getFileFactory(String factoryName)
+            throws NoSuccessException {
+	ImplementationBootstrapLoader l = getLoader(factoryName);
+	synchronized(l) {
+	    if (l.fileFactory == null) {
+		l.fileFactory = l.sagaFactory.createFileFactory();
+	    }
+	    return l.fileFactory;
+	}
     }
     
     /**
-     * Creates a ISN factory for the Information System Navigator.
+     * Creates a job factory, using the specified SagaFactory.
      * 
-     * @return an ISN factory.
-     * @throws NoSuccessException
-     *             is thrown when the Saga factory could not be created.
-     * @throws NotImplementedException
-     *             is thrown when ISN is not implemented.   
-     */
-    public static ISNFactory createISNFactory()
-            throws NotImplementedException, NoSuccessException {
-        initFactory();
-        return factory.createISNFactory();
-    } 
-    
-    /**
-     * Creates a job factory.
-     * 
+     * @param factoryName classname of the Saga factory to be used, or null.
      * @return a job factory.
      * @throws NotImplementedException
      *             is thrown when jobs are not implemented.
      * @throws NoSuccessException
      *             is thrown when the Saga factory could not be created.
      */
-    public static JobFactory createJobFactory() throws NotImplementedException,
+    public static JobFactory getJobFactory(String factoryName) throws NotImplementedException,
             NoSuccessException {
-        initFactory();
-        return factory.createJobFactory();
+	ImplementationBootstrapLoader l = getLoader(factoryName);
+	synchronized(l) {
+	    if (l.jobFactory == null) {
+		l.jobFactory = l.sagaFactory.createJobFactory();
+	    }
+	    return l.jobFactory;
+	}
     }
 
     /**
-     * Creates a logical file factory.
+     * Creates a logical file factory, using the specified SagaFactory.
      * 
+     * @param factoryName classname of the Saga factory to be used, or null.
      * @return a logical file factory.
      * @throws NotImplementedException
      *             is thrown when logical files are not implemented.
      * @throws NoSuccessException
      *             is thrown when the Saga factory could not be created.
      */
-    public static LogicalFileFactory createLogicalFileFactory()
+    public static LogicalFileFactory getLogicalFileFactory(String factoryName)
             throws NotImplementedException, NoSuccessException {
-        initFactory();
-        return factory.createLogicalFileFactory();
+	ImplementationBootstrapLoader l = getLoader(factoryName);
+	synchronized(l) {
+	    if (l.logicalFileFactory == null) {
+		l.logicalFileFactory = l.sagaFactory.createLogicalFileFactory();
+	    }
+	    return l.logicalFileFactory;
+	}
     }
 
     /**
-     * Creates a monitoring factory.
+     * Creates a monitoring factory, using the specified SagaFactory.
      * 
+     * @param factoryName classname of the Saga factory to be used, or null.
      * @return a monitoring factory.
      * @throws NotImplementedException
      *             is thrown when monitoring is not implemented.
      * @throws NoSuccessException
      *             is thrown when the Saga factory could not be created.
      */
-    public static MonitoringFactory createMonitoringFactory()
+    public static MonitoringFactory getMonitoringFactory(String factoryName)
             throws NotImplementedException, NoSuccessException {
-        initFactory();
-        return factory.createMonitoringFactory();
+	ImplementationBootstrapLoader l = getLoader(factoryName);
+	synchronized(l) {
+	    if (l.monitoringFactory == null) {
+		l.monitoringFactory = l.sagaFactory.createMonitoringFactory();
+	    }
+	    return l.monitoringFactory;
+	}
     }
 
     /**
-     * Creates a namespace factory.
+     * Creates a namespace factory, using the specified SagaFactory.
      * 
+     * @param factoryName classname of the Saga factory to be used, or null.
      * @return a namespace factory.
      * @throws NotImplementedException
      *             is thrown when namespace is not implemented.
      * @throws NoSuccessException
      *             is thrown when the Saga factory could not be created.
      */
-    public static NSFactory createNamespaceFactory()
+    public static NSFactory getNamespaceFactory(String factoryName)
             throws NotImplementedException, NoSuccessException {
-        initFactory();
-        return factory.createNamespaceFactory();
+	ImplementationBootstrapLoader l = getLoader(factoryName);
+	synchronized(l) {
+	    if (l.NSFactory == null) {
+		l.NSFactory = l.sagaFactory.createNamespaceFactory();
+	    }
+	    return l.NSFactory;
+	}
     }
 
     /**
-     * Creates an RPC factory.
+     * Creates an RPC factory, using the specified SagaFactory.
      * 
+     * @param factoryName classname of the Saga factory to be used, or null.
      * @return an RPC factory.
      * @throws NoSuccessException
      *             is thrown when the Saga factory could not be created.
@@ -194,80 +300,119 @@ public class ImplementationBootstrapLoader {
      * @throws NotImplementedException
      *             is thrown when RPC is not implemented.            
      */
-    public static RPCFactory createRPCFactory() throws NoSuccessException,
+    public static RPCFactory getRPCFactory(String factoryName) throws NoSuccessException,
             NotImplementedException {
-        initFactory();
-        return factory.createRPCFactory();
+	ImplementationBootstrapLoader l = getLoader(factoryName);
+	synchronized(l) {
+	    if (l.RPCFactory == null) {
+		l.RPCFactory = l.sagaFactory.createRPCFactory();
+	    }
+	    return l.RPCFactory;
+	}
     }
 
     /**
-     * Creates a SD factory for Service Discovery.
+     * Creates a stream factory, using the specified SagaFactory.
      * 
-     * @return a SD factory.
-     * @throws NoSuccessException
-     *             is thrown when the Saga factory could not be created.
-     * @throws NotImplementedException
-     *             is thrown when SD is not implemented.   
-     */
-    public static SDFactory createSDFactory()
-            throws NotImplementedException, NoSuccessException {
-        initFactory();
-        return factory.createSDFactory();
-    } 
-
-    /**
-     * Creates a Session factory.
-     * 
-     * @return a Session factory.
-     * @throws NoSuccessException
-     *             is thrown when the Saga factory could not be created.
-     */
-    public static SessionFactory createSessionFactory()
-            throws NoSuccessException {
-        initFactory();
-        return factory.createSessionFactory();
-    }
-
-    /**
-     * Creates a stream factory.
-     * 
+     * @param factoryName classname of the Saga factory to be used, or null.
      * @return a stream factory.
      * @throws NotImplementedException
      *             is thrown when streams are not implemented.
      * @throws NoSuccessException
      *             is thrown when the Saga factory could not be created.
      */
-    public static StreamFactory createStreamFactory()
+    public static StreamFactory getStreamFactory(String factoryName)
             throws NotImplementedException, NoSuccessException {
-        initFactory();
-        return factory.createStreamFactory();
+	ImplementationBootstrapLoader l = getLoader(factoryName);
+	synchronized(l) {
+	    if (l.streamFactory == null) {
+		l.streamFactory = l.sagaFactory.createStreamFactory();
+	    }
+	    return l.streamFactory;
+	}
     }
 
     /**
-     * Creates a task factory.
+     * Creates a task factory, using the specified SagaFactory.
      * 
+     * @param factoryName classname of the Saga factory to be used, or null.
      * @return a task factory.
      * @throws NotImplementedException
      *             is thrown when tasks are not implemented.
      * @throws NoSuccessException
      *             is thrown when the Saga factory could not be created.
      */
-    public static TaskFactory createTaskFactory()
+    public static TaskFactory getTaskFactory(String factoryName)
             throws NotImplementedException, NoSuccessException {
-        initFactory();
-        return factory.createTaskFactory();
+	ImplementationBootstrapLoader l = getLoader(factoryName);
+	synchronized(l) {
+	    if (l.taskFactory == null) {
+		l.taskFactory = l.sagaFactory.createTaskFactory();
+	    }
+	    return l.taskFactory;
+	}
     }
     
     /**
-     * Creates an URL factory.
+     * Creates an URL factory, using the specified SagaFactory.
      * 
+     * @param factoryName classname of the Saga factory to be used, or null.
      * @return an URL factory.
-      * @throws NoSuccessException
+     * @throws NoSuccessException
      *             is thrown when the Saga factory could not be created.
      */
-    public static URLFactory createURLFactory()
+    public static URLFactory getURLFactory(String factoryName)
             throws NoSuccessException {
-        initFactory();
-        return factory.createURLFactory();
+	ImplementationBootstrapLoader l = getLoader(factoryName);
+	synchronized(l) {
+	    if (l.URLFactory == null) {
+		l.URLFactory = l.sagaFactory.createURLFactory();
+	    }
+	    return l.URLFactory;
+	}
     }
+    
+    // REMOVE FROM GFD DOC
+    /**
+     * Creates a SD factory for Service Discovery, using the specified SagaFactory.
+     * 
+     * @param factoryName classname of the Saga factory to be used, or null.
+     * @return a SD factory.
+     * @throws NoSuccessException
+     *             is thrown when the Saga factory could not be created.
+     * @throws NotImplementedException
+     *             is thrown when SD is not implemented.   
+     */
+    public static SDFactory getSDFactory(String factoryName)
+            throws NotImplementedException, NoSuccessException {
+	ImplementationBootstrapLoader l = getLoader(factoryName);
+	synchronized(l) {
+	    if (l.SDFactory == null) {
+		l.SDFactory = l.sagaFactory.createSDFactory();
+	    }
+	    return l.SDFactory;
+	}
+    }
+    
+    /**
+     * Creates a ISN factory for the Information System Navigator, using the specified SagaFactory.
+     * 
+     * @param factoryName classname of the Saga factory to be used, or null.
+     * @return an ISN factory.
+     * @throws NoSuccessException
+     *             is thrown when the Saga factory could not be created.
+     * @throws NotImplementedException
+     *             is thrown when ISN is not implemented.   
+     */
+    public static ISNFactory getISNFactory(String factoryName)
+            throws NotImplementedException, NoSuccessException {
+	ImplementationBootstrapLoader l = getLoader(factoryName);
+	synchronized(l) {
+	    if (l.ISNFactory == null) {
+		l.ISNFactory = l.sagaFactory.createISNFactory();
+	    }
+	    return l.ISNFactory;
+	}
+    } 
+    // END REMOVE FROM GFD DOC
 }
