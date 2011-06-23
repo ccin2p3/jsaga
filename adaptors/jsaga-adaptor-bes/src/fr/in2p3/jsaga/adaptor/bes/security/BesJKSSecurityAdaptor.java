@@ -16,6 +16,11 @@ import java.util.*;
 * Date:   30 Nov 2010
 * ***************************************************/
 
+/**
+ * This class must not be used anymore
+ * @deprecated
+ * @see fr.in2p3.jsaga.adaptor.security.AxisJKSSecurityAdaptor
+ */
 public class BesJKSSecurityAdaptor extends JKSSecurityAdaptor {
 
 	// TODO : delete this class
@@ -27,15 +32,13 @@ public class BesJKSSecurityAdaptor extends JKSSecurityAdaptor {
     	return "BESJKS";
     }
     
-    /*
     public SecurityCredential createSecurityCredential(int usage, Map attributes, String contextId) throws IncorrectStateException, NoSuccessException {
     		String keyStorePass = (String) attributes.get(KEYSTORE_PASS);
 			String keyStorePath = (String) attributes.get(KEYSTORE);
-			// FIXME: this is not thread safe
+			// this is not thread safe
     		System.setProperty("javax.net.ssl.keyStore", keyStorePath);
     		System.setProperty("javax.net.ssl.keyStorePassword", keyStorePass);
     		System.setProperty("javax.net.ssl.trustStore", keyStorePath);
     		return super.createSecurityCredential(usage, attributes, contextId);
     }
-    */
 }
