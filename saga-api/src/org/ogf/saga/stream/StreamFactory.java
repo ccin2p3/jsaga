@@ -40,6 +40,18 @@ public abstract class StreamFactory {
         return url;
     }
 
+    private static URL createDefaultURL(String sagaFactoryClassname) {
+        URL url;
+        try {
+            url = URLFactory.createURL(sagaFactoryClassname, DEFAULT_SERVER_URL);
+        } catch (Throwable e) {
+            // Cannot happen.
+            throw new Error("Implementation error", e);
+
+        }
+        return url;
+    }
+
     /**
      * Creates a Stream. To be provided by the implementation.
      * 
@@ -488,7 +500,7 @@ public abstract class StreamFactory {
             BadParameterException, AuthenticationFailedException,
             AuthorizationFailedException, PermissionDeniedException,
             TimeoutException, NoSuccessException {
-        return createStreamServer(sagaFactoryClassname, session, createDefaultURL());
+        return createStreamServer(sagaFactoryClassname, session, createDefaultURL(sagaFactoryClassname));
     }
 
 
@@ -858,7 +870,7 @@ public abstract class StreamFactory {
     public static Task<StreamFactory, StreamServer> createStreamServer(
             String sagaFactoryClassname, TaskMode mode, Session session) throws NotImplementedException,
             NoSuccessException {
-        return createStreamServer(sagaFactoryClassname, mode, session, createDefaultURL());
+        return createStreamServer(sagaFactoryClassname, mode, session, createDefaultURL(sagaFactoryClassname));
     }
 
     /**
@@ -941,6 +953,6 @@ public abstract class StreamFactory {
      */
     public static Task<StreamFactory, StreamServer> createStreamServer(
             String sagaFactoryClassname, TaskMode mode) throws NotImplementedException, NoSuccessException {
-        return createStreamServer(sagaFactoryClassname, mode, createDefaultURL());
+        return createStreamServer(sagaFactoryClassname, mode, createDefaultURL(sagaFactoryClassname));
     }
 }
