@@ -28,9 +28,11 @@ import java.util.*;
 
 public class JKSSecurityAdaptor implements SecurityAdaptor {
 
-	//private static final String KEYSTORE = "Keystore";
-	//private static final String KEYSTORE_PASS = "KeystorePass";
-	private static final String USER_ALIAS = "UserAlias";
+	protected static final String KEYSTORE = "Keystore";
+	protected static final String KEYSTORE_PASS = "KeystorePass";
+	protected static final String TRUSTSTORE = "Truststore";
+	protected static final String TRUSTSTORE_PASS = "TruststorePass";
+	protected static final String USER_ALIAS = "UserAlias";
 	
     public String getType() {
     	return "JKS";
@@ -43,17 +45,15 @@ public class JKSSecurityAdaptor implements SecurityAdaptor {
     public Usage getUsage() {
     	return new UAnd(
     			 new Usage[]{
-    					 //new UFile(KEYSTORE), 
-    					 //new U(KEYSTORE_PASS),
+    					 new UOptional(KEYSTORE), 
+    					 new UOptional(KEYSTORE_PASS),
+    					 new UOptional(TRUSTSTORE), 
+    					 new UOptional(TRUSTSTORE_PASS),
     					 new UOptional(USER_ALIAS),
     					 new UOptional(Context.USERPASS)});
     }
 
     public Default[] getDefaults(Map map) throws IncorrectStateException {
-        /*return new Default[]{
-        		 new Default(KEYSTORE, new File[]{
-                         new File(System.getProperty("user.home")+"/.keystore")}),
-        };*/
     	return new Default[]{};
     }
 
@@ -61,15 +61,26 @@ public class JKSSecurityAdaptor implements SecurityAdaptor {
     	
     	try {
 			KeyStore keyStore = KeyStore.getInstance("jks");
-	    	// load private key
-    		//String keyStorePass = (String) attributes.get(KEYSTORE_PASS);
-			//String keyStorePath = (String) attributes.get(KEYSTORE);
+
+			// system properties as default values
     		String keyStorePath = System.getProperty(EngineProperties.JAVAX_NET_SSL_KEYSTORE);
     		String keyStorePass = System.getProperty(EngineProperties.JAVAX_NET_SSL_KEYSTOREPASSWORD);
+    		// override by the adaptor config
+    		if (attributes.containsKey(KEYSTORE)) 
+				keyStorePath = (String) attributes.get(KEYSTORE);
+    		if (attributes.containsKey(KEYSTORE_PASS)) 
+    			keyStorePass = (String) attributes.get(KEYSTORE_PASS);
 
     		if (keyStorePath == null)
     			throw new NoSuccessException("The property "+ EngineProperties.JAVAX_NET_SSL_KEYSTORE + " was not set.");
     		
+			// get optional attributes
+			//String userPass = (String) attributes.get(KEYSTORE_PASS);
+			String userPass = keyStorePass;
+			if (attributes.containsKey(Context.USERPASS)) {
+				userPass = (String) attributes.get(Context.USERPASS);
+			}
+			
 			// load the keystore
 	        File f = new File(keyStorePath);
 	        keyStore.load(new FileInputStream(f), (keyStorePass != null)?keyStorePass.toCharArray():null);
@@ -100,18 +111,19 @@ public class JKSSecurityAdaptor implements SecurityAdaptor {
 		    	}
 	    	}
 	    	
-	    	// load user key
-	        //PrivateKey privateKey = (PrivateKey) keyStore.getKey(alias, userPass.toCharArray());
-	    	//X509Certificate userCertificate = (X509Certificate) keyStore.getCertificate(alias);
-
     		// load CA certs
     		String trustStorePath = System.getProperty(EngineProperties.JAVAX_NET_SSL_TRUSTSTORE);
+    		if (attributes.containsKey(TRUSTSTORE)) 
+				keyStorePath = (String) attributes.get(TRUSTSTORE);
+
     		KeyStore trustStore;
     		if (keyStorePath.equals(trustStorePath)) {
     			// private key and CA certs in the same file
     			trustStore = keyStore;
     		} else {
         		String trustStorePass = System.getProperty(EngineProperties.JAVAX_NET_SSL_TRUSTSTOREPASSWORD);
+        		if (attributes.containsKey(TRUSTSTORE_PASS)) 
+    				keyStorePath = (String) attributes.get(TRUSTSTORE_PASS);
     			trustStore = KeyStore.getInstance("jks");
     			char[] password = (trustStorePass != null)?trustStorePass.toCharArray():null;
     			if (trustStorePath != null) {
@@ -147,13 +159,6 @@ public class JKSSecurityAdaptor implements SecurityAdaptor {
 	    		certificates[i] = (X509Certificate) loadCerts.get(i);
 			}
 
-			// get optional attributes
-			//String userPass = (String) attributes.get(KEYSTORE_PASS);
-			String userPass = keyStorePass;
-			if (attributes.containsKey(Context.USERPASS)) {
-				userPass = (String) attributes.get(Context.USERPASS);
-			}
-			
 	        return new JKSSecurityCredential(keyStore, keyStorePass, alias, userPass, certificates);
     	}
     	catch (Exception e) {
