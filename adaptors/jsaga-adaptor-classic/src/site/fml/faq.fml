@@ -42,12 +42,15 @@
         		There is no default value for password. You can also specify a trustStore (that contains certificates of the
         		trusted CAs) and a truststore password :
         		<pre>-Djavax.net.ssl.trustStore=your_truststore_path -Djavax.net.ssl.trustStorePassword=your_password</pre>
-        		If no truststore is given in properties, JSAGA will search for the following files in that order:
+        		If no truststore is given in properties, JSAGA will search for a file with the following path:
+        		<pre>~/.jsaga/.keystore</pre>
+        		If this file does not exist, the default values will be used by JSSE (Java security layer):
         		<ul>
-        			<li><pre>~/.jsaga/cacerts</pre></li>
-        			<li><pre>~/.jsaga/.keystore</pre></li>
+        			<li><pre>$JAVA_HOME/lib/security/jssecacerts</pre></li>
+        			<li><pre>$JAVA_HOME/lib/security/cacerts</pre></li>
         		</ul>.
         		There is no default value for password.
+        		It is possible to override these values in the JKS adaptor configuration.
         	</answer>
         </faq>
         <faq id="jks-keys">
