@@ -34,21 +34,45 @@
             </answer>
         </faq>
         <faq id="jks">
-        <!--  TODO document .keystore file -->
-            <question>How to import certificates into the Java Keystore ?</question>
-            <answer>Use the "keytool" command line interface from Java distribution:
-                <ul>
-                    <li>import CA (use a different alias for each imported CA)
-                        <pre>openssl x509 -outform der -in myCA.crt -out myCA.der
-keytool -import -alias 1 -file myCA.der</pre></li>
-                    <li>import your certificate
-                        <pre>java -cp $JSAGA_HOME/lib-adaptors/jsaga-adaptor-classic-*.jar \
-        fr.in2p3.jsaga.adaptor.security.JKSImportCert mycert.p12 passphrase</pre>
-                        If the keystore already exist, you may need to change the default values:
-                        <pre>-Djavax.net.ssl.keyStore=~/.keystore -Djavax.net.ssl.keyStorePassword=changeit</pre>
-                    </li>
-                </ul>
+        	<question>How do I use the Java keystore in JSAGA ?</question>
+        	<answer>Specify the keystore name and password in Java properties:
+        		<pre>-Djavax.net.ssl.keyStore=your_keystore_path -Djavax.net.ssl.keyStorePassword=your_password</pre>
+        		If no keystore file is given in properties, JSAGA will search for a file with the following path:
+        		<pre>~/.jsaga/.keystore</pre>
+        		There is no default value for password. You can also specify a trustStore (that contains certificates of the
+        		trusted CAs) and a truststore password :
+        		<pre>-Djavax.net.ssl.trustStore=your_truststore_path -Djavax.net.ssl.trustStorePassword=your_password</pre>
+        		If no truststore is given in properties, JSAGA will search for the following files in that order:
+        		<ul>
+        			<li><pre>~/.jsaga/cacerts</pre></li>
+        			<li><pre>~/.jsaga/.keystore</pre></li>
+        		</ul>.
+        		There is no default value for password.
+        	</answer>
+        </faq>
+        <faq id="jks-keys">
+        	<question>Does JSAGA support multiple keys in a keystore ?</question>
+        	<answer>Yes but each key must have an alias in the keystore. The alias must be specified in the configuration
+        	for the adaptor to be able to retrieve the appropriate key for authentication.</answer>
+        </faq>
+        <faq id="jks-import-keys">
+            <question>How to import a certificate and a key into the Java Keystore ?</question>
+            <answer>The certificate and the key should be in a PKCS12 (.p12) file. You can use
+            the JKSImportCert utility provided with JSAGA:
+                 <pre>java -cp $JSAGA_HOME/lib-adaptors/jsaga-adaptor-classic-*.jar \
+ fr.in2p3.jsaga.adaptor.security.JKSImportCert mycert.p12 passphrase</pre>
+                 If the keystore already exist, you may need to change the default values:
+                 <pre>-Djavax.net.ssl.keyStore=your_keystore -Djavax.net.ssl.keyStorePassword=your_password</pre>
             </answer>
+        </faq>
+        <faq id="jks-import-certs">
+            <question>How to import CA certificates into the Java Keystore ?</question>
+            <answer>Use the "keytool" command line interface from Java distribution (use a different alias for each imported CA)
+				<pre>keytool -import -alias alias_name -file CA_certificate -keystore your_truststore</pre>
+            </answer>
+            To import multiple certificates with a single command:
+            <pre>for i in *.pem ; do keytool -keystore your_truststore -import -file $i -noprompt \
+ -alias `basename $i`; done</pre>
         </faq>
         <faq id="pem_to_p12">
             <question>How to convert certificate from PEM to PKCS12 ?</question>
