@@ -91,9 +91,7 @@ public class SagaFactoryImpl implements SagaFactory {
          * 3. If it does not exist, do not setProperty
          */
         String keystore_path = EngineProperties.getProperty(EngineProperties.JAVAX_NET_SSL_KEYSTORE);
-        if (keystore_path != null) {
-        	System.setProperty(EngineProperties.JAVAX_NET_SSL_KEYSTORE, keystore_path);
-        } else {
+        if (keystore_path == null) {
         	File jsaga_keystore = new File(System.getProperty("user.home")+"/.jsaga/.keystore");
         	if (jsaga_keystore.exists()) {
         		System.setProperty(EngineProperties.JAVAX_NET_SSL_KEYSTORE, jsaga_keystore.getPath());
@@ -105,22 +103,14 @@ public class SagaFactoryImpl implements SagaFactory {
         
         /* set javax.net.ssl.trustStore
          * 1. Search for user value in configuration or property and setProperty
-         * 2. If no user value, check if file "~/.jsaga/.cacerts" exists and setProperty
-         * 3. If it does not exist, check if file "~/.jsaga/.keystore" exists and setProperty
-         * 4. If it does not exist, do not setProperty
+         * 2. If no user value, check if file "~/.jsaga/.keystore" exists and setProperty
+         * 3. If it does not exist, do not setProperty
          */
         String truststore_path = EngineProperties.getProperty(EngineProperties.JAVAX_NET_SSL_TRUSTSTORE);
-        if (truststore_path != null) {
-        	System.setProperty(EngineProperties.JAVAX_NET_SSL_TRUSTSTORE, truststore_path);
-        } else {
-        	File jsaga_truststore = new File(System.getProperty("user.home")+"/.jsaga/.cacerts");
-        	if (jsaga_truststore.exists()) {
-        		System.setProperty(EngineProperties.JAVAX_NET_SSL_TRUSTSTORE, jsaga_truststore.getPath());
-        	} else {
-            	File jsaga_keystore = new File(System.getProperty("user.home")+"/.jsaga/.keystore");
-            	if (jsaga_keystore.exists()) {
-            		System.setProperty(EngineProperties.JAVAX_NET_SSL_TRUSTSTORE, jsaga_keystore.getPath());
-            	}
+        if (truststore_path == null) {
+        	File jsaga_keystore = new File(System.getProperty("user.home")+"/.jsaga/.keystore");
+        	if (jsaga_keystore.exists()) {
+        		System.setProperty(EngineProperties.JAVAX_NET_SSL_TRUSTSTORE, jsaga_keystore.getPath());
         	}
         }
         /* set javax.net.ssl.trustStorePassword */
