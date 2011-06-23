@@ -1,6 +1,19 @@
+Additions and fixes in release 1.1.1:
+- to allow applications to use multiple Saga implementations within a single
+  application, all factory methods now also have versions that have as first
+  parameter the name of the SagaFactory class to be used. While this change does
+  not affect existing applications that don't use this feature, it DOES affect
+  Saga implementations: they may no longer use the default SagaFactory class.
+  Saga implementations now must use versions that specify their own SagaFactory
+  implementation, because the default (set by the application or user)
+  may indicate another Saga implementation.
+- one of the IOVec factory methods still did throw NotImplemented, which it should
+  not.
+- there was a small error in the javadoc of TaskContainer, which made the
+  page display as an empty page on sites that pass pages through PHP.
+
 Most of the additions and fixes in release 1.1 are prompted by the
 recent changes in the SAGA specifications.
-
 Additions and fixes in release 1.1 with respect to release 1.0.1:
 - Buffer factory method no longer throws NotImplementedException.
 - Buffer methods no longer throw NotImplementedException.

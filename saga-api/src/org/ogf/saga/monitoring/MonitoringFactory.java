@@ -10,14 +10,10 @@ import org.ogf.saga.error.TimeoutException;
  * Factory for objects in the monitoring package.
  */
 public abstract class MonitoringFactory {
-
-    private static MonitoringFactory factory;
-
-    private synchronized static void initializeFactory()
-            throws NotImplementedException, NoSuccessException {
-        if (factory == null) {
-            factory = ImplementationBootstrapLoader.createMonitoringFactory();
-        }
+        
+    private static MonitoringFactory getFactory(String sagaFactoryName)
+    	    throws NoSuccessException, NotImplementedException {
+	return ImplementationBootstrapLoader.getMonitoringFactory(sagaFactoryName);
     }
 
     /**
@@ -78,7 +74,46 @@ public abstract class MonitoringFactory {
             String mode, String unit, String type, String value)
             throws NotImplementedException, BadParameterException,
             TimeoutException, NoSuccessException {
-        initializeFactory();
-        return factory.doCreateMetric(name, desc, mode, unit, type, value);
+        return createMetric(null, name, desc, mode, unit, type, value);
+    }
+    
+    /**
+     * Constructs a <code>Metric</code> object with the specified parameters.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param name
+     *      name of the metric.
+     * @param desc
+     *      description of the metric.
+     * @param mode
+     *      mode of the metric.
+     * @param unit
+     *      unit of the metric value.
+     * @param type
+     *      type of the metric.
+     * @param value
+     *      value of the metric.
+     * @return
+     *      the metric.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown on incorrectly formatted 'value' parameter, invalid 'mode'
+     *      or 'type' parameter, and empty required parameter (all but 'unit'). 
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     */
+    public synchronized static Metric createMetric(String sagaFactoryClassname, String name, String desc,
+            String mode, String unit, String type, String value)
+            throws NotImplementedException, BadParameterException,
+            TimeoutException, NoSuccessException {
+        return getFactory(sagaFactoryClassname).doCreateMetric(name, desc, mode, unit, type, value);
     }
 }

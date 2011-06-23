@@ -22,14 +22,10 @@ import org.ogf.saga.url.URL;
  * Factory for objects from the namespace package.
  */
 public abstract class FileFactory {
-
-    private static FileFactory factory;
-
-    private static synchronized void initializeFactory()
+    
+    private static FileFactory getFactory(String sagaFactoryName)
             throws NoSuccessException {
-        if (factory == null) {
-            factory = ImplementationBootstrapLoader.createFileFactory();
-        }
+        return ImplementationBootstrapLoader.getFileFactory(sagaFactoryName);
     }
 
     /**
@@ -217,9 +213,6 @@ public abstract class FileFactory {
      *      number of bytes to read/write on readV/writeV.
      * @return
      *      the IOVec.
-     * @exception NotImplementedException
-     *      is thrown if the implementation does not provide an
-     *      implementation of this method.
      * @exception BadParameterException
      *      is thrown when <code>lenIn</code> is larger than the size of the
      *      specified buffer, or < 0, or when the implementation cannot handle
@@ -229,10 +222,32 @@ public abstract class FileFactory {
      *      and none of the other exceptions apply.
      */
     public static IOVec createIOVec(byte[] data, int lenIn)
-            throws BadParameterException, NoSuccessException,
-            NotImplementedException {
-        initializeFactory();
-        return factory.doCreateIOVec(data, lenIn);
+            throws BadParameterException, NoSuccessException {
+	return createIOVec(null, data, lenIn);
+    }
+    
+    /**
+     * Creates an IOVec.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param data
+     *      data to be used.
+     * @param lenIn
+     *      number of bytes to read/write on readV/writeV.
+     * @return
+     *      the IOVec.
+     * @exception BadParameterException
+     *      is thrown when <code>lenIn</code> is larger than the size of the
+     *      specified buffer, or < 0, or when the implementation cannot handle
+     *      the specified data buffer.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     */
+    public static IOVec createIOVec(String sagaFactoryClassname, byte[] data, int lenIn)
+            throws BadParameterException, NoSuccessException {
+	return getFactory(sagaFactoryClassname).doCreateIOVec(data, lenIn);
     }
 
     /**
@@ -251,8 +266,29 @@ public abstract class FileFactory {
      */
     public static IOVec createIOVec(byte[] data) throws BadParameterException,
             NoSuccessException {
-        initializeFactory();
-        return factory.doCreateIOVec(data, data.length);
+        return createIOVec(data, data.length);
+    }
+    
+
+    /**
+     * Creates an IOVec.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param data
+     *      data to be used.
+     * @return
+     *      the IOVec.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     * @exception BadParameterException
+     *      is thrown when the implementation cannot handle
+     *      the specified data buffer.
+     */
+    public static IOVec createIOVec(String sagaFactoryClassname, byte[] data) throws BadParameterException,
+            NoSuccessException {
+        return createIOVec(sagaFactoryClassname, data, data.length);
     }
 
     /**
@@ -273,8 +309,30 @@ public abstract class FileFactory {
      */
     public static IOVec createIOVec(int size, int lenIn)
             throws BadParameterException, NoSuccessException {
-        initializeFactory();
-        return factory.doCreateIOVec(size, lenIn);
+	return createIOVec(null, size, lenIn);
+    }
+    
+    /**
+     * Creates an IOVec.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param size
+     *      size of data to be used.
+     * @param lenIn
+     *      number of bytes to read/write on readV/writeV.
+     * @return
+     *      the IOVec.
+     * @exception BadParameterException
+     *      is thrown when <code>lenIn</code> is larger than the size of the
+     *      specified buffer, or < 0.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     */
+    public static IOVec createIOVec(String sagaFactoryClassname, int size, int lenIn)
+            throws BadParameterException, NoSuccessException {
+	return getFactory(sagaFactoryClassname).doCreateIOVec(size, lenIn);
     }
 
     /**
@@ -295,8 +353,30 @@ public abstract class FileFactory {
      */
     public static IOVec createIOVec(int size) throws BadParameterException,
             NoSuccessException, NotImplementedException {
-        initializeFactory();
-        return factory.doCreateIOVec(size, size);
+	return createIOVec(size, size);
+    }
+    
+    /**
+     * Creates an IOVec.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param size
+     *      size of data to be used.
+     * @return
+     *      the IOVec.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception BadParameterException
+     *      is thrown when the implementation cannot handle the specified size.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     */
+    public static IOVec createIOVec(String sagaFactoryClassname, int size) throws BadParameterException,
+            NoSuccessException, NotImplementedException {
+	return createIOVec(sagaFactoryClassname, size, size);
     }
 
     /**
@@ -352,8 +432,69 @@ public abstract class FileFactory {
             PermissionDeniedException, BadParameterException,
             AlreadyExistsException, DoesNotExistException, TimeoutException,
             NoSuccessException {
-        initializeFactory();
-        return factory.doCreateFile(session, name, flags);
+	return createFile((String) null, session, name, flags);
+    }
+    
+
+    /**
+     * Creates a File.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param session
+     *      the session handle.
+     * @param name
+     *      location of the file.
+     * @param flags
+     *      the open mode.
+     * @return
+     *      the file instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid file name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified URL already exists, and the
+     *      <code>CREATE</code> and <code>EXCLUSIVE</code> flags are given.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist, and the
+     *      <code>CREATE</code> flag is not given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     */
+    public static File createFile(String sagaFactoryClassname, Session session, URL name, int flags)
+            throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            AlreadyExistsException, DoesNotExistException, TimeoutException,
+            NoSuccessException {
+	if (session == null) {
+	    session = SessionFactory.createSession(sagaFactoryClassname);
+	}
+        return getFactory(sagaFactoryClassname).doCreateFile(session, name, flags);
     }
 
     /**
@@ -406,9 +547,65 @@ public abstract class FileFactory {
             PermissionDeniedException, BadParameterException,
             AlreadyExistsException, DoesNotExistException, TimeoutException,
             NoSuccessException {
-        initializeFactory();
-        return factory.doCreateFile(session, name, Flags.READ.getValue());
+	return createFile(session, name, Flags.READ.getValue());
     }
+    
+
+    /**
+     * Creates a File for reading.
+     *
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param session
+     *      the session handle.
+     * @param name
+     *      location of the file.
+     * @return
+     *      the file instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid file name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is not thrown, but a method may be invoked that may throw it (but
+     *      not in this case).
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     */
+    public static File createFile(String sagaFactoryClassname, Session session, URL name)
+            throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            AlreadyExistsException, DoesNotExistException, TimeoutException,
+            NoSuccessException {
+	return createFile(sagaFactoryClassname, session, name, Flags.READ.getValue());
+    }
+
 
     /**
      * Creates a File using the default session.
@@ -461,9 +658,64 @@ public abstract class FileFactory {
             PermissionDeniedException, BadParameterException,
             AlreadyExistsException, DoesNotExistException, TimeoutException,
             NoSuccessException {
-        Session session = SessionFactory.createSession();
-        initializeFactory();
-        return factory.doCreateFile(session, name, flags);
+        return createFile((Session) null, name, flags);
+    }
+    
+
+    /**
+     * Creates a File using the default session.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param name
+     *      location of the file.
+     * @param flags
+     *      the open mode.
+     * @return
+     *      the file instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid file name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified URL already exists, and the
+     *      <code>CREATE</code> and <code>EXCLUSIVE</code> flags are given.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist, and the
+     *      <code>CREATE</code> flag is not given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     */
+    public static File createFile(String sagaFactoryClassname, URL name, int flags)
+            throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            AlreadyExistsException, DoesNotExistException, TimeoutException,
+            NoSuccessException {
+        return createFile(sagaFactoryClassname, (Session) null, name, flags);
     }
 
     /**
@@ -513,11 +765,62 @@ public abstract class FileFactory {
             AuthorizationFailedException, PermissionDeniedException,
             BadParameterException, AlreadyExistsException,
             DoesNotExistException, TimeoutException, NoSuccessException {
-        Session session = SessionFactory.createSession();
-        initializeFactory();
-        return factory.doCreateFile(session, name, Flags.READ.getValue());
+        return createFile((Session) null, name);
     }
 
+
+    /**
+     * Creates a File for reading, using the default session.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param name
+     *      location of the file.
+     * @return
+     *      the file instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid file name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is not thrown, but a method may be invoked that may throw it (but
+     *      not in this case).
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     */
+    public static File createFile(String sagaFactoryClassname, URL name) throws NotImplementedException,
+            IncorrectURLException, AuthenticationFailedException,
+            AuthorizationFailedException, PermissionDeniedException,
+            BadParameterException, AlreadyExistsException,
+            DoesNotExistException, TimeoutException, NoSuccessException {
+        return createFile(sagaFactoryClassname, SessionFactory.createSession(sagaFactoryClassname), name);
+    }
+    
     /**
      * Creates a FileInputStream.
      * 
@@ -568,8 +871,65 @@ public abstract class FileFactory {
             PermissionDeniedException, BadParameterException,
             AlreadyExistsException, DoesNotExistException, TimeoutException,
             NoSuccessException {
-        initializeFactory();
-        return factory.doCreateFileInputStream(session, name);
+        return createFileInputStream((String) null, session, name);
+    }
+
+    /**
+     * Creates a FileInputStream.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param session
+     *      the session handle.
+     * @param name
+     *      location of the file.
+     * @return
+     *      the FileInputStream instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid file name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is not thrown, but a method may be invoked that may throw it (but
+     *      not in this case).
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     */
+    public static FileInputStream createFileInputStream(String sagaFactoryClassname, Session session,
+            URL name) throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            AlreadyExistsException, DoesNotExistException, TimeoutException,
+            NoSuccessException {
+	if (session == null) {
+	    session = SessionFactory.createSession(sagaFactoryClassname);
+	}
+        return getFactory(sagaFactoryClassname).doCreateFileInputStream(session, name);
     }
 
     /**
@@ -620,9 +980,61 @@ public abstract class FileFactory {
             PermissionDeniedException, BadParameterException,
             AlreadyExistsException, DoesNotExistException, TimeoutException,
             NoSuccessException {
-        Session session = SessionFactory.createSession();
-        initializeFactory();
-        return factory.doCreateFileInputStream(session, name);
+        return createFileInputStream((Session) null, name);
+    }
+    
+
+    /**
+     * Creates a FileInputStream using the default session.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param name
+     *      location of the file.
+     * @return
+     *      the FileInputStream instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid file name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is not thrown, but a method may be invoked that may throw it (but
+     *      not in this case).
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     */
+    public static FileInputStream createFileInputStream(String sagaFactoryClassname, URL name)
+            throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            AlreadyExistsException, DoesNotExistException, TimeoutException,
+            NoSuccessException {
+        return createFileInputStream(sagaFactoryClassname, SessionFactory.createSession(sagaFactoryClassname), name);
     }
 
     /**
@@ -678,9 +1090,70 @@ public abstract class FileFactory {
             AuthorizationFailedException, PermissionDeniedException,
             BadParameterException, AlreadyExistsException,
             DoesNotExistException, TimeoutException, NoSuccessException {
-        initializeFactory();
-        return factory.doCreateFileOutputStream(session, name, append);
+        return createFileOutputStream((String) null, session, name, append);
     }
+    
+    /**
+     * Creates a FileOutputStream.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param session
+     *      the session handle.
+     * @param name
+     *      location of the file.
+     * @param append
+     *      when set, the file is opened for appending.
+     * @return
+     *      the FileOutputStream instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL points to a directory,
+     *      or is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown if an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is not thrown, but a method may be invoked that may throw it (but
+     *      not in this case).
+     * @exception DoesNotExistException
+     *      is thrown if the parent directory does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     */
+    public static FileOutputStream createFileOutputStream(String sagaFactoryClassname, Session session,
+            URL name, boolean append) throws NotImplementedException,
+            IncorrectURLException, AuthenticationFailedException,
+            AuthorizationFailedException, PermissionDeniedException,
+            BadParameterException, AlreadyExistsException,
+            DoesNotExistException, TimeoutException, NoSuccessException {
+	if (session == null) {
+	    session = SessionFactory.createSession(sagaFactoryClassname);
+	}
+        return getFactory(sagaFactoryClassname).doCreateFileOutputStream(session, name, append);
+    }
+
 
     /**
      * Creates a FileOutputStream.
@@ -736,6 +1209,63 @@ public abstract class FileFactory {
         return createFileOutputStream(session, name, false);
     }
 
+
+    /**
+     * Creates a FileOutputStream.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param session
+     *      the session handle.
+     * @param name
+     *      location of the file.
+     * @return
+     *      the FileOutputStream instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL points to a directory,
+     *      or is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown if an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is not thrown, but a method may be invoked that may throw it (but
+     *      not in this case).
+     * @exception DoesNotExistException
+     *      is thrown if the parent directory does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     */
+    public static FileOutputStream createFileOutputStream(String sagaFactoryClassname, Session session,
+            URL name) throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            AlreadyExistsException, DoesNotExistException, TimeoutException,
+            NoSuccessException {
+        return createFileOutputStream(sagaFactoryClassname, session, name, false);
+    }
+
     /**
      * Creates a FileOutputStream using the default session.
      * 
@@ -787,10 +1317,67 @@ public abstract class FileFactory {
             AuthorizationFailedException, PermissionDeniedException,
             BadParameterException, AlreadyExistsException,
             DoesNotExistException, TimeoutException, NoSuccessException {
-        Session session = SessionFactory.createSession();
-        initializeFactory();
-        return factory.doCreateFileOutputStream(session, name, append);
+        return createFileOutputStream((Session) null, name, append);
     }
+    
+
+    /**
+     * Creates a FileOutputStream using the default session.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param name
+     *      location of the file.
+     * @param append
+     *      when set, the file is opened for appending.
+     * @return
+     *      the FileOutputStream instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL points to a directory,
+     *      or is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown if an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is not thrown, but a method may be invoked that may throw it (but
+     *      not in this case).
+     * @exception DoesNotExistException
+     *      is thrown if the parent directory does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.  
+     */
+    public static FileOutputStream createFileOutputStream(String sagaFactoryClassname, URL name,
+            boolean append) throws NotImplementedException,
+            IncorrectURLException, AuthenticationFailedException,
+            AuthorizationFailedException, PermissionDeniedException,
+            BadParameterException, AlreadyExistsException,
+            DoesNotExistException, TimeoutException, NoSuccessException {
+        Session session = SessionFactory.createSession(sagaFactoryClassname);
+        return createFileOutputStream(sagaFactoryClassname, session, name, append);
+    }
+
 
     /**
      * Creates a FileOutputStream using the default session.
@@ -843,6 +1430,61 @@ public abstract class FileFactory {
             NoSuccessException {
         return createFileOutputStream(name, false);
     }
+    
+    /**
+     * Creates a FileOutputStream using the default session.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param name
+     *      location of the file.
+     * @return
+     *      the FileOutputStream instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL points to a directory,
+     *      or is an invalid entry name.
+     * @exception IncorrectURLException
+     *      is thrown if an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is not thrown, but a method may be invoked that may throw it (but
+     *      not in this case).
+     * @exception DoesNotExistException
+     *      is thrown if the parent directory does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     */
+    public static FileOutputStream createFileOutputStream(String sagaFactoryClassname, URL name)
+            throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            AlreadyExistsException, DoesNotExistException, TimeoutException,
+            NoSuccessException {
+        return createFileOutputStream(sagaFactoryClassname, name, false);
+    }
+
 
     /**
      * Creates a Directory.
@@ -897,8 +1539,69 @@ public abstract class FileFactory {
             PermissionDeniedException, BadParameterException,
             AlreadyExistsException, DoesNotExistException, TimeoutException,
             NoSuccessException {
-        initializeFactory();
-        return factory.doCreateDirectory(session, name, flags);
+        return createDirectory((String) null, session, name, flags);
+    }
+    
+
+    /**
+     * Creates a Directory.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param session
+     *      the session handle.
+     * @param name
+     *      location of the directory.
+     * @param flags
+     *      the open mode.
+     * @return
+     *      the directory instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid file name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified URL already exists, and the
+     *      <code>CREATE</code> and <code>EXCLUSIVE</code> flags are given.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist, and the
+     *      <code>CREATE</code> flag is not given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     */
+    public static Directory createDirectory(String sagaFactoryClassname, Session session, URL name, int flags)
+            throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            AlreadyExistsException, DoesNotExistException, TimeoutException,
+            NoSuccessException {
+	if (session == null) {
+	    session = SessionFactory.createSession(sagaFactoryClassname);
+	}
+        return getFactory(sagaFactoryClassname).doCreateDirectory(session, name, flags);
     }
 
     /**
@@ -951,9 +1654,65 @@ public abstract class FileFactory {
             PermissionDeniedException, BadParameterException,
             AlreadyExistsException, DoesNotExistException, TimeoutException,
             NoSuccessException {
-        initializeFactory();
-        return factory.doCreateDirectory(session, name, Flags.READ.getValue());
+        return createDirectory(session, name, Flags.READ.getValue());
     }
+    
+
+    /**
+     * Creates a Directory for reading.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param session
+     *      the session handle.
+     * @param name
+     *      location of the directory.
+     * @return
+     *      the directory instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid file name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is not thrown, but a method may be invoked that may throw it (but
+     *      not in this case).
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     */
+    public static Directory createDirectory(String sagaFactoryClassname, Session session, URL name)
+            throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            AlreadyExistsException, DoesNotExistException, TimeoutException,
+            NoSuccessException {
+        return createDirectory(sagaFactoryClassname, session, name, Flags.READ.getValue());
+    }
+
 
     /**
      * Creates a Directory, using the default session.
@@ -1006,10 +1765,67 @@ public abstract class FileFactory {
             PermissionDeniedException, BadParameterException,
             AlreadyExistsException, DoesNotExistException, TimeoutException,
             NoSuccessException {
-        Session session = SessionFactory.createSession();
-        initializeFactory();
-        return factory.doCreateDirectory(session, name, flags);
+        return createDirectory((Session) null, name, flags);
     }
+    
+
+    /**
+     * Creates a Directory, using the default session.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param name
+     *      location of the directory.
+     * @param flags
+     *      the open mode.
+     * @return
+     *      the directory instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid file name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is thrown if the specified URL already exists, and the
+     *      <code>CREATE</code> and <code>EXCLUSIVE</code> flags are given.
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist, and the
+     *      <code>CREATE</code> flag is not given.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     */
+    public static Directory createDirectory(String sagaFactoryClassname, URL name, int flags)
+            throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            AlreadyExistsException, DoesNotExistException, TimeoutException,
+            NoSuccessException {
+        Session session = SessionFactory.createSession(sagaFactoryClassname);
+        return createDirectory(sagaFactoryClassname, session, name, flags);
+    }
+
 
     /**
      * Creates a Directory for reading, using the default session.
@@ -1059,9 +1875,61 @@ public abstract class FileFactory {
             PermissionDeniedException, BadParameterException,
             AlreadyExistsException, DoesNotExistException, TimeoutException,
             NoSuccessException {
-        Session session = SessionFactory.createSession();
-        initializeFactory();
-        return factory.doCreateDirectory(session, name, Flags.READ.getValue());
+        return createDirectory(name, Flags.READ.getValue());
+    }
+    
+
+    /**
+     * Creates a Directory for reading, using the default session.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param name
+     *      location of the directory.
+     * @return
+     *      the directory instance.
+     * @exception NotImplementedException
+     *      is thrown if the implementation does not provide an
+     *      implementation of this method.
+     * @exception PermissionDeniedException
+     *      is thrown when the method failed because the identity used did
+     *      not have sufficient permissions to perform the operation
+     *      successfully.
+     * @exception AuthorizationFailedException
+     *      is thrown when none of the available contexts of the
+     *      used session could be used for successful authorization.
+     *      This error indicates that the resource could not be accessed
+     *      at all, and not that an operation was not available due to
+     *      restricted permissions.
+     * @exception AuthenticationFailedException
+     *      is thrown when operation failed because none of the available
+     *      session contexts could successfully be used for authentication.
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception BadParameterException
+     *      is thrown when the specified URL is an invalid file name.
+     * @exception IncorrectURLException
+     *      is thrown when an implementation cannot handle the specified
+     *      protocol, or that access to the specified entity via the
+     *      given protocol is impossible.
+     * @exception AlreadyExistsException
+     *      is not thrown, but a method may be invoked that may throw it (but
+     *      not in this case).
+     * @exception DoesNotExistException
+     *      is thrown if the specified URL does not exist.
+     * @exception NoSuccessException
+     *      is thrown when the operation was not successfully performed,
+     *      and none of the other exceptions apply.
+     */
+    public static Directory createDirectory(String sagaFactoryClassname, URL name)
+            throws NotImplementedException, IncorrectURLException,
+            AuthenticationFailedException, AuthorizationFailedException,
+            PermissionDeniedException, BadParameterException,
+            AlreadyExistsException, DoesNotExistException, TimeoutException,
+            NoSuccessException {
+        return createDirectory(sagaFactoryClassname, name, Flags.READ.getValue());
     }
 
     /**
@@ -1085,8 +1953,37 @@ public abstract class FileFactory {
     public static Task<FileFactory, File> createFile(TaskMode mode,
             Session session, URL name, int flags)
             throws NotImplementedException, NoSuccessException {
-        initializeFactory();
-        return factory.doCreateFile(mode, session, name, flags);
+        return createFile(null, mode, session, name, flags);
+    }
+    
+
+    /**
+     * Creates a task that creates a File.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param mode
+     *            the task mode.
+     * @param session
+     *            the session handle.
+     * @param name
+     *            location of the file.
+     * @param flags
+     *            the open mode.
+     * @return the task.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     * @throws NoSuccessException
+     *             is thrown when the Saga factory could not be created.
+     */
+    public static Task<FileFactory, File> createFile(String sagaFactoryClassname, TaskMode mode,
+            Session session, URL name, int flags)
+            throws NotImplementedException, NoSuccessException {
+	if (session == null) {
+	    session = SessionFactory.createSession(sagaFactoryClassname);
+	}
+        return getFactory(sagaFactoryClassname).doCreateFile(mode, session, name, flags);
     }
 
     /**
@@ -1108,8 +2005,31 @@ public abstract class FileFactory {
     public static Task<FileFactory, File> createFile(TaskMode mode,
             Session session, URL name) throws NotImplementedException,
             NoSuccessException {
-        initializeFactory();
-        return factory.doCreateFile(mode, session, name, Flags.READ.getValue());
+        return createFile(mode, session, name, Flags.READ.getValue());
+    }
+    
+    /**
+     * Creates a task that creates a File for reading.
+     *
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param mode
+     *            the task mode.
+     * @param session
+     *            the session handle.
+     * @param name
+     *            location of the file.
+     * @return the task.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     * @throws NoSuccessException
+     *             is thrown when the Saga factory could not be created.
+     */
+    public static Task<FileFactory, File> createFile(String sagaFactoryClassname, TaskMode mode,
+            Session session, URL name) throws NotImplementedException,
+            NoSuccessException {
+        return createFile(sagaFactoryClassname, mode, session, name, Flags.READ.getValue());
     }
 
     /**
@@ -1131,9 +2051,33 @@ public abstract class FileFactory {
      */
     public static Task<FileFactory, File> createFile(TaskMode mode, URL name,
             int flags) throws NotImplementedException, NoSuccessException {
-        Session session = SessionFactory.createSession();
-        initializeFactory();
-        return factory.doCreateFile(mode, session, name, flags);
+        return createFile(mode, null, name, flags);
+    }
+    
+
+    /**
+     * Creates a task that creates a File, using the default session.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param mode
+     *            the task mode.
+     * @param name
+     *            location of the file.
+     * @param flags
+     *            the open mode.
+     * @return the task.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     * @exception NoSuccessException
+     *                is thrown when the default session could not be created or
+     *                when the Saga factory could not be created.
+     */
+    public static Task<FileFactory, File> createFile(String sagaFactoryClassname, TaskMode mode, URL name,
+            int flags) throws NotImplementedException, NoSuccessException {
+        Session session = SessionFactory.createSession(sagaFactoryClassname);
+        return createFile(sagaFactoryClassname, mode, session, name, flags);
     }
 
     /**
@@ -1154,9 +2098,30 @@ public abstract class FileFactory {
      */
     public static Task<FileFactory, File> createFile(TaskMode mode, URL name)
             throws NotImplementedException, NoSuccessException {
-        Session session = SessionFactory.createSession();
-        initializeFactory();
-        return factory.doCreateFile(mode, session, name, Flags.READ.getValue());
+        return createFile(mode, name, Flags.READ.getValue());
+    }
+    
+    /**
+     * Creates a task that creates a File for reading, using the default
+     * session.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param mode
+     *            the task mode.
+     * @param name
+     *            location of the file.
+     * @return the task.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     * @exception NoSuccessException
+     *                is thrown when the default session could not be created or
+     *                when the Saga factory could not be created.
+     */
+    public static Task<FileFactory, File> createFile(String sagaFactoryClassname, TaskMode mode, URL name)
+            throws NotImplementedException, NoSuccessException {
+        return createFile(sagaFactoryClassname, mode, name, Flags.READ.getValue());
     }
 
     /**
@@ -1178,8 +2143,34 @@ public abstract class FileFactory {
     public static Task<FileFactory, FileInputStream> createFileInputStream(
             TaskMode mode, Session session, URL name)
             throws NotImplementedException, NoSuccessException {
-        initializeFactory();
-        return factory.doCreateFileInputStream(mode, session, name);
+        return createFileInputStream(null, mode, session, name);
+    }
+    
+    /**
+     * Creates a task that creates a FileInputStream.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param mode
+     *            the task mode.
+     * @param session
+     *            the session handle.
+     * @param name
+     *            location of the file.
+     * @return the task.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     * @throws NoSuccessException
+     *             is thrown when the Saga factory could not be created.
+     */
+    public static Task<FileFactory, FileInputStream> createFileInputStream(
+            String sagaFactoryClassname, TaskMode mode, Session session, URL name)
+            throws NotImplementedException, NoSuccessException {
+	if (session == null) {
+	    session = SessionFactory.createSession(sagaFactoryClassname);
+	}
+        return getFactory(sagaFactoryClassname).doCreateFileInputStream(mode, session, name);
     }
 
     /**
@@ -1200,9 +2191,32 @@ public abstract class FileFactory {
     public static Task<FileFactory, FileInputStream> createFileInputStream(
             TaskMode mode, URL name) throws NotImplementedException,
             NoSuccessException {
-        Session session = SessionFactory.createSession();
-        initializeFactory();
-        return factory.doCreateFileInputStream(mode, session, name);
+
+        return createFileInputStream(mode, null, name);
+    }
+    
+
+    /**
+     * Creates a task that creates a FileInputStream using the default session.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param mode
+     *            the task mode.
+     * @param name
+     *            location of the file.
+     * @return the task.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     * @exception NoSuccessException
+     *                is thrown when the default session could not be created or
+     *                when the Saga factory could not be created.
+     */
+    public static Task<FileFactory, FileInputStream> createFileInputStream(
+            String sagaFactoryClassname, TaskMode mode, URL name) throws NotImplementedException,
+            NoSuccessException {
+        return createFileInputStream(sagaFactoryClassname, mode, null, name);
     }
 
     /**
@@ -1225,6 +2239,29 @@ public abstract class FileFactory {
             throws NotImplementedException, NoSuccessException {
         return createFileOutputStream(mode, session, name, false);
     }
+    
+    /**
+     * Creates a task that creates a FileOutputStream.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param mode
+     *            the task mode.
+     * @param session
+     *            the session handle.
+     * @param name
+     *            location of the file.
+     * @return the task.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     * @throws NoSuccessException
+     */
+    public static Task<FileFactory, FileOutputStream> createFileOutputStream(
+            String sagaFactoryClassname, TaskMode mode, Session session, URL name)
+            throws NotImplementedException, NoSuccessException {
+        return createFileOutputStream(sagaFactoryClassname, mode, session, name, false);
+    }
 
     /**
      * Creates a task that creates a FileOutputStream.
@@ -1245,8 +2282,35 @@ public abstract class FileFactory {
     public static Task<FileFactory, FileOutputStream> createFileOutputStream(
             TaskMode mode, Session session, URL name, boolean append)
             throws NotImplementedException, NoSuccessException {
-        initializeFactory();
-        return factory.doCreateFileOutputStream(mode, session, name, append);
+        return createFileOutputStream(null, mode, session, name, append);
+    }
+    
+
+    /**
+     * Creates a task that creates a FileOutputStream.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param mode
+     *            the task mode.
+     * @param name
+     *            location of the file.
+     * @param append
+     *            when set, the file is opened for appending.
+     * @return the task.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     * @throws NoSuccessException
+     *             is thrown when the Saga factory could not be created.
+     */
+    public static Task<FileFactory, FileOutputStream> createFileOutputStream(
+            String sagaFactoryClassname, TaskMode mode, Session session, URL name, boolean append)
+            throws NotImplementedException, NoSuccessException {
+	if (session == null) {
+	    session = SessionFactory.createSession(sagaFactoryClassname);
+	}
+        return getFactory(sagaFactoryClassname).doCreateFileOutputStream(mode, session, name, append);
     }
 
     /**
@@ -1269,6 +2333,29 @@ public abstract class FileFactory {
             NoSuccessException {
         return createFileOutputStream(mode, name, false);
     }
+    
+    /**
+     * Creates a task that creates a FileOutputStream using the default session.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param mode
+     *            the task mode.
+     * @param name
+     *            location of the file.
+     * @return the task.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     * @throws NoSuccessException
+     *             is thrown when the default session could not be created or
+     *             when the Saga factory could not be created.
+     */
+    public static Task<FileFactory, FileOutputStream> createFileOutputStream(
+            String sagaFactoryClassname, TaskMode mode, URL name) throws NotImplementedException,
+            NoSuccessException {
+        return createFileOutputStream(sagaFactoryClassname, mode, name, false);
+    }
 
     /**
      * Creates a task that creates a FileOutputStream.
@@ -1290,10 +2377,35 @@ public abstract class FileFactory {
     public static Task<FileFactory, FileOutputStream> createFileOutputStream(
             TaskMode mode, URL name, boolean append)
             throws NotImplementedException, NoSuccessException {
-        Session session = SessionFactory.createSession();
-        initializeFactory();
-        return factory.doCreateFileOutputStream(mode, session, name, append);
+        return createFileOutputStream(mode, null, name, append);
     }
+    
+    /**
+     * Creates a task that creates a FileOutputStream.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param mode
+     *            the task mode.
+     * @param name
+     *            location of the file.
+     * @param append
+     *            when set, the file is opened for appending.
+     * @return the task.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     * @throws NoSuccessException
+     *             is thrown when the default session could not be created or
+     *             when the Saga factory could not be created.
+     */
+    public static Task<FileFactory, FileOutputStream> createFileOutputStream(
+            String sagaFactoryClassname, TaskMode mode, URL name, boolean append)
+            throws NotImplementedException, NoSuccessException {
+        Session session = SessionFactory.createSession(sagaFactoryClassname);
+        return createFileOutputStream(sagaFactoryClassname, mode, session, name, append);
+    }
+
 
     /**
      * Creates a task that creates a Directory.
@@ -1316,8 +2428,37 @@ public abstract class FileFactory {
     public static Task<FileFactory, Directory> createDirectory(TaskMode mode,
             Session session, URL name, int flags)
             throws NotImplementedException, NoSuccessException {
-        initializeFactory();
-        return factory.doCreateDirectory(mode, session, name, flags);
+        return createDirectory(null, mode, session, name, flags);
+    }
+    
+
+    /**
+     * Creates a task that creates a Directory.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param mode
+     *            the task mode.
+     * @param session
+     *            the session handle.
+     * @param name
+     *            location of the directory.
+     * @param flags
+     *            the open mode.
+     * @return the task.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     * @throws NoSuccessException
+     *             is thrown when the Saga factory could not be created.
+     */
+    public static Task<FileFactory, Directory> createDirectory(String sagaFactoryClassname, TaskMode mode,
+            Session session, URL name, int flags)
+            throws NotImplementedException, NoSuccessException {
+	if (session == null) {
+	    session = SessionFactory.createSession(sagaFactoryClassname);
+	}
+        return getFactory(sagaFactoryClassname).doCreateDirectory(mode, session, name, flags);
     }
 
     /**
@@ -1339,9 +2480,31 @@ public abstract class FileFactory {
     public static Task<FileFactory, Directory> createDirectory(TaskMode mode,
             Session session, URL name) throws NotImplementedException,
             NoSuccessException {
-        initializeFactory();
-        return factory.doCreateDirectory(mode, session, name, Flags.READ
-                .getValue());
+        return createDirectory(mode, session, name, Flags.READ.getValue());
+    }
+    
+    /**
+     * Creates a task that creates a Directory for reading.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param mode
+     *            the task mode.
+     * @param session
+     *            the session handle.
+     * @param name
+     *            location of the directory.
+     * @return the task.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     * @throws NoSuccessException
+     *             is thrown when the Saga factory could not be created.
+     */
+    public static Task<FileFactory, Directory> createDirectory(String sagaFactoryClassname, TaskMode mode,
+            Session session, URL name) throws NotImplementedException,
+            NoSuccessException {
+        return createDirectory(sagaFactoryClassname, mode, session, name, Flags.READ.getValue());
     }
 
     /**
@@ -1364,9 +2527,34 @@ public abstract class FileFactory {
     public static Task<FileFactory, Directory> createDirectory(TaskMode mode,
             URL name, int flags) throws NotImplementedException,
             NoSuccessException {
-        Session session = SessionFactory.createSession();
-        initializeFactory();
-        return factory.doCreateDirectory(mode, session, name, flags);
+        return createDirectory(mode, null, name, flags);
+    }
+    
+
+    /**
+     * Creates a task that creates a Directory, using the default session.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param mode
+     *            the task mode.
+     * @param name
+     *            location of the directory.
+     * @param flags
+     *            the open mode.
+     * @return the task.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented.
+     * @exception NoSuccessException
+     *                is thrown when the default session could not be created or
+     *                when the Saga factory could not be created.
+     */
+    public static Task<FileFactory, Directory> createDirectory(String sagaFactoryClassname, TaskMode mode,
+            URL name, int flags) throws NotImplementedException,
+            NoSuccessException {
+        Session session = SessionFactory.createSession(sagaFactoryClassname);
+        return createDirectory(sagaFactoryClassname, mode, session, name, flags);
     }
 
     /**
@@ -1387,9 +2575,30 @@ public abstract class FileFactory {
      */
     public static Task<FileFactory, Directory> createDirectory(TaskMode mode,
             URL name) throws NotImplementedException, NoSuccessException {
-        Session session = SessionFactory.createSession();
-        initializeFactory();
-        return factory.doCreateDirectory(mode, session, name, Flags.READ
-                .getValue());
+        return createDirectory(mode, name, Flags.READ.getValue());
+    }
+    
+
+    /**
+     * Creates a task that creates a Directory for reading, using the default
+     * session.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param mode
+     *            the task mode.
+     * @param name
+     *            location of the directory.
+     * @return the task.
+     * @exception NotImplementedException
+     *                is thrown when the task version of this method is not
+     *                implemented
+     * @exception NoSuccessException
+     *                is thrown when the default session could not be created or
+     *                when the Saga factory could not be created.
+     */
+    public static Task<FileFactory, Directory> createDirectory(String sagaFactoryClassname, TaskMode mode,
+            URL name) throws NotImplementedException, NoSuccessException {
+        return createDirectory(sagaFactoryClassname, mode, name, Flags.READ.getValue());
     }
 }

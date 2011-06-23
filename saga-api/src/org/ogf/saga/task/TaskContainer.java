@@ -13,7 +13,7 @@ import org.ogf.saga.monitoring.Monitorable;
  * Note that a task container must be able to contain any task, so it has
  * no generic parameters for task result type or task object type. The
  * consequence of this is that these types are unknown. So, a task
- * pulled from a container has type <code>Task<?,?></code>, and its
+ * pulled from a container has type <code>Task&lt;?,?&gt;</code>, and its
  * {@link Task#getObject() getObject()} an {@link Task#getResult()}
  * methods return a {@link java.lang.Object}.
  */

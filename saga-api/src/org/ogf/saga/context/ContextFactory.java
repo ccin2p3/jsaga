@@ -9,23 +9,20 @@ import org.ogf.saga.error.TimeoutException;
  * Factory for objects in the saga.context package.
  */
 public abstract class ContextFactory {
-
-    private static ContextFactory factory;
-
+    
     /**
      * Constructs a security context. To be provided by the implementation.
      * 
      * @param type
-     *            when set to a non-empty string is called.
+     *            when set to a non-empty string, {@link Context#setDefaults()}
+     *            is called.
      * @return the security context.
      */
     protected abstract Context doCreateContext(String type)
             throws IncorrectStateException, TimeoutException, NoSuccessException;
 
-    private synchronized static void initFactory() throws NoSuccessException {
-        if (factory == null) {
-            factory = ImplementationBootstrapLoader.createContextFactory();
-        }
+    private static ContextFactory getFactory(String sagaFactoryName) throws NoSuccessException {
+        return ImplementationBootstrapLoader.getContextFactory(sagaFactoryName);
     }
 
     /**
@@ -46,8 +43,7 @@ public abstract class ContextFactory {
      */
     public static Context createContext(String type)
             throws IncorrectStateException, TimeoutException, NoSuccessException {
-        initFactory();
-        return factory.doCreateContext(type);
+	return createContext(null, type);
     }
 
     /**
@@ -66,5 +62,28 @@ public abstract class ContextFactory {
     public static Context createContext() throws IncorrectStateException,
             TimeoutException, NoSuccessException {
         return createContext("");
+    }
+    
+    /**
+     * Constructs a security context.
+     * 
+     * @param sagaFactoryClassname
+     *      the class name of the Saga factory to be used.
+     * @param type
+     *      type of the context.
+     * @return 
+     *      the security context.
+     * @exception IncorrectStateException
+     * @exception TimeoutException
+     *      is thrown when a remote operation did not complete successfully
+     *      because the network communication or the remote service timed
+     *      out.
+     * @exception NoSuccessException
+     *      is thrown if the implementation cannot create valid
+     *      default values based on the available information.
+     */
+    public static Context createContext(String sagaFactoryClassname, String type)
+            throws IncorrectStateException, TimeoutException, NoSuccessException {
+        return getFactory(sagaFactoryClassname).doCreateContext(type);
     }
 }
