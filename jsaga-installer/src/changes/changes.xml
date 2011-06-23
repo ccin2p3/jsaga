@@ -3,7 +3,9 @@
         <title>JSAGA Release Notes</title>
     </properties>
     <body>
-        <release version="0.9.14-SNAPSHOT"/>
+        <release version="0.9.14-SNAPSHOT" description="Compatible with SAGA Java Binding v1.1.1">
+            <action dev="sreynaud" type="update">Upgrade saga-api to version 1.1.1 (enable simultaneous usage of multiple SAGA implementations)</action>
+        </release>
         <release version="0.9.13" date="2011-05-20">
             <action dev="lschwarz" type="update">New URL implementation RFC-3986 compliant</action>
             <action dev="lschwarz" type="add">New job adaptor for PBS batch system via SSH connection</action>
