@@ -19,6 +19,8 @@ import java.util.Map;
  *
  */
 public interface Adaptor {
+    public static final String JSAGA_FACTORY = "fr.in2p3.jsaga.impl.SagaFactoryImpl";
+
     /**
      * @return the adaptor type (context type, data protocol or job protocol).
      */

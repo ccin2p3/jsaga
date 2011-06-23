@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl.job.staging;
 
+import fr.in2p3.jsaga.impl.SagaFactoryImpl;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.JobDescription;
 import org.ogf.saga.url.URL;
@@ -22,6 +23,7 @@ import java.util.regex.Pattern;
  *
  */
 public class DataStagingFactory {
+    private static final String JSAGA_FACTORY = SagaFactoryImpl.class.getName();
     private static final Pattern PATTERN = Pattern.compile("([^<>]*) *(>>|>|<<|<) *([^<>]*)");
 
     public static AbstractDataStaging create(String fileTransfer) throws NotImplementedException, BadParameterException, NoSuccessException {
@@ -34,25 +36,25 @@ public class DataStagingFactory {
             // set localURL
             URL localURL;
             if (isURL(local)) {
-                localURL = URLFactory.createURL(local);
+                localURL = URLFactory.createURL(JSAGA_FACTORY, local);
             } else if (new File(local).isAbsolute()) {
-                localURL = URLFactory.createURL(new File(local).toURI().toString());
+                localURL = URLFactory.createURL(JSAGA_FACTORY, new File(local).toURI().toString());
             } else {
-            	localURL = URLFactory.createURL("file:/" + local);
+            	localURL = URLFactory.createURL(JSAGA_FACTORY, "file:/" + local);
             }
 
             // create DataStaging
             if (">>".equals(operator) || ">".equals(operator)) {
                 boolean append = ">>".equals(operator);
                 if (isURL(worker)) {
-                    return new InputDataStagingToRemote(localURL, URLFactory.createURL(worker), append);
+                    return new InputDataStagingToRemote(localURL, URLFactory.createURL(JSAGA_FACTORY, worker), append);
                 } else {
                     return new InputDataStagingToWorker(localURL, worker, append);
                 }
             } else if ("<<".equals(operator) || "<".equals(operator)) {
                 boolean append = "<<".equals(operator);
                 if (isURL(worker)) {
-                    return new OutputDataStagingFromRemote(localURL, URLFactory.createURL(worker), append);
+                    return new OutputDataStagingFromRemote(localURL, URLFactory.createURL(JSAGA_FACTORY, worker), append);
                 } else {
                     return new OutputDataStagingFromWorker(localURL, worker, append);
                 }

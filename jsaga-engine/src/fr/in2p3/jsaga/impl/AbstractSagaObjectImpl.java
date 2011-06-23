@@ -22,6 +22,8 @@ import java.util.UUID;
  *
  */
 public abstract class AbstractSagaObjectImpl implements SagaObject {
+    protected static final String JSAGA_FACTORY = SagaFactoryImpl.class.getName();
+
     protected Session m_session;
     private UUID m_uuid;
 

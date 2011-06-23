@@ -55,10 +55,10 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
         // remove base directory
         String stagingDir = m_adaptor.getStagingDirectory(nativeJobId);
         if (stagingDir != null) {
-            URL url = URLFactory.createURL(stagingDir);
+            URL url = URLFactory.createURL(JSAGA_FACTORY, stagingDir);
             Directory dir = null;
             try {
-                dir = FileFactory.createDirectory(job.getSession(), url);
+                dir = FileFactory.createDirectory(JSAGA_FACTORY, job.getSession(), url);
                 return dir;
             } catch (IncorrectURLException e) {
                 throw new NoSuccessException(e);
@@ -72,9 +72,9 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
     protected static void transfer(Session session, StagingTransfer transfer) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         int append = (transfer.isAppend() ? Flags.APPEND : Flags.NONE).getValue();
         try {
-            URL from = URLFactory.createURL(pathToURL(transfer.getFrom()));
-            URL to = URLFactory.createURL(pathToURL(transfer.getTo()));
-            File file = FileFactory.createFile(session, from, Flags.NONE.getValue());
+            URL from = URLFactory.createURL(JSAGA_FACTORY, pathToURL(transfer.getFrom()));
+            URL to = URLFactory.createURL(JSAGA_FACTORY, pathToURL(transfer.getTo()));
+            File file = FileFactory.createFile(JSAGA_FACTORY, session, from, Flags.NONE.getValue());
             file.copy(to, append);
             file.close();
         } catch (AlreadyExistsException e) {
@@ -100,8 +100,8 @@ public class DataStagingManagerThroughSandbox implements DataStagingManager {
 
     private static void remove(Session session, String url) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, IncorrectStateException, NoSuccessException {
         try {
-            URL urlToRemove = URLFactory.createURL(url);
-            File file = FileFactory.createFile(session, urlToRemove, Flags.NONE.getValue());
+            URL urlToRemove = URLFactory.createURL(JSAGA_FACTORY, url);
+            File file = FileFactory.createFile(JSAGA_FACTORY, session, urlToRemove, Flags.NONE.getValue());
             file.remove();
             file.close();
         } catch (AlreadyExistsException e) {

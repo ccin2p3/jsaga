@@ -4,6 +4,7 @@ import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyDelegated;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
+import fr.in2p3.jsaga.impl.SagaFactoryImpl;
 import fr.in2p3.jsaga.impl.logicalfile.AbstractSyncLogicalFileImpl;
 import fr.in2p3.jsaga.impl.namespace.FlagsHelper;
 import fr.in2p3.jsaga.impl.namespace.JSAGAFlags;
@@ -29,6 +30,8 @@ import java.util.List;
  *
  */
 public class LogicalFileCopyFrom {
+    private static final String JSAGA_FACTORY = SagaFactoryImpl.class.getName();
+
     private Session m_session;
     private AbstractSyncLogicalFileImpl m_targetFile;
     private DataAdaptor m_adaptor;
@@ -103,7 +106,7 @@ public class LogicalFileCopyFrom {
         int correctedFlags = flags;
         correctedFlags = new FlagsHelper(correctedFlags).remove(JSAGAFlags.PRESERVETIMES, Flags.OVERWRITE);
         try {
-            return LogicalFileFactory.createLogicalFile(m_session, source, correctedFlags);
+            return LogicalFileFactory.createLogicalFile(JSAGA_FACTORY, m_session, source, correctedFlags);
         } catch (AlreadyExistsException e) {
             throw new NoSuccessException("Unexpected exception", e);
         }

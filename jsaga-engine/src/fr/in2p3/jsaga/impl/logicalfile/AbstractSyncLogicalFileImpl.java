@@ -214,7 +214,7 @@ public abstract class AbstractSyncLogicalFileImpl extends AbstractNSEntryImplWit
                 List<URL> list = new ArrayList<URL>();
                 try {
                     for (String location : array) {
-                        list.add(URLFactory.createURL(location));
+                        list.add(URLFactory.createURL(JSAGA_FACTORY, location));
                     }
                 } catch (BadParameterException e) {
                     throw new NoSuccessException(e);
@@ -250,7 +250,7 @@ public abstract class AbstractSyncLogicalFileImpl extends AbstractNSEntryImplWit
                 throw new IncorrectStateException("Can not replicate a logical entry with empty location", this);
             }
             URL physicalSource = locations.get(0);
-            NSEntry physicalSourceEntry = NSFactory.createNSEntry(m_session, physicalSource, Flags.NONE.getValue());
+            NSEntry physicalSourceEntry = NSFactory.createNSEntry(JSAGA_FACTORY, m_session, physicalSource, Flags.NONE.getValue());
             physicalSourceEntry.copy(physicalTarget, flags);
             physicalSourceEntry.close();
         }

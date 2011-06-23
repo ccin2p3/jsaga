@@ -87,7 +87,7 @@ public abstract class AbstractSyncJobServiceImpl extends AbstractSagaObjectImpl 
     public Job runJobSync(String commandLine, String host, boolean interactive) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         try {
             // set job description
-            JobDescription desc = JobFactory.createJobDescription();
+            JobDescription desc = JobFactory.createJobDescription(JSAGA_FACTORY);
             desc.setAttribute(JobDescription.EXECUTABLE, commandLine);
             desc.setAttribute(JobDescription.INTERACTIVE, ""+interactive);
             desc.setVectorAttribute(JobDescription.CANDIDATEHOSTS, new String[]{""+host});

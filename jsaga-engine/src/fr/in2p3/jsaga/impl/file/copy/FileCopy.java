@@ -6,6 +6,7 @@ import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyDelegated;
 import fr.in2p3.jsaga.adaptor.data.read.FileReader;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderGetter;
+import fr.in2p3.jsaga.impl.SagaFactoryImpl;
 import fr.in2p3.jsaga.impl.file.AbstractSyncFileImpl;
 import fr.in2p3.jsaga.impl.namespace.FlagsHelper;
 import fr.in2p3.jsaga.impl.namespace.JSAGAFlags;
@@ -31,6 +32,8 @@ import java.io.IOException;
  *
  */
 public class FileCopy {
+    private static final String JSAGA_FACTORY = SagaFactoryImpl.class.getName();
+
     private static final int DEFAULT_BUFFER_SIZE = 16384;
     private Session m_session;
     private AbstractSyncFileImpl m_sourceFile;
@@ -67,7 +70,7 @@ public class FileCopy {
                         targetHost, targetPort, targetPath,
                         overwrite, source.getQuery());
             } catch (ParentDoesNotExist parentDoesNotExist) {
-                throw new DoesNotExistException("Target parent directory does not exist: "+effectiveTarget.resolve(URLFactory.createURL(".")), parentDoesNotExist);
+                throw new DoesNotExistException("Target parent directory does not exist: "+effectiveTarget.resolve(URLFactory.createURL(JSAGA_FACTORY, ".")), parentDoesNotExist);
             } catch (DoesNotExistException doesNotExist) {
                 throw new IncorrectStateException("Source file does not exist: "+source, doesNotExist);
             } catch (AlreadyExistsException alreadyExists) {
@@ -175,7 +178,7 @@ public class FileCopy {
             correctedFlags = correctedFlags + Flags.EXCL.getValue();
         }
         try {
-            return (AbstractSyncFileImpl) FileFactory.createFile(m_session, target, correctedFlags);
+            return (AbstractSyncFileImpl) FileFactory.createFile(JSAGA_FACTORY, m_session, target, correctedFlags);
         } catch (DoesNotExistException e) {
             throw new NoSuccessException("Unexpected exception", e);
         } catch (AlreadyExistsException alreadyExists) {
