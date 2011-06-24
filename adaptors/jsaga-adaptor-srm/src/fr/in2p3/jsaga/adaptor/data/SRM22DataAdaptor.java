@@ -102,7 +102,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
 
     public boolean exists(String absolutePath, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
         try {
-            this.getMetaData(absolutePath);
+            this.getMetaData(absolutePath, Boolean.TRUE);
             return true;
         } catch (DoesNotExistException doesNotExist) {
             return false;
@@ -765,13 +765,23 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
 		
 		return TPermissionMode.fromValue(perms);
     }
-	
     private TMetaDataPathDetail getMetaData(String absolutePath) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
+    	return this.getMetaData(absolutePath, false);
+    }
+    
+    private TMetaDataPathDetail getMetaData(String absolutePath, Boolean justCheckExist) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
         org.apache.axis.types.URI uri = this.toSrmURI(absolutePath);
         SrmLsRequest request = new SrmLsRequest();
         request.setArrayOfSURLs(new ArrayOfAnyURI(new org.apache.axis.types.URI[]{uri}));
         request.setAllLevelRecursive(Boolean.FALSE);
-        request.setFullDetailedList(Boolean.TRUE);
+        // Optimization (called by exists)
+        if (justCheckExist) {
+            request.setFullDetailedList(Boolean.FALSE);
+            request.setCount(0);
+            request.setNumOfLevels(0);
+        } else {
+        	request.setFullDetailedList(Boolean.TRUE);
+        }
         SrmLsResponse response;
         try {
             // send request
