@@ -2,7 +2,6 @@ package fr.in2p3.jsaga.adaptor.ssh.job;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
@@ -16,8 +15,6 @@ import org.ogf.saga.error.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;

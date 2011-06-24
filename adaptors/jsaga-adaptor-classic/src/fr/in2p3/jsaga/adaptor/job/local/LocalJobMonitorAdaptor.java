@@ -52,7 +52,7 @@ public class LocalJobMonitorAdaptor extends LocalAdaptorAbstract implements Quer
     }
 
 	public String[] list() throws PermissionDeniedException, TimeoutException,	NoSuccessException {
-		String filter = "(\\w*).process";
+		String filter = "(.*).process";
 		Pattern p = Pattern.compile(filter);
 		String[] files = new File(LocalJobProcess.getRootDir()).list();
 		List<String> listeFichiers = new ArrayList<String>();

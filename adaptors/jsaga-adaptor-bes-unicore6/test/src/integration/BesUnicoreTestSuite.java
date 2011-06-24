@@ -46,22 +46,23 @@ public class BesUnicoreTestSuite extends JSAGATestSuite {
         public void test_suspend_running() { super.ignore("not supported"); }
     }
     
+    /* incompatible with Unicore Data plugin */
  	// test cases
-    public static class BesUnicoreJobRunSandboxTest extends JobRunSandboxTest {
-        public BesUnicoreJobRunSandboxTest() throws Exception {super("bes-unicore");}
-    }
+    //public static class BesUnicoreJobRunSandboxTest extends JobRunSandboxTest {
+    //    public BesUnicoreJobRunSandboxTest() throws Exception {super("bes-unicore");}
+    //}
     
  	// test cases
     public static class BesUnicoreJobRunDescriptionTest extends JobRunDescriptionTest {
         public BesUnicoreJobRunDescriptionTest() throws Exception {super("bes-unicore");}
         public void test_run_inWorkingDirectory() { super.ignore("return code not supported"); }
-        // TODO : test_run_queueRequirement
         public void test_run_queueRequirement() { super.ignore("not supported"); }
-        //public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
+        public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
     }
 
+    /* incompatible with Unicore Data plugin */
     // test cases
-    public static class BesUnicoreJobRunInteractiveTest extends JobRunInteractiveTest {
-        public BesUnicoreJobRunInteractiveTest() throws Exception {super("bes-unicore");}
-    }
+    //public static class BesUnicoreJobRunInteractiveTest extends JobRunInteractiveTest {
+    //    public BesUnicoreJobRunInteractiveTest() throws Exception {super("bes-unicore");}
+    //}
 }
