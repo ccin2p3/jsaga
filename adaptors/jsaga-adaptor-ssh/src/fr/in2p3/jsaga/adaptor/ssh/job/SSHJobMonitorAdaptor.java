@@ -2,7 +2,6 @@ package fr.in2p3.jsaga.adaptor.ssh.job;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 import java.util.Vector;
 
 import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
@@ -10,15 +9,10 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
 import fr.in2p3.jsaga.adaptor.ssh.SSHAdaptorAbstract;
 
-import org.ogf.saga.error.AuthenticationFailedException;
-import org.ogf.saga.error.AuthorizationFailedException;
-import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
-import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
 
-import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
