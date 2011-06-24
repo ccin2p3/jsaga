@@ -20,6 +20,7 @@ import org.w3c.dom.Document;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -63,7 +64,7 @@ public abstract class AbstractSyncJobServiceImpl extends AbstractSagaObjectImpl 
 
     public Job createJobSync(JobDescription jobDesc) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         // create uniqId
-        String uniqId = ""+System.currentTimeMillis();
+        String uniqId = UUID.randomUUID().toString(); //""+System.currentTimeMillis();
 
         // may modify jobDesc
         DataStagingManager stagingMgr = DataStagingManagerFactory.create(m_controlAdaptor, jobDesc, uniqId);
