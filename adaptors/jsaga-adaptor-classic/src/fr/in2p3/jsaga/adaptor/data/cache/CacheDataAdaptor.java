@@ -123,6 +123,7 @@ public class CacheDataAdaptor implements FileReaderStreamFactory, FileWriter {
                 URL url = (URL) list.get(i);
                 NSEntry entry = m_connection.open(url);
                 attrs[i] = new CacheFileAttributes(entry);
+                entry.close();
             }
             return attrs;
         }
