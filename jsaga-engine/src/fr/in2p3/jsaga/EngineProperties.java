@@ -31,6 +31,10 @@ public class EngineProperties {
     public static final String JOB_CONTROL_CHECK_AVAILABILITY = "job.control.check.availability";
     public static final String JOB_CONTROL_CHECK_MATCH = "job.control.check.match";
     public static final String JOB_CANCEL_CHECK_STATUS = "job.cancel.check.status";
+    public static final String JAVAX_NET_SSL_KEYSTORE = "javax.net.ssl.keyStore";
+    public static final String JAVAX_NET_SSL_KEYSTOREPASSWORD = "javax.net.ssl.keyStorePassword";
+    public static final String JAVAX_NET_SSL_TRUSTSTORE = "javax.net.ssl.trustStore";
+    public static final String JAVAX_NET_SSL_TRUSTSTOREPASSWORD = "javax.net.ssl.trustStorePassword";
 
     private static Exception s_exception;
     private static Properties s_prop;
