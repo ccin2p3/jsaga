@@ -53,7 +53,6 @@ public class SRMIntegrationTestSuite extends JSAGATestSuite {
     public static class SRMNSCopyRecursiveTest extends NSCopyRecursiveTest {
         public SRMNSCopyRecursiveTest() throws Exception {super("srm", "srm");}
     }
-    /** FIXME: "SRM_FAILURE: Incompatible with current file status" */
     public static class SRMNSMoveTest extends NSMoveTest {
         public SRMNSMoveTest() throws Exception {super("srm", "srm");}
     }
