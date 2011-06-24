@@ -219,7 +219,6 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
 
 	/*
 	 * Obsolete, getInfoWSRF is used instead
-	 */
 	private String getInfoXML(String nativeJobId, String infoName) throws NotImplementedException, NoSuccessException {
 		try {
 			int loop = 0;
@@ -273,6 +272,7 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
 			throw new NoSuccessException(e);
 		}
 	}
+	 */
 	
 	protected JobStatus instanciateJobStatusObject(String nativeJobId, ActivityStatusType ast) throws NoSuccessException {
 		try {
