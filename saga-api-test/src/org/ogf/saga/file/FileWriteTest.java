@@ -37,7 +37,7 @@ public abstract class FileWriteTest extends AbstractNSEntryTest {
     public void test_write_nocreate()throws Exception {
         if (m_file instanceof File) {
             try {
-                NSFactory.createNSEntry(m_session, createURL(m_dirUrl, "ThisFileDoesNotExist"), Flags.WRITE.getValue());
+                NSFactory.createNSEntry(m_session, createURL(m_dirUrl, "ThisFileDoesNotExist"), Flags.WRITE.getValue()).close();
                 fail("Expected DoesNotExist exception");
             } catch(DoesNotExistException e) {
             }
@@ -49,7 +49,7 @@ public abstract class FileWriteTest extends AbstractNSEntryTest {
     public void test_write_nooverwrite() throws Exception {
         if (m_file instanceof File) {
             try {
-                NSFactory.createNSEntry(m_session, m_fileUrl, Flags.WRITE.or(Flags.EXCL));
+                NSFactory.createNSEntry(m_session, m_fileUrl, Flags.WRITE.or(Flags.EXCL)).close();
                 fail("Expected AlreadyExist exception");
             } catch(AlreadyExistsException e) {
                 checkWrited(m_fileUrl, DEFAULT_CONTENT);
