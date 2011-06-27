@@ -201,7 +201,7 @@
                                 <artifactItem>
                                     <groupId>org.ogf.saga</groupId>
                                     <artifactId>saga-api</artifactId>
-                                    <version>1.1</version>
+                                    <version>1.1.1</version>
                                     <classifier>javadoc</classifier>
                                     <type>jar</type>
                                     <overWrite>true</overWrite>
