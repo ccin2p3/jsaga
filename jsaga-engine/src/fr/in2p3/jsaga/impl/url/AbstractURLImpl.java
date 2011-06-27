@@ -134,7 +134,7 @@ public abstract class AbstractURLImpl extends AbstractSagaObjectImpl implements 
     public boolean hasCache() {
     	if (this.m_cache == null) return false;
     	return (System.currentTimeMillis() - this.m_cache_creation_time
-    			< EngineProperties.getInteger(EngineProperties.DATA_URL_CACHE_LIFETIME).longValue());
+    			< EngineProperties.getInteger(EngineProperties.DATA_ATTRIBUTES_CACHE_LIFETIME).longValue());
     }
 
 
