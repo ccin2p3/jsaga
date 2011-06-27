@@ -6,6 +6,7 @@
         <release version="0.9.14-SNAPSHOT" description="Compatible with SAGA Java Binding v1.1.1">
             <action dev="sreynaud" type="update">Upgrade saga-api to version 1.1.1 (enable simultaneous usage of multiple SAGA implementations)</action>
             <action dev="lschwarz" type="update">the unique ID given by JSAGA to the Job plug-in has changed. It is now composed of digits and '-'.</action>
+            <action dev="lschwarz" type="update">Added configuration attribute "data.url.cache.lifetime"</action>
         </release>
         <release version="0.9.13" date="2011-05-20">
             <action dev="lschwarz" type="update">New URL implementation RFC-3986 compliant</action>
