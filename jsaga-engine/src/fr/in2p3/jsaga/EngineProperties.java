@@ -26,6 +26,7 @@ public class EngineProperties {
     public static final String JSAGA_DEFAULT_CONTEXTS_CHECK_CONFLICTS = "jsaga.default.contexts.check.conflicts";
     public static final String DATA_IMPLICIT_CLOSE_TIMEOUT = "data.implicit.close.timeout";
     public static final String DATA_COPY_BUFFER_SIZE = "data.copy.buffer.size";
+    public static final String DATA_ATTRIBUTES_CACHE_LIFETIME = "data.attributes.cache.lifetime";
     public static final String JOB_MONITOR_POLL_PERIOD = "job.monitor.poll.period";
     public static final String JOB_MONITOR_ERROR_THRESHOLD = "job.monitor.error.threshold";
     public static final String JOB_CONTROL_CHECK_AVAILABILITY = "job.control.check.availability";
@@ -35,7 +36,7 @@ public class EngineProperties {
     public static final String JAVAX_NET_SSL_KEYSTOREPASSWORD = "javax.net.ssl.keyStorePassword";
     public static final String JAVAX_NET_SSL_TRUSTSTORE = "javax.net.ssl.trustStore";
     public static final String JAVAX_NET_SSL_TRUSTSTOREPASSWORD = "javax.net.ssl.trustStorePassword";
-
+    
     private static Exception s_exception;
     private static Properties s_prop;
 
@@ -49,6 +50,7 @@ public class EngineProperties {
             s_prop.setProperty(JSAGA_DEFAULT_CONTEXTS_CHECK_CONFLICTS, "true");
             //s_prop.setProperty(DATA_IMPLICIT_CLOSE_TIMEOUT, "-1");
             s_prop.setProperty(DATA_COPY_BUFFER_SIZE, "16384");
+            s_prop.setProperty(DATA_ATTRIBUTES_CACHE_LIFETIME, "60000");
             s_prop.setProperty(JOB_MONITOR_POLL_PERIOD, "1000");
             s_prop.setProperty(JOB_MONITOR_ERROR_THRESHOLD, "3");
             s_prop.setProperty(JOB_CONTROL_CHECK_AVAILABILITY, "false");
