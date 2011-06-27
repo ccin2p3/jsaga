@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.adaptor.security;
 
-import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityCredential;
@@ -12,7 +11,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.security.KeyStore;
-import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.*;
@@ -33,6 +31,10 @@ public class JKSSecurityAdaptor implements SecurityAdaptor {
 	protected static final String TRUSTSTORE = "Truststore";
 	protected static final String TRUSTSTORE_PASS = "TruststorePass";
 	protected static final String USER_ALIAS = "UserAlias";
+    private static final String JAVAX_NET_SSL_KEYSTORE = "javax.net.ssl.keyStore";
+    private static final String JAVAX_NET_SSL_KEYSTOREPASSWORD = "javax.net.ssl.keyStorePassword";
+    private static final String JAVAX_NET_SSL_TRUSTSTORE = "javax.net.ssl.trustStore";
+    private static final String JAVAX_NET_SSL_TRUSTSTOREPASSWORD = "javax.net.ssl.trustStorePassword";
 	
     public String getType() {
     	return "JKS";
@@ -63,8 +65,8 @@ public class JKSSecurityAdaptor implements SecurityAdaptor {
 			KeyStore keyStore = KeyStore.getInstance("jks");
 
 			// system properties as default values
-    		String keyStorePath = System.getProperty(EngineProperties.JAVAX_NET_SSL_KEYSTORE);
-    		String keyStorePass = System.getProperty(EngineProperties.JAVAX_NET_SSL_KEYSTOREPASSWORD);
+    		String keyStorePath = System.getProperty(JAVAX_NET_SSL_KEYSTORE);
+    		String keyStorePass = System.getProperty(JAVAX_NET_SSL_KEYSTOREPASSWORD);
     		// override by the adaptor config
     		if (attributes.containsKey(KEYSTORE)) 
 				keyStorePath = (String) attributes.get(KEYSTORE);
@@ -72,7 +74,7 @@ public class JKSSecurityAdaptor implements SecurityAdaptor {
     			keyStorePass = (String) attributes.get(KEYSTORE_PASS);
 
     		if (keyStorePath == null)
-    			throw new NoSuccessException("The property "+ EngineProperties.JAVAX_NET_SSL_KEYSTORE + " was not set.");
+    			throw new NoSuccessException("The property "+ JAVAX_NET_SSL_KEYSTORE + " was not set.");
     		
 			// get optional attributes
 			//String userPass = (String) attributes.get(KEYSTORE_PASS);
@@ -112,7 +114,7 @@ public class JKSSecurityAdaptor implements SecurityAdaptor {
 	    	}
 	    	
     		// load CA certs
-    		String trustStorePath = System.getProperty(EngineProperties.JAVAX_NET_SSL_TRUSTSTORE);
+    		String trustStorePath = System.getProperty(JAVAX_NET_SSL_TRUSTSTORE);
     		if (attributes.containsKey(TRUSTSTORE)) 
 				keyStorePath = (String) attributes.get(TRUSTSTORE);
 
@@ -121,7 +123,7 @@ public class JKSSecurityAdaptor implements SecurityAdaptor {
     			// private key and CA certs in the same file
     			trustStore = keyStore;
     		} else {
-        		String trustStorePass = System.getProperty(EngineProperties.JAVAX_NET_SSL_TRUSTSTOREPASSWORD);
+        		String trustStorePass = System.getProperty(JAVAX_NET_SSL_TRUSTSTOREPASSWORD);
         		if (attributes.containsKey(TRUSTSTORE_PASS)) 
     				keyStorePath = (String) attributes.get(TRUSTSTORE_PASS);
     			trustStore = KeyStore.getInstance("jks");
