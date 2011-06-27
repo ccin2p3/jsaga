@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 /* ***************************************************
@@ -29,6 +30,7 @@ import java.util.regex.Pattern;
 public abstract class AbstractURLImpl extends AbstractSagaObjectImpl implements URL {
 
     protected FileAttributes m_cache;
+    protected Date m_cache_creation_time;
 	
 	AbstractURLImpl() throws BadParameterException {
 	}
@@ -121,6 +123,7 @@ public abstract class AbstractURLImpl extends AbstractSagaObjectImpl implements 
 
     public void setCache(FileAttributes cache) {
         m_cache = cache;
+        this.m_cache_creation_time = new Date();
     }
 
     public FileAttributes getCache() {
@@ -128,7 +131,11 @@ public abstract class AbstractURLImpl extends AbstractSagaObjectImpl implements 
     }
 
     public boolean hasCache() {
-        return (m_cache != null);
+        //return (m_cache != null);
+    	if (this.m_cache == null) return false;
+    	// TODO use general config param
+    	if (System.currentTimeMillis() - this.m_cache_creation_time.getTime() > 60000) return false;
+    	return true;
     }
 
 
