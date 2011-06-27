@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl.url;
 
+import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.impl.AbstractSagaObjectImpl;
 import org.ogf.saga.SagaObject;
@@ -12,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 /* ***************************************************
@@ -29,6 +31,7 @@ import java.util.regex.Pattern;
 public abstract class AbstractURLImpl extends AbstractSagaObjectImpl implements URL {
 
     protected FileAttributes m_cache;
+    protected long m_cache_creation_time;
 	
 	AbstractURLImpl() throws BadParameterException {
 	}
@@ -121,6 +124,7 @@ public abstract class AbstractURLImpl extends AbstractSagaObjectImpl implements 
 
     public void setCache(FileAttributes cache) {
         m_cache = cache;
+        this.m_cache_creation_time = System.currentTimeMillis();
     }
 
     public FileAttributes getCache() {
@@ -128,7 +132,9 @@ public abstract class AbstractURLImpl extends AbstractSagaObjectImpl implements 
     }
 
     public boolean hasCache() {
-        return (m_cache != null);
+    	if (this.m_cache == null) return false;
+    	return (System.currentTimeMillis() - this.m_cache_creation_time
+    			< EngineProperties.getInteger(EngineProperties.DATA_ATTRIBUTES_CACHE_LIFETIME).longValue());
     }
 
 
