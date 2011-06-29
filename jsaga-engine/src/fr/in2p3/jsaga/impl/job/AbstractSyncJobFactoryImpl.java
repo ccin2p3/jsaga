@@ -79,7 +79,7 @@ public abstract class AbstractSyncJobFactoryImpl extends JobFactory implements S
             }
             for (Object o : attributes.entrySet()) {
                 Map.Entry attr = (Map.Entry) o;
-                translator.setAttribute(attr.getKey().toString(), attr.getValue().toString());
+                translator.setAttribute(""+attr.getKey(), ""+attr.getValue());
             }
 
             // create JobService
