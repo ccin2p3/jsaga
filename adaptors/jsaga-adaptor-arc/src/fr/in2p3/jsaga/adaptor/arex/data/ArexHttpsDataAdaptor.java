@@ -29,7 +29,7 @@ import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityCredential;
 * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
 * Date:   11 Jan 2011
 * ***************************************************
-* Description:                                      */
+* Description:                                      *
 
 public class ArexHttpsDataAdaptor extends HttpsDataAdaptorSocketBased implements FileWriterStreamFactory {
 
