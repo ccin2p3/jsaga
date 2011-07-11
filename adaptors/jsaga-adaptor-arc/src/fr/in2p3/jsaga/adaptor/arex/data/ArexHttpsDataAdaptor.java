@@ -30,9 +30,7 @@ import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityCredential;
 * Date:   11 Jan 2011
 * ***************************************************
 * Description:                                      */
-/**
- *
- */
+
 public class ArexHttpsDataAdaptor extends HttpsDataAdaptorSocketBased implements FileWriterStreamFactory {
 
     public String getType() {
