@@ -70,9 +70,7 @@ public class SubState {
             case RUNN_A:
                 return State.RUNNING;
             case R_POST:
-                //fixme: should return RUNNING instead of DONE
-                return State.DONE;
-
+                return State.RUNNING;
             case _DONE_:
                 return State.DONE;
             case CANCEL:
