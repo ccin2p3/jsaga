@@ -103,7 +103,7 @@ public class Holder implements DEREncodable {
         Enumeration e = ((ASN1Sequence) targets.getDERObject()).getObjects();
 
         while (e.hasMoreElements()) {
-            GeneralName gn = GeneralName.getInstance((ASN1TaggedObject) e.nextElement());
+            GeneralName gn = GeneralName.getInstance(e.nextElement());
 
             if (gn.getTagNo() == 4) {
                 try {
