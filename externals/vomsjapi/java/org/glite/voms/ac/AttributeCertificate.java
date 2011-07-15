@@ -227,7 +227,7 @@ public class AttributeCertificate implements DEREncodable {
         ASN1Sequence seq = (ASN1Sequence) acInfo.getIssuer().getIssuerName().getDERObject();
 
         for (Enumeration e = seq.getObjects(); e.hasMoreElements();) {
-            GeneralName gn = GeneralName.getInstance((ASN1TaggedObject) e.nextElement());
+            GeneralName gn = GeneralName.getInstance(e.nextElement());
 
             if (gn.getTagNo() == 4) {
                 return Util.generalNameToX509Name(gn);
@@ -249,7 +249,7 @@ public class AttributeCertificate implements DEREncodable {
         ASN1Sequence seq = (ASN1Sequence) acInfo.getIssuer().getIssuerName().getDERObject();
 
         for (Enumeration e = seq.getObjects(); e.hasMoreElements();) {
-            GeneralName gn = GeneralName.getInstance((ASN1TaggedObject) e.nextElement());
+            GeneralName gn = GeneralName.getInstance(e.nextElement());
 
             if (gn.getTagNo() == 4) {
                 return Util.generalNameToX500Name(gn);
@@ -271,7 +271,7 @@ public class AttributeCertificate implements DEREncodable {
         GeneralNames gns = acInfo.getHolder().getIssuer();
 
         for (Enumeration e = ((ASN1Sequence)gns.getDERObject()).getObjects(); e.hasMoreElements();) {
-            GeneralName gn = GeneralName.getInstance((ASN1TaggedObject) e.nextElement());
+            GeneralName gn = GeneralName.getInstance(e.nextElement());
 
             if (gn.getTagNo() == 4) {
                 X509Principal principal = Util.generalNameToX509Name(gn);
