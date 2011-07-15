@@ -1,23 +1,12 @@
 package fr.in2p3.jsaga.command;
 
-import java.util.regex.Pattern;
-
-import fr.in2p3.jsaga.EngineProperties;
-import fr.in2p3.jsaga.engine.session.SessionConfiguration;
-import fr.in2p3.jsaga.impl.SagaFactoryImpl;
-import fr.in2p3.jsaga.impl.context.ConfiguredContext;
-import fr.in2p3.jsaga.impl.context.ConfigurableContextFactory;
-import fr.in2p3.jsaga.impl.context.ContextFactoryImpl;
-import fr.in2p3.jsaga.impl.context.ContextImpl;
-import fr.in2p3.jsaga.impl.session.SessionImpl;
+import fr.in2p3.jsaga.impl.context.*;
 import org.apache.commons.cli.*;
 import org.ogf.saga.context.Context;
-import org.ogf.saga.context.ContextFactory;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.SagaException;
 import org.ogf.saga.session.Session;
 import org.ogf.saga.session.SessionFactory;
-import org.ogf.saga.url.URLFactory;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***

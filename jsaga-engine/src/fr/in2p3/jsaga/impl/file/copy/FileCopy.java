@@ -1,12 +1,12 @@
 package fr.in2p3.jsaga.impl.file.copy;
 
+import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyDelegated;
 import fr.in2p3.jsaga.adaptor.data.read.FileReader;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderGetter;
-import fr.in2p3.jsaga.impl.SagaFactoryImpl;
 import fr.in2p3.jsaga.impl.file.AbstractSyncFileImpl;
 import fr.in2p3.jsaga.impl.namespace.FlagsHelper;
 import fr.in2p3.jsaga.impl.namespace.JSAGAFlags;
@@ -32,7 +32,7 @@ import java.io.IOException;
  *
  */
 public class FileCopy {
-    private static final String JSAGA_FACTORY = SagaFactoryImpl.class.getName();
+    private static final String JSAGA_FACTORY = Base.getSagaFactory();
 
     private static final int DEFAULT_BUFFER_SIZE = 16384;
     private Session m_session;

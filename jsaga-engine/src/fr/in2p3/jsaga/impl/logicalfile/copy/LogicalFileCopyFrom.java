@@ -1,10 +1,10 @@
 package fr.in2p3.jsaga.impl.logicalfile.copy;
 
+import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.data.DataAdaptor;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopy;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataCopyDelegated;
 import fr.in2p3.jsaga.adaptor.data.write.LogicalWriter;
-import fr.in2p3.jsaga.impl.SagaFactoryImpl;
 import fr.in2p3.jsaga.impl.logicalfile.AbstractSyncLogicalFileImpl;
 import fr.in2p3.jsaga.impl.namespace.FlagsHelper;
 import fr.in2p3.jsaga.impl.namespace.JSAGAFlags;
@@ -30,7 +30,7 @@ import java.util.List;
  *
  */
 public class LogicalFileCopyFrom {
-    private static final String JSAGA_FACTORY = SagaFactoryImpl.class.getName();
+    private static final String JSAGA_FACTORY = Base.getSagaFactory();
 
     private Session m_session;
     private AbstractSyncLogicalFileImpl m_targetFile;

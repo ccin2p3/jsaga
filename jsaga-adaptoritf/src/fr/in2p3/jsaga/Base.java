@@ -15,6 +15,17 @@ import java.io.File;
  *
  */
 public class Base {
+    private static String s_sagaFactory = "fr.in2p3.jsaga.impl.SagaFactoryImpl";
+    private static boolean s_used = false;
+    public static String getSagaFactory() {
+        if(!s_used) s_used=true;
+        return s_sagaFactory;
+    }
+    public static void setSagaFactory(String sagaFactoryClassName) {
+        if(s_used) throw new RuntimeException("Can not change JSAGA factory name because a SAGA object was already created");
+        s_sagaFactory = sagaFactoryClassName;
+    }
+
     public static final File JSAGA_HOME =
             System.getProperty("JSAGA_HOME")!=null
                     ? new File(System.getProperty("JSAGA_HOME"))

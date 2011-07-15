@@ -1,10 +1,10 @@
 package fr.in2p3.jsaga.impl.context;
 
+import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.engine.config.ConfigurationException;
 import fr.in2p3.jsaga.engine.session.SessionConfiguration;
 import fr.in2p3.jsaga.generated.session.Attribute;
-import fr.in2p3.jsaga.impl.SagaFactoryImpl;
 import org.ogf.saga.context.Context;
 import org.ogf.saga.context.ContextFactory;
 import org.ogf.saga.error.*;
@@ -20,7 +20,7 @@ import org.ogf.saga.error.*;
 * Description:                                      */
 
 public class ConfigurableContextFactory {
-    private static final String JSAGA_FACTORY = SagaFactoryImpl.class.getName();
+    private static final String JSAGA_FACTORY = Base.getSagaFactory();
 
     public static Context[] getContextsOfDefaultSession() throws IncorrectStateException, TimeoutException, NoSuccessException {
         SessionConfiguration cfg = new SessionConfiguration(EngineProperties.getURL(EngineProperties.JSAGA_DEFAULT_CONTEXTS));

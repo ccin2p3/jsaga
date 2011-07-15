@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.adaptor;
 
+import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import org.ogf.saga.error.IncorrectStateException;
@@ -19,7 +20,7 @@ import java.util.Map;
  *
  */
 public interface Adaptor {
-    public static final String JSAGA_FACTORY = "fr.in2p3.jsaga.impl.SagaFactoryImpl";
+    public static final String JSAGA_FACTORY = Base.getSagaFactory();
 
     /**
      * @return the adaptor type (context type, data protocol or job protocol).
