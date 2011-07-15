@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.impl;
 
+import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.EngineProperties;
 import fr.in2p3.jsaga.engine.config.TimeoutConfiguration;
 import org.ogf.saga.SagaObject;
@@ -22,7 +23,7 @@ import java.util.UUID;
  *
  */
 public abstract class AbstractSagaObjectImpl implements SagaObject {
-    protected static final String JSAGA_FACTORY = SagaFactoryImpl.class.getName();
+    protected static final String JSAGA_FACTORY = Base.getSagaFactory();
 
     protected Session m_session;
     private UUID m_uuid;

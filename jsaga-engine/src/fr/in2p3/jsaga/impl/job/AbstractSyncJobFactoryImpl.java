@@ -1,12 +1,12 @@
 package fr.in2p3.jsaga.impl.job;
 
+import fr.in2p3.jsaga.Base;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import fr.in2p3.jsaga.engine.factories.JobAdaptorFactory;
 import fr.in2p3.jsaga.engine.factories.JobMonitorAdaptorFactory;
 import fr.in2p3.jsaga.engine.job.monitor.JobMonitorService;
-import fr.in2p3.jsaga.impl.SagaFactoryImpl;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import fr.in2p3.jsaga.impl.job.description.SAGAJobDescriptionImpl;
 import fr.in2p3.jsaga.impl.job.service.JobServiceImpl;
@@ -32,7 +32,7 @@ import java.util.Map;
  *
  */
 public abstract class AbstractSyncJobFactoryImpl extends JobFactory implements SyncJobFactory {
-    protected static final String JSAGA_FACTORY = SagaFactoryImpl.class.getName();
+    protected static final String JSAGA_FACTORY = Base.getSagaFactory();
 
     private JobAdaptorFactory m_adaptorFactory;
     private JobMonitorAdaptorFactory m_monitorAdaptorFactory;

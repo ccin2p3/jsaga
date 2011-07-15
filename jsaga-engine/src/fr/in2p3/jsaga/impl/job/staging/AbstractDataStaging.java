@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.impl.job.staging;
 
-import fr.in2p3.jsaga.impl.SagaFactoryImpl;
+import fr.in2p3.jsaga.Base;
 import org.ogf.saga.url.URL;
 
 /* ***************************************************
@@ -16,7 +16,7 @@ import org.ogf.saga.url.URL;
  *
  */
 public abstract class AbstractDataStaging {
-    protected static final String JSAGA_FACTORY = SagaFactoryImpl.class.getName();
+    protected static final String JSAGA_FACTORY = Base.getSagaFactory();
     protected static final boolean INPUT = true;
     protected static final boolean OUTPUT = false;
 

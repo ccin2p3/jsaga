@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga;
 
-import fr.in2p3.jsaga.impl.SagaFactoryImpl;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
@@ -17,7 +16,7 @@ import org.ogf.saga.url.URLFactory;
  *
  */
 public class uri {
-    private static final String JSAGA_FACTORY = SagaFactoryImpl.class.getName();
+    private static final String JSAGA_FACTORY = Base.getSagaFactory();
 
     public static String protocol(String uri) throws Exception {
         return URLFactory.createURL(JSAGA_FACTORY, uri).getScheme();

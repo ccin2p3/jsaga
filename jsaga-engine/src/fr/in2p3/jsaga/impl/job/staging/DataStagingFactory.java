@@ -1,6 +1,6 @@
 package fr.in2p3.jsaga.impl.job.staging;
 
-import fr.in2p3.jsaga.impl.SagaFactoryImpl;
+import fr.in2p3.jsaga.Base;
 import org.ogf.saga.error.*;
 import org.ogf.saga.job.JobDescription;
 import org.ogf.saga.url.URL;
@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
  *
  */
 public class DataStagingFactory {
-    private static final String JSAGA_FACTORY = SagaFactoryImpl.class.getName();
+    private static final String JSAGA_FACTORY = Base.getSagaFactory();
     private static final Pattern PATTERN = Pattern.compile("([^<>]*) *(>>|>|<<|<) *([^<>]*)");
 
     public static AbstractDataStaging create(String fileTransfer) throws NotImplementedException, BadParameterException, NoSuccessException {
