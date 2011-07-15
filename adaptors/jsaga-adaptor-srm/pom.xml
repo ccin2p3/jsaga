@@ -95,7 +95,6 @@
 			<groupId>org.globus</groupId>
 			<artifactId>cog-url</artifactId>
 			<version>1.4</version>
-			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
