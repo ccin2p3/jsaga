@@ -38,7 +38,7 @@ public class SRM11DataAdaptor extends SRMDataAdaptorAbstract implements DataAdap
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         super.connect(userInfo, host, port, basePath, attributes);
         try {
-            URL serviceUrl = new URL(SERVICE_PROTOCOL, host, port, SERVICE_PATH);
+            URL serviceUrl = new URL(SERVICE_PROTOCOL, host, port, SERVICE_PATH, new org.globus.net.protocol.httpg.Handler()); //workaround for using HTTPG in tomcat or OGSi containers
             SRMServerV1Locator service = new SRMServerV1Locator(s_provider);
             m_stub = service.getISRM(serviceUrl);
             // set security
