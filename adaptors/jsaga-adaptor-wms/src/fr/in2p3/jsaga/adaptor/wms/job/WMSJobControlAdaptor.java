@@ -3,7 +3,6 @@ package fr.in2p3.jsaga.adaptor.wms.job;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.net.URL;
 import java.rmi.RemoteException;
 import java.security.PrivateKey;
@@ -19,10 +18,21 @@ import org.glite.jdl.AdParser;
 import org.glite.jdl.JobAdException;
 import org.glite.security.delegation.GrDPConstants;
 import org.glite.security.delegation.GrDPX509Util;
-import org.glite.wms.wmproxy.*;
+import org.glite.wms.wmproxy.AuthenticationFaultType;
+import org.glite.wms.wmproxy.AuthorizationFaultType;
+import org.glite.wms.wmproxy.BaseFaultType;
+import org.glite.wms.wmproxy.GenericFaultType;
+import org.glite.wms.wmproxy.InvalidArgumentFaultType;
+import org.glite.wms.wmproxy.JdlType;
+import org.glite.wms.wmproxy.NoSuitableResourcesFaultType;
+import org.glite.wms.wmproxy.ServerOverloadedFaultType;
+import org.glite.wms.wmproxy.StringAndLongList;
+import org.glite.wms.wmproxy.StringAndLongType;
+import org.glite.wms.wmproxy.StringList;
+import org.glite.wms.wmproxy.WMProxyLocator;
+import org.glite.wms.wmproxy.WMProxy_PortType;
 import org.globus.axis.gsi.GSIConstants;
 import org.globus.axis.transport.HTTPSSender;
-import org.globus.ftp.GridFTPClient;
 import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.TrustedCertificates;
 import org.globus.gsi.bc.BouncyCastleCertProcessingFactory;
@@ -51,8 +61,6 @@ import fr.in2p3.jsaga.adaptor.job.JobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
-import fr.in2p3.jsaga.adaptor.job.control.interactive.StreamableJobBatch;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingJobAdaptorTwoPhase;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
@@ -173,6 +181,8 @@ public class WMSJobControlAdaptor extends WMSJobAdaptorAbstract
 
             BouncyCastleCertProcessingFactory factory = BouncyCastleCertProcessingFactory.getDefault();
 
+            //FIXME (Jerome): We cannot mix proxy types. If the provided user certificate is not a GSI_2_PROXY, it will fail at some point server side I guess.
+            // We must detect the user proxy type and then generate the new one accordingly.
             X509Certificate certificate = factory.createCertificate(new ByteArrayInputStream(GrDPX509Util.readPEM(
                     new ByteArrayInputStream(certReq.getBytes()), GrDPConstants.CRH,
                     GrDPConstants.CRF)), userCerts[0], key, 12 * 3600, GSIConstants.GSI_2_PROXY); //12 hours proxy
