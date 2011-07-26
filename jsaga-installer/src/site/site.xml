@@ -30,7 +30,7 @@
             <item name="SAGA Java Binding API" href="saga-apidocs/index.html"/>
             <item name="Code Examples" href="jsaga-engine/xref/fr/in2p3/jsaga/command/package-summary.html"/>
             <item name="Deviations from SAGA" href="SAGA-delta.html"/>
-            <item name="Wiki" href="https://forge.in2p3.fr/wiki/jsaga"/>
+            <item name="Wiki" href="https://forge.in2p3.fr/projects/jsaga/wiki"/>
             <item name="FAQ" href="users-faq.html"/>
             <item name="Forum" href="https://forge.in2p3.fr/projects/jsaga/boards/show/11"/>
         </menu>
