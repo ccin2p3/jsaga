@@ -4,7 +4,7 @@
   <parent>
     <artifactId>adaptors</artifactId>
     <groupId>fr.in2p3.jsaga.adaptor</groupId>
-    <version>0.9.14-SNAPSHOT</version>
+    <version>0.9.14</version>
   </parent>
   <groupId>fr.in2p3.jsaga.adaptor</groupId>
   <artifactId>jsaga-adaptor-batchssh</artifactId>
@@ -43,7 +43,7 @@
 		<dependency><!-- needed for security context -->
 			<groupId>fr.in2p3.jsaga.adaptor</groupId>
 			<artifactId>jsaga-adaptor-ssh</artifactId>
-			<version>0.9.14-SNAPSHOT</version>
+			<version>0.9.14</version>
 			<scope>runtime</scope>
 		</dependency>
     <dependency>
