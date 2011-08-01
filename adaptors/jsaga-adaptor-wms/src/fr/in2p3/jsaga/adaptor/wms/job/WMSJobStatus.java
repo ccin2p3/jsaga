@@ -45,11 +45,9 @@ public class WMSJobStatus extends JobStatus {
             // The job is running
             return SubState.RUNNING_ACTIVE; }
         else if(jobState.equals(StatName._DONE)) {
-            // The job has finished, but Output Sandbox has not been transfered yet...
-        	// As RUNNING_POST_STAGING is now mapped to SAGA state RUNNING, we now send DONE otherwise
-        	// The job will never finish
-            // return SubState.RUNNING_POST_STAGING; }
-        	return SubState.DONE; }
+            // This state will be mapped to DONE anyway, but this SubState
+            // enable the user to know that post-staging is still on-going
+            return SubState.RUNNING_POST_STAGING; }
 
     	else if(jobState.equals(StatName._ABORTED))  {
             // The job has been aborted by the WMS (e.g. because it was too long, or the proxy certificated expired, etc.)

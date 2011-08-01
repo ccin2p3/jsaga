@@ -70,7 +70,9 @@ public class SubState {
             case RUNN_A:
                 return State.RUNNING;
             case R_POST:
-                return State.RUNNING;
+                // job is considered as DONE by JSAGA engine, but some
+                // users may need to now that post-staging is still on-going.
+                return State.DONE;
             case _DONE_:
                 return State.DONE;
             case CANCEL:
