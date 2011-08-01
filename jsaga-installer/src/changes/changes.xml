@@ -3,7 +3,7 @@
         <title>JSAGA Release Notes</title>
     </properties>
     <body>
-        <release version="0.9.14-SNAPSHOT" description="Compatible with SAGA Java Binding v1.1.1">
+        <release version="0.9.14" date="2011-08-01" description="Compatible with SAGA Java Binding v1.1.1">
             <action dev="sreynaud" type="update">Upgrade saga-api to version 1.1.1 (enable simultaneous usage of multiple SAGA implementations)</action>
             <action dev="lschwarz" type="update">the unique ID given by JSAGA to the Job plug-in has changed. It is now composed of digits and '-'.</action>
             <action dev="lschwarz" type="update">Added configuration attribute "data.attributes.cache.lifetime"</action>
