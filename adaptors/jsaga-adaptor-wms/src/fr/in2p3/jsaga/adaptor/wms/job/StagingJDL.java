@@ -69,13 +69,24 @@ public class StagingJDL {
     public StagingTransfer[] getOutputStagingTransfers(StringAndLongType[] files) {
         try {
             ListExpr output = (ListExpr) findExpr(m_expr, LIST_OUTPUT);
-            StagingTransfer[] transfers = new StagingTransfer[output.size()];
-            for (int i=0; i<output.size(); i++) {
-                RecordExpr r = (RecordExpr) output.sub(i);
-                String from = files[i].getName();
-                String to = getValue(r,VALUE_TO);
-                boolean append = Boolean.parseBoolean(getValue(r,VALUE_APPEND));
-                transfers[i] = new StagingTransfer(from, to, append);
+            StagingTransfer[] transfers = new StagingTransfer[files.length];
+            for (int i=0; i<files.length; i++) {
+            	boolean found = false;
+            	for (int j = 0; j < output.size(); j++) {
+            		RecordExpr r = (RecordExpr) output.sub(j);
+            		String from = getValue(r,VALUE_FROM);
+                	String filename = from.split(SANDBOX_BASE_URI)[1];
+                	if(files[i].getName().endsWith("/output/"+filename)){
+                		String to = getValue(r,VALUE_TO);
+                        boolean append = Boolean.parseBoolean(getValue(r,VALUE_APPEND));
+                        transfers[i] = new StagingTransfer(files[i].getName(), to, append);
+                        found = true;
+                        break;
+                	}
+				}
+            	if(!found){
+            		//TODO: log? Is it really possible?
+            	}
             }
             return transfers;
         } catch (DoesNotExistException e) {
