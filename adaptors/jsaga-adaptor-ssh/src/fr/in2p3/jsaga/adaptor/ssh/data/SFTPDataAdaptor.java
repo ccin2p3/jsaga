@@ -108,11 +108,14 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 			if (vv != null && vv.size() > 2) {
 				// remove . and .. in the list
 				FileAttributes[] list = new SFTPFileAttributes[vv.size() - 2];
-				for (int ii = 2; ii < vv.size(); ii++) {
+				int index=0;
+				for (int ii = 0; ii < vv.size(); ii++) {
 					Object obj = vv.elementAt(ii);
 					if (obj instanceof LsEntry) {
                         LsEntry entry = (LsEntry) obj;
-                        list[ii - 2] = new SFTPFileAttributes(entry.getFilename(), entry.getAttrs());
+                        if (!".".equals(entry.getFilename()) && !"..".equals(entry.getFilename())) {
+                        	list[index++] = new SFTPFileAttributes(entry.getFilename(), entry.getAttrs());
+                        }
 					}
 				}
 				return list;
