@@ -58,8 +58,11 @@ public class AbsoluteURLImpl extends AbstractURLImpl implements URL {
         if (url != "" && ! Pattern.matches(ABSOLUTE_URL_REGEXP, url)) {
     		throw new BadParameterException("URL must be absolute");
     	}
+        /* the full URL is encoded , but in case of non local schemes
+         * only the part before '?' or before '#' is encoded
+         */
         String encodedUrl = (URLHelper.startsWithLocalScheme(url))
-                ? URLEncoder.encodePathOnly(url)
+                ? URLEncoder.encodeUrlNoQueryNoFragment(url)
                 : URLEncoder.encode(url);
         try {
             u = new URI(encodedUrl);
