@@ -15,20 +15,28 @@ import java.net.URI;
  *
  */
 public class URLEncoder {
+	
+	/* this method is called on a full URL 
+	 * Only the part before ? (query separator) or # (fragment separator) is encoded
+	 * 
+	 */
     static String encode(String url) {
         int query, fragment;
         if ((query=url.lastIndexOf('?')) > -1) {
-            return encodePathOnly(url.substring(0,query)) + url.substring(query);
+            return encodeUrlNoQueryNoFragment(url.substring(0,query)) + url.substring(query);
         } else if ((fragment=url.lastIndexOf('#')) > -1) {
-            return encodePathOnly(url.substring(0,fragment)) + url.substring(fragment);
+            return encodeUrlNoQueryNoFragment(url.substring(0,fragment)) + url.substring(fragment);
         } else {
-            return encodePathOnly(url);
+            return encodeUrlNoQueryNoFragment(url);
         }
     }
 
-    static String encodePathOnly(String path) {
+    /* This method encodes a URL with no query and no fragment
+     * Thus ? and # are encoded
+     */
+    static String encodeUrlNoQueryNoFragment(String url) {
         StringBuffer buffer = new StringBuffer();
-        char[] array = path.toCharArray();
+        char[] array = url.toCharArray();
         for (int i=0; i<array.length; i++) {
             char c = array[i];
             if (c < 128) {      // ASCII
@@ -52,11 +60,11 @@ public class URLEncoder {
     }
 
     /**
-     * This is specific for file: scheme where we can support additional charachers as ':' ...
+     * This is specific for filenames where we can support additional charachers as ':' ...
      * @param path
      * @return
      */
-    /*static String encodeFilePathOnly(String path) {
+    public static String encodePathOnly(String path) {
         StringBuffer buffer = new StringBuffer();
         char[] array = path.toCharArray();
         for (int i=0; i<array.length; i++) {
@@ -79,7 +87,8 @@ public class URLEncoder {
             }
         }
         return buffer.toString();
-    }*/
+    }
+    
     private static boolean isIllegalASCII(char c) {
         if (c <= 32) {
             return true;
@@ -98,11 +107,14 @@ public class URLEncoder {
             }
         }
     }
-    /*
+    
+    /* same as isIllegalASCII but additional characters are encoded for filenames as ':'
+     * 
+     */
     private static boolean isReservedASCII(char c) {
     	if (isIllegalASCII(c)) return true;
         switch(c) {
-            // additional reserved characters for file: scheme
+            // additional reserved characters for filenames
             case ':':
                 return true;
             // other characters
@@ -110,7 +122,7 @@ public class URLEncoder {
                 return isIllegalASCII(c);
         }
     }
-    */
+    
     private static boolean isEncodedQuestionMark(char[] array, int pos) {
         return pos+2<array.length && array[pos+1]=='3' && array[pos+2]=='F';
     }
