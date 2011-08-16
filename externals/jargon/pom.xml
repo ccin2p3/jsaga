@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.sdsc.grid</groupId>
     <artifactId>jargon</artifactId>
-    <version>2.0.5</version>
+    <version>2.5</version>
     <name>Java Api for Rules, Grids, and Online Networks</name>
     <description>Java API for accessing SRB and iRODS servers.</description>
     <url>http://www.sdsc.edu/srb/jargon/</url>
