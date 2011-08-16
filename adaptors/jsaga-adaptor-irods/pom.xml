@@ -21,6 +21,15 @@
             </properties>
         </developer>
     </developers>
+    <!-- uncomment when the new API jargon-core will become stable: https://code.renci.org/gf/project/jargon/
+	<repositories>
+		<repository>
+			<id>renci.releases</id>
+			<name>RENCI</name>
+			<url>https://ci-dev.renci.org/nexus/content/repositories/releases</url>
+		</repository>
+	</repositories>
+	-->
     <dependencies>
         <dependency><!-- for security context (WARNING: order of dependencies matters) -->
             <groupId>fr.in2p3.jsaga.adaptor</groupId>
@@ -31,7 +40,17 @@
 		<dependency>
 			<groupId>edu.sdsc.grid</groupId>
 			<artifactId>jargon</artifactId>
-			<version>2.0.5</version>
+			<version>2.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.6.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.6.1</version>
 		</dependency>
     </dependencies>
 </project>
