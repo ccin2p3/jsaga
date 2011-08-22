@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
+    <session>
+        <context type="JKS" id="Demo">
+            <attribute name="Keystore" value="${user.home}/.jsaga/contexts/unicore6/demouser.jks"/>
+            <attribute name="KeystorePass" value="the!user"/>
+
+            <data type="unicore"/>
+
+            <include host="localhost6"/>
+            <exclude host="localhost6" domain="de"/>
+        </context>
+        <context type="JKS" id="DGrid">
+            <attribute name="Keystore" value="${user.home}/.jsaga/contexts/d-grid/usercert.jks"/>
+            <attribute name="KeystorePass" value="changeit"/>
+            <attribute name="UserAlias" value="CERT"/>
+            <attribute name="UserPass" value="changeit"/>
+
+            <data type="unicore"/>
+
+            <include domain="de"/>
+        </context>
+    </session>
+</jsaga-default>
