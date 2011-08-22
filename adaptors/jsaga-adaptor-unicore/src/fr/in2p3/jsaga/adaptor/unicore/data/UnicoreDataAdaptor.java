@@ -36,8 +36,7 @@ import java.util.*;
  *
  */
 public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPutter, FileReaderGetter {
-    private static Logger s_logger = Logger.getLogger(UnicoreDataAdaptor.class);
-	private String m_serverFileSeparator ;
+    private String m_serverFileSeparator ;
 	private StorageClient m_client;
     private String rootDirectory = ".";
     public String getType() {
@@ -78,9 +77,6 @@ public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPut
     }
     
     public boolean exists(String absolutePath, String additionalArgs) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-    	// prepare path
-    	//absolutePath = getEntryPath(absolutePath);
-		// if absolutePath is the root
 		if(absolutePath.equals(rootDirectory)) {
 			return true;
 		}
@@ -96,8 +92,6 @@ public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPut
     }
 
     public FileAttributes getAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-        //prepare path and connection
-        //absolutePath = getEntryPath(absolutePath);
 		try {
 			GridFileType gft = m_client.listProperties(absolutePath);
 			return new UnicoreFileAttributes(gft, m_serverFileSeparator);
@@ -110,8 +104,6 @@ public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPut
     }
 
     public FileAttributes[] listAttributes(String absolutePath, String additionalArgs) throws PermissionDeniedException, DoesNotExistException, TimeoutException, NoSuccessException {
-    	// prepare path
-    	//absolutePath = getEntryPath(absolutePath);
     	try {
     		GridFileType[] _list = m_client.listDirectory(absolutePath);
         	FileAttributes[] attrs = new FileAttributes[_list.length];
@@ -146,12 +138,10 @@ public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPut
     }
     
     public void removeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-    	// prepare path
 		delete(parentAbsolutePath + directoryName) ;
     }
 
     public void removeFile(String parentAbsolutePath, String fileName, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
-    	//prepare path
 		delete(parentAbsolutePath + fileName);
     }
 
