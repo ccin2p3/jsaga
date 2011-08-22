@@ -119,11 +119,13 @@ public class JKSSecurityAdaptor implements SecurityAdaptor {
 				keyStorePath = (String) attributes.get(TRUSTSTORE);
 
     		KeyStore trustStore;
+    		String trustStorePass;
     		if (keyStorePath.equals(trustStorePath)) {
     			// private key and CA certs in the same file
     			trustStore = keyStore;
+    			trustStorePass = keyStorePass;
     		} else {
-        		String trustStorePass = System.getProperty(JAVAX_NET_SSL_TRUSTSTOREPASSWORD);
+        		trustStorePass = System.getProperty(JAVAX_NET_SSL_TRUSTSTOREPASSWORD);
         		if (attributes.containsKey(TRUSTSTORE_PASS)) 
     				keyStorePath = (String) attributes.get(TRUSTSTORE_PASS);
     			trustStore = KeyStore.getInstance("jks");
@@ -134,11 +136,13 @@ public class JKSSecurityAdaptor implements SecurityAdaptor {
     			} else {
     				// first try $JAVA_HOME/lib/security/jssecacerts
 	    	        try {
-	    	        	f = new File(System.getProperty("java.home")+"/lib/security/jssecacerts");
+	    	        	trustStorePath = System.getProperty("java.home")+"/lib/security/jssecacerts";
+	    	        	f = new File(trustStorePath);
 	    	        	trustStore.load(new FileInputStream(f), password);
 	    	        } catch (FileNotFoundException fnfe) {
 	    				// then try $JAVA_HOME/lib/security/cacerts
-	    	        	f = new File(System.getProperty("java.home")+"/lib/security/cacerts");
+	    	        	trustStorePath = System.getProperty("java.home")+"/lib/security/cacerts";
+	    	        	f = new File(trustStorePath);
 	    	        	trustStore.load(new FileInputStream(f), password);
 	    	        }
     			}
@@ -160,8 +164,11 @@ public class JKSSecurityAdaptor implements SecurityAdaptor {
 	    	for (int i = 0; i < certificates.length; i++) {
 	    		certificates[i] = (X509Certificate) loadCerts.get(i);
 			}
-
-	        return new JKSSecurityCredential(keyStore, keyStorePass, alias, userPass, certificates);
+	    	JKSSecurityCredential jks_sc = new JKSSecurityCredential(keyStore, keyStorePass, alias, userPass, certificates);
+	    	jks_sc.setKeyStorePath(keyStorePath);
+	    	jks_sc.setTrustStorePath(trustStorePath);
+	    	jks_sc.setTrustStorePass(trustStorePass);
+	        return jks_sc;
     	}
     	catch (Exception e) {
     		throw new NoSuccessException(e);

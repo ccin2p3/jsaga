@@ -66,12 +66,13 @@ public class UnicoreAbstract {
     	m_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_CLIENTAUTH, "true");
 		
         //keystore and truststore locations
-		// TODO get JKS filename
-    	m_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_KEYSTORE, "/home/schwarz/.jsaga/contexts/unicore6/demouser.jks");
-    	m_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_KEYPASS, "the!user");
-    	m_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_KEYALIAS, "demo user");
-    	m_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_TRUSTSTORE, "/home/schwarz/.jsaga/contexts/unicore6/demouser.jks");
-    	m_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_TRUSTPASS, "the!user");
+    	m_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_KEYSTORE, m_credential.getKeyStorePath());
+    	m_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_KEYPASS, m_credential.getKeyStorePass());
+    	m_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_KEYALIAS, m_credential.getKeyStoreAlias());
+    	m_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_TRUSTSTORE, m_credential.getTrustStorePath());
+    	if (m_credential.getTrustStorePass() != null) {
+    		m_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_TRUSTPASS, m_credential.getTrustStorePass());
+    	}
 
 	    m_epr = EndpointReferenceType.Factory.newInstance();
 	    m_epr.addNewAddress().setStringValue(m_serverUrl);

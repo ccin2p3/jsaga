@@ -16,7 +16,10 @@ import java.security.cert.X509Certificate;
 public class JKSSecurityCredential extends X509SecurityCredential {
 
 	private X509Certificate[] caCertificates;
-
+	private String m_keyStorePath;
+	private String m_trustStorePath;
+	private String m_trustStorePass;
+	
     public JKSSecurityCredential(KeyStore keyStore, String keyStorePass, String userAlias, String userPass, X509Certificate[] caCertificates) throws Exception {
         super(keyStore, keyStorePass, userAlias, userPass);
         this.caCertificates = caCertificates;
@@ -25,4 +28,29 @@ public class JKSSecurityCredential extends X509SecurityCredential {
     public X509Certificate[] getCaCertificates() {
 		return caCertificates;
 	}
+
+	public void setKeyStorePath(String m_keyStorePath) {
+		this.m_keyStorePath = m_keyStorePath;
+	}
+
+	public String getKeyStorePath() {
+		return m_keyStorePath;
+	}
+
+	public void setTrustStorePath(String m_trustStorePath) {
+		this.m_trustStorePath = m_trustStorePath;
+	}
+
+	public String getTrustStorePath() {
+		return m_trustStorePath;
+	}
+
+	public void setTrustStorePass(String m_trustStorePass) {
+		this.m_trustStorePass = m_trustStorePass;
+	}
+
+	public String getTrustStorePass() {
+		return m_trustStorePass;
+	}
+   
 }

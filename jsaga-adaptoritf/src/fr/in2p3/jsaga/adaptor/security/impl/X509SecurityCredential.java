@@ -31,13 +31,17 @@ public class X509SecurityCredential implements SecurityCredential {
     private PrivateKey privateKey;
     private X509Certificate certificate;
 	private static final DateFormat DF = new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss");
-
+	private String m_keyStorePass;
+	private String m_KeyStoreAlias;
+	
     public X509SecurityCredential(KeyStore keyStore, String keyStorePass, String userAlias, String userPass) throws Exception {
         KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         keyManagerFactory.init(keyStore, keyStorePass.toCharArray());
         keyManager = keyManagerFactory.getKeyManagers();
         privateKey = (PrivateKey) keyStore.getKey(userAlias, userPass.toCharArray());
         certificate = (X509Certificate) keyStore.getCertificate(userAlias);
+		this.m_KeyStoreAlias = userAlias;
+		this.m_keyStorePass = keyStorePass;
     }
 
     public KeyManager[] getKeyManager() {
@@ -92,5 +96,13 @@ public class X509SecurityCredential implements SecurityCredential {
 	
 	public String getUserID() {
 		return certificate.getSubjectDN().getName();
+	}
+
+	public String getKeyStorePass() {
+		return m_keyStorePass;
+	}
+
+	public String getKeyStoreAlias() {
+		return m_KeyStoreAlias;
 	}
 }
