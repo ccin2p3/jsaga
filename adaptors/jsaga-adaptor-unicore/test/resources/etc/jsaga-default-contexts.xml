@@ -5,7 +5,9 @@
             <attribute name="Keystore" value="${user.home}/.jsaga/contexts/unicore6/demouser.jks"/>
             <attribute name="KeystorePass" value="the!user"/>
 
-            <data type="unicore"/>
+            <data type="unicore">
+            	<attribute name="Res" value="82ee2a6d-ed73-4d3b-b299-56b114f0919f"/>
+            </data>
 
             <include host="localhost6"/>
             <exclude host="localhost6" domain="de"/>
