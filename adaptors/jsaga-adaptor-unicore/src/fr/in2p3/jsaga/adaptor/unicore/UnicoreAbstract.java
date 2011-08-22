@@ -30,9 +30,11 @@ import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityCredential;
 
 public class UnicoreAbstract {
 
+	// TODO remove APPLICATION_NAME
 	protected static final String APPLICATION_NAME = "ApplicationName";
 	protected static final String SERVICE_NAME = "ServiceName";
-	protected static final String RES = "res";
+	protected static final String RES = "Res";
+	protected static final String TARGET = "Target";
 	protected String m_serviceName;
 	protected String m_applicationName;
 	protected String m_res;
@@ -61,9 +63,8 @@ public class UnicoreAbstract {
 		m_serviceName = (String) attributes.get(SERVICE_NAME);
     	m_res = (String) attributes.get(RES);
     	
-    	// build URL like https://<HOST>:<PORT>/<SITE>/services/<SERVICE_NAME>?res=<RES>
-    	//m_serverUrl = "https://"+host+":"+port+"/DEMO-SITE/services/StorageFactory?res=default_storage_factory";
-    	m_serverUrl = "https://"+host+":"+port+"/DEMO-SITE/services/StorageManagement?res=82ee2a6d-ed73-4d3b-b299-56b114f0919f";
+    	// build URL like https://<HOST>:<PORT>/<TARGET>/services/<SERVICE_NAME>?res=<RES>
+    	m_serverUrl = "https://"+host+":"+port+"/"+(String) attributes.get(TARGET)+"/services/"+m_serviceName+"?res="+m_res;
     	
     	m_uassecprop = new UASSecurityProperties();
     	m_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL, "true");
@@ -85,8 +86,9 @@ public class UnicoreAbstract {
         m_serverUrl = null;
         m_credential = null;
         m_applicationName = null;
-        //m_registryClient = null;
-        //m_securityManager = null;
+        m_res = null;
+        m_epr = null;
+        m_uassecprop = null;
     }    
 	
     /**

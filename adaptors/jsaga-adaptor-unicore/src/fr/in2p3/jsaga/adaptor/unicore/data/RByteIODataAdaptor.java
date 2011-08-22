@@ -42,14 +42,8 @@ public class RByteIODataAdaptor extends UnicoreAbstract implements FileWriterPut
 	private String m_serverFileSeparator ;
 	private StorageClient m_client;
     private String rootDirectory = ".";
-    private boolean m_isRetrying = false;
-    
     public String getType() {
         return "unicore";
-    }
-
-    public int getDefaultPort() {
-        return 8080;
     }
 
     public Usage getUsage() {
@@ -61,6 +55,7 @@ public class RByteIODataAdaptor extends UnicoreAbstract implements FileWriterPut
     	return new Default[]{
     			new Default(SERVICE_NAME, "StorageManagement"), 
     			new Default(RES, "default_storage"),
+    			new Default(TARGET, "DEMO-SITE"),
     			new Default(APPLICATION_NAME, "Bash shell")};
     }
 
