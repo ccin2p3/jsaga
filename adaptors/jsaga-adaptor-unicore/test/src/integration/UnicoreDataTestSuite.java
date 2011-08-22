@@ -33,9 +33,6 @@ public class UnicoreDataTestSuite extends JSAGATestSuite {
     }
     public static class UnicoreDirectoryMakeTest extends DirectoryMakeTest {
         public UnicoreDirectoryMakeTest() throws Exception {super("unicore");}
-        // DoesNotExistException is not sent because directories are created recursively
-        public void test_makeDir_child() throws Exception { super.ignore("Directories are created recursively");}
-
     }
     public static class UnicoreDirectoryTest extends DirectoryTest {
         public UnicoreDirectoryTest() throws Exception {super("unicore");}
