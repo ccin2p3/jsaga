@@ -15,6 +15,9 @@ import de.fzj.unicore.uas.client.StorageFactoryClient;
 import de.fzj.unicore.uas.security.IUASSecurityProperties;
 import de.fzj.unicore.uas.security.UASSecurityProperties;
 
+import fr.in2p3.jsaga.adaptor.base.usage.U;
+import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityCredential;
 
@@ -52,6 +55,17 @@ public class UnicoreAbstract {
         return 8080;
     }
 
+    public String getType() {
+        return "unicore";
+    }
+
+    public Usage getUsage() {
+    	return new UAnd(new Usage[]{new U(TARGET),
+    								new U(SERVICE_NAME), 
+    								new U(RES),
+    								});
+    }
+
 	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         
 
@@ -74,7 +88,20 @@ public class UnicoreAbstract {
     		m_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_TRUSTPASS, m_credential.getTrustStorePass());
     	}
 
-	    m_epr = EndpointReferenceType.Factory.newInstance();
+	    /*try {
+	    	String url = "https://"+host+":"+port+"/"+(String) attributes.get(TARGET)+"/services/StorageFactory?res=default_storage_factory";
+	    	EndpointReferenceType epr = EndpointReferenceType.Factory.newInstance();
+	    	epr.addNewAddress().setStringValue(url);
+	    	StorageFactoryClient m_registryClient=new StorageFactoryClient(url,epr,m_uassecprop);
+		    for ( Iterator<EndpointReferenceType> flavoursIter = m_registryClient.getAccessibleStorages().iterator(); flavoursIter.hasNext(); ) {
+		        System.out.println( flavoursIter.next().getAddress().toString() );
+		      }
+
+		} catch (Exception e) {
+			throw new NoSuccessException(e);
+		}*/
+
+		m_epr = EndpointReferenceType.Factory.newInstance();
 	    m_epr.addNewAddress().setStringValue(m_serverUrl);
     }
 
