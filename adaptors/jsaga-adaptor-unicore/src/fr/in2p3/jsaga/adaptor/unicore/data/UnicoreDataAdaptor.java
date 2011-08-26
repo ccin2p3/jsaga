@@ -39,16 +39,6 @@ public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPut
     private String m_serverFileSeparator ;
 	private StorageClient m_client;
     private String rootDirectory = ".";
-    public String getType() {
-        return "unicore";
-    }
-
-    public Usage getUsage() {
-    	return new UAnd(new Usage[]{new U(TARGET),
-    								new U(SERVICE_NAME), 
-    								new U(RES),
-    								});
-    }
 
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
     	return new Default[]{
@@ -119,8 +109,9 @@ public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPut
 
     public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
 		try {
-			if (!exists(parentAbsolutePath, additionalArgs)) throw new ParentDoesNotExist("Not found: " + parentAbsolutePath);
-			if (exists(parentAbsolutePath + directoryName, additionalArgs)) throw new AlreadyExistsException("Already exists: " + parentAbsolutePath + directoryName);
+			// TODO: uncomment in respect of the specs
+			//if (!exists(parentAbsolutePath, additionalArgs)) throw new ParentDoesNotExist("Not found: " + parentAbsolutePath);
+			//if (exists(parentAbsolutePath + directoryName, additionalArgs)) throw new AlreadyExistsException("Already exists: " + parentAbsolutePath + directoryName);
 			m_client.createDirectory(parentAbsolutePath + directoryName);
 		} catch (BaseFault e) {
 			e.printStackTrace();
