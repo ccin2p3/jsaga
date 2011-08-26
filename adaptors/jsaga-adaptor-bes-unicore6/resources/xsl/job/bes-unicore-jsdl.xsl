@@ -37,7 +37,7 @@
 	<xsl:template match="jsdl:JobDescription">
 	  <xsl:copy>
 	    <xsl:apply-templates select="@* | node()"/>
-		<jsaga:StagingDirectory><jsaga:URI><xsl:value-of select="$IntermediaryURL"/></jsaga:URI></jsaga:StagingDirectory>
+		<jsaga:StagingDirectory><jsaga:URI><xsl:value-of select="$IntermediaryURL"/>?Target=<xsl:value-of select="$Target"/></jsaga:URI></jsaga:StagingDirectory>
 	  </xsl:copy>
 	</xsl:template>
 		
@@ -72,14 +72,14 @@
        			<jsaga:URI><xsl:value-of select="jsdl:Source/jsdl:URI/text()"/></jsaga:URI>
             </xsl:when>
             <xsl:otherwise>
-	       		<jsaga:URI><xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="jsdl:FileName/text()"/></jsaga:URI>
+	       		<jsaga:URI><xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="jsdl:FileName/text()"/>?Target=<xsl:value-of select="$Target"/></jsaga:URI>
             </xsl:otherwise>
           </xsl:choose>
        	</jsaga:Source>
        	<jsaga:Target>
           <xsl:choose>
             <xsl:when test="jsdl:Source">
-	       		<jsaga:URI><xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="jsdl:FileName/text()"/></jsaga:URI>
+	       		<jsaga:URI><xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="jsdl:FileName/text()"/>?Target=<xsl:value-of select="$Target"/></jsaga:URI>
             </xsl:when>
             <xsl:otherwise>
        			<jsaga:URI><xsl:value-of select="jsdl:Target/jsdl:URI/text()"/></jsaga:URI>
