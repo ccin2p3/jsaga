@@ -3,7 +3,7 @@
     <session>
         <context type="AxisJKS" id="Demo">
             <attribute name="UserAlias" value="demo user"/>
-            <data type="rbyteio"/>
+            <data type="unicore"/>
             <job type="bes-unicore"/>
             <include host="localhost6"/>
             <exclude host="localhost6" domain="de" />
