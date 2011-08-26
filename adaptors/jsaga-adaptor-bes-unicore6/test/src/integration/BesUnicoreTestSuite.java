@@ -48,9 +48,9 @@ public class BesUnicoreTestSuite extends JSAGATestSuite {
     
     /* incompatible with Unicore Data plugin */
  	// test cases
-    //public static class BesUnicoreJobRunSandboxTest extends JobRunSandboxTest {
-    //    public BesUnicoreJobRunSandboxTest() throws Exception {super("bes-unicore");}
-    //}
+    public static class BesUnicoreJobRunSandboxTest extends JobRunSandboxTest {
+        public BesUnicoreJobRunSandboxTest() throws Exception {super("bes-unicore");}
+    }
     
  	// test cases
     public static class BesUnicoreJobRunDescriptionTest extends JobRunDescriptionTest {
