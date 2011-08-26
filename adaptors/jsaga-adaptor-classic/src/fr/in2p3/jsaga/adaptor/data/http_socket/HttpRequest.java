@@ -24,6 +24,7 @@ public class HttpRequest {
     public static final String TYPE_GET = "GET";
     public static final String TYPE_HEAD = "HEAD";
     public static final String TYPE_PUT = "PUT";
+    public static final String TYPE_POST = "POST";
     private String m_type;
     
     private static final String STATUS = "null";
@@ -32,7 +33,8 @@ public class HttpRequest {
     private static final String LAST_MODIFIED = "Last-Modified";
     private static final SimpleDateFormat DF = new SimpleDateFormat("EEE, d MMM yyyy KK:mm:ss zzz", Locale.ENGLISH);
     
-    protected Properties m_prop;
+    protected Properties m_queryHeaderProps;
+    protected Properties m_responseHeaderProps;
     private InputStream m_inputStream;
     private ByteArrayOutputStream m_outputStream;
 
@@ -65,12 +67,20 @@ public class HttpRequest {
     	m_type = type;
     	m_path = path;
     	m_socket = socket;
-    	if (TYPE_PUT.equals(m_type)) {
+    	m_queryHeaderProps = new Properties();
+    	m_queryHeaderProps.put("User-Agent", "JSAGA");
+    	m_queryHeaderProps.put("Accept", "*/*");
+    	m_queryHeaderProps.put("Host", m_socket.getInetAddress().getHostName());
+    	if (TYPE_PUT.equals(m_type) || TYPE_POST.equals(m_type)) {
     		m_outputStream = new ByteArrayOutputStream();
     	}
     	if (send) {
     		send();
     	}
+    }
+    
+    public void addHeader(String prop, String value) {
+    	m_queryHeaderProps.put(prop,value);
     }
     
 	public void write(int b) throws IOException {
@@ -87,6 +97,13 @@ public class HttpRequest {
         }
 	}
 	
+	public void write(String data) throws IOException {
+        try {
+        	m_outputStream.write(data.getBytes());
+        } catch (NullPointerException e) {
+        }
+	}
+	
     public void setVersion(String version) {
     	m_version = version;
     }
@@ -96,18 +113,18 @@ public class HttpRequest {
         BufferedWriter request = new BufferedWriter(new OutputStreamWriter(m_socket.getOutputStream()));
         request.write(m_type + " " + m_path + " HTTP/" + m_version);
         request.newLine();
-        request.write("User-Agent: JSAGA");
-        request.newLine();
-        request.write("Host: " + m_socket.getInetAddress().getHostName());
-        request.newLine();
-        request.write("Accept: */*");
-        request.newLine();
-        if (m_type.equals(TYPE_PUT)) {
-            request.write("Content-Length: " + String.valueOf(m_outputStream.size()));
+        Enumeration props = m_queryHeaderProps.propertyNames();
+        while (props.hasMoreElements()) {
+        	String p = (String)props.nextElement();
+        	request.write(p + ": " +m_queryHeaderProps.getProperty(p));
+        	request.newLine();
+        }
+    	if (TYPE_PUT.equals(m_type) || TYPE_POST.equals(m_type)) {
+            request.write(CONTENT_LENGTH + ": " + String.valueOf(m_outputStream.size()));
             request.newLine();
         }
         request.newLine();
-        if (m_type.equals(TYPE_PUT)) {
+    	if (TYPE_PUT.equals(m_type) || TYPE_POST.equals(m_type)) {
         	request.write(m_outputStream.toString());
         }
         request.flush();
@@ -116,18 +133,18 @@ public class HttpRequest {
         InputStream response = m_socket.getInputStream();
 
         // set properties
-        m_prop = new Properties();
+        m_responseHeaderProps = new Properties();
         String line;
         while ( (line=readLine(response)).length() > 0 ) {
             int pos = line.indexOf(':');
             if (pos > -1) {
-                m_prop.setProperty(line.substring(0,pos), line.substring(pos+2));
+                m_responseHeaderProps.setProperty(line.substring(0,pos), line.substring(pos+2));
             } else {
-                m_prop.setProperty(STATUS, line);
+                m_responseHeaderProps.setProperty(STATUS, line);
             }
         }
 
-        if (m_type.equals(TYPE_GET)) {
+        if (m_type.equals(TYPE_GET) || m_type.equals(TYPE_POST)) {
             // set input stream (with rest of response stream)
             m_inputStream = response;
         } else if (m_type.equals(TYPE_HEAD) || m_type.equals(TYPE_PUT)) {
@@ -143,11 +160,11 @@ public class HttpRequest {
     }
 
     public String getStatus() {
-        return m_prop.getProperty(STATUS);
+        return m_responseHeaderProps.getProperty(STATUS);
     }
 
     public long getContentLength() {
-        String value = m_prop.getProperty(CONTENT_LENGTH);
+        String value = m_responseHeaderProps.getProperty(CONTENT_LENGTH);
         if (value != null) {
             return Long.parseLong(value);
         } else {
@@ -156,7 +173,7 @@ public class HttpRequest {
     }
 
     public Date getLastModified() throws NoSuccessException {
-        String value = m_prop.getProperty(LAST_MODIFIED);
+        String value = m_responseHeaderProps.getProperty(LAST_MODIFIED);
         if (value != null) {
             try {
                 return DF.parse(value);
@@ -169,7 +186,7 @@ public class HttpRequest {
     }
 
     public boolean isDir() {
-        return !m_prop.contains(LAST_MODIFIED);
+        return !m_responseHeaderProps.contains(LAST_MODIFIED);
     }
 
     protected static String readLine(InputStream in) throws IOException {
