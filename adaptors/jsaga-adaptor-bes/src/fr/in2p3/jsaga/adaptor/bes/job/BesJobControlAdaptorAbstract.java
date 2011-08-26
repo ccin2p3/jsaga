@@ -59,11 +59,14 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
     ////////////////////////////////////////////////////
     // Implementation of the JobControlAdaptor interface
     ////////////////////////////////////////////////////
-    public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
-    	// _bes_url is built by connect()
-    	JobDescriptionTranslator translator =  new JobDescriptionTranslatorXSLT("xsl/job/bes-jsdl.xsl");//BesJobDescriptionTranslatorJSDL();
-    	return translator;
+    protected String getJobDescriptionTranslatorFilename() throws NoSuccessException {
+    	return "xsl/job/bes-jsdl.xsl";
     }
+    
+    public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
+    	return new JobDescriptionTranslatorXSLT(getJobDescriptionTranslatorFilename());
+    }
+
 
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
 
