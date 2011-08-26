@@ -6,7 +6,6 @@ import fr.in2p3.jsaga.adaptor.data.http_socket.HttpRequest;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
-import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
 import org.ogf.saga.error.*;
@@ -35,6 +34,10 @@ import javax.xml.parsers.ParserConfigurationException;
 * ***************************************************/
 public class BesUnicoreJobControlAdaptor extends BesJobControlStagingOnePhaseAdaptorAbstract implements JobControlAdaptor {
 
+	private static final String DATA_STAGING_PATH = "/DataStaging";
+    private static final String XSLTPARAM_TARGET = "Target";
+    private static final String XSLTPARAM_RES = "Res";
+	
     public String getType() {
         return "bes-unicore";
     }
@@ -48,8 +51,20 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlStagingOnePhaseAda
     			new Default("res", "default_bes_factory")};
     }
     
+    protected String getJobDescriptionTranslatorFilename() throws NoSuccessException {
+    	return "xsl/job/bes-unicore-jsdl.xsl";
+    }
+
     public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
-    	return new JobDescriptionTranslatorXSLT("xsl/job/bes-unicore-jsdl.xsl");
+    	JobDescriptionTranslator translator =  super.getJobDescriptionTranslator();
+    	System.out.println(_bes_url);
+    	// extract Target from _ds_url
+    	if (_ds_url.getQuery() != null) {
+    		String _target = _ds_url.getQuery().split("=")[1];
+    		translator.setAttribute(XSLTPARAM_TARGET, _target);
+    	}
+    	translator.setAttribute(XSLTPARAM_RES, "default_storage");
+    	return translator;
     }
 
     public JobMonitorAdaptor getDefaultJobMonitor() {
@@ -132,8 +147,9 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlStagingOnePhaseAda
 
 	public URI getDataStagingUrl(String host, int port, String basePath, Map attributes) throws URISyntaxException {
 		// This URL is used by JSAGA to choose the appropriate data plugin: the new UNICORE plugin
-		// TODO: needs to send the target DEMO-SITE as ?Target=DEMO-SITE
-		return new URI("unicore://"+host+":"+port+"/DataStaging");
+		// extract Target 'DEMO-SITE' from basePath = '/DEMO-SITE/services/BESFactory'
+		String _target = basePath.split("/")[1];
+		return new URI("unicore://" + host + ":" + port + DATA_STAGING_PATH + "?Target=" + _target);
 	}
 	
 }
