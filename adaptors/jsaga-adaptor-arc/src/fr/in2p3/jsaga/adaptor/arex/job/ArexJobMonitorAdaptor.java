@@ -69,7 +69,7 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
 	private static final String TIME_ISO8601 = "yyyy-MM-dd'T'HH:mm:ssz";
 	
 	// http://www.w3.org/2005/08/addressing
-	protected static final String WSA_NS = org.w3.x2005.x08.addressing.AttributedQNameType.getTypeDesc().getXmlType().getNamespaceURI();
+	protected static final String WSA_NS = fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.AttributedQNameType.getTypeDesc().getXmlType().getNamespaceURI();
 	
 	public String getType() {
         return "arex";

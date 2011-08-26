@@ -17,7 +17,7 @@ import org.ggf.schemas.bes.x2006.x08.besFactory.InvalidRequestMessageFaultType;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
-import org.w3.x2005.x08.addressing.EndpointReferenceType;
+import fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceType;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

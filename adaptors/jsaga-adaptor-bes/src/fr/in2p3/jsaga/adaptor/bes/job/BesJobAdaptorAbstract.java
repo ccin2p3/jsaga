@@ -1,23 +1,13 @@
 package fr.in2p3.jsaga.adaptor.bes.job;
 
-import fr.in2p3.jsaga.adaptor.bes.BesUtils;
-
-import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityCredential;
 
-import org.apache.axis.message.MessageElement;
 import org.ggf.schemas.bes.x2006.x08.besFactory.BESFactoryPortType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.BasicResourceAttributesDocumentType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.BesFactoryServiceLocator;
-import org.ggf.schemas.bes.x2006.x08.besFactory.FactoryResourceAttributesDocumentType;
-import org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentResponseType;
-import org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentType;
-import org.ggf.schemas.jsdl.x2005.x11.jsdl.JobDefinition_Type;
-
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
 import org.ogf.saga.error.BadParameterException;
@@ -25,11 +15,10 @@ import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
-import org.w3.x2005.x08.addressing.EndpointReferenceType;
+import fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceType;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Map;
 
 import javax.xml.rpc.ServiceException;

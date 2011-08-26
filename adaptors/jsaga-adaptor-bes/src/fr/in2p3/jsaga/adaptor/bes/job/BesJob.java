@@ -1,7 +1,7 @@
 package fr.in2p3.jsaga.adaptor.bes.job;
 
 import org.ogf.saga.error.NoSuccessException;
-import org.w3.x2005.x08.addressing.EndpointReferenceType;
+import fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceType;
 
 
 /* ***************************************************

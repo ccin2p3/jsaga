@@ -4,9 +4,9 @@ import javax.xml.soap.SOAPException;
 
 import org.apache.axis.message.MessageElement;
 import org.ogf.saga.error.NoSuccessException;
-import org.w3.x2005.x08.addressing.AttributedURIType;
-import org.w3.x2005.x08.addressing.EndpointReferenceType;
-import org.w3.x2005.x08.addressing.ReferenceParametersType;
+import fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.AttributedURIType;
+import fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceType;
+import fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.ReferenceParametersType;
 
 import fr.in2p3.jsaga.adaptor.bes.job.BesJob;
 
