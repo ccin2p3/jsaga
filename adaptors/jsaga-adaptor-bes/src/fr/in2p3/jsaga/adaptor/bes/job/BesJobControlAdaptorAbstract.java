@@ -1,11 +1,8 @@
 package fr.in2p3.jsaga.adaptor.bes.job;
 
 import fr.in2p3.jsaga.adaptor.bes.BesUtils;
-import fr.in2p3.jsaga.adaptor.bes.job.control.staging.BesStagingJobAdaptor;
-
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
-import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
@@ -29,22 +26,15 @@ import org.ggf.schemas.jsdl.x2005.x11.jsdl.Resources_Type;
 import org.globus.wsrf.encoding.DeserializationException;
 import org.globus.wsrf.encoding.ObjectDeserializer;
 
-import org.ogf.saga.error.AuthenticationFailedException;
-import org.ogf.saga.error.AuthorizationFailedException;
-import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
-import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
-import org.w3.x2005.x08.addressing.EndpointReferenceType;
+import fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceType;
 import org.xml.sax.InputSource;
 
 import java.io.StringReader;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Map;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -93,6 +83,7 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
 			throw new BadResource(e);
 		}
 		
+		
 		if (checkMatch)
 			checkResources(jsdl_type.getJobDescription().getResources());
 		
@@ -115,6 +106,7 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
 			//System.out.println(BesUtils.dumpBESMessage(response));
 			throw new NoSuccessException(e);
 		}
+		//System.out.println(BesUtils.dumpBESMessage(response));
 		return activityId2NativeId(response.getActivityIdentifier());
 	}
 		
@@ -141,10 +133,6 @@ public abstract class BesJobControlAdaptorAbstract extends BesJobAdaptorAbstract
 		}
 	}
 
-    ////////////////////////////////////////////////////
-    // Private methods
-    ////////////////////////////////////////////////////
-    
     /**
      * Check required resources against available resources
      * 
