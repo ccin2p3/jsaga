@@ -32,7 +32,6 @@ import java.util.Map;
 public abstract class BesJobControlStagingOnePhaseAdaptorAbstract extends BesJobControlAdaptorAbstract implements BesStagingJobAdaptor {
 
     private static final String XSLTPARAM_PROTOCOL = "Protocol";
-    private static final String XSLTPARAM_HOST = "HostName";
     private static final String XSLTPARAM_PORT = "Port";
     private static final String XSLTPARAM_PATH = "Path";
     
