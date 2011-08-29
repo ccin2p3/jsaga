@@ -41,6 +41,14 @@
 	  </xsl:copy>
 	</xsl:template>
 		
+	<xsl:template match="jsdl:Application">
+	  <xsl:copy>
+	    <!-- With this, UNICORE does the chmod +X and adds . in $PATH -->
+	    <jsdl:ApplicationName>Custom executable</jsdl:ApplicationName>
+	    <xsl:apply-templates select="@* | node()"/>
+	  </xsl:copy>
+	</xsl:template>
+		
 	<xsl:template match="jsdl:DataStaging/jsdl:Source">
 		<jsdl:Source>
 			<jsdl:URI><xsl:value-of select="$IntermediaryUnicoreURL"/>/<xsl:value-of select="../jsdl:FileName/text()"/></jsdl:URI>
