@@ -57,7 +57,6 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlStagingOnePhaseAda
 
     public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
     	JobDescriptionTranslator translator =  super.getJobDescriptionTranslator();
-    	System.out.println(_bes_url);
     	// extract Target from _ds_url
     	if (_ds_url.getQuery() != null) {
     		String _target = _ds_url.getQuery().split("=")[1];
