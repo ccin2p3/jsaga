@@ -14,13 +14,33 @@
         <faq id="url">
             <question>What is the URL syntax understood by this plug-in ?</question>
             <answer>The URL must be:
-                <pre><![CDATA[bes-unicore://<HOSTNAME>[:<PORT>]/<SITENAME>/services/BESFactory[?res=<FACTORY>]
+                <pre><![CDATA[bes-unicore://<HOSTNAME>[:<PORT>]/<TARGET>/services/BESFactory[?res=<RESOURCE>]
 Where:
     <HOSTNAME> is the name of the host running the BES Unicore6 service,
     <PORT> is 8080 by default,
-    <SITENAME> is the name of the site (e.g. "DEMO-SITE"),
-    <FACTORY> is the name of the factory (by default "default_bes_factory")
+    <TARGET> is the name of the site (e.g. "DEMO-SITE"),
+    <RESOURCE> is the name of the resource (by default "default_bes_factory")
 ]]></pre>
+            </answer>
+        </faq>
+        <faq id="unicore-servers">
+            <question>What UNICORE server is compatible with this plugin ?</question>
+            <answer>The bes-unicore has been tested against UNICORE-6.4.0 and UNICORE-6.4.1. Before startup, the 'default_storage' 
+            resource needs to be started: in the file
+            <pre>unicorex/conf/uas.config</pre>
+            modify the variable:
+            <pre>uas.onstartup</pre>
+            to add the following service:
+            <pre>de.fzj.unicore.uas.util.CreateSMSOnStartup \</pre>
+            With UNICORE-6.4.0, the BES service is not started by default. Modify the variable:
+            <pre>uas.onstartup</pre>
+            to add the following service:
+            <pre>de.fzj.unicore.uas.util.CreateSMSOnStartup \</pre>
+            You do not need to do this with UNICORE-6.4.1 as the BES service is started by default.
+            The internal UNICORE server contains a bug when building its own wrapper script. 
+            To fix the bug, change in the file
+            <pre>unicore/conf/simpleidb</pre>
+            the SHELL variable '$EXECUTABLE' into '$UC_EXECUTABLE'.
             </answer>
         </faq>
     </part>
