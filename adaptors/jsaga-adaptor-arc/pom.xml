@@ -7,7 +7,7 @@
     <version>0.9.15-SNAPSHOT</version>
   </parent>
   <artifactId>jsaga-adaptor-arc</artifactId>
-  <name>jsaga-adaptor-arc</name>
+  <name>Adaptor for BES submission on ARC systems</name>
   <description>This module provides support for A-REX service provided by ARC middleware</description>
 	<developers>
         <developer>
