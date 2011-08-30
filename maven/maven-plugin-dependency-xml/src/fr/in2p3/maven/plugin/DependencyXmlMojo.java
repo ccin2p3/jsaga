@@ -16,6 +16,7 @@ import org.apache.maven.shared.dependency.tree.DependencyTreeBuilder;
 import org.apache.maven.shared.dependency.tree.DependencyTreeBuilderException;
 import org.apache.maven.shared.jar.classes.JarClassesAnalysis;
 import org.apache.maven.model.License;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -214,7 +215,7 @@ public class DependencyXmlMojo extends AbstractMojo {
             if (value.contains("\"")) {
                 value = value.replaceAll("\"", "'");
             }
-            out.print(" "+name+"=\""+value+"\"");
+            out.print(" "+name+"=\""+StringEscapeUtils.escapeHtml4(value)+"\"");
         }
     }
 
