@@ -7,7 +7,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>jsaga-adaptor-bes-unicore6</artifactId>
-    <name>jsaga-adaptor-bes-unicore6</name>
+    <name>BES submission on Unicore6 system</name>
     <description>This module provides support for Unicore6 via BES (Basic Execution Service) interface</description>
 	<developers>
         <developer>
