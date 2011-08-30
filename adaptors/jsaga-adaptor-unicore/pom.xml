@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>fr.in2p3.jsaga.adaptor</groupId>
@@ -7,12 +8,16 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>jsaga-adaptor-unicore</artifactId>
     <name>Adaptors for Unicore</name>
-    <description>This module provides support for Unicore 6 components:
-data management protocol (RByte-IO).</description>
+    <description>This module provides support for Unicore6 data management.</description>
     <developers>
         <developer>
             <name>Lionel Schwarz</name>
             <email>lionel.schwarz@in2p3.fr</email>
+            <organization>CC-IN2P3</organization>
+            <organizationUrl>http://cc.in2p3.fr/</organizationUrl>
+            <properties>
+                <organizationLogoUrl>http://cc.in2p3.fr/plugins/kitcnrs/images/logoCC72.gif</organizationLogoUrl>
+            </properties>
         </developer>
     </developers>
 	<repositories>
