@@ -1,21 +1,16 @@
 package fr.in2p3.jsaga.adaptor.unicore.data;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
-import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
 import fr.in2p3.jsaga.adaptor.data.read.FileReaderGetter;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterPutter;
 import fr.in2p3.jsaga.adaptor.unicore.UnicoreAbstract;
 
-import org.apache.log4j.Logger;
 import org.ogf.saga.error.*;
 import org.unigrids.services.atomic.types.GridFileType;
-import org.w3.x2005.x08.addressing.EndpointReferenceType;
-
 import de.fzj.unicore.uas.client.SByteIOClient;
 import de.fzj.unicore.uas.client.StorageClient;
-import de.fzj.unicore.uas.client.StorageFactoryClient;
 import de.fzj.unicore.wsrflite.xmlbeans.BaseFault;
 
 import java.io.FileNotFoundException;
@@ -73,7 +68,6 @@ public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPut
 		try {
 			GridFileType gft = m_client.listProperties(absolutePath);
 		} catch (BaseFault e) {
-			e.printStackTrace();
 			throw new NoSuccessException(e);
 		} catch (FileNotFoundException e) {
 			return false;
@@ -86,7 +80,6 @@ public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPut
 			GridFileType gft = m_client.listProperties(absolutePath);
 			return new UnicoreFileAttributes(gft, m_serverFileSeparator);
 		} catch (BaseFault e) {
-			e.printStackTrace();
 			throw new NoSuccessException(e);
 		} catch (FileNotFoundException e) {
 			throw  new DoesNotExistException(e);
@@ -110,11 +103,10 @@ public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPut
     public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
 		try {
 			// TODO: uncomment in respect of the specs
-			//if (!exists(parentAbsolutePath, additionalArgs)) throw new ParentDoesNotExist("Not found: " + parentAbsolutePath);
-			//if (exists(parentAbsolutePath + directoryName, additionalArgs)) throw new AlreadyExistsException("Already exists: " + parentAbsolutePath + directoryName);
+			if (!exists(parentAbsolutePath, additionalArgs)) throw new ParentDoesNotExist("Not found: " + parentAbsolutePath);
+			if (exists(parentAbsolutePath + directoryName, additionalArgs)) throw new AlreadyExistsException("Already exists: " + parentAbsolutePath + directoryName);
 			m_client.createDirectory(parentAbsolutePath + directoryName);
 		} catch (BaseFault e) {
-			e.printStackTrace();
 			throw new NoSuccessException(e);
 		}
     }
@@ -123,7 +115,6 @@ public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPut
 		try {
 			m_client.delete(path);
 		} catch (BaseFault e) {
-			e.printStackTrace();
 			throw new NoSuccessException(e);
 		}
     }
