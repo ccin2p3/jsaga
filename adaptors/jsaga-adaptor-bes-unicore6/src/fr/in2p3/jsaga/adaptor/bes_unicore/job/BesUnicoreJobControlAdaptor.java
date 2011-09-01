@@ -8,11 +8,21 @@ import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
+import de.fzj.unicore.uas.client.StorageClient;
+import de.fzj.unicore.uas.security.IUASSecurityProperties;
+import de.fzj.unicore.uas.security.UASSecurityProperties;
+import de.fzj.unicore.wsrflite.xmlbeans.BaseFault;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.ogf.saga.error.*;
+import org.unigrids.services.atomic.types.GridFileType;
+import org.w3.x2005.x08.addressing.EndpointReferenceType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -38,6 +48,8 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlStagingOnePhaseAda
     private static final String XSLTPARAM_TARGET = "Target";
     private static final String XSLTPARAM_RES = "Res";
 	
+    private String m_target;
+    
     public String getType() {
         return "bes-unicore";
     }
@@ -57,12 +69,9 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlStagingOnePhaseAda
 
     public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
     	JobDescriptionTranslator translator =  super.getJobDescriptionTranslator();
-    	// extract Target from _ds_url
-    	if (_ds_url.getQuery() != null) {
-    		String _target = _ds_url.getQuery().split("=")[1];
-    		translator.setAttribute(XSLTPARAM_TARGET, _target);
-    	}
+   		translator.setAttribute(XSLTPARAM_TARGET, m_target);
     	translator.setAttribute(XSLTPARAM_RES, "default_storage");
+    	// TODO: passer un paramètre pour indiquer si "Custom executable" est supporté
     	return translator;
     }
 
@@ -72,6 +81,46 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlStagingOnePhaseAda
 
 	public Class getJobClass() {
 		return BesUnicoreJob.class;
+	}
+
+	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+    	super.connect(userInfo, host, port, basePath, attributes);
+    	// extract Target from _ds_url
+    	m_target = _ds_url.getQuery().split("=")[1];
+    	String _serverUrl = "https://"+host+":"+port+"/"+m_target+"/services/StorageManagement?res=default_storage";
+    	
+    	UASSecurityProperties _uassecprop = new UASSecurityProperties();
+    	_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL, "true");
+    	_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_CLIENTAUTH, "true");
+		
+        //keystore and truststore locations
+    	_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_KEYSTORE, m_credential.getKeyStorePath());
+    	_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_KEYPASS, m_credential.getKeyStorePass());
+    	_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_KEYALIAS, m_credential.getKeyStoreAlias());
+    	_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_TRUSTSTORE, m_credential.getTrustStorePath());
+    	if (m_credential.getTrustStorePass() != null) {
+    		_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_TRUSTPASS, m_credential.getTrustStorePass());
+    	}
+
+    	EndpointReferenceType _epr = EndpointReferenceType.Factory.newInstance();
+	    _epr.addNewAddress().setStringValue(_serverUrl);
+	    // Create data staging directory
+	    try {
+			StorageClient _client = new StorageClient(_epr,_uassecprop);
+			try {
+				_client.listProperties(DATA_STAGING_PATH);
+			} catch (FileNotFoundException e) {
+				Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Creating data staging directory");
+				_client.createDirectory(DATA_STAGING_PATH);
+			}
+		} catch (Exception e) {
+			Logger.getLogger(this.getClass().getName()).log(Level.WARN, "Error while creating data staging directory. Data staging may not work", e);
+		}
+	}
+	
+	public void disconnect() throws NoSuccessException {
+		m_target = null;
+		super.disconnect();
 	}
 
 	/*
