@@ -40,7 +40,8 @@ Where:
             The internal UNICORE server contains a bug when building its own wrapper script. 
             To fix the bug, change in the file
             <pre>unicore/conf/simpleidb</pre>
-            the SHELL variable '$EXECUTABLE' into '$UC_EXECUTABLE'.
+            the SHELL variable '$EXECUTABLE' into '$UC_EXECUTABLE' in the section of "Custom executable". If this section does not exist,
+            jobs with custom executable files will probably fail.
             </answer>
         </faq>
     </part>
