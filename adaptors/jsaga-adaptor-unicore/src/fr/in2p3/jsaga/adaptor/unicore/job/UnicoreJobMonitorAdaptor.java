@@ -1,5 +1,7 @@
 package fr.in2p3.jsaga.adaptor.unicore.job;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.ogf.saga.error.AuthenticationFailedException;
@@ -8,13 +10,21 @@ import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.IncorrectStateException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
+import org.unigrids.x2006.x04.services.tss.JobReferenceDocument;
 import org.w3.x2005.x08.addressing.EndpointReferenceType;
+
+import de.fzj.unicore.uas.client.EnumerationClient;
+import de.fzj.unicore.uas.client.TSFClient;
+import de.fzj.unicore.uas.client.TSSClient;
 
 import fr.in2p3.jsaga.adaptor.unicore.UnicoreAbstract;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
+import fr.in2p3.jsaga.adaptor.job.monitor.QueryListJob;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -24,33 +34,72 @@ import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
 * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
 * Date:   01/09/2011
 * ***************************************************/
-public class UnicoreJobMonitorAdaptor extends UnicoreAbstract implements
-		QueryIndividualJob {
+public class UnicoreJobMonitorAdaptor extends UnicoreJobAdaptorAbstract implements
+		QueryIndividualJob, QueryListJob, ListableJobAdaptor {
 
-    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-    	return new Default[]{
-    			new Default(TARGET, "DEMO-SITE"),
-    			new Default(SERVICE_NAME, "Registry"), 
-    			new Default(RES, "default_registry"),
-    			};
+    public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
+    	super.connect(userInfo, host, port, basePath, attributes);
+    	
+    	try {
+		    // Find a target system
+			TSFClient cl = new TSFClient(m_epr.getAddress().getStringValue(), m_epr, m_uassecprop);
+			Iterator<EndpointReferenceType> flavoursIter = cl.getTargetSystems().iterator(); 
+			if (flavoursIter.hasNext()) {
+				EndpointReferenceType _tss_epr = flavoursIter.next();
+		        m_client = new TSSClient(_tss_epr.getAddress().getStringValue(), _tss_epr, m_uassecprop);
+		    } else {
+		    	throw new NoSuccessException("No target system found");
+		    }
+		} catch (Exception e) {
+			throw new NoSuccessException(e);
+		}
     }
-
-	/*public void connect(String userInfo, String host, int port,
-			String basePath, Map attributes) throws NotImplementedException,
-			AuthenticationFailedException, AuthorizationFailedException,
-			BadParameterException, TimeoutException,
-			NoSuccessException {
-		// TODO Auto-generated method stub
-
-	}*/
 
 	public JobStatus getStatus(String nativeJobId) throws TimeoutException,
 			NoSuccessException {
 		try {
-			EndpointReferenceType _epr = EndpointReferenceType.Factory.newInstance();
-		    _epr.addNewAddress().setStringValue(nativeJobId);
-			UnicoreJob uj = new UnicoreJob(_epr, m_uassecprop);
+			UnicoreJob uj = new UnicoreJob(nativeJobId, m_uassecprop);
 			return uj.getStatus();
+		} catch (Exception e) {
+			throw new NoSuccessException(e);
+		}
+	}
+
+	public JobStatus[] getStatusList(String[] nativeJobIdArray) throws TimeoutException, NoSuccessException {
+		try {
+			JobStatus[] tab = new JobStatus[nativeJobIdArray.length];
+			for (int i=0; i<nativeJobIdArray.length; i++) {
+				tab[i] = new UnicoreJob(nativeJobIdArray[i], m_uassecprop).getStatus();
+			}
+			return tab;
+		} catch (Exception e) {
+			throw new NoSuccessException(e);
+		}
+	}
+
+	public String[] list() throws PermissionDeniedException, TimeoutException,
+			NoSuccessException {
+		try {
+			EnumerationClient<org.unigrids.x2006.x04.services.tss.JobReferenceDocument> list = m_client.getJobReferenceEnumeration();
+			long nb=0;
+			String[] l = null;
+			if (list != null) { // not supported by server < 6.3.0
+				nb = list.getNumberOfResults();
+				l = new String[(int) nb];
+				int index=0;
+				for (Iterator<JobReferenceDocument> i = list.iterator(); i.hasNext(); ) {
+					JobReferenceDocument jrd = i.next();
+					l[index++] = jrd.getJobReference().getAddress().getStringValue();
+				}
+			} else {
+				List<EndpointReferenceType> list2 = m_client.getJobs();
+				nb = list2.size();
+				l = new String[(int) nb];
+				for (int index=0; index<nb; index++) {
+					l[index] = list2.get(index).getAddress().getStringValue();
+				}
+			}
+			return l;
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
