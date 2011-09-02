@@ -6,7 +6,7 @@
             <attribute name="KeystorePass" value="the!user"/>
 
             <data type="unicore"/>
-
+			<job type="unicore"/>
             <include host="localhost6"/>
             <exclude host="localhost6" domain="de"/>
         </context>
