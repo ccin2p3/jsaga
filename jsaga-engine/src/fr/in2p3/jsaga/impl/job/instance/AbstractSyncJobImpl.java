@@ -512,16 +512,28 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         if (m_controlAdaptor instanceof HoldableJobAdaptor && m_controlAdaptor instanceof SuspendableJobAdaptor) {
             if (! ((HoldableJobAdaptor)m_controlAdaptor).hold(m_nativeJobId)) {
                 if (! ((SuspendableJobAdaptor)m_controlAdaptor).suspend(m_nativeJobId)) {
-                    throw new NoSuccessException("Failed to hold/suspend job because it is neither queued nor active: "+m_nativeJobId);
+                	if (getJobState().equals(State.NEW) || getJobState().equals(State.RUNNING)) {
+                		throw new NoSuccessException("Failed to hold/suspend job, the plugin returned False: "+m_nativeJobId);
+                	} else {
+                		throw new IncorrectStateException("Failed to hold/suspend job because it is neither queued nor active: "+m_nativeJobId);
+                	}
                 }
             }
         } else if (m_controlAdaptor instanceof HoldableJobAdaptor) {
             if (! ((HoldableJobAdaptor)m_controlAdaptor).hold(m_nativeJobId)) {
-                throw new NoSuccessException("Failed to hold job because it is not queued: "+m_nativeJobId);
+            	if (!getJobState().equals(State.NEW)) {
+            		throw new IncorrectStateException("Failed to hold job because it is not queued: "+m_nativeJobId);
+            	} else {
+            		throw new NoSuccessException("Failed to hold job; the plugin returned False");
+            	}
             }
         } else if (m_controlAdaptor instanceof SuspendableJobAdaptor) {
             if (! ((SuspendableJobAdaptor)m_controlAdaptor).suspend(m_nativeJobId)) {
-                throw new NoSuccessException("Failed to suspend job because if is not active: "+m_nativeJobId);
+            	if (!getJobState().equals(State.RUNNING)) {
+            		throw new IncorrectStateException("Failed to suspend job because if is not active: "+m_nativeJobId);
+            	} else {
+            		throw new NoSuccessException("Failed to suspend job; the plugin returned False");
+            	}
             }
         } else {
             throw new NotImplementedException("Suspend is not supported by this adaptor: "+m_controlAdaptor.getClass().getName());
@@ -536,16 +548,28 @@ public abstract class AbstractSyncJobImpl extends AbstractJobPermissionsImpl imp
         if (m_controlAdaptor instanceof HoldableJobAdaptor && m_controlAdaptor instanceof SuspendableJobAdaptor) {
             if (! ((HoldableJobAdaptor)m_controlAdaptor).release(m_nativeJobId)) {
                 if (! ((SuspendableJobAdaptor)m_controlAdaptor).resume(m_nativeJobId)) {
-                    throw new NoSuccessException("Failed to release/resume job because it is neither held nor suspended: "+m_nativeJobId);
+                	if (!getState().equals(State.SUSPENDED)) {
+                		throw new IncorrectStateException("Failed to release/resume job because it is neither held nor suspended: "+m_nativeJobId);
+                	} else {
+                		throw new NoSuccessException("Failed to release/resume job; the plugin returned False");
+                	}
                 }
             }
         } else if (m_controlAdaptor instanceof HoldableJobAdaptor) {
             if (! ((HoldableJobAdaptor)m_controlAdaptor).release(m_nativeJobId)) {
-                throw new NoSuccessException("Failed to release job because it is not held: "+m_nativeJobId);
+            	if (!getState().equals(State.SUSPENDED)) {
+            		throw new IncorrectStateException("Failed to release job because it is not held: "+m_nativeJobId);
+            	} else {
+            		throw new NoSuccessException("Failed to release job; the plugin returned False");
+            	}
             }
         } else if (m_controlAdaptor instanceof SuspendableJobAdaptor) {
             if (! ((SuspendableJobAdaptor)m_controlAdaptor).resume(m_nativeJobId)) {
-                throw new NoSuccessException("Failed to resume job because if is not suspended: "+m_nativeJobId);
+            	if (!getState().equals(State.SUSPENDED)) {
+            		throw new IncorrectStateException("Failed to resume job because if is not suspended: "+m_nativeJobId);
+            	} else {
+            		throw new NoSuccessException("Failed to resume job; the plugin returned False");
+            	}
             }
         } else {
             throw new NotImplementedException("Resume is not supported by this adaptor: "+m_controlAdaptor.getClass().getName());
