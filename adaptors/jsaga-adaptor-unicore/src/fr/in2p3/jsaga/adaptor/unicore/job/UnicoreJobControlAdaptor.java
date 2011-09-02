@@ -42,17 +42,7 @@ import fr.in2p3.jsaga.adaptor.unicore.UnicoreAbstract;
 * Date:   01/09/2011
 * ***************************************************/
 
-public class UnicoreJobControlAdaptor extends UnicoreAbstract implements JobControlAdaptor, HoldableJobAdaptor {
-
-	private TSSClient m_client;
-	
-    public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-    	return new Default[]{
-    			new Default(TARGET, "DEMO-SITE"),
-    			new Default(SERVICE_NAME, "TargetSystemService"), 
-    			new Default(RES, "default_target"),
-    			};
-    }
+public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract implements JobControlAdaptor, HoldableJobAdaptor {
 
     public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
     	return new JobDescriptionTranslatorXSLT("xsl/job/unicore-jsdl.xsl");
@@ -66,13 +56,8 @@ public class UnicoreJobControlAdaptor extends UnicoreAbstract implements JobCont
     	super.connect(userInfo, host, port, basePath, attributes);
     	
     	try {
-			//m_client = new TSSClient(m_epr.getAddress().getStringValue(),m_epr,m_uassecprop);
-
-			EndpointReferenceType _epr = EndpointReferenceType.Factory.newInstance();
-		    _epr.addNewAddress().setStringValue("https://localhost6:8080/DEMO-SITE/services/TargetSystemFactoryService?res=default_target_system_factory");
-			
 		    // Find a target system
-			TSFClient cl = new TSFClient(_epr.getAddress().getStringValue(), _epr, m_uassecprop);
+			TSFClient cl = new TSFClient(m_epr.getAddress().getStringValue(), m_epr, m_uassecprop);
 			Iterator<EndpointReferenceType> flavoursIter = cl.getTargetSystems().iterator(); 
 			if (flavoursIter.hasNext()) {
 				EndpointReferenceType _tss_epr = flavoursIter.next();
