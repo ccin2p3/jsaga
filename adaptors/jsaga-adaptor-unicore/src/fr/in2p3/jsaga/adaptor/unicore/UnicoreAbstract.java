@@ -15,6 +15,7 @@ import de.fzj.unicore.uas.client.StorageFactoryClient;
 import de.fzj.unicore.uas.security.IUASSecurityProperties;
 import de.fzj.unicore.uas.security.UASSecurityProperties;
 
+import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 import fr.in2p3.jsaga.adaptor.base.usage.U;
 import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
@@ -31,7 +32,7 @@ import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityCredential;
 * ***************************************************/
 
 
-public class UnicoreAbstract {
+public abstract class UnicoreAbstract implements ClientAdaptor {
 
 	protected static final String SERVICE_NAME = "ServiceName";
 	protected static final String RES = "Res";
@@ -87,19 +88,6 @@ public class UnicoreAbstract {
     	if (m_credential.getTrustStorePass() != null) {
     		m_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL_TRUSTPASS, m_credential.getTrustStorePass());
     	}
-
-	    /*try {
-	    	String url = "https://"+host+":"+port+"/"+(String) attributes.get(TARGET)+"/services/StorageFactory?res=default_storage_factory";
-	    	EndpointReferenceType epr = EndpointReferenceType.Factory.newInstance();
-	    	epr.addNewAddress().setStringValue(url);
-	    	StorageFactoryClient m_registryClient=new StorageFactoryClient(url,epr,m_uassecprop);
-		    for ( Iterator<EndpointReferenceType> flavoursIter = m_registryClient.getAccessibleStorages().iterator(); flavoursIter.hasNext(); ) {
-		        System.out.println( flavoursIter.next().getAddress().toString() );
-		      }
-
-		} catch (Exception e) {
-			throw new NoSuccessException(e);
-		}*/
 
 		m_epr = EndpointReferenceType.Factory.newInstance();
 	    m_epr.addNewAddress().setStringValue(m_serverUrl);
