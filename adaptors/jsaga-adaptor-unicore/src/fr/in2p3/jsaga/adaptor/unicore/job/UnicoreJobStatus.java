@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.unicore.job;
 
 
+import org.unigrids.services.atomic.types.StatusInfoType;
 import org.unigrids.services.atomic.types.StatusType;
 
 import fr.in2p3.jsaga.adaptor.job.SubState;
@@ -25,6 +26,14 @@ public class UnicoreJobStatus extends JobStatus {
 		super(jobId, stateCode, stateString, returnCode);
 	}
 
+	public UnicoreJobStatus(String jobId, StatusInfoType status) {
+		super(jobId, status.getStatus(), status.getDescription());
+	}
+	
+	public UnicoreJobStatus(String jobId, StatusInfoType status, Integer returnCode) {
+		super(jobId, status.getStatus(), status.getDescription(), returnCode);
+	}
+	
 	public String getModel() {
         return "UNICORE";
     }
@@ -32,7 +41,7 @@ public class UnicoreJobStatus extends JobStatus {
 	@Override
 	public SubState getSubState() {
 		StatusType.Enum state = (StatusType.Enum) m_nativeStateCode;
-    	String substate = null;
+		String substate = null;
         if (StatusType.QUEUED.equals(state)) {
        		return SubState.RUNNING_QUEUED;
         } else if (StatusType.READY.equals(state)) {
@@ -40,7 +49,9 @@ public class UnicoreJobStatus extends JobStatus {
         } else if (StatusType.RUNNING.equals(state)) {
        		return SubState.RUNNING_ACTIVE;
         } else if (StatusType.SUCCESSFUL.equals(state)) {
-            return SubState.DONE;
+        	// check m_nativeCause
+        	// in case of return code != 0, the job is successful
+            return (m_nativeCause == null)?SubState.DONE:SubState.FAILED_ERROR;
         } else if (StatusType.FAILED.equals(state)) {
             return SubState.FAILED_ERROR;
         } else {
