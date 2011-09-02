@@ -82,11 +82,12 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract implemen
 			sub.setJobDefinition(jdt);
 			sd.setSubmit(sub);
 			JobClient jc = m_client.submit(sd);
-			/*try {
+			try {
+				// TODO parameter ?
 				jc.waitUntilReady(600000); // 10mn
 			} catch (Exception e) {
 				throw new TimeoutException(e);
-			}*/
+			}
 			jc.start();
 			return jc.getUrl();
 		} catch (XmlException e) {
