@@ -46,7 +46,6 @@ public class BesUnicoreTestSuite extends JSAGATestSuite {
         public void test_suspend_running() { super.ignore("not supported"); }
     }
     
-    /* incompatible with Unicore Data plugin */
  	// test cases
     public static class BesUnicoreJobRunSandboxTest extends JobRunSandboxTest {
         public BesUnicoreJobRunSandboxTest() throws Exception {super("bes-unicore");}
