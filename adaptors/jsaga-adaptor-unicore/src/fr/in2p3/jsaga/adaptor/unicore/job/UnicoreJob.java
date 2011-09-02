@@ -1,5 +1,7 @@
 package fr.in2p3.jsaga.adaptor.unicore.job;
 
+import java.util.Calendar;
+
 import org.w3.x2005.x08.addressing.EndpointReferenceType;
 
 import de.fzj.unicore.uas.client.JobClient;
@@ -38,6 +40,10 @@ public class UnicoreJob {
 	
 	public int getExitCode() {
 		return m_client.getExitCode();
+	}
+	
+	public Calendar getSubmissionTime() {
+		return m_client.getSubmissionTime();
 	}
 	
 	public JobStatus getStatus() throws Exception {
