@@ -22,10 +22,12 @@ import org.w3.x2005.x08.addressing.EndpointReferenceType;
 import de.fzj.unicore.uas.client.JobClient;
 import de.fzj.unicore.uas.client.TSFClient;
 import de.fzj.unicore.uas.client.TSSClient;
+import de.fzj.unicore.wsrflite.xmlbeans.BaseFault;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.HoldableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
@@ -40,7 +42,7 @@ import fr.in2p3.jsaga.adaptor.unicore.UnicoreAbstract;
 * Date:   01/09/2011
 * ***************************************************/
 
-public class UnicoreJobControlAdaptor extends UnicoreAbstract implements JobControlAdaptor {
+public class UnicoreJobControlAdaptor extends UnicoreAbstract implements JobControlAdaptor, HoldableJobAdaptor {
 
 	private TSSClient m_client;
 	
@@ -95,6 +97,11 @@ public class UnicoreJobControlAdaptor extends UnicoreAbstract implements JobCont
 			sub.setJobDefinition(jdt);
 			sd.setSubmit(sub);
 			JobClient jc = m_client.submit(sd);
+			/*try {
+				jc.waitUntilReady(600000); // 10mn
+			} catch (Exception e) {
+				throw new TimeoutException(e);
+			}*/
 			jc.start();
 			return jc.getUrl();
 		} catch (XmlException e) {
@@ -104,10 +111,35 @@ public class UnicoreJobControlAdaptor extends UnicoreAbstract implements JobCont
 		}
 	}
 
-	public void cancel(String nativeJobId) throws PermissionDeniedException,
-			TimeoutException, NoSuccessException {
-		// TODO Auto-generated method stub
-		
+	public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+		try {
+			new UnicoreJob(nativeJobId, m_uassecprop).cancel();
+		} catch (Exception e) {
+			throw new NoSuccessException(e);
+		}
 	}
 
+	public boolean hold(String nativeJobId)	throws PermissionDeniedException, TimeoutException,	NoSuccessException {
+		try {
+			new UnicoreJob(nativeJobId, m_uassecprop).hold();
+			return true;
+		} catch (Exception e) {
+			if (e instanceof BaseFault) {
+				BaseFault fault = (BaseFault)e;
+				if (fault.getMessage().startsWith("Could not hold")) {
+					return false;
+				}
+			}
+			throw new NoSuccessException(e);
+		}
+	}
+
+	public boolean release(String nativeJobId) throws PermissionDeniedException,	TimeoutException, NoSuccessException {
+		try {
+			new UnicoreJob(nativeJobId, m_uassecprop).release();
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 }

@@ -26,13 +26,11 @@ public class UnicoreJob {
 		this(new JobClient(address.getAddress().getStringValue(), address, sec));
 	}
 	
-	/*
 	public UnicoreJob(String jobNativeID, IUASSecurityProperties sec) throws Exception {
 		EndpointReferenceType _epr = EndpointReferenceType.Factory.newInstance();
 	    _epr.addNewAddress().setStringValue(jobNativeID);
-		this(_epr,sec);
+		m_client = new JobClient(_epr.getAddress().getStringValue(), _epr, sec);
 	}
-	*/
 	
 	public String getNativeJobID() {
 		return m_client.getUrl();
@@ -49,5 +47,17 @@ public class UnicoreJob {
 		} else {
 			return new UnicoreJobStatus(getNativeJobID(), m_client.getStatus(), "Message Unknown");
 		}
+	}
+	
+	public void cancel() throws Exception {
+		m_client.abort();
+	}
+	
+	public void hold() throws Exception {
+		m_client.hold();
+	}
+	
+	public void release() throws Exception {
+		m_client.resume();
 	}
 }
