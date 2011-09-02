@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.adaptor.unicore.job;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import de.fzj.unicore.uas.client.TSSClient;
 import fr.in2p3.jsaga.adaptor.unicore.UnicoreAbstract;
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.monitor.JobInfoAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryListJob;
@@ -35,7 +37,7 @@ import fr.in2p3.jsaga.adaptor.job.monitor.QueryListJob;
 * Date:   01/09/2011
 * ***************************************************/
 public class UnicoreJobMonitorAdaptor extends UnicoreJobAdaptorAbstract implements
-		QueryIndividualJob, QueryListJob, ListableJobAdaptor {
+		QueryIndividualJob, QueryListJob, ListableJobAdaptor, JobInfoAdaptor {
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     	super.connect(userInfo, host, port, basePath, attributes);
@@ -103,6 +105,34 @@ public class UnicoreJobMonitorAdaptor extends UnicoreJobAdaptorAbstract implemen
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
+	}
+
+	public Integer getExitCode(String nativeJobId) throws NotImplementedException, NoSuccessException {
+		try {
+			return new UnicoreJob(nativeJobId, m_uassecprop).getExitCode();
+		} catch (Exception e) {
+			throw new NoSuccessException(e);
+		}
+	}
+
+	public Date getCreated(String nativeJobId) throws NotImplementedException, NoSuccessException {
+		try {
+			return new UnicoreJob(nativeJobId, m_uassecprop).getSubmissionTime().getTime();
+		} catch (Exception e) {
+			throw new NoSuccessException(e);
+		}
+	}
+
+	public Date getStarted(String nativeJobId) throws NotImplementedException, NoSuccessException {
+		throw new NotImplementedException();
+	}
+
+	public Date getFinished(String nativeJobId) throws NotImplementedException, NoSuccessException {
+		throw new NotImplementedException();
+	}
+
+	public String[] getExecutionHosts(String nativeJobId) throws NotImplementedException, NoSuccessException {
+		throw new NotImplementedException();
 	}
 
 }
