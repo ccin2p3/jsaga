@@ -2,6 +2,8 @@ package fr.in2p3.jsaga.adaptor.unicore.job;
 
 import java.util.Calendar;
 
+import org.unigrids.services.atomic.types.StatusInfoType;
+import org.unigrids.x2006.x04.services.jms.JobPropertiesDocument;
 import org.w3.x2005.x08.addressing.EndpointReferenceType;
 
 import de.fzj.unicore.uas.client.JobClient;
@@ -47,11 +49,23 @@ public class UnicoreJob {
 	}
 	
 	public JobStatus getStatus() throws Exception {
-		Integer rc = m_client.getExitCode();
+		StatusInfoType st = m_client.getResourcePropertiesDocument().getJobProperties().getStatusInfo();
+		// in some cases (jobs sleep), the status sent is FAILED with "Could not update status"
+		// whereas the jobs continues to run
+		// we need to throw an exception, otherwise the user thinks its job is failed
+		if (st.getDescription().contains("Could not update status")) {
+			throw new Exception("Could not get status: "+st.getDescription());
+		}
+		Integer rc = null;
+		try {
+			rc = m_client.getExitCode();
+		} catch (Exception e) {
+			// ignore if exit code is not available yet
+		}
 		if (rc != null) {
-			return new UnicoreJobStatus(getNativeJobID(), m_client.getStatus(), "Message Unknown", rc);
+			return new UnicoreJobStatus(getNativeJobID(), st, rc);
 		} else {
-			return new UnicoreJobStatus(getNativeJobID(), m_client.getStatus(), "Message Unknown");
+			return new UnicoreJobStatus(getNativeJobID(), st);
 		}
 	}
 	
