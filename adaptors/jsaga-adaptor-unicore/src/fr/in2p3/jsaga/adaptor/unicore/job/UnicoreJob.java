@@ -50,12 +50,15 @@ public class UnicoreJob {
 	
 	public JobStatus getStatus() throws Exception {
 		StatusInfoType st = m_client.getResourcePropertiesDocument().getJobProperties().getStatusInfo();
-		// in some cases (jobs sleep), the status sent is FAILED with "Could not update status"
-		// whereas the jobs continues to run
-		// we need to throw an exception, otherwise the user thinks its job is failed
-		if (st.getDescription().contains("Could not update status")) {
+		// Dans certains cas (/bin/sleep 30), le job se met en état FAILED
+		// alors qu'il continue à tourner
+		// Il faut renvoyer une exception pour éviter à l'utilisateur de croire que son job est planté
+		/// MAIS EN FAIT...
+		// Une fois que le job est FAILED, il reste dans cet état
+		// Les lignes suivantes sont donc commentées, sinon le getState boucle indéfiniment
+		/*if (st.getDescription().contains("Could not update status")) {
 			throw new Exception("Could not get status: "+st.getDescription());
-		}
+		}*/
 		Integer rc = null;
 		try {
 			rc = m_client.getExitCode();
@@ -78,6 +81,10 @@ public class UnicoreJob {
 	}
 	
 	public void release() throws Exception {
+		// If job is finished (exit code != null), throw an exception
+		if (m_client.getResourcePropertiesDocument().getJobProperties().getStatusInfo().getExitCode() != null) {
+			throw new Exception("Job is finished");
+		}
 		m_client.resume();
 	}
 }
