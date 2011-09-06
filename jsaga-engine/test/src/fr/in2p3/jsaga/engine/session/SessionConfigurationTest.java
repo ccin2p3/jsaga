@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.engine.session;
 import fr.in2p3.jsaga.impl.context.ContextImpl;
 import fr.in2p3.jsaga.impl.session.SessionImpl;
 import junit.framework.TestCase;
+
 import org.ogf.saga.context.Context;
 import org.ogf.saga.error.*;
 import org.ogf.saga.session.Session;
@@ -28,7 +29,8 @@ import java.util.Arrays;
 public class SessionConfigurationTest extends TestCase {
     private static final String CONFIG_SUCCESS = "/config/jsaga-default-contexts-success.xml";
     private static final String CONFIG_FAILURE = "/config/jsaga-default-contexts-failure.xml";
-
+    private static final String CONFIG_SCHEMES = "/config/jsaga-default-contexts-schemes.xml";
+    
     public void test_dumpXML() throws Exception {
         URL configUrl = SessionConfigurationTest.class.getResource(CONFIG_SUCCESS);
         SessionConfiguration config = new SessionConfiguration(configUrl);
@@ -89,6 +91,36 @@ public class SessionConfigurationTest extends TestCase {
         assertEquals("EGEE-myvo", findPrefixByUrl(session, "srm://ccsrm.in2p3.fr/pnfs/dteam"));
         assertEquals(null, findPrefixByUrl(session, "gridftp://cclcgvmli07.in2p3.fr/tmp"));
     }
+    
+    public void test_checkAttributes() throws Exception {
+    	String[] expectedKeys = new String[]{"BaseUrlExcludes","BaseUrlIncludes","Type","Att","UrlPrefix","JobServiceAttributes","DataServiceAttributes"};
+        SessionImpl session = (SessionImpl) createConfiguredSession(CONFIG_SCHEMES);
+        // Check we have 1 context only
+        Context[] ctxs = session.listContexts();
+        assertEquals(1, ctxs.length);
+        Context context = ctxs[0];
+        // Check keys
+    	this.assertEquals(Arrays.toString(expectedKeys), Arrays.toString(context.listAttributes()));
+    	// Check values
+        for (String key : context.listAttributes()) {
+            if (key.equals("BaseUrlExcludes")) {
+                assertEquals(Arrays.toString(new String[]{}), Arrays.toString(context.getVectorAttribute(key)));
+            } else if (key.equals("BaseUrlIncludes")) {
+                assertEquals(Arrays.toString(new String[]{"unicore://*","unicore://*"}), Arrays.toString(context.getVectorAttribute(key)));
+            } else if (key.equals("Type")) {
+                assertEquals("VOMS",context.getAttribute(key));
+            } else if (key.equals("Att")) {
+                assertEquals("Value",context.getAttribute(key));
+            } else if (key.equals("UrlPrefix")) {
+            	assertEquals("Demo",context.getAttribute(key));
+            } else if (key.equals("JobServiceAttributes")) {
+                assertEquals(Arrays.toString(new String[]{"unicore.ServiceName=JobManagement"}), Arrays.toString(context.getVectorAttribute(key)));
+            } else if (key.equals("DataServiceAttributes")) {
+                assertEquals(Arrays.toString(new String[]{"unicore.ServiceName=StorageManagement"}), Arrays.toString(context.getVectorAttribute(key)));
+            }
+        }
+    }
+    
     private static String findPrefixByUrl(SessionImpl session, String url) throws Exception {
         Context context = session.findContext(URLFactory.createURL(url));
         if (context != null) {
@@ -115,8 +147,9 @@ public class SessionConfigurationTest extends TestCase {
     private static Session createConfiguredSession(String configPath) throws IncorrectStateException, NoSuccessException, TimeoutException {
         URL configUrl = SessionConfigurationTest.class.getResource(configPath);
         SessionConfiguration config = new SessionConfiguration(configUrl);
-        Session session = SessionFactory.createSession(false);
+		Session session = SessionFactory.createSession(false);
         config.setDefaultSession(session);
+        
         return session;
     }
 }
