@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.adaptor.unicore;
 
-import java.util.Iterator;
 import java.util.Map;
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
@@ -10,8 +9,6 @@ import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.TimeoutException;
 import org.w3.x2005.x08.addressing.EndpointReferenceType;
 
-import de.fzj.unicore.uas.client.RegistryClient;
-import de.fzj.unicore.uas.client.StorageFactoryClient;
 import de.fzj.unicore.uas.security.IUASSecurityProperties;
 import de.fzj.unicore.uas.security.UASSecurityProperties;
 
@@ -37,9 +34,7 @@ public abstract class UnicoreAbstract implements ClientAdaptor {
 	protected static final String SERVICE_NAME = "ServiceName";
 	protected static final String RES = "Res";
 	protected static final String TARGET = "Target";
-	protected String m_serviceName;
-	protected String m_res;
-	protected String m_serverUrl ;
+	protected String m_target;
 	protected JKSSecurityCredential m_credential;
 	protected UASSecurityProperties m_uassecprop = null;
 	protected EndpointReferenceType m_epr = null;
@@ -69,12 +64,8 @@ public abstract class UnicoreAbstract implements ClientAdaptor {
 
 	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         
-
-		m_serviceName = (String) attributes.get(SERVICE_NAME);
-    	m_res = (String) attributes.get(RES);
-    	
-    	// build URL like https://<HOST>:<PORT>/<TARGET>/services/<SERVICE_NAME>?res=<RES>
-    	m_serverUrl = "https://"+host+":"+port+"/"+(String) attributes.get(TARGET)+"/services/"+m_serviceName+"?res="+m_res;
+    	m_target = (String) attributes.get(TARGET);
+    	String serverUrl = "https://"+host+":"+port+"/"+m_target+"/services/"+(String) attributes.get(SERVICE_NAME)+"?res="+(String) attributes.get(RES);
     	
     	m_uassecprop = new UASSecurityProperties();
     	m_uassecprop.setProperty(IUASSecurityProperties.WSRF_SSL, "true");
@@ -90,13 +81,12 @@ public abstract class UnicoreAbstract implements ClientAdaptor {
     	}
 
 		m_epr = EndpointReferenceType.Factory.newInstance();
-	    m_epr.addNewAddress().setStringValue(m_serverUrl);
+	    m_epr.addNewAddress().setStringValue(serverUrl);
     }
 
 	public void disconnect() throws NoSuccessException {
-        m_serverUrl = null;
         m_credential = null;
-        m_res = null;
+        m_target = null;
         m_epr = null;
         m_uassecprop = null;
     }    
