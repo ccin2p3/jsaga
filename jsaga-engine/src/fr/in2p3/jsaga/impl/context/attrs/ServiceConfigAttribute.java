@@ -55,7 +55,8 @@ public class ServiceConfigAttribute implements AttributeVector {
     }
 
     public void setValues(String[] values) throws NotImplementedException, IncorrectStateException, PermissionDeniedException, BadParameterException {
-        for (String v : values) {
+        m_values.clear();
+    	for (String v : values) {
             int equals = v.indexOf('=');
             if (equals == -1) {
                 throw new BadParameterException("Syntax error in expression: "+v);
