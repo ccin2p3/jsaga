@@ -102,7 +102,6 @@ public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPut
 
     public void makeDir(String parentAbsolutePath, String directoryName, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
 		try {
-			// TODO: uncomment in respect of the specs
 			if (!exists(parentAbsolutePath, additionalArgs)) throw new ParentDoesNotExist("Not found: " + parentAbsolutePath);
 			if (exists(parentAbsolutePath + directoryName, additionalArgs)) throw new AlreadyExistsException("Already exists: " + parentAbsolutePath + directoryName);
 			m_client.createDirectory(parentAbsolutePath + directoryName);
