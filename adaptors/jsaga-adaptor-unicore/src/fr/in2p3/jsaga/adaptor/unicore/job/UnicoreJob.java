@@ -2,6 +2,9 @@ package fr.in2p3.jsaga.adaptor.unicore.job;
 
 import java.util.Calendar;
 
+import org.ggf.schemas.jsdl.x2005.x11.jsdl.JobDescriptionType;
+import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.TimeoutException;
 import org.unigrids.services.atomic.types.StatusInfoType;
 import org.unigrids.x2006.x04.services.jms.JobPropertiesDocument;
 import org.w3.x2005.x08.addressing.EndpointReferenceType;
@@ -38,6 +41,23 @@ public class UnicoreJob {
 	
 	public String getNativeJobID() {
 		return m_client.getUrl();
+	}
+	
+	public void start() throws TimeoutException, NoSuccessException {
+		try {
+			m_client.waitUntilReady(600000); // 10mn
+		} catch (Exception e) {
+			throw new TimeoutException("Job was not READY after 10mn");
+		} 
+		try {
+			m_client.start();
+		} catch (Exception e) {
+			throw new NoSuccessException(e);
+		}
+	}
+	
+	public EndpointReferenceType getStorageEPR() throws Exception {
+		return m_client.getUspaceClient().getEPR();
 	}
 	
 	public int getExitCode() {
@@ -86,5 +106,9 @@ public class UnicoreJob {
 			throw new Exception("Job is finished");
 		}
 		m_client.resume();
+	}
+	
+	public JobDescriptionType getDescription() throws Exception {
+		return 	m_client.getResourcePropertiesDocument().getJobProperties().getOriginalJSDL().getJobDescription();
 	}
 }
