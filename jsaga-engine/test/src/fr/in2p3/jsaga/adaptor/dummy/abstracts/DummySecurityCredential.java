@@ -20,11 +20,11 @@ import java.io.PrintStream;
  */
 public class DummySecurityCredential implements SecurityCredential {
     public String getUserID() throws Exception {
-        return null;
+        return "me";
     }
 
     public String getAttribute(String key) throws NotImplementedException, NoSuccessException {
-        return null;
+    	throw new NotImplementedException();
     }
 
     public void close() throws Exception {
