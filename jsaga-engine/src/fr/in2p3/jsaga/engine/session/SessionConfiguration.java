@@ -137,12 +137,6 @@ public class SessionConfiguration {
                     context.setAttribute(attributeCfg.getName(), attributeCfg.getValue());
                 } else if (attributeCfg.getItemCount() > 0) {
                     context.setVectorAttribute(attributeCfg.getName(), attributeCfg.getItem());
-                } else {
-                    try {
-                        context.removeAttribute(attributeCfg.getName());
-                    } catch (DoesNotExistException e) {
-                        // ignore
-                    }
                 }
             }
         }
