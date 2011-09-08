@@ -198,8 +198,12 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
     protected StagingTransfer[] getStagingTransfers(String nativeJobId, String preOrPost) throws NoSuccessException{
     	StagingTransfer[] st = new StagingTransfer[]{};
     	JobDescriptionType jsdl;
+    	UnicoreJob ujob;
+    	EndpointReferenceType jobUSpace;
 		try {
-			jsdl = new UnicoreJob(nativeJobId, m_uassecprop).getDescription();
+			ujob = new UnicoreJob(nativeJobId, m_uassecprop);
+			jsdl = ujob.getDescription();
+			jobUSpace = ujob.getStorageEPR();
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
@@ -211,24 +215,26 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
 		} catch (URISyntaxException e) {
 			throw new NoSuccessException(e);
 		}
-    	String from, to, host;
+    	String from, to, host, res;
     	int port;
     	try {
-			host = new URI(m_epr.getAddress().getStringValue()).getHost();
-			port = new URI(m_epr.getAddress().getStringValue()).getPort();
+    		// extract host, port and res from something like:
+    		// https://localhost6.localdomain6:8080/DEMO-SITE/services/StorageManagement?res=7d105fd2-a849-468e-8603-4a4a0d0ff2b7
+    		URI jobEPRURI = new URI(jobUSpace.getAddress().getStringValue());
+			host = jobEPRURI.getHost();
+			port = jobEPRURI.getPort();
+			res = jobEPRURI.getQuery().split("=")[1];
 		} catch (URISyntaxException e) {
 			throw new NoSuccessException(e);
 		}
     	for (XmlObject jsaga_ds : getElementsByTagName(jsdl, "DataStaging")) {
     		String remoteFile = "unicore://" + host + ":" + port + "/"
-    			//+ getFirstNodeByTagName(jsaga_ds, "FileName").getTextContent()
     			+ getElementsByTagName(jsaga_ds, "FileName")[0].getDomNode().getFirstChild().getNodeValue()
-    			//+ jsdl.selectChildren(new QName("http://www.in2p3.fr/jsdl-extension","FileName","jsaga"))[0].xmlText()
-    			+ "?Target=" + m_target + "&Res=" +jobId;
-    		//System.out.println(remoteFile.toString());
+    			+ "?Target=" + m_target + "&Res=" +res;
     		if (preOrPost.equals(PRE_STAGING_TRANSFERS_TAGNAME) && getElementsByTagName(jsaga_ds, PRE_STAGING_TRANSFERS_TAGNAME).length > 0) {
     			from = getElementsByTagName(getElementsByTagName(jsaga_ds, "Source")[0],"URI")[0].getDomNode().getFirstChild().getNodeValue();
     			transfers.add(new StagingTransfer(from, remoteFile, false));
+        		System.out.println(from + "->" + remoteFile);
     		} else if (preOrPost.equals(POST_STAGING_TRANSFERS_TAGNAME) && getElementsByTagName(jsaga_ds, POST_STAGING_TRANSFERS_TAGNAME).length > 0) {
     			to = getElementsByTagName(getElementsByTagName(jsaga_ds, "Target")[0],"URI")[0].getDomNode().getFirstChild().getNodeValue();
     			transfers.add(new StagingTransfer(remoteFile, to, false));
