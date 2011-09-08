@@ -93,29 +93,39 @@ public class SessionConfigurationTest extends TestCase {
     }
     
     public void test_checkAttributes() throws Exception {
-    	String[] expectedKeys = new String[]{"BaseUrlExcludes","BaseUrlIncludes","Type","Att","UrlPrefix","JobServiceAttributes","DataServiceAttributes"};
+    	String[] expectedKeys = new String[]{ContextImpl.BASE_URL_EXCLUDES,
+    			ContextImpl.BASE_URL_INCLUDES,
+    			ContextImpl.TYPE,
+    			"Att",
+    			ContextImpl.URL_PREFIX,
+    			ContextImpl.JOB_SERVICE_ATTRIBUTES,
+    			ContextImpl.DATA_SERVICE_ATTRIBUTES};
         SessionImpl session = (SessionImpl) createConfiguredSession(CONFIG_SCHEMES);
+        
         // Check we have 1 context only
         Context[] ctxs = session.listContexts();
         assertEquals(1, ctxs.length);
         Context context = ctxs[0];
         // Check keys
-    	this.assertEquals(Arrays.toString(expectedKeys), Arrays.toString(context.listAttributes()));
+        Arrays.sort(expectedKeys);
+        String[] _listAttributes = context.listAttributes();
+        Arrays.sort(_listAttributes);
+    	this.assertEquals(Arrays.toString(expectedKeys), Arrays.toString(_listAttributes));
     	// Check values
         for (String key : context.listAttributes()) {
-            if (key.equals("BaseUrlExcludes")) {
+            if (key.equals(ContextImpl.BASE_URL_EXCLUDES)) {
                 assertEquals(Arrays.toString(new String[]{}), Arrays.toString(context.getVectorAttribute(key)));
-            } else if (key.equals("BaseUrlIncludes")) {
+            } else if (key.equals(ContextImpl.BASE_URL_INCLUDES)) {
                 assertEquals(Arrays.toString(new String[]{"unicore://*","unicore://*"}), Arrays.toString(context.getVectorAttribute(key)));
-            } else if (key.equals("Type")) {
+            } else if (key.equals(ContextImpl.TYPE)) {
                 assertEquals("VOMS",context.getAttribute(key));
             } else if (key.equals("Att")) {
                 assertEquals("Value",context.getAttribute(key));
-            } else if (key.equals("UrlPrefix")) {
+            } else if (key.equals(ContextImpl.URL_PREFIX)) {
             	assertEquals("Demo",context.getAttribute(key));
-            } else if (key.equals("JobServiceAttributes")) {
-                assertEquals(Arrays.toString(new String[]{"unicore.ServiceName=JobManagement"}), Arrays.toString(context.getVectorAttribute(key)));
-            } else if (key.equals("DataServiceAttributes")) {
+            } else if (key.equals(ContextImpl.JOB_SERVICE_ATTRIBUTES)) {
+                assertEquals(Arrays.toString(new String[]{"unicore.MaxJobsQueued=100","unicore.ServiceName=JobManagement"}), Arrays.toString(context.getVectorAttribute(key)));
+            } else if (key.equals(ContextImpl.DATA_SERVICE_ATTRIBUTES)) {
                 assertEquals(Arrays.toString(new String[]{"unicore.ServiceName=StorageManagement"}), Arrays.toString(context.getVectorAttribute(key)));
             }
         }
