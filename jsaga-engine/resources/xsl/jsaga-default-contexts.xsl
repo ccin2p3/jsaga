@@ -120,7 +120,7 @@
                                 </xsl:choose>
                             </item>
                         </xsl:for-each>
-                        <xsl:for-each select="$AdaptorsDescriptor/*/*[@type=$service/@type]
+                        <xsl:for-each select="$AdaptorsDescriptor/*/adapt:execution[@type=$service/@type]
                                               /adapt:attribute[not(@name=$service/cfg:attribute/@name)]">
                             <item>
                                 <xsl:value-of select="$service/@type"/>
@@ -159,7 +159,7 @@
                                 </xsl:choose>
                             </item>
                         </xsl:for-each>
-                        <xsl:for-each select="$AdaptorsDescriptor/*/*[@type=$service/@type]
+                        <xsl:for-each select="$AdaptorsDescriptor/*/adapt:protocol[@type=$service/@type]
                                               /adapt:attribute[not(@name=$service/cfg:attribute/@name)]">
                             <item>
                                 <xsl:value-of select="$service/@type"/>
