@@ -5,7 +5,7 @@
             <attribute name="BaseUrlIncludes">
                 <item>stest://</item>
             </attribute>
-            <attribute name="ServiceAttributes"/>
+            <attribute name="DataServiceAttributes"/>
         </context>
         <context type="VOMS">
             <attribute name="UserVO" value="dteam"/>
@@ -16,15 +16,16 @@
                 <item>cream://</item>
                 <item>wms://</item>
             </attribute>
-            <attribute name="ServiceAttributes">
+            <attribute name="JobServiceAttributes">
                 <item>wms.virtualorganisation=dteam</item>
             </attribute>
+            <attribute name="DataServiceAttributes"/>
         </context>
         <context type="Globus">
             <attribute name="BaseUrlIncludes">
                 <item>gatekeeper://</item>
             </attribute>
-            <attribute name="ServiceAttributes">
+            <attribute name="JobServiceAttributes">
                 <item>gatekeeper.ShellPath=F\:\\cygwin\\bin\\sh.exe</item>
             </attribute>
         </context>
@@ -32,7 +33,7 @@
             <attribute name="BaseUrlIncludes">
                 <item>local://</item>
             </attribute>
-            <attribute name="ServiceAttributes">
+            <attribute name="JobServiceAttributes">
                 <item>local.ShellPath=F\:\\cygwin\\bin\\sh.exe</item>
             </attribute>
         </context>
