@@ -47,7 +47,7 @@ public class JobAdaptorFactory extends ServiceAdaptorFactory {
     public Map getAttribute(URL url, ContextImpl context) throws NotImplementedException, NoSuccessException {
         String scheme = context.getSchemeFromAlias(url.getScheme());
         try {
-            return getAttributes(url, context, m_descriptor.getDefaultsMap(scheme));
+            return getAttributes(url, context, m_descriptor.getDefaultsMap(scheme), ContextImpl.JOB_SERVICE_ATTRIBUTES);
         } catch (BadParameterException e) {
             throw new NoSuccessException(e);
         }

@@ -87,7 +87,7 @@ public class Help extends AbstractCommand {
                 Set<String> ignored = new HashSet<String>();
                 ignored.addAll(Arrays.asList(Context.TYPE, ContextImpl.URL_PREFIX,
                         ContextImpl.BASE_URL_INCLUDES, ContextImpl.BASE_URL_EXCLUDES,
-                        ContextImpl.SERVICE_ATTRIBUTES));
+                        ContextImpl.JOB_SERVICE_ATTRIBUTES, ContextImpl.DATA_SERVICE_ATTRIBUTES));
                 for (Context context : session.listContexts()) {
                     String type = context.getAttribute(Context.TYPE);
                     boolean first = true;

@@ -23,13 +23,13 @@ import java.util.*;
  *
  */
 public class ServiceAdaptorFactory {
-    public static Map getAttributes(URL url, ContextImpl context, Map adaptorDefaults) throws NotImplementedException, BadParameterException, NoSuccessException {
+    public static Map getAttributes(URL url, ContextImpl context, Map adaptorDefaults, String serviceType) throws NotImplementedException, BadParameterException, NoSuccessException {
         // map rather than properties, because map supports "put(key, null)"
         Map attributes = new HashMap();
 
         // add service config
         String scheme = context.getSchemeFromAlias(url.getScheme());
-        Properties serviceConfig = context.getServiceConfig(scheme);
+        Properties serviceConfig = context.getServiceConfig(serviceType, scheme);
         if (serviceConfig != null) {
             attributes.putAll(serviceConfig);
         } else {

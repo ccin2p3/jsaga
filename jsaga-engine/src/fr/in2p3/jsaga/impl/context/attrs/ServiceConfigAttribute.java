@@ -7,6 +7,7 @@ import fr.in2p3.jsaga.impl.monitoring.MetricMode;
 import fr.in2p3.jsaga.impl.monitoring.MetricType;
 import org.ogf.saga.error.*;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /* ***************************************************
@@ -21,19 +22,11 @@ import java.util.*;
 /**
  *
  */
-public class ServiceConfigAttribute implements AttributeVector {
+public abstract class ServiceConfigAttribute implements AttributeVector {
     private Map<String, Properties> m_values;
 
     public ServiceConfigAttribute() {
         m_values = new HashMap<String, Properties>();
-    }
-
-    public String getKey() {
-        return ContextImpl.SERVICE_ATTRIBUTES;
-    }
-
-    public String getDescription() {
-        return "array of attributes for service used with this context";
     }
 
     public boolean isReadOnly() {
@@ -49,7 +42,36 @@ public class ServiceConfigAttribute implements AttributeVector {
     }
 
     public Attribute clone() throws CloneNotSupportedException {
-        ServiceConfigAttribute clone = new ServiceConfigAttribute();
+    	Class clazz;
+		try {
+			clazz = Class.forName(this.getClass().getName());
+		} catch (ClassNotFoundException e1) {
+			throw new CloneNotSupportedException();
+		}
+
+    	// Find the constructor
+    	java.lang.reflect.Constructor constructor;
+		try {
+			constructor = clazz.getConstructor();
+		} catch (SecurityException e) {
+			throw new CloneNotSupportedException();
+		} catch (NoSuchMethodException e) {
+			throw new CloneNotSupportedException();
+		}
+
+    	// And construct
+    	ServiceConfigAttribute clone;
+		try {
+			clone = (ServiceConfigAttribute)constructor.newInstance();
+		} catch (IllegalArgumentException e) {
+			throw new CloneNotSupportedException();
+		} catch (InstantiationException e) {
+			throw new CloneNotSupportedException();
+		} catch (IllegalAccessException e) {
+			throw new CloneNotSupportedException();
+		} catch (InvocationTargetException e) {
+			throw new CloneNotSupportedException();
+		}
         clone.m_values = m_values;
         return clone;
     }
