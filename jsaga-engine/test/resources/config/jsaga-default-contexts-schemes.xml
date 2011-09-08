@@ -2,6 +2,9 @@
 <jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
     <session>
         <context type="VOMS" id="Demo">
+            <attribute name="JobServiceAttributes">
+                <item>unicore.MaxJobsQueued=100</item>
+            </attribute>
             <attribute name="Att" value="Value"/>
             <data type="unicore">
             	<attribute name="ServiceName" value="StorageManagement"/>
