@@ -32,7 +32,8 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     public static final String URL_PREFIX = "UrlPrefix";
     public static final String BASE_URL_INCLUDES = "BaseUrlIncludes";
     public static final String BASE_URL_EXCLUDES = "BaseUrlExcludes";
-    public static final String SERVICE_ATTRIBUTES = "ServiceAttributes";
+    public static final String JOB_SERVICE_ATTRIBUTES = "JobServiceAttributes";
+    public static final String DATA_SERVICE_ATTRIBUTES = "DataServiceAttributes";
 
     private static Logger s_logger = Logger.getLogger(ContextImpl.class);
     
@@ -312,8 +313,14 @@ public class ContextImpl extends AbstractAttributesImpl implements Context {
     /**
      * This method is specific to JSAGA implementation.
      */
-    public Properties getServiceConfig(String scheme) {
-        return m_attributes.m_serviceAttributes.getServiceConfig(scheme);
+    public Properties getServiceConfig(String serviceType, String scheme) {
+    	if (JOB_SERVICE_ATTRIBUTES.equals(serviceType)) {
+    		return m_attributes.m_jobServiceAttributes.getServiceConfig(scheme);
+    	} else if (DATA_SERVICE_ATTRIBUTES.equals(serviceType)) {
+    		return m_attributes.m_dataServiceAttributes.getServiceConfig(scheme);
+    	} else {
+    		return null;
+    	}
     }
 
     /**

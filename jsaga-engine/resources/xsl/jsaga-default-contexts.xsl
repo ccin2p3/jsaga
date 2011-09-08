@@ -11,7 +11,8 @@
     <xsl:variable name="UrlPrefix">UrlPrefix</xsl:variable>
     <xsl:variable name="BaseUrlIncludes">BaseUrlIncludes</xsl:variable>
     <xsl:variable name="BaseUrlExcludes">BaseUrlExcludes</xsl:variable>
-    <xsl:variable name="ServiceAttributes">ServiceAttributes</xsl:variable>
+    <xsl:variable name="JobServiceAttributes">JobServiceAttributes</xsl:variable>
+    <xsl:variable name="DataServiceAttributes">DataServiceAttributes</xsl:variable>
 
     <xsl:template match="/cfg:jsaga-default">
         <jsaga-default>
@@ -37,7 +38,7 @@
         <context>
             <xsl:copy-of select="@type"/>
             <!-- config context -->
-            <xsl:copy-of select="cfg:attribute[@name!=$UrlPrefix and @name!=$BaseUrlIncludes and @name!=$BaseUrlExcludes and @name!=$ServiceAttributes]"/>
+            <xsl:copy-of select="cfg:attribute[@name!=$UrlPrefix and @name!=$BaseUrlIncludes and @name!=$BaseUrlExcludes and @name!=$JobServiceAttributes and @name!=$DataServiceAttributes]"/>
 
             <!-- prefix -->
             <xsl:if test="parent::cfg:session">
@@ -94,10 +95,11 @@
             </xsl:if>
 
             <!-- config services -->
-            <xsl:if test="cfg:attribute[@name=$ServiceAttributes] or cfg:data or cfg:job">
-                <attribute name="{$ServiceAttributes}">
-                    <xsl:copy-of select="cfg:attribute[@name=$ServiceAttributes]/cfg:item"/>
-                    <xsl:for-each select="cfg:data | cfg:job">
+            <!-- Job service -->
+            <xsl:if test="cfg:attribute[@name=$JobServiceAttributes] or cfg:job">
+                <attribute name="{$JobServiceAttributes}">
+                    <xsl:copy-of select="cfg:attribute[@name=$JobServiceAttributes]/cfg:item"/>
+                    <xsl:for-each select="cfg:job">
                         <xsl:variable name="service" select="."/>
                         <xsl:for-each select="cfg:attribute">
                             <item>
@@ -131,6 +133,46 @@
                     </xsl:for-each>
                 </attribute>
             </xsl:if>
+
+            <!-- Data service -->
+            <xsl:if test="cfg:attribute[@name=$DataServiceAttributes] or cfg:data">
+                <attribute name="{$DataServiceAttributes}">
+                    <xsl:copy-of select="cfg:attribute[@name=$DataServiceAttributes]/cfg:item"/>
+                    <xsl:for-each select="cfg:data">
+                        <xsl:variable name="service" select="."/>
+                        <xsl:for-each select="cfg:attribute">
+                            <item>
+                                <xsl:value-of select="$service/@type"/>
+                                <xsl:text>.</xsl:text>
+                                <xsl:value-of select="@name"/>
+                                <xsl:text>=</xsl:text>
+                                <xsl:choose>
+                                    <xsl:when test="@value">
+                                        <xsl:value-of select="@value"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:for-each select="cfg:item">
+                                            <xsl:if test="position()>1">,</xsl:if>
+                                            <xsl:value-of select="text()"/>
+                                        </xsl:for-each>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </item>
+                        </xsl:for-each>
+                        <xsl:for-each select="$AdaptorsDescriptor/*/*[@type=$service/@type]
+                                              /adapt:attribute[not(@name=$service/cfg:attribute/@name)]">
+                            <item>
+                                <xsl:value-of select="$service/@type"/>
+                                <xsl:text>.</xsl:text>
+                                <xsl:value-of select="@name"/>
+                                <xsl:text>=</xsl:text>
+                                <xsl:value-of select="@value"/>
+                            </item>
+                        </xsl:for-each>
+                    </xsl:for-each>
+                </attribute>
+            </xsl:if>
+
         </context>
     </xsl:template>
 

@@ -25,7 +25,8 @@ public class ContextAttributes implements Cloneable {
     AttributeScalar m_urlPrefix;
     BaseUrlPatternAttribute m_baseUrlIncludes;
     BaseUrlPatternAttribute m_baseUrlExcludes;
-    ServiceConfigAttribute m_serviceAttributes;
+    JobServiceConfigAttribute m_jobServiceAttributes;
+    DataServiceConfigAttribute m_dataServiceAttributes;
 
     /** constructor */
     ContextAttributes(ContextImpl context) {
@@ -42,7 +43,8 @@ public class ContextAttributes implements Cloneable {
         m_baseUrlExcludes = (BaseUrlPatternAttribute) context._addVectorAttribute(new BaseUrlPatternAttribute(
                 ContextImpl.BASE_URL_EXCLUDES,
                 "array of URL patterns rejected for this context"));
-        m_serviceAttributes = (ServiceConfigAttribute) context._addVectorAttribute(new ServiceConfigAttribute());
+        m_jobServiceAttributes = (JobServiceConfigAttribute) context._addVectorAttribute(new JobServiceConfigAttribute());
+        m_dataServiceAttributes = (DataServiceConfigAttribute) context._addVectorAttribute(new DataServiceConfigAttribute());
     }
 
     /** clone */
@@ -52,7 +54,8 @@ public class ContextAttributes implements Cloneable {
         clone.m_urlPrefix = m_urlPrefix;
         clone.m_baseUrlIncludes = m_baseUrlIncludes;
         clone.m_baseUrlExcludes = m_baseUrlExcludes;
-        clone.m_serviceAttributes = m_serviceAttributes;
+        clone.m_jobServiceAttributes = m_jobServiceAttributes;
+        clone.m_dataServiceAttributes = m_dataServiceAttributes;
         return clone;
     }
 
@@ -65,7 +68,9 @@ public class ContextAttributes implements Cloneable {
             throw new IncorrectStateException("Operation not allowed on vector attribute: "+key);
         } else if (m_baseUrlExcludes.getKey().equals(key)) {
             throw new IncorrectStateException("Operation not allowed on vector attribute: "+key);
-        } else if (m_serviceAttributes.getKey().equals(key)) {
+        } else if (m_jobServiceAttributes.getKey().equals(key)) {
+            throw new IncorrectStateException("Operation not allowed on vector attribute: "+key);
+        } else if (m_dataServiceAttributes.getKey().equals(key)) {
             throw new IncorrectStateException("Operation not allowed on vector attribute: "+key);
         } else {
             throw new DoesNotExistException("[INTERNAL ERROR] This exception should have been catched");
@@ -81,8 +86,10 @@ public class ContextAttributes implements Cloneable {
             return m_baseUrlIncludes;
         } else if (m_baseUrlExcludes.getKey().equals(key)) {
             return m_baseUrlExcludes;
-        } else if (m_serviceAttributes.getKey().equals(key)) {
-            return m_serviceAttributes;
+        } else if (m_jobServiceAttributes.getKey().equals(key)) {
+            return m_jobServiceAttributes;
+        } else if (m_dataServiceAttributes.getKey().equals(key)) {
+            return m_dataServiceAttributes;
         } else {
             throw new DoesNotExistException("[INTERNAL ERROR] This exception should have been catched");
         }
