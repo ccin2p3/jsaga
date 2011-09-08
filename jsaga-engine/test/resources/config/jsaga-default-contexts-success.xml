@@ -3,7 +3,7 @@
     <session>
         <context type="VOMS" id="DGrid"><!-- default id is VOMS0 -->
             <attribute name="UserProxy" value="/tmp/dgrid.pem"/>
-            <attribute name="ServiceAttributes">
+            <attribute name="DataServiceAttributes">
                 <item>srb.Resource=toto</item>
             </attribute>
             <attribute name="BaseUrlIncludes">

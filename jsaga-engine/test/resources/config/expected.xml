@@ -16,7 +16,7 @@
             <attribute name="BaseUrlExcludes">
                 <item>{gsiftp,gridftp-&gt;gsiftp}://*.*fzk.de[:2811]</item>
             </attribute>
-            <attribute name="ServiceAttributes">
+            <attribute name="DataServiceAttributes">
                 <item>srb.Resource=toto</item>
                 <item>srb.Zone=titi</item>
             </attribute>
@@ -27,7 +27,7 @@
             <attribute name="BaseUrlIncludes">
                 <item>gsiftp://*.*fzk.de[:2811]</item>
             </attribute>
-            <attribute name="ServiceAttributes"/>
+            <attribute name="DataServiceAttributes"/>
         </context>
         <context type="VOMS">
             <attribute name="UserProxy" value="/tmp/EGEE-myvo.pem"/>
@@ -35,7 +35,7 @@
             <attribute name="BaseUrlIncludes">
                 <item>srm://</item>
             </attribute>
-            <attribute name="ServiceAttributes">
+            <attribute name="DataServiceAttributes">
                 <item>srm.TransferProtocols=gsiftp,gsidcap</item>
             </attribute>
         </context>
