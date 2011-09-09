@@ -9,7 +9,9 @@ import fr.in2p3.jsaga.adaptor.unicore.UnicoreAbstract;
 
 import org.ogf.saga.error.*;
 import org.unigrids.services.atomic.types.GridFileType;
-import de.fzj.unicore.uas.client.SByteIOClient;
+import org.unigrids.services.atomic.types.ProtocolType.Enum;
+
+import de.fzj.unicore.uas.client.FileTransferClient;
 import de.fzj.unicore.uas.client.StorageClient;
 import de.fzj.unicore.wsrflite.xmlbeans.BaseFault;
 
@@ -33,6 +35,7 @@ import java.util.*;
 public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPutter, FileReaderGetter {
     private String m_serverFileSeparator ;
 	private StorageClient m_client;
+	private Enum[] m_protocols;
     private String rootDirectory = ".";
 
     public Default[] getDefaults(Map attributes) throws IncorrectStateException {
@@ -48,7 +51,7 @@ public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPut
     	
     	try {
 			m_client = new StorageClient(m_epr,m_uassecprop);
-
+			m_protocols = m_client.getSupportedProtocols();
 			// TODO customize this
 			m_serverFileSeparator = "/";
 		} catch (Exception e) {
@@ -58,6 +61,7 @@ public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPut
 
     public void disconnect() throws NoSuccessException {
     	m_client = null;
+    	m_protocols = null;
     	super.disconnect();
     }
     
@@ -133,7 +137,7 @@ public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPut
 			throw new NoSuccessException("Append not supported.");
 		}
 		try {
-			SByteIOClient io_client = m_client.getWriteStream(absolutePath);
+			FileTransferClient io_client = m_client.getExport(absolutePath, m_protocols);
 			io_client.writeAllData(stream);
 		} catch (IOException e) {
 			throw new NoSuccessException(e);
@@ -146,9 +150,11 @@ public class UnicoreDataAdaptor extends UnicoreAbstract implements FileWriterPut
 			OutputStream stream) throws PermissionDeniedException, BadParameterException,
             DoesNotExistException, TimeoutException, NoSuccessException {
 		try {
-			SByteIOClient io_client = m_client.getReadStream(absolutePath);
+			FileTransferClient io_client = m_client.getImport(absolutePath, m_protocols);
 			io_client.readAllData(stream);
 		} catch (IOException e) {
+			throw new NoSuccessException(e);
+		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
 	}
