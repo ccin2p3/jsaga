@@ -77,22 +77,24 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
 			Iterator<EndpointReferenceType> flavoursIter = cl.getTargetSystems().iterator(); 
 			if (flavoursIter.hasNext()) {
 				EndpointReferenceType _tss_epr = flavoursIter.next();
+				logger.debug("Found this TSS: " + _tss_epr.getAddress().getStringValue());
 		        m_client = new TSSClient(_tss_epr.getAddress().getStringValue(), _tss_epr, m_uassecprop);
 		    } else {
+				logger.debug("No TSS found, creating a new one");
 		    	m_client = cl.createTSS();
 		    }
 			// Check if the special "Custom executable" is supported on the server
-			try {
-				Iterator<ApplicationResourceType> _apps = m_client.getApplications().iterator();
-				while (_apps.hasNext()) {
-					if (_apps.next().getApplicationName().equals("Custom executable")) {
-						throw new Exception("OK");
-					}
-				}
-				logger.warn("Application \"Custom executable\" is not available, jobs may fail");
-			} catch (Exception e1) {
-				// Nothing to do
+			boolean customExecutableAvailable = false;
+			Iterator<ApplicationResourceType> _apps = m_client.getApplications().iterator();
+			String appName;
+			while (_apps.hasNext()) {
+				appName = _apps.next().getApplicationName();
+				logger.debug("Found this application: " + appName);
+				if (appName.equals("Custom executable")) 
+					customExecutableAvailable = true;
 			}
+			if (! customExecutableAvailable)
+				logger.warn("Application \"Custom executable\" is not available, jobs may fail");
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
@@ -108,6 +110,7 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
 			sub.setJobDefinition(jdt);
 			sd.setSubmit(sub);
 			JobClient jc = m_client.submit(sd);
+			logger.debug("Job submitted, id=" + jc.getUrl());
 			return jc.getUrl();
 		} catch (XmlException e) {
 			throw new NoSuccessException(e);
@@ -234,9 +237,11 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
     		if (preOrPost.equals(PRE_STAGING_TRANSFERS_TAGNAME) && getElementsByTagName(jsaga_ds, "Source").length > 0) {
     			from = getElementsByTagName(getElementsByTagName(jsaga_ds, "Source")[0],"URI")[0].getDomNode().getFirstChild().getNodeValue();
     			transfers.add(new StagingTransfer(from, remoteFile, false));
+    			logger.debug("pre-staging: " + from + " -> " + remoteFile);
     		} else if (preOrPost.equals(POST_STAGING_TRANSFERS_TAGNAME) && getElementsByTagName(jsaga_ds, "Target").length > 0) {
     			to = getElementsByTagName(getElementsByTagName(jsaga_ds, "Target")[0],"URI")[0].getDomNode().getFirstChild().getNodeValue();
     			transfers.add(new StagingTransfer(remoteFile, to, false));
+    			logger.debug("post-staging: " + remoteFile + " -> " + to);
     		}
     	}
     	return (StagingTransfer[]) transfers.toArray(st);
