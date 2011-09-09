@@ -4,10 +4,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.apache.log4j.Logger;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.ggf.schemas.jsdl.x2005.x11.jsdl.JobDefinitionDocument;
@@ -21,6 +23,7 @@ import org.ogf.saga.error.NotImplementedException;
 import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
 
+import org.unigrids.x2006.x04.services.tss.ApplicationResourceType;
 import org.unigrids.x2006.x04.services.tss.SubmitDocument;
 import org.unigrids.x2006.x04.services.tss.SubmitDocument.Submit;
 import org.w3.x2005.x08.addressing.EndpointReferenceType;
@@ -55,6 +58,7 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
 
     protected static final String PRE_STAGING_TRANSFERS_TAGNAME = "PreStagingIn";
     protected static final String POST_STAGING_TRANSFERS_TAGNAME = "PostStagingOut";
+    private Logger logger = Logger.getLogger(UnicoreJobControlAdaptor.class);
 
     public JobDescriptionTranslator getJobDescriptionTranslator() throws NoSuccessException {
     	return new JobDescriptionTranslatorXSLT("xsl/job/unicore-jsdl.xsl");
@@ -77,8 +81,18 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
 		    } else {
 		    	m_client = cl.createTSS();
 		    }
-			//throw new NoSuccessException("END");
-
+			// Check if the special "Custom executable" is supported on the server
+			try {
+				Iterator<ApplicationResourceType> _apps = m_client.getApplications().iterator();
+				while (_apps.hasNext()) {
+					if (_apps.next().getApplicationName().equals("Custom executable")) {
+						throw new Exception("OK");
+					}
+				}
+				logger.warn("Application \"Custom executable\" is not available, jobs may fail");
+			} catch (Exception e1) {
+				// Nothing to do
+			}
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
@@ -165,30 +179,22 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
      * Extract the staging URL from the JSDL as follows:
      * 
      * <jsaga:DataStaging>
-     *   <jsaga:PreStagingIn>
      *   <jsaga:FileName>xxx</jsaga:FileName>
      *   <jsaga:Source>
      *     <jsaga:URI>/tmp/yyy</jsaga:URI>
      *   </jsaga:Source>
-     *   <jsaga:Target>
-     *     <jsaga:URI>unicore://<host>:<port>/xxx/</jsaga:URI>
-     *   </jsaga:Target>
      * </jsaga:DataStaging>
      * 
      * or
      * <jsaga:DataStaging>
-     *   <jsaga:PostStagingOut>
      *   <jsaga:FileName>xxx</jsaga:FileName>
-     *   <jsaga:Source>
-     *     <jsaga:URI>unicore://<host>:<port>/xxx/</jsaga:URI>
-     *   </jsaga:Source>
      *   <jsaga:Target>
      *     <jsaga:URI>/tmp/yyy</jsaga:URI>
      *   </jsaga:Target>
      * </jsaga:DataStaging>
      * 
      * The Unicore data plugin URI is built like this: 
-     * unicore://<host>:<port>/<FileName>?Target=<target>&Res=<JobId>
+     * unicore://<host>:<port>/<FileName>?Target=<target>&Res=<resOfJobUSpace>
      * 
      * @param nativeJobId the native job identifier
      * @param jsdl the JSDL Job Description
@@ -208,13 +214,7 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
 			throw new NoSuccessException(e);
 		}
     	ArrayList transfers = new ArrayList();
-    	// Extract <jobId> from nativeJobID URL (extract xxx from https://.../JobManagement?res=xxx)
-    	String jobId;
-		try {
-			jobId = new URI(nativeJobId).getQuery().split("=")[1];
-		} catch (URISyntaxException e) {
-			throw new NoSuccessException(e);
-		}
+
     	String from, to, host, res;
     	int port;
     	try {
@@ -231,10 +231,10 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
     		String remoteFile = "unicore://" + host + ":" + port + "/"
     			+ getElementsByTagName(jsaga_ds, "FileName")[0].getDomNode().getFirstChild().getNodeValue()
     			+ "?Target=" + m_target + "&Res=" +res;
-    		if (preOrPost.equals(PRE_STAGING_TRANSFERS_TAGNAME) && getElementsByTagName(jsaga_ds, PRE_STAGING_TRANSFERS_TAGNAME).length > 0) {
+    		if (preOrPost.equals(PRE_STAGING_TRANSFERS_TAGNAME) && getElementsByTagName(jsaga_ds, "Source").length > 0) {
     			from = getElementsByTagName(getElementsByTagName(jsaga_ds, "Source")[0],"URI")[0].getDomNode().getFirstChild().getNodeValue();
     			transfers.add(new StagingTransfer(from, remoteFile, false));
-    		} else if (preOrPost.equals(POST_STAGING_TRANSFERS_TAGNAME) && getElementsByTagName(jsaga_ds, POST_STAGING_TRANSFERS_TAGNAME).length > 0) {
+    		} else if (preOrPost.equals(POST_STAGING_TRANSFERS_TAGNAME) && getElementsByTagName(jsaga_ds, "Target").length > 0) {
     			to = getElementsByTagName(getElementsByTagName(jsaga_ds, "Target")[0],"URI")[0].getDomNode().getFirstChild().getNodeValue();
     			transfers.add(new StagingTransfer(remoteFile, to, false));
     		}
@@ -244,15 +244,5 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
 	
     private static XmlObject[] getElementsByTagName(XmlObject obj, String elmt)  {
     	return obj.selectChildren(new QName("http://www.in2p3.fr/jsdl-extension", elmt, "jsaga"));
-    }
-    
-    private static Node getFirstNodeByTagName(XmlObject xml, String tag) {
-    	NodeList nl = xml.getDomNode().getChildNodes();
-    	for (int i=0; i<nl.getLength(); i++) {
-    		if (nl.item(i).getLocalName().equals(tag)) {
-    			return nl.item(i);
-    		}
-    	}
-    	return null;
     }
 }
