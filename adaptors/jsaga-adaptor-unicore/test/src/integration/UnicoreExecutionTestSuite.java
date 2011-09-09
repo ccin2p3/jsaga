@@ -36,17 +36,12 @@ public class UnicoreExecutionTestSuite extends JSAGATestSuite {
     // test cases
     public static class UnicoreJobRunRequiredTest extends JobRunRequiredTest {
         public UnicoreJobRunRequiredTest() throws Exception {super("unicore");}
-        // TODO: uncomment when server bug is fixed
-        public void test_run_long() { super.ignore("Bug in server: status FAILED for job sleep"); }
-        public void test_cancel_running() { super.ignore("Bug in server: status FAILED for job sleep"); }
     }
     
     // test cases
     public static class UnicoreJobRunOptionalTest extends JobRunOptionalTest {
         public UnicoreJobRunOptionalTest() throws Exception {super("unicore");}
         public void test_suspend_running() { super.ignore("not supported"); }
-        public void test_listJob() { super.ignore("Bug in server: status FAILED for job sleep"); }
-        public void test_simultaneousLongJob() { super.ignore("Bug in server: status FAILED for job sleep"); }
     }
     
  	// test cases
