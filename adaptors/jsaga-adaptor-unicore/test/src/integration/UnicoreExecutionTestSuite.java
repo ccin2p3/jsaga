@@ -57,6 +57,12 @@ public class UnicoreExecutionTestSuite extends JSAGATestSuite {
         public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
     }
 
+    public static class UnicoreJobRunInfoTest extends JobRunInfoTest {
+    	public UnicoreJobRunInfoTest() throws Exception {super("unicore");}
+    	public void test_dates() {super.ignore("Started and finished dates not supported"); }
+    	public void test_execution_hosts() {super.ignore("not supported"); }
+    }
+    
     // test cases
     //public static class UnicoreJobRunInteractiveTest extends JobRunInteractiveTest {
     //    public UnicoreJobRunInteractiveTest() throws Exception {super("unicore");}
