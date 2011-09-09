@@ -8,17 +8,8 @@
 	<xsl:output method="xml"/>
 	
 	<!-- JSAGA parameters -->
-	<xsl:param name="UniqId">staging</xsl:param>
-	<xsl:param name="HostName">host</xsl:param>
-	<xsl:param name="Protocol">file</xsl:param>
-	<xsl:param name="Port"></xsl:param>
-	<xsl:param name="Path">/tmp</xsl:param>
 	
 	<!-- constants -->
-	<!-- TODO remove this -->
-	<xsl:variable name="IntermediaryURL">
-		    <xsl:text>unicor://</xsl:text><xsl:value-of select="$HostName"/>:<xsl:value-of select="$Port"/>
-	</xsl:variable>
 
 	<xsl:template match="/ | @* | node()">
 	  <xsl:copy>
@@ -34,63 +25,23 @@
 	  </xsl:copy>
 	</xsl:template>
 		
-	<!--<xsl:template match="jsdl:JobDescription">
-	  <xsl:copy>
-	    <xsl:apply-templates select="@* | node()"/>
-		  <jsaga:StagingDirectory><jsaga:URI><xsl:value-of select="$IntermediaryURL"/></jsaga:URI></jsaga:StagingDirectory>
-	  </xsl:copy>
-	</xsl:template>-->
-		
-	<!--<xsl:template match="jsdl:DataStaging/jsdl:Source">
-		<jsdl:Source>
-			<jsdl:URI><xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="../jsdl:FileName/text()"/></jsdl:URI>
-		</jsdl:Source>
-	</xsl:template>-->
-	
-	<!--<xsl:template match="jsdl:DataStaging/jsdl:Target">
-		<jsdl:Target>
-			<jsdl:URI><xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="../jsdl:FileName/text()"/></jsdl:URI>
-		</jsdl:Target>
-	</xsl:template>-->
-	
 	<xsl:template match="jsdl:DataStaging">
-	  <!-- 
-	  <xsl:copy>
-	    <xsl:apply-templates select="@* | node()"/>
-	  </xsl:copy>
-	  -->
       <jsaga:DataStaging>
-        <xsl:choose>
-          <xsl:when test="jsdl:Source">
-     			<jsaga:PreStagingIn/>
-          </xsl:when>
-          <xsl:otherwise>
-     			<jsaga:PostStagingOut/>
-          </xsl:otherwise>
-        </xsl:choose>
         <jsaga:FileName>
           <xsl:value-of select="jsdl:FileName/text()"/>
         </jsaga:FileName>
-       	<jsaga:Source>
-          <xsl:choose>
-            <xsl:when test="jsdl:Source">
+        <xsl:choose>
+          <xsl:when test="jsdl:Source">
+        	<jsaga:Source>
        			<jsaga:URI><xsl:value-of select="jsdl:Source/jsdl:URI/text()"/></jsaga:URI>
-            </xsl:when>
-            <xsl:otherwise>
-	       		<jsaga:URI><xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="jsdl:FileName/text()"/></jsaga:URI>
-            </xsl:otherwise>
-          </xsl:choose>
-       	</jsaga:Source>
-       	<jsaga:Target>
-          <xsl:choose>
-            <xsl:when test="jsdl:Source">
-	       		<jsaga:URI><xsl:value-of select="$IntermediaryURL"/>/<xsl:value-of select="jsdl:FileName/text()"/></jsaga:URI>
-            </xsl:when>
-            <xsl:otherwise>
+	       	</jsaga:Source>
+          </xsl:when>
+          <xsl:otherwise>
+	       	<jsaga:Target>
        			<jsaga:URI><xsl:value-of select="jsdl:Target/jsdl:URI/text()"/></jsaga:URI>
-            </xsl:otherwise>
-          </xsl:choose>
-       	</jsaga:Target>
+	       	</jsaga:Target>
+          </xsl:otherwise>
+        </xsl:choose>
       </jsaga:DataStaging>
 	</xsl:template>
 
