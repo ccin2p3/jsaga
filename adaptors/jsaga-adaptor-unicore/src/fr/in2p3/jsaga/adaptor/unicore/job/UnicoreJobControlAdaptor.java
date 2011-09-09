@@ -234,11 +234,9 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
     		if (preOrPost.equals(PRE_STAGING_TRANSFERS_TAGNAME) && getElementsByTagName(jsaga_ds, PRE_STAGING_TRANSFERS_TAGNAME).length > 0) {
     			from = getElementsByTagName(getElementsByTagName(jsaga_ds, "Source")[0],"URI")[0].getDomNode().getFirstChild().getNodeValue();
     			transfers.add(new StagingTransfer(from, remoteFile, false));
-        		System.out.println(from + "->" + remoteFile);
     		} else if (preOrPost.equals(POST_STAGING_TRANSFERS_TAGNAME) && getElementsByTagName(jsaga_ds, POST_STAGING_TRANSFERS_TAGNAME).length > 0) {
     			to = getElementsByTagName(getElementsByTagName(jsaga_ds, "Target")[0],"URI")[0].getDomNode().getFirstChild().getNodeValue();
     			transfers.add(new StagingTransfer(remoteFile, to, false));
-        		System.out.println(remoteFile + "->" + to);
     		}
     	}
     	return (StagingTransfer[]) transfers.toArray(st);
