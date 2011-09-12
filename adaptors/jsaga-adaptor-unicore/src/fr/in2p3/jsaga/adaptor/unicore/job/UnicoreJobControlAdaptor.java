@@ -83,6 +83,7 @@ public class UnicoreJobControlAdaptor extends UnicoreJobAdaptorAbstract
 				logger.debug("No TSS found, creating a new one");
 		    	m_client = cl.createTSS();
 		    }
+			logger.info("Target System is " + m_client.getTargetSystemName());
 			// Check if the special "Custom executable" is supported on the server
 			boolean customExecutableAvailable = false;
 			Iterator<ApplicationResourceType> _apps = m_client.getApplications().iterator();
