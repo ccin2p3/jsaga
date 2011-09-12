@@ -69,22 +69,18 @@ public class UnicoreFileAttributes extends FileAttributes {
     }
 
     public PermissionBytes getGroupPermission() {
-    	// TODO
         return PERMISSION_UNKNOWN;
     }
 
     public PermissionBytes getAnyPermission() {
-    	// TODO
         return PERMISSION_UNKNOWN;
     }
 
     public String getOwner() {
-    	// TODO
         return ID_UNKNOWN;
     }
 
     public String getGroup() {
-    	// TODO
         return ID_UNKNOWN;
     }
 
