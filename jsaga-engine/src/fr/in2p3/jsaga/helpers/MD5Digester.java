@@ -12,7 +12,7 @@ import java.security.NoSuchAlgorithmException;
 * ***************************************************
 * File:   MD5Digester
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   5 août 2007
+* Date:   5 aout 2007
 * ***************************************************
 * Description:                                      */
 /**

@@ -23,7 +23,7 @@ import java.util.Map;
 * ***************************************************
 * File:   SuperSchedulerJobControlAdaptor
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   7 août 2008
+* Date:   7 aout 2008
 * ***************************************************
 * Description:                                      */
 /**

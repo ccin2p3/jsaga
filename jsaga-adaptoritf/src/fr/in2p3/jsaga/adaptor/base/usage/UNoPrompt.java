@@ -6,7 +6,7 @@ package fr.in2p3.jsaga.adaptor.base.usage;
 * ***************************************************
 * File:   UNoPrompt
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   8 août 2007
+* Date:   8 aout 2007
 * ***************************************************
 * Description:                                      */
 /**

@@ -8,7 +8,7 @@ import org.ogf.saga.context.ContextInfoTest;
  * ***************************************************
  * File:   U6ContextInfo
  * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
- * Date:   3 févr. 2010
+ * Date:   3 fevr. 2010
  * ***************************************************
  * Description:                                      */
 /**

@@ -11,7 +11,7 @@ import javax.xml.transform.TransformerException;
 * ***************************************************
 * File:   XSLLogger
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   17 déc. 2007
+* Date:   17 dec. 2007
 * ***************************************************
 * Description:                                      */
 /**

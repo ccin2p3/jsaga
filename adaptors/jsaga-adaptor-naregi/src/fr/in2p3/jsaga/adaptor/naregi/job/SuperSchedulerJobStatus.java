@@ -9,7 +9,7 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 * ***************************************************
 * File:   SuperSchedulerJobStatus
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   8 août 2008
+* Date:   8 aout 2008
 * ***************************************************
 * Description:                                      */
 /**

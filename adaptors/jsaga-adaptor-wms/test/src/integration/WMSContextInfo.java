@@ -8,7 +8,7 @@ import org.ogf.saga.context.ContextInfoTest;
 * ***************************************************
 * File:   WMSContextInfo
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   10 déc. 2008
+* Date:   10 dec. 2008
 * ***************************************************
 * Description:                                      */
 /**

@@ -20,7 +20,7 @@ import java.util.Calendar;
 * ***************************************************
 * File:   DelegationStub
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   16 déc. 2008
+* Date:   16 dec. 2008
 * ***************************************************
 * Description:                                      */
 /**

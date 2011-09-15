@@ -6,7 +6,7 @@ package fr.in2p3.jsaga.helpers;
 * ***************************************************
 * File:   StringArray
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   5 août 2007
+* Date:   5 aout 2007
 * ***************************************************
 * Description:                                      */
 /**

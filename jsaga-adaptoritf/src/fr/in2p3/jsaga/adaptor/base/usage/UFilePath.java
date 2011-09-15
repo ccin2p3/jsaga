@@ -12,7 +12,7 @@ import java.io.IOException;
 * ***************************************************
 * File:   UFilePath
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   1 févr. 2008
+* Date:   1 fevr. 2008
 * ***************************************************
 * Description:                                      */
 /**

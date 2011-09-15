@@ -10,7 +10,7 @@ import org.glite.ce.creamapi.ws.cream2.types.Status;
 * ***************************************************
 * File:   CreamJobStatus
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   16 déc. 2008
+* Date:   16 dec. 2008
 * ***************************************************
 * Description:                                      */
 /**

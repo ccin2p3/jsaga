@@ -14,7 +14,7 @@ import org.ogf.saga.url.URL;
 * ***************************************************
 * File:   AbstractCopyTask
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   21 févr. 2009
+* Date:   21 fevr. 2009
 * ***************************************************
 * Description:                                      */
 /**

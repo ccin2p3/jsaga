@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
  * ***************************************************
  * File:   FileDataAdaptor
  * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
- * Date:   16 août 2007
+ * Date:   16 aout 2007
  * ***************************************************
  * Description:                                      */
 /**
