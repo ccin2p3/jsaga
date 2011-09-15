@@ -19,7 +19,7 @@ import java.util.Vector;
 * ***************************************************
 * File:   Gsiftp1DataAdaptor
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   20 août 2007
+* Date:   20 aout 2007
 * ***************************************************
 * Description:                                      */
 /**

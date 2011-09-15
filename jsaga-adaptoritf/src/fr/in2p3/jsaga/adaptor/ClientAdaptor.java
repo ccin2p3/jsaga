@@ -11,7 +11,7 @@ import java.util.Map;
 * ***************************************************
 * File:   ClientAdaptor
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   21 août 2007
+* Date:   21 aout 2007
 * ***************************************************
 * Description:                                      */
 /**

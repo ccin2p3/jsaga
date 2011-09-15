@@ -16,7 +16,7 @@ import java.net.UnknownHostException;
 import java.util.Map;
 
 /*
- * Aurélien Croc (CEA Saclay, FRANCE)
+ * Aurelien Croc (CEA Saclay, FRANCE)
  * May, 1st 2010
  *
  * LCGCE+ Job Control adaptor

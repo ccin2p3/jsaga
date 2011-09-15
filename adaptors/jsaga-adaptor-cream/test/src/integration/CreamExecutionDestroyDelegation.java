@@ -13,7 +13,7 @@ import java.io.File;
 * ***************************************************
 * File:   CreamExecutionDestroyDelegation
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   3 févr. 2009
+* Date:   3 fevr. 2009
 * ***************************************************
 * Description:                                      */
 /**

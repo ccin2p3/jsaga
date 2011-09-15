@@ -8,7 +8,7 @@ import org.ogf.saga.context.ContextInfoTest;
 * ***************************************************
 * File:   CreamContextInfo
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   15 déc. 2008
+* Date:   15 dec. 2008
 * ***************************************************
 * Description:                                      */
 /**

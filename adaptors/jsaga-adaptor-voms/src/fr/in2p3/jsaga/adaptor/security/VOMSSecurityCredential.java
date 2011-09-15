@@ -24,7 +24,7 @@ import java.util.Vector;
  * ***************************************************
  * File:   VOMSSecurityCredential
  * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
- * Date:   11 août 2007
+ * Date:   11 aout 2007
  * ***************************************************
  * Description:                                      */
 /**

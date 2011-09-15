@@ -11,7 +11,7 @@ import java.util.Properties;
 * ***************************************************
 * File:   EnvironmentVariables
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   13 août 2007
+* Date:   13 aout 2007
 * ***************************************************
 * Description:                                      */
 /**

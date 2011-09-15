@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 * ***************************************************
 * File:   UDuration
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   14 août 2007
+* Date:   14 aout 2007
 * ***************************************************
 * Description:                                      */
 /**

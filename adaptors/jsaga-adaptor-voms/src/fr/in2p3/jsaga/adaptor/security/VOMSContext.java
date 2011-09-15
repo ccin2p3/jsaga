@@ -6,7 +6,7 @@ package fr.in2p3.jsaga.adaptor.security;
 * ***************************************************
 * File:   VOMSContext
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   12 févr. 2008
+* Date:   12 fevr. 2008
 * ***************************************************
 * Description:                                      */
 /**

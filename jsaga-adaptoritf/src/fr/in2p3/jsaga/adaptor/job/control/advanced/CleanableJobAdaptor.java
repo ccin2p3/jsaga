@@ -9,7 +9,7 @@ import org.ogf.saga.error.*;
 * ***************************************************
 * File:   CleanableJobAdaptor
 * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
-* Date:   1 févr. 2008
+* Date:   1 fevr. 2008
 * ***************************************************
 * Description:                                      */
 /**
