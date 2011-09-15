@@ -30,6 +30,7 @@
      			</jsaga:Source>
           </xsl:when>
           <xsl:otherwise>
+          		<jsdl:DeleteOnTermination>false</jsdl:DeleteOnTermination>
 		       	<jsaga:Target>
        				<jsaga:URI><xsl:value-of select="jsdl:Target/jsdl:URI/text()"/></jsaga:URI>
        			</jsaga:Target>
