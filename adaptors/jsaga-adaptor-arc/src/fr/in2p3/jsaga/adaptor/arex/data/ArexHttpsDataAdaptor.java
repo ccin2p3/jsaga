@@ -45,27 +45,6 @@ public class ArexHttpsDataAdaptor extends HttpsDataAdaptorSocketBased implements
         return 2010;
     }
 
-    /**
-     * Build and send a HTTP GET request
-     * 
-     * HTTP HEAD is not supported by A-REX, so all HEAD requests are replaced by GET
-     */
-    protected HttpRequest getRequest(String absolutePath, String additionalArgs, String requestType) throws PermissionDeniedException, DoesNotExistException, NoSuccessException {
-        
-    	if (requestType.equals(HttpRequest.TYPE_HEAD)) {
-    		requestType = HttpRequest.TYPE_GET;
-    	}
-    	try {
-    		return super.getRequest(absolutePath, additionalArgs, requestType);
-    	} catch (NoSuccessException e) {
-    		// A-REX sends 500 Internal error if file does not exists
-    		if (e.getMessage().endsWith("500 Internal error")) {
-    			throw new DoesNotExistException(e);
-    		}
-    		throw e;
-    	}
-    }
-
     //////////////////////////////////////////////////
     // Implementation of FileWriterStreamFactory
     //////////////////////////////////////////////////
