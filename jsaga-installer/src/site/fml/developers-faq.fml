@@ -193,6 +193,7 @@ git push origin --tags
 git branch -D &lt;release_tag&gt;
                 </pre>
                 DO NOT FORGET TO DO THE SAME FIX IN BRANCH 'master' !
+                DO NOT FORGET TO FETCH TAGS (git fetch --tags) ON ALL REPOSITORY CLONES !
             </answer>
         </faq>
     </part>
