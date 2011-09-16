@@ -53,86 +53,8 @@ public class ArexTestSuite extends JSAGATestSuite {
     // test cases
     public static class ArexJobRunDescriptionTest extends JobRunDescriptionTest {
         public ArexJobRunDescriptionTest() throws Exception {super("arex");}
-        public void test_run_inWorkingDirectory() { super.ignore("WorkingDirectory is not supported"); }
-        
-        public void test_run_cpuTimeRequirement() throws Exception {
-        	super.ignore("TotalCPUTime is ignored");
-        }
-        
-        public void test_run_wallTimeRequirement() throws Exception {
-        	super.ignore("walltimelimit is ignored and job is stuck"); if (true) return;
-        	// prepare a simple job
-        	JobDescription desc = createSimpleJob();
-        	// and inform the scheduler to the estimate time is 14 days
-        	desc.setAttribute(JobDescription.WALLTIMELIMIT, String.valueOf(60*60*24*14));
-        	
-        	Job job = null;
-        	try {
-        		// submit
-    	        job = runJob(desc);
-    	        
-    	        // wait the end
-    	        job.waitFor();  
-    	        
-    	        // check job status
-    	        assertEquals(
-    	                State.FAILED,
-    	                job.getState());
-        	}
-        	catch (NoSuccessException noSuccess) {
-            	// test is successful is exception instance of BadResource
-                if (!noSuccess.getClass().getName().endsWith("BadResource")) {
-                    throw noSuccess;
-                }
-            }
-        	finally {
-            	if(job != null) {
-            		job.waitFor(Float.valueOf(FINALY_TIMEOUT));
-            	}
-            }
-    	        
-        }
-
-        public void test_run_memoryRequirement() throws Exception {
-        	super.ignore("TotalPhysicalMemory is ignored"); if (true) return;
-            
-        	// prepare a job witch requires 8GB of RAM and expect FAILED status
-        	Attribute[] attributes = new Attribute[1];
-        	attributes[0] = new Attribute(JobDescription.TOTALPHYSICALMEMORY, "8192");
-        	JobDescription desc =  createJob(SIMPLE_JOB_BINARY, attributes, null);
-        	
-        	// submit
-            Job job = runJob(desc);
-            
-            // wait for the end
-            job.waitFor();  
-            
-            // check job status
-            assertEquals(
-                    State.FAILED,
-                    job.getState());       
-        }
-            
-        public void test_run_archi() throws Exception {
-        	super.ignore("CPUArchitecture is ignored"); if (true) return;
-            
-        	// prepare a job witch requires 'sparc' as CPU and expect FAILED status
-        	Attribute[] attributes = new Attribute[1];
-        	attributes[0] = new Attribute(JobDescription.CPUARCHITECTURE, "sparc");
-        	JobDescription desc =  createJob(SIMPLE_JOB_BINARY, attributes, null);
-        	
-        	// submit
-            Job job = runJob(desc);
-            
-            // wait for the end
-            job.waitFor();  
-            
-            // check job status
-            assertEquals(
-                    State.FAILED,
-                    job.getState());       
-        }
-            
+        //public void test_run_inWorkingDirectory() { super.ignore("WorkingDirectory is not supported"); }
+        public void test_run_cpuTimeRequirement() throws Exception { super.ignore("TotalCPUTime is ignored");}
     }
 
  	// test cases
@@ -142,6 +64,7 @@ public class ArexTestSuite extends JSAGATestSuite {
     
     // test cases
     public static class ArexJobRunInfoTest extends JobRunInfoTest {
+    	// TODO: WSRF does not work anymore
     	public ArexJobRunInfoTest() throws Exception {super("arex");}
     	public void test_created() {super.ignore("Creation date not supported"); }
     }
