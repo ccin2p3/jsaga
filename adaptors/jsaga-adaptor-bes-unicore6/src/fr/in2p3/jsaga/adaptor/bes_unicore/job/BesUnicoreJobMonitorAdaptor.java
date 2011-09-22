@@ -33,17 +33,8 @@ public class BesUnicoreJobMonitorAdaptor extends BesJobMonitorAdaptor  {
     			new Default("res", "default_bes_factory")};
     }
     
-	public Class getJobClass() {
-		return BesUnicoreJob.class;
-	}
-
 	protected Class getJobStatusClass() {
 		return BesUnicoreJobStatus.class;
 	}
 	
-    public URI getBESUrl(String host, int port, String basePath, Map attributes) throws URISyntaxException {
-    	URI url = super.getBESUrl(host, port, basePath, attributes);
-		return new URI(url.toString()+"?res=" + (String)attributes.get("res"));
-    }
-
 }
