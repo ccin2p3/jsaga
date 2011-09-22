@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
     <session>
+        <context type="AxisJKS" id="LocalUnicore">
+            <attribute name="UserAlias" value="demo user"/>
+            <job type="bes"/>
+            <include host="localhost6"/>
+        </context>
+        <context type="AxisJKS" id="Arc">
+            <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/>
+            <job type="bes"/>
+            <include host="interop" domain="grid.niif.hu"/>
+        </context>
+        <context type="AxisJKS" id="GenesisII">
+            <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/>
+            <job type="bes"/>
+            <include domain="futuregrid.org"/>
+            <exclude host="localhost6"/>
+        </context>
     </session>
 </jsaga-default>

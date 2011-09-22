@@ -2,6 +2,7 @@ package fr.in2p3.jsaga.adaptor.bes.job;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
+import fr.in2p3.jsaga.adaptor.bes.BesUtils;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityCredential;
 
@@ -19,6 +20,7 @@ import fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceTyp
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.rpc.ServiceException;
@@ -64,6 +66,14 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
     	return new Default[]{};
     }
     
+    public String getType() {
+        return "bes";
+    }
+
+	public int getDefaultPort() {
+		return 8443;
+	}
+
     public Class[] getSupportedSecurityCredentialClasses() {
     	return new Class[]{JKSSecurityCredential.class};
     }
@@ -71,6 +81,10 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
     public void setSecurityCredential(SecurityCredential credential) {
     		m_credential = (JKSSecurityCredential) credential;
     }
+
+	public Class getJobClass() {
+		return BesJob.class;
+	}
 
 	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     	try {
@@ -84,6 +98,8 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 		try {
 			_bes_service.setEndpointAddress(BES_FACTORY_PORT_TYPE, _bes_url.toString());
 	        _bes_pt=(BESFactoryPortType) _bes_service.getBESFactoryPortType();
+	        //GetFactoryAttributesDocumentResponseType gfadrt = _bes_pt.getFactoryAttributesDocument(new GetFactoryAttributesDocumentType());
+	        //System.out.println(BesUtils.dumpBESMessage(gfadrt));
 		} catch (ServiceException e) {
 			throw new NoSuccessException(e);
 		}
@@ -118,11 +134,23 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 	 * @param port
 	 * @param basePath
 	 * @param attributes
-	 * @return the URL build as "https://"+host+":"+port+basePath
+	 * @return the URL build as "https://"+host+":"+port+basePath+"?"+list_of_attributes
 	 * @throws URISyntaxException 
 	 */
     public URI getBESUrl(String host, int port, String basePath, Map attributes) throws URISyntaxException {
-    	return new URI("https://"+host+":"+port+basePath);
+    	String uri = "https://"+host+":"+port+basePath;
+    	int i=0;
+    	Iterator iter = attributes.entrySet().iterator();
+    	while (iter.hasNext()) {
+    		Map.Entry me = ((Map.Entry)iter.next());
+    		if (!me.getKey().equals("CheckAvailability")){
+    			if (i == 0) uri += "?";
+        		uri += me.getKey() + "=" + me.getValue();
+        		if (iter.hasNext()) uri += "&";
+        		i++;
+    		}
+    	}
+    	return new URI(uri); 
     }
     
 	///////////////////////////////////
@@ -138,8 +166,8 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 		} catch (IllegalAccessException e) {
 			throw new NoSuccessException(e);
 		}
-		_job.setActivityIdentifier(epr);
-		return _job.getNativeJobID();    	
+		_job.setActivityId(epr);
+		return _job.getNativeId();
     }
 
     public EndpointReferenceType nativeId2ActivityId(String nativeId) throws NoSuccessException {
@@ -147,12 +175,13 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 		try {
 			_job = (BesJob) getJobClass().newInstance();
 		} catch (InstantiationException e) {
+			e.printStackTrace();
 			throw new NoSuccessException(e);
 		} catch (IllegalAccessException e) {
 			throw new NoSuccessException(e);
 		}
-		_job.setNativeJobId(nativeId);
-		return _job.getActivityIdentifier();   	
+		_job.setNativeId(nativeId);
+		return _job.getActivityIdentifier();
     }
 
 }

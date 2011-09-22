@@ -37,7 +37,7 @@ import java.util.List;
 /**
  * This class is the abstract class for the JobMonitor specific to a BES implementation
  */
-public abstract class BesJobMonitorAdaptor extends BesJobAdaptorAbstract implements QueryIndividualJob, QueryListJob, ListableJobAdaptor {
+public class BesJobMonitorAdaptor extends BesJobAdaptorAbstract implements QueryIndividualJob, QueryListJob, ListableJobAdaptor {
       
 	// Implementation of the QueryIndividualJob interface
     public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
@@ -74,7 +74,10 @@ public abstract class BesJobMonitorAdaptor extends BesJobAdaptorAbstract impleme
 	}
 
 	// Private methods
-	protected abstract Class getJobStatusClass();
+	//protected abstract Class getJobStatusClass();
+	protected Class getJobStatusClass() {
+		return BesJobStatus.class;
+	}
 
 	/**
 	 * Get a list of statuses
