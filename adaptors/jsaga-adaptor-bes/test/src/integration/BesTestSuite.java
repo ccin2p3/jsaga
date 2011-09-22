@@ -22,11 +22,6 @@ public class BesTestSuite extends JSAGATestSuite {
     public static class index extends IndexTest {public index(){super(BesTestSuite.class);}}
 
     // test cases
-    public static class BesJobDescriptionTest extends JobDescriptionTest {
-        public BesJobDescriptionTest() throws Exception {super("bes");}
-     }
-    
-    // test cases
     public static class BesJobRunMinimalTest extends JobRunMinimalTest {
         public BesJobRunMinimalTest() throws Exception {super("bes");}
     }
@@ -35,6 +30,7 @@ public class BesTestSuite extends JSAGATestSuite {
     public static class BesJobRunRequiredTest extends JobRunRequiredTest {
         public BesJobRunRequiredTest() throws Exception {super("bes");}
         public void test_run_error() { super.ignore("return code not supported"); }
+        public void test_cancel_running() { super.ignore("not supported"); }
     }
     
     // test cases
@@ -46,16 +42,4 @@ public class BesTestSuite extends JSAGATestSuite {
         public void test_suspend_running() { super.ignore("not supported"); }
     }
     
- 	// test cases
-    public static class BesJobRunDescriptionTest extends JobRunDescriptionTest {
-        public BesJobRunDescriptionTest() throws Exception {super("bes");}
-        //public void test_run_inWorkingDirectory() { super.ignore("return code not supported"); }
-        //public void test_run_queueRequirement() { super.ignore("not supported"); }
-        //public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
-    }
-
-    // test cases
-    public static class BesJobRunInteractiveTest extends JobRunInteractiveTest {
-        public BesJobRunInteractiveTest() throws Exception {super("bes");}
-    }
 }
