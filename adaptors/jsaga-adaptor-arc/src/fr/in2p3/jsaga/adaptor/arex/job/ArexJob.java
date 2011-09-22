@@ -20,8 +20,12 @@ import fr.in2p3.jsaga.adaptor.bes.job.BesJob;
 * Date:   9 déc 2010
 * ***************************************************/
 
+/**
+ * @obsolete
+ */
 public class ArexJob extends BesJob {
 
+	/*
 	protected EndpointReferenceType toActivityIdentifier() throws NoSuccessException {
 		_job_endpoint = new EndpointReferenceType();
 		// split NativeJobID in serviceURL and jobId
@@ -30,23 +34,15 @@ public class ArexJob extends BesJob {
 		String jobId = _job_nativeId.substring(lastSlash+1);
 		_job_endpoint.setAddress(new AttributedURIType(service));
 		
-		MessageElement[] msg_elements = new MessageElement[2];
+		MessageElement[] msg_elements = new MessageElement[1];
 
-		MessageElement _msg_element_jobid = new MessageElement("JobID", "ns3", "http://www.nordugrid.org/schemas/a-rex");
+		MessageElement _msg_element_jobid = new MessageElement("JobID", "x", "http://www.nordugrid.org/schemas/a-rex");
 		try {
 			_msg_element_jobid.addTextNode(jobId);
 		} catch (SOAPException e) {
 			throw new NoSuccessException(e);
 		}
 		msg_elements[0] = _msg_element_jobid;
-		
-		MessageElement _msg_element_jobsessiondir = new MessageElement("JobSessionDir", "ns4", "http://www.nordugrid.org/schemas/a-rex");
-		try {
-			_msg_element_jobsessiondir.addTextNode(_job_nativeId);
-		} catch (SOAPException e) {
-			throw new NoSuccessException(e);
-		}
-		msg_elements[1] = _msg_element_jobsessiondir;
 		
 		ReferenceParametersType rpt = new ReferenceParametersType();
 		rpt.set_any(msg_elements);
@@ -65,4 +61,5 @@ public class ArexJob extends BesJob {
 		}
 		return _job_nativeId;
 	}
+	*/
 }
