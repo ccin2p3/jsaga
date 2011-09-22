@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.bes_unicore.job;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.bes.job.BesJob;
 import fr.in2p3.jsaga.adaptor.bes.job.BesJobControlStagingOnePhaseAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.data.http_socket.HttpRequest;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
@@ -78,10 +79,6 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlStagingOnePhaseAda
     public JobMonitorAdaptor getDefaultJobMonitor() {
         return new BesUnicoreJobMonitorAdaptor();
     }
-
-	public Class getJobClass() {
-		return BesUnicoreJob.class;
-	}
 
 	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     	super.connect(userInfo, host, port, basePath, attributes);
@@ -178,7 +175,9 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlStagingOnePhaseAda
             Element addr = (Element) ident.getElementsByTagName("add:Address").item(0);
             if (addr == null)
             	throw new NoSuccessException("<add:Address> tag not found");
-            return addr.getTextContent();
+            BesJob j = new BesJob();
+            j.setActivityId(ident);
+            return j.getNativeId();
 		} catch (IOException e) {
 			throw new NoSuccessException(e);
 		} catch (ParserConfigurationException e) {
@@ -188,11 +187,6 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlStagingOnePhaseAda
 		}
     }
     
-    public URI getBESUrl(String host, int port, String basePath, Map attributes) throws URISyntaxException {
-    	URI url = super.getBESUrl(host, port, basePath, attributes);
-		return new URI(url.toString()+"?res=" + (String)attributes.get("res"));
-    }
-
 	public URI getDataStagingUrl(String host, int port, String basePath, Map attributes) throws URISyntaxException {
 		// This URL is used by JSAGA to choose the appropriate data plugin: the new UNICORE plugin
 		// extract Target 'DEMO-SITE' from basePath = '/DEMO-SITE/services/BESFactory'

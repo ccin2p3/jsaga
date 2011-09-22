@@ -1,25 +1,18 @@
 package fr.in2p3.jsaga.adaptor.arex.job;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.rpc.ServiceException;
 
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
 import org.ogf.saga.error.BadParameterException;
-import org.ogf.saga.error.DoesNotExistException;
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.NotImplementedException;
-import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
 
 import fr.in2p3.jsaga.adaptor.arex.data.ArexHttpsDataAdaptor;
@@ -41,11 +34,6 @@ import org.oasis_open.docs.wsrf.rp_2.QueryExpressionType;
 import org.oasis_open.docs.wsrf.rp_2.QueryResourcePropertiesResponse;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnknownFaultType;
 import org.oasis_open.docs.wsrf.r_2.ResourceUnavailableFaultType;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 
 /* ***************************************************
@@ -77,10 +65,6 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
 
 	public int getDefaultPort() {
 		return 2010;
-	}
-
-	public Class getJobClass() {
-		return ArexJob.class;
 	}
 
 	protected Class getJobStatusClass() {
