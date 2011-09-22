@@ -16,9 +16,13 @@ import fr.in2p3.jsaga.adaptor.bes.job.BesJob;
 * Date:   9 déc. 2010
 * ***************************************************/
 
-public class BesUnicoreJob extends BesJob {
+/**
+ * @obsolete
+ */
 
-	protected EndpointReferenceType toActivityIdentifier() throws NoSuccessException {
+public class BesUnicoreJob /*extends BesJob*/ {
+
+	/*protected EndpointReferenceType toActivityIdentifier() throws NoSuccessException {
 		_job_endpoint = new EndpointReferenceType();
 		_job_endpoint.setAddress(new AttributedURIType(_job_nativeId));
         return _job_endpoint;
@@ -27,5 +31,5 @@ public class BesUnicoreJob extends BesJob {
 	protected String toStringIdentifier() throws NoSuccessException {
 		_job_nativeId = _job_endpoint.getAddress().get_value().toString();
 		return _job_nativeId;
-	}
+	}*/
 }
