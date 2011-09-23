@@ -1,11 +1,8 @@
 package fr.in2p3.jsaga.adaptor.bes_genesis2.job;
 
-import org.apache.axis.message.MessageElement;
-import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityStateEnumeration;
 import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityStatusType;
 
 import fr.in2p3.jsaga.adaptor.bes.job.BesJobStatus;
-import fr.in2p3.jsaga.adaptor.job.SubState;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -33,7 +30,7 @@ public class BesGenesisIIJobStatus extends BesJobStatus {
 	 * 
 	 * @return JobStatus the substate 
 	 */
-	public SubState getSubState() {
+	/*public SubState getSubState() {
 		// TODO: modify this
     	ActivityStateEnumeration state = ((ActivityStatusType) m_nativeStateCode).getState();
     	MessageElement any[] = ((ActivityStatusType) m_nativeStateCode).get_any();
@@ -58,5 +55,5 @@ public class BesGenesisIIJobStatus extends BesJobStatus {
         } else {
             return null;
         }
-    }
+    }*/
 }
