@@ -2,10 +2,10 @@ package fr.in2p3.jsaga.adaptor.bes.job;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.Usage;
-import fr.in2p3.jsaga.adaptor.bes.BesUtils;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityCredential;
 
+import org.apache.log4j.Logger;
 import org.ggf.schemas.bes.x2006.x08.besFactory.BESFactoryPortType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.BasicResourceAttributesDocumentType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.BesFactoryServiceLocator;
@@ -92,27 +92,38 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 		} catch (URISyntaxException e) {
 			throw new NoSuccessException(e);
 		}
+		Logger.getLogger(BesJobAdaptorAbstract.class).info("Connecting to BES service at: " + _bes_url);
     	if (_bes_pt != null) return;
     	
         BesFactoryServiceLocator _bes_service = new BesFactoryServiceLocator();
 		try {
 			_bes_service.setEndpointAddress(BES_FACTORY_PORT_TYPE, _bes_url.toString());
 	        _bes_pt=(BESFactoryPortType) _bes_service.getBESFactoryPortType();
-	        //GetFactoryAttributesDocumentResponseType gfadrt = _bes_pt.getFactoryAttributesDocument(new GetFactoryAttributesDocumentType());
-	        //System.out.println(BesUtils.dumpBESMessage(gfadrt));
+    		//System.clearProperty(EngineProperties.JAVAX_NET_SSL_KEYSTORE);
+    		//System.clearProperty(EngineProperties.JAVAX_NET_SSL_KEYSTOREPASSWORD);
+	        ((org.apache.axis.client.Stub) _bes_pt).setUsername("ogf30");
+	        ((org.apache.axis.client.Stub) _bes_pt).setPassword("ogf30");
 		} catch (ServiceException e) {
 			throw new NoSuccessException(e);
 		}
 		// TODO : uncomment to check resources
 		/*try {
-			GetFactoryAttributesDocumentResponseType r = _bes_pt.getFactoryAttributesDocument(new GetFactoryAttributesDocumentType());
+			org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentResponseType r = _bes_pt.getFactoryAttributesDocument(new org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentType());
 	        FactoryResourceAttributesDocumentType attr = r.getFactoryResourceAttributesDocument();
 			_br = attr.getBasicResourceAttributesDocument();
 			//_cr = attr.getContainedResource();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}*/
-		
+		/*
+		try {
+			org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentResponseType gfadrt = _bes_pt.getFactoryAttributesDocument(new org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentType());
+	        System.out.println(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(gfadrt));
+		} catch (Exception e) {
+			throw new NoSuccessException(e);
+		}
+		throw new NoSuccessException("END");
+		*/
     }
 
 	public void disconnect() throws NoSuccessException {
@@ -138,18 +149,16 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 	 * @throws URISyntaxException 
 	 */
     public URI getBESUrl(String host, int port, String basePath, Map attributes) throws URISyntaxException {
-    	String uri = "https://"+host+":"+port+basePath;
-    	int i=0;
+    	String uri = "https://"+host+":"+port+basePath+"?";
     	Iterator iter = attributes.entrySet().iterator();
     	while (iter.hasNext()) {
     		Map.Entry me = ((Map.Entry)iter.next());
     		if (!me.getKey().equals("CheckAvailability")){
-    			if (i == 0) uri += "?";
-        		uri += me.getKey() + "=" + me.getValue();
-        		if (iter.hasNext()) uri += "&";
-        		i++;
+        		uri += me.getKey() + "=" + me.getValue()+"?";
     		}
     	}
+    	// remove trailing char (either & or ?)
+    	uri=uri.substring(0, uri.length()-1);
     	return new URI(uri); 
     }
     
