@@ -16,6 +16,7 @@ import javax.xml.namespace.QName;
 
 public class BesUtils {
 	public static String dumpMessage(String nameSpace, Object BESMessage) {
+		if (BESMessage == null) return "";
 		StringWriter writer = new StringWriter();
 		writer.write("------->" + BESMessage.getClass().getName() + "\n");
 		try {
