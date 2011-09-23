@@ -1,6 +1,5 @@
 package fr.in2p3.jsaga.adaptor.bes.job;
 
-import fr.in2p3.jsaga.adaptor.bes.BesUtils;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
@@ -9,6 +8,7 @@ import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 
 import org.apache.axis.message.MessageElement;
+import org.apache.log4j.Logger;
 import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityDocumentType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.CreateActivityResponseType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.CreateActivityType;
@@ -99,23 +99,26 @@ public class BesJobControlAdaptor extends BesJobAdaptorAbstract implements JobCo
 		
 		CreateActivityType createActivity = new CreateActivityType();
 		createActivity.setActivityDocument(adt);
-		//System.out.println(BesUtils.dumpBESMessage(createActivity));
+		Logger.getLogger(BesJobControlAdaptor.class).debug(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(createActivity));
 		try {
 			response = _bes_pt.createActivity(createActivity);
+			Logger.getLogger(BesJobControlAdaptor.class).debug(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(response));
 		} catch (NotAcceptingNewActivitiesFaultType e) {
+			Logger.getLogger(BesJobControlAdaptor.class).error(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(response));
 			throw new PermissionDeniedException(e);
 		} catch (InvalidRequestMessageFaultType e) {
+			Logger.getLogger(BesJobControlAdaptor.class).error(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(response));
 			throw new NoSuccessException(e);
 		} catch (UnsupportedFeatureFaultType e) {
+			Logger.getLogger(BesJobControlAdaptor.class).error(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(response));
 			throw new NoSuccessException(e);
 		} catch (NotAuthorizedFaultType e) {
+			Logger.getLogger(BesJobControlAdaptor.class).error(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(response));
 			throw new PermissionDeniedException(e);
 		} catch (RemoteException e) {
-			//System.out.println(BesUtils.dumpBESMessage(response));
+			Logger.getLogger(BesJobControlAdaptor.class).error(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(response));
 			throw new NoSuccessException(e);
 		}
-		//System.out.println(BesUtils.dumpBESMessage(response));
-		//throw new NoSuccessException("");
 		return activityId2NativeId(response.getActivityIdentifier());
 	}
 		
@@ -124,21 +127,17 @@ public class BesJobControlAdaptor extends BesJobAdaptorAbstract implements JobCo
 		EndpointReferenceType[] refs = new EndpointReferenceType[1];
 		refs[0] = nativeId2ActivityId(nativeJobId);
 		request.setActivityIdentifier(refs);
+		TerminateActivitiesResponseType response = null;
 		try {
-			TerminateActivitiesResponseType response = _bes_pt.terminateActivities(request);
+			response = _bes_pt.terminateActivities(request);
 			TerminateActivityResponseType r = response.getResponse(0);
-			//System.out.println(BesUtils.dumpBESMessage(r));
+			Logger.getLogger(BesJobControlAdaptor.class).debug(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(r));
 			if (!r.isCancelled()) throw new NoSuccessException("Unable to cancel job");
-			/*for (MessageElement me: r.get_any()) {
-				if ("Terminated".equals(me.getName())) {
-					if (! me.getFirstChild().getNodeValue().equals("true")) {
-						throw new NoSuccessException("Unable to cancel job");
-					}
-				}
-			}*/
 		} catch (InvalidRequestMessageFaultType e) {
+			Logger.getLogger(BesJobControlAdaptor.class).error(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(response));
 			throw new NoSuccessException(e);
 		} catch (RemoteException e) {
+			Logger.getLogger(BesJobControlAdaptor.class).error(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(response));
 			throw new NoSuccessException(e);
 		}
 	}
@@ -210,7 +209,8 @@ public class BesJobControlAdaptor extends BesJobAdaptorAbstract implements JobCo
 	 * @throws NoSuccessException
 	 */
     private GetActivityDocumentResponseType[] getActivityDocuments(String[] nativeJobIdArray) throws NoSuccessException{
-		try {
+    	GetActivityDocumentsResponseType response = null;
+    	try {
 			GetActivityDocumentsType request = new GetActivityDocumentsType();
 			EndpointReferenceType[] refs = new EndpointReferenceType[nativeJobIdArray.length];
 			int i=0;
@@ -218,13 +218,15 @@ public class BesJobControlAdaptor extends BesJobAdaptorAbstract implements JobCo
 				refs[i++] = nativeId2ActivityId(nativeJobId);
 			}
 			request.setActivityIdentifier(refs);
-			GetActivityDocumentsResponseType response = _bes_pt.getActivityDocuments(request);
-			//System.out.println(BesUtils.dumpBESMessage(request));
-			//System.out.println(BesUtils.dumpBESMessage(response));
+			Logger.getLogger(BesJobControlAdaptor.class).debug(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(request));
+			response = _bes_pt.getActivityDocuments(request);
+			Logger.getLogger(BesJobMonitorAdaptor.class).debug(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(response));
 			return response.getResponse();
 		} catch (InvalidRequestMessageFaultType e) {
+			Logger.getLogger(BesJobMonitorAdaptor.class).error(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(response));
 			throw new NoSuccessException(e);
 		} catch (RemoteException e) {
+			Logger.getLogger(BesJobMonitorAdaptor.class).error(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(response));
 			throw new NoSuccessException(e);
 		}
     	
