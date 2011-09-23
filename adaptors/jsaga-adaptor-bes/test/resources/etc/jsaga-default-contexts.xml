@@ -15,6 +15,13 @@
             <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/>
             <job type="bes"/>
             <include domain="futuregrid.org"/>
+            <include domain="edu"/>
+            <exclude host="localhost6"/>
+        </context>
+        <context type="AxisJKS" id="Cream">
+            <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/>
+            <job type="bes"/>
+            <include domain="infn.it"/>
             <exclude host="localhost6"/>
         </context>
     </session>
