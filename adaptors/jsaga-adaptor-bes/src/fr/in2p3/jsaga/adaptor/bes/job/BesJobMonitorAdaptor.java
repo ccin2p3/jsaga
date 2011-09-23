@@ -38,10 +38,25 @@ import java.util.List;
  */
 public class BesJobMonitorAdaptor extends BesJobAdaptorAbstract implements QueryIndividualJob, QueryListJob, ListableJobAdaptor {
       
+	/**
+	 * Instanciate the appropriate JobStatus object
+	 * 
+	 * @param nativeJobId  the native Job Identifier
+	 * @param ast  the ActivityStatusType object containing the status of the job
+	 * @return the appropriate JobStatus object
+	 * @throws NoSuccessException
+	 * @see ArexJobStatus
+	 * @see BesUnicoreJobStatus
+	 * @see GenesisIIJobStatus
+	 */
+	protected JobStatus getJobStatus(String nativeJobId, ActivityStatusType ast) throws NoSuccessException {
+		return new BesJobStatus(nativeJobId, ast);
+	}
+	
 	// Implementation of the QueryIndividualJob interface
     public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
     	GetActivityStatusResponseType[] responseStatus = getActivityStatuses(new String[]{nativeJobId});
-    	return instanciateJobStatusObject(nativeJobId, responseStatus[0].getActivityStatus());
+    	return getJobStatus(nativeJobId, responseStatus[0].getActivityStatus());
 	}
 
     // Implementation of the QueryListJob interface
@@ -49,7 +64,7 @@ public class BesJobMonitorAdaptor extends BesJobAdaptorAbstract implements Query
     	GetActivityStatusResponseType[] responseStatus = getActivityStatuses(nativeJobIdArray);
 		JobStatus[] statusArray = new JobStatus[responseStatus.length];
 		for (int i=0; i<responseStatus.length; i++) {
-				statusArray[i] = instanciateJobStatusObject(nativeJobIdArray[i], responseStatus[i].getActivityStatus());
+				statusArray[i] = getJobStatus(nativeJobIdArray[i], responseStatus[i].getActivityStatus());
 		}
 		return statusArray;
 	}
@@ -73,10 +88,6 @@ public class BesJobMonitorAdaptor extends BesJobAdaptorAbstract implements Query
 			}
 		}
 		return (String[])urls.toArray(new String[urls.size()]);
-	}
-
-	protected Class getJobStatusClass() {
-		return BesJobStatus.class;
 	}
 
 	/**
@@ -111,34 +122,5 @@ public class BesJobMonitorAdaptor extends BesJobAdaptorAbstract implements Query
     	
     }
     
-	/**
-	 * Instanciate the appropriate JobStatus object (ArexJobStatus or BesUnicoreJobStatus)
-	 * 
-	 * @param nativeJobId  the native Job Identifier
-	 * @param ast  the ActivityStatusType object containing the status of the job
-	 * @return the appropriate JobStatus object
-	 * @throws NoSuccessException
-	 * @see ArexJobStatus
-	 * @see BesUnicoreJobStatus
-	 */
-	protected JobStatus instanciateJobStatusObject(String nativeJobId, ActivityStatusType ast) throws NoSuccessException {
-    	try {
-    		Constructor c = getJobStatusClass().getConstructor(new Class[]{String.class,ActivityStatusType.class});
-			return (JobStatus)c.newInstance(new Object[]{nativeJobId, ast});
-		} catch (InstantiationException e) {
-			throw new NoSuccessException(e);
-		} catch (IllegalAccessException e) {
-			throw new NoSuccessException(e);
-		} catch (SecurityException e) {
-			throw new NoSuccessException(e);
-		} catch (NoSuchMethodException e) {
-			throw new NoSuccessException(e);
-		} catch (IllegalArgumentException e) {
-			throw new NoSuccessException(e);
-		} catch (InvocationTargetException e) {
-			throw new NoSuccessException(e);
-		}
-	}
-	
 	
 }

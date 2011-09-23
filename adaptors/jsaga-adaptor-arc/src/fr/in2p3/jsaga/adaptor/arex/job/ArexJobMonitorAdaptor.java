@@ -48,7 +48,6 @@ import org.oasis_open.docs.wsrf.r_2.ResourceUnavailableFaultType;
 public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobInfoAdaptor {
         
 	protected ARex_PortType _arex_pt = null;
-	private ArexHttpsDataAdaptor _data_adaptor;
 	private static final Integer NB_TRIES = 10;
 	private static final String AREX_EXITCODE = "ExitCode";
 	private static final String AREX_SUBMISSIONTIME = "SubmissionTime";
@@ -56,7 +55,6 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
 	private static final String AREX_EXECUTIONNODE = "ExecutionNode";
 	private static final String TIME_ISO8601 = "yyyy-MM-dd'T'HH:mm:ssz";
 	
-	// http://www.w3.org/2005/08/addressing
 	protected static final String WSA_NS = fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.AttributedQNameType.getTypeDesc().getXmlType().getNamespaceURI();
 	
 	public String getType() {
@@ -67,10 +65,18 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
 		return 2010;
 	}
 
-	protected Class getJobStatusClass() {
-		return ArexJobStatus.class;
+	protected JobStatus getJobStatus(String nativeJobId, ActivityStatusType ast) throws NoSuccessException {
+		try {
+			if (ast.getState().equals(ActivityStateEnumeration.Finished) || ast.getState().equals(ActivityStateEnumeration.Failed)) {
+				return new ArexJobStatus(nativeJobId, ast, getExitCode(nativeJobId, 1));
+			} else {
+				throw new NotImplementedException();
+			}
+		} catch (NotImplementedException nie) {
+			return new ArexJobStatus(nativeJobId, ast);
+		}
 	}
-
+ 
 	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     	super.connect(userInfo, host, port, basePath, attributes);
     	
@@ -83,35 +89,10 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
 		} catch (ServiceException e) {
 			throw new NoSuccessException(e);
 		}
-		
-		/* used for getInfoXML
-		_data_adaptor = new ArexHttpsDataAdaptor();
-		_data_adaptor.setSecurityCredential(m_credential);
-		_data_adaptor.connect(userInfo, host, port, basePath, attributes);
-		*/
-		
-		/*
-		String cr_string = getStarted("https://interop.grid.niif.hu:2010/arex-x509/1077212955322581395788565").toString();
-		//String cr_string = "Thu Jan 20 16:26:10 CET 2011";
-		DateFormat df = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", java.util.Locale.US);
-	    Date creationTime;
-		try {
-			creationTime = df.parse(cr_string);
-		} catch (ParseException e) {
-			throw new NoSuccessException(e);
-		}
-	    System.out.println(creationTime.toString());
-		*/
-		
-		/*System.out.println(getInfoWSRP("https://interop.grid.niif.hu:2010/arex-x509/1077212958849731186823177","Owner",1));
-		//System.out.println(getInfoWSRP("https://interop.grid.niif.hu:2010/arex-x509/1077212958849731186823177","Efd",1));
-		*/
-		//throw new NoSuccessException("TO BE REMOVED");
     }
 
 	public void disconnect() throws NoSuccessException {
         _arex_pt = null;
-        //_data_adaptor = null;
         super.disconnect();
     }
 
@@ -176,17 +157,11 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
 	            QueryResourcePropertiesResponse response = _arex_pt.queryResourceProperties(query);
 	            
 	            if (response != null) {
-	            	/* loop for ComputingActivity node
-					for (MessageElement grpr_elmt: response.get_any()) {
-						if (infoName.equals(grpr_elmt.getName())) {
-							return grpr_elmt.getFirstChild().getNodeValue();
-						}
-					}*/
-	            	/* for direct acces to infoName */
+	            	/* for direct access to infoName */
 	            	return response.get_any()[0].getAsString();
 	            }
 				loop++;
-				// Do not sleep at last attempty
+				// Do not sleep at last attempt
 	    		if (loop < nbTries) Thread.sleep(5000);
     		}
 			throw new NotImplementedException("Could not get " + infoName);
@@ -200,74 +175,5 @@ public class ArexJobMonitorAdaptor extends BesJobMonitorAdaptor implements JobIn
         	throw new NoSuccessException(e);
         }
 	}
-
-	/*
-	 * Obsolete, getInfoWSRF is used instead
-	private String getInfoXML(String nativeJobId, String infoName) throws NotImplementedException, NoSuccessException {
-		try {
-			int loop = 0;
-			while (loop < 10) {
-			  InputStream _info_xml = _data_adaptor.getInputStream(_bes_url.getPath(), "info");
-			  DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			  DocumentBuilder db = dbf.newDocumentBuilder();
-			  Document doc;
-			  try {
-				  doc = db.parse(_info_xml);
-				  doc.getDocumentElement().normalize();
-				  NodeList caLst = doc.getElementsByTagName("ComputingActivity");
-				  for (int s = 0; s < caLst.getLength(); s++) {
-					  Node ca = caLst.item(s);
-					  if (ca.getNodeType() == Node.ELEMENT_NODE) {
-						  Element fstElmnt = (Element) ca;
-						  String id = fstElmnt.getElementsByTagName("IDFromEndpoint").item(0).getFirstChild().getNodeValue();
-						  if (id.equals(nativeJobId)) {
-							  //if (infoName.equals("CreationTime")) {
-								//  return fstElmnt.getAttribute(infoName);
-							  //} else {
-								  Node val = fstElmnt.getElementsByTagName(infoName).item(0);
-								  if (val == null) { // Node is not in XML doc yet, needs refresh
-									  loop++;
-									  break;
-								  }
-								  return val.getFirstChild().getNodeValue();
-							  //}
-						  }
-					  }
-				  }
-			  } catch (SAXException e) { // Sometimes : 13014:2: XML document structures must start and end within the same entity.
-				  loop++;
-			  }
-			  Thread.sleep(5000);
-			}
-			throw new NoSuccessException("Not found: " + infoName);
-		} catch (PermissionDeniedException e) {
-			throw new NoSuccessException(e);
-		} catch (BadParameterException e) {
-			throw new NoSuccessException(e);
-		} catch (DoesNotExistException e) {
-			throw new NotImplementedException(e);
-		} catch (TimeoutException e) {
-			throw new NoSuccessException(e);
-		} catch (IOException e) {
-			throw new NoSuccessException(e);
-		} catch (ParserConfigurationException e) {
-			throw new NoSuccessException(e);
-		} catch (InterruptedException e) {
-			throw new NoSuccessException(e);
-		}
-	}
-	 */
 	
-	protected JobStatus instanciateJobStatusObject(String nativeJobId, ActivityStatusType ast) throws NoSuccessException {
-		try {
-			if (ast.getState().equals(ActivityStateEnumeration.Finished) || ast.getState().equals(ActivityStateEnumeration.Failed)) {
-				return new ArexJobStatus(nativeJobId, ast, getExitCode(nativeJobId, 1));
-			} else {
-				throw new NotImplementedException();
-			}
-		} catch (NotImplementedException nie) {
-			return new ArexJobStatus(nativeJobId, ast);
-		}
-	}
- 
 }
