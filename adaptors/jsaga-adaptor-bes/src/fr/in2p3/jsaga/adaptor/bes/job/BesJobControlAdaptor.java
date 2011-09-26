@@ -75,14 +75,12 @@ public class BesJobControlAdaptor extends BesJobAdaptorAbstract implements JobCo
 
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
 
+		Logger.getLogger(BesJobControlAdaptor.class).debug(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(jobDesc));
+
 		CreateActivityResponseType response = null;
 		ActivityDocumentType adt = new ActivityDocumentType();
 		
 		StringReader sr = new StringReader(jobDesc);
-		
-		// **************
-		//System.out.println(jobDesc);
-		// **************
 		
 		JobDefinition_Type jsdl_type;
 		try {
@@ -90,7 +88,6 @@ public class BesJobControlAdaptor extends BesJobAdaptorAbstract implements JobCo
 		} catch (DeserializationException e) {
 			throw new BadResource(e);
 		}
-		
 		
 		if (checkMatch)
 			checkResources(jsdl_type.getJobDescription().getResources());
