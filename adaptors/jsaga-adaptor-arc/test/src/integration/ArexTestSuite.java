@@ -64,9 +64,7 @@ public class ArexTestSuite extends JSAGATestSuite {
     
     // test cases
     public static class ArexJobRunInfoTest extends JobRunInfoTest {
-    	// TODO: WSRF does not work anymore
     	public ArexJobRunInfoTest() throws Exception {super("arex");}
-    	public void test_created() {super.ignore("Creation date not supported"); }
     }
     
     public static class ArexJobRunInteractiveTest extends JobRunInteractiveTest {
