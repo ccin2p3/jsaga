@@ -5,6 +5,7 @@ import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityCredential;
 
+import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.log4j.Logger;
 import org.ggf.schemas.bes.x2006.x08.besFactory.BESFactoryPortType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.BasicResourceAttributesDocumentType;
@@ -99,11 +100,42 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 		try {
 			_bes_service.setEndpointAddress(BES_FACTORY_PORT_TYPE, _bes_url.toString());
 	        _bes_pt=(BESFactoryPortType) _bes_service.getBESFactoryPortType();
-    		//System.clearProperty(EngineProperties.JAVAX_NET_SSL_KEYSTORE);
-    		//System.clearProperty(EngineProperties.JAVAX_NET_SSL_KEYSTOREPASSWORD);
-	        ((org.apache.axis.client.Stub) _bes_pt).setUsername("ogf30");
-	        ((org.apache.axis.client.Stub) _bes_pt).setPassword("ogf30");
-		} catch (ServiceException e) {
+    		//System.clearProperty(fr.in2p3.jsaga.EngineProperties.JAVAX_NET_SSL_KEYSTORE);
+    		//System.clearProperty(fr.in2p3.jsaga.EngineProperties.JAVAX_NET_SSL_KEYSTOREPASSWORD);
+	        //((org.apache.axis.client.Stub) _bes_pt).setUsername("indiaInterop");
+	        //((org.apache.axis.client.Stub) _bes_pt).setPassword("1nd!@B3S");
+	        
+	        
+	        String secextNS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
+	        String utilityNS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
+	        
+	        /*
+	        org.apache.axis.message.SOAPHeaderElement wsseSecurity = new org.apache.axis.message.SOAPHeaderElement(new org.apache.axis.message.PrefixedQName(secextNS,"Security", "wsse"));
+	        wsseSecurity.setActor(null);
+	        wsseSecurity.setMustUnderstand(true);
+	        org.apache.axis.message.MessageElement usernameToken = new org.apache.axis.message.MessageElement(secextNS, "wsse:UsernameToken");
+	        usernameToken.addAttribute("wsu", utilityNS, "Id", "UsernameToken-15270039");
+	        org.apache.axis.message.MessageElement username = new org.apache.axis.message.MessageElement(secextNS, "wsse:Username");
+	        org.apache.axis.message.MessageElement password = new org.apache.axis.message.MessageElement(secextNS, "wsse:Password");
+	        username.setObjectValue("indiaInterop");
+	        usernameToken.addChild(username);
+	        password.addAttribute(null, secextNS, "Type", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText");
+	        password.setObjectValue("1nd!@B3S");
+	        usernameToken.addChild(password);
+	        wsseSecurity.appendChild(usernameToken);
+	        */
+
+	        /*
+	        org.apache.axis.message.SOAPHeaderElement wsseSecurity = new org.apache.axis.message.SOAPHeaderElement(new org.apache.axis.message.PrefixedQName(secextNS,"SecurityTokenReference", "wsse"));
+	        org.apache.axis.message.MessageElement secToken = new org.apache.axis.message.MessageElement(secextNS, "wsse:BinarySecurityToken");
+	        secToken.addAttribute(null, "Type", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509PKIPathv1");
+	        secToken.addAttribute("wsu", utilityNS, "Id", "RecipientMessageIdentity");
+	        secToken.setObjectValue("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");
+	        wsseSecurity.appendChild(secToken);
+	        */
+	        //org.apache.ws.security.message.token.UsernameToken usernameToken = new org.apache.ws.security.message.token.UsernameToken();
+	        //((org.apache.axis.client.Stub) _bes_pt).setHeader(wsseSecurity);
+		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
 		// TODO : uncomment to check resources
@@ -118,7 +150,7 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 		/*
 		try {
 			org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentResponseType gfadrt = _bes_pt.getFactoryAttributesDocument(new org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentType());
-	        System.out.println(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(gfadrt));
+			Logger.getLogger(BesJobAdaptorAbstract.class).debug(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(gfadrt));
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
