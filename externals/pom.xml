@@ -39,15 +39,12 @@
         <module>jce-jdk13</module>
         <module>jeldoclet</module>
         <module>jsch</module>
-        <module>jsr173</module>
         <module>jzlib</module>
         <module>naregi-ss-api</module>
         <module>opensaml</module>
         <module>puretls</module>
-        <module>unicore6-api</module>
         <module>vomsjapi</module>
         <module>wsgram-api</module>
-        <module>wss4j</module>
         <module>xmlsec</module>
     </modules>
     <build>
