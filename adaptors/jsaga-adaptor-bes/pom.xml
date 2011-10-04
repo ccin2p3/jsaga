@@ -66,16 +66,12 @@
 			<version>1.4-patched</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- <dependency>
-			<groupId>org.apache</groupId>
+		<dependency>
+			<groupId>org.apache.ws.security</groupId>
 			<artifactId>wss4j</artifactId>
+            <version>1.6.2</version>
 			<scope>compile</scope>
-		</dependency>-->
-        <dependency> <!-- pour ObjectDeserializer de wsrf-core -->
-            <groupId>org.globus</groupId>
-            <artifactId>wsgram-api</artifactId>
-            <version>4.0.0</version>
-			<scope>compile</scope>
-        </dependency>
+		</dependency>
+        
 	</dependencies>
 </project>
