@@ -1,5 +1,6 @@
 package fr.in2p3.jsaga.adaptor.bes.job;
 
+import fr.in2p3.jsaga.adaptor.bes.BesUtils;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
@@ -24,14 +25,13 @@ import org.ggf.schemas.bes.x2006.x08.besFactory.TerminateActivityResponseType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.UnsupportedFeatureFaultType;
 import org.ggf.schemas.jsdl.x2005.x11.jsdl.JobDefinition_Type;
 import org.ggf.schemas.jsdl.x2005.x11.jsdl.Resources_Type;
-import org.globus.wsrf.encoding.DeserializationException;
-import org.globus.wsrf.encoding.ObjectDeserializer;
 
 import org.ogf.saga.error.NoSuccessException;
 import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
+
 import fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceType;
-import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import java.io.StringReader;
 import java.rmi.RemoteException;
@@ -75,7 +75,7 @@ public class BesJobControlAdaptor extends BesJobAdaptorAbstract implements JobCo
 
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
 
-		Logger.getLogger(BesJobControlAdaptor.class).debug(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(jobDesc));
+		Logger.getLogger(BesJobControlAdaptor.class).debug(jobDesc);
 
 		CreateActivityResponseType response = null;
 		ActivityDocumentType adt = new ActivityDocumentType();
@@ -83,12 +83,11 @@ public class BesJobControlAdaptor extends BesJobAdaptorAbstract implements JobCo
 		StringReader sr = new StringReader(jobDesc);
 		
 		JobDefinition_Type jsdl_type;
-		try {
-			jsdl_type = (JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(sr), JobDefinition_Type.class);
-		} catch (DeserializationException e) {
-			throw new BadResource(e);
+        try {
+			jsdl_type = (JobDefinition_Type) BesUtils.deserialize(jobDesc, JobDefinition_Type.class);
+		} catch (SAXException e1) {
+			throw new BadResource(e1);
 		}
-		
 		if (checkMatch)
 			checkResources(jsdl_type.getJobDescription().getResources());
 		
@@ -97,6 +96,9 @@ public class BesJobControlAdaptor extends BesJobAdaptorAbstract implements JobCo
 		CreateActivityType createActivity = new CreateActivityType();
 		createActivity.setActivityDocument(adt);
 		Logger.getLogger(BesJobControlAdaptor.class).debug(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(createActivity));
+		
+		//if (true) throw new NoSuccessException("END");
+		
 		try {
 			response = _bes_pt.createActivity(createActivity);
 			Logger.getLogger(BesJobControlAdaptor.class).debug(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(response));
@@ -175,11 +177,10 @@ public class BesJobControlAdaptor extends BesJobAdaptorAbstract implements JobCo
      * @throws BadResource
      */
 	protected JobDefinition_Type getJobDescriptionTypeFromString(String nativeJobDescription) throws BadResource {
-    	StringReader sr = new StringReader(nativeJobDescription);
 		JobDefinition_Type jsdl_type;
 		try {
-			jsdl_type = (JobDefinition_Type) ObjectDeserializer.deserialize(new InputSource(sr), JobDefinition_Type.class);
-		} catch (DeserializationException e) {
+			jsdl_type = (JobDefinition_Type) BesUtils.deserialize(nativeJobDescription, JobDefinition_Type.class);
+		} catch (Exception e) {
 			throw new BadResource(e);
 		}
 		return jsdl_type;
