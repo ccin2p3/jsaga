@@ -8,6 +8,8 @@ import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
 
 import org.apache.axis.AxisFault;
 import org.apache.axis.client.Stub;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.glite.voms.VOMSAttribute;
 import org.glite.voms.VOMSValidator;
 import org.globus.axis.gsi.GSIConstants;
@@ -57,8 +59,9 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
 
     public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
         super.connect(userInfo, host, port, basePath, attributes);
+        java.net.URL serviceUrl;
         try {
-            java.net.URL serviceUrl = new java.net.URL(SERVICE_PROTOCOL, host, port, SERVICE_PATH, new org.globus.net.protocol.httpg.Handler()); //workaround for using HTTPG in tomcat or OGSi containers
+            serviceUrl = new java.net.URL(SERVICE_PROTOCOL, host, port, SERVICE_PATH, new org.globus.net.protocol.httpg.Handler()); //workaround for using HTTPG in tomcat or OGSi containers
             SRMServiceLocator service = new SRMServiceLocator(s_provider);
             m_stub = service.getsrm(serviceUrl);
             // set security
@@ -73,7 +76,9 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         // Get implementation name
         try {
         	this.ping();
+			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Connected to " + serviceUrl.toString());
         } catch (Exception e) {
+			Logger.getLogger(this.getClass().getName()).log(Level.WARN, "Could not ping " + serviceUrl.toString());
         	this.m_impl_name = "UNKNOWN";
         }
     }
@@ -93,6 +98,12 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             } else {
             	// FIXME: Implementation name is not necessary the first element of TExtraInfoArray (CASTOR)
             	this.m_impl_name = response.getOtherInfo().getExtraInfoArray(0).getValue();
+            	String otherInfo = "[";
+            	for (TExtraInfo info : response.getOtherInfo().getExtraInfoArray()) {
+            		otherInfo += info.getKey() + "=" + info.getValue() + ";";
+            	}
+            	otherInfo += "]";
+    			Logger.getLogger(this.getClass().getName()).log(Level.INFO, "SRM Version is " + response.getVersionInfo() + " " + otherInfo);
             }
         } catch (RemoteException e) {
             throw new BadParameterException(e);
@@ -119,6 +130,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
                 TAccessPattern.TRANSFER_MODE, TConnectionType.WAN, null, new ArrayOfString(m_transferProtocols)));
         try {
             // send request
+			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + " : " + absolutePath);
             SrmPrepareToGetResponse response = m_stub.srmPrepareToGet(request);
             long deadline = System.currentTimeMillis() + m_prepareTimeout;
 
@@ -141,6 +153,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             while (status.getStatusCode().equals(TStatusCode.SRM_REQUEST_QUEUED) ||
                    status.getStatusCode().equals(TStatusCode.SRM_REQUEST_INPROGRESS))
             {
+    			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Response is asynchronous");
                 if (System.currentTimeMillis() > deadline) {
                     throw new TimeoutException("SRM request blocked in status: "+status.getStatusCode().getValue());
                 }
@@ -265,6 +278,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
                 TAccessPattern.TRANSFER_MODE, TConnectionType.WAN, null, new ArrayOfString(m_transferProtocols)));
         try {
             // send request
+			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + " : " + absolutePath);
             SrmPrepareToPutResponse response = m_stub.srmPrepareToPut(request);
             long deadline = System.currentTimeMillis() + m_prepareTimeout;
 
@@ -287,6 +301,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             while (status.getStatusCode().equals(TStatusCode.SRM_REQUEST_QUEUED) ||
                    status.getStatusCode().equals(TStatusCode.SRM_REQUEST_INPROGRESS))
             {
+    			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Response is asynchronous");
                 if (System.currentTimeMillis() > deadline) {
                     throw new TimeoutException("SRM request blocked in status: "+status.getStatusCode().getValue());
                 }
@@ -784,6 +799,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         SrmLsResponse response;
         try {
             // send request
+			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + " : " + absolutePath);
             response = m_stub.srmLs(request);
         } catch (AxisFault e) {
             if (EOFException.class.getName().equals(e.getFaultString())) {
@@ -794,33 +810,75 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         } catch (RemoteException e) {
             throw new TimeoutException(e);
         }
+        
         TMetaDataPathDetail metadata = null;
-        if (response.getDetails()!=null && response.getDetails().getPathDetailArray().length>0) {
-            metadata = response.getDetails().getPathDetailArray(0);
-        }
 
         // returns
         TReturnStatus status = response.getReturnStatus();
-        TReturnStatus detailedStatus = (metadata!=null ? metadata.getStatus() : null);
-        if (status.getStatusCode().equals(TStatusCode.SRM_SUCCESS)) {
+        TReturnStatus detailedStatus = null;
+        
+        if (status.getStatusCode().equals(TStatusCode.SRM_SUCCESS)) { // Synchronous LS
+			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Response is synchronous");
+            if (response.getDetails()!=null && response.getDetails().getPathDetailArray().length>0) {
+                metadata = response.getDetails().getPathDetailArray(0);
+            }
+
+            detailedStatus = (metadata!=null ? metadata.getStatus() : null);
+
             if (detailedStatus!=null && detailedStatus.getStatusCode().equals(TStatusCode.SRM_SUCCESS)) {
                 return metadata;
             } else {
                 throw new NoSuccessException("Request successful but metadata not received");
             }
-        } else {
-            try {
-                if (detailedStatus != null) {
-                    rethrowException(detailedStatus);
-                } else {
-                    rethrowException(status);
+        } else if (status.getStatusCode().equals(TStatusCode.SRM_REQUEST_QUEUED) || status.getStatusCode().equals(TStatusCode.SRM_REQUEST_INPROGRESS)) { // asynchronous LS
+			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Response is asynchronous");
+            // save request token
+            String token = response.getRequestToken();
+            long deadline = System.currentTimeMillis() + m_prepareTimeout;
+            long period = 1000;     // 1 second
+            SrmStatusOfLsRequestRequest request2 = new SrmStatusOfLsRequestRequest();
+            request2.setRequestToken(token);
+            //request2.setArrayOfTargetSURLs(new ArrayOfAnyURI(new org.apache.axis.types.URI[]{logicalUri}));
+            while (status.getStatusCode().equals(TStatusCode.SRM_REQUEST_QUEUED) ||
+                   status.getStatusCode().equals(TStatusCode.SRM_REQUEST_INPROGRESS))
+            {
+                if (System.currentTimeMillis() > deadline) {
+                    throw new TimeoutException("SRM request blocked in status: "+status.getStatusCode().getValue());
                 }
-                throw new NoSuccessException("INTERNAL ERROR: an exception should have been raised");
-            } catch (BadParameterException e) {
-                throw new NoSuccessException("INTERNAL ERROR: unexpected exception", e);
-            } catch (AlreadyExistsException e) {
-                throw new NoSuccessException("INTERNAL ERROR: unexpected exception", e);
+                try {
+                    Thread.sleep(period);
+                    period *= 2;
+                } catch (InterruptedException e) {}
+                SrmStatusOfLsRequestResponse response2;
+				try {
+					response2 = m_stub.srmStatusOfLsRequest(request2);
+				} catch (RemoteException e) {
+		            throw new TimeoutException(e);
+				}
+	            if (response2.getDetails()!=null && response2.getDetails().getPathDetailArray().length>0) {
+	                metadata = response2.getDetails().getPathDetailArray(0);
+	            }
+
+	            detailedStatus = (metadata!=null ? metadata.getStatus() : null);
+
+	            if (detailedStatus!=null && detailedStatus.getStatusCode().equals(TStatusCode.SRM_SUCCESS)) {
+	                return metadata;
+	            }
+                status = response2.getReturnStatus();
             }
+
+        }
+        try {
+            if (detailedStatus != null) {
+                rethrowException(detailedStatus);
+            } else {
+                rethrowException(status);
+            }
+            throw new NoSuccessException("INTERNAL ERROR: an exception should have been raised");
+        } catch (BadParameterException e) {
+            throw new NoSuccessException("INTERNAL ERROR: unexpected exception", e);
+        } catch (AlreadyExistsException e) {
+            throw new NoSuccessException("INTERNAL ERROR: unexpected exception", e);
         }
     }
 
