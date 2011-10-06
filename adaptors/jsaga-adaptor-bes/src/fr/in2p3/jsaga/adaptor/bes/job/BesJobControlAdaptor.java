@@ -47,7 +47,7 @@ import java.util.ArrayList;
 * ***************************************************/
 
 /**
- * This class is the abstract class for the JobControl specific to a BES implementation
+ * This class is the generic class for generic access to a BES service
  */
 public class BesJobControlAdaptor extends BesJobAdaptorAbstract implements JobControlAdaptor {
 
@@ -80,8 +80,6 @@ public class BesJobControlAdaptor extends BesJobAdaptorAbstract implements JobCo
 		CreateActivityResponseType response = null;
 		ActivityDocumentType adt = new ActivityDocumentType();
 		
-		StringReader sr = new StringReader(jobDesc);
-		
 		JobDefinition_Type jsdl_type;
         try {
 			jsdl_type = (JobDefinition_Type) BesUtils.deserialize(jobDesc, JobDefinition_Type.class);
@@ -96,8 +94,6 @@ public class BesJobControlAdaptor extends BesJobAdaptorAbstract implements JobCo
 		CreateActivityType createActivity = new CreateActivityType();
 		createActivity.setActivityDocument(adt);
 		Logger.getLogger(BesJobControlAdaptor.class).debug(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(createActivity));
-		
-		//if (true) throw new NoSuccessException("END");
 		
 		try {
 			response = _bes_pt.createActivity(createActivity);
