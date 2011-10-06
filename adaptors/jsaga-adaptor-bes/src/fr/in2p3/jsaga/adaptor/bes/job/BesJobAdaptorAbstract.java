@@ -8,6 +8,8 @@ import fr.in2p3.jsaga.adaptor.security.impl.JKSSecurityCredential;
 import org.apache.axis.message.SOAPHeaderElement;
 import org.apache.log4j.Logger;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.components.crypto.CertificateStore;
+import org.apache.ws.security.message.WSSecEncryptedKey;
 import org.apache.ws.security.message.WSSecHeader;
 import org.apache.ws.security.message.WSSecUsernameToken;
 import org.ggf.schemas.bes.x2006.x08.besFactory.BESFactoryPortType;
@@ -26,6 +28,7 @@ import fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceTyp
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -46,8 +49,6 @@ import javax.xml.soap.SOAPException;
  */
 public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 
-	protected static final String BES_FACTORY_PORT_TYPE = "BESFactoryPortType";
-	
 	protected URI _bes_url ;
 	protected JKSSecurityCredential m_credential;
 
@@ -107,14 +108,10 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
     	
         BesFactoryServiceLocator _bes_service = new BesFactoryServiceLocator();
 		try {
-			_bes_service.setEndpointAddress(BES_FACTORY_PORT_TYPE, _bes_url.toString());
-	        _bes_pt=(BESFactoryPortType) _bes_service.getBESFactoryPortType();
-    		//System.clearProperty(fr.in2p3.jsaga.EngineProperties.JAVAX_NET_SSL_KEYSTORE);
-    		//System.clearProperty(fr.in2p3.jsaga.EngineProperties.JAVAX_NET_SSL_KEYSTOREPASSWORD);
-	        //((org.apache.axis.client.Stub) _bes_pt).setUsername("indiaInterop");
-	        //((org.apache.axis.client.Stub) _bes_pt).setPassword("1nd!@B3S");
+			_bes_service.setBESFactoryPortTypeEndpointAddress(_bes_url.toString());
+	        _bes_pt= _bes_service.getBESFactoryPortType();
 	        
-	        
+	        // Add SOAP security header
 	        ((org.apache.axis.client.Stub) _bes_pt).setHeader(this.buildSOAPHeader());
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
@@ -128,7 +125,7 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}*/
-		/*
+		
 		try {
 			org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentResponseType gfadrt = _bes_pt.getFactoryAttributesDocument(new org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentType());
 			Logger.getLogger(BesJobAdaptorAbstract.class).debug(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(gfadrt));
@@ -136,7 +133,6 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 			throw new NoSuccessException(e);
 		}
 		throw new NoSuccessException("END");
-		*/
     }
 
 	private SOAPHeaderElement buildSOAPHeader() throws Exception {
@@ -144,17 +140,22 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 	}
 	
 	private SOAPHeaderElement buildUsernamePassword() throws Exception {
-        WSSecUsernameToken usernameToken = new WSSecUsernameToken();
-        usernameToken.setPasswordsAreEncoded(false);
-        usernameToken.setPasswordType(WSConstants.PASSWORD_TEXT);
-        usernameToken.setUserInfo("indiaInterop", "1nd!@B3S");
+        WSSecUsernameToken token = new WSSecUsernameToken();
+        // USELESS token.setPasswordsAreEncoded(false);
+        token.setPasswordType(WSConstants.PASSWORD_TEXT);
+        token.setUserInfo("indiaInterop", "1nd!@B3S");
+        // USELESS token.addCreated();
         SOAPHeaderElement wsseSecurity = new SOAPHeaderElement(new org.apache.axis.message.PrefixedQName(secextNS,"Security", "wsse"));
-        WSSecHeader secHeader = new WSSecHeader(null, true);
         Document doc = wsseSecurity.getAsDocument();
-        //secHeader.setActor(null);
-        //secHeader.setMustUnderstand(true);
+        WSSecHeader secHeader = new WSSecHeader();
+        /* setMustUnderstand(true) gives Did not understand "MustUnderstand" */
+        secHeader.setMustUnderstand(false);
+        /* setActor("http://schemas.xmlsoap.org/soap/actor/next") otherwise NPE on server side */
+        secHeader.setActor("http://schemas.xmlsoap.org/soap/actor/next");
         secHeader.insertSecurityHeader(doc);
-        usernameToken.build(doc, secHeader);
+        token.prepare(doc);
+        token.prependToHeader(secHeader);
+        
         return new SOAPHeaderElement(secHeader.getSecurityHeader());
 	}
 	
@@ -168,6 +169,20 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
         return wsseSecurity;
 	}
 	
+	private SOAPHeaderElement buildEncryptedKey() throws Exception {
+		WSSecEncryptedKey token = new WSSecEncryptedKey();
+		token.setUseThisCert(m_credential.getCertificate()); 
+		token.setUserInfo(m_credential.getUserID());
+        SOAPHeaderElement wsseSecurity = new SOAPHeaderElement(new org.apache.axis.message.PrefixedQName(secextNS,"Security", "wsse"));
+        WSSecHeader secHeader = new WSSecHeader();
+        Document doc = wsseSecurity.getAsDocument();
+        secHeader.setMustUnderstand(true);
+        secHeader.setActor("http://schemas.xmlsoap.org/soap/actor/next");
+        secHeader.insertSecurityHeader(doc);
+        token.prepare(doc, new CertificateStore(new X509Certificate[]{m_credential.getCertificate()}));
+        token.appendToHeader(secHeader);
+        return new SOAPHeaderElement(secHeader.getSecurityHeader());
+	}
 	/**
 	 * @deprecated
 	 */
