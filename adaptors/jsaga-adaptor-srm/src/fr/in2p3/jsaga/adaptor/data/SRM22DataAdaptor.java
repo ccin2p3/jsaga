@@ -45,6 +45,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
 //        , LogicalReader
 {
     private static final String SERVICE_PROTOCOL = "httpg";
+    // TODO: Service_Path could be a parameter ("/srm/v2/server" for BeStMan)
     private static final String SERVICE_PATH = "/srm/managerv2";
     private ISRM m_stub;
     private String m_impl_name;
@@ -76,7 +77,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         // Get implementation name
         try {
         	this.ping();
-			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Connected to " + serviceUrl.toString());
+			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Connected to " + this.m_impl_name + " instance at " + serviceUrl.toString());
         } catch (Exception e) {
 			Logger.getLogger(this.getClass().getName()).log(Level.WARN, "Could not ping " + serviceUrl.toString());
         	this.m_impl_name = "UNKNOWN";
@@ -96,11 +97,10 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             if (response.getVersionInfo() == null) {
                 throw new NoSuccessException("Unknown version");
             } else {
-            	// FIXME: Implementation name is not necessary the first element of TExtraInfoArray (CASTOR)
-            	this.m_impl_name = response.getOtherInfo().getExtraInfoArray(0).getValue();
             	String otherInfo = "[";
             	for (TExtraInfo info : response.getOtherInfo().getExtraInfoArray()) {
             		otherInfo += info.getKey() + "=" + info.getValue() + ";";
+            		if (info.getKey().equals("backend_type")) this.m_impl_name = info.getValue();
             	}
             	otherInfo += "]";
     			Logger.getLogger(this.getClass().getName()).log(Level.INFO, "SRM Version is " + response.getVersionInfo() + " " + otherInfo);
@@ -799,7 +799,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         SrmLsResponse response;
         try {
             // send request
-			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + " : " + absolutePath);
+			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + (justCheckExist?"(CHECKEXIST)":"") + " : " + absolutePath);
             response = m_stub.srmLs(request);
         } catch (AxisFault e) {
             if (EOFException.class.getName().equals(e.getFaultString())) {
@@ -817,8 +817,38 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         TReturnStatus status = response.getReturnStatus();
         TReturnStatus detailedStatus = null;
         
-        if (status.getStatusCode().equals(TStatusCode.SRM_SUCCESS)) { // Synchronous LS
-			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Response is synchronous");
+        String token = response.getRequestToken();
+        long deadline = System.currentTimeMillis() + m_prepareTimeout;
+        long period = 1000;     // 1 second
+        SrmStatusOfLsRequestRequest request2 = new SrmStatusOfLsRequestRequest();
+        request2.setRequestToken(token);
+        while (status.getStatusCode().equals(TStatusCode.SRM_REQUEST_QUEUED) ||
+               status.getStatusCode().equals(TStatusCode.SRM_REQUEST_INPROGRESS))
+        {
+			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Response is asynchronous");
+            if (System.currentTimeMillis() > deadline) {
+                throw new TimeoutException("SRM request blocked in status: "+status.getStatusCode().getValue());
+            }
+            try {
+                Thread.sleep(period);
+                period *= 2;
+            } catch (InterruptedException e) {}
+            SrmStatusOfLsRequestResponse response2;
+			try {
+				response2 = m_stub.srmStatusOfLsRequest(request2);
+			} catch (RemoteException e) {
+	            throw new TimeoutException(e);
+			}
+
+            status = response2.getReturnStatus();
+            if (!status.getStatusCode().equals(TStatusCode.SRM_REQUEST_QUEUED) && !status.getStatusCode().equals(TStatusCode.SRM_REQUEST_INPROGRESS)) {
+            	// report details to first response
+            	response.setDetails(response2.getDetails());
+            }
+        }
+        request2 = null;
+        // Now all information is in response
+        //if (status.getStatusCode().equals(TStatusCode.SRM_SUCCESS)) { // Synchronous LS
             if (response.getDetails()!=null && response.getDetails().getPathDetailArray().length>0) {
                 metadata = response.getDetails().getPathDetailArray(0);
             }
@@ -827,53 +857,17 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
 
             if (detailedStatus!=null && detailedStatus.getStatusCode().equals(TStatusCode.SRM_SUCCESS)) {
                 return metadata;
-            } else {
-                throw new NoSuccessException("Request successful but metadata not received");
-            }
-        } else if (status.getStatusCode().equals(TStatusCode.SRM_REQUEST_QUEUED) || status.getStatusCode().equals(TStatusCode.SRM_REQUEST_INPROGRESS)) { // asynchronous LS
-			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Response is asynchronous");
-            // save request token
-            String token = response.getRequestToken();
-            long deadline = System.currentTimeMillis() + m_prepareTimeout;
-            long period = 1000;     // 1 second
-            SrmStatusOfLsRequestRequest request2 = new SrmStatusOfLsRequestRequest();
-            request2.setRequestToken(token);
-            //request2.setArrayOfTargetSURLs(new ArrayOfAnyURI(new org.apache.axis.types.URI[]{logicalUri}));
-            while (status.getStatusCode().equals(TStatusCode.SRM_REQUEST_QUEUED) ||
-                   status.getStatusCode().equals(TStatusCode.SRM_REQUEST_INPROGRESS))
-            {
-                if (System.currentTimeMillis() > deadline) {
-                    throw new TimeoutException("SRM request blocked in status: "+status.getStatusCode().getValue());
-                }
-                try {
-                    Thread.sleep(period);
-                    period *= 2;
-                } catch (InterruptedException e) {}
-                SrmStatusOfLsRequestResponse response2;
-				try {
-					response2 = m_stub.srmStatusOfLsRequest(request2);
-				} catch (RemoteException e) {
-		            throw new TimeoutException(e);
-				}
-	            if (response2.getDetails()!=null && response2.getDetails().getPathDetailArray().length>0) {
-	                metadata = response2.getDetails().getPathDetailArray(0);
-	            }
-
-	            detailedStatus = (metadata!=null ? metadata.getStatus() : null);
-
-	            if (detailedStatus!=null && detailedStatus.getStatusCode().equals(TStatusCode.SRM_SUCCESS)) {
-	                return metadata;
-	            }
-                status = response2.getReturnStatus();
+            //} else {
+            //    throw new NoSuccessException("Request successful but metadata not received");
             }
 
-        }
+        //}
         try {
-            if (detailedStatus != null) {
-                rethrowException(detailedStatus);
-            } else {
-                rethrowException(status);
-            }
+        	if (detailedStatus != null) {
+        		rethrowException(detailedStatus);
+        	} else {
+        		rethrowException(status);
+        	}
             throw new NoSuccessException("INTERNAL ERROR: an exception should have been raised");
         } catch (BadParameterException e) {
             throw new NoSuccessException("INTERNAL ERROR: unexpected exception", e);
