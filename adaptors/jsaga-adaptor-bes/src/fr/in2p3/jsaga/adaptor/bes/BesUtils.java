@@ -24,14 +24,13 @@ import javax.xml.namespace.QName;
 public class BesUtils {
 	public static String dumpMessage(String nameSpace, Object BESMessage) {
 		if (BESMessage == null) return "";
-		StringWriter writer = new StringWriter();
-		writer.write("-------> " + BESMessage.getClass().getName() + "\n");
+		String dump = "-------> " + BESMessage.getClass().getName() + "\n";
 		try {
-			writer.write(BesUtils.serialize(nameSpace, BESMessage));
+			dump += BesUtils.serialize(nameSpace, BESMessage);
 		} catch (Exception e) {
-			writer.write("Could not dump object " + BESMessage.getClass().getName());
+			dump += "Could not dump object " + BESMessage.getClass().getName();
 		}
-		return writer.toString();
+		return dump;
 	}
 
 	public static String dumpBESMessage(Object Message) {
