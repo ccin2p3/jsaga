@@ -119,24 +119,28 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
         }
     }
 
+    protected void checkExists(String absolutePath) throws AlreadyExistsException, NoSuccessException, PermissionDeniedException, BadParameterException, TimeoutException, ParentDoesNotExist {
+        boolean exists;
+        try {
+            exists = m_client.exists(absolutePath);
+        } catch (Exception e) {
+            try {
+                throw rethrowExceptionFull(e);
+            } catch (DoesNotExistException e1) {
+                throw new ParentDoesNotExist(e);
+            }
+        }
+        if (exists) {
+            throw new AlreadyExistsException("File already exists: "+absolutePath);
+        }
+    }
+    
     public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
         String absolutePath = parentAbsolutePath+"/"+fileName;
 
         // test existence
         if (exclusive) {
-            boolean exists;
-            try {
-                exists = m_client.exists(absolutePath);
-            } catch (Exception e) {
-                try {
-                    throw rethrowExceptionFull(e);
-                } catch (DoesNotExistException e1) {
-                    throw new ParentDoesNotExist(e);
-                }
-            }
-            if (exists) {
-                throw new AlreadyExistsException("File already exists: "+fileName);
-            }
+        	checkExists(absolutePath);
         }
 
         // create new connection (else test setUp hangs)
