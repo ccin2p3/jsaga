@@ -5,6 +5,7 @@
     <body>
         <release version="0.9.15">
             <action dev="lschwarz" type="add">New data adaptor for Unicore</action>
+            <action dev="lschwarz" type="add">Support of StoRM implementation of SRM</action>
             <action dev="lschwarz" type="update">Implementation of data staging for BES adaptor for Unicore</action>
             <action dev="lschwarz" type="update">Separate job service attributes from data service attributes</action>
             <action dev="lschwarz" type="update">Deprecated adaptor for unicore6 has been removed</action>
