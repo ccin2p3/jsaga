@@ -161,6 +161,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
                     Thread.sleep(period);
                     period *= 2;
                 } catch (InterruptedException e) {/*ignore*/}
+    			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request2.getClass().getName() + " : " + token);
                 SrmStatusOfGetRequestResponse response2 = m_stub.srmStatusOfGetRequest(request2);
                 status = response2.getReturnStatus();
                 if (response2.getArrayOfFileStatuses()!=null && response2.getArrayOfFileStatuses().getStatusArray().length>0) {
@@ -206,26 +207,14 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         String token = srmResponse.getToken();
         java.net.URI transferUrl = srmResponse.getTransferUrl();
 
+        /*
+         * CASTOR sends something like
+         * gsiftp://gdss518.gridpp.rl.ac.uk:51327/aa292814-e260-5074-e040-f68238b40b8f
+         * which fails with "Connection refused", host and port not reachable...
+         */
         // change URI to match appropriate gsiftp adaptor
-        if ("gsiftp".equals(transferUrl.getScheme())) {
-        	try {
-                if ("DPM".equals(this.m_impl_name)) {
-                	transferUrl = new java.net.URI("gsiftp-dpm",
-                			transferUrl.getUserInfo(), transferUrl.getHost(),
-                			transferUrl.getPort(), transferUrl.getPath(), transferUrl.getQuery(),
-                			transferUrl.getFragment());
-                } else if ("dCache".equals(this.m_impl_name)) {
-                	transferUrl = new java.net.URI("gsiftp-dcache",
-                			transferUrl.getUserInfo(), transferUrl.getHost(),
-                			transferUrl.getPort(), transferUrl.getPath(), transferUrl.getQuery(),
-                			transferUrl.getFragment());               	
-                }
-        		
-        	} catch (java.net.URISyntaxException e) {
-        		// keep transferUrl
-        	}
-        }
-
+        transferUrl = modifyScheme(transferUrl);
+        
         // connect to transfer server
         SagaDataAdaptor adaptor = new SagaDataAdaptor(transferUrl, m_credential, m_certRepository, token, absolutePath, this);
         return adaptor.getInputStream(transferUrl.getPath(), null);
@@ -239,6 +228,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         SrmReleaseFilesResponse response;
         try {
             // send request
+			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + " : " + absolutePath);
             response = m_stub.srmReleaseFiles(request);
         } catch (RemoteException e) {
             throw new TimeoutException(e);
@@ -309,6 +299,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
                     Thread.sleep(period);
                     period *= 2;
                 } catch (InterruptedException e) {/*ignore*/}
+    			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request2.getClass().getName() + " : " + token);
                 SrmStatusOfPutRequestResponse response2 = m_stub.srmStatusOfPutRequest(request2);
                 status = response2.getReturnStatus();
                 if (response2.getArrayOfFileStatuses()!=null && response2.getArrayOfFileStatuses().getStatusArray().length>0) {
@@ -351,25 +342,8 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         java.net.URI transferUrl = srmResponse.getTransferUrl();
         
         // change URI to match appropriate gsiftp adaptor
-        if ("gsiftp".equals(transferUrl.getScheme())) {
-        	try {
-                if ("DPM".equals(this.m_impl_name)) {
-                	transferUrl = new java.net.URI("gsiftp-dpm",
-                			transferUrl.getUserInfo(), transferUrl.getHost(),
-                			transferUrl.getPort(), transferUrl.getPath(), transferUrl.getQuery(),
-                			transferUrl.getFragment());
-                } else if ("dCache".equals(this.m_impl_name)) {
-                	transferUrl = new java.net.URI("gsiftp-dcache",
-                			transferUrl.getUserInfo(), transferUrl.getHost(),
-                			transferUrl.getPort(), transferUrl.getPath(), transferUrl.getQuery(),
-                			transferUrl.getFragment());               	
-                }
-        		
-        	} catch (java.net.URISyntaxException e) {
-        		// keep transferUrl
-        	}
-        }
-
+        transferUrl = modifyScheme(transferUrl);
+        
         // connect to transfer server
         SagaDataAdaptor adaptor;
         try {
@@ -390,6 +364,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         SrmPutDoneResponse response;
         try {
             // send request
+			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + " : " + token);
             response = m_stub.srmPutDone(request);
         } catch (RemoteException e) {
             throw new TimeoutException(e);
@@ -449,6 +424,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         SrmMkdirResponse response;
         try {
             // send request
+			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + " : " + uri.toString());
             response = m_stub.srmMkdir(request);
         } catch (RemoteException e) {
             throw new NoSuccessException(e);
@@ -473,6 +449,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         SrmRmdirResponse response;
         try {
             // send request
+			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + " : " + uri.toString());
             response = m_stub.srmRmdir(request);
         } catch (RemoteException e) {
             throw new NoSuccessException(e);
@@ -496,6 +473,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         SrmRmResponse response;
         try {
             // send request
+			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request.getClass().getName() + " : " + uri.toString());
             response = m_stub.srmRm(request);
         } catch (RemoteException e) {
             throw new NoSuccessException(e);
@@ -569,6 +547,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
 		
 		SrmSetPermissionResponse response = null;
 		try{
+			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + setPermissionRequest.getClass().getName() + " : " + absolutePath);
 			response = m_stub.srmSetPermission(setPermissionRequest);
 		} catch (RemoteException e) {
 	        throw new NoSuccessException(e);
@@ -680,6 +659,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
 		
 		SrmSetPermissionResponse response = null;
 		try{
+			Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + setPermissionRequest.getClass().getName() + " : " + absolutePath);
 			response = m_stub.srmSetPermission(setPermissionRequest);
 		} catch (RemoteException e) {
 	        throw new NoSuccessException(e);
@@ -835,6 +815,7 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             } catch (InterruptedException e) {}
             SrmStatusOfLsRequestResponse response2;
 			try {
+				Logger.getLogger(this.getClass().getName()).log(Level.DEBUG, "Sending " + request2.getClass().getName() + " : " + token);
 				response2 = m_stub.srmStatusOfLsRequest(request2);
 			} catch (RemoteException e) {
 	            throw new TimeoutException(e);
@@ -847,21 +828,26 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
             }
         }
         request2 = null;
-        // Now all information is in response
-        //if (status.getStatusCode().equals(TStatusCode.SRM_SUCCESS)) { // Synchronous LS
-            if (response.getDetails()!=null && response.getDetails().getPathDetailArray().length>0) {
-                metadata = response.getDetails().getPathDetailArray(0);
-            }
 
-            detailedStatus = (metadata!=null ? metadata.getStatus() : null);
+        if (response.getDetails()!=null && response.getDetails().getPathDetailArray().length>0) {
+            metadata = response.getDetails().getPathDetailArray(0);
+        }
 
-            if (detailedStatus!=null && detailedStatus.getStatusCode().equals(TStatusCode.SRM_SUCCESS)) {
-                return metadata;
-            //} else {
-            //    throw new NoSuccessException("Request successful but metadata not received");
-            }
+        detailedStatus = (metadata!=null ? metadata.getStatus() : null);
 
-        //}
+        if (detailedStatus!=null && detailedStatus.getStatusCode().equals(TStatusCode.SRM_SUCCESS)) {
+        	// StoRM does not return subpaths in arrayOfSubPaths but in pathDetailArray[1->N]
+        	// In this case (arrayOfSubPaths == null): copy pathDetailArray[1->N] to arrayOfSubPaths
+        	if (metadata.getArrayOfSubPaths() == null && response.getDetails().getPathDetailArray().length>1) {
+        		ArrayOfTMetaDataPathDetail subpaths = new ArrayOfTMetaDataPathDetail(new TMetaDataPathDetail[response.getDetails().getPathDetailArray().length-1]);
+        		for (int i=1; i<response.getDetails().getPathDetailArray().length; i++) {
+        			subpaths.setPathDetailArray(i-1, response.getDetails().getPathDetailArray(i));
+        		}
+        		metadata.setArrayOfSubPaths(subpaths);
+        	}
+            return metadata;
+        }
+
         try {
         	if (detailedStatus != null) {
         		rethrowException(detailedStatus);
@@ -904,5 +890,32 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
         } else {
             throw new NoSuccessException(code.getValue()+": "+explanation);
         }
+    }
+    
+    private java.net.URI modifyScheme(java.net.URI transferUrl) {
+    	
+	    if (!"gsiftp".equals(transferUrl.getScheme()))
+	    		return transferUrl;
+    	try {
+            if ("DPM".equals(this.m_impl_name)) {
+            	transferUrl = new java.net.URI("gsiftp-dpm",
+            			transferUrl.getUserInfo(), transferUrl.getHost(),
+            			transferUrl.getPort(), transferUrl.getPath(), transferUrl.getQuery(),
+            			transferUrl.getFragment());
+            } else if ("dCache".equals(this.m_impl_name)) {
+            	transferUrl = new java.net.URI("gsiftp-dcache",
+            			transferUrl.getUserInfo(), transferUrl.getHost(),
+            			transferUrl.getPort(), transferUrl.getPath(), transferUrl.getQuery(),
+            			transferUrl.getFragment());               	
+            } else if ("StoRM".equals(this.m_impl_name)) {
+            	transferUrl = new java.net.URI("gsiftp-storm",
+            			transferUrl.getUserInfo(), transferUrl.getHost(),
+            			transferUrl.getPort(), transferUrl.getPath(), transferUrl.getQuery(),
+            			transferUrl.getFragment());               	
+            }
+    	} catch (java.net.URISyntaxException e) {
+    		// No modification
+    	}
+		return transferUrl;
     }
 }
