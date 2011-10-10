@@ -51,6 +51,7 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 
 	protected URI _bes_url ;
 	protected JKSSecurityCredential m_credential;
+	protected String m_referenceParameter = null;
 
 	protected BESFactoryPortType _bes_pt = null;
 	
@@ -61,8 +62,6 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 	// Can be of type BasicResourceAttributesDocumentType or FactoryResourceAttributesDocumentType
 	protected Object[] _cr = null;
 
-    protected final String secextNS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
-    protected final String utilityNS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
     
 
 	//////////////////////////////////////////////////
@@ -103,6 +102,7 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 		} catch (URISyntaxException e) {
 			throw new NoSuccessException(e);
 		}
+		m_referenceParameter = (String) attributes.get("reference-parameter");
 		Logger.getLogger(BesJobAdaptorAbstract.class).info("Connecting to BES service at: " + _bes_url);
     	if (_bes_pt != null) return;
     	
@@ -111,8 +111,14 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 			_bes_service.setBESFactoryPortTypeEndpointAddress(_bes_url.toString());
 	        _bes_pt= _bes_service.getBESFactoryPortType();
 	        
-	        // Add SOAP security header
-	        ((org.apache.axis.client.Stub) _bes_pt).setHeader(this.buildSOAPHeader());
+	        if (m_referenceParameter != null) {
+	        	// add reference parameter
+	        	((org.apache.axis.client.Stub) _bes_pt).setHeader(this.buildReference());
+	        }
+	        /* deprecated
+	         * Add SOAP security header
+	         * ((org.apache.axis.client.Stub) _bes_pt).setHeader(this.buildUsernamePassword());
+	         */
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
@@ -126,6 +132,7 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 			e.printStackTrace();
 		}*/
 		
+		/*
 		try {
 			org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentResponseType gfadrt = _bes_pt.getFactoryAttributesDocument(new org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentType());
 			Logger.getLogger(BesJobAdaptorAbstract.class).debug(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(gfadrt));
@@ -133,16 +140,15 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 			throw new NoSuccessException(e);
 		}
 		throw new NoSuccessException("END");
+		*/
     }
 
-	private SOAPHeaderElement buildSOAPHeader() throws Exception {
-		return this.buildUsernamePassword();
-	}
-	
 	private SOAPHeaderElement buildUsernamePassword() throws Exception {
+	    String secextNS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
         WSSecUsernameToken token = new WSSecUsernameToken();
         // USELESS token.setPasswordsAreEncoded(false);
         token.setPasswordType(WSConstants.PASSWORD_TEXT);
+        // TODO: support of user/password adaptor ?
         token.setUserInfo("indiaInterop", "1nd!@B3S");
         // USELESS token.addCreated();
         SOAPHeaderElement wsseSecurity = new SOAPHeaderElement(new org.apache.axis.message.PrefixedQName(secextNS,"Security", "wsse"));
@@ -159,7 +165,12 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
         return new SOAPHeaderElement(secHeader.getSecurityHeader());
 	}
 	
+	/**
+	 * @deprecated
+	 */
 	private SOAPHeaderElement buildBinaryToken() throws SOAPException {
+	    String secextNS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
+	    String utilityNS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
         org.apache.axis.message.SOAPHeaderElement wsseSecurity = new org.apache.axis.message.SOAPHeaderElement(new org.apache.axis.message.PrefixedQName(secextNS,"SecurityTokenReference", "wsse"));
         org.apache.axis.message.MessageElement secToken = new org.apache.axis.message.MessageElement(secextNS, "wsse:BinarySecurityToken");
         secToken.addAttribute(null, "Type", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509PKIPathv1");
@@ -170,6 +181,7 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 	}
 	
 	private SOAPHeaderElement buildEncryptedKey() throws Exception {
+	    String secextNS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
 		WSSecEncryptedKey token = new WSSecEncryptedKey();
 		token.setUseThisCert(m_credential.getCertificate()); 
 		token.setUserInfo(m_credential.getUserID());
@@ -183,15 +195,18 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
         token.appendToHeader(secHeader);
         return new SOAPHeaderElement(secHeader.getSecurityHeader());
 	}
+
 	/**
 	 * @deprecated
 	 */
 	private SOAPHeaderElement buildUsernamePasswordDeprecated() throws SOAPException {
+	    String secextNS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
+	    String utilityNS = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
         org.apache.axis.message.SOAPHeaderElement wsseSecurity = new org.apache.axis.message.SOAPHeaderElement(new org.apache.axis.message.PrefixedQName(secextNS,"Security", "wsse"));
         wsseSecurity.setActor(null);
         wsseSecurity.setMustUnderstand(true);
         org.apache.axis.message.MessageElement usernameToken = new org.apache.axis.message.MessageElement(secextNS, "wsse:UsernameToken");
-        usernameToken.addAttribute("wsu", utilityNS, "Id", "UsernameToken-15270039");
+        usernameToken.addAttribute("wsu", utilityNS, "Id", "UsernameToken-1");
         org.apache.axis.message.MessageElement username = new org.apache.axis.message.MessageElement(secextNS, "wsse:Username");
         org.apache.axis.message.MessageElement password = new org.apache.axis.message.MessageElement(secextNS, "wsse:Password");
         username.setObjectValue("indiaInterop");
@@ -202,9 +217,18 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
         wsseSecurity.appendChild(usernameToken);
 		return wsseSecurity;
 	}
+
+	private SOAPHeaderElement buildReference() throws SOAPException {
+        org.apache.axis.message.SOAPHeaderElement ref = new org.apache.axis.message.SOAPHeaderElement(new org.apache.axis.message.PrefixedQName("http://edu.virginia.vcgr.genii/ref-params","resource-key", "refparam"));
+        ref.setMustUnderstand(false);
+        ref.addAttribute("http://www.w3.org/2005/08/addressing", "IsReferenceParameter", "true");
+        ref.setObjectValue(m_referenceParameter);
+        return ref;
+	}
 	
 	public void disconnect() throws NoSuccessException {
         m_credential = null;
+        m_referenceParameter = null;
         _bes_pt = null;
         _bes_url = null;
         _br = null;
