@@ -47,9 +47,9 @@ public class BesGenesisIITestSuite extends JSAGATestSuite {
     }
     
  	// test cases
-    public static class BesGenesisIIJobRunSandboxTest extends JobRunSandboxTest {
-        public BesGenesisIIJobRunSandboxTest() throws Exception {super("bes-genesis2");}
-    }
+    //public static class BesGenesisIIJobRunSandboxTest extends JobRunSandboxTest {
+    //    public BesGenesisIIJobRunSandboxTest() throws Exception {super("bes-genesis2");}
+    //}
     
  	// test cases
     public static class BesGenesisIIJobRunDescriptionTest extends JobRunDescriptionTest {
@@ -59,7 +59,6 @@ public class BesGenesisIITestSuite extends JSAGATestSuite {
         public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
     }
 
-    /* incompatible with GenesisII Data plugin */
     // test cases
     //public static class BesGenesisIIJobRunInteractiveTest extends JobRunInteractiveTest {
     //    public BesGenesisIIJobRunInteractiveTest() throws Exception {super("bes-genesis2");}
