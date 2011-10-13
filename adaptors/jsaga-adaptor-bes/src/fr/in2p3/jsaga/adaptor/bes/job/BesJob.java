@@ -67,8 +67,9 @@ public class BesJob {
  	 * _id_tag_ns <- http://www.unicore.eu/unicore6
  	 * _id <- 70cc4add-1787-46d7-ad4c-7bc378883294
 	 * @param epr
+	 * @throws NoSuccessException 
 	 */
-	public void setActivityId(EndpointReferenceType epr) {
+	public void setActivityId(EndpointReferenceType epr) throws NoSuccessException {
 		_address = epr.getAddress().get_value().toString();
 		ReferenceParametersType rpt = epr.getReferenceParameters();
 		// Get first ME
