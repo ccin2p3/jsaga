@@ -3,6 +3,7 @@ package fr.in2p3.jsaga.adaptor.bes.job;
 import fr.in2p3.jsaga.adaptor.bes.BesUtils;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.JobControlAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.control.staging.StagingTransfer;
@@ -49,7 +50,7 @@ import java.util.ArrayList;
 /**
  * This class is the generic class for generic access to a BES service
  */
-public class BesJobControlAdaptor extends BesJobAdaptorAbstract implements JobControlAdaptor {
+public class BesJobControlAdaptor extends BesJobAdaptorAbstract implements JobControlAdaptor, CleanableJobAdaptor {
 
     protected static final String STAGING_DIRECTORY_TAGNAME = "StagingDirectory";
     protected static final String DATA_STAGING_TAGNAME = "DataStaging";
@@ -242,7 +243,6 @@ public class BesJobControlAdaptor extends BesJobAdaptorAbstract implements JobCo
      * @return the StagingDirectory defined in the JobDescription
      */
     protected String getStagingDirectory(JobDefinition_Type jsdl_type) {
-		//MessageElement stagingDirectory = jsdl_type.getJobDescription().get_any()[STAGING_DIRECTORY];
     	for (MessageElement me: jsdl_type.getJobDescription().get_any()) {
     		if (STAGING_DIRECTORY_TAGNAME.equals(me.getName())) {
     			return me.getElementsByTagName("URI").item(0).getFirstChild().getNodeValue();
@@ -265,5 +265,12 @@ public class BesJobControlAdaptor extends BesJobAdaptorAbstract implements JobCo
     	}
     	return (StagingTransfer[]) transfers.toArray(st);
     }
+
+	public void clean(String nativeJobId) throws PermissionDeniedException,	TimeoutException, NoSuccessException {
+		// delete serialization file
+		BesJob _job = getJob();
+		_job.setNativeId(nativeJobId);
+		_job.clean();
+	}
 
 }
