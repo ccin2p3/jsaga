@@ -25,7 +25,7 @@ public abstract class JobRunRequiredTest extends AbstractJobTest {
         super(jobprotocol);
     }
 
-    /**
+    /*
      * Runs long job and expects done status
      */
     public void test_run_long() throws Exception {
@@ -45,7 +45,7 @@ public abstract class JobRunRequiredTest extends AbstractJobTest {
                 job.getState());
     }
 
-	/**
+	/*
      * Runs simple job and expects failed status
      */
     public void test_run_error() throws Exception {
@@ -78,7 +78,7 @@ public abstract class JobRunRequiredTest extends AbstractJobTest {
         
         // wait for RUNNING Jsaga substate
         if (! super.waitForSubState(job, MODEL+":RUNNING_ACTIVE")) {
-        	job.waitFor(Float.valueOf(FINALY_TIMEOUT));
+        	job.waitFor(Float.valueOf(MAX_QUEUING_TIME));
             fail("Job did not enter RUNNING_ACTIVE state within "+MAX_QUEUING_TIME+" seconds");
         }
         
@@ -129,8 +129,8 @@ public abstract class JobRunRequiredTest extends AbstractJobTest {
         }
     }
     
-    /**
-     * Runs a long job, waits for done state, cancels it and expects exception
+    /*
+     * Runs a simple job, waits for done state, cancels it and expects exception
      */
     public void test_cancel_done() throws Exception {
         
