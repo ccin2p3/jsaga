@@ -1,15 +1,20 @@
 package fr.in2p3.jsaga.adaptor.bes.job;
 
-import javax.xml.soap.SOAPException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
-import org.apache.axis.message.MessageElement;
 import org.ogf.saga.error.NoSuccessException;
-import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-import fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.AttributedURIType;
+import fr.in2p3.jsaga.adaptor.bes.BesUtils;
 import fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceType;
-import fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.ReferenceParametersType;
 
 
 /* ***************************************************
@@ -23,80 +28,57 @@ import fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.ReferenceParametersT
 
 public class BesJob {
 
-	protected String _id = null;
-	protected String _id_tag = null;
-	protected String _id_tag_ns = null;
-	protected String _address = null;
+	private final static String m_root = System.getProperty("user.home") + "/.jsaga/var/adaptor/bes/";
 	
-	/**
-	 * set activity identifier as an xml Element
-	 * 
-	 * This method parses a XML org.w3c.dom.Element object
-	 * It is used by the BesUnicoreJobAdaptor only (submit)
-	 * @param xmlActivityIdentifier
-	 * @throws SAXException
-	 */
-	// TODO: remove this method when BesUnicoreJobControlAdaptor.submit will be removed
-	public void setActivityId(Element xmlActivityIdentifier) throws SAXException {
-        Element addr = (Element) xmlActivityIdentifier.getElementsByTagName("add:Address").item(0);
-        if (addr == null)
-        	throw new SAXException("<add:Address> tag not found");
-		_address = addr.getFirstChild().getTextContent();
-		Element ref = (Element) xmlActivityIdentifier.getElementsByTagName("add:ReferenceParameters").item(0);
-		if (ref == null)
-        	throw new SAXException("<add:ReferenceParameters> tag not found");
-		Element id = (Element) ref.getFirstChild();
-		_id_tag = id.getTagName();
-		_id_tag_ns = id.getAttributes().item(0).getNodeValue();
-		_id = id.getFirstChild().getTextContent();
-	}
+	protected String m_nativeJobId;
 	
 	/**
 	 * set activity identifier as an EndpointReferenceType
 	 * 
-	 * This methods parses a fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceType object
+	 * This methods stores a fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceType object
 	 * like:
-	 *  <ns1:ActivityIdentifier xsi:type="ns2:EndpointReferenceType" xmlns:ns2="http://www.w3.org/2005/08/addressing">
+	 *  <ns2:EndpointReferenceType xsi:type="ns2:EndpointReferenceType" xmlns:ns2="http://www.w3.org/2005/08/addressing">
 	 *    	<ns2:Address xsi:type="ns2:AttributedURIType">https://localhost6.localdomain6:8080/DEMO-SITE/services/BESActivity?res=70cc4add-1787-46d7-ad4c-7bc378883294</ns2:Address>
   	 * 		<ns2:ReferenceParameters xsi:type="ns2:ReferenceParametersType">
    	 * 			<unic:ResourceId xmlns:unic="http://www.unicore.eu/unicore6">70cc4add-1787-46d7-ad4c-7bc378883294</unic:ResourceId>
   	 *		</ns2:ReferenceParameters>
- 	 * 	</ns1:ActivityIdentifier>
- 	 * _address <- https://localhost6.localdomain6:8080/DEMO-SITE/services/BESActivity?res=70cc4add-1787-46d7-ad4c-7bc378883294
- 	 * _id_tag <- unic:ResourceId
- 	 * _id_tag_ns <- http://www.unicore.eu/unicore6
- 	 * _id <- 70cc4add-1787-46d7-ad4c-7bc378883294
-	 * @param epr
+  	 *		<ns2:Metadata>
+  	 *		...
+  	 *		</ns2:Metadata>
+ 	 * 	</ns2:EndpointReferenceType>
+ 	 * in a XML file in the user's home
+	 * @param epr is the the activity identifier
 	 * @throws NoSuccessException 
 	 */
 	public void setActivityId(EndpointReferenceType epr) throws NoSuccessException {
-		_address = epr.getAddress().get_value().toString();
-		ReferenceParametersType rpt = epr.getReferenceParameters();
-		// Get first ME
-		_id_tag = rpt.get_any()[0].getName();
-		_id_tag_ns = rpt.get_any()[0].getNamespaceURI();
-		_id = rpt.get_any()[0].getFirstChild().getNodeValue();
+		// compute hash of EPR and store the EPR as String in a file named hash.xml
+		try {
+			// Create root directory if not exists
+			File rdir = new File(m_root);
+			if (! rdir.exists())
+				rdir.mkdirs();
+			
+			// Serialize ActivityIdentifier
+			byte[] serialized = BesUtils.serialize(EndpointReferenceType.getTypeDesc().getXmlType(), epr).getBytes();
+			
+			m_nativeJobId = getMD5sum(serialized);
+			
+			// Store in file
+	        OutputStream out = new FileOutputStream(getXmlJob());
+	        out.write(serialized);
+	        out.close();
+		} catch (Exception e) {
+			throw new NoSuccessException(e);
+		}
 	}
 
 	/**
 	 * set activity identifier as a String
 	 * 
-	 * This method parses a String like:
-	 * <service_address>;<job_id>;<job_id_tag>;<job_id_tag_namespace>
-	 * For example:
-	 * https://interop.grid.niif.hu:2010/arex-x509;93413166832541139194248;JobID;http://www.nordugrid.org/schemas/a-rex
- 	 * _address <- interop.grid.niif.hu:2010/arex-x509
- 	 * _id_tag <- JobID
- 	 * _id_tag_ns <- http://www.nordugrid.org/schemas/a-rex
- 	 * _id <- 93413166832541139194248
-	 * @param jobId
+	 * @param jobId is the native jobId
 	 */
 	public void setNativeId(String jobId) {
-		String[] _parts = jobId.split(";");
-		_address = _parts[0];
-		_id = _parts[1];
-		_id_tag = _parts[2];
-		_id_tag_ns = _parts[3];
+		m_nativeJobId = jobId;
 	}
 	
 	/**
@@ -104,32 +86,62 @@ public class BesJob {
 	 * @return String the native job identifier
 	 */
 	public String getNativeId() throws NoSuccessException {
-		return _address + ";" + _id + ";" + _id_tag + ";" + _id_tag_ns;
+		return m_nativeJobId;
 	}
 	
 	/**
 	 * returns the BES activity identifier (EndpointReferenceType)
 	 * @return EndpointReferenceType the BES activity identifier
+	 * 
+	 * The activity identifier is stored as serialized EPR in a XML file in the user HOME
 	 */
 	public EndpointReferenceType getActivityIdentifier() throws NoSuccessException {
-		EndpointReferenceType _job_endpoint = new EndpointReferenceType();
-		_job_endpoint.setAddress(new AttributedURIType(_address));
-		
-		MessageElement[] msg_elements = new MessageElement[1];
-
-		MessageElement _msg_element_jobid = new MessageElement(_id_tag, "ns1", _id_tag_ns);
+		// Read XML file
+		File refFile = getXmlJob();
 		try {
-			_msg_element_jobid.addTextNode(_id);
-		} catch (SOAPException e) {
-			throw new NoSuccessException(e);
+			EndpointReferenceType _job_endpoint;
+	        if (refFile.exists()) {
+	            byte[] ref = new byte[(int)refFile.length()];
+	            InputStream in = new FileInputStream(refFile);
+	            if (in.read(ref) > -1) {
+	            	_job_endpoint = (EndpointReferenceType) BesUtils.deserialize(new String(ref), EndpointReferenceType.class);
+	            } else {
+	            	throw new NoSuccessException("Could not read file " + refFile.getAbsolutePath());
+	            }
+	            in.close();
+	        } else {
+	        	throw new NoSuccessException("File " + refFile.getAbsolutePath() + " does not exist");
+	        }
+	        return _job_endpoint;
+		} catch (IOException e) {
+        	throw new NoSuccessException("Could not read file " + refFile.getAbsolutePath(), e);
+		} catch (SAXException e) {
+        	throw new NoSuccessException("Could not deserialize file " + refFile.getAbsolutePath(), e);
 		}
-		msg_elements[0] = _msg_element_jobid;
-		
-		ReferenceParametersType rpt = new ReferenceParametersType();
-		rpt.set_any(msg_elements);
-		
-		_job_endpoint.setReferenceParameters(rpt);
-        return _job_endpoint;
+	}
+
+	/**
+	 * returns the name of the XML file that contains the serialization of the activity identifier (EPR)
+	 * @return the name of the XML file that contains the serialization of the activity identifier (EPR)
+	 * @throws NoSuccessException if the job id was not set
+	 */
+	public File getXmlJob() throws NoSuccessException {
+		if (m_nativeJobId == null)
+			throw new NoSuccessException("No nativeJobId yet");
+		return getXmlJob(m_nativeJobId);
 	}
 	
+	/**
+	 * returns the name of the XML file of a given job ID
+	 * @param nativeJobId the job ID
+	 * @return the name of the XML file ("$HOME/.jsaga/var/adaptor/bes/<jobID>.xml")
+	 */
+	public static File getXmlJob(String nativeJobId) {
+		return new File(m_root, nativeJobId + ".xml");
+	}
+	
+	private static String getMD5sum(byte[] bytes) throws NoSuchAlgorithmException {
+		BigInteger bigInt = new BigInteger(1, MessageDigest.getInstance("MD5").digest(bytes));
+		return bigInt.toString(16);
+	}
 }
