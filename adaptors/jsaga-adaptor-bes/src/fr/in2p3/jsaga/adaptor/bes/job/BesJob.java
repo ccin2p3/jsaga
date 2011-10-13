@@ -140,6 +140,10 @@ public class BesJob {
 		return new File(m_root, nativeJobId + ".xml");
 	}
 	
+	public void clean() {
+		getXmlJob(m_nativeJobId).delete();
+	}
+	
 	private static String getMD5sum(byte[] bytes) throws NoSuchAlgorithmException {
 		BigInteger bigInt = new BigInteger(1, MessageDigest.getInstance("MD5").digest(bytes));
 		return bigInt.toString(16);
