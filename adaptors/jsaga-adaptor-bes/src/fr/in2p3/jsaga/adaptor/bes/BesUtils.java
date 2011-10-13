@@ -22,8 +22,8 @@ import javax.xml.namespace.QName;
 * ***************************************************/
 
 public class BesUtils {
-	public static String dumpMessage(String nameSpace, Object BESMessage) {
-		if (BESMessage == null) return "";
+	public static String dumpMessage(QName nameSpace, Object BESMessage) {
+		if (BESMessage == null) return nameSpace.getNamespaceURI() + ": NULL";
 		String dump = "-------> " + BESMessage.getClass().getName() + "\n";
 		try {
 			dump += BesUtils.serialize(nameSpace, BESMessage);
@@ -33,14 +33,22 @@ public class BesUtils {
 		return dump;
 	}
 
-	public static String dumpBESMessage(Object Message) {
-		return dumpMessage("http://schemas.ggf.org/bes/2006/08/bes-factory", Message);
+	/**
+	 * @deprecated
+	 */
+	public static String dumpMessage(String nameSpace, Object BESMessage) {
+		return dumpMessage(new QName(nameSpace), BESMessage);
 	}
-	
-	public static String serialize(String nameSpace, Object obj) throws Exception {
+
+	public static String dumpBESMessage(Object Message) {
+		return dumpMessage(new QName("http://schemas.ggf.org/bes/2006/08/bes-factory"), Message);
+	}
+
+	public static String serialize(QName nameSpace, Object obj) throws Exception {
 		MessageElement messageElement = new MessageElement();
-        messageElement.setQName(new QName(nameSpace, obj.getClass().getName().substring(obj.getClass().getName().lastIndexOf('.')+1)));
+        messageElement.setQName(nameSpace);
         messageElement.setObjectValue(obj);
+        
         StringWriter writer = new StringWriter();
 
         MessageContext ctx = MessageContext.getCurrentContext();
@@ -57,7 +65,13 @@ public class BesUtils {
         writer.write('\n');
         writer.flush();
         return writer.toString();
-
+	}
+	
+	/**
+	 * @deprecated
+	 */
+	public static String serialize(String nameSpace, Object obj) throws Exception {
+		return serialize(new QName(nameSpace, obj.getClass().getName().substring(obj.getClass().getName().lastIndexOf('.')+1)), obj);
 	}
 	
 	public static Object deserialize(String s, Class clazz) throws SAXException {
