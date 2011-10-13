@@ -92,8 +92,8 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
     		m_credential = (JKSSecurityCredential) credential;
     }
 
-	public Class getJobClass() {
-		return BesJob.class;
+	public BesJob getJob() {
+		return new BesJob();
 	}
 
 	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
@@ -196,27 +196,14 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 	
     public String activityId2NativeId(EndpointReferenceType epr) throws NoSuccessException {
 		BesJob _job;
-		try {
-			_job = (BesJob) getJobClass().newInstance();
-		} catch (InstantiationException e) {
-			throw new NoSuccessException(e);
-		} catch (IllegalAccessException e) {
-			throw new NoSuccessException(e);
-		}
+		_job = getJob();
 		_job.setActivityId(epr);
 		return _job.getNativeId();
     }
 
     public EndpointReferenceType nativeId2ActivityId(String nativeId) throws NoSuccessException {
 		BesJob _job;
-		try {
-			_job = (BesJob) getJobClass().newInstance();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-			throw new NoSuccessException(e);
-		} catch (IllegalAccessException e) {
-			throw new NoSuccessException(e);
-		}
+		_job = getJob();
 		_job.setNativeId(nativeId);
 		return _job.getActivityIdentifier();
     }
