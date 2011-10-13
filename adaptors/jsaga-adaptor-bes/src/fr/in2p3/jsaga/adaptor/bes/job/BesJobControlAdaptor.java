@@ -124,13 +124,11 @@ public class BesJobControlAdaptor extends BesJobAdaptorAbstract implements JobCo
 		request.setActivityIdentifier(refs);
 		TerminateActivitiesResponseType response = null;
 		try {
+			Logger.getLogger(BesJobControlAdaptor.class).debug(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(request));
 			response = _bes_pt.terminateActivities(request);
 			TerminateActivityResponseType r = response.getResponse(0);
 			Logger.getLogger(BesJobControlAdaptor.class).debug(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(r));
 			if (!r.isCancelled()) throw new NoSuccessException("Unable to cancel job");
-		} catch (InvalidRequestMessageFaultType e) {
-			Logger.getLogger(BesJobControlAdaptor.class).error(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(response));
-			throw new NoSuccessException(e);
 		} catch (RemoteException e) {
 			Logger.getLogger(BesJobControlAdaptor.class).error(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(response));
 			throw new NoSuccessException(e);
