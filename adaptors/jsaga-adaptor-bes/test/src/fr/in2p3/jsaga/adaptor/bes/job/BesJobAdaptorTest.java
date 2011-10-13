@@ -1,17 +1,14 @@
 package fr.in2p3.jsaga.adaptor.bes.job;
 
 import java.io.File;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import org.apache.axis.message.MessageElement;
 import org.ogf.saga.error.NoSuccessException;
 import org.xml.sax.SAXException;
 
 import junit.framework.TestCase;
 import fr.in2p3.jsaga.adaptor.bes.BesUtils;
 import fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceType;
-import fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.ReferenceParametersType;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
