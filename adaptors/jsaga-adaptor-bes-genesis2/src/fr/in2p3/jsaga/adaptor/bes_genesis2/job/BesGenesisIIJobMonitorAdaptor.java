@@ -1,6 +1,10 @@
 package fr.in2p3.jsaga.adaptor.bes_genesis2.job;
 
+import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityStatusType;
+import org.ogf.saga.error.NoSuccessException;
+
 import fr.in2p3.jsaga.adaptor.bes.job.BesJobMonitorAdaptor;
+import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -20,23 +24,10 @@ public class BesGenesisIIJobMonitorAdaptor extends BesJobMonitorAdaptor  {
 	public int getDefaultPort() {
 		return 18443;
 	}
-
-    /*public Default[] getDefaults(Map attributes) throws IncorrectStateException {
-    	return new Default[]{
-    			new Default("res", "default_bes_factory")};
-    }*/
-    
-	// TODO uncomment to implement substates
-	/*
+	
+	@Override
 	protected JobStatus getJobStatus(String nativeJobId, ActivityStatusType ast) throws NoSuccessException {
+		return new BesGenesisIIJobStatus(nativeJobId, ast);
 	}
-	*/
- 
-
-	/*
-    public URI getBESUrl(String host, int port, String basePath, Map attributes) throws URISyntaxException {
-    	URI url = super.getBESUrl(host, port, basePath, attributes);
-		return new URI(url.toString()+"?genii-container-id=" + (String)attributes.get("genii-container-id"));
-    }*/
 
 }
