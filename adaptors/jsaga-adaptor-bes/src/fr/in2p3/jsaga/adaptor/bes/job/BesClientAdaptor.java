@@ -17,12 +17,12 @@ import fr.in2p3.jsaga.adaptor.ClientAdaptor;
 
 public interface BesClientAdaptor extends ClientAdaptor {
     /**
-     * Get the class of the appropriate Job object, depending of the BES implementation
+     * Get a Job object, depending of the BES implementation
      * 
-     * @return Class the Java class of the Job object (this object must extend BesJob)
+     * @return the Job object (this object must be/extend BesJob)
      * @see BesJob
      */
-	public abstract Class getJobClass();
+	public abstract BesJob getJob();
 	
 	/**
 	 * Get the BES URL to use
