@@ -1,8 +1,11 @@
 package fr.in2p3.jsaga.adaptor.bes_genesis2.job;
 
+import org.apache.axis.message.MessageElement;
+import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityStateEnumeration;
 import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityStatusType;
 
 import fr.in2p3.jsaga.adaptor.bes.job.BesJobStatus;
+import fr.in2p3.jsaga.adaptor.job.SubState;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -25,13 +28,12 @@ public class BesGenesisIIJobStatus extends BesJobStatus {
 	 * TODO: modify DOC
 	 * For example:
 	 * <ns1:ActivityStatus state="Running" xsi:type="ns1:ActivityStatusType">
-	 *   <fs:Staging-In xmlns:fs="http://schemas.ogf.org/hpcp/2007/01/fs"/>
+	 *   <ns7:Exiting xmlns:ns7="http://vcgr.cs.virginia.edu/genesisII/bes/activity-states"/>
      * </ns1:ActivityStatus>
 	 * 
 	 * @return JobStatus the substate 
 	 */
-	/*public SubState getSubState() {
-		// TODO: modify this
+	public SubState getSubState() {
     	ActivityStateEnumeration state = ((ActivityStatusType) m_nativeStateCode).getState();
     	MessageElement any[] = ((ActivityStatusType) m_nativeStateCode).get_any();
     	String substate = (any == null)?null:any[0].getName();
@@ -39,10 +41,10 @@ public class BesGenesisIIJobStatus extends BesJobStatus {
         if (ActivityStateEnumeration.Pending.equals(state)) {
             return SubState.RUNNING_SUBMITTED;
         } else if (ActivityStateEnumeration.Running.equals(state)) {
-        	if ("Staging-In".equals(substate)) {
-        		return SubState.RUNNING_PRE_STAGING;
-        	} else if ("Staging-Out".equals(substate)) {
-        		return SubState.RUNNING_POST_STAGING;
+        	if ("Queued".equals(substate) || "Enqueing".equals(substate)) {
+        		return SubState.RUNNING_SUBMITTED;
+        	} else if ("Exiting".equals(substate)) {
+        		return SubState.RUNNING_ACTIVE;
         	} else {
         		return SubState.RUNNING_ACTIVE;
         	}
@@ -55,5 +57,5 @@ public class BesGenesisIIJobStatus extends BesJobStatus {
         } else {
             return null;
         }
-    }*/
+    }
 }
