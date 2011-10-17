@@ -2,8 +2,15 @@ package fr.in2p3.jsaga.adaptor.bes.job;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.ogf.saga.error.AuthenticationFailedException;
+import org.ogf.saga.error.AuthorizationFailedException;
+import org.ogf.saga.error.BadParameterException;
 import org.ogf.saga.error.NoSuccessException;
+import org.ogf.saga.error.NotImplementedException;
+import org.ogf.saga.error.TimeoutException;
 import org.xml.sax.SAXException;
 
 import junit.framework.TestCase;
@@ -57,6 +64,38 @@ public class BesJobAdaptorTest extends TestCase {
                 new BesJobControlAdaptor().getType());
     }
     
+    /**
+     * This test needs 3 system properties:
+     * -Djavax.net.ssl.keyStorePassword=
+	 * -Djavax.net.ssl.keyStore=
+	 * -Djavax.net.ssl.trustStore=
+     * @throws NoSuccessException
+     */
+    public void test_BES() throws NoSuccessException {
+    	// TODO use URL and configuration process by engine
+    	BesJobControlAdaptor adaptor = new BesJobControlAdaptor();
+    	Map attributes = new HashMap();
+    	String host = "149.165.146.134";
+    	int port = 18443;
+    	String basePath = "/axis/services/GeniiBESPortType";
+    	attributes.put("reference-parameter", "FC59F12A-CA13-79C0-3C7A-318435C6C49F");
+    	attributes.put("genii-container-id", "ECBCAEC8-5FFF-11E0-B887-28C73890A7D4");
+    	try {
+			adaptor.connect(null, host, port, basePath, attributes);
+		} catch (NotImplementedException e) {
+			throw new NoSuccessException(e);
+		} catch (AuthenticationFailedException e) {
+			throw new NoSuccessException(e);
+		} catch (AuthorizationFailedException e) {
+			throw new NoSuccessException(e);
+		} catch (BadParameterException e) {
+			throw new NoSuccessException(e);
+		} catch (TimeoutException e) {
+			throw new NoSuccessException(e);
+		}
+		assertEquals(host, adaptor.getBESAttributes().getCommonName());
+    }
+    
     public void test_jobSerialize() throws NoSuccessException, NoSuchAlgorithmException, SAXException {
     	EndpointReferenceType epr = (EndpointReferenceType) BesUtils.deserialize(ACTIVITY_IDENTIFIER, EndpointReferenceType.class);
 
@@ -70,9 +109,7 @@ public class BesJobAdaptorTest extends TestCase {
 		BesJob job_deserialized = new BesJob();
 		job_deserialized.setNativeId(job.getNativeId());
 		EndpointReferenceType epr_deserialized = job_deserialized.getActivityIdentifier();
-		assertEquals(epr.getAddress(), epr_deserialized.getAddress());
-		assertEquals(epr.getReferenceParameters(), epr_deserialized.getReferenceParameters());
-		assertEquals(epr.getMetadata(), epr_deserialized.getMetadata());
+		assertEquals(epr, epr_deserialized);
 
 		// clean
 		xmlJob.delete();
