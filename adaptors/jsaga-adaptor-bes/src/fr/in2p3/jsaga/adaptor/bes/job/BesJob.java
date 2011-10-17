@@ -11,11 +11,12 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import org.ogf.saga.error.NoSuccessException;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import fr.in2p3.jsaga.adaptor.bes.BesUtils;
 import fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceType;
-
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -48,9 +49,10 @@ public class BesJob {
  	 * 	</ns2:EndpointReferenceType>
  	 * in a XML file in the user's home
 	 * @param epr is the the activity identifier
+	 * @param store indicates if the job should be stored (Job is stored at submission, but not at list)
 	 * @throws NoSuccessException 
 	 */
-	public void setActivityId(EndpointReferenceType epr) throws NoSuccessException {
+	public void setActivityId(EndpointReferenceType epr, boolean store) throws NoSuccessException {
 		// compute hash of EPR and store the EPR as String in a file named hash.xml
 		try {
 			// Create root directory if not exists
@@ -58,20 +60,26 @@ public class BesJob {
 			if (! rdir.exists())
 				rdir.mkdirs();
 			
-			// Serialize ActivityIdentifier
-			byte[] serialized = BesUtils.serialize(EndpointReferenceType.getTypeDesc().getXmlType(), epr).getBytes();
+			// As ID we get the first child of the ReferenceParameter element
+			m_nativeJobId = epr.getReferenceParameters().get_any()[0].getFirstChild().getNodeValue();
 			
-			m_nativeJobId = getMD5sum(serialized);
-			
-			// Store in file
-	        OutputStream out = new FileOutputStream(getXmlJob());
-	        out.write(serialized);
-	        out.close();
+			if (store) {
+				// Serialize ActivityIdentifier
+				byte[] serialized = BesUtils.serialize(EndpointReferenceType.getTypeDesc().getXmlType(), epr).getBytes();
+				
+				// Store in file
+		        OutputStream out = new FileOutputStream(getXmlJob());
+		        out.write(serialized);
+		        out.close();
+			}
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
 	}
-
+	public void setActivityId(EndpointReferenceType epr) throws NoSuccessException {
+		this.setActivityId(epr, false);
+	}
+	
 	/**
 	 * set activity identifier as a String
 	 * 
@@ -144,8 +152,8 @@ public class BesJob {
 		getXmlJob(m_nativeJobId).delete();
 	}
 	
-	private static String getMD5sum(byte[] bytes) throws NoSuchAlgorithmException {
-		BigInteger bigInt = new BigInteger(1, MessageDigest.getInstance("MD5").digest(bytes));
-		return bigInt.toString(16);
-	}
+	//private static String getMD5sum(byte[] bytes) throws NoSuchAlgorithmException {
+	//	BigInteger bigInt = new BigInteger(1, MessageDigest.getInstance("MD5").digest(bytes));
+	//	return bigInt.toString(16);
+	//}
 }
