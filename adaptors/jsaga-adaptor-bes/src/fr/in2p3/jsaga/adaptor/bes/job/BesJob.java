@@ -55,15 +55,15 @@ public class BesJob {
 	public void setActivityId(EndpointReferenceType epr, boolean store) throws NoSuccessException {
 		// compute hash of EPR and store the EPR as String in a file named hash.xml
 		try {
-			// Create root directory if not exists
-			File rdir = new File(m_root);
-			if (! rdir.exists())
-				rdir.mkdirs();
-			
 			// As ID we get the first child of the ReferenceParameter element
 			m_nativeJobId = epr.getReferenceParameters().get_any()[0].getFirstChild().getNodeValue();
 			
 			if (store) {
+				// Create root directory if not exists
+				File rdir = new File(m_root);
+				if (! rdir.exists())
+					rdir.mkdirs();
+				
 				// Serialize ActivityIdentifier
 				byte[] serialized = BesUtils.serialize(EndpointReferenceType.getTypeDesc().getXmlType(), epr).getBytes();
 				
