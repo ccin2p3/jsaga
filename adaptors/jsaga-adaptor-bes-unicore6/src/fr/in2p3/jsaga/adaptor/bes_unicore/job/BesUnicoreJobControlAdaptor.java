@@ -176,7 +176,20 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlStagingOnePhaseAda
             if (addr == null)
             	throw new NoSuccessException("<add:Address> tag not found");
             BesJob j = new BesJob();
-            j.setActivityId(ident);
+            // transform Element into EndpointReferenceType
+            fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceType epr = new fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceType();
+            epr.setAddress(new fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.AttributedURIType(addr.getFirstChild().getTextContent()));
+    		Element ref = (Element) ident.getElementsByTagName("add:ReferenceParameters").item(0);
+    		if (ref == null)
+            	throw new SAXException("<add:ReferenceParameters> tag not found");
+    		Element id = (Element) ref.getFirstChild();
+    		fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.ReferenceParametersType refparam = new fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.ReferenceParametersType();
+    		org.apache.axis.message.MessageElement[] any = new org.apache.axis.message.MessageElement[1];
+    		any[0] = new org.apache.axis.message.MessageElement(ref);
+    		refparam.set_any(any);
+    		epr.setReferenceParameters(refparam);
+    		// send EndpointReferenceType to BesJob
+    		j.setActivityId(epr);
             return j.getNativeId();
 		} catch (IOException e) {
 			throw new NoSuccessException(e);
