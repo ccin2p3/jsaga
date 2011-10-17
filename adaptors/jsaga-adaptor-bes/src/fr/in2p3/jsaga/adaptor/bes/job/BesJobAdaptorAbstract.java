@@ -15,6 +15,10 @@ import org.apache.ws.security.message.WSSecUsernameToken;
 import org.ggf.schemas.bes.x2006.x08.besFactory.BESFactoryPortType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.BasicResourceAttributesDocumentType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.BesFactoryServiceLocator;
+import org.ggf.schemas.bes.x2006.x08.besFactory.FactoryResourceAttributesDocumentType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentResponseType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentType;
+import org.ggf.schemas.bes.x2006.x08.besFactory.InvalidRequestMessageFaultType;
 import org.ogf.saga.error.AuthenticationFailedException;
 import org.ogf.saga.error.AuthorizationFailedException;
 import org.ogf.saga.error.BadParameterException;
@@ -28,6 +32,7 @@ import fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceTyp
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.rmi.RemoteException;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.Map;
@@ -124,25 +129,25 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 		}
 		// TODO : uncomment to check resources
 		/*try {
-			org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentResponseType r = _bes_pt.getFactoryAttributesDocument(new org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentType());
-	        FactoryResourceAttributesDocumentType attr = r.getFactoryResourceAttributesDocument();
+	        FactoryResourceAttributesDocumentType attr = getBESAttributes();
 			_br = attr.getBasicResourceAttributesDocument();
 			//_cr = attr.getContainedResource();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}*/
 		
-		/*
+    }
+
+	public FactoryResourceAttributesDocumentType getBESAttributes() throws NoSuccessException {
 		try {
-			org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentResponseType gfadrt = _bes_pt.getFactoryAttributesDocument(new org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentType());
+			org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentResponseType gfadrt = _bes_pt.getFactoryAttributesDocument(new GetFactoryAttributesDocumentType());
 			Logger.getLogger(BesJobAdaptorAbstract.class).debug(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(gfadrt));
+			return gfadrt.getFactoryResourceAttributesDocument();
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
-		throw new NoSuccessException("END");
-		*/
-    }
-
+	}
+	
 	private SOAPHeaderElement buildReference() throws SOAPException {
 		// TODO this is hard-coded
         org.apache.axis.message.SOAPHeaderElement ref = new org.apache.axis.message.SOAPHeaderElement(
