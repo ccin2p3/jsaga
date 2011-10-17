@@ -22,6 +22,10 @@ Where:
 ]]></pre>
             </answer>
         </faq>
+        <faq id="bugs">
+        	<question>Known bugs and limitations</question>
+        	<answer>Due to bugs in the Genesis server, both datastaging and job cancellation are not supported yet</answer>
+        </faq>
     </part>
     <part id="security">
         <title>Security</title>
