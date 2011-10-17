@@ -103,7 +103,7 @@ public class BesJobAdaptorTest extends TestCase {
 
     	// serialization of the reference job identity
     	BesJob job = new BesJob();
-    	job.setActivityId(epr);
+    	job.setActivityId(epr, true);
 		File xmlJob = job.getXmlJob();
 		assertTrue(xmlJob.exists());
 		

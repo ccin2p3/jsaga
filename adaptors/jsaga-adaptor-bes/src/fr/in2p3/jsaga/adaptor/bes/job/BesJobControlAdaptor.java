@@ -115,7 +115,7 @@ public class BesJobControlAdaptor extends BesJobAdaptorAbstract implements JobCo
 			Logger.getLogger(BesJobControlAdaptor.class).error(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(response));
 			throw new NoSuccessException(e);
 		}
-		return activityId2NativeId(response.getActivityIdentifier());
+		return activityId2NativeId(response.getActivityIdentifier(), true);
 	}
 		
     public void cancel(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {

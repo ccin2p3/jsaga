@@ -182,13 +182,16 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 	// Other public methods
 	///////////////////////////////////
 	
-    public String activityId2NativeId(EndpointReferenceType epr) throws NoSuccessException {
+    public String activityId2NativeId(EndpointReferenceType epr, boolean store) throws NoSuccessException {
 		BesJob _job;
 		_job = getJob();
-		_job.setActivityId(epr);
+		_job.setActivityId(epr, store);
 		return _job.getNativeId();
     }
-
+    public String activityId2NativeId(EndpointReferenceType epr) throws NoSuccessException {
+    	return this.activityId2NativeId(epr, false);
+    }
+    
     public EndpointReferenceType nativeId2ActivityId(String nativeId) throws NoSuccessException {
 		BesJob _job;
 		_job = getJob();
