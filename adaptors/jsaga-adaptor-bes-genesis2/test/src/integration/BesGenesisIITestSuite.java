@@ -44,6 +44,7 @@ public class BesGenesisIITestSuite extends JSAGATestSuite {
         public void test_resume_running() { super.ignore("not supported"); }
         public void test_suspend_done() { super.ignore("not supported"); }
         public void test_suspend_running() { super.ignore("not supported"); }
+        public void test_listJob() { super.ignore("GenesisII does not provide job list in FactoryResourceAttributesDocument"); }
     }
     
  	// test cases
