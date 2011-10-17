@@ -47,6 +47,7 @@ public class BesGenesisIITestSuite extends JSAGATestSuite {
     }
     
  	// test cases
+    // DataStaging not supported because of <jsaga> refused in JSDL
     //public static class BesGenesisIIJobRunSandboxTest extends JobRunSandboxTest {
     //    public BesGenesisIIJobRunSandboxTest() throws Exception {super("bes-genesis2");}
     //}
@@ -60,6 +61,7 @@ public class BesGenesisIITestSuite extends JSAGATestSuite {
     }
 
     // test cases
+    // DataStaging not supported because of <jsaga> refused in JSDL
     //public static class BesGenesisIIJobRunInteractiveTest extends JobRunInteractiveTest {
     //    public BesGenesisIIJobRunInteractiveTest() throws Exception {super("bes-genesis2");}
     //}
