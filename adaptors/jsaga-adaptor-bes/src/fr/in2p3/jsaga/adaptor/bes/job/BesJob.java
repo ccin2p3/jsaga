@@ -53,7 +53,7 @@ public class BesJob {
 	 * @throws NoSuccessException 
 	 */
 	public void setActivityId(EndpointReferenceType epr, boolean store) throws NoSuccessException {
-		// compute hash of EPR and store the EPR as String in a file named hash.xml
+		// get ID from EPR and store the EPR as String in a file named ID.xml
 		try {
 			// As ID we get the first child of the ReferenceParameter element
 			m_nativeJobId = epr.getReferenceParameters().get_any()[0].getFirstChild().getNodeValue();
