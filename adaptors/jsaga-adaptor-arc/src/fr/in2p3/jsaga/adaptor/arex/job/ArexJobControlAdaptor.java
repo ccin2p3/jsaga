@@ -1,6 +1,6 @@
  package fr.in2p3.jsaga.adaptor.arex.job;
 
-import fr.in2p3.jsaga.adaptor.bes.job.BesJobControlAdaptorAbstract;
+import fr.in2p3.jsaga.adaptor.bes.job.BesJobControlAdaptor;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
@@ -66,7 +66,7 @@ import javax.xml.rpc.ServiceException;
 * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
 * Date:   9 déc 2010
 * ***************************************************/
-public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract implements StagingJobAdaptorTwoPhase {
+public class ArexJobControlAdaptor extends BesJobControlAdaptor implements StagingJobAdaptorTwoPhase {
 
 
 	public static final String AREX_NAMESPACE_URI = "http://www.nordugrid.org/schemas/a-rex";
@@ -83,10 +83,6 @@ public class ArexJobControlAdaptor extends BesJobControlAdaptorAbstract implemen
     
 	public int getDefaultPort() {
 		return 2010;
-	}
-
-	public Class getJobClass() {
-		return ArexJob.class;
 	}
 
     public JobMonitorAdaptor getDefaultJobMonitor() {

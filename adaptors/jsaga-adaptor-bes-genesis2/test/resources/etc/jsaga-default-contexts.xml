@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
+    <session>
+        <context type="AxisJKS" id="GenesisII">
+            <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/>
+            <job type="bes-genesis2">
+            	<attribute name="ReferenceParameterNS" value="http://edu.virginia.vcgr.genii/ref-params"/>
+            	<attribute name="ReferenceParameterName" value="resource-key"/>
+            	<attribute name="ReferenceParameterValue" value="FC59F12A-CA13-79C0-3C7A-318435C6C49F"/>
+            </job>
+            <include domain="futuregrid.org"/>
+        </context>
+    </session>
+</jsaga-default>

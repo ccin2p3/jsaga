@@ -1,13 +1,12 @@
 package fr.in2p3.jsaga.adaptor.bes.job;
 
-import fr.in2p3.jsaga.adaptor.bes.BesUtils;
 import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryIndividualJob;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryListJob;
 
+import org.apache.log4j.Logger;
 import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityStatusType;
-import org.ggf.schemas.bes.x2006.x08.besFactory.FactoryResourceAttributesDocumentType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.GetActivityStatusResponseType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.GetActivityStatusesResponseType;
 import org.ggf.schemas.bes.x2006.x08.besFactory.GetActivityStatusesType;
@@ -19,8 +18,6 @@ import org.ogf.saga.error.PermissionDeniedException;
 import org.ogf.saga.error.TimeoutException;
 import fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceType;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,12 +34,27 @@ import java.util.List;
 /**
  * This class is the abstract class for the JobMonitor specific to a BES implementation
  */
-public abstract class BesJobMonitorAdaptor extends BesJobAdaptorAbstract implements QueryIndividualJob, QueryListJob, ListableJobAdaptor {
+public class BesJobMonitorAdaptor extends BesJobAdaptorAbstract implements QueryIndividualJob, QueryListJob, ListableJobAdaptor {
       
+	/**
+	 * Instanciate the appropriate JobStatus object
+	 * 
+	 * @param nativeJobId  the native Job Identifier
+	 * @param ast  the ActivityStatusType object containing the status of the job
+	 * @return the appropriate JobStatus object
+	 * @throws NoSuccessException
+	 * @see ArexJobStatus
+	 * @see BesUnicoreJobStatus
+	 * @see GenesisIIJobStatus
+	 */
+	protected JobStatus getJobStatus(String nativeJobId, ActivityStatusType ast) throws NoSuccessException {
+		return new BesJobStatus(nativeJobId, ast);
+	}
+	
 	// Implementation of the QueryIndividualJob interface
     public JobStatus getStatus(String nativeJobId) throws TimeoutException, NoSuccessException {
     	GetActivityStatusResponseType[] responseStatus = getActivityStatuses(new String[]{nativeJobId});
-    	return instanciateJobStatusObject(nativeJobId, responseStatus[0].getActivityStatus());
+    	return getJobStatus(nativeJobId, responseStatus[0].getActivityStatus());
 	}
 
     // Implementation of the QueryListJob interface
@@ -50,7 +62,7 @@ public abstract class BesJobMonitorAdaptor extends BesJobAdaptorAbstract impleme
     	GetActivityStatusResponseType[] responseStatus = getActivityStatuses(nativeJobIdArray);
 		JobStatus[] statusArray = new JobStatus[responseStatus.length];
 		for (int i=0; i<responseStatus.length; i++) {
-				statusArray[i] = instanciateJobStatusObject(nativeJobIdArray[i], responseStatus[i].getActivityStatus());
+				statusArray[i] = getJobStatus(nativeJobIdArray[i], responseStatus[i].getActivityStatus());
 		}
 		return statusArray;
 	}
@@ -61,20 +73,20 @@ public abstract class BesJobMonitorAdaptor extends BesJobAdaptorAbstract impleme
 		GetFactoryAttributesDocumentResponseType r;
 		try {
 			r = _bes_pt.getFactoryAttributesDocument(new GetFactoryAttributesDocumentType());
+			Logger.getLogger(BesJobMonitorAdaptor.class).debug(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(r));
 		} catch (InvalidRequestMessageFaultType e) {
 			throw new NoSuccessException(e);
 		} catch (RemoteException e) {
 			throw new NoSuccessException(e);
 		}
-		FactoryResourceAttributesDocumentType attr = r.getFactoryResourceAttributesDocument();
-		for (EndpointReferenceType epr: attr.getActivityReference()) {
-			urls.add(activityId2NativeId(epr));
+		EndpointReferenceType[] refs = r.getFactoryResourceAttributesDocument().getActivityReference();
+		if (refs != null) {
+			for (EndpointReferenceType epr: refs) {
+				urls.add(activityId2NativeId(epr));
+			}
 		}
 		return (String[])urls.toArray(new String[urls.size()]);
 	}
-
-	// Private methods
-	protected abstract Class getJobStatusClass();
 
 	/**
 	 * Get a list of statuses
@@ -95,9 +107,10 @@ public abstract class BesJobMonitorAdaptor extends BesJobAdaptorAbstract impleme
 				refs[i++] = nativeId2ActivityId(nativeJobId);
 			}
 			requestStatus.setActivityIdentifier(refs);
-			//System.out.println(BesUtils.dumpBESMessage(requestStatus));
+			Logger.getLogger(BesJobMonitorAdaptor.class).debug(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(requestStatus));
 			GetActivityStatusesResponseType responseStatus = _bes_pt.getActivityStatuses(requestStatus);
-			//System.out.println(BesUtils.dumpBESMessage(responseStatus));
+			Logger.getLogger(BesJobMonitorAdaptor.class).debug(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(responseStatus));
+
 			return responseStatus.getResponse();
 		} catch (InvalidRequestMessageFaultType e) {
 			throw new NoSuccessException(e);
@@ -107,34 +120,5 @@ public abstract class BesJobMonitorAdaptor extends BesJobAdaptorAbstract impleme
     	
     }
     
-	/**
-	 * Instanciate the appropriate JobStatus object (ArexJobStatus or BesUnicoreJobStatus)
-	 * 
-	 * @param nativeJobId  the native Job Identifier
-	 * @param ast  the ActivityStatusType object containing the status of the job
-	 * @return the appropriate JobStatus object
-	 * @throws NoSuccessException
-	 * @see ArexJobStatus
-	 * @see BesUnicoreJobStatus
-	 */
-	protected JobStatus instanciateJobStatusObject(String nativeJobId, ActivityStatusType ast) throws NoSuccessException {
-    	try {
-    		Constructor c = getJobStatusClass().getConstructor(new Class[]{String.class,ActivityStatusType.class});
-			return (JobStatus)c.newInstance(new Object[]{nativeJobId, ast});
-		} catch (InstantiationException e) {
-			throw new NoSuccessException(e);
-		} catch (IllegalAccessException e) {
-			throw new NoSuccessException(e);
-		} catch (SecurityException e) {
-			throw new NoSuccessException(e);
-		} catch (NoSuchMethodException e) {
-			throw new NoSuccessException(e);
-		} catch (IllegalArgumentException e) {
-			throw new NoSuccessException(e);
-		} catch (InvocationTargetException e) {
-			throw new NoSuccessException(e);
-		}
-	}
-	
 	
 }

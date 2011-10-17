@@ -19,6 +19,7 @@
         <module>jsaga-adaptor-wsgram</module>
         <module>jsaga-adaptor-cream</module>
         <module>jsaga-adaptor-wms</module>
+	<module>jsaga-adaptor-bes-genesis2</module>
         <module>jsaga-adaptor-arc</module>
         <module>jsaga-adaptor-bes-unicore6</module>
         <module>jsaga-adaptor-bes</module>

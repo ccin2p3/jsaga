@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * This class is the abstract class for the JobControl with 1-phase data staging specific to a BES implementation
  */
-public abstract class BesJobControlStagingOnePhaseAdaptorAbstract extends BesJobControlAdaptorAbstract implements BesStagingJobAdaptor {
+public abstract class BesJobControlStagingOnePhaseAdaptorAbstract extends BesJobControlAdaptor implements BesStagingJobAdaptor {
 
     private static final String XSLTPARAM_PROTOCOL = "Protocol";
     private static final String XSLTPARAM_PORT = "Port";
