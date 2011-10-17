@@ -78,7 +78,9 @@ public class BesJobAdaptorTest extends TestCase {
     	String host = "149.165.146.134";
     	int port = 18443;
     	String basePath = "/axis/services/GeniiBESPortType";
-    	attributes.put("reference-parameter", "FC59F12A-CA13-79C0-3C7A-318435C6C49F");
+    	attributes.put("ReferenceParameterNS", "http://edu.virginia.vcgr.genii/ref-params");
+    	attributes.put("ReferenceParameterName", "resource-key");
+    	attributes.put("ReferenceParameterValue", "FC59F12A-CA13-79C0-3C7A-318435C6C49F");
     	attributes.put("genii-container-id", "ECBCAEC8-5FFF-11E0-B887-28C73890A7D4");
     	try {
 			adaptor.connect(null, host, port, basePath, attributes);
@@ -111,7 +113,8 @@ public class BesJobAdaptorTest extends TestCase {
 		EndpointReferenceType epr_deserialized = job_deserialized.getActivityIdentifier();
 		assertEquals(epr, epr_deserialized);
 
-		// clean
+		// clean and check that file is removed
 		xmlJob.delete();
+		assertFalse(xmlJob.exists());
     }
 }
