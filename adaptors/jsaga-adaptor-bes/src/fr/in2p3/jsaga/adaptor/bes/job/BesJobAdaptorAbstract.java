@@ -56,7 +56,6 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 
 	protected URI _bes_url ;
 	protected JKSSecurityCredential m_credential;
-	protected String m_referenceParameter = null;
 
 	protected BESFactoryPortType _bes_pt = null;
 	
@@ -97,17 +96,12 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
     		m_credential = (JKSSecurityCredential) credential;
     }
 
-	public BesJob getJob() {
-		return new BesJob();
-	}
-
 	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     	try {
 			_bes_url = getBESUrl(host, port, basePath, attributes);
 		} catch (URISyntaxException e) {
 			throw new NoSuccessException(e);
 		}
-		m_referenceParameter = (String) attributes.get("reference-parameter");
 		Logger.getLogger(BesJobAdaptorAbstract.class).info("Connecting to BES service at: " + _bes_url);
     	if (_bes_pt != null) return;
     	
@@ -116,14 +110,20 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 			_bes_service.setBESFactoryPortTypeEndpointAddress(_bes_url.toString());
 	        _bes_pt= _bes_service.getBESFactoryPortType();
 	        
-	        if (m_referenceParameter != null) {
+			String referenceParameter = (String) attributes.get("ReferenceParameterValue");
+	        if (referenceParameter != null) {
+	        	String nameSpace = (String) attributes.get("ReferenceParameterNS");
+	        	String name = (String) attributes.get("ReferenceParameterName");
+	        	if (nameSpace == null || name == null)
+	        		throw new NoSuccessException("Missing ReferenceParameter attributes");
 	        	// add reference parameter
-	        	((org.apache.axis.client.Stub) _bes_pt).setHeader(this.buildReference());
+	            org.apache.axis.message.SOAPHeaderElement ref = new org.apache.axis.message.SOAPHeaderElement(
+	            		new org.apache.axis.message.PrefixedQName(nameSpace,name, "refparam"));
+	            ref.setMustUnderstand(false);
+	            ref.addAttribute(EndpointReferenceType.getTypeDesc().getXmlType().getNamespaceURI(), "IsReferenceParameter", "true");
+	            ref.setObjectValue(referenceParameter);
+	        	((org.apache.axis.client.Stub) _bes_pt).setHeader(ref);
 	        }
-	        /* deprecated
-	         * Add SOAP security header
-	         * ((org.apache.axis.client.Stub) _bes_pt).setHeader(this.buildUsernamePassword());
-	         */
 		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
@@ -138,30 +138,9 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 		
     }
 
-	public FactoryResourceAttributesDocumentType getBESAttributes() throws NoSuccessException {
-		try {
-			org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentResponseType gfadrt = _bes_pt.getFactoryAttributesDocument(new GetFactoryAttributesDocumentType());
-			Logger.getLogger(BesJobAdaptorAbstract.class).debug(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(gfadrt));
-			return gfadrt.getFactoryResourceAttributesDocument();
-		} catch (Exception e) {
-			throw new NoSuccessException(e);
-		}
-	}
-	
-	private SOAPHeaderElement buildReference() throws SOAPException {
-		// TODO this is hard-coded
-        org.apache.axis.message.SOAPHeaderElement ref = new org.apache.axis.message.SOAPHeaderElement(
-        		new org.apache.axis.message.PrefixedQName("http://edu.virginia.vcgr.genii/ref-params","resource-key", "refparam"));
-        ref.setMustUnderstand(false);
-        ref.addAttribute("http://www.w3.org/2005/08/addressing", "IsReferenceParameter", "true");
-        ref.setObjectValue(m_referenceParameter);
-        return ref;
-	}
-	
 	public void disconnect() throws NoSuccessException {
         m_credential = null;
-        m_referenceParameter = null;
-        _bes_pt = null;
+       _bes_pt = null;
         _bes_url = null;
         _br = null;
         _cr = null;
@@ -171,6 +150,10 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
     // Implementation of BesClientAdaptor
 	///////////////////////////////////
     
+	public BesJob getJob() {
+		return new BesJob();
+	}
+
 	/**
 	 * Get the BES URL to use
 	 * 
@@ -213,6 +196,21 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
 		return _job.getActivityIdentifier();
     }
 
+	public FactoryResourceAttributesDocumentType getBESAttributes() throws NoSuccessException {
+		try {
+			org.ggf.schemas.bes.x2006.x08.besFactory.GetFactoryAttributesDocumentResponseType gfadrt = _bes_pt.getFactoryAttributesDocument(new GetFactoryAttributesDocumentType());
+			Logger.getLogger(BesJobAdaptorAbstract.class).debug(fr.in2p3.jsaga.adaptor.bes.BesUtils.dumpBESMessage(gfadrt));
+			return gfadrt.getFactoryResourceAttributesDocument();
+		} catch (Exception e) {
+			throw new NoSuccessException(e);
+		}
+	}
+	
+	/////////////////////////
+	// Private methods
+	/////////////////////////
+	
+	
     /////////////////////////
     // OLD deprecated methods
     /////////////////////////
@@ -225,7 +223,7 @@ public abstract class BesJobAdaptorAbstract implements BesClientAdaptor {
         // USELESS token.setPasswordsAreEncoded(false);
         token.setPasswordType(WSConstants.PASSWORD_TEXT);
         // TODO: support of user/password adaptor ?
-        token.setUserInfo("indiaInterop", "1nd!@B3S");
+        token.setUserInfo("indiaInterop", "XXXX");
         // USELESS token.addCreated();
         SOAPHeaderElement wsseSecurity = new SOAPHeaderElement(new org.apache.axis.message.PrefixedQName(secextNS,"Security", "wsse"));
         Document doc = wsseSecurity.getAsDocument();
