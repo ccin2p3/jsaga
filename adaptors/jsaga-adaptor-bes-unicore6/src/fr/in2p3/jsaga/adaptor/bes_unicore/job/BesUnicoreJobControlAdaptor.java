@@ -12,12 +12,9 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import de.fzj.unicore.uas.client.StorageClient;
 import de.fzj.unicore.uas.security.IUASSecurityProperties;
 import de.fzj.unicore.uas.security.UASSecurityProperties;
-import de.fzj.unicore.wsrflite.xmlbeans.BaseFault;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.ogf.saga.error.*;
-import org.unigrids.services.atomic.types.GridFileType;
 import org.w3.x2005.x08.addressing.EndpointReferenceType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -122,7 +119,7 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlStagingOnePhaseAda
 
 	/*
 	 * bypass BES stubs for submission as URI for datastaging are changed (scheme in lowercase) by the Axis URI class
-	 * 
+	 * TODO: remove this method when Unicore server fixed
 	 */
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
     	
@@ -179,17 +176,27 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlStagingOnePhaseAda
             // transform Element into EndpointReferenceType
             fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceType epr = new fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceType();
             epr.setAddress(new fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.AttributedURIType(addr.getFirstChild().getTextContent()));
-    		Element ref = (Element) ident.getElementsByTagName("add:ReferenceParameters").item(0);
+
+            Element ref = (Element) ident.getElementsByTagName("add:ReferenceParameters").item(0);
     		if (ref == null)
             	throw new SAXException("<add:ReferenceParameters> tag not found");
-    		Element id = (Element) ref.getFirstChild();
-    		fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.ReferenceParametersType refparam = new fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.ReferenceParametersType();
-    		org.apache.axis.message.MessageElement[] any = new org.apache.axis.message.MessageElement[1];
-    		any[0] = new org.apache.axis.message.MessageElement(ref);
-    		refparam.set_any(any);
-    		epr.setReferenceParameters(refparam);
-    		// send EndpointReferenceType to BesJob
-    		j.setActivityId(epr);
+    		org.apache.axis.message.MessageElement[] any = new org.apache.axis.message.MessageElement[ref.getChildNodes().getLength()];
+    		for (int i=0; i<ref.getChildNodes().getLength(); i++) {
+    			any[i] = new org.apache.axis.message.MessageElement((Element)ref.getChildNodes().item(i));
+    		}
+    		epr.setReferenceParameters(new fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.ReferenceParametersType(any));
+    		
+    		Element meta = (Element) ident.getElementsByTagName("add:Metadata").item(0);
+    		if (meta == null)
+            	throw new SAXException("<add:Metadata> tag not found");
+    		any = new org.apache.axis.message.MessageElement[meta.getChildNodes().getLength()];
+    		for (int i=0; i<meta.getChildNodes().getLength(); i++) {
+    			any[i] = new org.apache.axis.message.MessageElement((Element)meta.getChildNodes().item(i));
+    		}
+    		epr.setMetadata(new fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.MetadataType(any));
+    		
+    		// send EndpointReferenceType to BesJob and store the job
+    		j.setActivityId(epr, true);
             return j.getNativeId();
 		} catch (IOException e) {
 			throw new NoSuccessException(e);
