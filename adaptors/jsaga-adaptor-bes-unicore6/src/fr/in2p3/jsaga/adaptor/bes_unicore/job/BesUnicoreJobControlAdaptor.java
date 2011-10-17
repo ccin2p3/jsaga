@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.bes_unicore.job;
 
 import fr.in2p3.jsaga.adaptor.base.defaults.Default;
+import fr.in2p3.jsaga.adaptor.bes.job.BesJob;
 import fr.in2p3.jsaga.adaptor.bes.job.BesJobControlStagingOnePhaseAdaptorAbstract;
 import fr.in2p3.jsaga.adaptor.data.http_socket.HttpRequest;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
@@ -11,12 +12,9 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobMonitorAdaptor;
 import de.fzj.unicore.uas.client.StorageClient;
 import de.fzj.unicore.uas.security.IUASSecurityProperties;
 import de.fzj.unicore.uas.security.UASSecurityProperties;
-import de.fzj.unicore.wsrflite.xmlbeans.BaseFault;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.ogf.saga.error.*;
-import org.unigrids.services.atomic.types.GridFileType;
 import org.w3.x2005.x08.addressing.EndpointReferenceType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -79,10 +77,6 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlStagingOnePhaseAda
         return new BesUnicoreJobMonitorAdaptor();
     }
 
-	public Class getJobClass() {
-		return BesUnicoreJob.class;
-	}
-
 	public void connect(String userInfo, String host, int port, String basePath, Map attributes) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException, NoSuccessException {
     	super.connect(userInfo, host, port, basePath, attributes);
     	// extract Target from _ds_url
@@ -125,7 +119,7 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlStagingOnePhaseAda
 
 	/*
 	 * bypass BES stubs for submission as URI for datastaging are changed (scheme in lowercase) by the Axis URI class
-	 * 
+	 * TODO: remove this method when Unicore server fixed
 	 */
     public String submit(String jobDesc, boolean checkMatch, String uniqId) throws PermissionDeniedException, TimeoutException, NoSuccessException, BadResource {
     	
@@ -178,7 +172,32 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlStagingOnePhaseAda
             Element addr = (Element) ident.getElementsByTagName("add:Address").item(0);
             if (addr == null)
             	throw new NoSuccessException("<add:Address> tag not found");
-            return addr.getTextContent();
+            BesJob j = new BesJob();
+            // transform Element into EndpointReferenceType
+            fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceType epr = new fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceType();
+            epr.setAddress(new fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.AttributedURIType(addr.getFirstChild().getTextContent()));
+
+            Element ref = (Element) ident.getElementsByTagName("add:ReferenceParameters").item(0);
+    		if (ref == null)
+            	throw new SAXException("<add:ReferenceParameters> tag not found");
+    		org.apache.axis.message.MessageElement[] any = new org.apache.axis.message.MessageElement[ref.getChildNodes().getLength()];
+    		for (int i=0; i<ref.getChildNodes().getLength(); i++) {
+    			any[i] = new org.apache.axis.message.MessageElement((Element)ref.getChildNodes().item(i));
+    		}
+    		epr.setReferenceParameters(new fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.ReferenceParametersType(any));
+    		
+    		Element meta = (Element) ident.getElementsByTagName("add:Metadata").item(0);
+    		if (meta == null)
+            	throw new SAXException("<add:Metadata> tag not found");
+    		any = new org.apache.axis.message.MessageElement[meta.getChildNodes().getLength()];
+    		for (int i=0; i<meta.getChildNodes().getLength(); i++) {
+    			any[i] = new org.apache.axis.message.MessageElement((Element)meta.getChildNodes().item(i));
+    		}
+    		epr.setMetadata(new fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.MetadataType(any));
+    		
+    		// send EndpointReferenceType to BesJob and store the job
+    		j.setActivityId(epr, true);
+            return j.getNativeId();
 		} catch (IOException e) {
 			throw new NoSuccessException(e);
 		} catch (ParserConfigurationException e) {
@@ -188,11 +207,6 @@ public class BesUnicoreJobControlAdaptor extends BesJobControlStagingOnePhaseAda
 		}
     }
     
-    public URI getBESUrl(String host, int port, String basePath, Map attributes) throws URISyntaxException {
-    	URI url = super.getBESUrl(host, port, basePath, attributes);
-		return new URI(url.toString()+"?res=" + (String)attributes.get("res"));
-    }
-
 	public URI getDataStagingUrl(String host, int port, String basePath, Map attributes) throws URISyntaxException {
 		// This URL is used by JSAGA to choose the appropriate data plugin: the new UNICORE plugin
 		// extract Target 'DEMO-SITE' from basePath = '/DEMO-SITE/services/BESFactory'

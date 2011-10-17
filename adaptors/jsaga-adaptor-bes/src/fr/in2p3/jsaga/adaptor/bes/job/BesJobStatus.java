@@ -1,7 +1,11 @@
 package fr.in2p3.jsaga.adaptor.bes.job;
 
 
+import org.apache.axis.message.MessageElement;
+import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityStateEnumeration;
 import org.ggf.schemas.bes.x2006.x08.besFactory.ActivityStatusType;
+
+import fr.in2p3.jsaga.adaptor.job.SubState;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 
 /* ***************************************************
@@ -13,7 +17,7 @@ import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 * Date:   26 Nov 2010
 * ***************************************************/
 
-public abstract class BesJobStatus extends JobStatus {
+public class BesJobStatus extends JobStatus {
 
 	public BesJobStatus(String jobId, ActivityStatusType activityStatus) {
 		super(jobId, activityStatus, activityStatus.getState().getValue());
@@ -27,4 +31,30 @@ public abstract class BesJobStatus extends JobStatus {
         return "BES";
     }
 
+	/**
+	 * Gets the BES state of the job as found in the GetActivityStatusesResponseType message
+	 * 
+	 * For example:
+	 * <ns1:ActivityStatus state="Running" xsi:type="ns1:ActivityStatusType">
+     * </ns1:ActivityStatus>
+	 * 
+	 * @return JobStatus the substate 
+	 */
+	public SubState getSubState() {
+    	ActivityStateEnumeration state = ((ActivityStatusType) m_nativeStateCode).getState();
+    		
+        if (ActivityStateEnumeration.Pending.equals(state)) {
+            return SubState.RUNNING_SUBMITTED;
+        } else if (ActivityStateEnumeration.Running.equals(state)) {
+       		return SubState.RUNNING_ACTIVE;
+        } else if (ActivityStateEnumeration.Finished.equals(state)) {
+            return SubState.DONE;
+        } else if (ActivityStateEnumeration.Cancelled.equals(state)) {
+            return SubState.CANCELED;
+        } else if (ActivityStateEnumeration.Failed.equals(state)) {
+            return SubState.FAILED_ERROR;
+        } else {
+            return null;
+        }
+    }
 }
