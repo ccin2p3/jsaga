@@ -2,20 +2,22 @@ package fr.in2p3.jsaga.adaptor.bes.job;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
 import java.util.Map;
 
-import org.ogf.saga.error.AuthenticationFailedException;
-import org.ogf.saga.error.AuthorizationFailedException;
-import org.ogf.saga.error.BadParameterException;
+import org.ogf.saga.AbstractTest;
 import org.ogf.saga.error.NoSuccessException;
-import org.ogf.saga.error.NotImplementedException;
-import org.ogf.saga.error.TimeoutException;
+import org.ogf.saga.session.Session;
+import org.ogf.saga.session.SessionFactory;
+import org.ogf.saga.url.URL;
+import org.ogf.saga.url.URLFactory;
 import org.xml.sax.SAXException;
 
-import junit.framework.TestCase;
 import fr.in2p3.jsaga.adaptor.bes.BesUtils;
+import fr.in2p3.jsaga.engine.descriptors.AdaptorDescriptors;
+import fr.in2p3.jsaga.engine.factories.JobAdaptorFactory;
 import fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceType;
+import fr.in2p3.jsaga.impl.context.ContextImpl;
+import fr.in2p3.jsaga.impl.session.SessionImpl;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -29,8 +31,12 @@ import fr.in2p3.jsaga.generated.org.w3.x2005.x08.addressing.EndpointReferenceTyp
 /**
  *
  */
-public class BesJobAdaptorTest extends TestCase {
+public class BesJobAdaptorTest extends AbstractTest {
 	
+	public BesJobAdaptorTest() throws Exception {
+		super();
+	}
+
 	private final String ACTIVITY_IDENTIFIER = 
 		"<ns2:EndpointReferenceType xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ns2:EndpointReferenceType\" xmlns:ns2=\"http://www.w3.org/2005/08/addressing\">" +
 		"<ns2:Address xsi:type=\"ns2:AttributedURIType\">https://somehost:8443/BESservice</ns2:Address>" +
@@ -63,6 +69,16 @@ public class BesJobAdaptorTest extends TestCase {
                 "bes",
                 new BesJobControlAdaptor().getType());
     }
+
+    public void test_AREX() throws NoSuccessException {
+    	this.test_BES("bes://interop.grid.niif.hu:2010/arex-x509");
+    }
+    public void test_GenesisII() throws NoSuccessException {
+    	this.test_BES("bes://i134r.idp.iu.futuregrid.org:18443/axis/services/GeniiBESPortType?genii-container-id=ECBCAEC8-5FFF-11E0-B887-28C73890A7D4");
+    }
+    public void test_Unicore6() throws NoSuccessException {
+    	this.test_BES("bes://localhost6:8080/DEMO-SITE/services/BESFactory?res=default_bes_factory");
+    }
     
     /**
      * This test needs 3 system properties:
@@ -71,31 +87,30 @@ public class BesJobAdaptorTest extends TestCase {
 	 * -Djavax.net.ssl.trustStore=
      * @throws NoSuccessException
      */
-    public void test_BES() throws NoSuccessException {
-    	// TODO use URL and configuration process by engine
-    	BesJobControlAdaptor adaptor = new BesJobControlAdaptor();
-    	Map attributes = new HashMap();
-    	String host = "149.165.146.134";
-    	int port = 18443;
-    	String basePath = "/axis/services/GeniiBESPortType";
-    	attributes.put("ReferenceParameterNS", "http://edu.virginia.vcgr.genii/ref-params");
-    	attributes.put("ReferenceParameterName", "resource-key");
-    	attributes.put("ReferenceParameterValue", "FC59F12A-CA13-79C0-3C7A-318435C6C49F");
-    	attributes.put("genii-container-id", "ECBCAEC8-5FFF-11E0-B887-28C73890A7D4");
+    private void test_BES(String bes_url) throws NoSuccessException {
+        AdaptorDescriptors descriptors = AdaptorDescriptors.getInstance();
+        JobAdaptorFactory m_jobAdaptorFactory = new JobAdaptorFactory(descriptors);
+    	Session session = SessionFactory.createSession();
+    	BesJobControlAdaptor adaptor;
+
+        URL url;
+        ContextImpl context;
+        Map attributes;
+        
+        // connect to control services
     	try {
-			adaptor.connect(null, host, port, basePath, attributes);
-		} catch (NotImplementedException e) {
-			throw new NoSuccessException(e);
-		} catch (AuthenticationFailedException e) {
-			throw new NoSuccessException(e);
-		} catch (AuthorizationFailedException e) {
-			throw new NoSuccessException(e);
-		} catch (BadParameterException e) {
-			throw new NoSuccessException(e);
-		} catch (TimeoutException e) {
+			url = URLFactory.createURL(bes_url);
+			
+			context = ((SessionImpl)session).getBestMatchingContext(url);
+
+	        attributes = m_jobAdaptorFactory.getAttribute(url, context);
+	        adaptor = new BesJobControlAdaptor();
+	        m_jobAdaptorFactory.connect(url, adaptor, attributes, context);
+		} catch (Exception e) {
 			throw new NoSuccessException(e);
 		}
-		assertEquals(host, adaptor.getBESAttributes().getCommonName());
+		assertTrue(adaptor.getBESAttributes().isIsAcceptingNewActivities());
+		adaptor.disconnect();
     }
     
     public void test_jobSerialize() throws NoSuccessException, NoSuchAlgorithmException, SAXException {
