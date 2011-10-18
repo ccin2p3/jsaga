@@ -70,49 +70,6 @@ public class BesJobAdaptorTest extends AbstractTest {
                 new BesJobControlAdaptor().getType());
     }
 
-    public void test_AREX() throws NoSuccessException {
-    	this.test_BES("bes://interop.grid.niif.hu:2010/arex-x509");
-    }
-    public void test_GenesisII() throws NoSuccessException {
-    	this.test_BES("bes://i134r.idp.iu.futuregrid.org:18443/axis/services/GeniiBESPortType?genii-container-id=ECBCAEC8-5FFF-11E0-B887-28C73890A7D4");
-    }
-    public void test_Unicore6() throws NoSuccessException {
-    	this.test_BES("bes://localhost6:8080/DEMO-SITE/services/BESFactory?res=default_bes_factory");
-    }
-    
-    /**
-     * This test needs 3 system properties:
-     * -Djavax.net.ssl.keyStorePassword=
-	 * -Djavax.net.ssl.keyStore=
-	 * -Djavax.net.ssl.trustStore=
-     * @throws NoSuccessException
-     */
-    private void test_BES(String bes_url) throws NoSuccessException {
-        AdaptorDescriptors descriptors = AdaptorDescriptors.getInstance();
-        JobAdaptorFactory m_jobAdaptorFactory = new JobAdaptorFactory(descriptors);
-    	Session session = SessionFactory.createSession();
-    	BesJobControlAdaptor adaptor;
-
-        URL url;
-        ContextImpl context;
-        Map attributes;
-        
-        // connect to control services
-    	try {
-			url = URLFactory.createURL(bes_url);
-			
-			context = ((SessionImpl)session).getBestMatchingContext(url);
-
-	        attributes = m_jobAdaptorFactory.getAttribute(url, context);
-	        adaptor = new BesJobControlAdaptor();
-	        m_jobAdaptorFactory.connect(url, adaptor, attributes, context);
-		} catch (Exception e) {
-			throw new NoSuccessException(e);
-		}
-		assertTrue(adaptor.getBESAttributes().isIsAcceptingNewActivities());
-		adaptor.disconnect();
-    }
-    
     public void test_jobSerialize() throws NoSuccessException, NoSuchAlgorithmException, SAXException {
     	EndpointReferenceType epr = (EndpointReferenceType) BesUtils.deserialize(ACTIVITY_IDENTIFIER, EndpointReferenceType.class);
 
