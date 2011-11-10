@@ -864,6 +864,8 @@ public class SRM22DataAdaptor extends SRMDataAdaptorAbstract implements FileRead
 
     private org.apache.axis.types.URI toSrmURI(String absolutePath) throws NoSuccessException {
         try {
+        	// path with French chars (if encoded) are not supported by SRM
+        	// So better here to not encode and let URI throw an exception
             String encodedPath = PathEncoder.encode(absolutePath);
             return new org.apache.axis.types.URI("srm", null, m_host, m_port, SERVICE_PATH, "SFN="+encodedPath, null);
         } catch (org.apache.axis.types.URI.MalformedURIException e) {
