@@ -48,6 +48,7 @@ public class URLEncoder {
                     buffer.append(c);
                 }
             } else {            // non-ASCII (must be converted to UTF-8 before encoding)
+            	// FIXME: french chars are not encoded
                 if (c <= 160) { // isIllegal
                     appendHex(buffer, 0xC0 | (c >> 6));
                     appendHex(buffer, 0x80 | (c & 0x3F));
