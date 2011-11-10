@@ -2,6 +2,10 @@ package fr.in2p3.jsaga.adaptor.ssh.data;
 
 import com.jcraft.jsch.*;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
+
+import fr.in2p3.jsaga.adaptor.base.usage.UAnd;
+import fr.in2p3.jsaga.adaptor.base.usage.UOptional;
+import fr.in2p3.jsaga.adaptor.base.usage.Usage;
 import fr.in2p3.jsaga.adaptor.data.ParentDoesNotExist;
 import fr.in2p3.jsaga.adaptor.data.optimise.DataRename;
 import fr.in2p3.jsaga.adaptor.data.read.FileAttributes;
@@ -28,6 +32,7 @@ import java.util.Vector;
 public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 		FileReaderGetter, FileWriterPutter, DataRename {
 	private ChannelSftp channelSftp;
+	protected static final String FILENAME_ENCODING = "FilenameEncoding";
 	
 	public String getType() {
 		return "sftp";
@@ -37,6 +42,15 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
         return 22;
     }
 
+    public Usage getUsage() {
+        return new UAnd(
+        		new Usage[]{
+					 new UOptional(FILENAME_ENCODING),
+					 super.getUsage()
+
+        		});
+    }
+    
 	public void connect(String userInfo, String host, int port,
 			String basePath, Map attributes) throws NotImplementedException,
             AuthenticationFailedException, AuthorizationFailedException, BadParameterException, TimeoutException,
@@ -51,6 +65,13 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 		} catch (JSchException e) {
 			throw new NoSuccessException("Unable to open channel", e);
 		}
+		if (attributes.containsKey(FILENAME_ENCODING)) {
+	        try {
+				channelSftp.setFilenameEncoding((String) attributes.get(FILENAME_ENCODING));
+			} catch (SftpException e) {
+				throw new NoSuccessException("Unable to set filename encoding", e);
+			}
+		}
 	}
 
 	public void disconnect() throws NoSuccessException {
@@ -62,7 +83,6 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 			OutputStream stream) throws PermissionDeniedException, BadParameterException,
             DoesNotExistException, TimeoutException, NoSuccessException {
 		try {
-            channelSftp.setFilenameEncoding("ISO-8859-1");
 			channelSftp.get(absolutePath, stream);
 		} catch (SftpException e) {
 			if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE)
@@ -135,7 +155,6 @@ public class SFTPDataAdaptor extends SSHAdaptorAbstract implements
 			String additionalArgs, InputStream stream) throws PermissionDeniedException,
             BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
 		try {
-            channelSftp.setFilenameEncoding("ISO-8859-1");
 			if (append)
 				channelSftp.put(stream, absolutePath, ChannelSftp.APPEND);
 			else

@@ -42,5 +42,11 @@ Where:
 ]]></pre>
             </answer>
         </faq>
+        <faq id="encoding">
+            <question>What encoding is used for remote filenames ?</question>
+            <answer>The plug-in does not explicitly set any filename encoding, so the default on the server is used. If
+            you want to force a particular encoding for filenames, please use the "FilenameEncoding" parameter.
+            </answer>
+        </faq>
     </part>
 </faqs>

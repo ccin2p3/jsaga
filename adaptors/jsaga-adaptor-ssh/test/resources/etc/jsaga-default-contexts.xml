@@ -15,7 +15,9 @@
 	    <context type="SSH" id="sreynaud">
             <attribute name="UserID" value="sreynaud"/>
             <attribute name="UserKey" value="${user.home}/.jsaga/contexts/ssh/sreynaud"/>
-            <data type="sftp"/>
+            <data type="sftp">
+           		<attribute name="FilenameEncoding" value="ISO-8859-1"/>
+            </data>
             <job type="ssh"/>
             <include host="ccsyre*.in2p3.fr"/>
             <exclude host="localhost"/>
