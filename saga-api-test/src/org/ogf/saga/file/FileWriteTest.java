@@ -29,6 +29,7 @@ import org.ogf.saga.url.URLFactory;
 public abstract class FileWriteTest extends AbstractNSEntryTest {
     // test data
     private static final String DEFAULT_CONTENT2 = "Another text !";
+    private static final String DEFAULT_ENCODED_FILENAME = "fileéàê.txt";
 
     protected FileWriteTest(String protocol) throws Exception {
         super(protocol);
@@ -59,6 +60,20 @@ public abstract class FileWriteTest extends AbstractNSEntryTest {
         }
     }
 
+    public void test_write_encoded_filename() throws Exception {
+        URL fileUrl = createURL(m_subDirUrl, DEFAULT_ENCODED_FILENAME);
+        NSEntry file = m_dir.open(fileUrl, FLAGS_FILE);
+        Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT2.getBytes());
+        ((File)file).write(buffer);
+        file.close();
+        try {
+            NSFactory.createNSEntry(m_session, createURL(m_subDirUrl, DEFAULT_ENCODED_FILENAME), Flags.WRITE.or(Flags.EXCL)).close();
+            fail("Expected AlreadyExist exception");
+        } catch(AlreadyExistsException e) {
+        }
+        checkWrited(fileUrl, DEFAULT_CONTENT2);
+    }
+    
     public void test_write_overwrite() throws Exception {
         if (m_file instanceof File) {
             Buffer buffer = BufferFactory.createBuffer(DEFAULT_CONTENT2.getBytes());
