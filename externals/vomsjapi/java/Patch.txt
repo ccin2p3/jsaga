@@ -48,6 +48,9 @@ to return factory.createCredential(cred.getUserChain(),  cred.getUserKey().getPr
 return buildProxy( cred, 3600, DEFAULT_PROXY_TYPE );
 to return buildProxy( cred, 3600, DEFAULT_DELEGATION_TYPE);
 
+> modify private void loadPKCS12Credentials(File pkcs12File, String keyPassword) to find the first certificate with a private key
+instead of the first certificate.
+
 >> modify org\glite\voms\contact\VOMSProxyInit.java :
 protected GlobusCredential getGridProxy() :
 GlobusCredential proxy = VOMSProxyBuilder.buildProxy( userCredentials, proxyLifetime, proxyType );

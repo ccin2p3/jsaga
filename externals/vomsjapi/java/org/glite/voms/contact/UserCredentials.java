@@ -209,12 +209,15 @@ public class UserCredentials {
             ks.load( new FileInputStream(pkcs12File), keyPassword.toCharArray() );
             Enumeration aliases = ks.aliases();
             
-            if (!aliases.hasMoreElements())
+            String alias = null;
+            while(aliases.hasMoreElements()) {
+                alias = (String) aliases.nextElement();
+                if(ks.isKeyEntry(alias)) break;
+            }
+
+            if (alias == null)
                 throw new VOMSException("No aliases found inside pkcs12 certificate!");
             
-            // Take the first alias and hope it is the right one...
-            String alias = (String)aliases.nextElement();
-
 		userCert=(X509Certificate) ks.getCertificate( alias );
             userKey = new BouncyCastleOpenSSLKey((PrivateKey)ks.getKey( alias, keyPassword.toCharArray()));
             //userChain = (X509Certificate[]) ks.getCertificateChain( alias);
