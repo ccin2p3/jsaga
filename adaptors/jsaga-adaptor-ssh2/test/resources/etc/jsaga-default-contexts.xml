@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsaga-default xmlns="http://www.in2p3.fr/jsaga/session">
+    <contexts>
+        <context type="SSH">
+            <!-- <attribute name="UserID" value="sreynaud"/>--><!-- optional -->
+            <attribute name="UserKey" value="${user.home}/.jsaga/contexts/ssh/id_rsa"/>
+            <attribute name="UserPass" value="XXX"/>
+            <data type="sftp2"/>
+            <job type="ssh2"/>
+            <include host="localhost"/>
+        </context>
+    </contexts>
+    <session>
+        <context type="SSH"/>
+	    <context type="SSH" id="sreynaud">
+            <attribute name="UserID" value="sreynaud"/>
+            <attribute name="UserKey" value="${user.home}/.jsaga/contexts/ssh/sreynaud"/>
+            <data type="sftp2">
+           		<attribute name="FilenameEncoding" value="ISO-8859-1"/>
+            </data>
+            <job type="ssh2"/>
+            <include host="ccsyre*.in2p3.fr"/>
+            <exclude host="localhost"/>
+	    </context>
+	    <context type="UserPass" id="AFS">
+            <attribute name="UserID" value="${user.name}"/>
+            <attribute name="UserPass" value="XXX"/>
+            <data type="sftp2"/>
+            <job type="ssh2"/>
+            <include host="ccali61.in2p3.fr"/>
+            <exclude host="localhost"/>
+	    </context>
+	    <context type="UserPassStore" id="netrc">
+            <data type="sftp2"/>
+            <job type="ssh2"/>
+            <include host="ccali05.in2p3.fr"/>
+            <exclude host="localhost"/>
+	    </context>
+    </session>
+</jsaga-default>
