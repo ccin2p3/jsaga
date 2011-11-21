@@ -9,8 +9,8 @@ import org.ogf.saga.namespace.*;
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
 * File:   SFTPDataTestSuite
-* Author: Nicolas DEMESY (nicolas.demesy@bt.com)
-* Date:   15 avril 2008
+* Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
+* Date:   16 Nov 2011
 ****************************************************/
 
 public class SFTPDataTestSuite extends JSAGATestSuite {
@@ -37,7 +37,6 @@ public class SFTPDataTestSuite extends JSAGATestSuite {
     }
     public static class SFTPFileWriteTest extends FileWriteTest {
         public SFTPFileWriteTest() throws Exception {super("sftp2");}
-        //public void test_write_encoded_filename() throws Exception { super.ignore("Accents pas supportés");}
     }
     public static class SFTPNSCopyTest extends NSCopyTest {
         public SFTPNSCopyTest() throws Exception {super("sftp2", "sftp2");}

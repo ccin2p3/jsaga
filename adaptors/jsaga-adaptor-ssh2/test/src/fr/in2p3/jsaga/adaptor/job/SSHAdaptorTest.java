@@ -6,9 +6,9 @@ import junit.framework.TestCase;
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************
- * File:   SRMDataAdaptorTest
- * Author:
- * Date:
+ * File:   SSHDataAdaptorTest
+ * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
+ * Date:   Nov 2011
  * ***************************************************
  * Description:                                      */
 /**

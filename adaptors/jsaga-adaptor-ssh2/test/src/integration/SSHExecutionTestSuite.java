@@ -8,8 +8,8 @@ import org.ogf.saga.job.*;
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
 * File:   SSHExecutionTestSuite
-* Author: Nicolas DEMESY (nicolas.demesy@bt.com)
-* Date:   15 avril 2008
+* Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
+* Date:   16 Nov 2011
 ****************************************************/
 
 public class SSHExecutionTestSuite extends JSAGATestSuite {
