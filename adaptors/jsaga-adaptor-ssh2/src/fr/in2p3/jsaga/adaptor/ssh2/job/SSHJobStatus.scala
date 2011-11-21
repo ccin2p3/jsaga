@@ -40,7 +40,7 @@ class SSHJobStatus private (
   state: SubState,
   retCode: Int = 0) extends JobStatus(jobId, null, state.toSagaState.name, retCode) {
   
-  override def getModel = "ssh2"
+  override def getModel = "ssh"
 
   override def getSubState = state
 }
