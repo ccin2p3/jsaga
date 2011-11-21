@@ -8,8 +8,8 @@ import org.ogf.saga.job.JobRunMinimalTest;
 * ***             http://cc.in2p3.fr/             ***
 * ***************************************************
 * File:   SSHExecutionTestSuiteMinimal
-* Author: Nicolas DEMESY (nicolas.demesy@bt.com)
-* Date:   15 avril 2008
+* Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
+* Date:   16 Nov 2011
 ****************************************************/
 
 public class SSHExecutionTestSuiteMinimal extends JSAGATestSuite {
