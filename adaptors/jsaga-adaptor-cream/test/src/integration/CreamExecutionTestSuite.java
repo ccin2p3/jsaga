@@ -2,6 +2,7 @@ package integration;
 
 import junit.framework.Test;
 
+import org.ogf.saga.job.JobRunInfoTest;
 import org.ogf.saga.job.JobRunInteractiveTest;
 import org.ogf.saga.job.JobRunMinimalTest;
 import org.ogf.saga.job.JobRunSandboxTest;
@@ -37,4 +38,9 @@ public class CreamExecutionTestSuite extends JSAGATestSuite {
     	public CreamJobRunInteractiveTest() throws Exception {super("cream");}
     	public void test_run_environnement() throws Exception { super.ignore("Space is not supported in environment");   }
     }
+
+    public static class CreamJobRunInfoTest extends JobRunInfoTest {
+    	public CreamJobRunInfoTest() throws Exception {super("cream");}
+    }
+    
 }
