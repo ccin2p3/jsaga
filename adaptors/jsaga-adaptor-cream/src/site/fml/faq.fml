@@ -22,7 +22,7 @@ Where:
     <HOSTNAME> is the name of the host running the gLite-CREAM service,
     <PORT> is 8443 by default,
     <SCHEDULER> is the scheduler available on targeted site: pbs, lsf, sge, bqs...
-    <QUEUE> is the name of the job queue (e.g. short, long, a_vo_name...),
+    <QUEUE> is the name of the job queue (e.g. short, long, a_vo_name... this queue will override any queue specified via SAGA)
     <DELEGATION> is the identifier of your delegated proxy (optional).
 ]]></pre>
             </answer>
