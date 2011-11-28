@@ -24,6 +24,7 @@ public class BesUnicoreTestSuite extends JSAGATestSuite {
     // test cases
     public static class BesUnicoreJobDescriptionTest extends JobDescriptionTest {
         public BesUnicoreJobDescriptionTest() throws Exception {super("bes-unicore");}
+        public void test_wallTimeLimit() { super.ignore("not supported"); }
      }
     
     // test cases

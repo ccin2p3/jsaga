@@ -31,6 +31,7 @@ public class GlobusExecutionTestSuite extends JSAGATestSuite {
         public void test_cpuArchitecture() { super.ignore("RSL v1.0 does not support this"); }
         public void test_operatingSystemType() { super.ignore("RSL v1.0 does not support this"); }
         public void test_candidateHosts() { super.ignore("RSL v1.0 does not support this"); }
+        public void test_wallTimeLimit() { super.ignore("RSL v1.0 does not support this"); }
     }
 
     // test cases

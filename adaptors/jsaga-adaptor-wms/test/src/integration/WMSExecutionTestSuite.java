@@ -33,6 +33,7 @@ public class WMSExecutionTestSuite extends JSAGATestSuite {
         public void test_input() { super.ignore("not supported"); }
         public void test_output() { super.ignore("not supported"); }
         public void test_error() { super.ignore("not supported"); }
+        public void test_wallTimeLimit() { super.ignore("not supported"); }
     }
     // test cases
     public static class WMSJobRunMinimalTest extends JobRunMinimalTest {
