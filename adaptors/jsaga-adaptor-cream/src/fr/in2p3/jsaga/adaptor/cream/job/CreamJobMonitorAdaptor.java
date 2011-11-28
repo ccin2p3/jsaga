@@ -1,6 +1,7 @@
 package fr.in2p3.jsaga.adaptor.cream.job;
 
 import fr.in2p3.jsaga.adaptor.job.control.manage.ListableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.monitor.JobInfoAdaptor;
 import fr.in2p3.jsaga.adaptor.job.monitor.JobStatus;
 import fr.in2p3.jsaga.adaptor.job.monitor.QueryListJob;
 import org.apache.axis.types.URI;
@@ -9,6 +10,7 @@ import org.glite.ce.creamapi.ws.cream2.types.*;
 import org.ogf.saga.error.*;
 
 import java.rmi.RemoteException;
+import java.util.Date;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -22,9 +24,93 @@ import java.rmi.RemoteException;
 /**
  *
  */
-public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements QueryListJob, ListableJobAdaptor {
-//        , QueryFilteredJob {
+public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements QueryListJob, ListableJobAdaptor, JobInfoAdaptor {
+	
     public JobStatus[] getStatusList(String[] nativeJobIdArray) throws TimeoutException, NoSuccessException {
+        JobInfo[] resultArray;
+		resultArray = getJobInfoResult(nativeJobIdArray);
+        // convert
+        JobStatus[] jsArray = new JobStatus[resultArray.length];
+        for (int i=0; resultArray!=null && i<resultArray.length; i++) {
+            Status[] statusArray = resultArray[i].getStatus();
+            if (statusArray==null || statusArray.length==0) {
+                throw new NoSuccessException("Empty status for job: "+resultArray[i].getJobId().getId());
+            }
+            Status lastStatus = statusArray[statusArray.length - 1];
+            
+            // convert last status
+            if (lastStatus.getFailureReason()!=null) {
+                jsArray[i] = new CreamJobStatus(lastStatus, lastStatus.getFailureReason());
+            } else if (lastStatus.getExitCode()!=null && !lastStatus.getExitCode().equals("N/A")) {
+                jsArray[i] = new CreamJobStatus(lastStatus, Integer.parseInt(lastStatus.getExitCode()));
+            } else {
+                jsArray[i] = new CreamJobStatus(lastStatus);
+            }
+        	
+        }
+        return jsArray;
+    }
+
+    public String[] list() throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        JobId[] resultArray;
+        try {
+            resultArray = m_creamStub.getStub().jobList();
+        } catch (RemoteException e) {
+            throw new TimeoutException(e);
+        }
+        if (resultArray != null) {
+            String[] jobIds = new String[resultArray.length];
+            for (int i=0; i<resultArray.length; i++) {
+                jobIds[i] = resultArray[i].getId();
+            }
+            return jobIds;
+        } else {
+            throw new NoSuccessException("Failed to list jobs");
+        }
+    }
+
+	public Integer getExitCode(String nativeJobId)	throws NotImplementedException, NoSuccessException {
+        try {
+        	Status[] stat = this.getJobInfoResult(new String[]{nativeJobId})[0].getStatus();
+			return new Integer(stat[stat.length-1].getExitCode());
+		} catch (TimeoutException e) {
+			throw new NoSuccessException(e);
+		}
+	}
+
+	public Date getCreated(String nativeJobId) throws NotImplementedException,	NoSuccessException {
+		return this.getLastCommand(nativeJobId).getCreationTime().getTime();
+	}
+
+	public Date getStarted(String nativeJobId) throws NotImplementedException,	NoSuccessException {
+		return this.getLastCommand(nativeJobId).getStartProcessingTime().getTime();
+	}
+
+	public Date getFinished(String nativeJobId) throws NotImplementedException,	NoSuccessException {
+		return this.getLastCommand(nativeJobId).getExecutionCompletedTime().getTime();
+	}
+
+	public String[] getExecutionHosts(String nativeJobId) throws NotImplementedException, NoSuccessException {
+        try {
+			return new String[]{this.getJobInfoResult(new String[]{nativeJobId})[0].getWorkerNode()};
+		} catch (TimeoutException e) {
+			throw new NoSuccessException(e);
+		}
+	}
+
+	/*-----------------*/
+	/* Private methods */
+	/*-----------------*/
+	private Command getLastCommand(String nativeJobId) throws NotImplementedException, NoSuccessException {
+		try {
+			Command[] cmds = this.getJobInfoResult(new String[]{nativeJobId})[0].getLastCommand();
+			return cmds[cmds.length-1];
+		} catch (TimeoutException e) {
+			throw new NoSuccessException(e);
+		}
+	}
+	
+    private JobInfo[] getJobInfoResult(String[] nativeJobIdArray) throws TimeoutException, NoSuccessException {
         URI creamUri = m_creamStub.getURI();
         JobId[] jobIdList = new JobId[nativeJobIdArray.length];
         for (int i = 0; i < nativeJobIdArray.length; i++) {
@@ -35,20 +121,6 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
         JobFilter filter = new JobFilter();
         filter.setDelegationId(m_delegationId);
         filter.setJobId(jobIdList);
-        return this.getStatus(filter);
-    }
-
-    public JobStatus[] getFilteredStatus(Object[] filters) throws TimeoutException, NoSuccessException {
-        JobFilter filter = new JobFilter();
-        filter.setDelegationId(m_delegationId);
-        //todo: implement method getFilteredStatus()
-//        filter.setFromDate();
-//        filter.setToDate();
-        return this.getStatus(filter);
-    }
-
-    private JobStatus[] getStatus(JobFilter filter) throws TimeoutException, NoSuccessException {
-        // get status
         CREAMPort stub = m_creamStub.getStub();
         JobInfoResult[] resultArray;
         try {
@@ -56,9 +128,7 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
         } catch (RemoteException e) {
             throw new TimeoutException(e);
         }
-
-        // convert
-        JobStatus[] jsArray = new JobStatus[resultArray.length];
+        JobInfo[] infos = new JobInfo[resultArray.length];
         for (int i=0; resultArray!=null && i<resultArray.length; i++) {
             // rethrow exception
             try {
@@ -80,29 +150,16 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
             } catch (BaseFaultType fault) {
                 throw new NoSuccessException(getMessage(fault), fault);
             }
-
-            // extract last status from job info
+            // extract  job info
             JobInfo info = resultArray[i].getJobInfo();
             if (info == null) {
                 throw new NoSuccessException("Empty info for job: "+filter.getJobId(i));
             }
-            Status[] statusArray = info.getStatus();
-            if (statusArray==null || statusArray.length==0) {
-                throw new NoSuccessException("Empty status for job: "+info.getJobId().getId());
-            }
-            Status lastStatus = statusArray[statusArray.length - 1];
-            
-            // convert last status
-            if (lastStatus.getFailureReason()!=null) {
-                jsArray[i] = new CreamJobStatus(lastStatus, lastStatus.getFailureReason());
-            } else if (lastStatus.getExitCode()!=null && !lastStatus.getExitCode().equals("N/A")) {
-                jsArray[i] = new CreamJobStatus(lastStatus, Integer.parseInt(lastStatus.getExitCode()));
-            } else {
-                jsArray[i] = new CreamJobStatus(lastStatus);
-            }
+            infos[i] = info;
         }
-        return jsArray;
+        return infos;
     }
+
     private static String getMessage(BaseFaultType fault) {
         if (fault.getDescription()!=null && !fault.getDescription().equals("")) {
             return fault.getDescription();
@@ -110,24 +167,6 @@ public class CreamJobMonitorAdaptor extends CreamJobAdaptorAbstract implements Q
             return fault.getFaultCause();
         } else {
             return fault.getClass().getName();
-        }
-    }
-
-    public String[] list() throws PermissionDeniedException, TimeoutException, NoSuccessException {
-        JobId[] resultArray;
-        try {
-            resultArray = m_creamStub.getStub().jobList();
-        } catch (RemoteException e) {
-            throw new TimeoutException(e);
-        }
-        if (resultArray != null) {
-            String[] jobIds = new String[resultArray.length];
-            for (int i=0; i<resultArray.length; i++) {
-                jobIds[i] = resultArray[i].getId();
-            }
-            return jobIds;
-        } else {
-            throw new NoSuccessException("Failed to list jobs");
         }
     }
 }
