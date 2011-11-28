@@ -70,11 +70,9 @@ public abstract class JobDescriptionTest extends AbstractJobTest {
         m_jobDescription.setVectorAttribute(JobDescription.FILETRANSFER, new String[]{"myfile>myf", "file1<f1"});
     	this.change(JobDescription.CLEANUP, JobDescription.TRUE);
     }
-/* TODO: uncomment this test when it will be supported by adaptors
     public void test_wallTimeLimit() throws Exception {
         this.change(JobDescription.WALLTIMELIMIT, "120");
     }
-*/
     public void test_totalCPUTime() throws Exception {
         this.change(JobDescription.TOTALCPUTIME, "120");
     }

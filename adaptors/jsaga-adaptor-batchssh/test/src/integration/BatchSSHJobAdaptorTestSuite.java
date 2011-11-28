@@ -51,6 +51,7 @@ public class BatchSSHJobAdaptorTestSuite extends JSAGATestSuite {
         public void test_operatingSystemType() { super.ignore("not supported"); }
         public void test_candidateHosts() { super.ignore("not supported"); }
         public void test_queue() { super.ignore("not supported"); }
+        public void test_wallTimeLimit() { super.ignore("not supported"); }
      }
     
     // test cases
