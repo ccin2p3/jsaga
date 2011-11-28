@@ -13,7 +13,7 @@
 
     <!-- Adaptor-specific parameters -->
     <xsl:param name="BatchSystem"/>
-    <xsl:param name="QueueName"/>
+    <xsl:param name="QueueName"><xsl:value-of select="jsdl:JobIdentification/jsdl:JobAnnotation/text()"/></xsl:param>
     <xsl:param name="rank"/>
 
     <!-- constants -->
@@ -54,52 +54,57 @@ Environment = {<xsl:text/>
           </xsl:if>
 
 <!--  Requirements -->
-Requirements = true <xsl:text/>
+CERequirements = "true <xsl:text/>
         <xsl:for-each select="jsdl:JobIdentification/JDLRequirements/text()">
 &amp;&amp; <xsl:value-of select="."/> <xsl:text/>
         </xsl:for-each>
         <xsl:for-each select="jsdl:Resources/jsdl:TotalCPUTime/jsdl:UpperBoundedRange/text()">
-&amp;&amp; other.GlueCEPolicyMaxCPUTime >= <xsl:value-of select="."/> <xsl:text/>
+        	<xsl:text>&amp;&amp; other.GlueCEPolicyMaxCPUTime >= <xsl:value-of select="."/> </xsl:text>
+        </xsl:for-each>
+        <xsl:for-each select="jsdl:Resources/jsdl:TotalCPUCount/jsdl:UpperBoundedRange/text()">
+			<xsl:text>&amp;&amp; other.GlueCEPolicyAssignedJobSlots >= <xsl:value-of select="."/> </xsl:text>
         </xsl:for-each>
 		<xsl:for-each select="jsdl:Resources/jsdl:TotalPhysicalMemory/jsdl:UpperBoundedRange/text()">
-&amp;&amp; other.GlueHostMainMemoryRAMSize >= <xsl:value-of select="."/> <xsl:text/>
+			<xsl:text>&amp;&amp; other.GlueHostMainMemoryRAMSize >= <xsl:value-of select="."/> </xsl:text>
 		</xsl:for-each>
- 		<xsl:for-each select="jsdl:Resources/jsdl:CandidateHosts/jsdl:HostName/text()">
-             <xsl:choose>
-                 <xsl:when test="contains(.,'/')">
-&amp;&amp; other.GlueCEUniqueID == "<xsl:value-of select="."/>" <xsl:text/>
-                 </xsl:when>
-                 <xsl:otherwise>
-&amp;&amp; other.GlueCEInfoHostName == "<xsl:value-of select="."/>" <xsl:text/>
-                 </xsl:otherwise>
-             </xsl:choose>
+		<xsl:for-each select="jsdl:Resources/jsdl:TotalVirtualMemory/jsdl:UpperBoundedRange/text()">
+			<xsl:text>&amp;&amp; other.GlueHostMainMemoryVirtualSize >= <xsl:value-of select="."/> </xsl:text>
+		</xsl:for-each>
+		<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:WallTimeLimit/text()">
+			<xsl:text>&amp;&amp; other.GlueCEPolicyMaxWallClockTime >= <xsl:value-of select="."/> </xsl:text>
+		</xsl:for-each>
+		<xsl:for-each select="jsdl:Application/posix:POSIXApplication/posix:CPUTimeLimit/text()">
+			<xsl:text>&amp;&amp; other.GlueCEPolicyMaxCPUTime >= <xsl:value-of select="."/> </xsl:text>
 		</xsl:for-each>
 		<xsl:for-each select="jsdl:Application/spmd:SPMDApplication/spmd:ProcessesPerHost/text()">
-&amp;&amp; other.GlueCEInfoTotalCPUs >= <xsl:value-of select="."/> <xsl:text/>
-		</xsl:for-each>
-		<xsl:for-each select="jsdl:JobIdentification/jsdl:JobAnnotation/text()">
-&amp;&amp; other.GlueCEUniqueID == "<xsl:value-of select="."/>" <xsl:text/>
+			<xsl:text>&amp;&amp; other.GlueHostArchitectureSMPSize  >= <xsl:value-of select="."/> </xsl:text>
 		</xsl:for-each>
  		<xsl:for-each select="jsdl:Resources/jsdl:CPUArchitecture/jsdl:CPUArchitectureName/text()">
-&amp;&amp;  other.GlueHostArchitecturePlatformType == "<xsl:value-of select="."/>" <xsl:text/>
+			<xsl:text>&amp;&amp; other.GlueHostArchitecturePlatformType == "<xsl:value-of select="."/>" </xsl:text>
 		</xsl:for-each>
 		<xsl:for-each select="jsdl:Resources/jsdl:OperatingSystem/jsdl:OperatingSystemType/jsdl:OperatingSystemName/text()">
-&amp;&amp;  other.OperatingSystemName == "<xsl:value-of select="."/>" <xsl:text/>
+			<xsl:text>&amp;&amp; other.GlueHostOperatingSystemName == "<xsl:value-of select="."/>" </xsl:text>
 		</xsl:for-each>
-<xsl:text/>;
+		<xsl:for-each select="jsdl:Resources/jsdl:OperatingSystem/jsdl:OperatingSystemType/jsdl:OperatingSystemVersion/text()">
+			<xsl:text>&amp;&amp; other.GlueHostOperatingSystemVersion == "<xsl:value-of select="."/>" </xsl:text>
+		</xsl:for-each>
+<xsl:text>";</xsl:text>
 
         <xsl:if test="$rank">
 Rank = <xsl:value-of select="$rank"/>;<xsl:text/>
         </xsl:if>
 
         <!-- TODO : To test when input sandbox will work -->
+		<xsl:for-each select="jsdl:Application/spmd:SPMDApplication/spmd:NumberOfProcesses/text()">
+CpuNumber = <xsl:value-of select="."/>;<xsl:text/>
+	    </xsl:for-each>
         <xsl:for-each select="jsdl:Application/spmd:SPMDApplication/spmd:SPMDVariation/text()[not(. = 'None')]">
             <xsl:choose>
 	            <xsl:when test=". = 'MPI' or . = 'MPICH1' or . = 'MPICH2'">
-JobType = "MPICH";<xsl:text/>
-		        <xsl:for-each select="../../spmd:NumberOfProcesses/text()">
-NodeNumber = <xsl:value-of select="."/>;<xsl:text/>
-	    	    </xsl:for-each>
+                    <xsl:if test="not(../../spmd:NumberOfProcesses)">
+                        <xsl:message terminate="yes">NumberOfProcesses is mandatory for parallel jobs</xsl:message>
+                    </xsl:if>
+JobType = "Mpich";<xsl:text/>
 	            </xsl:when>
     	        <xsl:otherwise>
 	    	        <xsl:message terminate="yes">Unsupported SPMDVariation : <xsl:value-of select="."/></xsl:message>
@@ -208,9 +213,21 @@ StdError = "<xsl:value-of select="text()"/>";<xsl:text/>
         <xsl:if test="$BatchSystem">
 BatchSystem	= "<xsl:value-of select="$BatchSystem"/>";
         </xsl:if>
-        <xsl:if test="$QueueName">
+
+    	<!-- SAGA queue is override by Queue in URL -->
+        <xsl:choose>
+	        <xsl:when test="$QueueName">
+	        	<xsl:if test="jsdl:JobIdentification/jsdl:JobAnnotation and jsdl:JobIdentification/jsdl:JobAnnotation = $QueueName ">
+	                <xsl:message terminate="no">Queue specified in SAGA is override by Queue in URL</xsl:message>
+	        	</xsl:if>
 QueueName = "<xsl:value-of select="$QueueName"/>";
-        </xsl:if>
+	        </xsl:when>
+	        <xsl:otherwise>
+				<xsl:for-each select="jsdl:JobIdentification/jsdl:JobAnnotation/text()">
+QueueName = "<xsl:value-of select="."/>" <xsl:text/>
+				</xsl:for-each>
+	        </xsl:otherwise>
+        </xsl:choose>
 ]
     </xsl:template>
 
