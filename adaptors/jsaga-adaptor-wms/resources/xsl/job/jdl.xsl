@@ -88,7 +88,7 @@ Requirements = true <xsl:text/>
              </xsl:choose>
 		</xsl:for-each>
 		<xsl:for-each select="jsdl:Application/spmd:SPMDApplication/spmd:ProcessesPerHost/text()">
-&amp;&amp; other.GlueCEInfoTotalCPUs >= <xsl:value-of select="."/> <xsl:text/>
+&amp;&amp; other.GlueHostArchitectureSMPSize  >= <xsl:value-of select="."/> <xsl:text/>
 		</xsl:for-each>
 		<xsl:for-each select="jsdl:JobIdentification/jsdl:JobAnnotation/text()">
 &amp;&amp; other.GlueCEUniqueID == "<xsl:value-of select="."/>" <xsl:text/>
@@ -97,7 +97,7 @@ Requirements = true <xsl:text/>
 &amp;&amp;  other.GlueHostArchitecturePlatformType == "<xsl:value-of select="."/>" <xsl:text/>
 		</xsl:for-each>
 		<xsl:for-each select="jsdl:Resources/jsdl:OperatingSystem/jsdl:OperatingSystemType/jsdl:OperatingSystemName/text()">
-&amp;&amp;  other.OperatingSystemName == "<xsl:value-of select="."/>" <xsl:text/>
+&amp;&amp;  other.GlueHostOperatingSystemName == "<xsl:value-of select="."/>" <xsl:text/>
 		</xsl:for-each>
 <xsl:text/>;
 
