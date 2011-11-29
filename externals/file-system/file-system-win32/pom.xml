@@ -19,8 +19,8 @@
                 <extensions>true</extensions>
                 <configuration>
                     <javahOS>win32</javahOS>
-                    <compilerExecutable>f:/cygwin/bin/g++-3.exe</compilerExecutable>
-                    <linkerExecutable>f:/cygwin/bin/g++-3.exe</linkerExecutable>
+                    <compilerExecutable>c:/cygwin/bin/g++-3.exe</compilerExecutable>
+                    <linkerExecutable>c:/cygwin/bin/g++-3.exe</linkerExecutable>
                     <compilerStartOptions>
                         <compilerStartOption>-mno-cygwin</compilerStartOption>
                     </compilerStartOptions>

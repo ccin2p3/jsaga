@@ -57,7 +57,7 @@
             <attribute name="UserKey" value="${user.home}/.jsaga/contexts/globus/userkey.pem"/>
             <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/globus_cred.txt"/>
             <job type="gatekeeper">
-                <attribute name="ShellPath" value="F:\cygwin\bin\sh.exe"/>
+                <attribute name="ShellPath" value="c:\cygwin\bin\sh.exe"/>
             </job>
             <include host="localhost"/>
             <exclude host="localhost" domain="de"/>
@@ -91,7 +91,7 @@
 
         <context type="None">
             <job type="local">
-                <attribute name="ShellPath" value="f:/cygwin/bin/sh.exe"/>
+                <attribute name="ShellPath" value="c:/cygwin/bin/sh.exe"/>
                 <alias>fork</alias>
             </job>
         </context>

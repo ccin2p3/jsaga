@@ -45,7 +45,7 @@
 <!--
         <context type="GlobusRFC820" id="DemoCert">
             <job type="gatekeeper">
-                <attribute name="ShellPath" value="F:\cygwin\bin\sh.exe"/>
+                <attribute name="ShellPath" value="c:\cygwin\bin\sh.exe"/>
             </job>
         </context>
 -->
