@@ -75,9 +75,9 @@ public class GsiftpDataAdaptor implements DataCopy, DataRename, FileReaderStream
 
         // replace implementation
         GsiftpDataAdaptorAbstract sav = m_adaptor;
-        if (fl.contains("PARALLEL") && fl.contains("SIZE") && fl.contains("ERET") && fl.contains("ESTO")) {
+        if (fl.contains(FeatureList.PARALLEL) && fl.contains(FeatureList.SIZE) && fl.contains(FeatureList.ERET) && fl.contains(FeatureList.ESTO)) {
             // <*>              = PARALLEL, SIZE, ERET, ESTO
-            if (fl.contains("DCAU") && fl.contains("MDTM") && fl.contains("REST STREAM")) {
+            if (fl.contains(FeatureList.DCAU) && fl.contains(FeatureList.MDTM) && fl.contains("REST STREAM")) {
                 // <globus>     = <*> + DCAU, MDTM, "REST STREAM"
                 if (fl.contains("SPAS") && fl.contains("SPOR")) {
                     // <new>    = <globus> + MLST..., SPAS, SPOR, UTF8, "LANG EN"
@@ -86,7 +86,7 @@ public class GsiftpDataAdaptor implements DataCopy, DataRename, FileReaderStream
                     // <old>    = <globus>
                     m_adaptor = new Gsiftp1DataAdaptor();
                 }
-            } else if (fl.contains("SBUF") && fl.contains("EOF")) {
+            } else if (fl.contains(FeatureList.SBUF) && fl.contains("EOF")) {
                 // <oldDCache>  = <*> + SBUF + EOF
                 // <newDCache>  = <*> + SBUF + EOF + GETPUT, CKSM, SCKS, MODEX
                 m_adaptor = new GsiftpDCacheDataAdaptor();
