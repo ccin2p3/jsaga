@@ -56,7 +56,7 @@ Environment = {<xsl:text/>
 <!--  Requirements -->
 CERequirements = "true <xsl:text/>
         <xsl:for-each select="jsdl:JobIdentification/JDLRequirements/text()">
-&amp;&amp; <xsl:value-of select="."/> <xsl:text/>
+			<xsl:text>&amp;&amp; <xsl:value-of select="."/> </xsl:text>
         </xsl:for-each>
         <xsl:for-each select="jsdl:Resources/jsdl:TotalCPUTime/jsdl:UpperBoundedRange/text()">
         	<xsl:text>&amp;&amp; other.GlueCEPolicyMaxCPUTime >= <xsl:value-of select="."/> </xsl:text>
