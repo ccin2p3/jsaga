@@ -2,12 +2,16 @@ package integration;
 
 import junit.framework.Test;
 
+import org.ogf.saga.job.Job;
+import org.ogf.saga.job.JobDescription;
 import org.ogf.saga.job.JobDescriptionTest;
 import org.ogf.saga.job.JobRunDescriptionTest;
 import org.ogf.saga.job.JobRunInfoTest;
 import org.ogf.saga.job.JobRunInteractiveTest;
 import org.ogf.saga.job.JobRunMinimalTest;
+import org.ogf.saga.job.JobRunOptionalTest;
 import org.ogf.saga.job.JobRunSandboxTest;
+import org.ogf.saga.task.State;
 
 /* ***************************************************
 * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -46,7 +50,59 @@ public class CreamExecutionTestSuite extends JSAGATestSuite {
         public CreamJobRunDescriptionTest() throws Exception {super("cream");}
         public void test_run_inWorkingDirectory() { super.ignore("WorkingDirectory is not supported"); }
         public void test_run_queueRequirement() throws Exception {super.ignore("SAGA queue is override by Queue in URL"); }
+        // todo: uncomment when CREAM-CE is fixed
         //public void test_run_cpuTimeRequirement() throws Exception { super.ignore("TotalCPUTime is ignored");}
+    }
+
+    public static class CreamJobRunOptionalTest extends JobRunOptionalTest {
+        public CreamJobRunOptionalTest() throws Exception {super("cream");}
+    	/**
+         * Runs a long job, waits for running state and suspends it
+         */
+        public void test_suspend_queued() throws Exception {
+            
+        	// prepare
+        	JobDescription desc = createLongJob();
+        	
+            // submit
+            Job job = runJob(desc);
+            
+            // wait for RUNNING state (deviation from SAGA specification)
+            if (! super.waitForSubState(job, MODEL+":PENDING")) {
+            	job.waitFor(Float.valueOf(FINALY_TIMEOUT));
+                fail("Job did not enter PENDING state within "+MAX_QUEUING_TIME+" seconds");
+            }
+            
+            try {
+            	
+    	        // suspend job
+    	        job.suspend();
+    	        
+    	        // wait for 1 second because suspend is an asynchronous method
+    	        job.waitFor(1);
+    	        
+    	        // check job status
+    	        assertEquals(
+    	                State.SUSPENDED,
+    	                job.getState());
+
+    	        // resume job
+    	        job.resume();
+    	        
+    	        // wait for 1 second
+    	        job.waitFor(1);
+    	        
+    	        // check job status
+    	        assertEquals(
+    	                State.RUNNING,
+    	                job.getState());
+            }
+            finally {
+            	job.waitFor(Float.valueOf(FINALY_TIMEOUT));
+            }
+        }
+        
+
     }
 
     public static class CreamJobRunSandboxTest extends JobRunSandboxTest {

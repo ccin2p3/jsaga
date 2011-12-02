@@ -4,6 +4,7 @@ import fr.in2p3.jsaga.adaptor.base.defaults.Default;
 import fr.in2p3.jsaga.adaptor.base.usage.*;
 import fr.in2p3.jsaga.adaptor.job.BadResource;
 import fr.in2p3.jsaga.adaptor.job.control.advanced.CleanableJobAdaptor;
+import fr.in2p3.jsaga.adaptor.job.control.advanced.HoldableJobAdaptor;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslator;
 import fr.in2p3.jsaga.adaptor.job.control.description.JobDescriptionTranslatorXSLT;
 import fr.in2p3.jsaga.adaptor.job.control.interactive.JobIOHandler;
@@ -36,7 +37,8 @@ import java.util.regex.Pattern;
 /**
  *
  */
-public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements StagingJobAdaptorTwoPhase, CleanableJobAdaptor {
+public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements StagingJobAdaptorTwoPhase, CleanableJobAdaptor,
+	HoldableJobAdaptor {
     // parameters configured
     private static final String SSL_CA_FILES = "sslCAFiles";
 
@@ -221,7 +223,46 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         CreamExceptionFactory.rethrow(resultArray);
     }
 
-    private JobFilter getJobFilter(String nativeJobId) throws NoSuccessException {
+	public boolean hold(String nativeJobId) throws PermissionDeniedException, TimeoutException, NoSuccessException {
+        JobFilter filter = this.getJobFilter(nativeJobId);
+
+        // purge job
+        CREAMPort stub = m_creamStub.getStub();
+        Result[] resultArray;
+        try {
+            resultArray = stub.jobSuspend(filter);
+        } catch (RemoteException e) {
+            throw new TimeoutException(e);
+        }
+        if (resultArray[0].getJobStatusInvalidFault() != null) return false;
+        // Not sure why we get this exception sometimes:
+        if (resultArray[0].getJobUnknownFault() != null) return false;
+        // rethrow exception if any fault in result
+        CreamExceptionFactory.rethrow(resultArray);
+        return true;
+	}
+
+	public boolean release(String nativeJobId) throws PermissionDeniedException, TimeoutException,	NoSuccessException {
+        JobFilter filter = this.getJobFilter(nativeJobId);
+
+        // purge job
+        CREAMPort stub = m_creamStub.getStub();
+        Result[] resultArray;
+        try {
+            resultArray = stub.jobResume(filter);
+        } catch (RemoteException e) {
+            throw new TimeoutException(e);
+        }
+
+        if (resultArray[0].getJobStatusInvalidFault() != null) return false;
+        // Not sure why we get this exception sometimes:
+        if (resultArray[0].getJobUnknownFault() != null) return false;
+        // rethrow exception if any fault in result
+        CreamExceptionFactory.rethrow(resultArray);
+        return true;
+	}
+
+	private JobFilter getJobFilter(String nativeJobId) throws NoSuccessException {
         JobId jobId = new JobId();
         jobId.setCreamURL(m_creamStub.getURI());
         jobId.setId(nativeJobId);
@@ -230,4 +271,5 @@ public class CreamJobControlAdaptor extends CreamJobAdaptorAbstract implements S
         filter.setJobId(new JobId[]{jobId});
         return filter;
     }
+
 }
