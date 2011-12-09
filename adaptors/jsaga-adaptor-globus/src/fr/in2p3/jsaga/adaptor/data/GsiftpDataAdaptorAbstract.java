@@ -16,6 +16,8 @@ import org.globus.ftp.*;
 import org.globus.ftp.exception.*;
 import org.globus.gsi.gssapi.GlobusGSSException;
 import org.globus.gsi.gssapi.auth.HostAuthorization;
+import org.globus.io.streams.FTPOutputStream;
+import org.globus.io.streams.GridFTPOutputStream;
 import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.*;
 
@@ -143,17 +145,10 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
         	checkExists(absolutePath);
         }
 
-        // create new connection (else test setUp hangs)
-        GridFTPClient tmpConnection = createConnection(m_credential, m_client, m_TCPBufferSize, m_DataChannelAuthentication);
-
         // create output stream
         try {
-            return new GsiftpOutputStream(tmpConnection, absolutePath, append);
+        	return new GridFTPOutputStream(m_credential, m_client.getHost(), m_client.getPort(), absolutePath, append);
         } catch (Exception e) {
-            try{tmpConnection.close();} catch (Exception e2) {
-                /*Ignore it to throw the primary execption*/
-                Logger.getLogger(GsiftpDataAdaptorAbstract.class.getName()).log(Level.DEBUG, "Exception ignored when closing connection.", e2);
-            }
             try {
                 throw rethrowExceptionFull(e);
             } catch (DoesNotExistException e2) {
@@ -306,7 +301,7 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
             }
 
             // may disable data channel authentication
-            if (client.isFeatureSupported("DCAU")) {
+            if (client.isFeatureSupported(FeatureList.DCAU)) {
                 if (! reqDCAU) {
                     client.setDataChannelAuthentication(DataChannelAuthentication.NONE);
                 }
