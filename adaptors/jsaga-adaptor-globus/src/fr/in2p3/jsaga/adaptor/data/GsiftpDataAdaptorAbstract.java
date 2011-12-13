@@ -17,6 +17,7 @@ import org.globus.ftp.exception.*;
 import org.globus.gsi.gssapi.GlobusGSSException;
 import org.globus.gsi.gssapi.auth.HostAuthorization;
 import org.globus.io.streams.FTPOutputStream;
+import org.globus.io.streams.GridFTPInputStream;
 import org.globus.io.streams.GridFTPOutputStream;
 import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.*;
@@ -115,7 +116,7 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
     public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         // create input stream
         try {
-            return new GsiftpInputStream(m_client, absolutePath);
+        	return new GridFTPInputStream(m_credential, m_client.getHost(), m_client.getPort(), absolutePath);
         } catch (Exception e) {
             throw rethrowException(e);
         }
@@ -280,18 +281,9 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
         }
     }
 
-    private static GridFTPClient createConnection(GSSCredential cred, GridFTPClient client, int tcpBufferSize, boolean reqDCAU) throws PermissionDeniedException, TimeoutException, NoSuccessException {
-        try {
-            return createConnection(cred, client.getHost(), client.getPort(), tcpBufferSize, reqDCAU);
-        } catch (AuthenticationFailedException e) {
-            throw new PermissionDeniedException(e);
-        } catch (AuthorizationFailedException e) {
-            throw new PermissionDeniedException(e);
-        }
-    }
     private static GridFTPClient createConnection(GSSCredential cred, String host, int port, int tcpBufferSize, boolean reqDCAU) throws AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {
         try {
-            GridFTPClient client = new GridFTPClient(host, port);
+            GridFTPClient client = new GsiftpClient(host, port);
             client.setAuthorization(HostAuthorization.getInstance());
             client.authenticate(cred);
 
