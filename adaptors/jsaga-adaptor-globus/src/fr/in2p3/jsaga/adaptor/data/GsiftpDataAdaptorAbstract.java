@@ -147,7 +147,7 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
 
         // create output stream
         try {
-        	return new GridFTPOutputStream(m_credential, m_client.getHost(), m_client.getPort(), absolutePath, append);
+        	return new GsiftpOutputStream(m_credential, m_client.getHost(), m_client.getPort(), absolutePath, append);
         } catch (Exception e) {
             try {
                 throw rethrowExceptionFull(e);

@@ -1,11 +1,8 @@
 package fr.in2p3.jsaga.adaptor.data;
 
-import org.globus.common.ChainedIOException;
-import org.globus.ftp.GridFTPClient;
-import org.globus.ftp.Session;
 import org.globus.ftp.exception.FTPException;
-import org.globus.io.streams.FTPOutputStream;
 import org.globus.io.streams.GridFTPOutputStream;
+import org.ietf.jgss.GSSCredential;
 
 import java.io.IOException;
 
@@ -14,56 +11,29 @@ import java.io.IOException;
  * ***             http://cc.in2p3.fr/             ***
  * ***************************************************
  * File:   GsiftpOutputStream
- * Author: Sylvain Reynaud (sreynaud@in2p3.fr)
- * Date:   29 juin 2009
+ * Author: Lionel Schwarz (lionel.schwarz@in2p3.fr)
+ * Date:   13 dec 2011
  * ***************************************************
  * Description:                                      */
 /**
- * @deprecated 
+ * This class is used to catch the SocketException in IOException sent by close() when the socket is already closed
  */
-public class GsiftpOutputStream extends FTPOutputStream {
-    //private boolean m_isClosed;
+public class GsiftpOutputStream extends GridFTPOutputStream {
+    public GsiftpOutputStream(GSSCredential cred, String host, int port,
+			String file, boolean append) throws IOException, FTPException {
+		super(cred, host, port, file, append);
+	}
 
-    public GsiftpOutputStream(GridFTPClient client, String file, boolean append) throws IOException, FTPException {
-        //m_isClosed = false;
-        this.ftp = client;
-        boolean passive = true;
-        put(passive, Session.TYPE_IMAGE, file, append);
-    }
-
-    public void abort() {
-    	if (this.output != null) {
-    	    try {
-    		this.output.close();
-    	    } catch(Exception e) {}
-    	}
-    }
-    
-    /** override super.close() to prevent it from closing the connection */
-    //TODO: uncomment this when API will be able to reuse existing connection without hanging
+    /** override super.close() catch the exception at close() */
     public void close() throws IOException {
-    	if (this.output != null) {
-    	    try {
-    		this.output.close();
-    	    } catch(Exception e) {}
-    	}
-
     	try {
-    	    if (this.state != null) {
-    		this.state.waitForEnd();
-    	    }
-    	} catch (FTPException e) {
-    	    throw new ChainedIOException("close failed.", e);
-    	}
+			super.close();
+		} catch (IOException e) {
+			// when socket is already closed, ignore it
+			// use getMessage() because buggy getCause() returns null
+			if (!(e.getMessage().toLowerCase().contains("socket closed"))) {
+				throw e;
+			}
+		}
     }
-
-
-    //todo: remove this when API will be able to reuse existing connection without hanging
-    /** override super.close() to close the temporary connection once and only once */
-//    public synchronized void close() throws IOException {
-//        if (! m_isClosed) {
-//            m_isClosed = true;
-//            super.close();
-//        }
-//    }
 }
