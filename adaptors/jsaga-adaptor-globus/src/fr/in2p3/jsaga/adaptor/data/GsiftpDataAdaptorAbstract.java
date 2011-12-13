@@ -9,16 +9,13 @@ import fr.in2p3.jsaga.adaptor.data.read.FileReaderStreamFactory;
 import fr.in2p3.jsaga.adaptor.data.write.FileWriterStreamFactory;
 import fr.in2p3.jsaga.adaptor.security.SecurityCredential;
 import fr.in2p3.jsaga.adaptor.security.impl.GSSCredentialSecurityCredential;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.globus.common.ChainedIOException;
 import org.globus.ftp.*;
 import org.globus.ftp.exception.*;
 import org.globus.gsi.gssapi.GlobusGSSException;
 import org.globus.gsi.gssapi.auth.HostAuthorization;
-import org.globus.io.streams.FTPOutputStream;
 import org.globus.io.streams.GridFTPInputStream;
-import org.globus.io.streams.GridFTPOutputStream;
 import org.ietf.jgss.GSSCredential;
 import org.ogf.saga.error.*;
 
@@ -283,7 +280,9 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
 
     private static GridFTPClient createConnection(GSSCredential cred, String host, int port, int tcpBufferSize, boolean reqDCAU) throws AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {
         try {
+    		Logger.getLogger(GsiftpDataAdaptorAbstract.class).info("Connecting to Gsiftp service at: " + host + ":" + port + "...");
             GridFTPClient client = new GsiftpClient(host, port);
+            
             client.setAuthorization(HostAuthorization.getInstance());
             client.authenticate(cred);
 
@@ -300,7 +299,6 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
             } else {
                 client.setLocalNoDataChannelAuthentication();
             }
-
             // returns
             return client;
         } catch (ChainedIOException e) {
