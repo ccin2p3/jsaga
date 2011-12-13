@@ -18,7 +18,7 @@ import java.io.IOException;
  * ***************************************************
  * Description:                                      */
 /**
- *
+ * @deprecated
  */
 public class GsiftpInputStream extends FTPInputStream {
     public GsiftpInputStream(GridFTPClient client, String file) throws IOException, FTPException {
