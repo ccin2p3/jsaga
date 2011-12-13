@@ -38,6 +38,7 @@ public class GsiftpClient extends GridFTPClient {
      * 
      * Tokenize with "\n" instead of System.getProperty("line.separator")
      * because the line separator is the server one not the client one.
+     * TODO: use command 'SYST' to know the operating system on the server
      */
 	@Override
     public MlsxEntry mlst(String fileName)
