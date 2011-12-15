@@ -128,6 +128,8 @@ public class Gsiftp2DataAdaptor extends GsiftpDataAdaptorAbstract {
             throw new AlreadyExistsException(e);
         } else if (message.indexOf("Permission denied") > -1) {
             throw new PermissionDeniedException(e);
+        } else if (message.indexOf("Operation not permitted") > -1) {
+            throw new PermissionDeniedException(e);
         } else {
             throw new NoSuccessException(e);
         }
