@@ -18,27 +18,13 @@ import java.io.IOException;
  * ***************************************************
  * Description:                                      */
 /**
- * @deprecated
+ *
  */
 public class GsiftpInputStream extends FTPInputStream {
-    public GsiftpInputStream(GridFTPClient client, String file) throws IOException, FTPException {
+    public GsiftpInputStream(GsiftpClient client, String file) throws IOException, FTPException {
         super.ftp = client;
         boolean passive = true;
         super.get(passive, Session.TYPE_IMAGE, file);
     }
 
-    /** override super.close() to prevent it from closing the connection */
-    public void close() throws IOException {
-        if (super.input != null) {
-            super.input.close();
-        }
-
-        if (super.state != null) {
-            try {
-                super.state.waitForEnd();
-            } catch (FTPException e) {
-                throw new ChainedIOException("close failed.", e);
-            }
-        }
-    }
 }
