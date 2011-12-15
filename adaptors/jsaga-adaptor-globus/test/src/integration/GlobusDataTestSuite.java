@@ -42,6 +42,8 @@ public class GlobusDataTestSuite extends JSAGATestSuite {
         public GsiftpFileReadTest() throws Exception {super("gsiftp");}
     }
     public static class GsiftpFileWriteTest extends FileWriteTest {
+    	// test_write_append: DPM ignores the append flag so the adaptor sends a BadParameter
+    	// test_read_and_write: does not work on DPM servers for unknown reason
         public GsiftpFileWriteTest() throws Exception {super("gsiftp");}
     }
     public static class GsiftpNSCopyTest extends NSCopyTest {
