@@ -13,7 +13,26 @@
         </faq>
         <faq id="bugs">
         	<question>Bugs and limitations</question>
-        	<answer>GridFTP servers running under Windows(c) system are not supported</answer>
+        	<answer>
+        		<ul>
+        			<li>GridFTP servers running under Windows(c) system are not supported</li>
+        			<li>For the safety of your files, opening a file in Write mode with the append flag against a DPM server will be refused because DPM ignores the Append flag</li>
+        			<li>Opening a non-existing file in ReadWrite mode (with CREATE flag) against a DPM GridFTP server will fail with a 'DoesNotExist' exception:
+        			<pre>org.ogf.saga.file.File reader = (org.ogf.saga.file.File) Open Declaration org.ogf.saga.namespace.NSFactory.createNSEntry(session, fileUrl, Flags.READ.or(Flags.WRITE.or(Flags.CREATE.getValue())));
+DoesNotExist: File does not exist: &lt;FILE_URL&gt;
+	at fr.in2p3.jsaga.impl.file.stream.FileInputStreamImpl.&lt;init&gt;(FileInputStreamImpl.java:44)
+	at fr.in2p3.jsaga.impl.file.stream.FileStreamFactoryImpl.newFileInputStream(FileStreamFactoryImpl.java:29)
+	at fr.in2p3.jsaga.impl.file.AbstractSyncFileFactoryImpl.openFileInputStream(AbstractSyncFileFactoryImpl.java:73)
+	at fr.in2p3.jsaga.impl.file.AbstractSyncFileImpl.init(AbstractSyncFileImpl.java:102)
+	at fr.in2p3.jsaga.impl.file.AbstractSyncFileImpl.&lt;init&gt;(AbstractSyncFileImpl.java:42)
+	at fr.in2p3.jsaga.impl.file.AbstractAsyncFileImpl.&lt;init&gt;(AbstractAsyncFileImpl.java:32)
+	at fr.in2p3.jsaga.impl.file.FileImpl.&lt;init&gt;(FileImpl.java:30)
+	at fr.in2p3.jsaga.impl.namespace.AbstractSyncNSFactoryImpl.doCreateNSFileSync(AbstractSyncNSFactoryImpl.java:81)
+	at fr.in2p3.jsaga.impl.namespace.AbstractSyncNSFactoryImpl.doCreateNSEntrySync(AbstractSyncNSFactoryImpl.java:51)
+	at fr.in2p3.jsaga.impl.namespace.NSFactoryImpl.doCreateNSEntry(NSFactoryImpl.java:35)
+	at org.ogf.saga.namespace.NSFactory.createNSEntry(NSFactory.java:222)
+	at org.ogf.saga.namespace.NSFactory.createNSEntry(NSFactory.java:161)
+        			</pre></li></ul></answer>
         </faq>
     </part>
     <part id="security">
