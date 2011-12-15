@@ -41,7 +41,7 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
     protected boolean m_DataChannelAuthentication;
 
     protected GSSCredential m_credential;
-    protected GridFTPClient m_client;
+    protected GsiftpClient m_client;
 
     public abstract String getType();
     public abstract Usage getUsage();
@@ -78,7 +78,7 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
 
     public void disconnect() throws NoSuccessException {
         try {
-            m_client.close();
+        	m_client.disconnect();
         } catch (Exception e) {
             throw new NoSuccessException(e);
         }
@@ -113,7 +113,7 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
     public InputStream getInputStream(String absolutePath, String additionalArgs) throws PermissionDeniedException, BadParameterException, DoesNotExistException, TimeoutException, NoSuccessException {
         // create input stream
         try {
-        	return new GridFTPInputStream(m_credential, m_client.getHost(), m_client.getPort(), absolutePath);
+        	return new GsiftpInputStream(m_client, absolutePath);
         } catch (Exception e) {
             throw rethrowException(e);
         }
@@ -136,7 +136,12 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
     }
     
     public OutputStream getOutputStream(String parentAbsolutePath, String fileName, boolean exclusive, boolean append, String additionalArgs) throws PermissionDeniedException, BadParameterException, AlreadyExistsException, ParentDoesNotExist, TimeoutException, NoSuccessException {
-        String absolutePath = parentAbsolutePath+"/"+fileName;
+        
+    	// Check if Append is supported
+    	if (append && !m_client.isAppendSupported())
+    		throw new BadParameterException("'APPE' FTP command will probably not work on the remote server");
+    	
+    	String absolutePath = parentAbsolutePath+"/"+fileName;
 
         // test existence
         if (exclusive) {
@@ -146,6 +151,7 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
         // create output stream
         try {
         	return new GsiftpOutputStream(m_credential, m_client.getHost(), m_client.getPort(), absolutePath, append);
+        	//return new GsiftpOutputStream(m_client, absolutePath, append);
         } catch (Exception e) {
             try {
                 throw rethrowExceptionFull(e);
@@ -278,10 +284,11 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
         }
     }
 
-    private static GridFTPClient createConnection(GSSCredential cred, String host, int port, int tcpBufferSize, boolean reqDCAU) throws AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {
+    private static GsiftpClient createConnection(GSSCredential cred, String host, int port, int tcpBufferSize, boolean reqDCAU) throws AuthenticationFailedException, AuthorizationFailedException, TimeoutException, NoSuccessException {
         try {
     		Logger.getLogger(GsiftpDataAdaptorAbstract.class).info("Connecting to Gsiftp service at: " + host + ":" + port + "...");
-            GridFTPClient client = new GsiftpClient(host, port);
+            GsiftpClient client = new GsiftpClient(host, port);
+    		Logger.getLogger(GsiftpDataAdaptorAbstract.class).info(client.getWelcome());
             
             client.setAuthorization(HostAuthorization.getInstance());
             client.authenticate(cred);
