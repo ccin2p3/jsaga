@@ -11,6 +11,10 @@
                 please contact us so that we can fill out this FAQ.
             </answer>
         </faq>
+        <faq id="bugs">
+        	<question>Bugs and limitations</question>
+        	<answer>GridFTP servers running under Windows(c) system are not supported</answer>
+        </faq>
     </part>
     <part id="security">
         <title>Globus Security Infrastructure</title>
