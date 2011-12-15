@@ -139,7 +139,7 @@ public abstract class GsiftpDataAdaptorAbstract implements DataCopy, DataRename,
         
     	// Check if Append is supported
     	if (append && !m_client.isAppendSupported())
-    		throw new BadParameterException("'APPE' FTP command will probably not work on the remote server");
+    		throw new BadParameterException("'Append' flag will probably not work on the remote server");
     	
     	String absolutePath = parentAbsolutePath+"/"+fileName;
 
