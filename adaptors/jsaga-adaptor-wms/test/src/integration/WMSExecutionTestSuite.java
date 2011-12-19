@@ -65,4 +65,9 @@ public class WMSExecutionTestSuite extends JSAGATestSuite {
         public void test_run_cpuTimeRequirement() { super.ignore("not supported"); }
         public void test_run_inWorkingDirectory() { super.ignore("not supported"); }
     }
+
+    // test cases
+    public static class WMSJobRunInfoTest extends JobRunInfoTest {
+    	public WMSJobRunInfoTest() throws Exception {super("wms");}
+    }
 }
