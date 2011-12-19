@@ -7,7 +7,7 @@ import org.ogf.saga.error.*;
 import org.ogf.saga.url.URL;
 import org.ogf.saga.url.URLFactory;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 /* ***************************************************
@@ -64,6 +64,15 @@ public abstract class AbstractTest extends TestCase {
         }
         m_properties = new Properties();
         m_properties.load(test.openStream());
+        // may override test config
+        File developerTestProps = new File(new File(System.getProperty("user.home"), ".jsaga"), "saga-test.properties");
+        if (developerTestProps.exists()) {
+            Properties developerProps = new Properties();
+            developerProps.load(new FileInputStream(developerTestProps));
+            m_properties.putAll(developerProps);
+        }
+        // forward test config to System properties
+        System.getProperties().putAll(m_properties);
     }
 
     /** Implicitly invoked before executing each test method */
