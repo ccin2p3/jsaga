@@ -127,13 +127,18 @@ public abstract class JobRunInfoTest extends AbstractJobTest {
         // submit
         Job job = runJob(desc);
         logger.info(job.getAttribute(Job.JOBID));   // for detecting hang in run()
-
+        
         // wait for the END
         job.waitFor();
         logger.info("Job finished.");               // for detecting hang in waitFor()
 
         // check execution hosts
-        assertTrue(job.getVectorAttribute(Job.EXECUTIONHOSTS).length > 0);
+        String executionHosts[] = job.getVectorAttribute(Job.EXECUTIONHOSTS);
+        assertTrue(executionHosts.length > 0);
+        for (int i=0; i<executionHosts.length; i++) {
+        	assertNotNull(executionHosts[i]);
+        	assertFalse(executionHosts[i].equals(""));
+        }
     }
     
     
