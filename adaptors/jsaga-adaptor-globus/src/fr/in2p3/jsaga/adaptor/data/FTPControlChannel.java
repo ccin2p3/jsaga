@@ -19,7 +19,9 @@ import org.globus.ftp.vanilla.Reply;
  * ***************************************************
  * Description:                                      */
 
-//TODO: remove this class when Globus API will provide the getLastReply() method
+/**
+ * @deprecated
+ */
 public class FTPControlChannel extends org.globus.ftp.extended.GridFTPControlChannel {
 
 	private String welcomeMsg;
