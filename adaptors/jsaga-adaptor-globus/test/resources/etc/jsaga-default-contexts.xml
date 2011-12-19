@@ -5,12 +5,6 @@
             <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/globus/certificates/"/>
             <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/globus_cred.txt"/>
         </context>
-        <context type="GlobusRFC820">
-            <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/globus/certificates/"/>
-            <attribute name="UserCert" value="${user.home}/.jsaga/contexts/globus/usercert.pem"/>
-            <attribute name="UserKey" value="${user.home}/.jsaga/contexts/globus/userkey.pem"/>
-            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/perso_cred.txt"/>
-        </context>
         <context type="MyProxy">
             <attribute name="CertRepository" value="${user.home}/.globus/certificates/"/>
             <attribute name="Server" value="cclcgsrvli02.in2p3.fr:7512"/>
@@ -18,7 +12,11 @@
         </context>
     </contexts>
     <session>
-        <context type="GlobusRFC820" id="DemoCert">
+        <context type="Globus" id="DemoCert">
+            <attribute name="CertRepository" value="${user.home}/.jsaga/contexts/globus/certificates/"/>
+            <attribute name="UserCert" value="${user.home}/.jsaga/contexts/globus/usercert.pem"/>
+            <attribute name="UserKey" value="${user.home}/.jsaga/contexts/globus/userkey.pem"/>
+            <attribute name="UserProxy" value="${user.home}/.jsaga/tmp/perso_cred.txt"/>
             <job type="gatekeeper">
                 <attribute name="TcpPortRange" value="30000,31000"/>
                 <!-- <attribute name="ShellPath" value="c:\cygwin\bin\sh.exe"/>-->
