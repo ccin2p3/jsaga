@@ -4,7 +4,10 @@
 if test ! -f build/cp.txt ; then
     mvn dependency:build-classpath -Dmdep.cpFile=build/cp.txt
 fi
-export CLASSPATH="test/gatekeeper/cog-jobmanager.jar;`cat build/cp.txt`"
+cpSep=":"
+grep ';' build/cp.txt && cpSep=";"
+
+export CLASSPATH="test/gatekeeper/cog-jobmanager.jar$cpSep`cat build/cp.txt`"
 
 # set java
 if test -z "$JAVA_HOME" ; then
@@ -14,7 +17,8 @@ else
 fi
 
 # set X509_* environment variables
-USER_HOME="e:/User Settings"
+#USER_HOME="e:/User Settings"
+USER_HOME=$HOME
 X509_USER_PROXY=$USER_HOME/.jsaga/tmp/globus_cred.txt
 X509_CERT_DIR=$USER_HOME/.jsaga/contexts/globus/certificates/
 
