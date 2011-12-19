@@ -30,21 +30,16 @@ import org.globus.ftp.vanilla.Reply;
 
 public class GsiftpClient extends GridFTPClient {
 
+	public String welcomeMessage = null;
 	public GsiftpClient(String host, int port) throws IOException,
 			ServerException {
 		super(host, port);
-		//TODO: remove following lines when Globus API will provide the getLastReply() method
 
-		// Close standard GridFTPControlChannel to reopen the Channel with our object
-		// in order to get the welcome message
-		controlChannel.close();
-        controlChannel = new FTPControlChannel(host, port);
-        controlChannel.open();
+		welcomeMessage = controlChannel.getLastReply().getMessage();
 	}
 
-	// TODO: modify this method when Globus API will provide the getLastReply() method
 	public String getWelcome() {
-		return ((FTPControlChannel)controlChannel).getWelcome();
+		return this.welcomeMessage;
 	}
 	
 	public boolean isAppendSupported() {
