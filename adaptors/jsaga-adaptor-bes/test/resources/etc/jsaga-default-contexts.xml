@@ -20,15 +20,20 @@
             </job>
             <include host="i134r" domain="idp.iu.futuregrid.org"/>
         </context>
-        <context type="AxisJKS" id="GenesisII-Sierra">
+        <context type="AxisJKS" id="Unicore-Sierra">
+            <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/>
+            <job type="bes"/>
+            <include host="s79r" domain="idp.sdsc.futuregrid.org" port="8080"/>
+        </context>
+        <!-- <context type="AxisJKS" id="GenesisII-Sierra">
             <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/>
             <job type="bes">
             	<attribute name="ReferenceParameterNS" value="http://edu.virginia.vcgr.genii/ref-params"/>
             	<attribute name="ReferenceParameterName" value="resource-key"/>
             	<attribute name="ReferenceParameterValue" value="9BC75AB7-41C5-DF7F-905D-90058E35D2FB"/>
             </job>
-            <include host="s79r" domain="idp.sdsc.futuregrid.org"/>
-        </context>
+            <include host="s79r" domain="idp.sdsc.futuregrid.org" port="18443"/>
+        </context> -->
         <context type="AxisJKS" id="Cream">
             <attribute name="UserAlias" value="id cnrs de lionel schwarz #2"/>
             <job type="bes"/>
