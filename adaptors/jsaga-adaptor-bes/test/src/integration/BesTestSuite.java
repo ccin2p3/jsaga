@@ -44,17 +44,17 @@ public class BesTestSuite extends JSAGATestSuite {
         public void test_GenesisII_Futuregrid_India() throws Exception {
         	this.test_BES("bes://i134r.idp.iu.futuregrid.org:18443/axis/services/GeniiBESPortType?genii-container-id=ECBCAEC8-5FFF-11E0-B887-28C73890A7D4");
         }
-        public void test_GenesisII_Futuregrid_Sierra() throws Exception {
-        	// resource 9BC75AB7-41C5-DF7F-905D-90058E35D2FB is unknown
-        	this.test_BES("bes://s79r.idp.sdsc.futuregrid.org:18443/axis/services/GeniiBESPortType?genii-container-id=D3C0D562-DB2A-7650-1799-63AB627860A9");
-        }
+//        public void test_GenesisII_Futuregrid_Sierra() throws Exception {
+//        	// resource 9BC75AB7-41C5-DF7F-905D-90058E35D2FB is unknown
+//        	this.test_BES("bes://s79r.idp.sdsc.futuregrid.org:18443/axis/services/GeniiBESPortType?genii-container-id=D3C0D562-DB2A-7650-1799-63AB627860A9");
+//        }
         public void test_Unicore6_local() throws Exception {
         	this.test_BES("bes://localhost6:8080/DEMO-SITE/services/BESFactory?res=default_bes_factory");
         }
-        public void test_Unicore6_Futuregrid_India() throws Exception {
-        	// PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
-        	this.test_BES("bes://i134r.idp.iu.futuregrid.org:8080/DEMO-SITE/services/BESFactory?res=default_bes_factory");
-        }
+//        public void test_Unicore6_Futuregrid_India() throws Exception {
+//        	// PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+//        	this.test_BES("bes://i134r.idp.iu.futuregrid.org:8080/DEMO-SITE/services/BESFactory?res=default_bes_factory");
+//        }
         public void test_Unicore6_Futuregrid_Sierra() throws Exception {
         	//PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
         	this.test_BES("bes://s79r.idp.sdsc.futuregrid.org:8080/DEMO-SITE/services/BESFactory?res=default_bes_factory");
