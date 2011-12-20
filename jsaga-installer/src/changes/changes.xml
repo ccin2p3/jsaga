@@ -14,6 +14,7 @@
             <action dev="lschwarz" type="update">Support of asynchronous SRM LS</action>
             <action dev="lschwarz" type="fix">Removed explicit filename encoding in SFTP adaptor</action>
             <action dev="lschwarz" type="fix">Fixed various bugs in GridFTP adaptor</action>
+            <action dev="lschwarz" type="update">Upgrade cog-jglobus library from 1.4 to 1.8</action>
         </release>
         <release version="0.9.14" date="2011-08-01" description="Compatible with SAGA Java Binding v1.1.1">
             <action dev="sreynaud" type="update">Upgrade saga-api to version 1.1.1 (enable simultaneous usage of multiple SAGA implementations)</action>
