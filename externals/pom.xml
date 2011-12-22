@@ -36,8 +36,6 @@
         <module>jargon</module>
         <module>jce-jdk13</module>
         <module>jeldoclet</module>
-        <module>jsch</module>
-        <module>jzlib</module>
         <module>naregi-ss-api</module>
         <module>opensaml</module>
         <module>puretls</module>

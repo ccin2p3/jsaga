@@ -1,7 +1,0 @@
-
-com.jcraft.jsch.SftpException :
-
-Add :   
-	public int getid() {
-	  return this.id;
-  	}
