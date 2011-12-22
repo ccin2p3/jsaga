@@ -45,7 +45,6 @@
         <module>puretls</module>
         <module>vomsjapi</module>
         <module>wsgram-api</module>
-        <module>xmlsec</module>
     </modules>
     <build>
         <directory>build</directory>
