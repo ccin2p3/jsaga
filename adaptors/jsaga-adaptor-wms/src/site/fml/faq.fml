@@ -50,5 +50,20 @@ Where:
 ]]></pre>
             </answer>
         </faq>
+        <faq id="ce">
+        	<question>How to get the name of the CE chosen by the WMS ?</question>
+        	<answer>As soon as the job is in 'READY' state, the name of the destination CE is available using
+        		<pre>job.getVectorAttribute(Job.EXECUTIONHOSTS)[0]</pre>
+        	</answer>
+        </faq>
+        <faq id="wn">
+        	<question>How to get the name of the worker node where the job is running ?</question>
+        	<answer>As soon as the job is in 'RUNNING' state, the name of the WN may be accessible with
+        		<pre>job.getVectorAttribute(Job.EXECUTIONHOSTS)[1]</pre>
+        		But on some cases, the WN is not available so the array returned by 
+        		<pre>job.getVectorAttribute(Job.EXECUTIONHOSTS) </pre>
+        		will only contain one element: the CE
+        	</answer>
+        </faq>
     </part>
 </faqs>
