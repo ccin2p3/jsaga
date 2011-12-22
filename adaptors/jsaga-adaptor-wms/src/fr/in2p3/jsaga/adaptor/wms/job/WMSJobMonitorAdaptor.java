@@ -131,7 +131,22 @@ public class WMSJobMonitorAdaptor extends WMSJobAdaptorAbstract implements Query
     }
 
     public String[] getExecutionHosts(String nativeJobId) throws NotImplementedException, NoSuccessException {
-        return new String[]{this.getJobInfo(nativeJobId).getCeNode()};
+    	org.glite.wsdl.types.lb.JobStatus js = this.getJobInfo(nativeJobId);
+    	String ce = js.getDestination();
+    	String wn = js.getCeNode(); // getCeNode() gives the WN in case of Cream
+    	// If no CE, return null
+    	if (ce == null) return null;
+    	if (wn == null) { // job is scheduled on CE but not running yet
+    		return new String[]{ce};
+    	} else {
+    		// In case of old LCGCE, the getCeNode() method sometimes returns CE (as "gt2 <CE>") and not WN
+    		// In this case, ignore wn
+    		if (wn.startsWith("gt2 ")) { 
+    			return new String[]{ce};
+    		} else {
+    			return new String[]{ce, wn};
+    		}
+    	}
     }
 
     private org.glite.wsdl.types.lb.JobStatus getJobInfo(String nativeJobId) throws NoSuccessException {
