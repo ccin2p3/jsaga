@@ -47,10 +47,11 @@
             <version>0.9</version>
             <scope>compile</scope>
         </dependency>
-		<dependency>
-			<groupId>xmlsec</groupId>
-			<artifactId>xmlsec</artifactId>
-			<version>1.4.1</version>
+        <dependency>
+            <groupId>org.apache.santuario</groupId>
+            <artifactId>xmlsec</artifactId>
+            <version>1.4.5</version>
+            <scope>compile</scope>
         </dependency>
 	</dependencies>
 </project>
