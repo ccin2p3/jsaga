@@ -134,6 +134,7 @@ public abstract class JobRunInfoTest extends AbstractJobTest {
 
         // check execution hosts
         String executionHosts[] = job.getVectorAttribute(Job.EXECUTIONHOSTS);
+        assertFalse(executionHosts == null);
         assertTrue(executionHosts.length > 0);
         for (int i=0; i<executionHosts.length; i++) {
         	assertNotNull(executionHosts[i]);
