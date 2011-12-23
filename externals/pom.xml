@@ -34,7 +34,6 @@
         <module>glite-ce-cream-api-java</module>
         <module>glite-ce-delegation</module>
         <module>jargon</module>
-        <module>jce-jdk13</module>
         <module>jeldoclet</module>
         <module>naregi-ss-api</module>
         <module>opensaml</module>
