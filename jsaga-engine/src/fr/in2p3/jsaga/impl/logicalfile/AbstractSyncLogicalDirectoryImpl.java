@@ -107,7 +107,12 @@ public abstract class AbstractSyncLogicalDirectoryImpl extends AbstractNSDirecto
         new FlagsHelper(flags).allowed(Flags.DEREFERENCE, Flags.RECURSIVE);
         if (Flags.DEREFERENCE.isSet(flags)) {
             try {
-                return ((AbstractSyncLogicalDirectoryImpl)this._dereferenceDir()).findSync(namePattern, attrPattern, flags - Flags.DEREFERENCE.getValue());
+                AbstractSyncLogicalDirectoryImpl entry = (AbstractSyncLogicalDirectoryImpl) this._dereferenceDir();
+                try {
+                    return entry.findSync(namePattern, attrPattern, flags - Flags.DEREFERENCE.getValue());
+                } finally {
+                    entry.close();
+                }
             } catch (IncorrectURLException e) {
                 throw new NoSuccessException(e);
             }

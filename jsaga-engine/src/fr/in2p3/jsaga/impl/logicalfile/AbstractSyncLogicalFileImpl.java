@@ -110,7 +110,12 @@ public abstract class AbstractSyncLogicalFileImpl extends AbstractNSEntryImplWit
     public void copySync(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, AlreadyExistsException, TimeoutException, NoSuccessException, IncorrectURLException {
         new FlagsHelper(flags).allowed(JSAGAFlags.PRESERVETIMES, Flags.DEREFERENCE, Flags.CREATEPARENTS, Flags.OVERWRITE);
         if (Flags.DEREFERENCE.isSet(flags)) {
-            this._dereferenceEntry().copySync(target, flags - Flags.DEREFERENCE.getValue());
+            AbstractSyncNSEntryImpl targetEntry = this._dereferenceEntry();
+            try {
+                targetEntry.copySync(target, flags - Flags.DEREFERENCE.getValue());
+            } finally {
+                targetEntry.close();
+            }
             return; //==========> EXIT
         }
         URL effectiveTarget = this._getEffectiveURL(target);
@@ -118,12 +123,15 @@ public abstract class AbstractSyncLogicalFileImpl extends AbstractNSEntryImplWit
             // throw NotImplementedException if can not preserve times
             long sourceTimes = this.getMTime();
             AbstractNSEntryImpl targetEntry = super._getTargetEntry_checkPreserveTimes(effectiveTarget);
+            try {
+                // copy
+                new LogicalFileCopy(m_session, this, m_adaptor).copy(effectiveTarget, flags);
 
-            // copy
-            new LogicalFileCopy(m_session, this, m_adaptor).copy(effectiveTarget, flags);
-
-            // preserve times
-            targetEntry.setMTime(sourceTimes);
+                // preserve times
+                targetEntry.setMTime(sourceTimes);
+            } finally {
+                targetEntry.close();
+            }
         } else {
             // copy only
             new LogicalFileCopy(m_session, this, m_adaptor).copy(effectiveTarget, flags);
@@ -133,7 +141,12 @@ public abstract class AbstractSyncLogicalFileImpl extends AbstractNSEntryImplWit
     public void copyFromSync(URL source, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException, IncorrectURLException {
         new FlagsHelper(flags).allowed(JSAGAFlags.PRESERVETIMES, Flags.DEREFERENCE, Flags.OVERWRITE);
         if (Flags.DEREFERENCE.isSet(flags)) {
-            this._dereferenceEntry().copyFromSync(source, flags - Flags.DEREFERENCE.getValue());
+            AbstractSyncNSEntryImpl entry = this._dereferenceEntry();
+            try {
+                entry.copyFromSync(source, flags - Flags.DEREFERENCE.getValue());
+            } finally {
+                entry.close();
+            }
             return; //==========> EXIT
         }
         URL effectiveSource = this._getEffectiveURL(source);
@@ -251,8 +264,11 @@ public abstract class AbstractSyncLogicalFileImpl extends AbstractNSEntryImplWit
             }
             URL physicalSource = locations.get(0);
             NSEntry physicalSourceEntry = NSFactory.createNSEntry(JSAGA_FACTORY, m_session, physicalSource, Flags.NONE.getValue());
-            physicalSourceEntry.copy(physicalTarget, flags);
-            physicalSourceEntry.close();
+            try {
+                physicalSourceEntry.copy(physicalTarget, flags);
+            } finally {
+                physicalSourceEntry.close();
+            }
         }
         catch (NotImplementedException e) {throw new NotImplementedException(MESSAGE, e);}
         catch (IncorrectURLException e) {throw new IncorrectURLException(MESSAGE, e);}

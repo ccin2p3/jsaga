@@ -10,6 +10,8 @@ import fr.in2p3.jsaga.helpers.SAGAPattern;
 import fr.in2p3.jsaga.impl.url.*;
 import fr.in2p3.jsaga.sync.namespace.SyncNSDirectory;
 import fr.in2p3.jsaga.sync.namespace.SyncNSEntry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.ogf.saga.error.*;
 import org.ogf.saga.namespace.Flags;
 import org.ogf.saga.namespace.NSFactory;
@@ -19,6 +21,7 @@ import org.ogf.saga.url.URLFactory;
 
 import java.util.*;
 import java.util.regex.Pattern;
+import org.ogf.saga.namespace.NSEntry;
 
 /* ***************************************************
  * *** Centre de Calcul de l'IN2P3 - Lyon (France) ***
@@ -33,15 +36,18 @@ import java.util.regex.Pattern;
  *
  */
 public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl implements SyncNSDirectory {
+
     /** constructor for factory */
     protected AbstractSyncNSDirectoryImpl(Session session, URL url, DataAdaptor adaptor, int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         super(session, URLHelper.toDirectoryURL(url), adaptor, flags);
         boolean initOK = false;
         try {
-        	this.init(flags);
-        	initOK = true;
+            this.init(flags);
+            initOK = true;
         } finally {
-        	if (!initOK) this.close();
+            if (!initOK) {
+                this.close();
+            }
         }
     }
 
@@ -58,13 +64,15 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
     }
 
     private void init(int flags) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        if(Flags.CREATEPARENTS.isSet(flags)) flags=Flags.CREATE.or(flags);
+        if (Flags.CREATEPARENTS.isSet(flags)) {
+            flags = Flags.CREATE.or(flags);
+        }
         new FlagsHelper(flags).allowed(JSAGAFlags.BYPASSEXIST, Flags.ALLNAMESPACEFLAGS);
         if (Flags.CREATE.isSet(flags)) {
             if (m_adaptor instanceof DataWriterAdaptor) {
                 if ("/".equals(m_url.getPath())) {
                     if (Flags.EXCL.isSet(flags)) {
-                        throw new AlreadyExistsException("Not allowed to create root directory: "+ m_url.toString(), this);
+                        throw new AlreadyExistsException("Not allowed to create root directory: " + m_url.toString(), this);
                     } else {
                         return;
                     }
@@ -73,42 +81,41 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
                 String directoryName = super._getEntryName();
                 try {
                     // try to make current directory
-                    ((DataWriterAdaptor)m_adaptor).makeDir(parent.getPath(), directoryName, m_url.getQuery());
-                } catch(ParentDoesNotExist e) {
+                    ((DataWriterAdaptor) m_adaptor).makeDir(parent.getPath(), directoryName, m_url.getQuery());
+                } catch (ParentDoesNotExist e) {
                     // make parent directories, then retry
                     if (Flags.CREATEPARENTS.isSet(flags)) {
                         this._makeParentDirs();
                         try {
-                            ((DataWriterAdaptor)m_adaptor).makeDir(parent.getPath(), directoryName, m_url.getQuery());
+                            ((DataWriterAdaptor) m_adaptor).makeDir(parent.getPath(), directoryName, m_url.getQuery());
                         } catch (ParentDoesNotExist e2) {
-                            throw new DoesNotExistException("Failed to create parent directory: "+parent, e.getCause());
+                            throw new DoesNotExistException("Failed to create parent directory: " + parent, e.getCause());
                         }
                     } else {
-                        throw new DoesNotExistException("Parent directory does not exist: "+parent, e.getCause());
+                        throw new DoesNotExistException("Parent directory does not exist: " + parent, e.getCause());
                     }
-                } catch(AlreadyExistsException e) {
+                } catch (AlreadyExistsException e) {
                     if (Flags.EXCL.isSet(flags)) {
-                        throw new AlreadyExistsException("Entry already exists: "+ m_url, e.getCause());
+                        throw new AlreadyExistsException("Entry already exists: " + m_url, e.getCause());
                     }
                 }
             } else {
-                throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme());
+                throw new NotImplementedException("Not supported for this protocol: " + m_url.getScheme());
             }
         } else if (Flags.CREATEPARENTS.isSet(flags)) {
             this._makeParentDirs();
-        } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !((AbstractURLImpl)m_url).hasCache() && m_adaptor instanceof DataReaderAdaptor) {
-            boolean exists = ((DataReaderAdaptor)m_adaptor).exists(m_url.getPath(), m_url.getQuery());
-            if (! exists) {
-                throw new DoesNotExistException("Directory does not exist: "+ m_url);
+        } else if (!JSAGAFlags.BYPASSEXIST.isSet(flags) && !((AbstractURLImpl) m_url).hasCache() && m_adaptor instanceof DataReaderAdaptor) {
+            boolean exists = ((DataReaderAdaptor) m_adaptor).exists(m_url.getPath(), m_url.getQuery());
+            if (!exists) {
+                throw new DoesNotExistException("Directory does not exist: " + m_url);
             }
         }
     }
 
     ////////////////////////////////////////// interface SyncNSDirectory //////////////////////////////////////////
-
     public void changeDirSync(URL dir) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
-        if (dir.getScheme()!=null || dir.getUserInfo()!=null || dir.getHost()!=null) {
-            throw new IncorrectURLException("Was expecting a absolute/relative path instead of: "+dir.toString());
+        if (dir.getScheme() != null || dir.getUserInfo() != null || dir.getHost() != null) {
+            throw new IncorrectURLException("Was expecting a absolute/relative path instead of: " + dir.toString());
         }
         m_url = _resolveRelativeUrl(m_url, dir);
     }
@@ -124,6 +131,7 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
     public List<URL> listSync(String pattern, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
         return this._list(pattern, flags);
     }
+
     public List<URL> listSync(String pattern) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
         return this.listSync(pattern, Flags.NONE.getValue());
     }
@@ -131,6 +139,7 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
     public List<URL> listSync(int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
         return this._list(null, flags);
     }
+
     public List<URL> listSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, IncorrectURLException {
         return this.listSync(Flags.NONE.getValue());
     }
@@ -145,25 +154,25 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
         FileAttributes[] childs;
         try {
             if (m_adaptor instanceof DataFilteredList && pattern.endsWith("/")) {
-                childs = ((DataFilteredList)m_adaptor).listDirectories(
+                childs = ((DataFilteredList) m_adaptor).listDirectories(
                         m_url.getPath(),
                         m_url.getQuery());
             } else if (m_adaptor instanceof DataReaderAdaptor) {
-                childs = ((DataReaderAdaptor)m_adaptor).listAttributes(
+                childs = ((DataReaderAdaptor) m_adaptor).listAttributes(
                         m_url.getPath(),
                         m_url.getQuery());
             } else {
-                throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
+                throw new NotImplementedException("Not supported for this protocol: " + m_url.getScheme(), this);
             }
         } catch (DoesNotExistException e) {
-            throw new IncorrectStateException("Directory does not exist: "+m_url, e);
+            throw new IncorrectStateException("Directory does not exist: " + m_url, e);
         }
 
         // filter
         Pattern p = SAGAPattern.toRegexp(pattern);
         List<URL> matchingNames = new ArrayList<URL>();
-        for (int i=0; i<childs.length; i++) {
-            if (p==null || p.matcher(childs[i].getRelativePath()).matches()) {
+        for (int i = 0; i < childs.length; i++) {
+            if (p == null || p.matcher(childs[i].getRelativePath()).matches()) {
                 URL childUrl = URLFactoryImpl.createURLWithCache(childs[i]);
                 matchingNames.add(childUrl);
             }
@@ -187,10 +196,11 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
             Pattern p = SAGAPattern.toRegexp(pattern);
             this._doFind(p, flags, matchingPath, CURRENT_DIR_RELATIVE_PATH);
         } else {
-            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: " + m_url.getScheme(), this);
         }
         return matchingPath;
     }
+
     public List<URL> findSync(String pattern) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         return this.findSync(pattern, Flags.RECURSIVE.getValue());
     }
@@ -198,30 +208,36 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
     private void _doFind(Pattern p, int flags, List<URL> matchingPath, URL currentRelativePath) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         // for each child
         FileAttributes[] childs = this._listAttributes(m_url.getPath());
-        for (int i=0; i<childs.length; i++) {
+        for (int i = 0; i < childs.length; i++) {
             // set child relative path
             URL childRelativePath = URLHelper.createURL(currentRelativePath, childs[i].getRelativePath());
             // add child relative path to matching list
-            if (p==null || p.matcher(childs[i].getRelativePath()).matches()) {
+            if (p == null || p.matcher(childs[i].getRelativePath()).matches()) {
                 matchingPath.add(childRelativePath);
             }
             // may recurse
-            if (Flags.RECURSIVE.isSet(flags) && childs[i].getType()==FileAttributes.TYPE_DIRECTORY) {
+            if (Flags.RECURSIVE.isSet(flags) && childs[i].getType() == FileAttributes.TYPE_DIRECTORY) {
                 AbstractSyncNSDirectoryImpl childDir;
                 try {
                     URL childDirName = URLFactory.createURL(JSAGA_FACTORY, childs[i].getRelativePath());
                     childDir = (AbstractSyncNSDirectoryImpl) this._openNSDir(childDirName);
+                    try {
+                        childDir._doFind(p, flags, matchingPath, childRelativePath);
+                    } finally {
+                        childDir.close();
+                    }
                 } catch (IncorrectURLException e) {
                     throw new NoSuccessException(e);
                 }
-                childDir._doFind(p, flags, matchingPath, childRelativePath);
             }
         }
     }
 
     public boolean existsSync(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
         try {
-            this._openNSEntryWithDoesNotExist(name);
+            SyncNSEntry entry = this._openNSEntryWithDoesNotExist(name);
+            ((NSEntry) entry).close();
+	    //System.out.println("Entry exists " + name);
             return true;
         } catch (DoesNotExistException e) {
             return false;
@@ -229,32 +245,57 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
     }
 
     public long getMTimeSync(URL name) throws NotImplementedException, IncorrectURLException, DoesNotExistException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException {
-        return this._openNSEntryWithDoesNotExist(name).getMTimeSync();
+        SyncNSEntry entry = this._openNSEntryWithDoesNotExist(name);
+        try {
+            return entry.getMTimeSync();
+        } finally {
+            ((NSEntry) entry).close();
+        }
     }
 
     public boolean isDirSync(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, DoesNotExistException {
-        return this._openNSEntryWithDoesNotExist(name).isDirSync();
+        SyncNSEntry entry = this._openNSEntryWithDoesNotExist(name);
+        try {
+            return entry.isDirSync();
+        } finally {
+            ((NSEntry) entry).close();
+        }
     }
 
     public boolean isEntrySync(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, DoesNotExistException {
-        return this._openNSEntryWithDoesNotExist(name).isEntrySync();
+        SyncNSEntry entry = this._openNSEntryWithDoesNotExist(name);
+        try {
+            return entry.isEntrySync();
+        } finally {
+            ((NSEntry) entry).close();
+        }
     }
 
     public boolean isLinkSync(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, DoesNotExistException {
-        return this._openNSEntryWithDoesNotExist(name).isLinkSync();
+        SyncNSEntry entry = this._openNSEntryWithDoesNotExist(name);
+        try {
+            return entry.isLinkSync();
+        } finally {
+            ((NSEntry) entry).close();
+        }
     }
 
     public URL readLinkSync(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, TimeoutException, NoSuccessException, DoesNotExistException {
-        return this._openNSEntryWithDoesNotExist(name).readLinkSync();
+        SyncNSEntry entry = this._openNSEntryWithDoesNotExist(name);
+        try {
+            return entry.readLinkSync();
+        } finally {
+            ((NSEntry) entry).close();
+        }
     }
-
     private String[] m_entriesCache = null;
+
     public int getNumEntriesSync() throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         if (m_adaptor instanceof DataReaderAdaptor) {
             m_entriesCache = this._listNames(m_url.getPath());
             return m_entriesCache.length;
         } else {
-            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: " + m_url.getScheme(), this);
         }
     }
 
@@ -270,16 +311,22 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
                     throw new NoSuccessException(e);
                 }
             } else {
-                throw new DoesNotExistException("Invalid index: "+entry, this);
+                throw new DoesNotExistException("Invalid index: " + entry, this);
             }
         } else {
-            throw new NotImplementedException("Not supported for this protocol: "+ m_url.getScheme(), this);
+            throw new NotImplementedException("Not supported for this protocol: " + m_url.getScheme(), this);
         }
     }
 
     public void copySync(URL source, URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        this._openNSEntry(source).copySync(target, flags);
+        SyncNSEntry entry = this._openNSEntry(source);
+        try {
+            entry.copySync(target, flags);
+        } finally {
+            ((NSEntry) entry).close();
+        }
     }
+
     public void copySync(URL source, URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         this.copySync(source, target, Flags.NONE.getValue());
     }
@@ -287,20 +334,37 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
     public void copySync(String sourcePattern, URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (SAGAPattern.hasWildcard(sourcePattern)) {
             for (URL source : this.listSync(sourcePattern)) {
-                this._openNSEntry(source).copySync(target, flags);
+                SyncNSEntry entry = this._openNSEntry(source);
+                try {
+                    entry.copySync(target, flags);
+                } finally {
+                    ((NSEntry) entry).close();
+                }
             }
         } else {
             URL source = URLFactory.createURL(JSAGA_FACTORY, sourcePattern);
-            this._openNSEntry(source).copySync(target, flags);
+            SyncNSEntry entry = this._openNSEntry(source);
+            try {
+                entry.copySync(target, flags);
+            } finally {
+                ((NSEntry) entry).close();
+            }
         }
     }
+
     public void copySync(String sourcePattern, URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         this.copySync(sourcePattern, target, Flags.NONE.getValue());
     }
 
     public void linkSync(URL source, URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        this._openNSEntry(source).linkSync(target, flags);
+        SyncNSEntry entry = this._openNSEntry(source);
+        try {
+            entry.linkSync(target, flags);
+        } finally {
+            ((NSEntry) entry).close();
+        }
     }
+
     public void linkSync(URL source, URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         this.linkSync(source, target, Flags.NONE.getValue());
     }
@@ -308,20 +372,33 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
     public void linkSync(String sourcePattern, URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (SAGAPattern.hasWildcard(sourcePattern)) {
             for (URL source : this.listSync(sourcePattern)) {
-                this._openNSEntry(source);
+                SyncNSEntry entry = this._openNSEntry(source);
+                ((NSEntry) entry).close();
             }
         } else {
             URL source = URLFactory.createURL(JSAGA_FACTORY, sourcePattern);
-            this._openNSEntry(source).linkSync(target, flags);
+            SyncNSEntry entry = this._openNSEntry(source);
+            try {
+                entry.linkSync(target, flags);
+            } finally {
+                ((NSEntry) entry).close();
+            }
         }
     }
+
     public void linkSync(String sourcePattern, URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         this.linkSync(sourcePattern, target, Flags.NONE.getValue());
     }
 
     public void moveSync(URL source, URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
-        this._openNSEntry(source).moveSync(target, flags);
+        SyncNSEntry entry = this._openNSEntry(source);
+        try {
+            entry.moveSync(target, flags);
+        } finally {
+            ((NSEntry) entry).close();
+        }
     }
+
     public void moveSync(URL source, URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         this.moveSync(source, target, Flags.NONE.getValue());
     }
@@ -329,20 +406,33 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
     public void moveSync(String sourcePattern, URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (SAGAPattern.hasWildcard(sourcePattern)) {
             for (URL source : this.listSync(sourcePattern)) {
-                this._openNSEntry(source);
+                SyncNSEntry entry = this._openNSEntry(source);
+                ((NSEntry) entry).close();
             }
         } else {
             URL source = URLFactory.createURL(JSAGA_FACTORY, sourcePattern);
-            this._openNSEntry(source).moveSync(target, flags);
+            SyncNSEntry entry = this._openNSEntry(source);
+            try {
+                entry.moveSync(target, flags);
+            } finally {
+                ((NSEntry) entry).close();
+            }
         }
     }
+
     public void moveSync(String sourcePattern, URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         this.moveSync(sourcePattern, target, Flags.NONE.getValue());
     }
 
     public void removeSync(URL target, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
-        this._openNSEntry(target).removeSync(flags);
+        SyncNSEntry entry = this._openNSEntry(target);
+        try {
+            entry.removeSync(flags);
+        } finally {
+            ((NSEntry) entry).close();
+        }
     }
+
     public void removeSync(URL target) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         this.removeSync(target, Flags.NONE.getValue());
     }
@@ -350,13 +440,24 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
     public void removeSync(String targetPattern, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         if (SAGAPattern.hasWildcard(targetPattern)) {
             for (URL target : this.listSync(targetPattern)) {
-                this._openNSEntry(target).removeSync(flags);
+                SyncNSEntry entry = this._openNSEntry(target);
+                try {
+                    entry.removeSync(flags);
+                } finally {
+                    ((NSEntry) entry).close();
+                }
             }
         } else {
             URL target = URLFactory.createURL(JSAGA_FACTORY, targetPattern);
-            this._openNSEntry(target).removeSync(flags);
+            SyncNSEntry entry = this._openNSEntry(target);
+            try {
+                entry.removeSync(flags);
+            } finally {
+                ((NSEntry) entry).close();
+            }
         }
     }
+
     public void removeSync(String targetPattern) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectURLException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         this.removeSync(targetPattern, Flags.NONE.getValue());
     }
@@ -365,13 +466,20 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
         int makeDirFlags = Flags.CREATE.or(flags);
         NSFactory.createNSDirectory(JSAGA_FACTORY, m_session, target, makeDirFlags).close();
     }
+
     public void makeDirSync(URL target) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, AlreadyExistsException, DoesNotExistException, TimeoutException, NoSuccessException {
         this.makeDirSync(target, Flags.NONE.getValue());
     }
 
     public void permissionsAllowSync(URL target, String id, int permissions, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, TimeoutException, NoSuccessException {
-        this._openNSEntry(target, flags).permissionsAllow(id, permissions);
+        SyncNSEntry entry = this._openNSEntry(target, flags);
+        try {
+            entry.permissionsAllow(id, permissions);
+        } finally {
+            ((NSEntry) entry).close();
+        }
     }
+
     public void permissionsAllowSync(URL target, String id, int permissions) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, TimeoutException, NoSuccessException {
         this.permissionsAllowSync(target, id, permissions, Flags.NONE.getValue());
     }
@@ -380,21 +488,40 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
         if (SAGAPattern.hasWildcard(targetPattern)) {
             try {
                 for (URL target : this.listSync(targetPattern)) {
-                    this._openNSEntry(target, flags).permissionsAllow(id, permissions);
+                    SyncNSEntry entry = this._openNSEntry(target, flags);
+                    try {
+                        entry.permissionsAllow(id, permissions);
+                    } finally {
+                        ((NSEntry) entry).close();
+                    }
                 }
-            } catch(IncorrectURLException e) {throw new NoSuccessException(e);}
+            } catch (IncorrectURLException e) {
+                throw new NoSuccessException(e);
+            }
         } else {
             URL target = URLFactory.createURL(JSAGA_FACTORY, targetPattern);
-            this._openNSEntry(target, flags).permissionsAllow(id, permissions);
+            SyncNSEntry entry = this._openNSEntry(target, flags);
+            try {
+                entry.permissionsAllow(id, permissions);
+            } finally {
+                ((NSEntry) entry).close();
+            }
         }
     }
+
     public void permissionsAllowSync(String targetPattern, String id, int permissions) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, IncorrectStateException, BadParameterException, TimeoutException, NoSuccessException {
         this.permissionsAllowSync(targetPattern, id, permissions, Flags.NONE.getValue());
     }
 
     public void permissionsDenySync(URL target, String id, int permissions, int flags) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
-        this._openNSEntry(target, flags).permissionsDeny(id, permissions);
+        SyncNSEntry entry = this._openNSEntry(target, flags);
+        try {
+            entry.permissionsDeny(id, permissions);
+        } finally {
+            ((NSEntry) entry).close();
+        }
     }
+
     public void permissionsDenySync(URL target, String id, int permissions) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         this.permissionsDenySync(target, id, permissions, Flags.NONE.getValue());
     }
@@ -403,22 +530,36 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
         if (SAGAPattern.hasWildcard(targetPattern)) {
             try {
                 for (URL target : this.listSync(targetPattern)) {
-                    this._openNSEntry(target, flags).permissionsDeny(id, permissions);
+                    SyncNSEntry entry = this._openNSEntry(target, flags);
+                    try {
+                        entry.permissionsDeny(id, permissions);
+                    } finally {
+                        ((NSEntry) entry).close();
+                    }
                 }
-            } catch(IncorrectURLException e) {throw new NoSuccessException(e);
-            } catch(IncorrectStateException e) {throw new NoSuccessException(e);}
+            } catch (IncorrectURLException e) {
+                throw new NoSuccessException(e);
+            } catch (IncorrectStateException e) {
+                throw new NoSuccessException(e);
+            }
         } else {
             URL target = URLFactory.createURL(JSAGA_FACTORY, targetPattern);
-            this._openNSEntry(target, flags).permissionsDeny(id, permissions);
+            SyncNSEntry entry = this._openNSEntry(target, flags);
+            try {
+                entry.permissionsDeny(id, permissions);
+            } finally {
+                ((NSEntry) entry).close();
+            }
+
         }
     }
+
     public void permissionsDenySync(String targetPattern, String id, int permissions) throws NotImplementedException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, TimeoutException, NoSuccessException {
         this.permissionsDenySync(targetPattern, id, permissions, Flags.NONE.getValue());
     }
-
     ///////////////////////////////////////// protected methods /////////////////////////////////////////
-
     protected static URL CURRENT_DIR_RELATIVE_PATH;
+
     static {
         try {
             CURRENT_DIR_RELATIVE_PATH = URLFactory.createURL(JSAGA_FACTORY, "./");
@@ -430,7 +571,7 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
     private String[] _listNames(String absolutePath) throws NotImplementedException, PermissionDeniedException, IncorrectStateException, TimeoutException, NoSuccessException {
         FileAttributes[] files = this._listAttributes(absolutePath);
         String[] filenames = new String[files.length];
-        for (int i=0; i<files.length; i++) {
+        for (int i = 0; i < files.length; i++) {
             filenames[i] = files[i].getRelativePath();
         }
         return filenames;
@@ -449,6 +590,7 @@ public abstract class AbstractSyncNSDirectoryImpl extends AbstractNSEntryDirImpl
             throw new NoSuccessException(e);
         }
     }
+
     private SyncNSEntry _openNSEntryWithDoesNotExist(URL name) throws NotImplementedException, IncorrectURLException, AuthenticationFailedException, AuthorizationFailedException, PermissionDeniedException, BadParameterException, IncorrectStateException, DoesNotExistException, TimeoutException, NoSuccessException {
         try {
             return (SyncNSEntry) this.open(name, Flags.NONE.getValue());
